@@ -1289,19 +1289,25 @@ igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *resul
     igraph_integer_t counter, rootdfs = 0;
     igraph_bool_t is_biconnected = true;
 
-    if (
-        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
-        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) ||
-        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST))
-    ) {
+    if (no_of_nodes == 0 || no_of_nodes == 1) {
+        /* The null graph is not connected, hence it is not biconnected either.
+         * The singleton graph is not biconnected. */
         is_biconnected = false;
         goto exit2;
     }
 
-    if (no_of_nodes == 0 || no_of_nodes == 1) {
-        /* The null graph is not connected, hence it is not biconnected either.
-         * The singleton graph is not biconnected. */
+    /* no_of_nodes == 2 is special: if the two nodes are connected, then the
+     * graph is both biconnected _and_ acyclic, unlike no_of_nodes >= 3, where
+     * the graph is not acyclic if it is biconnected. */
+
+    /* We do not touch the cache for graphs with less than three nodes because
+     * of all the edge cases. */
+    if (no_of_nodes >= 3 && (
+        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) ||
+        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST))
+    )) {
         is_biconnected = false;
         goto exit2;
     }
@@ -1395,7 +1401,9 @@ exit2:
         *result = is_biconnected;
     }
 
-    if (is_biconnected) {
+    /* We do not touch the cache for graphs with less than three nodes because
+     * of all the edge cases. */
+    if (is_biconnected && no_of_nodes > 2) {
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
     }
