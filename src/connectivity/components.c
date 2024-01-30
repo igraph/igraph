@@ -1278,7 +1278,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * \example examples/simple/igraph_is_biconnected.c
  */
 
-igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result) {
+igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *res) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t nextptr;
@@ -1397,8 +1397,8 @@ exit:
 
 exit2:
 
-    if (result) {
-        *result = is_biconnected;
+    if (res) {
+        *res = is_biconnected;
     }
 
     /* We do not touch the cache for graphs with less than three nodes because
