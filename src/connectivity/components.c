@@ -1251,6 +1251,8 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * \function igraph_is_biconnected
  * \brief Checks whether a graph is biconnected.
  *
+ * \experimental
+ *
  * A graph is biconnected if the removal of any single vertex (and
  * its incident edges) does not disconnect it.
  *
