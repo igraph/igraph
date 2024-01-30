@@ -981,8 +981,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  *
  * </para><para>
  * Use \ref igraph_is_biconnected() if you are only interested in whether the
- * graph has at least one articulation point: if it is biconnected, it does not
- * have any articulation points, otherwise it has at least one.
+ * graph has precisely one biconnected component.
  *
  * \param graph The input graph. It will be treated as undirected.
  * \param res Pointer to an initialized vector, the
@@ -1269,7 +1268,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * two connected vertices as biconnected, however, igraph does.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param result If not a NULL pointer, the result will be returned here.
+ * \param result If not a \c NULL pointer, the result will be returned here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
