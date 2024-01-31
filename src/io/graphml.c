@@ -1609,7 +1609,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     libxml_old_structured_error_handler = xmlStructuredError;
     libxml_old_structured_error_context = xmlStructuredErrorContext;
     xmlSetGenericErrorFunc(&state, &igraph_i_libxml_generic_error_handler);
-    xmlSetStructuredErrorFunc(&state, (xmlStructuredErrorFunc)&igraph_i_libxml_structured_error_handler);
+    xmlSetStructuredErrorFunc(&state, &igraph_i_libxml_structured_error_handler);
 
     /* Okay, parsing will start now. The parser might do things that eventually
      * trigger the igraph error handler, but we want the parser state to
