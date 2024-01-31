@@ -4,7 +4,7 @@
 
 ### Added
 
- - `igraph_is_biconnected()` checks if a graph is biconnected. It provides a faster way to check biconnectedness than `igraph_biconnecte_components()` did.
+ - `igraph_is_biconnected()` checks if a graph is biconnected.
 
 ### Fixed
 
