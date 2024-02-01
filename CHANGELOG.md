@@ -11,7 +11,8 @@
  - More robust error handling in HRG code.
  - Fixed infinite loop in `igraph_hrg_sample_many()`.
  - `igraph_community_fastgreedy()` no longer crashes when providing a modularity vector only, but not a merges matrix of membership vector.
- - Compatibility with libxml2 version 2.12.
+ - The graph property cache was not initialized correctly on systems where the size of `bool` was not 1 byte (#2477).
+ - Compatibility with libxml2 version 2.12 (#2442).
 
 ### Deprecated
 
