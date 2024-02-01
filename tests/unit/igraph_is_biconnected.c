@@ -83,8 +83,7 @@ int main(void) {
     /* Two disjoint cycles */
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
                  0,1, 1,2, 2,0, 3,4, 4,5, 5,3,
-                 -1
-                 );
+                 -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
     igraph_destroy(&g);
@@ -92,8 +91,15 @@ int main(void) {
     /* Cycle + isolated vertex */
     igraph_small(&g, 4, IGRAPH_UNDIRECTED,
                  0,1, 1,2, 2,0,
-                 -1
-                 );
+                 -1);
+    igraph_is_biconnected(&g, &result);
+    IGRAPH_ASSERT(!result);
+    igraph_destroy(&g);
+
+    /* Special case: the root is an articulation point */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 2,0, 0,3, 3,4, 4,0,
+                 -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
     igraph_destroy(&g);
