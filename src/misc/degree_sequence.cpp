@@ -897,7 +897,7 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %s graph.",
+    IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %sgraph.",
                   IGRAPH_EINVAL, multiedges ? "multi" : "simple ");
 }
 
@@ -1124,6 +1124,6 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %s graph.",
+    IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %sgraph.",
                  IGRAPH_EINVAL, multiedges ? "multi" : "simple ");
 }
