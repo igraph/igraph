@@ -1,7 +1,7 @@
 /*
   IGraph library.
   Constructing realizations of degree sequences and bi-degree sequences.
-  Copyright (C) 2018-2020  The igraph development team <igraph@igraph.org>
+  Copyright (C) 2018-2024  The igraph development team <igraph@igraph.org>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -787,12 +787,19 @@ igraph_error_t igraph_realize_degree_sequence(
     }
 }
 
-// Uses index order to construct an undirected bipartite graph. Deg1 is considered to range from index [0, len(deg1)[,
-// so for this implementation deg1 is always the source degree sequence and deg2 is always the dest degree sequence.
-static igraph_error_t igraph_i_realize_undirected_bipartite_index(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_bool_t multiedges) {
+
+// Uses index order to construct an undirected bipartite graph.
+// degree1 is considered to range from index [0, len(degree1)[,
+// so for this implementation degree1 is always the source degree
+// sequence and degree2 is always the dest degree sequence.
+static igraph_error_t igraph_i_realize_undirected_bipartite_index(
+    igraph_t *graph,
+    const igraph_vector_int_t *degree1, const igraph_vector_int_t *degree2,
+    igraph_bool_t multiedges
+) {
     igraph_integer_t ec = 0; // The number of edges added so far
-    igraph_integer_t n1 = igraph_vector_int_size(deg1);
-    igraph_integer_t n2 = igraph_vector_int_size(deg2);
+    igraph_integer_t n1 = igraph_vector_int_size(degree1);
+    igraph_integer_t n2 = igraph_vector_int_size(degree2);
     igraph_vector_int_t edges;
     igraph_integer_t ds1_sum;
     igraph_integer_t ds2_sum;
@@ -802,15 +809,16 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(igraph_t *grap
     std::vector<vd_pair> *src_vs = &vertices1;
     std::vector<vd_pair> *dest_vs = &vertices2;
 
-    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg1, &ds1_sum));
-    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg2, &ds2_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degree1, &ds1_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degree2, &ds2_sum));
 
     if (ds1_sum != ds2_sum) {
         goto fail;
     }
+
     // If both degree sequences are empty, it's bigraphical
     if (!(n1 == 0 && n2 == 0)) {
-        if (igraph_vector_int_min(deg1) < 0 || igraph_vector_int_min(deg2) < 0){
+        if (igraph_vector_int_min(degree1) < 0 || igraph_vector_int_min(degree2) < 0){
             goto fail;
         }
     }
@@ -819,10 +827,10 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(igraph_t *grap
     vertices2.reserve(n2);
 
     for (igraph_integer_t i = 0; i < n1; i++) {
-        vertices1.push_back(vd_pair(i, VECTOR(*deg1)[i]));
+        vertices1.push_back(vd_pair(i, VECTOR(*degree1)[i]));
     }
     for (igraph_integer_t i=0; i < n2; i++) {
-        vertices2.push_back(vd_pair(i+n1, VECTOR(*deg2)[i]));
+        vertices2.push_back(vd_pair(i+n1, VECTOR(*degree2)[i]));
     }
 
     IGRAPH_CHECK(igraph_vector_int_init(&edges, ds1_sum+ds2_sum));
@@ -889,30 +897,58 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(igraph_t *grap
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERROR("Degree sequences of input partitions cannot be realized as a bipartite graph.", IGRAPH_EINVAL);
+    IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %s graph.",
+                  IGRAPH_EINVAL, multiedges ? "multi" : "simple ");
 }
 
 /**
  * \function igraph_realize_bipartite_degree_sequence
- * \brief Generates an undirected, connected, bipartite graph with the given degree sequences.
+ * \brief Generates a bipartite graph with the given degree sequence.
  *
- * This function generates an undirected, connected, bipartite graph with given degree sequences, where the first
- * degree sequence is the degree sequence of the first partition, while the second degree sequence is the degree
- * sequence of the second partition. The function ensures that the graphs are connected only if and only if the
- * input degree sequences are potentially connected. The function does not support directed graphs.
+ * \experimental
  *
+ * This function generates a bipartite graph with the given bidegree sequence,
+ * using a Havel-Hakimi-like construction algorithm. The order in which vertices
+ * are connected up is controlled by the \p method parameter. When using the
+ * \c IGRAPH_REALIZE_DEGSEQ_SMALLEST method, it is ensured that the graph will be
+ * connected if and only if the given bidegree sequence is potentially connected.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param deg1 The degree sequence of the first partition.
- * \param deg2 The degree sequence of the second partition.
- * \param multiedges A boolean indicating whether multiedges are allowed during graph construction.
+ * \param degrees1 The degree sequence of the first partition.
+ * \param degrees2 The degree sequence of the second partition.
+ * \param allowed_edge_types The types of edges to allow in the graph.
+ *        \clist
+ *          \cli IGRAPH_SIMPLE_SW
+ *          simple graph (i.e. no multi-edges allowed).
+ *          \cli IGRAPH_MULTI_SW
+ *          multi-edges are allowed
+ *        \endclist
+ * \param method The method to generate the graph. Possible values:
+ *        \clist
+ *          \cli IGRAPH_REALIZE_DEGSEQ_SMALLEST
+ *          The vertex with smallest remaining degree is selected first, from either
+ *          partition. The result is usually a graph with high negative degree
+ *          assortativity. This method is guaranteed to generate a connected graph,
+ *          if one exists.
+ *          \cli IGRAPH_REALIZE_DEGSEQ_LARGEST
+ *          The vertex with the largest remaining degree is selected first, from
+ *          either parition. The result is usually a graph with high positive degree
+ *          assortativity, and is often disconnected.
+ *          \cli IGRAPH_REALIZE_DEGSEQ_INDEX
+ *          The vertices are selected in order of their index.
+ *         \endclist
  * \return Error code.
+ * \sa \ref igraph_is_bigraphical() to test bigraphicality without generating a graph.
  */
 
-igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, const igraph_edge_type_sw_t allowed_edge_types, const igraph_realize_degseq_t method) {
+igraph_error_t igraph_realize_bipartite_degree_sequence(
+    igraph_t *graph,
+    const igraph_vector_int_t *degrees1, const igraph_vector_int_t *degrees2,
+    const igraph_edge_type_sw_t allowed_edge_types, const igraph_realize_degseq_t method
+) {
     igraph_integer_t ec = 0; // The number of edges added so far
-    igraph_integer_t n1 = igraph_vector_int_size(deg1);
-    igraph_integer_t n2 = igraph_vector_int_size(deg2);
+    igraph_integer_t n1 = igraph_vector_int_size(degrees1);
+    igraph_integer_t n2 = igraph_vector_int_size(degrees2);
     igraph_vector_int_t edges;
     igraph_integer_t ds1_sum;
     igraph_integer_t ds2_sum;
@@ -939,22 +975,23 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
         largest = true;
         break;
     case IGRAPH_REALIZE_DEGSEQ_INDEX:
-        return igraph_i_realize_undirected_bipartite_index(graph, deg1, deg2, multiedges);
+        return igraph_i_realize_undirected_bipartite_index(graph, degrees1, degrees2, multiedges);
     default:
-        IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid bipartite degree sequence realization method.", IGRAPH_EINVAL);
     }
     IGRAPH_HANDLE_EXCEPTIONS_END;
 
-    // Checks if the degree sequences are bigraphical
-    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg1, &ds1_sum));
-    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg2, &ds2_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degrees1, &ds1_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degrees2, &ds2_sum));
 
+    // Degree sequences of the two partitions must sum to the same value
     if (ds1_sum != ds2_sum) {
         goto fail;
     }
+
     // If both degree sequences are empty, it's bigraphical
     if (!(n1 == 0 && n2 == 0)) {
-        if (igraph_vector_int_min(deg1) < 0 || igraph_vector_int_min(deg2) < 0){
+        if (igraph_vector_int_min(degrees1) < 0 || igraph_vector_int_min(degrees2) < 0){
             goto fail;
         }
     }
@@ -963,13 +1000,13 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     vertices2.reserve(n2);
 
     for (igraph_integer_t i = 0; i < n1; i++) {
-        vertices1.push_back(vd_pair(i, VECTOR(*deg1)[i]));
+        vertices1.push_back(vd_pair(i, VECTOR(*degrees1)[i]));
     }
     for (igraph_integer_t i=0; i < n2; i++) {
-        vertices2.push_back(vd_pair(i+n1, VECTOR(*deg2)[i]));
+        vertices2.push_back(vd_pair(i+n1, VECTOR(*degrees2)[i]));
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, ds1_sum+ds2_sum));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ds1_sum+ds2_sum);
 
 
     std::vector<vd_pair> *src_vs;
@@ -1079,12 +1116,14 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
             ec++;
         }
     }
-    IGRAPH_CHECK(igraph_create(graph, &edges, n1+n2, false));
+    IGRAPH_CHECK(igraph_create(graph, &edges, n1+n2, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERROR("Degree sequences of input partitions cannot be realized as a bipartite graph.", IGRAPH_EINVAL);
-
+    IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %s graph.",
+                 IGRAPH_EINVAL, multiedges ? "multi" : "simple ");
 }

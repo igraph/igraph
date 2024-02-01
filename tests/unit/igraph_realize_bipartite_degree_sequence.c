@@ -1,11 +1,26 @@
-//
-// Created by Lara Holm on 1.11.2023.
-//
+/*
+  IGraph library.
+  Constructing realizations of degree sequences and bi-degree sequences.
+  Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <igraph.h>
 #include <stdio.h>
 
 #include "test_utilities.h"
-#include "math/safe_intop.h"
 
 int main(void) {
     igraph_vector_int_t ds1, ds2;
@@ -20,16 +35,22 @@ int main(void) {
     printf("===EDGE CASES===\n");
 
     // Tests that should fail with IGRAPH_EINVAL
-//    printf("--ds1 empty--\n");
-//    igraph_integer_t dd[] = {1, 1};
-//    igraph_vector_int_init(&ds1, 0);
-//    igraph_vector_int_init_array(&ds2, dd,2);
-//    igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-//
-//    printf("--ds2 empty--\n");
-//    igraph_vector_int_init_array(&ds1, dd, 2);
-//    igraph_vector_int_init(&ds2, 0);
-//    igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+    printf("--ds1 empty--\n");
+    igraph_integer_t dd[] = {1, 1};
+    igraph_vector_int_init(&ds1, 0);
+    igraph_vector_int_init_array(&ds2, dd, 2);
+    CHECK_ERROR(
+        igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+        IGRAPH_EINVAL
+    );
+
+    printf("--ds2 empty--\n");
+    igraph_vector_int_init_array(&ds1, dd, 2);
+    igraph_vector_int_init(&ds2, 0);
+    CHECK_ERROR(
+        igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+        IGRAPH_EINVAL
+    );
 
     printf("\n===Empty degree sequences===\n");
     printf("--Smallest--\n");
