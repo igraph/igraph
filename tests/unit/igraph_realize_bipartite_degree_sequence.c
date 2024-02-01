@@ -43,6 +43,8 @@ int main(void) {
         igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
         IGRAPH_EINVAL
     );
+    igraph_vector_int_destroy(&ds1);
+    igraph_vector_int_destroy(&ds2);
 
     printf("--ds2 empty--\n");
     igraph_vector_int_init_array(&ds1, dd, 2);
@@ -51,6 +53,8 @@ int main(void) {
         igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
         IGRAPH_EINVAL
     );
+    igraph_vector_int_destroy(&ds1);
+    igraph_vector_int_destroy(&ds2);
 
     printf("\n===Empty degree sequences===\n");
     printf("--Smallest--\n");
