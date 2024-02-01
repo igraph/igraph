@@ -41,8 +41,8 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_dqueue, full)(T
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_dqueue, size)(const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, pop)(TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, pop_back)(TYPE(igraph_dqueue)* q);
-IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, head)(const TYPE(igraph_dqueue)* q);
-IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, back)(const TYPE(igraph_dqueue)* q);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_dqueue, head)(const TYPE(igraph_dqueue)* q);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_dqueue, back)(const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, push)(TYPE(igraph_dqueue)* q, BASE elem);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);

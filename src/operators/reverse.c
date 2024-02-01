@@ -35,7 +35,7 @@
  * \function igraph_reverse_edges
  * \brief Reverses some edges of a directed graph.
  *
- * This functon reverses some edges of a directed graph. The modification is done in place.
+ * This function reverses some edges of a directed graph. The modification is done in place.
  * All attributes, as well as the ordering of edges and vertices are preserved.
  *
  * </para><para>

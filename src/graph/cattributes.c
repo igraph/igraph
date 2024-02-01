@@ -2603,7 +2603,7 @@ static igraph_error_t igraph_i_cattribute_get_string_graph_attr(const igraph_t *
     }
     str = (igraph_strvector_t*)rec->value;
     IGRAPH_CHECK(igraph_strvector_resize(value, 1));
-    IGRAPH_CHECK(igraph_strvector_set(value, 0, STR(*str, 0)));
+    IGRAPH_CHECK(igraph_strvector_set(value, 0, igraph_strvector_get(str, 0)));
 
     return IGRAPH_SUCCESS;
 }
@@ -3020,7 +3020,7 @@ const char *igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
 
     rec = VECTOR(*gal)[j];
     str = (igraph_strvector_t*)rec->value;
-    return STR(*str, 0);
+    return igraph_strvector_get(str, 0);
 }
 
 /**
@@ -3130,7 +3130,7 @@ const char *igraph_cattribute_VAS(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*val)[j];
     str = (igraph_strvector_t*)rec->value;
-    return STR(*str, vid);
+    return igraph_strvector_get(str, vid);
 }
 
 /**
@@ -3240,7 +3240,7 @@ const char *igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 
     rec = VECTOR(*eal)[j];
     str = (igraph_strvector_t*)rec->value;
-    return STR(*str, eid);
+    return igraph_strvector_get(str, eid);
 }
 
 /**

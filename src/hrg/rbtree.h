@@ -59,44 +59,29 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_LIST
-#define IGRAPH_HRG_LIST
-
-class list {
-public:
-    int x;            // stored elementd in linked-list
-    list* next;           // pointer to next elementd
-    list(): x(-1), next(0) { }
-    ~list() { }
+struct list {
+    int x = -1;             // stored elementd in linked-list
+    list* next = nullptr;   // pointer to next elementd
 };
-#endif
 
-class keyValuePair {
-public:
-    int x;            // elementrb key (int)
-    int y;            // stored value (int)
-    keyValuePair* next;       // linked-list pointer
-    keyValuePair(): x(-1), y(-1), next(0) { }
-    ~keyValuePair() { }
+struct keyValuePair {
+    int x = -1;                     // elementrb key (int)
+    int y = -1;                     // stored value (int)
+    keyValuePair* next = nullptr;   // linked-list pointer
 };
 
 // ******** Tree elementrb Class *****************************************
 
-class elementrb {
-public:
-    int key;          // search key (int)
-    int value;            // stored value (int)
+struct elementrb {
+    int key = -1;               // search key (int)
+    int value = -1;             // stored value (int)
 
-    bool color;           // F: BLACK, T: RED
-    short int mark;       // marker
+    bool color = false;         // F: BLACK, T: RED
+    short int mark = 0;         // marker
 
-    elementrb *parent;        // pointer to parent node
-    elementrb *left;      // pointer for left subtree
-    elementrb *right;     // pointer for right subtree
-
-    elementrb(): key(-1), value(-1), color(false), mark(0), parent(0),
-        left(0), right(0) { }
-    ~elementrb() { }
+    elementrb *parent = nullptr;    // pointer to parent node
+    elementrb *left = nullptr;      // pointer for left subtree
+    elementrb *right = nullptr;     // pointer for right subtree
 };
 
 // ******** Red-Black Tree Class *****************************************
@@ -109,7 +94,6 @@ public:
 // cannot insert such an item. Beware of this limitation.
 
 class rbtree {
-private:
     elementrb* root;      // binary tree root
     elementrb* leaf;      // all leaf nodes
     int support;          // number of nodes in the tree
@@ -118,23 +102,23 @@ private:
     void rotateRight(elementrb *y);   // right-rotation operator
     void insertCleanup(elementrb *z); // house-keeping after insertion
     void deleteCleanup(elementrb *x); // house-keeping after deletion
-    keyValuePair* returnSubtreeAsList(elementrb *z, keyValuePair *head);
+    keyValuePair* returnSubtreeAsList(const elementrb *z, keyValuePair *head) const;
     void deleteSubTree(elementrb *z); // delete subtree rooted at z
-    elementrb* returnMinKey(elementrb *z); // returns minimum of subtree
+    elementrb* returnMinKey(elementrb *z) const; // returns minimum of subtree
     // rooted at z
-    elementrb* returnSuccessor(elementrb *z); // returns successor of z's key
+    elementrb* returnSuccessor(elementrb *z) const; // returns successor of z's key
 
 public:
     rbtree(); ~rbtree(); // default constructor/destructor
 
     // returns value associated with searchKey
-    int returnValue(const int searchKey);
+    int returnValue(int searchKey) const;
     // returns T if searchKey found, and points foundNode at the
     // corresponding node
-    elementrb* findItem(const int searchKey);
+    elementrb* findItem(int searchKey) const;
     // insert a new key with stored value
     void insertItem(int newKey, int newValue);
-    // selete a node with given key
+    // delete a node with given key
     void deleteItem(int killKey);
     // replace value of a node with given key
     void replaceItem(int key, int newValue);
@@ -143,17 +127,17 @@ public:
     // delete the entire tree
     void deleteTree();
     // return array of keys in tree
-    int* returnArrayOfKeys();
+    int* returnArrayOfKeys() const;
     // return list of keys in tree
-    list* returnListOfKeys();
+    list* returnListOfKeys() const;
     // return the tree as a list of keyValuePairs
-    keyValuePair* returnTreeAsList();
+    keyValuePair* returnTreeAsList() const;
     // returns the maximum key in the tree
-    keyValuePair returnMaxKey();
+    keyValuePair returnMaxKey() const;
     // returns the minimum key in the tree
-    keyValuePair returnMinKey();
+    keyValuePair returnMinKey() const;
     // returns number of items in tree
-    int returnNodecount();
+    int returnNodecount() const;
 };
 
 }

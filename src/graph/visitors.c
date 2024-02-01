@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
-   IGraph R package.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_visitor.h"
@@ -30,7 +25,7 @@
 
 /**
  * \function igraph_bfs
- * Breadth-first search
+ * \brief Breadth-first search.
  *
  * A simple breadth-first search, with a lot of different results and
  * the possibility to call a callback whenever a vertex is visited.
@@ -115,12 +110,13 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                void *extra) {
 
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+
     igraph_error_t ret;
 
     igraph_dqueue_int_t Q;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t actroot = 0;
-    igraph_vector_bool_t added;
+    igraph_vector_char_t added;
 
     igraph_lazy_adjlist_t adjlist;
 
@@ -151,7 +147,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, no_of_nodes);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&added, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -162,14 +158,14 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
        the restricted set, but are to be used as 'root' vertices. */
     if (restricted) {
         igraph_integer_t i, n = igraph_vector_int_size(restricted);
-        igraph_vector_bool_fill(&added, true);
+        igraph_vector_char_fill(&added, true);
         for (i = 0; i < n; i++) {
             igraph_integer_t v = VECTOR(*restricted)[i];
             VECTOR(added)[v] = false;
         }
     }
 
-    /* Resize result vectors, and fill them with IGRAPH_NAN */
+    /* Resize result vectors, and fill them with the initial value. */
 
 # define VINIT(v, initial) \
     if (v) { \
@@ -227,10 +223,9 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
             igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
             igraph_integer_t succ_vec;
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
-            igraph_integer_t i, n;
 
             IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
-            n = igraph_vector_int_size(neis);
+            const igraph_integer_t n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -245,7 +240,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                 VECTOR(*dist)[actvect] = actdist;
             }
 
-            for (i = 0; i < n; i++) {
+            for (igraph_integer_t i = 0; i < n; i++) {
                 igraph_integer_t nei = VECTOR(*neis)[i];
                 if (! VECTOR(added)[nei]) {
                     VECTOR(added)[nei] = true;
@@ -257,8 +252,9 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
                 }
             }
 
-            succ_vec = igraph_dqueue_int_empty(&Q) ? -1L :
-                       igraph_dqueue_int_head(&Q);
+            succ_vec = igraph_dqueue_int_empty(&Q)
+                           ? -1
+                           : igraph_dqueue_int_head(&Q);
             if (callback) {
                 IGRAPH_CHECK_CALLBACK(
                     callback(graph, actvect, pred_vec, succ_vec, act_rank - 1, actdist, extra),
@@ -283,7 +279,7 @@ cleanup:
 
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_bool_destroy(&added);
+    igraph_vector_char_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -334,11 +330,10 @@ igraph_error_t igraph_bfs_simple(
     igraph_vector_int_t *parents
 ) {
 
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_integer_t num_visited = 0;
     igraph_vector_int_t neis;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
     bool *added;
     igraph_integer_t lastlayer = -1;
 
@@ -348,15 +343,15 @@ igraph_error_t igraph_bfs_simple(
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     /* temporary storage */
+
     added = IGRAPH_CALLOC(no_of_nodes, bool);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory for BFS.");
     IGRAPH_FINALLY(igraph_free, added);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
@@ -394,8 +389,8 @@ igraph_error_t igraph_bfs_simple(
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvect,
                                       mode));
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
-        for (i = 0; i < nei_count; i++) {
-            igraph_integer_t neighbor = VECTOR(neis)[i];
+        for (igraph_integer_t i = 0; i < nei_count; i++) {
+            const igraph_integer_t neighbor = VECTOR(neis)[i];
             if (! added[neighbor]) {
                 added[neighbor] = true;
                 if (parents) {
@@ -429,7 +424,7 @@ igraph_error_t igraph_bfs_simple(
 
 /**
  * \function igraph_dfs
- * Depth-first search
+ * \brief Depth-first search.
  *
  * A simple depth-first search, with
  * the possibility to call a callback whenever a vertex is discovered
@@ -490,50 +485,48 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_dfshandler_t *out_callback,
                void *extra) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t adjlist;
     igraph_stack_int_t stack;
     igraph_vector_char_t added;
     igraph_vector_int_t nptr;
     igraph_error_t ret;
-    igraph_integer_t actroot;
     igraph_integer_t act_rank = 0;
     igraph_integer_t rank_out = 0;
     igraph_integer_t act_dist = 0;
 
     if (root < 0 || root >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid root vertex for DFS", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid root vertex for DFS.", IGRAPH_EINVAL);
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_stack_int_init(&stack, 100));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&added, no_of_nodes);
+    IGRAPH_STACK_INT_INIT_FINALLY(&stack, 100);
+
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
 
-# define FREE_ALL() do {            \
-        igraph_vector_int_destroy(&nptr);            \
-        igraph_lazy_adjlist_destroy(&adjlist);        \
-        igraph_stack_int_destroy(&stack);                 \
-        igraph_vector_char_destroy(&added);           \
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, no_of_nodes);
+
+# define FREE_ALL() do { \
+        igraph_vector_int_destroy(&nptr); \
+        igraph_lazy_adjlist_destroy(&adjlist); \
+        igraph_stack_int_destroy(&stack); \
+        igraph_vector_char_destroy(&added); \
         IGRAPH_FINALLY_CLEAN(4); } while (0)
 
     /* Resize result vectors and fill them with the initial value */
 
-# define VINIT(v, initial) if (v) {             \
-        IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes));       \
+# define VINIT(v, initial) if (v) { \
+        IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes)); \
         igraph_vector_int_fill(v, initial); }
 
     VINIT(order, -1);
@@ -544,7 +537,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 # undef VINIT
 
     IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
-    VECTOR(added)[root] = 1;
+    VECTOR(added)[root] = true;
     if (parents) {
         VECTOR(*parents)[root] = -1;
     }
@@ -562,7 +555,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
         }
     }
 
-    for (actroot = 0; actroot < no_of_nodes; ) {
+    for (igraph_integer_t actroot = 0; actroot < no_of_nodes; ) {
 
         /* 'root' first, then all other vertices */
         if (igraph_stack_int_empty(&stack)) {
@@ -574,7 +567,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 continue;
             }
             IGRAPH_CHECK(igraph_stack_int_push(&stack, actroot));
-            VECTOR(added)[actroot] = 1;
+            VECTOR(added)[actroot] = true;
             if (parents) {
                 VECTOR(*parents)[actroot] = -1;
             }
@@ -598,11 +591,12 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
         while (!igraph_stack_int_empty(&stack)) {
             igraph_integer_t actvect = igraph_stack_int_top(&stack);
-            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
-            igraph_integer_t n = igraph_vector_int_size(neis);
             igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, actvect);
 
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+
+            const igraph_integer_t n = igraph_vector_int_size(neis);
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = false;
@@ -615,7 +609,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             if (any) {
                 /* There is such a neighbor, add it */
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, nei));
-                VECTOR(added)[nei] = 1;
+                VECTOR(added)[nei] = true;
                 if (parents) {
                     VECTOR(*parents)[ nei ] = actvect;
                 }

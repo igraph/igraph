@@ -30,7 +30,7 @@
 igraph_error_t igraph_i_property_cache_init(igraph_i_property_cache_t *cache) {
     IGRAPH_STATIC_ASSERT(IGRAPH_PROP_I_SIZE <= 32);
 
-    memset(cache->value, 0, sizeof(cache->value) / sizeof(cache->value[0]));
+    memset(cache->value, 0, sizeof(cache->value));
     cache->known = 0;
     return IGRAPH_SUCCESS;
 }

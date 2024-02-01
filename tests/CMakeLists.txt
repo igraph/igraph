@@ -374,12 +374,14 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_biconnected_components
   igraph_decompose
+  igraph_is_biconnected
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bridges
   igraph_decompose_strong
+  igraph_is_biconnected
   igraph_subcomponent
 )
 
@@ -992,6 +994,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_transitivity
+  igraph_tree_game
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj

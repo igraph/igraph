@@ -34,7 +34,7 @@ IGRAPH_EXPORT void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h);
 IGRAPH_EXPORT void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem);
-IGRAPH_EXPORT BASE FUNCTION(igraph_heap, top)(const TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_heap, top)(const TYPE(igraph_heap)* h);
 IGRAPH_EXPORT BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_heap, size)(const TYPE(igraph_heap)* h);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t capacity);

@@ -99,7 +99,7 @@ igraph_error_t igraph_connected_components(
         return igraph_i_connected_components_strong(graph, membership, csize, no);
     }
 
-    IGRAPH_ERROR("Cannot calculate connected components.", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
 }
 
 static igraph_error_t igraph_i_connected_components_weak(
@@ -394,7 +394,7 @@ static igraph_error_t igraph_i_connected_components_strong(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 
 /**
  * \ingroup structural
@@ -468,7 +468,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     } else if (no_of_nodes == 1) {
         *res = true;
     } else if (mode == IGRAPH_WEAK) {
-        IGRAPH_CHECK(igraph_is_connected_weak(graph, res));
+        IGRAPH_CHECK(igraph_i_is_connected_weak(graph, res));
     } else {   /* mode == IGRAPH_STRONG */
         /* A strongly connected graph has at least as many edges as vertices,
          * except for the singleton graph, which is handled above. */
@@ -481,13 +481,13 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     }
 
     /* Cache updates are done in igraph_i_connected_components_strong() and
-     * igraph_is_connected_weak() because those might be called from other
+     * igraph_i_is_connected_weak() because those might be called from other
      * places and we want to make use of the caching if so */
 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
     igraph_integer_t added_count;
     bool *already_added;
@@ -976,14 +976,21 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * A vertex is an articulation point if its removal increases
  * the number of (weakly) connected components in the graph.
  *
+ * </para><para>
+ * Note that a graph without any articulation points is not necessarily
+ * biconnected. Counterexamples are the two-vertex complete graph as well
+ * as empty graphs. Use \ref igraph_is_biconnected() to check whether
+ * a graph is biconnected.
+ *
  * \param graph The input graph. It will be treated as undirected.
- * \param res Pointer to an initialized vector, the
- *    articulation points will be stored here.
+ * \param res Pointer to an initialized vector, the articulation points will
+ *   be stored here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
- * \sa \ref igraph_biconnected_components(), \ref igraph_clusters(), \ref igraph_bridges()
+ * \sa \ref igraph_biconnected_components(), \ref igraph_is_bipartite(),
+ * \ref igraph_connected_components(), \ref igraph_bridges()
  */
 
 igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_int_t *res) {
@@ -1001,19 +1008,21 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * </para><para>
  * A biconnected component of a graph is a maximal biconnected
  * subgraph of it. The biconnected components of a graph can be given
- * by the partition of its edges: every edge is a member of exactly
+ * by a partition of its edges: every edge is a member of exactly
  * one biconnected component. Note that this is not true for
  * vertices: the same vertex can be part of many biconnected
- * components.
+ * components, while isolated vertices are part of none at all.
  *
  * </para><para>
  * Note that some authors do not consider the graph consisting of
  * two connected vertices as biconnected, however, igraph does.
  *
  * </para><para>
- * Somewhat arbitrarily, igraph does not consider components containing
- * a single vertex only as being biconnected. Isolated vertices will
- * not be part of any of the biconnected components.
+ * igraph does not consider components containing a single vertex only as
+ * being biconnected. Isolated vertices will not be part of any of the
+ * biconnected components. This means that checking whether there is a single
+ * biconnected component is not sufficient for determining if a graph is
+ * biconnected. Use \ref igraph_is_biconnected() for this purpose.
  *
  * \param graph The input graph. It will be treated as undirected.
  * \param no If not a NULL pointer, the number of biconnected components will
@@ -1035,13 +1044,14 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
- * edges, but only if you do not calculate \c components and
- * \c component_edges. If you calculate \c components, then it is
- * quadratic in the number of vertices. If you calculate \c
- * component_edges as well, then it is cubic in the number of
+ * edges, but only if you do not calculate \p components and
+ * \p component_edges. If you calculate \p components, then it is
+ * quadratic in the number of vertices. If you calculate
+ * \p component_edges as well, then it is cubic in the number of
  * vertices.
  *
- * \sa \ref igraph_articulation_points(), \ref igraph_clusters().
+ * \sa \ref igraph_articulation_points(), \ref igraph_is_biconnected(),
+ * \ref igraph_connected_components().
  *
  * \example examples/simple/igraph_biconnected_components.c
  */
@@ -1243,6 +1253,160 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_is_biconnected
+ * \brief Checks whether a graph is biconnected.
+ *
+ * \experimental
+ *
+ * A graph is biconnected if the removal of any single vertex (and
+ * its incident edges) does not disconnect it.
+ *
+ * </para><para>
+ * igraph does not consider single-vertex graphs biconnected.
+ *
+ * </para><para>
+ * Note that some authors do not consider the graph consisting of
+ * two connected vertices as biconnected, however, igraph does.
+ *
+ * \param graph The input graph. It will be treated as undirected.
+ * \param result If not a \c NULL pointer, the result will be returned here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
+ *
+ * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components().
+ *
+ * \example examples/simple/igraph_is_biconnected.c
+ */
+
+igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *res) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t nextptr;
+    igraph_vector_int_t num, low;
+    igraph_stack_int_t path;
+    igraph_lazy_adjlist_t inclist;
+    igraph_bool_t is_biconnected = true;
+
+    if (no_of_nodes == 0 || no_of_nodes == 1) {
+        /* The null graph is not connected, hence it is not biconnected either.
+         * The singleton graph is not biconnected. */
+        is_biconnected = false;
+        goto exit2;
+    }
+
+    /* no_of_nodes == 2 is special: if the two nodes are connected, then the
+     * graph is both biconnected _and_ acyclic, unlike no_of_nodes >= 3, where
+     * the graph is not acyclic if it is biconnected. */
+
+    /* We do not touch the cache for graphs with less than three nodes because
+     * of all the edge cases. */
+    if (no_of_nodes >= 3 && (
+        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) ||
+        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST))
+    )) {
+        is_biconnected = false;
+        goto exit2;
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
+
+    IGRAPH_STACK_INT_INIT_FINALLY(&path, 100);
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inclist);
+
+    const igraph_integer_t root = 0; /* start DFS from vertex 0 */
+    igraph_integer_t counter = 1;
+    igraph_integer_t rootdfs = 0;
+    IGRAPH_CHECK(igraph_stack_int_push(&path, root));
+    VECTOR(low)[root] = VECTOR(num)[root] = counter++;
+    while (!igraph_stack_int_empty(&path)) {
+        igraph_integer_t act = igraph_stack_int_top(&path);
+        igraph_integer_t actnext = VECTOR(nextptr)[act];
+
+        const igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&inclist, act);
+        const igraph_integer_t n = igraph_vector_int_size(neis);
+        if (actnext < n) {
+            /* Step down (maybe) */
+            igraph_integer_t nei = VECTOR(*neis)[actnext];
+            if (VECTOR(low)[nei] == 0) {
+                if (act == root) {
+                    rootdfs++;
+                }
+                IGRAPH_CHECK(igraph_stack_int_push(&path, nei));
+                VECTOR(low)[nei] = VECTOR(num)[nei] = counter++;
+            } else {
+                /* Update low value if needed */
+                if (VECTOR(num)[nei] < VECTOR(low)[act]) {
+                    VECTOR(low)[act] = VECTOR(num)[nei];
+                }
+            }
+            VECTOR(nextptr)[act] += 1;
+        } else {
+            /* Step up */
+            igraph_stack_int_pop(&path);
+            if (!igraph_stack_int_empty(&path)) {
+                igraph_integer_t prev = igraph_stack_int_top(&path);
+                /* Update LOW value if needed */
+                if (VECTOR(low)[act] < VECTOR(low)[prev]) {
+                    VECTOR(low)[prev] = VECTOR(low)[act];
+                }
+                /* Check for articulation point */
+                if (VECTOR(low)[act] >= VECTOR(num)[prev]) {
+                    if (prev != root /* the root */) {
+                        /* Found an articulation point, the graph is not biconnected */
+                        is_biconnected = false;
+                        goto exit;
+                    }
+                }
+            } /* !igraph_stack_int_empty(&path) */
+        }
+
+    } /* !igraph_stack_int_empty(&path) */
+
+    /* The root is an articulation point, the graph is not biconnected */
+    if (rootdfs >= 2) {
+        is_biconnected = false;
+        goto exit;
+    }
+
+    /* We did not reach all vertices, the graph is not connected */
+    if (counter <= no_of_nodes) {
+        is_biconnected = false;
+        goto exit;
+    }
+
+exit:
+
+    igraph_lazy_adjlist_destroy(&inclist);
+    igraph_stack_int_destroy(&path);
+    igraph_vector_int_destroy(&low);
+    igraph_vector_int_destroy(&num);
+    igraph_vector_int_destroy(&nextptr);
+    IGRAPH_FINALLY_CLEAN(5);
+
+exit2:
+
+    if (res) {
+        *res = is_biconnected;
+    }
+
+    /* We do not touch the cache for graphs with less than three nodes because
+     * of all the edge cases. */
+    if (is_biconnected && no_of_nodes >= 3) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 
 /**
  * \function igraph_bridges
@@ -1258,7 +1422,8 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
- * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(), \ref igraph_clusters()
+ * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(),
+ * \ref igraph_connected_components()
  */
 
 igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges) {

@@ -4,6 +4,31 @@
 
 ### Added
 
+ - `igraph_is_biconnected()` checks if a graph is biconnected.
+
+### Fixed
+
+ - More robust error handling in HRG code.
+ - Fixed infinite loop in `igraph_hrg_sample_many()`.
+ - `igraph_community_fastgreedy()` no longer crashes when providing a modularity vector only, but not a merges matrix of membership vector.
+ - The graph property cache was not initialized correctly on systems where the size of `bool` was not 1 byte (#2477).
+ - Compatibility with libxml2 version 2.12 (#2442).
+
+### Deprecated
+
+ - The macro `STR()` is deprecated; use the function `igraph_strvector_get()` instead.
+
+### Other
+
+ - Performance: Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Performance: Improved cache use by `igraph_is_bipartite()`.
+ - The documentation is now also generated in Texinfo format.
+ - Documentation improvements
+
+## [0.10.8] - 2023-11-17
+
+### Added
+
  - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
  - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
  - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
@@ -27,6 +52,8 @@
  - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
  - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
  - `igraph_community_spinglass()` now checks its parameters more carefully.
+ - `igraph_similarity_dice_pairs()` and `igraph_similarity_jaccard_pairs()` now validate vertex IDs.
+ - `igraph_maxflow()` now returns an error code if the source and target vertices are the same. It used to get stuck in an infinite loop in earlier versions when the `flow` argument was non-NULL.
 
 ### Other
 
@@ -1239,7 +1266,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.7..master
+[master]: https://github.com/igraph/igraph/compare/0.10.8..master
+[0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
 [0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
 [0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
 [0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5

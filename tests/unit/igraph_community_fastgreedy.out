@@ -24,3 +24,12 @@ Modularity:  0.452381
 Membership: 1 1 1 1 1 0 0 0 0 0 
 Modularity:  ---
 Membership: 1 1 1 1 1 0 0 0 0 0 
+Modularity:  0.452381
+Membership: 
+Testing a trivial disconnected graph
+Modularity:  0.5
+Membership: 1 1 0 0 
+Modularity:  ---
+Membership: 1 1 0 0 
+Modularity:  0.5
+Membership: 
