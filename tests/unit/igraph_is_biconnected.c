@@ -106,5 +106,30 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
+    /* Cache concistency checks */
+
+    /* K_2 is a special graph: it is biconnected yet it has no cycles.
+     * Make sure we don't accidentally set or interpret the cache
+     * incorrectly. */
+
+    igraph_bool_t acyclic;
+
+    igraph_full(&g, 2, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+
+    igraph_is_biconnected(&g, &result);
+    IGRAPH_ASSERT(result);
+    igraph_is_acyclic(&g, &acyclic);
+    IGRAPH_ASSERT(acyclic);
+
+    igraph_invalidate_cache(&g);
+
+    igraph_is_acyclic(&g, &acyclic);
+    IGRAPH_ASSERT(acyclic);
+    igraph_is_biconnected(&g, &result);
+    IGRAPH_ASSERT(result);
+
+    igraph_destroy(&g);
+
+
     return 0;
 }
