@@ -99,7 +99,7 @@ igraph_error_t igraph_connected_components(
         return igraph_i_connected_components_strong(graph, membership, csize, no);
     }
 
-    IGRAPH_ERROR("Cannot calculate connected components.", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
 }
 
 static igraph_error_t igraph_i_connected_components_weak(
