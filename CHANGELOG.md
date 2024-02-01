@@ -5,6 +5,7 @@
 ### Added
 
  - `igraph_is_biconnected()` checks if a graph is biconnected.
+ - `igraph_igraph_realize_bipartite_degree_sequence()` constructs a bipartite graph that has the given bidegree sequence, optionally ensuring that it is connected (PR #2425 by Lára Margrét Hólmfríðardóttir @larah19).
 
 ### Fixed
 
