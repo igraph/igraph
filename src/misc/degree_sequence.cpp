@@ -833,8 +833,7 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
         vertices2.push_back(vd_pair(i+n1, VECTOR(*degree2)[i]));
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, ds1_sum+ds2_sum));
-
+	IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ds1_sum + ds2_sum);
 
     while (!vertices1.empty() && !vertices2.empty()) {
         // Go by index, so we start in ds1, so ds2 needs to be sorted.
@@ -894,6 +893,8 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
     IGRAPH_CHECK(igraph_create(graph, &edges, n1+n2, false));
 
     igraph_vector_int_destroy(&edges);
+	IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 
 fail:
