@@ -951,6 +951,8 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
     const igraph_vector_int_t *degrees1, const igraph_vector_int_t *degrees2,
     const igraph_edge_type_sw_t allowed_edge_types, const igraph_realize_degseq_t method
 ) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
     igraph_integer_t ec = 0; // The number of edges added so far
     igraph_integer_t n1 = igraph_vector_int_size(degrees1);
     igraph_integer_t n2 = igraph_vector_int_size(degrees2);
@@ -971,7 +973,6 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
         multiedges = false;
     }
 
-    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     switch (method) {
     case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
         largest = false;
@@ -984,7 +985,6 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
     default:
         IGRAPH_ERROR("Invalid bipartite degree sequence realization method.", IGRAPH_EINVAL);
     }
-    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degrees1, &ds1_sum));
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(degrees2, &ds2_sum));
@@ -1131,4 +1131,6 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
 fail:
     IGRAPH_ERRORF("The given bidegree sequence cannot be realized as a bipartite %sgraph.",
                  IGRAPH_EINVAL, multiedges ? "multi" : "simple ");
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 }
