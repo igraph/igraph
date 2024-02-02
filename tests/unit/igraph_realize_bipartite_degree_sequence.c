@@ -45,7 +45,7 @@ void check_degrees(
     igraph_vector_int_init_copy(&expected_degrees, ds1);
     igraph_vector_int_append(&expected_degrees, ds2);
     if (! igraph_vector_int_all_e(&degrees, &expected_degrees)) {
-        printf("Degrees not as epexted!");
+        printf("Degrees not as expected!");
         printf("Expected: "); print_vector_int(&expected_degrees);
         printf("Actual:   "); print_vector_int(&degrees);
     }
