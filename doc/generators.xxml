@@ -31,6 +31,7 @@
 <!-- doxrox-include igraph_full_multipartite -->
 <!-- doxrox-include igraph_turan -->
 <!-- doxrox-include igraph_realize_degree_sequence -->
+<!-- doxrox-include igraph_realize_bipartite_degree_sequence -->
 <!-- doxrox-include igraph_famous -->
 <!-- doxrox-include igraph_lcf -->
 <!-- doxrox-include igraph_lcf_vector -->

@@ -5,6 +5,7 @@
 ### Added
 
  - `igraph_is_biconnected()` checks if a graph is biconnected.
+ - `igraph_igraph_realize_bipartite_degree_sequence()` constructs a bipartite graph that has the given bidegree sequence, optionally ensuring that it is connected (PR #2425 by Lára Margrét Hólmfríðardóttir @larah19).
 
 ### Fixed
 
@@ -29,7 +30,7 @@
 
 ### Added
 
- - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19).
  - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
  - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
  - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
