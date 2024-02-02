@@ -81,6 +81,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/larah19"><img src="https://avatars.githubusercontent.com/u/54937363?v=4?s=100" width="100px;" alt=""/><br /><sub><b>larah19</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=larah19" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Biswa96"><img src="https://avatars.githubusercontent.com/u/31443074?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Biswapriyo Nath</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Biswa96" title="Code">💻</a></td>
+    <td align="center"><a href="http://cecinestpasunefromage.wordpress.com/"><img src="https://avatars.githubusercontent.com/u/2363820?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gwyn Ciesla</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=limburgher" title="Code">💻</a></td>
   </tr>
 </table>
 

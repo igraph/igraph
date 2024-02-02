@@ -1018,3 +1018,8 @@ add_legacy_tests(
         FOLDER tests/unit NAMES
         jdm
 )
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        igraph_realize_bipartite_degree_sequence
+)
