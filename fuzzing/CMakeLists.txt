@@ -3,6 +3,8 @@ include(fuzz_helpers)
 add_custom_target(build_fuzzers)
 
 # Add fuzz targets
+add_fuzzer(basic_properties_directed)
+add_fuzzer(basic_properties_undirected)
 add_fuzzer(bliss)
 add_fuzzer(edge_connectivity)
 add_fuzzer(read_dimacs_flow)
