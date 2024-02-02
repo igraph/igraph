@@ -30,6 +30,11 @@ int main(void) {
     igraph_bool_t is_simple;
     igraph_vector_int_t degrees;
     igraph_vector_int_t edges;
+    igraph_realize_degseq_t methods[] = {
+        IGRAPH_REALIZE_DEGSEQ_SMALLEST,
+        IGRAPH_REALIZE_DEGSEQ_LARGEST,
+        IGRAPH_REALIZE_DEGSEQ_INDEX
+    };
 
     // Edge cases
     printf("===EDGE CASES===\n");
@@ -72,7 +77,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
 
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&edges);
@@ -95,7 +100,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
 
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&edges);
@@ -118,7 +123,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
 
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&edges);
@@ -144,7 +149,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
 
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&edges);
@@ -163,7 +168,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
 
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&edges);
@@ -182,7 +187,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
 
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&edges);
@@ -215,7 +220,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Simple: %d\n", is_simple);
     printf("Connected: %d\n", is_connected);
     printf("Bipartite: %d\n", is_bipartite);
@@ -252,7 +257,7 @@ int main(void) {
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
     igraph_is_bipartite(&g, &is_bipartite, NULL);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Has multiedges: %d\n", has_multi);
     printf("Connected: %d\n", is_connected);
     printf("Bipartite: %d\n", is_bipartite);
@@ -289,7 +294,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Simple: %d\n", is_simple);
     printf("Connected: %d\n", is_connected);
     printf("Bipartite: %d\n", is_bipartite);
@@ -326,7 +331,7 @@ int main(void) {
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
     igraph_is_bipartite(&g, &is_bipartite, NULL);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Has multiedges: %d\n", has_multi);
     printf("Connected: %d\n", is_connected);
     printf("Bipartite: %d\n", is_bipartite);
@@ -364,7 +369,7 @@ int main(void) {
     igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, false);
     igraph_vector_int_print(&degrees);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Simple: %d\n", is_simple);
     printf("Connected: %d\n", is_connected);
     printf("Bipartite: %d\n", is_bipartite);
@@ -401,7 +406,7 @@ int main(void) {
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
     igraph_is_bipartite(&g, &is_bipartite, NULL);
 
-    printf("vcount: %d\n", (int)igraph_vcount(&g));
+    printf("vcount: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Has multiedges: %d\n", has_multi);
     printf("Connected: %d\n", is_connected);
     printf("Bipartite: %d\n", is_bipartite);
@@ -411,6 +416,41 @@ int main(void) {
     igraph_vector_int_destroy(&ds1);
     igraph_vector_int_destroy(&ds2);
     igraph_destroy(&g);
+
+    // A bidegree sequence that is not potentially connected
+    igraph_vector_int_init_int(&ds1, 3,
+                               1, 1, 1);
+    for (size_t i=0; i < sizeof(methods) / sizeof(methods[0]); i++) {
+        igraph_realize_bipartite_degree_sequence(
+            &g, &ds1, &ds1, IGRAPH_SIMPLE_SW, methods[i]);
+        igraph_is_bipartite(&g, &is_bipartite, NULL);
+        IGRAPH_ASSERT(is_bipartite);
+        igraph_destroy(&g);
+    }
+    igraph_vector_int_destroy(&ds1);
+
+    // A bidegree sequence that can only be realized as a multigraph,
+    // but not a simple graph
+    igraph_vector_int_init_int(&ds1, 3,
+                               1, 3, 1);
+    igraph_vector_int_init_int(&ds2, 2,
+                               2, 3);
+    for (size_t i=0; i < sizeof(methods) / sizeof(methods[0]); i++) {
+        CHECK_ERROR(
+            igraph_realize_bipartite_degree_sequence(
+            &g, &ds1, &ds2, IGRAPH_SIMPLE_SW, methods[i]),
+            IGRAPH_EINVAL
+        );
+
+        igraph_realize_bipartite_degree_sequence(
+            &g, &ds1, &ds2, IGRAPH_MULTI_SW, methods[i]);
+
+        igraph_is_bipartite(&g, &is_bipartite, NULL);
+        IGRAPH_ASSERT(is_bipartite);
+        igraph_destroy(&g);
+    }
+    igraph_vector_int_destroy(&ds1);
+    igraph_vector_int_destroy(&ds2);
 
     VERIFY_FINALLY_STACK();
     return 0;
