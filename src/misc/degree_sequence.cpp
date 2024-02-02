@@ -903,7 +903,7 @@ fail:
 
 /**
  * \function igraph_realize_bipartite_degree_sequence
- * \brief Generates a bipartite graph with the given degree sequence.
+ * \brief Generates a bipartite graph with the given bidegree sequence.
  *
  * \experimental
  *
@@ -912,6 +912,10 @@ fail:
  * are connected up is controlled by the \p method parameter. When using the
  * \c IGRAPH_REALIZE_DEGSEQ_SMALLEST method, it is ensured that the graph will be
  * connected if and only if the given bidegree sequence is potentially connected.
+ *
+ * </para><para>
+ * The vertices of the graph will be ordered so that those having \p degrees1
+ * come first, followed by \p degrees2.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param degrees1 The degree sequence of the first partition.
@@ -923,7 +927,8 @@ fail:
  *          \cli IGRAPH_MULTI_SW
  *          multi-edges are allowed
  *        \endclist
- * \param method The method to generate the graph. Possible values:
+ * \param method Controls the order in which vertices are selected for connection.
+ *        Possible values:
  *        \clist
  *          \cli IGRAPH_REALIZE_DEGSEQ_SMALLEST
  *          The vertex with smallest remaining degree is selected first, from either
