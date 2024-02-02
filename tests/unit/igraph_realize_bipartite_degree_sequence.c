@@ -101,6 +101,7 @@ int main(void) {
             &g, &ds1, &ds2, IGRAPH_SIMPLE_SW, methods[i]);
         print_graph(&g);
         printf("\n");
+        igraph_destroy(&g);
     }
     igraph_vector_int_destroy(&ds1);
     igraph_vector_int_destroy(&ds2);
@@ -115,6 +116,7 @@ int main(void) {
             &g, &ds1, &ds2, IGRAPH_SIMPLE_SW, methods[i]);
         print_graph(&g);
         printf("\n");
+        igraph_destroy(&g);
     }
     igraph_vector_int_destroy(&ds1);
     igraph_vector_int_destroy(&ds2);
