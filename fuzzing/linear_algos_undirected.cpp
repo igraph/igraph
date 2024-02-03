@@ -63,6 +63,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_maximum_cardinality_search(&graph, &iv1, &iv2);
         igraph_coreness(&graph, &iv1, IGRAPH_ALL);
         igraph_girth(&graph, &r, &iv1);
+        igraph_bridges(&graph, &iv1);
+        igraph_assortativity_degree(&graph, &r, IGRAPH_UNDIRECTED);
+        igraph_count_multiple(&graph, &iv1, igraph_ess_all(IGRAPH_EDGEORDER_FROM));
 
         // These algorithms require a starting vertex,
         // so we require the graph to have at least one vertex.
@@ -77,11 +80,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
         igraph_minimum_spanning_tree_unweighted(&graph, &g);
+        // Only when there is precisely one connected component:
         if (i == 1 && igraph_vcount(&g) >= 2) {
-            // Only when there is precisely one connected component.
             igraph_to_prufer(&g, &iv1);
+
+            igraph_t t;
+            igraph_from_prufer(&t, &iv1);
+            igraph_destroy(&t);
         }
         igraph_destroy(&g);
+
+        igraph_simplify(&graph, true, true, NULL);
 
         igraph_matrix_destroy(&m);
         igraph_vector_int_destroy(&iv5);

@@ -61,6 +61,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_STRONG);
         igraph_coreness(&graph, &iv1, IGRAPH_OUT);
+        igraph_assortativity_degree(&graph, &r, IGRAPH_DIRECTED);
+        igraph_count_multiple(&graph, &iv1, igraph_ess_all(IGRAPH_EDGEORDER_ID));
 
         // These algorithms require a starting vertex,
         // so we require the graph to have at least one vertex.
@@ -78,6 +80,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (b) {
             igraph_topological_sorting(&graph, &iv1, IGRAPH_OUT);
         }
+
+        igraph_simplify(&graph, true, true, NULL);
 
         igraph_matrix_destroy(&m);
         igraph_vector_int_destroy(&iv5);
