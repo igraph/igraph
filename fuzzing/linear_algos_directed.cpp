@@ -30,10 +30,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
-    if (Size % 2 == 0 || Size > 512+1) {
+    if (Size % 2 == 0 || Size > 512+1 || Size < 1) {
         return 0;
     }
 
@@ -61,14 +60,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         check_err(igraph_matrix_init(&m, 0, 0));
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_STRONG);
-        igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_OUT);
-        igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_OUT, &iv1, &iv2);
-        igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_OUT);
-        igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
         igraph_coreness(&graph, &iv1, IGRAPH_OUT);
-        igraph_bfs(&graph, 0, NULL, IGRAPH_OUT, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
-        igraph_dfs(&graph, 0, IGRAPH_OUT, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
-        igraph_dominator_tree(&graph, 0, &iv1, NULL, &iv2, IGRAPH_OUT);
+
+        // These algorithms require a starting vertex,
+        // so we require the graph to have at least one vertex.
+        if (igraph_vcount(&graph) >= 1) {
+            igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_OUT);
+            igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_OUT, &iv1, &iv2);
+            igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_OUT);
+            igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
+            igraph_bfs(&graph, 0, NULL, IGRAPH_OUT, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
+            igraph_dfs(&graph, 0, IGRAPH_OUT, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
+            igraph_dominator_tree(&graph, 0, &iv1, NULL, &iv2, IGRAPH_OUT);
+        }
 
         igraph_is_dag(&graph, &b);
         if (b) {

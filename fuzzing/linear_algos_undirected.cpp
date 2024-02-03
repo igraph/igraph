@@ -30,10 +30,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
-    if (Size % 2 == 0 || Size > 512+1) {
+    if (Size % 2 == 0 || Size > 512+1 || Size < 1) {
         return 0;
     }
 
@@ -49,6 +48,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_matrix_t m;
         igraph_integer_t i, i2;
         igraph_real_t r;
+        igraph_t g;
 
         check_err(igraph_vector_int_list_init(&ivl1, 0));
         check_err(igraph_vector_int_list_init(&ivl2, 0));
@@ -59,18 +59,29 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         check_err(igraph_vector_int_init(&iv5, 0));
         check_err(igraph_matrix_init(&m, 0, 0));
 
-        igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
         igraph_biconnected_components(&graph, &i, NULL, &ivl1, &ivl2, &iv1);
-        igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_ALL);
-        igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_ALL, &iv1, &iv2);
-        igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
-        igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, false, true);
         igraph_maximum_cardinality_search(&graph, &iv1, &iv2);
         igraph_coreness(&graph, &iv1, IGRAPH_ALL);
-        igraph_bfs(&graph, 0, NULL, IGRAPH_ALL, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
-        igraph_dfs(&graph, 0, IGRAPH_ALL, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
-        igraph_minimum_spanning_tree(&graph, &iv1, NULL);
         igraph_girth(&graph, &r, &iv1);
+
+        // These algorithms require a starting vertex,
+        // so we require the graph to have at least one vertex.
+        if (igraph_vcount(&graph) >=1) {
+            igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_ALL);
+            igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_ALL, &iv1, &iv2);
+            igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
+            igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, false, true);
+            igraph_bfs(&graph, 0, NULL, IGRAPH_ALL, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
+            igraph_dfs(&graph, 0, IGRAPH_ALL, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
+        }
+
+        igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
+        igraph_minimum_spanning_tree_unweighted(&graph, &g);
+        if (i == 1 && igraph_vcount(&g) >= 2) {
+            // Only when there is precisely one connected component.
+            igraph_to_prufer(&g, &iv1);
+        }
+        igraph_destroy(&g);
 
         igraph_matrix_destroy(&m);
         igraph_vector_int_destroy(&iv5);
