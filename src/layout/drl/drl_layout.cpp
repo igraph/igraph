@@ -44,12 +44,6 @@
 // S. Martin
 // 5/6/2005
 
-// C++ library routines
-#include <map>
-#include <vector>
-
-using namespace std;
-
 // layout routines and constants
 #include "drl_layout.h"
 #include "drl_parse.h"

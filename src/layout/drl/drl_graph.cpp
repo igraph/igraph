@@ -1260,7 +1260,7 @@ int graph::draw_graph(igraph_matrix_t *res) {
     }
     igraph_integer_t n = positions.size();
     IGRAPH_CHECK(igraph_matrix_resize(res, n, 2));
-    for (size_t i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         MATRIX(*res, i, 0) = positions[i].x;
         MATRIX(*res, i, 1) = positions[i].y;
     }
