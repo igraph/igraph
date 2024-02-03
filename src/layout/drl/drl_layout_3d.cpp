@@ -55,11 +55,6 @@ using namespace std;
 #include "drl_parse.h"
 #include "drl_graph_3d.h"
 
-// MPI
-#ifdef MUSE_MPI
-    #include <mpi.h>
-#endif
-
 using namespace drl3d;
 #include "igraph_layout.h"
 #include "igraph_random.h"
