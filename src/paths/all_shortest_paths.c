@@ -36,7 +36,9 @@
  * \brief All shortest paths (geodesics) from a vertex.
  *
  * When there is more than one shortest path between two vertices,
- * all of them will be returned.
+ * all of them will be returned. Every edge is considered separately,
+ * therefore in graphs with multi-edges, this function may produce
+ * a very large number of results.
  *
  * \param graph The graph object.
  * \param vertices The result, the IDs of the vertices along the paths.
