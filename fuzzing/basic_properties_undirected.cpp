@@ -43,12 +43,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     /* Undirected */
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
-        igraph_bool_t bres, bres2;
+        igraph_bool_t bres, bres2, bres3;
 
         igraph_has_multiple(&graph, &bres);
-        igraph_has_loop(&graph, &bres);
-        igraph_is_simple(&graph, &bres);
+        igraph_has_loop(&graph, &bres2);
         igraph_invalidate_cache(&graph);
+
+        igraph_is_simple(&graph, &bres3);
+        igraph_invalidate_cache(&graph);
+
+        IGRAPH_ASSERT((bres || bres2) == !bres3);
 
         igraph_is_bipartite(&graph, &bres, NULL);
         igraph_invalidate_cache(&graph);
