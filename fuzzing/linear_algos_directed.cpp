@@ -45,10 +45,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_vector_int_list_t ivl1, ivl2;
         igraph_vector_int_t iv1, iv2, iv3, iv4, iv5;
+        igraph_graph_list_t gl;
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_integer_t i, i2;
-        igraph_bool_t b;
+        igraph_bool_t b, b2;
         igraph_real_t r;
 
         check_err(igraph_vector_int_list_init(&ivl1, 0));
@@ -79,6 +80,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_dfs(&graph, 0, IGRAPH_OUT, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
             igraph_bfs_simple(&graph, 0, IGRAPH_OUT, &iv1, &iv2, &iv3);
             igraph_dominator_tree(&graph, 0, &iv1, NULL, &iv2, IGRAPH_OUT);
+            igraph_subcomponent(&graph, &iv1, 0, IGRAPH_OUT);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, true);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
         }
@@ -87,6 +89,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (b) {
             igraph_topological_sorting(&graph, &iv1, IGRAPH_OUT);
         }
+
+        igraph_is_eulerian(&graph, &b, &b2);
+        if (b) igraph_eulerian_path(&graph, &iv1, &iv2);
+        if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
+
+        igraph_graph_list_init(&gl, 0);
+        igraph_decompose(&graph, &gl, IGRAPH_STRONG, 10, 5);
+        igraph_graph_list_destroy(&gl);
 
         igraph_simplify(&graph, true, true, NULL);
 

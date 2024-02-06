@@ -45,9 +45,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
         igraph_vector_int_list_t ivl1, ivl2;
         igraph_vector_int_t iv1, iv2, iv3, iv4, iv5;
+        igraph_graph_list_t gl;
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_integer_t i, i2;
+        igraph_bool_t b, b2;
         igraph_real_t r;
         igraph_t g;
 
@@ -81,9 +83,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_bfs(&graph, 0, NULL, IGRAPH_ALL, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
             igraph_dfs(&graph, 0, IGRAPH_ALL, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
             igraph_bfs_simple(&graph, 0, IGRAPH_ALL, &iv1, &iv2, &iv3);
+            igraph_subcomponent(&graph, &iv1, 0, IGRAPH_ALL);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, true);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
         }
+
+        igraph_is_eulerian(&graph, &b, &b2);
+        if (b) igraph_eulerian_path(&graph, &iv1, &iv2);
+        if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
         igraph_minimum_spanning_tree_unweighted(&graph, &g);
@@ -97,6 +104,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_destroy(&t);
         }
         igraph_destroy(&g);
+
+        igraph_graph_list_init(&gl, 0);
+        igraph_decompose(&graph, &gl, IGRAPH_WEAK, -1, 4);
+        igraph_graph_list_destroy(&gl);
 
         igraph_simplify(&graph, true, true, NULL);
 
