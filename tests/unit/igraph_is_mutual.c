@@ -26,6 +26,7 @@ void call_and_print(igraph_t *graph, igraph_es_t es, igraph_bool_t loops) {
     igraph_vector_bool_print(&result);
     printf("\n");
     igraph_vector_bool_destroy(&result);
+    cache_consistency_checks(graph);
 }
 
 

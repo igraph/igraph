@@ -16,6 +16,7 @@ int main(void) {
     igraph_is_bipartite(&graph, &bipartite, &types);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Singleton graph */
@@ -23,6 +24,7 @@ int main(void) {
     igraph_is_bipartite(&graph, &bipartite, &types);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Singleton with self-loop */
@@ -32,11 +34,13 @@ int main(void) {
     igraph_is_bipartite(&graph, &bipartite, &types);
     IGRAPH_ASSERT(! bipartite);
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
+    cache_consistency_checks(&graph);
 
     /* Test cache usage */
     igraph_has_loop(&graph, &has_loop);
     igraph_is_bipartite(&graph, &bipartite, NULL);
     IGRAPH_ASSERT(! bipartite);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
@@ -48,11 +52,13 @@ int main(void) {
     igraph_is_bipartite(&graph, &bipartite, &types);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
+    cache_consistency_checks(&graph);
 
     /* Test cache usage */
     igraph_is_forest(&graph, &acyclic, NULL, IGRAPH_ALL);
     igraph_is_bipartite(&graph, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
+    cache_consistency_checks(&graph);
 
     /* Odd directed cycle */
     igraph_add_edge(&graph, 2, 0);
@@ -61,11 +67,13 @@ int main(void) {
     igraph_is_bipartite(&graph, &bipartite, &types);
     IGRAPH_ASSERT(! bipartite);
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
+    cache_consistency_checks(&graph);
 
     /* Test cache usage */
     igraph_is_forest(&graph, &acyclic, NULL, IGRAPH_ALL);
     igraph_is_bipartite(&graph, &bipartite, NULL);
     IGRAPH_ASSERT(! bipartite);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 

@@ -590,3 +590,159 @@ void record_last_warning(const char *reason, const char *file, int line) {
 
     expect_warning_ctx.observed = strdup(reason);
 }
+
+/* Checks that various cached properties are consistent with each other */
+void cache_consistency_checks(const igraph_t *graph) {
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST)) {
+        /* A graph that is undirected acyclic (i.e. a forest) is simple */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {
+            IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP));
+        }
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI)) {
+            IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI));
+        }
+
+        /* If it is directed ... */
+        if (igraph_is_directed(graph)) {
+            /* ... it has no mutual edges. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL));
+            }
+
+            /* ... it is a DAG. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_DAG)) {
+                IGRAPH_ASSERT(igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_DAG));
+            }
+
+            /* ... if it has at least an edge, it is not strongly connected. */
+            if (igraph_ecount(graph) > 0 && igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED));
+            }
+        }
+    }
+
+    /* A graph with self-loops is not a forest */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST)) {
+            IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST));
+        }
+    }
+
+    /* A graph with multi-edges is not a forest */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST)) {
+            IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST));
+        }
+    }
+
+    if (igraph_is_directed(graph)) {
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_DAG) &&
+            igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_DAG))
+        {
+            /* A DAG has no self-loops. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP));
+            }
+
+            /* A DAG has no mutual edges. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL));
+            }
+
+            /* A DAG with at least one edge is not strongly connected.
+             * The only strongly connected DAG is the singleton. */
+            if (igraph_ecount(graph) > 0 && igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED));
+            }
+        }
+
+        /* A directed graph with self-loops ... */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+            igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+            /* ... is not a DAG. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_DAG)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_DAG));
+            }
+
+            /* ... is not a forest. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST));
+            }
+        }
+
+        /* A directed graph with mutual edges ... */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL) &&
+            igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+            /* ... is not a DAG. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_DAG)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_DAG));
+            }
+
+            /* ... is not a forest. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST));
+            }
+        }
+
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+            ! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED))
+        {
+            /* A graph that is not weakly connected is also not strongly connected. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED));
+            }
+        }
+
+        /* A graph that is strongly connected ... */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED) &&
+            igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED))
+        {
+            /* ... is not a DAG if it has at least an edge. */
+            if (igraph_ecount(graph) > 0 && igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_DAG)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_DAG));
+            }
+
+            /* ... is not a forest if it has at least an edge. */
+            if (igraph_ecount(graph) > 0 && igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST)) {
+                IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST));
+            }
+
+            /* ... is also weakly connected. */
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+                IGRAPH_ASSERT(igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED));
+            }
+        }
+    }
+
+    /* The empty graph is strongly/weakly connected only if it is the singleton graph.
+     * This also verified that the null graph is not cached to be connected. */
+    if (igraph_ecount(graph) == 0 && igraph_vcount(graph) != 1) {
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+            IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED));
+        }
+
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED)) {
+            IGRAPH_ASSERT(! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED));
+        }
+    }
+
+    /* An undirected simple graph with at least as many edges as a tree is weakly connected */
+    if (igraph_ecount(graph) >= igraph_vcount(graph)-1 &&
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        ! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP) &&
+        ! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI))
+    {
+        if ((! igraph_is_directed(graph)) ||
+            (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL) &&
+             ! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL))
+        ) {
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+                IGRAPH_ASSERT(igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED));
+            }
+        }
+    }
+}

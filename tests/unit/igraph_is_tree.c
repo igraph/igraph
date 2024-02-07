@@ -13,6 +13,7 @@ int main(void) {
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -23,6 +24,7 @@ int main(void) {
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(res);
     IGRAPH_ASSERT(root == 0);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -32,6 +34,7 @@ int main(void) {
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -41,6 +44,7 @@ int main(void) {
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -53,6 +57,7 @@ int main(void) {
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -64,6 +69,7 @@ int main(void) {
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(res);
     IGRAPH_ASSERT(root == 0);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -78,11 +84,13 @@ int main(void) {
 
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(res);
     IGRAPH_ASSERT(root == 0);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -94,14 +102,17 @@ int main(void) {
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
     IGRAPH_ASSERT(res);
     IGRAPH_ASSERT(root == 3);
+    cache_consistency_checks(&g);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_OUT);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(res);
     IGRAPH_ASSERT(root == 0);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -113,12 +124,15 @@ int main(void) {
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(res);
     IGRAPH_ASSERT(root == 0);
+    cache_consistency_checks(&g);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_OUT);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
@@ -131,6 +145,7 @@ int main(void) {
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     IGRAPH_ASSERT(! res);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 

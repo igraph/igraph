@@ -83,6 +83,7 @@ void validate_properties(const igraph_t* graph) {
     CHECK(is_strongly_connected);
     CHECK(has_mutual_edge);
     CHECK(has_mutual_nonloop_edge);
+    cache_consistency_checks(graph);
 }
 
 void test_basic_operations(igraph_t* graph) {

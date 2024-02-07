@@ -167,4 +167,7 @@ void record_last_warning(const char *reason, const char *file, int line);
             free(expect_warning_ctx.observed); \
         } \
     } while (0)
+
+void cache_consistency_checks(const igraph_t *graph);
+
 #endif /* TEST_UTILITIES_H */
