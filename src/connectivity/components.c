@@ -730,6 +730,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
         IGRAPH_FINALLY(igraph_destroy, &newg);
+        igraph_i_property_cache_set_bool(&newg, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
         resco++;
@@ -937,6 +938,8 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
             /* invmap = */ 0, /* map_is_prepared = */ 1
         ));
         IGRAPH_FINALLY(igraph_destroy, &newg);
+        igraph_i_property_cache_set_bool(&newg, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool(&newg, IGRAPH_PROP_IS_STRONGLY_CONNECTED, true);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
         IGRAPH_FINALLY_CLEAN(1);  /* ownership of newg now taken by 'components' */
 
