@@ -253,29 +253,40 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     igraph_integer_t visited_count;
     igraph_integer_t vcount, ecount;
 
-    vcount = igraph_vcount(graph);
-    ecount = igraph_ecount(graph);
-
     /* For undirected graphs and for directed graphs with mode == IGRAPH_ALL,
-     * we can return early if we know from the cache that the graph is weakly
-     * connected and is a forest. We can do this even if the user wants the
-     * root vertex because we always return zero as the root vertex for
-     * undirected graphs */
+     * we can return early if the cache has information on whether the graph
+     * is weakly connected and is a forest. We can do this even if the user
+     * wants the root vertex because we always return zero as the root vertex
+     * for undirected graphs */
     if (treat_as_undirected &&
         igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)
     ) {
-        is_tree = true;
-        iroot = 0;
+        is_tree = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST) &&
+                  igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED);
+        if (is_tree) {
+            iroot = 0;
+        }
         goto success;
     }
 
-    /* A tree must have precisely vcount-1 edges. */
-    /* By convention, the zero-vertex graph will not be considered a tree. */
+    vcount = igraph_vcount(graph);
+    ecount = igraph_ecount(graph);
+
+    /* A tree must have precisely vcount-1 edges.
+     * By convention, the zero-vertex graph will not be considered a tree.
+     *
+     * Cache use in the undirected case only:
+     * A graph with vcount-1 edges is a tree if and only if it is connected. */
     if (ecount != vcount - 1) {
         is_tree = false;
+        goto success;
+    } else if (treat_as_undirected &&
+               igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+        is_tree = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED);
+        if (is_tree) {
+            iroot = 0;
+        }
         goto success;
     }
 
@@ -369,12 +380,27 @@ success:
         *root = iroot;
     }
 
-    if (is_tree && treat_as_undirected) {
-        /* For undirected graphs (or directed graphs that are treated as
-         * undirected in this calculation), a tree is weakly connected and is
-         * a forest, so we can cache this */
+    if (is_tree) {
+        /* In both the directed and undirected case, if the graph is a tree, then
+         * it is a forest (i.e. undirected acyclic), weakly connected, and simple. */
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+
+        if (igraph_is_directed(graph)) {
+            /* Neither an undirected tree, nor an in- or out-tree has mutual edges. */
+            igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MUTUAL, false);
+
+            /* Any directed graph that has no undirected cycles cannot have
+             * directed cycles either. */
+            igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_DAG, true);
+
+            /* A DAG cannot be strongly connected if it has at least an edge. */
+            if (ecount > 0) {
+                igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, false);
+            }
+        }
     }
 
     return IGRAPH_SUCCESS;
@@ -502,28 +528,55 @@ static igraph_error_t igraph_i_is_forest(
  */
 igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
                                 igraph_vector_int_t *roots, igraph_neimode_t mode) {
-    /* Caching is enabled only if the graph is undirected or mode == IGRAPH_ALL.
-     * Also, we can't return early if we need to calculate the roots */
-    igraph_bool_t use_cache = (
-        !igraph_is_directed(graph) || mode == IGRAPH_ALL
-    );
+
+    const igraph_bool_t treat_as_undirected = !igraph_is_directed(graph) || mode == IGRAPH_ALL;
 
     if (!roots && !res) {
         return IGRAPH_SUCCESS;
     }
 
-    if (use_cache && !roots && res) {
+    /* From here on we rely on either 'roots' or 'res' being non-NULL. */
+
+    /* Caching is enabled only if the graph is undirected or mode == IGRAPH_ALL.
+     * Also, we can't return early if we need to calculate the roots */
+    if (treat_as_undirected && !roots && res) {
         IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_IS_FOREST, res);
     }
 
     IGRAPH_CHECK(igraph_i_is_forest(graph, res, roots, mode));
 
-    /* At this point we know whether the graph is a forest if we have at least
-     * one of 'res' or 'roots' */
-    if (res) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, *res);
-    } else if (roots) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, !igraph_vector_int_empty(roots));
+    /* At this point we know whether the graph is a forest based on
+     * either 'res' or 'roots', at least one of which is non-NULL. */
+    igraph_bool_t is_forest;
+    if (res != NULL) {
+        is_forest = *res;
+    } else /* roots != NULL */ {
+        is_forest = igraph_vcount(graph) == 0 || !igraph_vector_int_empty(roots);
+    }
+
+    if (treat_as_undirected && !is_forest) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
+    }
+    if (is_forest) {
+        /* In both the directed and undirected case, if the graph is a forest
+         * (i.e. undirected acyclic), then it is simple. */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+
+        if (igraph_is_directed(graph)) {
+            /* Neither an undirected forest, nor an in- or out-forest has mutual edges. */
+            igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MUTUAL, false);
+
+            /* Any directed graph that has no undirected cycles cannot have
+             * directed cycles either. */
+            igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_DAG, true);
+
+            /* A DAG cannot be strongly connected if it has at least an edge. */
+            if (igraph_ecount(graph) > 0) {
+                igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, false);
+            }
+        }
     }
 
     return IGRAPH_SUCCESS;
