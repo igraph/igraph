@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - When `igraph_is_forest()` tested for a directed in- or out-forest, and the test result was negative, it would incorrectly cache that the graph was not an undirected forest either.
+
 ## [0.10.9] - 2024-02-02
 
 ### Added
