@@ -1065,14 +1065,12 @@ igraph_radius_dijkstra:
     DEPS: weights ON graph
 
 igraph_pseudo_diameter:
-    NAME-R: pseudo_diameter
     PARAMS: |-
         GRAPH graph, OUT REAL diameter, VERTEX start_vid,
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
 
 igraph_pseudo_diameter_dijkstra:
-    NAME-R: pseudo_diameter
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         OUT REAL diameter, VERTEX start_vid,
