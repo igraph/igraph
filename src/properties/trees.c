@@ -215,13 +215,14 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * An undirected graph is a tree if it is connected and has no cycles.
  *
  * </para><para>
- * In the directed case, a possible additional requirement is that all
- * edges are oriented away from a root (out-tree or arborescence) or all edges
+ * In the directed case, an additional requirement is that all edges
+ * are oriented away from a root (out-tree or arborescence) or all edges
  * are oriented towards a root (in-tree or anti-arborescence).
  * This test can be controlled using the \p mode parameter.
  *
  * </para><para>
- * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
+ * By convention, the null graph (i.e. the graph with no vertices) is considered
+ * not to be connected, and therefore not a tree.
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
