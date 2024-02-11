@@ -29,7 +29,7 @@
 /**
  * \ingroup structural
  * \function igraph_are_connected
- * \brief Decides whether two vertices are connected.
+ * \brief Decides whether two vertices are adjacent.
  *
  * Decides whether there are any edges that have \p v1 and \p v2
  * as endpoints. This function is of course symmetric for undirected
