@@ -10,7 +10,7 @@
 <!-- doxrox-include about_structural -->
 
 <section id="basic-properties"><title>Basic properties</title>
-<!-- doxrox-include igraph_are_connected -->
+<!-- doxrox-include igraph_are_adjacent -->
 </section>
 
 <section id="Sparsifiers"><title>Sparsifiers</title>
@@ -252,6 +252,7 @@
 </section>
 
 <section id="structural-properties-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_are_connected -->
 <!-- doxrox-include igraph_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_shortest_paths_bellman_ford -->

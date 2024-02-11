@@ -724,7 +724,7 @@ igraph_error_t igraph_minimum_size_separators(
             if (ii == j) {
                 continue;    /* the same vertex */
             }
-            IGRAPH_CHECK(igraph_are_connected(&graph_copy, ii, j, &conn));
+            IGRAPH_CHECK(igraph_are_adjacent(&graph_copy, ii, j, &conn));
             if (conn) {
                 continue;    /* they are connected */
             }
