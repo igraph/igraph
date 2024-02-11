@@ -205,7 +205,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     // explicitly; it will only exist in terms of the incidence and the adjacency
     // lists, maintained in parallel as the edges are removed from the residual
     // graph.
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_NO_LOOPS));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &adjlist, &inclist));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
