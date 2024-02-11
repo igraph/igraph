@@ -465,22 +465,23 @@ static igraph_error_t igraph_i_is_forest(
  * \function igraph_is_forest
  * \brief Decides whether the graph is a forest.
  *
- * An undirected graph is a forest if it has no cycles.
- * </para><para>
+ * An undirected graph is a forest if it has no cycles. Equivalently,
+ * a graph is a forest if all connected components are trees.
  *
- * In the directed case, a possible additional requirement is that edges in each
+ * </para><para>
+ * In the directed case, an additional requirement is that edges in each
  * tree are oriented away from the root (out-trees or arborescences) or all edges
  * are oriented towards the root (in-trees or anti-arborescences).
  * This test can be controlled using the \p mode parameter.
- * </para><para>
  *
+ * </para><para>
  * By convention, the null graph (i.e. the graph with no vertices) is considered to be a forest.
- * </para><para>
  *
+ * </para><para>
  * The \p res return value of this function is cached in the graph itself if
  * \p mode is set to \c IGRAPH_ALL or if the graph is undirected. Calling the
  * function multiple times with no modifications to the graph in between
- * will return a cached value in O(1) time if the roots are not asked for.
+ * will return a cached value in O(1) time if the roots are not requested.
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable. If not \c NULL, then the result will be stored
