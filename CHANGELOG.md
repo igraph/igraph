@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
+
 ## [0.10.9] - 2024-02-02
 
 ### Added
