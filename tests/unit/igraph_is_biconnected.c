@@ -27,16 +27,19 @@ int main(void) {
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_small(&g, 2, IGRAPH_UNDIRECTED,
@@ -44,6 +47,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
@@ -52,6 +56,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
@@ -64,6 +69,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
@@ -71,6 +77,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
@@ -78,6 +85,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     /* Two disjoint cycles */
@@ -86,6 +94,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     /* Cycle + isolated vertex */
@@ -94,6 +103,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     /* Special case: the root is an articulation point */
@@ -102,6 +112,7 @@ int main(void) {
                  -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
+    cache_consistency_checks(&g);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
@@ -120,6 +131,7 @@ int main(void) {
     IGRAPH_ASSERT(result);
     igraph_is_acyclic(&g, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&g);
 
     igraph_invalidate_cache(&g);
 
@@ -127,9 +139,11 @@ int main(void) {
     IGRAPH_ASSERT(acyclic);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(result);
+    cache_consistency_checks(&g);
 
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

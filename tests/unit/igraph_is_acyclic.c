@@ -28,24 +28,28 @@ int main(void) {
     igraph_empty(&graph, 0, IGRAPH_DIRECTED);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Null graph undirected */
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Singleton graph directed */
     igraph_empty(&graph, 1, IGRAPH_DIRECTED);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Singleton graph undirected */
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Directed cyclic */
@@ -54,6 +58,7 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(!acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Directed acyclic */
@@ -62,6 +67,7 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Undirected cyclic */
@@ -70,6 +76,7 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(! acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Undirected acyclic */
@@ -78,6 +85,7 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Self loop directed */
@@ -86,6 +94,7 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(! acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Self loop undirected */
@@ -94,6 +103,7 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(! acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     /* Directed acyclic graph which would be cyclic if undirected */
@@ -102,10 +112,10 @@ int main(void) {
         -1);
     igraph_is_acyclic(&graph, &acyclic);
     IGRAPH_ASSERT(acyclic);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
 
     return 0;
-
 }

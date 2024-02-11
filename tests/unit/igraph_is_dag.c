@@ -28,6 +28,7 @@ int main(void) {
         igraph_empty(&graph, n, IGRAPH_DIRECTED);
         igraph_is_dag(&graph, &is_dag);
         IGRAPH_ASSERT(is_dag);
+        cache_consistency_checks(&graph);
         igraph_destroy(&graph);
     }
 
@@ -36,6 +37,7 @@ int main(void) {
         igraph_empty(&graph, n, IGRAPH_UNDIRECTED);
         igraph_is_dag(&graph, &is_dag);
         IGRAPH_ASSERT(!is_dag);
+        cache_consistency_checks(&graph);
         igraph_destroy(&graph);
     }
 
@@ -45,6 +47,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // reciprocal edges -- not a DAG
@@ -53,6 +56,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(! is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // 4-cycle -- not a DAG
@@ -61,6 +65,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(!is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // 4-cycle with outgoing edge -- not a DAG
@@ -69,6 +74,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(!is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // 4-cycle with incoming edge -- not a DAG
@@ -77,6 +83,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(!is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // X shape, DAG
@@ -85,6 +92,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // self-loop present, not a DAG
@@ -93,6 +101,7 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(!is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // singleton with self-loop
@@ -101,24 +110,28 @@ int main(void) {
                  -1);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(!is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // out-tree
     igraph_kary_tree(&graph, 6, 2, IGRAPH_TREE_OUT);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // in-tree
     igraph_kary_tree(&graph, 6, 2, IGRAPH_TREE_IN);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     // undirected -- not a DAG
     igraph_kary_tree(&graph, 6, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_is_dag(&graph, &is_dag);
     IGRAPH_ASSERT(!is_dag);
+    cache_consistency_checks(&graph);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

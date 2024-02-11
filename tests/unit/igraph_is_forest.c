@@ -34,6 +34,7 @@ void check_output(const igraph_t *graph, igraph_bool_t *res, igraph_neimode_t mo
         printf("Not a forest.\n");
     }
     IGRAPH_ASSERT(*res == result);
+    cache_consistency_checks(graph);
     igraph_vector_int_destroy(&roots);
     printf("\n");
 }
@@ -125,8 +126,22 @@ int main(void) {
     mode=IGRAPH_ALL;
     res=0;
     check_output(&graph, &res, mode);
-
     igraph_destroy(&graph);
+
+    /* Cache testing */
+
+    /* 1 <- 0 -> 2 <- 3 */
+    igraph_small(&graph, 0, IGRAPH_DIRECTED,
+                 0,1, 0,2, 3,2, -1);
+    /* This must not cache that the graph is not a forest,
+     * as we are only checking the directed case: */
+    igraph_is_forest(&graph, &res, NULL, IGRAPH_OUT);
+    IGRAPH_ASSERT(!res);
+    igraph_is_forest(&graph, &res, NULL, IGRAPH_ALL);
+    IGRAPH_ASSERT(res);
+    cache_consistency_checks(&graph);
+    igraph_destroy(&graph);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

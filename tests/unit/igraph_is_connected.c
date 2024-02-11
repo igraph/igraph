@@ -32,6 +32,7 @@ int main(void) {
 
     igraph_is_connected(&graph, &conn, IGRAPH_STRONG);
     IGRAPH_ASSERT(! conn);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
@@ -43,6 +44,7 @@ int main(void) {
 
     igraph_is_connected(&graph, &conn, IGRAPH_STRONG);
     IGRAPH_ASSERT(conn);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
@@ -55,6 +57,7 @@ int main(void) {
 
     igraph_is_connected(&graph, &conn, IGRAPH_STRONG);
     IGRAPH_ASSERT(! conn);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
@@ -67,6 +70,7 @@ int main(void) {
 
     igraph_is_connected(&graph, &conn, IGRAPH_STRONG);
     IGRAPH_ASSERT(! conn);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
@@ -80,6 +84,7 @@ int main(void) {
 
     igraph_is_connected(&graph, &conn, IGRAPH_STRONG);
     IGRAPH_ASSERT(! conn);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
@@ -93,6 +98,7 @@ int main(void) {
 
     igraph_is_connected(&graph, &conn, IGRAPH_STRONG);
     IGRAPH_ASSERT(conn);
+    cache_consistency_checks(&graph);
 
     igraph_destroy(&graph);
 
