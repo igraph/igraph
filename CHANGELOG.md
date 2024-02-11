@@ -6,6 +6,10 @@
 
  - `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
 
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.9] - 2024-02-02
 
 ### Added
@@ -30,7 +34,7 @@
  - Performance: Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
  - Performance: Improved cache use by `igraph_is_bipartite()`.
  - The documentation is now also generated in Texinfo format.
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.10.8] - 2023-11-17
 
