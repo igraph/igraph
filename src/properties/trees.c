@@ -257,20 +257,29 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
 
-    /* For undirected graphs and for directed graphs with mode == IGRAPH_ALL,
-     * we can return early if we know from the cache that the graph is weakly
-     * connected and is a forest. We can do this even if the user wants the
-     * root vertex because we always return zero as the root vertex for
-     * undirected graphs */
-    if (treat_as_undirected &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)
-    ) {
-        is_tree = true;
-        iroot = 0;
-        goto success;
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+        igraph_bool_t weakly_connected = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED);
+
+        if (weakly_connected) {
+            /* For undirected graphs and for directed graphs with mode == IGRAPH_ALL,
+             * we can return early if we know from the cache that the graph is weakly
+             * connected and is a forest. We can do this even if the user wants the
+             * root vertex because we always return zero as the root vertex for
+             * undirected graphs */
+            if (treat_as_undirected &&
+                igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+                igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST)
+            ) {
+                is_tree = true;
+                iroot = 0;
+                goto success;
+            }
+        } else /* ! weakly_connected */ {
+            /* If the graph is not weakly connected, then it is neither an undirected
+             * not a directed tree. There is no root, so we can return early. */
+            is_tree = false;
+            goto success;
+        }
     }
 
     /* A tree must have precisely vcount-1 edges. */
@@ -370,10 +379,10 @@ success:
         *root = iroot;
     }
 
-    if (is_tree && treat_as_undirected) {
-        /* For undirected graphs (or directed graphs that are treated as
-         * undirected in this calculation), a tree is weakly connected and is
-         * a forest, so we can cache this */
+    if (is_tree) {
+        /* A graph that is a directed tree is also an undirected tree.
+         * An undirected tree is weakly connected and is a forest,
+         * so we can cache this. */
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
