@@ -3,10 +3,6 @@
 export DEPS_PATH=/src/deps
 mkdir $DEPS_PATH
 
-# Float divide by zero should not be an error; igraph relies on it extensively
-CFLAGS="${CFLAGS} -fno-sanitize=float-divide-by-zero"
-CXXFLAGS="${CXXFLAGS} -fno-sanitize=float-divide-by-zero"
-
 # Build libxml2 without ICU support, https://github.com/igraph/igraph/issues/1992
 # Building libxml2 from scratch is also required for MemorySanitizer.
 # It may be necessary to leave CMAKE_BUILD_TYPE empty and specify LIBXML2_WITH_MODULES=OFF
@@ -84,7 +80,7 @@ XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 #  - vertex_connectivity, too slow
 # disabled for UBSan:
 #  - read_dimacs_flow, needs a complete rewrite, see https://github.com/igraph/igraph/issues/1924
-TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected"
+TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected centrality"
 if [ "$SANITIZER" != "undefined" ]
 then
   TARGETS="$TARGETS read_dimacs_flow"
