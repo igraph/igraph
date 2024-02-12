@@ -7,6 +7,10 @@
  - When `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
  - `igraph_spanner()` now correctly ignores edge directions, and no longer crashes on directed graphs.
 
+### Deprecated
+
+ - `igraph_are_connected()` is renamed to `igraph_are_adjacent()`; the old name is kept available until at least igraph 1.0.
+
 ### Other
 
  - Documentation improvements.

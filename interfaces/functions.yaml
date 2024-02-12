@@ -405,6 +405,9 @@ igraph_sample_dirichlet:
 # Basic query functions
 #######################################
 
+igraph_are_adjacent:
+    PARAMS: GRAPH graph, VERTEX v1, VERTEX v2, OUT BOOLEAN res
+
 igraph_are_connected:
     PARAMS: GRAPH graph, VERTEX v1, VERTEX v2, OUT BOOLEAN res
 
