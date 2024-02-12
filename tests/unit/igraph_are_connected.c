@@ -28,11 +28,11 @@ int main(void) {
     /* Complete graph. Any two distinct vertices are connected. */
 
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-
-    igraph_are_connected(&g, 2, 7, &connected);
+    
+    igraph_are_adjacent(&g, 2, 7, &connected);
     IGRAPH_ASSERT(connected);
-
-    igraph_are_connected(&g, 0, 0, &connected);
+    
+    igraph_are_adjacent(&g, 0, 0, &connected);
     IGRAPH_ASSERT(! connected);
 
     igraph_destroy(&g);
@@ -40,10 +40,10 @@ int main(void) {
     /* Complete graph with self-loops. */
 
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    igraph_are_connected(&g, 1, 7, &connected);
+    igraph_are_adjacent(&g, 1, 7, &connected);
     IGRAPH_ASSERT(connected);
-
-    igraph_are_connected(&g, 2, 2, &connected);
+    
+    igraph_are_adjacent(&g, 2, 2, &connected);
     IGRAPH_ASSERT(connected);
 
     igraph_destroy(&g);
@@ -51,7 +51,7 @@ int main(void) {
     /* Graph with no edges. Any two distinct vertices are disconnected. */
 
     igraph_empty(&g, 10, IGRAPH_DIRECTED);
-    igraph_are_connected(&g, 3, 6, &connected);
+    igraph_are_adjacent(&g, 3, 6, &connected);
     IGRAPH_ASSERT(! connected);
     igraph_destroy(&g);
 
@@ -59,7 +59,7 @@ int main(void) {
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 2,3, -1);
     igraph_set_error_handler(igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_are_connected(&g, 0, igraph_vcount(&g) + 2 /* vertex ID out of range */, &connected) == IGRAPH_EINVVID);
+    IGRAPH_ASSERT(igraph_are_adjacent(&g, 0, igraph_vcount(&g) + 2 /* vertex ID out of range */, &connected) == IGRAPH_EINVVID);
     igraph_set_error_handler(igraph_error_handler_abort);
     igraph_destroy(&g);
 

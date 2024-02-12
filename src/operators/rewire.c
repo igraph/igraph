@@ -155,7 +155,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                         ok = 0;
                     }
                 } else {
-                    IGRAPH_CHECK(igraph_are_connected(graph, a, d, &ok));
+                    IGRAPH_CHECK(igraph_are_adjacent(graph, a, d, &ok));
                     ok = !ok;
                 }
             }
@@ -165,7 +165,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                         ok = 0;
                     }
                 } else {
-                    IGRAPH_CHECK(igraph_are_connected(graph, c, b, &ok));
+                    IGRAPH_CHECK(igraph_are_adjacent(graph, c, b, &ok));
                     ok = !ok;
                 }
             }
