@@ -621,7 +621,7 @@ igraph_widest_path_widths_floyd_warshall:
 
 igraph_spanner:
     PARAMS: |-
-        GRAPH graph, OUT EDGE_INDICES spanner, REAL stretch, EDGEWEIGHTS weights
+        GRAPH graph, OUT EDGE_INDICES spanner, REAL stretch, OPTIONAL EDGEWEIGHTS weights
     DEPS: weights ON graph
 
 igraph_subcomponent:
