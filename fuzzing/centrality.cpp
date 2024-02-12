@@ -41,6 +41,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         VECTOR(edges)[i] = Data[i+1];
     }
 
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     /* Undirected */
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_vector_t v;
@@ -70,6 +72,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_transitivity_undirected(&graph, &r, IGRAPH_TRANSITIVITY_NAN);
             igraph_transitivity_local_undirected(&graph, &v, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
             igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &v, &r, igraph_vss_all(), IGRAPH_DIRECTED, 0.6, NULL, NULL);
+            igraph_constraint(&graph, &v, igraph_vss_all(), NULL);
+            igraph_spanner(&graph, &iv, 2.34, NULL);
 
             igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
             igraph_simplify(&graph, /* multiple */ true, /* loops */ false, NULL);
