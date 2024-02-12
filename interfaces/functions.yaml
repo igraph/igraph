@@ -1611,7 +1611,7 @@ igraph_community_walktrap:
 
 igraph_community_edge_betweenness:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR_INT result, OPTIONAL OUT VECTOR edge_betweenness,
+        GRAPH graph, OUT VECTOR_INT removed_edges, OPTIONAL OUT VECTOR edge_betweenness,
         OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership,
         BOOLEAN directed=True, OPTIONAL EDGEWEIGHTS weights=NULL

@@ -364,7 +364,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \em weakly connected components are detected.
  *
  * \param graph The input graph.
- * \param result Pointer to an initialized vector, the result will be
+ * \param removed_edges Pointer to an initialized vector, the result will be
  *     stored here, the IDs of the removed edges in the order of their
  *     removal. It will be resized as needed. It may be \c NULL if
  *     the edge IDs are not needed by the caller.
@@ -406,7 +406,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \example examples/simple/igraph_community_edge_betweenness.c
  */
 igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                      igraph_vector_int_t *result,
+                                      igraph_vector_int_t *removed_edges,
                                       igraph_vector_t *edge_betweenness,
                                       igraph_matrix_int_t *merges,
                                       igraph_vector_int_t *bridges,
