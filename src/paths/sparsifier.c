@@ -395,7 +395,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         }
 
         // Commit the new clustering
-        igraph_vector_int_update(&clustering, &new_clustering);
+        igraph_vector_int_update(&clustering, &new_clustering); /* reserved */
 
         // Remove intra-cluster edges
         for (v = 0; v < no_of_nodes; v++) {
