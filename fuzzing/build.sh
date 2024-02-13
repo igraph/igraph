@@ -8,9 +8,9 @@ mkdir $DEPS_PATH
 # It may be necessary to leave CMAKE_BUILD_TYPE empty and specify LIBXML2_WITH_MODULES=OFF
 # in order for fuzz introspector builds to succeed (details unverified).
 cd $SRC
-wget https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.4.tar.xz
-tar xf libxml2-2.12.4.tar.xz
-cd libxml2-2.12.4
+wget https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.5.tar.xz
+tar xf libxml2-2.12.5.tar.xz
+cd libxml2-2.12.5
 mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_MODULES=OFF
 make install -j$(nproc)
@@ -80,7 +80,7 @@ XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 #  - vertex_connectivity, too slow
 # disabled for UBSan:
 #  - read_dimacs_flow, needs a complete rewrite, see https://github.com/igraph/igraph/issues/1924
-TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected"
+TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected centrality community"
 if [ "$SANITIZER" != "undefined" ]
 then
   TARGETS="$TARGETS read_dimacs_flow"

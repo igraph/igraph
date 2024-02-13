@@ -38,6 +38,21 @@
 
 ## [master]
 
+## [0.10.10] - 2024-02-13
+
+### Fixed
+
+ - When `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
+ - `igraph_spanner()` now correctly ignores edge directions, and no longer crashes on directed graphs.
+
+### Deprecated
+
+ - `igraph_are_connected()` is renamed to `igraph_are_adjacent()`; the old name is kept available until at least igraph 1.0.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.9] - 2024-02-02
 
 ### Added
@@ -62,7 +77,7 @@
  - Performance: Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
  - Performance: Improved cache use by `igraph_is_bipartite()`.
  - The documentation is now also generated in Texinfo format.
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.10.8] - 2023-11-17
 
@@ -1306,7 +1321,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.9..master
+[master]: https://github.com/igraph/igraph/compare/0.10.10..master
+[0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
 [0.10.9]: https://github.com/igraph/igraph/compare/0.10.8..0.10.9
 [0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
 [0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7

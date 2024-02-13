@@ -17,6 +17,9 @@ igraph_add_edges:
     PARAMS: INOUT GRAPH graph, VERTEX_INDEX_PAIRS edges, ATTRIBUTES attr
     DEPS: edges ON graph
 
+igraph_empty_attrs:
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed, ATTRIBUTES attr
+
 igraph_add_vertices:
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
 
@@ -65,9 +68,6 @@ igraph_edge:
 igraph_edges:
     PARAMS: GRAPH graph, EDGE_SELECTOR eids, OUT VECTOR_INT edges
     DEPS: eids ON graph
-
-igraph_empty_attrs:
-    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed, ATTRIBUTES attr
 
 igraph_get_eid:
     PARAMS: |-
@@ -405,6 +405,9 @@ igraph_sample_dirichlet:
 # Basic query functions
 #######################################
 
+igraph_are_adjacent:
+    PARAMS: GRAPH graph, VERTEX v1, VERTEX v2, OUT BOOLEAN res
+
 igraph_are_connected:
     PARAMS: GRAPH graph, VERTEX v1, VERTEX v2, OUT BOOLEAN res
 
@@ -621,7 +624,7 @@ igraph_widest_path_widths_floyd_warshall:
 
 igraph_spanner:
     PARAMS: |-
-        GRAPH graph, OUT EDGE_INDICES spanner, REAL stretch, EDGE_WEIGHTS weights
+        GRAPH graph, OUT EDGE_INDICES spanner, REAL stretch, OPTIONAL EDGE_WEIGHTS weights
     DEPS: weights ON graph
 
 igraph_subcomponent:
@@ -1065,14 +1068,12 @@ igraph_radius_dijkstra:
     DEPS: weights ON graph
 
 igraph_pseudo_diameter:
-    NAME-R: pseudo_diameter
     PARAMS: |-
         GRAPH graph, OUT REAL diameter, VERTEX start_vid,
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
 
 igraph_pseudo_diameter_dijkstra:
-    NAME-R: pseudo_diameter
     PARAMS: |-
         GRAPH graph, EDGE_WEIGHTS weights=NULL,
         OUT REAL diameter, VERTEX start_vid,
@@ -1613,7 +1614,7 @@ igraph_community_walktrap:
 
 igraph_community_edge_betweenness:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR_INT result, OPTIONAL OUT VECTOR edge_betweenness,
+        GRAPH graph, OUT VECTOR_INT removed_edges, OPTIONAL OUT VECTOR edge_betweenness,
         OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership,
         BOOLEAN directed=True, OPTIONAL EDGE_WEIGHTS weights=NULL

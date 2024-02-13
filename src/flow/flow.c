@@ -1750,20 +1750,20 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
 
     switch (neighbors) {
     case IGRAPH_VCONN_NEI_ERROR:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        IGRAPH_CHECK(igraph_are_adjacent(graph, source, target, &conn));
         if (conn) {
             IGRAPH_ERROR("Source and target vertices connected.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_VCONN_NEI_NEGATIVE:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        IGRAPH_CHECK(igraph_are_adjacent(graph, source, target, &conn));
         if (conn) {
             *res = -1;
             return IGRAPH_SUCCESS;
         }
         break;
     case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        IGRAPH_CHECK(igraph_are_adjacent(graph, source, target, &conn));
         if (conn) {
             *res = no_of_nodes;
             return IGRAPH_SUCCESS;
