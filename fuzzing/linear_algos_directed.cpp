@@ -77,6 +77,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_OUT, &iv1, &iv2);
             igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
             igraph_bfs(&graph, 0, NULL, IGRAPH_OUT, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
+
+            igraph_reverse_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID));
+
             igraph_dfs(&graph, 0, IGRAPH_OUT, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
             igraph_bfs_simple(&graph, 0, IGRAPH_OUT, &iv1, &iv2, &iv3);
             igraph_dominator_tree(&graph, 0, &iv1, NULL, &iv2, IGRAPH_OUT);
@@ -97,6 +100,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_graph_list_init(&gl, 0);
         igraph_decompose(&graph, &gl, IGRAPH_STRONG, 10, 5);
         igraph_graph_list_destroy(&gl);
+
+        if (igraph_vcount(&graph) >= 2) {
+            igraph_get_all_eids_between(&graph, &iv2, 0, 1, IGRAPH_DIRECTED);
+            igraph_get_all_eids_between(&graph, &iv2, 1, 0, IGRAPH_UNDIRECTED);
+            igraph_get_all_eids_between(&graph, &iv2, 0, 0, IGRAPH_UNDIRECTED);
+
+            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1);
+            igraph_vector_int_push_back(&iv1, 0);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 0);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_get_eids(&graph, &iv2, &iv1, IGRAPH_DIRECTED, false);
+        }
 
         igraph_simplify(&graph, true, true, NULL);
 

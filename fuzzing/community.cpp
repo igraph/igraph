@@ -87,6 +87,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 }
             }
 
+            {
+                igraph_t graph2;
+                igraph_copy(&graph2, &graph);
+                igraph_contract_vertices(&graph2, &membership, NULL);
+                igraph_destroy(&graph2);
+            }
+
             igraph_modularity(&graph, &membership, NULL, 1.5, IGRAPH_UNDIRECTED, &m);
             igraph_modularity_matrix(&graph, NULL, 0.75, &mat, IGRAPH_DIRECTED);
 

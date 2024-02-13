@@ -88,6 +88,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
         }
 
+        if (igraph_vcount(&graph) >= 2) {
+            igraph_get_all_eids_between(&graph, &iv2, 1, 0, IGRAPH_UNDIRECTED);
+            igraph_get_all_eids_between(&graph, &iv2, 0, 0, IGRAPH_UNDIRECTED);
+
+            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1);
+            igraph_vector_int_push_back(&iv1, 0);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_get_eids(&graph, &iv2, &iv1, IGRAPH_UNDIRECTED, false);
+        }
+
         igraph_is_eulerian(&graph, &b, &b2);
         if (b) igraph_eulerian_path(&graph, &iv1, &iv2);
         if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
