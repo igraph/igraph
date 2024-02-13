@@ -28,10 +28,10 @@ int main(void) {
     /* Complete graph. Any two distinct vertices are connected. */
 
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    
+
     igraph_are_adjacent(&g, 2, 7, &connected);
     IGRAPH_ASSERT(connected);
-    
+
     igraph_are_adjacent(&g, 0, 0, &connected);
     IGRAPH_ASSERT(! connected);
 
@@ -42,7 +42,7 @@ int main(void) {
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     igraph_are_adjacent(&g, 1, 7, &connected);
     IGRAPH_ASSERT(connected);
-    
+
     igraph_are_adjacent(&g, 2, 2, &connected);
     IGRAPH_ASSERT(connected);
 
