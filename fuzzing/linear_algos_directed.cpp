@@ -68,6 +68,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_count_multiple(&graph, &iv1, igraph_ess_all(IGRAPH_EDGEORDER_ID));
         igraph_is_loop(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_FROM));
         igraph_is_multiple(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO));
+        igraph_is_mutual(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO), false);
         igraph_maxdegree(&graph, &i, igraph_vss_all(), IGRAPH_IN, true);
 
         // These algorithms require a starting vertex,
@@ -86,6 +87,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_subcomponent(&graph, &iv1, 0, IGRAPH_OUT);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, true);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
+
+            igraph_t g;
+            igraph_vector_int_resize(&iv1, 1);
+            VECTOR(iv1)[0] = 0;
+            igraph_unfold_tree(&graph, &g, IGRAPH_IN, &iv1, &iv2);
+            igraph_destroy(&g);
         }
 
         igraph_is_dag(&graph, &b);

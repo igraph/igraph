@@ -117,6 +117,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         }
         igraph_destroy(&g);
 
+        if (igraph_vcount(&graph) >= 1) {
+            igraph_vector_int_resize(&iv1, 1);
+            VECTOR(iv1)[0] = 0;
+            igraph_unfold_tree(&graph, &g, IGRAPH_ALL, &iv1, &iv2);
+            igraph_destroy(&g);
+        }
+
         igraph_graph_list_init(&gl, 0);
         igraph_decompose(&graph, &gl, IGRAPH_WEAK, -1, 4);
         igraph_graph_list_destroy(&gl);
