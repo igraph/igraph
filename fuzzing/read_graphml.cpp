@@ -39,6 +39,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // Do the fuzzing
     igraph_t g;
     if (igraph_read_graph_graphml(&g, ifile, 0) == IGRAPH_SUCCESS) {
+
+        FILE *ofile = fopen("/dev/null", "w");
+        if (ofile) {
+            igraph_write_graph_graphml(&g, ofile, true);
+            fclose(ofile);
+        }
+
         // Clean up
         igraph_destroy(&g);
     }
