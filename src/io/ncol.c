@@ -30,11 +30,11 @@
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
 
-int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
-                                  void* scanner);
-int igraph_ncol_yylex_destroy (void *scanner );
-int igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
-void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
+int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t *user_defined,
+                                  void *scanner);
+int igraph_ncol_yylex_destroy(void *scanner);
+int igraph_ncol_yyparse(igraph_i_ncol_parsedata_t *context);
+void igraph_ncol_yyset_in(FILE *in_str, void *yyscanner);
 
 /* for IGRAPH_FINALLY, which assumes that destructor functions return void */
 void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
