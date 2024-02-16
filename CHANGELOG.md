@@ -6,6 +6,7 @@
 
  - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
  - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
+ - Fixed the handling of duplicate edge IDs in `igraph_subgraph_from_edges()`.
 
 ### Other
 
