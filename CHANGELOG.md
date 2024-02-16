@@ -5,6 +5,11 @@
 ### Fixed
 
  - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
+ - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
+
+### Other
+
+ - Documentation improvements.
 
 ## [0.10.10] - 2024-02-13
 
