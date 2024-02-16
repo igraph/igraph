@@ -247,6 +247,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     igraph_eit_t it;
     igraph_integer_t actvertex = -1;
     igraph_attribute_type_t nametype, weighttype;
+    const igraph_integer_t vcount = igraph_vcount(graph), ecount = igraph_ecount(graph);
 
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
                                    &it));
@@ -301,8 +302,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     } else if (weights == NULL) {
         /* No weights but use names */
         igraph_strvector_t nvec;
-        IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
+        IGRAPH_STRVECTOR_INIT_FINALLY(&nvec, vcount);
         IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
                      igraph_vss_all(),
                      &nvec));
@@ -326,11 +326,12 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             }
             IGRAPH_EIT_NEXT(it);
         }
+        igraph_strvector_destroy(&nvec);
         IGRAPH_FINALLY_CLEAN(1);
     } else if (names == NULL) {
         /* No names but weights */
         igraph_vector_t wvec;
-        IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
+        IGRAPH_VECTOR_INIT_FINALLY(&wvec, ecount);
         IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, weights,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
@@ -358,9 +359,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         /* Both names and weights */
         igraph_strvector_t nvec;
         igraph_vector_t wvec;
-        IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
-        IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
+        IGRAPH_VECTOR_INIT_FINALLY(&wvec, ecount);
+        IGRAPH_STRVECTOR_INIT_FINALLY(&nvec, vcount);
         IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, weights,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
@@ -397,15 +397,14 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     }
 
     if (isolates) {
-        igraph_integer_t nov = igraph_vcount(graph);
+        igraph_integer_t nov = vcount;
         igraph_integer_t i;
         int ret = 0;
         igraph_integer_t deg;
         igraph_strvector_t nvec;
         const char *str;
 
-        IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
+        IGRAPH_STRVECTOR_INIT_FINALLY(&nvec, 1);
         for (i = 0; i < nov; i++) {
             IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, IGRAPH_ALL, IGRAPH_LOOPS));
             if (deg == 0) {
