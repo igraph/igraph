@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
+
 ## [0.10.10] - 2024-02-13
 
 ### Fixed

@@ -1059,6 +1059,10 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             igraph_real_t val = VECTOR(*myid)[i];
             if (val != (igraph_integer_t) val) {
                 IGRAPH_WARNINGF("%g is not a valid integer id for GML files, ignoring all supplied ids.", val);
+                if (myid == &v_myid) {
+                    igraph_vector_destroy(&v_myid);
+                    IGRAPH_FINALLY_CLEAN(1);
+                }
                 myid = NULL;
                 break;
             }
@@ -1070,6 +1074,10 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_vector_is_duplicate_free(myid, &duplicate_free));
         if (! duplicate_free) {
             IGRAPH_WARNING("Duplicate id values found, ignoring supplies ids.");
+            if (myid == &v_myid) {
+                igraph_vector_destroy(&v_myid);
+                IGRAPH_FINALLY_CLEAN(1);
+            }
             myid = NULL;
         }
     }
