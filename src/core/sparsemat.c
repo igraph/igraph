@@ -2109,6 +2109,8 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
  *    sparse matrix.
  * \return Error code.
  *
+ * \sa \ref igraph_sparsemat_as_matrix() for the reverse conversion.
+ *
  * Time complexity: O(mn), the number of elements in the dense
  * matrix.
  */
@@ -2198,6 +2200,8 @@ static igraph_error_t igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
  * \param spmat The input sparse matrix, in triplet or
  *    column-compressed format.
  * \return Error code.
+ *
+ * \sa \ref igraph_matrix_as_sparsemat() for the reverse conversion.
  *
  * Time complexity: O(mn), the number of elements in the dense
  * matrix.
