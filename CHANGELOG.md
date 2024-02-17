@@ -7,6 +7,7 @@
  - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
  - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
  - Fixed the handling of duplicate edge IDs in `igraph_subgraph_from_edges()`.
+ - Fixed conversion of sparse matrices to dense with `igraph_sparsemat_as_matrix()` when sparse matrix object did not make use of its full allocated capacity.
 
 ### Other
 

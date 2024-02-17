@@ -2152,13 +2152,13 @@ static igraph_error_t igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
     CS_INT *p = spmat->cs->p;
     CS_INT *i = spmat->cs->i;
     CS_ENTRY *x = spmat->cs->x;
-    CS_INT nzmax = spmat->cs->nzmax;
+    CS_INT elem_count = spmat->cs->p[ spmat->cs->n ];
 
     IGRAPH_CHECK(igraph_matrix_resize(res, nrow, ncol));
     igraph_matrix_null(res);
 
-    while (*p < nzmax) {
-        while (to < * (p + 1)) {
+    while (*p < elem_count) {
+        while (to < *(p + 1)) {
             MATRIX(*res, *i, from) += *x;
             to++;
             i++;
