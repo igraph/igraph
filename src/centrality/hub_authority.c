@@ -137,19 +137,28 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
 
 /**
  * \function igraph_hub_and_authority_scores
- * \brief Kleinberg's hub and authority scores.
+ * \brief Kleinberg's hub and authority scores (HITS).
  *
  * Hub and authority scores are a generalization of the ideas behind
  * eigenvector centrality to directed graphs. The authority score of
  * a vertex is proportional to the sum of the hub scores of vertices
  * that point to it. Conversely, the hub score of a vertex is proportional
- * to the sum of authority scores of vertices that it points to.
+ * to the sum of authority scores of vertices that it points to. These
+ * concepts are also known under the name Hyperlink-Induced Topic Search (HITS).
  *
  * </para><para>
  * The hub and authority scores of the vertices are defined as the principal
  * eigenvectors of <code>A A^T</code> and <code>A^T A</code>, respectively,
  * where <code>A</code> is the adjacency matrix of the graph and <code>A^T</code>
  * is its transposed.
+ *
+ * </para><para>
+ * If vector \c h and \c a contain hub and authority scores, then the two
+ * scores are related by <code>h = Aa</code> and <code>a = Ah</code>.
+ * When the principal eigenvalue of <code>A A^T</code> is dengenerate, there
+ * is no unique solution to the hub- and authority-score problem.
+ * igraph guarantees that the scores that are returned are matching, i.e. are
+ * related by these formulas, even in this situation.
  *
  * </para><para>
  * The concept of hub and authority scores were developed for \em directed graphs.

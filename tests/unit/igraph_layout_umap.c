@@ -93,7 +93,7 @@ void check_graph_twoclusters_weights(
     igraph_integer_t nc = igraph_vector_size(weights);
     igraph_integer_t nd;
 
-    if (distances == NULL) {     
+    if (distances == NULL) {
         for (i = 0; i < nc; i++) {
             if (VECTOR(*weights)[i] != 1.0) {
                 printf("Connectivities with NULL distances should all be 1 or -1.\n");
@@ -233,7 +233,7 @@ int main(void) {
     printf("Singleton graph:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, &layout, 0, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_singleton(&layout);
-    
+
     printf("Singleton graph, use seed:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, &layout, 1, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_singleton(&layout);

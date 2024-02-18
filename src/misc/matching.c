@@ -110,11 +110,11 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
             *result = false; return IGRAPH_SUCCESS;
         }
         /* Matched vertices must be connected */
-        IGRAPH_CHECK(igraph_are_connected(graph, i,
+        IGRAPH_CHECK(igraph_are_adjacent(graph, i,
                                           j, &conn));
         if (!conn) {
             /* Try the other direction -- for directed graphs */
-            IGRAPH_CHECK(igraph_are_connected(graph, j,
+            IGRAPH_CHECK(igraph_are_adjacent(graph, j,
                                               i, &conn));
             if (!conn) {
                 *result = false; return IGRAPH_SUCCESS;

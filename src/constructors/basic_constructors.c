@@ -97,15 +97,17 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  * \function igraph_small
  * \brief Shorthand to create a small graph, giving the edges as arguments.
  *
- * </para><para>
  * This function is handy when a relatively small graph needs to be created.
  * Instead of giving the edges as a vector, they are given simply as
  * arguments and a <code>-1</code> needs to be given after the last meaningful
  * edge argument.
  *
- * </para><para>Note that only graphs which have vertex IDs smaller than
- * the largest value representable by the <type>int</type> type can be created this way.
- * If you give larger values then the result is undefined.
+ * </para><para>
+ * This function is intended to be used with vertex IDs that are entered as
+ * literal integers. If you use a variable instead of a literal, make sure
+ * that it is of type <type>int</type>, as this is the type that this function
+ * assumes for all variadic arguments. Using a different integer type is
+ * undefined behaviour and likely to cause platform-specific issues.
  *
  * \param graph Pointer to an uninitialized graph object. The result
  *        will be stored here.
@@ -118,10 +120,11 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  *        \cli IGRAPH_UNDIRECTED
  *          The graph to be created will be \em undirected.
  *        \endclist
- * \param ... The additional arguments giving the edges of the
- *        graph. Don't forget to supply an additional <code>-1</code> after the last
- *        (meaningful) argument. The \p first parameter is present for
- *        technical reasons and represents the first variadic argument.
+ * \param ... The additional arguments giving the edges of the graph,
+ *        and \em must be of type <type>int</type>. Don't forget to supply an
+ *        additional <code>-1</code> after the last (meaningful) argument. The
+ *        \p first parameter is present for technical reasons and represents
+ *        the first variadic argument.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number

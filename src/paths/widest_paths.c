@@ -128,8 +128,6 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
-    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
@@ -168,7 +166,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&widths, no_of_nodes);
-    igraph_vector_fill(&widths, my_neginfinity);
+    igraph_vector_fill(&widths, IGRAPH_NEGINFINITY);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for widest paths.");
@@ -188,9 +186,9 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         }
     }
 
-    VECTOR(widths)[from] = my_posinfinity;
+    VECTOR(widths)[from] = IGRAPH_POSINFINITY;
     parent_eids[from] = 0;
-    igraph_2wheap_push_with_index(&Q, from, my_posinfinity);
+    igraph_2wheap_push_with_index(&Q, from, IGRAPH_POSINFINITY);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, maxnei = igraph_2wheap_max_index(&Q);

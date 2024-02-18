@@ -526,13 +526,13 @@ void print_attributes(const igraph_t *g) {
     for (i = 0; i < igraph_strvector_size(&gnames); i++) {
         if (i != 0)
             putchar(' ');
-        printf("%s=", STR(gnames, i));
+        printf("%s=", igraph_strvector_get(&gnames, i));
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_real_printf(GAN(g, STR(gnames, i)));
+            igraph_real_printf(GAN(g, igraph_strvector_get(&gnames, i)));
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            printf("%d", GAB(g, STR(gnames, i)));
+            printf("%d", GAB(g, igraph_strvector_get(&gnames, i)));
         } else {
-            printf("\"%s\"", GAS(g, STR(gnames, i)));
+            printf("\"%s\"", GAS(g, igraph_strvector_get(&gnames, i)));
         }
     }
     if (igraph_strvector_size(&gnames))
@@ -542,13 +542,13 @@ void print_attributes(const igraph_t *g) {
         printf("Vertex %" IGRAPH_PRId ":", i);
         for (j = 0; j < igraph_strvector_size(&vnames); j++) {
             putchar(' ');
-            printf("%s=", STR(vnames, j));
+            printf("%s=", igraph_strvector_get(&vnames, j));
             if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                igraph_real_printf(VAN(g, STR(vnames, j), i));
+                igraph_real_printf(VAN(g, igraph_strvector_get(&vnames, j), i));
             } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
-                printf("%d", VAB(g, STR(vnames, j), i));
+                printf("%d", VAB(g, igraph_strvector_get(&vnames, j), i));
             } else {
-                printf("\"%s\"", VAS(g, STR(vnames, j), i));
+                printf("\"%s\"", VAS(g, igraph_strvector_get(&vnames, j), i));
             }
         }
         printf("\n");
@@ -558,13 +558,13 @@ void print_attributes(const igraph_t *g) {
         printf("Edge %" IGRAPH_PRId " (%" IGRAPH_PRId "-%" IGRAPH_PRId "):", i, IGRAPH_FROM(g, i), IGRAPH_TO(g, i));
         for (j = 0; j < igraph_strvector_size(&enames); j++) {
             putchar(' ');
-            printf("%s=", STR(enames, j));
+            printf("%s=", igraph_strvector_get(&enames, j));
             if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                igraph_real_printf(EAN(g, STR(enames, j), i));
+                igraph_real_printf(EAN(g, igraph_strvector_get(&enames, j), i));
             } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
-                printf("%d", EAB(g, STR(enames, j), i));
+                printf("%d", EAB(g, igraph_strvector_get(&enames, j), i));
             } else {
-                printf("\"%s\"", EAS(g, STR(enames, j), i));
+                printf("\"%s\"", EAS(g, igraph_strvector_get(&enames, j), i));
             }
         }
         printf("\n");

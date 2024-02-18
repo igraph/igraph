@@ -48,9 +48,9 @@ macro(use_all_warnings TARGET_NAME)
       /wd4800 # forcing value to 'true' or 'false' (performance warning)
       /wd4204 # nonstandard extension used: non-constant aggregate initializer
       /wd4701 # potentially uninitialized local variable
-      /wd4054 # 'type cast': from function pointer '...' to data pointer 'void *'
-      /wd4055 # from data pointer 'void *' to function pointer '...'
       /wd4221 # nonstandard extension used: '...': cannot be initialized using address of automatic variable '...'
+      /wd4127 # conditional expression is constant
+      /wd4702 # unreachable code
     )
   else()
     # Notes:

@@ -154,6 +154,7 @@ igraph_error_t igraph_i_layout_random_bounded(
         }
     }
 
+    RNG_BEGIN();
     IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
     for (igraph_integer_t i = 0; i < no_nodes; i++) {
         igraph_real_t x1 = minx ? VECTOR(*minx)[i] : dminx;
@@ -175,6 +176,7 @@ igraph_error_t igraph_i_layout_random_bounded(
         MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
         MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
     }
+    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -249,6 +251,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         }
     }
 
+    RNG_BEGIN();
     IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
     for (igraph_integer_t i = 0; i < no_nodes; i++) {
         igraph_real_t x1 = minx ? VECTOR(*minx)[i] : dminx;
@@ -279,6 +282,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
         MATRIX(*res, i, 2) = RNG_UNIF(z1, z2);
     }
+    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

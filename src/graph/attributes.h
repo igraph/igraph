@@ -30,10 +30,9 @@ __BEGIN_DECLS
     do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
         igraph_error_t igraph_i_ret2=IGRAPH_SUCCESS; \
+        (to)->attr = NULL; \
         if ((from)->attr) { \
             IGRAPH_CHECK(igraph_i_ret2=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
-        } else { \
-            (to)->attr = NULL; \
         } \
         if (igraph_i_ret2 != IGRAPH_SUCCESS) { \
             IGRAPH_ERROR("", igraph_i_ret2); \

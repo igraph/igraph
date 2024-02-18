@@ -62,6 +62,16 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 include(debugging)
 include(sanitizers)
 
+# Enable fuzzer instrumentation if needed
+# FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is a conventional
+# macro used to adapt code for fuzzability, for example by
+# reducing largest allowed graph sizes when reading various
+# file formats.
+if(BUILD_FUZZING)
+  add_compile_options(-fsanitize=fuzzer-no-link)
+  add_compile_definitions(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+endif()
+
 # Add version information
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_version.h.in
@@ -156,6 +166,9 @@ add_subdirectory(src)
 add_subdirectory(interfaces)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
+endif()
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_FUZZING)
+  add_subdirectory(fuzzing)
 endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   add_subdirectory(doc)

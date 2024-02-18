@@ -1,9 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
-   IGraph R package.
-   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2005-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,15 +13,11 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_cocitation.h"
 
-#include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 
@@ -124,6 +117,17 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * Self-similarities are not calculated.
  *
  * </para><para>
+ * Note that the presence of loop edges may yield counter-intuitive
+ * results. A node with a loop edge is considered to be a neighbor of itself
+ * \em twice (because there are two edge stems incident on the node). Adding a
+ * loop edge to a node may decrease its similarity to other nodes, but it may
+ * also \em increase it. For instance, if nodes A and B are connected but share
+ * no common neighbors, their similarity is zero. However, if a loop edge is
+ * added to B, then B itself becomes a common neighbor of A and B and thus the
+ * similarity of A and B will be increased. Consider removing loop edges
+ * explicitly before invoking this function using \ref igraph_simplify().
+ *
+ * </para><para>
  * See the following paper for more details: Lada A. Adamic and Eytan Adar:
  * Friends and neighbors on the Web. Social Networks, 25(3):211-230, 2003.
  * https://doi.org/10.1016/S0378-8733(03)00009-1
@@ -164,13 +168,11 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
     igraph_vector_int_t degrees;
-    igraph_neimode_t mode0;
+    igraph_neimode_t mode0 = IGRAPH_REVERSE_MODE(mode);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    switch (mode) {
-    case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
-    case IGRAPH_IN: mode0 = IGRAPH_OUT; break;
-    default: mode0 = IGRAPH_ALL;
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid neighbor mode.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
@@ -196,10 +198,10 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_vids;
-    igraph_integer_t from, i, j;
-    igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i;
+    igraph_vector_int_t neis;
     igraph_vector_int_t vid_reverse_index;
     igraph_vit_t vit;
 
@@ -226,22 +228,18 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* The result */
 
-    for (from = 0; from < no_of_nodes; from++) {
-        igraph_real_t weight;
-
+    for (igraph_integer_t from = 0; from < no_of_nodes; from++) {
         IGRAPH_ALLOW_INTERRUPTION();
+
+        const igraph_real_t weight = weights ? VECTOR(*weights)[from] : 1;
+
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
-        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
-        if (weights) {
-            weight = VECTOR(*weights)[from];
-        } else {
-            weight = 1;
-        }
+        const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (i = 0; i < nei_count - 1; i++) {
             igraph_integer_t u = VECTOR(neis)[i];
             igraph_integer_t k = VECTOR(vid_reverse_index)[u];
-            for (j = i + 1; j < nei_count; j++) {
+            for (igraph_integer_t j = i + 1; j < nei_count; j++) {
                 igraph_integer_t v = VECTOR(neis)[j];
                 igraph_integer_t l = VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
@@ -449,6 +447,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
  */
 igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                     const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t al;
     igraph_integer_t u, v;
     igraph_integer_t len_union, len_intersection;
@@ -457,6 +456,9 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
     igraph_integer_t k = igraph_vector_int_size(pairs);
     if (k % 2 != 0) {
         IGRAPH_ERROR("Number of elements in `pairs' must be even.", IGRAPH_EINVAL);
+    }
+    if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
+        IGRAPH_ERROR("Invalid vertex ID in pairs.", IGRAPH_EINVVID);
     }
     IGRAPH_CHECK(igraph_vector_resize(res, k / 2));
 
@@ -467,7 +469,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
         /* Add the loop edges */
 
         igraph_vector_bool_t seen;
-        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, igraph_vcount(graph));
+        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, no_of_nodes);
 
         for (igraph_integer_t i = 0; i < k; i++) {
             igraph_integer_t j = VECTOR(*pairs)[i];

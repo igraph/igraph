@@ -396,9 +396,10 @@ Communities::Communities(Graph* graph, int random_walks_length,
     }
 
     H = new Neighbor_heap(G->nb_edges);
+    IGRAPH_ASSUME(G->nb_vertices >= 0); // avoid false-positive GCC warnings
     communities = new Community[2 * G->nb_vertices];
 
-// init the n single vertex communities
+    // init the n single vertex communities
 
     for (int i = 0; i < G->nb_vertices; i++) {
         communities[i].this_community = i;

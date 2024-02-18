@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2022  The igraph development team
+   Copyright (C) 2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,26 +30,45 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
-    if (Size % 2 == 1 || Size > 65280) {
+    if (Size % 2 == 0 || Size > 512+1 || Size < 1) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size));
-    for (size_t i=0; i < Size; ++i) {
-        VECTOR(edges)[i] = Data[i];
+    check_err(igraph_vector_int_init(&edges, Size-1));
+    for (size_t i=0; i < Size-1; ++i) {
+        VECTOR(edges)[i] = Data[i+1];
     }
 
-    if (igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
-        igraph_integer_t conn;
+    /* Directed */
+    if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
+        igraph_bool_t bres, bres2, bres3;
 
-        /* Enable connectivity checks in order to try to force the fuzzer
-         * to find connected graphs. Disconnected graphs result in low coverage. */
-        check_err(igraph_vertex_connectivity(&graph, &conn, 1));
-        check_err(igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, nullptr));
-        check_err(igraph_vertex_connectivity(&graph, &conn, 1));
+        igraph_has_multiple(&graph, &bres);
+        igraph_has_loop(&graph, &bres2);
+        igraph_has_mutual(&graph, &bres3, false);
+        igraph_invalidate_cache(&graph);
+
+        igraph_is_simple(&graph, &bres3);
+        igraph_invalidate_cache(&graph);
+
+        IGRAPH_ASSERT((bres || bres2) == !bres3);
+
+        igraph_is_connected(&graph, &bres, IGRAPH_STRONG);
+        igraph_invalidate_cache(&graph);
+
+        igraph_is_dag(&graph, &bres);
+        igraph_invalidate_cache(&graph);
+
+        igraph_is_forest(&graph, &bres, NULL, IGRAPH_OUT);
+        igraph_invalidate_cache(&graph);
+
+        igraph_is_tree(&graph, &bres, NULL, IGRAPH_OUT);
+        igraph_invalidate_cache(&graph);
+
+        igraph_is_eulerian(&graph, &bres, &bres2);
+        igraph_invalidate_cache(&graph);
 
         igraph_destroy(&graph);
     }

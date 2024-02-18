@@ -66,8 +66,8 @@ int main(void) {
 
     igraph_vector_int_init(&parents, 0);
     igraph_vector_init(&weights, 0);
-    igraph_hrg_consensus(&karate, &parents, &weights, /* hrg= */ 0,
-                         /* start= */ 0, /* num_samples= */ 100);
+    igraph_hrg_consensus(&karate, &parents, &weights, /* hrg= */ NULL,
+                         /* start= */ false, /* num_samples= */ 100);
 
     /* We do some simple validity tests on the results only; the exact results
      * are different on i386 vs other platforms due to numerical inaccuracies */

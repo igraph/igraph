@@ -40,17 +40,18 @@
  * The density of a graph is simply the ratio of the actual number of its
  * edges and the largest possible number of edges it could have.
  * The maximum number of edges depends on interpretation: are vertices
- * allowed to have a connected to themselves? This is controlled by the
+ * allowed to have a connection to themselves? This is controlled by the
  * \p loops parameter.
  *
  * </para><para>
  * Note that density is ill-defined for graphs which have multiple edges
  * between some pairs of vertices. Consider calling \ref igraph_simplify()
- * on such graphs.
+ * on such graphs. This function does not check whether the graph has
+ * parallel edges. The result it returns for such graphs is not meaningful.
  *
  * \param graph The input graph object.
  * \param res Pointer to a real number, the result will be stored
- *   here.
+ *   here. It must not have parallel edges.
  * \param loops Logical constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
@@ -219,16 +220,19 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
  * \function igraph_reciprocity
  * \brief Calculates the reciprocity of a directed graph.
  *
- * </para><para>
  * The measure of reciprocity defines the proportion of mutual
  * connections, in a directed graph. It is most commonly defined as
- * the probability that the opposite counterpart of a directed edge is
- * also included in the graph. In adjacency matrix notation:
- * <code>sum(i, j, (A.*A')ij) / sum(i, j, Aij)</code>, where
- * <code>A.*A'</code> is the element-wise product of matrix
- * <code>A</code> and its transpose. This measure is
- * calculated if the \p mode argument is \c
- * IGRAPH_RECIPROCITY_DEFAULT.
+ * the probability that the opposite counterpart of a randomly chosen
+ * directed edge is also included in the graph. In adjacency matrix
+ * notation: <code>1 - (sum_ij |A_ij - A_ji|) / (2 sum_ij A_ij)</code>.
+ * In multigraphs, each parallel edges between two vertices must
+ * have its own separate reciprocal edge, in accordance with the
+ * above formula. This measure is calculated if the \p mode argument is
+ * \c IGRAPH_RECIPROCITY_DEFAULT.
+ *
+ * </para><para>
+ * For directed graphs with no edges, NaN is returned.
+ * For undirected graphs, 1 is returned unconditionally.
  *
  * </para><para>
  * Prior to igraph version 0.6, another measure was implemented,
@@ -243,7 +247,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
  *
  * \param graph The graph object.
  * \param res Pointer to an \c igraph_real_t which will contain the result.
- * \param ignore_loops Whether to ignore loop edges.
+ * \param ignore_loops Whether to ignore self-loops when counting edges.
  * \param mode Type of reciprocity to calculate, possible values are
  *    \c IGRAPH_RECIPROCITY_DEFAULT and \c IGRAPH_RECIPROCITY_RATIO,
  *    please see their description above.
@@ -263,7 +267,6 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
     igraph_integer_t nonrec = 0, rec = 0, loops = 0;
     igraph_vector_int_t inneis, outneis;
-    igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_RECIPROCITY_DEFAULT &&
@@ -271,7 +274,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
         IGRAPH_ERROR("Invalid reciprocity type.", IGRAPH_EINVAL);
     }
 
-    /* THIS IS AN EXIT HERE !!!!!!!!!!!!!! */
+    /* Undirected graphs has reciprocity 1.0 by definition. */
     if (!igraph_is_directed(graph)) {
         *res = 1.0;
         return IGRAPH_SUCCESS;
@@ -280,7 +283,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&inneis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outneis, 0);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ip, op;
         IGRAPH_CHECK(igraph_neighbors(graph, &inneis, i, IGRAPH_IN));
         IGRAPH_CHECK(igraph_neighbors(graph, &outneis, i, IGRAPH_OUT));
@@ -327,5 +330,6 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     igraph_vector_int_destroy(&inneis);
     igraph_vector_int_destroy(&outneis);
     IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }

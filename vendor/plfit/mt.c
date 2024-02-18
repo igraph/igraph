@@ -11,8 +11,6 @@
  * This file has been placed in the public domain.
  */
 
-#include <stdlib.h>
-
 #include "igraph_random.h"
 
 #include "plfit_mt.h"

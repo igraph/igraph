@@ -83,9 +83,6 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         igraph_real_t coolfact,
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma,
-        /* igraph_matrix_t *adhesion, */
-        /* igraph_matrix_t *normalised_adhesion, */
-        /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus);
 
 /**
@@ -203,7 +200,7 @@ igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                     gamma_minus);
             break;
         default:
-            IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
+            IGRAPH_ERROR("Unknown implementation in spinglass community detection.",
                          IGRAPH_EINVAL);
         }
     );
@@ -225,7 +222,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         igraph_real_t gamma) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    unsigned long changes, runs;
+    igraph_integer_t changes, runs;
     igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc, prob;
@@ -233,30 +230,39 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     /* Check arguments */
 
     if (spins < 2) {
-        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of spins must be at least 2.", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
-        IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid update rule for spinglass community detection.", IGRAPH_EINVAL);
     }
     if (weights) {
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
-        use_weights = 1;
+        use_weights = true;
         if (igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Weights must not be negative when using the original implementation of spinglass communities. Select the implementation meant for negative weights.", IGRAPH_EINVAL);
+            IGRAPH_ERROR(
+                "Weights must not be negative when using the original implementation of spinglass communities. "
+                "Select the implementation meant for negative weights.",
+                IGRAPH_EINVAL);
         }
     }
     if (coolfact < 0 || coolfact >= 1.0) {
-        IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cooling factor must be positive and strictly smaller than 1.", IGRAPH_EINVAL);
     }
     if (gamma < 0.0) {
-        IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Gamma value must not be negative.", IGRAPH_EINVAL);
     }
-    if (starttemp / stoptemp < 1.0) {
-        IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
-                     IGRAPH_EINVAL);
+    if ( !(starttemp == 0 && stoptemp == 0) ) {
+        if (! (starttemp > 0 && stoptemp > 0)) {
+            IGRAPH_ERROR("Starting and stopping temperatures must be both positive or both zero.",
+                         IGRAPH_EINVAL);
+        }
+        if (starttemp <= stoptemp) {
+            IGRAPH_ERROR("The starting temperature must be larger than the stopping temperature.",
+                         IGRAPH_EINVAL);
+        }
     }
 
     /* The spinglass algorithm does not handle the trivial cases of the
@@ -267,7 +273,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
             igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+            IGRAPH_CHECK(igraph_modularity(graph, membership, nullptr, 1, igraph_is_directed(graph), modularity));
         }
         if (temperature) {
             *temperature = stoptemp;
@@ -284,19 +290,19 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     igraph_bool_t conn;
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot work with unconnected graph.", IGRAPH_EINVAL);
     }
 
     network net;
 
     /* Transform the igraph_t */
-    IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       &net, use_weights, 0));
+    IGRAPH_CHECK(igraph_i_read_network_spinglass(graph, weights,
+                                       &net, use_weights));
 
-    prob = 2.0 * net.sum_weights / double(net.node_list->Size())
-           / double(net.node_list->Size() - 1);
+    prob = 2.0 * net.sum_weights / double(net.node_list.Size())
+           / double(net.node_list.Size() - 1);
 
-    PottsModel pm(&net, (unsigned int)spins, update_rule);
+    PottsModel pm(&net, spins, update_rule);
 
     /* initialize the random number generator */
     RNG_BEGIN();
@@ -428,8 +434,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       igraph_real_t gamma) {
     IGRAPH_HANDLE_EXCEPTIONS(
         igraph_bool_t use_weights = false;
-        double prob;
-        char startnode[255];
+        char startnode[SPINGLASS_MAX_NAME_LEN];
 
         /* Check arguments */
 
@@ -463,23 +468,20 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         network net;
 
         /* Transform the igraph_t */
-        IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                           &net, use_weights, 0));
+        IGRAPH_CHECK(igraph_i_read_network_spinglass(graph, weights,
+                                           &net, use_weights));
 
-        prob = 2.0 * net.sum_weights / double(net.node_list->Size())
-               / double(net.node_list->Size() - 1);
-
-        PottsModel pm(&net, (unsigned int)spins, update_rule);
+        PottsModel pm(&net, spins, update_rule);
 
         /* initialize the random number generator */
         RNG_BEGIN();
 
-        /* to be exected, if we want to find the community around a particular node*/
+        /* to be expected, if we want to find the community around a particular node*/
         /* the initial conf is needed, because otherwise,
            the degree of the nodes is not in the weight property, stupid!!! */
         pm.assign_initial_conf(-1);
-        snprintf(startnode, 255, "%" IGRAPH_PRId "", vertex + 1);
-        pm.FindCommunityFromStart(gamma, prob, startnode, community,
+        snprintf(startnode, sizeof(startnode) / sizeof(startnode[0]), "%" IGRAPH_PRId "", vertex + 1);
+        pm.FindCommunityFromStart(gamma, startnode, community,
                                    cohesion, adhesion, inner_links, outer_links);
 
         RNG_END();
@@ -502,13 +504,10 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         igraph_real_t coolfact,
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma,
-        /* igraph_matrix_t *adhesion, */
-        /* igraph_matrix_t *normalised_adhesion, */
-        /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    unsigned long changes, runs;
+    igraph_integer_t runs;
     igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc;
@@ -518,32 +517,38 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     /* Check arguments */
 
     if (parupdate) {
-        IGRAPH_ERROR("Parallel spin update not implemented with "
-                     "negative gamma", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Parallel spin update not implemented with negative weights.",
+                     IGRAPH_UNIMPLEMENTED);
     }
 
     if (spins < 2) {
-        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of spins must be at least 2.", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
-        IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid update rule for spinglass community detection.", IGRAPH_EINVAL);
     }
     if (weights) {
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
-        use_weights = 1;
+        use_weights = true;
     }
     if (coolfact < 0 || coolfact >= 1.0) {
-        IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cooling factor must be positive and strictly smaller than 1.", IGRAPH_EINVAL);
     }
     if (gamma < 0.0) {
-        IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Gamma value must not be negative.", IGRAPH_EINVAL);
     }
-    if (starttemp / stoptemp < 1.0) {
-        IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
-                     IGRAPH_EINVAL);
+    if ( !(starttemp == 0 && stoptemp == 0) ) {
+        if (! (starttemp > 0 && stoptemp > 0)) {
+            IGRAPH_ERROR("Starting and stopping temperatures must be both positive or both zero.",
+                         IGRAPH_EINVAL);
+        }
+        if (starttemp <= stoptemp) {
+            IGRAPH_ERROR("The starting temperature must be larger than the stopping temperature.",
+                         IGRAPH_EINVAL);
+        }
     }
 
     /* The spinglass algorithm does not handle the trivial cases of the
@@ -554,7 +559,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
             igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+            IGRAPH_CHECK(igraph_modularity(graph, membership, nullptr, 1, igraph_is_directed(graph), modularity));
         }
         if (temperature) {
             *temperature = stoptemp;
@@ -571,7 +576,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     igraph_bool_t conn;
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot work with unconnected graph.", IGRAPH_EINVAL);
     }
 
     if (weights && igraph_vector_size(weights) > 0) {
@@ -591,12 +596,12 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     network net;
 
     /* Transform the igraph_t */
-    IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       &net, use_weights, 0));
+    IGRAPH_CHECK(igraph_i_read_network_spinglass(graph, weights,
+                                       &net, use_weights));
 
     bool directed = igraph_is_directed(graph);
 
-    PottsModelN pm(&net, (unsigned int)spins, directed);
+    PottsModelN pm(&net, spins, directed);
 
     /* initialize the random number generator */
     RNG_BEGIN();
@@ -614,21 +619,15 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     pm.assign_initial_conf(true);
 
     runs = 0;
-    changes = 1;
-    acc = 0;
-    while (changes > 0 && (kT / stoptemp > 1.0 || (zeroT && runs < 150))) {
-
+    while (kT / stoptemp > 1.0 || (zeroT && runs < 150)) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         runs++;
         kT = kT * coolfact;
         acc = pm.HeatBathLookup(gamma, gamma_minus, kT, 50);
         if (acc < (1.0 - 1.0 / double(spins)) * 0.001) {
-            changes = 0;
-        } else {
-            changes = 1;
+            break;
         }
-
     } /* while loop */
 
     /* These are needed, otherwise 'modularity' is not calculated */
@@ -638,7 +637,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     IGRAPH_MATRIX_INIT_FINALLY(&normalized_adhesion, 0, 0);
     pm.WriteClusters(modularity, temperature, csize, membership,
                       &adhesion, &normalized_adhesion, &polarization,
-                      kT, d_p, d_n, gamma, gamma_minus);
+                      kT, d_p, d_n);
     igraph_matrix_destroy(&normalized_adhesion);
     igraph_matrix_destroy(&adhesion);
     IGRAPH_FINALLY_CLEAN(2);

@@ -2,9 +2,92 @@
 
 ## [master]
 
+### Fixed
+
+ - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
+ - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
+ - Fixed the handling of duplicate edge IDs in `igraph_subgraph_from_edges()`.
+ - Fixed conversion of sparse matrices to dense with `igraph_sparsemat_as_matrix()` when sparse matrix object did not make use of its full allocated capacity.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.10] - 2024-02-13
+
+### Fixed
+
+ - When `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
+ - `igraph_spanner()` now correctly ignores edge directions, and no longer crashes on directed graphs.
+
+### Deprecated
+
+ - `igraph_are_connected()` is renamed to `igraph_are_adjacent()`; the old name is kept available until at least igraph 1.0.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.9] - 2024-02-02
+
+### Added
+
+ - `igraph_is_biconnected()` checks if a graph is biconnected.
+ - `igraph_realize_bipartite_degree_sequence()` constructs a bipartite graph that has the given bidegree sequence, optionally ensuring that it is connected (PR #2425 by Lára Margrét Hólmfríðardóttir @larah19).
+
+### Fixed
+
+ - More robust error handling in HRG code.
+ - Fixed infinite loop in `igraph_hrg_sample_many()`.
+ - `igraph_community_fastgreedy()` no longer crashes when providing a modularity vector only, but not a merges matrix of membership vector.
+ - The graph property cache was not initialized correctly on systems where the size of `bool` was not 1 byte (#2477).
+ - Compatibility with libxml2 version 2.12 (#2442).
+
+### Deprecated
+
+ - The macro `STR()` is deprecated; use the function `igraph_strvector_get()` instead.
+
+### Other
+
+ - Performance: Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Performance: Improved cache use by `igraph_is_bipartite()`.
+ - The documentation is now also generated in Texinfo format.
+ - Documentation improvements.
+
+## [0.10.8] - 2023-11-17
+
+### Added
+
+ - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19).
+ - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
+ - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
+ - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
+
+### Changed
+
+ - The behaviour of the Pajek format reader and writer is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret. Only those vertex and edge parameters are treated as valid which Pajek itself understands, therefore support for `size` is now dropped, and support for the `font` edge parameter is added. See http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm for more information. Invalid/unrecognized parameters are now converted to igraph attributes by the reader, but just as before, they are not output by the writer.
+ - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
+ - `igraph_avg_nearest_neighbor_degree()` now supports non-simple graphs.
+
+### Fixed
+
+ - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
+ - Fixed the handling of duplicate vertex IDs in `igraph_induced_subgraph()`.
+ - `igraph_vector_which_min()` and `igraph_vector_which_max()` no longer allow zero-length input, which makes them consistent with other similar functions, and was the originally intended behaviour. Passing zero-length input is invalid use and currently triggers an assertion failure.
+ - `igraph_erdos_renyi_game_gnm()` and `igraph_erdos_renyi_game_gnp()` are now interruptible.
+ - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
+ - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
+ - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
+ - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
+ - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
+ - `igraph_community_spinglass()` now checks its parameters more carefully.
+ - `igraph_similarity_dice_pairs()` and `igraph_similarity_jaccard_pairs()` now validate vertex IDs.
+ - `igraph_maxflow()` now returns an error code if the source and target vertices are the same. It used to get stuck in an infinite loop in earlier versions when the `flow` argument was non-NULL.
+
 ### Other
 
  - Updated vendored mini-gmp to 6.3.0.
+ - `igraph_connected_components()` makes better use of the cache, improving overall performance.
  - Documentation improvements.
 
 ## [0.10.7] - 2023-09-04
@@ -688,6 +771,7 @@ Some of the highlights are:
    incorrect (it was always zero). This is now fixed.
  - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
     for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
+ - `igraph_community_label_propagation` incorrectly did not result in all labels being dominant (issue #1963, fixed in PR #1966).
 
 ### Other
 
@@ -1211,7 +1295,10 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.7..master
+[master]: https://github.com/igraph/igraph/compare/0.10.10..master
+[0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
+[0.10.9]: https://github.com/igraph/igraph/compare/0.10.8..0.10.9
+[0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
 [0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
 [0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
 [0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5

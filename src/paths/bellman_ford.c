@@ -238,12 +238,11 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \function igraph_get_shortest_paths_bellman_ford
  * \brief Weighted shortest paths from a vertex, allowing negative weights.
  *
- * This function calculates weighted shortest paths from or to a single vertex,
- * and allows negative weights. When there is more than one shortest path between
- * two vertices, only one of them is returned.
- *
- * If there are no negative weights, you are better off with
- * \ref igraph_get_shortest_paths_dijkstra() .
+ * This function calculates weighted shortest paths from or to a single vertex
+ * using the Bellman-Ford algorithm, whihc can handle negative weights. When
+ * there is more than one shortest path between two vertices, only one of them
+ * is returned. When there are no negative weights,
+ * \ref igraph_get_shortest_paths_dijkstra() is likely to be faster.
  *
  * \param graph The input graph, can be directed.
  * \param vertices The result, the IDs of the vertices along the paths.
@@ -301,9 +300,10 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * Time complexity: O(|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges.
  *
- * \sa \ref igraph_get_shortest_paths() for a faster unweighted version
- * or \ref igraph_get_shortest_paths_dijkstra() if you do not have negative
- * edge weights.
+ * \sa \ref igraph_distances_bellman_ford() to compute only shortest path
+ * lengths, but not the paths themselves; \ref igraph_get_shortest_paths() for
+ * a faster unweighted version or \ref igraph_get_shortest_paths_dijkstra()
+ * if you do not have negative edge weights.
  */
 
 igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,

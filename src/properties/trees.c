@@ -215,13 +215,14 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * An undirected graph is a tree if it is connected and has no cycles.
  *
  * </para><para>
- * In the directed case, a possible additional requirement is that all
- * edges are oriented away from a root (out-tree or arborescence) or all edges
+ * In the directed case, an additional requirement is that all edges
+ * are oriented away from a root (out-tree or arborescence) or all edges
  * are oriented towards a root (in-tree or anti-arborescence).
  * This test can be controlled using the \p mode parameter.
  *
  * </para><para>
- * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
+ * By convention, the null graph (i.e. the graph with no vertices) is considered
+ * not to be connected, and therefore not a tree.
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
@@ -256,20 +257,29 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
 
-    /* For undirected graphs and for directed graphs with mode == IGRAPH_ALL,
-     * we can return early if we know from the cache that the graph is weakly
-     * connected and is a forest. We can do this even if the user wants the
-     * root vertex because we always return zero as the root vertex for
-     * undirected graphs */
-    if (treat_as_undirected &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST) &&
-        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)
-    ) {
-        is_tree = true;
-        iroot = 0;
-        goto success;
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+        igraph_bool_t weakly_connected = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED);
+
+        if (weakly_connected) {
+            /* For undirected graphs and for directed graphs with mode == IGRAPH_ALL,
+             * we can return early if we know from the cache that the graph is weakly
+             * connected and is a forest. We can do this even if the user wants the
+             * root vertex because we always return zero as the root vertex for
+             * undirected graphs */
+            if (treat_as_undirected &&
+                igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+                igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST)
+            ) {
+                is_tree = true;
+                iroot = 0;
+                goto success;
+            }
+        } else /* ! weakly_connected */ {
+            /* If the graph is not weakly connected, then it is neither an undirected
+             * not a directed tree. There is no root, so we can return early. */
+            is_tree = false;
+            goto success;
+        }
     }
 
     /* A tree must have precisely vcount-1 edges. */
@@ -369,10 +379,10 @@ success:
         *root = iroot;
     }
 
-    if (is_tree && treat_as_undirected) {
-        /* For undirected graphs (or directed graphs that are treated as
-         * undirected in this calculation), a tree is weakly connected and is
-         * a forest, so we can cache this */
+    if (is_tree) {
+        /* A graph that is a directed tree is also an undirected tree.
+         * An undirected tree is weakly connected and is a forest,
+         * so we can cache this. */
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
@@ -464,22 +474,23 @@ static igraph_error_t igraph_i_is_forest(
  * \function igraph_is_forest
  * \brief Decides whether the graph is a forest.
  *
- * An undirected graph is a forest if it has no cycles.
- * </para><para>
+ * An undirected graph is a forest if it has no cycles. Equivalently,
+ * a graph is a forest if all connected components are trees.
  *
- * In the directed case, a possible additional requirement is that edges in each
+ * </para><para>
+ * In the directed case, an additional requirement is that edges in each
  * tree are oriented away from the root (out-trees or arborescences) or all edges
  * are oriented towards the root (in-trees or anti-arborescences).
  * This test can be controlled using the \p mode parameter.
- * </para><para>
  *
+ * </para><para>
  * By convention, the null graph (i.e. the graph with no vertices) is considered to be a forest.
- * </para><para>
  *
+ * </para><para>
  * The \p res return value of this function is cached in the graph itself if
  * \p mode is set to \c IGRAPH_ALL or if the graph is undirected. Calling the
  * function multiple times with no modifications to the graph in between
- * will return a cached value in O(1) time if the roots are not asked for.
+ * will return a cached value in O(1) time if the roots are not requested.
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable. If not \c NULL, then the result will be stored
@@ -502,28 +513,61 @@ static igraph_error_t igraph_i_is_forest(
  */
 igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
                                 igraph_vector_int_t *roots, igraph_neimode_t mode) {
-    /* Caching is enabled only if the graph is undirected or mode == IGRAPH_ALL.
-     * Also, we can't return early if we need to calculate the roots */
-    igraph_bool_t use_cache = (
-        !igraph_is_directed(graph) || mode == IGRAPH_ALL
-    );
+
+    const igraph_bool_t treat_as_undirected = !igraph_is_directed(graph) || mode == IGRAPH_ALL;
 
     if (!roots && !res) {
         return IGRAPH_SUCCESS;
     }
 
-    if (use_cache && !roots && res) {
-        IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_IS_FOREST, res);
+    /* Note on cache use:
+     *
+     * The IGRAPH_PROP_IS_FOREST cached property is equivalent to this function's
+     * result ONLY in the undirected case. Keep in mind that a graph that is not
+     * a directed forest may still be an undirected forest, i.e. may still be free
+     * of undirected cycles. Example: 1->2<-3->4.
+     */
+
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST)) {
+        const igraph_bool_t no_undirected_cycles = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST);
+        if (treat_as_undirected && res && ! roots) {
+            /* If the graph is treated as undirected and no roots are requested,
+             * we can directly use the cached IGRAPH_PROP_IS_FOREST value. */
+            *res = no_undirected_cycles;
+            return IGRAPH_SUCCESS;
+        } else {
+            /* Otherwise we can use negative cached values (i.e. "false"):
+             *  - A graph with undirected cycles cannot be a directed forest.
+             *  - If the graph is not a forest, we don't need to look for roots.
+             */
+            if (! no_undirected_cycles) {
+                if (res) { res = false; }
+                if (roots) { igraph_vector_int_clear(roots); }
+                return IGRAPH_SUCCESS;
+            }
+        }
     }
 
     IGRAPH_CHECK(igraph_i_is_forest(graph, res, roots, mode));
 
-    /* At this point we know whether the graph is a forest if we have at least
-     * one of 'res' or 'roots' */
-    if (res) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, *res);
-    } else if (roots) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, !igraph_vector_int_empty(roots));
+    /* At this point we know whether the graph is an (undirected or directed) forest
+     * as we have at least one of 'res' or 'roots'. The case when both are NULL was
+     * caught above. */
+    igraph_bool_t is_forest;
+    if (res != NULL) {
+        is_forest = *res;
+    } else /* roots != NULL */ {
+        is_forest = igraph_vcount(graph) == 0 || !igraph_vector_int_empty(roots);
+    }
+    if (is_forest) {
+        /* If the graph is a directed forest, then it has no undirected cycles.
+         * We can enter positive results in the cache unconditionally. */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
+    } else if (treat_as_undirected) {
+        /* However, if the graph is not a directed forest, it might still be
+         * an undirected forest. We can only enter negative results in the cache
+         * when edge directions were ignored, but NOT in the directed case. */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
     }
 
     return IGRAPH_SUCCESS;

@@ -38,9 +38,6 @@
 
 #include "drl_layout_3d.h"
 #include "drl_Node_3d.h"
-#ifdef MUSE_MPI
-    #include <mpi.h>
-#endif
 
 #include <deque>
 

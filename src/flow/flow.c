@@ -474,7 +474,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \c hi_pr implementation discussed in
  * B. V. Cherkassky and A. V. Goldberg: On implementing the
  * push-relabel method for the maximum flow problem, (Algorithmica,
- * 19:390--410, 1997) on all the graph classes i've tried.
+ * 19:390--410, 1997) on all the graph classes I've tried.
  *
  * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for
@@ -525,6 +525,9 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     }
     if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
         IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
+    }
+    if (source == target) {
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
     }
 
     stats->nopush = stats->norelabel = stats->nogap = stats->nogapnodes =
@@ -1099,8 +1102,8 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
  *
  * </para><para> The minimum s-t cut in a weighted (=valued) graph is the
  * total minimum edge weight needed to remove from the graph to
- * eliminate all paths from a given vertex (\c source) to
- * another vertex (\c target). Directed paths are considered in
+ * eliminate all paths from a given vertex (\p source) to
+ * another vertex (\p target). Directed paths are considered in
  * directed graphs, and undirected paths in undirected graphs.  </para>
  *
  * <para> The minimum s-t cut between two vertices is known to be same
@@ -1747,20 +1750,20 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
 
     switch (neighbors) {
     case IGRAPH_VCONN_NEI_ERROR:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        IGRAPH_CHECK(igraph_are_adjacent(graph, source, target, &conn));
         if (conn) {
             IGRAPH_ERROR("Source and target vertices connected.", IGRAPH_EINVAL);
         }
         break;
     case IGRAPH_VCONN_NEI_NEGATIVE:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        IGRAPH_CHECK(igraph_are_adjacent(graph, source, target, &conn));
         if (conn) {
             *res = -1;
             return IGRAPH_SUCCESS;
         }
         break;
     case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        IGRAPH_CHECK(igraph_are_adjacent(graph, source, target, &conn));
         if (conn) {
             *res = no_of_nodes;
             return IGRAPH_SUCCESS;
@@ -1872,16 +1875,18 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  * \function igraph_st_vertex_connectivity
  * \brief The vertex connectivity of a pair of vertices.
  *
- * </para><para>The vertex connectivity of two vertices (\c source and
- * \c target) is the minimum number of vertices that have to be
- * deleted to eliminate all paths from \c source to \c
- * target. Directed paths are considered in directed graphs.</para>
+ * The vertex connectivity of two vertices (\p source and
+ * \p target) is the minimum number of vertices that must be
+ * deleted to eliminate all paths from \p source to \p
+ * target. Directed paths are considered in directed graphs.
  *
- * <para>The vertex connectivity of a pair is the same as the number
+ * </para><para>
+ * The vertex connectivity of a pair is the same as the number
  * of different (i.e. node-independent) paths from source to
- * target.</para>
+ * target, assuming no direct edges between them.
  *
- * <para>The current implementation uses maximum flow calculations to
+ * </para><para>
+ * The current implementation uses maximum flow calculations to
  * obtain the result.
  *
  * \param graph The input graph.
@@ -1896,7 +1901,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  *     \c IGRAPH_VCONN_NEI_IGNORE, ignore the fact that the two vertices
  *        are connected and calculate the number of vertices needed
  *        to eliminate all paths except for the trivial (direct) paths
- *        between \p source and \p vertex. TODO: what about neighbors?
+ *        between \p source and \p vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|^3), but see the discussion at \ref
@@ -2128,8 +2133,9 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
  * and \ref igraph_edge_connectivity().
  */
 
-igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
-                               igraph_bool_t checks) {
+igraph_error_t igraph_vertex_connectivity(
+        const igraph_t *graph, igraph_integer_t *res,
+        igraph_bool_t checks) {
 
     igraph_bool_t ret = false;
 
@@ -2153,12 +2159,11 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
  * \function igraph_st_edge_connectivity
  * \brief Edge connectivity of a pair of vertices.
  *
- * </para><para> The edge connectivity of two vertices (\c source and
- * \c target) in a graph is the minimum number of edges that
- * have to be deleted from the graph to eliminate all paths from \c
- * source to \c target.</para>
+ * The edge connectivity of two vertices (\p source and \p target) is the
+ * minimum number of edges that have to be deleted from the graph to eliminate
+ * all paths from \p source to \p target.
  *
- * <para>This function uses the maximum flow algorithm to calculate
+ * </para><para>This function uses the maximum flow algorithm to calculate
  * the edge connectivity.
  *
  * \param graph The input graph, it has to be directed.
@@ -2169,7 +2174,8 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
  *
  * Time complexity: O(|V|^3).
  *
- * \sa \ref igraph_maxflow_value(), \ref igraph_edge_connectivity(),
+ * \sa \ref igraph_maxflow_value(), \ref igraph_edge_disjoint_paths(),
+ * \ref igraph_edge_connectivity(),
  * \ref igraph_st_vertex_connectivity(), \ref
  * igraph_vertex_connectivity().
  */
@@ -2180,7 +2186,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
     igraph_real_t flow;
 
     if (source == target) {
-        IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The source and target vertices must be different.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
@@ -2255,13 +2261,12 @@ igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t 
  * \function igraph_edge_disjoint_paths
  * \brief The maximum number of edge-disjoint paths between two vertices.
  *
- * </para><para> A set of paths between two vertices is called
- * edge-disjoint if they do not share any edges. The maximum number of
- * edge-disjoint paths are calculated by this function using maximum
- * flow techniques. Directed paths are considered in directed
- * graphs. </para>
+ * A set of paths between two vertices is called edge-disjoint if they do not
+ * share any edges. The maximum number of edge-disjoint paths are calculated
+ * by this function using maximum flow techniques. Directed paths are
+ * considered in directed graphs.
  *
- * <para> Note that the number of disjoint paths is the same as the
+ * </para><para>Note that the number of disjoint paths is the same as the
  * edge connectivity of the two vertices using uniform edge weights.
  *
  * \param graph The input graph, can be directed or undirected.
@@ -2285,7 +2290,8 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_
     igraph_real_t flow;
 
     if (source == target) {
-        IGRAPH_ERROR("Not implemented for source=target", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Not implemented when the source and target are the same.",
+                     IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
@@ -2299,13 +2305,17 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_
  * \function igraph_vertex_disjoint_paths
  * \brief Maximum number of vertex-disjoint paths between two vertices.
  *
- * </para><para> A set of paths between two vertices is called
- * vertex-disjoint if they share no vertices. The calculation is
- * performed by using maximum flow techniques. </para>
+ * A set of paths between two vertices is called vertex-disjoint if
+ * they share no vertices, other than the endpoints. This function computes
+ * the largest number of such paths that can be constructed between
+ * a source and a target vertex. The calculation is performed by using maximum
+ * flow techniques.
  *
- * <para> Note that the number of vertex-disjoint paths is the same as
- * the vertex connectivity of the two vertices in most cases (if the
- * two vertices are not connected by an edge).
+ * </para><para>
+ * When there are no edges from the source to the target, the number of
+ * vertex-disjoint paths is the same as the vertex connectivity of
+ * the two vertices. When some edges are present, each one of them
+ * contributes one extra path.
  *
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
@@ -2316,66 +2326,38 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_
  *
  * Time complexity: O(|V|^3).
  *
- * \sa \ref igraph_edge_disjoint_paths(), \ref
- * igraph_vertex_connectivity(), \ref igraph_maxflow_value().
+ * \sa \ref igraph_edge_disjoint_paths(),
+ * \ref igraph_st_vertex_connectivity(), \ref igraph_maxflow_value().
  */
 
 igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
                                  igraph_integer_t source,
                                  igraph_integer_t target) {
 
-    igraph_bool_t conn;
+    igraph_vector_int_t eids;
 
     if (source == target) {
-        IGRAPH_ERROR("The source==target case is not implemented",
+        IGRAPH_ERROR("Not implemented when the source and target are the same.",
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-    if (conn) {
-        /* We need to remove every (possibly directed) edge between source
-           and target and calculate the disjoint paths on the new
-           graph. Finally we add 1 for each removed connection.  */
-        igraph_es_t es;
-        igraph_t newgraph;
-        igraph_integer_t num_removed_edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 4);
+    IGRAPH_CHECK(igraph_get_all_eids_between(graph, &eids, source, target, /*directed*/ true));
 
-        IGRAPH_CHECK(igraph_es_all_between(&es, source, target, IGRAPH_DIRECTED));
-        IGRAPH_FINALLY(igraph_es_destroy, &es);
-
-        IGRAPH_CHECK(igraph_copy(&newgraph, graph));
-        IGRAPH_FINALLY(igraph_destroy, &newgraph);
-        IGRAPH_CHECK(igraph_delete_edges(&newgraph, es));
-        num_removed_edges = igraph_ecount(graph) - igraph_ecount(&newgraph);
-
-        if (igraph_is_directed(graph)) {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(&newgraph, res,
-                         source, target,
-                         IGRAPH_VCONN_NEI_IGNORE));
-        } else {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(&newgraph, res,
-                         source, target,
-                         IGRAPH_VCONN_NEI_IGNORE));
-        }
-
-        if (res) {
-            *res += num_removed_edges;
-        }
-
-        IGRAPH_FINALLY_CLEAN(2);
-        igraph_destroy(&newgraph);
-        igraph_es_destroy(&es);
+    if (igraph_is_directed(graph)) {
+        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+                        source, target,
+                        IGRAPH_VCONN_NEI_IGNORE));
     } else {
-        if (igraph_is_directed(graph)) {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
                         source, target,
                         IGRAPH_VCONN_NEI_IGNORE));
-        } else {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
-                        source, target,
-                        IGRAPH_VCONN_NEI_IGNORE));
-        }
     }
+
+    *res += igraph_vector_int_size(&eids);
+
+    igraph_vector_int_destroy(&eids);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
