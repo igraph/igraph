@@ -1725,6 +1725,11 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  * </para><para>
  * When a numerical attribute value is NaN, it will be omitted from the file.
  *
+ * </para><para>
+ * This function assumes that non-ASCII characters in attribute names and string
+ * attribute values are UTF-8 encoded. If this is not the case, the resulting
+ * XML file will be invalid.
+ *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
