@@ -14,3 +14,12 @@ repos:
         exclude: "\\.out$"
       - id: check-merge-conflict
       - id: fix-byte-order-marker
+        exclude: "utf8_with_bom.net$"
+
+  - repo: local
+    hooks:
+      - id: update-contributors-txt
+        name: Update CONTRIBUTORS.txt
+        language: python
+        entry: python3 tools/update_contributors_txt.py
+        pass_filenames: false

@@ -26,13 +26,26 @@ int main(void) {
     igraph_integer_t value;
 
     igraph_small(&g, 6, IGRAPH_DIRECTED,
-                 0, 1, 0, 2, 1, 2, 1, 3, 2, 4, 3, 4, 3, 5, 4, 5, -1);
+                 0,1, 0,2, 1,2, 1,3, 2,4, 3,4, 3,5, 4,5, 3,3, -1);
 
     igraph_edge_disjoint_paths(&g, &value, 0, 5);
+    IGRAPH_ASSERT(value == 2);
+
+    igraph_edge_disjoint_paths(&g, &value, 0, 3);
+    IGRAPH_ASSERT(value == 1);
+
+    igraph_edge_disjoint_paths(&g, &value, 3, 0);
+    IGRAPH_ASSERT(value == 0);
+
+    igraph_edge_disjoint_paths(&g, &value, 3, 5);
+    IGRAPH_ASSERT(value == 2);
+
+    igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_EACH, NULL);
+
+    igraph_edge_disjoint_paths(&g, &value, 4, 3);
+    IGRAPH_ASSERT(value == 3);
 
     igraph_destroy(&g);
-
-    IGRAPH_ASSERT(value == 2);
 
     VERIFY_FINALLY_STACK();
     return 0;

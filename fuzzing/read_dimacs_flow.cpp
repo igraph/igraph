@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2022  The igraph development team
+   Copyright (C) 2021-2023  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,25 +30,26 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // Turn on attribute handling
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    // Create input file
-    char filename[256];
-    sprintf(filename, "/tmp/libfuzzer.dl");
-    FILE *fp = fopen(filename, "wb");
-    if (!fp) return 0;
-    fwrite(data, size, 1, fp);
-    fclose(fp);
-
     // Read input file
-    FILE *ifile;
-    ifile = fopen("/tmp/libfuzzer.dl", "r");
+    FILE *ifile = fmemopen((void*) data, size, "r");
     if (!ifile) {
-        remove(filename);
         return 0;
     }
 
+    igraph_strvector_t problem;
+    IGRAPH_ASSERT(igraph_strvector_init(&problem, 0) == IGRAPH_SUCCESS);
+
+    igraph_vector_int_t label;
+    IGRAPH_ASSERT(igraph_vector_int_init(&label, 0) == IGRAPH_SUCCESS);
+
+    igraph_vector_t capacity;
+    IGRAPH_ASSERT(igraph_vector_init(&capacity, 0) == IGRAPH_SUCCESS);
+
+    igraph_integer_t source, target;
+
     // Do the fuzzing
     igraph_t g;
-    if (igraph_read_graph_dl(&g, ifile, IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
+    if (igraph_read_graph_dimacs_flow(&g, ifile, &problem, &label, &source, &target, &capacity, IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         // Clean up
         igraph_destroy(&g);
     }
@@ -56,8 +57,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // no need to call igraph_destroy() if igraph_read_graph_dl() returns an
     // error code as we don't have a valid graph object in that case
 
+    igraph_vector_destroy(&capacity);
+    igraph_vector_int_destroy(&label);
+    igraph_strvector_destroy(&problem);
+
     fclose(ifile);
-    remove(filename);
 
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
 

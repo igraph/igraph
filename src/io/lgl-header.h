@@ -27,7 +27,6 @@
 
 typedef struct {
     void *scanner;
-    int eof;
     char errmsg[300];
     igraph_error_t igraph_errno;
     igraph_bool_t has_weights;

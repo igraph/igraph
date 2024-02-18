@@ -75,6 +75,11 @@
     </listitem>
     <listitem>
       <para>
+        <ulink url="https://github.com/ntamas/plfit">plfit</ulink>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
         A library providing a
         <ulink url="https://www.netlib.org/blas/">BLAS</ulink> API
         (available by default on macOS;
@@ -454,18 +459,21 @@ pacman -S \
     directory.
   </para>
   <para>
-    To build the documentation for the development version, simply build
-    the <literal>html</literal> or <literal>pdf</literal> targets for the
-    HTML and PDF versions of the documentation, respectively.
+    To build the documentation for the development version, simply build the
+    <literal>html</literal>, <literal>pdf</literal> or <literal>info</literal>
+    targets for the HTML, PDF and Info versions of the documentation,
+    respectively.
   </para>
 <programlisting>
 $ cmake --build . --target html
 </programlisting>
   <para>
     Building the HTML documentation requires Python 3, <literal>xmlto</literal>
-    and <literal>source-highlight</literal>. Building the PDF documentation
-    also requires <literal>xsltproc</literal>, <literal>xmllint</literal>
-    and <literal>fop</literal>.
+    and <literal>source-highlight</literal>. Building the PDF documentation also
+    requires <literal>xsltproc</literal>, <literal>xmllint</literal> and
+    <literal>fop</literal>. Building the Texinfo documentation also requires
+    the docbook2X package, <literal>xmllint</literal> and
+    <literal>makeinfo</literal>.
   </para>
 </section>
 
@@ -485,7 +493,7 @@ $ cmake --build . --target html
       Otherwise, it falls back to the bundled (<quote>vendored</quote>)
       version. In order to make configuration as deterministic as
       possible, you may want to disable this auto-detection. To do so, set
-      each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> option
+      each of the <literal>IGRAPH_USE_INTERNAL_XXX</literal> options
       described above. Additionally, set <literal>BLA_VENDOR</literal> to
       use the BLAS and LAPACK implementations of your choice. This should
       be the same BLAS and LAPACK library that igraph's other dependencies
@@ -493,7 +501,7 @@ $ cmake --build . --target html
     </para>
     <para>
       For example, to force igraph to use external versions of all
-      dependencies, and to use OpenBLAS for BLAS/LAPACK, use
+      dependencies except plfit, and to use OpenBLAS for BLAS/LAPACK, use
     </para>
     <para>
 <programlisting>
@@ -503,6 +511,7 @@ $ cmake .. \
     -DIGRAPH_USE_INTERNAL_ARPACK=OFF \
     -DIGRAPH_USE_INTERNAL_GLPK=OFF \
     -DIGRAPH_USE_INTERNAL_GMP=OFF \
+    -DIGRAPH_USE_INTERNAL_PLFIT=ON \
     -DBLA_VENDOR=OpenBLAS \
     -DIGRAPH_GRAPHML_SUPPORT=ON
 </programlisting>

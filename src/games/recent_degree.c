@@ -91,7 +91,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
     if (!have_outseq && m < 0) {
-        IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Number of edges per step cannot be negative, got %" IGRAPH_PRId ".",
                        IGRAPH_EINVAL, m);
     }
     if (time_window < 0) {

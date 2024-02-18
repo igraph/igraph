@@ -217,10 +217,10 @@ igraph_error_t igraph_intersection_many(
 
         /* OK, now remove all elements from the tail(s) that are bigger
            than the smallest tail element. */
-        for (j = 0, allsame = 1; j < no_of_graphs; j++) {
+        for (j = 0, allsame = true; j < no_of_graphs; j++) {
             igraph_integer_t from = -1, to = -1;
             igraph_vector_int_t *order = igraph_vector_int_list_get_ptr(&order_vects, j);
-            while (1) {
+            while (true) {
                 igraph_integer_t edge = igraph_vector_int_tail(order);
                 igraph_vector_int_t *ev = igraph_vector_int_list_get_ptr(&edge_vects, j);
                 from = VECTOR(*ev)[2 * edge];
@@ -236,7 +236,7 @@ igraph_error_t igraph_intersection_many(
                 }
             }
             if (from != tailfrom || to != tailto) {
-                allsame = 0;
+                allsame = false;
             }
         }
 
@@ -247,7 +247,7 @@ igraph_error_t igraph_intersection_many(
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tailto));
         }
 
-        /* Drop edges matching the smalles tail elements
+        /* Drop edges matching the smallest tail elements
            from the order vectors, build edge maps */
         if (allne) {
             for (j = 0; j < no_of_graphs; j++) {

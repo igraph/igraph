@@ -49,10 +49,10 @@
         PLFIT_ERROR("xmin must be at least 1", PLFIT_EINVAL); \
     }
 
-static int plfit_i_resample_continuous(double* xs_head, size_t num_smaller,
+static int plfit_i_resample_continuous(const double* xs_head, size_t num_smaller,
         size_t n, double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result);
-static int plfit_i_resample_discrete(double* xs_head, size_t num_smaller,
+static int plfit_i_resample_discrete(const double* xs_head, size_t num_smaller,
         size_t n, double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result);
 
@@ -62,9 +62,9 @@ static int double_comparator(const void *a, const void *b) {
     return (*da > *db) - (*da < *db);
 }
 
-static int plfit_i_copy_and_sort(double* xs, size_t n, double** result) {
+static int plfit_i_copy_and_sort(const double* xs, size_t n, double** result) {
     *result = (double*)malloc(sizeof(double) * n);
-    if (*result == 0) {
+    if (*result == NULL) {
         PLFIT_ERROR("cannot create sorted copy of input data", PLFIT_ENOMEM);
     }
 
@@ -85,8 +85,8 @@ static int plfit_i_copy_and_sort(double* xs, size_t n, double** result) {
  * \return the nubmer of elements in the array that are smaller than the given
  *         value.
  */
-static size_t count_smaller(double* begin, double* end, double xmin) {
-    double* p;
+static size_t count_smaller(const double* begin, const double* end, double xmin) {
+    const double* p;
     size_t counter = 0;
 
     for (p = begin; p < end; p++) {
@@ -111,14 +111,14 @@ static size_t count_smaller(double* begin, double* end, double xmin) {
  * \return pointer to the head of the new array or 0 if there is not enough
  * memory
  */
-static double* extract_smaller(double* begin, double* end, double xmin,
+static double* extract_smaller(const double* begin, const double* end, double xmin,
         size_t* result_length) {
     size_t counter = count_smaller(begin, end, xmin);
     double *p, *result;
 
     result = calloc(counter > 0 ? counter : 1, sizeof(double));
-    if (result == 0)
-        return 0;
+    if (result == NULL)
+        return NULL;
 
     for (p = result; begin < end; begin++) {
         if (*begin < xmin) {
@@ -144,7 +144,7 @@ static double* extract_smaller(double* begin, double* end, double xmin,
  *                        given array is returned here. It is left unchanged if
  *                        the function returns with an error.
  *
- * \return pointer to the head of the new array or 0 if there is not enough
+ * \return pointer to the head of the new array or NULL if there is not enough
  * memory
  */
 static double** unique_element_pointers(double* begin, double* end, size_t* result_length) {
@@ -157,7 +157,7 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
     /* Special case: empty array */
     if (begin == end) {
         result = calloc(1, sizeof(double*));
-        if (result != 0) {
+        if (result != NULL) {
             result[0] = 0;
             if (result_length != 0) {
                 *result_length = 0;
@@ -168,8 +168,8 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
 
     /* Allocate initial result array, including the guard element */
     result = calloc(num_elts+1, sizeof(double*));
-    if (result == 0)
-        return 0;
+    if (result == NULL)
+        return NULL;
 
     prev_x = *begin;
     result[used_elts++] = begin;
@@ -182,10 +182,14 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
         /* New block found */
         if (used_elts >= num_elts) {
             /* Array full; allocate a new chunk */
+            double** tmp;
             num_elts = num_elts*2 + 1;
-            result = realloc(result, sizeof(double*) * (num_elts+1));
-            if (result == 0)
-                return 0;
+            tmp = realloc(result, sizeof(double*) * (num_elts+1));
+            if (tmp == NULL) {
+                free(result);
+                return NULL;
+            }
+            result = tmp;
         }
 
         /* Store the new element */
@@ -210,7 +214,7 @@ static void plfit_i_perform_finite_size_correction(plfit_result_t* result, size_
 
 /********** Continuous power law distribution fitting **********/
 
-static void plfit_i_logsum_less_than_continuous(double* begin, double* end,
+static void plfit_i_logsum_less_than_continuous(const double* begin, const double* end,
         double xmin, double* result, size_t* m) {
     double logsum = 0.0;
     size_t count = 0;
@@ -226,14 +230,14 @@ static void plfit_i_logsum_less_than_continuous(double* begin, double* end,
     *result = logsum;
 }
 
-static double plfit_i_logsum_continuous(double* begin, double* end, double xmin) {
+static double plfit_i_logsum_continuous(const double* begin, const double* end, double xmin) {
     double logsum = 0.0;
     for (; begin != end; begin++)
         logsum += log(*begin / xmin);
     return logsum;
 }
 
-static int plfit_i_estimate_alpha_continuous(double* xs, size_t n,
+static int plfit_i_estimate_alpha_continuous(const double* xs, size_t n,
         double xmin, double* alpha) {
     double result;
     size_t m;
@@ -251,9 +255,9 @@ static int plfit_i_estimate_alpha_continuous(double* xs, size_t n,
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_estimate_alpha_continuous_sorted(double* xs, size_t n,
+static int plfit_i_estimate_alpha_continuous_sorted(const double* xs, size_t n,
         double xmin, double* alpha) {
-    double* end = xs+n;
+    const double* end = xs+n;
 
     XMIN_CHECK_ZERO;
 
@@ -267,7 +271,7 @@ static int plfit_i_estimate_alpha_continuous_sorted(double* xs, size_t n,
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_ks_test_continuous(double* xs, double* xs_end,
+static int plfit_i_ks_test_continuous(const double* xs, const double* xs_end,
         const double alpha, const double xmin, double* D) {
     /* Assumption: xs is sorted and cut off at xmin so the first element is
      * always larger than or equal to xmin. */
@@ -290,7 +294,7 @@ static int plfit_i_ks_test_continuous(double* xs, double* xs_end,
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_calculate_p_value_continuous(double* xs, size_t n,
+static int plfit_i_calculate_p_value_continuous(const double* xs, size_t n,
         const plfit_continuous_options_t *options, plfit_bool_t xmin_fixed,
         plfit_result_t *result) {
     long int num_trials;
@@ -387,7 +391,7 @@ static int plfit_i_calculate_p_value_continuous(double* xs, size_t n,
     return retval;
 }
 
-int plfit_log_likelihood_continuous(double* xs, size_t n, double alpha,
+int plfit_log_likelihood_continuous(const double* xs, size_t n, double alpha,
         double xmin, double* L) {
     double logsum, c;
     size_t m;
@@ -404,9 +408,9 @@ int plfit_log_likelihood_continuous(double* xs, size_t n, double alpha,
     return PLFIT_SUCCESS;
 }
 
-int plfit_estimate_alpha_continuous_sorted(double* xs, size_t n, double xmin,
+int plfit_estimate_alpha_continuous_sorted(const double* xs, size_t n, double xmin,
         const plfit_continuous_options_t* options, plfit_result_t *result) {
-    double *begin, *end;
+    const double *begin, *end;
 
     if (!options)
         options = &plfit_continuous_default_options;
@@ -432,7 +436,7 @@ int plfit_estimate_alpha_continuous_sorted(double* xs, size_t n, double xmin,
     return PLFIT_SUCCESS;
 }
 
-int plfit_estimate_alpha_continuous(double* xs, size_t n, double xmin,
+int plfit_estimate_alpha_continuous(const double* xs, size_t n, double xmin,
         const plfit_continuous_options_t* options, plfit_result_t *result) {
     double *xs_copy;
 
@@ -569,7 +573,7 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
     return PLFIT_SUCCESS;
 }
 
-int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* options,
+int plfit_continuous(const double* xs, size_t n, const plfit_continuous_options_t* options,
         plfit_result_t* result) {
     gss_parameter_t gss_param;
     plfit_continuous_xmin_opt_data_t opt_data;
@@ -605,7 +609,7 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
     /* Create an array containing pointers to the unique elements of the input. From
      * each block of unique elements, we add the pointer to the first one. */
     uniques = unique_element_pointers(opt_data.begin, opt_data.end, &num_uniques);
-    if (uniques == 0) {
+    if (uniques == NULL) {
         free(opt_data.begin);
         PLFIT_ERROR("cannot fit continuous power-law", PLFIT_ENOMEM);
     }
@@ -641,7 +645,13 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                  * area around it more thoroughly. */
                 const size_t subdivision_length = 10;
                 size_t num_strata = num_uniques / subdivision_length;
-                double **strata = calloc(num_strata, sizeof(double*));
+
+                strata = calloc(num_strata, sizeof(double*));
+                if (strata == NULL) {
+                    free(uniques);
+                    free(opt_data.begin);
+                    PLFIT_ERROR("cannot fit continuous power-law", PLFIT_ENOMEM);
+                }
 
                 for (i = 0; i < num_strata; i++) {
                     strata[i] = uniques[i * subdivision_length];
@@ -731,12 +741,9 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
     }
 
 cleanup:
-    if (strata) {
-        free(strata);
-    }
-    if (uniques) {
-        free(uniques);
-    }
+    /* It is safe to call free() on NULL */
+    free(strata);
+    free(uniques);
     free(opt_data.begin);
 
     return retval;
@@ -750,14 +757,14 @@ typedef struct {
     double xmin;
 } plfit_i_estimate_alpha_discrete_data_t;
 
-static double plfit_i_logsum_discrete(double* begin, double* end, double xmin) {
+static double plfit_i_logsum_discrete(const double* begin, const double* end, double xmin) {
     double logsum = 0.0;
     for (; begin != end; begin++)
         logsum += log(*begin);
     return logsum;
 }
 
-static void plfit_i_logsum_less_than_discrete(double* begin, double* end, double xmin,
+static void plfit_i_logsum_less_than_discrete(const double* begin, const double* end, double xmin,
         double* logsum, size_t* m) {
     double result = 0.0;
     size_t count = 0;
@@ -778,7 +785,7 @@ static lbfgsfloatval_t plfit_i_estimate_alpha_discrete_lbfgs_evaluate(
         void* instance, const lbfgsfloatval_t* x,
         lbfgsfloatval_t* g, const int n,
         const lbfgsfloatval_t step) {
-    plfit_i_estimate_alpha_discrete_data_t* data;
+    const plfit_i_estimate_alpha_discrete_data_t* data;
     lbfgsfloatval_t result;
     double dx = step;
     double huge = 1e10;     /* pseudo-infinity; apparently DBL_MAX does not work */
@@ -833,7 +840,7 @@ static int plfit_i_estimate_alpha_discrete_lbfgs_progress(void* instance,
     return 0;
 }
 
-static int plfit_i_estimate_alpha_discrete_linear_scan(double* xs, size_t n,
+static int plfit_i_estimate_alpha_discrete_linear_scan(const double* xs, size_t n,
         double xmin, double* alpha, const plfit_discrete_options_t* options,
         plfit_bool_t sorted) {
     double curr_alpha, best_alpha, L, L_max;
@@ -873,7 +880,7 @@ static int plfit_i_estimate_alpha_discrete_linear_scan(double* xs, size_t n,
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_estimate_alpha_discrete_lbfgs(double* xs, size_t n, double xmin,
+static int plfit_i_estimate_alpha_discrete_lbfgs(const double* xs, size_t n, double xmin,
         double* alpha, const plfit_discrete_options_t* options, plfit_bool_t sorted) {
     lbfgs_parameter_t param;
     lbfgsfloatval_t* variables;
@@ -923,7 +930,7 @@ static int plfit_i_estimate_alpha_discrete_lbfgs(double* xs, size_t n, double xm
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_estimate_alpha_discrete_fast(double* xs, size_t n, double xmin,
+static int plfit_i_estimate_alpha_discrete_fast(const double* xs, size_t n, double xmin,
         double* alpha, const plfit_discrete_options_t* options, plfit_bool_t sorted) {
     plfit_continuous_options_t cont_options;
 
@@ -942,7 +949,7 @@ static int plfit_i_estimate_alpha_discrete_fast(double* xs, size_t n, double xmi
     }
 }
 
-static int plfit_i_estimate_alpha_discrete(double* xs, size_t n, double xmin,
+static int plfit_i_estimate_alpha_discrete(const double* xs, size_t n, double xmin,
         double* alpha, const plfit_discrete_options_t* options,
         plfit_bool_t sorted) {
     switch (options->alpha_method) {
@@ -968,7 +975,7 @@ static int plfit_i_estimate_alpha_discrete(double* xs, size_t n, double xmin,
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_ks_test_discrete(double* xs, double* xs_end, const double alpha,
+static int plfit_i_ks_test_discrete(const double* xs, const double* xs_end, const double alpha,
         const double xmin, double* D) {
     /* Assumption: xs is sorted and cut off at xmin so the first element is
      * always larger than or equal to xmin. */
@@ -1009,7 +1016,7 @@ static int plfit_i_ks_test_discrete(double* xs, double* xs_end, const double alp
     return PLFIT_SUCCESS;
 }
 
-static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
+static int plfit_i_calculate_p_value_discrete(const double* xs, size_t n,
         const plfit_discrete_options_t* options, plfit_bool_t xmin_fixed,
         plfit_result_t *result) {
     long int num_trials;
@@ -1072,7 +1079,7 @@ static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
 
         /* Allocate memory to sample into */
         ys = calloc(n > 0 ? n : 1, sizeof(double));
-        if (ys == 0) {
+        if (ys == NULL) {
             retval = PLFIT_ENOMEM;
         } else {
             /* The main for loop starts here. */
@@ -1109,7 +1116,7 @@ static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
     return retval;
 }
 
-int plfit_log_likelihood_discrete(double* xs, size_t n, double alpha, double xmin, double* L) {
+int plfit_log_likelihood_discrete(const double* xs, size_t n, double alpha, double xmin, double* L) {
     double result;
     size_t m;
 
@@ -1126,7 +1133,7 @@ int plfit_log_likelihood_discrete(double* xs, size_t n, double alpha, double xmi
     return PLFIT_SUCCESS;
 }
 
-int plfit_estimate_alpha_discrete(double* xs, size_t n, double xmin,
+int plfit_estimate_alpha_discrete(const double* xs, size_t n, double xmin,
         const plfit_discrete_options_t* options, plfit_result_t *result) {
     double *xs_copy, *begin, *end;
 
@@ -1170,13 +1177,13 @@ int plfit_estimate_alpha_discrete(double* xs, size_t n, double xmin,
     return PLFIT_SUCCESS;
 }
 
-int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options,
+int plfit_discrete(const double* xs, size_t n, const plfit_discrete_options_t* options,
         plfit_result_t* result) {
     double curr_D, curr_alpha;
     plfit_result_t best_result;
     double *xs_copy, *px, *end, *end_xmin, prev_x;
     size_t best_n;
-    int m;
+    size_t m;
 
     if (!options)
         options = &plfit_discrete_default_options;
@@ -1262,7 +1269,7 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
 
 /***** resampling routines to generate synthetic replicates ****/
 
-static int plfit_i_resample_continuous(double* xs_head, size_t num_smaller,
+static int plfit_i_resample_continuous(const double* xs_head, size_t num_smaller,
         size_t n, double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result)
 {
@@ -1283,7 +1290,7 @@ static int plfit_i_resample_continuous(double* xs_head, size_t num_smaller,
     return PLFIT_SUCCESS;
 }
 
-int plfit_resample_continuous(double* xs, size_t n, double alpha, double xmin,
+int plfit_resample_continuous(const double* xs, size_t n, double alpha, double xmin,
         size_t num_samples, plfit_mt_rng_t* rng, double* result) {
     double *xs_head;
     size_t num_smaller = 0;
@@ -1303,7 +1310,7 @@ int plfit_resample_continuous(double* xs, size_t n, double alpha, double xmin,
     return retval;
 }
 
-static int plfit_i_resample_discrete(double* xs_head, size_t num_smaller, size_t n,
+static int plfit_i_resample_discrete(const double* xs_head, size_t num_smaller, size_t n,
         double alpha, double xmin, size_t num_samples, plfit_mt_rng_t* rng,
         double* result)
 {
@@ -1324,7 +1331,7 @@ static int plfit_i_resample_discrete(double* xs_head, size_t num_smaller, size_t
     return PLFIT_SUCCESS;
 }
 
-int plfit_resample_discrete(double* xs, size_t n, double alpha, double xmin,
+int plfit_resample_discrete(const double* xs, size_t n, double alpha, double xmin,
         size_t num_samples, plfit_mt_rng_t* rng, double* result) {
     double *xs_head;
     size_t num_smaller = 0;
@@ -1346,7 +1353,7 @@ int plfit_resample_discrete(double* xs, size_t n, double alpha, double xmin,
 
 /******** calculating the p-value of a fitted model only *******/
 
-int plfit_calculate_p_value_continuous(double* xs, size_t n,
+int plfit_calculate_p_value_continuous(const double* xs, size_t n,
         const plfit_continuous_options_t* options, plfit_bool_t xmin_fixed,
         plfit_result_t *result) {
     double* xs_copy;
@@ -1359,7 +1366,7 @@ int plfit_calculate_p_value_continuous(double* xs, size_t n,
     return PLFIT_SUCCESS;
 }
 
-int plfit_calculate_p_value_discrete(double* xs, size_t n,
+int plfit_calculate_p_value_discrete(const double* xs, size_t n,
         const plfit_discrete_options_t* options, plfit_bool_t xmin_fixed,
         plfit_result_t *result) {
     double* xs_copy;

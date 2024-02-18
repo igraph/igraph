@@ -27,7 +27,6 @@
 
 #include "core/interruption.h"
 
-#include <string.h>   /* memset */
 #include <stdio.h>
 
 /**

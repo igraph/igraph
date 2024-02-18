@@ -44,19 +44,19 @@ private:
     void init(igraph_integer_t n, const igraph_vector_t *nodeWeights);
 
 public:
-    FlowGraph(igraph_integer_t n);
-    FlowGraph(igraph_integer_t n, const igraph_vector_t *nodeWeights);
+    explicit FlowGraph(igraph_integer_t n);
+
     FlowGraph(const FlowGraph &fgraph);
     FlowGraph(const FlowGraph &fgraph, const std::vector<igraph_integer_t> &sub_members);
 
     FlowGraph(const igraph_t *graph, const igraph_vector_t *e_weights,
               const igraph_vector_t *v_weights);
 
-    void swap(FlowGraph &fgraph);
+    void swap(FlowGraph &fgraph) noexcept;
 
     void initiate();
     void eigenvector();
-    void calibrate();
+    void calibrate() noexcept;
 
     void back_to(const FlowGraph &fgraph);
 

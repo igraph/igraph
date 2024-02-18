@@ -96,7 +96,7 @@ igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&neis);
     IGRAPH_I_ATTRIBUTE_DESTROY(res);
-    IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/1, /*vertex=*/1, /*edge=*/0);
+    IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/true, /*vertex=*/true, /*edge=*/false);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }

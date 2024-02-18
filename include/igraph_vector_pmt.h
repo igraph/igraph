@@ -41,7 +41,7 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(
         TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector)* v);
 
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
 
 /*--------------------*/
 /* Accessing elements */
@@ -70,10 +70,10 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igra
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
 IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE value);
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
 
 /*-----------------------*/
 /* Initializing elements */
@@ -141,23 +141,23 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector)
 /* Comparison                   */
 /*------------------------------*/
 
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
                                                            const TYPE(igraph_vector) *rhs);
 #ifndef NOTORDERED
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
                                                            const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
                                                            const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
                                                             const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
                                                             const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp)(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE int FUNCTION(igraph_vector, lex_cmp)(
         const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp)(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE int FUNCTION(igraph_vector, colex_cmp)(
         const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, lex_cmp_untyped)(const void *lhs, const void *rhs);
-IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE int FUNCTION(igraph_vector, lex_cmp_untyped)(const void *lhs, const void *rhs);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs);
 #endif
 
 /*------------------------------*/
@@ -165,10 +165,10 @@ IGRAPH_EXPORT int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, co
 /*------------------------------*/
 
 #ifndef NOTORDERED
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, minmax)(
         const TYPE(igraph_vector) *v, BASE *min, BASE *max);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, which_minmax)(
@@ -179,22 +179,22 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, which_minmax)(
 /* Vector properties */
 /*-------------------*/
 
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, empty)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v);
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v);
-IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v);
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, empty)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v);
 #ifndef NOTORDERED
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v,
                                                                   BASE low, BASE high);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
                                                                  BASE limit);
 #endif
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
                                                               const TYPE(igraph_vector) *rhs);
 #ifndef NOTORDERED
-IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *m1,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *m1,
                                                                    const TYPE(igraph_vector) *m2);
 #endif
 
@@ -202,7 +202,7 @@ IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(ig
 /* Searching for elements */
 /*------------------------*/
 
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v, BASE e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v, BASE e);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, search)(
         const TYPE(igraph_vector) *v, igraph_integer_t from, BASE what, igraph_integer_t *pos);
 #ifndef NOTORDERED
@@ -280,7 +280,7 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_complex_create_polar(igraph_vector_co
                                                                 const igraph_vector_t *r,
                                                                 const igraph_vector_t *theta);
 
-IGRAPH_EXPORT igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *lhs,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *lhs,
                                                                const igraph_vector_complex_t *rhs,
                                                                igraph_real_t eps);
 

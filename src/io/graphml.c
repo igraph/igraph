@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
-   IGraph R package.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_foreign.h"
@@ -344,7 +339,7 @@ static void igraph_i_graphml_parser_state_set_error_from_varargs(
 }
 
 static void igraph_i_graphml_parser_state_set_error_from_xmlerror(
-    struct igraph_i_graphml_parser_state *state, const xmlErrorPtr error
+    struct igraph_i_graphml_parser_state *state, const xmlError *error
 ) {
     const size_t max_error_message_length = 4096;
 
@@ -1530,7 +1525,11 @@ static void igraph_i_libxml_generic_error_handler(void* ctx, const char* msg, ..
     va_end(args);
 }
 
-static void igraph_i_libxml_structured_error_handler(void* ctx, xmlErrorPtr error) {
+#if LIBXML_VERSION < 21200
+static void igraph_i_libxml_structured_error_handler(void* ctx, xmlError *error) {
+#else
+static void igraph_i_libxml_structured_error_handler(void* ctx, const xmlError *error) {
+#endif
     struct igraph_i_graphml_parser_state* state = (struct igraph_i_graphml_parser_state*) ctx;
     igraph_i_graphml_parser_state_set_error_from_xmlerror(state, error);
 }

@@ -72,95 +72,83 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_EDGE
-#define IGRAPH_HRG_EDGE
-class edge {
-public:
-    int x;            // stored integer value  (edge terminator)
-    double* h;            // (histogram) weights of edge existence
-    double total_weight;      // (histogram) total weight observed
-    int obs_count;        // number of observations in histogram
-    edge* next;           // pointer to next elementd
-    edge(): x(-1), h(0), total_weight(0.0), obs_count(0), next(0)  { }
+struct edge {
+    int x = -1;                 // stored integer value  (edge terminator)
+    double* h = nullptr;        // (histogram) weights of edge existence
+    double total_weight = 0.0;  // (histogram) total weight observed
+    int obs_count = 0;          // number of observations in histogram
+    edge* next = nullptr;       // pointer to next elementd
+    edge() = default;
+    edge(const edge &) = delete;
+    edge & operator = (const edge &) = delete;
     ~edge() {
-        if (h != NULL) {
-            delete [] h;
-        }
-        h = NULL;
+        delete [] h;
     }
 };
-#endif
 
-#ifndef IGRAPH_HRG_VERT
-#define IGRAPH_HRG_VERT
-class vert {
-public:
-    std::string name;           // (external) name of vertex
-    int degree;            // degree of this vertex
-
-    vert(): name(""), degree(0) { }
-    ~vert() { }
+struct vert {
+    std::string name;      // (external) name of vertex
+    int degree = 0;        // degree of this vertex
 };
-#endif
 
 // ******** Graph Class with Edge Statistics *****************************
 
 class graph {
 public:
-    graph(const int, bool predict = false);
+    explicit graph(int, bool predict = false);
     ~graph();
 
     // add (i,j) to graph
-    bool addLink(const int, const int);
+    bool addLink(int, int);
     // add weight to (i,j)'s histogram
-    bool addAdjacencyObs(const int, const int, const double, const double);
+    bool addAdjacencyObs(int, int, double, double);
     // add to obs_count and total_weight
     void addAdjacencyEnd();
     // true if (i,j) is already in graph
-    bool doesLinkExist(const int, const int);
+    bool doesLinkExist(int, int) const;
     // returns degree of vertex i
-    int getDegree(const int);
+    int getDegree(int) const;
     // returns name of vertex i
-    std::string getName(const int);
+    std::string getName(int) const;
     // returns edge list of vertex i
-    edge* getNeighborList(const int);
+    const edge* getNeighborList(int) const noexcept;
     // return ptr to histogram of edge (i,j)
-    double* getAdjacencyHist(const int, const int);
+    double* getAdjacencyHist(int, int) const;
     // return average value of adjacency A(i,j)
-    double getAdjacencyAverage(const int, const int);
+    double getAdjacencyAverage(int, int) const;
     // returns bin_resolution
-    double getBinResolution();
+    double getBinResolution() const;
     // returns num_bins
-    int getNumBins();
+    int getNumBins() const;
     // returns m
-    int numLinks();
+    int numLinks() const;
     // returns n
-    int numNodes();
+    int numNodes() const;
     // returns total_weight
-    double getTotalWeight();
+    double getTotalWeight() const;
     // reset edge (i,j)'s histogram
-    void resetAdjacencyHistogram(const int, const int);
+    void resetAdjacencyHistogram(int, int);
     // reset all edge histograms
     void resetAllAdjacencies();
     // clear all links from graph
     void resetLinks();
     // allocate edge histograms
-    void setAdjacencyHistograms(const igraph_integer_t);
+    void setAdjacencyHistograms(igraph_integer_t);
     // set name of vertex i
-    bool setName(const int, const std::string);
+    bool setName(int, const std::string &);
 
 private:
-    bool predict;      // do we need prediction?
-    vert* nodes;       // list of nodes
-    edge** nodeLink;   // linked list of neighbors to vertex
-    edge** nodeLinkTail;   // pointers to tail of neighbor list
-    double*** A;       // stochastic adjacency matrix for this graph
-    int obs_count;     // number of observations in A
-    double total_weight;   // total weight added to A
-    int n;         // number of vertices
-    int m;         // number of directed edges
-    int num_bins;      // number of bins in edge histograms
-    double bin_resolution; // width of histogram bin
+    bool predict;           // do we need prediction?
+    vert* nodes;            // list of nodes
+    edge** nodeLink;        // linked list of neighbors to vertex
+    edge** nodeLinkTail;    // pointers to tail of neighbor list
+    double*** A = nullptr;  // stochastic adjacency matrix for this graph
+    int obs_count;          // number of observations in A
+    double total_weight;    // total weight added to A
+    int n;                  // number of vertices
+    int m;                  // number of directed edges
+    int num_bins;           // number of bins in edge histograms
+    double bin_resolution;  // width of histogram bin
 };
 
 } // namespace fitHRG

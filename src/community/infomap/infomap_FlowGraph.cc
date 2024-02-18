@@ -43,11 +43,7 @@ void FlowGraph::init(igraph_integer_t n, const igraph_vector_t *v_weights) {
 }
 
 FlowGraph::FlowGraph(igraph_integer_t n) {
-    init(n, NULL);
-}
-
-FlowGraph::FlowGraph(igraph_integer_t n, const igraph_vector_t *v_weights) {
-    init(n, v_weights);
+    init(n, nullptr);
 }
 
 /* Build the graph from igraph_t object */
@@ -85,8 +81,8 @@ FlowGraph::FlowGraph(const igraph_t *graph,
         // We skip adding zero-weight edges.
         if (linkWeight > 0.0) {
             if (from != to) {
-                node[from].outLinks.push_back(make_pair(to, linkWeight));
-                node[to].inLinks.push_back(make_pair(from, linkWeight));
+                node[from].outLinks.emplace_back(to, linkWeight);
+                node[to].inLinks.emplace_back(from, linkWeight);
             }
         }
     }
@@ -94,7 +90,7 @@ FlowGraph::FlowGraph(const igraph_t *graph,
 
 FlowGraph::FlowGraph(const FlowGraph &fgraph) {
     igraph_integer_t n = fgraph.Nnode;
-    init(n, NULL);
+    init(n, nullptr);
     for (igraph_integer_t i = 0; i < n; i++) {
         node[i] = fgraph.node[i];
     }
@@ -118,18 +114,17 @@ FlowGraph::FlowGraph(const FlowGraph &fgraph) {
 FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &sub_members) {
     igraph_integer_t sub_Nnode = sub_members.size();
 
-    init(sub_Nnode, NULL);
+    init(sub_Nnode, nullptr);
 
     //XXX: use set of integer to ensure that elements are sorted
     set<igraph_integer_t> sub_mem(sub_members.begin(), sub_members.end());
 
-    set<igraph_integer_t>::iterator it_mem = sub_mem.begin();
+    auto it_mem = sub_mem.begin();
 
     vector<igraph_integer_t> sub_renumber(fgraph.Nnode, -1);
     // id --> sub_id
 
     for (igraph_integer_t j = 0; j < sub_Nnode; j++) {
-        //int orig_nr = sub_members[j];
         igraph_integer_t orig_nr = (*it_mem);
 
         node[j].teleportWeight = fgraph.node[orig_nr].teleportWeight;
@@ -154,8 +149,8 @@ FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &su
                     // printf("%2d | %4d to %4d\n", j, orig_nr, to);
                     // printf("from %4d (%4d:%1.5f) to %4d (%4d)\n", j, orig_nr,
                     //        node[j].selfLink, to_newnr, to);
-                    node[j].outLinks.push_back(make_pair(to_newnr, link_weight));
-                    node[to_newnr].inLinks.push_back(make_pair(j, link_weight));
+                    node[j].outLinks.emplace_back(to_newnr, link_weight);
+                    node[to_newnr].inLinks.emplace_back(j, link_weight);
                 }
             }
         }
@@ -166,8 +161,8 @@ FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &su
             double link_weight = fgraph.node[orig_nr].inLinks[k].second;
             if (to < orig_nr) {
                 if (sub_mem.find(to) != sub_mem.end()) {
-                    node[j].inLinks.push_back(make_pair(to_newnr, link_weight));
-                    node[to_newnr].outLinks.push_back(make_pair(j, link_weight));
+                    node[j].inLinks.emplace_back(to_newnr, link_weight);
+                    node[to_newnr].outLinks.emplace_back(j, link_weight);
                 }
             }
         }
@@ -180,7 +175,7 @@ FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &su
     the graph is "re" calibrate
     but NOT the given one.
  */
-void FlowGraph::swap(FlowGraph &fgraph) {
+void FlowGraph::swap(FlowGraph &fgraph) noexcept {
     node.swap(fgraph.node);
 
     igraph_integer_t Nnode_tmp = fgraph.Nnode;
@@ -345,14 +340,14 @@ void FlowGraph::eigenvector() {
 /* Compute the codeLength of the given network
  * note: (in **node, one node == one module)
  */
-void FlowGraph::calibrate() {
+void FlowGraph::calibrate() noexcept {
     exit_log_exit = 0.0;
     exitFlow = 0.0;
     size_log_size = 0.0;
 
     for (igraph_integer_t i = 0; i < Nnode; i++) { // For each module
         // own node/module codebook
-        size_log_size         += plogp(node[i].exit + node[i].size);
+        size_log_size += plogp(node[i].exit + node[i].size);
 
         // use of index codebook
         exitFlow      += node[i].exit;

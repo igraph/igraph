@@ -151,25 +151,17 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
             oldCodeLength = greedy.codeLength;
             bool moved = true;
-            //igraph_integer_t count = 0;
             double inner_oldCodeLength = 1000;
 
             while (moved) { // main greedy optimizing loop
                 inner_oldCodeLength = greedy.codeLength;
                 moved = greedy.optimize();
 
-                //count++;
-
                 if (fabs(greedy.codeLength - inner_oldCodeLength) < 1.0e-10)
                     // if the move does'n reduce the codelenght -> exit !
                 {
                     moved = false;
                 }
-
-                //if (count == 10) {
-                //  greedy->tune();
-                //  count = 0;
-                //}
             }
 
             // transform the network to network of modules:
@@ -193,7 +185,8 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * \brief Find community structure that minimizes the expected description length of a random walker trajectory.
  *
  * Implementation of the Infomap community detection algorithm of
- * Martin Rosvall and Carl T. Bergstrom.
+ * Martin Rosvall and Carl T. Bergstrom. This algorithm takes edge directions
+ * into account.
  *
  * </para><para>
  * For more details, see the visualization of the math and the map generator
@@ -218,7 +211,7 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * If you want to specify a random seed (as in the original
  * implementation) you can use \ref igraph_rng_seed().
  *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are taken into account.
  * \param e_weights Numeric vector giving the weights of the edges.
  *     The random walker will favour edges with high weights over
  *     edges with low weights; the probability of picking a particular
@@ -320,7 +313,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         }
     }
 
-    *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
+    *codelength = shortestCodeLength / log(2.0);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 

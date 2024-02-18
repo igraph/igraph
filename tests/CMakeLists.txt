@@ -268,7 +268,7 @@ add_examples(
   igraph_is_loop
   igraph_is_multiple
   igraph_list_triangles
-  igraph_knn
+  igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
@@ -283,9 +283,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  components
   coreness
   efficiency
   global_transitivity
+  harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
@@ -328,6 +330,8 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_joint_degree_distribution
+  igraph_joint_type_distribution
   igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
@@ -351,11 +355,11 @@ add_legacy_tests(
   igraph_unfold_tree
   igraph_voronoi
   igraph_widest_paths
-  harmonic_centrality
+  igraph_spanner
+  knn
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
-  igraph_spanner
 )
 
 add_legacy_tests(
@@ -364,6 +368,7 @@ add_legacy_tests(
   bug_1814
   bug_1970
   bug_2150
+  bug_2497
 )
 
 # components.at
@@ -371,12 +376,14 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_biconnected_components
   igraph_decompose
+  igraph_is_biconnected
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bridges
   igraph_decompose_strong
+  igraph_is_biconnected
   igraph_subcomponent
 )
 
@@ -565,6 +572,7 @@ add_legacy_tests(
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
+  igraph_union
 )
 
 # conversion.at
@@ -988,6 +996,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_transitivity
+  igraph_tree_game
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
@@ -1005,4 +1014,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        jdm
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        igraph_realize_bipartite_degree_sequence
 )

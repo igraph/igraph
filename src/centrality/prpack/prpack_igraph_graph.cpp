@@ -1,7 +1,5 @@
 #include "prpack_igraph_graph.h"
-#include <stdexcept>
 #include <climits>
-#include <cstdlib>
 #include <cstring>
 #include <new>
 
@@ -16,8 +14,10 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         const igraph_t *g, const igraph_vector_t *weights, bool directed) {
 
     const bool treat_as_directed = igraph_is_directed(g) && directed;
-    igraph_integer_t vcount = igraph_vcount(g), ecount = igraph_ecount(g);
-    double *p_weight = nullptr;
+    const igraph_integer_t vcount = igraph_vcount(g);
+    const igraph_integer_t ecount = igraph_ecount(g);
+    double *p_weight;
+    int *p_head;
 
     if (vcount > INT_MAX) {
         IGRAPH_ERROR("Too many vertices for PRPACK.", IGRAPH_EINVAL);
@@ -40,7 +40,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
     }
 
     // Allocate memory for heads and tails
-    int *p_head = heads = new int[num_es];
+    p_head = heads = new int[num_es];
     tails = new int[num_vs];
     memset(tails, 0, num_vs * sizeof(tails[0]));
 
@@ -66,7 +66,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
             IGRAPH_EIT_NEXT(eit);
 
             // Handle the weight
-            if (weights != 0) {
+            if (weights != NULL) {
                 // Does this edge have zero or negative weight?
                 if (VECTOR(*weights)[eid] < 0) {
                     // Negative weights are disallowed.
@@ -110,7 +110,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
             // TODO: should loop edges be added in both directions?
             int *p_head_copy = p_head;
             for (int j = 0; j < temp; j++) {
-                if (weights != 0) {
+                if (weights != NULL) {
                     if (VECTOR(*weights)[VECTOR(neis)[j]] <= 0) {
                         // Ignore
                         num_ignored_es++;

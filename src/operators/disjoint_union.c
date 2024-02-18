@@ -37,6 +37,13 @@
  * and |E1|+|E2| edges.
  *
  * </para><para>
+ * The vertex and edge ordering of the graphs will be preserved.
+ * In other words, the vertex and edge IDs of the first graph map to
+ * identical values in the new graph, while the vertex and edge IDs
+ * of the second graph map to IDs incremented by the vertex and edge
+ * count of the first graph.
+ *
+ * </para><para>
  * Both graphs need to have the same directedness, i.e. either both
  * directed or both undirected.
  *
@@ -100,13 +107,17 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
 
 /**
  * \function igraph_disjoint_union_many
- * \brief The disjint union of many graphs.
+ * \brief The disjoint union of many graphs.
  *
  * First the vertices in the graphs will be relabeled with new vertex
  * IDs to have pairwise disjoint vertex ID sets and then the union of
  * the graphs is formed.
  * The number of vertices and edges in the result is the total number
  * of vertices and edges in the graphs.
+ *
+ * </para><para>
+ * The vertex and edge ordering of the input graphs is preserved in
+ * the output graph.
  *
  * </para><para>
  * All graphs need to have the same directedness, i.e. either all

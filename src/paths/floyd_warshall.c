@@ -23,11 +23,9 @@
 #include "core/interruption.h"
 #include "internal/utils.h"
 
-static igraph_error_t igraph_distances_floyd_warshall_original(
-        const igraph_t *graph, igraph_matrix_t *res,
-        const igraph_vector_t *weights) {
+static igraph_error_t distances_floyd_warshall_original(igraph_matrix_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_matrix_nrow(res);
 
     for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
         IGRAPH_ALLOW_INTERRUPTION();
@@ -58,9 +56,7 @@ static igraph_error_t igraph_distances_floyd_warshall_original(
 }
 
 
-static igraph_error_t igraph_distances_floyd_warshall_tree(
-        const igraph_t *graph, igraph_matrix_t *res,
-        const igraph_vector_t *weights) {
+static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
 
     /* This is the "Tree" algorithm of Brodnik et al.
      * A difference from the paper is that instead of using the OUT_k tree of shortest
@@ -68,7 +64,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
      * This makes it easier to iterate through matrices in column-major order,
      * i.e. storage order, thus increasing performance. */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_matrix_nrow(res);
 
     /* successors[v][u] is the second vertex on the shortest path from v to u,
        i.e. the parent of v in the IN_u tree. */
@@ -351,11 +347,11 @@ igraph_error_t igraph_distances_floyd_warshall(
 
     switch (method) {
     case IGRAPH_FLOYD_WARSHALL_ORIGINAL:
-        IGRAPH_CHECK(igraph_distances_floyd_warshall_original(graph, res, weights));
+        IGRAPH_CHECK(distances_floyd_warshall_original(res));
         break;
     case IGRAPH_FLOYD_WARSHALL_AUTOMATIC:
     case IGRAPH_FLOYD_WARSHALL_TREE:
-        IGRAPH_CHECK(igraph_distances_floyd_warshall_tree(graph, res, weights));
+        IGRAPH_CHECK(distances_floyd_warshall_tree(res));
         break;
     default:
         IGRAPH_ERROR("Invalid method.", IGRAPH_EINVAL);
