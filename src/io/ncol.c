@@ -238,6 +238,25 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     return IGRAPH_SUCCESS;
 }
 
+
+static igraph_error_t check_name(const char *name) {
+    size_t len = 0;
+
+    for (; *name != '\0'; name++, len++) {
+        if (   *name <= 0x020 /* space or non-printable */
+            || *name == 0x7f /* del */) {
+            IGRAPH_ERRORF("The NCOL format does not allow non-printable characters or spaces in vertex names. "
+                          "Character code 0x%02X found.", IGRAPH_EINVAL,
+                          *name);
+        }
+    }
+    if (len == 0) {
+        IGRAPH_ERROR("The NCOL format does not support empty vertex names.", IGRAPH_EINVAL);
+    }
+    return IGRAPH_SUCCESS;
+}
+
+
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_ncol
@@ -314,7 +333,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         }
     }
 
-    if (names == 0 && weights == 0) {
+    if (names == NULL && weights == NULL) {
         /* No names, no weights */
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t from, to;
@@ -326,7 +345,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             }
             IGRAPH_EIT_NEXT(it);
         }
-    } else if (weights == 0) {
+    } else if (weights == NULL) {
         /* No weights, but use names */
         igraph_strvector_t nvec;
         IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
@@ -341,7 +360,9 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str1 = igraph_strvector_get(&nvec, from);
+            IGRAPH_CHECK(check_name(str1));
             str2 = igraph_strvector_get(&nvec, to);
+            IGRAPH_CHECK(check_name(str2));
             ret = fprintf(outstream, "%s %s\n", str1, str2);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
@@ -350,7 +371,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         }
         igraph_strvector_destroy(&nvec);
         IGRAPH_FINALLY_CLEAN(1);
-    } else if (names == 0) {
+    } else if (names == NULL) {
         /* No names but weights */
         igraph_vector_t wvec;
         IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
@@ -392,7 +413,9 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str1 = igraph_strvector_get(&nvec, from);
+            IGRAPH_CHECK(check_name(str1));
             str2 = igraph_strvector_get(&nvec, to);
+            IGRAPH_CHECK(check_name(str2));
             ret = fprintf(outstream, "%s %s ", str1, str2);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);

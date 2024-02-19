@@ -72,6 +72,12 @@ zip $OUT/read_pajek_seed_corpus.zip \
         $SRC/igraph/tests/regression/*.net \
         $SRC/igraph/fuzzing/test_inputs/*.net
 
+zip $OUT/write_all_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.gml \
+        $SRC/igraph/tests/regression/*.gml \
+        $SRC/igraph/tests/unit/*.gml \
+        $SRC/igraph/fuzzing/test_inputs/*.gml
+
 cd $SRC/igraph
 
 XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
