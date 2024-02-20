@@ -55,7 +55,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
         file = tmpfile();
         IGRAPH_ASSERT(file != NULL);
-        CHECK_ERR(igraph_write_graph_leda(&g, file, "name", "weight"));
+        // Do not check error because:
+        // "Vertex attribute values cannot contain newline characters."
+        igraph_write_graph_leda(&g, file, "label", "weight");
         fclose(file);
 
         file = tmpfile();
