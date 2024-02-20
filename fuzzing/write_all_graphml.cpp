@@ -49,7 +49,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     // Do the fuzzing
     igraph_t g;
-    if (igraph_read_graph_gml(&g, ifile) == IGRAPH_SUCCESS) {
+    if (igraph_read_graph_graphml(&g, ifile, 0) == IGRAPH_SUCCESS) {
         FILE *file;
         igraph_t g2;
 
@@ -72,6 +72,16 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         CHECK_ERR(igraph_read_graph_gml(&g2, file));
         fclose(file);
         igraph_destroy(&g2);
+
+        /*
+        file = tmpfile();
+        IGRAPH_ASSERT(file != NULL);
+        CHECK_ERR(igraph_write_graph_pajek(&g, file));
+        rewind(file);
+        CHECK_ERR(igraph_read_graph_pajek(&g2, file));
+        fclose(file);
+        igraph_destroy(&g2);
+        */
 
         file = tmpfile();
         IGRAPH_ASSERT(file != NULL);
@@ -113,7 +123,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         igraph_destroy(&g);
     }
 
-    // no need to call igraph_destroy() if igraph_read_graph_gml() returns an
+    // no need to call igraph_destroy() if igraph_read_graph_graphml() returns an
     // error code as we don't have a valid graph object in that case
 
     fclose(ifile);
