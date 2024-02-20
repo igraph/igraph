@@ -407,9 +407,11 @@ igraph_sample_dirichlet:
 
 igraph_are_adjacent:
     PARAMS: GRAPH graph, VERTEX v1, VERTEX v2, OUT BOOLEAN res
+    DEPS: v1 ON graph, v2 ON graph
 
 igraph_are_connected:
     PARAMS: GRAPH graph, VERTEX v1, VERTEX v2, OUT BOOLEAN res
+    DEPS: v1 ON graph, v2 ON graph
 
 #######################################
 # Structural properties

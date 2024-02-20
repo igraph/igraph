@@ -88,6 +88,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
         }
 
+        if (igraph_vcount(&graph) >= 2) {
+            igraph_get_all_eids_between(&graph, &iv2, 1, 0, IGRAPH_UNDIRECTED);
+            igraph_get_all_eids_between(&graph, &iv2, 0, 0, IGRAPH_UNDIRECTED);
+
+            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1);
+            igraph_vector_int_push_back(&iv1, 0);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_vector_int_push_back(&iv1, 1);
+            igraph_get_eids(&graph, &iv2, &iv1, IGRAPH_UNDIRECTED, false);
+        }
+
         igraph_is_eulerian(&graph, &b, &b2);
         if (b) igraph_eulerian_path(&graph, &iv1, &iv2);
         if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
@@ -105,6 +117,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         }
         igraph_destroy(&g);
 
+        if (igraph_vcount(&graph) >= 1) {
+            igraph_vector_int_resize(&iv1, 1);
+            VECTOR(iv1)[0] = 0;
+            igraph_unfold_tree(&graph, &g, IGRAPH_ALL, &iv1, &iv2);
+            igraph_destroy(&g);
+        }
+
         igraph_graph_list_init(&gl, 0);
         igraph_decompose(&graph, &gl, IGRAPH_WEAK, -1, 4);
         igraph_graph_list_destroy(&gl);
@@ -116,6 +135,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             // shortest paths due to multi-edges.
             igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
         }
+
+        igraph_cohesive_blocks(&graph, &ivl1, &iv1, &iv2, NULL);
 
         igraph_add_vertices(&graph, 3, NULL);
         igraph_degree_1(&graph, &i, 0, IGRAPH_ALL, IGRAPH_NO_LOOPS);

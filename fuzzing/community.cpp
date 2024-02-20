@@ -43,7 +43,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    /* Undirected */
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_matrix_int_t merges, im;
         igraph_matrix_t mat;
@@ -87,8 +86,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 }
             }
 
+            {
+                igraph_t graph2;
+                igraph_copy(&graph2, &graph);
+                igraph_contract_vertices(&graph2, &membership, NULL);
+                igraph_destroy(&graph2);
+            }
+
             igraph_modularity(&graph, &membership, NULL, 1.5, IGRAPH_UNDIRECTED, &m);
             igraph_modularity_matrix(&graph, NULL, 0.75, &mat, IGRAPH_DIRECTED);
+            igraph_assortativity_nominal(&graph, &membership, &r, IGRAPH_DIRECTED, true);
 
             igraph_simplify(&graph, true, true, NULL);
             igraph_community_voronoi(&graph, &membership, &iv, &m, NULL, NULL, IGRAPH_OUT, 1.0);

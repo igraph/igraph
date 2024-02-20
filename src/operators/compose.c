@@ -33,7 +33,7 @@
  *
  * The composition of graphs contains the same number of vertices as
  * the bigger graph of the two operands. It contains an (i,j) edge if
- * and only if there is a k vertex, such that the first graphs
+ * and only if there is a k vertex, such that the first graph
  * contains an (i,k) edge and the second graph a (k,j) edge.
  *
  * </para><para>This is of course exactly the composition of two

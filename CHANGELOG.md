@@ -38,6 +38,19 @@
 
 ## [master]
 
+### Fixed
+
+ - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
+ - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
+ - Fixed the handling of duplicate edge IDs in `igraph_subgraph_from_edges()`.
+ - Fixed conversion of sparse matrices to dense with `igraph_sparsemat_as_matrix()` when sparse matrix object did not make use of its full allocated capacity.
+ - `igraph_write_graph_ncol()` and `igraph_write_graph_lgl()` now refuse to write vertex names which would result in an invalid file that cannot be read back in.
+ - `igraph_write_graph_gml()` now ignores graph attributes called `edge` or `node` with a warning. Writing these would create an invalid GML file that igraph couldn't read back.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.10] - 2024-02-13
 
 ### Fixed

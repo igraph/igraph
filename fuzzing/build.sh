@@ -72,18 +72,31 @@ zip $OUT/read_pajek_seed_corpus.zip \
         $SRC/igraph/tests/regression/*.net \
         $SRC/igraph/fuzzing/test_inputs/*.net
 
+zip $OUT/write_all_gml_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.gml \
+        $SRC/igraph/tests/regression/*.gml \
+        $SRC/igraph/tests/unit/*.gml \
+        $SRC/igraph/fuzzing/test_inputs/*.gml
+
+zip $OUT/write_all_graphml_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.graphml \
+        $SRC/igraph/tests/unit/*.graphml \
+        $SRC/igraph/tests/regression/*.graphml \
+        $SRC/igraph/fuzzing/test_inputs/*.graphml
+
 cd $SRC/igraph
 
 XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 
 # disabled:
-#  - vertex_connectivity, too slow
+#  - nothing at the moment
 # disabled for UBSan:
 #  - read_dimacs_flow, needs a complete rewrite, see https://github.com/igraph/igraph/issues/1924
-TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected centrality community"
+#  - write_all_gml|graphml, uses `(igraph_integer_t) x == x` to check representability as integer; this triggers UBSan
+TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected centrality community"
 if [ "$SANITIZER" != "undefined" ]
 then
-  TARGETS="$TARGETS read_dimacs_flow"
+  TARGETS="$TARGETS read_dimacs_flow write_all_gml write_all_graphml"
 fi
 
 for TARGET in $TARGETS
