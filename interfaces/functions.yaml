@@ -2002,6 +2002,9 @@ igraph_disjoint_union:
 igraph_disjoint_union_many:
     PARAMS: OUT GRAPH res, GRAPH_PTR_LIST graphs
 
+igraph_join:
+    PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+
 igraph_union:
     PARAMS: |-
         OUT GRAPH res, GRAPH left, GRAPH right,

@@ -556,6 +556,7 @@ add_examples(
   igraph_compose
   igraph_difference
   igraph_disjoint_union
+  igraph_join
   igraph_intersection
   igraph_union
 )
