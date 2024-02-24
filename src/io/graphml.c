@@ -646,16 +646,12 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
         if (xmlStrEqual(localname, toXmlChar("id"))) {
             xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
-            if (xmlStr == NULL) {
-                IGRAPH_ERROR("Cannot duplicate value of 'id' attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(xmlStr, "Cannot duplicate value of 'id' attribute.");
             rec->id = fromXmlChar(xmlStr);
             xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
             xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
-            if (xmlStr == NULL) {
-                IGRAPH_ERROR("Cannot duplicate value of 'attr.name' attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(xmlStr, "Cannot duplicate value of 'attr.name' attribute.");
             rec->record.name = fromXmlChar(xmlStr);
             xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
@@ -1024,9 +1020,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         break;
     case IGRAPH_ATTRIBUTE_STRING:
         str = strdup(state->data_char);
-        if (str == NULL) {
-            IGRAPH_ERROR("Cannot allocate memory for string attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(str, "Cannot allocate memory for string attribute.");
 
         if (graphmlrec->default_value.as_string != 0) {
             IGRAPH_FREE(graphmlrec->default_value.as_string);
