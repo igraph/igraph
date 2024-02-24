@@ -591,8 +591,17 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 #define XML_ATTR_URI(it) (*(it+2))
 #define XML_ATTR_VALUE_START(it) (*(it+3))
 #define XML_ATTR_VALUE_END(it) (*(it+4))
+#define XML_ATTR_VALUE_LENGTH(it) (int)((*(it+4))-(*(it+3)))
 #define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
 #define XML_ATTR_VALUE_PF(it) (int)((*(it+4))-(*(it+3))), *(it+3) /* for use in printf-style function with "%.*s" */
+
+static igraph_bool_t xmlAttrValueEqual(xmlChar** attr, const char* expected) {
+    size_t expected_length = strlen(expected);
+    return (
+        expected_length == XML_ATTR_VALUE_LENGTH(attr) &&
+        !xmlStrncmp(toXmlChar(expected), XML_ATTR_VALUE(attr))
+    );
+}
 
 static igraph_error_t igraph_i_graphml_add_attribute_key(
     igraph_i_graphml_attribute_record_t** record,
@@ -655,29 +664,29 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
             rec->record.name = fromXmlChar(xmlStr);
             xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
-            if (!xmlStrncmp(toXmlChar("boolean"), XML_ATTR_VALUE(it))) {
+            if (xmlAttrValueEqual(it, "boolean")) {
                 rec->type = I_GRAPHML_BOOLEAN;
                 rec->record.type = IGRAPH_ATTRIBUTE_BOOLEAN;
                 rec->default_value.as_boolean = 0;
-            } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "string")) {
                 char *str = strdup("");
                 IGRAPH_CHECK_OOM(str, "Cannot allocate new empty string.");
                 rec->type = I_GRAPHML_STRING;
                 rec->record.type = IGRAPH_ATTRIBUTE_STRING;
                 rec->default_value.as_string = str;
-            } else if (!xmlStrncmp(toXmlChar("float"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "float")) {
                 rec->type = I_GRAPHML_FLOAT;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->default_value.as_numeric = IGRAPH_NAN;
-            } else if (!xmlStrncmp(toXmlChar("double"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "double")) {
                 rec->type = I_GRAPHML_DOUBLE;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->default_value.as_numeric = IGRAPH_NAN;
-            } else if (!xmlStrncmp(toXmlChar("int"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "int")) {
                 rec->type = I_GRAPHML_INTEGER;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->default_value.as_numeric = IGRAPH_NAN;
-            } else if (!xmlStrncmp(toXmlChar("long"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "long")) {
                 rec->type = I_GRAPHML_LONG;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->default_value.as_numeric = IGRAPH_NAN;
@@ -687,28 +696,28 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
             }
         } else if (xmlStrEqual(*it, toXmlChar("for"))) {
             /* graph, vertex or edge attribute? */
-            if (!xmlStrncmp(toXmlChar("graph"), XML_ATTR_VALUE(it))) {
+            if (xmlAttrValueEqual(it, "graph")) {
                 trie = &state->g_names;
                 ptrvector = &state->g_attrs;
-            } else if (!xmlStrncmp(toXmlChar("node"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "node")) {
                 trie = &state->v_names;
                 ptrvector = &state->v_attrs;
-            } else if (!xmlStrncmp(toXmlChar("edge"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "edge")) {
                 trie = &state->e_names;
                 ptrvector = &state->e_attrs;
-            } else if (!xmlStrncmp(toXmlChar("graphml"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "graphml")) {
                 igraph_i_report_unhandled_attribute_target("graphml", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("hyperedge"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "hyperedge")) {
                 igraph_i_report_unhandled_attribute_target("hyperedge", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("port"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "port")) {
                 igraph_i_report_unhandled_attribute_target("port", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("endpoint"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "endpoint")) {
                 igraph_i_report_unhandled_attribute_target("endpoint", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("all"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "all")) {
                 /* TODO: we should handle this */
                 igraph_i_report_unhandled_attribute_target("all", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
@@ -1108,9 +1117,9 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
                         continue;
                     }
                     if (xmlStrEqual(*it, toXmlChar("edgedefault"))) {
-                        if (!xmlStrncmp(toXmlChar("directed"), XML_ATTR_VALUE(it))) {
+                        if (xmlAttrValueEqual(it, "directed")) {
                             state->edges_directed = 1;
-                        } else if (!xmlStrncmp(toXmlChar("undirected"), XML_ATTR_VALUE(it))) {
+                        } else if (xmlAttrValueEqual(it, "undirected")) {
                             state->edges_directed = 0;
                         }
                     }
