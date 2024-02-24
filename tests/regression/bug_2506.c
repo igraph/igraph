@@ -27,6 +27,7 @@ azert hallod, az a resze nem kis mertekben baszott fel, hogy "majd ha tobbet let
 
 int main(int argc, char* argv[]) {
     igraph_t g;
+    igraph_error_t result;
     FILE *ifile;
 
     igraph_set_error_handler(igraph_error_handler_ignore);
@@ -35,9 +36,16 @@ int main(int argc, char* argv[]) {
 
     ifile = fopen("bug_2506.graphml", "r");
     IGRAPH_ASSERT(ifile != NULL);
-    IGRAPH_ASSERT(igraph_read_graph_graphml(&g, ifile, 0) == IGRAPH_PARSEERROR);
+
+    result = igraph_read_graph_graphml(&g, ifile, 0);
     fclose(ifile);
 
+    if (result == IGRAPH_UNIMPLEMENTED) {
+        /* maybe it is simply disabled at compile-time */
+        return 77;
+    }
+
+    IGRAPH_ASSERT(result == IGRAPH_PARSEERROR);
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
 
     return 0;
