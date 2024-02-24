@@ -761,11 +761,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     /* add to trie, attributes */
-    IGRAPH_CHECK(igraph_trie_get(trie, rec->id, &id));
-    if (id != igraph_trie_size(trie) - 1) {
+    IGRAPH_CHECK(igraph_trie_check(trie, rec->id, &id));
+    if (id >= 0) {
         IGRAPH_ERRORF("Duplicate attribute found: '%s'.", IGRAPH_PARSEERROR, rec->id);
     }
-
+    IGRAPH_CHECK(igraph_trie_get(trie, rec->id, &id));
     IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, rec));
 
     /* Ownership of 'rec' is now taken by ptrvector so we are not responsible
