@@ -13,9 +13,11 @@
  - `igraph_disjoint_union()` and `igraph_disjoint_union_many()` now check for overflow.
  - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted any more.
  - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
+ - `igraph_is_separator()` and `igraph_is_minimal_separator()` now work correctly with disconnected graphs.
 
 ### Other
 
+ - The performance of `igraph_is_minimal_separator()` was improved.
  - Documentation improvements.
 
 ## [0.10.10] - 2024-02-13
