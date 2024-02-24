@@ -23,20 +23,8 @@ int main(void) {
     const char *str = "Gr`HOk";
     igraph_t g;
 
-    FILE *tempFile = tmpfile();
+    igraph_from_nauty(&g, str);
 
-    if (tempFile) {
-        fputs(str, tempFile);
-
-        fseek(infile, 0, SEEK_SET);
-
-        igraph_read_grap6(&g, tempFile);
-
-        fclose(tempFile);
-    } else {
-        printf("Error creating temporary file");
-        return 1;
-    }
     print_graph_canon(&g);
 
     igraph_destroy(&g);
