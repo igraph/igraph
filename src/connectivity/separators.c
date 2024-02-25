@@ -404,14 +404,9 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
  * https://doi.org/10.1007/3-540-46784-X_17
  *
  * \param graph The input graph. It may be directed, but edge
- *        directions are ignored.
- * \param separators An initialized pointer vector, the separators
- *        are stored here. It is a list of pointers to <type>igraph_vector_int_t</type>
- *        objects. Each vector will contain the ids of the vertices in
- *        the separator.
- *        To free all memory allocated for \p separators, you need call
- *        \ref igraph_vector_destroy() and then \ref igraph_free() on
- *        each element, before destroying the pointer vector itself.
+ *    directions are ignored.
+ * \param separators Pointer to a list of integer vectors, the separators
+ *    will be stored here.
  * \return Error code.
  *
  * \sa \ref igraph_minimum_size_separators()
@@ -614,6 +609,7 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
  * The implementation is based on the following paper:
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
+ * https://doi.org/10.1002/net.3230230604
  *
  * \param graph The input graph, which must be undirected.
  * \param separators An initialized list of integer vectors, the separators
