@@ -48,6 +48,7 @@
  - `igraph_write_graph_gml()` now ignores graph attributes called `edge` or `node` with a warning. Writing these would create an invalid GML file that igraph couldn't read back.
  - `igraph_disjoint_union()` and `igraph_disjoint_union_many()` now check for overflow.
  - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted any more.
+ - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
 
 ### Other
 

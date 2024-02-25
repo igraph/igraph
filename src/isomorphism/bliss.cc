@@ -360,9 +360,8 @@ igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_ve
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
  *   null pointer is the graph is not colored.
- * \param generators Must be an initialized pointer vector. It will
- *    contain pointers to \ref igraph_vector_int_t objects
- *    representing generators of the automorphism group.
+ * \param generators Must be an initialized interger vector list.
+ *   The generators of the automorphism group will be stored here.
  * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info If not \c NULL then information on Bliss internals is

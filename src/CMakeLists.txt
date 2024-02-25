@@ -27,7 +27,7 @@ foreach(FORMAT dl gml lgl ncol pajek)
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "${flex_hide_line_numbers} -CF -8"
+      COMPILE_FLAGS "${flex_hide_line_numbers} -Cf -8"
       DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)

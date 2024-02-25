@@ -294,6 +294,10 @@ static igraph_error_t igraph_i_trie_get_node(
  */
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+    if (key && *key == 0) {
+        IGRAPH_ERROR("keys in a trie cannot be empty", IGRAPH_EINVAL);
+    }
+
     if (!t->storekeys) {
         IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id));
         if (*id > t->maxvalue) {
@@ -349,9 +353,7 @@ igraph_error_t igraph_trie_get_len(
         igraph_integer_t *id) {
 
     char *tmp = strndup(key, length);
-    if (! tmp) {
-        IGRAPH_ERROR("Cannot get from trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot get from trie.");
     IGRAPH_FINALLY(igraph_free, tmp);
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     IGRAPH_FREE(tmp);

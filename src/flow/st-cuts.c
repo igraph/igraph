@@ -1320,22 +1320,15 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * 351--372, 1996.
  *
  * \param graph The input graph, it must be directed.
- * \param value Pointer to a real number, the value of the minimum cut
+ * \param value Pointer to a real number or \c NULL. The value of the minimum cut
  *        is stored here, unless it is a null pointer.
- * \param cuts An initialized pointer vector, the cuts are stored
- *        here. It is a list of pointers to \ref igraph_vector_int_t
- *        objects. Each vector will contain the IDs of the edges in
- *        the cut. This argument is ignored if it is a null pointer.
- *        To free all memory allocated for \c cuts, you need call
- *        \ref igraph_vector_int_destroy() and then \ref igraph_free() on
- *        each element, before destroying the pointer vector itself.
- * \param partition1s An initialized pointer vector, the list of
- *        vertex sets, generating the actual edge cuts, are stored
- *        here. It is a list of pointers to \ref igraph_vector_int_t
- *        objects. Each vector contains a set of vertex IDs. If X is such
+ * \param cuts Pointer to initialized list of integer vectors or \c NULL.
+ *        The cuts are stored here as lists of vertex IDs.
+ * \param partition1s Pointer to an initialized list of integer vectors or \c NULL.
+ *        The list of vertex sets, generating the actual edge cuts, are stored
+ *        here. Each vector contains a set of vertex IDs. If X is such
  *        a set, then all edges going from X to the complement of X
- *        form an (s,t) edge-cut in the graph. This argument is
- *        ignored if it is a null pointer.
+ *        form an (s,t) edge-cut in the graph.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
  * \param capacity Vector of edge capacities. All capacities must be
