@@ -802,6 +802,8 @@ igraph_error_t igraph_moran_process(const igraph_t *graph,
         i++;
         IGRAPH_VIT_NEXT(vA);
     }
+
+
     /* By now we should have chosen a vertex for reproduction. Check this. */
     IGRAPH_ASSERT(a >= 0);
 
@@ -1207,3 +1209,189 @@ igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+      /*############ Documentation ###########*/
+
+
+
+
+/**
+ * @file microscopic_update.c
+ * @brief Microscopic update rules for agent-level strategy revision.
+ *
+ * This file contains functions for computing cumulative proportionate values
+ * of vectors associated with edges or vertices in a graph. These functions are
+ * used in the context of strategy revision for game networks.
+ *
+ * @author Minh Van Nguyen <nguyenminh2@gmail.com>
+ * @copyright 2011
+ * @license GNU General Public License, version 2 or later
+ */
+
+#include "igraph_microscopic_update.h"
+
+/**
+ * @brief Compute cumulative proportionate values for edge-associated vectors.
+ *
+ * This function computes cumulative proportionate values for a vector associated
+ * with edges in a given graph. The perspective can be local (neighborhood of a vertex)
+ * or global (entire graph).
+ *
+ * @param graph The graph object representing the game network.
+ * @param U A vector of edge values.
+ * @param V Pointer to the resulting vector of cumulative proportionate values.
+ * @param islocal Boolean indicating whether to use a local perspective.
+ * @param vid The vertex ID for local perspective (ignored if islocal is false).
+ * @param mode Defines the neighborhood type for a local perspective.
+ * @return IGRAPH_SUCCESS on success, IGRAPH_EINVAL for invalid input.
+ */
+static igraph_error_t igraph_i_ecumulative_proportionate_values(const igraph_t *graph,
+                                                     const igraph_vector_t *U,
+                                                     igraph_vector_t *V,
+                                                     igraph_bool_t islocal,
+                                                     igraph_integer_t vid,
+                                                     igraph_neimode_t mode);
+
+/**
+ * @brief Compute cumulative proportionate values for vertex-associated vectors.
+ *
+ * This function computes cumulative proportionate values for a vector associated
+ * with vertices in a given graph. The perspective can be local (neighborhood of a vertex)
+ * or global (entire graph).
+ *
+ * @param graph The graph object representing the game network.
+ * @param U A vector of vertex values.
+ * @param V Pointer to the resulting vector of cumulative proportionate values.
+ * @param islocal Boolean indicating whether to use a local perspective.
+ * @param vid The vertex ID for local perspective (ignored if islocal is false).
+ * @param mode Defines the neighborhood type for a local perspective.
+ * @return IGRAPH_SUCCESS on success, IGRAPH_EINVAL for invalid input.
+ */
+static igraph_error_t igraph_i_vcumulative_proportionate_values(const igraph_t *graph,
+                                                     const igraph_vector_t *U,
+                                                     igraph_vector_t *V,
+                                                     igraph_bool_t islocal,
+                                                     igraph_integer_t vid,
+                                                     igraph_neimode_t mode);
+
+/**
+ * @brief Standard tests before microscopic strategy updates.
+ *
+ * This function performs common tests before strategy updates, such as
+ * checking for isolated vertices or empty graphs.
+ *
+ * @param graph The graph object representing the game network.
+ * @param vid The vertex ID for which strategy updates are considered.
+ * @param quantities A vector of quantities associated with vertices.
+ * @param strategies A vector of current strategies for the vertex population.
+ * @param mode Defines the neighborhood type for a local perspective.
+ * @param updates Boolean indicating whether to proceed with strategy revision.
+ * @param islocal Boolean indicating whether to use a local perspective.
+ * @return IGRAPH_SUCCESS on success, IGRAPH_EINVAL for invalid input.
+ */
+static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
+                                               igraph_integer_t vid,
+                                               const igraph_vector_t *quantities,
+                                               const igraph_vector_int_t *strategies,
+                                               igraph_neimode_t mode,
+                                               igraph_bool_t *updates,
+                                               igraph_bool_t islocal);
+
+
+
+
+
+/**
+ * \ingroup spatialgames
+ * \function igraph_deterministic_optimal_imitation
+ * \brief Update a vertex's strategy using deterministic optimal imitation.
+ *
+ * This function updates the strategy of a vertex based on deterministic optimal imitation, where the vertex adopts the strategy that yields a local optimum within its immediate neighborhood.
+ *
+ * \param graph The graph object representing the game network.
+ * \param vid The vertex ID to update.
+ * \param optimality The type of optimality to be used (IGRAPH_MAXIMUM or IGRAPH_MINIMUM).
+ * \param quantities A vector of quantities representing each vertex's measure (e.g., fitness).
+ * \param strategies A vector of current strategies for the vertex population.
+ * \param mode Defines the neighborhood to consider for the vertex.
+ * \return IGRAPH_SUCCESS if successful, otherwise an error code.
+ */
+igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
+        igraph_integer_t vid,
+        igraph_optimal_t optimality,
+        const igraph_vector_t *quantities,
+        igraph_vector_int_t *strategies,
+        igraph_neimode_t mode);
+
+/**
+ * \ingroup spatialgames
+ * \function igraph_moran_process
+ * \brief Simulate the Moran process in a network setting.
+ *
+ * This function extends the classic Moran process to operate on a weighted graph, where vertices reproduce and replace others based on their quantities and strategies.
+ *
+ * \param graph The graph object representing the game network.
+ * \param weights A vector of edge weights for the graph.
+ * \param quantities A vector of quantities representing each vertex's measure (e.g., fitness).
+ * \param strategies A vector of current strategies for the vertex population.
+ * \param mode Defines the neighborhood to consider for vertex reproduction.
+ * \return IGRAPH_SUCCESS if successful, otherwise an error code.
+ */
+igraph_error_t igraph_moran_process(const igraph_t *graph,
+                         const igraph_vector_t *weights,
+                         igraph_vector_t *quantities,
+                         igraph_vector_int_t *strategies,
+                         igraph_neimode_t mode);
+
+
+
+/**
+ * \ingroup spatialgames
+ * \function igraph_roulette_wheel_imitation
+ * \brief Adopt a strategy using roulette wheel selection.
+ *
+ * This function implements a simple stochastic imitation strategy where a vertex revises its strategy
+ * based on a roulette wheel selection mechanism. The vertex selects a strategy proportionate to its
+ * quantity (e.g., fitness) from its local neighborhood.
+ *
+ * \param graph The graph object representing the game network.
+ * \param vid The vertex whose strategy is to be updated.
+ * \param islocal Boolean flag controlling the perspective for computing the relative quantity.
+ * \param quantities A vector of quantities providing the quantity of each vertex in the graph.
+ * \param strategies A vector of the current strategies for the vertex population.
+ * \param mode Defines the sort of neighborhood to consider for the vertex.
+ * \return Error code indicating the success or failure of the function.
+ */
+igraph_error_t igraph_roulette_wheel_imitation(const igraph_t *graph,
+                                    igraph_integer_t vid,
+                                    igraph_bool_t islocal,
+                                    const igraph_vector_t *quantities,
+                                    igraph_vector_int_t *strategies,
+                                    igraph_neimode_t mode) {
+    // Function implementation goes here
+}
+
+/**
+ * \ingroup spatialgames
+ * \function igraph_stochastic_imitation
+ * \brief Adopt a strategy via stochastic imitation with uniform selection.
+ *
+ * This function implements a simple stochastic imitation strategy where a vertex revises its strategy
+ * to that of a vertex chosen uniformly at random from its local neighborhood.
+ *
+ * \param graph The graph object representing the game network.
+ * \param vid The vertex whose strategy is to be updated.
+ * \param algo This flag controls which algorithm to use in stochastic imitation.
+ * \param quantities A vector of quantities providing the quantity of each vertex in the graph.
+ * \param strategies A vector of the current strategies for the vertex population.
+ * \param mode Defines the sort of neighborhood to consider for the vertex.
+ * \return Error code indicating the success or failure of the function.
+ */
+igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
+                                igraph_integer_t vid,
+                                igraph_imitate_algorithm_t algo,
+                                const igraph_vector_t *quantities,
+                                igraph_vector_int_t *strategies,
+                                igraph_neimode_t mode) {
+    // Function implementation goes here
+}
+
