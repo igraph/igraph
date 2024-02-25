@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    ifile = fopen("bug_2506.graphml", "r");
+    ifile = fopen("bug_2506_1.graphml", "r");
     IGRAPH_ASSERT(ifile != NULL);
 
     result = igraph_read_graph_graphml(&g, ifile, 0);
@@ -44,6 +44,15 @@ int main(int argc, char* argv[]) {
         /* maybe it is simply disabled at compile-time */
         return 77;
     }
+
+    IGRAPH_ASSERT(result == IGRAPH_PARSEERROR);
+    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
+    ifile = fopen("bug_2506_2.graphml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    result = igraph_read_graph_graphml(&g, ifile, 0);
+    fclose(ifile);
 
     IGRAPH_ASSERT(result == IGRAPH_PARSEERROR);
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
