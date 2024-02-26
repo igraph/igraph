@@ -45,8 +45,9 @@
  *
  * </para><para>
  * Both graphs need to have the same directedness, i.e. either both
- * directed or both undirected. As of now, the join of directed graphs
- * is unimplemented.
+ * directed or both undirected. If both graphs are directed, then for each
+ * vertex v, u in graphs G1, G2 we add edges (v, u), (u, v) to maintain
+ * completeness.
  *
  * </para><para>
  * The current version of this function cannot handle graph, vertex
@@ -76,14 +77,13 @@ igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
         IGRAPH_ERROR("Cannot create join of directed and undirected graphs.",
                      IGRAPH_EINVAL);
     }
-    if (directed_left) {
-        IGRAPH_ERROR("Join of two directed graphs is currently unimplemented.",
-                     IGRAPH_UNIMPLEMENTED);
-    }
 
     IGRAPH_CHECK(igraph_disjoint_union(res,left,right));
     IGRAPH_SAFE_MULT(no_of_nodes_left, no_of_nodes_right ,&no_of_new_edges);
     IGRAPH_SAFE_MULT(no_of_new_edges, 2 ,&no_of_new_edges);
+    if (directed_left) {
+        IGRAPH_SAFE_MULT(no_of_new_edges, 2 ,&no_of_new_edges);
+    }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&new_edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&new_edges, no_of_new_edges));
 
@@ -91,6 +91,10 @@ igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
         for(j = 0; j < no_of_nodes_right; j++) {
             igraph_vector_int_push_back(&new_edges, i);  /* reserved */
             igraph_vector_int_push_back(&new_edges, j + no_of_nodes_left);  /* reserved */
+            if (directed_left) {
+                igraph_vector_int_push_back(&new_edges, j + no_of_nodes_left);  /* reserved */
+                igraph_vector_int_push_back(&new_edges, i);  /* reserved */
+            }
         }
     }
 

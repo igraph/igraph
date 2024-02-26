@@ -25,11 +25,26 @@
 int main(void) {
     igraph_t left, right, joined;
 
+    /* Standard join. */
+    printf("Standard join.\n");
     igraph_small(&left, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, -1);
     igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);
 
     igraph_join(&joined, &left, &right);
-    print_graph(&joined, stdout);
+    print_graph(&joined);
+    printf("\n");
+
+    igraph_destroy(&left);
+    igraph_destroy(&right);
+    igraph_destroy(&joined);
+
+    /* Standard directed join */
+    printf("Standard directed join.\n");
+    igraph_small(&left, 2, IGRAPH_DIRECTED, 0,1, -1);
+    igraph_small(&right, 3, IGRAPH_DIRECTED, 0,1, 2,1, -1);
+
+    igraph_join(&joined, &left, &right);
+    print_graph(&joined);
     printf("\n");
 
     igraph_destroy(&left);
@@ -41,6 +56,7 @@ int main(void) {
     igraph_small(&right, 0, IGRAPH_UNDIRECTED, -1);
     igraph_join(&joined, &left, &right);
     IGRAPH_ASSERT(igraph_ecount(&joined) != 0 || igraph_vcount(&joined) != 0);
+
     igraph_destroy(&left);
     igraph_destroy(&right);
     igraph_destroy(&joined);
@@ -51,6 +67,7 @@ int main(void) {
     igraph_join(&joined, &left, &right);
     IGRAPH_ASSERT(igraph_ecount(&joined) != igraph_ecount(&left)
                   || igraph_vcount(&joined) != igraph_vcount(&left));
+    
     igraph_destroy(&left);
     igraph_destroy(&right);
     igraph_destroy(&joined);

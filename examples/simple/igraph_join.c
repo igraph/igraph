@@ -34,5 +34,17 @@ int main(void) {
     igraph_destroy(&right);
     igraph_destroy(&joined);
 
+
+    igraph_small(&left, 2, IGRAPH_DIRECTED, 0,1, -1);
+    igraph_small(&right, 3, IGRAPH_DIRECTED, 0,1, 2,1, -1);
+
+    igraph_join(&joined, &left, &right);
+    igraph_write_graph_edgelist(&joined, stdout);
+    printf("\n");
+
+    igraph_destroy(&left);
+    igraph_destroy(&right);
+    igraph_destroy(&joined);
+
     return 0;
 }
