@@ -356,9 +356,9 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  *    partition {1, 4} will not induce a connected subgraph.
  * \return Error code.
  *
- * Time complexity: In weighted graphs, O((log s) |E| log |V| + |V|), and in
- * unweighted graphs O((log s) |E| + |V|), where s is the number of generator
- * vertices and |V| and |E| are the number of vertices and edges in the graph.
+ * Time complexity: In weighted graphs, O((log |S|) |E| (log |V|) + |V|), and in
+ * unweighted graphs O((log |S|) |E| + |V|), where |S| is the number of generator
+ * vertices, and |V| and |E| are the number of vertices and edges in the graph.
  *
  * \sa \ref igraph_distances(), \ref igraph_distances_dijkstra().
  */
