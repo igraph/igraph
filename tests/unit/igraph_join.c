@@ -20,6 +20,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.h"
+
 int main(void) {
     igraph_t left, right, joined;
 
@@ -27,9 +29,28 @@ int main(void) {
     igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);
 
     igraph_join(&joined, &left, &right);
-    igraph_write_graph_edgelist(&joined, stdout);
+    print_graph(&joined, stdout);
     printf("\n");
 
+    igraph_destroy(&left);
+    igraph_destroy(&right);
+    igraph_destroy(&joined);
+
+    /* Empty graphs; the result is the null graph. */
+    igraph_small(&left, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&right, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_join(&joined, &left, &right);
+    IGRAPH_ASSERT(igraph_ecount(&joined) != 0 || igraph_vcount(&joined) != 0);
+    igraph_destroy(&left);
+    igraph_destroy(&right);
+    igraph_destroy(&joined);
+
+    /* Empty graph joined with non-empty; the result is the non-empty. */
+    igraph_small(&left, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, -1);
+    igraph_small(&right, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_join(&joined, &left, &right);
+    IGRAPH_ASSERT(igraph_ecount(&joined) != igraph_ecount(&left)
+                  || igraph_vcount(&joined) != igraph_vcount(&left));
     igraph_destroy(&left);
     igraph_destroy(&right);
     igraph_destroy(&joined);
