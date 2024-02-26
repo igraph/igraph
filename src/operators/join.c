@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2020 The igraph development team
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,13 +14,11 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_operators.h"
+#include "math/safe_intop.h"
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
@@ -55,7 +53,7 @@
  * and edge attributes, they will be lost.
  *
  * \param res  Pointer to an uninitialized graph object, the result
- *        will stored here.
+ *        will be stored here.
  * \param left The first graph.
  * \param right The second graph.
  * \return Error code.
@@ -68,6 +66,7 @@ igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
 
     igraph_integer_t no_of_nodes_left = igraph_vcount(left);
     igraph_integer_t no_of_nodes_right = igraph_vcount(right);
+    igraph_integer_t no_of_new_edges;
     igraph_vector_int_t new_edges;
     igraph_bool_t directed_left = igraph_is_directed(left);
     igraph_integer_t i;
@@ -82,14 +81,16 @@ igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
                      IGRAPH_UNIMPLEMENTED);
     }
 
+    IGRAPH_CHECK(igraph_disjoint_union(res,left,right));
+    IGRAPH_SAFE_MULT(no_of_nodes_left, no_of_nodes_right ,&no_of_new_edges);
+    IGRAPH_SAFE_MULT(no_of_new_edges, 2 ,&no_of_new_edges);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&new_edges, 0);
-
-    igraph_disjoint_union(res,left,right);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&new_edges, no_of_new_edges));
 
     for(i = 0; i < no_of_nodes_left; i++) {
         for(j = 0; j < no_of_nodes_right; j++) {
-            igraph_vector_int_push_back(&new_edges, i);
-            igraph_vector_int_push_back(&new_edges, j + no_of_nodes_left);
+            igraph_vector_int_push_back(&new_edges, i);  /* reserved */
+            igraph_vector_int_push_back(&new_edges, j + no_of_nodes_left);  /* reserved */
         }
     }
 
