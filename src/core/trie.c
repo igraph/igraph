@@ -27,6 +27,7 @@
 #include "core/trie.h"
 #include "internal/hacks.h" /* strdup */
 
+#include <assert.h>
 #include <string.h>
 
 
@@ -127,6 +128,8 @@ static igraph_error_t igraph_i_trie_get_node(
     igraph_trie_node_t *t, const char *key, igraph_integer_t newvalue,
     igraph_integer_t *id
 ) {
+    assert(key != 0);
+
     /* If newvalue is negative, we don't add the node if nonexistent, only check
      * for its existence */
     igraph_bool_t add = (newvalue >= 0);
@@ -294,7 +297,9 @@ static igraph_error_t igraph_i_trie_get_node(
  */
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
-    if (key && *key == 0) {
+    assert(key != 0);
+
+    if (*key == 0) {
         IGRAPH_ERROR("keys in a trie cannot be empty", IGRAPH_EINVAL);
     }
 
