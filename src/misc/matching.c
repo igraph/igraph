@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_matching.h"
 
 #include "igraph_adjlist.h"
@@ -29,10 +30,11 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
+#include "igraph_vector.h"
 
 #include <math.h>
 
-/* #define MATCHING_DEBUG */
+#define MATCHING_DEBUG // TODO: comment out when done debugging
 
 #ifdef _MSC_VER
 /* MSVC does not support variadic macros */
@@ -1018,6 +1020,19 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
+
+
+
+static igraph_error_t igraph_i_maximum_matching_unweighted(
+        const igraph_t *graph,
+        igraph_integer_t *matching_size,
+        igraph_vector_int_t *matching);
+
+static igraph_error_t igraph_i_maximum_matching_unweighted_bloss_aug(igraph_integer_t w1, igraph_integer_t w2, igraph_t *graph, igraph_vector_int_t *even_level, igraph_vector_int_t *odd_level,
+    igraph_vector_bool_t *visited_nodes, igraph_vector_bool_t *visited_edges, igraph_vector_bool_t *used_edges, igraph_vector_bool_t *erased_nodes,
+    igraph_integer_t no_of_nodes, igraph_vector_int_t *blossom, igraph_vector_int_list_t *predecessors, igraph_vector_int_list_t *unused_ancestors, igraph_vector_int_list_t *unvisited_ancestors,
+    igraph_vector_int_list_t *anomalies, igraph_vector_int_list_t *bridges, igraph_vector_int_t *match);
+
 /**
  * \function igraph_maximum_matching
  * \brief Calculates a maximum matching in a graph.
@@ -1063,6 +1078,18 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
 igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
                             igraph_real_t *matching_weight, igraph_vector_int_t *matching,
                             const igraph_vector_t *weights) {
+    // TODO: add eps to function declaration?
+    // TODO: do boring input validity test or whatever
+    // TODO: make dependent on if weights are given
+    // TODO: figure out function signature better
+    igraph_i_maximum_matching_unweighted(graph, matching_size, matching);
+
+
+    return IGRAPH_SUCCESS;
+}
+
+
+static igraph_error_t igraph_i_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching) {
     /* Data Structures
      ***********************
      * collection of sets bridges(i), from which one bridge is pulled at a time, from the current phase set.
@@ -1083,149 +1110,527 @@ igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *
      */
 
 
+    /* Data Structures in this section
+     *********************************
+     * even/odd level arrays of length n, -1 taken as infinity
+     *
+     * TODO figure out these two set representations
+     * predecessors and anomalies n length list of arrays of length n
+     *
+     * bridges as a list of vectors length n, each list length 2n? - igraph_vector_push_back igraph_vector_pop_back
+     *
+     * level_i_queue and next_level_i_queue
+     *
+     * Blossom array of length n
+     *
+     * TODO figure out other blossom representation
+     */
+
+    // NOTE use IGRAPH_CHECK() macro
+
+    igraph_integer_t i,j,u,v,temp;
+    igraph_vector_int_t even_level;
+    igraph_vector_int_t odd_level;
+    igraph_vector_bool_t visited_nodes;
+    igraph_vector_bool_t visited_edges;
+    igraph_vector_bool_t used_edges;
+    igraph_vector_bool_t erased_nodes;
+    igraph_integer_t no_of_nodes;
+    igraph_vector_int_t blossom;
+    igraph_vector_int_list_t predecessors;
+    igraph_vector_int_list_t unused_ancestors;
+    igraph_vector_int_list_t unvisited_ancestors;
+    igraph_vector_int_list_t anomalies;
+    igraph_vector_int_list_t bridges;
+    igraph_vector_int_t match;
+    igraph_vector_int_t neighbors;
+    igraph_dqueue_int_t level_i_queue;
+    igraph_dqueue_int_t next_level_i_queue;
+
+
+    igraph_vs_t all_selector; // TODO: is this needed?
+
+    // initialize data structures
+    no_of_nodes = igraph_vcount(graph);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&even_level, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&odd_level, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&blossom, no_of_nodes);
+    //IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited_nodes, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_int_list_init(&unused_ancestors, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &unused_ancestors);
+    IGRAPH_CHECK(igraph_vector_int_list_init(&unvisited_ancestors, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &unvisited_ancestors);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited_edges, no_of_nodes); //TODO: make into matrix?
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&used_edges, no_of_nodes); //TODO: make into matrix?
+    //unused ancestor list?
+    //unvistied predecessor list?
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&erased_nodes, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_int_list_init(&predecessors, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &predecessors);
+    IGRAPH_CHECK(igraph_vector_int_list_init(&anomalies, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &anomalies);
+    IGRAPH_CHECK(igraph_vector_int_list_init(&bridges, 2*no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &bridges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&match, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
+    // TODO: decide if all these need to be this size
+    IGRAPH_CHECK(igraph_dqueue_int_init(&level_i_queue, no_of_nodes));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &level_i_queue);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&next_level_i_queue, no_of_nodes));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &next_level_i_queue);
+
+    // TODO: reserve memory for vector lists?
+
     // Search(graph)
     //******************************************
-    // (0) Initialize
-    // for each vertex
-    // evenlevel(v) = infinity
-    // oddlevel(v) = infinity
-    // blossom(v) = undefined
-    // predecessors(v) = empty set
-    // anomalies(v) = empty set
-    // v marked unvisited
-    //
-    // Every edge marked unused and unvisited
-    //
-    // bridges(i) = empty set
-    // i = -1
-    //
-    // exposed vertices have evenlevel set to 0
-    //
-    // (2)
-    // i = i+1
-    // if no more vertices have level i then halt
-    //
-    // if i is even
-    // for each v with evenlevel(v) = i find its unmatched, unused neighbors.
-    // for each neighbor u
-    // 	if evenlevel(u) is finite
-    // 		temp = (evenlevel(u) + evenlevel(v))/2
-    // 		add (u,v) to bridges(temp)
-    // 	else
-    // 		handle oddlevel
-    // 		if oddlevel(u) == infinity
-    // 			oddlevel(u) = i+1
-    // 		handle predecessors
-    // 		if oddlevel(u) == i+1
-    // 			add v to predecessors(u)
-    // 		handle anomalies
-    // 			add v to anomalies(u)
-    // for each edge (u,v) in bridges(i) call bloss_aug(u,v)
-    // if an augmentation occurred go to (0), otherwise go to (2)
+    // (0) Initialize loop variables
+    igraph_bool_t has_vertices = 1;
+    if (no_of_nodes == 0) {
+        has_vertices = 0;
+    }
+    igraph_vector_int_fill(&match, -1);
 
-    return IGRAPH_SUCCESS
+    while (has_vertices) {
+        /* remove when finished with algorithm
+        igraph_vit_t iterator; // does this need to go at the top?
+        igraph_vit_create(graph,all_selector,&iterator);
+        while (!IGRAPH_VIT_END(iterator)) {
+            igraph_integer_t vertex = IGRAPH_VIT_GET(iterator);
+            // predecessors(v) = empty set
+            // anomalies(v) = empty set
+            // v marked unvisited
+            IGRAPH_VIT_NEXT(iterator);
+        }
+        */
+        // Beginning of a phase
+
+        // for each vertex v
+        // evenlevel(v) = infinity
+        igraph_vector_int_fill(&even_level, -1);
+        // oddlevel(v) = infinity
+        igraph_vector_int_fill(&odd_level, -1);
+        // blossom(v) = undefined
+        igraph_vector_int_fill(&blossom, -1);
+        // predecessors(v) = empty set
+        for (j=0; j<no_of_nodes; j++) {
+            igraph_vector_int_clear(igraph_vector_int_list_get_ptr(&predecessors,j));
+            igraph_vector_int_clear(igraph_vector_int_list_get_ptr(&unused_ancestors,j));
+            igraph_vector_int_clear(igraph_vector_int_list_get_ptr(&unvisited_ancestors,j));
+        }
+        // anomalies(v) = empty set
+        for (j=0; j<no_of_nodes; j++) {
+            igraph_vector_int_clear(igraph_vector_int_list_get_ptr(&anomalies,j));
+        }
+        // v marked unvisited
+        igraph_vector_bool_fill(&visited_nodes,0);
+
+        // all edges marked unused and unvisited
+        igraph_vector_bool_fill(&visited_edges,0);
+        igraph_vector_bool_fill(&used_edges,0);
+        // mark all nodes not erased
+        igraph_vector_bool_fill(&erased_nodes,0);
+
+        // bridges(j) = empty set for all j
+        for (j=0; j<no_of_nodes; j++) {
+            igraph_vector_int_clear(igraph_vector_int_list_get_ptr(&bridges,j));
+        }
+
+        // i = -1
+        i = -1;
+
+        // for each exposed vertex v, even_level = 0
+        // for each vertex
+        for (j=0; j<no_of_nodes; j++){
+            // if not matched
+            if (VECTOR(match)[j] == -1) {
+                // even_level = 0;
+                VECTOR(even_level)[j] = 0;
+                // place into level_i_queue
+                igraph_dqueue_int_push(&level_i_queue, j);
+            }
+
+        }
+
+        // (2)
+        igraph_bool_t augmented = 0;
+        while (!augmented && has_vertices) {
+            // i = i+1
+            i++;
+            // if i is even
+            if (i%2 == 0) {
+                // for each v with evenlevel(v) = i find its unmatched, unused neighbors.
+                // TODO: unused condition
+                while (!igraph_dqueue_int_empty(&level_i_queue)) {
+                    v = igraph_dqueue_int_pop(&level_i_queue);
+                    // for each neighbor u
+                    igraph_neighbors(graph, &neighbors, v, IGRAPH_ALL);
+                    for (j=0;j<igraph_vector_int_size(&neighbors);j++) {
+                        u = VECTOR(neighbors)[j];
+                        // if evenlevel(u) is finite
+                        if (VECTOR(even_level)[u] != -1) {
+                            // temp = (evenlevel(u) + evenlevel(v))/2
+                            temp = (VECTOR(even_level)[u] + VECTOR(even_level)[v]) / 2;
+                            // add (u,v) to bridges(temp)
+                            igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&bridges,temp), u);
+                            igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&bridges,temp), v);
+                        }
+                        else {
+                            // handle oddlevel
+                            // if oddlevel(u) == infinity
+                            if (VECTOR(odd_level)[u] == -1) {
+                                // oddlevel(u) = i+1
+                                VECTOR(odd_level)[u] = i+1;
+                                igraph_dqueue_int_push(&next_level_i_queue, u);
+                            }
+                            // handle predecessors
+                            // if oddlevel(u) == i+1
+                            if (VECTOR(odd_level)[u] == i+1) {
+                                // add v to predecessors(u)
+                                igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&predecessors,u), v);
+                                igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&unused_ancestors,u), v);
+                                igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&unvisited_ancestors,u), v);
+                            }
+                            // handle anomalies
+                            if (VECTOR(odd_level)[u] < i) {
+                                // add v to anomalies(u)
+                                igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&anomalies,u), v);
+                            }
+                        }
+                    }
+                }
+            }
+            // if i is odd
+            else {
+                // for each v with odd_level(v) = i and v not in any blossom take its matched neighbor u
+                // TODO: blossom condition
+                while (!igraph_dqueue_int_empty(&level_i_queue)) {
+                    v = igraph_dqueue_int_pop(&level_i_queue);
+                    u = VECTOR(match)[v]; // BUG: can u be -1?
+                    // handle bridges
+                    // if odd_level(u) = i
+                    if (VECTOR(odd_level)[u] == i) {
+                        // temp = (odd_level(u)+odd_level(v))/2
+                        temp = (VECTOR(odd_level)[u] + VECTOR(odd_level)[v]) / 2;
+                        // add (u,v) to bridges(temp)
+                        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&bridges,temp), u);
+                        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&bridges,temp), v);
+                    }
+                    //  handle predecessors
+                    //  if oddlevel(u) = infinity
+                    if (VECTOR(odd_level)[u] == -1) {
+                        // even_level(u) = i+1
+                        VECTOR(even_level)[u] = i+1;
+                        igraph_dqueue_int_push(&next_level_i_queue, u);
+                        // predecessors(u) = {v}
+                        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&predecessors,u), v);
+                        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&unused_ancestors,u), v);
+                        igraph_vector_int_push_back(igraph_vector_int_list_get_ptr(&unvisited_ancestors,u), v);
+                    }
+                }
+
+            }
+#ifdef MATCHING_DEBUG
+                debug("bridges(i):");
+                igraph_vector_int_print(igraph_vector_int_list_get_ptr(&bridges, i));
+#endif
+            // for each edge (u,v) in bridges(i) call bloss_aug(u,v)
+            for (j=0; j<igraph_vector_int_size(igraph_vector_int_list_get_ptr(&bridges, i));j++) {
+                // TODO: call bloss_aug
+            }
+
+            igraph_dqueue_int_t temp = level_i_queue;
+            level_i_queue = next_level_i_queue;
+            next_level_i_queue = temp;
+            // if no more vertices have level i then halt
+
+            if (igraph_dqueue_int_size(&level_i_queue) == 0) {
+                has_vertices = 0;
+            }
+        }
+
+        //igraph_vit_destroy(&iterator);
+    }
+
+    // compute matching size
+    *matching_size = 0;
+
+    igraph_vector_int_destroy(&even_level);
+    igraph_vector_int_destroy(&odd_level);
+    igraph_vector_int_destroy(&blossom);
+    igraph_vector_bool_destroy(&visited_nodes);
+    igraph_vector_bool_destroy(&visited_edges);
+    igraph_vector_bool_destroy(&used_edges);
+    igraph_vector_bool_destroy(&erased_nodes);
+    igraph_vector_int_list_destroy(&predecessors);
+    igraph_vector_int_list_destroy(&anomalies);
+    igraph_vector_int_list_destroy(&bridges);
+    igraph_vector_int_destroy(&match);
+    igraph_vector_int_destroy(&neighbors);
+    igraph_dqueue_int_destroy(&level_i_queue);
+    igraph_dqueue_int_destroy(&next_level_i_queue);
+    IGRAPH_FINALLY_CLEAN(14);
+
+
+    return IGRAPH_SUCCESS;
 }
 
-// BlossAug(w1, w2) w1, w2 are vertices
-//******************************************
-// Initialization
-// init flags pathFound, blossomFound, erased
-// check if path discovered, if yes flag path found
-// while path not found and blossom not found and not erased
-// 	if left tree should grow
-// 		init flags grown/backtracked, has ancestors
-// 		if vl has no unused ancestors
-// 			flag no ancestors
-// 			if f(vl) is undefined
-// 				flag blossom found
-// 			else //backtrack
-// 				vl = f(vl)
-// 		while left tree hasn't grown/backtraced and vr has unused ancestors and not erased and blossom not found
-// 			choose unused ancestor edge (vl,u)
-// 			if u is marked erased
-// 				delete u from predecessors(vl)
-// 				if vl has no unused ancestors
-// 					flag no ancestors
-// 					if vl==w1
-// 						flag erased
-// 					else
-// 						mark vl erased
-// 						vl = f(vl)
-// 						flag grown/backtracked
-// 			else
-// 				mark (vl,u) used
-// 				if u is in a blossom B
-// 					u = base*(B)
-// 				if u is unmarked 	// grow left tree
-// 					mark u "left"
-// 					f(u) = vl
-// 					vl = u
-// 					flag has grown/backtracked
-// 				else
-// 					if u == barrier or u == vr //left tree can't
-// 						flag grown/backtracked // rename this flag
-// 					else 		// steal from right tree
-// 						mark u "left"
-// 						vr = f(vr)
-// 						vl = u
-// 						DCV = u
-// 						flag has grown/backtracked
-// 	else right tree should grow
-// 		if vr has no unused ancestors
-// 			flag no ancestors
-// 			if vr == barrier 	// steal from left tree
-// 				vr = DCV
-// 				barrier = DCV
-// 				mark vr "right"
-// 				vl = f(vl)
-// 			else 			// backtrack
-// 				vr = f(vr)
-// 		while right tree hasn't grown/backtracked/intersect and vr has unused ancestors and not erased
-// 			choose unused ancestor edge (vr,u)
-// 			if u is marked erased
-// 				delete u from predecessors(vr)
-// 				if vr has no unused ancestor
-// 					flag no ancestors
-// 					if vr==w2
-// 						flag erased
-// 					else
-// 						mark vr erased
-// 						vr = f(vr)
-// 						flag grown/backtracked/intersect
-// 			else
-// 				mark (vr,u) used
-// 				if u is in a blossom B
-// 					u = base*(B)
-// 				if u is unmarked
-// 					mark u "right"
-// 					f(u) = vr
-// 					vr = u
-// 					flag has grown/backtracked/intersect
-// 				else			//mark encounter with left tree
-// 					if u == vl
-// 						DCV = u
-// 					flag has grown/backtracked/intersect
-// 	check if path discovered, if yes flag path found
-// if path found
-// 	run findPath()
-// 	augment matching, and erased path vertices
-// if blossom found
-// 	remove "right" mark from DCV
-// 	create new blossom set B, consisting of all vertices mark "left" or "right"
-// 	peakL(B) = w1, peakR(B) = w2, base(B) = DCV
-// 	for each u in B:
-// 		blossom(u) = B
-// 		if u is outer
-// 			oddlevel(u) = 2i + 1 - evenlevel(u)
-// 		if u is inner
-// 			evenlevel(u) = 2i + 1 - oddlevel(u)
-// 			for each v in anomalies(u)
-// 				temp = (evenlevel(u)+evenlevel(v))/2
-// 				add edge (u,v) to bridges(temp)
-// 				Mark (u,v) used
+//TODO: tidy up parameters
+static igraph_error_t igraph_i_maximum_matching_unweighted_bloss_aug(igraph_integer_t w1, igraph_integer_t w2, igraph_t *graph, igraph_vector_int_t *even_level, igraph_vector_int_t *odd_level,
+    igraph_vector_bool_t *visited_nodes, igraph_vector_bool_t *visited_edges, igraph_vector_bool_t *used_edges, igraph_vector_bool_t *erased_nodes,
+    igraph_integer_t no_of_nodes, igraph_vector_int_t *blossom, igraph_vector_int_list_t *predecessors,igraph_vector_int_list_t *unused_ancestors, igraph_vector_int_list_t *unvisited_ancestors,
+    igraph_vector_int_list_t *anomalies, igraph_vector_int_list_t *bridges, igraph_vector_int_t *match) {
+
+    // BlossAug(w1, w2) w1, w2 are vertices - return augmenting path, if empty none was found
+    //
+    //******************************************
+    // TODO: Check if w1 and w2 are in same blossom, exit if yes
+    //
+    // Initialization
+
+    // grown_back is flagged when the tree grows, backtracks, or fails to grow along a specific edge
+    igraph_bool_t pathFound, blossomFound, erased, grown_back, has_ancestors;
+    igraph_integer_t dcv, barrier, vl, vr, level_vl, level_vr, u;
+    igraph_vector_bool_t left;
+    igraph_vector_bool_t right;
+    igraph_vector_int_t father;
+    igraph_vector_int_t *ancestors;
+
+    //TODO: decide vl and vr using blossom info
+    vl = w1;
+    vr = w2;
+
+    pathFound = false;
+    blossomFound = false;
+    erased = false;
+    dcv = -1;
+    barrier = vr;
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&left, no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&right, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&father, no_of_nodes);
+    igraph_vector_bool_fill(&left, 0);
+    igraph_vector_bool_fill(&right, 0);
+    igraph_vector_int_fill(&father, -1);
+
+    // check if path discovered, if yes flag path found
+    if (VECTOR(*even_level)[vl] == 0 && VECTOR(*even_level)[vr] == 0) {
+        pathFound = true;
+    }
+    // while path not found and blossom not found and not erased
+    while (!pathFound && !blossomFound && !erased) {
+        // get level of vl and vr
+        level_vl = VECTOR(*even_level)[vl] <= VECTOR(*odd_level)[vl] ? VECTOR(*even_level)[vl] : VECTOR(*odd_level)[vl];
+        level_vl = VECTOR(*even_level)[vl] == -1 ? VECTOR(*odd_level)[vl] : level_vl;
+        level_vl = VECTOR(*odd_level)[vl] == -1 ? VECTOR(*even_level)[vl] : level_vl;
+
+        level_vr = VECTOR(*even_level)[vr] <= VECTOR(*odd_level)[vr] ? VECTOR(*even_level)[vr] : VECTOR(*odd_level)[vr];
+        level_vr = VECTOR(*even_level)[vr] == -1 ? VECTOR(*odd_level)[vr] : level_vr;
+        level_vr = VECTOR(*odd_level)[vr] == -1 ? VECTOR(*even_level)[vr] : level_vr;
+
+        //TODO: error if one is -1?
+
+        // if left tree should grow
+        if (level_vl >= level_vr) {
+            // init flags grown/backtracked, has ancestors
+            grown_back = false;
+            has_ancestors = true;
+            // if vl has no unused ancestors
+            // TODO: is this even correct? do i need to create an ancestors array in initial search?
+            ancestors = igraph_vector_int_list_get_ptr(unused_ancestors, vl); // TODO: make copy instead?
+            if (igraph_vector_int_empty(ancestors)) {
+                // flag no ancestors
+                has_ancestors = false;
+                // if f(vl) is undefined
+                if (VECTOR(father)[vl] == -1) {
+                    // flag blossom found
+                    blossomFound = true;
+                }
+                // else backtrack
+                else {
+                    // vl = f(vl)
+                    vl = VECTOR(father)[vl];
+                }
+            }
+            // while left tree hasn't grown/backtraced and vl has unused ancestors and not erased and blossom not found
+            while (!grown_back && has_ancestors && !erased && !blossomFound) {
+                // choose unused ancestor edge (vl,u)
+                u = igraph_vector_int_pop_back(ancestors);
+                // if u is marked erased
+                if (VECTOR(*erased_nodes)[u]) {
+                    // delete u from predecessors(vl)
+                    // if vl has no unused ancestors
+                    if (igraph_vector_int_empty(ancestors)) {
+                        // flag no ancestors
+                        has_ancestors = false;
+                        // if vl==w1
+                        if (vl == w1) {
+                        // flag erased
+                            erased = true;
+                        }
+                        // 	else
+                        else {
+                            // TODO: mark vl erased
+                            // vl = f(vl)
+                            vl = VECTOR(father)[vl];
+                            // flag grown/backtracked
+                            grown_back = true;
+                        }
+                    }
+                }
+                else {
+                    // TODO: mark (vl,u) used
+                    //
+                    // if u is in a blossom B
+                    if (VECTOR(*blossom)[u] != -1) {
+                        // TODO: u = base*(B)
+                    }
+                    // if u is unmarked 	// grow left tree
+                    if (!VECTOR(left)[u] && !VECTOR(right)[u]) {
+                        // mark u "left"
+                        VECTOR(left)[u] = true;
+                        // f(u) = vl
+                        VECTOR(father)[u] = vl;
+                        // vl = u
+                        vl = u;
+                        // flag has grown/backtracked
+                        grown_back = true;
+                    }
+                    // else
+                    else {
+                        // if u == barrier or u == vr //left tree can't grow this way
+                        if (u == barrier || u == vr) {
+                            // flag grown/backtracked
+                            grown_back = true;
+                        }
+                        // else steal from right tree
+                        else {
+                            // mark u "left"
+                            VECTOR(left)[u] = true;
+                            // vr = f(vr)
+                            vr = VECTOR(father)[vr];
+                            // vl = u
+                            vl = u;
+                            // DCV = u
+                            dcv = u;
+                            // flag has grown/backtracked
+                            grown_back = true;
+                        }
+                    }
+                }
+            }
+        }
+        // 	else right tree should grow
+        else {
+            // init flags grown/backtracked, has ancestors
+            grown_back = false;
+            has_ancestors = true;
+            // if vr has no unused ancestors
+            ancestors = igraph_vector_int_list_get_ptr(predecessors, vr);
+            if (igraph_vector_int_empty(ancestors)) {
+                // flag no ancestors
+                has_ancestors = false;
+                // if vr == barrier then steal from left tree
+                if (vr == barrier) {
+                    // vr = DCV
+                    vr = dcv;
+                    // barrier = DCV
+                    barrier = dcv;
+                    // mark vr "right"
+                    VECTOR(left)[vr] = false;
+                    VECTOR(right)[vr] = true;
+                    // vl = f(vl)
+                    vl = VECTOR(father)[vl];
+                }
+                // else backtrack
+                else {
+                    // vr = f(vr)
+                    vr = VECTOR(father)[vr];
+                }
+            }
+            // while right tree hasn't grown/backtracked/intersect and vr has unused ancestors and not erased
+            while (!grown_back && has_ancestors && !erased && !blossomFound) {
+                // choose unused ancestor edge (vr,u)
+                u = igraph_vector_int_pop_back(ancestors);
+                // if u is marked erased
+                if (VECTOR(*erased_nodes)[u]) {
+                    // TODO: delete u from predecessors(vr)
+                    //
+                    // if vr has no unused ancestor
+                    if (igraph_vector_int_empty(ancestors)) {
+                        // 					flag no ancestors
+                        has_ancestors = false;
+                        // if vr==w2
+                        if (vr == w2) {
+                            // flag erased
+                            erased = true;
+                        }
+                        else {
+                            // mark vr erased
+                            VECTOR(*erased_nodes)[vr] = true;
+                            // vr = f(vr)
+                            vr = VECTOR(father)[vr];
+                            // flag grown/backtracked/intersect
+                            grown_back = true;
+                        }
+                    }
+                }
+                else {
+                    // TODO: mark (vr,u) used
+                    //
+                    // if u is in a blossom B
+                    if (VECTOR(*blossom)[u] != -1) {
+                        // TODO: u = base*(B)
+                    }
+                    // if u is unmarked
+                    if (!VECTOR(left)[u] && !VECTOR(right)[u]) {
+                        // mark u "right"
+                        VECTOR(right)[u] = true;
+                        // f(u) = vr
+                        VECTOR(father)[u] = vr;
+                        // vr = u
+                        vr = u;
+                        // flag has grown/backtracked/intersect
+                        grown_back = true;
+                    }
+                    // else encounter with left tree
+                    else {
+                        // if u == vl
+                        if (u == vl) {
+                            // DCV = u
+                            dcv = u;
+                        }
+                        // flag has grown/backtracked/intersect
+                        grown_back = true;
+                    }
+                }
+            }
+        }
+        // check if path discovered, if yes flag path found
+        if (VECTOR(*match)[vl] == -1 && VECTOR(*match)[vr] == -1) {
+            pathFound = true;
+        }
+    }
+    // if path found
+    // 	run findPath()
+    // 	augment matching, and erased path vertices
+    // if blossom found
+    // 	remove "right" mark from DCV
+    // 	create new blossom set B, consisting of all vertices mark "left" or "right"
+    // 	peakL(B) = w1, peakR(B) = w2, base(B) = DCV
+    // 	for each u in B:
+    // 		blossom(u) = B
+    // 		if u is outer
+    // 			oddlevel(u) = 2i + 1 - evenlevel(u)
+    // 		if u is inner
+    // 			evenlevel(u) = 2i + 1 - oddlevel(u)
+    // 			for each v in anomalies(u)
+    // 				temp = (evenlevel(u)+evenlevel(v))/2
+    // 				add edge (u,v) to bridges(temp)
+    // 				Mark (u,v) used
+    return IGRAPH_SUCCESS;
+}
 
 
-// findPath(high, low, B, evenLevel, oddLevel, LR_marks, blossoms) high and low vertices, B is a blossom, levels and LR_marks are arrays, blossoms is three arrays storing left and right peaks and bases of blossoms
+// findPath(high, low, B, even_level, odd_level, LR_marks, blossoms) high and low vertices, B is a blossom, levels and LR_marks are arrays, blossoms is three arrays storing left and right peaks and bases of blossoms
 //******************************************
 // Must be called with a path existing between high and low, with the corresponding data used by BlossAug() to find it, otherwise errors may occur
 // Note: open() from paper is combined with findPath to remove recursive calls
@@ -1279,6 +1684,28 @@ igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *
 // 					push PeakR, path(j), B, pointer to path(j), true
 // 					push PeakL, path(j+1), B, pointer to path(j), false
 // return path
+
+struct igraph_i_disjoint_tree_set {
+    // idk how to represent the tree
+    igraph_vector_int_t micro;
+    igraph_vector_int_t size;
+    igraph_vector_int_t number;
+    igraph_vector_int_list_t node;
+    igraph_matrix_int_t mark;
+};
+
+igraph_error_t igraph_i_disjoint_tree_set(struct igraph_i_disjoint_tree_set *T) {
+    // initialize root node and other sets
+    return IGRAPH_SUCCESS;
+}
+// grow(T,v,w) add w to tree making v its parent
+// link(T,v) link v to its parent
+// find(T,v) find the set v belongs to
+//      microfind
+//      macrofind?!
+//      macrounite?!!?!?
+//      macrosetmake?!!?!?!?!??
+// destroy(T)
 
 #ifdef MATCHING_DEBUG
     #undef MATCHING_DEBUG
