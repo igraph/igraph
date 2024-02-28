@@ -370,7 +370,10 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
         UPDATEMARK();
 
         /* Add it to the list of separators, if it is new */
-        if (igraph_i_separators_is_not_seen_yet(separators, sorter)) {
+        if (
+            igraph_vector_int_size(sorter) > 0 &&
+            igraph_i_separators_is_not_seen_yet(separators, sorter)
+        ) {
             IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(separators, sorter));
         }
     } /* while cptr < complen */

@@ -369,6 +369,7 @@ add_legacy_tests(
   bug_2150
   bug_2497
   bug_2506
+  bug_2517
 )
 
 # components.at
