@@ -51,7 +51,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
         igraph_vector_int_list_t ivl;
         igraph_vector_int_t iv1, iv2;
-        igraph_bool_t b;
+        igraph_bool_t is_separator, is_minimal_separator;
 
         igraph_vector_int_list_init(&ivl, 0);
         igraph_vector_int_init(&iv1, 0);
@@ -64,11 +64,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_is_separator(
                 &graph,
                 igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),
-                &b);
+                &is_separator);
             if (igraph_vector_int_size(igraph_vector_int_list_get_ptr(&ivl, i)) > 0) {
                 // Exclude empty sets until this bug is fixed:
                 // https://github.com/igraph/igraph/issues/2517
-                IGRAPH_ASSERT(b);
+                IGRAPH_ASSERT(is_separator);
             }
         }
 
@@ -91,8 +91,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 igraph_is_minimal_separator(
                     &graph,
                     igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),
-                    &b);
-                IGRAPH_ASSERT(b);
+                    &is_minimal_separator);
+                IGRAPH_ASSERT(is_minimal_separator);
             }
         }
 
