@@ -1,8 +1,4 @@
 /*
-azert hallod, az a resze nem kis mertekben baszott fel, hogy "majd ha tobbet leteszunk az asztalra"
-*/
-
-/*
    IGraph library.
    Copyright (C) 2024  The igraph development team
 
@@ -49,6 +45,15 @@ int main(int argc, char* argv[]) {
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
 
     ifile = fopen("bug_2506_2.graphml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    result = igraph_read_graph_graphml(&g, ifile, 0);
+    fclose(ifile);
+
+    IGRAPH_ASSERT(result == IGRAPH_PARSEERROR);
+    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
+    ifile = fopen("bug_2506_3.graphml", "r");
     IGRAPH_ASSERT(ifile != NULL);
 
     result = igraph_read_graph_graphml(&g, ifile, 0);
