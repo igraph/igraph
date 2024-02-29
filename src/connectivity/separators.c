@@ -679,20 +679,25 @@ static igraph_error_t igraph_i_minimum_size_separators_append(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * Finds the k largest degree vertices.
+ */
 static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
-    const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t k
+    const igraph_t *graph, igraph_vector_int_t *res, const igraph_integer_t k
 ) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t deg, order;
-    igraph_integer_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
+
+    /* It is assumed that this function receives only simple graphs, so we can use the
+     * faster IGRAPH_LOOPS here instead of the slower IGRAPH_NO_LOOPS. */
+    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
     IGRAPH_CHECK(igraph_vector_int_order1(&deg, &order, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_int_resize(res, k));
-    for (i = 0; i < k; i++) {
+    for (igraph_integer_t i = 0; i < k; i++) {
         VECTOR(*res)[i] = VECTOR(order)[no_of_nodes - 1 - i];
     }
 
@@ -736,7 +741,7 @@ igraph_error_t igraph_minimum_size_separators(
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t conn;
     igraph_vector_int_t X;
-    igraph_integer_t i, j, k, n;
+    igraph_integer_t k, n;
     igraph_bool_t issepX;
     igraph_t Gbar;
     igraph_vector_t phi;
@@ -745,7 +750,7 @@ igraph_error_t igraph_minimum_size_separators(
     igraph_maxflow_stats_t stats;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs",
+        IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
@@ -766,7 +771,7 @@ igraph_error_t igraph_minimum_size_separators(
         IGRAPH_CHECK(igraph_articulation_points(graph, &ap));
         n = igraph_vector_int_size(&ap);
         IGRAPH_CHECK(igraph_vector_int_list_resize(separators, n));
-        for (i = 0; i < n; i++) {
+        for (igraph_integer_t i = 0; i < n; i++) {
             igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
             IGRAPH_CHECK(igraph_vector_int_push_back(v, VECTOR(ap)[i]));
         }
@@ -775,10 +780,10 @@ igraph_error_t igraph_minimum_size_separators(
         return IGRAPH_SUCCESS;
     } else if (conn == no_of_nodes - 1) {
         IGRAPH_CHECK(igraph_vector_int_list_resize(separators, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
             IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes - 1));
-            for (j = 0, k = 0; j < no_of_nodes; j++) {
+            for (igraph_integer_t j = 0, k = 0; j < no_of_nodes; j++) {
                 if (j != i) {
                     VECTOR(*v)[k++] = j;
                 }
@@ -813,19 +818,19 @@ igraph_error_t igraph_minimum_size_separators(
 
     /* ---------------------------------------------------------------- */
     /* 3 If v[j] != x[i] and v[j] is not adjacent to x[i] then */
-    for (i = 0; i < k; i++) {
+    for (igraph_integer_t i = 0; i < k; i++) {
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        for (j = 0; j < no_of_nodes; j++) {
-            igraph_integer_t ii = VECTOR(X)[i];
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            igraph_integer_t xi = VECTOR(X)[i];
             igraph_real_t phivalue;
             igraph_bool_t conn;
 
-            if (ii == j) {
+            if (xi == j) {
                 continue;    /* the same vertex */
             }
-            IGRAPH_CHECK(igraph_are_adjacent(&graph_copy, ii, j, &conn));
+            IGRAPH_CHECK(igraph_are_adjacent(&graph_copy, xi, j, &conn));
             if (conn) {
                 continue;    /* they are connected */
             }
@@ -835,7 +840,7 @@ igraph_error_t igraph_minimum_size_separators(
             If |phi|=k, then */
             IGRAPH_CHECK(igraph_maxflow(&Gbar, &phivalue, &phi, /*cut=*/ NULL,
                                         /*partition=*/ NULL, /*partition2=*/ NULL,
-                                        /* source= */ ii + no_of_nodes,
+                                        /* source= */ xi + no_of_nodes,
                                         /* target= */ j,
                                         &capacity, &stats));
 
@@ -848,7 +853,7 @@ igraph_error_t igraph_minimum_size_separators(
                 IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ NULL,
                                                    /*cuts=*/ &stcuts,
                                                    /*partition1s=*/ NULL,
-                                                   /*source=*/ ii + no_of_nodes,
+                                                   /*source=*/ xi + no_of_nodes,
                                                    /*target=*/ j,
                                                    /*capacity=*/ &capacity));
 
@@ -860,9 +865,9 @@ igraph_error_t igraph_minimum_size_separators(
 
             /* --------------------------------------------------------------- */
             /* 8 Add edge (x[i],v[j]) to G. */
-            IGRAPH_CHECK(igraph_add_edge(&graph_copy, ii, j));
-            IGRAPH_CHECK(igraph_add_edge(&Gbar, ii + no_of_nodes, j));
-            IGRAPH_CHECK(igraph_add_edge(&Gbar, j + no_of_nodes, ii));
+            IGRAPH_CHECK(igraph_add_edge(&graph_copy, xi, j));
+            IGRAPH_CHECK(igraph_add_edge(&Gbar, xi + no_of_nodes, j));
+            IGRAPH_CHECK(igraph_add_edge(&Gbar, j + no_of_nodes, xi));
             IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
             IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
 
