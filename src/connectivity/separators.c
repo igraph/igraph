@@ -469,6 +469,9 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
         UPDATEMARK();
 
         /* Add it to the list of separators, if it is new */
+        /* TODO: Is there a cleaner way to avoid empty separators,
+         * or is this an inherent limitation of the algorithm?
+         * See https://github.com/igraph/igraph/issues/2517 */
         if (
             igraph_vector_int_size(sorter) > 0 &&
             igraph_i_separators_is_not_seen_yet(separators, sorter)
