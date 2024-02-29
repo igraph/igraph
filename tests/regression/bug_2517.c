@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2024  The igraph development team
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,17 +13,14 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include "igraph.h"
+#include <igraph.h>
 
 #include "../unit/test_utilities.h"
 
-int main(int argc, char* argv[]) {
+int main(void) {
     igraph_t g;
     igraph_vector_int_list_t result;
 
@@ -41,7 +38,7 @@ int main(int argc, char* argv[]) {
 
     igraph_vector_int_list_destroy(&result);
 
-    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
