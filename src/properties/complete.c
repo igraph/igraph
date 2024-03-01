@@ -26,6 +26,8 @@
  * \function igraph_is_complete
  * \brief Decides whether the graph is complete.
  *
+ * \experimental
+ *
  * A graph is considered complete if all pairs of different vertices are
  * adjacent.
  *
@@ -46,7 +48,6 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res)
     const igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t complete_ecount;
     igraph_bool_t simple, directed = igraph_is_directed(graph);
-    igraph_integer_t i;
     igraph_vector_int_t neighbours;
 
     /* If the graph is the null graph or the singleton graph, return early */
@@ -108,15 +109,15 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res)
 #  error "Unexpected IGRAPH_INTEGER_SIZE value."
 #endif
 
-/* If the amount of edges is strictly lower than what it should be for a
-   complete graph, return early */
+    /* If the amount of edges is strictly lower than what it should be for a
+       complete graph, return early */
 
-if (ecount < complete_ecount) {
-    *res = false;
-    return IGRAPH_SUCCESS;
-}
+    if (ecount < complete_ecount) {
+        *res = false;
+        return IGRAPH_SUCCESS;
+    }
 
-/* If the graph is simple, compare and conclude */
+    /* If the graph is simple, compare and conclude */
     IGRAPH_CHECK(igraph_is_simple(graph, &simple));
 
     if (simple) {
@@ -127,7 +128,7 @@ if (ecount < complete_ecount) {
     /* Allocate memory for vector of size v */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbours, vcount);
 
-    for (i = 0; i < vcount; ++i) {
+    for (igraph_integer_t i = 0; i < vcount; ++i) {
 
         igraph_vector_int_clear(&neighbours);
 
