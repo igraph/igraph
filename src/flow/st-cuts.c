@@ -1162,7 +1162,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg, no_of_nodes);
 
     IGRAPH_CHECK(igraph_degree(Sbar, &indeg, igraph_vss_all(),
-                               IGRAPH_IN, /*loops=*/ 1));
+                               IGRAPH_IN, /*loops=*/ true));
 
 #define ACTIVE(x) (VECTOR(*active)[VECTOR(*invmap)[(x)]])
 #define ZEROIN(x) (VECTOR(indeg)[(x)]==0)
