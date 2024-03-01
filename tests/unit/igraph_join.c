@@ -72,5 +72,7 @@ int main(void) {
     igraph_destroy(&right);
     igraph_destroy(&joined);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
