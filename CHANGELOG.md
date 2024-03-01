@@ -24,6 +24,7 @@
 
 ### Other
 
+ - Performance: `igraph_is_simple()` now makes more granular use of the cache.
  - Performance: `igraph_degree()` now makes use of the cache when checking for self-loops.
  - The performance of `igraph_is_minimal_separator()` was improved.
  - Documentation improvements.
