@@ -1224,6 +1224,15 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
         IGRAPH_ERROR("Invalid mode for degree calculation.", IGRAPH_EINVMODE);
     }
 
+    if (! loops) {
+        /* If the graph is known not to have loops, we can use the faster
+         * loops == true code path, which has O(1) complexity instead of of O(d). */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+            loops = true;
+        }
+    }
+
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
