@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_is_complete()` checks there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
+
 ### Fixed
 
  - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
