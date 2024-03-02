@@ -369,6 +369,7 @@ add_legacy_tests(
   bug_2150
   bug_2497
   bug_2506
+  bug_2517
 )
 
 # components.at
@@ -806,6 +807,11 @@ add_examples(
   igraph_is_separator
   igraph_minimal_separators
   igraph_minimum_size_separators
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_is_separator
 )
 
 add_legacy_tests(

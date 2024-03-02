@@ -50,7 +50,6 @@ int main(void) {
     if (result) {
         FAIL("All non-central vertices of star graph failed.", 5);
     }
-    igraph_destroy(&graph);
 
     /* Same graph, all vertices */
     igraph_is_separator(&graph, igraph_vss_range(0, 10), &result);
