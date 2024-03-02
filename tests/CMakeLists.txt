@@ -325,6 +325,7 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_complete
   igraph_is_dag
   igraph_is_mutual
   igraph_is_tree
