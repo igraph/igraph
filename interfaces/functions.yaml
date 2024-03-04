@@ -2511,10 +2511,6 @@ igraph_random_sample:
     PARAMS: OUT VECTOR_INT res, INTEGER l, INTEGER h, INTEGER length
     FLAGS: RNG
 
-igraph_random_sample_real:
-    PARAMS: OUT VECTOR_INT res, REAL l, REAL h, INTEGER length
-    FLAGS: RNG
-
 igraph_convex_hull:
     PARAMS: MATRIX data, OUT INDEX_VECTOR resverts, OUT MATRIX rescoords
 
