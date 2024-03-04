@@ -59,10 +59,41 @@ static igraph_integer_t igraph_read_graph6_number_and_skip(const char *str) {
     return res;
 }
 
-igraph_error_t igraph_from_nauty(igraph_t *graph, const char *str) {
-    igraph_integer_t length = strlen(str);
+static igraph_error_t igraph_from_nauty_digraph6(igraph_t *graph, const char *str) {
 
     igraph_integer_t no_of_nodes = igraph_read_graph6_number_and_skip(str);
+
+    igraph_integer_t length = strlen(str);
+    igraph_matrix_t adj_matrix;
+
+    IGRAPH_CHECK(igraph_matrix_init(&adj_matrix, no_of_nodes, no_of_nodes));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &adj_matrix);
+
+    igraph_integer_t bitIndex = 0;
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            //TODO bigger numbers
+            igraph_integer_t byte = 1 + bitIndex / 6;
+            if (byte >= length) break;
+            igraph_integer_t bit = 5 - bitIndex % 6;
+            igraph_integer_t value = str[byte] - 63;
+            igraph_integer_t is_set = value & (1 << bit);
+            if (is_set) {
+                MATRIX(adj_matrix, i, j) = 1;
+            }
+            bitIndex++;
+        }
+    }
+    igraph_adjacency(graph, &adj_matrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_ONCE);
+    igraph_matrix_destroy(&adj_matrix);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_from_nauty_graph6(igraph_t *graph, const char *str) {
+    igraph_integer_t no_of_nodes = igraph_read_graph6_number_and_skip(str);
+
+    igraph_integer_t length = strlen(str);
     igraph_matrix_t adj_matrix;
 
     IGRAPH_CHECK(igraph_matrix_init(&adj_matrix, no_of_nodes, no_of_nodes));
@@ -89,6 +120,14 @@ igraph_error_t igraph_from_nauty(igraph_t *graph, const char *str) {
     return IGRAPH_SUCCESS;
 }
 
+igraph_error_t igraph_from_nauty(igraph_t *graph, const char *str) {
+    if (str[0] == '&') {
+        return igraph_from_nauty_digraph6(graph, str + 1);
+    } else {
+        return igraph_from_nauty_graph6(graph, str);
+    }
+}
+
 igraph_error_t igraph_to_nauty(const igraph_t *graph, char **res) {
     char *str_res = NULL;
     //TODO memory management
@@ -101,7 +140,7 @@ igraph_error_t igraph_to_nauty(const igraph_t *graph, char **res) {
         for (igraph_integer_t i = 0; i < j; i++) {
             igraph_integer_t byte = 1 + bitIndex / 6;
             igraph_integer_t bit = 5 - bitIndex % 6;
-            //TODO if there is an edge between i and j?
+            //TODO is this the best way to check if there is an edge between i and j?
             igraph_integer_t eid;
             igraph_get_eid(graph, &eid, i, j, false, false);
             if (eid != -1) {
