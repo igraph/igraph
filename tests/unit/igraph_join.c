@@ -67,7 +67,7 @@ int main(void) {
     igraph_join(&joined, &left, &right);
     IGRAPH_ASSERT(igraph_ecount(&joined) != igraph_ecount(&left)
                   || igraph_vcount(&joined) != igraph_vcount(&left));
-    
+
     igraph_destroy(&left);
     igraph_destroy(&right);
     igraph_destroy(&joined);

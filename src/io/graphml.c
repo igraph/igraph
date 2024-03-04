@@ -779,7 +779,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     if (id >= 0) {
         IGRAPH_ERRORF("Duplicate attribute ID found: '%s'.", IGRAPH_PARSEERROR, rec->id);
     }
-    
+
     /* check if we have already seen this attribute name */
     n = igraph_vector_ptr_size(ptrvector);
     for (i = 0; i < n; i++) {
