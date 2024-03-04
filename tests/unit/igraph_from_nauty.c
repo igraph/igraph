@@ -19,15 +19,29 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main(void) {
-    const char *str = "Gr`HOk";
+void print(const char *str) {
     igraph_t g;
-
     igraph_from_nauty(&g, str);
-
     print_graph_canon(&g);
-
     igraph_destroy(&g);
+}
+
+int main(void) {
+    //graph6
+    const char *str1 = "Gr`HOk";
+
+    //digraph6
+    const char *singleton = "&@?";
+    const char *one_vertex_with_loop = "&@_";
+
+    printf("some graph6 example\n");
+    print(str1);
+
+    printf("\ndigraph6 singleton\n");
+    print(singleton);
+
+    printf("\ndigraph6 single vertex with loop\n");
+    print(one_vertex_with_loop);
 
     VERIFY_FINALLY_STACK();
     return 0;

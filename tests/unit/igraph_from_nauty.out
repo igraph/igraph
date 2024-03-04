@@ -1,3 +1,4 @@
+some graph6 example
 directed: false
 vcount: 8
 edges: {
@@ -13,4 +14,17 @@ edges: {
 4 6
 5 7
 6 7
+}
+
+digraph6 singleton
+directed: true
+vcount: 1
+edges: {
+}
+
+digraph6 single vertex with loop
+directed: true
+vcount: 1
+edges: {
+0 0
 }
