@@ -231,22 +231,27 @@ igraph_barabasi_game:
         OPTIONAL VECTOR_INT outseq, BOOLEAN outpref=False, REAL A=1.0,
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         OPTIONAL GRAPH start_from
+    FLAGS: RNG
 
 igraph_erdos_renyi_game_gnp:
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
+    FLAGS: RNG
 
 igraph_erdos_renyi_game_gnm:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False
+    FLAGS: RNG
 
 igraph_degree_sequence_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
         DEGSEQ_MODE method=CONFIGURATION
+    FLAGS: RNG
 
 igraph_growing_random_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, INTEGER m=1, BOOLEAN directed=False,
         BOOLEAN citation=False
+    FLAGS: RNG
 
 igraph_barabasi_aging_game:
     PARAMS: |-
@@ -254,35 +259,41 @@ igraph_barabasi_aging_game:
         BOOLEAN outpref=False, REAL pa_exp=1.0, REAL aging_exp=0.0, INTEGER aging_bin=1,
         REAL zero_deg_appeal=1.0, REAL zero_age_appeal=0.0, REAL deg_coef=1.0,
         REAL age_coef=1.0, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_recent_degree_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, REAL power=1.0, INTEGER window=1,
         INTEGER m=1, OPTIONAL VECTOR_INT outseq, BOOLEAN outpref=False,
         REAL zero_appeal=1.0, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_recent_degree_aging_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER m=1, OPTIONAL VECTOR_INT outseq,
         BOOLEAN outpref=False, REAL pa_exp=1.0, REAL aging_exp=0.0, INTEGER aging_bin=1,
         INTEGER window=1, REAL zero_appeal=1.0, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_callaway_traits_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types,
         INTEGER edges_per_step=1, VECTOR type_dist, MATRIX pref_matrix,
         BOOLEAN directed=False, OPTIONAL OUT VECTOR_INT node_type_vec
+    FLAGS: RNG
 
 igraph_establishment_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER types, INTEGER k=1,
         VECTOR type_dist, MATRIX pref_matrix, BOOLEAN directed=True,
         OPTIONAL OUT VECTOR_INT node_type_vec
+    FLAGS: RNG
 
 igraph_grg_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False,
         OPTIONAL OUT VECTOR x, OPTIONAL OUT VECTOR y
+    FLAGS: RNG
 
 igraph_preference_game:
     PARAMS: |-
@@ -290,6 +301,7 @@ igraph_preference_game:
         VECTOR type_dist, BOOLEAN fixed_sizes=False,
         MATRIX pref_matrix, OUT VECTOR_INT node_type_vec,
         BOOLEAN directed=False, BOOLEAN loops=False
+    FLAGS: RNG
 
 igraph_asymmetric_preference_game:
     PARAMS: |-
@@ -297,52 +309,62 @@ igraph_asymmetric_preference_game:
         MATRIX type_dist_matrix, MATRIX pref_matrix,
         OUT VECTOR_INT node_type_out_vec, OUT VECTOR_INT node_type_in_vec,
         BOOLEAN loops=False
+    FLAGS: RNG
 
 igraph_rewire_edges:
     PARAMS: |-
         INOUT GRAPH graph, REAL prob, BOOLEAN loops=False,
         BOOLEAN multiple=False
+    FLAGS: RNG
 
 igraph_rewire_directed_edges:
     PARAMS: |-
         INOUT GRAPH graph, REAL prob, BOOLEAN loops=False,
         NEIMODE mode=OUT
+    FLAGS: RNG
 
 igraph_watts_strogatz_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei,
         REAL p, BOOLEAN loops=False, BOOLEAN multiple=False
+    FLAGS: RNG
 
 igraph_lastcit_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INTEGER edges_per_node=1,
         INTEGER agebins=1, VECTOR preference, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_cited_type_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INDEX_VECTOR types, VECTOR pref,
         INTEGER edges_per_step=1, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_citing_cited_type_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, INDEX_VECTOR types, MATRIX pref,
         INTEGER edges_per_step=1, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_forest_fire_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1,
         INTEGER ambs=1, BOOLEAN directed=True
+    FLAGS: RNG
 
 igraph_simple_interconnected_islands_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size,
         REAL islands_pin, INTEGER n_inter
+    FLAGS: RNG
 
 igraph_static_fitness_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
         OPTIONAL VECTOR fitness_in, BOOLEAN loops=False,
         BOOLEAN multiple=False
+    FLAGS: RNG
 
 igraph_static_power_law_game:
     PARAMS: |-
@@ -350,56 +372,67 @@ igraph_static_power_law_game:
         REAL exponent_out, REAL exponent_in=-1,
         BOOLEAN loops=False, BOOLEAN multiple=False,
         BOOLEAN finite_size_correction=True
+    FLAGS: RNG
 
 igraph_k_regular_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_nodes, INTEGER k,
         BOOLEAN directed=False, BOOLEAN multiple=False
+    FLAGS: RNG
 
 igraph_sbm_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, MATRIX pref_matrix,
         VECTOR_INT block_sizes, BOOLEAN directed=False,
         BOOLEAN loops=False
+    FLAGS: RNG
 
 igraph_hsbm_game:
     INTERNAL: true
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, INTEGER m,
         VECTOR rho, MATRIX C, REAL p
+    FLAGS: RNG
 
 igraph_hsbm_list_game:
     INTERNAL: true
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, VECTOR_INT mlist,
         VECTOR_LIST rholist, MATRIX_LIST Clist, REAL p
+    FLAGS: RNG
 
 igraph_correlated_game:
     PARAMS: |-
         GRAPH old_graph, OUT GRAPH new_graph,
         REAL corr, REAL p=edge_density(old.graph), OPTIONAL INDEX_VECTOR permutation=NULL
+    FLAGS: RNG
 
 igraph_correlated_pair_game:
     PARAMS: |-
         OUT GRAPH graph1, OUT GRAPH graph2, INTEGER n, REAL corr,
         REAL p, BOOLEAN directed=False,
         OPTIONAL INDEX_VECTOR permutation=NULL
+    FLAGS: RNG
 
 igraph_dot_product_game:
     PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
+    FLAGS: RNG
 
 igraph_sample_sphere_surface:
     PARAMS: |-
         INTEGER dim, INTEGER n=1, REAL radius=1,
         BOOLEAN positive=True, OUT MATRIX res
+    FLAGS: RNG
 
 igraph_sample_sphere_volume:
     PARAMS: |-
         INTEGER dim, INTEGER n=1, REAL radius=1,
         BOOLEAN positive=True, OUT MATRIX res
+    FLAGS: RNG
 
 igraph_sample_dirichlet:
     PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
+    FLAGS: RNG
 
 #######################################
 # Basic query functions
@@ -628,6 +661,7 @@ igraph_spanner:
     PARAMS: |-
         GRAPH graph, OUT EDGE_INDICES spanner, REAL stretch, OPTIONAL EDGEWEIGHTS weights
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_subcomponent:
     PARAMS: GRAPH graph, OUT VERTEX_INDICES res, VERTEX vid, NEIMODE mode=ALL
@@ -697,6 +731,7 @@ igraph_pagerank:
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph,
         options ON algo
+    FLAGS: RNG
 
 igraph_personalized_pagerank:
     PARAMS: |-
@@ -709,6 +744,7 @@ igraph_personalized_pagerank:
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,
         options ON algo
+    FLAGS: RNG
 
 igraph_personalized_pagerank_vs:
     PARAMS: |-
@@ -871,6 +907,7 @@ igraph_eigenvector_centrality:
         EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
+    FLAGS: RNG
 
 igraph_hub_score:
     PARAMS: |-
@@ -1074,6 +1111,7 @@ igraph_pseudo_diameter:
         GRAPH graph, OUT REAL diameter, VERTEX start_vid,
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
+    FLAGS: RNG
 
 igraph_pseudo_diameter_dijkstra:
     PARAMS: |-
@@ -1082,6 +1120,7 @@ igraph_pseudo_diameter_dijkstra:
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_diversity:
     PARAMS: |-
@@ -1094,12 +1133,14 @@ igraph_random_walk:
         GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_INDICES vertices, OUT EDGE_INDICES edges,
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, weights ON graph, vertices ON graph, edges ON graph
+    FLAGS: RNG
 
 igraph_random_edge_walk:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL, OUT EDGE_INDICES edgewalk,
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, weights ON graph, edgewalk ON graph
+    FLAGS: RNG
 
 igraph_global_efficiency:
     PARAMS: GRAPH graph, OUT REAL res, EDGEWEIGHTS weights=NULL, BOOLEAN directed=True
@@ -1370,6 +1411,7 @@ igraph_independence_number:
 
 igraph_layout_random:
     PARAMS: GRAPH graph, OUT MATRIX res
+    FLAGS: RNG
 
 igraph_layout_circle:
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR order=ALL
@@ -1398,6 +1440,7 @@ igraph_layout_fruchterman_reingold:
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_layout_kamada_kawai:
     PARAMS: |-
@@ -1407,12 +1450,14 @@ igraph_layout_kamada_kawai:
         OPTIONAL VECTOR minx, OPTIONAL VECTOR maxx,
         OPTIONAL VECTOR miny, OPTIONAL VECTOR maxy
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_layout_lgl:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, INTEGER maxiter=150, REAL maxdelta=VCOUNT(graph),
         REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph),
         INTEGER root=-1
+    FLAGS: RNG
 
 igraph_layout_reingold_tilford:
     PARAMS: |-
@@ -1431,6 +1476,7 @@ igraph_roots_for_tree_layout:
 
 igraph_layout_random_3d:
     PARAMS: GRAPH graph, OUT MATRIX res
+    FLAGS: RNG
 
 igraph_layout_sphere:
     PARAMS: GRAPH graph, OUT MATRIX res
@@ -1447,6 +1493,7 @@ igraph_layout_fruchterman_reingold_3d:
         DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area,
         DEPRECATED repulserad
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_layout_kamada_kawai_3d:
     PARAMS: |-
@@ -1457,6 +1504,7 @@ igraph_layout_kamada_kawai_3d:
         OPTIONAL VECTOR miny, OPTIONAL VECTOR maxy,
         OPTIONAL VECTOR minz, OPTIONAL VECTOR maxz
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_layout_graphopt:
     PARAMS: |-
@@ -1464,19 +1512,23 @@ igraph_layout_graphopt:
         REAL node_charge=0.001, REAL node_mass=30,
         REAL spring_length=0, REAL spring_constant=1,
         REAL max_sa_movement=5, BOOLEAN use_seed=False
+    FLAGS: RNG
 
 igraph_layout_drl:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         DRL_OPTIONS options=drl_defaults$default, OPTIONAL EDGEWEIGHTS weights
+    FLAGS: RNG
 
 igraph_layout_drl_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         DRL_OPTIONS options=drl_defaults$default, OPTIONAL EDGEWEIGHTS weights
+    FLAGS: RNG
 
 igraph_layout_merge_dla:
     PARAMS: GRAPH_PTR_LIST graphs, MATRIX_LIST coords, OUT MATRIX res
+    FLAGS: RNG
 
 igraph_layout_sugiyama:
     PARAMS: |-
@@ -1504,6 +1556,7 @@ igraph_layout_gem:
         INTEGER maxiter=40*vcount(graph)^2,
         REAL temp_max=vcount(graph),
         REAL temp_min=1/10, REAL temp_init=sqrt(vcount(graph))
+    FLAGS: RNG
 
 igraph_layout_davidson_harel:
     PARAMS: |-
@@ -1514,18 +1567,21 @@ igraph_layout_davidson_harel:
         REAL weight_edge_lengths=ELENW,
         REAL weight_edge_crossings=ECROSSW,
         REAL weight_node_edge_dist=NEDISTW
+    FLAGS: RNG
 
 igraph_layout_umap:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
         BOOLEAN distances_are_weights=False
+    FLAGS: RNG
 
 igraph_layout_umap_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
         BOOLEAN distances_are_weights=False
+    FLAGS: RNG
 
 igraph_layout_umap_compute_weights:
     PARAMS: |-
@@ -1599,6 +1655,7 @@ igraph_community_spinglass:
         REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0,
         SPINGLASS_IMPLEMENTATION implementation=ORIG, REAL lambda=1.0
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_community_spinglass_single:
     PARAMS: |-
@@ -1607,6 +1664,7 @@ igraph_community_spinglass_single:
         OUT INTEGER inner_links, OUT INTEGER outer_links,
         INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_community_walktrap:
     PARAMS: |-
@@ -1676,10 +1734,12 @@ igraph_community_leading_eigenvector:
         OPTIONAL OUT VECTOR_LIST eigenvectors,
         OPTIONAL OUT VECTOR history,
         LEVCFUNC callback, EXTRA callback_extra
+    FLAGS: RNG
 
 igraph_community_fluid_communities:
     PARAMS: |-
         GRAPH graph, INTEGER no_of_communities, OUT VECTOR_INT membership
+    FLAGS: RNG
 
 igraph_community_label_propagation:
     PARAMS: |-
@@ -1687,6 +1747,7 @@ igraph_community_label_propagation:
         OPTIONAL EDGEWEIGHTS weights, OPTIONAL INDEX_VECTOR initial,
         OPTIONAL VECTOR_BOOL fixed
     DEPS: weights ON graph
+    FLAGS: RNG
 
 igraph_community_multilevel:
     PARAMS: |-
@@ -1709,6 +1770,7 @@ igraph_community_leiden:
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_weights ON graph
+    FLAGS: RNG
 
 igraph_split_join_distance:
     PARAMS: |-
@@ -1721,6 +1783,7 @@ igraph_community_infomap:
         VERTEXWEIGHTS v_weights=NULL, INTEGER nb_trials=10,
         OUT VECTOR_INT membership, OUT REAL codelength
     DEPS: e_weights ON graph, v_weights ON graph
+    FLAGS: RNG
 
 igraph_community_voronoi:
     PARAMS: |-
@@ -1731,6 +1794,7 @@ igraph_community_voronoi:
         OPTIONAL EDGE_LENGTHS lengths, OPTIONAL EDGEWEIGHTS weights,
         NEIMODE mode=OUT, REAL radius=-1
     DEPS: generators ON graph, weights ON graph, lengths ON graph
+    FLAGS: RNG
 
 #######################################
 # Graphlets
@@ -1837,6 +1901,7 @@ igraph_get_stochastic_sparse:
 
 igraph_to_directed:
     PARAMS: INOUT GRAPH graph, TODIRECTED mode=MUTUAL
+    FLAGS: RNG
 
 igraph_to_undirected:
     PARAMS: |-
@@ -1919,14 +1984,17 @@ igraph_write_graph_dot:
 
 igraph_motifs_randesu:
     PARAMS: GRAPH graph, OUT VECTOR hist, INTEGER size=3, VECTOR cut_prob
+    FLAGS: RNG
 
 igraph_motifs_randesu_estimate:
     PARAMS: |-
         GRAPH graph, OUT INTEGER est, INTEGER size=3, VECTOR cut_prob,
         INTEGER sample_size, OPTIONAL VECTOR_INT sample
+    FLAGS: RNG
 
 igraph_motifs_randesu_no:
     PARAMS: GRAPH graph, OUT INTEGER no, INTEGER size=3, VECTOR cut_prob
+    FLAGS: RNG
 
 igraph_dyad_census:
     PARAMS: GRAPH graph, OUT REAL mut, OUT REAL asym, OUT REAL null
@@ -2388,6 +2456,7 @@ igraph_adjacency_spectral_embedding:
         VECTOR cvec=AsmDefaultCvec,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, cvec ON graph
+    FLAGS: RNG
 
 igraph_laplacian_spectral_embedding:
     PARAMS: |-
@@ -2397,6 +2466,7 @@ igraph_laplacian_spectral_embedding:
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, type ON graph
+    FLAGS: RNG
 
 #######################################
 # Eigensolvers
@@ -2418,6 +2488,7 @@ igraph_power_law_fit:
     PARAMS: |-
         VECTOR data, OUT PLFIT res, REAL xmin=-1,
         BOOLEAN force_continuous=False
+    FLAGS: RNG
 
 #######################################
 # Dynamics, on networks
@@ -2427,6 +2498,7 @@ igraph_sir:
     PARAMS: |-
         GRAPH graph, REAL beta, REAL gamma, INTEGER no_sim=100,
         OUT SIR_LIST res
+    FLAGS: RNG
 
 #######################################
 # Other, not graph related
@@ -2437,6 +2509,11 @@ igraph_running_mean:
 
 igraph_random_sample:
     PARAMS: OUT VECTOR_INT res, INTEGER l, INTEGER h, INTEGER length
+    FLAGS: RNG
+
+igraph_random_sample_real:
+    PARAMS: OUT VECTOR_INT res, REAL l, REAL h, INTEGER length
+    FLAGS: RNG
 
 igraph_convex_hull:
     PARAMS: MATRIX data, OUT INDEX_VECTOR resverts, OUT MATRIX rescoords
@@ -2532,9 +2609,11 @@ igraph_minimum_spanning_tree_prim:
 igraph_random_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, OPTIONAL VERTEX vid
     DEPS: res ON graph, vid ON graph
+    FLAGS: RNG
 
 igraph_tree_game:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, RANDOM_TREE_METHOD method=LERW
+    FLAGS: RNG
 
 #######################################
 # Coloring
@@ -2559,18 +2638,21 @@ igraph_moran_process:
         GRAPH graph, EDGEWEIGHTS weights=NULL, INOUT VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: weights ON graph, quantities ON graph, strategies ON graph
+    FLAGS: RNG
 
 igraph_roulette_wheel_imitation:
     PARAMS: |-
         GRAPH graph, VERTEX vid, BOOLEAN is_local, VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
+    FLAGS: RNG
 
 igraph_stochastic_imitation:
     PARAMS: |-
         GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
+    FLAGS: RNG
 
 #######################################
 # Other, (yet) undocumented functions
