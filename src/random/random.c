@@ -681,8 +681,13 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
          * Then we subtract 1 to arrive at the [0; 1) interval. This is fast
          * but we lose one bit of precision as there are 2^53 possible doubles
          * between 0 and 1. */
-        uint64_t r = (igraph_i_rng_get_random_bits_uint64(rng, 52) & 0xFFFFFFFFFFFFFull) | 0x3FF0000000000000ull;
-        return *(double *)(&r) - 1.0;
+        union {
+            uint64_t as_uint64_t;
+            double as_double;
+        } value;
+        value.as_uint64_t =
+            (igraph_i_rng_get_random_bits_uint64(rng, 52) & 0xFFFFFFFFFFFFFull) | 0x3FF0000000000000ull;
+        return value.as_double - 1.0;
     }
 }
 
