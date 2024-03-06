@@ -1489,7 +1489,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler = {
     /* serror = */ 0
 };
 
-#endif
+#endif // HAVE_LIBXML == 1
 
 #define IS_FORBIDDEN_CONTROL_CHAR(x) ((x) < ' ' && (x) != '\t' && (x) != '\r' && (x) != '\n')
 
@@ -1557,7 +1557,7 @@ static void igraph_i_libxml_structured_error_handler(void* ctx, const xmlError *
     struct igraph_i_graphml_parser_state* state = (struct igraph_i_graphml_parser_state*) ctx;
     igraph_i_graphml_parser_state_set_error_from_xmlerror(state, error);
 }
-#endif
+#endif // HAVE_LIBXML == 1
 
 /**
  * \ingroup loadsave
@@ -1728,13 +1728,13 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-#else
+#else // HAVE_LIBXML == 1
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(instream);
     IGRAPH_UNUSED(index);
 
     IGRAPH_ERROR("GraphML support is disabled.", IGRAPH_UNIMPLEMENTED);
-#endif
+#endif // HAVE_LIBXML == 1
 }
 
 /**
