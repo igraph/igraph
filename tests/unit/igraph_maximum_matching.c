@@ -135,5 +135,6 @@ int main() {
     test_bipartite_graphs();
     test_general_graphs();
     test_petersen_graph();
+    VERIFY_FINALLY_STACK();
     return 0;
 }
