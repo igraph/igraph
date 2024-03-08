@@ -20,7 +20,27 @@
 #include <igraph.h>
 
 int main() {
+    igraph_t graph;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t matching;
+    igraph_integer_t matching_size;
 
-    //TODO: implement example
+    igraph_small(&graph, 0, IGRAPH_DIRECTED,
+                 1,2, 1,3, 2,4, 3,5,
+                 4,5, 5,6, 6,8, 6,9,
+                 7,8, 8,9, 8,10, 9,10,
+                 -1);
+
+    igraph_vector_int_init(&edges,0);
+    igraph_vector_int_init(&matching,0);
+
+    igraph_create(&graph, &edges, 0, 0);
+    igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL, 0);
+
+    printf("matching size is: " IGRAPH_PRId "\n", matching_size);
+    printf("matching: ");
+    igraph_vector_int_print(&matching);
+
+
     return 0;
 }

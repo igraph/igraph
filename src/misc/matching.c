@@ -1069,7 +1069,7 @@ static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, 
  *
  * Time complexity: O(|E| |V|^2) for unweighted graphs.
  *
- * \example TODO: make an example
+ * \example examples/simple/igraph_maximum_matching.c
  */
 igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
                             igraph_real_t *matching_weight, igraph_vector_int_t *matching,
