@@ -1018,8 +1018,8 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path);
-igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching);
+static igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path);
+static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching);
 
 /**
  * \function igraph_maximum_matching
