@@ -1036,13 +1036,13 @@ static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, 
  * Currently maximum weight matchings are not supported.
  *
  * </para><para>
- * Maximum matchings in bipartite graphs are found by the push-relabel algorithm
- * with greedy initialization and a global relabeling after every n/2 steps where
- * n is the number of vertices in the graph.
+ * Maximum matchings are found be repeatedly finding augmenting paths, then augmenting matching with it.
+ * Odd length cycles are handled by discovering them as blossoms, then contracting all vertices in blossom
+ * to single vertex and restarting search for augmenting path.
  *
  * </para><para>
- * References: Gabow H: The Weighted Matching Approach to Maximum Cardinality Matching. //TODO:change
- * Fundamenta Informaticae, 2017.
+ * References:
+ * Edmonds J: Paths, trees, and Flowers. Canadian Journal of Mathematics. 17 (1965), 449–467. doi:10.4153/cjm-1965-045-4
  *
  * \param graph The input graph. It can be directed but the edge directions
  *              will be ignored.
@@ -1057,7 +1057,7 @@ static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, 
  *                 or -1 if vertex i is unmatched.
  * \param weights A null pointer (=no edge weights), or a vector giving the
  *                weights of the edges.
- * \param eps A small real number used in equality tests in the weighted //TODO:do I need?
+ * \param eps A small real number used in equality tests in the weighted
  *            matching algorithm. Two real numbers are considered
  *            equal in the algorithm if their difference is smaller than
  *            \c eps. This is required to avoid the accumulation of numerical
@@ -1067,7 +1067,7 @@ static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, 
  *            is ignored.
  * \return Error code.
  *
- * Time complexity: O(sqrt(|V|) |E|) for unweighted graphs (according to Gabow(2017)). //TODO:change
+ * Time complexity: O(|E| |V|^2) for unweighted graphs.
  *
  * \example TODO: make an example
  */
@@ -1078,7 +1078,6 @@ igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *
     // delegate to correct subroutine
     if (weights != NULL) {
         return IGRAPH_UNIMPLEMENTED;
-
     }
     else {
         igraph_maximum_matching_unweighted(graph, matching_size, matching);
