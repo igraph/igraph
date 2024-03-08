@@ -1058,7 +1058,7 @@ static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, 
  * \param weights A null pointer (=no edge weights), or a vector giving the
  *                weights of the edges.
  * \param eps A small real number used in equality tests in the weighted //TODO:do I need?
- *            bipartite matching algorithm. Two real numbers are considered
+ *            matching algorithm. Two real numbers are considered
  *            equal in the algorithm if their difference is smaller than
  *            \c eps. This is required to avoid the accumulation of numerical
  *            errors. It is advised to pass a value derived from the
@@ -1187,14 +1187,10 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
     IGRAPH_CHECK(igraph_dqueue_int_init(&queue, n));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy,&queue);
 
-    // vertex mark vector //TODO:do i even need these marks?
+    // vertex mark vector
     igraph_vector_bool_t v_mark;
     IGRAPH_CHECK(igraph_vector_bool_init(&v_mark, n));
     IGRAPH_FINALLY(igraph_vector_bool_destroy,&v_mark);
-    // edge mark vector
-    igraph_vector_bool_t e_mark;
-    IGRAPH_CHECK(igraph_vector_bool_init(&e_mark, m));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy,&e_mark);
 
     // blossom mark vector, used to find the root of a blossom
     igraph_vector_bool_t b_mark;
@@ -1218,7 +1214,6 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
         }
         // unmark all vertices and edges in G, mark all edges of matching
         igraph_vector_bool_fill(&v_mark, false);
-        igraph_vector_bool_fill(&e_mark, false);
         igraph_vector_bool_fill(&b_mark, false);
 
         igraph_vector_int_fill(&distance, 0);
@@ -1370,9 +1365,8 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
     igraph_vector_int_destroy(&neighbors);
     igraph_dqueue_int_destroy(&queue);
     igraph_vector_bool_destroy(&v_mark);
-    igraph_vector_bool_destroy(&e_mark);
     igraph_vector_bool_destroy(&b_mark);
-    IGRAPH_FINALLY_CLEAN(8);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
