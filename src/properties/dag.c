@@ -61,6 +61,10 @@
  */
 igraph_error_t igraph_topological_sorting(
         const igraph_t* graph, igraph_vector_int_t *res, igraph_neimode_t mode) {
+
+    /* Note: This function ignores self-loops, there it cannot
+     * use the IGRAPH_PROP_IS_DAG property cache entry. */
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
     igraph_vector_int_t neis;
@@ -69,13 +73,14 @@ igraph_error_t igraph_topological_sorting(
     igraph_integer_t node, i, j;
 
     if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs.",
+                     IGRAPH_EINVAL);
     } else if (mode == IGRAPH_OUT) {
         deg_mode = IGRAPH_IN;
     } else if (mode == IGRAPH_IN) {
         deg_mode = IGRAPH_OUT;
     } else {
-        IGRAPH_ERROR("Invalid mode", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
@@ -111,14 +116,16 @@ igraph_error_t igraph_topological_sorting(
         }
     }
 
-    if (igraph_vector_int_size(res) < no_of_nodes) {
-        IGRAPH_ERROR("The graph has cycles; topological sorting is only possible in acyclic graphs", IGRAPH_EINVAL);
-    }
-
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
+
+    if (igraph_vector_int_size(res) < no_of_nodes) {
+        IGRAPH_ERROR("The graph has cycles; "
+                     "topological sorting is only possible in acyclic graphs.",
+                     IGRAPH_EINVAL);
+    }
 
     return IGRAPH_SUCCESS;
 }

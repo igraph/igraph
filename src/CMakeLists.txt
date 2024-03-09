@@ -27,7 +27,7 @@ foreach(FORMAT dl gml lgl ncol pajek)
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "${flex_hide_line_numbers}"
+      COMPILE_FLAGS "${flex_hide_line_numbers} -Cf -8"
       DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
@@ -324,7 +324,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.3")
+set_target_properties(igraph PROPERTIES VERSION "3.1.5")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

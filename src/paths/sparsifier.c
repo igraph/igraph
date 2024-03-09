@@ -119,15 +119,15 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  * \function igraph_spanner
  * \brief Calculates a spanner of a graph with a given stretch factor.
  *
- * A spanner of a graph G = (V,E) with a stretch t is a subgraph
- * H = (V,Es) such that Es is a subset of E and the distance
- * between any pair of nodes in H is at most t times the distance
- * in G. The returned graph is always a spanner of the
- * given graph with the specified stretch. For weighted graphs the
- * number of edges in the spanner is O(k * n^(1 + 1 / k)), where k is
- * k = (stretch + 1) / 2,  m is the number of edges and n is the number
- * of nodes in G. For unweighted graphs the number of edges is
- * O(n^(1 + 1 / k) + kn).
+ * A spanner of a graph <code>G = (V,E)</code> with a stretch \c t is a
+ * subgraph <code>H = (V,Es)</code> such that \c Es is a subset of \c E
+ * and the distance between any pair of nodes in \c H is at most \c t
+ * times the distance in \c G. The returned graph is always a spanner of
+ * the given graph with the specified stretch. For weighted graphs the
+ * number of edges in the spanner is <code>O(k n^(1 + 1 / k))</code>, where
+ * \c k is <code>k = (t + 1) / 2</code>,  \c m is the number of edges
+ * and \c n is the number of nodes in \c G. For unweighted graphs the number
+ * of edges is <code>O(n^(1 + 1 / k) + kn)</code>.
  *
  * </para><para>
  * This function is based on the algorithm of Baswana and Sen: "A Simple and
@@ -138,10 +138,10 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  *        is directed, the directions of the edges will be ignored.
  * \param spanner An initialized vector, the IDs of the edges that constitute
  *        the calculated spanner will be returned here. Use
- * \ref igraph_subgraph_from_edges() to extract the spanner as a separate
+ *        \ref igraph_subgraph_from_edges() to extract the spanner as a separate
  *        graph object.
- * \param stretch The stretch factor of the spanner.
- * \param weights The edge weights or NULL.
+ * \param stretch The stretch factor \c t of the spanner.
+ * \param weights The edge weights or \c NULL.
  *
  * \return Error code:
  * \clist
@@ -150,13 +150,14 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  * \endclist
  *
  * Time complexity: The algorithm is a randomized Las Vegas algorithm. The expected
- *                  running time is O(km) where k is the value mentioned above.
+ * running time is O(km) where k is the value mentioned above and m is the number
+ * of edges.
  */
 igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanner,
         igraph_real_t stretch, const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t i, j, v, nlen, neighbor, cluster;
     igraph_real_t sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
     igraph_vector_int_t clustering, lightest_eid;
@@ -178,21 +179,21 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
 
     /* Test validity of stretch factor */
     if (stretch < 1) {
-        IGRAPH_ERROR("Stretch factor must be at least 1", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Stretch factor must be at least 1.", IGRAPH_EINVAL);
     }
 
     /* Test validity of weights vector */
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector length does not match.", IGRAPH_EINVAL);
         }
         if (no_of_edges > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
             }
             else if (isnan(min)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
     }
@@ -205,7 +206,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     // explicitly; it will only exist in terms of the incidence and the adjacency
     // lists, maintained in parallel as the edges are removed from the residual
     // graph.
-    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_NO_LOOPS));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &adjlist, &inclist));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -394,7 +395,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         }
 
         // Commit the new clustering
-        igraph_vector_int_update(&clustering, &new_clustering);
+        igraph_vector_int_update(&clustering, &new_clustering); /* reserved */
 
         // Remove intra-cluster edges
         for (v = 0; v < no_of_nodes; v++) {

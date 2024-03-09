@@ -58,6 +58,7 @@ Radoslav Fulek (@rfulekjames)
 professorcode1 (@professorcode1)
 larah19 (@larah19)
 Biswapriyo Nath (@Biswa96)
+Gwyn Ciesla (@limburgher)
 
 This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
 

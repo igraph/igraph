@@ -40,10 +40,49 @@
 
 ### Fixed
 
+ - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
+ - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
+ - Fixed the handling of duplicate edge IDs in `igraph_subgraph_from_edges()`.
+ - Fixed conversion of sparse matrices to dense with `igraph_sparsemat_as_matrix()` when sparse matrix object did not make use of its full allocated capacity.
+ - `igraph_write_graph_ncol()` and `igraph_write_graph_lgl()` now refuse to write vertex names which would result in an invalid file that cannot be read back in.
+ - `igraph_write_graph_gml()` now ignores graph attributes called `edge` or `node` with a warning. Writing these would create an invalid GML file that igraph couldn't read back.
+ - `igraph_disjoint_union()` and `igraph_disjoint_union_many()` now check for overflow.
+ - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted any more.
+ - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.10] - 2024-02-13
+
+### Fixed
+
+ - When `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
+ - `igraph_spanner()` now correctly ignores edge directions, and no longer crashes on directed graphs.
+
+### Deprecated
+
+ - `igraph_are_connected()` is renamed to `igraph_are_adjacent()`; the old name is kept available until at least igraph 1.0.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.9] - 2024-02-02
+
+### Added
+
+ - `igraph_is_biconnected()` checks if a graph is biconnected.
+ - `igraph_realize_bipartite_degree_sequence()` constructs a bipartite graph that has the given bidegree sequence, optionally ensuring that it is connected (PR #2425 by Lára Margrét Hólmfríðardóttir @larah19).
+
+### Fixed
+
  - More robust error handling in HRG code.
  - Fixed infinite loop in `igraph_hrg_sample_many()`.
  - `igraph_community_fastgreedy()` no longer crashes when providing a modularity vector only, but not a merges matrix of membership vector.
- - Compatibility with libxml2 version 2.12.
+ - The graph property cache was not initialized correctly on systems where the size of `bool` was not 1 byte (#2477).
+ - Compatibility with libxml2 version 2.12 (#2442).
 
 ### Deprecated
 
@@ -51,15 +90,16 @@
 
 ### Other
 
- - Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Performance: Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Performance: Improved cache use by `igraph_is_bipartite()`.
  - The documentation is now also generated in Texinfo format.
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.10.8] - 2023-11-17
 
 ### Added
 
- - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19).
  - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
  - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
  - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
@@ -1297,7 +1337,9 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.8..master
+[master]: https://github.com/igraph/igraph/compare/0.10.10..master
+[0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
+[0.10.9]: https://github.com/igraph/igraph/compare/0.10.8..0.10.9
 [0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
 [0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
 [0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6

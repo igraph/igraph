@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
-   IGraph R package.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_foreign.h"
@@ -502,6 +497,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 #define XML_ATTR_URI(it) (*(it+2))
 #define XML_ATTR_VALUE_START(it) (*(it+3))
 #define XML_ATTR_VALUE_END(it) (*(it+4))
+#define XML_ATTR_VALUE_LENGTH(it) (int)((*(it+4))-(*(it+3)))
 #define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
 #define XML_ATTR_VALUE_PF(it) (int)((*(it+4))-(*(it+3))), *(it+3) /* for use in printf-style function with "%.*s" */
 
@@ -531,6 +527,14 @@ static void safely_free_optional_string(char** str) {
         igraph_free(*str);
         *str = NULL;
     }
+}
+
+static igraph_bool_t xmlAttrValueEqual(xmlChar** attr, const char* expected) {
+    size_t expected_length = strlen(expected);
+    return (
+        expected_length == XML_ATTR_VALUE_LENGTH(attr) &&
+        !xmlStrncmp(toXmlChar(expected), XML_ATTR_VALUE(attr))
+    );
 }
 
 static igraph_error_t igraph_i_graphml_add_attribute_key(
@@ -592,22 +596,22 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
             safely_free_optional_string(&attr_name);
             IGRAPH_CHECK(safely_convert_xml_attribute_to_string(it, &attr_name));
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
-            if (!xmlStrncmp(toXmlChar("boolean"), XML_ATTR_VALUE(it))) {
+            if (xmlAttrValueEqual(it, "boolean")) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_BOOLEAN;
                 rec->type = I_GRAPHML_BOOLEAN;
-            } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "string")) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_STRING;
                 rec->type = I_GRAPHML_STRING;
-            } else if (!xmlStrncmp(toXmlChar("float"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "float")) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_FLOAT;
-            } else if (!xmlStrncmp(toXmlChar("double"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "double")) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_DOUBLE;
-            } else if (!xmlStrncmp(toXmlChar("int"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "int")) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_INTEGER;
-            } else if (!xmlStrncmp(toXmlChar("long"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "long")) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_LONG;
             } else {
@@ -616,28 +620,28 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
             }
         } else if (xmlStrEqual(*it, toXmlChar("for"))) {
             /* graph, vertex or edge attribute? */
-            if (!xmlStrncmp(toXmlChar("graph"), XML_ATTR_VALUE(it))) {
+            if (xmlAttrValueEqual(it, "graph")) {
                 trie = &state->g_names;
                 ptrvector = &state->g_attrs;
-            } else if (!xmlStrncmp(toXmlChar("node"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "node")) {
                 trie = &state->v_names;
                 ptrvector = &state->v_attrs;
-            } else if (!xmlStrncmp(toXmlChar("edge"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "edge")) {
                 trie = &state->e_names;
                 ptrvector = &state->e_attrs;
-            } else if (!xmlStrncmp(toXmlChar("graphml"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "graphml")) {
                 igraph_i_report_unhandled_attribute_target("graphml", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("hyperedge"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "hyperedge")) {
                 igraph_i_report_unhandled_attribute_target("hyperedge", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("port"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "port")) {
                 igraph_i_report_unhandled_attribute_target("port", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("endpoint"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "endpoint")) {
                 igraph_i_report_unhandled_attribute_target("endpoint", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
-            } else if (!xmlStrncmp(toXmlChar("all"), XML_ATTR_VALUE(it))) {
+            } else if (xmlAttrValueEqual(it, "all")) {
                 /* TODO: we should handle this */
                 igraph_i_report_unhandled_attribute_target("all", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
@@ -651,6 +655,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     /* throw an error if there is no ID; this is a clear violation of the GraphML DTD */
     if (rec->id == NULL) {
         IGRAPH_ERROR("Found <key> tag with no 'id' attribute.", IGRAPH_PARSEERROR);
+    }
+
+    /* throw an error if the ID is an empty string; this is also a clear violation of the GraphML DTD */
+    if (*(rec->id) == 0) {
+        IGRAPH_ERROR("Found <key> tag with an empty 'id' attribute.", IGRAPH_PARSEERROR);
     }
 
     /* in case of a missing attr.name attribute, use the id as the attribute name */
@@ -693,11 +702,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     /* add to trie, attributes */
-    IGRAPH_CHECK(igraph_trie_get(trie, rec->id, &id));
-    if (id != igraph_trie_size(trie) - 1) {
+    IGRAPH_CHECK(igraph_trie_check(trie, rec->id, &id));
+    if (id >= 0) {
         IGRAPH_ERRORF("Duplicate attribute found: '%s'.", IGRAPH_PARSEERROR, rec->id);
     }
-
+    IGRAPH_CHECK(igraph_trie_get(trie, rec->id, &id));
     IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, rec));
 
     /* Ownership of 'rec' is now taken by ptrvector so we are not responsible
@@ -985,9 +994,9 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
                         continue;
                     }
                     if (xmlStrEqual(*it, toXmlChar("edgedefault"))) {
-                        if (!xmlStrncmp(toXmlChar("directed"), XML_ATTR_VALUE(it))) {
+                        if (xmlAttrValueEqual(it, "directed")) {
                             state->edges_directed = 1;
-                        } else if (!xmlStrncmp(toXmlChar("undirected"), XML_ATTR_VALUE(it))) {
+                        } else if (xmlAttrValueEqual(it, "undirected")) {
                             state->edges_directed = 0;
                         }
                     }
@@ -1593,6 +1602,11 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  *
  * </para><para>
  * When a numerical attribute value is NaN, it will be omitted from the file.
+ *
+ * </para><para>
+ * This function assumes that non-ASCII characters in attribute names and string
+ * attribute values are UTF-8 encoded. If this is not the case, the resulting
+ * XML file will be invalid.
  *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be

@@ -1508,11 +1508,10 @@ cleanup:
  *
  * \param pattern The smaller graph, it can be directed or undirected.
  * \param target The bigger graph, it can be directed or undirected.
- * \param domains A pointer vector, or a null pointer. If a pointer
- *    vector, then it must contain pointers to \ref igraph_vector_int_t
- *    objects and the length of the vector must match the number of
- *    vertices in the \p pattern graph. For each vertex, the IDs of
- *    the compatible vertices in the target graph are listed.
+ * \param domains An integer vector list of \c NULL. The length of each
+ *    vector must match the number of vertices in the \p pattern graph.
+ *    For each vertex, the IDs of the compatible vertices in the target
+ *    graph are listed.
  * \param iso Pointer to a boolean, or a null pointer. If not a null
  *    pointer, then the boolean is set to \c true if a subgraph
  *    isomorphism is found, and to \c false otherwise.

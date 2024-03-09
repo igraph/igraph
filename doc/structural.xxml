@@ -10,7 +10,7 @@
 <!-- doxrox-include about_structural -->
 
 <section id="basic-properties"><title>Basic properties</title>
-<!-- doxrox-include igraph_are_connected -->
+<!-- doxrox-include igraph_are_adjacent -->
 </section>
 
 <section id="Sparsifiers"><title>Sparsifiers</title>
@@ -102,6 +102,7 @@
 <!-- doxrox-include igraph_biconnected_components -->
 <!-- doxrox-include igraph_articulation_points -->
 <!-- doxrox-include igraph_bridges -->
+<!-- doxrox-include igraph_is_biconnected -->
 </section>
 
 <section id="degree-sequences"><title>Degree sequences</title>
@@ -251,6 +252,7 @@
 </section>
 
 <section id="structural-properties-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_are_connected -->
 <!-- doxrox-include igraph_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_shortest_paths_bellman_ford -->

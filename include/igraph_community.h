@@ -100,7 +100,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            igraph_real_t *codelength);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                                    igraph_vector_int_t *result,
+                                                    igraph_vector_int_t *removed_edges,
                                                     igraph_vector_t *edge_betweenness,
                                                     igraph_matrix_int_t *merges,
                                                     igraph_vector_int_t *bridges,

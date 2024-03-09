@@ -3025,7 +3025,7 @@ int splittree::returnNodecount() {
 
 keyValuePairSplit* splittree::returnTheseSplits(const int target) {
     keyValuePairSplit *head, *curr, *prev, *newhead, *newtail, *newpair;
-    size_t count, len;
+    int count;
 
     head = returnTreeAsList();
     prev = newhead = newtail = newpair = nullptr;
@@ -3033,11 +3033,8 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
 
     while (curr != nullptr) {
         count = 0;
-        len   = curr->x.size();
-        for (int i = 0; i < len; i++) {
-            if (curr->x[i] == 'M') {
-                count++;
-            }
+        for (auto c : curr->x) {
+            if (c == 'M') count++;
         }
         if (count == target && curr->x[1] != '*') {
             newpair       = new keyValuePairSplit;

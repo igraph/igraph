@@ -1,0 +1,148 @@
+===EDGE CASES===
+--ds1 empty--
+--ds2 empty--
+
+===Empty degree sequences===
+Method: smallest
+directed: false
+vcount: 0
+edges: {
+}
+
+Method: largest
+directed: false
+vcount: 0
+edges: {
+}
+
+Method: index
+directed: false
+vcount: 0
+edges: {
+}
+
+
+===All 0 degree sequences===
+Method: smallest
+directed: false
+vcount: 7
+edges: {
+}
+
+Method: largest
+directed: false
+vcount: 7
+edges: {
+}
+
+Method: index
+directed: false
+vcount: 7
+edges: {
+}
+
+
+===TESTING SMALLEST METHOD===
+
+===Simple, connected graph===
+directed: false
+vcount: 9
+edges: {
+4 3
+8 1
+7 1
+4 1
+5 0
+6 0
+4 2
+6 2
+}
+Simple: 1
+Connected: 1
+Bipartite: 1
+
+===Connected multigraph===
+directed: false
+vcount: 5
+edges: {
+3 2
+3 0
+3 0
+3 1
+4 1
+4 1
+}
+vcount: 5
+Has multiedges: 1
+Connected: 1
+Bipartite: 1
+
+===TESTING LARGEST METHOD===
+
+===Simple graph===
+directed: false
+vcount: 9
+edges: {
+4 1
+6 1
+5 1
+4 0
+6 0
+4 2
+7 2
+8 3
+}
+Simple: 1
+Connected: 0
+Bipartite: 1
+
+===Multigraph===
+directed: false
+vcount: 5
+edges: {
+3 1
+3 1
+3 0
+4 0
+4 1
+3 2
+}
+Has multiedges: 1
+Connected: 1
+Bipartite: 1
+
+===TESTING INDEX METHOD===
+
+===Simple graph===
+directed: false
+vcount: 9
+edges: {
+7 0
+7 1
+4 1
+8 1
+5 1
+7 2
+4 2
+8 2
+7 3
+6 3
+}
+Simple: 1
+Connected: 1
+Bipartite: 1
+
+===Multigraph===
+directed: false
+vcount: 5
+edges: {
+3 0
+3 0
+3 1
+4 1
+4 1
+3 2
+}
+Has multiedges: 1
+Connected: 1
+Bipartite: 1

@@ -110,11 +110,11 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
             *result = false; return IGRAPH_SUCCESS;
         }
         /* Matched vertices must be connected */
-        IGRAPH_CHECK(igraph_are_connected(graph, i,
+        IGRAPH_CHECK(igraph_are_adjacent(graph, i,
                                           j, &conn));
         if (!conn) {
             /* Try the other direction -- for directed graphs */
-            IGRAPH_CHECK(igraph_are_connected(graph, j,
+            IGRAPH_CHECK(igraph_are_adjacent(graph, j,
                                               i, &conn));
             if (!conn) {
                 *result = false; return IGRAPH_SUCCESS;
@@ -141,7 +141,7 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
 
 /**
  * \function igraph_is_maximal_matching
- * Checks whether a matching in a graph is maximal.
+ * \brief Checks whether a matching in a graph is maximal.
  *
  * A matching is maximal if and only if there exists no unmatched vertex in a
  * graph such that one of its neighbors is also unmatched.
@@ -1018,6 +1018,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
+<<<<<<< HEAD
 static igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path);
 static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching);
 
@@ -1506,6 +1507,8 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
     return IGRAPH_SUCCESS;
 }
 
+=======
+>>>>>>> upstream/develop
 #ifdef MATCHING_DEBUG
     #undef MATCHING_DEBUG
 #endif

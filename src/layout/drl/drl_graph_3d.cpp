@@ -43,9 +43,6 @@ using namespace std;
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "core/interruption.h"
-#ifdef MUSE_MPI
-    #include <mpi.h>
-#endif
 
 namespace drl3d {
 
@@ -493,31 +490,10 @@ void graph::update_nodes ( ) {
         get_positions ( node_indices, new_positions );
 
         if ( i < num_nodes ) {
-
-            // advance random sequence according to myid
-            for ( size_t j = 0; j < 2 * myid; j++ ) {
-                RNG_UNIF01();
-            }
-            // rand();
-
             // calculate node energy possibilities
             if ( !(positions[i].fixed && real_fixed) ) {
                 update_node_pos ( i, old_positions, new_positions );
             }
-
-            // advance random sequence for next iteration
-            for ( size_t j = 2 * myid; j < 2 * (node_indices.size() - 1); j++ ) {
-                RNG_UNIF01();
-            }
-            // rand();
-
-        } else {
-            // advance random sequence according to use by
-            // the other processors
-            for ( size_t j = 0; j < 2 * (node_indices.size()); j++ ) {
-                RNG_UNIF01();
-            }
-            //rand();
         }
 
         // check if anything was actually updated (e.g. everything was fixed)
@@ -529,11 +505,6 @@ void graph::update_nodes ( ) {
 
         // update positions across processors (if not all fixed)
         if ( !all_fixed ) {
-#ifdef MUSE_MPI
-            MPI_Allgather ( &new_positions[2 * myid], 2, MPI_FLOAT,
-                            new_positions, 2, MPI_FLOAT, MPI_COMM_WORLD );
-#endif
-
             // update positions (old to new)
             update_density ( node_indices, old_positions, new_positions );
         }
@@ -842,11 +813,7 @@ float graph::get_tot_energy ( ) {
     //for ( i = positions.begin(); i != positions.end(); i++ )
     //  tot_energy += i->energy;
 
-#ifdef MUSE_MPI
-    MPI_Reduce ( &my_tot_energy, &tot_energy, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD );
-#else
     tot_energy = my_tot_energy;
-#endif
 
     return tot_energy;
 
