@@ -43,6 +43,22 @@ int main(void) {
     printf("\ndigraph6 single vertex with loop\n");
     print(one_vertex_with_loop);
 
+    printf("\ndigraph6 two vertices with loop on first vertx\n");
+    print("&A_");
+
+    printf("\ndigraph6 two vertices with edge from 0 to 1\n");
+    print("&AO");
+
+    printf("\ndigraph6 two vertices with edge from 1 to 0\n");
+    print("&AG");
+
+    printf("\ndigraph6 three vertices with edge from 1 to 2\n");
+    print("&B@?");
+
+    printf("\ndigraph6 directed version of Gr`HOk\n");
+    // echo -e 'n=8\nm\n01101000\n00010100\n00010010\n00000001\n00000110\n00000001\n00000001\n00000000' | ./amtog -z
+    print("&GY@OQ?OW@?O?");
+
     VERIFY_FINALLY_STACK();
     return 0;
 }
