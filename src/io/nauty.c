@@ -70,8 +70,8 @@ static igraph_error_t igraph_from_nauty_digraph6(igraph_t *graph, const char *st
     IGRAPH_FINALLY(igraph_matrix_destroy, &adj_matrix);
 
     igraph_integer_t bitIndex = 0;
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
             //TODO bigger numbers
             igraph_integer_t byte = 1 + bitIndex / 6;
             if (byte >= length) break;
