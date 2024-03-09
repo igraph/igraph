@@ -128,12 +128,13 @@ igraph_error_t igraph_from_nauty(igraph_t *graph, const char *str) {
     }
 }
 
-igraph_error_t igraph_to_nauty(const igraph_t *graph, char **res) {
+static igraph_error_t igraph_to_nauty_graph6(const igraph_t *graph, char **res) {
     char *str_res = NULL;
     //TODO memory management
     str_res = IGRAPH_CALLOC(1000, char);
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    str_res[0] = no_of_nodes;
 
     igraph_integer_t bitIndex = 0;
     for (igraph_integer_t j = 1; j < no_of_nodes; j++) {
@@ -152,11 +153,54 @@ igraph_error_t igraph_to_nauty(const igraph_t *graph, char **res) {
 
 
     igraph_integer_t length = 1 + bitIndex / 6 + 1;
-    str_res[0] = no_of_nodes;
     for (igraph_integer_t i = 0; i < length; i++) {
         str_res[i] += 63;
     }
 
     *res = str_res;
     return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_to_nauty_digraph6(const igraph_t *graph, char **res) {
+    char *str_res = NULL;
+    //TODO memory management
+    str_res = IGRAPH_CALLOC(1000, char);
+
+    str_res[0] = '&';
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    str_res[1] = no_of_nodes;
+
+    igraph_integer_t bitIndex = 0;
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            igraph_integer_t byte = 2 + bitIndex / 6;
+            igraph_integer_t bit = 5 - bitIndex % 6;
+            //TODO is this the best way to check if there is an edge between i and j?
+            igraph_integer_t eid;
+            igraph_get_eid(graph, &eid, i, j, true, false);
+            if (eid != -1) {
+                str_res[byte] |= (1 << bit);
+            }
+            bitIndex++;
+        }
+    }
+
+
+    igraph_integer_t length = 1 + bitIndex / 6 + 1;
+    for (igraph_integer_t i = 1; i < length + 1; i++) {
+        str_res[i] += 63;
+    }
+
+    *res = str_res;
+    return IGRAPH_SUCCESS;
+}
+
+
+igraph_error_t igraph_to_nauty(const igraph_t *graph, char **res) {
+    if (igraph_is_directed(graph)) {
+        return igraph_to_nauty_digraph6(graph, res);
+    } else {
+        return igraph_to_nauty_graph6(graph, res);
+    }
 }
