@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-#define MATCHING_DEBUG /*//TODO:undefine*/
+/* #define MATCHING_DEBUG */
 
 #ifdef _MSC_VER
 /* MSVC does not support variadic macros */
@@ -1299,8 +1299,6 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                         VECTOR(distance)[w] = VECTOR(distance)[v] + 1;
                         // distance(x) = distance(v) + 2
                         VECTOR(distance)[x] = VECTOR(distance)[v] + 2;
-                        debug("distance:");
-                        igraph_vector_int_print(&distance);
 
                         // root(w) = root(v)
                         VECTOR(root)[w] = VECTOR(root)[v];
@@ -1378,8 +1376,10 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                             // find current in the edge list
                                             igraph_integer_t pos = 0;
                                             igraph_vector_int_t *list = igraph_vector_int_list_get_ptr(&b_lists, VECTOR(contraction)[current]);
+                                            #ifdef MATCHING_DEBUG
                                             debug("list:");
                                             igraph_vector_int_print(list);
+                                            #endif
                                             igraph_integer_t length = igraph_vector_int_size(list);
                                             while (VECTOR(*list)[pos%length] != current) {
                                                 pos++;
