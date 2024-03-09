@@ -19,10 +19,22 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+void print(igraph_t *g) {
+    char *str = NULL;
+
+    igraph_to_nauty(g, &str);
+    printf("%s\n", str);
+
+
+    IGRAPH_FREE(str);
+    igraph_destroy(g);
+}
+
+
 int main(void) {
     igraph_t g;
 
-    printf("Should be Gr`HOk:");
+    printf("Should be Gr`HOk:\n");
     igraph_small(&g, 8, IGRAPH_UNDIRECTED,
                  0,1, 0,2, 0,4,
                  1,3, 1,5,
@@ -32,12 +44,8 @@ int main(void) {
                  5,7,
                  6,7,
                  -1);
-    char *str = NULL;
 
-    igraph_to_nauty(&g, &str);
-    printf("%s", str);
-
-    igraph_destroy(&g);
+    print(&g);
 
     VERIFY_FINALLY_STACK();
     return 0;
