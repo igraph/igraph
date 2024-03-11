@@ -205,7 +205,7 @@ static igraph_error_t igraph_i_connected_components_weak(
     IGRAPH_FINALLY_CLEAN(3);
 
     /* Update cache */
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, no_of_clusters == 1);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, no_of_clusters == 1);
 
     return IGRAPH_SUCCESS;
 }
@@ -386,9 +386,9 @@ static igraph_error_t igraph_i_connected_components_strong(
     IGRAPH_FINALLY_CLEAN(4);
 
     /* Update cache */
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
     if (no_of_clusters == 1) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
     return IGRAPH_SUCCESS;
@@ -555,11 +555,11 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
     IGRAPH_FINALLY_CLEAN(3);
 
 exit:
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, *res);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, *res);
     if (igraph_is_directed(graph) && *res == 0) {
         /* If the graph is not weakly connected, it is not strongly connected
          * either so we can also cache that */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
     }
 
     return IGRAPH_SUCCESS;
@@ -1400,8 +1400,8 @@ exit2:
     /* We do not touch the cache for graphs with less than three nodes because
      * of all the edge cases. */
     if (is_biconnected && no_of_nodes >= 3) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, false);
     }
 
     return IGRAPH_SUCCESS;

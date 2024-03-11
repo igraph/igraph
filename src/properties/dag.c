@@ -216,7 +216,7 @@ finalize:
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
 
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_DAG, *res);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_DAG, *res);
 
     return IGRAPH_SUCCESS;
 }
