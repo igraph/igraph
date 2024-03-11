@@ -57,6 +57,17 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igr
                                     igraph_bool_t *iso);
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                                        igraph_bool_t *iso);
+IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms(
+        const igraph_t *graph, const igraph_vector_int_t *colors,
+        igraph_real_t *result);
+IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_list_t *generators
+);
+IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_t *labeling
+);
 
 /* LAD */
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(

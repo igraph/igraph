@@ -130,6 +130,7 @@ void test_bliss(void) {
     igraph_bliss_info_t info;
     igraph_vector_int_t color;
     igraph_vector_int_list_t generators;
+    igraph_real_t num_automorphisms;
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
     igraph_vector_int_init_range(&perm, 0, igraph_vcount(&ring1));
@@ -145,23 +146,20 @@ void test_bliss(void) {
         printf("Bliss failed on ring isomorphism.\n");
     }
 
-    igraph_count_automorphisms_bliss(&ring1, NULL, IGRAPH_BLISS_F, &info);
-    if (strcmp(info.group_size, "200") != 0) {
+    igraph_count_automorphisms(&ring1, NULL, &num_automorphisms);
+    if (num_automorphisms != 200) {
         printf("Biss automorphism count failed: ring1.\n");
     }
-    igraph_free(info.group_size);
 
-    igraph_count_automorphisms_bliss(&ring2, NULL, IGRAPH_BLISS_F, &info);
-    if (strcmp(info.group_size, "200") != 0) {
+    igraph_count_automorphisms(&ring2, NULL, &num_automorphisms);
+    if (num_automorphisms != 200) {
         printf("Biss automorphism count failed: ring2.\n");
     }
-    igraph_free(info.group_size);
 
-    igraph_count_automorphisms_bliss(&directed_ring, NULL, IGRAPH_BLISS_F, &info);
-    if (strcmp(info.group_size, "100") != 0) {
+    igraph_count_automorphisms(&directed_ring, NULL, &num_automorphisms);
+    if (num_automorphisms != 100) {
         printf("Biss automorphism count failed: directed_ring.\n");
     }
-    igraph_free(info.group_size);
 
     // The following test is included so there is at least one call to igraph_automorphism_group_bliss
     // in the test suite. However, the generator set returned may depend on the splitting
