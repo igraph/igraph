@@ -460,8 +460,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * </para><para>
  * In the weighted case, the eigenvector centrality of a vertex is proportional
  * to the weighted sum of centralities of its neighbours, i.e.
- * <code>c_i = sum_j w_ij c_j</code>, where <code>w_ij</code> is the weight
- * of the edge connecting vertices \c i and \c j. The weights of parallel edges
+ * <code>c_j = sum_i w_ij c_i</code>, where <code>w_ij</code> is the weight
+ * of the edge connecting vertex \c i to \c j. The weights of parallel edges
  * are added up.
  *
  * </para><para>

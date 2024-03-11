@@ -1,10 +1,6 @@
 /*
-azert hallod, az a resze nem kis mertekben baszott fel, hogy "majd ha tobbet leteszunk az asztalra"
-*/
-
-/*
    IGraph library.
-   Copyright (C) 2024  The igraph development team
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,15 +13,15 @@ azert hallod, az a resze nem kis mertekben baszott fel, hogy "majd ha tobbet let
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <igraph.h>
 #include <stdio.h>
-#include "igraph.h"
 
-int main(int argc, char* argv[]) {
+#include "../unit/test_utilities.h"
+
+int main(void) {
     igraph_t g;
     igraph_error_t result;
     FILE *ifile;
@@ -56,6 +52,17 @@ int main(int argc, char* argv[]) {
 
     IGRAPH_ASSERT(result == IGRAPH_PARSEERROR);
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
+    ifile = fopen("bug_2506_3.graphml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    result = igraph_read_graph_graphml(&g, ifile, 0);
+    fclose(ifile);
+
+    IGRAPH_ASSERT(result == IGRAPH_PARSEERROR);
+    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
