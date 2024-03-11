@@ -383,8 +383,8 @@ success:
         /* A graph that is a directed tree is also an undirected tree.
          * An undirected tree is weakly connected and is a forest,
          * so we can cache this. */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
     return IGRAPH_SUCCESS;
@@ -562,12 +562,12 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
     if (is_forest) {
         /* If the graph is a directed forest, then it has no undirected cycles.
          * We can enter positive results in the cache unconditionally. */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, true);
     } else if (treat_as_undirected) {
         /* However, if the graph is not a directed forest, it might still be
          * an undirected forest. We can only enter negative results in the cache
          * when edge directions were ignored, but NOT in the directed case. */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, false);
     }
 
     return IGRAPH_SUCCESS;

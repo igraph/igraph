@@ -60,7 +60,7 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
         }
     }
 
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, *res);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, *res);
 
     return IGRAPH_SUCCESS;
 }
