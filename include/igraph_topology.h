@@ -272,7 +272,7 @@ typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
                IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM
              } igraph_bliss_sh_t;
 
-IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_t *labeling,
+IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation_bliss(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_t *labeling,
                                                igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 IGRAPH_EXPORT igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
                                           const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,

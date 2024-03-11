@@ -258,8 +258,11 @@ public:
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
-                                 igraph_vector_int_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+igraph_error_t igraph_canonical_permutation_bliss(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_t *labeling, igraph_bliss_sh_t sh,
+    igraph_bliss_info_t *info
+) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);
@@ -424,7 +427,7 @@ igraph_error_t igraph_automorphism_group_bliss(
  *
  * </para><para>
  * Isomorphism testing is implemented by producing the canonical form
- * of both graphs using \ref igraph_canonical_permutation() and
+ * of both graphs using \ref igraph_canonical_permutation_bliss() and
  * comparing them.
  *
  * \param graph1 The first input graph. Multiple edges between the same nodes
@@ -512,8 +515,8 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     IGRAPH_VECTOR_INT_INIT_FINALLY(&perm1, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&perm2, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_canonical_permutation(graph1, colors1, &perm1, sh, info1));
-    IGRAPH_CHECK(igraph_canonical_permutation(graph2, colors2, &perm2, sh, info2));
+    IGRAPH_CHECK(igraph_canonical_permutation_bliss(graph1, colors1, &perm1, sh, info1));
+    IGRAPH_CHECK(igraph_canonical_permutation_bliss(graph2, colors2, &perm2, sh, info2));
 
     IGRAPH_CHECK(igraph_vector_int_resize(mymap12, no_of_nodes));
 
