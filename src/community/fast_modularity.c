@@ -696,7 +696,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     } else {
         debug("Calculating degrees\n");
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, 1));
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
         for (i = 0; i < no_of_nodes; i++) {
             VECTOR(a)[i] = VECTOR(degrees)[i];
         }

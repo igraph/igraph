@@ -540,6 +540,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "aagon",
+      "name": "aagon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10883752?v=4",
+      "profile": "https://github.com/aagon",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "GanzuraTheConsumer",
+      "name": "Quinn Buratynski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19657136?v=4",
+      "profile": "https://github.com/GanzuraTheConsumer",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

@@ -1,3 +1,4 @@
+/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
@@ -17,28 +18,33 @@
 */
 
 #include <igraph.h>
-
-#include "../unit/test_utilities.h"
+#include <stdio.h>
 
 int main(void) {
-    FILE *file;
-    igraph_t graph;
-    igraph_error_t err;
+    igraph_t left, right, joined;
 
-    igraph_set_attribute_table(&igraph_cattribute_table);
+    igraph_small(&left, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, -1);
+    igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);
 
-    igraph_set_error_handler(igraph_error_handler_printignore);
+    igraph_join(&joined, &left, &right);
+    igraph_write_graph_edgelist(&joined, stdout);
+    printf("\n");
 
-    file = fopen("bug_1970.graphml", "r");
-    IGRAPH_ASSERT(file != NULL);
+    igraph_destroy(&left);
+    igraph_destroy(&right);
+    igraph_destroy(&joined);
 
-    err = igraph_read_graph_graphml(&graph, file, 0);
-    fclose(file);
-    IGRAPH_ASSERT(err != IGRAPH_SUCCESS);
 
-    /* graph creation should have failed, no need to destroy 'graph' */
+    igraph_small(&left, 2, IGRAPH_DIRECTED, 0,1, -1);
+    igraph_small(&right, 3, IGRAPH_DIRECTED, 0,1, 2,1, -1);
 
-    VERIFY_FINALLY_STACK();
+    igraph_join(&joined, &left, &right);
+    igraph_write_graph_edgelist(&joined, stdout);
+    printf("\n");
+
+    igraph_destroy(&left);
+    igraph_destroy(&right);
+    igraph_destroy(&joined);
 
     return 0;
 }

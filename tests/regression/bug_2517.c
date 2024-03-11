@@ -21,22 +21,22 @@
 #include "../unit/test_utilities.h"
 
 int main(void) {
-    FILE *file;
-    igraph_t graph;
-    igraph_error_t err;
+    igraph_t g;
+    igraph_vector_int_list_t result;
 
-    igraph_set_attribute_table(&igraph_cattribute_table);
+    igraph_vector_int_list_init(&result, 0);
 
-    igraph_set_error_handler(igraph_error_handler_printignore);
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
+    igraph_all_minimal_st_separators(&g, &result);
+	print_vector_int_list(&result);
+    igraph_destroy(&g);
 
-    file = fopen("bug_1970.graphml", "r");
-    IGRAPH_ASSERT(file != NULL);
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0, 1, -1);
+    igraph_all_minimal_st_separators(&g, &result);
+	print_vector_int_list(&result);
+    igraph_destroy(&g);
 
-    err = igraph_read_graph_graphml(&graph, file, 0);
-    fclose(file);
-    IGRAPH_ASSERT(err != IGRAPH_SUCCESS);
-
-    /* graph creation should have failed, no need to destroy 'graph' */
+    igraph_vector_int_list_destroy(&result);
 
     VERIFY_FINALLY_STACK();
 

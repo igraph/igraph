@@ -10,6 +10,7 @@
 <section id="union-and-intersection"><title>Union and intersection</title>
 <!-- doxrox-include igraph_disjoint_union -->
 <!-- doxrox-include igraph_disjoint_union_many -->
+<!-- doxrox-include igraph_join -->
 <!-- doxrox-include igraph_union -->
 <!-- doxrox-include igraph_union_many -->
 <!-- doxrox-include igraph_intersection -->
