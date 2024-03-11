@@ -711,12 +711,12 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     n = igraph_vector_ptr_size(ptrvector);
     for (i = 0; i < n; i++) {
         if (!strcmp(
-            rec->record.name,
+            attr_name,
             ((igraph_i_graphml_attribute_record_t*) igraph_vector_ptr_get(ptrvector, i))->record.name
         )) {
             IGRAPH_ERRORF(
                 "Duplicate attribute name found: '%s' (for <key id='%s'>).",
-                IGRAPH_PARSEERROR, rec->record.name, rec->id
+                IGRAPH_PARSEERROR, attr_name, rec->id
             );
         }
     }
