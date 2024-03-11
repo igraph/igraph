@@ -65,7 +65,7 @@ static igraph_error_t igraph_i_invert_permutation(const igraph_vector_int_t *per
  *
  * This function creates a new graph from the input graph by permuting
  * its vertices according to the specified mapping. Call this function
- * with the output of \ref igraph_canonical_permutation() to create
+ * with the output of \ref igraph_canonical_permutation_bliss() to create
  * the canonical form of a graph.
  *
  * \param graph The input graph.

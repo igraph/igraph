@@ -264,7 +264,7 @@ typedef struct igraph_bliss_info_t {
  * \enumval IGRAPH_BLISS_FLM Largest maximally non-trivially connected
  *      non-singleton cell.
  * \enumval IGRAPH_BLISS_FSM Smallest maximally non-trivially
- *      connected non-singletion cell.
+ *      connected non-singleton cell.
  */
 
 typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
@@ -281,15 +281,10 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, con
                                           igraph_bliss_sh_t sh,
                                           igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
 
-IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms(
+IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms_bliss(
         const igraph_t *graph, const igraph_vector_int_t *colors,
         igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_automorphisms(
-        const igraph_t *graph, const igraph_vector_int_t *colors,
-        igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
-
-IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(
+IGRAPH_EXPORT igraph_error_t igraph_automorphism_group_bliss(
     const igraph_t *graph, const igraph_vector_int_t *colors,
     igraph_vector_int_list_t *generators, igraph_bliss_sh_t sh,
     igraph_bliss_info_t *info

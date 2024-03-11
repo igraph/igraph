@@ -885,7 +885,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
  *   \p edge_compat_fn.
  * \return Error code.
  *
- * \sa igraph_count_automorphisms()
+ * \sa igraph_count_automorphisms_bliss()
  *
  * Time complexity: exponential.
  */

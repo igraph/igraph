@@ -230,7 +230,7 @@ public:
 
 
 /**
- * \function igraph_canonical_permutation
+ * \function igraph_canonical_permutation_bliss
  * \brief Canonical permutation using Bliss.
  *
  * This function computes the vertex permutation which transforms
@@ -290,18 +290,7 @@ igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_
 }
 
 /**
- * \function igraph_automorphisms
- * \brief Number of automorphisms using Bliss (deprecated alias).
- *
- * \deprecated-by igraph_count_automorphisms 0.10.5
- */
-igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
-                                    igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-    return igraph_count_automorphisms(graph, colors, sh, info);
-}
-
-/**
- * \function igraph_count_automorphisms
+ * \function igraph_count_automorphisms_bliss
  * \brief Number of automorphisms using Bliss.
  *
  * The number of automorphisms of a graph is computed using Bliss. The
@@ -322,8 +311,10 @@ igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_i
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
-                         igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+igraph_error_t igraph_count_automorphisms_bliss(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_bliss_sh_t sh, igraph_bliss_info_t *info
+) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);
@@ -348,7 +339,7 @@ igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_ve
 }
 
 /**
- * \function igraph_automorphism_group
+ * \function igraph_automorphism_group_bliss
  * \brief Automorphism group generators using Bliss.
  *
  * The generators of the automorphism group of a graph are computed
@@ -371,9 +362,11 @@ igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_ve
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_automorphism_group(
-    const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_list_t *generators,
-    igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+igraph_error_t igraph_automorphism_group_bliss(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_list_t *generators, igraph_bliss_sh_t sh,
+    igraph_bliss_info_t *info
+) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);

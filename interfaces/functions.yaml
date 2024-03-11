@@ -2324,12 +2324,12 @@ igraph_isomorphic_bliss:
         OPTIONAL OUT BLISSINFO info1, OPTIONAL OUT BLISSINFO info2
     DEPS: colors1 ON graph1, colors2 ON graph2
 
-igraph_count_automorphisms:
+igraph_count_automorphisms_bliss:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLORS colors, BLISSSH sh="fm", OUT BLISSINFO info
     DEPS: colors ON graph
 
-igraph_automorphism_group:
+igraph_automorphism_group_bliss:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLORS colors, PRIMARY OUT VERTEX_INDICES_LIST generators,
         BLISSSH sh="fm", OUT BLISSINFO info
