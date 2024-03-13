@@ -133,7 +133,7 @@ igraph_error_t igraph_edge(
 ) {
 
     if (eid < 0 || eid >= igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid edge ID when retrieving edge endpoints.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot retrieve edge endpoints.", IGRAPH_EINVEID);
     }
 
     if (igraph_is_directed(graph)) {

@@ -52,8 +52,7 @@
  *        vertex ID in \p edges to the second, etc.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid edges vector (odd number of vertices).
- *         \c IGRAPH_EINVVID: invalid (negative)
- *         vertex ID.
+ *         \c IGRAPH_EINVVID: invalid (negative) vertex ID.
  *
  * Time complexity: O(|V|+|E|),
  * |V| is the number of vertices,

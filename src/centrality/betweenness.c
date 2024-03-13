@@ -472,10 +472,8 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  *        calculating weighted betweenness. No edge weight may be NaN.
  *        Supply a null pointer here for unweighted betweenness.
  * \return Error code:
- *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex ID passed in
- *        \p vids.
+ *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids.
  *
  * Time complexity: O(|V||E|),
  * |V| and
@@ -518,10 +516,8 @@ igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  *        If negative, the exact betweenness will be calculated, and
  *        there will be no upper limit on path lengths.
  * \return Error code:
- *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
- *        \c IGRAPH_EINVVID, invalid vertex ID passed in
- *        \p vids.
+ *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
+ *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids.
  *
  * Time complexity: O(|V||E|),
  * |V| and

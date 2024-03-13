@@ -253,8 +253,7 @@ __BEGIN_DECLS
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
  * \enumval IGRAPH_EINVVID Invalid vertex ID, negative or too big.
- * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
- *    square matrix was expected.
+ * \enumval IGRAPH_EINVEID Invalid edge ID, negative or too big.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
  * \enumval IGRAPH_EFILE A file operation failed. E.g. a file doesn't exist,
  *   or the user has no rights to open it.
@@ -320,7 +319,7 @@ typedef enum {
     IGRAPH_EXISTS            = 5,
     /* IGRAPH_EINVEVECTOR       = 6, */   /* removed in 1.0 */
     IGRAPH_EINVVID           = 7,
-    IGRAPH_NONSQUARE         = 8,
+    IGRAPH_EINVEID           = 8,         /* used to be IGRAPH_NONSQUARE before 1.0 */
     IGRAPH_EINVMODE          = 9,
     IGRAPH_EFILE             = 10,
     IGRAPH_UNIMPLEMENTED     = 12,
