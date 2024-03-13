@@ -295,8 +295,6 @@ __BEGIN_DECLS
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
  * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
- * \enumval IGRAPH_EDRL Internal error in the DrL layout generator; not used
- *   any more (replaced by IGRAPH_EINTERNAL).
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  * \enumval IGRAPH_EGLP Internal GLPK error.
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
@@ -360,7 +358,7 @@ typedef enum {
     /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     IGRAPH_ELAPACK           = 53,
-    IGRAPH_EDRL IGRAPH_DEPRECATED_ENUMVAL = 54,
+    /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */
     IGRAPH_EOVERFLOW         = 55,
     IGRAPH_EGLP              = 56,
     IGRAPH_CPUTIME           = 57,
