@@ -284,7 +284,6 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
- * \enumval IGRAPH_EDIVZERO Big integer division by zero.
  * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
  * \enumval IGRAPH_GLP_EROOT GLPK error (GLP_EROOT).
  * \enumval IGRAPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
@@ -293,9 +292,6 @@ __BEGIN_DECLS
  * \enumval IGRAPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
  * \enumval IGRAPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
  * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
- * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not
- *   expected to find this; it is signalled if some igraph function is
- *   not using the attribute handler interface properly.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
  * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
@@ -352,7 +348,7 @@ typedef enum {
     IGRAPH_ARPACK_MAXIT      = 39,
     IGRAPH_ARPACK_NOSHIFT    = 40,
     IGRAPH_ARPACK_REORDER    = 41,
-    IGRAPH_EDIVZERO          = 42,
+    /* IGRAPH_EDIVZERO          = 42, */   /* removed in 1.0 */
     IGRAPH_GLP_EBOUND        = 43,
     IGRAPH_GLP_EROOT         = 44,
     IGRAPH_GLP_ENOPFS        = 45,
@@ -361,7 +357,7 @@ typedef enum {
     IGRAPH_GLP_EMIPGAP       = 48,
     IGRAPH_GLP_ETMLIM        = 49,
     IGRAPH_GLP_ESTOP         = 50,
-    IGRAPH_EATTRIBUTES       = 51,
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     IGRAPH_ELAPACK           = 53,
     IGRAPH_EDRL IGRAPH_DEPRECATED_ENUMVAL = 54,
