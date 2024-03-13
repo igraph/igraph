@@ -1879,8 +1879,7 @@ igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
  *   are in the interval, false (zero) otherwise. If any element is NaN, it will
  *   return \c 0 (=false).
  *
- * Time complexity: O(n), the number
- * of elements in the vector.
+ * Time complexity: O(n), the number of elements in the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v,

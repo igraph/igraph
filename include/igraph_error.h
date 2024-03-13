@@ -252,8 +252,6 @@ __BEGIN_DECLS
  *    number was specified as the number of vertices.
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
- * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex IDs. A vertex ID
- *    is either negative or bigger than the number of vertices minus one.
  * \enumval IGRAPH_EINVVID Invalid vertex ID, negative or too big.
  * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
  *    square matrix was expected.
@@ -320,7 +318,7 @@ typedef enum {
     IGRAPH_PARSEERROR        = 3,
     IGRAPH_EINVAL            = 4,
     IGRAPH_EXISTS            = 5,
-    IGRAPH_EINVEVECTOR       = 6,
+    /* IGRAPH_EINVEVECTOR       = 6, */   /* removed in 1.0 */
     IGRAPH_EINVVID           = 7,
     IGRAPH_NONSQUARE         = 8,
     IGRAPH_EINVMODE          = 9,

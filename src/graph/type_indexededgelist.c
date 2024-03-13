@@ -239,7 +239,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  * \param attr The attributes of the new edges. You can supply a null pointer
  *        here if you do not need edge attributes.
  * \return Error code:
- *    \c IGRAPH_EINVEVECTOR: invalid (odd) edges vector length,
+ *    \c IGRAPH_EINVAL: invalid (odd) edges vector length,
  *    \c IGRAPH_EINVVID: invalid vertex ID in edges vector.
  *
  * This function invalidates all iterators.
@@ -262,7 +262,7 @@ igraph_error_t igraph_add_edges(
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (igraph_vector_int_size(edges) % 2 != 0) {
-        IGRAPH_ERROR("Invalid (odd) length of edges vector.", IGRAPH_EINVEVECTOR);
+        IGRAPH_ERROR("Invalid (odd) length of edges vector.", IGRAPH_EINVAL);
     }
     if (!igraph_vector_int_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
         IGRAPH_ERROR("Out-of-range vertex IDs when adding edges.", IGRAPH_EINVVID);
