@@ -63,11 +63,6 @@ __BEGIN_DECLS
     #endif
 #endif
 
-/* Magic macro to fail the build if certain condition does not hold. See:
- * https://stackoverflow.com/questions/4079243/how-can-i-use-sizeof-in-a-preprocessor-macro
- */
-#define IGRAPH_STATIC_ASSERT(condition) ((void)sizeof(char[1 - 2*!(condition)]))
-
 __END_DECLS
 
 #endif
