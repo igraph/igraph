@@ -18,6 +18,7 @@
  - `igraph_automorphism_group()` has been renamed to `igraph_automorphism_group_bliss()` because it has a BLISS-specific interface. A new `igraph_automorphism_group()` function was added with a simplified interface that does not depend on BLISS.
  - `igraph_canonical_permutation()` has been renamed to `igraph_canonical_permutation_bliss()` because it has a BLISS-specific interface. A new `igraph_canonical_permutation()` function was added with a simplified interface that does not depend on BLISS.
  - The `IGRAPH_EINVEVECTOR` error code was removed; `igraph_create()` and `igraph_add_edges()` that used to return this error code for invalid edge vectors will now return `IGRAPH_EINVAL` instead.
+ - The `IGRAPH_NONSQUARE` error code was removed; functions that used them now return `IGRAPH_EINVAL` instead when encountering a non-square matrix.
 
 ### Added
 

@@ -230,7 +230,7 @@ int main(void) {
         printf("Check handling of non-square matrix error.\n");
         igraph_real_t e[] = {1, 2, 0};
         igraph_matrix_view(&mat, e, 1, 3);
-        check_error(&mat, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NONSQUARE);
+        check_error(&mat, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_EINVAL);
     }
 
     {
@@ -243,7 +243,7 @@ int main(void) {
     {
         printf("Check error for 0x1 matrix.\n");
         igraph_matrix_init(&mat, 0, 1);
-        check_error(&mat, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_NONSQUARE);
+        check_error(&mat, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
         igraph_matrix_destroy(&mat);
     }
 
