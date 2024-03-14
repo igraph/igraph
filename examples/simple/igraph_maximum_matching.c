@@ -41,6 +41,9 @@ int main() {
     printf("matching: ");
     igraph_vector_int_print(&matching);
 
+    igraph_vector_int_destroy(&matching);
+    igraph_vector_int_destroy(&edges);
+    igraph_destroy(&graph);
 
     return 0;
 }
