@@ -37,7 +37,7 @@ int main() {
     igraph_create(&graph, &edges, 0, 0);
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL, 0);
 
-    printf("matching size is: " IGRAPH_PRId "\n", matching_size);
+    printf("matching size is: %" IGRAPH_PRId "\n", matching_size);
     printf("matching: ");
     igraph_vector_int_print(&matching);
 
