@@ -19,8 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void test_trivial_graphs() {
-    int result = 0;
+void test_trivial_graphs(void) {
     igraph_t graph;
     igraph_vector_int_t edges;
     igraph_vector_int_t matching;
@@ -45,8 +44,7 @@ void test_trivial_graphs() {
     igraph_destroy(&graph);
 }
 
-void test_path_graphs() {
-    int result = 0;
+void test_path_graphs(void) {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_vector_int_init(&matching,0);
@@ -78,8 +76,7 @@ void test_path_graphs() {
     igraph_destroy(&graph);
 }
 
-void test_bipartite_graphs() {
-    int result = 0;
+void test_bipartite_graphs(void) {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_vector_int_init(&matching,0);
@@ -104,8 +101,7 @@ void test_bipartite_graphs() {
     igraph_destroy(&graph);
 }
 
-void test_general_graphs() {
-    int result = 0;
+void test_general_graphs(void) {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_vector_int_init(&matching,0);
@@ -131,8 +127,7 @@ void test_general_graphs() {
     igraph_destroy(&graph);
 }
 
-void test_petersen_graph() {
-    int result = 0;
+void test_petersen_graph(void) {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_vector_int_init(&matching,0);
