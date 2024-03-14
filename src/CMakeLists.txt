@@ -27,7 +27,7 @@ foreach(FORMAT dl gml lgl ncol pajek)
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "${flex_hide_line_numbers} -Cf -8"
+      COMPILE_FLAGS "${flex_hide_line_numbers}"
       DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
@@ -231,6 +231,7 @@ add_library(
   operators/difference.c
   operators/disjoint_union.c
   operators/intersection.c
+  operators/join.c
   operators/misc_internal.c
   operators/permute.c
   operators/reverse.c
@@ -258,6 +259,7 @@ add_library(
   paths/widest_paths.c
 
   properties/basic_properties.c
+  properties/complete.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c

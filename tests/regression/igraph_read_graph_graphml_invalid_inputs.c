@@ -18,10 +18,7 @@
    02110-1301 USA
 */
 
-#include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
-#include "igraph.h"
+#include <igraph.h>
 #include <stdio.h>
 
 #include "../unit/test_utilities.h"
@@ -76,6 +73,8 @@ int main(void) {
     RUN_TEST("invalid3.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid4.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid5.graphml", /* should_parse = */ 0);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -38,6 +38,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_is_complete()` checks there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
+
 ### Fixed
 
  - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
@@ -49,9 +53,13 @@
  - `igraph_disjoint_union()` and `igraph_disjoint_union_many()` now check for overflow.
  - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted any more.
  - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
+ - `igraph_is_separator()` and `igraph_is_minimal_separator()` now work correctly with disconnected graphs.
+ - `igraph_linegraph()` now considers self-loops to be self-adjacent in undirected graphs, bringing consistency with how directed graphs were already handled in previous versions.
 
 ### Other
 
+ - Performance: `igraph_degree()` now makes use of the cache when checking for self-loops.
+ - The performance of `igraph_is_minimal_separator()` was improved.
  - Documentation improvements.
 
 ## [0.10.10] - 2024-02-13
