@@ -1150,7 +1150,6 @@ igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_
 
 igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path) {
     igraph_integer_t n = igraph_vcount(graph);
-    igraph_integer_t m = igraph_ecount(graph);
     igraph_integer_t v, v_contraction, w, w_contraction, x, blossom_root, current;
     igraph_bool_t finished, path_found, contracted;
 
