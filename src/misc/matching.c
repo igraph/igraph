@@ -1315,12 +1315,12 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                 // P = path (root(v) -> ... -> v) -> (w -> ... -> root(w))
                                 // Complicated by blossoms, must decide which way to go around the blossom
                                 current = v;
-                                while (!VECTOR(f_is_root)[current]) {
+                                while (current != -1 && !VECTOR(f_is_root)[current]) {
                                     if (current != VECTOR(contraction)[current]) {
                                         // if entering on even distance vertex
                                         if (VECTOR(distance)[current]%2 == 0) {
                                             // follow parents out of blossom
-                                            while (current != VECTOR(contraction)[current]) {
+                                            while (current != -1 && current != VECTOR(contraction)[current]) {
                                                 igraph_vector_int_push_back(path,current);
                                                 current = VECTOR(f_parent)[current];
                                             }
@@ -1344,7 +1344,7 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                                 dir = -1;
                                             }
                                             // follow edge list
-                                            while (current != VECTOR(contraction)[current]) {
+                                            while (current != -1 && current != VECTOR(contraction)[current]) {
                                                 igraph_vector_int_push_back(path,current);
                                                 pos++;
                                                 current = VECTOR(*list)[pos%length];
@@ -1359,13 +1359,13 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                 igraph_vector_int_push_back(path,current);
                                 igraph_vector_int_reverse(path);
                                 current = w;
-                                while (!VECTOR(f_is_root)[current]) {
+                                while (current != -1 && !VECTOR(f_is_root)[current]) {
                                     // if current has been contracted
                                     if (current != VECTOR(contraction)[current]) {
                                         // if entering on even distance vertex
                                         if (VECTOR(distance)[current]%2 == 0) {
                                             // follow parents out of blossom
-                                            while (current != VECTOR(contraction)[current]) {
+                                            while (current != -1 && current != VECTOR(contraction)[current]) {
                                                 igraph_vector_int_push_back(path,current);
                                                 current = VECTOR(f_parent)[current];
                                             }
@@ -1393,7 +1393,7 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                                 dir = -1;
                                             }
                                             // follow edge list
-                                            while (current != VECTOR(contraction)[current]) {
+                                            while (current != -1 && current != VECTOR(contraction)[current]) {
                                                 igraph_vector_int_push_back(path,current);
                                                 pos++;
                                                 current = VECTOR(*list)[pos%length];
@@ -1424,29 +1424,25 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                 // then continue to root(w), removing marks instead
                                 current = v;
                                 VECTOR(b_mark)[current] = true;
-                                while (!VECTOR(f_is_root)[current]) {
+                                while (current != -1 && !VECTOR(f_is_root)[current]) {
                                     current = VECTOR(f_parent)[current];
                                     VECTOR(b_mark)[current] = true;
                                 }
                                 current = w;
                                 blossom_root = -1;
-                                if (blossom_root == -1) {
-                                    if (VECTOR(b_mark)[current]) {
-                                        blossom_root = current;
-                                        debug("found blossom root\n");
-                                    }
-                                    else {
-                                        VECTOR(b_mark)[current] = true;
-                                    }
+                                if (VECTOR(b_mark)[current]) {
+                                    blossom_root = current;
+                                    debug("found blossom root\n");
                                 }
                                 else {
-                                    VECTOR(b_mark)[current] = false;
+                                    VECTOR(b_mark)[current] = true;
                                 }
                                 while (!VECTOR(f_is_root)[current]) {
                                     current = VECTOR(f_parent)[current];
                                     if (blossom_root == -1) {
                                         if (VECTOR(b_mark)[current]) {
                                             blossom_root = current;
+                                            debug("found blossom root\n");
                                         }
                                         else {
                                             VECTOR(b_mark)[current] = true;
@@ -1461,7 +1457,7 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                 // mark all vertices in B as contracted to blossom root
                                 // do by traversing again, but stopping when blossom marks stop
                                 current = v;
-                                while (VECTOR(b_mark)[current]) {
+                                while (current != -1 && VECTOR(b_mark)[current]) {
                                     VECTOR(contraction)[current] = blossom_root;
                                     VECTOR(b_mark)[current] = false;
                                     igraph_vector_int_push_back(list, current);
@@ -1469,7 +1465,7 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                 }
                                 current = w;
                                 igraph_vector_int_resize(&temp_list,0);
-                                while (VECTOR(b_mark)[current]) {
+                                while (current != -1 && VECTOR(b_mark)[current]) {
                                     VECTOR(contraction)[current] = blossom_root;
                                     VECTOR(b_mark)[current] = false;
                                     igraph_vector_int_push_back(&temp_list, current);
