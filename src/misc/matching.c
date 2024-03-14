@@ -1074,7 +1074,11 @@ static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, 
 igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
                             igraph_real_t *matching_weight, igraph_vector_int_t *matching,
                             const igraph_vector_t *weights, igraph_real_t eps) {
-    // do input validation
+    // input validation
+    if (weights && igraph_vector_size(weights) < igraph_ecount(graph)) {
+        IGRAPH_ERROR("weights vector too short", IGRAPH_EINVAL);
+    }
+
     // delegate to correct subroutine
     if (weights != NULL) {
         return IGRAPH_UNIMPLEMENTED;
