@@ -1259,8 +1259,8 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
             debug("Currently searching for path from vertex %" IGRAPH_PRId "\n", v);
             #endif
 
-            // flag finished, this and flag near beginning of next loop are tug of warring,
-            // meaning if we hit a vertex with no unmarked edges coming off, and can't find a new vertex we quit.
+            // flag finished, this and flags in forest expansion and blossom contraction steps are tug of warring,
+            // meaning if we hit a vertex with no unmarked edges coming off, and can't find a new vertex, and can't find a blossom, we quit.
             finished = true;
 
             // while there exists an unmarked edge e = {v, w} and we haven't contracted and have't found path
@@ -1415,12 +1415,14 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                             }
                             // else
                             else {
-                                #ifdef MATCHING_DEBUG
                                 debug("Contracting blossom\n");
-                                #endif
                                 // Contract a blossom
                                 // flag contracted
                                 contracted = true;
+
+                                // unflag finished
+                                finished = false;
+
                                 // B is blossom formed by e and edges on the path v -> w in T
                                 // find by traversing back v -> root(v) blossom marking each vertex,
                                 // then traverse w -> root(w) and first blossom marked is blossom root
