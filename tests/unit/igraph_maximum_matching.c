@@ -123,6 +123,35 @@ void test_general_graphs(void) {
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
 
+    // next three are designed to test blossom contraction
+    igraph_integer_t gen3_matching_size;
+    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+                 3,1, 1,2, 2,4, 2,5, 4,6, 5,7, 6,7,
+                 5,8, 8,9, 9,10, 10,11, 11,12, -1);
+    igraph_maximum_matching(&graph, &gen3_matching_size, NULL, &matching, NULL, 0);
+    IGRAPH_ASSERT(gen3_matching_size == 6);
+    igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
+    IGRAPH_ASSERT(is_matching);
+
+    igraph_integer_t gen4_matching_size;
+    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+                 3,1, 1,2, 2,4, 2,5, 4,6, 5,7, 6,7,
+                 7,8, 8,9, 9,10, 10,11, 11,12, -1);
+    igraph_maximum_matching(&graph, &gen4_matching_size, NULL, &matching, NULL, 0);
+    IGRAPH_ASSERT(gen4_matching_size == 6);
+    igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
+    IGRAPH_ASSERT(is_matching);
+
+    igraph_integer_t gen5_matching_size;
+    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+                 3,1, 1,2, 2,4, 2,5, 4,6, 5,7, 6,7,
+                 5,8, 8,9, 9,10, 9,11, 10,12, 11,13, 12,13,
+                 11,14, 14,15, 15,16, 16,17, 17,18, 18,19, 19,20, -1);
+    igraph_maximum_matching(&graph, &gen5_matching_size, NULL, &matching, NULL, 0);
+    IGRAPH_ASSERT(gen5_matching_size == 10);
+    igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
+    IGRAPH_ASSERT(is_matching);
+
     igraph_vector_int_destroy(&matching);
     igraph_destroy(&graph);
 }
