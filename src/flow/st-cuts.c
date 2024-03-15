@@ -1290,7 +1290,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
             if (u < 0) {
                 break;
             }
-            if (!igraph_estack_iselement(T, u)) {
+            if (!igraph_marked_queue_int_iselement(S, u)) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(Isv, u));
             }
         }
