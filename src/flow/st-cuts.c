@@ -31,6 +31,7 @@
 #include "igraph_operators.h"
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
+#include "igraph_topology.h"
 
 #include "core/estack.h"
 #include "core/marked_queue.h"
@@ -1141,11 +1142,10 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
    element from which 'v' is reachable. (Not necessarily through
    active vertices.)
 
-   We calculate the in-degree of all vertices in Sbar first. Then we
-   look at the vertices with zero in-degree. If these are active,
-   then they are minimal. If they are are not active, then we remove
-   them from the graph, and check whether they resulted in more
-   zero-indegree vertices.
+   We do so by traversing the nodes in topological sort order. The nodes that
+   are processed first and are not yet connected to any minimal nodes are then
+   marked as minimal (if active). Any subsequent nodes that are connected to
+   minimal nodes are then not marked as minimal.
 */
 
 static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
@@ -1154,51 +1154,69 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
                                            igraph_vector_int_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(Sbar);
-    igraph_vector_int_t indeg;
-    igraph_integer_t i, minsize;
+    igraph_integer_t i;
     igraph_vector_int_t neis;
+    igraph_vector_bool_t connected_to_minimal;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&indeg, no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&connected_to_minimal, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_degree(Sbar, &indeg, igraph_vss_all(),
-                               IGRAPH_IN, /*loops=*/ true));
+    /* Get topological order. The graph Sbar is the condensation the reverse
+     * residual graph, and as such it is guaranteed to be a directed acyclic
+     * graph.
+     */
+    igraph_vector_int_t order;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_CHECK(igraph_topological_sorting(Sbar, &order, IGRAPH_OUT));
+
+    // Clear minimal nodes, we will push back to vector as required.
+    igraph_vector_int_clear(minimal);
 
 #define ACTIVE(x) (VECTOR(*active)[VECTOR(*invmap)[(x)]])
-#define ZEROIN(x) (VECTOR(indeg)[(x)]==0)
 
+    /* We will loop over the nodes in topological sort order. This way, any node
+     * that we encounter that is not yet connected to a minimal node and that is
+     * active, should be marked as minimal. Any node that is connected to a
+     * minimal node should not be considered minimal, irrespective of it being
+     * active or not.
+     */
     for (i = 0; i < no_of_nodes; i++) {
-        if (!ACTIVE(i)) {
-            igraph_integer_t j, n;
-            IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, i, IGRAPH_OUT));
-            n = igraph_vector_int_size(&neis);
-            for (j = 0; j < n; j++) {
-                igraph_integer_t nei = VECTOR(neis)[j];
-                VECTOR(indeg)[nei] -= 1;
+        igraph_integer_t v = VECTOR(order)[i];
+
+        igraph_integer_t j, n;
+        IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, v, IGRAPH_IN));
+        n = igraph_vector_int_size(&neis);
+        for (j = 0; j < n; j++) {
+            igraph_integer_t nei = VECTOR(neis)[j];
+            /* If connected to node that is connected to node that is minimal,
+             * this node is also connected to node that is minimal.
+             */
+            if (VECTOR(connected_to_minimal)[nei]) {
+                VECTOR(connected_to_minimal)[v] = true;
+                break;
             }
         }
-    }
 
-    for (minsize = 0, i = 0; i < no_of_nodes; i++) {
-        if (ACTIVE(i) && ZEROIN(i)) {
-            minsize++;
-        }
-    }
+        /* If this node is not connected to node that is minimal, and this node
+         * is minimal and active itself, set it as a minimal node.
+         */
+        if (!VECTOR(connected_to_minimal)[v] && ACTIVE(v)) {
 
-    IGRAPH_CHECK(igraph_vector_int_resize(minimal, minsize));
-
-    for (minsize = 0, i = 0; i < no_of_nodes; i++) {
-        if (ACTIVE(i) && ZEROIN(i)) {
-            VECTOR(*minimal)[minsize++] = i;
+            igraph_vector_int_push_back(minimal, v);
+            /* Also mark this node as connected to minimal, to make sure that
+             * any descendants will be marked as being connected to a minimal
+             * node.
+             */
+            VECTOR(connected_to_minimal)[v] = true;
         }
     }
 
 #undef ACTIVE
-#undef ZEROIN
 
-    igraph_vector_int_destroy(&indeg);
+    igraph_vector_int_destroy(&order);
+    igraph_vector_bool_destroy(&connected_to_minimal);
     igraph_vector_int_destroy(&neis);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
