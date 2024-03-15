@@ -112,7 +112,6 @@ void test_general_graphs(void) {
     igraph_small(&graph, 10, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,9, 3,4, 3,5, 4,6, 5,7, 5,8, 7,8, 8,9, 8,10, -1);
     igraph_maximum_matching(&graph, &gen1_matching_size, NULL, &matching, NULL, 0);
     IGRAPH_ASSERT(gen1_matching_size == 5);
-    igraph_vector_int_print(&matching);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
 
