@@ -12,6 +12,8 @@ variables:
 jobs:
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
+    pool:
+      vmImage: 'ubuntu-20.04' # TODO: fix for ubuntu-22.04
     steps:
       - script: |
           sudo apt-get update
@@ -29,6 +31,8 @@ jobs:
           extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero"'
 
   - job: linux_static_vendored_32
+    pool:
+      vmImage: 'ubuntu-20.04' # TODO: fix for ubuntu-22.04
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -77,8 +81,6 @@ jobs:
           build_shared: true
 
   - job: linux_clang_18
-    pool:
-      vmImage: 'ubuntu-22.04'
     steps:
       - script: |
           sudo apt-get install ninja-build ccache -y
