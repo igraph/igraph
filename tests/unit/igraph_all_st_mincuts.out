@@ -1,3 +1,4 @@
+Graph 1:
 Found 4 cuts, value: 1
 Partition 0: 0
 Cut 0:
@@ -12,6 +13,7 @@ Partition 3: 0 1 2 3
 Cut 3:
   3 -> 4
 
+Graph 2:
 Found 2 cuts, value: 1
 Partition 0: 0
 Cut 0:
@@ -20,29 +22,28 @@ Partition 1: 0 4 3 2 1
 Cut 1:
   4 -> 5
 
+Graph 3:
 Found 1 cuts, value: 1
 Partition 0: 0
 Cut 0:
   0 -> 1
 
-Found 4 cuts, value: 2
+Graph 4:
+Found 3 cuts, value: 2
 Partition 0: 0
 Cut 0:
   0 -> 1
   0 -> 2
-Partition 1: 0 1 8 7 6 5 4
+Partition 1: 0 2
 Cut 1:
-  0 -> 2
-  1 -> 3
-Partition 2: 0 2
-Cut 2:
   0 -> 1
   2 -> 3
-Partition 3: 0 2 1 8 7 6 5 4
-Cut 3:
+Partition 2: 0 2 1 8 7 6 5 4
+Cut 2:
   1 -> 3
   2 -> 3
 
+Graph 5:
 Found 2 cuts, value: 2
 Partition 0: 2
 Cut 0:
@@ -53,6 +54,7 @@ Cut 1:
   1 -> 0
   2 -> 0
 
+Graph 6:
 Found 2 cuts, value: 2
 Partition 0: 2 3
 Cut 0:
@@ -63,37 +65,26 @@ Cut 1:
   1 -> 0
   2 -> 0
 
-Found 8 cuts, value: 2
+Graph 7:
+Found 5 cuts, value: 2
 Partition 0: 0
 Cut 0:
   0 -> 4
   0 -> 7
-Partition 1: 0 4 2 1 6
+Partition 1: 0 7
 Cut 1:
-  0 -> 7
-  4 -> 5
-Partition 2: 0 4 2 1 6 5
-Cut 2:
-  0 -> 7
-  5 -> 3
-Partition 3: 0 4 2 1 6 5 3
-Cut 3:
-  0 -> 7
-  3 -> 8
-Partition 4: 0 7
-Cut 4:
   0 -> 4
   7 -> 8
-Partition 5: 0 7 4 2 1 6
-Cut 5:
+Partition 2: 0 7 4 2 1 6
+Cut 2:
   4 -> 5
   7 -> 8
-Partition 6: 0 7 4 2 1 6 5
-Cut 6:
+Partition 3: 0 7 4 2 1 6 5
+Cut 3:
   5 -> 3
   7 -> 8
-Partition 7: 0 7 4 2 1 6 5 3
-Cut 7:
+Partition 4: 0 7 4 2 1 6 5 3
+Cut 4:
   3 -> 8
   7 -> 8
 
