@@ -15,9 +15,7 @@ jobs:
     pool:
       vmImage: 'ubuntu-20.04' # TODO: fix for ubuntu-22.04
     steps:
-      - script: |
-          sudo apt-get update
-          sudo apt-get install ninja-build ccache language-pack-de -y
+      - script: sudo apt-get install ninja-build ccache language-pack-de -y
         displayName: Install dependencies
 
       - script: |
@@ -149,9 +147,6 @@ jobs:
 
   - job: documentation
     steps:
-      - script: sudo apt-get update
-        displayName: Update package registry
-
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
         displayName: Install dependencies
 
