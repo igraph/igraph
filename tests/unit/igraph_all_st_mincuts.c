@@ -156,6 +156,36 @@ int main(void) {
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
+    /* ---------------------------------------------------------------- */
+
+    printf("Graph 8:\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 2, 3, 0, 1, 2, 5, 1, 2, 4, 3, 5, 5, 4,
+                 -1);
+
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
+    igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
+                          /*source=*/ 3, /*target=*/ 4, /*capacity=*/ NULL);
+
+    print_and_destroy(&g, value, &partitions, &cuts);
+    igraph_destroy(&g);
+
+    /* ---------------------------------------------------------------- */
+
+    printf("Graph 9:\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 1, 2, 0, 3, 0, 4, 0, 0, 5, 3, 1, 1, 4, 3, 2, 2, 5, 4, 3, 5, 3, 5, 4,
+                 -1);
+
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
+    igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
+                          /*source=*/ 3, /*target=*/ 0, /*capacity=*/ NULL);
+
+    print_and_destroy(&g, value, &partitions, &cuts);
+    igraph_destroy(&g);
+
     VERIFY_FINALLY_STACK();
     return 0;
 }
