@@ -26,10 +26,9 @@
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_misc.h"    /* IGRAPH_STATIC_ASSERT */
 
 #include "graph/attributes.h"
-
-#include "internal/hacks.h" /* IGRAPH_STATIC_ASSERT */
 
 #include "io/pajek-header.h"
 #include "io/parsers/pajek-parser.h"
