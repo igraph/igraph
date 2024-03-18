@@ -110,8 +110,8 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * \sa \ref igraph_is_bigraphical() to check if a bi-degree-sequence can be realized as a bipartite graph;
  * \ref igraph_realize_degree_sequence() to construct a graph with a given degree sequence.
  *
- * Time complexity: O(n^2) for simple directed graphs, O(n log n) for graphs with self-loops,
- * and O(n) for all other cases, where n is the length of the degree sequence(s).
+ * Time complexity: O(n^2) for simple directed graphs, O(n log n) for directed graphs with at most one
+ * self-loops per vertex, and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
 igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
                         const igraph_vector_int_t *in_degrees,
@@ -137,7 +137,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
         else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ) {
             return igraph_i_is_graphical_undirected_simple(out_degrees, res);
         } else {
-            /* Remainig case:
+            /* Remaining case:
              *  - At most one self-loop per vertex but multi-edges between distinct vertices allowed.
              * These cases cannot currently be requested through the documented API,
              * so no explanatory error message for now. */
@@ -163,7 +163,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
         else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ) {
             return igraph_i_is_graphical_directed_simple(out_degrees, in_degrees, res);
         } else {
-            /* Remainig cases:
+            /* Remaining cases:
              *  - At most one self-loop per vertex but multi-edges between distinct vertices allowed.
              *  - At most one edge between distinct vertices but multi-self-loops allowed.
              * These cases cannot currently be requested through the documented API,
