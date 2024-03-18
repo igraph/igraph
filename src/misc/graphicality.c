@@ -585,37 +585,11 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_v
  *  - Use the Fulkerson-Chen-Anstee theorem
  */
 
-typedef struct {
-    const igraph_vector_int_t* first;
-    const igraph_vector_int_t* second;
-} igraph_i_qsort_dual_vector_cmp_data_t;
-
-static int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
-    igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
-        (igraph_i_qsort_dual_vector_cmp_data_t*)data;
-    igraph_integer_t index1 = *((igraph_integer_t*)p1);
-    igraph_integer_t index2 = *((igraph_integer_t*)p2);
-    if (VECTOR(*sort_data->first)[index1] < VECTOR(*sort_data->first)[index2]) {
-        return 1;
-    }
-    if (VECTOR(*sort_data->first)[index1] > VECTOR(*sort_data->first)[index2]) {
-        return -1;
-    }
-    if (VECTOR(*sort_data->second)[index1] < VECTOR(*sort_data->second)[index2]) {
-        return 1;
-    }
-    if (VECTOR(*sort_data->second)[index1] > VECTOR(*sort_data->second)[index2]) {
-        return -1;
-    }
-    return 0;
-}
-
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
     igraph_vector_int_list_t buckets;
     igraph_vector_int_t* current_bucket;
     igraph_vector_int_t sorted_in_degrees, sorted_out_degrees, left_pq, right_pq;
     igraph_integer_t i, j, k, vcount, lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
-    igraph_i_qsort_dual_vector_cmp_data_t sort_data;
 
     /* The conditions from the loopy multigraph case are necessary here as well. */
     IGRAPH_CHECK(igraph_i_is_graphical_directed_loopy_multi(out_degrees, in_degrees, res));
