@@ -557,8 +557,6 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_integer_t i, j, k;
     igraph_bool_t unlabelled_left;
 
-    igraph_vector_t label_counters; /* real type, stores weight sums */
-
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
      * away the constness, and promise ourselves that we will make a proper
      * copy of 'fixed' into 'fixed_copy' as soon as we start mutating it */
@@ -641,8 +639,6 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     }
 
     /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
-    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes);
-
     switch (lpa_variant) {
     case IGRAPH_LPA_FAST:
         IGRAPH_CHECK(igraph_i_community_fast_label_propagation(graph, membership, mode, weights, fixed_copy));
@@ -660,21 +656,24 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_ERROR("Invalid igraph_lpa_variant_t.", IGRAPH_EINVAL);
     }
 
-
     /* Permute labels in increasing order */
-    igraph_vector_fill(&label_counters, -1);
+    igraph_vector_int_t relabel_label;
+    IGRAPH_CHECK(igraph_vector_int_init(&relabel_label, no_of_nodes));
+    igraph_vector_int_fill(&relabel_label, -1);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &relabel_label);
+
     j = 0;
     unlabelled_left = false;
     for (i = 0; i < no_of_nodes; i++) {
         k = VECTOR(*membership)[i];
         if (k >= 0) {
-            if (VECTOR(label_counters)[k] == -1) {
+            if (VECTOR(relabel_label)[k] == -1) {
                 /* We have seen this label for the first time */
-                VECTOR(label_counters)[k] = j;
+                VECTOR(relabel_label)[k] = j;
                 k = j;
                 j++;
             } else {
-                k = (igraph_integer_t) VECTOR(label_counters)[k];
+                k = VECTOR(relabel_label)[k];
             }
         } else {
             /* This is an unlabeled vertex */
@@ -754,8 +753,9 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(3);
     }
 
-    igraph_vector_destroy(&label_counters);
+    igraph_vector_int_destroy(&relabel_label);
     IGRAPH_FINALLY_CLEAN(1);
+
     if (fixed != fixed_copy) {
         igraph_vector_bool_destroy(fixed_copy);
         IGRAPH_FREE(fixed_copy);
