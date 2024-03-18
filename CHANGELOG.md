@@ -21,6 +21,7 @@
  - The `IGRAPH_NONSQUARE` error code was removed; functions that used them now return `IGRAPH_EINVAL` instead when encountering a non-square matrix.
  - The unused `IGRAPH_EDIVZERO` and `IGRAPH_EATTRIBUTES` error codes were removed with no replacement.
  - A new error code called `IGRAPH_EINVEID` was added for cases when an invalid edge ID was encountered in an edge ID vector.
+ - `igraph_community_label_propagation()` changed signature to allow specification of LPA variants. A new fast label propagation variant was added.
 
 ### Added
 
