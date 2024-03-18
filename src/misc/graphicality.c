@@ -110,8 +110,8 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * \sa \ref igraph_is_bigraphical() to check if a bi-degree-sequence can be realized as a bipartite graph;
  * \ref igraph_realize_degree_sequence() to construct a graph with a given degree sequence.
  *
- * Time complexity: O(n^2) for simple directed graphs, O(n log n) for directed graphs with at most one
- * self-loops per vertex, and O(n) for all other cases, where n is the length of the degree sequence(s).
+ * Time complexity: O(n log n) for directed graphs with at most one self-loops per vertex,
+ * and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
 igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
                         const igraph_vector_int_t *in_degrees,
@@ -611,8 +611,10 @@ static int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const
 }
 
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
-    igraph_vector_int_t index_array;
-    igraph_integer_t i, j, vcount, lhs, rhs;
+    igraph_vector_int_list_t buckets;
+    igraph_vector_int_t* current_bucket;
+    igraph_vector_int_t sorted_in_degrees, sorted_out_degrees, left_pq, right_pq;
+    igraph_integer_t i, j, k, vcount, lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
     igraph_i_qsort_dual_vector_cmp_data_t sort_data;
 
     /* The conditions from the loopy multigraph case are necessary here as well. */
@@ -627,17 +629,35 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         return IGRAPH_SUCCESS;
     }
 
-    /* Create an index vector that sorts the vertices by decreasing in-degree */
-    IGRAPH_CHECK(igraph_vector_int_init_range(&index_array, 0, vcount));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &index_array);
+    
+    IGRAPH_CHECK(igraph_vector_int_list_init(&buckets, vcount));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &buckets);
 
-    /* Set up the auxiliary struct for sorting */
-    sort_data.first  = in_degrees;
-    sort_data.second = out_degrees;
+    for (i = 0; i < vcount; i++) {
+        if (VECTOR(*in_degrees)[i] >= vcount || VECTOR(*out_degrees)[i] >= vcount) {
+            *res = false;
+            igraph_vector_int_list_destroy(&buckets);
+            IGRAPH_FINALLY_CLEAN(1);
+            return IGRAPH_SUCCESS;
+        }
+        current_bucket = igraph_vector_int_list_get_ptr(&buckets, VECTOR(*in_degrees)[i]);
+        igraph_vector_int_push_back(current_bucket, VECTOR(*out_degrees)[i]);
+    }
 
-    /* Sort the index vector */
-    igraph_qsort_r(VECTOR(index_array), vcount, sizeof(VECTOR(index_array)[0]), &sort_data,
-                   igraph_i_qsort_dual_vector_cmp_desc);
+    IGRAPH_CHECK(igraph_vector_int_init(&sorted_in_degrees, vcount));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &sorted_in_degrees);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&sorted_out_degrees, vcount));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &sorted_out_degrees);
+
+    k = 0;
+    for (i = vcount - 1; i >= 0; i--) {
+        current_bucket = igraph_vector_int_list_get_ptr(&buckets, i);
+        for (j = 0; j < igraph_vector_int_size(current_bucket); j++, k++) {
+            VECTOR(sorted_in_degrees)[k] = i;
+            VECTOR(sorted_out_degrees)[k] = VECTOR(*current_bucket)[j];
+        }
+    }
 
     /* Be optimistic, then check whether the Fulkerson–Chen–Anstee condition
      * holds for every k. In particular, for every k in [0; n), it must be true
@@ -648,29 +668,68 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
      *     \sum_{i=k+1}^{n-1} min(outdegree[i], k + 1)
      */
 
-#define INDEGREE(x) (VECTOR(*in_degrees)[VECTOR(index_array)[x]])
-#define OUTDEGREE(x) (VECTOR(*out_degrees)[VECTOR(index_array)[x]])
+#define INDEGREE(x) (VECTOR(sorted_in_degrees)[x])
+#define OUTDEGREE(x) (VECTOR(sorted_out_degrees)[x])
+    
+    IGRAPH_CHECK(igraph_vector_int_init(&left_pq, vcount));
+    IGRAPH_CHECK(igraph_vector_int_init(&right_pq, vcount));
+
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &left_pq);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &right_pq);
+
+    left_pq_size = 0;
+    right_pq_size = vcount;
+    left_i = 0;
+    right_i = 0;
+    left_sum = 0;
+    right_sum = 0;
+    for (i = 0; i < vcount; i++) {
+        VECTOR(right_pq)[OUTDEGREE(i)]++;
+    }
 
     *res = true;
     lhs = 0;
+    rhs = 0;
     for (i = 0; i < vcount; i++) {
         lhs += INDEGREE(i);
 
         /* It is enough to check for indexes where the in-degree is about to
          * decrease in the next step; see "Stronger condition" in the Wikipedia
          * entry for the Fulkerson-Chen-Anstee condition */
-        if (i != vcount - 1 && INDEGREE(i) == INDEGREE(i + 1)) {
-            continue;
+
+        if (OUTDEGREE(i) < i) {
+            left_sum += OUTDEGREE(i);
+        }
+        else {
+            VECTOR(left_pq)[OUTDEGREE(i)]++;
+            left_pq_size++;
+        }
+        while (left_i < i) {
+            while (VECTOR(left_pq)[left_i] > 0) {
+                VECTOR(left_pq)[left_i]--;
+                left_pq_size--;
+                left_sum += left_i;
+            }
+            left_i++;
         }
 
-        rhs = 0;
-        for (j = 0; j <= i; j++) {
-            rhs += OUTDEGREE(j) < i ? OUTDEGREE(j) : i;
+        while (right_i < i + 1) {
+            while (VECTOR(right_pq)[right_i] > 0) {
+                VECTOR(right_pq)[right_i]--;
+                right_pq_size--;
+                right_sum += right_i;
+            }
+            right_i++;
         }
-        for (j = i + 1; j < vcount; j++) {
-            rhs += OUTDEGREE(j) < (i + 1) ? OUTDEGREE(j) : (i + 1);
+        if (OUTDEGREE(i) < i + 1) {
+            right_sum -= OUTDEGREE(i);
+        }
+        else {
+            VECTOR(right_pq)[OUTDEGREE(i)]--;
+            right_pq_size--;
         }
 
+        rhs = left_sum + i * left_pq_size + right_sum + (i + 1) * right_pq_size;
         if (lhs > rhs) {
             *res = false;
             break;
@@ -680,8 +739,12 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 #undef INDEGREE
 #undef OUTDEGREE
 
-    igraph_vector_int_destroy(&index_array);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_list_destroy(&buckets);
+    igraph_vector_int_destroy(&sorted_in_degrees);
+    igraph_vector_int_destroy(&sorted_out_degrees);
+    igraph_vector_int_destroy(&left_pq);
+    igraph_vector_int_destroy(&right_pq);
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }
