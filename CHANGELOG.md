@@ -19,6 +19,7 @@
  - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
  - `igraph_is_separator()` and `igraph_is_minimal_separator()` now work correctly with disconnected graphs.
  - `igraph_linegraph()` now considers self-loops to be self-adjacent in undirected graphs, bringing consistency with how directed graphs were already handled in previous versions.
+ - `igraph_all_st_mincuts()` now correctly returns all minimum cuts. This also fixes a problem with `igraph_minimum_size_separators()`.
 
 ### Other
 
