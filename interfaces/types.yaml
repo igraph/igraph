@@ -493,7 +493,7 @@ WHEEL_MODE:
     FLAGS: ENUM
 
 LPA_VARIANT:
-    # Enum that describes how a tree graph should be constructed
+    # Enum that describes the label propagation algorithm variant
     CTYPE: igraph_lpa_variant_t
     FLAGS: ENUM
 
