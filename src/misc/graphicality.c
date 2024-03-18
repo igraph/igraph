@@ -669,7 +669,8 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 
         /* It is enough to check for indexes where the in-degree is about to
          * decrease in the next step; see "Stronger condition" in the Wikipedia
-         * entry for the Fulkerson-Chen-Anstee condition */
+         * entry for the Fulkerson-Chen-Anstee condition. However, this does not
+         * provide any noticeable benefits for the current implementation. */
 
         if (OUTDEGREE(i) < i) {
             left_sum += OUTDEGREE(i);
