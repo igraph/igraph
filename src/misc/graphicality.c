@@ -615,7 +615,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
             return IGRAPH_SUCCESS;
         }
         current_bucket = igraph_vector_int_list_get_ptr(&buckets, VECTOR(*in_degrees)[i]);
-        igraph_vector_int_push_back(current_bucket, VECTOR(*out_degrees)[i]);
+        IGRAPH_CHECK(igraph_vector_int_push_back(current_bucket, VECTOR(*out_degrees)[i]));
     }
 
     IGRAPH_CHECK(igraph_vector_int_init(&sorted_in_degrees, vcount));
