@@ -143,6 +143,7 @@ add_library(
   centrality/eigenvector.c
   centrality/hub_authority.c
   centrality/pagerank.c
+  centrality/dispersion.c
   centrality/truss.cpp
   centrality/prpack.cpp
 
