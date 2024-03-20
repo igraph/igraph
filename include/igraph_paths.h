@@ -68,7 +68,8 @@ typedef igraph_error_t igraph_astar_heuristic_func_t(
 typedef enum {
     IGRAPH_FLOYD_WARSHALL_AUTOMATIC = 0,
     IGRAPH_FLOYD_WARSHALL_ORIGINAL = 1,
-    IGRAPH_FLOYD_WARSHALL_TREE = 2
+    IGRAPH_FLOYD_WARSHALL_TREE = 2,
+    IGRAPH_FLOYD_WARSHALL_HOURGLASS = 3
 } igraph_floyd_warshall_algorithm_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
