@@ -260,8 +260,7 @@ public:
  */
 igraph_error_t igraph_canonical_permutation(
     const igraph_t *graph, const igraph_vector_int_t *colors,
-    igraph_vector_int_t *labeling, igraph_bliss_sh_t sh,
-    igraph_bliss_info_t *info
+    igraph_vector_int_t *labeling
 ) {
     return igraph_canonical_permutation_bliss(
         graph, colors, labeling, IGRAPH_BLISS_FL, NULL
