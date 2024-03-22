@@ -48,7 +48,7 @@ int main(void) {
     igraph_community_fastgreedy(&graph, NULL, NULL, NULL, &membership);
     check(&membership);
 
-    igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, NULL, NULL, NULL);
+    igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, NULL, NULL, NULL, IGRAPH_LPA_DOMINANCE);
     check(&membership);
 
     igraph_community_walktrap(&graph, NULL, 4, NULL, NULL, &membership);
