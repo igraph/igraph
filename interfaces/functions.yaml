@@ -652,7 +652,7 @@ igraph_betweenness_subset:
         BOOLEAN directed=True, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
         EDGEWEIGHTS weights=NULL
     DEPS: |-
-        vids ON graph, weights ON graph, res ON graph, sources ON graph, targets ON graph
+        vids ON graph, weights ON graph, res ON graph vids, sources ON graph, targets ON graph
 
 igraph_edge_betweenness:
     PARAMS: |-
@@ -695,7 +695,7 @@ igraph_pagerank:
         REAL damping=0.85, EDGEWEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
     DEPS: |-
-        vids ON graph, weights ON graph, vector ON graph,
+        vids ON graph, weights ON graph, vector ON graph vids,
         options ON algo
 
 igraph_personalized_pagerank:
@@ -866,7 +866,7 @@ igraph_add_edge:
 
 igraph_eigenvector_centrality:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
+        GRAPH graph, OUT ALL_VERTEX_QTY vector, OUT REAL value,
         BOOLEAN directed=False, BOOLEAN scale=True,
         EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
@@ -874,21 +874,21 @@ igraph_eigenvector_centrality:
 
 igraph_hub_score:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
+        GRAPH graph, OUT ALL_VERTEX_QTY vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_authority_score:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
+        GRAPH graph, OUT ALL_VERTEX_QTY vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_hub_and_authority_scores:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY hub_vector, OUT VERTEX_QTY authority_vector,
+        GRAPH graph, OUT ALL_VERTEX_QTY hub_vector, OUT ALL_VERTEX_QTY authority_vector,
         OUT REAL value, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=ARPACK_DEFAULTS
 
@@ -2550,25 +2550,25 @@ igraph_vertex_coloring_greedy:
 
 igraph_deterministic_optimal_imitation:
     PARAMS: |-
-        GRAPH graph, VERTEX vid, OPTIMALITY optimality=MAXIMUM, VERTEX_QTY quantities,
+        GRAPH graph, VERTEX vid, OPTIMALITY optimality=MAXIMUM, ALL_VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
 
 igraph_moran_process:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, INOUT VERTEX_QTY quantities,
+        GRAPH graph, EDGEWEIGHTS weights=NULL, INOUT ALL_VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: weights ON graph, quantities ON graph, strategies ON graph
 
 igraph_roulette_wheel_imitation:
     PARAMS: |-
-        GRAPH graph, VERTEX vid, BOOLEAN is_local, VERTEX_QTY quantities,
+        GRAPH graph, VERTEX vid, BOOLEAN is_local, ALL_VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
 
 igraph_stochastic_imitation:
     PARAMS: |-
-        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VERTEX_QTY quantities,
+        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, ALL_VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
 
