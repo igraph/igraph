@@ -41,7 +41,7 @@
  * \param graph The input graph. Edge directions are ignored in
  *        directed graphs.
  * \param res The result is stored here. If the \p use_seed argument
- *        is true (non-zero), then this matrix is also used as the
+ *        is true, then this matrix is also used as the
  *        starting point of the algorithm.
  * \param use_seed Boolean, whether to use the supplied coordinates in
  *        \p res as the starting point. If false (zero), then a

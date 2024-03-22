@@ -224,8 +224,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
  * \brief Decides whether the size of the list is zero.
  *
  * \param v The list object.
- * \return Non-zero number (true) if the size of the list is zero and
- *         zero (false) otherwise.
+ * \return True if the size of the list is zero and false otherwise.
  *
  * Time complexity: O(1).
  */
