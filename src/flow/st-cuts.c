@@ -1410,25 +1410,36 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true, /*edge_comb=*/ NULL));
 
     /* We relabel the residual graph so that it is in topological sort order. */
+    igraph_integer_t no_of_nodes_residual = igraph_vcount(&residual);
     igraph_vector_int_t order;
     igraph_t tmpgraph;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes_residual);
     IGRAPH_CHECK(igraph_topological_sorting(&residual, &order, IGRAPH_OUT));
 
+    /* Invert permutation */
+    igraph_vector_int_t inv_order;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&inv_order, igraph_vector_int_size(&order));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &inv_order);
+    for (i = 0; i < no_of_nodes_residual; i++) {
+        VECTOR(inv_order)[VECTOR(order)[i]] = i;
+    }
+
     // Relabel mapping
-    for (i = 0; i < igraph_vcount(&residual); i++) {
+    for (i = 0; i < no_of_nodes_residual; i++) {
         VECTOR(NtoL)[i] = VECTOR(order)[VECTOR(NtoL)[i]];
     }
 
     /* Permute vertices and replace residual with tmpgraph that is topologically
      * sorted.
      */
-    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &order));
+    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &inv_order));
+
     igraph_destroy(&residual); // We first free memory from original residual graph
     residual = tmpgraph;       // Then we replace it by allocated memory from tmpgraph
 
+    igraph_vector_int_destroy(&inv_order);
     igraph_vector_int_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     newsource = VECTOR(NtoL)[source];
     newtarget = VECTOR(NtoL)[target];
