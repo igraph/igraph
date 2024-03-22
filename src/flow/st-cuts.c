@@ -1418,7 +1418,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* Invert order to get permutation to ensure vertices follow topological order. */
     igraph_vector_int_t inv_order;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&inv_order, igraph_vector_int_size(&order));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&inv_order, no_of_nodes_residual);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &inv_order);
     for (i = 0; i < no_of_nodes_residual; i++) {
         VECTOR(inv_order)[VECTOR(order)[i]] = i;
