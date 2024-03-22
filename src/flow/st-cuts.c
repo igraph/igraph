@@ -1425,8 +1425,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     }
 
     // Relabel mapping
-    for (i = 0; i < no_of_nodes_residual; i++) {
-        VECTOR(NtoL)[i] = VECTOR(order)[VECTOR(NtoL)[i]];
+    for (i = 0; i < no_of_nodes; i++) {
+        VECTOR(NtoL)[i] = VECTOR(inv_order)[VECTOR(NtoL)[i]];
     }
 
     /* Permute vertices and replace residual with tmpgraph that is topologically
