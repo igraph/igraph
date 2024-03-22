@@ -610,9 +610,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     for (i = 0; i < vcount; i++) {
         if (VECTOR(*in_degrees)[i] >= vcount || VECTOR(*out_degrees)[i] >= vcount) {
             *res = false;
-            igraph_vector_int_list_destroy(&buckets);
-            IGRAPH_FINALLY_CLEAN(1);
-            return IGRAPH_SUCCESS;
+            goto cleanup1;
         }
         current_bucket = igraph_vector_int_list_get_ptr(&buckets, VECTOR(*in_degrees)[i]);
         IGRAPH_CHECK(igraph_vector_int_push_back(current_bucket, VECTOR(*out_degrees)[i]));
@@ -714,12 +712,15 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 #undef INDEGREE
 #undef OUTDEGREE
 
-    igraph_vector_int_list_destroy(&buckets);
     igraph_vector_int_destroy(&sorted_in_degrees);
     igraph_vector_int_destroy(&sorted_out_degrees);
     igraph_vector_int_destroy(&left_pq);
     igraph_vector_int_destroy(&right_pq);
-    IGRAPH_FINALLY_CLEAN(5);
+    IGRAPH_FINALLY_CLEAN(4);
+
+cleanup1:
+    igraph_vector_int_list_destroy(&buckets);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
