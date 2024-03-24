@@ -241,7 +241,7 @@ public:
  *
  * </para><para>
  * The current implementation uses the BLISS isomorphism algorithms with
- * sensible defaults. Use \ref igaph_canonical_permutation_bliss() to fine-tune
+ * sensible defaults. Use \ref igraph_canonical_permutation_bliss() to fine-tune
  * the parameters.
  *
  * \param graph The input graph. Multiple edges between the same nodes
