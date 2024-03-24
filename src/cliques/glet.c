@@ -800,8 +800,8 @@ igraph_error_t igraph_i_graphlets_project(
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here. This vector is also used to initialize the
  *        the weight vector for the iterative algorithm, if the
- *        \c startMu argument is true (non-zero).
- * \param startMu If true (non-zero), then the supplied Mu vector is
+ *        \c startMu argument is true.
+ * \param startMu If true, then the supplied Mu vector is
  *        used as the starting point of the iteration. Otherwise a
  *        constant 1 vector is used.
  * \param niter Integer scalar, the number of iterations to perform.

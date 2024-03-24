@@ -264,6 +264,12 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
  * Turán graphs are complete multipartite graphs with the property
  * that the sizes of the partitions are as close to equal as possible.
  *
+ * </para><para>
+ * The Turán graph with \p n vertices and \p r partitions is the densest
+ * graph on \p n  vertices that does not contain a clique of size
+ * <code>r+1</code>.
+ *
+ * </para><para>
  * This function generates undirected graphs. The null graph is
  * returned when the number of vertices is zero. A complete graph is
  * returned if the number of partitions is greater than the number of

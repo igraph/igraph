@@ -487,8 +487,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_i
  * \brief Decides whether the size of the vector is zero.
  *
  * \param v The vector object.
- * \return Non-zero number (true) if the size of the vector is zero and
- *         zero (false) otherwise.
+ * \return True if the size of the vector is zero and false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -1875,9 +1874,9 @@ igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
  * \param v The vector object.
  * \param low The lower limit of the interval (inclusive).
  * \param high The higher limit of the interval (inclusive).
- * \return True (positive integer) if the vector is empty or all vector elements
- *   are in the interval, false (zero) otherwise. If any element is NaN, it will
- *   return \c 0 (=false).
+ * \return True if the vector is empty or all vector elements
+ *   are in the interval, false otherwise. If any element is NaN, it will
+ *   return false.
  *
  * Time complexity: O(n), the number of elements in the vector.
  */
@@ -1905,12 +1904,10 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
  *
  * \param v The \type igraph_vector_t object.
  * \param limit The limit.
- * \return True (positive integer) if the vector contains at least one
- *   smaller element than \p limit, false (zero)
- *   otherwise.
+ * \return True if the vector contains at least one
+ *   smaller element than \p limit, false otherwise.
  *
- * Time complexity: O(n), the number
- * of elements in the vector.
+ * Time complexity: O(n), the number of elements in the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
@@ -1987,10 +1984,10 @@ FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    less than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match. If any element
- *    is NaN, it will return \c 0 (=false).
+ * \return True if the elements in the \p lhs are all
+ *    less than the corresponding elements in \p rhs. Returns false
+ *    if the lengths of the vectors don't match. If any element
+ *    is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2025,10 +2022,10 @@ igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    greater than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match. If any element
- *    is NaN, it will return \c 0 (=false).
+ * \return True if the elements in the \p lhs are all
+ *    greater than the corresponding elements in \p rhs. Returns false
+ *    if the lengths of the vectors don't match. If any element
+ *    is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2064,10 +2061,10 @@ igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    less than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
- *    match. If any element is NaN, it will return \c 0 (=false).
+ *    rhs. Returns false if the lengths of the vectors don't
+ *    match. If any element is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2103,10 +2100,10 @@ FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    greater than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
- *    match.  If any element is NaN, it will return \c 0 (=false).
+ *    rhs. Returns false if the lengths of the vectors don't
+ *    match.  If any element is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2163,8 +2160,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  *   contain \p what then
  *   \p pos is set to the position to which it
  *   should be inserted (to keep the the vector sorted of course).
- * \return Positive integer (true) if \p what is
- *   found in the vector, zero (false) otherwise.
+ * \return True if \p what is found in the vector, false otherwise.
  *
  * Time complexity: O(log(n)),
  * n is the number of elements in
@@ -2200,8 +2196,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  *        it should be inserted (to keep the the vector sorted).
  * \param start The start position of the slice to search (inclusive).
  * \param end The end position of the slice to search (exclusive).
- * \return Positive integer (true) if \p what is found in the vector,
- *         zero (false) otherwise.
+ * \return True if \p what is found in the vector, false otherwise.
  *
  * Time complexity: O(log(n)),
  * n is the number of elements in the slice of \p v, i.e. \p end - \p start.
@@ -2262,12 +2257,9 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  * It is assumed that the vector is sorted.
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
- * \return Positive integer (true) if \p what is
- *   found in the vector, zero (false) otherwise.
+ * \return True if \p what is found in the vector, false otherwise.
  *
- * Time complexity: O(log(n)),
- * n is the number of elements in
- * \p v.
+ * Time complexity: O(log(n)), n is the number of elements in \p v.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
