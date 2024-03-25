@@ -29,6 +29,7 @@
 #include "core/exceptions.h"
 
 #include <climits>
+#include <cmath>
 #include <stdexcept>
 
 using namespace bliss;
@@ -231,6 +232,43 @@ public:
 
 /**
  * \function igraph_canonical_permutation
+ * \brief Canonical permutation of a graph.
+ *
+ * This function computes the vertex permutation which transforms
+ * the graph into a canonical form. Two graphs have the same canonical form if
+ * and only if they are isomorphic. Use \ref igraph_is_same_graph() to compare
+ * two canonical forms.
+ *
+ * </para><para>
+ * The current implementation uses the BLISS isomorphism algorithms with
+ * sensible defaults. Use \ref igraph_canonical_permutation_bliss() to fine-tune
+ * the parameters.
+ *
+ * \param graph The input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param colors An optional vertex color vector for the graph. Supply a
+ *   null pointer is the graph is not colored.
+ * \param labeling Pointer to a vector, the result is stored here. The
+ *    permutation takes vertex 0 to the first element of the vector,
+ *    vertex 1 to the second, etc. The vector will be resized as
+ *    needed.
+ * \return Error code.
+ *
+ * \sa \ref igraph_is_same_graph()
+ *
+ * Time complexity: exponential, in practice it is fast for many graphs.
+ */
+igraph_error_t igraph_canonical_permutation(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_t *labeling
+) {
+    return igraph_canonical_permutation_bliss(
+        graph, colors, labeling, IGRAPH_BLISS_FL, NULL
+    );
+}
+
+/**
+ * \function igraph_canonical_permutation_bliss
  * \brief Canonical permutation using Bliss.
  *
  * This function computes the vertex permutation which transforms
@@ -258,8 +296,11 @@ public:
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
-                                 igraph_vector_int_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+igraph_error_t igraph_canonical_permutation_bliss(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_t *labeling, igraph_bliss_sh_t sh,
+    igraph_bliss_info_t *info
+) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);
@@ -290,18 +331,53 @@ igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_
 }
 
 /**
- * \function igraph_automorphisms
- * \brief Number of automorphisms using Bliss (deprecated alias).
+ * \function igraph_count_automorphisms
+ * \brief Number of automorphisms of a graph.
  *
- * \deprecated-by igraph_count_automorphisms 0.10.5
+ * This function computes the number of automorphisms of a graph. Since the
+ * number of automorphisms may be very large, the result is returned as an
+ * \c igraph_real_t instead of an integer. If the number of automorphisms
+ * is larger than what can be represented in an \c igraph_real_t and you need
+ * the exact number, use \ref igraph_count_automorphisms_bliss(), which can
+ * return the number as a string.
+ *
+ * \param graph The input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param colors An optional vertex color vector for the graph. Supply a
+ *   null pointer is the graph is not colored.
+ * \param result Pointer to an \c igraph_real_t, the number of automorphisms
+ *   will be returned here.
+ * \return Error code. \c IGRAPH_EOVERFLOW if the number of automorphisms is
+ *   too large to be represented in an \c igraph_real_t .
+ *
+ * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
-                                    igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-    return igraph_count_automorphisms(graph, colors, sh, info);
+igraph_error_t igraph_count_automorphisms(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_real_t *result
+) {
+    igraph_bliss_info_t info;
+    double x;
+
+    IGRAPH_CHECK(igraph_count_automorphisms_bliss(graph, colors, IGRAPH_BLISS_FL, &info));
+
+    x = strtod(info.group_size, NULL);
+    igraph_free(info.group_size);
+
+    if (x == 0) {
+        return IGRAPH_FAILURE;
+    } else if (x == HUGE_VAL) {
+        return IGRAPH_EOVERFLOW;
+    } else {
+        if (result) {
+            *result = x;
+        }
+        return IGRAPH_SUCCESS;
+    }
 }
 
 /**
- * \function igraph_count_automorphisms
+ * \function igraph_count_automorphisms_bliss
  * \brief Number of automorphisms using Bliss.
  *
  * The number of automorphisms of a graph is computed using Bliss. The
@@ -322,8 +398,10 @@ igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_i
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
-                         igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+igraph_error_t igraph_count_automorphisms_bliss(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_bliss_sh_t sh, igraph_bliss_info_t *info
+) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);
@@ -349,6 +427,39 @@ igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_ve
 
 /**
  * \function igraph_automorphism_group
+ * \brief Automorphism group generators of a graph.
+ *
+ * This function computes the generators of the automorphism group of a graph.
+ * The generator set may not be minimal and may depend on the specific parameters
+ * of the algorithm under the hood. The generators are permutations represented
+ * using zero-based indexing.
+ *
+ * </para><para>
+ * The current implementation uses BLISS behind the scenes and the result may
+ * be dependent on the splitting heuristics. Use \ref igraph_automorphism_group_bliss()
+ * if you want to fine-tune the splitting heuristics.
+ *
+ * \param graph The input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param colors An optional vertex color vector for the graph. Supply a
+ *   null pointer is the graph is not colored.
+ * \param generators Must be an initialized interger vector list.
+ *   The generators of the automorphism group will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: exponential, in practice it is fast for many graphs.
+ */
+igraph_error_t igraph_automorphism_group(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_list_t *generators
+) {
+    return igraph_automorphism_group_bliss(
+        graph, colors, generators, IGRAPH_BLISS_FL, NULL
+    );
+}
+
+/**
+ * \function igraph_automorphism_group_bliss
  * \brief Automorphism group generators using Bliss.
  *
  * The generators of the automorphism group of a graph are computed
@@ -371,9 +482,11 @@ igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_ve
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_automorphism_group(
-    const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_list_t *generators,
-    igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+igraph_error_t igraph_automorphism_group_bliss(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_list_t *generators, igraph_bliss_sh_t sh,
+    igraph_bliss_info_t *info
+) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
         IGRAPH_FINALLY(bliss_free_graph, g);
@@ -431,7 +544,7 @@ igraph_error_t igraph_automorphism_group(
  *
  * </para><para>
  * Isomorphism testing is implemented by producing the canonical form
- * of both graphs using \ref igraph_canonical_permutation() and
+ * of both graphs using \ref igraph_canonical_permutation_bliss() and
  * comparing them.
  *
  * \param graph1 The first input graph. Multiple edges between the same nodes
@@ -519,8 +632,8 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     IGRAPH_VECTOR_INT_INIT_FINALLY(&perm1, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&perm2, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_canonical_permutation(graph1, colors1, &perm1, sh, info1));
-    IGRAPH_CHECK(igraph_canonical_permutation(graph2, colors2, &perm2, sh, info2));
+    IGRAPH_CHECK(igraph_canonical_permutation_bliss(graph1, colors1, &perm1, sh, info1));
+    IGRAPH_CHECK(igraph_canonical_permutation_bliss(graph2, colors2, &perm2, sh, info2));
 
     IGRAPH_CHECK(igraph_vector_int_resize(mymap12, no_of_nodes));
 

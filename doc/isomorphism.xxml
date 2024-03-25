@@ -11,20 +11,19 @@
 <!-- doxrox-include about_graph_isomorphism -->
 <!-- doxrox-include igraph_isomorphic -->
 <!-- doxrox-include igraph_subisomorphic -->
+<!-- doxrox-include igraph_count_automorphisms -->
+<!-- doxrox-include igraph_automorphism_group -->
+<!-- doxrox-include igraph_canonical_permutation -->
 </section>
 
 <section id="bliss-algorithm"><title>The BLISS algorithm</title>
 <!-- doxrox-include about_bliss -->
 <!-- doxrox-include igraph_bliss_sh_t -->
 <!-- doxrox-include igraph_bliss_info_t -->
-<!-- doxrox-include igraph_canonical_permutation -->
 <!-- doxrox-include igraph_isomorphic_bliss -->
-<!-- doxrox-include igraph_count_automorphisms -->
-<!-- doxrox-include igraph_automorphism_group -->
-
-<section id="bliss-algorithm-deprecated"><title>Deprecated aliases</title>
-<!-- doxrox-include igraph_automorphisms -->
-</section>
+<!-- doxrox-include igraph_count_automorphisms_bliss -->
+<!-- doxrox-include igraph_automorphism_group_bliss -->
+<!-- doxrox-include igraph_canonical_permutation_bliss -->
 
 </section>
 

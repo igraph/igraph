@@ -1982,7 +1982,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
         if (eit->pos >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_EINVEID);
         }
         break;
     case IGRAPH_ES_VECTOR:
@@ -1993,7 +1993,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
         eit->vec = es.data.vecptr;
         eit->end = igraph_vector_int_size(eit->vec);
         if (!igraph_vector_int_isininterval(eit->vec, 0, igraph_ecount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_EINVEID);
         }
         break;
     case IGRAPH_ES_RANGE:
@@ -2002,10 +2002,10 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
             if (es.data.range.start < 0 ||
                 es.data.range.start > no_of_edges ||
                 (no_of_edges > 0 && es.data.range.start == no_of_edges)) {
-                IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVEID);
             }
             if (es.data.range.end < 0 || es.data.range.end > no_of_edges) {
-                IGRAPH_ERROR("Cannot create range iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot create range iterator, ending edge ID out of range.", IGRAPH_EINVEID);
             }
         }
         eit->type = IGRAPH_EIT_RANGE;

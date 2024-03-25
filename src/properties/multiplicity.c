@@ -89,8 +89,8 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     /* If the graph turned out to be simple, we can cache that it has no loop
      * and no multiple edges */
     if (*res) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
     return IGRAPH_SUCCESS;
@@ -161,7 +161,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, *res);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, *res);
 
     return IGRAPH_SUCCESS;
 }
@@ -496,7 +496,7 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
 
     /* cache the result if loops are not treated as mutual */
     if (!loops) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MUTUAL, *res);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MUTUAL, *res);
     }
 
     return IGRAPH_SUCCESS;

@@ -21,7 +21,7 @@
 #include "test_utilities.h"
 
 #define TEST_GRAPH(name) \
-    igraph_count_automorphisms(&graph, NULL, IGRAPH_BLISS_F, &info); \
+    igraph_count_automorphisms_bliss(&graph, NULL, IGRAPH_BLISS_F, &info); \
     printf("%s: %s\n", name, info.group_size); \
     igraph_free(info.group_size); \
     igraph_destroy(&graph);

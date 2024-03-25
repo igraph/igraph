@@ -234,7 +234,10 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_integer_t max_merges;
 
     if (! igraph_vector_int_isininterval(edges, 0, no_of_edges-1)) {
-        IGRAPH_ERROR("Invalid edge ID.", IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+            "Cannot calculate merges of edge betweenness community detection.",
+            IGRAPH_EINVEID
+        );
     }
     if (no_removed_edges < no_of_edges) {
             IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "

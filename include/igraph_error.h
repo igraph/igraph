@@ -252,11 +252,8 @@ __BEGIN_DECLS
  *    number was specified as the number of vertices.
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
- * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex IDs. A vertex ID
- *    is either negative or bigger than the number of vertices minus one.
  * \enumval IGRAPH_EINVVID Invalid vertex ID, negative or too big.
- * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
- *    square matrix was expected.
+ * \enumval IGRAPH_EINVEID Invalid edge ID, negative or too big.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
  * \enumval IGRAPH_EFILE A file operation failed. E.g. a file doesn't exist,
  *   or the user has no rights to open it.
@@ -287,7 +284,6 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
- * \enumval IGRAPH_EDIVZERO Big integer division by zero.
  * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
  * \enumval IGRAPH_GLP_EROOT GLPK error (GLP_EROOT).
  * \enumval IGRAPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
@@ -296,17 +292,9 @@ __BEGIN_DECLS
  * \enumval IGRAPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
  * \enumval IGRAPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
  * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
- * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not
- *   expected to find this; it is signalled if some igraph function is
- *   not using the attribute handler interface properly.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
- * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
- * \enumval IGRAPH_EDRL Internal error in the DrL layout generator; not used
- *   any more (replaced by IGRAPH_EINTERNAL).
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
- * \enumval IGRAPH_EGLP Internal GLPK error.
- * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
  * \enumval IGRAPH_ERANGE Maximum vertex or edge count exceeded.
@@ -320,9 +308,9 @@ typedef enum {
     IGRAPH_PARSEERROR        = 3,
     IGRAPH_EINVAL            = 4,
     IGRAPH_EXISTS            = 5,
-    IGRAPH_EINVEVECTOR       = 6,
+    /* IGRAPH_EINVEVECTOR       = 6, */   /* removed in 1.0 */
     IGRAPH_EINVVID           = 7,
-    IGRAPH_NONSQUARE         = 8,
+    IGRAPH_EINVEID           = 8,         /* used to be IGRAPH_NONSQUARE before 1.0 */
     IGRAPH_EINVMODE          = 9,
     IGRAPH_EFILE             = 10,
     IGRAPH_UNIMPLEMENTED     = 12,
@@ -355,7 +343,7 @@ typedef enum {
     IGRAPH_ARPACK_MAXIT      = 39,
     IGRAPH_ARPACK_NOSHIFT    = 40,
     IGRAPH_ARPACK_REORDER    = 41,
-    IGRAPH_EDIVZERO          = 42,
+    /* IGRAPH_EDIVZERO          = 42, */   /* removed in 1.0 */
     IGRAPH_GLP_EBOUND        = 43,
     IGRAPH_GLP_EROOT         = 44,
     IGRAPH_GLP_ENOPFS        = 45,
@@ -364,13 +352,13 @@ typedef enum {
     IGRAPH_GLP_EMIPGAP       = 48,
     IGRAPH_GLP_ETMLIM        = 49,
     IGRAPH_GLP_ESTOP         = 50,
-    IGRAPH_EATTRIBUTES       = 51,
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
-    IGRAPH_ELAPACK           = 53,
-    IGRAPH_EDRL IGRAPH_DEPRECATED_ENUMVAL = 54,
+    /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
+    /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */
     IGRAPH_EOVERFLOW         = 55,
-    IGRAPH_EGLP              = 56,
-    IGRAPH_CPUTIME           = 57,
+    /* IGRAPH_EGLP              = 56, */   /* removed in 1.0 */
+    /* IGRAPH_CPUTIME           = 57, */   /* removed in 1.0 */
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
     IGRAPH_STOP              = 60,

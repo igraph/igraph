@@ -557,7 +557,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
     igraph_integer_t i;
 
     if (no_of_edges % 2 != 0) {
-        IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
+        IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVAL);
     }
     no_of_edges /= 2;
 
@@ -972,7 +972,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     /* Set the cache: A graph that is not bipartite has
      * an odd-length cycle, therefore it cannot be a forest. */
     if (! bi) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, false);
     }
 
     if (res) {

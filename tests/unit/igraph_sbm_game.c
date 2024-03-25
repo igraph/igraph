@@ -85,7 +85,7 @@ int main(void) {
     VERIFY_FINALLY_STACK();
 
     printf("Check for nonsquare matrix error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_nonsq, &block_sizes_3, 0, 0), IGRAPH_NONSQUARE);
+    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_nonsq, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
 
     printf("Check for preference matrix probability out of range error handling.\n");
     CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_oor, &block_sizes_3, 0, 0), IGRAPH_EINVAL);

@@ -51,10 +51,8 @@
  *        not. If yes, then the first edge points from the first
  *        vertex ID in \p edges to the second, etc.
  * \return Error code:
- *         \c IGRAPH_EINVEVECTOR: invalid edges
- *         vector (odd number of vertices).
- *         \c IGRAPH_EINVVID: invalid (negative)
- *         vertex ID.
+ *         \c IGRAPH_EINVAL: invalid edges vector (odd number of vertices).
+ *         \c IGRAPH_EINVVID: invalid (negative) vertex ID.
  *
  * Time complexity: O(|V|+|E|),
  * |V| is the number of vertices,
@@ -69,9 +67,9 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
     igraph_integer_t max;
 
     if (igraph_vector_int_size(edges) % 2 != 0) {
-        IGRAPH_ERROR("Invalid (odd) edges vector.", IGRAPH_EINVEVECTOR);
+        IGRAPH_ERROR("Invalid (odd) edges vector.", IGRAPH_EINVAL);
     }
-    if (has_edges && !igraph_vector_int_isininterval(edges, 0, IGRAPH_VCOUNT_MAX-1)) {
+    if (!igraph_vector_int_isininterval(edges, 0, IGRAPH_VCOUNT_MAX-1)) {
         IGRAPH_ERROR("Invalid (negative or too large) vertex ID.", IGRAPH_EINVVID);
     }
 

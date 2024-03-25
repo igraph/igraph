@@ -91,9 +91,9 @@ static const char *igraph_i_error_strings[] = {
     /*  3 */ "Parse error",
     /*  4 */ "Invalid value",
     /*  5 */ "Already exists",
-    /*  6 */ "Invalid edge vector",
+    /*  6 */ "Invalid edge vector",    /* removed in 1.0 */
     /*  7 */ "Invalid vertex ID",
-    /*  8 */ "Non-square matrix",
+    /*  8 */ "Invalid edge ID",
     /*  9 */ "Invalid mode",
     /* 10 */ "File operation error",
     /* 11 */ "Unfold infinite iterator",
@@ -131,7 +131,7 @@ static const char *igraph_i_error_strings[] = {
     "is to increase the size of NCV relative to NEV",
     /* 41 */ "The Schur form computed by LAPACK routine dlahqr "
     "could not be reordered by LAPACK routine dtrsen.",
-    /* 42 */ "Big integer division by zero",
+    /* 42 */ "Big integer division by zero",    /* removed in 1.0 */
     /* 43 */ "GLPK Error, GLP_EBOUND",
     /* 44 */ "GLPK Error, GLP_EROOT",
     /* 45 */ "GLPK Error, GLP_ENOPFS",
@@ -140,11 +140,10 @@ static const char *igraph_i_error_strings[] = {
     /* 48 */ "GLPK Error, GLP_EMIPGAP",
     /* 49 */ "GLPK Error, GLP_ETMLIM",
     /* 50 */ "GLPK Error, GLP_STOP",
-    /* 51 */ "Internal attribute handler error",
+    /* 51 */ "Internal attribute handler error",    /* removed in 1.0 */
     /* 52 */ "Unimplemented attribute combination for this type",
     /* 53 */ "LAPACK call resulted in an error",
-    /* 54 */ "Internal DrL error; this error should never be visible to the user, "
-    "please report this error along with the steps to reproduce it.",
+    /* 54 */ "Internal DrL error",   /* removed in 1.0 */
     /* 55 */ "Integer or double overflow",
     /* 56 */ "Internal GPLK error",
     /* 57 */ "CPU time exceeded",
