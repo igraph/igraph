@@ -1038,7 +1038,7 @@ static void igraph_i_maximum_matching_get_tree_path(igraph_integer_t *current, i
  * Currently maximum weight matchings are not supported.
  *
  * </para><para>
- * Maximum matchings are found be repeatedly finding augmenting paths, then augmenting matching with it.
+ * Maximum matchings are found by repeatedly finding augmenting paths, then augmenting matching with it.
  * Odd length cycles are handled by discovering them as blossoms, then contracting all vertices in blossom
  * to single vertex and restarting search for augmenting path.
  *
