@@ -19,7 +19,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t edges;
     igraph_vector_int_t matching;
