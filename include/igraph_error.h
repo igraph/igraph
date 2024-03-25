@@ -294,9 +294,7 @@ __BEGIN_DECLS
  * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
- * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
- * \enumval IGRAPH_EGLP Internal GLPK error.
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
@@ -357,10 +355,10 @@ typedef enum {
     IGRAPH_GLP_ESTOP         = 50,
     /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
-    IGRAPH_ELAPACK           = 53,
+    /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
     /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */
     IGRAPH_EOVERFLOW         = 55,
-    IGRAPH_EGLP              = 56,
+    /* IGRAPH_EGLP              = 56, */   /* removed in 1.0 */
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,

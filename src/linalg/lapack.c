@@ -128,25 +128,25 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows.", IGRAPH_FAILURE);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of columns.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of columns.", IGRAPH_FAILURE);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_FAILURE);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_FAILURE);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_FAILURE);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_FAILURE);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_FAILURE);
             break;
         }
     }
@@ -233,34 +233,34 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     if (info < 0) {
         switch (info) {
         case -1:
-            IGRAPH_ERROR("Invalid transpose argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid transpose argument.", IGRAPH_FAILURE);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_FAILURE);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_FAILURE);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LU matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LU matrix.", IGRAPH_FAILURE);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_FAILURE);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_FAILURE);
             break;
         case -7:
-            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_FAILURE);
             break;
         case -8:
-            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_FAILURE);
             break;
         case -9:
-            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_FAILURE);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_FAILURE);
             break;
         }
     }
@@ -337,31 +337,31 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_FAILURE);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_FAILURE);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_FAILURE);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_FAILURE);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_FAILURE);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_FAILURE);
             break;
         case -7:
-            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_FAILURE);
             break;
         case -8:
-            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_FAILURE);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_FAILURE);
             break;
         }
     }
@@ -684,10 +684,10 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                  VECTOR(work), &lwork, info);
 
     if (*info < 0) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
     } else if (*info > 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
         } else {
             IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev).");
         }
@@ -953,10 +953,10 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     if (*info < 0) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
     } else if (*info > 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
         } else {
             IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev).");
         }
