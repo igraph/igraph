@@ -109,14 +109,14 @@ void test_general_graphs(void) {
 
     //test two non-bipartite graphs
     igraph_integer_t gen1_matching_size;
-    igraph_small(&graph, 10, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,9, 3,4, 3,5, 4,6, 5,7, 5,8, 7,8, 8,9, 8,10, -1);
+    igraph_small(&graph, 11, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,9, 3,4, 3,5, 4,6, 5,7, 5,8, 7,8, 8,9, 8,10, -1);
     igraph_maximum_matching(&graph, &gen1_matching_size, NULL, &matching, NULL, 0);
     IGRAPH_ASSERT(gen1_matching_size == 5);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
 
     igraph_integer_t gen2_matching_size;
-    igraph_small(&graph, 6, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,4, 3,5, 4,5, 5,6, -1);
+    igraph_small(&graph, 7, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,4, 3,5, 4,5, 5,6, -1);
     igraph_maximum_matching(&graph, &gen2_matching_size, NULL, &matching, NULL, 0);
     IGRAPH_ASSERT(gen2_matching_size == 3);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
@@ -124,7 +124,7 @@ void test_general_graphs(void) {
 
     // next three are designed to test blossom contraction
     igraph_integer_t gen3_matching_size;
-    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+    igraph_small(&graph, 13, IGRAPH_UNDIRECTED,
                  3,1, 1,2, 2,4, 2,5, 4,6, 5,7, 6,7,
                  5,8, 8,9, 9,10, 10,11, 11,12, -1);
     igraph_maximum_matching(&graph, &gen3_matching_size, NULL, &matching, NULL, 0);
@@ -133,7 +133,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(is_matching);
 
     igraph_integer_t gen4_matching_size;
-    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+    igraph_small(&graph, 13, IGRAPH_UNDIRECTED,
                  3,1, 1,2, 2,4, 2,5, 4,6, 5,7, 6,7,
                  7,8, 8,9, 9,10, 10,11, 11,12, -1);
     igraph_maximum_matching(&graph, &gen4_matching_size, NULL, &matching, NULL, 0);
@@ -142,12 +142,34 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(is_matching);
 
     igraph_integer_t gen5_matching_size;
-    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+    igraph_small(&graph, 21, IGRAPH_UNDIRECTED,
                  3,1, 1,2, 2,4, 2,5, 4,6, 5,7, 6,7,
                  5,8, 8,9, 9,10, 9,11, 10,12, 11,13, 12,13,
                  11,14, 14,15, 15,16, 16,17, 17,18, 18,19, 19,20, -1);
     igraph_maximum_matching(&graph, &gen5_matching_size, NULL, &matching, NULL, 0);
     IGRAPH_ASSERT(gen5_matching_size == 10);
+    igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
+    IGRAPH_ASSERT(is_matching);
+
+    igraph_integer_t gen6_matching_size;
+    igraph_small(&graph, 19, IGRAPH_UNDIRECTED,
+                 1,2, 2,3, 2,9, 3,4, 4,5, 4,6, 5,7, 6,8, 7,8,
+                 8,12, 9,10, 10,11, 11,12, 1,13, 7,14, 14,15,
+                 15,16, 16,17, 17,18, -1);
+    igraph_maximum_matching(&graph, &gen6_matching_size, NULL, &matching, NULL, 0);
+    IGRAPH_ASSERT(gen6_matching_size == 9);
+    igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
+    IGRAPH_ASSERT(is_matching);
+
+    igraph_integer_t gen7_matching_size;
+    igraph_small(&graph, 34, IGRAPH_UNDIRECTED,
+                 1,2, 2,3, 2,4, 3,5, 4,6, 5,6, 4,7, 7,8, 8,9,
+                 8,10, 9,11, 10,12, 11,12, 11,13, 13,14, 14,15,
+                 14,16, 15,17, 16,18, 17,18, 15,19, 19,20, 20,21,
+                 20,22, 21,23, 22,24, 23,24, 24,25, 25,26, 27,28,
+                 28,29, 29,30, 29,31, 30, 32, 31,33, 32,33, 33,1, -1);
+    igraph_maximum_matching(&graph, &gen7_matching_size, NULL, &matching, NULL, 0);
+    IGRAPH_ASSERT(gen7_matching_size == 16);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
 
