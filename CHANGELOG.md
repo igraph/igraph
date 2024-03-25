@@ -25,6 +25,8 @@
  - The `IGRAPH_CPUTIME` error code was removed in favour of the interruption mechanism built into igraph.
  - The unused `IGRAPH_EDIVZERO` and `IGRAPH_EATTRIBUTES` error codes were removed with no replacement.
  - A new error code called `IGRAPH_EINVEID` was added for cases when an invalid edge ID was encountered in an edge ID vector.
+ - `igraph_progress()`, `igraph_progressf()` and `IGRAPH_PROGRESS()` do not convert error codes to `IGRAPH_INTERRUPTED` any more. Any error code returned from the progress handler function is forwarded intact to the caller. If you want to trigger the interruption of the current calculation from the progress handler without reporting an error, report `IGRAPH_INTERRUPTED` explicitly. It is the responsibility of higher-level interfaces to handle this error code appropriately.
+ - `igraph_status()`, `igraph_statusf()` and their macro versions (`IGRAPH_STATUS()` and `IGRAPH_STATUSF()`) do not convert error codes to `IGRAPH_INTERRUPTED` any more. Any error code returned from the status handler function is forwarded intact to the caller. If you want to trigger the interruption of the current calculation from the status handler without reporting an error, report `IGRAPH_INTERRUPTED` explicitly. It is the responsibility of higher-level interfaces to handle this error code appropriately.
 
 ### Added
 

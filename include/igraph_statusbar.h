@@ -86,16 +86,13 @@ IGRAPH_EXPORT igraph_error_t igraph_status(const char *message, void *data);
  *        Existing igraph functions pass a null pointer here.
  * \return If the status handler returns with a value other than
  *        \c IGRAPH_SUCCESS, then the function that called this
- *        macro returns as well, with error code
- *        \c IGRAPH_INTERRUPTED.
+ *        macro returns as well, with the same error code, after
+ *        cleaning up all allocated memory as needed.
  */
 
 #define IGRAPH_STATUS(message, data) \
     do { \
-        if (igraph_status((message), (data)) != IGRAPH_SUCCESS) { \
-            IGRAPH_FINALLY_FREE(); \
-            return IGRAPH_INTERRUPTED; \
-        } \
+        IGRAPH_CHECK(igraph_status((message), (data))); \
     } while (0)
 
 IGRAPH_EXPORT igraph_error_t igraph_statusf(const char *message, void *data, ...);
@@ -107,21 +104,19 @@ IGRAPH_EXPORT igraph_error_t igraph_statusf(const char *message, void *data, ...
  * This is the more flexible version of \ref IGRAPH_STATUS(),
  * having a printf-like syntax. As this macro takes variable
  * number of arguments, they must be all supplied as a single
- * argument, enclosed in parentheses. Then \ref igraph_statusf()
- * is called with the given arguments.
+ * argument, enclosed in parentheses. \ref igraph_statusf() is then
+ * called with the given arguments.
+ *
  * \param args The arguments to pass to \ref igraph_statusf().
  * \return If the status handler returns with a value other than
  *        \c IGRAPH_SUCCESS, then the function that called this
- *        macro returns as well, with error code
- *        \c IGRAPH_INTERRUPTED.
+ *        macro returns as well, with the same error code, after
+ *        cleaning up all allocated memory as needed.
  */
 
 #define IGRAPH_STATUSF(args) \
     do { \
-        if (igraph_statusf args != IGRAPH_SUCCESS) { \
-            IGRAPH_FINALLY_FREE(); \
-            return IGRAPH_INTERRUPTED; \
-        } \
+        IGRAPH_CHECK(igraph_statusf args); \
     } while (0)
 
 __END_DECLS
