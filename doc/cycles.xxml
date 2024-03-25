@@ -19,4 +19,11 @@
 <!-- doxrox-include igraph_minimum_cycle_basis -->
 </section>
 
+<section><title>Simple cycles</title>
+<!-- doxrox-include igraph_simple_cycle_search_state_init -->
+<!-- doxrox-include igraph_simple_cycle_search_state_destroy -->
+<!-- doxrox-include igraph_simple_cycles_search_all -->
+<!-- doxrox-include igraph_simple_cycles_search_from_one_vertex -->
+</section>
+
 </chapter>

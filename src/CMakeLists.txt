@@ -178,6 +178,8 @@ add_library(
   connectivity/components.c
   connectivity/separators.c
 
+  cycles/simple_cycles.c
+
   flow/flow.c
   flow/flow_conversion.c
   flow/st-cuts.c
