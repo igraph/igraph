@@ -32,16 +32,17 @@ void test_trivial_graphs(void) {
     igraph_create(&graph, &edges, 0, 0);
     igraph_maximum_matching(&graph, &null_matching_size, NULL, &matching, NULL, 0);
     IGRAPH_ASSERT(null_matching_size == 0);
+    igraph_destroy(&graph);
 
     //test singleton graph
     igraph_integer_t single_matching_size;
     igraph_create(&graph, &edges, 1, false);
     igraph_maximum_matching(&graph, &single_matching_size, NULL, &matching, NULL, 0);
     IGRAPH_ASSERT(single_matching_size == 0);
+    igraph_destroy(&graph);
 
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&matching);
-    igraph_destroy(&graph);
 }
 
 void test_path_graphs(void) {
@@ -57,6 +58,7 @@ void test_path_graphs(void) {
     IGRAPH_ASSERT(path1_matching_size == 1);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t path2_matching_size;
     igraph_ring(&graph, 3, IGRAPH_UNDIRECTED, 0, false);
@@ -64,6 +66,7 @@ void test_path_graphs(void) {
     IGRAPH_ASSERT(path2_matching_size == 1);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t path3_matching_size;
     igraph_ring(&graph, 4, IGRAPH_UNDIRECTED, 0, false);
@@ -71,9 +74,9 @@ void test_path_graphs(void) {
     IGRAPH_ASSERT(path3_matching_size == 2);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_vector_int_destroy(&matching);
-    igraph_destroy(&graph);
 }
 
 void test_bipartite_graphs(void) {
@@ -89,6 +92,7 @@ void test_bipartite_graphs(void) {
     IGRAPH_ASSERT(bi1_matching_size == 4);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t bi2_matching_size;
     igraph_small(&graph, 6, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,4, 3,4, 3,5, 4,6, 5,6, -1);
@@ -96,9 +100,9 @@ void test_bipartite_graphs(void) {
     IGRAPH_ASSERT(bi2_matching_size == 3);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_vector_int_destroy(&matching);
-    igraph_destroy(&graph);
 }
 
 void test_general_graphs(void) {
@@ -114,6 +118,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen1_matching_size == 5);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t gen2_matching_size;
     igraph_small(&graph, 7, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,4, 3,5, 4,5, 5,6, -1);
@@ -121,6 +126,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen2_matching_size == 3);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     // next three are designed to test blossom contraction
     igraph_integer_t gen3_matching_size;
@@ -131,6 +137,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen3_matching_size == 6);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t gen4_matching_size;
     igraph_small(&graph, 13, IGRAPH_UNDIRECTED,
@@ -140,6 +147,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen4_matching_size == 6);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t gen5_matching_size;
     igraph_small(&graph, 21, IGRAPH_UNDIRECTED,
@@ -150,6 +158,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen5_matching_size == 10);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t gen6_matching_size;
     igraph_small(&graph, 19, IGRAPH_UNDIRECTED,
@@ -160,6 +169,7 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen6_matching_size == 9);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_integer_t gen7_matching_size;
     igraph_small(&graph, 34, IGRAPH_UNDIRECTED,
@@ -172,9 +182,9 @@ void test_general_graphs(void) {
     IGRAPH_ASSERT(gen7_matching_size == 16);
     igraph_is_maximal_matching(&graph, NULL, &matching, &is_matching);
     IGRAPH_ASSERT(is_matching);
+    igraph_destroy(&graph);
 
     igraph_vector_int_destroy(&matching);
-    igraph_destroy(&graph);
 }
 
 void test_petersen_graph(void) {
