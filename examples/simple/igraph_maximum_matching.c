@@ -21,7 +21,6 @@
 
 int main(void) {
     igraph_t graph;
-    igraph_vector_int_t edges;
     igraph_vector_int_t matching;
     igraph_integer_t matching_size;
 
@@ -31,10 +30,8 @@ int main(void) {
                  7,8, 8,9, 8,10, 9,10,
                  -1);
 
-    igraph_vector_int_init(&edges,0);
     igraph_vector_int_init(&matching,0);
 
-    igraph_create(&graph, &edges, 0, 0);
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL, 0);
 
     printf("matching size is: %" IGRAPH_PRId "\n", matching_size);
@@ -42,7 +39,6 @@ int main(void) {
     igraph_vector_int_print(&matching);
 
     igraph_vector_int_destroy(&matching);
-    igraph_vector_int_destroy(&edges);
     igraph_destroy(&graph);
 
     return 0;
