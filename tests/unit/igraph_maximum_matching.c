@@ -205,7 +205,7 @@ void test_petersen_graph(void) {
     igraph_destroy(&graph);
 }
 
-int main() {
+int main(void) {
     test_trivial_graphs();
     test_path_graphs();
     test_bipartite_graphs();
