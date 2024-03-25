@@ -73,7 +73,7 @@ IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(
     const igraph_t *pattern, const igraph_t *target, const igraph_vector_int_list_t *domains,
     igraph_bool_t *iso, igraph_vector_int_t *map, igraph_vector_int_list_t *maps,
-    igraph_bool_t induced, igraph_integer_t time_limit
+    igraph_bool_t induced
 );
 
 /* VF2 family*/

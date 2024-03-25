@@ -70,7 +70,7 @@ int main(void) {
     igraph_vector_int_list_init(&maps, 0);
 
     igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ NULL, &iso, &map,
-                             &maps, /*induced=*/ false, /*time_limit=*/ 0);
+                             &maps, /*induced=*/ false);
 
     if (!iso) {
         return 1;
@@ -80,7 +80,7 @@ int main(void) {
     printf("---------\n");
 
     igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ NULL, &iso, &map,
-                             &maps, /*induced=*/ true, /*time_limit=*/ 0);
+                             &maps, /*induced=*/ true);
 
     if (!iso) {
         return 2;
@@ -106,7 +106,7 @@ int main(void) {
     igraph_vector_int_destroy(&v);
 
     igraph_subisomorphic_lad(&pattern, &target, &domains, &iso, &map, &maps,
-                             /*induced=*/ false, /*time_limit=*/ 0);
+                             /*induced=*/ false);
 
     if (!iso) {
         return 3;

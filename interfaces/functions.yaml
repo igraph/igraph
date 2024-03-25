@@ -2355,7 +2355,7 @@ igraph_subisomorphic_lad:
     PARAMS: |-
         GRAPH pattern, GRAPH target, OPTIONAL VERTEX_INDICES_LIST domains,
         OPTIONAL OUT BOOLEAN iso, OUT INDEX_VECTOR map,
-        OPTIONAL OUT VECTOR_INT_LIST maps, BOOLEAN induced, INTEGER time_limit
+        OPTIONAL OUT VECTOR_INT_LIST maps, BOOLEAN induced
 
 igraph_simplify_and_colorize:
     # Despite their names, vertex_color and edge_color are not really colors
