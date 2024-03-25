@@ -1020,6 +1020,8 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
 
 static igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path);
 static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching);
+static void igraph_i_maximum_matching_get_tree_path(igraph_integer_t *current, igraph_vector_bool_t *f_is_root, igraph_vector_int_t *contraction,
+                                    igraph_vector_int_t *distance, igraph_vector_int_t *f_parent, igraph_vector_int_list_t *b_lists, igraph_vector_int_t *path);
 
 /**
  * \function igraph_maximum_matching
@@ -1318,97 +1320,11 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
                                 // P = path (root(v) -> ... -> v) -> (w -> ... -> root(w))
                                 // Complicated by blossoms, must decide which way to go around the blossom
                                 current = v;
-                                while (current != -1 && !VECTOR(f_is_root)[current]) {
-                                    if (current != VECTOR(contraction)[current]) {
-                                        // if entering on even distance vertex
-                                        if (VECTOR(distance)[current]%2 == 0) {
-                                            // follow parents out of blossom
-                                            while (current != -1 && current != VECTOR(contraction)[current]) {
-                                                igraph_vector_int_push_back(path,current);
-                                                current = VECTOR(f_parent)[current];
-                                            }
-                                        }
-                                        // else entering on odd distance vertex
-                                        else {
-                                            // use blossom edge list to find our way around the other side of it
-                                            // find current in the edge list
-                                            igraph_integer_t pos = 0;
-                                            igraph_vector_int_t *list = igraph_vector_int_list_get_ptr(&b_lists, VECTOR(contraction)[current]);
-                                            igraph_integer_t length = igraph_vector_int_size(list);
-                                            while (VECTOR(*list)[pos%length] != current) {
-                                                pos++;
-                                            }
-                                            // determine direction to follow edge list
-                                            igraph_integer_t dir;
-                                            if (VECTOR(f_parent)[current] == VECTOR(*list)[(pos+1)%length]) {
-                                                dir = 1;
-                                            }
-                                            else {
-                                                dir = -1;
-                                            }
-                                            // follow edge list
-                                            while (current != -1 && current != VECTOR(contraction)[current]) {
-                                                igraph_vector_int_push_back(path,current);
-                                                pos++;
-                                                current = VECTOR(*list)[pos%length];
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        igraph_vector_int_push_back(path,current);
-                                        current = VECTOR(f_parent)[current];
-                                    }
-                                }
+                                igraph_i_maximum_matching_get_tree_path(&current, &f_is_root, &contraction, &distance, &f_parent, &b_lists, path);
                                 igraph_vector_int_push_back(path,current);
                                 igraph_vector_int_reverse(path);
                                 current = w;
-                                while (current != -1 && !VECTOR(f_is_root)[current]) {
-                                    // if current has been contracted
-                                    if (current != VECTOR(contraction)[current]) {
-                                        // if entering on even distance vertex
-                                        if (VECTOR(distance)[current]%2 == 0) {
-                                            // follow parents out of blossom
-                                            while (current != -1 && current != VECTOR(contraction)[current]) {
-                                                igraph_vector_int_push_back(path,current);
-                                                current = VECTOR(f_parent)[current];
-                                            }
-                                        }
-                                        // else entering on odd distance vertex
-                                        else {
-                                            // use blossom edge list to find our way around the other side of it
-                                            // find current in the edge list
-                                            igraph_integer_t pos = 0;
-                                            igraph_vector_int_t *list = igraph_vector_int_list_get_ptr(&b_lists, VECTOR(contraction)[current]);
-                                            #ifdef MATCHING_DEBUG
-                                            debug("list:");
-                                            igraph_vector_int_print(list);
-                                            #endif
-                                            igraph_integer_t length = igraph_vector_int_size(list);
-                                            while (VECTOR(*list)[pos%length] != current) {
-                                                pos++;
-                                            }
-                                            // determine direction to follow edge list
-                                            igraph_integer_t dir;
-                                            if (VECTOR(f_parent)[current] == VECTOR(*list)[(pos+1)%length]) {
-                                                dir = 1;
-                                            }
-                                            else {
-                                                dir = -1;
-                                            }
-                                            // follow edge list
-                                            while (current != -1 && current != VECTOR(contraction)[current]) {
-                                                igraph_vector_int_push_back(path,current);
-                                                pos++;
-                                                current = VECTOR(*list)[pos%length];
-                                            }
-                                            debug("current:%" IGRAPH_PRId, current);
-                                        }
-                                    }
-                                    else {
-                                        igraph_vector_int_push_back(path,current);
-                                        current = VECTOR(f_parent)[current];
-                                    }
-                                }
+                                igraph_i_maximum_matching_get_tree_path(&current, &f_is_root, &contraction, &distance, &f_parent, &b_lists, path);
                                 igraph_vector_int_push_back(path,current);
                                 // flag path_found
                                 path_found = true;
@@ -1505,6 +1421,52 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
     IGRAPH_FINALLY_CLEAN(12);
 
     return IGRAPH_SUCCESS;
+}
+
+void igraph_i_maximum_matching_get_tree_path(igraph_integer_t *current, igraph_vector_bool_t *f_is_root, igraph_vector_int_t *contraction,
+                                    igraph_vector_int_t *distance, igraph_vector_int_t *f_parent, igraph_vector_int_list_t *b_lists, igraph_vector_int_t *path) {
+    while (*current != -1 && !VECTOR(*f_is_root)[*current]) {
+        // if current has been contracted
+        if (*current != VECTOR(*contraction)[*current]) {
+            // if entering on even distance vertex
+            if (VECTOR(*distance)[*current]%2 == 0) {
+                // follow parents out of blossom
+                while (*current != -1 && *current != VECTOR(*contraction)[*current]) {
+                    igraph_vector_int_push_back(path,*current);
+                    *current = VECTOR(*f_parent)[*current];
+                }
+            }
+            // else entering on odd distance vertex
+            else {
+                // use blossom edge list to find our way around the other side of it
+                // find current in the edge list
+                igraph_integer_t pos = 0;
+                igraph_vector_int_t *list = igraph_vector_int_list_get_ptr(b_lists, VECTOR(*contraction)[*current]);
+                igraph_integer_t length = igraph_vector_int_size(list);
+                while (VECTOR(*list)[pos%length] != *current) {
+                    pos++;
+                }
+                // determine direction to follow edge list
+                igraph_integer_t dir;
+                if (VECTOR(*f_parent)[*current] == VECTOR(*list)[(pos+1)%length]) {
+                    dir = 1;
+                }
+                else {
+                    dir = -1;
+                }
+                // follow edge list
+                while (*current != -1 && *current != VECTOR(*contraction)[*current]) {
+                    igraph_vector_int_push_back(path,*current);
+                    pos++;
+                    *current = VECTOR(*list)[pos%length];
+                }
+            }
+        }
+        else {
+            igraph_vector_int_push_back(path,*current);
+            *current = VECTOR(*f_parent)[*current];
+        }
+    }
 }
 
 #ifdef MATCHING_DEBUG
