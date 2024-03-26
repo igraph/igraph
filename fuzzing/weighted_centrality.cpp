@@ -42,8 +42,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     for (size_t i=0; i < ((Size-1) / 3); ++i) {
         VECTOR(edges)[i * 2] = Data[i * 3 + 1];
         VECTOR(edges)[i * 2 + 1] = Data[i * 3 + 2];
-        //Error at src/centrality/betweenness.c:437 : Weight vector must be positive. - Invalid value.
-        VECTOR(weights)[i] = ((float)Data[i * 3 + 3]) / 50.0 + 0.001;
+        // We keep the weights strictly positive, as this is required by some algorithms.
+        // Error at src/centrality/betweenness.c:437 : Weight vector must be positive. - Invalid value.
+        VECTOR(weights)[i] = ((double) Data[i * 3 + 3] + 1.0) / 105.0;
     }
 
     igraph_rng_seed(igraph_rng_default(), 42);
