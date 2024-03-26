@@ -284,14 +284,6 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
- * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
- * \enumval IGRAPH_GLP_EROOT GLPK error (GLP_EROOT).
- * \enumval IGRAPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
- * \enumval IGRAPH_GLP_ENODFS GLPK error (GLP_ENODFS).
- * \enumval IGRAPH_GLP_EFAIL GLPK error (GLP_EFAIL).
- * \enumval IGRAPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
- * \enumval IGRAPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
- * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
@@ -344,14 +336,14 @@ typedef enum {
     IGRAPH_ARPACK_NOSHIFT    = 40,
     IGRAPH_ARPACK_REORDER    = 41,
     /* IGRAPH_EDIVZERO          = 42, */   /* removed in 1.0 */
-    IGRAPH_GLP_EBOUND        = 43,
-    IGRAPH_GLP_EROOT         = 44,
-    IGRAPH_GLP_ENOPFS        = 45,
-    IGRAPH_GLP_ENODFS        = 46,
-    IGRAPH_GLP_EFAIL         = 47,
-    IGRAPH_GLP_EMIPGAP       = 48,
-    IGRAPH_GLP_ETMLIM        = 49,
-    IGRAPH_GLP_ESTOP         = 50,
+    /* IGRAPH_GLP_EBOUND        = 43, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EROOT         = 44, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ENOPFS        = 45, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ENODFS        = 46, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EFAIL         = 47, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
     /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
