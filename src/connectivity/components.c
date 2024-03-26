@@ -74,7 +74,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  *        Alternatively this argument can be \c NULL, in which
  *        case it is ignored.
  * \param no Pointer to an integer, if not \c NULL then the number of
- *        clusters will be stored here.
+ *        components will be stored here.
  * \param mode For directed graph this specifies whether to calculate
  *        weakly or strongly connected components. Possible values:
  *        \c IGRAPH_WEAK,
@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_clusters;
+    igraph_integer_t no_of_components;
     bool *already_added;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
@@ -152,9 +152,9 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     /* The algorithm */
 
-    no_of_clusters = 0;
+    no_of_components = 0;
     for (igraph_integer_t first_node = 0; first_node < no_of_nodes; ++first_node) {
-        igraph_integer_t act_cluster_size;
+        igraph_integer_t act_component_size;
 
         if (already_added[first_node]) {
             continue;
@@ -162,9 +162,9 @@ static igraph_error_t igraph_i_connected_components_weak(
         IGRAPH_ALLOW_INTERRUPTION();
 
         already_added[first_node] = true;
-        act_cluster_size = 1;
+        act_component_size = 1;
         if (membership) {
-            VECTOR(*membership)[first_node] = no_of_clusters;
+            VECTOR(*membership)[first_node] = no_of_components;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, first_node));
 
@@ -179,23 +179,23 @@ static igraph_error_t igraph_i_connected_components_weak(
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
                 already_added[neighbor] = true;
-                act_cluster_size++;
+                act_component_size++;
                 if (membership) {
-                    VECTOR(*membership)[neighbor] = no_of_clusters;
+                    VECTOR(*membership)[neighbor] = no_of_components;
                 }
             }
         }
 
-        no_of_clusters++;
+        no_of_components++;
         if (csize) {
-            IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_cluster_size));
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_component_size));
         }
     }
 
     /* Cleaning up */
 
     if (no) {
-        *no = no_of_clusters;
+        *no = no_of_components;
     }
 
     /* Clean up */
@@ -205,7 +205,7 @@ static igraph_error_t igraph_i_connected_components_weak(
     IGRAPH_FINALLY_CLEAN(3);
 
     /* Update cache */
-    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, no_of_clusters == 1);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, no_of_components == 1);
 
     return IGRAPH_SUCCESS;
 }
@@ -218,7 +218,7 @@ static igraph_error_t igraph_i_connected_components_strong(
     igraph_vector_int_t next_nei = IGRAPH_VECTOR_NULL;
     igraph_integer_t num_seen;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-    igraph_integer_t no_of_clusters = 0;
+    igraph_integer_t no_of_components = 0;
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
     igraph_adjlist_t adjlist;
 
@@ -319,16 +319,16 @@ static igraph_error_t igraph_i_connected_components_strong(
     num_seen = 0;
 
     while (!igraph_vector_int_empty(&out)) {
-        igraph_integer_t act_cluster_size;
+        igraph_integer_t act_component_size;
         igraph_integer_t grandfather = igraph_vector_int_pop_back(&out);
 
         if (VECTOR(next_nei)[grandfather] != 0) {
             continue;
         }
         VECTOR(next_nei)[grandfather] = 1;
-        act_cluster_size = 1;
+        act_component_size = 1;
         if (membership) {
-            VECTOR(*membership)[grandfather] = no_of_clusters;
+            VECTOR(*membership)[grandfather] = no_of_components;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, grandfather));
 
@@ -351,9 +351,9 @@ static igraph_error_t igraph_i_connected_components_strong(
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
                 VECTOR(next_nei)[neighbor] = 1;
-                act_cluster_size++;
+                act_component_size++;
                 if (membership) {
-                    VECTOR(*membership)[neighbor] = no_of_clusters;
+                    VECTOR(*membership)[neighbor] = no_of_components;
                 }
 
                 num_seen++;
@@ -366,16 +366,16 @@ static igraph_error_t igraph_i_connected_components_strong(
             }
         }
 
-        no_of_clusters++;
+        no_of_components++;
         if (csize) {
-            IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_cluster_size));
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_component_size));
         }
     }
 
     IGRAPH_PROGRESS("Strongly connected components: ", 100.0, NULL);
 
     if (no) {
-        *no = no_of_clusters;
+        *no = no_of_components;
     }
 
     /* Clean up */
@@ -386,8 +386,8 @@ static igraph_error_t igraph_i_connected_components_strong(
     IGRAPH_FINALLY_CLEAN(4);
 
     /* Update cache */
-    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
-    if (no_of_clusters == 1) {
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_components == 1);
+    if (no_of_components == 1) {
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
@@ -514,7 +514,7 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 10);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    /* Try to find at least two clusters */
+    /* Try to find at least two components */
     already_added[0] = true;
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
 
@@ -765,7 +765,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     igraph_integer_t i, n, num_seen;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
-    igraph_integer_t no_of_clusters = 0;
+    igraph_integer_t no_of_components = 0;
 
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
     const igraph_vector_int_t* tmp;
@@ -872,7 +872,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
     /* number of components built */
     num_seen = 0;
-    while (!igraph_vector_int_empty(&out) && no_of_clusters < maxcompno) {
+    while (!igraph_vector_int_empty(&out) && no_of_components < maxcompno) {
         /* consume the vector from the last element */
         igraph_integer_t grandfather = igraph_vector_int_pop_back(&out);
 
@@ -950,7 +950,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
             VECTOR(vids_old2new)[VECTOR(verts)[i]] = 0;
         }
 
-        no_of_clusters++;
+        no_of_components++;
     }
 
     IGRAPH_PROGRESS("Strongly connected components: ", 100.0, NULL);
