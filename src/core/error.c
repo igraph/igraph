@@ -100,6 +100,8 @@ static const char *igraph_i_error_strings[] = {
     /* 12 */ "Unimplemented function call",
     /* 13 */ "Interrupted",
     /* 14 */ "Numeric procedure did not converge",
+
+    /* ARPACK error codes moved to igraph_arpack_error_t in arpack.c from version 1.0 */
     /* 15 */ "Matrix-vector product failed",
     /* 16 */ "N must be positive",
     /* 17 */ "NEV must be positive",
@@ -123,30 +125,36 @@ static const char *igraph_i_error_strings[] = {
     /* 34 */ "Error from calculation of a real Schur form",
     /* 35 */ "LAPACK (dtrevc) error for calculating eigenvectors",
     /* 36 */ "Unknown ARPACK error",
+    /* ARPACK error codes end here */
+
     /* 37 */ "Negative loop detected while calculating shortest paths",
     /* 38 */ "Internal error, likely a bug in igraph",
+
+    /* More ARPACK error codes moved to igraph_arpack_error_t in arpack.c from version 1.0 */
     /* 39 */ "Maximum number of iterations reached",
     /* 40 */ "No shifts could be applied during a cycle of the "
     "Implicitly restarted Arnoldi iteration. One possibility "
     "is to increase the size of NCV relative to NEV",
     /* 41 */ "The Schur form computed by LAPACK routine dlahqr "
     "could not be reordered by LAPACK routine dtrsen.",
+    /* ARPACK error codes end here */
+
     /* 42 */ "Big integer division by zero",    /* removed in 1.0 */
-    /* 43 */ "GLPK Error, GLP_EBOUND",
-    /* 44 */ "GLPK Error, GLP_EROOT",
-    /* 45 */ "GLPK Error, GLP_ENOPFS",
-    /* 46 */ "GLPK Error, GLP_ENODFS",
-    /* 47 */ "GLPK Error, GLP_EFAIL",
-    /* 48 */ "GLPK Error, GLP_EMIPGAP",
-    /* 49 */ "GLPK Error, GLP_ETMLIM",
-    /* 50 */ "GLPK Error, GLP_STOP",
+    /* 43 */ "GLPK Error, GLP_EBOUND",    /* removed in 1.0 */
+    /* 44 */ "GLPK Error, GLP_EROOT",    /* removed in 1.0 */
+    /* 45 */ "GLPK Error, GLP_ENOPFS",    /* removed in 1.0 */
+    /* 46 */ "GLPK Error, GLP_ENODFS",    /* removed in 1.0 */
+    /* 47 */ "GLPK Error, GLP_EFAIL",    /* removed in 1.0 */
+    /* 48 */ "GLPK Error, GLP_EMIPGAP",    /* removed in 1.0 */
+    /* 49 */ "GLPK Error, GLP_ETMLIM",    /* removed in 1.0 */
+    /* 50 */ "GLPK Error, GLP_STOP",    /* removed in 1.0 */
     /* 51 */ "Internal attribute handler error",    /* removed in 1.0 */
     /* 52 */ "Unimplemented attribute combination for this type",
-    /* 53 */ "LAPACK call resulted in an error",
+    /* 53 */ "LAPACK call resulted in an error",    /* removed in 1.0 */
     /* 54 */ "Internal DrL error",   /* removed in 1.0 */
     /* 55 */ "Integer or double overflow",
-    /* 56 */ "Internal GPLK error",
-    /* 57 */ "CPU time exceeded",
+    /* 56 */ "Internal GPLK error",    /* removed in 1.0 */
+    /* 57 */ "CPU time exceeded",    /* removed in 1.0 */
     /* 58 */ "Integer or double underflow",
     /* 59 */ "Random walk got stuck",
     /* 60 */ "Search stopped; this error should never be visible to the user, "
