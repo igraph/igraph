@@ -117,11 +117,11 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
                       const igraph_bool_t directed,
                       igraph_real_t *modularity) {
 
-    igraph_vector_t e, k_out, k_in;
-    igraph_integer_t types;
+    igraph_vector_t k_out, k_in;
+    igraph_integer_t no_of_partitions;
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i;
-    igraph_real_t m;
+    igraph_real_t e; /* count/fraction of edges/weights within partitions */
+    igraph_real_t m; /* edge count / weight sum */
     igraph_integer_t c1, c2;
     /* Only consider the graph as directed if it actually is directed */
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
@@ -147,22 +147,22 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     /* At this point, the 'membership' vector does not have length zero,
        thus it is safe to call igraph_vector_max() and min(). */
 
-    types = igraph_vector_int_max(membership) + 1;
+    no_of_partitions = igraph_vector_int_max(membership) + 1;
 
     if (igraph_vector_int_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&e, types);
-    IGRAPH_VECTOR_INIT_FINALLY(&k_out, types);
-    IGRAPH_VECTOR_INIT_FINALLY(&k_in, types);
+    IGRAPH_VECTOR_INIT_FINALLY(&k_out, no_of_partitions);
+    IGRAPH_VECTOR_INIT_FINALLY(&k_in, no_of_partitions);
 
+    e = 0.0;
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges)
             IGRAPH_ERROR("Weight vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = 0.0;
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             igraph_real_t w = VECTOR(*weights)[i];
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
@@ -170,7 +170,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
             c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
             c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
-                VECTOR(e)[c1] += directed_multiplier * w;
+                e += directed_multiplier * w;
             }
             VECTOR(k_out)[c1] += w;
             VECTOR(k_in)[c2]  += w;
@@ -178,11 +178,11 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
         }
     } else {
         m = no_of_edges;
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
             c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
-                VECTOR(e)[c1] += directed_multiplier;
+                e += directed_multiplier;
             }
             VECTOR(k_out)[c1] += 1;
             VECTOR(k_in)[c2]  += 1;
@@ -198,20 +198,20 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     /* Divide all vectors by total weight. */
     igraph_vector_scale(&k_out, 1.0/( directed_multiplier * m ) );
     igraph_vector_scale(&k_in, 1.0/( directed_multiplier * m ) );
-    igraph_vector_scale(&e, 1.0/( directed_multiplier * m ) );
+    e /= directed_multiplier * m;
 
-    *modularity = 0.0;
     if (m > 0) {
-        for (i = 0; i < types; i++) {
-            *modularity += VECTOR(e)[i];
+        *modularity = e;
+        for (igraph_integer_t i = 0; i < no_of_partitions; i++) {
             *modularity -= resolution * VECTOR(k_out)[i] * VECTOR(k_in)[i];
         }
+    } else {
+        *modularity = IGRAPH_NAN;
     }
 
-    igraph_vector_destroy(&e);
     igraph_vector_destroy(&k_out);
     igraph_vector_destroy(&k_in);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
