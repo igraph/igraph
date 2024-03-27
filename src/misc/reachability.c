@@ -24,15 +24,6 @@
 #include "igraph_interface.h"
 #include "igraph_reachability.h"
 
-void _print_vector_int(const igraph_vector_int_t *v) {
-    igraph_integer_t i, n = igraph_vector_int_size(v);
-    printf("(");
-    for (i=0; i < n; i++) {
-        printf(" %" IGRAPH_PRId, VECTOR(*v)[i]);
-    }
-    printf(" )\n");
-}
-
 igraph_integer_t igraph_bitset_popcount(igraph_vector_int_t *bitset)
 {
     igraph_integer_t i, n, count = 0;
