@@ -298,6 +298,7 @@ add_library(
   misc/order_cycle.cpp
   misc/other.c
   misc/power_law_fit.c
+  misc/reachability.c
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c

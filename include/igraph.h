@@ -95,5 +95,6 @@
 #include "igraph_eulerian.h"
 #include "igraph_graphicality.h"
 #include "igraph_cycles.h"
+#include "igraph_reachability.h"
 
 #endif
