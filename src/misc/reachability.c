@@ -65,11 +65,11 @@ igraph_error_t igraph_reachability_directed(
 
     for (i = 0; i < *no_of_components; ++i)
     {
-        IGRAPH_CHECK(igraph_vector_int_resize(igraph_vector_int_list_get_ptr(reach, i), BITNSLOTS(no_of_nodes)));
+        IGRAPH_CHECK(igraph_vector_int_resize(igraph_vector_int_list_get_ptr(reach, i), IGRAPH_BITNSLOTS(no_of_nodes)));
     }
     for (i = 0; i < no_of_nodes; ++i)
     {
-        BITSET(VECTOR(*igraph_vector_int_list_get_ptr(reach, VECTOR(*membership)[i])), i);
+        IGRAPH_BITSET(VECTOR(*igraph_vector_int_list_get_ptr(reach, VECTOR(*membership)[i])), i);
     }
 
     IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, *no_of_components));
@@ -97,7 +97,7 @@ igraph_error_t igraph_reachability_directed(
         for (j = 0; j < n; j++)
         {
             to_bitset = igraph_vector_int_list_get_ptr(reach, VECTOR(*dag_neighbours)[j]);
-            for (k = 0; k < BITNSLOTS(no_of_nodes); ++k)
+            for (k = 0; k < IGRAPH_BITNSLOTS(no_of_nodes); ++k)
             {
                 VECTOR(*from_bitset)[k] |= VECTOR(*to_bitset)[k];
             }
