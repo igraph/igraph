@@ -70,8 +70,7 @@ igraph_error_t igraph_reachability_directed(
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    IGRAPH_CHECK(igraph_vector_int_list_init(reach, *no_of_components));
-    IGRAPH_FINALLY(igraph_vector_int_list_destroy, reach);
+    IGRAPH_CHECK(igraph_vector_int_list_resize(reach, *no_of_components));
 
     for (i = 0; i < *no_of_components; ++i)
     {
@@ -116,7 +115,7 @@ igraph_error_t igraph_reachability_directed(
 
     igraph_adjlist_destroy(&adjlist);
     igraph_adjlist_destroy(&dag);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
