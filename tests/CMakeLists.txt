@@ -358,6 +358,7 @@ add_legacy_tests(
   igraph_spanner
   knn
   random_spanning_tree
+  reachability
   single_target_shortest_path
   topological_sorting
 )
