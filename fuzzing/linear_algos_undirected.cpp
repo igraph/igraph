@@ -139,12 +139,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
         }
 
+        /* Basic graph modification */
         igraph_add_vertices(&graph, 3, NULL);
         igraph_degree_1(&graph, &i, 0, IGRAPH_ALL, IGRAPH_NO_LOOPS);
         igraph_delete_vertices(&graph, igraph_vss_1(0));
         igraph_add_edge(&graph, 0, 1);
         igraph_count_multiple_1(&graph, &i, 0);
         igraph_delete_edges(&graph, igraph_ess_1(0));
+
+        if (igraph_vcount(&graph) >= 4) {
+            igraph_rewire(&graph, igraph_ecount(&graph) + 1, IGRAPH_REWIRING_SIMPLE);
+        }
 
         igraph_matrix_destroy(&m);
         igraph_vector_bool_destroy(&bv);
