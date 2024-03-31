@@ -74,12 +74,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
         es = igraph_ess_vector(&eids);
     }
 
-    /* We don't want the algorithm to get stuck in an infinite loop when
-     * it can't choose two edges satisfying the conditions. Instead of
-     * this, we choose two arbitrary edges and if they have endpoints
-     * in common, we just decrease the number of trials left and continue
-     * (so unsuccessful rewirings still count as a trial)
-     */
+    /* We count both successful and unsuccessful rewiring trials.
+     * This is necessary for uniform sampling. */
 
     num_swaps = num_successful_swaps = 0;
     while (num_swaps < n) {
@@ -227,34 +223,36 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
  * \function igraph_rewire
  * \brief Randomly rewires a graph while preserving its degree sequence.
  *
- * </para><para>
  * This function generates a new graph based on the original one by randomly
- * rewiring edges while preserving the original graph's degree sequence.
- * The rewiring is done "in place", so no new graph will
- * be allocated. If you would like to keep the original graph intact, use
- * \ref igraph_copy() beforehand. All graph attributes will be lost.
+ * "rewriting" edges while preserving the original graph's degree sequence.
+ * The rewiring is done "in place", so no new graph will be allocated. If you
+ * would like to keep the original graph intact, use \ref igraph_copy()
+ * beforehand. All graph attributes will be lost.
+ *
+ * </para><para>
+ * The rewiring is performed with degree-preserving edge switches:
+ * Two arbitrary edges are picked uniformly at random, namely
+ * <code>(a, b)</code> and <code>(c, d)</code>, then they are replaced
+ * by <code>(a, d)</code> and <code>(b, c)</code> if this preserves the
+ * constraints specified by \p mode.
  *
  * \param graph The graph object to be rewired.
  * \param n Number of rewiring trials to perform.
  * \param mode The rewiring algorithm to be used. It can be one of the following flags:
  *         \clist
  *           \cli IGRAPH_REWIRING_SIMPLE
- *                Simple rewiring algorithm which chooses two arbitrary edges
- *                in each step (namely (a,b) and (c,d)) and substitutes them
- *                with (a,d) and (c,b) if they don't exist.  The method will
- *                neither destroy nor create self-loops.
+ *                This method does not create or destroy self-loops, and does
+ *                not create multi-edges.
  *           \cli IGRAPH_REWIRING_SIMPLE_LOOPS
- *                Same as \c IGRAPH_REWIRING_SIMPLE but allows the creation or
- *                destruction of self-loops.
+ *                This method allows the creation or destruction of self-loops.
+ *                Self-loops are created by switching edges that have a single
+ *                common endpoint.
  *         \endclist
  *
  * \return Error code:
  *         \clist
  *           \cli IGRAPH_EINVMODE
  *                Invalid rewiring mode.
- *           \cli IGRAPH_EINVAL
- *                Graph unsuitable for rewiring (e.g. it has
- *                less than 4 nodes in case of \c IGRAPH_REWIRING_SIMPLE)
  *           \cli IGRAPH_ENOMEM
  *                Not enough memory for temporary data.
  *         \endclist
