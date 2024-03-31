@@ -54,6 +54,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         IGRAPH_ASSERT((bres || bres2) == !bres3);
 
+        igraph_is_complete(&graph, &bres);
+        igraph_invalidate_cache(&graph);
+
         igraph_is_bipartite(&graph, &bres, NULL);
         igraph_invalidate_cache(&graph);
 
