@@ -54,9 +54,8 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * The forest fire model intends to reproduce the following network
  * characteristics, observed in real networks:
  * \ilist
- * \ili Heavy-tailed in-degree distribution.
- * \ili Heavy-tailed out-degree distribution.
- * \ili Communities.
+ * \ili Heavy-tailed in- and out-degree distributions.
+ * \ili Community structure.
  * \ili Densification power-law. The network is densifying in time,
  *      according to a power-law rule.
  * \ili Shrinking diameter. The diameter of the network decreases in

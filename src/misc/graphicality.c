@@ -729,7 +729,7 @@ cleanup1:
 
 /***** Bipartite case *****/
 
-/* Bipartite graph with multi-eges:
+/* Bipartite graph with multi-edges:
  *  - Degrees must be non-negative.
  *  - Sum of degrees must be the same in the two partitions.
  */

@@ -133,8 +133,7 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
  * \brief Decides whether the size of the set is zero.
  *
  * \param set The set object.
- * \return Non-zero number if the size of the set is not zero and
- *         zero otherwise.
+ * \return True if the size of the set is not zero and false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -259,7 +258,7 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
  *
  * \param set The set object.
  * \param e The element being sought.
- * \return Positive integer (true) if \p e is found, zero (false) otherwise.
+ * \return True if \p e is found, false otherwise.
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
@@ -307,7 +306,7 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
  * \param element The next element or 0 (if the iteration
  *   has ended) is returned here.
  *
- * \return Nonzero if there are more elements, zero otherwise.
+ * \return True if there are more elements, false otherwise.
  */
 igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t *state,
                                  igraph_integer_t *element) {
