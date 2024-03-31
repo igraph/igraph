@@ -21,6 +21,7 @@
  - `igraph_linegraph()` now considers self-loops to be self-adjacent in undirected graphs, bringing consistency with how directed graphs were already handled in previous versions.
  - `igraph_all_st_mincuts()` now correctly returns all minimum cuts. This also fixes a problem with `igraph_minimum_size_separators()`.
  - Corrected minor error in `igraph_community_label_propagation()` when adding labels to isolated nodes with some fixed labels present.
+ - `igraph_community_spinglass()` no longer crashes when passing an edgeless graph and an empty weight vector.
 
 ### Other
 
