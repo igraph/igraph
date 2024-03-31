@@ -40,8 +40,7 @@
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
 igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     char message[256];
     igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
     igraph_vector_int_t eids;
@@ -50,8 +49,9 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     igraph_es_t es;
     igraph_adjlist_t al;
 
-    if (no_of_nodes < 4) {
-        IGRAPH_ERROR("graph unsuitable for rewiring", IGRAPH_EINVAL);
+    if (no_of_edges < 2) {
+        /* There are no possible rewirings, return with the same graph. */
+        return IGRAPH_SUCCESS;
     }
 
     directed = igraph_is_directed(graph);
