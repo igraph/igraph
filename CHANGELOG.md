@@ -22,6 +22,11 @@
  - `igraph_all_st_mincuts()` now correctly returns all minimum cuts. This also fixes a problem with `igraph_minimum_size_separators()`.
  - Corrected minor error in `igraph_community_label_propagation()` when adding labels to isolated nodes with some fixed labels present.
  - `igraph_community_spinglass()` no longer crashes when passing an edgeless graph and an empty weight vector.
+ - `igraph_rewire()` no longer crashes on graphs with fewer than two edges.
+
+### Changed
+
+ - `igraph_rewire()` on longer throws an error on graphs with fewer than four vertices. These graphs are now returned unchanged, just like other graphs which are the unique realization of their degree sequence.
 
 ### Other
 
