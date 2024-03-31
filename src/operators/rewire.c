@@ -45,17 +45,16 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
     igraph_vector_int_t eids;
     igraph_vector_int_t edgevec, alledges;
-    igraph_bool_t directed, loops, ok;
+    const igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_bool_t loops = (mode & IGRAPH_REWIRING_SIMPLE_LOOPS);
+    igraph_bool_t ok;
     igraph_es_t es;
     igraph_adjlist_t al;
 
     if (no_of_edges < 2) {
         /* There are no possible rewirings, return with the same graph. */
         return IGRAPH_SUCCESS;
-    }
-
-    directed = igraph_is_directed(graph);
-    loops = (mode & IGRAPH_REWIRING_SIMPLE_LOOPS);
+    }    
 
     RNG_BEGIN();
 
@@ -68,7 +67,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
         IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&alledges, no_of_edges * 2);
-        igraph_get_edgelist(graph, &alledges, /*bycol=*/ 0);
+        igraph_get_edgelist(graph, &alledges, /*bycol=*/ false);
     } else {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edgevec, 4);
         es = igraph_ess_vector(&eids);
@@ -91,7 +90,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
         switch (mode) {
         case IGRAPH_REWIRING_SIMPLE:
         case IGRAPH_REWIRING_SIMPLE_LOOPS:
-            ok = 1;
+            ok = true;
 
             /* Choose two edges randomly */
             VECTOR(eids)[0] = RNG_INTEGER(0, no_of_edges - 1);
@@ -126,12 +125,12 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             /* If we do not touch loops, check whether a == b or c == d and disallow
              * the swap if needed */
             if (!loops && (a == b || c == d)) {
-                ok = 0;
+                ok = false;
             } else {
                 /* Check whether they are suitable for rewiring */
                 if (a == c || b == d) {
                     /* Swapping would have no effect */
-                    ok = 0;
+                    ok = false;
                 } else {
                     /* a != c && b != d */
                     /* If a == d or b == c, the swap would generate at least one loop, so
@@ -148,7 +147,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             if (ok) {
                 if (use_adjlist) {
                     if (igraph_adjlist_has_edge(&al, a, d, directed)) {
-                        ok = 0;
+                        ok = false;
                     }
                 } else {
                     IGRAPH_CHECK(igraph_are_adjacent(graph, a, d, &ok));
@@ -158,7 +157,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             if (ok) {
                 if (use_adjlist) {
                     if (igraph_adjlist_has_edge(&al, c, b, directed)) {
-                        ok = 0;
+                        ok = false;
                     }
                 } else {
                     IGRAPH_CHECK(igraph_are_adjacent(graph, c, b, &ok));
