@@ -19,7 +19,6 @@
 */
 
 #include "igraph_graphicality.h"
-#include "igraph_vector_list.h"
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
@@ -583,14 +582,12 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_v
  *  - The sum of in- and out-degrees must be the same.
  *  - Use the Fulkerson-Chen-Anstee theorem
  */
-
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
-    igraph_vector_int_list_t buckets;
-    igraph_vector_int_t* current_bucket;
+    igraph_vector_int_t in_degree_cumcounts;
+    igraph_vector_int_t in_degree_counts;
     igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
     igraph_vector_int_t left_pq, right_pq;
     igraph_integer_t lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
-    igraph_integer_t i, j, k;
 
     /* The conditions from the loopy multigraph case are necessary here as well. */
     IGRAPH_CHECK(igraph_i_is_graphical_directed_loopy_multi(out_degrees, in_degrees, res));
@@ -604,28 +601,46 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&buckets, vcount);
 
-    for (i = 0; i < vcount; i++) {
-        if (VECTOR(*in_degrees)[i] >= vcount || VECTOR(*out_degrees)[i] >= vcount) {
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_cumcounts, vcount+1);
+
+    /* Compute in_degree_cumcounts[d+1] to be the no. of in-degrees == d */
+    for (igraph_integer_t v = 0; v < vcount; v++) {
+        igraph_integer_t indeg = VECTOR(*in_degrees)[v];
+        igraph_integer_t outdeg = VECTOR(*out_degrees)[v];
+        if (indeg >= vcount || outdeg >= vcount) {
             *res = false;
-            goto cleanup1;
+            igraph_vector_int_destroy(&in_degree_cumcounts);
+            IGRAPH_FINALLY_CLEAN(1);
+            return IGRAPH_SUCCESS;
         }
-        current_bucket = igraph_vector_int_list_get_ptr(&buckets, VECTOR(*in_degrees)[i]);
-        IGRAPH_CHECK(igraph_vector_int_push_back(current_bucket, VECTOR(*out_degrees)[i]));
+        VECTOR(in_degree_cumcounts)[indeg + 1]++;
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, vcount);
+    /* Comupte in_degree_cumcounts[d] to be the no. of in-degrees < d */
+    for (igraph_integer_t indeg = 0; indeg < vcount; indeg++) {
+        VECTOR(in_degree_cumcounts)[indeg+1] += VECTOR(in_degree_cumcounts)[indeg];
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, vcount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, vcount);
 
-    k = 0;
-    for (i = vcount - 1; i >= 0; i--) {
-        current_bucket = igraph_vector_int_list_get_ptr(&buckets, i);
-        for (j = 0; j < igraph_vector_int_size(current_bucket); j++, k++) {
-            VECTOR(sorted_in_degrees)[k] = i;
-            VECTOR(sorted_out_degrees)[k] = VECTOR(*current_bucket)[j];
-        }
+    /* in_degree_counts[d] is the number of vertices with in-degree d
+     * that were placed so far within the following loop. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_counts, vcount);
+
+    for (igraph_integer_t v = 0; v < vcount; v++) {
+        igraph_integer_t outdeg = VECTOR(*out_degrees)[v];
+        igraph_integer_t indeg  = VECTOR(*in_degrees)[v];
+        igraph_integer_t idx = VECTOR(in_degree_cumcounts)[indeg] + VECTOR(in_degree_counts)[indeg];
+        VECTOR(sorted_out_degrees)[vcount - idx - 1] = outdeg;
+        VECTOR(sorted_in_degrees)[vcount - idx - 1] = indeg;
+        VECTOR(in_degree_counts)[indeg]++;
     }
+
+    igraph_vector_int_destroy(&in_degree_counts);
+    igraph_vector_int_destroy(&in_degree_cumcounts);
+    IGRAPH_FINALLY_CLEAN(2);
 
     /* Be optimistic, then check whether the Fulkerson–Chen–Anstee condition
      * holds for every k. In particular, for every k in [0; n), it must be true
@@ -651,14 +666,14 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     right_i = 0;
     left_sum = 0;
     right_sum = 0;
-    for (i = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         VECTOR(right_pq)[OUTDEGREE(i)]++;
     }
 
     *res = true;
     lhs = 0;
     rhs = 0;
-    for (i = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         lhs += INDEGREE(i);
 
         /* It is enough to check for indexes where the in-degree is about to
@@ -713,10 +728,6 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     igraph_vector_int_destroy(&left_pq);
     igraph_vector_int_destroy(&right_pq);
     IGRAPH_FINALLY_CLEAN(4);
-
-cleanup1:
-    igraph_vector_int_list_destroy(&buckets);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
