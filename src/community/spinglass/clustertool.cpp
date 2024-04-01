@@ -241,7 +241,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
             IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
         use_weights = true;
-        if (igraph_vector_min(weights) < 0) {
+        if (igraph_vector_size(weights) > 0 && igraph_vector_min(weights) < 0) {
             IGRAPH_ERROR(
                 "Weights must not be negative when using the original implementation of spinglass communities. "
                 "Select the implementation meant for negative weights.",

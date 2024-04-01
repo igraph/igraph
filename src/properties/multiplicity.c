@@ -50,47 +50,76 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
 
-    if (
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI)
-    ) {
-        /* use the cached result */
-        *res = (
-            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP) &&
-            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)
-        );
-        return IGRAPH_SUCCESS;
+    /* Is it already known whether the graph has loops or multi-edges? */
+    igraph_bool_t known_loop, known_multi;
+
+    /* If it is known, does the graph have them? */
+    igraph_bool_t has_loop, has_multi;
+
+    known_loop  = igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP);
+    if (known_loop) {
+        has_loop = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP);
+        if (has_loop) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
     }
+
+    known_multi = igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI);
+    if (known_multi) {
+        has_multi = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI);
+        if (has_multi) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    if (known_loop && known_multi) {
+        if (!has_loop && !has_multi) {
+            *res = true;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    /* Up to now, these variables were used to store the cache status.
+     * From here on, we re-use them to store the outcome of explicit
+     * checks. */
+
+    known_loop = known_multi = false;
+    has_loop = has_multi = false; /* be optimistic */
 
     if (vc == 0 || ec == 0) {
         *res = true;
+        known_loop = known_multi = true;
     } else {
         igraph_vector_int_t neis;
-        igraph_integer_t i, j, n;
-        igraph_bool_t found = false;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-        for (i = 0; i < vc; i++) {
+        for (igraph_integer_t i = 0; i < vc; i++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-            n = igraph_vector_int_size(&neis);
-            for (j = 0; j < n; j++) {
+            const igraph_integer_t n = igraph_vector_int_size(&neis);
+            for (igraph_integer_t j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
-                    found = true; break;
+                    known_loop = true; has_loop = true; break;
                 }
                 if (j > 0 && VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
-                    found = true; break;
+                    known_multi = true; has_multi = true; break;
                 }
             }
         }
-        *res = !found;
+        *res = !has_loop && !has_multi;
+        if (*res) {
+            known_multi = known_loop = true;
+        }
         igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    /* If the graph turned out to be simple, we can cache that it has no loop
-     * and no multiple edges */
-    if (*res) {
-        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
-        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, false);
+    if (known_loop) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, has_loop);
+    }
+
+    if (known_multi) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, has_multi);
     }
 
     return IGRAPH_SUCCESS;
