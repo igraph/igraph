@@ -223,6 +223,31 @@ int main(void) {
     igraph_vector_int_init_int_end(&ods, -1, 0, 1, 2, -1);
     digraphical_print_destroy(&ids, &ods);
 
+    /* Degree sequences of simple threshold digraphs:
+     * These sequences make good test cases as they have a unique realization.
+     * These sequnces were constructed based on point 3 of Theorem 1 in https://arxiv.org/abs/1212.1149
+     * by computing a "closure" of a random digraphs.
+     */
+    igraph_vector_int_init_int_end(&ids, -1, 4, 3, 0, 3, 4, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 3, 3, 4, 3, 1, -1);
+    digraphical_print_destroy(&ids, &ods);
+
+    igraph_vector_int_init_int_end(&ids, -1, 4, 4, 3, 3, 4, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 4, 4, 4, 4, 2, -1);
+    digraphical_print_destroy(&ids, &ods);
+
+    igraph_vector_int_init_int_end(&ids, -1, 2, 4, 0, 3, 1, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 3, 2, 3, 1, 1, -1);
+    digraphical_print_destroy(&ids, &ods);
+
+    igraph_vector_int_init_int_end(&ids, -1, 11, 0, 0, 0, 7, 0, 9, 0, 13, 0, 0, 0, 0, 0, 0, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 3, 4, 4, 4, 3, 4, 3, 4, 2, 3, 2, 2, 1, 1, 0, -1);
+    digraphical_print_destroy(&ids, &ods);
+
+    igraph_vector_int_init_int_end(&ids, -1, 8, 4, 0, 0, 5, 0, 8, 9, 7, 0, 0, 11, 14, 13, 0, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 8, 8, 9, 9, 8, 8, 6, 5, 6, 4, 3, 2, 1, 1, 1, -1);
+    digraphical_print_destroy(&ids, &ods);
+
     VERIFY_FINALLY_STACK();
 
     return 0;
