@@ -19,8 +19,7 @@
 */
 
 #include "igraph_graphicality.h"
-
-#include "igraph_qsort.h"
+#include "igraph_vector_list.h"
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
