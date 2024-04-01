@@ -248,6 +248,20 @@ int main(void) {
     igraph_vector_int_init_int_end(&ods, -1, 8, 8, 9, 9, 8, 8, 6, 5, 6, 4, 3, 2, 1, 1, 1, -1);
     digraphical_print_destroy(&ids, &ods);
 
+    /* Some degree sequences with no simple realizations,
+     * based on incrementing an in- and out-degree of the above. */
+    igraph_vector_int_init_int_end(&ids, -1, 8, 4, 1, 0, 5, 0, 8, 9, 7, 0, 0, 11, 14, 13, 0, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 8, 8, 10, 9, 8, 8, 6, 5, 6, 4, 3, 2, 1, 1, 1, -1);
+    digraphical_print_destroy(&ids, &ods);
+
+    igraph_vector_int_init_int_end(&ids, -1, 9, 4, 0, 0, 5, 0, 8, 9, 7, 0, 0, 11, 14, 13, 0, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 8, 9, 9, 9, 8, 8, 6, 5, 6, 4, 3, 2, 1, 1, 1, -1);
+    digraphical_print_destroy(&ids, &ods);
+
+    igraph_vector_int_init_int_end(&ids, -1, 8, 4, 0, 0, 5, 0, 8, 9, 7, 0, 0, 11, 14, 14, 0, -1);
+    igraph_vector_int_init_int_end(&ods, -1, 8, 8, 9, 9, 8, 8, 6, 5, 6, 4, 3, 3, 1, 1, 1, -1);
+    digraphical_print_destroy(&ids, &ods);
+
     VERIFY_FINALLY_STACK();
 
     return 0;
