@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * \sa \ref igraph_is_bigraphical() to check if a bi-degree-sequence can be realized as a bipartite graph;
  * \ref igraph_realize_degree_sequence() to construct a graph with a given degree sequence.
  *
- * Time complexity: O(n log n) for directed graphs with at most one self-loops per vertex,
+ * Time complexity: O(n log n) for directed graphs with at most one self-loop per vertex,
  * and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
 igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
