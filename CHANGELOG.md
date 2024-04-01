@@ -4,7 +4,7 @@
 
 ### Added
 
- - `igraph_is_complete()` checks there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
+ - `igraph_is_complete()` checks whether there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
 
 ### Fixed
 
@@ -15,7 +15,7 @@
  - `igraph_write_graph_ncol()` and `igraph_write_graph_lgl()` now refuse to write vertex names which would result in an invalid file that cannot be read back in.
  - `igraph_write_graph_gml()` now ignores graph attributes called `edge` or `node` with a warning. Writing these would create an invalid GML file that igraph couldn't read back.
  - `igraph_disjoint_union()` and `igraph_disjoint_union_many()` now check for overflow.
- - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted any more.
+ - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted anymore.
  - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
  - `igraph_is_separator()` and `igraph_is_minimal_separator()` now work correctly with disconnected graphs.
  - `igraph_linegraph()` now considers self-loops to be self-adjacent in undirected graphs, bringing consistency with how directed graphs were already handled in previous versions.
@@ -33,7 +33,7 @@
  - Performance: `igraph_is_simple()` now makes more granular use of the cache.
  - Performance: `igraph_degree()` now makes use of the cache when checking for self-loops.
  - The performance of `igraph_is_minimal_separator()` was improved.
- - `igraph_is_graphical()` now performs graphicality checks for degree sequences of simple directed graphs in linear time, an improvement from the previously used quadratic algorithm (contributed by Arnar Bjarni Arnarson in #2537).
+ - `igraph_is_graphical()` now performs graphicality checks for degree sequences of simple directed graphs in linear time, an improvement from the previously used quadratic algorithm (contributed by Arnar Bjarni Arnarson @Tagl in #2537).
  - Documentation improvements.
 
 ## [0.10.10] - 2024-02-13
