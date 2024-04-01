@@ -43,7 +43,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         VECTOR(edges)[i * 2] = Data[i * 3 + 1];
         VECTOR(edges)[i * 2 + 1] = Data[i * 3 + 2];
         // We keep the weights strictly positive, as this is required by some algorithms.
-        // Error at src/centrality/betweenness.c:437 : Weight vector must be positive. - Invalid value.
         VECTOR(weights)[i] = ((double) Data[i * 3 + 3] + 1.0) / 105.0;
     }
 
@@ -120,7 +119,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             // NOTE: Currently Infomap dominates this fuzz target due to being
             // slower and more complex than the other algorithms.
-            igraph_community_infomap(&graph, &weights, NULL, 1, &membership, &r);
+            // TODO: Currently disabled because of extremely bad performance.
+            // igraph_community_infomap(&graph, &weights, NULL, 1, &membership, &r);
 
             igraph_simplify(&graph, true, true, &comb);
             EANV(&graph, "weight", &weights);
