@@ -33,6 +33,7 @@
  - Performance: `igraph_is_simple()` now makes more granular use of the cache.
  - Performance: `igraph_degree()` now makes use of the cache when checking for self-loops.
  - The performance of `igraph_is_minimal_separator()` was improved.
+ - `igraph_is_graphical()` now performs graphcality checks for degree sequences of simple directed graphs in linear time, an improvement from the previously used quadratic algorithm (contributed by Arnar Bjarni Arnarson in #2537).
  - Documentation improvements.
 
 ## [0.10.10] - 2024-02-13
