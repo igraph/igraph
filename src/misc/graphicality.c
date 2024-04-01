@@ -583,8 +583,7 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_v
  *  - Use the Fulkerson-Chen-Anstee theorem
  */
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
-    igraph_vector_int_t in_degree_cumcounts;
-    igraph_vector_int_t in_degree_counts;
+    igraph_vector_int_t in_degree_cumcounts, in_degree_counts;
     igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
     igraph_vector_int_t left_pq, right_pq;
     igraph_integer_t lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
@@ -617,7 +616,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         VECTOR(in_degree_cumcounts)[indeg + 1]++;
     }
 
-    /* Comupte in_degree_cumcounts[d] to be the no. of in-degrees < d */
+    /* Compute in_degree_cumcounts[d] to be the no. of in-degrees < d */
     for (igraph_integer_t indeg = 0; indeg < vcount; indeg++) {
         VECTOR(in_degree_cumcounts)[indeg+1] += VECTOR(in_degree_cumcounts)[indeg];
     }
@@ -625,8 +624,8 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, vcount);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, vcount);
 
-    /* in_degree_counts[d] is the number of vertices with in-degree d
-     * that were placed so far within the following loop. */
+    /* In the following loop, in_degree_counts[d] keeps track of the number of vertices
+     * with in-degree d that were already placed. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_counts, vcount);
 
     for (igraph_integer_t v = 0; v < vcount; v++) {
@@ -653,12 +652,9 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 
 #define INDEGREE(x) (VECTOR(sorted_in_degrees)[x])
 #define OUTDEGREE(x) (VECTOR(sorted_out_degrees)[x])
-    
-    IGRAPH_CHECK(igraph_vector_int_init(&left_pq, vcount));
-    IGRAPH_CHECK(igraph_vector_int_init(&right_pq, vcount));
 
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &left_pq);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &right_pq);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&left_pq, vcount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&right_pq, vcount);
 
     left_pq_size = 0;
     right_pq_size = vcount;
