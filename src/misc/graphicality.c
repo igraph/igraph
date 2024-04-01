@@ -587,8 +587,10 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_v
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
     igraph_vector_int_list_t buckets;
     igraph_vector_int_t* current_bucket;
-    igraph_vector_int_t sorted_in_degrees, sorted_out_degrees, left_pq, right_pq;
-    igraph_integer_t i, j, k, vcount, lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
+    igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
+    igraph_vector_int_t left_pq, right_pq;
+    igraph_integer_t lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
+    igraph_integer_t i, j, k;
 
     /* The conditions from the loopy multigraph case are necessary here as well. */
     IGRAPH_CHECK(igraph_i_is_graphical_directed_loopy_multi(out_degrees, in_degrees, res));
@@ -596,7 +598,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         return IGRAPH_SUCCESS;
     }
 
-    vcount = igraph_vector_int_size(out_degrees);
+    const igraph_integer_t vcount = igraph_vector_int_size(out_degrees);
     if (vcount == 0) {
         *res = true;
         return IGRAPH_SUCCESS;
