@@ -128,9 +128,8 @@ igraph_error_t igraph_i_glpk_check(int retval, const char* message) {
     }
 
     /* handle errors */
-#define HANDLE_CODE(c)  case c: code = #c; ret = IGRAPH_##c; break;
-#define HANDLE_CODE2(c) case c: code = #c; ret = IGRAPH_FAILURE; break;
-#define HANDLE_CODE3(c) case c: code = #c; ret = IGRAPH_INTERRUPTED; break;
+#define HANDLE_CODE(c) case c: code = #c; ret = IGRAPH_FAILURE; break;
+#define HANDLE_CODE2(c) case c: code = #c; ret = IGRAPH_INTERRUPTED; break;
     switch (retval) {
         HANDLE_CODE(GLP_EBOUND);
         HANDLE_CODE(GLP_EROOT);
@@ -140,14 +139,14 @@ igraph_error_t igraph_i_glpk_check(int retval, const char* message) {
         HANDLE_CODE(GLP_EMIPGAP);
         HANDLE_CODE(GLP_ETMLIM);
 
-        HANDLE_CODE3(GLP_ESTOP);
+        HANDLE_CODE2(GLP_ESTOP);
 
-        HANDLE_CODE2(GLP_EBADB);
-        HANDLE_CODE2(GLP_ESING);
-        HANDLE_CODE2(GLP_ECOND);
-        HANDLE_CODE2(GLP_EOBJLL);
-        HANDLE_CODE2(GLP_EOBJUL);
-        HANDLE_CODE2(GLP_EITLIM);
+        HANDLE_CODE(GLP_EBADB);
+        HANDLE_CODE(GLP_ESING);
+        HANDLE_CODE(GLP_ECOND);
+        HANDLE_CODE(GLP_EOBJLL);
+        HANDLE_CODE(GLP_EOBJUL);
+        HANDLE_CODE(GLP_EITLIM);
 
     default:
         IGRAPH_ERROR("Unknown GLPK error.", IGRAPH_FAILURE);

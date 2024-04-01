@@ -284,14 +284,6 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
- * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
- * \enumval IGRAPH_GLP_EROOT GLPK error (GLP_EROOT).
- * \enumval IGRAPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
- * \enumval IGRAPH_GLP_ENODFS GLPK error (GLP_ENODFS).
- * \enumval IGRAPH_GLP_EFAIL GLPK error (GLP_EFAIL).
- * \enumval IGRAPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
- * \enumval IGRAPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
- * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
@@ -316,42 +308,20 @@ typedef enum {
     IGRAPH_UNIMPLEMENTED     = 12,
     IGRAPH_INTERRUPTED       = 13,
     IGRAPH_DIVERGED          = 14,
-    IGRAPH_ARPACK_PROD       = 15,   /* unused, reserved */
-    IGRAPH_ARPACK_NPOS       = 16,
-    IGRAPH_ARPACK_NEVNPOS    = 17,
-    IGRAPH_ARPACK_NCVSMALL   = 18,
-    IGRAPH_ARPACK_NONPOSI    = 19,
-    IGRAPH_ARPACK_WHICHINV   = 20,
-    IGRAPH_ARPACK_BMATINV    = 21,
-    IGRAPH_ARPACK_WORKLSMALL = 22,
-    IGRAPH_ARPACK_TRIDERR    = 23,
-    IGRAPH_ARPACK_ZEROSTART  = 24,
-    IGRAPH_ARPACK_MODEINV    = 25,
-    IGRAPH_ARPACK_MODEBMAT   = 26,
-    IGRAPH_ARPACK_ISHIFT     = 27,
-    IGRAPH_ARPACK_NEVBE      = 28,
-    IGRAPH_ARPACK_NOFACT     = 29,
-    IGRAPH_ARPACK_FAILED     = 30,
-    IGRAPH_ARPACK_HOWMNY     = 31,
-    IGRAPH_ARPACK_HOWMNYS    = 32,
-    IGRAPH_ARPACK_EVDIFF     = 33,
-    IGRAPH_ARPACK_SHUR       = 34,
-    IGRAPH_ARPACK_LAPACK     = 35,
-    IGRAPH_ARPACK_UNKNOWN    = 36,
+    IGRAPH_EARPACK           = 15,
+    /* ARPACK error codes from 15 to 36 were moved to igraph_arpack_error_t in 1.0 */
     IGRAPH_ENEGLOOP          = 37,
     IGRAPH_EINTERNAL         = 38,
-    IGRAPH_ARPACK_MAXIT      = 39,
-    IGRAPH_ARPACK_NOSHIFT    = 40,
-    IGRAPH_ARPACK_REORDER    = 41,
+    /* ARPACK error codes from 39 to 41 were moved to igraph_arpack_error_t in 1.0 */
     /* IGRAPH_EDIVZERO          = 42, */   /* removed in 1.0 */
-    IGRAPH_GLP_EBOUND        = 43,
-    IGRAPH_GLP_EROOT         = 44,
-    IGRAPH_GLP_ENOPFS        = 45,
-    IGRAPH_GLP_ENODFS        = 46,
-    IGRAPH_GLP_EFAIL         = 47,
-    IGRAPH_GLP_EMIPGAP       = 48,
-    IGRAPH_GLP_ETMLIM        = 49,
-    IGRAPH_GLP_ESTOP         = 50,
+    /* IGRAPH_GLP_EBOUND        = 43, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EROOT         = 44, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ENOPFS        = 45, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ENODFS        = 46, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EFAIL         = 47, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
     /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
