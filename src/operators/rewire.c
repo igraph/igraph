@@ -54,7 +54,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     if (no_of_edges < 2) {
         /* There are no possible rewirings, return with the same graph. */
         return IGRAPH_SUCCESS;
-    }    
+    }
 
     RNG_BEGIN();
 
