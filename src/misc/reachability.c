@@ -19,28 +19,11 @@
 */
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
 #include "igraph_reachability.h"
-
-igraph_integer_t igraph_bitset_popcount(igraph_vector_int_t *bitset)
-{
-    igraph_integer_t i, n, count = 0;
-    n = igraph_vector_int_size(bitset);
-    for (i = 0; i < n; ++i)
-    {
-        // TODO: Check if __cpuid claims the operation is supported by CPU
-        // https://learn.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64?view=msvc-170
-        #ifdef _MSC_VER
-        count += __popcnt64(VECTOR(*bitset)[i]);
-        #else
-        count += __builtin_popcountll(VECTOR(*bitset)[i]);
-        //printf("Current count at %ld: %ld\n", i, (igraph_integer_t)__builtin_popcountll(VECTOR(*bitset)[i]));
-        #endif
-    }
-    return count;
-}
 
 igraph_error_t igraph_reachability_directed(
     const igraph_t *graph,
@@ -97,10 +80,7 @@ igraph_error_t igraph_reachability_directed(
         for (j = 0; j < n; j++)
         {
             to_bitset = igraph_vector_int_list_get_ptr(reach, VECTOR(*dag_neighbours)[j]);
-            for (k = 0; k < IGRAPH_BITNSLOTS(no_of_nodes); ++k)
-            {
-                VECTOR(*from_bitset)[k] |= VECTOR(*to_bitset)[k];
-            }
+            igraph_bitset_or(from_bitset, from_bitset, to_bitset, no_of_nodes);
         }
     }
 

@@ -38,7 +38,7 @@ void compute_and_print(const igraph_t *g)
 
     for (i = 0; i < no_of_nodes; i++)
     {
-        VECTOR(reach_counts)[i] = igraph_bitset_popcount(igraph_vector_int_list_get_ptr(&reach, VECTOR(membership)[i]));
+        VECTOR(reach_counts)[i] = igraph_bitset_popcount(igraph_vector_int_list_get_ptr(&reach, VECTOR(membership)[i]), no_of_nodes);
     }
 
     print_vector_int(&membership);

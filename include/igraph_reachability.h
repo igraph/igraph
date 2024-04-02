@@ -30,15 +30,6 @@
 
 __BEGIN_DECLS
 
-#define IGRAPH_BITMASK(b) (1 << ((b) % IGRAPH_INTEGER_SIZE))
-#define IGRAPH_BITSLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
-#define IGRAPH_BITSET(a, b) ((a)[IGRAPH_BITSLOT(b)] |= IGRAPH_BITMASK(b))
-#define IGRAPH_BITCLEAR(a, b) ((a)[IGRAPH_BITSLOT(b)] &= ~IGRAPH_BITMASK(b))
-#define IGRAPH_BITTEST(a, b) ((a)[IGRAPH_BITSLOT(b)] & IGRAPH_BITMASK(b))
-#define IGRAPH_BITNSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - 1) / IGRAPH_INTEGER_SIZE)
-
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_vector_int_t* bitset);
-
 IGRAPH_EXPORT igraph_error_t igraph_reachability_directed(
         const igraph_t *graph,
         igraph_vector_int_t *membership,
@@ -48,4 +39,4 @@ IGRAPH_EXPORT igraph_error_t igraph_reachability_directed(
 
 __END_DECLS
 
-#endif // IGRAPH_GRAPHICALITY_H
+#endif // IGRAPH_REACHABILITY_H

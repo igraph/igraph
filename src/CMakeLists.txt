@@ -40,6 +40,7 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 add_library(
   igraph
   core/array.c
+  core/bitset.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c
