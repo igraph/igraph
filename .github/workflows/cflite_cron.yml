@@ -1,49 +1,51 @@
-name: ClusterFuzzLite PR fuzzing
+name: ClusterFuzzLite cron tasks
 on:
-  pull_request:
-    paths:
-      - '**'
+  schedule:
+    - cron: '0 0 * * *'  # Once a day at midnight.
 permissions: read-all
 jobs:
-  PR:
+  Pruning:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ matrix.sanitizer }}-${{ github.ref }}
-      cancel-in-progress: true
-    strategy:
-      fail-fast: false
-      matrix:
-        sanitizer:
-        - address
-        # Override this with the sanitizers you want.
-        # - undefined
-        # - memory
     steps:
-    - name: Build Fuzzers (${{ matrix.sanitizer }})
+    - name: Build Fuzzers
       id: build
       uses: google/clusterfuzzlite/actions/build_fuzzers@v1
       with:
         language: c++
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        sanitizer: ${{ matrix.sanitizer }}
-        # Optional but recommended: used to only run fuzzers that are affected
-        # by the PR.
-        # See later section on "Git repo for storage".
-        storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/igraph/clusterfuzz-storage-repo.git
-        # storage-repo-branch: main   # Optional. Defaults to "main"
-        # storage-repo-branch-coverage: gh-pages  # Optional. Defaults to "gh-pages".
-    - name: Run Fuzzers (${{ matrix.sanitizer }})
+    - name: Run Fuzzers
       id: run
       uses: google/clusterfuzzlite/actions/run_fuzzers@v1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        fuzz-seconds: 720
-        mode: 'code-change'
-        sanitizer: ${{ matrix.sanitizer }}
+        fuzz-seconds: 900
+        mode: 'prune'
         output-sarif: true
-        # Optional but recommended: used to download the corpus produced by
-        # batch fuzzing.
+        # Optional but recommended.
         # See later section on "Git repo for storage".
         storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/igraph/clusterfuzz-storage-repo.git
         # storage-repo-branch: main   # Optional. Defaults to "main"
         # storage-repo-branch-coverage: gh-pages  # Optional. Defaults to "gh-pages".
+
+  Coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build Fuzzers
+      id: build
+      uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+      with:
+        language: c++
+        sanitizer: coverage
+    - name: Run Fuzzers
+      id: run
+      uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        fuzz-seconds: 900
+        mode: 'coverage'
+        sanitizer: 'coverage'
+        # Optional but recommended.
+        # See later section on "Git repo for storage".
+        storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/igraph/clusterfuzz-storage-repo.git
+        # storage-repo-branch: main   # Optional. Defaults to "main"
+        # storage-repo-branch-coverage: gh-pages  # Optional. Defaults to "gh-pages".
+

@@ -1,15 +1,11 @@
-name: ClusterFuzzLite PR fuzzing
+name: ClusterFuzzLite batch fuzzing
 on:
-  pull_request:
-    paths:
-      - '**'
+  schedule:
+    - cron: '0 0/6 * * *'  # Every 6th hour. Change this to whatever is suitable.
 permissions: read-all
 jobs:
-  PR:
+  BatchFuzzing:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ matrix.sanitizer }}-${{ github.ref }}
-      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
@@ -24,25 +20,17 @@ jobs:
       uses: google/clusterfuzzlite/actions/build_fuzzers@v1
       with:
         language: c++
-        github-token: ${{ secrets.GITHUB_TOKEN }}
         sanitizer: ${{ matrix.sanitizer }}
-        # Optional but recommended: used to only run fuzzers that are affected
-        # by the PR.
-        # See later section on "Git repo for storage".
-        storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/igraph/clusterfuzz-storage-repo.git
-        # storage-repo-branch: main   # Optional. Defaults to "main"
-        # storage-repo-branch-coverage: gh-pages  # Optional. Defaults to "gh-pages".
     - name: Run Fuzzers (${{ matrix.sanitizer }})
       id: run
       uses: google/clusterfuzzlite/actions/run_fuzzers@v1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        fuzz-seconds: 720
-        mode: 'code-change'
+        fuzz-seconds: 3600
+        mode: 'batch'
         sanitizer: ${{ matrix.sanitizer }}
         output-sarif: true
-        # Optional but recommended: used to download the corpus produced by
-        # batch fuzzing.
+        # Optional but recommended: For storing certain artifacts from fuzzing.
         # See later section on "Git repo for storage".
         storage-repo: https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/igraph/clusterfuzz-storage-repo.git
         # storage-repo-branch: main   # Optional. Defaults to "main"
