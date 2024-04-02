@@ -76,6 +76,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             SETEANV(&graph, "weight", &weights);
 
+            // Currently used only as a vertex attribute that must be handled
+            // appropriately during vertex contractions. Not used with any of the
+            // community detection functions.
             igraph_strength(&graph, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, &weights);
             SETVANV(&graph, "strength", &v);
 
@@ -115,7 +118,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_modularity(&graph, &membership, &weights, 1.5, IGRAPH_UNDIRECTED, &m);
             igraph_modularity_matrix(&graph, &weights, 0.75, &mat, IGRAPH_DIRECTED);
-            igraph_assortativity_nominal(&graph, &membership, &r, IGRAPH_DIRECTED, true);
 
             // NOTE: Currently Infomap dominates this fuzz target due to being
             // slower and more complex than the other algorithms.
@@ -125,6 +127,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_simplify(&graph, true, true, &comb);
             EANV(&graph, "weight", &weights);
 
+            // Compute 'length' vector for community_voronoi()
             igraph_vector_update(&v, &weights);
             for (igraph_integer_t i=0; i < igraph_vector_size(&v); i++) {
                 VECTOR(v)[i] = 1 / (1 + VECTOR(v)[i]);
@@ -138,13 +141,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_community_leiden(&graph, &weights, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
             igraph_community_multilevel(&graph, &weights, 0.8, &membership, &im, &mv);
 
+            // community_spinglass() only works on connected graphs
             igraph_is_connected(&graph, &b, IGRAPH_WEAK);
             if (b) {
-                igraph_integer_t no_comm = 4;
-                if (no_comm > igraph_vcount(&graph)) {
-                    no_comm = igraph_vcount(&graph);
-                }
-                igraph_community_fluid_communities(&graph, no_comm, &membership);
                 igraph_community_spinglass(&graph, &weights, &r, NULL, &membership, NULL, 10, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_CONFIG, 1.0, IGRAPH_SPINCOMM_IMP_ORIG, 1.0);
             }
 
