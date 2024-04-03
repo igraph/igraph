@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -36,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size-1));
+    igraph_vector_int_init(&edges, Size-1);
     for (size_t i=0; i < Size-1; ++i) {
         VECTOR(edges)[i] = Data[i+1];
     }
@@ -53,15 +48,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_real_t r;
         igraph_t g;
 
-        check_err(igraph_vector_int_list_init(&ivl1, 0));
-        check_err(igraph_vector_int_list_init(&ivl2, 0));
-        check_err(igraph_vector_int_init(&iv1, 0));
-        check_err(igraph_vector_int_init(&iv2, 0));
-        check_err(igraph_vector_int_init(&iv3, 0));
-        check_err(igraph_vector_int_init(&iv4, 0));
-        check_err(igraph_vector_int_init(&iv5, 0));
-        check_err(igraph_vector_bool_init(&bv, 0));
-        check_err(igraph_matrix_init(&m, 0, 0));
+        igraph_vector_int_list_init(&ivl1, 0);
+        igraph_vector_int_list_init(&ivl2, 0);
+        igraph_vector_int_init(&iv1, 0);
+        igraph_vector_int_init(&iv2, 0);
+        igraph_vector_int_init(&iv3, 0);
+        igraph_vector_int_init(&iv4, 0);
+        igraph_vector_int_init(&iv5, 0);
+        igraph_vector_bool_init(&bv, 0);
+        igraph_matrix_init(&m, 0, 0);
 
         igraph_biconnected_components(&graph, &i, NULL, &ivl1, &ivl2, &iv1);
         igraph_maximum_cardinality_search(&graph, &iv1, &iv2);
