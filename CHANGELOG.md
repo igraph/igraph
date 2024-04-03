@@ -54,6 +54,8 @@
 
 ## [master]
 
+## [0.10.11] - 2024-04-02
+
 ### Added
 
  - `igraph_is_complete()` checks whether there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
@@ -1371,7 +1373,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.10..master
+[master]: https://github.com/igraph/igraph/compare/0.10.11..master
+[0.10.11]: https://github.com/igraph/igraph/compare/0.10.10..0.10.11
 [0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
 [0.10.9]: https://github.com/igraph/igraph/compare/0.10.8..0.10.9
 [0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
