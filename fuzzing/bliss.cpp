@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     // Data[0]  - splitting heuristic
     // Data[1:] - edges
@@ -42,7 +37,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     const igraph_integer_t max_vcount  = 64;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     if (Size % 2 == 0 || Size > 512+1 || Size < 1) {
@@ -55,7 +49,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     heur = (igraph_bliss_sh_t) Data[0];
 
-    check_err(igraph_vector_int_init(&edges, Size-1));
+    igraph_vector_int_init(&edges, Size-1);
     for (size_t i=0; i < Size-1; ++i) {
         VECTOR(edges)[i] = Data[i+1];
     }
@@ -65,14 +59,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (igraph_vcount(&graph) <= max_vcount) {
             igraph_bool_t multi;
 
-            check_err(igraph_has_multiple(&graph, &multi));
+            igraph_has_multiple(&graph, &multi);
 
             /* Bliss does not support multigraphs and the input is currently not checked */
             if (! multi) {
                 igraph_bliss_info_t info;
                 igraph_vector_int_list_t generators;
-                check_err(igraph_vector_int_list_init(&generators, 0));
-                check_err(igraph_automorphism_group(&graph, nullptr, &generators, heur, &info));
+                igraph_vector_int_list_init(&generators, 0);
+                igraph_automorphism_group(&graph, nullptr, &generators, heur, &info);
                 igraph_free(info.group_size);
                 igraph_vector_int_list_destroy(&generators);
             }
@@ -86,14 +80,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (igraph_vcount(&graph) <= max_vcount) {
             igraph_bool_t multi;
 
-            check_err(igraph_has_multiple(&graph, &multi));
+            igraph_has_multiple(&graph, &multi);
 
             /* Bliss does not support multigraphs and the input is currently not checked */
             if (! multi) {
                 igraph_bliss_info_t info;
                 igraph_vector_int_list_t generators;
-                check_err(igraph_vector_int_list_init(&generators, 0));
-                check_err(igraph_automorphism_group(&graph, nullptr, &generators, heur, &info));
+                igraph_vector_int_list_init(&generators, 0);
+                igraph_automorphism_group(&graph, nullptr, &generators, heur, &info);
                 igraph_free(info.group_size);
                 igraph_vector_int_list_destroy(&generators);
             }
