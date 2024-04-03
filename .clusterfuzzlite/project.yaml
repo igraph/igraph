@@ -1,2 +1,0 @@
-language: c++
-coverage_extra_args: -ignore-filename-regex=.*libxml2-2.*/.* -ignore-filename-regex=.*/vendor/.*
