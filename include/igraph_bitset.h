@@ -35,9 +35,9 @@ __BEGIN_DECLS
 
 #define IGRAPH_BITMASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
 #define IGRAPH_BITSLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
-#define IGRAPH_BITSET(a, b) ((a)[IGRAPH_BITSLOT(b)] |= IGRAPH_BITMASK(b))
-#define IGRAPH_BITCLEAR(a, b) ((a)[IGRAPH_BITSLOT(b)] &= ~IGRAPH_BITMASK(b))
-#define IGRAPH_BITTEST(a, b) ((a)[IGRAPH_BITSLOT(b)] & IGRAPH_BITMASK(b))
+#define IGRAPH_BITSET(a, b) (VECTOR((a))[IGRAPH_BITSLOT(b)] |= IGRAPH_BITMASK(b))
+#define IGRAPH_BITCLEAR(a, b) (VECTOR((a))[IGRAPH_BITSLOT(b)] &= ~IGRAPH_BITMASK(b))
+#define IGRAPH_BITTEST(a, b) (VECTOR((a))[IGRAPH_BITSLOT(b)] & IGRAPH_BITMASK(b))
 #define IGRAPH_BITNSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
 #ifdef _MSC_VER
@@ -77,17 +77,23 @@ igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x) {
 #define IGRAPH_CLO(x) IGRAPH_CLZ(~(x))
 #define IGRAPH_CTO(x) IGRAPH_CTZ(~(x))
 
-IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_vector_int_t *bitset, igraph_integer_t n);
-IGRAPH_EXPORT void igraph_bitset_destroy(igraph_vector_int_t *bitset);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_vector_int_t* bitset, igraph_integer_t n);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_zero(igraph_vector_int_t* bitset, igraph_integer_t n);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_one(igraph_vector_int_t* bitset, igraph_integer_t n);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_zero(igraph_vector_int_t* bitset, igraph_integer_t n);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_one(igraph_vector_int_t* bitset, igraph_integer_t n);
-IGRAPH_EXPORT void igraph_bitset_or(igraph_vector_int_t* dest, igraph_vector_int_t* src1, igraph_vector_int_t* src2, igraph_integer_t n);
-IGRAPH_EXPORT void igraph_bitset_and(igraph_vector_int_t* dest, igraph_vector_int_t* src1, igraph_vector_int_t* src2, igraph_integer_t n);
-IGRAPH_EXPORT void igraph_bitset_xor(igraph_vector_int_t* dest, igraph_vector_int_t* src1, igraph_vector_int_t* src2, igraph_integer_t n);
-IGRAPH_EXPORT void igraph_bitset_not(igraph_vector_int_t* dest, igraph_vector_int_t* src, igraph_integer_t n);
+typedef struct s_bitset {
+    igraph_integer_t size;
+    igraph_integer_t* stor_begin;
+    igraph_integer_t* stor_end;
+} igraph_bitset_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size);
+IGRAPH_EXPORT void igraph_bitset_destroy(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_bitset_t* bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t* bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t* bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t* bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t* bitset);
+IGRAPH_EXPORT void igraph_bitset_or(igraph_bitset_t* dest, igraph_bitset_t* src1, igraph_bitset_t* src2);
+IGRAPH_EXPORT void igraph_bitset_and(igraph_bitset_t* dest, igraph_bitset_t* src1, igraph_bitset_t* src2);
+IGRAPH_EXPORT void igraph_bitset_xor(igraph_bitset_t* dest, igraph_bitset_t* src1, igraph_bitset_t* src2);
+IGRAPH_EXPORT void igraph_bitset_not(igraph_bitset_t* dest, igraph_bitset_t* src);
 
 __END_DECLS
 

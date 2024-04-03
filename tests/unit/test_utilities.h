@@ -150,7 +150,7 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
 
 void record_last_warning(const char *reason, const char *file, int line);
 
-void print_bitset(igraph_vector_int_t* bitset, igraph_integer_t n);
+void print_bitset(igraph_bitset_t* bitset);
 
 #define EXPECT_WARNING(funcall, expected_warning) \
     do { \

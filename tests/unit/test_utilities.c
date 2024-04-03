@@ -591,10 +591,10 @@ void record_last_warning(const char *reason, const char *file, int line) {
     expect_warning_ctx.observed = strdup(reason);
 }
 
-void print_bitset(igraph_vector_int_t* bitset, igraph_integer_t n) {
+void print_bitset(igraph_bitset_t* bitset) {
     printf("(");
-    for (igraph_integer_t i = n-1; i >= 0; --i) {
-        printf(" %d", !!IGRAPH_BITTEST(VECTOR(*bitset), i));
+    for (igraph_integer_t i = bitset->size - 1; i >= 0; --i) {
+        printf(" %d", !!IGRAPH_BITTEST(*bitset, i));
     }
     printf(" )\n");
 }
