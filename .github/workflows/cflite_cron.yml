@@ -1,7 +1,9 @@
 name: ClusterFuzzLite cron tasks
 on:
   schedule:
-    - cron: '0 0 * * *'  # Once a day at midnight.
+    - cron: '0 2 * * *'  # Once a day at 2 AM UTC
+  workflow_dispatch:
+
 permissions: read-all
 jobs:
   Pruning:
