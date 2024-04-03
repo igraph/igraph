@@ -66,6 +66,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bitset
   heap
   igraph_array
   igraph_complex
