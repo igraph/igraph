@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -37,8 +32,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, ((Size-1) / 3) * 2));
-    check_err(igraph_vector_init(&weights, (Size-1) / 3));
+    igraph_vector_int_init(&edges, ((Size-1) / 3) * 2);
+    igraph_vector_init(&weights, (Size-1) / 3);
     for (size_t i=0; i < ((Size-1) / 3); ++i) {
         VECTOR(edges)[i * 2] = Data[i * 3 + 1];
         VECTOR(edges)[i * 2 + 1] = Data[i * 3 + 2];
@@ -47,7 +42,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         VECTOR(weights)[i] = ((double) Data[i * 3 + 3] + 1.0) / 105.0;
     }
 
-    // Turn on attribute handling
+    // Turn on attribute handling. Weights will be stored as an edge attribute
+    // in order to allow graph simplification while retainingweights.
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -60,8 +56,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         /* Limit graph size for the sake of performance. */
         if (igraph_vcount(&graph) <= 64) {
-            check_err(igraph_vector_init(&v, 0));
-            check_err(igraph_vector_int_init(&iv, 0));
+            igraph_vector_init(&v, 0);
+            igraph_vector_int_init(&iv, 0);
 
             igraph_betweenness_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_ALL, &weights, 4);
             igraph_betweenness_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_IN, &weights, 5);

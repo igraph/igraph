@@ -18,7 +18,7 @@
    02110-1301 USA
 */
 
-#include "igraph.h"
+#include <igraph.h>
 #include <cstdio>
 
 // This fuzzer checks two things:
