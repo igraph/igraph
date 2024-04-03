@@ -4,9 +4,6 @@
 
 /* This program benchmarks igraph_qsort() indirectly through vector_sort() */
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
 int main(void) {
     igraph_vector_int_t vec;
 
@@ -24,7 +21,7 @@ int main(void) {
     for (igraph_integer_t i=0; i < N; i++) {
         VECTOR(vec)[i] = RNG_INTEGER(0, N-1);
     }
-    BENCH("Sort vector of length " TOSTRING(N), igraph_vector_int_sort(&vec));
+    BENCH("Sort vector of length " IGRAPH_I_STRINGIFY(N), igraph_vector_int_sort(&vec));
 
 #undef N
 #define N 1000000
@@ -33,7 +30,7 @@ int main(void) {
     for (igraph_integer_t i=0; i < N; i++) {
         VECTOR(vec)[i] = RNG_INTEGER(0, N-1);
     }
-    BENCH("Sort vector of length " TOSTRING(N), igraph_vector_int_sort(&vec));
+    BENCH("Sort vector of length " IGRAPH_I_STRINGIFY(N), igraph_vector_int_sort(&vec));
 
 #undef N
 #define N 100000
@@ -42,7 +39,7 @@ int main(void) {
     for (igraph_integer_t i=0; i < N; i++) {
         VECTOR(vec)[i] = RNG_INTEGER(0, N-1);
     }
-    BENCH("Sort vector of length " TOSTRING(N), igraph_vector_int_sort(&vec));
+    BENCH("Sort vector of length " IGRAPH_I_STRINGIFY(N), igraph_vector_int_sort(&vec));
 
     RNG_END();
 

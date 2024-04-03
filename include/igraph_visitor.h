@@ -45,7 +45,7 @@ __BEGIN_DECLS
  * callback function must be of type \c igraph_bfshandler_t. It has
  * the following arguments:
  *
- * \param graph The graph that that algorithm is working on. Of course
+ * \param graph The graph that the algorithm is working on. Of course
  *   this must not be modified.
  * \param vid The id of the vertex just found by the breadth-first
  *   search.
@@ -66,7 +66,7 @@ __BEGIN_DECLS
  *    returning to the caller with the same error code. If a BFS is
  *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
- *    contain NaN.
+ *    contain negative values.
  *
  * \sa \ref igraph_bfs()
  */
@@ -102,7 +102,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
  * completed. These callbacks must be of type \c
  * igraph_dfshandler_t. They have the following arguments:
  *
- * \param graph The graph that that algorithm is working on. Of course
+ * \param graph The graph that the algorithm is working on. Of course
  *   this must not be modified.
  * \param vid The id of the vertex just found by the depth-first
  *   search.
@@ -113,10 +113,10 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
  * \return \c IGRAPH_SUCCESS if the DFS should continue, \c IGRAPH_STOP
  *    if the DFS should stop and return to the caller normally. Any other
  *    value is treated as an igraph error code, terminating the search and
- *    returning to the caller with the same error code. If a BFS is
+ *    returning to the caller with the same error code. If a DFS is
  *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
- *    contain NaN.
+ *    contain negative values.
  *
  * \sa \ref igraph_dfs()
  */

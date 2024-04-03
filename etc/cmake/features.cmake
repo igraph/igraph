@@ -20,3 +20,6 @@ endif()
 
 option(FLEX_KEEP_LINE_NUMBERS "Keep references to the original line numbers in generated Flex/Bison parser files" OFF)
 mark_as_advanced(FLEX_KEEP_LINE_NUMBERS)
+
+option(BUILD_FUZZING "Build fuzz targets and enable fuzzer instrumentation" OFF)
+mark_as_advanced(BUILD_FUZZING)

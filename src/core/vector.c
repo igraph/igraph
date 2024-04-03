@@ -76,10 +76,10 @@
  * Time complexity: O(n), where n is the number of elements in the vector.
  */
 igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_int_t *to) {
-    igraph_integer_t i, n = igraph_vector_size(from);
+    const igraph_integer_t n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_int_resize(to, n));
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         VECTOR(*to)[i] = floor(VECTOR(*from)[i]);
     }
 
@@ -87,10 +87,10 @@ igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_in
 }
 
 igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_int_t *to) {
-    igraph_integer_t i, n = igraph_vector_size(from);
+    const igraph_integer_t n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_int_resize(to, n));
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         VECTOR(*to)[i] = round(VECTOR(*from)[i]);
     }
 

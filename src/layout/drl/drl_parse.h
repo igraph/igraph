@@ -33,10 +33,6 @@
 // The parse class contains the methods necessary to parse
 // the command line, print help, and do error checking
 
-#ifdef MUSE_MPI
-    #include <mpi.h>
-#endif
-
 #include <string>
 
 namespace drl {

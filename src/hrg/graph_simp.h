@@ -63,6 +63,8 @@
 #include "hrg/rbtree.h"
 #include "hrg/dendro.h"
 
+#include <string>
+
 #include <cstring>
 #include <cstdlib>
 
@@ -70,89 +72,69 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_SIMPLEEDGE
-#define IGRAPH_HRG_SIMPLEEDGE
-class simpleEdge {
-public:
-    int x;            // index of edge terminator
-    simpleEdge* next;     // pointer to next elementd
-
-    simpleEdge(): x(-1), next(0) { }
-    ~simpleEdge() { }
+struct simpleEdge {
+    int x = -1;                 // index of edge terminator
+    simpleEdge* next = nullptr; // pointer to next elementd
 };
-#endif
 
-#ifndef IGRAPH_HRG_SIMPLEVERT
-#define IGRAPH_HRG_SIMPLEVERT
-class simpleVert {
-public:
-    std::string name;          // (external) name of vertex
-    int degree;           // degree of this vertex
-    int group_true;       // index of vertex's true group
-
-    simpleVert(): name(""), degree(0), group_true(-1) { }
-    ~simpleVert() { }
+struct simpleVert {
+    std::string name;       // (external) name of vertex
+    int degree = 0;         // degree of this vertex
+    int group_true = -1;    // index of vertex's true group
 };
-#endif
 
-#ifndef IGRAPH_HRG_TWOEDGE
-#define IGRAPH_HRG_TWOEDGE
-class twoEdge {
-public:
-    int o;            // index of edge originator
-    int x;            // index of edge terminator
-
-    twoEdge(): o(-1), x(-1) { }
-    ~twoEdge() { }
+struct twoEdge {
+    int o = -1; // index of edge originator
+    int x = -1; // index of edge terminator
 };
-#endif
 
 // ******** Graph Class with Edge Statistics *****************************
 
 class simpleGraph {
 public:
-    simpleGraph(const int); ~simpleGraph();
+    explicit simpleGraph(int);
+    ~simpleGraph();
 
     // add group label to vertex i
-    bool addGroup(const int, const int);
+    bool addGroup(int, int);
     // add (i,j) to graph
-    bool addLink(const int, const int);
+    bool addLink(int, int);
     // true if (i,j) is already in graph
-    bool doesLinkExist(const int, const int);
+    bool doesLinkExist(int, int) const;
     // returns A(i,j)
-    double getAdjacency(const int, const int);
+    double getAdjacency(int, int) const;
     // returns degree of vertex i
-    int getDegree(const int);
+    int getDegree(int) const;
     // returns group label of vertex i
-    int getGroupLabel(const int);
+    int getGroupLabel(int) const;
     // returns name of vertex i
-    std::string getName(const int);
+    std::string getName(int) const;
     // returns edge list of vertex i
-    simpleEdge* getNeighborList(const int);
+    const simpleEdge* getNeighborList(int) const;
     // return pointer to a node
-    simpleVert* getNode(const int);
+    const simpleVert* getNode(int) const;
     // returns num_groups
-    int getNumGroups();
+    int getNumGroups() const;
     // returns m
-    int getNumLinks();
+    int getNumLinks() const;
     // returns n
-    int getNumNodes();
+    int getNumNodes() const;
     // set name of vertex i
-    bool setName(const int, const std::string);
+    bool setName(int i, const std::string &text);
 
 private:
-    simpleVert* nodes;        // list of nodes
-    simpleEdge** nodeLink;    // linked list of neighbors to vertex
-    simpleEdge** nodeLinkTail;    // pointers to tail of neighbor list
-    double** A;           // adjacency matrix for this graph
-    twoEdge* E;           // list of all edges (array)
-    int n;            // number of vertices
-    int m;            // number of directed edges
-    int num_groups;       // number of bins in node histograms
+    simpleVert* nodes;          // list of nodes
+    simpleEdge** nodeLink;      // linked list of neighbors to vertex
+    simpleEdge** nodeLinkTail;  // pointers to tail of neighbor list
+    double** A;                 // adjacency matrix for this graph
+    twoEdge* E;                 // list of all edges (array)
+    int n;                      // number of vertices
+    int m;                      // number of directed edges
+    int num_groups;             // number of bins in node histograms
 
     // quicksort functions
-    void QsortMain(block*, int, int);
-    int QsortPartition(block*, int, int, int);
+    static void QsortMain(block*, int, int);
+    static int QsortPartition(block*, int, int, int);
 };
 
 } // namespace fitHRG

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="g_name" for="graph" attr.name="name" attr.type="string"/>
+  <key id="g_type" for="graph" attr.name="type" attr.type="string"/>
+  <key id="g_loops" for="graph" attr.name="loops" attr.type="boolean"/>
+  <key id="g_m" for="graph" attr.name="m" attr.type="double"/>
+  <key id="v_label" for="node" attr.name="label" attr.type="string"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="boolean"/>
+  <graph id="G" edgedefault="undirected">
+    <data key="g_name">Erdos-Renyi (gnm) graph</data>
+    <data key="g_type">gnm</data>
+    <data key="g_loops">false</data>
+    <data key="g_m">7</data>
+    <node id="n0">
+      <data key="v_label">A</data>
+    </node>
+    <node id="n1">
+      <data key="v_label">B</data>
+    </node>
+    <node id="n2">
+      <data key="v_label">C</data>
+    </node>
+    <node id="n3">
+      <data key="v_label">D</data>
+    </node>
+    <node id="n4">
+      <data key="v_label">E</data>
+    </node>
+    <edge source="n0" target="n1">
+      <data key="e_weight">false</data>
+    </edge>
+    <edge source="n1" target="n2">
+      <data key="e_weight">false</data>
+    </edge>
+    <edge source="n0" target="n3">
+      <data key="e_weight">true</data>
+    </edge>
+    <edge source="n1" target="n3">
+      <data key="e_weight">true</data>
+    </edge>
+    <edge source="n0" target="n4">
+      <data key="e_weight">false</data>
+    </edge>
+    <edge source="n1" target="n4">
+      <data key="e_weight">true</data>
+    </edge>
+    <edge source="n3" target="n4">
+      <data key="e_weight">false</data>
+    </edge>
+  </graph>
+</graphml>

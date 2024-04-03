@@ -94,18 +94,19 @@ input :    /* empty */
          | input edge
 ;
 
-edge :   edgeid edgeid NEWLINE        {
-           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
-           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
+edge :   endpoints NEWLINE {
            IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 0.0));
        }
-       | edgeid edgeid weight NEWLINE {
-           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
-           IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
-           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, $3));
-           context->has_weights = 1;
+       | endpoints weight NEWLINE {
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, $2));
+           context->has_weights = true;
        }
 ;
+
+endpoints : edgeid edgeid  {
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
+};
 
 edgeid : ALNUM  {
   igraph_integer_t trie_id;
@@ -123,7 +124,7 @@ weight : ALNUM  {
                                         igraph_ncol_yyget_leng(scanner),
                                         &val));
     $$=val;
-} ;
+};
 
 %%
 

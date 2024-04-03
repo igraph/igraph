@@ -49,11 +49,15 @@
  * \function igraph_read_graph_edgelist
  * \brief Reads an edge list from a file and creates a graph.
  *
- * </para><para>
  * This format is simply a series of an even number of non-negative integers separated by
  * whitespace. The integers represent vertex IDs. Placing each edge (i.e. pair of integers)
  * on a separate line is not required, but it is recommended for readability.
  * Edges of directed graphs are assumed to be in "from, to" order.
+ *
+ * </para><para>
+ * The largest vertex ID plus one, or the parameter \p n determines the vertex count,
+ * whichever is larger. See \ref igraph_read_graph_ncol() for reading files where
+ * vertices are specified by name instead of by a numerical vertex ID.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.

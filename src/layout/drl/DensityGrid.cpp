@@ -174,11 +174,7 @@ void DensityGrid::Subtract(Node &N) {
     // check to see that we are inside grid
     if ( (x_grid >= GRID_SIZE) || (x_grid < 0) ||
          (y_grid >= GRID_SIZE) || (y_grid < 0) ) {
-#ifdef MUSE_MPI
-        MPI_Abort ( MPI_COMM_WORLD, 1 );
-#else
         throw runtime_error("Exceeded density grid in DrL.");
-#endif
     }
 
     /* Subtract density values */
@@ -216,11 +212,7 @@ void DensityGrid::Add(Node &N) {
     // check to see that we are inside grid
     if ( (x_grid >= GRID_SIZE) || (x_grid < 0) ||
          (y_grid >= GRID_SIZE) || (y_grid < 0) ) {
-#ifdef MUSE_MPI
-        MPI_Abort ( MPI_COMM_WORLD, 1 );
-#else
         throw runtime_error("Exceeded density grid in DrL.");
-#endif
     }
 
     /* Add density values */

@@ -128,14 +128,12 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
-    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     igraph_vector_t widths;
     igraph_integer_t *parent_eids;
-    igraph_bool_t *is_target;
+    bool *is_target;
     igraph_integer_t i, to_reach;
 
     if (!weights) {
@@ -168,32 +166,29 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&widths, no_of_nodes);
-    igraph_vector_fill(&widths, my_neginfinity);
+    igraph_vector_fill(&widths, IGRAPH_NEGINFINITY);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent_eids == 0) {
-        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for widest paths.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
-    is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
-    if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
-    }
+
+    is_target = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(is_target, "Insufficient memory for widest paths.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
-            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
+            is_target[ IGRAPH_VIT_GET(vit) ] = true;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
     }
 
-    VECTOR(widths)[from] = my_posinfinity;
+    VECTOR(widths)[from] = IGRAPH_POSINFINITY;
     parent_eids[from] = 0;
-    igraph_2wheap_push_with_index(&Q, from, my_posinfinity);
+    igraph_2wheap_push_with_index(&Q, from, IGRAPH_POSINFINITY);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, maxnei = igraph_2wheap_max_index(&Q);
@@ -203,7 +198,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (is_target[maxnei]) {
-            is_target[maxnei] = 0;
+            is_target[maxnei] = false;
             to_reach--;
         }
 

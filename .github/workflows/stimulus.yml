@@ -5,14 +5,14 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     env:
-      STIMULUS_VERSION: "0.14.0"
+      STIMULUS_VERSION: "0.19.0"
     steps:
       # Use Clang for more informative error messages
       - name: Install Clang
         run: sudo apt-get install clang
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 

@@ -24,6 +24,7 @@
 
 #include "igraph_interface.h"
 
+#include "core/interruption.h"
 #include "math/safe_intop.h"
 
 /**
@@ -71,6 +72,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     igraph_vector_int_t index1, index2;
     igraph_integer_t actb = 0;
     igraph_integer_t actvalue = 0;
+    int iter = 0;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a Kautz graph",
@@ -124,7 +126,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     IGRAPH_FINALLY(igraph_vector_int_destroy, &index2);
 
     /* Fill the index tables*/
-    while (1) {
+    while (true) {
         /* at the beginning of the loop, 0:actb contain the valid prefix */
         /* we might need to fill it to get a valid string */
         igraph_integer_t z = 0;
@@ -149,7 +151,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         }
 
         /* not yet, we need a valid prefix now */
-        while (1) {
+        while (true) {
             /* try to increase digits at position actb */
             igraph_integer_t next = VECTOR(digits)[actb] + 1;
             if (actb != 0 && VECTOR(digits)[actb - 1] == next) {
@@ -192,6 +194,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     igraph_vector_int_destroy(&index2);

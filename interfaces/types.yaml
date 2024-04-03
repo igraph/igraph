@@ -2,7 +2,7 @@
 #
 # This file is a YAML representation of the types used in the functions.yaml
 # function specification file. It provides the meaning of each type in comments
-# and also specifies the C types correspnding to each abstract type.
+# and also specifies the C types corresponding to each abstract type.
 #
 # See https://github.com/igraph/stimulus for more information
 
@@ -68,7 +68,7 @@ VOID:
 
 INDEX_VECTOR:
     # A vector of integer indices that should adapt to the conventions of the
-    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
+    # host language (i.e. 1-based for R, Mathematica, Octave etc., 0-based for
     # Python and similar).
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
@@ -548,10 +548,6 @@ LEVCFUNC:
 ###############################################################################
 # Miscellaneous
 ###############################################################################
-
-ARPACKFUNC:
-    # ARPACK matrix multiplication function.
-    CTYPE: igraph_arpack_function_t
 
 ARPACKOPT:
     # Structure that contains the options of the ARPACK eigensolver.

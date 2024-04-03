@@ -487,8 +487,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_i
  * \brief Decides whether the size of the vector is zero.
  *
  * \param v The vector object.
- * \return Non-zero number (true) if the size of the vector is zero and
- *         zero (false) otherwise.
+ * \return True if the size of the vector is zero and false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -1320,9 +1319,8 @@ void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
  * \function igraph_vector_max
  * \brief Largest element of a vector.
  *
- * </para><para>
- * If the size of the vector is zero, an arbitrary number is
- * returned.
+ * The vector must not be empty.
+ *
  * \param v The vector object.
  * \return The maximum element of \p v, or NaN if any element is NaN.
  *
@@ -1331,9 +1329,7 @@ void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     BASE max;
     BASE *ptr;
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    IGRAPH_ASSERT(v->stor_begin != v->end);
+    IGRAPH_ASSERT(!FUNCTION(igraph_vector, empty)(v));
     max = *(v->stor_begin);
 #if defined(BASE_IGRAPH_REAL)
     if (isnan(max)) { return max; }; /* Result is NaN */
@@ -1358,42 +1354,37 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
  * \function igraph_vector_which_max
  * \brief Gives the index of the maximum element of the vector.
  *
- * </para><para>
- * If the size of the vector is zero, -1 is returned. If the largest
+ * The vector must not be empty. If the largest
  * element is not unique, then the index of the first is returned.
  * If the vector contains NaN values, the index of the first NaN value
  * is returned.
+ *
  * \param v The vector object.
  * \return The index of the first maximum element.
  *
  * Time complexity: O(n), n is the size of the vector.
  */
 igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
-    if (!FUNCTION(igraph_vector, empty)(v)) {
-        BASE *max;
-        BASE *ptr;
-        IGRAPH_ASSERT(v != NULL);
-        IGRAPH_ASSERT(v->stor_begin != NULL);
-        IGRAPH_ASSERT(v->stor_begin != v->end);
-        max = ptr = v->stor_begin;
+    BASE *max;
+    BASE *ptr;
+    IGRAPH_ASSERT(!FUNCTION(igraph_vector, empty)(v));
+    max = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL)
-        if (isnan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+    if (isnan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+#endif
+    ptr++;
+    while (ptr < v->end) {
+        if (*ptr > *max) {
+            max = ptr;
+        }
+#if defined(BASE_IGRAPH_REAL)
+        else if (isnan(*ptr)) {
+            return ptr - v->stor_begin; /* Result is NaN */
+        }
 #endif
         ptr++;
-        while (ptr < v->end) {
-            if (*ptr > *max) {
-                max = ptr;
-            }
-#if defined(BASE_IGRAPH_REAL)
-            else if (isnan(*ptr)) {
-                return ptr - v->stor_begin; /* Result is NaN */
-            }
-#endif
-            ptr++;
-        }
-        return max - v->stor_begin;
     }
-    return -1;
+    return max - v->stor_begin;
 }
 
 /**
@@ -1401,7 +1392,8 @@ igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v
  * \function igraph_vector_min
  * \brief Smallest element of a vector.
  *
- * The vector must be non-empty.
+ * The vector must not be empty.
+ *
  * \param v The input vector.
  * \return The smallest element of \p v, or NaN if any element is NaN.
  *
@@ -1411,9 +1403,7 @@ igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v
 BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     BASE min;
     BASE *ptr;
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    IGRAPH_ASSERT(v->stor_begin != v->end);
+    IGRAPH_ASSERT(!FUNCTION(igraph_vector, empty)(v));
     min = *(v->stor_begin);
 #if defined(BASE_IGRAPH_REAL)
     if (isnan(min)) { return min; }; /* Result is NaN */
@@ -1438,41 +1428,36 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
  * \function igraph_vector_which_min
  * \brief Index of the smallest element.
  *
- * </para><para>
- * The vector must be non-empty. If the smallest element is not unique,
- * then the index of the first is returned. If the vector contains NaN
- * values, the index of the first NaN value is returned.
+ * The vector must not be empty. If the smallest element
+ * is not unique, then the index of the first is returned. If the vector
+ * contains NaN values, the index of the first NaN value is returned.
+ *
  * \param v The input vector.
  * \return Index of the smallest element.
  *
  * Time complexity: O(n), the number of elements.
  */
 igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
-    if (!FUNCTION(igraph_vector, empty)(v)) {
-        BASE *min;
-        BASE *ptr;
-        IGRAPH_ASSERT(v != NULL);
-        IGRAPH_ASSERT(v->stor_begin != NULL);
-        IGRAPH_ASSERT(v->stor_begin != v->end);
-        min = ptr = v->stor_begin;
+    BASE *min;
+    BASE *ptr;
+    IGRAPH_ASSERT(!FUNCTION(igraph_vector, empty)(v));
+    min = ptr = v->stor_begin;
 #if defined(BASE_IGRAPH_REAL)
-        if (isnan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+    if (isnan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+#endif
+    ptr++;
+    while (ptr < v->end) {
+        if (*ptr < *min) {
+            min = ptr;
+        }
+#if defined(BASE_IGRAPH_REAL)
+        else if (isnan(*ptr)) {
+            return ptr - v->stor_begin; /* Result is NaN */
+        }
 #endif
         ptr++;
-        while (ptr < v->end) {
-            if (*ptr < *min) {
-                min = ptr;
-            }
-#if defined(BASE_IGRAPH_REAL)
-            else if (isnan(*ptr)) {
-                return ptr - v->stor_begin; /* Result is NaN */
-            }
-#endif
-            ptr++;
-        }
-        return min - v->stor_begin;
     }
-    return -1;
+    return min - v->stor_begin;
 }
 
 #ifdef __clang__
@@ -1889,12 +1874,11 @@ igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
  * \param v The vector object.
  * \param low The lower limit of the interval (inclusive).
  * \param high The higher limit of the interval (inclusive).
- * \return True (positive integer) if the vector is empty or all vector elements
- *   are in the interval, false (zero) otherwise. If any element is NaN, it will
- *   return \c 0 (=false).
+ * \return True if the vector is empty or all vector elements
+ *   are in the interval, false otherwise. If any element is NaN, it will
+ *   return false.
  *
- * Time complexity: O(n), the number
- * of elements in the vector.
+ * Time complexity: O(n), the number of elements in the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v,
@@ -1920,12 +1904,10 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
  *
  * \param v The \type igraph_vector_t object.
  * \param limit The limit.
- * \return True (positive integer) if the vector contains at least one
- *   smaller element than \p limit, false (zero)
- *   otherwise.
+ * \return True if the vector contains at least one
+ *   smaller element than \p limit, false otherwise.
  *
- * Time complexity: O(n), the number
- * of elements in the vector.
+ * Time complexity: O(n), the number of elements in the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
@@ -2002,10 +1984,10 @@ FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    less than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match. If any element
- *    is NaN, it will return \c 0 (=false).
+ * \return True if the elements in the \p lhs are all
+ *    less than the corresponding elements in \p rhs. Returns false
+ *    if the lengths of the vectors don't match. If any element
+ *    is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2040,10 +2022,10 @@ igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    greater than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match. If any element
- *    is NaN, it will return \c 0 (=false).
+ * \return True if the elements in the \p lhs are all
+ *    greater than the corresponding elements in \p rhs. Returns false
+ *    if the lengths of the vectors don't match. If any element
+ *    is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2079,10 +2061,10 @@ igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    less than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
- *    match. If any element is NaN, it will return \c 0 (=false).
+ *    rhs. Returns false if the lengths of the vectors don't
+ *    match. If any element is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2118,10 +2100,10 @@ FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    greater than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the lengths of the vectors don't
- *    match.  If any element is NaN, it will return \c 0 (=false).
+ *    rhs. Returns false if the lengths of the vectors don't
+ *    match.  If any element is NaN, it will return false.
  *
  * Time complexity: O(n), the length of the vectors.
  */
@@ -2178,8 +2160,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  *   contain \p what then
  *   \p pos is set to the position to which it
  *   should be inserted (to keep the the vector sorted of course).
- * \return Positive integer (true) if \p what is
- *   found in the vector, zero (false) otherwise.
+ * \return True if \p what is found in the vector, false otherwise.
  *
  * Time complexity: O(log(n)),
  * n is the number of elements in
@@ -2215,8 +2196,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  *        it should be inserted (to keep the the vector sorted).
  * \param start The start position of the slice to search (inclusive).
  * \param end The end position of the slice to search (exclusive).
- * \return Positive integer (true) if \p what is found in the vector,
- *         zero (false) otherwise.
+ * \return True if \p what is found in the vector, false otherwise.
  *
  * Time complexity: O(log(n)),
  * n is the number of elements in the slice of \p v, i.e. \p end - \p start.
@@ -2277,12 +2257,9 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  * It is assumed that the vector is sorted.
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
- * \return Positive integer (true) if \p what is
- *   found in the vector, zero (false) otherwise.
+ * \return True if \p what is found in the vector, false otherwise.
  *
- * Time complexity: O(log(n)),
- * n is the number of elements in
- * \p v.
+ * Time complexity: O(log(n)), n is the number of elements in \p v.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
@@ -2863,9 +2840,7 @@ igraph_error_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
 void FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
                                     BASE *min, BASE *max) {
     BASE* ptr;
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    IGRAPH_ASSERT(v->stor_begin != v->end);
+    IGRAPH_ASSERT(!FUNCTION(igraph_vector, empty)(v));
     *min = *max = *(v->stor_begin);
     #if defined(BASE_IGRAPH_REAL)
         if (isnan(*min)) { return; }; /* Result is NaN */
@@ -2911,9 +2886,7 @@ void FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
         igraph_integer_t *which_min, igraph_integer_t *which_max) {
     BASE *min, *max;
     BASE *ptr;
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    IGRAPH_ASSERT(v->stor_begin != v->end);
+    IGRAPH_ASSERT(!FUNCTION(igraph_vector, empty)(v));
     ptr = v->stor_begin;
     min = max = ptr;
     #if defined(BASE_IGRAPH_REAL)

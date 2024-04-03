@@ -149,6 +149,10 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
+    // Avoid warnings with GCC when compiling with LTO.
+    IGRAPH_ASSUME(no_of_nodes >= 0);
+    IGRAPH_ASSUME(no_of_edges >= 0);
+
     // Refactoring the walktrap code to support larger graphs is pointless
     // as running the algorithm on them would take an impractically long time.
     if (no_of_nodes > INT_MAX || no_of_edges > INT_MAX) {

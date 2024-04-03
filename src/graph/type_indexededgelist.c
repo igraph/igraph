@@ -1204,7 +1204,8 @@ igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
  *
  * \sa \ref igraph_strength() for the version that takes into account
  * edge weights; \ref igraph_degree_1() to efficiently compute the
- * degree of a single vertex.
+ * degree of a single vertex; \ref igraph_maxdegree() if you only need
+ * the largest degree.
  *
  * \example examples/simple/igraph_degree.c
  */
@@ -1221,6 +1222,15 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Invalid mode for degree calculation.", IGRAPH_EINVMODE);
+    }
+
+    if (! loops) {
+        /* If the graph is known not to have loops, we can use the faster
+         * loops == true code path, which has O(1) complexity instead of of O(d). */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+            loops = true;
+        }
     }
 
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
@@ -1351,20 +1361,23 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
 
 /**
  * \function igraph_get_eid
- * \brief Get the edge ID from the end points of an edge.
+ * \brief Get the edge ID from the endpoints of an edge.
  *
  * For undirected graphs \c from and \c to are exchangeable.
  *
  * \param graph The graph object.
  * \param eid Pointer to an integer, the edge ID will be stored here.
+ *        If \p error is false and no edge was found, <code>-1</code>
+ *        will be returned.
  * \param from The starting point of the edge.
  * \param to The end point of the edge.
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge
- *        was not found. If it is false, then -1 will be assigned to \p eid.
- *        Note that invalid vertex IDs in input arguments (\p from or \p to)
- *        always return an error code.
+ *        was not found. If it is false, then <code>-1</code> will be
+ *        assigned to \p eid. Note that invalid vertex IDs in input
+ *        arguments (\p from or \p to) always trigger an error,
+ *        regardless of this setting.
  * \return Error code.
  * \sa \ref igraph_edge() for the opposite operation, \ref igraph_get_all_eids_between()
  *     to retrieve all edge IDs between a pair of vertices.
@@ -1715,7 +1728,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
         igraph_integer_t i2 = VECTOR(graph->is)[node];
         igraph_integer_t eid1, eid2;
         igraph_integer_t n1, n2;
-        igraph_bool_t seen_loop_edge = 0;
+        igraph_bool_t seen_loop_edge = false;
 
         while (i1 < j1 && i2 < j2) {
             eid1 = VECTOR(graph->oi)[i1];
@@ -1810,7 +1823,7 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
     igraph_integer_t ne2 = igraph_ecount(graph2);
     igraph_integer_t i, eid1, eid2;
 
-    *res = 0; /* Assume that the graphs differ */
+    *res = false; /* Assume that the graphs differ */
 
     /* Check for same number of vertices/edges */
     if ((nv1 != nv2) || (ne1 != ne2)) {
@@ -1848,7 +1861,7 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
         }
     }
 
-    *res = 1; /* No difference was found, graphs are the same */
+    *res = true; /* No difference was found, graphs are the same */
     return IGRAPH_SUCCESS;
 }
 

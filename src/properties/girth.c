@@ -34,22 +34,30 @@
  * \function igraph_girth
  * \brief The girth of a graph is the length of the shortest cycle in it.
  *
- * </para><para>
  * The current implementation works for undirected graphs only,
  * directed graphs are treated as undirected graphs. Self-loops and
- * multiple edges are ignored.
+ * multiple edges are ignored, i.e. cycles of length 1 or 2 are
+ * not considered.
  *
  * </para><para>
  * For graphs that contain no cycles, and only for such graphs,
  * infinity is returned.
  *
  * </para><para>
- * This implementation is based on Alon Itai and Michael Rodeh:
+ * The first implementation of this function was done by Keith Briggs,
+ * thanks Keith.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Alon Itai and Michael Rodeh:
  * Finding a minimum circuit in a graph
  * \emb Proceedings of the ninth annual ACM symposium on Theory of
- * computing \eme, 1-10, 1977. The first implementation of this
- * function was done by Keith Briggs, thanks Keith.
- * \param graph The input graph.
+ * computing \eme, 1-10, 1977.
+ * https://doi.org/10.1145/800105.803390
+ *
+ * \param graph The input graph. Edge directions will be ignored.
  * \param girth Pointer to an \c igraph_real_t, if not \c NULL then the result
  *     will be stored here.
  * \param circle Pointer to an initialized vector, the vertex IDs in

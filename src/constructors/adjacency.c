@@ -262,37 +262,32 @@ static igraph_error_t igraph_i_adjacency_min(
  *        row i and column j in the adjacency matrix \p adjmatrix):
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
- *          the graph will be directed and
+ *          The graph will be directed and
  *          an element gives the number of edges between two vertices.
  *        \cli IGRAPH_ADJ_UNDIRECTED
- *          this is the same as \c IGRAPH_ADJ_MAX,
- *          for convenience.
+ *          The graph will be undirected and
+ *          an element gives the number of edges between two vertices.
+ *          If the input matrix is not symmetric, an error is thrown.
  *        \cli IGRAPH_ADJ_MAX
- *          undirected graph will be created
+ *          An undirected graph will be created
  *          and the number of edges between vertices
- *          i and
- *          j is
- *          max(A(i,j), A(j,i)).
+ *          i and j is max(A(i,j), A(j,i)).
  *        \cli IGRAPH_ADJ_MIN
- *          undirected graph will be created
+ *          An undirected graph will be created
  *          with min(A(i,j), A(j,i))
- *          edges between vertices
- *          i and
- *          j.
+ *          edges between vertices i and j.
  *        \cli IGRAPH_ADJ_PLUS
- *          undirected graph will be created
+ *          An undirected graph will be created
  *          with A(i,j)+A(j,i) edges
- *          between vertices
- *          i and
- *          j.
+ *          between vertices i and j.
  *        \cli IGRAPH_ADJ_UPPER
- *          undirected graph will be created,
- *          only the upper right triangle (including the diagonal) is
+ *          An undirected graph will be created.
+ *          Only the upper right triangle (including the diagonal) is
  *          used for the number of edges.
  *        \cli IGRAPH_ADJ_LOWER
- *          undirected graph will be created,
- *          only the lower left triangle (including the diagonal) is
- *          used for creating the edges.
+ *          An undirected graph will be created.
+ *          Only the lower left triangle (including the diagonal) is
+ *          used for the number of edges.
  *       \endclist
  * \param loops Constant to specify how the diagonal of the matrix should be
  *        treated when creating loop edges.

@@ -61,24 +61,24 @@ static igraph_error_t dot_escape(const char *orig, char **result) {
             if (is_number) {
                 newlen++;
             } else {
-                need_quote = 1;
+                need_quote = true;
                 newlen++;
             }
         } else if (orig[i] == '_') {
-            is_number = 0; newlen++;
+            is_number = false; newlen++;
         } else if (orig[i] == '\\' || orig[i] == '"' || orig[i] == '\n') {
-            need_quote = 1; is_number = 0; newlen += 2; /* will be escaped */
+            need_quote = true; is_number = false; newlen += 2; /* will be escaped */
         } else if (isalpha(orig[i])) {
-            is_number = 0; newlen++;
+            is_number = false; newlen++;
         } else {
-            is_number = 0; need_quote = 1; newlen++;
+            is_number = false; need_quote = true; newlen++;
         }
     }
     if (is_number && len > 0 && orig[len - 1] == '.') {
-        is_number = 0;
+        is_number = false;
     }
     if (!is_number && isdigit(orig[0])) {
-        need_quote = 1;
+        need_quote = true;
     }
 
     if (is_number || !need_quote) {
@@ -138,12 +138,18 @@ static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x) {
  * \function igraph_write_graph_dot
  * \brief Write the graph to a stream in DOT format.
  *
+ * </para><para>
  * DOT is the format used by the widely known GraphViz software, see
  * http://www.graphviz.org for details. The grammar of the DOT format
  * can be found here: http://www.graphviz.org/doc/info/lang.html
  *
- * </para><para>This is only a preliminary implementation, no visualization
+ * </para><para>
+ * This is only a preliminary implementation, no visualization
  * information is written.
+ *
+ * </para><para>
+ * This format is meant solely for interoperability with Graphviz.
+ * It is not recommended for data exchange or archival.
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
@@ -219,9 +225,9 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
                 CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
-                IGRAPH_WARNING("A boolean graph attribute was converted to numeric");
+                IGRAPH_WARNING("Boolean graph attribute was converted to numeric");
             } else {
-                IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
+                IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute was ignored");
             }
             IGRAPH_FREE(newname);
             IGRAPH_FINALLY_CLEAN(1);

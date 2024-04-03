@@ -30,3 +30,14 @@ edges: {
 1 1
 }
 ==============
+directed: false
+vcount: 2
+edges: {
+1 0
+}
+directed: false
+vcount: 2
+edges: {
+1 0
+}
+==============

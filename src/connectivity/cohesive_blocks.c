@@ -97,7 +97,7 @@ static igraph_error_t igraph_i_cb_components(igraph_t *graph,
                         IGRAPH_CHECK(igraph_vector_int_push_back(components, v));
                     }
                 } else {
-                    if (!VECTOR(*compid)[v]) {
+                    if (VECTOR(*compid)[v] == 0) {
                         VECTOR(*compid)[v] = cno; /* could be anything positive */
                         IGRAPH_CHECK(igraph_vector_int_push_back(components, v));
                         IGRAPH_CHECK(igraph_dqueue_int_push(Q, v));

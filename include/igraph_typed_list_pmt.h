@@ -57,17 +57,17 @@ IGRAPH_EXPORT void FUNCTION(destroy)(TYPE* v);
 /* Accessing elements */
 /*--------------------*/
 
-IGRAPH_EXPORT ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos);
 IGRAPH_EXPORT void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
-IGRAPH_EXPORT ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v);
 
 /*-----------------*/
 /* List properties */
 /*-----------------*/
 
-IGRAPH_EXPORT igraph_integer_t FUNCTION(capacity)(const TYPE* v);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(empty)(const TYPE* v);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(size)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(capacity)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(empty)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(size)(const TYPE* v);
 
 /*------------------------*/
 /* Resizing operations    */

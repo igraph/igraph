@@ -10,7 +10,7 @@
 
 namespace prpack {
 
-    class prpack_igraph_graph : public prpack_base_graph {        
+    class prpack_igraph_graph : public prpack_base_graph {
     public:
         // constructors
         prpack_igraph_graph() { }

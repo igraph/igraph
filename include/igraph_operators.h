@@ -49,6 +49,8 @@ IGRAPH_EXPORT igraph_error_t igraph_union(igraph_t *res, const igraph_t *left, c
                                igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2);
 IGRAPH_EXPORT igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
                                     igraph_vector_int_list_t *edgemaps);
+IGRAPH_EXPORT igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
+                                         const igraph_t *right);
 IGRAPH_EXPORT igraph_error_t igraph_intersection(igraph_t *res,
                                       const igraph_t *left, const igraph_t *right,
                                       igraph_vector_int_t *edge_map1,

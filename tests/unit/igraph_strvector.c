@@ -24,7 +24,7 @@
 void strvector_print(const igraph_strvector_t *sv) {
     igraph_integer_t i, s = igraph_strvector_size(sv);
     for (i = 0; i < s; i++) {
-        printf("\"%s\"\n", STR(*sv, i));
+        printf("\"%s\"\n", igraph_strvector_get(sv, i));
     }
     printf("\n");
 }
@@ -154,7 +154,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_strvector_size(&sv1) == igraph_strvector_size(&sv3));
 
     for (igraph_integer_t i=0; i < igraph_strvector_size(&sv1); ++i) {
-        IGRAPH_ASSERT(strcmp(STR(sv1, i), STR(sv3, i)) == 0);
+        IGRAPH_ASSERT(strcmp(igraph_strvector_get(&sv1, i), igraph_strvector_get(&sv3, i)) == 0);
     }
 
     igraph_strvector_destroy(&sv1);

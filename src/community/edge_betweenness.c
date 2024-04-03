@@ -39,11 +39,11 @@
 
 static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *membership) {
     const igraph_integer_t no = igraph_vector_int_max(membership) + 1;
-    igraph_vector_t idx;
+    igraph_vector_int_t idx;
     igraph_integer_t realno = 0;
     const igraph_integer_t len = igraph_vector_int_size(membership);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no);
     for (igraph_integer_t i = 0; i < len; i++) {
         const igraph_integer_t t = VECTOR(*membership)[i];
         if (VECTOR(idx)[t]) {
@@ -53,7 +53,7 @@ static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *me
             VECTOR(*membership)[i] = VECTOR(idx)[t] - 1;
         }
     }
-    igraph_vector_destroy(&idx);
+    igraph_vector_int_destroy(&idx);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -364,7 +364,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \em weakly connected components are detected.
  *
  * \param graph The input graph.
- * \param result Pointer to an initialized vector, the result will be
+ * \param removed_edges Pointer to an initialized vector, the result will be
  *     stored here, the IDs of the removed edges in the order of their
  *     removal. It will be resized as needed. It may be \c NULL if
  *     the edge IDs are not needed by the caller.
@@ -406,7 +406,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \example examples/simple/igraph_community_edge_betweenness.c
  */
 igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                      igraph_vector_int_t *result,
+                                      igraph_vector_int_t *removed_edges,
                                       igraph_vector_t *edge_betweenness,
                                       igraph_matrix_int_t *merges,
                                       igraph_vector_int_t *bridges,
@@ -439,12 +439,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     /* Needed only for the weighted case */
     igraph_2wheap_t heap;
 
-    if (result == NULL) {
-        result = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        IGRAPH_CHECK_OOM(result, "Insufficient memory for edge betweenness-based community detection.");
-        IGRAPH_FINALLY(igraph_free, result);
+    if (removed_edges == NULL) {
+        removed_edges = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        IGRAPH_CHECK_OOM(removed_edges, "Insufficient memory for edge betweenness-based community detection.");
+        IGRAPH_FINALLY(igraph_free, removed_edges);
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(result, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(removed_edges, 0);
         result_owned = true;
     }
 
@@ -513,7 +513,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_vector_int_resize(result, no_of_edges));
+    IGRAPH_CHECK(igraph_vector_int_resize(removed_edges, no_of_edges));
     if (edge_betweenness) {
         IGRAPH_CHECK(igraph_vector_resize(edge_betweenness, no_of_edges));
         if (no_of_edges > 0) {
@@ -699,7 +699,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         /* Now look for the smallest edge betweenness */
         /* and eliminate that edge from the network */
         maxedge = igraph_i_vector_which_max_not_null(&eb, passive);
-        VECTOR(*result)[e] = maxedge;
+        VECTOR(*removed_edges)[e] = maxedge;
         if (edge_betweenness) {
             VECTOR(*edge_betweenness)[e] = VECTOR(eb)[maxedge];
             if (!directed) {
@@ -752,14 +752,14 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     if (merges || bridges || modularity || membership) {
-        IGRAPH_CHECK(igraph_community_eb_get_merges(graph, directed, result, weights, merges,
+        IGRAPH_CHECK(igraph_community_eb_get_merges(graph, directed, removed_edges, weights, merges,
                      bridges, modularity,
                      membership));
     }
 
     if (result_owned) {
-        igraph_vector_int_destroy(result);
-        IGRAPH_FREE(result);
+        igraph_vector_int_destroy(removed_edges);
+        IGRAPH_FREE(removed_edges);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

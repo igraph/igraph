@@ -69,7 +69,7 @@ igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t alloc_s
 
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
-    h->destroy = 1;
+    h->destroy = true;
 
     return IGRAPH_SUCCESS;
 }
@@ -106,7 +106,7 @@ igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, const igraph_real_
     }
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin + len;
-    h->destroy = 1;
+    h->destroy = true;
 
     memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
     for (i = 0; i < len; i++) {
@@ -451,7 +451,7 @@ igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t all
     }
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
-    h->destroy = 1;
+    h->destroy = true;
     h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (h->index_begin == 0) {
         IGRAPH_FREE(h->stor_begin);

@@ -125,6 +125,11 @@ int main(void) {
         str = igraph_trie_idx(&trie, i);
         printf("%" IGRAPH_PRId ": %s\n", i, str);
     }
+
+    /* prevent insertion of empty key */
+    igraph_set_error_handler(igraph_error_handler_ignore);
+    IGRAPH_ASSERT(igraph_trie_get(&trie, "", &id) == IGRAPH_EINVAL);
+
     igraph_trie_destroy(&trie);
 
     VERIFY_FINALLY_STACK();

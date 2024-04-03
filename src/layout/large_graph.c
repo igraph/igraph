@@ -150,6 +150,8 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
 
+    RNG_BEGIN();
+
     /* Determine the root vertex, random pick right now */
     if (proot < 0) {
         root = RNG_INTEGER(0, no_of_nodes - 1);
@@ -220,8 +222,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         /* Step 1: place the next layer on spheres */
         /*-----------------------------------------*/
 
-        RNG_BEGIN();
-
         j = VECTOR(layers)[actlayer];
         for (i = VECTOR(layers)[actlayer - 1];
              i < VECTOR(layers)[actlayer]; i++) {
@@ -261,8 +261,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 j++;
             }
         }
-
-        RNG_END();
 
         /*-----------------------------------------*/
         /* Step 2: add the edges of the next layer */
@@ -372,6 +370,8 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             /*       printf("%li iterations, maxchange: %f\n", it, (double)maxchange); */
         }
     }
+
+    RNG_END();
 
     IGRAPH_PROGRESS("Large graph layout", 100.0, 0);
     igraph_destroy(&mst);

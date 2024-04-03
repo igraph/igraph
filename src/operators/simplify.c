@@ -118,7 +118,7 @@ igraph_error_t igraph_simplify(igraph_t *graph,
         igraph_vector_int_destroy(&edges_to_delete);
         IGRAPH_FINALLY_CLEAN(1);
 
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
 
         return IGRAPH_SUCCESS;
     }
@@ -197,13 +197,13 @@ igraph_error_t igraph_simplify(igraph_t *graph,
     if (loops) {
         /* Loop edges were removed so we know for sure that there aren't any
          * loop edges now */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
     }
 
     if (multiple) {
         /* Multi-edges were removed so we know for sure that there aren't any
          * multi-edges now */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
     return IGRAPH_SUCCESS;

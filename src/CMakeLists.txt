@@ -231,6 +231,7 @@ add_library(
   operators/difference.c
   operators/disjoint_union.c
   operators/intersection.c
+  operators/join.c
   operators/misc_internal.c
   operators/permute.c
   operators/reverse.c
@@ -260,6 +261,7 @@ add_library(
   paths/widest_paths.c
 
   properties/basic_properties.c
+  properties/complete.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c
@@ -326,7 +328,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.1")
+set_target_properties(igraph PROPERTIES VERSION "3.1.6")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
@@ -411,7 +413,7 @@ target_link_libraries(
 )
 
 if (NOT BUILD_SHARED_LIBS)
-  target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
+  target_compile_definitions(igraph PUBLIC IGRAPH_STATIC)
 else()
   target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()

@@ -250,8 +250,8 @@ void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
 
 /* Edge comparison function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {
-    const igraph_integer_t *edge1 = (igraph_integer_t *) e1;
-    const igraph_integer_t *edge2 = (igraph_integer_t *) e2;
+    const igraph_integer_t *edge1 = (const igraph_integer_t *) e1;
+    const igraph_integer_t *edge2 = (const igraph_integer_t *) e2;
     if (edge1[0] < edge2[0]) {
         return -1;
     } else if (edge1[0] > edge2[0]) {
@@ -278,7 +278,7 @@ void print_graph_canon(const igraph_t *graph) {
     printf("edges: {\n");
 
     igraph_vector_int_init(&edges, 0);
-    igraph_get_edgelist(graph, &edges, 0);
+    igraph_get_edgelist(graph, &edges, false);
 
     /* If the graph is undirected, we make sure that the first vertex of undirected edges
      * is always the one with the lower ID. */
@@ -526,13 +526,13 @@ void print_attributes(const igraph_t *g) {
     for (i = 0; i < igraph_strvector_size(&gnames); i++) {
         if (i != 0)
             putchar(' ');
-        printf("%s=", STR(gnames, i));
+        printf("%s=", igraph_strvector_get(&gnames, i));
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_real_printf(GAN(g, STR(gnames, i)));
+            igraph_real_printf(GAN(g, igraph_strvector_get(&gnames, i)));
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            printf("%d", GAB(g, STR(gnames, i)));
+            printf("%d", GAB(g, igraph_strvector_get(&gnames, i)));
         } else {
-            printf("\"%s\"", GAS(g, STR(gnames, i)));
+            printf("\"%s\"", GAS(g, igraph_strvector_get(&gnames, i)));
         }
     }
     if (igraph_strvector_size(&gnames))
@@ -542,13 +542,13 @@ void print_attributes(const igraph_t *g) {
         printf("Vertex %" IGRAPH_PRId ":", i);
         for (j = 0; j < igraph_strvector_size(&vnames); j++) {
             putchar(' ');
-            printf("%s=", STR(vnames, j));
+            printf("%s=", igraph_strvector_get(&vnames, j));
             if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                igraph_real_printf(VAN(g, STR(vnames, j), i));
+                igraph_real_printf(VAN(g, igraph_strvector_get(&vnames, j), i));
             } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
-                printf("%d", VAB(g, STR(vnames, j), i));
+                printf("%d", VAB(g, igraph_strvector_get(&vnames, j), i));
             } else {
-                printf("\"%s\"", VAS(g, STR(vnames, j), i));
+                printf("\"%s\"", VAS(g, igraph_strvector_get(&vnames, j), i));
             }
         }
         printf("\n");
@@ -558,13 +558,13 @@ void print_attributes(const igraph_t *g) {
         printf("Edge %" IGRAPH_PRId " (%" IGRAPH_PRId "-%" IGRAPH_PRId "):", i, IGRAPH_FROM(g, i), IGRAPH_TO(g, i));
         for (j = 0; j < igraph_strvector_size(&enames); j++) {
             putchar(' ');
-            printf("%s=", STR(enames, j));
+            printf("%s=", igraph_strvector_get(&enames, j));
             if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                igraph_real_printf(EAN(g, STR(enames, j), i));
+                igraph_real_printf(EAN(g, igraph_strvector_get(&enames, j), i));
             } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
-                printf("%d", EAB(g, STR(enames, j), i));
+                printf("%d", EAB(g, igraph_strvector_get(&enames, j), i));
             } else {
-                printf("\"%s\"", EAS(g, STR(enames, j), i));
+                printf("\"%s\"", EAS(g, igraph_strvector_get(&enames, j), i));
             }
         }
         printf("\n");

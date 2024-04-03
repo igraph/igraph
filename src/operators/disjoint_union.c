@@ -25,6 +25,8 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_disjoint_union
  * \brief Creates the union of two disjoint graphs.
@@ -35,6 +37,13 @@
  * If the two graphs have |V1| and |V2| vertices and |E1| and |E2|
  * edges respectively then the new graph will have |V1|+|V2| vertices
  * and |E1|+|E2| edges.
+ *
+ * </para><para>
+ * The vertex and edge ordering of the graphs will be preserved.
+ * In other words, the vertex and edge IDs of the first graph map to
+ * identical values in the new graph, while the vertex and edge IDs
+ * of the second graph map to IDs incremented by the vertex and edge
+ * count of the first graph.
  *
  * </para><para>
  * Both graphs need to have the same directedness, i.e. either both
@@ -60,36 +69,42 @@
 igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                           const igraph_t *right) {
 
-    igraph_integer_t no_of_nodes_left = igraph_vcount(left);
-    igraph_integer_t no_of_nodes_right = igraph_vcount(right);
-    igraph_integer_t no_of_edges_left = igraph_ecount(left);
-    igraph_integer_t no_of_edges_right = igraph_ecount(right);
+    const igraph_integer_t no_of_nodes_left = igraph_vcount(left);
+    const igraph_integer_t no_of_nodes_right = igraph_vcount(right);
+    const igraph_integer_t no_of_edges_left = igraph_ecount(left);
+    const igraph_integer_t no_of_edges_right = igraph_ecount(right);
+    igraph_integer_t no_of_nodes; /* vertex count of the result */
+    igraph_integer_t no_of_edges2; /* twice the edge count of the result */
     igraph_vector_int_t edges;
     igraph_bool_t directed_left = igraph_is_directed(left);
     igraph_integer_t from, to;
-    igraph_integer_t i;
 
     if (directed_left != igraph_is_directed(right)) {
         IGRAPH_ERROR("Cannot create disjoint union of directed and undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
+    /* The edge count of an existing graph object is always safe to multiply by 2. */
+    IGRAPH_SAFE_ADD(no_of_nodes_left, no_of_nodes_right, &no_of_nodes);
+    IGRAPH_SAFE_ADD(2*no_of_edges_left, 2*no_of_edges_right, &no_of_edges2);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges,
-                                       2 * (no_of_edges_left + no_of_edges_right)));
-    for (i = 0; i < no_of_edges_left; i++) {
-        igraph_edge(left, i, &from, &to);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
+    for (igraph_integer_t i = 0; i < no_of_edges_left; i++) {
+        from = IGRAPH_FROM(left, i);
+        to = IGRAPH_TO(left, i);
         igraph_vector_int_push_back(&edges, from); /* reserved */
         igraph_vector_int_push_back(&edges, to); /* reserved */
     }
-    for (i = 0; i < no_of_edges_right; i++) {
-        igraph_edge(right, i, &from, &to);
+    for (igraph_integer_t i = 0; i < no_of_edges_right; i++) {
+        from = IGRAPH_FROM(right, i);
+        to = IGRAPH_TO(right, i);
         igraph_vector_int_push_back(&edges, from + no_of_nodes_left); /* reserved */
         igraph_vector_int_push_back(&edges, to + no_of_nodes_left); /* reserved */
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges,
-                               (no_of_nodes_left + no_of_nodes_right),
+                               no_of_nodes,
                                directed_left));
 
     igraph_vector_int_destroy(&edges);
@@ -100,13 +115,17 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
 
 /**
  * \function igraph_disjoint_union_many
- * \brief The disjint union of many graphs.
+ * \brief The disjoint union of many graphs.
  *
  * First the vertices in the graphs will be relabeled with new vertex
  * IDs to have pairwise disjoint vertex ID sets and then the union of
  * the graphs is formed.
  * The number of vertices and edges in the result is the total number
  * of vertices and edges in the graphs.
+ *
+ * </para><para>
+ * The vertex and edge ordering of the input graphs is preserved in
+ * the output graph.
  *
  * </para><para>
  * All graphs need to have the same directedness, i.e. either all
@@ -133,18 +152,17 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = true;
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_edges = 0;
+    igraph_integer_t no_of_edges2 = 0; /* twice the edge count of the result */
     igraph_integer_t shift = 0;
     igraph_t *graph;
-    igraph_integer_t i, j;
     igraph_integer_t from, to;
 
     if (no_of_graphs != 0) {
         graph = VECTOR(*graphs)[0];
         directed = igraph_is_directed(graph);
-        for (i = 0; i < no_of_graphs; i++) {
+        for (igraph_integer_t i = 0; i < no_of_graphs; i++) {
             graph = VECTOR(*graphs)[i];
-            no_of_edges += igraph_ecount(graph);
+            IGRAPH_SAFE_ADD(no_of_edges2, 2*igraph_ecount(graph), &no_of_edges2);
             if (directed != igraph_is_directed(graph)) {
                 IGRAPH_ERROR("Cannot create disjoint union of directed and undirected graphs.",
                              IGRAPH_EINVAL);
@@ -153,18 +171,19 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_edges));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
 
-    for (i = 0; i < no_of_graphs; i++) {
+    for (igraph_integer_t i = 0; i < no_of_graphs; i++) {
         igraph_integer_t ec;
         graph = VECTOR(*graphs)[i];
         ec = igraph_ecount(graph);
-        for (j = 0; j < ec; j++) {
-            igraph_edge(graph, j, &from, &to);
+        for (igraph_integer_t j = 0; j < ec; j++) {
+            from = IGRAPH_FROM(graph, j);
+            to = IGRAPH_TO(graph, j);
             igraph_vector_int_push_back(&edges, from + shift); /* reserved */
             igraph_vector_int_push_back(&edges, to + shift); /* reserved */
         }
-        shift += igraph_vcount(graph);
+        IGRAPH_SAFE_ADD(shift, igraph_vcount(graph), &shift);
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, shift, directed));

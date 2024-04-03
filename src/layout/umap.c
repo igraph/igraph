@@ -748,7 +748,6 @@ static igraph_error_t igraph_i_umap_apply_forces(
         igraph_bool_t avoid_neighbor_repulsion,
         igraph_integer_t negative_sampling_rate,
         igraph_integer_t epoch,
-        igraph_integer_t epochs,
         igraph_vector_t *next_epoch_sample_per_edge)
 {
     igraph_integer_t no_of_vertices = igraph_matrix_nrow(layout);
@@ -974,7 +973,6 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
                 avoid_neighbor_repulsion,
                 negative_sampling_rate,
                 e,
-                epochs,
                 &next_epoch_sample_per_edge);
 
 #ifdef UMAP_DEBUG

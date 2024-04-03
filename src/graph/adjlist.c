@@ -27,7 +27,6 @@
 
 #include "core/interruption.h"
 
-#include <string.h>   /* memset */
 #include <stdio.h>
 
 /**
@@ -208,23 +207,23 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
     }
     if (has_loops) {
         /* If we have found at least one loop above, set the cache to true */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, true);
     } else if (loops == IGRAPH_NO_LOOPS) {
         /* If we explicitly _checked_ for loops (to remove them) and haven't
          * found one, set the cache to false. This is the only case when a
          * definite "no" from has_loops really means that there are no loops at
          * all */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
     }
     if (has_multiple) {
         /* If we have found at least one multiedge above, set the cache to true */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, true);
     } else if (multiple == IGRAPH_NO_MULTIPLE) {
         /* If we explicitly _checked_ for multi-edges (to remove them) and
          * haven't found one, set the cache to false. This is the only case
          * when a definite "no" from has_multiple really means that there are
          * no multi-edges at all all */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
     igraph_vector_int_destroy(&degrees);
@@ -977,7 +976,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 p++;
             } else {
-                *has_multiple = 1;
+                *has_multiple = true;
                 /* Current item is the same as the next one, but if it is a
                  * loop edge, then the first one or two items are okay. We need
                  * to keep one if mode == IGRAPH_IN or mode == IGRAPH_OUT,

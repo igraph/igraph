@@ -31,7 +31,6 @@
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
 static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i, j, n;
     igraph_vector_int_t adjedges, adjedges2;
     igraph_vector_int_t edges;
     igraph_integer_t prev = -1;
@@ -40,9 +39,10 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges2, 0);
 
-    for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, i);
-        igraph_integer_t to = IGRAPH_TO(graph, i);
+    for (igraph_integer_t e1 = 0; e1 < no_of_edges; e1++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, e1);
+        igraph_integer_t to = IGRAPH_TO(graph, e1);
+        igraph_integer_t n;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -50,22 +50,28 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
             IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL));
         }
         n = igraph_vector_int_size(&adjedges);
-        for (j = 0; j < n; j++) {
-            igraph_integer_t e = VECTOR(adjedges)[j];
-            if (e < i) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e));
+        for (igraph_integer_t i = 0; i < n; i++) {
+            igraph_integer_t e2 = VECTOR(adjedges)[i];
+            if (e2 < e1) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e2));
             }
         }
 
         IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL));
         n = igraph_vector_int_size(&adjedges2);
-        for (j = 0; j < n; j++) {
-            igraph_integer_t e = VECTOR(adjedges2)[j];
-            if (e < i) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e));
+        for (igraph_integer_t i = 0; i < n; i++) {
+            igraph_integer_t e2 = VECTOR(adjedges2)[i];
+            if (e2 < e1) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e2));
             }
+        }
+
+        /* Self-loops are considered self-adjacent. */
+        if (from == to) {
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e1));
         }
 
         prev = from;
@@ -75,7 +81,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
     igraph_vector_int_destroy(&adjedges2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_create(linegraph, &edges, no_of_edges, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -137,6 +143,11 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
  * L(G) has one vertex for each edge in G and two vertices in L(G) are connected
  * by a directed edge if the target of the first vertex's corresponding edge
  * is the same as the source of the second vertex's corresponding edge.
+ *
+ * </para><para>
+ * Self-loops are considered self-adjacent, thus their corresponding vertex
+ * in the line graph will also a have a single self-loop, in both undirected
+ * and directed graphs.
  *
  * </para><para>
  * Edge \em i  in the original graph will correspond to vertex \em i

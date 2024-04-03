@@ -188,11 +188,11 @@ int plfit_walker_alias_sampler_init(plfit_walker_alias_sampler_t* sampler,
 
     /* Initialize indexes and probs */
     sampler->indexes = (long int*)calloc(n > 0 ? n : 1, sizeof(long int));
-    if (sampler->indexes == 0) {
+    if (sampler->indexes == NULL) {
         return PLFIT_ENOMEM;
     }
     sampler->probs   = (double*)calloc(n > 0 ? n : 1, sizeof(double));
-    if (sampler->probs == 0) {
+    if (sampler->probs == NULL) {
         free(sampler->indexes);
         return PLFIT_ENOMEM;
     }
@@ -216,13 +216,13 @@ int plfit_walker_alias_sampler_init(plfit_walker_alias_sampler_t* sampler,
 
     /* Allocate space for short & long stick indexes */
     long_sticks = (long int*)calloc(num_long_sticks > 0 ? num_long_sticks : 1, sizeof(long int));
-    if (long_sticks == 0) {
+    if (long_sticks == NULL) {
         free(sampler->probs);
         free(sampler->indexes);
         return PLFIT_ENOMEM;
     }
     short_sticks = (long int*)calloc(num_short_sticks > 0 ? num_short_sticks : 1, sizeof(long int));
-    if (short_sticks == 0) {
+    if (short_sticks == NULL) {
         free(sampler->probs);
         free(sampler->indexes);
         free(long_sticks);

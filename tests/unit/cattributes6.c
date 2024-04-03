@@ -51,26 +51,26 @@ static void check_vector_queries(const igraph_t *g) {
                            &enames, &etypes);
     for (j = 0; j < igraph_strvector_size(&vnames); j++) {
         if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_cattribute_VANV(g, STR(vnames, j), igraph_vss_all(), &vec);
+            igraph_cattribute_VANV(g, igraph_strvector_get(&vnames, j), igraph_vss_all(), &vec);
             for (i = 0; i < igraph_vcount(g); i++) {
-                igraph_real_t num = VAN(g, STR(vnames, j), i);
+                igraph_real_t num = VAN(g, igraph_strvector_get(&vnames, j), i);
                 if (num != VECTOR(vec)[i] &&
                     (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
                     exit(51);
                 }
             }
         } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_cattribute_VASV(g, STR(vnames, j), igraph_vss_all(), &svec);
+            igraph_cattribute_VASV(g, igraph_strvector_get(&vnames, j), igraph_vss_all(), &svec);
             for (i = 0; i < igraph_vcount(g); i++) {
-                const char *str = VAS(g, STR(vnames, j), i);
-                if (strcmp(str, STR(svec, i))) {
+                const char *str = VAS(g, igraph_strvector_get(&vnames, j), i);
+                if (strcmp(str, igraph_strvector_get(&svec, i))) {
                     exit(52);
                 }
             }
         } else {
-            igraph_cattribute_VABV(g, STR(vnames, j), igraph_vss_all(), &bvec);
+            igraph_cattribute_VABV(g, igraph_strvector_get(&vnames, j), igraph_vss_all(), &bvec);
             for (i = 0; i < igraph_vcount(g); i++) {
-                igraph_bool_t b = VAB(g, STR(vnames, j), i);
+                igraph_bool_t b = VAB(g, igraph_strvector_get(&vnames, j), i);
                 if (b != VECTOR(bvec)[i]) {
                     exit(53);
                 }
@@ -80,29 +80,29 @@ static void check_vector_queries(const igraph_t *g) {
 
     for (j = 0; j < igraph_strvector_size(&enames); j++) {
         if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_cattribute_EANV(g, STR(enames, j),
+            igraph_cattribute_EANV(g, igraph_strvector_get(&enames, j),
                                    igraph_ess_all(IGRAPH_EDGEORDER_ID), &vec);
             for (i = 0; i < igraph_ecount(g); i++) {
-                igraph_real_t num = EAN(g, STR(enames, j), i);
+                igraph_real_t num = EAN(g, igraph_strvector_get(&enames, j), i);
                 if (num != VECTOR(vec)[i] &&
                     (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
                     exit(54);
                 }
             }
         } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_cattribute_EASV(g, STR(enames, j),
+            igraph_cattribute_EASV(g, igraph_strvector_get(&enames, j),
                                    igraph_ess_all(IGRAPH_EDGEORDER_ID), &svec);
             for (i = 0; i < igraph_ecount(g); i++) {
-                const char *str = EAS(g, STR(enames, j), i);
-                if (strcmp(str, STR(svec, i))) {
+                const char *str = EAS(g, igraph_strvector_get(&enames, j), i);
+                if (strcmp(str, igraph_strvector_get(&svec, i))) {
                     exit(55);
                 }
             }
         } else {
-            igraph_cattribute_EABV(g, STR(enames, j),
+            igraph_cattribute_EABV(g, igraph_strvector_get(&enames, j),
                                    igraph_ess_all(IGRAPH_EDGEORDER_ID), &bvec);
             for (i = 0; i < igraph_ecount(g); i++) {
-                igraph_bool_t b = EAB(g, STR(enames, j), i);
+                igraph_bool_t b = EAB(g, igraph_strvector_get(&enames, j), i);
                 if (b != VECTOR(bvec)[i]) {
                     exit(56);
                 }
