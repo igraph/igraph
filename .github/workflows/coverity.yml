@@ -3,10 +3,10 @@
 name: Coverity
 
 # Coverity only allows a few builds per day.
-# Build once at 3 AM UTC every day.
+# Build once at 2 AM UTC every day.
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:

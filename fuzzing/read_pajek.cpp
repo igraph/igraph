@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2023  The igraph development team
+   Copyright (C) 2021-2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
    02110-1301 USA
 */
 
-#include "igraph.h"
+#include <igraph.h>
 #include <cstdio>
 
 extern "C"
