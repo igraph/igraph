@@ -21,6 +21,7 @@
 #ifndef IGRAPH_REACHABILITY_H
 #define IGRAPH_REACHABILITY_H
 
+#include "igraph_bitset_list.h"
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
@@ -35,7 +36,7 @@ IGRAPH_EXPORT igraph_error_t igraph_reachability_directed(
         igraph_vector_int_t *membership,
         igraph_vector_int_t *csize,
         igraph_integer_t *no_of_components,
-        igraph_vector_int_list_t *reach);
+        igraph_bitset_list_t *reach);
 
 __END_DECLS
 

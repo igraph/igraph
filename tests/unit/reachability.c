@@ -23,14 +23,14 @@
 void compute_and_print(const igraph_t *g)
 {
     igraph_vector_int_t membership, csize, reach_counts;
-    igraph_vector_int_list_t reach;
+    igraph_bitset_list_t reach;
     igraph_integer_t no_of_nodes, no_of_components, i;
 
     no_of_nodes = igraph_vcount(g);
 
     igraph_vector_int_init(&membership, 0);
     igraph_vector_int_init(&csize, 0);
-    igraph_vector_int_list_init(&reach, 0);
+    igraph_bitset_list_init(&reach, 0);
 
     igraph_reachability_directed(g, &membership, &csize, &no_of_components, &reach);
 
@@ -38,16 +38,16 @@ void compute_and_print(const igraph_t *g)
 
     for (i = 0; i < no_of_nodes; i++)
     {
-        VECTOR(reach_counts)[i] = igraph_bitset_popcount(igraph_vector_int_list_get_ptr(&reach, VECTOR(membership)[i]), no_of_nodes);
+        VECTOR(reach_counts)[i] = igraph_bitset_popcount(igraph_bitset_list_get_ptr(&reach, VECTOR(membership)[i]));
     }
 
     print_vector_int(&membership);
     print_vector_int(&csize);
     printf("No. of components: %" IGRAPH_PRId "\n", no_of_components);
-    print_vector_int_list(&reach);
+    print_bitset_list(&reach);
     print_vector_int(&reach_counts);
 
-    igraph_vector_int_list_destroy(&reach);
+    igraph_bitset_list_destroy(&reach);
     igraph_vector_int_destroy(&csize);
     igraph_vector_int_destroy(&membership);
     igraph_vector_int_destroy(&reach_counts);

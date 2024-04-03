@@ -41,6 +41,7 @@ add_library(
   igraph
   core/array.c
   core/bitset.c
+  core/bitset_list.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c

@@ -39,6 +39,52 @@ void igraph_bitset_destroy(igraph_bitset_t *bitset) {
     }
 }
 
+void igraph_bitset_copy(igraph_bitset_t *dest, const igraph_bitset_t* src) {
+    for (igraph_integer_t i = 0; i < IGRAPH_BITNSLOTS(dest->size); ++i)
+    {
+        VECTOR(*dest)[i] = VECTOR(*src)[i];
+    }
+}
+
+igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset) {
+    return IGRAPH_INTEGER_SIZE * (bitset->stor_end - bitset->stor_begin);
+}
+
+igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset) {
+    return bitset->size;
+}
+
+igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t capacity) {
+    igraph_integer_t current_capacity;
+    igraph_integer_t *tmp;
+
+    IGRAPH_ASSERT(bitset != NULL);
+    IGRAPH_ASSERT(bitset->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
+
+    current_capacity = igraph_bitset_capacity(bitset);
+
+    if (IGRAPH_BITNSLOTS(capacity) <= IGRAPH_BITNSLOTS(current_capacity)) {
+        return IGRAPH_SUCCESS;
+    }
+
+    tmp = IGRAPH_REALLOC(bitset->stor_begin, IGRAPH_BITNSLOTS(capacity), igraph_integer_t);
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for bitset.");
+
+    bitset->stor_begin = tmp;
+    bitset->stor_end = bitset->stor_begin + IGRAPH_BITNSLOTS(capacity);
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t new_size) {
+    IGRAPH_ASSERT(bitset != NULL);
+    IGRAPH_ASSERT(bitset->stor_begin != NULL);
+    IGRAPH_CHECK(igraph_bitset_reserve(bitset, new_size));
+    bitset->size = new_size;
+    return IGRAPH_SUCCESS;
+}
+
 igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset)
 {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;

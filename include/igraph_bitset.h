@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2009-2020  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +14,10 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
 */
 
 #ifndef IGRAPH_BITSET_H
@@ -85,6 +87,10 @@ typedef struct s_bitset {
 
 IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size);
 IGRAPH_EXPORT void igraph_bitset_destroy(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t capacity);
+IGRAPH_EXPORT igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t new_size);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_bitset_t* bitset);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t* bitset);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t* bitset);
