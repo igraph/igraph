@@ -33,12 +33,12 @@
 
 __BEGIN_DECLS
 
-#define IGRAPH_BITMASK(b) (1 << ((b) % IGRAPH_INTEGER_SIZE))
+#define IGRAPH_BITMASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
 #define IGRAPH_BITSLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
 #define IGRAPH_BITSET(a, b) ((a)[IGRAPH_BITSLOT(b)] |= IGRAPH_BITMASK(b))
 #define IGRAPH_BITCLEAR(a, b) ((a)[IGRAPH_BITSLOT(b)] &= ~IGRAPH_BITMASK(b))
 #define IGRAPH_BITTEST(a, b) ((a)[IGRAPH_BITSLOT(b)] & IGRAPH_BITMASK(b))
-#define IGRAPH_BITNSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - 1) / IGRAPH_INTEGER_SIZE)
+#define IGRAPH_BITNSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
 #ifdef _MSC_VER
 igraph_integer_t igraph_msvc_ctz32(igraph_integer_t x) {
@@ -74,9 +74,11 @@ igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x) {
 #define IGRAPH_CTZ IGRAPH_CTZ64
 #endif
 
-#define IGRAPH_CLO(x) IGRAPH_CLZ(~x)
-#define IGRAPH_CTO(x) IGRAPH_CTZ(~x)
+#define IGRAPH_CLO(x) IGRAPH_CLZ(~(x))
+#define IGRAPH_CTO(x) IGRAPH_CTZ(~(x))
 
+IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_vector_int_t *bitset, igraph_integer_t n);
+IGRAPH_EXPORT void igraph_bitset_destroy(igraph_vector_int_t *bitset);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_vector_int_t* bitset, igraph_integer_t n);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_zero(igraph_vector_int_t* bitset, igraph_integer_t n);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_one(igraph_vector_int_t* bitset, igraph_integer_t n);
