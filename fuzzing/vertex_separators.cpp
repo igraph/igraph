@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2022  The igraph development team
+   Copyright (C) 2021-2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -41,7 +36,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, 2*Size));
+    igraph_vector_int_init(&edges, 2*Size);
     size_t j = 0;
     for (size_t i=0; i < Size; ++i) {
         VECTOR(edges)[j++] = Data[i] / 16;
@@ -65,17 +60,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 &graph,
                 igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),
                 &is_separator);
-            if (igraph_vector_int_size(igraph_vector_int_list_get_ptr(&ivl, i)) > 0) {
-                // Exclude empty sets until this bug is fixed:
-                // https://github.com/igraph/igraph/issues/2517
-                IGRAPH_ASSERT(is_separator);
-            }
+            IGRAPH_ASSERT(is_separator);
         }
 
         igraph_minimum_size_separators(&graph, &ivl);
 
         // Simplification is necessary for cohesive_blocks() and
-        // enables a straightforward complete graph check below.
+        // enables a straightforward check for complete graphs below.
         igraph_simplify(&graph, true, true, NULL);
 
         const igraph_integer_t vcount = igraph_vcount(&graph);
