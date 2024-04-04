@@ -51,12 +51,22 @@ igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x) {
     unsigned long index;
     return _BitScanForward(&index, x) ? index : 64;
 }
+igraph_integer_t igraph_msvc_clz32(igraph_integer_t x) {
+    unsigned long index;
+    return _BitScanReverse(&index, x) ? 31 - index : 32;
+}
+igraph_integer_t igraph_msvc_clz64(igraph_integer_t x) {
+    unsigned long index;
+    return _BitScanReverse(&index, x) ? 63 - index : 64;
+}
 // TODO: Check if __cpuid claims the operation is supported by CPU
 // https://learn.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64?view=msvc-170
 #define IGRAPH_POPCOUNT32(x) __popcnt(x)
 #define IGRAPH_POPCOUNT64(x) __popcnt64(x)
 #define IGRAPH_CTZ32(x) igraph_msvc_ctz32(x)
 #define IGRAPH_CTZ64(x) igraph_msvc_ctz64(x)
+#define IGRAPH_CLZ32(x) igraph_msvc_clz32(x)
+#define IGRAPH_CLZ64(x) igraph_msvc_clz64(x)
 #else
 #define IGRAPH_POPCOUNT32(x) __builtin_popcount(x)
 #define IGRAPH_POPCOUNT64(x) __builtin_popcountll(x)
