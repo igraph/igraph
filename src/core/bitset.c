@@ -21,6 +21,25 @@
 #include "igraph_bitset.h"
 #include "igraph_memory.h"
 
+#ifdef _MSC_VER
+igraph_integer_t igraph_msvc_ctz32(igraph_integer_t x) {
+    unsigned long index;
+    return _BitScanForward(&index, x) ? index : 32;
+}
+igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x) {
+    unsigned long index;
+    return _BitScanForward(&index, x) ? index : 64;
+}
+igraph_integer_t igraph_msvc_clz32(igraph_integer_t x) {
+    unsigned long index;
+    return _BitScanReverse(&index, x) ? 31 - index : 32;
+}
+igraph_integer_t igraph_msvc_clz64(igraph_integer_t x) {
+    unsigned long index;
+    return _BitScanReverse(&index, x) ? 63 - index : 64;
+}
+#endif
+
 igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size) {
     igraph_integer_t alloc_size = IGRAPH_BITNSLOTS(size);
     bitset->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);

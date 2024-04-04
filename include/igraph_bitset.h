@@ -43,22 +43,10 @@ __BEGIN_DECLS
 #define IGRAPH_BITNSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
 #ifdef _MSC_VER
-igraph_integer_t igraph_msvc_ctz32(igraph_integer_t x) {
-    unsigned long index;
-    return _BitScanForward(&index, x) ? index : 32;
-}
-igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x) {
-    unsigned long index;
-    return _BitScanForward(&index, x) ? index : 64;
-}
-igraph_integer_t igraph_msvc_clz32(igraph_integer_t x) {
-    unsigned long index;
-    return _BitScanReverse(&index, x) ? 31 - index : 32;
-}
-igraph_integer_t igraph_msvc_clz64(igraph_integer_t x) {
-    unsigned long index;
-    return _BitScanReverse(&index, x) ? 63 - index : 64;
-}
+igraph_integer_t igraph_msvc_ctz32(igraph_integer_t x);
+igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x);
+igraph_integer_t igraph_msvc_clz32(igraph_integer_t x);
+igraph_integer_t igraph_msvc_clz64(igraph_integer_t x);
 // TODO: Check if __cpuid claims the operation is supported by CPU
 // https://learn.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64?view=msvc-170
 #define IGRAPH_POPCOUNT32(x) __popcnt(x)
