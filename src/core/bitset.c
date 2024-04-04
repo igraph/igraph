@@ -39,7 +39,10 @@ void igraph_bitset_destroy(igraph_bitset_t *bitset) {
     }
 }
 
-void igraph_bitset_copy(igraph_bitset_t *dest, const igraph_bitset_t* src) {
+igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitset_t* src) {
+    IGRAPH_ASSERT(src != NULL);
+    IGRAPH_ASSERT(src->stor_begin != NULL);
+    IGRAPH_CHECK(igraph_bitset_init(dest, src->size));
     for (igraph_integer_t i = 0; i < IGRAPH_BITNSLOTS(dest->size); ++i)
     {
         VECTOR(*dest)[i] = VECTOR(*src)[i];

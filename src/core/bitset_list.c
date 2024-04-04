@@ -46,7 +46,7 @@ static igraph_error_t igraph_i_bitset_list_init_item(
 static igraph_error_t igraph_i_bitset_list_copy_item(
     igraph_bitset_t* dest, const igraph_bitset_t* source
 ) {
-    return igraph_bitset_copy(dest, source);
+    return igraph_bitset_init_copy(dest, source);
 }
 
 static void igraph_i_bitset_list_destroy_item(igraph_bitset_t* item) {

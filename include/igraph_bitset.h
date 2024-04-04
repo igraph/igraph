@@ -87,6 +87,7 @@ typedef struct s_bitset {
 
 IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size);
 IGRAPH_EXPORT void igraph_bitset_destroy(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_error_t igraph_bitset_init_copy(igraph_bitset_t* dest, const igraph_bitset_t* src);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset);
 IGRAPH_EXPORT igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t capacity);
