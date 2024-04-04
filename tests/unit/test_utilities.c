@@ -594,7 +594,7 @@ void record_last_warning(const char *reason, const char *file, int line) {
 void print_bitset(const igraph_bitset_t* bitset) {
     printf("(");
     for (igraph_integer_t i = bitset->size - 1; i >= 0; --i) {
-        printf(" %d", !!IGRAPH_BITTEST(*bitset, i));
+        printf(" %d", !!IGRAPH_BIT_TEST(*bitset, i));
     }
     printf(" )\n");
 }

@@ -35,18 +35,18 @@
 
 __BEGIN_DECLS
 
-#define IGRAPH_BITMASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
-#define IGRAPH_BITSLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
-#define IGRAPH_BITSET(a, b) (VECTOR((a))[IGRAPH_BITSLOT(b)] |= IGRAPH_BITMASK(b))
-#define IGRAPH_BITCLEAR(a, b) (VECTOR((a))[IGRAPH_BITSLOT(b)] &= ~IGRAPH_BITMASK(b))
-#define IGRAPH_BITTEST(a, b) (VECTOR((a))[IGRAPH_BITSLOT(b)] & IGRAPH_BITMASK(b))
-#define IGRAPH_BITNSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
+#define IGRAPH_BIT_MASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
+#define IGRAPH_BIT_SLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
+#define IGRAPH_BIT_SET(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] |= IGRAPH_BIT_MASK(b))
+#define IGRAPH_BIT_CLEAR(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] &= ~IGRAPH_BIT_MASK(b))
+#define IGRAPH_BIT_TEST(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] & IGRAPH_BIT_MASK(b))
+#define IGRAPH_BIT_NSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
 #ifdef _MSC_VER
-igraph_integer_t igraph_msvc_ctz32(igraph_integer_t x);
-igraph_integer_t igraph_msvc_ctz64(igraph_integer_t x);
-igraph_integer_t igraph_msvc_clz32(igraph_integer_t x);
-igraph_integer_t igraph_msvc_clz64(igraph_integer_t x);
+igraph_integer_t igraph_i_msvc_ctz32(igraph_integer_t x);
+igraph_integer_t igraph_i_msvc_ctz64(igraph_integer_t x);
+igraph_integer_t igraph_i_msvc_clz32(igraph_integer_t x);
+igraph_integer_t igraph_i_msvc_clz64(igraph_integer_t x);
 // TODO: Check if __cpuid claims the operation is supported by CPU
 // https://learn.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64?view=msvc-170
 #define IGRAPH_POPCOUNT32(x) __popcnt(x)

@@ -53,7 +53,7 @@ igraph_error_t igraph_reachability_directed(
     }
     for (i = 0; i < no_of_nodes; ++i)
     {
-        IGRAPH_BITSET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[i]), i);
+        IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[i]), i);
     }
 
     IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, *no_of_components));
