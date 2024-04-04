@@ -106,6 +106,7 @@ int main(void) {
     print_bitset(&v1);
     igraph_bitset_resize(&v1, 63);
     print_bitset(&v1);
+    igraph_bitset_destroy(&v1);
     printf("\n");
 
     printf("Test OR\n");
