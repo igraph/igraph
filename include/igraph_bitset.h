@@ -31,8 +31,6 @@
 #include "intrin.h"
 #endif
 
-#include "limits.h"
-
 __BEGIN_DECLS
 
 #define IGRAPH_BIT_MASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
