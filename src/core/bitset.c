@@ -22,22 +22,72 @@
 #include "igraph_memory.h"
 
 #ifdef _MSC_VER
-igraph_integer_t igraph_i_msvc_ctz32(igraph_integer_t x) {
+igraph_integer_t igraph_i_ctz32(igraph_integer_t x) {
+#ifdef HAVE__BITSCANFORWARD
     unsigned long index;
     return _BitScanForward(&index, x) ? index : 32;
+#else
+    for (igraph_integer_t i = 0; i < 32; ++i) {
+        if (IGRAPH_BIT_MASK(i) & x) {
+            return i;
+        }
+    }
+    return 32;
+#endif
 }
-igraph_integer_t igraph_i_msvc_ctz64(igraph_integer_t x) {
+
+igraph_integer_t igraph_i_ctz64(igraph_integer_t x) {
+#ifdef HAVE_BITSCANFORWARD64
     unsigned long index;
-    return _BitScanForward(&index, x) ? index : 64;
+    return _BitScanForward64(&index, x) ? index : 64;
+#else
+    for (igraph_integer_t i = 0; i < 64; ++i) {
+        if (IGRAPH_BIT_MASK(i) & x) {
+            return i;
+        }
+    }
+    return 64;
+#endif
 }
-igraph_integer_t igraph_i_msvc_clz32(igraph_integer_t x) {
+
+igraph_integer_t igraph_i_clz32(igraph_integer_t x) {
+#ifdef HAVE_BITSCANREVERSE
     unsigned long index;
     return _BitScanReverse(&index, x) ? 31 - index : 32;
+#else
+    for (igraph_integer_t i = 0; i >= 0; --i) {
+        if (IGRAPH_BIT_MASK(i) & x) {
+            return 31 - i;
+        }
+    }
+    return 32;
+#endif
 }
-igraph_integer_t igraph_i_msvc_clz64(igraph_integer_t x) {
+
+igraph_integer_t igraph_i_clz64(igraph_integer_t x) {
+#ifdef HAVE_BITSCANREVERSE64
     unsigned long index;
-    return _BitScanReverse(&index, x) ? 63 - index : 64;
+    return _BitScanReverse64(&index, x) ? 63 - index : 64;
+#else
+    for (igraph_integer_t i = 63; i >= 0; --i) {
+        if (IGRAPH_BIT_MASK(i) & x) {
+            return 63 - i;
+        }
+    }
+    return 64;
+#endif
 }
+
+#if (!defined(HAVE__POPCNT64) && IGRAPH_INTEGER_SIZE==64) || (!defined(HAVE_POPCNT) && IGRAPH_INTEGER_SIZE==32)
+igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
+    igraph_integer_t result = 0;
+    while (x) {
+        result++;
+        x = x & (x-1);
+    }
+    return result;
+}
+#endif
 #endif
 
 igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size) {
