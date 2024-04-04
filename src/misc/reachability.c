@@ -91,3 +91,36 @@ igraph_error_t igraph_reachability_directed(
 
     return IGRAPH_SUCCESS;
 }
+
+igraph_error_t igraph_count_reachable_directed(
+    const igraph_t *graph,
+    igraph_vector_int_t *counts)
+{
+    igraph_vector_int_t membership, csize;
+    igraph_integer_t no_of_components, no_of_nodes = igraph_vcount(graph);
+    igraph_bitset_list_t reach;
+
+    IGRAPH_CHECK(igraph_vector_int_init(&membership, 0));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &membership);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&csize, 0));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &csize);
+
+    IGRAPH_CHECK(igraph_bitset_list_init(&reach, 0));
+    IGRAPH_FINALLY(igraph_bitset_list_destroy, &reach);
+
+    IGRAPH_CHECK(igraph_reachability_directed(graph, &membership, &csize, &no_of_components, &reach));
+
+    IGRAPH_CHECK(igraph_vector_int_resize(counts, igraph_vcount(graph)));
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++)
+    {
+        VECTOR(*counts)[i] = igraph_bitset_popcount(igraph_bitset_list_get_ptr(&reach, VECTOR(membership)[i]));
+    }
+
+    igraph_bitset_list_destroy(&reach);
+    igraph_vector_int_destroy(&csize);
+    igraph_vector_int_destroy(&membership);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}
