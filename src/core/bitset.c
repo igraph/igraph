@@ -47,6 +47,7 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
     {
         VECTOR(*dest)[i] = VECTOR(*src)[i];
     }
+    return IGRAPH_SUCCESS;
 }
 
 igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset) {
@@ -91,7 +92,6 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
 igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset)
 {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
-    const igraph_integer_t padding = IGRAPH_INTEGER_SIZE - final_block_size;
     const igraph_integer_t slots = IGRAPH_BITNSLOTS(bitset->size);
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~0 : ((1 << final_block_size) - 1);
     igraph_integer_t count = 0;
@@ -117,8 +117,7 @@ igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset)
     }
     for (igraph_integer_t i = 1; i < slots; ++i) {
         if (VECTOR(*bitset)[slots - i - 1] != 0) {
-            const igraph_integer_t result = IGRAPH_INTEGER_SIZE * i + IGRAPH_CLZ(VECTOR(*bitset)[slots - i - 1]);
-            return result - padding;
+            return IGRAPH_INTEGER_SIZE * i + IGRAPH_CLZ(VECTOR(*bitset)[slots - i - 1]) - padding;
         }
     }
     return bitset->size;
@@ -132,13 +131,11 @@ igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset)
     const igraph_integer_t one = 1, zero = 0;
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
     if (bitset->size && (mask | VECTOR(*bitset)[slots - 1]) != ~zero) {
-        const igraph_integer_t result = IGRAPH_CLO(mask | VECTOR(*bitset)[slots - 1]);
         return IGRAPH_CLO(mask | VECTOR(*bitset)[slots - 1]) - padding;
     }
     for (igraph_integer_t i = 1; i < slots; ++i) {
         if (VECTOR(*bitset)[slots - i - 1] != ~zero) {
-            const igraph_integer_t result = IGRAPH_INTEGER_SIZE * i + IGRAPH_CLO(VECTOR(*bitset)[slots - i - 1]);
-            return result - padding;
+            return IGRAPH_INTEGER_SIZE * i + IGRAPH_CLO(VECTOR(*bitset)[slots - i - 1]) - padding;
         }
     }
     return bitset->size;
@@ -152,8 +149,7 @@ igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset)
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         if (VECTOR(*bitset)[i] != zero) {
-            const igraph_integer_t result = IGRAPH_INTEGER_SIZE * i + IGRAPH_CTZ(VECTOR(*bitset)[i]);
-            return result;
+            return IGRAPH_INTEGER_SIZE * i + IGRAPH_CTZ(VECTOR(*bitset)[i]);
         }
     }
     if (bitset->size && (mask & VECTOR(*bitset)[slots - 1]) != zero) {
@@ -170,8 +166,7 @@ igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset)
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         if (VECTOR(*bitset)[i] != ~zero) {
-            const igraph_integer_t result = IGRAPH_INTEGER_SIZE * i + IGRAPH_CTO(VECTOR(*bitset)[i]);
-            return result;
+            return IGRAPH_INTEGER_SIZE * i + IGRAPH_CTO(VECTOR(*bitset)[i]);
         }
     }
     if (bitset->size && (mask | VECTOR(*bitset)[slots - 1]) != ~zero) {
