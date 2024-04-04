@@ -33,7 +33,7 @@ igraph_error_t igraph_reachability_directed(
     igraph_bitset_list_t *reach)
 {
     igraph_integer_t no_of_nodes;
-    igraph_integer_t i, j, k, n;
+    igraph_integer_t i, j, n;
     igraph_adjlist_t adjlist, dag;
     igraph_vector_int_t *dag_neighbours, *neighbours;
     igraph_bitset_t *from_bitset, *to_bitset;
