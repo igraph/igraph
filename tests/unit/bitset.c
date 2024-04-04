@@ -98,14 +98,14 @@ int main(void) {
     print_bitset(&v3);
     igraph_bitset_or(&v1, &v2, &v3);
     print_bitset(&v1);
-    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v1);
+    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v3);
     printf("\n");
 
     printf("Test AND\n");
     n = 7;
-    igraph_bitset_init(&v2, n);
+    igraph_bitset_init(&v1, n);
     igraph_bitset_init(&v2, n);
     igraph_bitset_init(&v3, n);
     IGRAPH_BITSET(v1, 0);
@@ -120,8 +120,8 @@ int main(void) {
     print_bitset(&v3);
     igraph_bitset_and(&v1, &v2, &v3);
     print_bitset(&v1);
-    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v1);
+    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v3);
     printf("\n");
 
@@ -142,8 +142,8 @@ int main(void) {
     print_bitset(&v3);
     igraph_bitset_xor(&v1, &v2, &v3);
     print_bitset(&v1);
-    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v1);
+    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v3);
     printf("\n");
 
@@ -159,8 +159,8 @@ int main(void) {
     print_bitset(&v2);
     igraph_bitset_not(&v1, &v2);
     print_bitset(&v1);
-    igraph_bitset_destroy(&v2);
     igraph_bitset_destroy(&v1);
+    igraph_bitset_destroy(&v2);
     printf("\n");
 
     printf("Test popcount\n");
