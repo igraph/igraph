@@ -101,11 +101,8 @@ igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size
 
 void igraph_bitset_destroy(igraph_bitset_t *bitset) {
     IGRAPH_ASSERT(bitset != NULL);
-    if (bitset->stor_begin != NULL) {
-        IGRAPH_FREE(bitset->stor_begin);
-        bitset->size = 0;
-        bitset->stor_begin = NULL;
-    }
+    IGRAPH_FREE(bitset->stor_begin);
+    bitset->size = 0;
 }
 
 igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitset_t* src) {
@@ -143,6 +140,7 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
 
     tmp = IGRAPH_REALLOC(bitset->stor_begin, IGRAPH_BIT_NSLOTS(capacity), igraph_integer_t);
     IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for bitset.");
+
 
     bitset->stor_begin = tmp;
     bitset->stor_end = bitset->stor_begin + IGRAPH_BIT_NSLOTS(capacity);
