@@ -167,23 +167,24 @@ int main(void) {
     n = 75;
     igraph_bitset_init(&v1, n);
     print_bitset(&v1);
-    printf("Popcount: %ld\n", igraph_bitset_popcount(&v1));
+
+    printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
     for (i = 2; i < n; i++) {
         if (i == 2 || i == 3 || i == 5 || i == 7 || i == 11 || !(i%2 == 0 || i%3 == 0 || i%5 == 0 || i%7 == 0 || i%11 == 0)) {
             IGRAPH_BITSET(v1, i);
         }
     }
     print_bitset(&v1);
-    printf("Popcount: %ld\n", igraph_bitset_popcount(&v1));
+    printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
     IGRAPH_BITCLEAR(v1, 67);
     print_bitset(&v1);
-    printf("Popcount: %ld\n", igraph_bitset_popcount(&v1));
+    printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
     IGRAPH_BITSET(v1, 9);
     print_bitset(&v1);
-    printf("Popcount: %ld\n", igraph_bitset_popcount(&v1));
+    printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Popcount: %ld\n", igraph_bitset_popcount(&v1));
+    printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -192,25 +193,25 @@ int main(void) {
     igraph_bitset_init(&v1, n);
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     IGRAPH_BITSET(v1, 0);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     IGRAPH_BITSET(v1, 23);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     IGRAPH_BITCLEAR(v1, 0);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     IGRAPH_BITSET(v1, n - 3);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     IGRAPH_BITSET(v1, n - 1);
     print_bitset(&v1);
-    printf("Leading zeros: %ld\n", igraph_bitset_countl_zero(&v1));
+    printf("Leading zeros: %" IGRAPH_PRId "\n", igraph_bitset_countl_zero(&v1));
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -220,22 +221,22 @@ int main(void) {
     igraph_bitset_init(&v1, n);
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Leading ones: %ld\n", igraph_bitset_countl_one(&v1));
+    printf("Leading ones: %" IGRAPH_PRId "\n", igraph_bitset_countl_one(&v1));
     IGRAPH_BITCLEAR(v1, 0);
     print_bitset(&v1);
-    printf("Leading ones: %ld\n", igraph_bitset_countl_one(&v1));
+    printf("Leading ones: %" IGRAPH_PRId "\n", igraph_bitset_countl_one(&v1));
     IGRAPH_BITCLEAR(v1, 23);
     print_bitset(&v1);
-    printf("Leading ones: %ld\n", igraph_bitset_countl_one(&v1));
+    printf("Leading ones: %" IGRAPH_PRId "\n", igraph_bitset_countl_one(&v1));
     IGRAPH_BITSET(v1, 0);
     print_bitset(&v1);
-    printf("Leading ones: %ld\n", igraph_bitset_countl_one(&v1));
+    printf("Leading ones: %" IGRAPH_PRId "\n", igraph_bitset_countl_one(&v1));
     IGRAPH_BITCLEAR(v1, n - 3);
     print_bitset(&v1);
-    printf("Leading ones: %ld\n", igraph_bitset_countl_one(&v1));
+    printf("Leading ones: %" IGRAPH_PRId "\n", igraph_bitset_countl_one(&v1));
     IGRAPH_BITCLEAR(v1, n - 1);
     print_bitset(&v1);
-    printf("Leading ones: %ld\n", igraph_bitset_countl_one(&v1));
+    printf("Leading ones: %" IGRAPH_PRId "\n", igraph_bitset_countl_one(&v1));
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -245,26 +246,26 @@ int main(void) {
     igraph_bitset_init(&v1, n);
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     IGRAPH_BITSET(v1, 0);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     IGRAPH_BITSET(v1, 23);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     IGRAPH_BITCLEAR(v1, 0);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     IGRAPH_BITCLEAR(v1, 23);
     IGRAPH_BITSET(v1, n - 1);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     IGRAPH_BITSET(v1, 2);
     print_bitset(&v1);
-    printf("Trailing zeros: %ld\n", igraph_bitset_countr_zero(&v1));
+    printf("Trailing zeros: %" IGRAPH_PRId "\n", igraph_bitset_countr_zero(&v1));
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -273,23 +274,23 @@ int main(void) {
     igraph_bitset_init(&v1, n);
     igraph_bitset_not(&v1, &v1);
     print_bitset(&v1);
-    printf("Trailing ones: %ld\n", igraph_bitset_countr_one(&v1));
+    printf("Trailing ones: %" IGRAPH_PRId "\n", igraph_bitset_countr_one(&v1));
     IGRAPH_BITCLEAR(v1, 23);
     print_bitset(&v1);
-    printf("Trailing ones: %ld\n", igraph_bitset_countr_one(&v1));
+    printf("Trailing ones: %" IGRAPH_PRId "\n", igraph_bitset_countr_one(&v1));
     IGRAPH_BITCLEAR(v1, 0);
     print_bitset(&v1);
-    printf("Trailing ones: %ld\n", igraph_bitset_countr_one(&v1));
+    printf("Trailing ones: %" IGRAPH_PRId "\n", igraph_bitset_countr_one(&v1));
     IGRAPH_BITSET(v1, 0);
     print_bitset(&v1);
-    printf("Trailing ones: %ld\n", igraph_bitset_countr_one(&v1));
+    printf("Trailing ones: %" IGRAPH_PRId "\n", igraph_bitset_countr_one(&v1));
     IGRAPH_BITSET(v1, 23);
     IGRAPH_BITCLEAR(v1, n - 1);
     print_bitset(&v1);
-    printf("Trailing ones: %ld\n", igraph_bitset_countr_one(&v1));
+    printf("Trailing ones: %" IGRAPH_PRId "\n", igraph_bitset_countr_one(&v1));
     IGRAPH_BITCLEAR(v1, 2);
     print_bitset(&v1);
-    printf("Trailing ones: %ld\n", igraph_bitset_countr_one(&v1));
+    printf("Trailing ones: %" IGRAPH_PRId "\n", igraph_bitset_countr_one(&v1));
     igraph_bitset_destroy(&v1);
     printf("\n");
 
