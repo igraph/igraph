@@ -24,7 +24,7 @@ void compute_and_print(const igraph_t *g)
 {
     igraph_vector_int_t membership, csize, reach_counts;
     igraph_bitset_list_t reach;
-    igraph_integer_t no_of_nodes, no_of_components, i;
+    igraph_integer_t no_of_nodes, no_of_components;
 
     no_of_nodes = igraph_vcount(g);
 
