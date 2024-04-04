@@ -78,7 +78,34 @@ int main(void) {
     print_bitset(&v1);
     IGRAPH_BIT_CLEAR(v1, 17);
     print_bitset(&v1);
+    printf("\n");
+
+    printf("Test bitset copy constructor\n");
+    igraph_bitset_init_copy(&v2, &v1);
+    print_bitset(&v2);
     igraph_bitset_destroy(&v1);
+    igraph_bitset_destroy(&v2);
+    printf("\n");
+
+    printf("Test bitset resize\n");
+    igraph_bitset_init(&v1, 0);
+    print_bitset(&v1);
+    igraph_bitset_resize(&v1, 10);
+    print_bitset(&v1);
+    IGRAPH_BIT_SET(v1, 3);
+    print_bitset(&v1);
+    igraph_bitset_resize(&v1, 64);
+    print_bitset(&v1);
+    IGRAPH_BIT_SET(v1, 63);
+    print_bitset(&v1);
+    igraph_bitset_resize(&v1, 70);
+    print_bitset(&v1);
+    IGRAPH_BIT_SET(v1, 64);
+    print_bitset(&v1);
+    igraph_bitset_resize(&v1, 64);
+    print_bitset(&v1);
+    igraph_bitset_resize(&v1, 63);
+    print_bitset(&v1);
     printf("\n");
 
     printf("Test OR\n");
