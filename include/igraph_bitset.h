@@ -33,11 +33,105 @@
 
 __BEGIN_DECLS
 
+/**
+ * \ingroup bitset
+ * \define IGRAPH_BIT_MASK
+ * \brief Computes mask used to access a specific bit of an integer.
+ * Used in combination with \ref IGRAPH_BIT_SLOT to access an element of a bitset.
+ *
+ * Usage:
+ * \verbatim IGRAPH_BIT_MASK(10) \endverbatim
+ * to obtain an integer where only the 11th least significant bit is set.
+ *
+ * Note that passing negative values here results in undefined behaviour.
+ *
+ * \param b The only bit index that should have its bit set.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_BIT_MASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
+
+/**
+ * \ingroup bitset
+ * \define IGRAPH_BIT_SLOT
+ * \brief Computes index used to access a specific slot of a bitset.
+ * Used in combination with \ref IGRAPH_BIT_MASK to access an element of a bitset.
+ *
+ * Usage:
+ * \verbatim IGRAPH_BIT_SLOT(70) \endverbatim
+ * will return 1 if using 64-bit words or 2 if using 32-bit words.
+ *
+ * \param b The bit index whose slot should be determined.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_BIT_SLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
+
+/**
+ * \ingroup bitset
+ * \define IGRAPH_BIT_SET
+ * \brief Sets a specific bit in a bitset to 1 without altering other bits.
+ *
+ * Usage:
+ * \verbatim IGRAPH_BIT_SET(bitset, 3) \endverbatim
+ * will set the fourth least significant bit in the bitset to 1.
+ *
+ * \param a The bitset
+ * \param b The bit index that should have its bit set to 1 after the operation.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_BIT_SET(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] |= IGRAPH_BIT_MASK(b))
+
+/**
+ * \ingroup bitset
+ * \define IGRAPH_BIT_CLEAR
+ * \brief Sets a specific bit in a bitset to 0 without altering other bits.
+ *
+ * Usage:
+ * \verbatim IGRAPH_BIT_CLEAR(bitset, 4) \endverbatim
+ * will set the fifth least significant bit in the bitset to 0.
+ *
+ * \param a The bitset
+ * \param b The bit index that should have its bit set to 0 after the operation.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_BIT_CLEAR(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] &= ~IGRAPH_BIT_MASK(b))
+
+/**
+ * \ingroup bitset
+ * \define IGRAPH_BIT_TEST
+ * \brief Tests whether a bit is set in a bitset.
+ * Returns 0 if the bit at the specified bit index is not set,
+ * otherwise returns a non-zero value.
+ *
+ * Usage:
+ * \verbatim IGRAPH_BIT_TEST(bitset, 7) \endverbatim
+ * will test the eighth least significant bit in the bitset.
+ *
+ * \param a The bitset
+ * \param b The bit index that should have its bit tested.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_BIT_TEST(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] & IGRAPH_BIT_MASK(b))
+
+/**
+ * \ingroup bitset
+ * \define IGRAPH_BIT_NSLOTS
+ * \brief Computes the number of slots required to store a specified number of bits.
+ *
+ * Usage:
+ * \verbatim IGRAPH_BIT_NSLOTS(70) \endverbatim
+ * will return 2 if using 64-bit words and 3 if using 32-bit words.
+ * \verbatim IGRAPH_BIT_NSLOTS(128) \endverbatim
+ * will return 2 if using 64-bit words and 4 if using 32-bit words.
+ *
+ * \param nb The specified number of bits.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_BIT_NSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
 #ifdef _MSC_VER

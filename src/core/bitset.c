@@ -90,6 +90,79 @@ igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
 #endif
 #endif
 
+/**
+ * \ingroup bitset
+ * \section about_igraph_bitset_t_objects About \type igraph_bitset_t objects
+ *
+ * <para>The \type igraph_bitset_t data type is a simple and efficient
+ * interface to arrays containing boolean values. It is similar to
+ * the \type bitset template in the C++ standard library, although the main
+ * difference being the C++ version's size is initialized at compile time.</para>
+ *
+ * <para>The \type igraph_bitset_t type and use O(n/w) space
+ * to store n elements, where w is the bit width of the integer type used throughout the library, either 32 or 64.
+ * Sometimes they use more, this is because bitsets can
+ * shrink, but even if they shrink, the current implementation does not free a
+ * single bit of memory.</para>
+ *
+ * <para>The elements in an \type igraph_bitset_t object and its variants are
+ * indexed from zero, we follow the usual C convention here. Bitsets are indexed
+ * from right to left, meaning index 0 is the least significant bit and index n-1
+ * is the most significant bit.</para>
+ *
+ * <para>The elements of a bitset always occupy a single block of
+ * memory, the starting address of this memory block can be queried
+ * with the \ref VECTOR macro. This way, bitset objects can be used
+ * with standard mathematical libraries, like the GNU Scientific
+ * Library.</para>
+ */
+
+/**
+ * \ingroup bitset
+ * \section igraph_bitset_constructors_and_destructors Constructors and
+ * destructors
+ *
+ * <para>\type igraph_bitset_t objects have to be initialized before using
+ * them, this is analogous to calling a constructor on them. There are two
+ * \type igraph_bitset_t constructors, for your convenience.
+ * \ref igraph_bitset_init() is the basic constructor, it
+ * creates a bitset of the given length, filled with zeros.
+ * \ref igraph_bitset_init_copy() creates a new identical copy
+ * of an already existing and initialized bitset.</para>
+ *
+ * <para>If a \type igraph_bitset_t object is not needed any more, it
+ * should be destroyed to free its allocated memory by calling the
+ * \type igraph_bitset_t destructor, \ref igraph_bitset_destroy().</para>
+ */
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_init
+ * \brief Initializes a bitset object (constructor).
+ *
+ * </para><para>
+ * Every bitset needs to be initialized before it can be used, and
+ * there are a number of initialization functions or otherwise called
+ * constructors. This function constructs a bitset of the given size and
+ * initializes each entry to 0.
+ *
+ * </para><para>
+ * Every bitset object initialized by this function should be
+ * destroyed (ie. the memory allocated for it should be freed) when it
+ * is not needed anymore, the \ref igraph_bitset_destroy() function is
+ * responsible for this.
+ * \param bitset Pointer to a not yet initialized bitset object.
+ * \param size The size of the bitset.
+ * \return error code:
+ *       \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, the amount of
+ * \quote time \endquote required to allocate
+ * O(n/w) elements,
+ * n is the number of elements.
+ * w is the word size of the machine (32 or 64).
+ */
+
 igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size) {
     igraph_integer_t alloc_size = IGRAPH_BIT_NSLOTS(size);
     bitset->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
@@ -99,11 +172,46 @@ igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_destroy
+ * \brief Destroys a bitset object.
+ *
+ * </para><para>
+ * All bitsets initialized by \ref igraph_bitset_init() should be properly
+ * destroyed by this function. A destroyed bitset needs to be
+ * reinitialized by \ref igraph_bitset_init() or
+ * another constructor.
+ * \param bitset Pointer to the (previously initialized) bitset object to
+ *        destroy.
+ *
+ * Time complexity: operating system dependent.
+ */
+
 void igraph_bitset_destroy(igraph_bitset_t *bitset) {
     IGRAPH_ASSERT(bitset != NULL);
     IGRAPH_FREE(bitset->stor_begin);
     bitset->size = 0;
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_init_copy
+ * \brief Initializes a bitset from another bitset object (constructor).
+ *
+ * </para><para>
+ * The contents of the existing bitset object will be copied to
+ * the new one.
+ * \param dest Pointer to a not yet initialized bitset object.
+ * \param src The original bitset object to copy.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, usually
+ * O(n/w),
+ * n is the size of the bitset,
+ * w is the word size of the machine (32 or 64).
+ */
 
 igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitset_t* src) {
     IGRAPH_ASSERT(src != NULL);
@@ -116,13 +224,72 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_capacity
+ * \brief Returns the allocated capacity of the bitset.
+ *
+ * Note that this might be different from the size of the bitset (as
+ * queried by \ref igraph_bitset_size()), and specifies how many elements
+ * the bitset can hold, without reallocation.
+ *
+ * \param bitset Pointer to the (previously initialized) bitset object
+ *          to query.
+ * \return The allocated capacity.
+ *
+ * \sa \ref igraph_bitset_size().
+ *
+ * Time complexity: O(1).
+ */
+
+
 igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset) {
     return IGRAPH_INTEGER_SIZE * (bitset->stor_end - bitset->stor_begin);
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_size
+ * \brief Returns the size (=length) of the bitset.
+ *
+ * \param bitset The bitset object
+ * \return The size of the bitset.
+ *
+ * Time complexity: O(1).
+ */
+
 igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset) {
     return bitset->size;
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_reserve
+ * \brief Reserves memory for a bitset.
+ *
+ * </para><para>
+ * \a igraph bitsets are flexible, they can grow and
+ * shrink. Growing
+ * however occasionally needs the data in the bitset to be copied.
+ * In order to avoid this, you can call this function to reserve space for
+ * future growth of the bitset.
+ *
+ * </para><para>
+ * Note that this function does \em not change the size of the
+ * bitset. Let us see a small example to clarify things: if you
+ * reserve space for 100 elements and the size of your
+ * bitset was (and still is) 60, then you can surely add additional 40
+ * elements to your bitset before it will be copied.
+ * \param bitset The bitset object.
+ * \param capacity The new \em allocated size of the bitset.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, should be around
+ * O(n/w),
+ * n is the new allocated size of the bitset,
+ * w is the word size of the machine (32 or 64).
+ */
 
 igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t capacity) {
     igraph_integer_t current_capacity;
@@ -148,6 +315,34 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_resize
+ * \brief Resize the bitset.
+ *
+ * </para><para>
+ * Note that this function does not free any memory, just sets the
+ * size of the bitset to the given one. It may, on the other hand,
+ * allocate more memory if the new size is larger than the previous
+ * one. In this case the newly appeared elements in the bitset are
+ * \em not set to zero, they are uninitialized.
+ * \param bitset The bitset object
+ * \param new_size The new size of the bitset.
+ * \return Error code,
+ *         \c IGRAPH_ENOMEM if there is not enough
+ *         memory. Note that this function \em never returns an error
+ *         if the bitset is made smaller.
+ * \sa \ref igraph_bitset_reserve() for allocating memory for future
+ * extensions of a bitset.
+ *
+ * Time complexity: O(1) if the new
+ * size is smaller, operating system dependent if it is larger. In the
+ * latter case it is usually around
+ * O(n/w),
+ * n is the new size of the bitset,
+ * w is the word size of the machine (32 or 64).
+ */
+
 igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t new_size) {
     IGRAPH_ASSERT(bitset != NULL);
     IGRAPH_ASSERT(bitset->stor_begin != NULL);
@@ -161,6 +356,17 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
     bitset->size = new_size;
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_popcount
+ * \brief Returns the population count (number of set bits) of the bitset.
+ *
+ * \param bitset The bitset object
+ * \return The population count of the bitset.
+ *
+ * Time complexity: O(n/w).
+ */
 
 igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset)
 {
@@ -177,6 +383,19 @@ igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset)
     }
     return count;
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_countl_zero
+ * \brief Returns the number of leading (starting at the most significant bit)
+ * zeros in the bitset before the first one is encountered.
+ * If the bitset is all zeros, then its size is returned.
+ *
+ * \param bitset The bitset object
+ * \return The number of leading zeros in the bitset.
+ *
+ * Time complexity: O(n/w).
+ */
 
 igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset)
 {
@@ -196,6 +415,19 @@ igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset)
     return bitset->size;
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_countl_one
+ * \brief Returns the number of leading ones (starting at the most significant bit)
+ * in the bitset before the first zero is encountered.
+ * If the bitset is all ones, then its size is returned.
+ *
+ * \param bitset The bitset object
+ * \return The number of leading ones in the bitset.
+ *
+ * Time complexity: O(n/w).
+ */
+
 igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset)
 {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
@@ -214,6 +446,19 @@ igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset)
     return bitset->size;
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_countr_zero
+ * \brief Returns the number of trailing (starting at the least significant bit)
+ * zeros in the bitset before the first one is encountered.
+ * If the bitset is all zeros, then its size is returned.
+ *
+ * \param bitset The bitset object
+ * \return The number of trailing zeros in the bitset.
+ *
+ * Time complexity: O(n/w).
+ */
+
 igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset)
 {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
@@ -230,6 +475,19 @@ igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset)
     }
     return bitset->size;
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_countr_one
+ * \brief Returns the number of trailing ones (starting at the least significant bit)
+ * in the bitset before the first zero is encountered.
+ * If the bitset is all ones, then its size is returned.
+ *
+ * \param bitset The bitset object
+ * \return The number of trailing ones in the bitset.
+ *
+ * Time complexity: O(n/w).
+ */
 
 igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset)
 {
@@ -248,12 +506,38 @@ igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset)
     return bitset->size;
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_or
+ * \brief Applies a bitwise or to the contents of two bitsets and stores it in an already initialized bitset.
+ * The destination bitset may be equal to one (or even both) of the sources.
+ *
+ * \param dest The bitset object where the result is stored
+ * \param src1 A bitset
+ * \param src2 A bitset
+ *
+ * Time complexity: O(n/w).
+ */
+
 void igraph_bitset_or(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i)
     {
         VECTOR(*dest)[i] = VECTOR(*src1)[i] | VECTOR(*src2)[i];
     }
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_and
+ * \brief Applies a bitwise and to the contents of two bitsets and stores it in an already initialized bitset.
+ * The destination bitset may be equal to one (or even both) of the sources.
+ *
+ * \param dest The bitset object where the result is stored
+ * \param src1 A bitset
+ * \param src2 A bitset
+ *
+ * Time complexity: O(n/w).
+ */
 
 void igraph_bitset_and(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i)
@@ -262,12 +546,38 @@ void igraph_bitset_and(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bits
     }
 }
 
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_xor
+ * \brief Applies a bitwise xor to the contents of two bitsets and stores it in an already initialized bitset.
+ * The destination bitset may be equal to one (or even both) of the sources.
+ *
+ * \param dest The bitset object where the result is stored
+ * \param src1 A bitset
+ * \param src2 A bitset
+ *
+ * Time complexity: O(n/w).
+ */
+
 void igraph_bitset_xor(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i)
     {
         VECTOR(*dest)[i] = VECTOR(*src1)[i] ^ VECTOR(*src2)[i];
     }
 }
+
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_and
+ * \brief Applies a bitwise not to the contents of a bitset and stores it in an already initialized bitset.
+ * The destination bitset may be equal to the source.
+ *
+ * \param dest The bitset object where the result is stored
+ * \param src A bitset
+ *
+ * Time complexity: O(n/w).
+ */
 
 void igraph_bitset_not(igraph_bitset_t *dest, igraph_bitset_t *src) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i)
