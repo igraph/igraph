@@ -339,11 +339,8 @@ static igraph_error_t igraph_i_maximal_cliques_up(
  * almost surely be different between these three versions.
  *
  * \param graph The input graph.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, i.e. \p res will contain pointers to \ref igraph_vector_int_t
- *   objects which contain the indices of vertices involved in a clique.
- *   The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed. Note that vertices
+ * \param res Pointer to list of integer vectors. The maximal cliques
+ *   will be returned here as vectors of vertex IDs. Note that vertices
  *   of a clique may be returned in arbitrary order.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.

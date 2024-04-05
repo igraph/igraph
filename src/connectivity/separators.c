@@ -34,97 +34,269 @@
 
 #include "core/interruption.h"
 
-static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
-                                 igraph_vit_t *vit,
-                                 igraph_integer_t except,
-                                 igraph_bool_t *res,
-                                 igraph_vector_bool_t *removed,
-                                 igraph_dqueue_int_t *Q,
-                                 igraph_vector_int_t *neis,
-                                 igraph_integer_t no_of_nodes) {
 
-    igraph_integer_t start = 0;
+/**
+ * \function igraph_i_is_separator
+ *
+ * Checks if vertex set \c S is a separator. Optionally, also checks if it
+ * is a _minimal_ separator.
+ *
+ * \param graph The graph, edge directions are ignored.
+ * \param S Candidate vertex set.
+ * \param is_separator Pointer to boolean, is S a separator?
+ * \param is_minimal If not \c NULL, it is also checked whether the separator
+ *    is minimal. This takes additional time.  If S is not a separator, this is
+ *    set to false
+ */
+static igraph_error_t igraph_i_is_separator(
+    const igraph_t *graph,
+    igraph_vs_t S,
+    igraph_bool_t *is_separator,
+    igraph_bool_t *is_minimal
+) {
 
-    if (IGRAPH_VIT_SIZE(*vit) >= no_of_nodes - 1) {
-        /* Just need to check that we really have at least n-1 vertices in it */
-        igraph_vector_bool_t hit;
-        igraph_integer_t nohit = 0;
-        IGRAPH_CHECK(igraph_vector_bool_init(&hit, no_of_nodes));
-        IGRAPH_FINALLY(igraph_vector_bool_destroy, &hit);
-        for (IGRAPH_VIT_RESET(*vit);
-             !IGRAPH_VIT_END(*vit);
-             IGRAPH_VIT_NEXT(*vit)) {
-            igraph_integer_t v = IGRAPH_VIT_GET(*vit);
-            if (!VECTOR(hit)[v]) {
-                nohit++;
-                VECTOR(hit)[v] = true;
+    const igraph_integer_t vcount = igraph_vcount(graph);
+
+    /* mark[v] means:
+     *
+     * bit 0: Was v visited?
+     * bit 1: Is v in S?
+     * bit 2: Used to keep track of which vertices were reachable in S
+     *        from its neighbourhood in the minimal separator test.
+     */
+    igraph_vector_char_t mark;
+
+    igraph_vector_int_t neis;
+    igraph_dqueue_int_t Q;
+    igraph_vit_t vit;
+    igraph_integer_t S_size = 0, S_visited_count = 0;
+
+    IGRAPH_CHECK(igraph_vit_create(graph, S, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&mark, vcount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 10);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
+
+#define VISITED(x) (VECTOR(mark)[x] & 1) /* Was x visited? */
+#define SET_VISITED(x) (VECTOR(mark)[x] |= 1) /* Mark x as visited. */
+#define IN_S(x) (VECTOR(mark)[x] & 2) /* Is x in S? */
+#define SET_IN_S(x) (VECTOR(mark)[x] |= 2) /* Mark x as being in S. */
+
+    /* Mark and count vertices in S, taking care not to double-count
+     * when duplicate vertices were passed in. */
+    for (; ! IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        const igraph_integer_t u = IGRAPH_VIT_GET(vit);
+        if (! IN_S(u)) {
+            SET_IN_S(u);
+            S_size++;
+        }
+    }
+
+    /* If S contains more than |V| - 2 vertices, it is not a separator. */
+    if (S_size > vcount-2) {
+        *is_separator = false;
+        goto done;
+    }
+
+    /* Assume that S is not a separator until proven otherwise. */
+    *is_separator = false;
+
+    for (IGRAPH_VIT_RESET(vit); ! IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+
+        const igraph_integer_t u = IGRAPH_VIT_GET(vit);
+        if (VISITED(u)) {
+            continue;
+        }
+
+        /* For the sake of the following discussion, and counting of degrees,
+         * let us consider each undirected edge as a pair of directed ones.
+         */
+
+        /* We start at a vertex in S, and traverse the graph with the following
+         * restriction:
+         *
+         * Once we exited S through an edge, we may not exit through
+         * any other edge again (but we may re-enter S). With this traversal,
+         * we can determine: once we find ourselves outside of S, are there
+         * any vertices which we can only reach by passing through S again?
+         *
+         * Theorem: The visited vertices in S constitute a separating set if and
+         * only if when the traversal is complete, some of them still have
+         * untraversed out-edges.
+         *
+         * Note that this refers only to the subset of S visited during this
+         * traversal, not the rest of S. If there are remaining vertices in S,
+         * they may constitute a separating set as well. We cannot conclude that
+         * S is NOT a separator until all its vertices have been considered, hence
+         * the outer for-loop.
+         */
+
+        /* Sum of in-degrees of visited vertices in S. */
+        igraph_integer_t degsum = 0;
+
+        /* Number of in-edges of vertices in S that were traversed. */
+        igraph_integer_t edgecount = 0;
+
+        /* Have we already traversed an edge leaving S? */
+        igraph_bool_t exited = false;
+
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, u));
+
+        while (! igraph_dqueue_int_empty(&Q)) {
+            const igraph_integer_t v = igraph_dqueue_int_pop(&Q);
+            if (VISITED(v)) {
+                continue;
+            }
+
+            SET_VISITED(v);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
+
+            const igraph_integer_t dv = igraph_vector_int_size(&neis);
+
+            if (IN_S(v)) {
+                degsum += dv;
+                S_visited_count++;
+            }
+
+            for (igraph_integer_t i=0; i < dv; i++) {
+                const igraph_integer_t w = VECTOR(neis)[i];
+
+                /* Decide whether to traverse the v -> w edge. */
+                if (!exited || !IN_S(v) || IN_S(w)) {
+                    if (IN_S(w)) {
+                        edgecount++;
+                    }
+
+                    if (!VISITED(w)) {
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, w));
+                    }
+
+                    if (!exited && IN_S(v) && !IN_S(w)) {
+                        exited = true;
+                    }
+                }
             }
         }
-        igraph_vector_bool_destroy(&hit);
-        IGRAPH_FINALLY_CLEAN(1);
-        if (nohit >= no_of_nodes - 1) {
-            *res = false;
-            return IGRAPH_SUCCESS;
+
+        /* If some incident edges of visited vertices in S are
+         * still untraversed, then S is a separator. We are done. */
+        if (degsum > edgecount) {
+            *is_separator = true;
+            break;
         }
     }
 
-    /* Remove the given vertices from the graph, do a breadth-first
-       search and check the number of components */
+done:
 
-    if (except < 0) {
-        for (IGRAPH_VIT_RESET(*vit);
-             !IGRAPH_VIT_END(*vit);
-             IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = true;
+    /* Optionally, check if S is also a _minimal_ separator. */
+    if (is_minimal != NULL) {
+        /* Be optimistic, and assume that if S was found to be a separator,
+         * it is a minimal separator. */
+        *is_minimal = *is_separator;
+
+        /* If S was proven to be a separator before visiting all of its
+         * vertices, it is not minimal. We are done. */
+        if (*is_minimal && S_visited_count < S_size) {
+            *is_minimal = false;
         }
-    } else {
-        /* There is an exception */
-        igraph_integer_t i;
-        for (i = 0, IGRAPH_VIT_RESET(*vit);
-             i < except;
-             i++, IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = true;
-        }
-        for (IGRAPH_VIT_NEXT(*vit);
-             !IGRAPH_VIT_END(*vit);
-             IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = true;
-        }
-    }
 
-    /* Look for the first node that is not removed */
-    while (start < no_of_nodes && VECTOR(*removed)[start]) {
-        start++;
-    }
+        /* The subset of S with untraversed out-edges forms a separator.
+         * Therefore, if S contains vertices with no untraversed out-edges,
+         * S is not minimal.
+         *
+         * Suppose it doesn't contain any.
+         *
+         * Then for S to be minimal, each of its vertices should be reachable
+         * from any vertex in the unvisited neighbourhood of S. In order to
+         * separate a vertex in this neighbourhood, we need to cut precisely
+         * those vertices in S which are reachable from it.
+         *
+         * The check below verifies BOTH of the above conditions by traversing
+         * the graph from each unvisited neighbour of S with the constraint
+         * of never entering S.
+         */
+        if (*is_minimal) {
+            igraph_vector_int_t Sneis;
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&Sneis, 10);
 
-    if (start == no_of_nodes) {
-        IGRAPH_ERROR("All vertices are included in the separator",
-                     IGRAPH_EINVAL);
-    }
+            /* If the 2nd bit of mark[v] is the same as 'bit', it indicates
+             * that v in S was reached in the current testing round.
+             * We flip 'bit' between testing rounds, assuming that the previous
+             * round reached all of S. */
+            igraph_bool_t bit = true;
 
-    IGRAPH_CHECK(igraph_dqueue_int_push(Q, start));
-    VECTOR(*removed)[start] = true;
-    while (!igraph_dqueue_int_empty(Q)) {
-        igraph_integer_t node = igraph_dqueue_int_pop(Q);
-        igraph_integer_t j, n;
-        IGRAPH_CHECK(igraph_neighbors(graph, neis, node, IGRAPH_ALL));
-        n = igraph_vector_int_size(neis);
-        for (j = 0; j < n; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
-            if (!VECTOR(*removed)[nei]) {
-                IGRAPH_CHECK(igraph_dqueue_int_push(Q, nei));
-                VECTOR(*removed)[nei] = true;
+#define REACHED(x) (!(VECTOR(mark)[x] & 4) == !bit) /* Was x in S reached already? */
+#define FLIP_REACHED(x) (VECTOR(mark)[x] ^= 4) /* Flip the reachability status of x in S. */
+
+            for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+                const igraph_integer_t u = IGRAPH_VIT_GET(vit);
+                IGRAPH_CHECK(igraph_neighbors(graph, &Sneis, u, IGRAPH_ALL));
+                const igraph_integer_t du = igraph_vector_int_size(&Sneis);
+                for (igraph_integer_t i=0; i < du; i++) {
+
+                    igraph_integer_t v = VECTOR(Sneis)[i];
+                    if (VISITED(v)) {
+                        continue;
+                    }
+
+                    /* How many vertices in S were reachable from u? */
+                    igraph_integer_t S_reached = 0;
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, v));
+                    while (! igraph_dqueue_int_empty(&Q)) {
+                        v = igraph_dqueue_int_pop(&Q);
+                        if (VISITED(v)) {
+                            continue;
+                        }
+
+                        SET_VISITED(v);
+                        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
+
+                        const igraph_integer_t dv = igraph_vector_int_size(&neis);
+
+                        for (igraph_integer_t j=0; j < dv; j++) {
+                            const igraph_integer_t w = VECTOR(neis)[j];
+
+                            if (! VISITED(w)) {
+                                IGRAPH_CHECK(igraph_dqueue_int_push(&Q, w));
+                            } else if (IN_S(w) && !REACHED(w)) {
+                                S_reached++;
+                                FLIP_REACHED(w); /* set as reachable */
+                            }
+                        }
+                    }
+
+                    bit = !bit;
+
+                    if (S_reached < S_size) {
+                        *is_minimal = false;
+                        break;
+                    }
+                }
+
+                if (! *is_minimal) {
+                    break;
+                }
             }
+
+            igraph_vector_int_destroy(&Sneis);
+            IGRAPH_FINALLY_CLEAN(1);
         }
     }
 
-    /* Look for the next node that was neither removed, not visited */
-    while (start < no_of_nodes && VECTOR(*removed)[start]) {
-        start++;
-    }
+#undef REACHED
+#undef FLIP_REACHED
+#undef VISITED
+#undef SET_VISITED
+#undef IN_S
+#undef SET_IN_S
 
-    /* If there is another component, then we have a separator */
-    *res = (start < no_of_nodes);
+
+    igraph_dqueue_int_destroy(&Q);
+    igraph_vector_int_destroy(&neis);
+    igraph_vector_char_destroy(&mark);
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
 }
@@ -133,11 +305,14 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
  * \function igraph_is_separator
  * \brief Would removing this set of vertices disconnect the graph?
  *
+ * A vertex set \c S is a separator if there are vertices \c u and \c v
+ * in the graph such that all paths between \c u and \c v pass through
+ * some vertices in \c S.
+ *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
- * \param candidate The candidate separator. It must not contain all
- *        vertices.
- * \param res Pointer to a Boolean variable, the result is stored here.
+ * \param candidate The candidate separator.
+ * \param res Pointer to a boolean variable, the result is stored here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
@@ -146,48 +321,18 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
  */
 
 igraph_error_t igraph_is_separator(const igraph_t *graph,
-                        const igraph_vs_t candidate,
-                        igraph_bool_t *res) {
+                                   const igraph_vs_t candidate,
+                                   igraph_bool_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_bool_t removed;
-    igraph_dqueue_int_t Q;
-    igraph_vector_int_t neis;
-    igraph_vit_t vit;
-
-    IGRAPH_CHECK(igraph_vit_create(graph, candidate, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-    IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
-    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-
-    IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed,
-                                       &Q, &neis, no_of_nodes));
-
-    igraph_vector_int_destroy(&neis);
-    igraph_dqueue_int_destroy(&Q);
-    igraph_vector_bool_destroy(&removed);
-    igraph_vit_destroy(&vit);
-    IGRAPH_FINALLY_CLEAN(4);
-
-    return IGRAPH_SUCCESS;
+    return igraph_i_is_separator(graph, candidate, res, NULL);
 }
 
 /**
  * \function igraph_is_minimal_separator
  * \brief Decides whether a set of vertices is a minimal separator.
  *
- * A set of vertices is a minimal separator, if the removal of the
- * vertices disconnects the graph, and this is not true for any subset
- * of the set.
- *
- * </para><para>This implementation first checks that the given
- * candidate is a separator, by calling \ref
- * igraph_is_separator(). If it is a separator, then it checks that
- * each subset of size n-1, where n is the size of the candidate, is
- * not a separator.
+ * A vertex separator \c S is minimal is no proper subset of \c S
+ * is also a separator.
  *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
@@ -196,63 +341,17 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
  *        here.
  * \return Error code.
  *
- * Time complexity: O(n(|V|+|E|)), |V| is the number of vertices, |E|
- * is the number of edges, n is the number vertices in the candidate
- * separator.
+ * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
  *
  * \example examples/simple/igraph_is_minimal_separator.c
  */
 
 igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
-                                const igraph_vs_t candidate,
-                                igraph_bool_t *res) {
+                                           const igraph_vs_t candidate,
+                                           igraph_bool_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_bool_t removed;
-    igraph_dqueue_int_t Q;
-    igraph_vector_int_t neis;
-    igraph_integer_t candsize;
-    igraph_vit_t vit;
-
-    IGRAPH_CHECK(igraph_vit_create(graph, candidate, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-    candsize = IGRAPH_VIT_SIZE(vit);
-
-    IGRAPH_CHECK(igraph_vector_bool_init(&removed, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &removed);
-    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-
-    /* Is it a separator at all? */
-    IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed,
-                                       &Q, &neis, no_of_nodes));
-    if (! *res) {
-        /* Not a separator at all, nothing to do, *res is already set */
-    } else if (candsize == 0) {
-        /* Nothing to do, minimal, *res is already set */
-    } else {
-        /* General case, we need to remove each vertex from 'candidate'
-         * and check whether the remainder is a separator. If this is
-         * false for all vertices, then 'candidate' is a minimal
-         * separator.
-         */
-        *res = false;
-        for (igraph_integer_t i=0; i < candsize && (! *res); i++) {
-            igraph_vector_bool_null(&removed);
-            IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, i, res, &removed,
-                                               &Q, &neis, no_of_nodes));
-        }
-        *res = ! *res; /* opposite */
-    }
-
-    igraph_vector_int_destroy(&neis);
-    igraph_dqueue_int_destroy(&Q);
-    igraph_vector_bool_destroy(&removed);
-    igraph_vit_destroy(&vit);
-    IGRAPH_FINALLY_CLEAN(4);
-
-    return IGRAPH_SUCCESS;
+    igraph_bool_t is_separator;
+    return igraph_i_is_separator(graph, candidate, &is_separator, res);
 }
 
 /* --------------------------------------------------------------------*/
@@ -370,7 +469,13 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
         UPDATEMARK();
 
         /* Add it to the list of separators, if it is new */
-        if (igraph_i_separators_is_not_seen_yet(separators, sorter)) {
+        /* TODO: Is there a cleaner way to avoid empty separators,
+         * or is this an inherent limitation of the algorithm?
+         * See https://github.com/igraph/igraph/issues/2517 */
+        if (
+            igraph_vector_int_size(sorter) > 0 &&
+            igraph_i_separators_is_not_seen_yet(separators, sorter)
+        ) {
             IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(separators, sorter));
         }
     } /* while cptr < complen */
@@ -404,14 +509,9 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
  * https://doi.org/10.1007/3-540-46784-X_17
  *
  * \param graph The input graph. It may be directed, but edge
- *        directions are ignored.
- * \param separators An initialized pointer vector, the separators
- *        are stored here. It is a list of pointers to <type>igraph_vector_int_t</type>
- *        objects. Each vector will contain the ids of the vertices in
- *        the separator.
- *        To free all memory allocated for \p separators, you need call
- *        \ref igraph_vector_destroy() and then \ref igraph_free() on
- *        each element, before destroying the pointer vector itself.
+ *    directions are ignored.
+ * \param separators Pointer to a list of integer vectors, the separators
+ *    will be stored here.
  * \return Error code.
  *
  * \sa \ref igraph_minimum_size_separators()
@@ -579,20 +679,25 @@ static igraph_error_t igraph_i_minimum_size_separators_append(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * Finds the k largest degree vertices.
+ */
 static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
-    const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t k
+    const igraph_t *graph, igraph_vector_int_t *res, const igraph_integer_t k
 ) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t deg, order;
-    igraph_integer_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
+
+    /* It is assumed that this function receives only simple graphs, so we can use the
+     * faster IGRAPH_LOOPS here instead of the slower IGRAPH_NO_LOOPS. */
+    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
     IGRAPH_CHECK(igraph_vector_int_order1(&deg, &order, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_int_resize(res, k));
-    for (i = 0; i < k; i++) {
+    for (igraph_integer_t i = 0; i < k; i++) {
         VECTOR(*res)[i] = VECTOR(order)[no_of_nodes - 1 - i];
     }
 
@@ -614,6 +719,7 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
  * The implementation is based on the following paper:
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
+ * https://doi.org/10.1002/net.3230230604
  *
  * \param graph The input graph, which must be undirected.
  * \param separators An initialized list of integer vectors, the separators
@@ -635,7 +741,7 @@ igraph_error_t igraph_minimum_size_separators(
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t conn;
     igraph_vector_int_t X;
-    igraph_integer_t i, j, k, n;
+    igraph_integer_t k, n;
     igraph_bool_t issepX;
     igraph_t Gbar;
     igraph_vector_t phi;
@@ -644,7 +750,7 @@ igraph_error_t igraph_minimum_size_separators(
     igraph_maxflow_stats_t stats;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs",
+        IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
@@ -665,7 +771,7 @@ igraph_error_t igraph_minimum_size_separators(
         IGRAPH_CHECK(igraph_articulation_points(graph, &ap));
         n = igraph_vector_int_size(&ap);
         IGRAPH_CHECK(igraph_vector_int_list_resize(separators, n));
-        for (i = 0; i < n; i++) {
+        for (igraph_integer_t i = 0; i < n; i++) {
             igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
             IGRAPH_CHECK(igraph_vector_int_push_back(v, VECTOR(ap)[i]));
         }
@@ -674,10 +780,10 @@ igraph_error_t igraph_minimum_size_separators(
         return IGRAPH_SUCCESS;
     } else if (conn == no_of_nodes - 1) {
         IGRAPH_CHECK(igraph_vector_int_list_resize(separators, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
             IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes - 1));
-            for (j = 0, k = 0; j < no_of_nodes; j++) {
+            for (igraph_integer_t j = 0, k = 0; j < no_of_nodes; j++) {
                 if (j != i) {
                     VECTOR(*v)[k++] = j;
                 }
@@ -712,19 +818,19 @@ igraph_error_t igraph_minimum_size_separators(
 
     /* ---------------------------------------------------------------- */
     /* 3 If v[j] != x[i] and v[j] is not adjacent to x[i] then */
-    for (i = 0; i < k; i++) {
+    for (igraph_integer_t i = 0; i < k; i++) {
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        for (j = 0; j < no_of_nodes; j++) {
-            igraph_integer_t ii = VECTOR(X)[i];
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            igraph_integer_t xi = VECTOR(X)[i];
             igraph_real_t phivalue;
             igraph_bool_t conn;
 
-            if (ii == j) {
+            if (xi == j) {
                 continue;    /* the same vertex */
             }
-            IGRAPH_CHECK(igraph_are_adjacent(&graph_copy, ii, j, &conn));
+            IGRAPH_CHECK(igraph_are_adjacent(&graph_copy, xi, j, &conn));
             if (conn) {
                 continue;    /* they are connected */
             }
@@ -734,7 +840,7 @@ igraph_error_t igraph_minimum_size_separators(
             If |phi|=k, then */
             IGRAPH_CHECK(igraph_maxflow(&Gbar, &phivalue, &phi, /*cut=*/ NULL,
                                         /*partition=*/ NULL, /*partition2=*/ NULL,
-                                        /* source= */ ii + no_of_nodes,
+                                        /* source= */ xi + no_of_nodes,
                                         /* target= */ j,
                                         &capacity, &stats));
 
@@ -747,7 +853,7 @@ igraph_error_t igraph_minimum_size_separators(
                 IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ NULL,
                                                    /*cuts=*/ &stcuts,
                                                    /*partition1s=*/ NULL,
-                                                   /*source=*/ ii + no_of_nodes,
+                                                   /*source=*/ xi + no_of_nodes,
                                                    /*target=*/ j,
                                                    /*capacity=*/ &capacity));
 
@@ -759,9 +865,9 @@ igraph_error_t igraph_minimum_size_separators(
 
             /* --------------------------------------------------------------- */
             /* 8 Add edge (x[i],v[j]) to G. */
-            IGRAPH_CHECK(igraph_add_edge(&graph_copy, ii, j));
-            IGRAPH_CHECK(igraph_add_edge(&Gbar, ii + no_of_nodes, j));
-            IGRAPH_CHECK(igraph_add_edge(&Gbar, j + no_of_nodes, ii));
+            IGRAPH_CHECK(igraph_add_edge(&graph_copy, xi, j));
+            IGRAPH_CHECK(igraph_add_edge(&Gbar, xi + no_of_nodes, j));
+            IGRAPH_CHECK(igraph_add_edge(&Gbar, j + no_of_nodes, xi));
             IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
             IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
 

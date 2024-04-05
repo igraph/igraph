@@ -2002,6 +2002,9 @@ igraph_disjoint_union:
 igraph_disjoint_union_many:
     PARAMS: OUT GRAPH res, GRAPH_PTR_LIST graphs
 
+igraph_join:
+    PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+
 igraph_union:
     PARAMS: |-
         OUT GRAPH res, GRAPH left, GRAPH right,
@@ -2511,6 +2514,9 @@ igraph_to_prufer:
 
 igraph_tree_from_parent_vector:
     PARAMS: OUT GRAPH graph, INDEX_VECTOR parents, TREE_MODE type=OUT
+
+igraph_is_complete:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_minimum_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGEWEIGHTS weights=NULL

@@ -205,6 +205,26 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     return IGRAPH_SUCCESS;
 }
 
+
+static igraph_error_t check_name(const char *name) {
+    size_t len = 0;
+
+    for (; *name != '\0'; name++, len++) {
+        if (   *name <= 0x020 /* space or non-printable */
+            || *name == 0x7f /* del */
+            || *name == '#') {
+            IGRAPH_ERRORF("The LGL format does not allow non-printable characters, spaces or '#' in vertex names. "
+                          "Character code 0x%02X found.", IGRAPH_EINVAL,
+                           *name);
+        }
+    }
+    if (len == 0) {
+        IGRAPH_ERROR("The LGL format does not support empty vertex names.", IGRAPH_EINVAL);
+    }
+    return IGRAPH_SUCCESS;
+}
+
+
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_lgl
@@ -295,7 +315,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId "\n", from, to);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -313,16 +333,18 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str2 = igraph_strvector_get(&nvec, to);
+            IGRAPH_CHECK(check_name(str2));
 
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s\n", str2);
             } else {
                 actvertex = from;
                 str1 = igraph_strvector_get(&nvec, from);
+                IGRAPH_CHECK(check_name(str1));
                 ret = fprintf(outstream, "# %s\n%s\n", str1, str2);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -349,7 +371,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret3 = fputc('\n', outstream);
             if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
-                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -374,20 +396,23 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str2 = igraph_strvector_get(&nvec, to);
+            IGRAPH_CHECK(check_name(str2));
+
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s ", str2);
             } else {
                 actvertex = from;
                 str1 = igraph_strvector_get(&nvec, from);
+                IGRAPH_CHECK(check_name(str1));
                 ret = fprintf(outstream, "# %s\n%s ", str1, str2);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing LGL file failed.", IGRAPH_EFILE);
             }
             ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret2 = fputc('\n', outstream);
             if (ret < 0 || ret2 == EOF) {
-                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -414,11 +439,12 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
                                  igraph_vss_1(i), &nvec));
                     str = igraph_strvector_get(&nvec, 0);
+                    IGRAPH_CHECK(check_name(str));
                     ret = fprintf(outstream, "# %s\n", str);
                 }
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
+                IGRAPH_ERROR("Writing LGL file failed.", IGRAPH_EFILE);
             }
         }
         igraph_strvector_destroy(&nvec);

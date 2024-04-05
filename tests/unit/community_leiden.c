@@ -179,6 +179,19 @@ int main(void) {
     run_leiden_modularity(&graph, NULL);
     igraph_destroy(&graph);
 
+    /* The next two tests need an empty weight vector. */
+    igraph_vector_clear(&weights);
+
+    /* Null graph */
+    igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
+    run_leiden_modularity(&graph, &weights);
+    igraph_destroy(&graph);
+
+    /* Edgeless graph */
+    igraph_empty(&graph, 5, IGRAPH_UNDIRECTED);
+    run_leiden_modularity(&graph, &weights);
+    igraph_destroy(&graph);
+
     igraph_vector_destroy(&weights);
 
     VERIFY_FINALLY_STACK();

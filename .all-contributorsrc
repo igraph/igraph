@@ -540,6 +540,51 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "aagon",
+      "name": "aagon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10883752?v=4",
+      "profile": "https://github.com/aagon",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "GanzuraTheConsumer",
+      "name": "Quinn Buratynski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19657136?v=4",
+      "profile": "https://github.com/GanzuraTheConsumer",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Tagl",
+      "name": "Arnar Bjarni Arnarson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7704746?v=4",
+      "profile": "https://github.com/Tagl",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "SoapGentoo",
+      "name": "David Seifert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16636962?v=4",
+      "profile": "https://github.com/SoapGentoo",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "krlmlr",
+      "name": "Kirill Müller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1741643?v=4",
+      "profile": "https://fosstodon.org/@kirill",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

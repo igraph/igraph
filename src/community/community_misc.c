@@ -341,6 +341,8 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * <code>VI(C_1, C_2) = [H(C_1) - MI(C_1, C_2)] + [H(C_2) - MI(C_1, C_2)]</code>.
  * Lower values of the variation of information indicate a smaller difference between
  * the two clusterings, with <code>VI = 0</code> achieved precisely when they coincide.
+ * igraph uses natural units for the variation of information, i.e. it uses the
+ * natural logarithm when computing entropies.
  *
  * </para><para>
  * The Rand index is defined as the probability that the two clusterings agree

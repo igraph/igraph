@@ -973,7 +973,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     /* Set the cache: A graph that is not bipartite has
      * an odd-length cycle, therefore it cannot be a forest. */
     if (! bi) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, false);
     }
 
     if (res) {

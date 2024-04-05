@@ -325,6 +325,7 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_complete
   igraph_is_dag
   igraph_is_mutual
   igraph_is_tree
@@ -369,6 +370,8 @@ add_legacy_tests(
   bug_1970
   bug_2150
   bug_2497
+  bug_2506
+  bug_2517
 )
 
 # components.at
@@ -556,6 +559,7 @@ add_examples(
   igraph_compose
   igraph_difference
   igraph_disjoint_union
+  igraph_join
   igraph_intersection
   igraph_union
 )
@@ -809,6 +813,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_is_separator
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   igraph_cohesive_blocks
   igraph_minimum_size_separators
 )
@@ -974,6 +983,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted

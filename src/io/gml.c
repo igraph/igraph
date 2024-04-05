@@ -1092,7 +1092,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         name = igraph_strvector_get(&gnames, i);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
         IGRAPH_FINALLY(igraph_free, newname);
-        if (!strcmp(newname, "directed")) {
+        if (!strcmp(newname, "directed")|| !strcmp(newname, "edge") || !strcmp(newname, "node")) {
             IGRAPH_WARNINGF("The graph attribute '%s' was ignored while writing GML format.", name);
         } else {
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {

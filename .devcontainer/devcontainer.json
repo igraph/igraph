@@ -9,7 +9,7 @@
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
         "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-            "packages": "build-essential,clang,cmake,cmake-curses-gui,ninja-build,ccache,colordiff,astyle,bison,flex,libxml2-dev,libarpack2-dev,libglpk-dev,libgmp-dev,xmlto,texinfo,source-highlight,libxml2-utils,xsltproc,fop"
+            "packages": "build-essential,clang,cmake,cmake-curses-gui,ninja-build,ccache,colordiff,astyle,bison,flex,libxml2-dev,libarpack2-dev,libglpk-dev,libgmp-dev,xmlto,texinfo,source-highlight,libxml2-utils,xsltproc,fop,docbook2x"
         }
     },
 

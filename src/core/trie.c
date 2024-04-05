@@ -27,6 +27,7 @@
 #include "core/trie.h"
 #include "internal/hacks.h" /* strdup */
 
+#include <assert.h>
 #include <string.h>
 
 
@@ -127,6 +128,8 @@ static igraph_error_t igraph_i_trie_get_node(
     igraph_trie_node_t *t, const char *key, igraph_integer_t newvalue,
     igraph_integer_t *id
 ) {
+    assert(key != NULL);
+
     /* If newvalue is negative, we don't add the node if nonexistent, only check
      * for its existence */
     igraph_bool_t add = (newvalue >= 0);
@@ -294,6 +297,12 @@ static igraph_error_t igraph_i_trie_get_node(
  */
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+    assert(key != NULL);
+
+    if (*key == '\0') {
+        IGRAPH_ERROR("Keys in a trie cannot be empty.", IGRAPH_EINVAL);
+    }
+
     if (!t->storekeys) {
         IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id));
         if (*id > t->maxvalue) {
@@ -307,13 +316,13 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
         ret = igraph_strvector_push_back(&t->keys, key);
         if (ret != IGRAPH_SUCCESS) {
             IGRAPH_FINALLY_EXIT();
-            IGRAPH_ERROR("cannot get element from trie", ret);
+            IGRAPH_ERROR("Cannot get element from trie.", ret);
         }
         ret = igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id);
         if (ret != IGRAPH_SUCCESS) {
             igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1); /* shrinks, error safe */
             IGRAPH_FINALLY_EXIT();
-            IGRAPH_ERROR("cannot get element from trie", ret);
+            IGRAPH_ERROR("Cannot get element from trie.", ret);
         }
 
         /* everything is fine */
@@ -349,9 +358,7 @@ igraph_error_t igraph_trie_get_len(
         igraph_integer_t *id) {
 
     char *tmp = strndup(key, length);
-    if (! tmp) {
-        IGRAPH_ERROR("Cannot get from trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot get from trie.");
     IGRAPH_FINALLY(igraph_free, tmp);
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     IGRAPH_FREE(tmp);
