@@ -35,10 +35,10 @@
 <!-- doxrox-include igraph_bitset_xor -->
 <!-- doxrox-include igraph_bitset_not -->
 <!-- doxrox-include igraph_bitset_popcount -->
-<!-- doxrox-include igraph_bitset_countl_zeros -->
-<!-- doxrox-include igraph_bitset_countl_ones -->
-<!-- doxrox-include igraph_bitset_countr_zeros -->
-<!-- doxrox-include igraph_bitset_countr_ones -->
+<!-- doxrox-include igraph_bitset_countl_zero -->
+<!-- doxrox-include igraph_bitset_countl_one -->
+<!-- doxrox-include igraph_bitset_countr_zero -->
+<!-- doxrox-include igraph_bitset_countr_one -->
 </section>
 
 <section id="bitset-properties"><title>Vector properties</title>
