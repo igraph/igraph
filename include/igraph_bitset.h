@@ -35,6 +35,19 @@ __BEGIN_DECLS
 
 /**
  * \ingroup bitset
+ * \section igraph_bitset_accessing_elements Accessing elements
+ *
+ * <para>The simplest way to access an element of a bitset is
+ * to use the \ref IGRAPH_BIT_TEST , \ref IGRAPH_BIT_SET and \ref IGRAPH_BIT_CLEAR macros.
+ * </para>
+ *
+ * <para>There are a few other macros which allow manual manipulation of bitsets.
+ * Those are \ref VECTOR , \ref IGRAPH_BIT_SLOT, \ref IGRAPH_BIT_MASK and
+ * \ref IGRAPH_BIT_NSLOTS. </para>
+ */
+
+/**
+ * \ingroup bitset
  * \define IGRAPH_BIT_MASK
  * \brief Computes mask used to access a specific bit of an integer.
  * Used in combination with \ref IGRAPH_BIT_SLOT to access an element of a bitset.
