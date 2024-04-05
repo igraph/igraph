@@ -569,7 +569,7 @@ void igraph_bitset_xor(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bits
 
 /**
  * \ingroup bitset
- * \function igraph_bitset_and
+ * \function igraph_bitset_not
  * \brief Applies a bitwise not to the contents of a bitset and stores it in an already initialized bitset.
  * The destination bitset may be equal to the source.
  *
