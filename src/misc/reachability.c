@@ -18,12 +18,12 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "igraph_reachability.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_bitset_list.h"
-#include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
-#include "igraph_reachability.h"
 
 
 /**
