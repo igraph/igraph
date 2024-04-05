@@ -54,6 +54,10 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_community_label_propagation()` is now interruptible.
+
 ## [0.10.11] - 2024-04-02
 
 ### Added
