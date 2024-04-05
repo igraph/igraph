@@ -25,6 +25,36 @@
 #include "igraph_interface.h"
 #include "igraph_reachability.h"
 
+
+/**
+ * \ingroup structural
+ * \function igraph_reachability_directed
+ * \brief Calculates which vertices are reachable from each vertex in the graph.
+ *
+ * <para>
+ * The resulting list will contain one bitset for each strongly connected component.
+ * The bitset for component i will have its j-th bit set, if vertex j is reachable from component i.
+ * Use the membership vector to get the reachability for a particular vertex.
+ * </para>
+ *
+ * \param graph The graph object to analyze.
+ * \param membership See \ref igraph_connected_components .
+ * \param csize See \ref igraph_connected_components .
+ * \param no_of_components Pointer to an integer. The number of
+ *        components will be stored here.
+ * \param reach A list of bitsets representing the result.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory
+ *         to perform the operation.
+ *
+ * Time complexity: O(|C||V|/w + |V| + |E|),
+ * |C| is the number of strongly connected components (at most |V|),
+ * |V| is the number of vertices,
+ * |E| is the number of edges and
+ * edges in the graph, respectively and
+ * w is the word size of the machine (32 or 64).
+ */
+
 igraph_error_t igraph_reachability_directed(
     const igraph_t *graph,
     igraph_vector_int_t *membership,
@@ -91,6 +121,30 @@ igraph_error_t igraph_reachability_directed(
 
     return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * \ingroup structural
+ * \function igraph_count_reachable_directed
+ * \brief Calculates the number of vertices reachable from each vertex in the graph.
+ *
+ * <para>
+ * The resulting vector will store how many vertices are reachable from vertex i at index i.
+ * </para>
+ *
+ * \param graph The graph object to analyze.
+ * \param counts A vector of integers representing the result.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory
+ *         to perform the operation.
+ *
+ * Time complexity: O(|C||V|/w + |V| + |E|),
+ * |C| is the number of strongly connected components (at most |V|),
+ * |V| is the number of vertices,
+ * |E| is the number of edges and
+ * edges in the graph, respectively and
+ * w is the word size of the machine (32 or 64).
+ */
 
 igraph_error_t igraph_count_reachable_directed(
     const igraph_t *graph,
