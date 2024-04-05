@@ -20,7 +20,6 @@
 
 <section id="bitset-accessing-elements">
 <!-- doxrox-include igraph_bitset_accessing_elements -->
-<!-- doxrox-include VECTOR -->
 <!-- doxrox-include IGRAPH_BIT_MASK -->
 <!-- doxrox-include IGRAPH_BIT_SLOT -->
 <!-- doxrox-include IGRAPH_BIT_SET -->
