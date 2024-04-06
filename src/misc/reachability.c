@@ -34,7 +34,8 @@
  * \experimental
  * </para><para>
  * The resulting list will contain one bitset for each strongly connected component.
- * The bitset for component i will have its j-th bit set, if vertex j is reachable from component i.
+ * The bitset for component i will have its j-th bit set, if vertex j is reachable from some vertex in component i in 0 or more steps.
+ * In particular, a vertex is always reachable from itself.
  * Use the membership vector to get the reachability for a particular vertex.
  *
  * \param graph The graph object to analyze.
