@@ -28,7 +28,7 @@
 
 /**
  * \ingroup structural
- * \function igraph_reachability_directed
+ * \function igraph_reachability
  * \brief Calculates which vertices are reachable from each vertex in the graph.
  *
  * \experimental
@@ -44,6 +44,7 @@
  * \param no_of_components Pointer to an integer. The number of
  *        components will be stored here.
  * \param reach A list of bitsets representing the result.
+ * \param directed For a directed graph, determines whether edges are treated as directed or undirected.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
@@ -56,12 +57,13 @@
  * w is the word size of the machine (32 or 64).
  */
 
-igraph_error_t igraph_reachability_directed(
+igraph_error_t igraph_reachability(
     const igraph_t *graph,
     igraph_vector_int_t *membership,
     igraph_vector_int_t *csize,
     igraph_integer_t *no_of_components,
-    igraph_bitset_list_t *reach)
+    igraph_bitset_list_t *reach,
+    igraph_bool_t directed)
 {
     igraph_integer_t no_of_nodes;
     igraph_integer_t i, j, n;
@@ -71,10 +73,12 @@ igraph_error_t igraph_reachability_directed(
 
     no_of_nodes = igraph_vcount(graph);
 
-    IGRAPH_CHECK(igraph_connected_components(graph, membership, csize, no_of_components, IGRAPH_STRONG));
-
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    if (directed) {
+        IGRAPH_CHECK(igraph_connected_components(graph, membership, csize, no_of_components, IGRAPH_STRONG));
+    }
+    else {
+        IGRAPH_CHECK(igraph_connected_components(graph, membership, csize, no_of_components, IGRAPH_WEAK));
+    }
 
     IGRAPH_CHECK(igraph_bitset_list_resize(reach, *no_of_components));
 
@@ -87,6 +91,12 @@ igraph_error_t igraph_reachability_directed(
         IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[i]), i);
     }
 
+    if (!directed) {
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, *no_of_components));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &dag);
 
@@ -126,7 +136,7 @@ igraph_error_t igraph_reachability_directed(
 
 /**
  * \ingroup structural
- * \function igraph_count_reachable_directed
+ * \function igraph_count_reachable
  * \brief Calculates the number of vertices reachable from each vertex in the graph.
  *
  * \experimental
@@ -135,6 +145,7 @@ igraph_error_t igraph_reachability_directed(
  *
  * \param graph The graph object to analyze.
  * \param counts A vector of integers representing the result.
+ * \param directed For a directed graph, determines whether edges are treated as directed or undirected.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
@@ -147,9 +158,10 @@ igraph_error_t igraph_reachability_directed(
  * w is the word size of the machine (32 or 64).
  */
 
-igraph_error_t igraph_count_reachable_directed(
+igraph_error_t igraph_count_reachable(
     const igraph_t *graph,
-    igraph_vector_int_t *counts)
+    igraph_vector_int_t *counts,
+    igraph_bool_t directed)
 {
     igraph_vector_int_t membership, csize;
     igraph_integer_t no_of_components, no_of_nodes = igraph_vcount(graph);
@@ -164,7 +176,7 @@ igraph_error_t igraph_count_reachable_directed(
     IGRAPH_CHECK(igraph_bitset_list_init(&reach, 0));
     IGRAPH_FINALLY(igraph_bitset_list_destroy, &reach);
 
-    IGRAPH_CHECK(igraph_reachability_directed(graph, &membership, &csize, &no_of_components, &reach));
+    IGRAPH_CHECK(igraph_reachability(graph, &membership, &csize, &no_of_components, &reach, directed));
 
     IGRAPH_CHECK(igraph_vector_int_resize(counts, igraph_vcount(graph)));
     for (igraph_integer_t i = 0; i < no_of_nodes; i++)

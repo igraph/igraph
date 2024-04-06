@@ -31,16 +31,18 @@
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_reachability_directed(
+IGRAPH_EXPORT igraph_error_t igraph_reachability(
     const igraph_t *graph,
     igraph_vector_int_t *membership,
     igraph_vector_int_t *csize,
     igraph_integer_t *no_of_components,
-    igraph_bitset_list_t *reach);
+    igraph_bitset_list_t *reach,
+    igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_count_reachable_directed(
+IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
     const igraph_t *graph,
-    igraph_vector_int_t *counts);
+    igraph_vector_int_t *counts,
+    igraph_bool_t directed);
 
 __END_DECLS
 
