@@ -31,6 +31,7 @@
  * \function igraph_reachability_directed
  * \brief Calculates which vertices are reachable from each vertex in the graph.
  *
+ * \experimental
  * </para><para>
  * The resulting list will contain one bitset for each strongly connected component.
  * The bitset for component i will have its j-th bit set, if vertex j is reachable from component i.
@@ -127,6 +128,7 @@ igraph_error_t igraph_reachability_directed(
  * \function igraph_count_reachable_directed
  * \brief Calculates the number of vertices reachable from each vertex in the graph.
  *
+ * \experimental
  * </para><para>
  * The resulting vector will store how many vertices are reachable from vertex i at index i.
  *

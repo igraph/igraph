@@ -140,6 +140,7 @@ igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
  * \function igraph_bitset_init
  * \brief Initializes a bitset object (constructor).
  *
+ * \experimental
  * </para><para>
  * Every bitset needs to be initialized before it can be used, and
  * there are a number of initialization functions or otherwise called
@@ -177,6 +178,7 @@ igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size
  * \function igraph_bitset_destroy
  * \brief Destroys a bitset object.
  *
+ * \experimental
  * </para><para>
  * All bitsets initialized by \ref igraph_bitset_init() should be properly
  * destroyed by this function. A destroyed bitset needs to be
@@ -199,6 +201,7 @@ void igraph_bitset_destroy(igraph_bitset_t *bitset) {
  * \function igraph_bitset_init_copy
  * \brief Initializes a bitset from another bitset object (constructor).
  *
+ * \experimental
  * </para><para>
  * The contents of the existing bitset object will be copied to
  * the new one.
@@ -228,6 +231,7 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
  * \function igraph_bitset_capacity
  * \brief Returns the allocated capacity of the bitset.
  *
+ * \experimental
  * Note that this might be different from the size of the bitset (as
  * queried by \ref igraph_bitset_size()), and specifies how many elements
  * the bitset can hold, without reallocation.
@@ -251,6 +255,7 @@ igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset) {
  * \function igraph_bitset_size
  * \brief Returns the size (=length) of the bitset.
  *
+ * \experimental
  * \param bitset The bitset object
  * \return The size of the bitset.
  *
@@ -266,6 +271,7 @@ igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset) {
  * \function igraph_bitset_reserve
  * \brief Reserves memory for a bitset.
  *
+ * \experimental
  * </para><para>
  * \a igraph bitsets are flexible, they can grow and
  * shrink. Growing
@@ -319,6 +325,7 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
  * \function igraph_bitset_resize
  * \brief Resize the bitset.
  *
+ * \experimental
  * </para><para>
  * Note that this function does not free any memory, just sets the
  * size of the bitset to the given one. It may, on the other hand,
@@ -361,6 +368,7 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
  * \function igraph_bitset_popcount
  * \brief Returns the population count (number of set bits) of the bitset.
  *
+ * \experimental
  * \param bitset The bitset object
  * \return The population count of the bitset.
  *
@@ -388,6 +396,7 @@ igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset) {
  * zeros in the bitset before the first one is encountered.
  * If the bitset is all zeros, then its size is returned.
  *
+ * \experimental
  * \param bitset The bitset object
  * \return The number of leading zeros in the bitset.
  *
@@ -418,6 +427,7 @@ igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset) {
  * in the bitset before the first zero is encountered.
  * If the bitset is all ones, then its size is returned.
  *
+ * \experimental
  * \param bitset The bitset object
  * \return The number of leading ones in the bitset.
  *
@@ -448,6 +458,7 @@ igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset) {
  * zeros in the bitset before the first one is encountered.
  * If the bitset is all zeros, then its size is returned.
  *
+ * \experimental
  * \param bitset The bitset object
  * \return The number of trailing zeros in the bitset.
  *
@@ -477,6 +488,7 @@ igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset) {
  * in the bitset before the first zero is encountered.
  * If the bitset is all ones, then its size is returned.
  *
+ * \experimental
  * \param bitset The bitset object
  * \return The number of trailing ones in the bitset.
  *
@@ -505,6 +517,7 @@ igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset) {
  * \brief Applies a bitwise or to the contents of two bitsets and stores it in an already initialized bitset.
  * The destination bitset may be equal to one (or even both) of the sources.
  *
+ * \experimental
  * \param dest The bitset object where the result is stored
  * \param src1 A bitset
  * \param src2 A bitset
@@ -524,6 +537,7 @@ void igraph_bitset_or(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitse
  * \brief Applies a bitwise and to the contents of two bitsets and stores it in an already initialized bitset.
  * The destination bitset may be equal to one (or even both) of the sources.
  *
+ * \experimental
  * \param dest The bitset object where the result is stored
  * \param src1 A bitset
  * \param src2 A bitset
@@ -543,6 +557,7 @@ void igraph_bitset_and(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bits
  * \brief Applies a bitwise xor to the contents of two bitsets and stores it in an already initialized bitset.
  * The destination bitset may be equal to one (or even both) of the sources.
  *
+ * \experimental
  * \param dest The bitset object where the result is stored
  * \param src1 A bitset
  * \param src2 A bitset
@@ -563,6 +578,7 @@ void igraph_bitset_xor(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bits
  * \brief Applies a bitwise not to the contents of a bitset and stores it in an already initialized bitset.
  * The destination bitset may be equal to the source.
  *
+ * \experimental
  * \param dest The bitset object where the result is stored
  * \param src A bitset
  *

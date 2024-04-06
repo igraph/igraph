@@ -52,6 +52,7 @@ __BEGIN_DECLS
  * \brief Computes mask used to access a specific bit of an integer.
  * Used in combination with \ref IGRAPH_BIT_SLOT to access an element of a bitset.
  *
+ * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_MASK(10) \endverbatim
  * to obtain an integer where only the 11th least significant bit is set.
@@ -70,6 +71,7 @@ __BEGIN_DECLS
  * \brief Computes index used to access a specific slot of a bitset.
  * Used in combination with \ref IGRAPH_BIT_MASK to access an element of a bitset.
  *
+ * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_SLOT(70) \endverbatim
  * will return 1 if using 64-bit words or 2 if using 32-bit words.
@@ -85,6 +87,7 @@ __BEGIN_DECLS
  * \define IGRAPH_BIT_SET
  * \brief Sets a specific bit in a bitset to 1 without altering other bits.
  *
+ * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_SET(bitset, 3) \endverbatim
  * will set the fourth least significant bit in the bitset to 1.
@@ -101,6 +104,7 @@ __BEGIN_DECLS
  * \define IGRAPH_BIT_CLEAR
  * \brief Sets a specific bit in a bitset to 0 without altering other bits.
  *
+ * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_CLEAR(bitset, 4) \endverbatim
  * will set the fifth least significant bit in the bitset to 0.
@@ -119,6 +123,7 @@ __BEGIN_DECLS
  * Returns 0 if the bit at the specified bit index is not set,
  * otherwise returns a non-zero value.
  *
+ * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_TEST(bitset, 7) \endverbatim
  * will test the eighth least significant bit in the bitset.
@@ -135,6 +140,7 @@ __BEGIN_DECLS
  * \define IGRAPH_BIT_NSLOTS
  * \brief Computes the number of slots required to store a specified number of bits.
  *
+ * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_NSLOTS(70) \endverbatim
  * will return 2 if using 64-bit words and 3 if using 32-bit words.
