@@ -325,7 +325,6 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
     bitset->stor_begin = tmp;
     bitset->stor_end = bitset->stor_begin + IGRAPH_BIT_NSLOTS(capacity);
 
-
     return IGRAPH_SUCCESS;
 }
 
@@ -364,6 +363,7 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
     IGRAPH_ASSERT(bitset != NULL);
     IGRAPH_ASSERT(bitset->stor_begin != NULL);
     IGRAPH_CHECK(igraph_bitset_reserve(bitset, new_size));
+
     for (igraph_integer_t i = bitset->size; i % IGRAPH_INTEGER_SIZE != 0; ++i) {
         IGRAPH_BIT_CLEAR(*bitset, i);
     }
@@ -371,6 +371,7 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
         VECTOR(*bitset)[i] = 0;
     }
     bitset->size = new_size;
+
     return IGRAPH_SUCCESS;
 }
 
@@ -395,12 +396,14 @@ igraph_integer_t igraph_bitset_popcount(const igraph_bitset_t *bitset) {
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~0 : ((1 << final_block_size) - 1);
     igraph_integer_t count = 0;
+
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         count += IGRAPH_POPCOUNT(VECTOR(*bitset)[i]);
     }
     if (bitset->size) {
         count += IGRAPH_POPCOUNT(mask & VECTOR(*bitset)[slots - 1]);
     }
+
     return count;
 }
 
@@ -427,6 +430,7 @@ igraph_integer_t igraph_bitset_countl_zero(const igraph_bitset_t *bitset) {
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t one = 1, zero = 0;
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
+
     if (bitset->size && (mask & VECTOR(*bitset)[slots - 1]) != 0) {
         return IGRAPH_CLZ(mask & VECTOR(*bitset)[slots - 1]) - padding;
     }
@@ -435,6 +439,7 @@ igraph_integer_t igraph_bitset_countl_zero(const igraph_bitset_t *bitset) {
             return IGRAPH_INTEGER_SIZE * i + IGRAPH_CLZ(VECTOR(*bitset)[slots - i - 1]) - padding;
         }
     }
+
     return bitset->size;
 }
 
@@ -461,6 +466,7 @@ igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
+
     if (bitset->size && (mask | VECTOR(*bitset)[slots - 1]) != ~zero) {
         return IGRAPH_CLO(mask | VECTOR(*bitset)[slots - 1]) - padding;
     }
@@ -469,6 +475,7 @@ igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
             return IGRAPH_INTEGER_SIZE * i + IGRAPH_CLO(VECTOR(*bitset)[slots - i - 1]) - padding;
         }
     }
+
     return bitset->size;
 }
 
@@ -494,6 +501,7 @@ igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
+
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         if (VECTOR(*bitset)[i] != zero) {
             return IGRAPH_INTEGER_SIZE * i + IGRAPH_CTZ(VECTOR(*bitset)[i]);
@@ -502,6 +510,7 @@ igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
     if (bitset->size && (mask & VECTOR(*bitset)[slots - 1]) != zero) {
         return IGRAPH_INTEGER_SIZE * (slots - 1) + IGRAPH_CTZ(mask & VECTOR(*bitset)[slots - 1]);
     }
+
     return bitset->size;
 }
 
@@ -527,6 +536,7 @@ igraph_integer_t igraph_bitset_countr_one(const igraph_bitset_t *bitset) {
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
+
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         if (VECTOR(*bitset)[i] != ~zero) {
             return IGRAPH_INTEGER_SIZE * i + IGRAPH_CTO(VECTOR(*bitset)[i]);
@@ -535,6 +545,7 @@ igraph_integer_t igraph_bitset_countr_one(const igraph_bitset_t *bitset) {
     if (bitset->size && (mask | VECTOR(*bitset)[slots - 1]) != ~zero) {
         return IGRAPH_INTEGER_SIZE * (slots - 1) + IGRAPH_CTO(mask | VECTOR(*bitset)[slots - 1]);
     }
+
     return bitset->size;
 }
 
