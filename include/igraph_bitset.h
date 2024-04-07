@@ -29,7 +29,7 @@
 
 /* Required for MSVC intrinsics such as __popcnt and __popcnt64 */
 #ifdef _MSC_VER
-#include "intrin.h"
+    #include "intrin.h"
 #endif
 
 __BEGIN_DECLS
@@ -163,44 +163,65 @@ __BEGIN_DECLS
  */
 #define IGRAPH_BIT_NSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
-#ifdef _MSC_VER
-igraph_integer_t igraph_i_ctz32(igraph_integer_t x);
-igraph_integer_t igraph_i_ctz64(igraph_integer_t x);
-igraph_integer_t igraph_i_clz32(igraph_integer_t x);
-igraph_integer_t igraph_i_clz64(igraph_integer_t x);
-#ifdef HAVE__POPCNT
-#define IGRAPH_POPCOUNT32(x) __popcnt(x)
-#elif IGRAPH_INTEGER_SIZE==32
-igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
-#define IGRAPH_POPCOUNT32(x) igraph_i_popcnt(x)
-#endif
-#ifdef HAVE__POPCNT64
-#define IGRAPH_POPCOUNT64(x) __popcnt64(x)
-#elif IGRAPH_INTEGER_SIZE==64
-igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
-#define IGRAPH_POPCOUNT64(x) igraph_i_popcnt(x)
-#endif
-#define IGRAPH_CTZ32(x) igraph_i_ctz32(x)
-#define IGRAPH_CTZ64(x) igraph_i_ctz64(x)
-#define IGRAPH_CLZ32(x) igraph_i_clz32(x)
-#define IGRAPH_CLZ64(x) igraph_i_clz64(x)
+
+#if defined(__GNUC__)
+    /* GCC and Clang support these six builtins from very early versions. */
+
+    #define IGRAPH_I_POPCOUNT32(x) __builtin_popcount(x)
+    #define IGRAPH_I_POPCOUNT64(x) __builtin_popcountll(x)
+
+    /* The result of the following four builtins is undefined for zero input,
+     * therefore we handle this specially.
+     * See https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html */
+    #define IGRAPH_I_CTZ32(x) (x ? __builtin_ctz(x) : 32)
+    #define IGRAPH_I_CTZ64(x) (x ? __builtin_ctzll(x) : 64)
+    #define IGRAPH_I_CLZ32(x) (x ? __builtin_clz(x) : 32)
+    #define IGRAPH_I_CLZ64(x) (x ? __builtin_clzll(x) : 64)
+
 #else
-#define IGRAPH_POPCOUNT32(x) __builtin_popcount(x)
-#define IGRAPH_POPCOUNT64(x) __builtin_popcountll(x)
-#define IGRAPH_CTZ32(x) (x ? __builtin_ctz(x) : 32)
-#define IGRAPH_CTZ64(x) (x ? __builtin_ctzll(x) : 64)
-#define IGRAPH_CLZ32(x) (x ? __builtin_clz(x) : 32)
-#define IGRAPH_CLZ64(x) (x ? __builtin_clzll(x) : 64)
+    /* Non-GNU compilers, i.e. MSVC and others. Attempt to use MSVC intrinsics
+     * when available, otherwise use fallback implementation. */
+
+    #if IGRAPH_INTEGER_SIZE == 32
+        #ifdef HAVE__POPCNT
+            #define IGRAPH_I_POPCOUNT32(x) __popcnt(x)
+        #else
+            igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
+            #define IGRAPH_I_POPCOUNT32(x) igraph_i_popcnt(x)
+        #endif
+    #elif IGRAPH_INTEGER_SIZE == 64
+        #ifdef HAVE__POPCNT64
+            #define IGRAPH_I_POPCOUNT64(x) __popcnt64(x)
+        #else
+            igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
+            #define IGRAPH_I_POPCOUNT64(x) igraph_i_popcnt(x)
+        #endif
+    #else
+        #error "Unexpected IGRAPH_INTEGER_SIZE value."
+    #endif
+
+    igraph_integer_t igraph_i_ctz32(igraph_integer_t x);
+    igraph_integer_t igraph_i_ctz64(igraph_integer_t x);
+    igraph_integer_t igraph_i_clz32(igraph_integer_t x);
+    igraph_integer_t igraph_i_clz64(igraph_integer_t x);
+    #define IGRAPH_I_CTZ32(x) igraph_i_ctz32(x)
+    #define IGRAPH_I_CTZ64(x) igraph_i_ctz64(x)
+    #define IGRAPH_I_CLZ32(x) igraph_i_clz32(x)
+    #define IGRAPH_I_CLZ64(x) igraph_i_clz64(x)
+
 #endif
 
-#if IGRAPH_INTEGER_SIZE==32
-#define IGRAPH_POPCOUNT IGRAPH_POPCOUNT32
-#define IGRAPH_CLZ IGRAPH_CLZ32
-#define IGRAPH_CTZ IGRAPH_CTZ32
+
+#if IGRAPH_INTEGER_SIZE == 32
+    #define IGRAPH_POPCOUNT IGRAPH_I_POPCOUNT32
+    #define IGRAPH_CLZ IGRAPH_I_CLZ32
+    #define IGRAPH_CTZ IGRAPH_I_CTZ32
+#elif IGRAPH_INTEGER_SIZE == 64
+    #define IGRAPH_POPCOUNT IGRAPH_I_POPCOUNT64
+    #define IGRAPH_CLZ IGRAPH_I_CLZ64
+    #define IGRAPH_CTZ IGRAPH_I_CTZ64
 #else
-#define IGRAPH_POPCOUNT IGRAPH_POPCOUNT64
-#define IGRAPH_CLZ IGRAPH_CLZ64
-#define IGRAPH_CTZ IGRAPH_CTZ64
+    #error "Unexpected IGRAPH_INTEGER_SIZE value."
 #endif
 
 #define IGRAPH_CLO(x) IGRAPH_CLZ(~(x))
@@ -214,20 +235,20 @@ typedef struct {
 
 IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size);
 IGRAPH_EXPORT void igraph_bitset_destroy(igraph_bitset_t *bitset);
-IGRAPH_EXPORT igraph_error_t igraph_bitset_init_copy(igraph_bitset_t* dest, const igraph_bitset_t* src);
+IGRAPH_EXPORT igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitset_t *src);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset);
 IGRAPH_EXPORT igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset);
 IGRAPH_EXPORT igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t new_size);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_bitset_t* bitset);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t* bitset);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t* bitset);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t* bitset);
-IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t* bitset);
-IGRAPH_EXPORT void igraph_bitset_or(igraph_bitset_t* dest, igraph_bitset_t* src1, igraph_bitset_t* src2);
-IGRAPH_EXPORT void igraph_bitset_and(igraph_bitset_t* dest, igraph_bitset_t* src1, igraph_bitset_t* src2);
-IGRAPH_EXPORT void igraph_bitset_xor(igraph_bitset_t* dest, igraph_bitset_t* src1, igraph_bitset_t* src2);
-IGRAPH_EXPORT void igraph_bitset_not(igraph_bitset_t* dest, igraph_bitset_t* src);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset);
+IGRAPH_EXPORT igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset);
+IGRAPH_EXPORT void igraph_bitset_or(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2);
+IGRAPH_EXPORT void igraph_bitset_and(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2);
+IGRAPH_EXPORT void igraph_bitset_xor(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2);
+IGRAPH_EXPORT void igraph_bitset_not(igraph_bitset_t *dest, igraph_bitset_t *src);
 
 __END_DECLS
 

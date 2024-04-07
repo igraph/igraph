@@ -21,7 +21,6 @@
 #include "igraph_bitset.h"
 #include "igraph_memory.h"
 
-#ifdef _MSC_VER
 igraph_integer_t igraph_i_ctz32(igraph_integer_t x) {
 #ifdef HAVE__BITSCANFORWARD
     unsigned long index;
@@ -33,20 +32,6 @@ igraph_integer_t igraph_i_ctz32(igraph_integer_t x) {
         }
     }
     return 32;
-#endif
-}
-
-igraph_integer_t igraph_i_ctz64(igraph_integer_t x) {
-#ifdef HAVE_BITSCANFORWARD64
-    unsigned long index;
-    return _BitScanForward64(&index, x) ? index : 64;
-#else
-    for (igraph_integer_t i = 0; i < 64; ++i) {
-        if (IGRAPH_BIT_MASK(i) & x) {
-            return i;
-        }
-    }
-    return 64;
 #endif
 }
 
@@ -64,6 +49,31 @@ igraph_integer_t igraph_i_clz32(igraph_integer_t x) {
 #endif
 }
 
+igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
+    igraph_integer_t result = 0;
+    while (x) {
+        result++;
+        x = x & (x - 1);
+    }
+    return result;
+}
+
+/* Fallbacks for 64-bit word (and igraph_integer_t) size */
+#if IGRAPH_INTEGER_SIZE == 64
+igraph_integer_t igraph_i_ctz64(igraph_integer_t x) {
+#ifdef HAVE_BITSCANFORWARD64
+    unsigned long index;
+    return _BitScanForward64(&index, x) ? index : 64;
+#else
+    for (igraph_integer_t i = 0; i < 64; ++i) {
+        if (IGRAPH_BIT_MASK(i) & x) {
+            return i;
+        }
+    }
+    return 64;
+#endif
+}
+
 igraph_integer_t igraph_i_clz64(igraph_integer_t x) {
 #ifdef HAVE_BITSCANREVERSE64
     unsigned long index;
@@ -77,18 +87,7 @@ igraph_integer_t igraph_i_clz64(igraph_integer_t x) {
     return 64;
 #endif
 }
-
-#if (!defined(HAVE__POPCNT64) && IGRAPH_INTEGER_SIZE==64) || (!defined(HAVE_POPCNT) && IGRAPH_INTEGER_SIZE==32)
-igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
-    igraph_integer_t result = 0;
-    while (x) {
-        result++;
-        x = x & (x - 1);
-    }
-    return result;
-}
-#endif
-#endif
+#endif /* IGRAPH_INTEGER_SIZE == 64 */
 
 /**
  * \ingroup bitset
