@@ -377,8 +377,8 @@ typedef igraph_error_type_t igraph_error_t;
  * \param igraph_errno The \a igraph error code.
  */
 
-typedef void igraph_error_handler_t (const char *reason, const char *file,
-                                     int line, igraph_error_t igraph_errno);
+typedef void igraph_error_handler_t(const char *reason, const char *file,
+                                    int line, igraph_error_t igraph_errno);
 
 /**
  * \var igraph_error_handler_abort
@@ -423,7 +423,7 @@ IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_printignore;
  *   more.
  */
 
-IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
+IGRAPH_EXPORT igraph_error_handler_t *igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 
 /* We use IGRAPH_FILE_BASENAME instead of __FILE__ to ensure that full
@@ -487,8 +487,8 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
  * \sa igraph_errorf().
  */
 
-IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, int line,
-                               igraph_error_t igraph_errno);
+IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file,
+                                          int line, igraph_error_t igraph_errno);
 
 /**
  * \define IGRAPH_ERRORF
@@ -537,11 +537,13 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
  */
 
 IGRAPH_FUNCATTR_PRINTFLIKE(1,5)
-IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
-                                igraph_error_t igraph_errno, ...);
+IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file,
+                                           int line, igraph_error_t igraph_errno,
+                                           ...);
 
-IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file, int line,
-                                 igraph_error_t igraph_errno, va_list ap);
+IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file,
+                                            int line, igraph_error_t igraph_errno,
+                                            va_list ap);
 
 /**
  * \function igraph_strerror
@@ -554,7 +556,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
  * \return pointer to the textual description of the error code.
  */
 
-IGRAPH_EXPORT const char* igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT const char *igraph_strerror(const igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -572,9 +574,9 @@ struct igraph_i_protectedPtr {
     void (*func)(void*);
 };
 
-typedef void igraph_finally_func_t (void*);
+typedef void igraph_finally_func_t(void *);
 
-IGRAPH_EXPORT void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
+IGRAPH_EXPORT void IGRAPH_FINALLY_REAL(igraph_finally_func_t *func, void *ptr);
 
 /**
  * \function IGRAPH_FINALLY_CLEAN
@@ -813,7 +815,8 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * argument is not used.
  */
 
-typedef void igraph_warning_handler_t (const char *reason, const char *file, int line);
+typedef void igraph_warning_handler_t(const char *reason,
+                                      const char *file, int line);
 
 /**
  * \function igraph_set_warning_handler
@@ -827,7 +830,7 @@ typedef void igraph_warning_handler_t (const char *reason, const char *file, int
  * \return The current warning handler function.
  */
 
-IGRAPH_EXPORT igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
+IGRAPH_EXPORT igraph_warning_handler_t *igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
 IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_ignore;
 IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
@@ -848,7 +851,8 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT void igraph_warning(const char *reason, const char *file, int line);
+IGRAPH_EXPORT void igraph_warning(const char *reason,
+                                  const char *file, int line);
 
 /**
  * \define IGRAPH_WARNINGF
@@ -892,7 +896,8 @@ IGRAPH_EXPORT void igraph_warning(const char *reason, const char *file, int line
  */
 
 IGRAPH_FUNCATTR_PRINTFLIKE(1,4)
-IGRAPH_EXPORT void igraph_warningf(const char *reason, const char *file, int line, ...);
+IGRAPH_EXPORT void igraph_warningf(const char *reason,
+                                   const char *file, int line, ...);
 
 /**
  * \define IGRAPH_WARNING
@@ -948,7 +953,7 @@ IGRAPH_EXPORT void igraph_warningf(const char *reason, const char *file, int lin
  * \param line The number of the line in the source file which triggered the error.
  */
 
-typedef void igraph_fatal_handler_t (const char *reason, const char *file, int line);
+typedef void igraph_fatal_handler_t(const char *reason, const char *file, int line);
 
 /**
  * \function igraph_set_fatal_handler
@@ -966,7 +971,7 @@ typedef void igraph_fatal_handler_t (const char *reason, const char *file, int l
  * \return The current fatal error handler function.
  */
 
-IGRAPH_EXPORT igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t* new_handler);
+IGRAPH_EXPORT igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t *new_handler);
 
 /**
  * \var igraph_fatal_handler_abort
@@ -989,7 +994,8 @@ IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
  * \param line The number of line in the source file which triggered the error.
  */
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason,
+                                                         const char *file, int line);
 
 /**
  * \function igraph_fatalf
@@ -1006,7 +1012,8 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason, con
  */
 
 IGRAPH_FUNCATTR_PRINTFLIKE(1,4)
-IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason,
+                                                          const char *file, int line, ...);
 
 /**
  * \define IGRAPH_FATALF
