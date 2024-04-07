@@ -27,6 +27,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
+/* Required for MSVC intrinsics such as __popcnt and __popcnt64 */
 #ifdef _MSC_VER
 #include "intrin.h"
 #endif
@@ -38,21 +39,23 @@ __BEGIN_DECLS
  * \section igraph_bitset_accessing_elements Accessing elements
  *
  * <para>The simplest way to access an element of a bitset is
- * to use the \ref IGRAPH_BIT_TEST , \ref IGRAPH_BIT_SET and \ref IGRAPH_BIT_CLEAR macros.
+ * to use the \ref IGRAPH_BIT_TEST(), \ref IGRAPH_BIT_SET() and \ref IGRAPH_BIT_CLEAR() macros.
  * </para>
  *
  * <para>There are a few other macros which allow manual manipulation of bitsets.
- * Those are \ref VECTOR , \ref IGRAPH_BIT_SLOT, \ref IGRAPH_BIT_MASK and
- * \ref IGRAPH_BIT_NSLOTS. </para>
+ * Those are \ref VECTOR(), \ref IGRAPH_BIT_SLOT(), \ref IGRAPH_BIT_MASK() and
+ * \ref IGRAPH_BIT_NSLOTS().</para>
  */
 
 /**
  * \ingroup bitset
  * \define IGRAPH_BIT_MASK
  * \brief Computes mask used to access a specific bit of an integer.
- * Used in combination with \ref IGRAPH_BIT_SLOT to access an element of a bitset.
  *
  * \experimental
+ *
+ * Used in combination with \ref IGRAPH_BIT_SLOT() to access an element of a bitset.
+ *
  * Usage:
  * \verbatim IGRAPH_BIT_MASK(10) \endverbatim
  * to obtain an integer where only the 11th least significant bit is set.
@@ -69,9 +72,11 @@ __BEGIN_DECLS
  * \ingroup bitset
  * \define IGRAPH_BIT_SLOT
  * \brief Computes index used to access a specific slot of a bitset.
- * Used in combination with \ref IGRAPH_BIT_MASK to access an element of a bitset.
  *
  * \experimental
+ *
+ * Used in combination with \ref IGRAPH_BIT_MASK to access an element of a bitset.
+ *
  * Usage:
  * \verbatim IGRAPH_BIT_SLOT(70) \endverbatim
  * will return 1 if using 64-bit words or 2 if using 32-bit words.
@@ -88,6 +93,7 @@ __BEGIN_DECLS
  * \brief Sets a specific bit in a bitset to 1 without altering other bits.
  *
  * \experimental
+ *
  * Usage:
  * \verbatim IGRAPH_BIT_SET(bitset, 3) \endverbatim
  * will set the fourth least significant bit in the bitset to 1.
@@ -105,6 +111,7 @@ __BEGIN_DECLS
  * \brief Sets a specific bit in a bitset to 0 without altering other bits.
  *
  * \experimental
+ *
  * Usage:
  * \verbatim IGRAPH_BIT_CLEAR(bitset, 4) \endverbatim
  * will set the fifth least significant bit in the bitset to 0.
@@ -120,10 +127,12 @@ __BEGIN_DECLS
  * \ingroup bitset
  * \define IGRAPH_BIT_TEST
  * \brief Tests whether a bit is set in a bitset.
+ *
+ * \experimental
+ *
  * Returns 0 if the bit at the specified bit index is not set,
  * otherwise returns a non-zero value.
  *
- * \experimental
  * Usage:
  * \verbatim IGRAPH_BIT_TEST(bitset, 7) \endverbatim
  * will test the eighth least significant bit in the bitset.
@@ -141,6 +150,7 @@ __BEGIN_DECLS
  * \brief Computes the number of slots required to store a specified number of bits.
  *
  * \experimental
+ *
  * Usage:
  * \verbatim IGRAPH_BIT_NSLOTS(70) \endverbatim
  * will return 2 if using 64-bit words and 3 if using 32-bit words.
@@ -196,7 +206,7 @@ igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
 #define IGRAPH_CLO(x) IGRAPH_CLZ(~(x))
 #define IGRAPH_CTO(x) IGRAPH_CTZ(~(x))
 
-typedef struct s_bitset {
+typedef struct {
     igraph_integer_t size;
     igraph_integer_t* stor_begin;
     igraph_integer_t* stor_end;
@@ -221,4 +231,4 @@ IGRAPH_EXPORT void igraph_bitset_not(igraph_bitset_t* dest, igraph_bitset_t* src
 
 __END_DECLS
 
-#endif // IGRAPH_BITSET_H
+#endif /* IGRAPH_BITSET_H */
