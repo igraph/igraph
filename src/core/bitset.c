@@ -394,7 +394,8 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
 igraph_integer_t igraph_bitset_popcount(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
-    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~0 : ((1 << final_block_size) - 1);
+    const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
+    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - 1);
     igraph_integer_t count = 0;
 
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
