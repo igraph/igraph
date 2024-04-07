@@ -484,7 +484,7 @@ IGRAPH_EXPORT igraph_error_handler_t *igraph_set_error_handler(igraph_error_hand
  * \param igraph_errno The \a igraph error code.
  * \return the error code (if it returns)
  *
- * \sa igraph_errorf().
+ * \sa \ref igraph_errorf()
  */
 
 IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file,
@@ -533,7 +533,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file,
  * \param ... Additional parameters, the values to substitute into the
  *            format string.
  *
- * \sa igraph_error().
+ * \sa \ref igraph_error()
  */
 
 IGRAPH_FUNCATTR_PRINTFLIKE(1,5)
