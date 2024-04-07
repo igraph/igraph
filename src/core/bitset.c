@@ -253,7 +253,7 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
  */
 
 
-igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_capacity(const igraph_bitset_t *bitset) {
     return IGRAPH_INTEGER_SIZE * (bitset->stor_end - bitset->stor_begin);
 }
 
@@ -270,7 +270,7 @@ igraph_integer_t igraph_bitset_capacity(igraph_bitset_t *bitset) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t igraph_bitset_size(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_size(const igraph_bitset_t *bitset) {
     return bitset->size;
 }
 
@@ -390,7 +390,7 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
  * Time complexity: O(n/w).
  */
 
-igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_popcount(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~0 : ((1 << final_block_size) - 1);
@@ -421,7 +421,7 @@ igraph_integer_t igraph_bitset_popcount(igraph_bitset_t *bitset) {
  * Time complexity: O(n/w).
  */
 
-igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_countl_zero(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t padding = IGRAPH_INTEGER_SIZE - final_block_size;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
@@ -455,7 +455,7 @@ igraph_integer_t igraph_bitset_countl_zero(igraph_bitset_t *bitset) {
  * Time complexity: O(n/w).
  */
 
-igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t padding = IGRAPH_INTEGER_SIZE - final_block_size;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
@@ -489,7 +489,7 @@ igraph_integer_t igraph_bitset_countl_one(igraph_bitset_t *bitset) {
  * Time complexity: O(n/w).
  */
 
-igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
@@ -522,7 +522,7 @@ igraph_integer_t igraph_bitset_countr_zero(igraph_bitset_t *bitset) {
  * Time complexity: O(n/w).
  */
 
-igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset) {
+igraph_integer_t igraph_bitset_countr_one(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
     const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
@@ -556,7 +556,8 @@ igraph_integer_t igraph_bitset_countr_one(igraph_bitset_t *bitset) {
  * Time complexity: O(n/w).
  */
 
-void igraph_bitset_or(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2) {
+void igraph_bitset_or(igraph_bitset_t *dest,
+                      const igraph_bitset_t *src1, const igraph_bitset_t *src2) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
         VECTOR(*dest)[i] = VECTOR(*src1)[i] | VECTOR(*src2)[i];
     }
@@ -580,7 +581,7 @@ void igraph_bitset_or(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitse
  * Time complexity: O(n/w).
  */
 
-void igraph_bitset_and(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2) {
+void igraph_bitset_and(igraph_bitset_t *dest, const igraph_bitset_t *src1, const igraph_bitset_t *src2) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
         VECTOR(*dest)[i] = VECTOR(*src1)[i] & VECTOR(*src2)[i];
     }
@@ -604,7 +605,8 @@ void igraph_bitset_and(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bits
  * Time complexity: O(n/w).
  */
 
-void igraph_bitset_xor(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bitset_t *src2) {
+void igraph_bitset_xor(igraph_bitset_t *dest,
+                       const igraph_bitset_t *src1, const igraph_bitset_t *src2) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
         VECTOR(*dest)[i] = VECTOR(*src1)[i] ^ VECTOR(*src2)[i];
     }
@@ -628,7 +630,7 @@ void igraph_bitset_xor(igraph_bitset_t *dest, igraph_bitset_t *src1, igraph_bits
  * Time complexity: O(n/w).
  */
 
-void igraph_bitset_not(igraph_bitset_t *dest, igraph_bitset_t *src) {
+void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src) {
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
         VECTOR(*dest)[i] = ~VECTOR(*src)[i];
     }
