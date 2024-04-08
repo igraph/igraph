@@ -68,7 +68,7 @@ REPLACE ----- function object, extract its signature --------------------------
 [\s]*(?P<brief>[^\n]*?)\n        # brief description
 (?P<after>.*?)\*\/               # tail of the comment
 \s*
-(IGRAPH_EXPORT )?                # strip IGRAPH_EXPORT from prototype
+(IGRAPH_EXPORT\s+)?              # strip IGRAPH_EXPORT from prototype
 (?P<def>.*?\))                   # function head
 (?=(\s*;)|(\s*\{))               # prototype ends with ; function head with {
 .*\Z                             # and the remainder
