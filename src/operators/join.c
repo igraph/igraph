@@ -18,10 +18,9 @@
 */
 
 #include "igraph_operators.h"
-#include "math/safe_intop.h"
-
-#include "igraph_constructors.h"
 #include "igraph_interface.h"
+
+#include "math/safe_intop.h"
 
 /**
  * \function igraph_join
