@@ -51,7 +51,7 @@ void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
  *
  * </para><para>
  * This format is used by the Large Graph Layout program
- * (http://lgl.sourceforge.net), and it is simply a
+ * (https://lgl.sourceforge.net), and it is simply a
  * symbolic weighted edge list. It is a simple text file with one edge
  * per line. An edge is defined by two symbolic vertex names separated
  * by whitespace. The vertex names themselves cannot contain
