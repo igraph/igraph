@@ -478,13 +478,14 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
  * References:
  *
  * </para><para>
- * Deritei et al, Community detection by graph Voronoi diagrams,
+ * Deritei et al., Community detection by graph Voronoi diagrams,
  * New Journal of Physics 16, 063007 (2014)
  * https://doi.org/10.1088/1367-2630/16/6/063007
  *
  * </para><para>
- * Molnár et al, Community Detection in Directed Weighted Networks using Voronoi Partitioning,
- * https://arxiv.org/abs/2304.12389
+ * Molnár et al., Community Detection in Directed Weighted Networks using Voronoi Partitioning,
+ * Scientific Reports 14, 8124 (2024)
+ * https://doi.org/10.1038/s41598-024-58624-4
  *
  * \param graph The input graph. It must be simple.
  * \param membership If not \c NULL, the membership of each vertex is returned here.
