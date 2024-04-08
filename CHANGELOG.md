@@ -6,6 +6,10 @@
 
  - `igraph_community_label_propagation()` is now interruptible.
 
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.11] - 2024-04-02
 
 ### Added
