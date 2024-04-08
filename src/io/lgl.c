@@ -48,7 +48,7 @@ void igraph_lgl_yylex_destroy_wrapper (void *scanner ) {
  *
  * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
- * (http://lgl.sourceforge.net), it can
+ * (https://lgl.sourceforge.net), it can
  * describe undirected optionally weighted graphs. From the LGL
  * manual:
  *

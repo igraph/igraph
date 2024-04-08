@@ -821,7 +821,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
      * We follow the description of the Gale-Ryser theorem in:
      *
      * A. Berger, A note on the characterization of digraphic sequences, Discrete Math. 314, 38 (2014).
-     * http://dx.doi.org/10.1016/j.disc.2013.09.010
+     * https://doi.org/10.1016/j.disc.2013.09.010
      *
      * Gale-Ryser condition with 0-based indexing:
      *

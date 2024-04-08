@@ -220,7 +220,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * </para><para>
  * M. E. J. Newman: Assortative mixing in networks,
  * Phys. Rev. Lett. 89, 208701 (2002)
- * http://doi.org/10.1103/PhysRevLett.89.208701.
+ * https://doi.org/10.1103/PhysRevLett.89.208701.
  * See equation (4) for performing the calculation in undirected
  * graphs with the degrees as values.
  *

@@ -478,13 +478,14 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
  * References:
  *
  * </para><para>
- * Deritei et al, Community detection by graph Voronoi diagrams,
+ * Deritei et al., Community detection by graph Voronoi diagrams,
  * New Journal of Physics 16, 063007 (2014)
  * https://doi.org/10.1088/1367-2630/16/6/063007
  *
  * </para><para>
- * Molnár et al, Community Detection in Directed Weighted Networks using Voronoi Partitioning,
- * https://arxiv.org/abs/2304.12389
+ * Molnár et al., Community Detection in Directed Weighted Networks using Voronoi Partitioning,
+ * Scientific Reports 14, 8124 (2024)
+ * https://doi.org/10.1038/s41598-024-58624-4
  *
  * \param graph The input graph. It must be simple.
  * \param membership If not \c NULL, the membership of each vertex is returned here.
@@ -509,7 +510,8 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
  */
 igraph_error_t igraph_community_voronoi(
         const igraph_t *graph,
-        igraph_vector_int_t *membership, igraph_vector_int_t *generators, igraph_real_t *modularity,
+        igraph_vector_int_t *membership, igraph_vector_int_t *generators,
+        igraph_real_t *modularity,
         const igraph_vector_t *lengths, const igraph_vector_t *weights,
         igraph_neimode_t mode, igraph_real_t r) {
 
@@ -632,7 +634,7 @@ igraph_error_t igraph_community_voronoi(
         IGRAPH_CHECK(choose_generators(graph, pgenerators, NULL, &local_rel_dens, &lengths2, mode, r));
         IGRAPH_CHECK(igraph_voronoi(graph, membership, NULL, pgenerators, &lengths2, mode, IGRAPH_VORONOI_RANDOM));
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, weights,1,
+            IGRAPH_CHECK(igraph_modularity(graph, membership, weights, 1,
                                            mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED, modularity));
         }
     }
