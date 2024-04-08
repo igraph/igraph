@@ -372,7 +372,7 @@ WITH --------------------------------------------------------------------------
 
 REPLACE IN *.h ----- structure member descriptions ----------------------------
 
-\\member\b\s*                    # \enumval command
+\\member\b\s*                     # \enumval command
 (?P<paramname>(\w+)|(...))\s+     # name of the parameter
 (?P<paramtext>.*?)                # text of the \enumval command
 (?=(\\member)|(</variablelist>)|
@@ -386,14 +386,14 @@ WITH --------------------------------------------------------------------------
 
 REPLACE ----- \typedef function -----------------------------------------------
 
-(?P<before>\A.*?)                   # comment head
+(?P<before>\A.*?)                 # comment head
 \\typedef\s+                      # \typedef command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 [\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)                    # comment tail
 \*\/                              # end of comment block
 \s*
-(?P<src>typedef\s+[^;]*;)        # the typedef definition
+(?P<src>typedef\s+[^;]*;)         # the typedef definition
 .*\Z
 
 WITH --------------------------------------------------------------------------
