@@ -178,7 +178,9 @@ REPLACE ----- variables -------------------------------------------------------
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 [\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)\*\/                # tail of the comment
-\s*(?P<def>[^;]*;)                # the definition of the variable
+\s*
+(IGRAPH_EXPORT\s+)?               # strip IGRAPH_EXPORT
+(?P<def>[^;]*;)                   # the definition of the variable
 .*\Z                              # and the remainder
 
 WITH --------------------------------------------------------------------------
