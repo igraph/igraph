@@ -487,7 +487,7 @@ void igraph_warning(const char *reason, const char *file, int line) {
  *        template string.
  */
 
-void igraph_warningf(const char *reason, const char *file, int line,...) {
+void igraph_warningf(const char *reason, const char *file, int line, ...) {
     va_list ap;
     va_start(ap, line);
     vsnprintf(igraph_i_warningmsg_buffer,
