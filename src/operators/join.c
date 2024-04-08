@@ -62,8 +62,9 @@
  * Time complexity: O(|V1|*|V2|+|E1|+|E2|).
  *
  */
-igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
-                          const igraph_t *right) {
+igraph_error_t igraph_join(igraph_t *res,
+                           const igraph_t *left,
+                           const igraph_t *right) {
 
     igraph_integer_t no_of_nodes_left = igraph_vcount(left);
     igraph_integer_t no_of_nodes_right = igraph_vcount(right);
