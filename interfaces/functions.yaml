@@ -1279,6 +1279,9 @@ igraph_bridges:
 igraph_is_biconnected:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
+igraph_count_reachable:
+    PARAMS: GRAPH graph, OUT VECTOR_INT counts, BOOLEAN directed
+
 #######################################
 # Cliques
 #######################################
