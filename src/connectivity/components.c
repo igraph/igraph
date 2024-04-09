@@ -65,7 +65,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  *
  * When computing strongly connected components, the components will be
  * indexed in topological order. In other words, vertex \c v is reachable
- * from vertex \c u precisely when <code>membership[u] &le;= membership[v]</code>.
+ * from vertex \c u precisely when <code>membership[u] &lt;= membership[v]</code>.
  *
  * \param graph The graph object to analyze.
  * \param membership For every vertex the ID of its component is given.
