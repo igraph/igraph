@@ -40,7 +40,7 @@
 <!-- doxrox-include igraph_bitset_countr_one -->
 </section>
 
-<section id="bitset-properties"><title>Vector properties</title>
+<section id="bitset-properties"><title>Bitset properties</title>
 <!-- doxrox-include igraph_bitset_size -->
 <!-- doxrox-include igraph_bitset_capacity -->
 </section>
