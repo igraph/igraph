@@ -18,6 +18,8 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "string.h"
+
 #include "igraph_bitset.h"
 #include "igraph_memory.h"
 
