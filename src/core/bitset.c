@@ -740,10 +740,11 @@ igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file) {
     for (igraph_integer_t i = bitset->size - 1; i >= 0; i++) {
         fprintf(file, "%"IGRAPH_PRId, IGRAPH_BIT_TEST(*bitset, i) ? (igraph_integer_t)1 : (igraph_integer_t)0);
     }
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef USING_R
 IGRAPH_EXPORT igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset) {
-    igraph_bitset_fprint(bitset, stdout);
+    return igraph_bitset_fprint(bitset, stdout);
 }
 #endif
