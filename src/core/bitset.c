@@ -715,3 +715,35 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src)
         [i] = ~VECTOR(*src)[i];
     }
 }
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_fprint
+ * \brief Prints the bits of a bitset.
+ *
+ * \experimental
+ *
+ * Outputs the contents of a bitset to a file.
+ * The bitset is written from index n-1 to index 0, left to right,
+ * such that index 0 is the least significant bit and index n-1 is
+ * the most significant bit, where n is the size of the bitset.
+ * This is the reverse of how sequential structures are usually written,
+ * such as vectors, but consistent with the bitset being a binary
+ * representation of an integer and how they are usually written.
+ *
+ * \param bitset The bitset to be printed.
+ * \param file The file to be written.
+ *
+ * Time complexity: O(n).
+ */
+igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file) {
+    for (igraph_integer_t i = bitset->size - 1; i >= 0; i++) {
+        fprintf(file, "%"IGRAPH_PRId, IGRAPH_BIT_TEST(*bitset, i) ? (igraph_integer_t)1 : (igraph_integer_t)0);
+    }
+}
+
+#ifndef USING_R
+IGRAPH_EXPORT igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset) {
+    igraph_bitset_fprint(bitset, stdout);
+}
+#endif

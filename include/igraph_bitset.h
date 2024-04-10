@@ -249,7 +249,10 @@ IGRAPH_EXPORT void igraph_bitset_or(igraph_bitset_t *dest, const igraph_bitset_t
 IGRAPH_EXPORT void igraph_bitset_and(igraph_bitset_t *dest, const igraph_bitset_t *src1, const igraph_bitset_t *src2);
 IGRAPH_EXPORT void igraph_bitset_xor(igraph_bitset_t *dest, const igraph_bitset_t *src1, const igraph_bitset_t *src2);
 IGRAPH_EXPORT void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src);
-
+IGRAPH_EXPORT igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file);
+#ifndef USING_R
+IGRAPH_EXPORT igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset);
+#endif
 __END_DECLS
 
 #endif /* IGRAPH_BITSET_H */
