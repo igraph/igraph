@@ -2402,7 +2402,7 @@ igraph_adjacency_spectral_embedding:
         EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X,
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
         VECTOR cvec=AsmDefaultCvec,
-        INOUT ARPACK_OPTIONS options=RPACK_DEFAULTS
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, cvec ON graph
 
 igraph_laplacian_spectral_embedding:
