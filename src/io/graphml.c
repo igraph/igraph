@@ -586,14 +586,15 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     return IGRAPH_SUCCESS;
 }
 
-#define XML_ATTR_LOCALNAME(it) (*(it))
-#define XML_ATTR_PREFIX(it) (*(it+1))
-#define XML_ATTR_URI(it) (*(it+2))
-#define XML_ATTR_VALUE_START(it) (*(it+3))
-#define XML_ATTR_VALUE_END(it) (*(it+4))
-#define XML_ATTR_VALUE_LENGTH(it) (int)((*(it+4))-(*(it+3)))
-#define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
-#define XML_ATTR_VALUE_PF(it) (int)((*(it+4))-(*(it+3))), *(it+3) /* for use in printf-style function with "%.*s" */
+/* See https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html#startElementNsSAX2Func */
+#define XML_ATTR_LOCALNAME(it) it[0]
+#define XML_ATTR_PREFIX(it) it[1]
+#define XML_ATTR_URI(it) it[2]
+#define XML_ATTR_VALUE_START(it) it[3]
+#define XML_ATTR_VALUE_END(it) it[4]
+#define XML_ATTR_VALUE_LENGTH(it) (size_t)(it[4] - it[3])
+#define XML_ATTR_VALUE(it) it[3], (int)(it[4] - it[3]) /* for use in strnxxx()-style functions that take a char * and a length */
+#define XML_ATTR_VALUE_PF(it) (int)(it[4] - it[3]), it[3] /* for use in printf-style function with "%.*s" */
 
 static igraph_bool_t xmlAttrValueEqual(xmlChar** attr, const char* expected) {
     size_t expected_length = strlen(expected);
