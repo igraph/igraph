@@ -733,7 +733,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     /* throw an error if the ID is an empty string; this is also a clear violation of the GraphML DTD */
-    if (*(rec->id) == 0) {
+    if (*(rec->id) == '\0') {
         IGRAPH_ERROR("Found <key> tag with an empty 'id' attribute.", IGRAPH_PARSEERROR);
     }
 
