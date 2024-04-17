@@ -19,16 +19,20 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int print_and_destroy(igraph_vector_int_list_t *list) {
-    igraph_integer_t i, n = igraph_vector_int_list_size(list);
-
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t* v = igraph_vector_int_list_get_ptr(list, i);
-        igraph_vector_int_print(v);
+void print_and_destroy(const igraph_t *graph, igraph_vector_int_list_t *list) {
+    const igraph_integer_t n = igraph_vector_int_list_size(list);
+    for (igraph_integer_t i =0; i < n; i++) {
+        igraph_bool_t sep;
+        igraph_is_minimal_separator(
+            graph,
+            igraph_vss_vector(igraph_vector_int_list_get_ptr(list, i)),
+            &sep);
+        IGRAPH_ASSERT(sep);
     }
+    print_vector_int_list(list);
+    printf("----\n");
 
     igraph_vector_int_list_destroy(list);
-    return 0;
 }
 
 int main(void) {
@@ -41,7 +45,7 @@ int main(void) {
                  -1);
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
-    print_and_destroy(&sep);
+    print_and_destroy(&g, &sep);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -52,7 +56,7 @@ int main(void) {
                  -1);
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
-    print_and_destroy(&sep);
+    print_and_destroy(&g, &sep);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -63,7 +67,7 @@ int main(void) {
                  -1);
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
-    print_and_destroy(&sep);
+    print_and_destroy(&g, &sep);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -75,15 +79,15 @@ int main(void) {
                  -1);
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
-    print_and_destroy(&sep);
+    print_and_destroy(&g, &sep);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
 
-    igraph_full(&g, 4, IGRAPH_UNDIRECTED, /*loops=*/ 0);
+    igraph_full(&g, 4, IGRAPH_UNDIRECTED, /*loops=*/ false);
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
-    print_and_destroy(&sep);
+    print_and_destroy(&g, &sep);
     igraph_destroy(&g);
 
     /* ----------------------------------------------------------- */
@@ -115,14 +119,14 @@ int main(void) {
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
     printf("Orig:\n");
-    print_and_destroy(&sep);
+    print_and_destroy(&g, &sep);
 
     igraph_vector_int_list_init(&sep, 0);
     igraph_vs_vector_small(&vs, 0, 1, 2, 3, 4, 5, 6, 16, 17, 18, 19, 20, 21, 22, -1);
     igraph_induced_subgraph(&g, &g2, vs, IGRAPH_SUBGRAPH_AUTO);
     igraph_minimum_size_separators(&g2, &sep);
     printf("1-7,17-23:\n");
-    print_and_destroy(&sep);
+    print_and_destroy(&g2, &sep);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g2);
 
@@ -131,7 +135,7 @@ int main(void) {
     igraph_induced_subgraph(&g, &g2, vs, IGRAPH_SUBGRAPH_AUTO);
     igraph_minimum_size_separators(&g2, &sep);
     printf("7-16:\n");
-    print_and_destroy(&sep);
+    print_and_destroy(&g2, &sep);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g2);
 
@@ -140,7 +144,7 @@ int main(void) {
     igraph_induced_subgraph(&g, &g2, vs, IGRAPH_SUBGRAPH_AUTO);
     igraph_minimum_size_separators(&g2, &sep);
     printf("17-23:\n");
-    print_and_destroy(&sep);
+    print_and_destroy(&g2, &sep);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g2);
 
@@ -149,7 +153,7 @@ int main(void) {
     igraph_induced_subgraph(&g, &g2, vs, IGRAPH_SUBGRAPH_AUTO);
     igraph_minimum_size_separators(&g2, &sep);
     printf("7,8,11,14:\n");
-    print_and_destroy(&sep);
+    print_and_destroy(&g2, &sep);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g2);
 
@@ -158,7 +162,7 @@ int main(void) {
     igraph_induced_subgraph(&g, &g2, vs, IGRAPH_SUBGRAPH_AUTO);
     igraph_minimum_size_separators(&g2, &sep);
     printf("1-7:\n");
-    print_and_destroy(&sep);
+    print_and_destroy(&g2, &sep);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g2);
 
