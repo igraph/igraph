@@ -20,6 +20,7 @@
 
 <section id="bipartite-adjacency-matrices"><title>Bipartite adjacency matrices</title>
 <!-- doxrox-include igraph_biadjacency -->
+<!-- doxrox-include igraph_weighted_biadjacency -->
 <!-- doxrox-include igraph_get_biadjacency -->
 </section>
 

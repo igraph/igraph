@@ -747,6 +747,105 @@ igraph_error_t igraph_biadjacency(
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \function igraph_weighted_biadjacency
+ * \brief Creates a bipartite graph from a weighted bipartite adjacency matrix.
+ *
+ * A bipartite (or two-mode) graph contains two types of vertices and
+ * edges always connect vertices of different types. A bipartite adjacency
+ * matrix is an \em n x \em m matrix, \em n and \em m are the number of vertices
+ * of the two types, respectively. Nonzero elements in the matrix denote
+ * edges between the two corresponding vertices.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param types Pointer to an initialized boolean vector, or a null
+ *   pointer. If not a null pointer, then the vertex types are stored
+ *   here. It is resized as needed.
+ * \param weights
+ * \param biadjmatrix The bipartite adjacency matrix that serves as an input
+ *   to this function.
+ * \param directed Specifies whether to create an undirected or a directed
+ *   graph.
+ * \param mode Specifies the direction of the edges in a directed
+ *   graph. If \c IGRAPH_OUT, then edges point from vertices
+ *   of the first kind (corresponding to rows) to vertices of the
+ *   second kind (corresponding to columns); if \c IGRAPH_IN,
+ *   then the opposite direction is realized; if \c IGRAPH_ALL,
+ *   then mutual edges will be created.
+ * \return Error code.
+ *
+ * Time complexity: O(n*m), the size of the bipartite adjacency matrix.
+ */
+
+igraph_error_t igraph_weighted_biadjacency(
+        igraph_t *graph,
+        igraph_vector_bool_t *types,
+        igraph_vector_t *weights,
+        const igraph_matrix_t *biadjmatrix,
+        igraph_bool_t directed,
+        igraph_neimode_t mode) {
+
+    const igraph_integer_t n1 = igraph_matrix_nrow(biadjmatrix);
+    const igraph_integer_t n2 = igraph_matrix_ncol(biadjmatrix);
+    const igraph_integer_t no_of_nodes = n1 + n2;
+    igraph_vector_int_t edges;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    igraph_vector_clear(weights);
+
+    for (igraph_integer_t i = 0; i < n1; i++) {
+        for (igraph_integer_t j = 0; j < n2; j++) {
+            igraph_real_t weight = MATRIX(*biadjmatrix, i, j);
+            igraph_integer_t from, to;
+
+            if (weight != 0) {
+                if (mode == IGRAPH_IN) {
+                    from = n1 + j;
+                    to = i;
+                } else {
+                    from = i;
+                    to = n1 + j;
+                }
+                if (mode != IGRAPH_ALL || !directed) {
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                    IGRAPH_CHECK(igraph_vector_push_back(weights, weight));
+                } else {
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                    IGRAPH_CHECK(igraph_vector_push_back(weights, weight));
+
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                    IGRAPH_CHECK(igraph_vector_push_back(weights, weight));
+                }
+            }
+        }
+    }
+
+    igraph_vector_resize_min(weights);
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_FINALLY(igraph_destroy, graph);
+
+    if (types) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
+        igraph_vector_bool_null(types);
+        for (igraph_integer_t i = n1; i < no_of_nodes; i++) {
+            VECTOR(*types)[i] = true;
+        }
+    }
+
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+
 /**
  * \function igraph_get_incidence
  * \brief Convert a bipartite graph into a bipartite adjacency matrix (deprecated alias).
