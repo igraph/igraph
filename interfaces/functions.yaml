@@ -1196,6 +1196,13 @@ igraph_biadjacency:
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
+igraph_weighted_biadjacency:
+    PARAMS: |-
+        OUT GRAPH graph, 
+        OUT BIPARTITE_TYPES types, OUT EDGE_WEIGHTS weights, 
+        MATRIX biadjmatrix,
+        BOOLEAN directed=False, NEIMODE mode=ALL
+
 igraph_get_biadjacency:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OPTIONAL EDGE_WEIGHTS weights,
