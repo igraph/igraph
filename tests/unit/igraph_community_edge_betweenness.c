@@ -58,11 +58,14 @@ void test_unweighted(void) {
 
     igraph_vector_int_init(&edges, 0);
     igraph_vector_init(&eb, 0);
-    igraph_community_edge_betweenness(&g, &edges, &eb, 0 /*merges */,
-                                      0 /*bridges */, /*modularity=*/ 0,
-                                      /*membership=*/ 0,
+    igraph_community_edge_betweenness(&g, &edges, &eb,
+                                      /*merges=*/ NULL,
+                                      /*bridges=*/ NULL,
+                                      /*modularity=*/ NULL,
+                                      /*membership=*/ NULL,
                                       IGRAPH_UNDIRECTED,
-                                      /*weights=*/ 0);
+                                      /*weights=*/ NULL,
+                                      /*lengths=*/ NULL);
 
     no_of_edges = igraph_ecount(&g);
     for (i = 0; i < no_of_edges; i++) {
@@ -76,11 +79,14 @@ void test_unweighted(void) {
     printf("\n");
 
     /* Try it once again without storage space for edges */
-    igraph_community_edge_betweenness(&g, 0, &eb, 0 /*merges */,
-                                      0 /*bridges */, /*modularity=*/ 0,
-                                      /*membership=*/ 0,
+    igraph_community_edge_betweenness(&g, NULL, &eb,
+                                      /*merges=*/ NULL,
+                                      /*bridges=*/ NULL,
+                                      /*modularity=*/ NULL,
+                                      /*membership=*/ NULL,
                                       IGRAPH_UNDIRECTED,
-                                      /*weights=*/ 0);
+                                      /*weights=*/ NULL,
+                                      /*lengths=*/ NULL);
     for (i = 0; i < no_of_edges; i++) {
         printf("%.2f ", VECTOR(eb)[i]);
     }
@@ -127,6 +133,7 @@ void test_weighted(void) {
                                       0 /*bridges */, /*modularity=*/ 0,
                                       /*membership=*/ 0,
                                       IGRAPH_UNDIRECTED,
+                                      NULL,
                                       &weights);
 
     if (!igraph_vector_int_all_e(&edges_sol1, &edges) &&
@@ -147,6 +154,7 @@ void test_weighted(void) {
                                       0 /*bridges */, /*modularity=*/ 0,
                                       /*membership=*/ 0,
                                       IGRAPH_UNDIRECTED,
+                                      NULL,
                                       &weights);
 
     if (!igraph_vector_between(&eb, &eb_sol1_lo, &eb_sol1_hi) &&
@@ -172,13 +180,14 @@ void test_zero_edge_graph(void) {
 
     igraph_community_edge_betweenness(&g,
         &res, // result
-        &eb, // edge_betweenness result
+        &eb,  // edge_betweenness result
         NULL, // merges result
         NULL, // bridges
         NULL, // modularity
         NULL, // membership
         IGRAPH_UNDIRECTED, // directed
-        NULL // weights
+        NULL, // weights
+        NULL  // lengths
         );
 
     igraph_vector_destroy(&eb);
