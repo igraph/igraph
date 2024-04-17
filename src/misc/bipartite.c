@@ -655,16 +655,16 @@ igraph_error_t igraph_biadjacency(
     const igraph_integer_t no_of_nodes = n1 + n2;
     igraph_vector_int_t edges;
 
-    if (n1 > 0 && n2 > 0 && igraph_matrix_min(biadjmatrix) < 0) {
-        IGRAPH_ERRORF(
-            "Bipartite adjacencey matrix elements should be non-negative, found %g.",
-            IGRAPH_EINVAL, igraph_matrix_min(biadjmatrix)
-        );
-    }
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (multiple) {
+
+        if (n1 > 0 && n2 > 0 && igraph_matrix_min(biadjmatrix) < 0) {
+            IGRAPH_ERRORF(
+                "Bipartite adjacency matrix elements should be non-negative, found %g.",
+                IGRAPH_EINVAL, igraph_matrix_min(biadjmatrix)
+                );
+        }
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
