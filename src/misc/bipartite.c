@@ -761,27 +761,36 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
 
 /**
  * \function igraph_get_biadjacency
- * \brief Convert a bipartite graph into a bipartite adjacency matrix.
+ * \brief Converts a bipartite graph into a bipartite adjacency matrix.
+ *
+ * In a bipartite adjacency matrix \c A, element <code>A_ij</code>
+ * gives the number of edges between the <code>i</code>th vertex of the
+ * first partition and the <code>j</code>th vertex of the second partition.
+ *
+ * </para><para>
+ * If the graph contains edges within the same partition, this function
+ * issues a warning.
  *
  * \param graph The input graph, edge directions are ignored.
- * \param types Boolean vector containing the vertex types. All vertices
- *   in one part of the graph should have type 0, the others type 1.
+ * \param types Boolean vector containing the vertex types. Vertices belonging
+ *   to the first partition have type \c false, the one in the second
+ *   partition type \c true.
  * \param res Pointer to an initialized matrix, the result is stored
  *   here. An element of the matrix gives the number of edges
  *   (irrespectively of their direction) between the two corresponding
- *   vertices. The rows will correspond to vertices with type 0,
- *   the columns correspond to vertices with type 1.
- * \param row_ids Pointer to an initialized vector or a null
- *   pointer. If not a null pointer, then the vertex IDs (in the
- *   graph) corresponding to the rows of the result matrix are stored
- *   here.
- * \param col_ids Pointer to an initialized vector or a null
- *   pointer. If not a null pointer, then the vertex IDs corresponding
- *   to the columns of the result matrix are stored here.
+ *   vertices. The rows will correspond to vertices with type \c false,
+ *   the columns correspond to vertices with type \c true.
+ * \param row_ids Pointer to an initialized vector or \c NULL.
+ *   If not a null pointer, then the IDs of vertices with type \c false
+ *   are stored here, with the same ordering as the rows of the
+ *   biadjacency matrix.
+ * \param col_ids Pointer to an initialized vector or \c NULL.
+ *   If not a null pointer, then the IDs of vertices with type \c true
+ *   are stored here, with the same ordering as the columns of the
+ *   biadjacency matrix.
  * \return Error code.
  *
- * Time complexity: O(n*m), n and m are number of vertices of the two
- * different kind.
+ * Time complexity: O(|E|) where |E| is the number of edges.
  *
  * \sa \ref igraph_biadjacency() for the opposite operation.
  */
@@ -831,7 +840,7 @@ igraph_error_t igraph_get_biadjacency(
         }
     }
     if (ignored_edges) {
-            IGRAPH_WARNINGF("%" IGRAPH_PRId " edges running within partitions were ignored.", ignored_edges);
+        IGRAPH_WARNINGF("%" IGRAPH_PRId " edges running within partitions were ignored.", ignored_edges);
     }
 
     if (row_ids) {
