@@ -1619,8 +1619,9 @@ igraph_community_edge_betweenness:
         GRAPH graph, OUT VECTOR_INT removed_edges, OPTIONAL OUT VECTOR edge_betweenness,
         OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership,
-        BOOLEAN directed=True, OPTIONAL EDGE_WEIGHTS weights=NULL
-    DEPS: weights ON graph
+        BOOLEAN directed=True,
+        OPTIONAL EDGE_WEIGHTS weights=NULL, OPTIONAL EDGE_LENGTHS lengths=NULL
+    DEPS: weights ON graph, lengths ON graph, edge_betweenness ON graph
 
 igraph_community_eb_get_merges:
     PARAMS: |-

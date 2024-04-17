@@ -36,6 +36,7 @@ int main(void) {
                                       &bridges, /*modularity*/ NULL,
                                       /*membership*/ NULL,
                                       IGRAPH_UNDIRECTED,
+                                      NULL,
                                       &weights);
     printf("edges:\n");
     igraph_vector_int_print(&edges);
