@@ -1198,9 +1198,10 @@ igraph_biadjacency:
 
 igraph_get_biadjacency:
     PARAMS: |-
-        GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
+        GRAPH graph, BIPARTITE_TYPES types=NULL, OPTIONAL EDGE_WEIGHTS weights,
+        OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
-    DEPS: types ON graph
+    DEPS: types ON graph, weights ON graph
 
 igraph_is_bipartite:
     PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT BIPARTITE_TYPES type

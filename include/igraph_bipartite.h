@@ -68,10 +68,11 @@ IGRAPH_EXPORT igraph_error_t igraph_biadjacency(igraph_t *graph, igraph_vector_b
                                    igraph_neimode_t mode, igraph_bool_t multiple);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_biadjacency(const igraph_t *graph,
-                                       const igraph_vector_bool_t *types,
-                                       igraph_matrix_t *res,
-                                       igraph_vector_int_t *row_ids,
-                                       igraph_vector_int_t *col_ids);
+                                                    const igraph_vector_bool_t *types,
+                                                    const igraph_vector_t *weights,
+                                                    igraph_matrix_t *res,
+                                                    igraph_vector_int_t *row_ids,
+                                                    igraph_vector_int_t *col_ids);
 
 IGRAPH_EXPORT igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                                       igraph_bool_t *res,
