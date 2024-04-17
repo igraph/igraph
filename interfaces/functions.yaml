@@ -1192,7 +1192,7 @@ igraph_create_bipartite:
 
 igraph_biadjacency:
     PARAMS: |-
-        OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
+        OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX biadjmatrix,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
