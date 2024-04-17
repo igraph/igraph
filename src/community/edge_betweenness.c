@@ -355,10 +355,8 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * \brief Community finding based on edge betweenness.
  *
  * Community structure detection based on the betweenness of the edges
- * in the network. The algorithm was invented by M. Girvan and
- * M. Newman, see: M. Girvan and M. E. J. Newman: Community structure in
- * social and biological networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826
- * (2002). https://doi.org/10.1073/pnas.122653799
+ * in the network. This method is also known as the Girvan-Newman
+ * algorithm.
  *
  * </para><para>
  * The idea is that the betweenness of the edges connecting two
@@ -376,6 +374,36 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * of betweenness and modularity are used, however, only splits into
  * \em weakly connected components are detected.
  *
+ * </para><para>
+ * When edge weights are given, the ratio of betweenness and weight values
+ * is used to choose which edges to remove first, as described in
+ * M. E. J. Newman: Analysis of Weighted Networks (2004), Section C.
+ * Thus, edges with large weights are treated as strong connections,
+ * and will be removed later than weak connections having similar betweenness.
+ * Weights are also used for calculating modularity.
+ *
+ * </para><para>
+ * If lengths are given, they will be considered for shortest path length
+ * calculations while computing betweenness values.
+ *
+ * </para><para>
+ * Note: In igraph 0.10, this function interpreted weights in a different,
+ * erroneous way, and issued a warning when weights were used. Please
+ * see https://github.com/igraph/igraph/issues/2229 for additional details.
+ *
+ * </para><para>
+ * References
+ *
+ * </para><para>
+ * M. Girvan and M. E. J. Newman,
+ * Community Structure in Social and Biological Networks, PNAS 99, 7821 (2002).
+ * https://doi.org/10.1073/pnas.122653799
+ *
+ * </para><para>
+ * M. E. J. Newman,
+ * Analysis of Weighted Networks, Phys. Rev. E 70, 9 (2004).
+ * https://doi.org/10.1103/PhysRevE.70.056131
+ *
  * \param graph The input graph.
  * \param removed_edges Pointer to an initialized vector, the result will be
  *     stored here, the IDs of the removed edges in the order of their
@@ -384,6 +412,8 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * \param edge_betweenness Pointer to an initialized vector or
  *     \c NULL. In the former case the edge betweenness of the removed
  *     edge is stored here. The vector will be resized as needed.
+ *     Note that the betweenness values stored here are \em not divided
+ *     by weights.
  * \param merges Pointer to an initialized matrix or \c NULL. If not \c NULL
  *     then merges performed by the algorithm are stored here. Even if
  *     this is a divisive algorithm, we can replay it backwards and

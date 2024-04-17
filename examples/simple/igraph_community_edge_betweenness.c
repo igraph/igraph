@@ -25,9 +25,10 @@ int main(void) {
     igraph_matrix_int_t merges;
     igraph_vector_int_t bridges;
 
-    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
-                 0,1, 0,1, 0,1, -1);
-    igraph_vector_init_int(&weights, 3, 1, 2, 3);
+    igraph_small(&graph, 5, IGRAPH_UNDIRECTED,
+                 0, 1, 1, 2, 0, 2, 0, 3, 1, 3, 1, 4,
+                 -1);
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&graph)+1);
     igraph_vector_init(&eb, 0);
     igraph_vector_int_init(&edges, 0);
     igraph_matrix_int_init(&merges, 0, 0);
@@ -36,8 +37,8 @@ int main(void) {
                                       &bridges, /*modularity*/ NULL,
                                       /*membership*/ NULL,
                                       IGRAPH_UNDIRECTED,
-                                      NULL,
-                                      &weights);
+                                      &weights,
+                                      NULL);
     printf("edges:\n");
     igraph_vector_int_print(&edges);
     printf("edge betweenness:\n");
