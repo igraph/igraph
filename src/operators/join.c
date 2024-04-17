@@ -26,6 +26,8 @@
  * \function igraph_join
  * \brief Creates the join of two disjoint graphs.
  *
+ * \experimental
+ *
  * First the vertices of the second graph will be relabeled with new
  * vertex IDs to have two disjoint sets of vertex IDs, then the union
  * of the two graphs will be formed. Finally, the vertces from the
