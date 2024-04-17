@@ -756,7 +756,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
                          igraph_matrix_t *res,
                          igraph_vector_int_t *row_ids,
                          igraph_vector_int_t *col_ids) {
-    return igraph_get_biadjacency(graph, types, res, row_ids, col_ids);
+    return igraph_get_biadjacency(graph, types, NULL, res, row_ids, col_ids);
 }
 
 /**
@@ -775,11 +775,14 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
  * \param types Boolean vector containing the vertex types. Vertices belonging
  *   to the first partition have type \c false, the one in the second
  *   partition type \c true.
+ * \param weights A vector specifying a weight for each edge or \c NULL.
+ *   If \c NULL, all edges are assumed to have weight 1.
  * \param res Pointer to an initialized matrix, the result is stored
  *   here. An element of the matrix gives the number of edges
- *   (irrespectively of their direction) between the two corresponding
- *   vertices. The rows will correspond to vertices with type \c false,
- *   the columns correspond to vertices with type \c true.
+ *   (irrespectively of their direction), or sum of edge weights,
+ *   between the two corresponding vertices. The rows will correspond
+ *   to vertices with type \c false, the columns correspond to vertices
+ *   with type \c true.
  * \param row_ids Pointer to an initialized vector or \c NULL.
  *   If not a null pointer, then the IDs of vertices with type \c false
  *   are stored here, with the same ordering as the rows of the
@@ -797,36 +800,43 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
 
 igraph_error_t igraph_get_biadjacency(
     const igraph_t *graph, const igraph_vector_bool_t *types,
+    const igraph_vector_t *weights,
     igraph_matrix_t *res, igraph_vector_int_t *row_ids,
     igraph_vector_int_t *col_ids
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t n1 = 0, n2 = 0, i;
-    igraph_vector_int_t perm;
-    igraph_integer_t p1, p2;
+    igraph_integer_t n1 = 0, n2 = 0;
     igraph_integer_t ignored_edges = 0;
+    igraph_vector_int_t perm;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
         IGRAPH_ERRORF("Vertex type vector size (%" IGRAPH_PRId ") not equal to number of vertices (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
+    if (weights) {
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERRORF("Edge weight vector size (%" IGRAPH_PRId ") not equal to number of edges (%" IGRAPH_PRId ").",
+                          IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
+        }
+    }
+
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         n1 += VECTOR(*types)[i] == false ? 1 : 0;
     }
     n2 = no_of_nodes - n1;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&perm, no_of_nodes);
 
-    for (i = 0, p1 = 0, p2 = n1; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0, p1 = 0, p2 = n1; i < no_of_nodes; i++) {
         VECTOR(perm)[i] = VECTOR(*types)[i] ? p2++ : p1++;
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, n1, n2));
     igraph_matrix_null(res);
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to = IGRAPH_TO(graph, i);
         igraph_integer_t from2 = VECTOR(perm)[from];
@@ -834,12 +844,13 @@ igraph_error_t igraph_get_biadjacency(
         if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
             ignored_edges++;
         } else if (! VECTOR(*types)[from]) {
-            MATRIX(*res, from2, to2 - n1) += 1;
+            MATRIX(*res, from2, to2 - n1) += weights ? VECTOR(*weights)[i] : 1;
         } else {
-            MATRIX(*res, to2, from2 - n1) += 1;
+            MATRIX(*res, to2, from2 - n1) += weights ? VECTOR(*weights)[i] : 1;
         }
     }
-    if (ignored_edges) {
+
+    if (ignored_edges > 0) {
         IGRAPH_WARNINGF("%" IGRAPH_PRId " edges running within partitions were ignored.", ignored_edges);
     }
 
@@ -850,7 +861,7 @@ igraph_error_t igraph_get_biadjacency(
         IGRAPH_CHECK(igraph_vector_int_resize(col_ids, n2));
     }
     if (row_ids || col_ids) {
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             if (! VECTOR(*types)[i]) {
                 if (row_ids) {
                     igraph_integer_t i2 = VECTOR(perm)[i];
