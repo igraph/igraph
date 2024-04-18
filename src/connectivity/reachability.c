@@ -66,23 +66,24 @@ igraph_error_t igraph_reachability(
         igraph_bitset_list_t *reach,
         igraph_bool_t directed) {
 
-    igraph_integer_t no_of_nodes;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_comps;
     igraph_integer_t i, j, n;
     igraph_adjlist_t adjlist, dag;
     igraph_vector_int_t *dag_neighbours, *neighbours;
     igraph_bitset_t *from_bitset, *to_bitset;
 
-    no_of_nodes = igraph_vcount(graph);
+    IGRAPH_CHECK(igraph_connected_components(graph,
+                                             membership, csize, &no_of_comps,
+                                             directed ? IGRAPH_STRONG : IGRAPH_WEAK));
 
-    if (directed) {
-        IGRAPH_CHECK(igraph_connected_components(graph, membership, csize, no_of_components, IGRAPH_STRONG));
-    } else {
-        IGRAPH_CHECK(igraph_connected_components(graph, membership, csize, no_of_components, IGRAPH_WEAK));
+    if (no_of_components) {
+        *no_of_components = no_of_comps;
     }
 
-    IGRAPH_CHECK(igraph_bitset_list_resize(reach, *no_of_components));
+    IGRAPH_CHECK(igraph_bitset_list_resize(reach, no_of_comps));
 
-    for (i = 0; i < *no_of_components; ++i) {
+    for (i = 0; i < no_of_comps; ++i) {
         IGRAPH_CHECK(igraph_bitset_resize(igraph_bitset_list_get_ptr(reach, i), no_of_nodes));
     }
     for (i = 0; i < no_of_nodes; ++i) {
@@ -95,7 +96,7 @@ igraph_error_t igraph_reachability(
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, *no_of_components));
+    IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, no_of_comps));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &dag);
 
     for (i = 0; i < no_of_nodes; ++i) {
@@ -109,7 +110,7 @@ igraph_error_t igraph_reachability(
         }
     }
 
-    for (i = *no_of_components - 1; i >= 0; --i) {
+    for (i = no_of_comps - 1; i >= 0; --i) {
         dag_neighbours = igraph_adjlist_get(&dag, i);
         from_bitset = igraph_bitset_list_get_ptr(reach, i);
         n = igraph_vector_int_size(dag_neighbours);
@@ -208,15 +209,13 @@ igraph_error_t igraph_count_reachable(
 igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closure) {
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_vector_int_t membership, csize, edges;
-    igraph_integer_t no_of_components;
+    igraph_vector_int_t membership, edges;
     igraph_bitset_list_t reach;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
     IGRAPH_BITSET_LIST_INIT_FINALLY(&reach, 0);
 
-    IGRAPH_CHECK(igraph_reachability(graph, &membership, &csize, &no_of_components, &reach, /* directed */ true));
+    IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, /* directed */ true));
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
@@ -229,13 +228,14 @@ igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closur
         }
     }
 
+    igraph_bitset_list_destroy(&reach);
+    igraph_vector_int_destroy(&membership);
+    IGRAPH_FINALLY_CLEAN(2);
+
     IGRAPH_CHECK(igraph_create(closure, &edges, no_of_nodes, directed));
 
-    igraph_bitset_list_destroy(&reach);
-    igraph_vector_int_destroy(&csize);
-    igraph_vector_int_destroy(&membership);
     igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
