@@ -733,12 +733,13 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src)
  *
  * \param bitset The bitset to be printed.
  * \param file The file to be written.
+ * \return Error code.
  *
  * Time complexity: O(n).
  */
 igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file) {
-    for (igraph_integer_t i = bitset->size - 1; i >= 0; i++) {
-        fprintf(file, "%"IGRAPH_PRId, IGRAPH_BIT_TEST(*bitset, i) ? (igraph_integer_t)1 : (igraph_integer_t)0);
+    for (igraph_integer_t i = bitset->size - 1; i >= 0; i--) {
+        fprintf(file, "%d", (bool) IGRAPH_BIT_TEST(*bitset, i));
     }
     return IGRAPH_SUCCESS;
 }
