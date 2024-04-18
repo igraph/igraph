@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2009-2020  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,8 +24,6 @@
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_vector.h"
-
-#include "limits.h"
 
 __BEGIN_DECLS
 
