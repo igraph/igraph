@@ -476,38 +476,6 @@ igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *
     return true;
 }
 
-/**
- * Deprecated in favour of \ref igraph_vector_all_almost_e() which uses
- * relative tolerances. Will be removed in 0.11.
- *
- * Checks if two vectors are equal within an absolute tolerance.
- */
-igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
-                                  const igraph_vector_t *rhs,
-                                  igraph_real_t tol) {
-    igraph_integer_t i, s;
-    IGRAPH_ASSERT(lhs != 0);
-    IGRAPH_ASSERT(rhs != 0);
-    IGRAPH_ASSERT(lhs->stor_begin != 0);
-    IGRAPH_ASSERT(rhs->stor_begin != 0);
-
-    s = igraph_vector_size(lhs);
-    if (s != igraph_vector_size(rhs)) {
-        return false;
-    } else {
-        if (tol == 0) {
-            tol = DBL_EPSILON;
-        }
-        for (i = 0; i < s; i++) {
-            igraph_real_t l = VECTOR(*lhs)[i];
-            igraph_real_t r = VECTOR(*rhs)[i];
-            if (l < r - tol || l > r + tol) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
 
 /**
  * \function igraph_vector_all_almost_e
