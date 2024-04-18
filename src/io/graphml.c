@@ -30,7 +30,7 @@
 
 #include "config.h"
 
-#include <ctype.h>
+#include <ctype.h>   /* isdigit */
 #include <math.h>    /* isnan */
 #include <string.h>
 #include <stdarg.h>  /* va_start & co */
@@ -586,14 +586,15 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     return IGRAPH_SUCCESS;
 }
 
-#define XML_ATTR_LOCALNAME(it) (*(it))
-#define XML_ATTR_PREFIX(it) (*(it+1))
-#define XML_ATTR_URI(it) (*(it+2))
-#define XML_ATTR_VALUE_START(it) (*(it+3))
-#define XML_ATTR_VALUE_END(it) (*(it+4))
-#define XML_ATTR_VALUE_LENGTH(it) (int)((*(it+4))-(*(it+3)))
-#define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
-#define XML_ATTR_VALUE_PF(it) (int)((*(it+4))-(*(it+3))), *(it+3) /* for use in printf-style function with "%.*s" */
+/* See https://gnome.pages.gitlab.gnome.org/libxml2/devhelp/libxml2-parser.html#startElementNsSAX2Func */
+#define XML_ATTR_LOCALNAME(it) it[0]
+#define XML_ATTR_PREFIX(it) it[1]
+#define XML_ATTR_URI(it) it[2]
+#define XML_ATTR_VALUE_START(it) it[3]
+#define XML_ATTR_VALUE_END(it) it[4]
+#define XML_ATTR_VALUE_LENGTH(it) (size_t)(it[4] - it[3])
+#define XML_ATTR_VALUE(it) it[3], (int)(it[4] - it[3]) /* for use in strnxxx()-style functions that take a char * and a length */
+#define XML_ATTR_VALUE_PF(it) (int)(it[4] - it[3]), it[3] /* for use in printf-style function with "%.*s" */
 
 static igraph_bool_t xmlAttrValueEqual(xmlChar** attr, const char* expected) {
     size_t expected_length = strlen(expected);
@@ -734,7 +735,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     /* throw an error if the ID is an empty string; this is also a clear violation of the GraphML DTD */
-    if (*(rec->id) == 0) {
+    if (*(rec->id) == '\0') {
         IGRAPH_ERROR("Found <key> tag with an empty 'id' attribute.", IGRAPH_PARSEERROR);
     }
 

@@ -2,11 +2,20 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_community_label_propagation()` is now interruptible.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.11] - 2024-04-02
 
 ### Added
 
  - `igraph_is_complete()` checks whether there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
+ - `igraph_join()` creates the _join_ of two graphs (experimental function, contributed by Quinn Buratynski @GanzuraTheConsumer in #2508).
 
 ### Fixed
 

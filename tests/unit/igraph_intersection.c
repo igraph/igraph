@@ -32,12 +32,11 @@ int main(void) {
     igraph_vector_ptr_t glist;
 
     igraph_star(&star, 11, IGRAPH_STAR_UNDIRECTED, /*center=*/ 10);
-    igraph_ring(&ring, 10, IGRAPH_UNDIRECTED, /*mutual=*/ 0, /*circular=*/ 1);
+    igraph_ring(&ring, 10, IGRAPH_UNDIRECTED, /*mutual=*/ false, /*circular=*/ true);
 
-    igraph_union(&uni, &star, &ring, /*edge_map1=*/ 0, /*edge_map2=*/ 0);
+    igraph_union(&uni, &star, &ring, /*edge_map1=*/ NULL, /*edge_map2=*/ NULL);
 
-    igraph_intersection(&result, &uni, &star, /*edge_map1*/ 0,
-                        /*edge_map2=*/ 0);
+    igraph_intersection(&result, &uni, &star, /*edge_map1*/ NULL, /*edge_map2=*/ NULL);
     print_graph_canon(&result);
 
     igraph_destroy(&result);
@@ -48,7 +47,7 @@ int main(void) {
     VECTOR(glist)[0] = &uni;
     VECTOR(glist)[1] = &star;
 
-    igraph_intersection_many(&result, &glist, /*edgemaps=*/ 0);
+    igraph_intersection_many(&result, &glist, /*edgemaps=*/ NULL);
     printf("--\n");
     print_graph_canon(&result);
 
