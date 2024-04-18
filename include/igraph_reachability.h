@@ -45,10 +45,8 @@ IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
     igraph_bool_t directed);
 
 
-IGRAPH_EXPORT igraph_error_t igraph_transitive_closure(
-    const igraph_t *graph,
-    igraph_t* closure,
-    igraph_bool_t directed);
+IGRAPH_EXPORT igraph_error_t igraph_transitive_closure(const igraph_t *graph,
+                                                       igraph_t* closure);
 
 __END_DECLS
 

@@ -200,45 +200,40 @@ igraph_error_t igraph_count_reachable(
  * \brief Computes the transitive closure of a graph.
  *
  * \experimental
- * </para><para>
- * The resulting graph will have an edge from i to j if j is reachable from i in 1 or more steps.
+ *
+ * The resulting graph will have an edge from vertex \c i to vertex \c j
+ * if \c j is reachable from \c i.
  *
  * \param graph The graph object to analyze.
  * \param closure The resulting graph representing the transitive closure.
- * \param directed For a directed graph, determines whether edges are treated as directed or undirected.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * Time complexity: O(|V|^2 + |E|)
- * |V| is the number of vertices,
+ * Time complexity: O(|V|^2 + |E|), where
+ * |V| is the number of vertices, and
  * |E| is the number of edges, respectively.
  */
-igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closure, igraph_bool_t directed)
-{
-    igraph_vector_int_t membership, csize;
-    igraph_integer_t no_of_components, no_of_nodes = igraph_vcount(graph);
+igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closure) {
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_vector_int_t membership, csize, edges;
+    igraph_integer_t no_of_components;
     igraph_bitset_list_t reach;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&membership, 0));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &membership);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
+    IGRAPH_BITSET_LIST_INIT_FINALLY(&reach, 0);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&csize, 0));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &csize);
+    IGRAPH_CHECK(igraph_reachability(graph, &membership, &csize, &no_of_components, &reach, /* directed */ true));
 
-    IGRAPH_CHECK(igraph_bitset_list_init(&reach, 0));
-    IGRAPH_FINALLY(igraph_bitset_list_destroy, &reach);
-
-    IGRAPH_CHECK(igraph_reachability(graph, &membership, &csize, &no_of_components, &reach, directed));
-
-    igraph_vector_int_t edges;
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, 0));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
-        igraph_bitset_t* row = igraph_bitset_list_get_ptr(&reach, VECTOR(membership)[u]);
+        const igraph_bitset_t *row = igraph_bitset_list_get_ptr(&reach, VECTOR(membership)[u]);
         for (igraph_integer_t v = directed ? 0 : u + 1; v < no_of_nodes; v++) {
             if (u != v && IGRAPH_BIT_TEST(*row, v)) {
-                igraph_vector_int_push_back(&edges, u);
-                igraph_vector_int_push_back(&edges, v);
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, u));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v));
             }
         }
     }
