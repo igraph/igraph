@@ -2062,7 +2062,7 @@ static igraph_error_t igraph_i_vertex_connectivity_undirected(
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     IGRAPH_CHECK(igraph_to_directed(&newgraph, IGRAPH_TO_DIRECTED_MUTUAL));
 
-    IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(&newgraph, res, /* all_edges_are_mutual = */ 1));
+    IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(&newgraph, res, /* all_edges_are_mutual = */ true));
 
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
@@ -2070,7 +2070,13 @@ static igraph_error_t igraph_i_vertex_connectivity_undirected(
     return IGRAPH_SUCCESS;
 }
 
-/* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
+/* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G))
+ *
+ * Check if the graph is connected, and if its minimum degree is 1.
+ * This is sufficient to determine both the vertex and edge connectivity,
+ * which are returned in 'res'. 'found' will indicate if the connectivity
+ * could be determined.
+ */
 static igraph_error_t igraph_i_connectivity_checks(
         const igraph_t *graph,
         igraph_integer_t *res,
@@ -2137,11 +2143,12 @@ static igraph_error_t igraph_i_connectivity_checks(
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
- * \param checks Logical constant. Whether to check that the graph is
- *    connected and also the degree of the vertices. If the graph is
+ * \param checks Logical constant. Whether to check if the graph is
+ *    connected or complete and also the degree of the vertices. If the graph is
  *    not (strongly) connected then the connectivity is obviously zero. Otherwise
- *    if the minimum degree is one then the vertex connectivity is also
- *    one. It is a good idea to perform these checks, as they can be
+ *    if the minimum degree is 1 then the vertex connectivity is also
+ *    1. If the graph is complete, the connectivity is the vertex count
+ *    minus one. It is a good idea to perform these checks, as they can be
  *    done quickly compared to the connectivity calculation itself.
  *    They were suggested by Peter McMahan, thanks Peter.
  * \return Error code.
@@ -2160,6 +2167,20 @@ igraph_error_t igraph_vertex_connectivity(
 
     if (checks) {
         IGRAPH_CHECK(igraph_i_connectivity_checks(graph, res, &ret));
+    }
+
+    if (checks && !ret) {
+        /* The vertex connectivity of a complete graph is vcount-1 by definition.
+         * This check cannot be performed within igraph_i_connectivity_checks(),
+         * as that function is used both for vertex and edge connectivities.
+         * Checking if the graph is complete does not suffice to determine the
+         * edge connectivity of a complete multigraph. */
+        igraph_bool_t complete;
+        IGRAPH_CHECK(igraph_is_complete(graph, &complete));
+        if (complete) {
+            *res = igraph_vcount(graph) - 1;
+            ret = true;
+        }
     }
 
     /* Are we done yet? */
