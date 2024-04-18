@@ -255,17 +255,3 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
-
-/**
- * \function igraph_shortest_paths_johnson
- * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm (deprecated).
- *
- * \deprecated-by igraph_distances_johnson 0.10.0
- */
-igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
-                                  igraph_matrix_t *res,
-                                  const igraph_vs_t from,
-                                  const igraph_vs_t to,
-                                  const igraph_vector_t *weights) {
-    return igraph_distances_johnson(graph, res, from, to, weights, IGRAPH_OUT);
-}

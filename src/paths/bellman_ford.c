@@ -218,20 +218,6 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_shortest_paths_bellman_ford
- * \brief Weighted shortest path lengths between vertices, allowing negative weights (deprecated).
- *
- * \deprecated-by igraph_distances_bellman_ford 0.10.0
- */
-igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
-                                       igraph_matrix_t *res,
-                                       const igraph_vs_t from,
-                                       const igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode) {
-    return igraph_distances_bellman_ford(graph, res, from, to, weights, mode);
-}
 
 /**
  * \ingroup structural
