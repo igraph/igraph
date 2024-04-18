@@ -1,13 +1,13 @@
 
 Null graph (not connected)
-Directed
+Mode: directed
 ( )
 ( )
 No. of components: 0
 {
 }
 ( )
-Undirected
+Mode: udirected
 ( )
 ( )
 No. of components: 0
@@ -16,7 +16,7 @@ No. of components: 0
 ( )
 
 Singleton graph (connected)
-Directed
+Mode: directed
 ( 0 )
 ( 1 )
 No. of components: 1
@@ -24,7 +24,7 @@ No. of components: 1
   0: ( 1 )
 }
 ( 1 )
-Undirected
+Mode: udirected
 ( 0 )
 ( 1 )
 No. of components: 1
@@ -34,7 +34,7 @@ No. of components: 1
 ( 1 )
 
 Kautz graph (connected)
-Directed
+Mode: directed
 ( 0 0 0 0 0 0 0 0 0 0 0 0 )
 ( 12 )
 No. of components: 1
@@ -42,7 +42,7 @@ No. of components: 1
   0: ( 1 1 1 1 1 1 1 1 1 1 1 1 )
 }
 ( 12 12 12 12 12 12 12 12 12 12 12 12 )
-Undirected
+Mode: udirected
 ( 0 0 0 0 0 0 0 0 0 0 0 0 )
 ( 12 )
 No. of components: 1
@@ -52,7 +52,7 @@ No. of components: 1
 ( 12 12 12 12 12 12 12 12 12 12 12 12 )
 
 Directed 2-path
-Directed
+Mode: directed
 ( 0 1 )
 ( 1 1 )
 No. of components: 2
@@ -61,7 +61,7 @@ No. of components: 2
   1: ( 1 0 )
 }
 ( 2 1 )
-Undirected
+Mode: udirected
 ( 0 0 )
 ( 2 )
 No. of components: 1
@@ -71,7 +71,7 @@ No. of components: 1
 ( 2 2 )
 
 Two disjoint 3-cycles
-Directed
+Mode: directed
 ( 1 1 1 0 0 0 )
 ( 3 3 )
 No. of components: 2
@@ -80,7 +80,7 @@ No. of components: 2
   1: ( 0 0 0 1 1 1 )
 }
 ( 3 3 3 3 3 3 )
-Undirected
+Mode: udirected
 ( 0 0 0 1 1 1 )
 ( 3 3 )
 No. of components: 2
@@ -91,7 +91,7 @@ No. of components: 2
 ( 3 3 3 3 3 3 )
 
 Path graph with 6 vertices ascending
-Directed
+Mode: directed
 ( 0 1 2 3 4 5 )
 ( 1 1 1 1 1 1 )
 No. of components: 6
@@ -104,7 +104,7 @@ No. of components: 6
   5: ( 1 0 0 0 0 0 )
 }
 ( 6 5 4 3 2 1 )
-Undirected
+Mode: udirected
 ( 0 0 0 0 0 0 )
 ( 6 )
 No. of components: 1
@@ -114,7 +114,7 @@ No. of components: 1
 ( 6 6 6 6 6 6 )
 
 Path graph with 6 vertices descending
-Directed
+Mode: directed
 ( 5 4 3 2 1 0 )
 ( 1 1 1 1 1 1 )
 No. of components: 6
@@ -127,7 +127,7 @@ No. of components: 6
   5: ( 0 0 0 0 0 1 )
 }
 ( 1 2 3 4 5 6 )
-Undirected
+Mode: udirected
 ( 0 0 0 0 0 0 )
 ( 6 )
 No. of components: 1
@@ -136,8 +136,8 @@ No. of components: 1
 }
 ( 6 6 6 6 6 6 )
 
-Custom
-Directed
+Small directed graph
+Mode: directed
 ( 5 5 5 6 7 7 4 2 3 3 3 1 0 )
 ( 1 1 1 3 1 3 1 2 )
 No. of components: 8
@@ -152,7 +152,7 @@ No. of components: 8
   7: ( 0 0 0 0 0 0 0 1 1 0 0 0 0 )
 }
 ( 6 6 6 3 2 2 1 6 3 3 3 2 2 )
-Undirected
+Mode: udirected
 ( 0 0 0 0 0 0 1 0 0 0 0 1 1 )
 ( 10 3 )
 No. of components: 2
@@ -161,3 +161,15 @@ No. of components: 2
   1: ( 1 1 0 0 0 0 1 0 0 0 0 0 0 )
 }
 ( 10 10 10 10 10 10 3 10 10 10 10 3 3 )
+
+Small undirected graph
+Mode: directed
+( 0 0 0 1 1 2 )
+( 3 2 1 )
+No. of components: 3
+{
+  0: ( 0 0 0 1 1 1 )
+  1: ( 0 1 1 0 0 0 )
+  2: ( 1 0 0 0 0 0 )
+}
+( 3 3 3 2 2 1 )

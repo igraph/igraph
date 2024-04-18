@@ -37,7 +37,7 @@ void compute_and_print(const igraph_t *g, igraph_bool_t directed) {
 
     igraph_count_reachable(g, &reach_counts, directed);
 
-    printf(directed ? "Directed\n" : "Undirected\n");
+    printf("Mode: %s\n", directed ? "directed" : "undirected");
     print_vector_int(&membership);
     print_vector_int(&csize);
     printf("No. of components: %" IGRAPH_PRId "\n", no_of_components);
@@ -97,10 +97,18 @@ int main(void) {
     compute_and_print(&g, false);
     igraph_destroy(&g);
 
-    printf("\nCustom\n");
+    printf("\nSmall directed graph\n");
     igraph_small(&g, 13, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 0, 1, 3, 3, 4, 4, 5, 5, 4, 7, 4, 7, 8, 9, 8, 10, 9, 8, 10, 11, 6, 12, 6, -1);
     compute_and_print(&g, true);
     compute_and_print(&g, false);
+    igraph_destroy(&g);
+
+    printf("\nSmall undirected graph\n");
+    igraph_small(&g, 6, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 0,2,
+                 3,4,
+                 -1);
+    compute_and_print(&g, true);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
