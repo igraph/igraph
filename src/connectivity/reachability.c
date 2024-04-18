@@ -143,7 +143,7 @@ igraph_error_t igraph_reachability(
  * \experimental
  *
  * \param graph The graph object to analyze.
- * \param counts Integer vector. <code>counts[v]<code> will store the number
+ * \param counts Integer vector. <code>counts[v]</code> will store the number
  *    of vertices reachable from vertex \c v, including \c v itself.
  * \param directed For a directed graph, determines whether edges are treated
  *    as directed or undirected.
