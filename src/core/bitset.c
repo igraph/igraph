@@ -745,7 +745,7 @@ igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file) {
 }
 
 #ifndef USING_R
-IGRAPH_EXPORT igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset) {
+igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset) {
     return igraph_bitset_fprint(bitset, stdout);
 }
 #endif
