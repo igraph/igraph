@@ -20,8 +20,7 @@
 
 #include "test_utilities.h"
 
-void compute_and_print(const igraph_t *g, igraph_bool_t directed)
-{
+void compute_and_print(const igraph_t *g, igraph_bool_t directed) {
     igraph_vector_int_t membership, csize, reach_counts;
     igraph_bitset_list_t reach;
     igraph_integer_t no_of_nodes, no_of_components;
@@ -51,8 +50,7 @@ void compute_and_print(const igraph_t *g, igraph_bool_t directed)
     igraph_vector_int_destroy(&reach_counts);
 }
 
-int main(void)
-{
+int main(void) {
     igraph_t g;
 
     /* Component calculations are run twice to exercise the cache */
