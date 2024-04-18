@@ -57,12 +57,11 @@
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * Time complexity: O(|C||V|/w + |V| + |E|),
+ * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
- * |V| is the number of vertices,
- * |E| is the number of edges and
- * edges in the graph, respectively and
- * w is the bit width of \type igraph_integer_t, typically the
+ * |V| is the number of vertices, and
+ * |E| is the number of edges respectively,
+ * and w is the bit width of \type igraph_integer_t, typically the
  * word size of the machine (32 or 64).
  */
 
@@ -137,25 +136,25 @@ igraph_error_t igraph_reachability(
 /**
  * \ingroup structural
  * \function igraph_count_reachable
- * \brief Calculates the number of vertices reachable from each vertex in the graph.
+ * \brief The number of vertices reachable from each vertex in the graph.
  *
  * \experimental
- * </para><para>
- * The resulting vector will store how many vertices are reachable from vertex i at index i.
  *
  * \param graph The graph object to analyze.
- * \param counts A vector of integers representing the result.
- * \param directed For a directed graph, determines whether edges are treated as directed or undirected.
+ * \param counts Integer vector. <code>counts[v]<code> will store the number
+ *    of vertices reachable from vertex \c v, including \c v itself.
+ * \param directed For a directed graph, determines whether edges are treated
+ *    as directed or undirected.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * Time complexity: O(|C||V|/w + |V| + |E|),
+ * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
- * |V| is the number of vertices,
- * |E| is the number of edges and
- * edges in the graph, respectively and
- * w is the word size of the machine (32 or 64).
+ * |V| is the number of vertices, and
+ * |E| is the number of edges respectively,
+ * and w is the bit width of \type igraph_integer_t, typically the
+ * word size of the machine (32 or 64).
  */
 
 igraph_error_t igraph_count_reachable(
