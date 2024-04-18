@@ -76,10 +76,7 @@ igraph_error_t igraph_reachability(
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_comps;
-    igraph_integer_t i, j, n;
     igraph_adjlist_t adjlist, dag;
-    igraph_vector_int_t *dag_neighbours, *neighbours;
-    igraph_bitset_t *from_bitset, *to_bitset;
 
     IGRAPH_CHECK(igraph_connected_components(graph,
                                              membership, csize, &no_of_comps,
@@ -91,11 +88,11 @@ igraph_error_t igraph_reachability(
 
     IGRAPH_CHECK(igraph_bitset_list_resize(reach, no_of_comps));
 
-    for (i = 0; i < no_of_comps; ++i) {
-        IGRAPH_CHECK(igraph_bitset_resize(igraph_bitset_list_get_ptr(reach, i), no_of_nodes));
+    for (igraph_integer_t comp = 0; comp < no_of_comps; ++comp) {
+        IGRAPH_CHECK(igraph_bitset_resize(igraph_bitset_list_get_ptr(reach, comp), no_of_nodes));
     }
-    for (i = 0; i < no_of_nodes; ++i) {
-        IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[i]), i);
+    for (igraph_integer_t v = 0; v < no_of_nodes; ++v) {
+        IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[v]), v);
     }
 
     if (!directed) {
@@ -104,26 +101,27 @@ igraph_error_t igraph_reachability(
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
     IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, no_of_comps));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &dag);
 
-    for (i = 0; i < no_of_nodes; ++i) {
-        neighbours = igraph_adjlist_get(&adjlist, i);
-        dag_neighbours = igraph_adjlist_get(&dag, VECTOR(*membership)[i]);
-        n = igraph_vector_int_size(neighbours);
-        for (j = 0; j < n; j++) {
-            if (VECTOR(*membership)[i] != VECTOR(*membership)[VECTOR(*neighbours)[j]]) {
-                igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[VECTOR(*neighbours)[j]]);
+    for (igraph_integer_t v = 0; v < no_of_nodes; ++v) {
+        const igraph_vector_int_t *neighbours = igraph_adjlist_get(&adjlist, v);
+        igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, VECTOR(*membership)[v]);
+        const igraph_integer_t n = igraph_vector_int_size(neighbours);
+        for (igraph_integer_t i = 0; i < n; i++) {
+            if (VECTOR(*membership)[v] != VECTOR(*membership)[VECTOR(*neighbours)[i]]) {
+                igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[VECTOR(*neighbours)[i]]);
             }
         }
     }
 
-    for (i = no_of_comps - 1; i >= 0; --i) {
-        dag_neighbours = igraph_adjlist_get(&dag, i);
-        from_bitset = igraph_bitset_list_get_ptr(reach, i);
-        n = igraph_vector_int_size(dag_neighbours);
-        for (j = 0; j < n; j++) {
-            to_bitset = igraph_bitset_list_get_ptr(reach, VECTOR(*dag_neighbours)[j]);
+    for (igraph_integer_t i = no_of_comps - 1; i >= 0; --i) {
+        const igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, i);
+        igraph_bitset_t *from_bitset = igraph_bitset_list_get_ptr(reach, i);
+        const igraph_integer_t n = igraph_vector_int_size(dag_neighbours);
+        for (igraph_integer_t j = 0; j < n; j++) {
+            const igraph_bitset_t *to_bitset = igraph_bitset_list_get_ptr(reach, VECTOR(*dag_neighbours)[j]);
             igraph_bitset_or(from_bitset, from_bitset, to_bitset);
         }
     }
