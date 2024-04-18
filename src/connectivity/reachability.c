@@ -79,6 +79,10 @@ igraph_error_t igraph_reachability(
     igraph_integer_t no_of_comps;
     igraph_adjlist_t adjlist, dag;
 
+    if (! igraph_is_directed(graph)) {
+        directed = false;
+    }
+
     IGRAPH_CHECK(igraph_connected_components(graph,
                                              membership, csize, &no_of_comps,
                                              directed ? IGRAPH_STRONG : IGRAPH_WEAK));
