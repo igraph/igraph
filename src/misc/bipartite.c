@@ -399,7 +399,7 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
 
 /**
  * \function igraph_full_bipartite
- * \brief Create a full bipartite network.
+ * \brief Creates a complete bipartite graph.
  *
  * A bipartite network contains two kinds of vertices and connections
  * are only possible between two vertices of different kind. There are
@@ -408,10 +408,10 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
  *
  * </para><para>
  * igraph does not have direct support for bipartite networks, at
- * least not at the C language level. In other words the igraph_t
+ * least not at the C language level. In other words the \type igraph_t
  * structure does not contain information about the vertex types.
  * The C functions for bipartite networks usually have an additional
- * input argument to graph, called \c types, a boolean vector giving
+ * input argument to graph, called \p types, a boolean vector giving
  * the vertex types.
  *
  * </para><para>
@@ -419,7 +419,7 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
  * extra vector, you just need to supply an initialized boolean vector
  * to them.
  *
- * \param graph Pointer to an igraph_t object, the graph will be
+ * \param graph Pointer to an uninitialized graph object, the graph will be
  *   created here.
  * \param types Pointer to a boolean vector. If not a null pointer,
  *   then the vertex types will be stored here.
@@ -436,7 +436,8 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  *
- * \sa \ref igraph_full() for non-bipartite full graphs.
+ * \sa \ref igraph_full() for non-bipartite complete graphs,
+ * \ref igraph_full_multipartite() for complete multipartite graphs.
  */
 
 igraph_error_t igraph_full_bipartite(igraph_t *graph,
