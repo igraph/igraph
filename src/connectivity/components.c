@@ -69,7 +69,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  *
  * \param graph The graph object to analyze.
  * \param membership For every vertex the ID of its component is given.
- *    The vector has to be preinitialized and will be resized as neede.
+ *    The vector has to be preinitialized and will be resized as needed.
  *    Alternatively this argument can be \c NULL, in which case it is ignored.
  * \param csize For every component it gives its size, the order being defined
  *    by the component IDs. The vector must be preinitialized and will be
