@@ -48,14 +48,16 @@
  *    IDs. The vector will be resized as needed.
  * \param no_of_components Pointer to an integer or \c NULL. The number of
  *    components will be stored here.
- * \param reach A list of bitsets representing the result.
- *    <code>reach[membership[u]][v]</code> is \c true if vertex \c v is
- *    reachable from vertex \c u.
+ * \param reach A list of bitsets representing the result. It will be resized
+ *    as needed. <code>reach[membership[u]][v]</code> is set to \c true if
+ *    vertex \c v is reachable from vertex \c u.
  * \param directed For a directed graph, determines whether edges are treated
  *    as directed or undirected. Ignored for undirected graphs.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
+ *
+ * \sa \ref igraph_connected_components(), \ref igraph_count_reachable().
  *
  * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
@@ -149,6 +151,8 @@ igraph_error_t igraph_reachability(
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
+ * \sa \ref igraph_connected_components(), \ref igraph_transitive_closure()
+ *
  * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
  * |V| is the number of vertices, and
@@ -199,6 +203,8 @@ igraph_error_t igraph_count_reachable(
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
+ *
+ * \sa \ref igraph_connected_components(), \ref igraph_count_reachable()
  *
  * Time complexity: O(|V|^2 + |E|), where
  * |V| is the number of vertices, and
