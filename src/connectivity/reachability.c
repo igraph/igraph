@@ -33,19 +33,26 @@
  * \brief Calculates which vertices are reachable from each vertex in the graph.
  *
  * \experimental
- * </para><para>
+ *
  * The resulting list will contain one bitset for each strongly connected component.
- * The bitset for component i will have its j-th bit set, if vertex j is reachable from some vertex in component i in 0 or more steps.
+ * The bitset for component i will have its j-th bit set, if vertex j is reachable
+ * from some vertex in component i in 0 or more steps.
  * In particular, a vertex is always reachable from itself.
- * Use the membership vector to get the reachability for a particular vertex.
  *
  * \param graph The graph object to analyze.
- * \param membership See \ref igraph_connected_components .
- * \param csize See \ref igraph_connected_components .
- * \param no_of_components Pointer to an integer. The number of
- *        components will be stored here.
+ * \param membership Pointer to an integer vector. For every vertex,
+ *    the ID of its component is given. The vector will be resized as needed.
+ *    This parameter must not be \c NULL.
+ * \param csize Pointer to an integer vector or \c NULL. For every component, it
+ *    gives its size (vertex count), the order being defined by the component
+ *    IDs. The vector will be resized as needed.
+ * \param no_of_components Pointer to an integer or \c NULL. The number of
+ *    components will be stored here.
  * \param reach A list of bitsets representing the result.
- * \param directed For a directed graph, determines whether edges are treated as directed or undirected.
+ *    <code>reach[membership[u]][v]</code> is \c true if vertex \c v is
+ *    reachable from vertex \c u.
+ * \param directed For a directed graph, determines whether edges are treated
+ *    as directed or undirected. Ignored for undirected graphs.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
@@ -55,7 +62,8 @@
  * |V| is the number of vertices,
  * |E| is the number of edges and
  * edges in the graph, respectively and
- * w is the word size of the machine (32 or 64).
+ * w is the bit width of \type igraph_integer_t, typically the
+ * word size of the machine (32 or 64).
  */
 
 igraph_error_t igraph_reachability(
