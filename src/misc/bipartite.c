@@ -596,16 +596,13 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  * edges between the two corresponding vertices.
  *
  * </para><para>
- * Note that this function can operate in two modes, depending on the
+ * This function can operate in two modes, depending on the
  * \p multiple argument. If it is \c false, then a single edge is
  * created for every non-zero element in the bipartite adjacency matrix. If
- * \p multiple is \c true, then the matrix elements are rounded up
- * to the closest non-negative integer to get the number of edges to
- * create between a pair of vertices.
- *
- * </para><para>
- * This function does not create multiple edges if \p multiple is
- * \c false, but might create some if it is \c true.
+ * \p multiple is \c true, then as many edges are created between two
+ * vertices as the corresponding matrix element. When \p multiple
+ * is set to \c true, matrix elements should be whole numbers.
+ * Otherwise their fractional part will be discarded.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param types Pointer to an initialized boolean vector, or a null
@@ -621,7 +618,8 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  *   second kind (corresponding to columns); if \c IGRAPH_IN,
  *   then the opposite direction is realized; if \c IGRAPH_ALL,
  *   then mutual edges will be created.
- * \param multiple How to interpret the matrix elements. See details above.
+ * \param multiple Whether to interpret matrix entries as edge multiplicities,
+ *   see details above.
  * \return Error code.
  *
  * Time complexity: O(n*m), the size of the bipartite adjacency matrix.
@@ -653,7 +651,7 @@ igraph_error_t igraph_biadjacency(
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                igraph_integer_t elem = ceil(MATRIX(*biadjmatrix, i, j));
+                igraph_integer_t elem = MATRIX(*biadjmatrix, i, j);
                 igraph_integer_t from, to;
 
                 if (elem == 0) {
