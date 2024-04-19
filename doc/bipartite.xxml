@@ -35,8 +35,6 @@
 
 <section id="deprecated-bipartite"><title>Deprecated functions</title>
 <!-- doxrox-include igraph_bipartite_game -->
-<!-- doxrox-include igraph_incidence -->
-<!-- doxrox-include igraph_get_incidence -->
 </section>
 
 </chapter>

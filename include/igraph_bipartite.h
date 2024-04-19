@@ -102,16 +102,6 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_v
 
 /* Deprecated functions: */
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_incidence(
-   igraph_t *graph, igraph_vector_bool_t *types, const igraph_matrix_t *incidence,
-   igraph_bool_t directed, igraph_neimode_t mode, igraph_bool_t multiple
-);
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_incidence(
-   const igraph_t *graph, const igraph_vector_bool_t *types, igraph_matrix_t *res,
-   igraph_vector_int_t *row_ids, igraph_vector_int_t *col_ids
-);
-
 IGRAPH_EXPORT IGRAPH_DEPRECATED  igraph_error_t igraph_bipartite_game(
     igraph_t *graph, igraph_vector_bool_t *types,
     igraph_erdos_renyi_t type,
