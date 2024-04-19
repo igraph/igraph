@@ -42,26 +42,26 @@ int main(void) {
     igraph_matrix_t incidence;
 
 
-    printf("Incidence matrix with no rows and no columns:\n");
+    printf("Bipartite adjacency matrix with no rows and no columns:\n");
     igraph_matrix_init(&incidence, 0, 0);
     print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 0);
 
     {
-        printf("\nIncidence matrix for two vertices:\n");
+        printf("\nBipartite adjacency matrix for two vertices:\n");
         int elem[] = {5};
         matrix_init_int_row_major(&incidence, 1, 1, elem);
         print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 0);
     }
 
     {
-        printf("\nIncidence matrix for two vertices, multiple = true:\n");
+        printf("\nBipartite adjacencymatrix for two vertices, multiple = true:\n");
         int elem[] = {5};
         matrix_init_int_row_major(&incidence, 1, 1, elem);
         print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 1);
     }
 
     {
-        printf("\nIncidence matrix for five vertices:\n");
+        printf("\nBipartite adjacencymatrix for five vertices:\n");
         int elem[] = {0, 1, 2, 3, 4, 5};
         matrix_init_int_row_major(&incidence, 2, 3, elem);
         print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 1);
