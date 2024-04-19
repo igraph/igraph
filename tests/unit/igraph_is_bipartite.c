@@ -50,6 +50,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
 
     /* Test cache usage */
+    bipartite = false;
     igraph_is_forest(&graph, &acyclic, NULL, IGRAPH_ALL);
     igraph_is_bipartite(&graph, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
@@ -63,6 +64,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vector_bool_size(&types) == igraph_vcount(&graph));
 
     /* Test cache usage */
+    bipartite = true;
     igraph_is_forest(&graph, &acyclic, NULL, IGRAPH_ALL);
     igraph_is_bipartite(&graph, &bipartite, NULL);
     IGRAPH_ASSERT(! bipartite);
