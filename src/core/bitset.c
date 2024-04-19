@@ -731,6 +731,9 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src)
  * such as vectors, but consistent with the bitset being a binary
  * representation of an integer and how they are usually written.
  *
+ * </para><para>
+ * No newline is printed at the end.
+ *
  * \param bitset The bitset to be printed.
  * \param file The file to be written.
  * \return Error code.
@@ -739,7 +742,7 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src)
  */
 igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file) {
     for (igraph_integer_t i = bitset->size - 1; i >= 0; i--) {
-        fprintf(file, "%d", (bool) IGRAPH_BIT_TEST(*bitset, i));
+        fputc(IGRAPH_BIT_TEST(*bitset, i) ? '1' : '0', file);
     }
     return IGRAPH_SUCCESS;
 }
