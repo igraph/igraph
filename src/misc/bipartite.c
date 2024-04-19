@@ -586,21 +586,6 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
 }
 
 /**
- * \function igraph_incidence
- * \brief Creates a bipartite graph from a bipartite adjacency matrix (deprecated alias).
- *
- * \deprecated-by igraph_biadjacency 0.10.5
- */
-
-igraph_error_t igraph_incidence(
-    igraph_t *graph, igraph_vector_bool_t *types,
-    const igraph_matrix_t *incidence, igraph_bool_t directed,
-    igraph_neimode_t mode, igraph_bool_t multiple
-) {
-    return igraph_biadjacency(graph, types, incidence, directed, mode, multiple);
-}
-
-/**
  * \function igraph_biadjacency
  * \brief Creates a bipartite graph from a bipartite adjacency matrix.
  *
@@ -843,22 +828,6 @@ igraph_error_t igraph_weighted_biadjacency(
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-}
-
-
-/**
- * \function igraph_get_incidence
- * \brief Convert a bipartite graph into a bipartite adjacency matrix (deprecated alias).
- *
- * \deprecated-by igraph_get_biadjacency 0.10.5
- */
-
-igraph_error_t igraph_get_incidence(const igraph_t *graph,
-                         const igraph_vector_bool_t *types,
-                         igraph_matrix_t *res,
-                         igraph_vector_int_t *row_ids,
-                         igraph_vector_int_t *col_ids) {
-    return igraph_get_biadjacency(graph, types, NULL, res, row_ids, col_ids);
 }
 
 /**
