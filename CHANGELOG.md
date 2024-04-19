@@ -42,6 +42,7 @@
  - The Pajek format reader and writer now map vertex labels to the `name` vertex attribute in igraph. The `id` attribute is no longer used.
  - `igraph_minimum_size_separators()` no longer returns any separating vertex sets for complete graphs. Prior to igraph 1.0, it would return all `n - 1` size vertex subsets where `n` is the vertex count.
  - `igraph_community_edge_betweenness()` now treats edges with large weights as strong connections.
+ - `igraph_biadjacency()` now truncates non-integer matrix entries to their integer part instead of rounding them up. This brings consistency with related functions such as `igraph_adjacency()`.
 
 ### Fixed
 
