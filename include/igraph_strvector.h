@@ -106,13 +106,6 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
 IGRAPH_EXPORT igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv,
                                                       igraph_integer_t capacity);
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_copy(
-    igraph_strvector_t *to, const igraph_strvector_t *from);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_set2(
-    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
-);
-
 __END_DECLS
 
 #endif

@@ -132,10 +132,6 @@ __BEGIN_DECLS
 IGRAPH_EXPORT igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_int_t *to);
 IGRAPH_EXPORT igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_int_t *to);
 
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
-                                                                  const igraph_vector_t *rhs,
-                                                                  igraph_real_t tol);
-
 IGRAPH_EXPORT igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
                                                        const igraph_vector_t *rhs,
                                                        igraph_real_t eps);

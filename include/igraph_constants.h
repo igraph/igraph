@@ -96,11 +96,6 @@ typedef enum { IGRAPH_DEGSEQ_CONFIGURATION = 0,     /* Configuration model, allo
                IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,      /* Fast heuristic, generates simple graphs */
                IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE,  /* Configuration model, generates simple graphs */
                IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE, /* Edge-switching MCMC, generates simple graphs */
-
-               /* Deprecated, kept for backwards compatibility: */
-               IGRAPH_DEGSEQ_SIMPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE
              } igraph_degseq_t;
 
 typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,

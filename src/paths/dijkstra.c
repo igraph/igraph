@@ -300,20 +300,6 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     return igraph_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, -1);
 }
 
-/**
- * \function igraph_shortest_paths_dijkstra
- * \brief Weighted shortest path lengths between vertices (deprecated).
- *
- * \deprecated-by igraph_distances_dijkstra 0.10.0
- */
-igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
-                                       igraph_matrix_t *res,
-                                       const igraph_vs_t from,
-                                       const igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode) {
-    return igraph_distances_dijkstra(graph, res, from, to, weights, mode);
-}
 
 /**
  * \ingroup structural

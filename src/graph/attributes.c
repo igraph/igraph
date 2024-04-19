@@ -888,12 +888,6 @@ igraph_set_attribute_table(const igraph_attribute_table_t * table) {
     return old;
 }
 
-igraph_attribute_table_t *
-igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
-    IGRAPH_WARNING("igraph_i_set_attribute_table is deprecated, use igraph_set_attribute_table.");
-    return igraph_set_attribute_table(table);
-}
-
 igraph_bool_t igraph_has_attribute_table(void) {
     return igraph_i_attribute_table != NULL;
 }
