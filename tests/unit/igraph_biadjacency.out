@@ -1,11 +1,11 @@
-Incidence matrix with no rows and no columns:
+Bipartite adjacency matrix with no rows and no columns:
 directed: true
 vcount: 0
 edges: {
 }
 types: 
 
-Incidence matrix for two vertices:
+Bipartite adjacency matrix for two vertices:
 directed: true
 vcount: 2
 edges: {
@@ -14,7 +14,7 @@ edges: {
 }
 types: 0 1
 
-Incidence matrix for two vertices, multiple = true:
+Bipartite adjacencymatrix for two vertices, multiple = true:
 directed: true
 vcount: 2
 edges: {
@@ -31,7 +31,7 @@ edges: {
 }
 types: 0 1
 
-Incidence matrix for five vertices:
+Bipartite adjacencymatrix for five vertices:
 directed: true
 vcount: 5
 edges: {
