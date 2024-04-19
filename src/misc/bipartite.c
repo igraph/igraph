@@ -923,7 +923,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     /* Shortcut: Graphs with self-loops are not bipartite. */
     if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
         igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
-        if (*res) {
+        if (res) {
             *res = false;
         }
         return IGRAPH_SUCCESS;
@@ -934,7 +934,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     if (! types &&
         igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
         igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST)) {
-        if (*res) {
+        if (res) {
             *res = true;
         }
         return IGRAPH_SUCCESS;
@@ -963,7 +963,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
             for (j = 0; j < n; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
                 if (VECTOR(seen)[nei]) {
-                    igraph_integer_t neitype = VECTOR(seen)[nei];
+                    char neitype = VECTOR(seen)[nei];
                     if (neitype == acttype) {
                         bi = false;
                         break;
