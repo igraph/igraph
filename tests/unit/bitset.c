@@ -19,17 +19,17 @@
 */
 
 #include <igraph.h>
-#include <stdlib.h>
 
 #include "test_utilities.h"
 
 int main(void) {
     igraph_bitset_t v1, v2, v3;
-    igraph_integer_t i, n;
+    igraph_integer_t n;
 
     printf("Initialise empty bitset\n");
     n = 0;
     igraph_bitset_init(&v1, n);
+    IGRAPH_ASSERT(igraph_bitset_size(&v1) == n);
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -51,6 +51,7 @@ int main(void) {
     n = 75;
     igraph_bitset_init(&v1, n);
     print_bitset(&v1);
+    IGRAPH_ASSERT(igraph_bitset_size(&v1) == n);
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -80,6 +81,10 @@ int main(void) {
     print_bitset(&v1);
     printf("\n");
 
+    printf("Test printing\n");
+    igraph_bitset_print(&v1);
+    printf("\n\n");
+
     printf("Test bitset copy constructor\n");
     igraph_bitset_init_copy(&v2, &v1);
     print_bitset(&v2);
@@ -90,8 +95,10 @@ int main(void) {
     printf("Test bitset resize\n");
     igraph_bitset_init(&v1, 0);
     print_bitset(&v1);
+    IGRAPH_ASSERT(igraph_bitset_size(&v1) == 0);
     igraph_bitset_resize(&v1, 10);
     print_bitset(&v1);
+    IGRAPH_ASSERT(igraph_bitset_size(&v1) == 10);
     IGRAPH_BIT_SET(v1, 3);
     print_bitset(&v1);
     igraph_bitset_resize(&v1, 64);
@@ -106,6 +113,7 @@ int main(void) {
     print_bitset(&v1);
     igraph_bitset_resize(&v1, 63);
     print_bitset(&v1);
+    IGRAPH_ASSERT(igraph_bitset_size(&v1) == 63);
     igraph_bitset_destroy(&v1);
     printf("\n");
 
@@ -197,7 +205,7 @@ int main(void) {
     print_bitset(&v1);
 
     printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
-    for (i = 2; i < n; i++) {
+    for (igraph_integer_t i = 2; i < n; i++) {
         if (i == 2 || i == 3 || i == 5 || i == 7 || i == 11 || !(i%2 == 0 || i%3 == 0 || i%5 == 0 || i%7 == 0 || i%11 == 0)) {
             IGRAPH_BIT_SET(v1, i);
         }
