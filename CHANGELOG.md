@@ -60,6 +60,7 @@
 ### Fixed
 
  - `igraph_community_label_propagation()` is now interruptible.
+ - `igraph_is_bipartite()` would on rare occasions return invalid results when the cache was employed.
 
 ### Other
 

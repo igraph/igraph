@@ -275,7 +275,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
  *
  * Time complexity: O(1).
  */
-IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
+igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
     return rng->type->bits;
 }
 
