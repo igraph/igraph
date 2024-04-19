@@ -963,7 +963,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
             for (j = 0; j < n; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
                 if (VECTOR(seen)[nei]) {
-                    igraph_integer_t neitype = VECTOR(seen)[nei];
+                    char neitype = VECTOR(seen)[nei];
                     if (neitype == acttype) {
                         bi = false;
                         break;
