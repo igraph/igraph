@@ -104,7 +104,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  * number of vertices in the graph, a list of shifts giving additional
  * edges to a cycle backbone, and another integer giving how many times
  * the shifts should be performed. See
- * http://mathworld.wolfram.com/LCFNotation.html for details.
+ * https://mathworld.wolfram.com/LCFNotation.html for details.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.

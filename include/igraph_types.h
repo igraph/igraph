@@ -138,15 +138,6 @@ IGRAPH_EXPORT int igraph_real_snprintf_precise(char *str, size_t size, igraph_re
 #define IGRAPH_INFINITY ((double)INFINITY)
 #define IGRAPH_POSINFINITY IGRAPH_INFINITY
 #define IGRAPH_NEGINFINITY (-IGRAPH_INFINITY)
-
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_finite(double x);
-#define IGRAPH_FINITE(x) igraph_finite(x)
-
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_nan(double x);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_inf(double x);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_posinf(double x);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_neginf(double x);
-
 #define IGRAPH_NAN ((double)NAN)
 
 __END_DECLS

@@ -87,9 +87,6 @@ __BEGIN_DECLS
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
-                                                                      const igraph_matrix_t *rhs,
-                                                                      igraph_real_t tol);
 
 IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_almost_e(const igraph_matrix_t *lhs,
                                                            const igraph_matrix_t *rhs,

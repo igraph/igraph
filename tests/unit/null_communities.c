@@ -42,7 +42,7 @@ int main(void) {
 
     /* Edge betweenness */
 
-    igraph_community_edge_betweenness(&g, NULL, NULL, &merges, NULL, &modularity, &membership, 0, NULL);
+    igraph_community_edge_betweenness(&g, NULL, NULL, &merges, NULL, &modularity, &membership, IGRAPH_UNDIRECTED, NULL, NULL);
 
     IGRAPH_ASSERT(igraph_matrix_int_nrow(&merges) == 0);
     IGRAPH_ASSERT(igraph_matrix_int_ncol(&merges) == 2);

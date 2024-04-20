@@ -716,6 +716,14 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
  * A vertex set is a separator if its removal disconnects the graph.
  *
  * </para><para>
+ * If the graph is already disconnected, no separators are returned.
+ * Note that this convention differs from that used by some other
+ * funtions such as \ref igraph_all_minimal_st_separators().
+ *
+ * </para><para>
+ * Complete graphs have no vertex separators.
+ *
+ * </para><para>
  * The implementation is based on the following paper:
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
@@ -723,7 +731,7 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
  *
  * \param graph The input graph, which must be undirected.
  * \param separators An initialized list of integer vectors, the separators
- *        are stored here. It is a list of pointers to igraph_vector_int_t
+ *        are stored here. It is a list of pointers to \type igraph_vector_int_t
  *        objects. Each vector will contain the IDs of the vertices in
  *        the separator. The separators are returned in an arbitrary order.
  * \return Error code.
@@ -762,8 +770,9 @@ igraph_error_t igraph_minimum_size_separators(
     k = conn;
 
     /* Special cases for low connectivity, two exits here! */
-    if (conn == 0) {
-        /* Nothing to do */
+    if (conn == 0 || conn == no_of_nodes - 1) {
+        /* Nothing to do on disconnected or complete graphs:
+         * there are no separators. */
         return IGRAPH_SUCCESS;
     } else if (conn == 1) {
         igraph_vector_int_t ap;
@@ -777,18 +786,6 @@ igraph_error_t igraph_minimum_size_separators(
         }
         igraph_vector_int_destroy(&ap);
         IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
-    } else if (conn == no_of_nodes - 1) {
-        IGRAPH_CHECK(igraph_vector_int_list_resize(separators, no_of_nodes));
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(separators, i);
-            IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes - 1));
-            for (igraph_integer_t j = 0, k = 0; j < no_of_nodes; j++) {
-                if (j != i) {
-                    VECTOR(*v)[k++] = j;
-                }
-            }
-        }
         return IGRAPH_SUCCESS;
     }
 

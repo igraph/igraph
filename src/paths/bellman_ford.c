@@ -102,7 +102,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                       IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
-    if (no_of_edges > 0 && igraph_vector_is_any_nan(weights)) {
+    if (igraph_vector_is_any_nan(weights)) {
         IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
@@ -218,20 +218,6 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_shortest_paths_bellman_ford
- * \brief Weighted shortest path lengths between vertices, allowing negative weights (deprecated).
- *
- * \deprecated-by igraph_distances_bellman_ford 0.10.0
- */
-igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
-                                       igraph_matrix_t *res,
-                                       const igraph_vs_t from,
-                                       const igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode) {
-    return igraph_distances_bellman_ford(graph, res, from, to, weights, mode);
-}
 
 /**
  * \ingroup structural
@@ -396,7 +382,12 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         for (k = 0; k < nlen; k++) {
             igraph_integer_t nei = VECTOR(*neis)[k];
             igraph_integer_t target = IGRAPH_OTHER(graph, nei, j);
-            igraph_real_t altdist = VECTOR(dist)[j] + VECTOR(*weights)[nei];
+            igraph_real_t weight = VECTOR(*weights)[nei];
+            igraph_real_t altdist = VECTOR(dist)[j] + weight;
+
+            if (isnan(weight)) {
+                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
 
             /* infinite weights are handled correctly here; if an edge has
              * infinite weight, altdist will also be infinite so the condition

@@ -1268,7 +1268,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv_min, 0);
         *v = VECTOR(M)[i];
         /* TODO: restricted == keep ? */
-        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ NULL,
+        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v, /*roots=*/ NULL,
                                 /*mode=*/ IGRAPH_IN, /*unreachable=*/ false,
                                 /*restricted=*/ &keep, /*order=*/ &Isv_min,
                                 /*rank=*/ NULL, /*parents=*/ NULL, /*pred=*/ NULL,

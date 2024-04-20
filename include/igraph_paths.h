@@ -123,26 +123,6 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_floyd_warshall(const igraph_t *gra
                                                              const igraph_vector_t *weights,
                                                              igraph_neimode_t mode,
                                                              igraph_floyd_warshall_algorithm_t method);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
-                                        const igraph_vs_t from, const igraph_vs_t to,
-                                        igraph_neimode_t mode);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
-                                                     igraph_matrix_t *res,
-                                                     const igraph_vs_t from,
-                                                     const igraph_vs_t to,
-                                                     const igraph_vector_t *weights,
-                                                     igraph_neimode_t mode);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
-                                                 igraph_matrix_t *res,
-                                                 const igraph_vs_t from,
-                                                 const igraph_vs_t to,
-                                                 const igraph_vector_t *weights,
-                                                 igraph_neimode_t mode);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
-                                                igraph_matrix_t *res,
-                                                const igraph_vs_t from,
-                                                const igraph_vs_t to,
-                                                const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                                             igraph_vector_int_list_t *vertices,

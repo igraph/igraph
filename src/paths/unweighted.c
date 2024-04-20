@@ -256,20 +256,6 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
 }
 
 /**
- * \function igraph_shortest_paths
- * \brief Length of the shortest paths between vertices.
- *
- * \deprecated-by igraph_distances 0.10.0
- */
-igraph_error_t igraph_shortest_paths(const igraph_t *graph,
-                                     igraph_matrix_t *res,
-                                     const igraph_vs_t from,
-                                     const igraph_vs_t to,
-                                     igraph_neimode_t mode) {
-    return igraph_distances(graph, res, from, to, mode);
-}
-
-/**
  * \ingroup structural
  * \function igraph_get_shortest_paths
  * \brief Shortest paths from a vertex.
