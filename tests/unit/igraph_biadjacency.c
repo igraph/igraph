@@ -44,41 +44,64 @@ int main(void) {
 
     printf("Bipartite adjacency matrix with no rows and no columns:\n");
     igraph_matrix_init(&incidence, 0, 0);
-    print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 0);
+    print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, false);
 
     {
         printf("\nBipartite adjacency matrix for two vertices:\n");
         int elem[] = {5};
         matrix_init_int_row_major(&incidence, 1, 1, elem);
-        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 0);
+        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, false);
     }
 
     {
         printf("\nBipartite adjacencymatrix for two vertices, multiple = true:\n");
         int elem[] = {5};
         matrix_init_int_row_major(&incidence, 1, 1, elem);
-        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 1);
+        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, true);
     }
 
     {
         printf("\nBipartite adjacencymatrix for five vertices:\n");
         int elem[] = {0, 1, 2, 3, 4, 5};
         matrix_init_int_row_major(&incidence, 2, 3, elem);
-        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, 1);
+        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_ALL, true);
     }
 
     {
         printf("\nSame graph, IGRAPH_OUT:\n");
         int elem[] = {0, 1, 2, 3, 4, 5};
         matrix_init_int_row_major(&incidence, 2, 3, elem);
-        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_OUT, 1);
+        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_OUT, true);
+    }
+
+    {
+        printf("\nSame graph, IGRAPH_IN:\n");
+        int elem[] = {0, 1, 2, 3, 4, 5};
+        matrix_init_int_row_major(&incidence, 2, 3, elem);
+        print_and_destroy(&incidence, IGRAPH_DIRECTED, IGRAPH_IN, true);
     }
 
     {
         printf("\nSame graph, undirected:\n");
         int elem[] = {0, 1, 2, 3, 4, 5};
         matrix_init_int_row_major(&incidence, 2, 3, elem);
-        print_and_destroy(&incidence, IGRAPH_UNDIRECTED, IGRAPH_OUT, 1);
+        print_and_destroy(&incidence, IGRAPH_UNDIRECTED, IGRAPH_OUT, true);
+    }
+
+    {
+        printf("\nNon-integer elements, multiple=false:\n");
+        igraph_real_t elem[] = {0.0, 1.2, -1.8,
+                                5.0, 0.0,  2.2};
+        matrix_init_real_row_major(&incidence, 2, 3, elem);
+        print_and_destroy(&incidence, IGRAPH_UNDIRECTED, IGRAPH_ALL, false);
+    }
+
+    {
+        printf("\nNon-integer elements, multiple=true:\n");
+        igraph_real_t elem[] = {0.0, 1.2, 1.8,
+                                5.0, 0.0, 2.2};
+        matrix_init_real_row_major(&incidence, 2, 3, elem);
+        print_and_destroy(&incidence, IGRAPH_UNDIRECTED, IGRAPH_ALL, true);
     }
 
     VERIFY_FINALLY_STACK();
@@ -88,7 +111,7 @@ int main(void) {
         int elem[] = {-5};
         matrix_init_int_row_major(&incidence, 1, 1, elem);
         CHECK_ERROR(igraph_biadjacency(&g, &types, &incidence, IGRAPH_DIRECTED,
-                    IGRAPH_ALL, 1), IGRAPH_EINVAL);
+                    IGRAPH_ALL, true), IGRAPH_EINVAL);
         igraph_matrix_destroy(&incidence);
     }
 
