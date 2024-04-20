@@ -291,6 +291,92 @@ edges: {
 2 2: 2
 }
 
+
+Testing NaN and Inf passthrough
+
+IGRAPH_ADJ_DIRECTED
+directed: true
+vcount: 3
+edges: {
+0 1
+0 2
+1 0
+1 1
+1 2
+2 0
+2 2
+}
+( 1.5 Inf NaN -Inf -5.2 NaN NaN )
+
+IGRAPH_ADJ_MAX
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+1 1
+2 2
+}
+( NaN NaN -Inf NaN )
+
+IGRAPH_ADJ_MIN
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+1 1
+2 1
+2 2
+}
+( NaN NaN -Inf -5.2 NaN )
+
+IGRAPH_ADJ_LOWER
+directed: false
+vcount: 3
+edges: {
+1 0
+1 1
+2 0
+2 2
+}
+( NaN -Inf NaN NaN )
+
+IGRAPH_ADJ_UPPER
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+1 1
+2 1
+2 2
+}
+( 1.5 Inf -Inf -5.2 NaN )
+
+IGRAPH_ADJ_PLUS
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+1 1
+2 1
+2 2
+}
+( NaN NaN -Inf -5.2 NaN )
+
+IGRAPH_ADJ_UNDIRECTED (symmetric)
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+1 1
+2 2
+}
+( NaN Inf -Inf NaN )
+
 Check handling of non-square matrix error.
 Check handling of invalid adjacency mode.
 Check error for 0x1 matrix.
