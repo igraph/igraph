@@ -124,7 +124,7 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
             igraph_integer_t k, neilen2, nei = VECTOR(*neis1)[j];
             igraph_vector_int_t *neis2 = igraph_adjlist_get(&adjlist, nei);
             if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
-                IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
+                IGRAPH_ERROR("Non-bipartite edge found in bipartite projection.",
                              IGRAPH_EINVAL);
             }
             neilen2 = igraph_vector_int_size(neis2);
