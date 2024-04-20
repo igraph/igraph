@@ -41,10 +41,17 @@ int main(void) {
     igraph_vector_bool_init(&types, 0);
     igraph_matrix_t biadjmat;
 
+    {
+        printf("Bipartite adjacency matrix with no rows and no columns:\n");
+        igraph_matrix_init(&biadjmat, 0, 0);
+        print_and_destroy(&biadjmat, IGRAPH_DIRECTED, IGRAPH_ALL, false);
+    }
 
-    printf("Bipartite adjacency matrix with no rows and no columns:\n");
-    igraph_matrix_init(&biadjmat, 0, 0);
-    print_and_destroy(&biadjmat, IGRAPH_DIRECTED, IGRAPH_ALL, false);
+    {
+        printf("Bipartite adjacency matrix no rows and some columns:\n");
+        igraph_matrix_init(&biadjmat, 0, 5);
+        print_and_destroy(&biadjmat, IGRAPH_DIRECTED, IGRAPH_ALL, false);
+    }
 
     {
         printf("\nBipartite adjacency matrix for two vertices:\n");
