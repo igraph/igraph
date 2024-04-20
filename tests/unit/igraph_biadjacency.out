@@ -4,6 +4,12 @@ vcount: 0
 edges: {
 }
 types: 
+Bipartite adjacency matrix no rows and some columns:
+directed: true
+vcount: 5
+edges: {
+}
+types: 1 1 1 1 1
 
 Bipartite adjacency matrix for two vertices:
 directed: true

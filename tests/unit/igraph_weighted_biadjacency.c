@@ -53,6 +53,12 @@ int main(void) {
     }
 
     {
+        printf("Bipartite adjacency matrix with some rows and no columns:\n");
+        igraph_matrix_init(&biadjmat, 3, 0);
+        print_and_destroy(&biadjmat, IGRAPH_DIRECTED, IGRAPH_ALL);
+    }
+
+    {
         printf("\nBipartite adjacency matrix for two vertices:\n");
         igraph_real_t elem[] = {1.25};
         matrix_init_real_row_major(&biadjmat, 1, 1, elem);

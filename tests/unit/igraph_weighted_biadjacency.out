@@ -5,6 +5,13 @@ edges: {
 }
 weights: 
 types: 
+Bipartite adjacency matrix with some rows and no columns:
+directed: true
+vcount: 3
+edges: {
+}
+weights: 
+types: 0 0 0
 
 Bipartite adjacency matrix for two vertices:
 directed: true
