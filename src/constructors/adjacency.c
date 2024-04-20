@@ -322,7 +322,7 @@ igraph_error_t igraph_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
@@ -747,7 +747,7 @@ igraph_error_t igraph_weighted_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
