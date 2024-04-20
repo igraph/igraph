@@ -90,6 +90,28 @@ edges: {
 }
 types: 0 0 1 1 1
 
+Same graph, IGRAPH_IN:
+directed: true
+vcount: 5
+edges: {
+2 1
+2 1
+2 1
+3 0
+3 1
+3 1
+3 1
+3 1
+4 0
+4 0
+4 1
+4 1
+4 1
+4 1
+4 1
+}
+types: 0 0 1 1 1
+
 Same graph, undirected:
 directed: false
 vcount: 5
@@ -107,6 +129,33 @@ edges: {
 1 4
 1 4
 1 4
+1 4
+1 4
+}
+types: 0 0 1 1 1
+
+Non-integer elements, multiple=false:
+directed: false
+vcount: 5
+edges: {
+0 3
+0 4
+1 2
+1 4
+}
+types: 0 0 1 1 1
+
+Non-integer elements, multiple=true:
+directed: false
+vcount: 5
+edges: {
+0 3
+0 4
+1 2
+1 2
+1 2
+1 2
+1 2
 1 4
 1 4
 }
