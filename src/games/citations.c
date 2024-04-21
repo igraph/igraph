@@ -69,7 +69,7 @@ static void igraph_i_citing_cited_type_game_free (
  *
  * \param graph Pointer to an uninitialized graph object, the result
  *     will be stored here.
- * \param node The number of vertices in the network.
+ * \param nodes The number of vertices in the network.
  * \param edges_per_node The number of edges to add in each time
  *     step.
  * \param agebins The number of age bins to use.
@@ -348,14 +348,13 @@ err_pref_neg:
 }
 
 static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {
-    igraph_integer_t i;
     if (!s->sumtrees) {
         return;
     }
-    for (i = 0; i < s->no; i++) {
+    for (igraph_integer_t i = 0; i < s->no; i++) {
         igraph_psumtree_destroy(&s->sumtrees[i]);
     }
-    igraph_free(s->sumtrees);
+    IGRAPH_FREE(s->sumtrees);
 }
 
 /**
