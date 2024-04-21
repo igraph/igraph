@@ -931,3 +931,36 @@ igraph_error_t igraph_extended_chordal_ring(
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_hypercube
+ * \brief Creates an n-dimensional hypercube.
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param nodes Integer constant, n-dimensional hypercube, 2^n vertices.
+ * \param directed Whether the graph should be directed.
+ * \return Error code.
+ */
+igraph_error_t igraph_hypercube(
+    igraph_t *graph, igraph_integer_t nodes, igraph_bool_t directed) {
+
+    igraph_vector_int_t dims;
+    igraph_integer_t i;
+
+    /* Calculate dimension vector for the hypercube */    
+    igraph_vector_int_init(&dims, nodes);
+    igraph_vector_int_fill(&dims, 2);
+
+    /* Use igraph_square_lattice to construct hypercube */
+    igraph_error_t status = 
+    igraph_square_lattice(graph, &dims, 1, directed, 0, 0);
+    igraph_vector_int_destroy(&dims);
+    if(status != IGRAPH_SUCCESS){
+        return status;
+    }
+   
+    return IGRAPH_SUCCESS;
+}
+
+
+
