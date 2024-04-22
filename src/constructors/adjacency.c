@@ -322,7 +322,7 @@ igraph_error_t igraph_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
@@ -512,7 +512,7 @@ static igraph_error_t igraph_i_weighted_adjacency_max(
         for (j = i + 1; j < no_of_nodes; j++) {
             M1 = MATRIX(*adjmatrix, i, j);
             M2 = MATRIX(*adjmatrix, j, i);
-            if (M1 < M2) {
+            if (M1 < M2 || isnan(M2)) {
                 M1 = M2;
             }
             if (M1 != 0.0) {
@@ -531,11 +531,21 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     igraph_vector_t *weights,
     igraph_loops_t loops
 ) {
-    if (!igraph_matrix_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR(
-            "Adjacency matrix should be symmetric to produce an undirected graph.",
-            IGRAPH_EINVAL
-        );
+    /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
+     * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
+     * returns false for these as NaN != NaN. */
+    igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
+    for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_integer_t j=0; j < i; j++) {
+            igraph_real_t a1 = MATRIX(*adjmatrix, i, j);
+            igraph_real_t a2 = MATRIX(*adjmatrix, j, i);
+            if (a1 != a2 && ! (isnan(a1) && isnan(a2))) {
+                IGRAPH_ERROR(
+                    "Adjacency matrix should be symmetric to produce an undirected graph.",
+                    IGRAPH_EINVAL
+                    );
+            }
+        }
     }
     return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
 }
@@ -639,7 +649,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
         for (j = i + 1; j < no_of_nodes; j++) {
             M1 = MATRIX(*adjmatrix, i, j);
             M2 = MATRIX(*adjmatrix, j, i);
-            if (M1 > M2) {
+            if (M1 > M2 || isnan(M2)) {
                 M1 = M2;
             }
             if (M1 != 0.0) {
@@ -737,7 +747,7 @@ igraph_error_t igraph_weighted_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);

@@ -65,8 +65,6 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 
     igraph_integer_t resp = 0;
 
-    igraph_integer_t i, j;
-
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
@@ -88,8 +86,8 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 
     RNG_BEGIN();
 
-    for (i = 1; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_neighbors; j++) {
+    for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
+        for (igraph_integer_t j = 0; j < no_of_neighbors; j++) {
             if (citation) {
                 igraph_integer_t to = RNG_INTEGER(0, i - 1);
                 VECTOR(edges)[resp++] = i;
