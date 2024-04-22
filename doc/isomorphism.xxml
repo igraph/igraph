@@ -25,10 +25,6 @@
 <!-- doxrox-include igraph_automorphism_group_bliss -->
 <!-- doxrox-include igraph_canonical_permutation_bliss -->
 
-<section id="bliss-algorithm-deprecated"><title>Deprecated aliases</title>
-<!-- doxrox-include igraph_automorphisms -->
-</section>
-
 </section>
 
 <section id="vf2-algorithm"><title>The VF2 algorithm</title>

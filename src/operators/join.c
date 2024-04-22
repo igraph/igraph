@@ -18,14 +18,15 @@
 */
 
 #include "igraph_operators.h"
-#include "math/safe_intop.h"
-
-#include "igraph_constructors.h"
 #include "igraph_interface.h"
+
+#include "math/safe_intop.h"
 
 /**
  * \function igraph_join
  * \brief Creates the join of two disjoint graphs.
+ *
+ * \experimental
  *
  * First the vertices of the second graph will be relabeled with new
  * vertex IDs to have two disjoint sets of vertex IDs, then the union
@@ -62,8 +63,9 @@
  * Time complexity: O(|V1|*|V2|+|E1|+|E2|).
  *
  */
-igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
-                          const igraph_t *right) {
+igraph_error_t igraph_join(igraph_t *res,
+                           const igraph_t *left,
+                           const igraph_t *right) {
 
     igraph_integer_t no_of_nodes_left = igraph_vcount(left);
     igraph_integer_t no_of_nodes_right = igraph_vcount(right);

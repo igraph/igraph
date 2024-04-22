@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -36,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size-1));
+    igraph_vector_int_init(&edges, Size-1);
     for (size_t i=0; i < Size-1; ++i) {
         VECTOR(edges)[i] = Data[i+1];
     }
@@ -54,19 +49,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         /* Limit graph size for the sake of performance. */
         if (igraph_vcount(&graph) <= 64) {
-            check_err(igraph_matrix_int_init(&merges, 0, 0));
-            check_err(igraph_matrix_int_init(&im, 0, 0));
-            check_err(igraph_matrix_init(&mat, 0, 0));
-            check_err(igraph_vector_int_init(&membership, 0));
-            check_err(igraph_vector_int_init(&membership2, 0));
-            check_err(igraph_vector_int_init(&iv, 0));
-            check_err(igraph_vector_int_init(&iv2, 0));
+            igraph_matrix_int_init(&merges, 0, 0);
+            igraph_matrix_int_init(&im, 0, 0);
+            igraph_matrix_init(&mat, 0, 0);
+            igraph_vector_int_init(&membership, 0);
+            igraph_vector_int_init(&membership2, 0);
+            igraph_vector_int_init(&iv, 0);
+            igraph_vector_int_init(&iv2, 0);
             igraph_vector_init(&mv, 0);
             igraph_vector_init(&v, 0);
 
             igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL);
             igraph_community_walktrap(&graph, NULL, 3, &merges, &mv, &membership);
-            igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, NULL);
+            igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, NULL, NULL);
+
+            // Take the opportunity to run functions that can use the output of community detection.
 
             {
                 igraph_community_comparison_t method[] = {

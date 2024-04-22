@@ -1426,7 +1426,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int
  *
  * Time complexity: O(1).
  */
-IGRAPH_EXPORT igraph_error_t igraph_es_all_between(
+igraph_error_t igraph_es_all_between(
     igraph_es_t *es, igraph_integer_t from, igraph_integer_t to,
     igraph_bool_t directed
 ) {

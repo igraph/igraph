@@ -66,8 +66,9 @@
  *
  * \example examples/simple/igraph_disjoint_union.c
  */
-igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
-                          const igraph_t *right) {
+igraph_error_t igraph_disjoint_union(igraph_t *res,
+                                     const igraph_t *left,
+                                     const igraph_t *right) {
 
     const igraph_integer_t no_of_nodes_left = igraph_vcount(left);
     const igraph_integer_t no_of_nodes_right = igraph_vcount(right);
@@ -148,7 +149,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * of edges in the result.
  */
 igraph_error_t igraph_disjoint_union_many(igraph_t *res,
-                               const igraph_vector_ptr_t *graphs) {
+                                          const igraph_vector_ptr_t *graphs) {
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = true;
     igraph_vector_int_t edges;

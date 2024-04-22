@@ -18,7 +18,7 @@
    02110-1301 USA
 */
 
-#include "igraph.h"
+#include <igraph.h>
 #include <cstdio>
 
 // This fuzzer checks two things:
@@ -70,18 +70,20 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         CHECK_ERR(igraph_write_graph_gml(&g, file, IGRAPH_WRITE_GML_DEFAULT_SW, NULL, "no one"));
         rewind(file);
         CHECK_ERR(igraph_read_graph_gml(&g2, file));
-        fclose(file);
         igraph_destroy(&g2);
+        fclose(file);
 
-        /*
+        // Reading Pajek files back is disabled because of
+        // https://github.com/igraph/igraph/issues/2560
         file = tmpfile();
         IGRAPH_ASSERT(file != NULL);
         CHECK_ERR(igraph_write_graph_pajek(&g, file));
+        /*
         rewind(file);
         CHECK_ERR(igraph_read_graph_pajek(&g2, file));
-        fclose(file);
         igraph_destroy(&g2);
         */
+        fclose(file);
 
         file = tmpfile();
         IGRAPH_ASSERT(file != NULL);

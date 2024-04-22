@@ -221,19 +221,6 @@ igraph_bool_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
             igraph_vector_complex_all_almost_e(&lhs->data, &rhs->data, eps);
 }
 
-/**
- * Deprecated in favour of \ref igraph_matrix_all_almost_e() which uses
- * relative tolerances. Will be removed in 0.11.
- *
- * Checks if two matrices are equal within an absolute tolerance.
- */
-igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
-                                      const igraph_matrix_t *rhs,
-                                      igraph_real_t tol) {
-    return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&
-            igraph_vector_e_tol(&lhs->data, &rhs->data, tol);
-}
-
 
 /**
  * \function igraph_matrix_all_almost_e

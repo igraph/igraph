@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -36,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size-1));
+    igraph_vector_int_init(&edges, Size-1);
     for (size_t i=0; i < Size-1; ++i) {
         VECTOR(edges)[i] = Data[i+1];
     }
@@ -52,15 +47,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_bool_t b, b2;
         igraph_real_t r;
 
-        check_err(igraph_vector_int_list_init(&ivl1, 0));
-        check_err(igraph_vector_int_list_init(&ivl2, 0));
-        check_err(igraph_vector_int_init(&iv1, 0));
-        check_err(igraph_vector_int_init(&iv2, 0));
-        check_err(igraph_vector_int_init(&iv3, 0));
-        check_err(igraph_vector_int_init(&iv4, 0));
-        check_err(igraph_vector_int_init(&iv5, 0));
-        check_err(igraph_vector_bool_init(&bv, 0));
-        check_err(igraph_matrix_init(&m, 0, 0));
+        igraph_vector_int_list_init(&ivl1, 0);
+        igraph_vector_int_list_init(&ivl2, 0);
+        igraph_vector_int_init(&iv1, 0);
+        igraph_vector_int_init(&iv2, 0);
+        igraph_vector_int_init(&iv3, 0);
+        igraph_vector_int_init(&iv4, 0);
+        igraph_vector_int_init(&iv5, 0);
+        igraph_vector_bool_init(&bv, 0);
+        igraph_matrix_init(&m, 0, 0);
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_STRONG);
         igraph_coreness(&graph, &iv1, IGRAPH_OUT);
@@ -100,6 +95,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_topological_sorting(&graph, &iv1, IGRAPH_OUT);
         }
 
+        igraph_feedback_arc_set(&graph, &iv1, NULL, IGRAPH_FAS_APPROX_EADES);
+
         igraph_is_eulerian(&graph, &b, &b2);
         if (b) igraph_eulerian_path(&graph, &iv1, &iv2);
         if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
@@ -131,12 +128,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
         }
 
+        /* Basic graph modification */
         igraph_add_vertices(&graph, 3, NULL);
         igraph_degree_1(&graph, &i, 0, IGRAPH_IN, IGRAPH_NO_LOOPS);
         igraph_delete_vertices(&graph, igraph_vss_1(0));
         igraph_add_edge(&graph, 0, 1);
         igraph_count_multiple_1(&graph, &i, 0);
         igraph_delete_edges(&graph, igraph_ess_1(0));
+
+        if (igraph_vcount(&graph) >= 4) {
+            igraph_rewire(&graph, igraph_ecount(&graph) + 1, IGRAPH_REWIRING_SIMPLE);
+        }
 
         igraph_matrix_destroy(&m);
         igraph_vector_bool_destroy(&bv);

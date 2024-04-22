@@ -1192,15 +1192,23 @@ igraph_create_bipartite:
 
 igraph_biadjacency:
     PARAMS: |-
-        OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
+        OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX biadjmatrix,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
+igraph_weighted_biadjacency:
+    PARAMS: |-
+        OUT GRAPH graph, 
+        OUT BIPARTITE_TYPES types, OUT EDGE_WEIGHTS weights, 
+        MATRIX biadjmatrix,
+        BOOLEAN directed=False, NEIMODE mode=ALL
+
 igraph_get_biadjacency:
     PARAMS: |-
-        GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
+        GRAPH graph, BIPARTITE_TYPES types=NULL, OPTIONAL EDGE_WEIGHTS weights,
+        OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
-    DEPS: types ON graph
+    DEPS: types ON graph, weights ON graph
 
 igraph_is_bipartite:
     PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT BIPARTITE_TYPES type
@@ -1619,8 +1627,9 @@ igraph_community_edge_betweenness:
         GRAPH graph, OUT VECTOR_INT removed_edges, OPTIONAL OUT VECTOR edge_betweenness,
         OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership,
-        BOOLEAN directed=True, OPTIONAL EDGE_WEIGHTS weights=NULL
-    DEPS: weights ON graph
+        BOOLEAN directed=True,
+        OPTIONAL EDGE_WEIGHTS weights=NULL, OPTIONAL EDGE_LENGTHS lengths=NULL
+    DEPS: weights ON graph, lengths ON graph, edge_betweenness ON graph
 
 igraph_community_eb_get_merges:
     PARAMS: |-
@@ -2355,7 +2364,7 @@ igraph_subisomorphic_lad:
     PARAMS: |-
         GRAPH pattern, GRAPH target, OPTIONAL VERTEX_INDICES_LIST domains,
         OPTIONAL OUT BOOLEAN iso, OUT INDEX_VECTOR map,
-        OPTIONAL OUT VECTOR_INT_LIST maps, BOOLEAN induced, INTEGER time_limit
+        OPTIONAL OUT VECTOR_INT_LIST maps, BOOLEAN induced
 
 igraph_simplify_and_colorize:
     # Despite their names, vertex_color and edge_color are not really colors
@@ -2402,7 +2411,7 @@ igraph_adjacency_spectral_embedding:
         EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X,
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
         VECTOR cvec=AsmDefaultCvec,
-        INOUT ARPACK_OPTIONS options=RPACK_DEFAULTS
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, cvec ON graph
 
 igraph_laplacian_spectral_embedding:

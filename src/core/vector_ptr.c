@@ -393,18 +393,6 @@ void *igraph_vector_ptr_get(const igraph_vector_ptr_t* v, igraph_integer_t pos) 
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_e
- * \brief Access an element of a pointer vector (deprecated alias).
- *
- * \deprecated-by igraph_vector_ptr_get 0.10.0
- */
-
-void *igraph_vector_ptr_e(const igraph_vector_ptr_t* v, igraph_integer_t pos) {
-    return igraph_vector_ptr_get(v, pos);
-}
-
-/**
- * \ingroup vectorptr
  * \function igraph_vector_ptr_set
  * \brief Assign to an element of a pointer vector.
  *
@@ -545,18 +533,6 @@ igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *to, const igraph
            (size_t) igraph_vector_ptr_size(from)*sizeof(void*));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup vectorptr
- * \function igraph_vector_ptr_copy
- * \brief Initializes a pointer vector from another one (deprecated alias).
- *
- * \deprecated-by igraph_vector_ptr_init_copy 0.10
- */
-
-igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    return igraph_vector_ptr_init_copy(to, from);
 }
 
 /**

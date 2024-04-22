@@ -21,23 +21,17 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(int err) {
-    if (err)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     if (Size % 2 == 1 || Size > 65280) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size));
+    igraph_vector_int_init(&edges, Size);
     for (size_t i=0; i < Size; ++i) {
         VECTOR(edges)[i] = Data[i];
     }
@@ -47,9 +41,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         /* Enable connectivity checks in order to try to force the fuzzer
          * to find connected graphs. Disconnected graphs result in low coverage. */
-        check_err(igraph_edge_connectivity(&graph, &conn, 1));
-        check_err(igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, nullptr));
-        check_err(igraph_edge_connectivity(&graph, &conn, 1));
+        igraph_edge_connectivity(&graph, &conn, 1);
+        igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, nullptr);
+        igraph_edge_connectivity(&graph, &conn, 1);
 
         igraph_destroy(&graph);
     }

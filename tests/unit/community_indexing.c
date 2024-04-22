@@ -54,7 +54,7 @@ int main(void) {
     igraph_community_walktrap(&graph, NULL, 4, NULL, NULL, &membership);
     check(&membership);
 
-    igraph_community_edge_betweenness(&graph, NULL, NULL, NULL, NULL, NULL, &membership, IGRAPH_UNDIRECTED, NULL);
+    igraph_community_edge_betweenness(&graph, NULL, NULL, NULL, NULL, NULL, &membership, IGRAPH_UNDIRECTED, NULL, NULL);
     check(&membership);
 
     igraph_community_leading_eigenvector(&graph, NULL, NULL, &membership, igraph_vcount(&graph), NULL, NULL, false, NULL, NULL, NULL, NULL, NULL);

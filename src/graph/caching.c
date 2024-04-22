@@ -17,6 +17,7 @@
 */
 
 #include "igraph_interface.h"
+#include "igraph_misc.h"    /* IGRAPH_STATIC_ASSERT */
 
 #include "graph/caching.h"
 

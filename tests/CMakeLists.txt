@@ -567,11 +567,12 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
   igraph_connect_neighborhood
+  igraph_disjoint_union
   igraph_graph_power
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
-  igraph_intersection2
+  igraph_intersection
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
@@ -779,6 +780,7 @@ add_legacy_tests(
   igraph_bipartite_projection
   igraph_biadjacency
   igraph_get_biadjacency
+  igraph_weighted_biadjacency
 )
 
 # centralization.at
@@ -982,6 +984,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted

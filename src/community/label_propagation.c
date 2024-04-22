@@ -26,6 +26,8 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
         igraph_vector_int_t *membership,
         igraph_neimode_t mode,
@@ -42,6 +44,7 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_vector_t label_weights;
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
     igraph_neimode_t reverse_mode;
+    int iter = 0; /* interruption counter */
 
     reverse_mode = IGRAPH_REVERSE_MODE(mode);
 
@@ -102,6 +105,8 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
         igraph_vector_int_t *neis;
         igraph_vector_int_t *ineis;
         igraph_bool_t was_zero;
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         if (retention) {
             /* We stop in this iteration by default, unless a label changes */
@@ -267,6 +272,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     igraph_dqueue_int_t queue;
     igraph_vector_bool_t in_queue;
     igraph_neimode_t reverse_mode;
+    int iter = 0; /* interruption counter */
 
     reverse_mode = IGRAPH_REVERSE_MODE(mode);
 
@@ -318,6 +324,8 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
         igraph_real_t max_count;
         igraph_vector_int_t *neis;
         igraph_bool_t was_zero;
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         v1 = igraph_dqueue_int_pop(&queue);
         VECTOR(in_queue)[v1] = 0;
@@ -717,7 +725,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_CHECK(igraph_dqueue_int_init(&q, 0));
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
-        for (i = 0; i < no_of_not_fixed_nodes; ++i) {
+        for (i=0; i < no_of_not_fixed_nodes; ++i) {
             igraph_integer_t v = VECTOR(node_order)[i];
 
             /* Is this node unlabelled? */

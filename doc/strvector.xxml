@@ -30,11 +30,4 @@
 <!-- doxrox-include igraph_strvector_size -->
 <!-- doxrox-include igraph_strvector_capacity -->
 
-<section id="igraph-Strvector-deprecated">
-<title>Deprecated functions</title>
-<!-- doxrox-include igraph_strvector_copy -->
-<!-- doxrox-include igraph_strvector_add -->
-<!-- doxrox-include igraph_strvector_set2 -->
-</section>
-
 </section>

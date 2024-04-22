@@ -21,11 +21,6 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -36,7 +31,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size-1));
+    igraph_vector_int_init(&edges, Size-1);
     for (size_t i=0; i < Size-1; ++i) {
         VECTOR(edges)[i] = Data[i+1];
     }
@@ -53,6 +48,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_invalidate_cache(&graph);
 
         IGRAPH_ASSERT((bres || bres2) == !bres3);
+
+        igraph_is_complete(&graph, &bres);
+        igraph_invalidate_cache(&graph);
 
         igraph_is_bipartite(&graph, &bres, NULL);
         igraph_invalidate_cache(&graph);

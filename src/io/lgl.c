@@ -48,7 +48,7 @@ void igraph_lgl_yylex_destroy_wrapper (void *scanner ) {
  *
  * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
- * (http://lgl.sourceforge.net), it can
+ * (https://lgl.sourceforge.net), it can
  * describe undirected optionally weighted graphs. From the LGL
  * manual:
  *
@@ -184,6 +184,8 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
         IGRAPH_CHECK(igraph_attribute_record_set_name(weightrec, weightstr));
         IGRAPH_CHECK(igraph_attribute_record_set_type(weightrec, IGRAPH_ATTRIBUTE_NUMERIC));
         igraph_vector_swap(weightrec->value.as_vector, context.weights);
+
+        pweight = &weight;
     }
 
     /* Create graph */

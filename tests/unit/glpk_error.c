@@ -42,7 +42,7 @@ int main(void) {
     igraph_full(&graph, 700, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
 
     ehandler = igraph_set_error_handler(igraph_error_handler_printignore);
-    IGRAPH_ASSERT(igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP) == IGRAPH_EGLP);
+    IGRAPH_ASSERT(igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP) == IGRAPH_FAILURE);
     igraph_set_error_handler(ehandler);
 
     igraph_destroy(&graph);

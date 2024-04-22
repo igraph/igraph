@@ -20,8 +20,6 @@
 
 #include "igraph_graphicality.h"
 
-#include "igraph_qsort.h"
-
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
 
@@ -110,7 +108,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * \sa \ref igraph_is_bigraphical() to check if a bi-degree-sequence can be realized as a bipartite graph;
  * \ref igraph_realize_degree_sequence() to construct a graph with a given degree sequence.
  *
- * Time complexity: O(n^2) for simple directed graphs, O(n log n) for graphs with self-loops,
+ * Time complexity: O(n log n) for directed graphs with at most one self-loop per vertex,
  * and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
 igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
@@ -137,7 +135,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
         else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ) {
             return igraph_i_is_graphical_undirected_simple(out_degrees, res);
         } else {
-            /* Remainig case:
+            /* Remaining case:
              *  - At most one self-loop per vertex but multi-edges between distinct vertices allowed.
              * These cases cannot currently be requested through the documented API,
              * so no explanatory error message for now. */
@@ -163,7 +161,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
         else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ) {
             return igraph_i_is_graphical_directed_simple(out_degrees, in_degrees, res);
         } else {
-            /* Remainig cases:
+            /* Remaining cases:
              *  - At most one self-loop per vertex but multi-edges between distinct vertices allowed.
              *  - At most one edge between distinct vertices but multi-self-loops allowed.
              * These cases cannot currently be requested through the documented API,
@@ -584,36 +582,11 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_simple(const igraph_v
  *  - The sum of in- and out-degrees must be the same.
  *  - Use the Fulkerson-Chen-Anstee theorem
  */
-
-typedef struct {
-    const igraph_vector_int_t* first;
-    const igraph_vector_int_t* second;
-} igraph_i_qsort_dual_vector_cmp_data_t;
-
-static int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
-    igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
-        (igraph_i_qsort_dual_vector_cmp_data_t*)data;
-    igraph_integer_t index1 = *((igraph_integer_t*)p1);
-    igraph_integer_t index2 = *((igraph_integer_t*)p2);
-    if (VECTOR(*sort_data->first)[index1] < VECTOR(*sort_data->first)[index2]) {
-        return 1;
-    }
-    if (VECTOR(*sort_data->first)[index1] > VECTOR(*sort_data->first)[index2]) {
-        return -1;
-    }
-    if (VECTOR(*sort_data->second)[index1] < VECTOR(*sort_data->second)[index2]) {
-        return 1;
-    }
-    if (VECTOR(*sort_data->second)[index1] > VECTOR(*sort_data->second)[index2]) {
-        return -1;
-    }
-    return 0;
-}
-
 static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
-    igraph_vector_int_t index_array;
-    igraph_integer_t i, j, vcount, lhs, rhs;
-    igraph_i_qsort_dual_vector_cmp_data_t sort_data;
+    igraph_vector_int_t in_degree_cumcounts, in_degree_counts;
+    igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
+    igraph_vector_int_t left_pq, right_pq;
+    igraph_integer_t lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
 
     /* The conditions from the loopy multigraph case are necessary here as well. */
     IGRAPH_CHECK(igraph_i_is_graphical_directed_loopy_multi(out_degrees, in_degrees, res));
@@ -621,23 +594,52 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         return IGRAPH_SUCCESS;
     }
 
-    vcount = igraph_vector_int_size(out_degrees);
+    const igraph_integer_t vcount = igraph_vector_int_size(out_degrees);
     if (vcount == 0) {
         *res = true;
         return IGRAPH_SUCCESS;
     }
 
-    /* Create an index vector that sorts the vertices by decreasing in-degree */
-    IGRAPH_CHECK(igraph_vector_int_init_range(&index_array, 0, vcount));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &index_array);
 
-    /* Set up the auxiliary struct for sorting */
-    sort_data.first  = in_degrees;
-    sort_data.second = out_degrees;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_cumcounts, vcount+1);
 
-    /* Sort the index vector */
-    igraph_qsort_r(VECTOR(index_array), vcount, sizeof(VECTOR(index_array)[0]), &sort_data,
-                   igraph_i_qsort_dual_vector_cmp_desc);
+    /* Compute in_degree_cumcounts[d+1] to be the no. of in-degrees == d */
+    for (igraph_integer_t v = 0; v < vcount; v++) {
+        igraph_integer_t indeg = VECTOR(*in_degrees)[v];
+        igraph_integer_t outdeg = VECTOR(*out_degrees)[v];
+        if (indeg >= vcount || outdeg >= vcount) {
+            *res = false;
+            igraph_vector_int_destroy(&in_degree_cumcounts);
+            IGRAPH_FINALLY_CLEAN(1);
+            return IGRAPH_SUCCESS;
+        }
+        VECTOR(in_degree_cumcounts)[indeg + 1]++;
+    }
+
+    /* Compute in_degree_cumcounts[d] to be the no. of in-degrees < d */
+    for (igraph_integer_t indeg = 0; indeg < vcount; indeg++) {
+        VECTOR(in_degree_cumcounts)[indeg+1] += VECTOR(in_degree_cumcounts)[indeg];
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, vcount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, vcount);
+
+    /* In the following loop, in_degree_counts[d] keeps track of the number of vertices
+     * with in-degree d that were already placed. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_counts, vcount);
+
+    for (igraph_integer_t v = 0; v < vcount; v++) {
+        igraph_integer_t outdeg = VECTOR(*out_degrees)[v];
+        igraph_integer_t indeg  = VECTOR(*in_degrees)[v];
+        igraph_integer_t idx = VECTOR(in_degree_cumcounts)[indeg] + VECTOR(in_degree_counts)[indeg];
+        VECTOR(sorted_out_degrees)[vcount - idx - 1] = outdeg;
+        VECTOR(sorted_in_degrees)[vcount - idx - 1] = indeg;
+        VECTOR(in_degree_counts)[indeg]++;
+    }
+
+    igraph_vector_int_destroy(&in_degree_counts);
+    igraph_vector_int_destroy(&in_degree_cumcounts);
+    IGRAPH_FINALLY_CLEAN(2);
 
     /* Be optimistic, then check whether the Fulkerson–Chen–Anstee condition
      * holds for every k. In particular, for every k in [0; n), it must be true
@@ -648,29 +650,66 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
      *     \sum_{i=k+1}^{n-1} min(outdegree[i], k + 1)
      */
 
-#define INDEGREE(x) (VECTOR(*in_degrees)[VECTOR(index_array)[x]])
-#define OUTDEGREE(x) (VECTOR(*out_degrees)[VECTOR(index_array)[x]])
+#define INDEGREE(x) (VECTOR(sorted_in_degrees)[x])
+#define OUTDEGREE(x) (VECTOR(sorted_out_degrees)[x])
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&left_pq, vcount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&right_pq, vcount);
+
+    left_pq_size = 0;
+    right_pq_size = vcount;
+    left_i = 0;
+    right_i = 0;
+    left_sum = 0;
+    right_sum = 0;
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        VECTOR(right_pq)[OUTDEGREE(i)]++;
+    }
 
     *res = true;
     lhs = 0;
-    for (i = 0; i < vcount; i++) {
+    rhs = 0;
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         lhs += INDEGREE(i);
 
         /* It is enough to check for indexes where the in-degree is about to
          * decrease in the next step; see "Stronger condition" in the Wikipedia
-         * entry for the Fulkerson-Chen-Anstee condition */
-        if (i != vcount - 1 && INDEGREE(i) == INDEGREE(i + 1)) {
-            continue;
+         * entry for the Fulkerson-Chen-Anstee condition. However, this does not
+         * provide any noticeable benefits for the current implementation. */
+
+        if (OUTDEGREE(i) < i) {
+            left_sum += OUTDEGREE(i);
+        }
+        else {
+            VECTOR(left_pq)[OUTDEGREE(i)]++;
+            left_pq_size++;
+        }
+        while (left_i < i) {
+            while (VECTOR(left_pq)[left_i] > 0) {
+                VECTOR(left_pq)[left_i]--;
+                left_pq_size--;
+                left_sum += left_i;
+            }
+            left_i++;
         }
 
-        rhs = 0;
-        for (j = 0; j <= i; j++) {
-            rhs += OUTDEGREE(j) < i ? OUTDEGREE(j) : i;
+        while (right_i < i + 1) {
+            while (VECTOR(right_pq)[right_i] > 0) {
+                VECTOR(right_pq)[right_i]--;
+                right_pq_size--;
+                right_sum += right_i;
+            }
+            right_i++;
         }
-        for (j = i + 1; j < vcount; j++) {
-            rhs += OUTDEGREE(j) < (i + 1) ? OUTDEGREE(j) : (i + 1);
+        if (OUTDEGREE(i) < i + 1) {
+            right_sum -= OUTDEGREE(i);
+        }
+        else {
+            VECTOR(right_pq)[OUTDEGREE(i)]--;
+            right_pq_size--;
         }
 
+        rhs = left_sum + i * left_pq_size + right_sum + (i + 1) * right_pq_size;
         if (lhs > rhs) {
             *res = false;
             break;
@@ -680,8 +719,11 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 #undef INDEGREE
 #undef OUTDEGREE
 
-    igraph_vector_int_destroy(&index_array);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_destroy(&sorted_in_degrees);
+    igraph_vector_int_destroy(&sorted_out_degrees);
+    igraph_vector_int_destroy(&left_pq);
+    igraph_vector_int_destroy(&right_pq);
+    IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
 }
@@ -690,7 +732,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 
 /***** Bipartite case *****/
 
-/* Bipartite graph with multi-eges:
+/* Bipartite graph with multi-edges:
  *  - Degrees must be non-negative.
  *  - Sum of degrees must be the same in the two partitions.
  */
@@ -779,7 +821,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
      * We follow the description of the Gale-Ryser theorem in:
      *
      * A. Berger, A note on the characterization of digraphic sequences, Discrete Math. 314, 38 (2014).
-     * http://dx.doi.org/10.1016/j.disc.2013.09.010
+     * https://doi.org/10.1016/j.disc.2013.09.010
      *
      * Gale-Ryser condition with 0-based indexing:
      *

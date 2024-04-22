@@ -107,7 +107,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *g
                                                     igraph_vector_t *modularity,
                                                     igraph_vector_int_t *membership,
                                                     igraph_bool_t directed,
-                                                    const igraph_vector_t *weights);
+                                                    const igraph_vector_t *weights,
+                                                    const igraph_vector_t *lengths);
 IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                                  const igraph_bool_t directed,
                                                  const igraph_vector_int_t *edges,

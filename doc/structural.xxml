@@ -95,7 +95,6 @@
 <section id="graph-components"><title>Graph components</title>
 <!-- doxrox-include igraph_subcomponent -->
 <!-- doxrox-include igraph_connected_components -->
-<!-- doxrox-include igraph_clusters -->
 <!-- doxrox-include igraph_is_connected -->
 <!-- doxrox-include igraph_decompose -->
 <!-- doxrox-include igraph_biconnected_components -->
@@ -252,10 +251,6 @@
 
 <section id="structural-properties-deprecated"><title>Deprecated functions</title>
 <!-- doxrox-include igraph_are_connected -->
-<!-- doxrox-include igraph_shortest_paths -->
-<!-- doxrox-include igraph_shortest_paths_dijkstra -->
-<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
-<!-- doxrox-include igraph_shortest_paths_johnson -->
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_laplacian -->

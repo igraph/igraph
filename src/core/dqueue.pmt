@@ -429,15 +429,3 @@ BASE FUNCTION(igraph_dqueue, get)(const TYPE(igraph_dqueue) *q, igraph_integer_t
         IGRAPH_FATAL("Out of bounds access in dqueue.");
     }
 }
-
-/**
- * \ingroup dqueue
- * \function igraph_dqueue_e
- * \brief Access an element in a queue (deprecated alias).
- *
- * \deprecated-by igraph_dqueue_get 0.10.2
- */
-
-BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, igraph_integer_t idx) {
-    return FUNCTION(igraph_dqueue, get)(q, idx);
-}
