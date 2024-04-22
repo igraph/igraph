@@ -169,5 +169,5 @@ igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result
 * This is typically the fastest of this set of functions.
  */
 igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result) {
-    return igraph_i_safe_real_to_int(round(value), result);
+    return igraph_i_safe_real_to_int(trunc(value), result);
 }
