@@ -952,8 +952,7 @@ igraph_error_t igraph_hypercube(
     igraph_vector_int_fill(&dims, 2);
 
     /* Use igraph_square_lattice to construct hypercube */
-    igraph_error_t status = 
-    igraph_square_lattice(graph, &dims, 1, directed, 0, 0);
+    IGRAPH_CHECK(igraph_square_lattice(graph, &dims, 1, directed, false, NULL));
     igraph_vector_int_destroy(&dims);
     if(status != IGRAPH_SUCCESS){
         return status;
