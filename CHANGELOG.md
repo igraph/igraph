@@ -6,7 +6,7 @@
 
  - `igraph_community_label_propagation()` is now interruptible.
  - `igraph_is_bipartite()` would on rare occasions return invalid results when the cache was employed.
- - `igraph_weighted_adjacency()` correctly passes through NaN values with `IGRAPH_ADJ_MAX`, and correctly recognized symmetric adjacency matrices containing NaN values with `IGRAPH_ADJ_UNDIRECTED`.
+ - `igraph_weighted_adjacency()` correctly passes through NaN values with `IGRAPH_ADJ_MAX`, and correctly recognizes symmetric adjacency matrices containing NaN values with `IGRAPH_ADJ_UNDIRECTED`.
 
 ### Other
 
