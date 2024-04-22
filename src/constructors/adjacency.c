@@ -788,6 +788,10 @@ igraph_error_t igraph_weighted_adjacency(
         IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
+    /* The weighted graph produced by this function is likely to be used
+     * multiple times, so we trim the weight vector size. */
+    igraph_vector_resize_min(weights);
+
     /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
     IGRAPH_FINALLY(igraph_destroy, graph);
@@ -1415,6 +1419,10 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     default:
         IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
+
+    /* The weighted graph produced by this function is likely to be used
+     * multiple times, so we trim the weight vector size. */
+    igraph_vector_resize_min(weights);
 
     /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));

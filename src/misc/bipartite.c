@@ -807,6 +807,8 @@ igraph_error_t igraph_weighted_biadjacency(
         }
     }
 
+    /* The weighted graph produced by this function is likely to be used
+     * multiple times, so we trim the weight vector size. */
     igraph_vector_resize_min(weights);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
