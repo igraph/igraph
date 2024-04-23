@@ -807,8 +807,6 @@ igraph_error_t igraph_weighted_biadjacency(
         }
     }
 
-    igraph_vector_resize_min(weights);
-
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
