@@ -390,7 +390,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
                         igraph_integer_t neigh_label = VECTOR(*membership)[v2]; /* neighbor community */
                         if (neigh_label != new_label && /* not in new community */
                             (fixed == NULL || !VECTOR(*fixed)[v2]) ) { /* not fixed */
-                            igraph_dqueue_int_push(&queue, v2);
+                            IGRAPH_CHECK(igraph_dqueue_int_push(&queue, v2));
                             VECTOR(in_queue)[v2] = 1;
                         }
                     }
@@ -732,7 +732,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             if (IS_UNLABELLED(v)) {
                 /* If yes, we label it, and do a BFS to apply the same label
                  * to all other unlabelled nodes reachable from it */
-                igraph_dqueue_int_push(&q, v);
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, v));
                 VECTOR(*membership)[v] = j;
                 while (!igraph_dqueue_int_empty(&q)) {
                     igraph_integer_t ni, num_neis;
