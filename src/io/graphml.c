@@ -21,7 +21,6 @@
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_misc.h"
 
 #include "core/interruption.h"
 #include "core/trie.h"
