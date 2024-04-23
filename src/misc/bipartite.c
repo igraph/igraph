@@ -745,7 +745,7 @@ igraph_error_t igraph_biadjacency(
  * \param types Pointer to an initialized boolean vector, or a null
  *   pointer. If not a null pointer, then the vertex types are stored
  *   here. It is resized as needed.
- * \param weights
+ * \param weights Pointer to an initialized vector, the weights will be stored here.
  * \param biadjmatrix The bipartite adjacency matrix that serves as an input
  *   to this function.
  * \param directed Specifies whether to create an undirected or a directed
