@@ -79,16 +79,15 @@ static igraph_error_t igraph_i_adjacency_directed(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t M = MATRIX(*adjmatrix, i, j);
             if (i == j) {
                 IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
             }
-            for (k = 0; k < M; k++) {
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -253,7 +252,9 @@ static igraph_error_t igraph_i_adjacency_min(
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
- * next row is for vertex 1, etc.
+ * next row is for vertex 1, etc. No guarantees are given about the ordering
+ * of edges.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The adjacency matrix. How it is interpreted
  *        depends on the \p mode argument.
@@ -427,11 +428,10 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
                 if (i == j) {
@@ -670,7 +670,9 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
- * next row is for vertex 1, etc.
+ * next row is for vertex 1, etc. No guarantees are given for the ordering
+ * of edges.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The weighted adjacency matrix. How it is interpreted
  *        depends on the \p mode argument. The common feature is that

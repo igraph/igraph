@@ -34,11 +34,11 @@ No loops
 directed: true
 vcount: 4
 edges: {
-0 1: 1
-0 2: 2
 1 0: 2
-1 3: 1
+0 1: 1
 3 1: 1
+0 2: 2
+1 3: 1
 }
 
 Loops once
@@ -47,12 +47,12 @@ Loops once
 directed: true
 vcount: 4
 edges: {
-0 1: 1
-0 2: 2
 1 0: 2
-1 3: 1
-2 2: 4
+0 1: 1
 3 1: 1
+0 2: 2
+2 2: 4
+1 3: 1
 }
 
 Loops twice
@@ -61,12 +61,12 @@ Loops twice
 directed: true
 vcount: 4
 edges: {
-0 1: 1
-0 2: 2
 1 0: 2
-1 3: 1
-2 2: 2
+0 1: 1
 3 1: 1
+0 2: 2
+2 2: 2
+1 3: 1
 }
 
 IGRAPH_ADJ_UPPER
@@ -298,15 +298,15 @@ IGRAPH_ADJ_DIRECTED
 directed: true
 vcount: 3
 edges: {
-0 1
-0 2
 1 0
-1 1
-1 2
 2 0
+0 1
+1 1
+0 2
+1 2
 2 2
 }
-( 1.5 Inf NaN -Inf -5.2 NaN NaN )
+( NaN NaN 1.5 -Inf Inf -5.2 NaN )
 
 IGRAPH_ADJ_MAX
 directed: false
