@@ -739,9 +739,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 #define IGRAPH_CHECK_CALLBACK(expr, code) \
     do { \
         igraph_error_t igraph_i_ret = (expr); \
-        if (code) { \
-            *(code) = igraph_i_ret; \
-        } \
+        *(code) = igraph_i_ret; \
         if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS && igraph_i_ret != IGRAPH_STOP)) { \
             IGRAPH_ERROR("", igraph_i_ret); \
         } \
