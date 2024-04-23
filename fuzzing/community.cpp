@@ -59,7 +59,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_init(&mv, 0);
             igraph_vector_init(&v, 0);
 
-            igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL);
+            igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_FAST);
+            igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_RETENTION);
+            igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_DOMINANCE);
+
             igraph_community_walktrap(&graph, NULL, 3, &merges, &mv, &membership);
             igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, NULL, NULL);
 
