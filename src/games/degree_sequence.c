@@ -43,13 +43,12 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
                                        const igraph_vector_int_t *in_seq) {
 
     igraph_integer_t outsum = 0, insum = 0;
-    igraph_bool_t directed = (in_seq != 0 && igraph_vector_int_size(in_seq) != 0);
+    igraph_bool_t directed = (in_seq != NULL && igraph_vector_int_size(in_seq) != 0);
     igraph_bool_t degseq_ok;
     igraph_integer_t no_of_nodes, no_of_edges;
-    igraph_integer_t *bag1 = 0, *bag2 = 0;
+    igraph_integer_t *bag1, *bag2;
     igraph_integer_t bagp1 = 0, bagp2 = 0;
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
 
     IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &degseq_ok));
     if (!degseq_ok) {
@@ -66,24 +65,20 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     no_of_edges = directed ? outsum : outsum / 2;
 
     bag1 = IGRAPH_CALLOC(outsum, igraph_integer_t);
-    if (bag1 == 0) {
-        IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(bag1, "Insufficient memory for sampling from configuration model.");
     IGRAPH_FINALLY(igraph_free, bag1);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < VECTOR(*out_seq)[i]; j++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t j = 0; j < VECTOR(*out_seq)[i]; j++) {
             bag1[bagp1++] = i;
         }
     }
     if (directed) {
         bag2 = IGRAPH_CALLOC(insum, igraph_integer_t);
-        if (bag2 == 0) {
-            IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(bag2, "Insufficient memory for sampling from configuration model.");
         IGRAPH_FINALLY(igraph_free, bag2);
-        for (i = 0; i < no_of_nodes; i++) {
-            for (j = 0; j < VECTOR(*in_seq)[i]; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (igraph_integer_t j = 0; j < VECTOR(*in_seq)[i]; j++) {
                 bag2[bagp2++] = i;
             }
         }
@@ -95,7 +90,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     RNG_BEGIN();
 
     if (directed) {
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             igraph_integer_t from = RNG_INTEGER(0, bagp1 - 1);
             igraph_integer_t to = RNG_INTEGER(0, bagp2 - 1);
             igraph_vector_int_push_back(&edges, bag1[from]); /* safe, already reserved */
@@ -105,7 +100,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
             bagp1--; bagp2--;
         }
     } else {
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             igraph_integer_t from = RNG_INTEGER(0, bagp1 - 1);
             igraph_integer_t to;
             igraph_vector_int_push_back(&edges, bag1[from]); /* safe, already reserved */

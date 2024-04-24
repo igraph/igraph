@@ -63,30 +63,33 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  * \function igraph_connected_components
  * \brief Calculates the (weakly or strongly) connected components in a graph.
  *
- * \param graph The graph object to analyze.
- * \param membership First half of the result will be stored here. For
- *        every vertex the id of its component is given. The vector
- *        has to be preinitialized and will be resized. Alternatively
- *        this argument can be \c NULL, in which case it is ignored.
- * \param csize The second half of the result. For every component it
- *        gives its size, the order is defined by the component ids.
- *        The vector has to be preinitialized and will be resized.
- *        Alternatively this argument can be \c NULL, in which
- *        case it is ignored.
- * \param no Pointer to an integer, if not \c NULL then the number of
- *        components will be stored here.
- * \param mode For directed graph this specifies whether to calculate
- *        weakly or strongly connected components. Possible values:
- *        \c IGRAPH_WEAK,
- *        \c IGRAPH_STRONG. This argument is
- *        ignored for undirected graphs.
- * \return Error code:
- *         \c IGRAPH_EINVAL: invalid mode argument.
+ * When computing strongly connected components, the components will be
+ * indexed in topological order. In other words, vertex \c v is reachable
+ * from vertex \c u precisely when <code>membership[u] &lt;= membership[v]</code>.
  *
- * Time complexity: O(|V|+|E|),
- * |V| and
- * |E| are the number of vertices and
- * edges in the graph.
+ * \param graph The graph object to analyze.
+ * \param membership For every vertex the ID of its component is given.
+ *    The vector has to be preinitialized and will be resized as needed.
+ *    Alternatively this argument can be \c NULL, in which case it is ignored.
+ * \param csize For every component it gives its size, the order being defined
+ *    by the component IDs. The vector must be preinitialized and will be
+ *    resized as needed. Alternatively this argument can be \c NULL, in which
+ *    case it is ignored.
+ * \param no Pointer to an integer, if not \c NULL then the number of
+ *    components will be stored here.
+ * \param mode For directed graph this specifies whether to calculate
+ *    weakly or strongly connected components. Possible values:
+ *    \clist
+ *    \cli IGRAPH_WEAK
+ *       Compute weakly connected components, i.e. ignore edge directions.
+ *    \cli IGRAPH_STRONG
+ *       Compute strongly connnected components, i.e. considr edge directions.
+ *    \endclist
+ *    This parameter is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), where |V| and |E| are the number of vertices
+ * and edges in the graph.
  */
 
 igraph_error_t igraph_connected_components(

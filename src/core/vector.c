@@ -662,7 +662,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
  * \brief Check if any element is NaN.
  *
  * \param v The \type igraph_vector_t object to check.
- * \return 1 if any element is NaN, 0 otherwise.
+ * \return True if any element is NaN, false otherwise.
  *
  * Time complexity: O(n), the number of elements.
  */

@@ -23,14 +23,14 @@
 
 #include "test_utilities.h"
 
-void print_and_clear_vector_int_list(igraph_vector_int_list_t *list) {
-    igraph_integer_t l = igraph_vector_int_list_size(list);
-    printf("---\n");
-    for (igraph_integer_t i = 0; i < l; i++) {
-        igraph_vector_int_print(igraph_vector_int_list_get_ptr(list, i));
-    }
+void print_and_destroy_graph_and_maps(igraph_t *uni, igraph_vector_int_list_t *list) {
+    printf("Union graph:\n");
+    print_graph(uni);
+    igraph_destroy(uni);
+
+    printf("Edge maps:\n");
+    print_vector_int_list(list);
     igraph_vector_int_list_clear(list);
-    printf("===\n");
 }
 
 int main(void) {
@@ -39,6 +39,8 @@ int main(void) {
     igraph_vector_ptr_t glist;
     igraph_vector_int_t edge_map1, edge_map2;
     igraph_vector_int_list_t edgemaps;
+
+    printf("BINARY VERSION\n");
 
     igraph_vector_int_init(&edge_map1, 0);
     igraph_vector_int_init(&edge_map2, 0);
@@ -52,9 +54,11 @@ int main(void) {
                  -1);
 
     igraph_union(&uni, &left, &right, &edge_map1, &edge_map2);
-    igraph_write_graph_edgelist(&uni, stdout);
-    igraph_vector_int_print(&edge_map1);
-    igraph_vector_int_print(&edge_map2);
+    printf("Union graph:\n");
+    print_graph(&uni);
+    printf("Edge maps:\n");
+    print_vector_int(&edge_map1);
+    print_vector_int(&edge_map2);
 
     igraph_destroy(&uni);
     igraph_destroy(&left);
@@ -63,18 +67,20 @@ int main(void) {
     igraph_vector_int_destroy(&edge_map1);
     igraph_vector_int_destroy(&edge_map2);
 
+    printf("\n\nN-ARY VERSION\n");
+
     /* Empty graph list */
+
+    printf("\nEmpty graph list:\n");
     igraph_vector_ptr_init(&glist, 0);
     igraph_vector_int_list_init(&edgemaps, 0);
     igraph_union_many(&uni, &glist, &edgemaps);
-    if (!igraph_is_directed(&uni) || igraph_vcount(&uni) != 0) {
-        return 1;
-    }
-    print_and_clear_vector_int_list(&edgemaps);
+    print_and_destroy_graph_and_maps(&uni, &edgemaps);
     igraph_vector_ptr_destroy(&glist);
-    igraph_destroy(&uni);
 
     /* Non-empty graph list */
+
+    printf("\nNon-empty directed graph list 1:\n");
     igraph_vector_ptr_init(&glist, 10);
     for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = IGRAPH_CALLOC(1, igraph_t);
@@ -83,17 +89,19 @@ int main(void) {
     }
 
     igraph_union_many(&uni, &glist, &edgemaps);
-    igraph_write_graph_edgelist(&uni, stdout);
 
     for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         igraph_destroy(VECTOR(glist)[i]);
         IGRAPH_FREE(VECTOR(glist)[i]);
     }
-    print_and_clear_vector_int_list(&edgemaps);
+
+    print_and_destroy_graph_and_maps(&uni, &edgemaps);
     igraph_vector_ptr_destroy(&glist);
-    igraph_destroy(&uni);
 
     /* Another non-empty graph list */
+
+    printf("\nNon-empty directed graph list 2:\n");
+
     igraph_vector_ptr_init(&glist, 10);
     for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = IGRAPH_CALLOC(1, igraph_t);
@@ -111,11 +119,14 @@ int main(void) {
         igraph_destroy(VECTOR(glist)[i]);
         IGRAPH_FREE(VECTOR(glist)[i]);
     }
-    print_and_clear_vector_int_list(&edgemaps);
+
+    print_and_destroy_graph_and_maps(&uni, &edgemaps);
     igraph_vector_ptr_destroy(&glist);
-    igraph_destroy(&uni);
 
     /* Undirected graph list*/
+
+    printf("\nUndirected graph list:\n");
+
     igraph_vector_ptr_init(&glist, 10);
     for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = IGRAPH_CALLOC(1, igraph_t);
@@ -133,9 +144,9 @@ int main(void) {
         igraph_destroy(VECTOR(glist)[i]);
         IGRAPH_FREE(VECTOR(glist)[i]);
     }
-    print_and_clear_vector_int_list(&edgemaps);
+
+    print_and_destroy_graph_and_maps(&uni, &edgemaps);
     igraph_vector_ptr_destroy(&glist);
-    igraph_destroy(&uni);
 
     igraph_vector_int_list_destroy(&edgemaps);
 

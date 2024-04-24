@@ -275,7 +275,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
  *
  * Time complexity: O(1).
  */
-IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
+igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
     return rng->type->bits;
 }
 
@@ -2215,7 +2215,6 @@ igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                              igraph_vector_t *result) {
 
     igraph_integer_t len = igraph_vector_size(alpha);
-    igraph_integer_t j;
     igraph_real_t sum = 0.0;
 
     if (len < 2) {
@@ -2229,17 +2228,13 @@ igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
 
     IGRAPH_CHECK(igraph_vector_resize(result, len));
 
-    RNG_BEGIN();
-
-    for (j = 0; j < len; j++) {
-        VECTOR(*result)[j] = igraph_rng_get_gamma(rng, VECTOR(*alpha)[j], 1.0);
-        sum += VECTOR(*result)[j];
+    for (igraph_integer_t i = 0; i < len; i++) {
+        VECTOR(*result)[i] = igraph_rng_get_gamma(rng, VECTOR(*alpha)[i], 1.0);
+        sum += VECTOR(*result)[i];
     }
-    for (j = 0; j < len; j++) {
-        VECTOR(*result)[j] /= sum;
+    for (igraph_integer_t i = 0; i < len; i++) {
+        VECTOR(*result)[i] /= sum;
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

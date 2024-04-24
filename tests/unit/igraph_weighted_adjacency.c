@@ -227,6 +227,86 @@ int main(void) {
     VERIFY_FINALLY_STACK();
 
     {
+        igraph_real_t elem[] = { 0,          1.5,              IGRAPH_INFINITY,
+                                 IGRAPH_NAN, -IGRAPH_INFINITY, -5.2,
+                                 IGRAPH_NAN, 0,                IGRAPH_NAN };
+
+        igraph_real_t elem_sym[] = { 0,               IGRAPH_NAN,       IGRAPH_INFINITY,
+                                     IGRAPH_NAN,      -IGRAPH_INFINITY, 0,
+                                     IGRAPH_INFINITY, 0,                IGRAPH_NAN };
+
+        igraph_matrix_t am;
+        igraph_vector_t weights;
+        igraph_t graph;
+
+        printf("\nTesting NaN and Inf passthrough\n");
+
+        igraph_vector_init(&weights, 0);
+
+        matrix_init_real_row_major(&am, 3, 3, elem);
+
+        printf("\nIGRAPH_ADJ_DIRECTED\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_DIRECTED, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        printf("\nIGRAPH_ADJ_MAX\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_MAX, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        printf("\nIGRAPH_ADJ_MIN\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_MIN, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        printf("\nIGRAPH_ADJ_LOWER\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_LOWER, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        printf("\nIGRAPH_ADJ_UPPER\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_UPPER, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        printf("\nIGRAPH_ADJ_PLUS\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_PLUS, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        /* Must detect that the matrix is not symmetric and throw an error. */
+        CHECK_ERROR(
+            igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_UNDIRECTED, &weights, IGRAPH_LOOPS_TWICE),
+            IGRAPH_EINVAL);
+
+        igraph_matrix_destroy(&am);
+
+        matrix_init_real_row_major(&am, 3, 3, elem_sym);
+
+        /* Must detect that the matrix is symmetric (desite the NaNs) and succeed. */
+        printf("\nIGRAPH_ADJ_UNDIRECTED (symmetric)\n");
+        igraph_weighted_adjacency(&graph, &am, IGRAPH_ADJ_UNDIRECTED, &weights, IGRAPH_LOOPS_TWICE);
+        print_graph(&graph);
+        print_vector(&weights);
+        igraph_destroy(&graph);
+
+        igraph_matrix_destroy(&am);
+
+        igraph_vector_destroy(&weights);
+
+        printf("\n");
+    }
+
+    VERIFY_FINALLY_STACK();
+
+    {
         printf("Check handling of non-square matrix error.\n");
         igraph_real_t e[] = {1, 2, 0};
         igraph_matrix_view(&mat, e, 1, 3);
