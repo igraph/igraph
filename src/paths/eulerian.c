@@ -577,7 +577,8 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  *                 belonging to the cycle will be stored here. May be \c NULL
  *                 if it is not needed by the caller.
  * \param vertex_res Pointer to an initialised vector. The indices of vertices
- *                   belonging to the cycle will be stored here. May be \c NULL
+ *                   belonging to the cycle will be stored here. The first and
+ *                   last vertex in the vector will be the same. May be \c NULL
  *                   if it is not needed by the caller.
  * \return Error code:
  *        \clist
