@@ -137,18 +137,32 @@ static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec) {
 static igraph_error_t igraph_i_simple_cycles_unblock(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t u
 ) {
+    // TODO: introduce stack for w & neis in order to reduce the number of iterations.
     igraph_vector_int_t* neis;
     igraph_integer_t w;
+    igraph_stack_int_t u_stack;
+    igraph_stack_int_init(&u_stack, 0);
+    igraph_stack_int_push(&u_stack, u);
 
-    VECTOR(state->blocked)[u] = false;
+    while(igraph_stack_int_size(&u_stack) > 0) {
+        igraph_integer_t current_u = igraph_stack_int_top(&u_stack);
+        VECTOR(state->blocked)[current_u] = false;
 
-    neis = igraph_adjlist_get(&state->B, u);
-    while (!igraph_vector_int_empty(neis)) {
-        w = igraph_vector_int_pop_back(neis);
-        if (VECTOR(state->blocked)[w]) {
-            IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, w));
+        neis = igraph_adjlist_get(&state->B, current_u);
+        bool recurse_deeper = false;
+        while (!igraph_vector_int_empty(neis) && !recurse_deeper) {
+            w = igraph_vector_int_pop_back(neis);
+            if (VECTOR(state->blocked)[w]) {
+                igraph_stack_int_push(&u_stack, w);
+            }
+        }
+
+        if (!recurse_deeper) {
+            igraph_stack_int_pop(&u_stack);
         }
     }
+
+    igraph_stack_int_destroy(&u_stack);
 
     return IGRAPH_SUCCESS;
 }
