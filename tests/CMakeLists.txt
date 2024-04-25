@@ -985,6 +985,7 @@ add_legacy_tests(
 add_benchmarks(
   NAMES
   graphicality
+  igraph_adjacency
   igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted
