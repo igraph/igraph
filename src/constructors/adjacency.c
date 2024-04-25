@@ -151,25 +151,24 @@ static igraph_error_t igraph_i_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_integer_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        /* do the loops first */
-        M = MATRIX(*adjmatrix, i, i);
-        if (M) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (k = 0; k < M; k++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < j; i++) {
+            M = MATRIX(*adjmatrix, i, j);
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        /* then the rest */
-        for (j = i + 1; j < no_of_nodes; j++) {
-            M = MATRIX(*adjmatrix, i, j);
-            for (k = 0; k < M; k++) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+        /* do the loops as well */
+        M = MATRIX(*adjmatrix, j, j);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (igraph_integer_t k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
@@ -182,25 +181,25 @@ static igraph_error_t igraph_i_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_integer_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < i; j++) {
-            M = MATRIX(*adjmatrix, i, j);
-            for (k = 0; k < M; k++) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        /* do the loops first */
+        M = MATRIX(*adjmatrix, j, j);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (igraph_integer_t k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        /* do the loops as well */
-        M = MATRIX(*adjmatrix, i, i);
-        if (M) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (k = 0; k < M; k++) {
+        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+            M = MATRIX(*adjmatrix, i, j);
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
     }
@@ -558,27 +557,25 @@ static igraph_error_t igraph_i_weighted_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        /* do the loops first */
-        if (loops) {
-            M = MATRIX(*adjmatrix, i, i);
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < j; i++) {
+            igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
-                igraph_i_adjust_loop_edge_weight(&M, loops);
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
 
-        /* then the rest */
-        for (j = i + 1; j < no_of_nodes; j++) {
-            igraph_real_t M = MATRIX(*adjmatrix, i, j);
+        /* do the loops as well */
+        if (loops) {
+            M = MATRIX(*adjmatrix, j, j);
             if (M != 0.0) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
@@ -594,27 +591,26 @@ static igraph_error_t igraph_i_weighted_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < i; j++) {
-            M = MATRIX(*adjmatrix, i, j);
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        /* do the loops first */
+        if (loops) {
+            M = MATRIX(*adjmatrix, j, j);
             if (M != 0.0) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
 
-        /* do the loops as well */
-        if (loops) {
-            M = MATRIX(*adjmatrix, i, i);
+        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+            M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
-                igraph_i_adjust_loop_edge_weight(&M, loops);
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
