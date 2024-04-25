@@ -29,10 +29,7 @@ void print_and_destroy(igraph_matrix_t *biadjmat, igraph_bool_t directed, igraph
 
     igraph_weighted_biadjacency(&g, &types, &weights, biadjmat, directed, mode);
 
-    print_graph_canon(&g);
-    printf("weights: ");
-    igraph_vector_print(&weights);
-
+    print_weighted_graph_canon(&g, &weights);
     printf("types: ");
     igraph_vector_bool_print(&types);
 
