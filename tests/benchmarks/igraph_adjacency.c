@@ -3,15 +3,25 @@
 
 #include "bench.h"
 
-#define TOSTR1(x) #x
-#define TOSTR(x) TOSTR1(x)
+/*
+ * Benchmark creating graphs from dense adjacency matrices.
+ *
+ * When there are a small number of non-zero elements (low mean degree),
+ * iterating through the matrix dominates the timing. When there are
+ * many non-zero elements, creating the graphfrom its edge list dominates.
+ */
 
 void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer_t rep) {
     igraph_t g;
     igraph_matrix_t mat;
     igraph_vector_t weights;
-    char buf[255];
-    igraph_adjacency_t types[] = { IGRAPH_ADJ_DIRECTED, IGRAPH_ADJ_MAX, IGRAPH_ADJ_PLUS, IGRAPH_ADJ_UPPER };
+    char msg[255];
+    igraph_adjacency_t types[] = {
+        IGRAPH_ADJ_DIRECTED,
+        IGRAPH_ADJ_MAX,
+        IGRAPH_ADJ_PLUS,
+        IGRAPH_ADJ_UPPER /* similar to DIRECTED when unweighted, similar to MAX when weighted */
+    };
     const char *names[] = { "DIRECTED", "MAX", "PLUS", "UPPER" };
 
     igraph_matrix_init(&mat, 0, 0);
@@ -24,18 +34,18 @@ void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer
     igraph_destroy(&g);
 
     for (size_t i=0; i < sizeof(types) / sizeof(types[0]); i++) {
-        snprintf(buf, sizeof(buf) / sizeof(buf[0]),
-                 "%2d vcount=%" IGRAPH_PRId ", meandeg=%3" IGRAPH_PRId ", %8s, %" IGRAPH_PRId ", unweighted",
+        snprintf(msg, sizeof(msg) / sizeof(msg[0]),
+                 "%2d vcount=%" IGRAPH_PRId ", meandeg=%3" IGRAPH_PRId ", %8s, unweighted, %" IGRAPH_PRId "x",
                  (int) i+1, vcount, meandeg, names[i], rep);
 
-        BENCH(buf, REPEAT(igraph_adjacency(&g, &mat, types[i], IGRAPH_LOOPS_ONCE), rep));
+        BENCH(msg, REPEAT(igraph_adjacency(&g, &mat, types[i], IGRAPH_LOOPS_ONCE), rep));
         igraph_destroy(&g);
 
-        snprintf(buf, sizeof(buf) / sizeof(buf[0]),
-                 "%2d vcount=%" IGRAPH_PRId ", meandeg=%3" IGRAPH_PRId ", %8s, %" IGRAPH_PRId ",   weighted",
+        snprintf(msg, sizeof(msg) / sizeof(msg[0]),
+                 "%2d vcount=%" IGRAPH_PRId ", meandeg=%3" IGRAPH_PRId ", %8s,   weighted, %" IGRAPH_PRId "x",
                  (int) i+1, vcount, meandeg, names[i], rep);
 
-        BENCH(buf, REPEAT(igraph_weighted_adjacency(&g, &mat, types[i], &weights, IGRAPH_LOOPS_ONCE), rep));
+        BENCH(msg, REPEAT(igraph_weighted_adjacency(&g, &mat, types[i], &weights, IGRAPH_LOOPS_ONCE), rep));
         igraph_destroy(&g);
     }
     printf("\n");
