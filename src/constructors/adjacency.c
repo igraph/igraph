@@ -533,20 +533,35 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
      * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
      * returns false for these as NaN != NaN. */
-    igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
+    const igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
     for (igraph_integer_t i=0; i < n; i++) {
+        /* do the loops first */
+        if (loops) {
+            igraph_real_t M = MATRIX(*adjmatrix, i, i);
+            if (M != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
+            }
+        }
+
         for (igraph_integer_t j=0; j < i; j++) {
-            igraph_real_t a1 = MATRIX(*adjmatrix, i, j);
-            igraph_real_t a2 = MATRIX(*adjmatrix, j, i);
-            if (a1 != a2 && ! (isnan(a1) && isnan(a2))) {
+            igraph_real_t M1 = MATRIX(*adjmatrix, i, j);
+            igraph_real_t M2 = MATRIX(*adjmatrix, j, i);
+            if (IGRAPH_UNLIKELY(M1 != M2 && ! (isnan(M1) && isnan(M2)))) {
                 IGRAPH_ERROR(
                     "Adjacency matrix should be symmetric to produce an undirected graph.",
                     IGRAPH_EINVAL
-                    );
+                );
+            } else if (M1 != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
             }
         }
     }
-    return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
+    return IGRAPH_SUCCESS;
 }
 
 
