@@ -66,6 +66,13 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_transitive_closure()` computes the transitive closure of a graph (experimental function).
+ - `igraph_reachability()` determines which vertices are reachable from each other in a graph (experimental function).
+ - `igraph_count_reachable()` counts how many vertices are reachable from each vertex (experimental function).
+ - Added a bitset data structure, `igraph_bitset_t`, and a set of corresponding functions (experimental functionality).
+
 ### Fixed
 
  - `igraph_community_label_propagation()` is now interruptible.
@@ -73,6 +80,10 @@
  - `igraph_weighted_adjacency()` correctly passes through NaN values with `IGRAPH_ADJ_MAX`, and correctly recognizes symmetric adjacency matrices containing NaN values with `IGRAPH_ADJ_UNDIRECTED`.
  - `igraph_read_graph_gml()` can now read GML files that use ids larger than what is representable on 32 bits, provided that igraph was configured with a 64-bit `igraph_integer_t` size.
  - Fixed a performance issue in `igraph_read_graph_graphml()` with files containing a very large number of entities, such as `&gt;`.
+
+### Deprecated
+
+ - `igraph_transitive_closure_dag()` is deprecated in favour of `igraph_transitive_closure()`
 
 ### Other
 
