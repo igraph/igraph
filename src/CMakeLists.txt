@@ -40,6 +40,8 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 add_library(
   igraph
   core/array.c
+  core/bitset.c
+  core/bitset_list.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c
@@ -177,6 +179,7 @@ add_library(
   connectivity/cohesive_blocks.c
   connectivity/components.c
   connectivity/separators.c
+  connectivity/reachability.c
 
   flow/flow.c
   flow/flow_conversion.c
