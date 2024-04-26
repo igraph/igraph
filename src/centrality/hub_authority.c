@@ -23,7 +23,6 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
-#include "igraph_blas.h"
 
 #include "centrality/centrality_internal.h"
 
@@ -167,6 +166,9 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \ref igraph_eigenvector_centrality().
  *
  * </para><para>
+ * Results are scaled so that the largest hub and authority scores are both 1.
+ *
+ * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
@@ -183,8 +185,6 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  *    stored here. If a null pointer then it is ignored.
  * \param value If not a null pointer then the eigenvalue
  *    corresponding to the calculated eigenvectors is stored here.
- * \param scale If not zero then the result will be scaled such that
- *     the absolute value of the maximum centrality is one.
  * \param weights A null pointer (meaning no edge weights), or a vector
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
@@ -203,7 +203,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  */
 igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_vector_t *hub_vector, igraph_vector_t *authority_vector,
-        igraph_real_t *value, igraph_bool_t scale,
+        igraph_real_t *value,
         const igraph_vector_t *weights, igraph_arpack_options_t *options) {
 
     igraph_adjlist_t inadjlist, outadjlist;
@@ -342,7 +342,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                 which = i;
             }
         }
-        if (scale && amax != 0) {
+        if (amax != 0) {
             igraph_vector_scale(my_hub_vector_p, 1 / VECTOR(*my_hub_vector_p)[which]);
         } else if (igraph_i_vector_mostly_negative(my_hub_vector_p)) {
             igraph_vector_scale(my_hub_vector_p, -1.0);
@@ -364,7 +364,6 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(2);
 
     if (authority_vector) {
-        igraph_real_t norm;
         IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
         igraph_vector_null(authority_vector);
         if (weights == NULL) {
@@ -372,12 +371,8 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         } else {
             igraph_i_kleinberg_weighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &ininclist, graph, weights);
         }
-        if (!scale) {
-            norm = 1.0 / igraph_blas_dnrm2(authority_vector);
-        } else {
-            norm = 1.0 / igraph_vector_max(authority_vector);
-        }
-        igraph_vector_scale(authority_vector, norm);
+
+        igraph_vector_scale(authority_vector, 1.0 / igraph_vector_max(authority_vector));
     }
 
     if (!hub_vector && authority_vector) {

@@ -33,6 +33,7 @@
  - `igraph_community_label_propagation()` changed signature to allow specification of LPA variants. A new fast label propagation variant was added.
  - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` now use a `mode` parameter with possible values `IGRAPH_OUT`, `IGRAPH_IN` or `IGRAPH_ALL` to control how edge directions are considered. Previously they used a boolean `directed` parameter.
  - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` no longer have a `scale` parameter. The result is now always scaled so that the largest centrality value is 1.
+ - `igraph_hub_and_authority_scores()` no longer has a `scale` parameter. The result is now always scaled so that the largest hub and authority scores are each 1.
 
 ### Added
 

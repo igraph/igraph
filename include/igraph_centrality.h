@@ -123,10 +123,10 @@ IGRAPH_EXPORT igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph
                                                            igraph_arpack_options_t *options);
 
 IGRAPH_EXPORT igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph, igraph_vector_t *hub_vector,
-                                         igraph_vector_t *authority_vector,
-                                         igraph_real_t *value, igraph_bool_t scale,
-                                         const igraph_vector_t *weights,
-                                         igraph_arpack_options_t *options);
+                                                             igraph_vector_t *authority_vector,
+                                                             igraph_real_t *value,
+                                                             const igraph_vector_t *weights,
+                                                             igraph_arpack_options_t *options);
 
 IGRAPH_EXPORT igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                     igraph_vs_t vids, const igraph_vector_t *weights);
