@@ -83,7 +83,7 @@ static igraph_error_t adjmat_mul_weighted(igraph_real_t *to, const igraph_real_t
 }
 
 static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
-                                                      igraph_real_t *value, igraph_bool_t scale,
+                                                      igraph_real_t *value,
                                                       const igraph_vector_t *weights,
                                                       igraph_arpack_options_t *options) {
 
@@ -219,7 +219,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
                     which = i;
                 }
             }
-            if (scale && amax != 0) {
+            /* Scale result so that the largest value is 1.0. */
+            if (amax != 0) {
                 igraph_vector_scale(vector, 1 / VECTOR(*vector)[which]);
             } else if (igraph_i_vector_mostly_negative(vector)) {
                 igraph_vector_scale(vector, -1.0);
@@ -252,7 +253,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
 }
 
 static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
-                                                    igraph_real_t *value, igraph_bool_t scale,
+                                                    igraph_real_t *value,
                                                     igraph_neimode_t mode,
                                                     const igraph_vector_t *weights,
                                                     igraph_arpack_options_t *options) {
@@ -408,7 +409,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                     which = i;
                 }
             }
-            if (scale && amax != 0) {
+            /* Scale result so that the largest value is 1.0. */
+            if (amax != 0) {
                 igraph_vector_scale(vector, 1 / VECTOR(*vector)[which]);
             } else if (igraph_i_vector_mostly_negative(vector)) {
                 igraph_vector_scale(vector, -1.0);
@@ -464,9 +466,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * are added up.
  *
  * </para><para>
- * The centrality scores returned by igraph can be normalized
- * (using the \p scale parameter) such that the largest eigenvector centrality
- * score is 1 (with one exception, see below).
+ * The centrality scores returned by igraph are normalized such that the largest
+ * eigenvector centrality score is 1, unless all scores are zeros.
  *
  * </para><para>
  * Eigenvector centrality is meaningful only for (strongly) connected graphs.
@@ -512,8 +513,6 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *          edge directions are ignored, and the unweighted eigenvector
  *          centrality is calculated.
  *        \endclist
- * \param scale If not zero then the result will be scaled such that
- *     the absolute value of the maximum centrality is one.
  * \param weights A null pointer (indicating no edge weights), or a vector
  *     giving the weights of the edges. Weights should be positive to guarantee
  *     a meaningful result. The algorithm might produce complex numbers when some
@@ -539,7 +538,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
 igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_vector_t *vector,
                                   igraph_real_t *value,
-                                  igraph_neimode_t mode, igraph_bool_t scale,
+                                  igraph_neimode_t mode,
                                   const igraph_vector_t *weights,
                                   igraph_arpack_options_t *options) {
 
@@ -557,9 +556,9 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
 
     if (mode == IGRAPH_ALL) {
         return igraph_i_eigenvector_centrality_undirected(graph, vector, value,
-                                                          scale, weights, options);
+                                                          weights, options);
     } else {
         return igraph_i_eigenvector_centrality_directed(graph, vector, value,
-                                                        scale, mode, weights, options);
+                                                        mode, weights, options);
     }
 }

@@ -27,7 +27,6 @@ void print_and_destroy(igraph_t *g, igraph_neimode_t mode, igraph_vector_t *weig
     igraph_vector_init(&v, 0);
     igraph_eigenvector_centrality(g, &v, &value,
                                   mode,
-                                  /* scale */ true,
                                   weights,
                                   /* options */ NULL);
 
@@ -147,10 +146,10 @@ int main(void) {
     igraph_vector_fill(&weights, 1);
     igraph_full(&g, 5, IGRAPH_DIRECTED, /* loops */ false);
     CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* mode */ IGRAPH_OUT,
-                                  /* scale */ true, &weights,
+                                  &weights,
                                   /* options */ NULL), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* mode */ IGRAPH_ALL,
-                                  /* scale */ true, &weights,
+                                  &weights,
                                   /* options */ NULL), IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);

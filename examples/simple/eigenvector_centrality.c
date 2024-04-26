@@ -40,7 +40,7 @@ int main(void) {
 
     /* Compute eigenvector centrality. */
     igraph_eigenvector_centrality(&graph, &vector, &value, IGRAPH_OUT,
-                                  /*scale=*/ true, &weights, /*options=*/ NULL);
+                                  &weights, /*options=*/ NULL);
 
     /* Print results. */
     printf("eigenvalue: %g\n", value);

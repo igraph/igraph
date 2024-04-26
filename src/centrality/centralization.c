@@ -527,8 +527,6 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * \param mode How to consider edge directions in directed graphs.
  *     See \ref igraph_eigenvector_centrality() for details. Ignored
  *     for directed graphs.
- * \param scale If not zero then the result will be scaled, such that
- *     the absolute value of the maximum centrality is one.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices) parameter and
@@ -557,7 +555,6 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
     igraph_vector_t *vector,
     igraph_real_t *value,
     igraph_neimode_t mode,
-    igraph_bool_t scale,
     igraph_arpack_options_t *options,
     igraph_real_t *centralization,
     igraph_real_t *theoretical_max,
@@ -581,13 +578,11 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
     }
 
     IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, mode,
-                 scale, /*weights=*/ NULL,
+                 /*weights=*/ NULL,
                  options));
 
     IGRAPH_CHECK(igraph_centralization_eigenvector_centrality_tmax(
-                     graph, 0, mode,
-                     scale,
-                     tmax));
+                     graph, 0, mode, tmax));
 
     *centralization = igraph_centralization(scores, *tmax, normalized);
 
@@ -646,7 +641,6 @@ igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     const igraph_t *graph,
     igraph_integer_t nodes,
     igraph_neimode_t mode,
-    igraph_bool_t scale,
     igraph_real_t *res) {
 
     if (graph) {
@@ -659,11 +653,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     if (mode != IGRAPH_ALL) {
         *res = nodes - 1;
     } else {
-        if (scale) {
-            *res = nodes - 2;
-        } else {
-            *res = (nodes - 2.0) / M_SQRT2;
-        }
+        *res = nodes - 2;
     }
 
     return IGRAPH_SUCCESS;
