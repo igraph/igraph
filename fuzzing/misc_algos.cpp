@@ -58,7 +58,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_list_triangles(&graph, &iv1);
 
-        igraph_count_reachable(&graph, &iv1, IGRAPH_DIRECTED);
+        igraph_count_reachable(&graph, &iv1, IGRAPH_OUT);
 
         if (igraph_vcount(&graph) >= 2) {
             igraph_get_all_simple_paths(&graph,&iv1,  0, igraph_vss_1(1), 5, IGRAPH_ALL);

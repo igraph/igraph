@@ -31,11 +31,11 @@ void compute_and_print(const igraph_t *g, igraph_bool_t directed) {
     igraph_vector_int_init(&csize, 0);
     igraph_bitset_list_init(&reach, 0);
 
-    igraph_reachability(g, &membership, &csize, &no_of_components, &reach, directed);
+    igraph_reachability(g, &membership, &csize, &no_of_components, &reach, directed ? IGRAPH_OUT : IGRAPH_ALL);
 
     igraph_vector_int_init(&reach_counts, no_of_nodes);
 
-    igraph_count_reachable(g, &reach_counts, directed);
+    igraph_count_reachable(g, &reach_counts, directed ? IGRAPH_OUT : IGRAPH_ALL);
 
     printf("Mode: %s\n", directed ? "directed" : "undirected");
     print_vector_int(&membership);

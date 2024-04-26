@@ -49,8 +49,11 @@
  * \param reach A list of bitsets representing the result. It will be resized
  *    as needed. <code>reach[membership[u]][v]</code> is set to \c true if
  *    vertex \c v is reachable from vertex \c u.
- * \param directed For a directed graph, determines whether edges are treated
- *    as directed or undirected. Ignored for undirected graphs.
+ * \param mode In directed graphs, controls the treatment of edge directions.
+ *    Ignored in undirected graphs. With \c IGRAPH_OUT, reachability is computed
+ *    by traversing edges along their direction. With \c IGRAPH_IN, edges are
+ *    traversed opposite to their direction. With \c IGRAPH_ALL, edge directions
+ *    are ignored and the graph is treated as undirected.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
@@ -74,19 +77,23 @@ igraph_error_t igraph_reachability(
         igraph_vector_int_t *csize,
         igraph_integer_t *no_of_components,
         igraph_bitset_list_t *reach,
-        igraph_bool_t directed) {
+        igraph_neimode_t mode) {
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_comps;
     igraph_adjlist_t adjlist, dag;
 
+    if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
+        IGRAPH_ERROR("Invalid mode for reachability.", IGRAPH_EINVAL);
+    }
+
     if (! igraph_is_directed(graph)) {
-        directed = false;
+        mode = IGRAPH_ALL;
     }
 
     IGRAPH_CHECK(igraph_connected_components(graph,
                                              membership, csize, &no_of_comps,
-                                             directed ? IGRAPH_STRONG : IGRAPH_WEAK));
+                                             mode == IGRAPH_ALL ? IGRAPH_WEAK : IGRAPH_STRONG));
 
     if (no_of_components) {
         *no_of_components = no_of_comps;
@@ -101,11 +108,11 @@ igraph_error_t igraph_reachability(
         IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[v]), v);
     }
 
-    if (!directed) {
+    if (mode == IGRAPH_ALL) {
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, no_of_comps));
@@ -116,15 +123,19 @@ igraph_error_t igraph_reachability(
         igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, VECTOR(*membership)[v]);
         const igraph_integer_t n = igraph_vector_int_size(neighbours);
         for (igraph_integer_t i = 0; i < n; i++) {
-            if (VECTOR(*membership)[v] != VECTOR(*membership)[VECTOR(*neighbours)[i]]) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[VECTOR(*neighbours)[i]]));
+            igraph_integer_t w = VECTOR(*neighbours)[i];
+            if (VECTOR(*membership)[v] != VECTOR(*membership)[w]) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[w]));
             }
         }
     }
 
-    for (igraph_integer_t i = no_of_comps - 1; i >= 0; i--) {
-        const igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, i);
-        igraph_bitset_t *from_bitset = igraph_bitset_list_get_ptr(reach, i);
+    /* Iterate through strongly connected components in reverser topological order,
+     * exploiting the fact that they are indexed in topological order. */
+    for (igraph_integer_t i = 0; i < no_of_comps; i++) {
+        const igraph_integer_t comp = mode == IGRAPH_IN ? i : no_of_comps - i - 1;
+        const igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, comp);
+        igraph_bitset_t *from_bitset = igraph_bitset_list_get_ptr(reach, comp);
         const igraph_integer_t n = igraph_vector_int_size(dag_neighbours);
         for (igraph_integer_t j = 0; j < n; j++) {
             const igraph_bitset_t *to_bitset = igraph_bitset_list_get_ptr(reach, VECTOR(*dag_neighbours)[j]);
@@ -150,8 +161,11 @@ igraph_error_t igraph_reachability(
  * \param graph The graph object to analyze.
  * \param counts Integer vector. <code>counts[v]</code> will store the number
  *    of vertices reachable from vertex \c v, including \c v itself.
- * \param directed For a directed graph, determines whether edges are treated
- *    as directed or undirected.
+ * \param mode In directed graphs, controls the treatment of edge directions.
+ *    Ignored in undirected graphs. With \c IGRAPH_OUT, reachability is computed
+ *    by traversing edges along their direction. With \c IGRAPH_IN, edges are
+ *    traversed opposite to their direction. With \c IGRAPH_ALL, edge directions
+ *    are ignored and the graph is treated as undirected.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
@@ -166,10 +180,9 @@ igraph_error_t igraph_reachability(
  * word size of the machine (32 or 64).
  */
 
-igraph_error_t igraph_count_reachable(
-        const igraph_t *graph,
-        igraph_vector_int_t *counts,
-        igraph_bool_t directed) {
+igraph_error_t igraph_count_reachable(const igraph_t *graph,
+                                      igraph_vector_int_t *counts,
+                                      igraph_neimode_t mode) {
 
     igraph_vector_int_t membership;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -178,7 +191,7 @@ igraph_error_t igraph_count_reachable(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
     IGRAPH_BITSET_LIST_INIT_FINALLY(&reach, 0);
 
-    IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, directed));
+    IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, mode));
 
     IGRAPH_CHECK(igraph_vector_int_resize(counts, igraph_vcount(graph)));
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
@@ -224,7 +237,7 @@ igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closur
     IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
     IGRAPH_BITSET_LIST_INIT_FINALLY(&reach, 0);
 
-    IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, /* directed */ true));
+    IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, IGRAPH_OUT));
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
