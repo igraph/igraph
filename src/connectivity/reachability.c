@@ -55,7 +55,10 @@
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
  *
- * \sa \ref igraph_connected_components(), \ref igraph_count_reachable().
+ * \sa \ref igraph_connected_components() to find the connnected components
+ * of a graph; \ref igraph_count_reachable() to count how many vertices
+ * are reachable from each vertex; \ref igraph_subcomponent() to find
+ * which vertices are rechable from a single vertex.
  *
  * Time complexity: O(|C||V|/w + |V| + |E|), where
  * |C| is the number of strongly connected components (at most |V|),
