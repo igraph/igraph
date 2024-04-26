@@ -119,6 +119,9 @@
 #elif defined(BASE_ATTRIBUTE_RECORD)
     #define BASE igraph_attribute_record_t
 
+#elif defined(BASE_BITSET)
+    #define BASE igraph_bitset_t
+
 #else
     #error unknown BASE_ directive
 #endif
@@ -163,6 +166,10 @@
     #define FUNCTION(c) CONCAT2x(igraph_attribute_record_list,c)
     #define INTERNAL_FUNCTION(c) CONCAT2x(igraph_i_attribute_record_list,c)
     #define TYPE igraph_attribute_record_list_t
+#elif defined(BITSET_LIST)
+    #define FUNCTION(c) CONCAT2x(igraph_bitset_list,c)
+    #define INTERNAL_FUNCTION(c) CONCAT2x(igraph_i_bitset_list,c)
+    #define TYPE igraph_bitset_list_t
 #else
     #if defined(BASE_IGRAPH_REAL)
         #define FUNCTION(a,c) CONCAT2(a,c)

@@ -66,6 +66,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bitset
   heap
   igraph_array
   igraph_complex
@@ -349,6 +350,7 @@ add_legacy_tests(
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_similarity
+  igraph_transitive_closure
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
@@ -358,6 +360,7 @@ add_legacy_tests(
   igraph_spanner
   knn
   random_spanning_tree
+  reachability
   single_target_shortest_path
   topological_sorting
 )

@@ -125,7 +125,7 @@ struct igraph_i_graphml_parser_state {
     xmlChar *data_key;
     igraph_attribute_elemtype_t data_type;
     char *error_message;
-    char *data_char;
+    igraph_vector_char_t data_char;
     igraph_integer_t act_node;
     igraph_bool_t ignore_namespaces;
 };
@@ -263,8 +263,11 @@ static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml
     IGRAPH_FINALLY(igraph_trie_destroy, &state->e_attr_ids);
 
     IGRAPH_CHECK(igraph_trie_init(&state->g_attr_ids, 0));
+    IGRAPH_FINALLY(igraph_trie_destroy, &state->g_attr_ids);
 
-    IGRAPH_FINALLY_CLEAN(9);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&state->data_char, 0);
+
+    IGRAPH_FINALLY_CLEAN(11);
 
     return IGRAPH_SUCCESS;
 }
@@ -282,12 +285,11 @@ static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser
     igraph_vector_ptr_destroy_all(&state->e_attrs);
     igraph_vector_ptr_destroy_all(&state->g_attrs);
 
+    igraph_vector_char_destroy(&state->data_char);
+
     if (state->data_key) {
         xmlFree((void *) state->data_key);
         state->data_key = NULL;
-    }
-    if (state->data_char) {
-        IGRAPH_FREE(state->data_char);
     }
 
     if (state->error_message) {
@@ -382,7 +384,6 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     state->successful = 1;
     state->edges_directed = 0;
     state->data_key = NULL;
-    state->data_char = NULL;
     state->unknown_depth = 0;
     state->ignore_namespaces = 0;
 }
@@ -767,9 +768,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
             if (state->data_key == 0) {
                 return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
             }
-            if (state->data_char) {
-                IGRAPH_FREE(state->data_char);
-            }
+            igraph_vector_char_clear(&state->data_char);
             state->data_type = type;
         } else {
             /* ignore */
@@ -782,30 +781,16 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
 static igraph_error_t igraph_i_graphml_append_to_data_char(
     struct igraph_i_graphml_parser_state *state, const xmlChar *data, int len
 ) {
-    igraph_integer_t data_char_new_start = 0;
-    char* new_data_char;
-
     if (!state->successful) {
         return IGRAPH_SUCCESS;
     }
 
-    if (state->data_char) {
-        data_char_new_start = strlen(state->data_char);
-        new_data_char = IGRAPH_REALLOC(state->data_char,
-                                          (size_t)(data_char_new_start + len + 1), char);
-    } else {
-        new_data_char = IGRAPH_CALLOC((size_t) len + 1, char);
+    /* vector_push_back() minimizes reallocations by doubling the size of the buffer,
+     * while vector_append() would only allocate as much additional memory as needed. */
+    IGRAPH_STATIC_ASSERT(sizeof(char) == sizeof(xmlChar));
+    for (int i=0; i < len; i++) {
+        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, data[i]));
     }
-
-    if (new_data_char == NULL) {
-        /* state->data_char is left untouched here so that's good */
-        return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
-    }
-
-    state->data_char = new_data_char;
-    memcpy(state->data_char + data_char_new_start, data,
-           (size_t) len * sizeof(xmlChar));
-    state->data_char[data_char_new_start + len] = '\0';
 
     return IGRAPH_SUCCESS;
 }
@@ -868,38 +853,46 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
         igraph_vector_t *vec;
         igraph_strvector_t *strvec;
         const char* strvalue;
+
     case IGRAPH_ATTRIBUTE_BOOLEAN:
+        /* Add null terminator */
+        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
         boolvec = rec->value.as_vector_bool;
         IGRAPH_CHECK(igraph_i_graphml_parse_boolean(
-            state->data_char, VECTOR(*boolvec) + id, rec->default_value.boolean
+            VECTOR(state->data_char), VECTOR(*boolvec) + id, rec->default_value.boolean
         ));
         break;
+
     case IGRAPH_ATTRIBUTE_NUMERIC:
+        /* Add null terminator */
+        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
         vec = rec->value.as_vector;
         IGRAPH_CHECK(igraph_i_graphml_parse_numeric(
-            state->data_char, VECTOR(*vec) + id, rec->default_value.numeric
+            VECTOR(state->data_char), VECTOR(*vec) + id, rec->default_value.numeric
         ));
         break;
+
     case IGRAPH_ATTRIBUTE_STRING:
+        /* Ensure that the vector ends with a null terminator */
         strvec = rec->value.as_strvector;
-        if (state->data_char) {
-            strvalue = state->data_char;
+        if (igraph_vector_char_size(&state->data_char) > 0) {
+            IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
+            strvalue = VECTOR(state->data_char);
         } else {
             strvalue = rec->default_value.string;
         }
         IGRAPH_CHECK(igraph_strvector_set(strvec, id, strvalue ? strvalue : ""));
         break;
+
     case IGRAPH_ATTRIBUTE_UNSPECIFIED:
         break;
+
     default:
         IGRAPH_FATAL("Unexpected attribute type.");
     }
 
 exit:
-    if (state->data_char) {
-        IGRAPH_FREE(state->data_char);
-        state->data_char = NULL;
-    }
+    igraph_vector_char_clear(&state->data_char);
 
     return result;
 }
@@ -913,7 +906,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
 
     IGRAPH_ASSERT(state->current_attr_record != NULL);
 
-    if (state->data_char == 0) {
+    if (igraph_vector_char_size(&state->data_char) == 0) {
         return IGRAPH_SUCCESS;
     }
 
@@ -921,15 +914,21 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
 
     switch (rec->type) {
     case IGRAPH_ATTRIBUTE_BOOLEAN:
-        IGRAPH_CHECK(igraph_i_graphml_parse_boolean(state->data_char, &default_bool, false));
+        /* Add null terminator */
+        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
+        IGRAPH_CHECK(igraph_i_graphml_parse_boolean(VECTOR(state->data_char), &default_bool, false));
         IGRAPH_CHECK(igraph_attribute_record_set_default_boolean(rec, default_bool));
         break;
     case IGRAPH_ATTRIBUTE_NUMERIC:
-        IGRAPH_CHECK(igraph_i_graphml_parse_numeric(state->data_char, &default_num, IGRAPH_NAN));
+        /* Add null terminator */
+        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
+        IGRAPH_CHECK(igraph_i_graphml_parse_numeric(VECTOR(state->data_char), &default_num, IGRAPH_NAN));
         IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, default_num));
         break;
     case IGRAPH_ATTRIBUTE_STRING:
-        IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, state->data_char));
+        /* Add null terminator */
+        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
+        IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, VECTOR(state->data_char)));
         break;
     case IGRAPH_ATTRIBUTE_UNSPECIFIED:
         break;
@@ -937,9 +936,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         IGRAPH_FATAL("Unexpected attribute type.");
     }
 
-    if (state->data_char) {
-        IGRAPH_FREE(state->data_char);
-    }
+    igraph_vector_char_clear(&state->data_char);
 
     return result;
 }

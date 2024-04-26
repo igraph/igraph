@@ -120,6 +120,8 @@ __BEGIN_DECLS
         else IGRAPH_SAFE_MULT(_safe_n, (_safe_n - 1) / 2, res); \
     } while (0)
 
+igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value);
+
 igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result);
 igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result);
 igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result);

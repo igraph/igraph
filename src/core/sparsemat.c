@@ -27,8 +27,9 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_misc.h"    /* IGRAPH_STATIC_ASSERT */
 #include "igraph_types.h"
+
+#include "internal/hacks.h"    /* IGRAPH_STATIC_ASSERT */
 
 #include <limits.h>
 #include <string.h>
