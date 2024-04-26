@@ -2,6 +2,13 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_transitive_closure()` computes the transitive closure of a graph (experimental function).
+ - `igraph_reachability()` determines which vertices are reachable from each other in a graph (experimental function).
+ - `igraph_count_reachable()` counts how many vertices are reachable from each vertex (experimental function).
+ - Added a bitset data structure, `igraph_bitset_t`, and a set of corresponding functions (experimental functionality).
+
 ### Fixed
 
  - `igraph_community_label_propagation()` is now interruptible.
