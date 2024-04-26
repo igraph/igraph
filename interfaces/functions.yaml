@@ -435,7 +435,7 @@ igraph_diameter_dijkstra:
 
 igraph_closeness:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res,
+        GRAPH graph, OUT VERTEX_QTY res,
         OPTIONAL OUT VECTOR_INT reachable_count,
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEX_SELECTOR vids=ALL,
@@ -445,7 +445,7 @@ igraph_closeness:
 
 igraph_closeness_cutoff:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res,
+        GRAPH graph, OUT VERTEX_QTY res,
         OPTIONAL OUT VECTOR_INT reachable_count,
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEX_SELECTOR vids=ALL,
@@ -635,20 +635,20 @@ igraph_subcomponent:
 
 igraph_betweenness:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         BOOLEAN directed=True, EDGE_WEIGHTS weights=NULL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_betweenness_cutoff:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         BOOLEAN directed=True, EDGE_WEIGHTS weights=NULL,
         REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_betweenness_subset:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         BOOLEAN directed=True, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
         EDGE_WEIGHTS weights=NULL
     DEPS: |-
@@ -668,7 +668,7 @@ igraph_edge_betweenness_cutoff:
 
 igraph_edge_betweenness_subset:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, EDGE_SELECTOR eids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, EDGE_SELECTOR eids=ALL,
         BOOLEAN directed=True, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
         EDGE_WEIGHTS weights=NULL
     DEPS: |-
@@ -676,13 +676,13 @@ igraph_edge_betweenness_subset:
 
 igraph_harmonic_centrality:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, EDGE_WEIGHTS weights=NULL, BOOLEAN normalized=False
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_harmonic_centrality_cutoff:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, EDGE_WEIGHTS weights=NULL, BOOLEAN normalized=False,
         REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
@@ -690,7 +690,7 @@ igraph_harmonic_centrality_cutoff:
 igraph_pagerank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
-        OUT VERTEX_QTYS vector, OUT REAL value,
+        OUT VERTEX_QTY vector, OUT REAL value,
         VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, EDGE_WEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
@@ -701,7 +701,7 @@ igraph_pagerank:
 igraph_personalized_pagerank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
-        OUT VERTEX_QTYS vector, OUT REAL value,
+        OUT VERTEX_QTY vector, OUT REAL value,
         VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, OPTIONAL VECTOR personalized,
         OPTIONAL EDGE_WEIGHTS weights,
@@ -713,7 +713,7 @@ igraph_personalized_pagerank:
 igraph_personalized_pagerank_vs:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
-        PRIMARY OUT VERTEX_QTYS vector, OUT REAL value,
+        PRIMARY OUT VERTEX_QTY vector, OUT REAL value,
         VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85,
         VERTEX_SELECTOR reset_vids,
@@ -919,7 +919,7 @@ igraph_avg_nearest_neighbor_degree:
     PARAMS: |-
         GRAPH graph, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL, NEIMODE neighbor_degree_mode=ALL,
-        OPTIONAL OUT VERTEX_QTYS knn, OPTIONAL OUT VECTOR knnk,
+        OPTIONAL OUT VERTEX_QTY knn, OPTIONAL OUT VECTOR knnk,
         EDGE_WEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
@@ -933,7 +933,7 @@ igraph_degree_correlation_vector:
 
 igraph_strength:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL, BOOLEAN loops=True, EDGE_WEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
@@ -1041,14 +1041,14 @@ igraph_contract_vertices:
 
 igraph_eccentricity:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL
     DEPS: vids ON graph, res ON graph vids
 
 igraph_eccentricity_dijkstra:
     PARAMS: |-
         GRAPH graph, EDGE_WEIGHTS weights=NULL,
-        OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
@@ -1085,7 +1085,7 @@ igraph_pseudo_diameter_dijkstra:
 
 igraph_diversity:
     PARAMS: |-
-        GRAPH graph, EDGE_WEIGHTS weights=NULL, OUT VERTEX_QTYS res,
+        GRAPH graph, EDGE_WEIGHTS weights=NULL, OUT VERTEX_QTY res,
         VERTEX_SELECTOR vids=ALL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
@@ -1107,7 +1107,7 @@ igraph_global_efficiency:
 
 igraph_local_efficiency:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         EDGE_WEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
