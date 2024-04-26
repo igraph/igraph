@@ -44,6 +44,7 @@
  - `igraph_minimum_size_separators()` no longer returns any separating vertex sets for complete graphs. Prior to igraph 1.0, it would return all `n - 1` size vertex subsets where `n` is the vertex count.
  - `igraph_community_edge_betweenness()` now treats edges with large weights as strong connections.
  - `igraph_biadjacency()` now truncates non-integer matrix entries to their integer part instead of rounding them up. This brings consistency with related functions such as `igraph_adjacency()`.
+ - The order of edges in the graph returned by `igraph_(weighted_)adjacency()` and `igraph_biadjacency()` has changed. Note that these functions do not guarantee any specific edge order.
 
 ### Fixed
 
@@ -58,6 +59,10 @@
 ### Deprecated
 
 - `igraph_delete_vertices_idx()` is now deprecated in favour of `igraph_delete_vertices_map()`, which is functionally equivalent but has a name that is consistent with `igraph_induced_subgraph_map()`.
+
+### Other
+
+ - Improved performance when creating graphs from dense adjacency matrices (`igraph_adjacency()` and `igraph_weighted_adjacency()`).
 
 ## [master]
 

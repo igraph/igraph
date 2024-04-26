@@ -646,11 +646,11 @@ igraph_error_t igraph_biadjacency(
             IGRAPH_ERRORF(
                 "Bipartite adjacency matrix elements should be non-negative, found %g.",
                 IGRAPH_EINVAL, igraph_matrix_min(biadjmatrix)
-                );
+            );
         }
 
-        for (igraph_integer_t i = 0; i < n1; i++) {
-            for (igraph_integer_t j = 0; j < n2; j++) {
+        for (igraph_integer_t j = 0; j < n2; j++) {
+            for (igraph_integer_t i = 0; i < n1; i++) {
                 igraph_integer_t elem = MATRIX(*biadjmatrix, i, j);
                 igraph_integer_t from, to;
 
@@ -684,8 +684,8 @@ igraph_error_t igraph_biadjacency(
 
     } else {
 
-        for (igraph_integer_t i = 0; i < n1; i++) {
-            for (igraph_integer_t j = 0; j < n2; j++) {
+        for (igraph_integer_t j = 0; j < n2; j++) {
+            for (igraph_integer_t i = 0; i < n1; i++) {
                 igraph_integer_t from, to;
 
                 if (MATRIX(*biadjmatrix, i, j) != 0) {
@@ -777,8 +777,8 @@ igraph_error_t igraph_weighted_biadjacency(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     igraph_vector_clear(weights);
 
-    for (igraph_integer_t i = 0; i < n1; i++) {
-        for (igraph_integer_t j = 0; j < n2; j++) {
+    for (igraph_integer_t j = 0; j < n2; j++) {
+        for (igraph_integer_t i = 0; i < n1; i++) {
             igraph_real_t weight = MATRIX(*biadjmatrix, i, j);
             igraph_integer_t from, to;
 

@@ -79,16 +79,15 @@ static igraph_error_t igraph_i_adjacency_directed(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t M = MATRIX(*adjmatrix, i, j);
             if (i == j) {
                 IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
             }
-            for (k = 0; k < M; k++) {
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -152,25 +151,24 @@ static igraph_error_t igraph_i_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_integer_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        /* do the loops first */
-        M = MATRIX(*adjmatrix, i, i);
-        if (M) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (k = 0; k < M; k++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < j; i++) {
+            M = MATRIX(*adjmatrix, i, j);
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        /* then the rest */
-        for (j = i + 1; j < no_of_nodes; j++) {
-            M = MATRIX(*adjmatrix, i, j);
-            for (k = 0; k < M; k++) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+        /* do the loops as well */
+        M = MATRIX(*adjmatrix, j, j);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (igraph_integer_t k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
@@ -183,25 +181,25 @@ static igraph_error_t igraph_i_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_integer_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < i; j++) {
-            M = MATRIX(*adjmatrix, i, j);
-            for (k = 0; k < M; k++) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        /* do the loops first */
+        M = MATRIX(*adjmatrix, j, j);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (igraph_integer_t k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        /* do the loops as well */
-        M = MATRIX(*adjmatrix, i, i);
-        if (M) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (k = 0; k < M; k++) {
+        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+            M = MATRIX(*adjmatrix, i, j);
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
     }
@@ -253,7 +251,9 @@ static igraph_error_t igraph_i_adjacency_min(
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
- * next row is for vertex 1, etc.
+ * next row is for vertex 1, etc. No guarantees are given about the ordering
+ * of edges.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The adjacency matrix. How it is interpreted
  *        depends on the \p mode argument.
@@ -427,11 +427,10 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
                 if (i == j) {
@@ -534,20 +533,35 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
      * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
      * returns false for these as NaN != NaN. */
-    igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
+    const igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
     for (igraph_integer_t i=0; i < n; i++) {
+        /* do the loops first */
+        if (loops) {
+            igraph_real_t M = MATRIX(*adjmatrix, i, i);
+            if (M != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
+            }
+        }
+
         for (igraph_integer_t j=0; j < i; j++) {
-            igraph_real_t a1 = MATRIX(*adjmatrix, i, j);
-            igraph_real_t a2 = MATRIX(*adjmatrix, j, i);
-            if (a1 != a2 && ! (isnan(a1) && isnan(a2))) {
+            igraph_real_t M1 = MATRIX(*adjmatrix, i, j);
+            igraph_real_t M2 = MATRIX(*adjmatrix, j, i);
+            if (IGRAPH_UNLIKELY(M1 != M2 && ! (isnan(M1) && isnan(M2)))) {
                 IGRAPH_ERROR(
                     "Adjacency matrix should be symmetric to produce an undirected graph.",
                     IGRAPH_EINVAL
-                    );
+                );
+            } else if (M1 != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
             }
         }
     }
-    return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -558,27 +572,25 @@ static igraph_error_t igraph_i_weighted_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        /* do the loops first */
-        if (loops) {
-            M = MATRIX(*adjmatrix, i, i);
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < j; i++) {
+            igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
-                igraph_i_adjust_loop_edge_weight(&M, loops);
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
 
-        /* then the rest */
-        for (j = i + 1; j < no_of_nodes; j++) {
-            igraph_real_t M = MATRIX(*adjmatrix, i, j);
+        /* do the loops as well */
+        if (loops) {
+            M = MATRIX(*adjmatrix, j, j);
             if (M != 0.0) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
@@ -594,27 +606,26 @@ static igraph_error_t igraph_i_weighted_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < i; j++) {
-            M = MATRIX(*adjmatrix, i, j);
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        /* do the loops first */
+        if (loops) {
+            M = MATRIX(*adjmatrix, j, j);
             if (M != 0.0) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
 
-        /* do the loops as well */
-        if (loops) {
-            M = MATRIX(*adjmatrix, i, i);
+        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+            M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
-                igraph_i_adjust_loop_edge_weight(&M, loops);
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
@@ -670,7 +681,9 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
- * next row is for vertex 1, etc.
+ * next row is for vertex 1, etc. No guarantees are given for the ordering
+ * of edges.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The weighted adjacency matrix. How it is interpreted
  *        depends on the \p mode argument. The common feature is that
