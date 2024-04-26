@@ -58,6 +58,7 @@
  - Removed `igraph_Calloc()`, `igraph_Realloc()` and `igraph_Free()`. Use `IGRAPH_CALLOC()`, `IGRAPH_REALLOC()` and `IGRAPH_FREE()` instead.
  - The deprecated `igraph_automorphisms()` was removed. Use `igraph_count_automorphisms()` or `igraph_count_automorphisms_bliss()` instead.
  - The deprecated `igraph_decompose_destroy()` was removed.
+ - The deprecated `igraph_hub_score()` and `igraph_authority_score()` were removed.
 
 ### Deprecated
 
