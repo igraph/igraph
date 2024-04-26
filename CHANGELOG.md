@@ -31,6 +31,7 @@
  - `igraph_community_edge_betweenness()` now takes both a `weights` and a `lengths` parameter. Egde weights (interpreted as connection strengths) are used to divide betweenness scores before selecting them for removal as well as for the modularity computation. Edge lengths are used for defining shortest path lengths during the betweenness computation. This fixes issues #2229 and #1040.
  - `igraph_get_biadjacency()` now takes a `weights` parameter, and can optionally create weighted biadjacency matrices.
  - `igraph_community_label_propagation()` changed signature to allow specification of LPA variants. A new fast label propagation variant was added.
+ - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` now use a `mode` parameter with possible values `IGRAPH_OUT`, `IGRAPH_IN` or `IGRAPH_ALL` to control how edge directions are considered. Previously they used a boolean `directed` parameter.
 
 ### Added
 
