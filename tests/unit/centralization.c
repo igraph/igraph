@@ -60,7 +60,7 @@ int main(void) {
                 &g,
                 /*vector=*/ NULL,
                 /*value=*/ NULL,
-                IGRAPH_DIRECTED,
+                /*mode=*/ IGRAPH_OUT,
                 /*scale=*/ false,
                 &arpack_options, &cent,
                 /*theoretical_max=*/ NULL,

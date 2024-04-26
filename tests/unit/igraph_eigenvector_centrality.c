@@ -28,8 +28,10 @@ void print_and_destroy(igraph_t *g, igraph_vector_t *weights)
     igraph_real_t value;
 
     igraph_vector_init(&v, 0);
-    igraph_eigenvector_centrality(g, &v, &value, /* directed */ true,
-                                  /* scale */ true, weights,
+    igraph_eigenvector_centrality(g, &v, &value,
+                                  /* mode */ IGRAPH_OUT,
+                                  /* scale */ true,
+                                  weights,
                                   /* options */ NULL);
 
     printf("Eigenvalue: %g\n", value);
@@ -104,10 +106,10 @@ int main(void) {
     igraph_vector_init(&weights, 2);
     igraph_vector_fill(&weights, 1);
     igraph_full(&g, 5, IGRAPH_DIRECTED, /* loops */ false);
-    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* directed */ true,
+    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* mode */ IGRAPH_OUT,
                                   /* scale */ true, &weights,
                                   /* options */ NULL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* directed */ false,
+    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* mode */ IGRAPH_ALL,
                                   /* scale */ true, &weights,
                                   /* options */ NULL), IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);

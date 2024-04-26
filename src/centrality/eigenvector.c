@@ -253,6 +253,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
 
 static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
                                                     igraph_real_t *value, igraph_bool_t scale,
+                                                    igraph_neimode_t mode,
                                                     const igraph_vector_t *weights,
                                                     igraph_arpack_options_t *options) {
 
@@ -261,8 +262,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_vector_t indegree;
     igraph_bool_t dag;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
     igraph_bool_t negative_weights = false;
+
+    mode = IGRAPH_REVERSE_MODE(mode);
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -301,7 +303,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                     igraph_vector_size(weights), igraph_ecount(graph));
         }
         if (igraph_is_directed(graph)) {
-            IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
+            IGRAPH_WARNING("Weighted directed graph in eigenvector centrality.");
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
@@ -343,9 +345,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
 
     IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
-                                 IGRAPH_IN, IGRAPH_LOOPS, weights));
+                                 mode, IGRAPH_LOOPS, weights));
     RNG_BEGIN();
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
         } else {
@@ -359,7 +361,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     if (!weights) {
         igraph_adjlist_t adjlist;
 
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(adjmat_mul_unweighted,
@@ -376,7 +378,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         data.inclist = &inclist;
         data.weights = weights;
 
-        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(adjmat_mul_weighted,
@@ -400,7 +402,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             igraph_vector_fill(vector, 0);
             MATRIX(values, 0, 0) = 0;
         } else {
-            for (i = 0; i < no_of_nodes; i++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
                 igraph_real_t tmp;
                 VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
                 tmp = fabs(VECTOR(*vector)[i]);
@@ -418,7 +420,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
         if (! negative_weights) {
-            for (i = 0; i < no_of_nodes; i++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*vector)[i] < 0) {
                     VECTOR(*vector)[i] = 0;
                 }
@@ -470,11 +472,6 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * score is 1 (with one exception, see below).
  *
  * </para><para>
- * In the directed case, the left eigenvector of the adjacency matrix is
- * calculated. In other words, the centrality of a vertex is proportional
- * to the sum of centralities of vertices pointing to it.
- *
- * </para><para>
  * Eigenvector centrality is meaningful only for (strongly) connected graphs.
  * Undirected graphs that are not connected should be decomposed into connected
  * components, and the eigenvector centrality calculated for each separately.
@@ -502,8 +499,22 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *     be a null pointer, then it is ignored.
  * \param value If not a null pointer, then the eigenvalue
  *     corresponding to the found eigenvector is stored here.
- * \param directed Boolean scalar, whether to consider edge directions
- *     in a directed graph. It is ignored for undirected graphs.
+ * \param mode How to consider edge directions in directed graphs.
+ *     It is ignored for undirected graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the left eigenvector of the adjacency matrix is calculated,
+ *          i.e. the centrality of a vertex is proportional to the sum
+ *          of centralities of vertices pointing to it. This is the standard
+ *          eigenvector centrality.
+ *        \cli IGRAPH_IN
+ *          the right eigenvector of the adjacency matrix is calculated,
+ *          i.e. the centrality of a vertex is proportional to the sum
+ *          of centralities of vertices it points to.
+ *        \cli IGRAPH_ALL
+ *          edge directions are ignored, and the unweighted eigenvector
+ *          centrality is calculated.
+ *        \endclist
  * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
  * \param weights A null pointer (indicating no edge weights), or a vector
@@ -531,7 +542,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
 igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_vector_t *vector,
                                   igraph_real_t *value,
-                                  igraph_bool_t directed, igraph_bool_t scale,
+                                  igraph_neimode_t mode, igraph_bool_t scale,
                                   const igraph_vector_t *weights,
                                   igraph_arpack_options_t *options) {
 
@@ -539,11 +550,19 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
         options = igraph_arpack_options_get_default();
     }
 
-    if (directed && igraph_is_directed(graph)) {
-        return igraph_i_eigenvector_centrality_directed(graph, vector, value,
-                scale, weights, options);
-    } else {
+    if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
+        IGRAPH_ERROR("Invalid mode for eigenvector centrality.", IGRAPH_EINVAL);
+    }
+
+    if (! igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    if (mode == IGRAPH_ALL) {
         return igraph_i_eigenvector_centrality_undirected(graph, vector, value,
-                scale, weights, options);
+                                                          scale, weights, options);
+    } else {
+        return igraph_i_eigenvector_centrality_directed(graph, vector, value,
+                                                        scale, mode, weights, options);
     }
 }
