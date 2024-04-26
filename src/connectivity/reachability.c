@@ -114,7 +114,7 @@ igraph_error_t igraph_reachability(
         const igraph_integer_t n = igraph_vector_int_size(neighbours);
         for (igraph_integer_t i = 0; i < n; i++) {
             if (VECTOR(*membership)[v] != VECTOR(*membership)[VECTOR(*neighbours)[i]]) {
-                igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[VECTOR(*neighbours)[i]]);
+                IGRAPH_CHECK(igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[VECTOR(*neighbours)[i]]));
             }
         }
     }
