@@ -66,7 +66,7 @@ __BEGIN_DECLS
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_MASK(b) ((igraph_integer_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
+#define IGRAPH_BIT_MASK(b) ((igraph_uint_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
 
 /**
  * \ingroup bitset
@@ -186,24 +186,24 @@ __BEGIN_DECLS
         #ifdef HAVE__POPCNT
             #define IGRAPH_I_POPCOUNT32(x) __popcnt(x)
         #else
-            igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
+            igraph_integer_t igraph_i_popcnt(igraph_uint_t x);
             #define IGRAPH_I_POPCOUNT32(x) igraph_i_popcnt(x)
         #endif
     #elif IGRAPH_INTEGER_SIZE == 64
         #ifdef HAVE__POPCNT64
             #define IGRAPH_I_POPCOUNT64(x) __popcnt64(x)
         #else
-            igraph_integer_t igraph_i_popcnt(igraph_integer_t x);
+            igraph_integer_t igraph_i_popcnt(igraph_uint_t x);
             #define IGRAPH_I_POPCOUNT64(x) igraph_i_popcnt(x)
         #endif
     #else
         #error "Unexpected IGRAPH_INTEGER_SIZE value."
     #endif
 
-    igraph_integer_t igraph_i_ctz32(igraph_integer_t x);
-    igraph_integer_t igraph_i_ctz64(igraph_integer_t x);
-    igraph_integer_t igraph_i_clz32(igraph_integer_t x);
-    igraph_integer_t igraph_i_clz64(igraph_integer_t x);
+    igraph_integer_t igraph_i_ctz32(igraph_uint_t x);
+    igraph_integer_t igraph_i_ctz64(igraph_uint_t x);
+    igraph_integer_t igraph_i_clz32(igraph_uint_t x);
+    igraph_integer_t igraph_i_clz64(igraph_uint_t x);
     #define IGRAPH_I_CTZ32(x) igraph_i_ctz32(x)
     #define IGRAPH_I_CTZ64(x) igraph_i_ctz64(x)
     #define IGRAPH_I_CLZ32(x) igraph_i_clz32(x)
@@ -229,8 +229,8 @@ __BEGIN_DECLS
 
 typedef struct {
     igraph_integer_t size;
-    igraph_integer_t* stor_begin;
-    igraph_integer_t* stor_end;
+    igraph_uint_t *stor_begin;
+    igraph_uint_t *stor_end;
 } igraph_bitset_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size);
