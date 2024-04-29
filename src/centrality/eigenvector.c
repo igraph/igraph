@@ -87,18 +87,21 @@ static igraph_error_t adjmat_mul_weighted(igraph_real_t *to, const igraph_real_t
 /* Checks if any eigenvector centrality values are zero. If they are, it indicates that the
  * graph is not (strongly) connected. Eigenvector centrality is not meaningful for such graphs.
  * To account for numerical inaccuracies, a threshold of 'eps' is used when testing for zero.
- * This function is intended to be used with scaled/normalized eigenvector centrality scores,
- * and 'eps' is chosen to be reasonable for scores with a magnitude around 0.1 - 1.
+ * This function is intended to be used with eigenvector centrality values scaled such that
+ * the maximum is 1. 'eps' is chosen accordinly.
  */
 static void warn_zero_entries(const igraph_vector_t *evcent) {
-    /* Same tolerance as the default in igraph_vector_zapsmall() */
-    const igraph_real_t tol = pow(DBL_EPSILON, 2.0/3);
+    /* This is a conservative tolerance that will still catch most values
+     * which should be zero without being triggered by small yet truly
+     * nonzero values.
+     * See https://github.com/igraph/igraph/pull/2592 */
+    const igraph_real_t tol = 10 * DBL_EPSILON;
     const igraph_integer_t n = igraph_vector_size(evcent);
 
     for (igraph_integer_t i=0; i < n; i++) {
         igraph_real_t x = VECTOR(*evcent)[i];
         if (-tol < x && x < tol) {
-            IGRAPH_WARNING("Some eigenvector centralities are nearly zero, indicating a graph that is not (strongly) connected. "
+            IGRAPH_WARNING("Some eigenvector centralities are nearly zero, indicating that the graph may not be (strongly) connected. "
                            "Eigenvector centrality is not meaningful for disconnected graphs.");
             return;
         }
