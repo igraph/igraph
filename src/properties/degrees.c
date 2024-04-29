@@ -570,20 +570,18 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     igraph_integer_t no_vids;
     igraph_vector_int_t degrees;
     igraph_vector_int_t neis;
-    igraph_integer_t i;
 
-    if (!weights) {
+    if (! weights) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
         IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             VECTOR(*res)[i] = VECTOR(degrees)[i];
         }
         igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
-
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
@@ -599,23 +597,19 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_null(res);
 
     if (loops) {
-        for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-            igraph_integer_t vid = IGRAPH_VIT_GET(vit);
-            igraph_integer_t j, n;
-            IGRAPH_CHECK(igraph_incident(graph, &neis, vid, mode));
-            n = igraph_vector_int_size(&neis);
-            for (j = 0; j < n; j++) {
+        for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+            IGRAPH_CHECK(igraph_incident(graph, &neis, IGRAPH_VIT_GET(vit), mode));
+            const igraph_integer_t n = igraph_vector_int_size(&neis);
+            for (igraph_integer_t j = 0; j < n; j++) {
                 igraph_integer_t edge = VECTOR(neis)[j];
                 VECTOR(*res)[i] += VECTOR(*weights)[edge];
             }
         }
     } else {
-        for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-            igraph_integer_t vid = IGRAPH_VIT_GET(vit);
-            igraph_integer_t j, n;
-            IGRAPH_CHECK(igraph_incident(graph, &neis, vid, mode));
-            n = igraph_vector_int_size(&neis);
-            for (j = 0; j < n; j++) {
+        for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+            IGRAPH_CHECK(igraph_incident(graph, &neis, IGRAPH_VIT_GET(vit), mode));
+            const igraph_integer_t n = igraph_vector_int_size(&neis);
+            for (igraph_integer_t j = 0; j < n; j++) {
                 igraph_integer_t edge = VECTOR(neis)[j];
                 igraph_integer_t from = IGRAPH_FROM(graph, edge);
                 igraph_integer_t to = IGRAPH_TO(graph, edge);
