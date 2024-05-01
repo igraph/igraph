@@ -536,9 +536,10 @@ igraph_error_t igraph_degree_correlation_vector(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_strength_all(const igraph_t *graph, igraph_vector_t *res,
-                    igraph_neimode_t mode, igraph_bool_t loops,
-                    const igraph_vector_t *weights) {
+igraph_error_t igraph_i_strength_all(
+        const igraph_t *graph, igraph_vector_t *res,
+        igraph_neimode_t mode, igraph_bool_t loops,
+        const igraph_vector_t *weights) {
 
     // When calculating strength for all vertices, iterating over edges is faster
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -546,10 +547,6 @@ igraph_error_t igraph_strength_all(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
     igraph_vector_null(res);
-
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Mode should be either IGRAPH_OUT, IGRAPH_IN or IGRAPH_ALL.", IGRAPH_EINVMODE);
-    }
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
@@ -640,8 +637,12 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for vertex strength calculation.", IGRAPH_EINVMODE);
+    }
+
     if (igraph_vs_is_all(&vids)) {
-        return igraph_strength_all(graph, res, mode, loops, weights);
+        return igraph_i_strength_all(graph, res, mode, loops, weights);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
