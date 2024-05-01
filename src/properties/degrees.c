@@ -476,7 +476,7 @@ igraph_error_t igraph_degree_correlation_vector(
     case IGRAPH_IN:  deg_from = &deg_in;  break;
     case IGRAPH_ALL: deg_from = &deg_all; break;
     default:
-        IGRAPH_ERROR("Invalid 'from' mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'from' mode.", IGRAPH_EINVMODE);
     }
 
     switch (to_mode) {
@@ -484,7 +484,7 @@ igraph_error_t igraph_degree_correlation_vector(
     case IGRAPH_IN:  deg_to = &deg_in;  break;
     case IGRAPH_ALL: deg_to = &deg_all; break;
     default:
-        IGRAPH_ERROR("Invalid 'to' mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'to' mode.", IGRAPH_EINVMODE);
     }
 
     maxdeg = no_of_edges > 0 ? igraph_vector_int_max(deg_from) : 0;

@@ -84,7 +84,7 @@ igraph_error_t igraph_reachability(
     igraph_adjlist_t adjlist, dag;
 
     if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
-        IGRAPH_ERROR("Invalid mode for reachability.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode for reachability.", IGRAPH_EINVMODE);
     }
 
     if (! igraph_is_directed(graph)) {
