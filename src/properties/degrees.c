@@ -536,6 +536,55 @@ igraph_error_t igraph_degree_correlation_vector(
     return IGRAPH_SUCCESS;
 }
 
+igraph_error_t igraph_i_strength_all(
+        const igraph_t *graph, igraph_vector_t *res,
+        igraph_neimode_t mode, igraph_bool_t loops,
+        const igraph_vector_t *weights) {
+
+    // When calculating strength for all vertices, iterating over edges is faster
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    igraph_vector_null(res);
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    if (loops) {
+        if (mode & IGRAPH_OUT) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                VECTOR(*res)[IGRAPH_FROM(graph, edge)] += VECTOR(*weights)[edge];
+            }
+        }
+        if (mode & IGRAPH_IN) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                VECTOR(*res)[IGRAPH_TO(graph, edge)] += VECTOR(*weights)[edge];
+            }
+        }
+    } else {
+        if (mode & IGRAPH_OUT) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                if (from != IGRAPH_TO(graph, edge)) {
+                   VECTOR(*res)[from] += VECTOR(*weights)[edge];
+                }
+            }
+        }
+        if (mode & IGRAPH_IN) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                igraph_integer_t to = IGRAPH_TO(graph, edge);
+                if (IGRAPH_FROM(graph, edge) != to) {
+                    VECTOR(*res)[to] += VECTOR(*weights)[edge];
+                }
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_strength
  * \brief Strength of the vertices, also called weighted vertex degree.
@@ -550,6 +599,7 @@ igraph_error_t igraph_degree_correlation_vector(
  * \param vids The vertices for which the calculation is performed.
  * \param mode Gives whether to count only outgoing (\c IGRAPH_OUT),
  *   incoming (\c IGRAPH_IN) edges or both (\c IGRAPH_ALL).
+ *   This parameter is ignored for undirected graphs.
  * \param loops A logical scalar, whether to count loop edges as well.
  * \param weights A vector giving the edge weights. If this is a \c NULL
  *   pointer, then \ref igraph_degree() is called to perform the
@@ -585,6 +635,14 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+    }
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for vertex strength calculation.", IGRAPH_EINVMODE);
+    }
+
+    if (igraph_vs_is_all(&vids)) {
+        return igraph_i_strength_all(graph, res, mode, loops, weights);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
