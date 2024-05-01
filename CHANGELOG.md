@@ -28,6 +28,7 @@
 ### Other
 
  - Documentation improvements.
+ - `igraph_strength()` and `igraph_degree(loops=false)` are now faster when calculating values for all vertices (contributed by @gendelpiekel in #2602)
 
 ## [0.10.11] - 2024-04-02
 
