@@ -13,6 +13,7 @@ jobs:
   coverity:
     runs-on: ubuntu-latest
 
+    # Do not run in forks
     if: github.repository == 'igraph/igraph'
 
     steps:
