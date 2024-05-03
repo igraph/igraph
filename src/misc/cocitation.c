@@ -172,7 +172,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid neighbor mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode for inverse log weighted similarity.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);

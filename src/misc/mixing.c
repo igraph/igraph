@@ -837,7 +837,7 @@ igraph_error_t igraph_joint_degree_distribution(
     case IGRAPH_IN:  deg_from = &deg_in;  break;
     case IGRAPH_ALL: deg_from = &deg_all; break;
     default:
-        IGRAPH_ERROR("Invalid 'from' degree mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'from' degree mode.", IGRAPH_EINVMODE);
     }
 
     switch (to_mode) {
@@ -845,7 +845,7 @@ igraph_error_t igraph_joint_degree_distribution(
     case IGRAPH_IN:  deg_to = &deg_in;  break;
     case IGRAPH_ALL: deg_to = &deg_all; break;
     default:
-        IGRAPH_ERROR("Invalid 'to' degree mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'to' degree mode.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_CHECK(mixing_matrix(graph,
