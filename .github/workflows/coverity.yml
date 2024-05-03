@@ -13,6 +13,8 @@ jobs:
   coverity:
     runs-on: ubuntu-latest
 
+    if: github.repository == 'igraph/igraph'
+
     steps:
     - name: Install dependencies
       run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
