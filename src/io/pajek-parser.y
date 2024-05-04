@@ -238,9 +238,15 @@ vertexline: vertex NEWLINE |
 
 vertex: integer {
   igraph_integer_t v = $1;
+  /* Per feedback from Pajek's authors, negative signs should be ignored.
+   * See https://nascol.discourse.group/t/pajek-arcslist-edgelist-format/44/2 
+   * This applies to all of *Edges, *Arcs, *Edgeslist and *Arcslist section. */
+  if (v < 0) {
+    v = -v;
+  }
   if (v < 1 || v > context->vcount) {
       IGRAPH_YY_ERRORF(
-                  "Invalid vertex id (%" IGRAPH_PRId ") in Pajek file. "
+                  "Invalid vertex ID (%" IGRAPH_PRId ") in Pajek file. "
                   "The number of vertices is %" IGRAPH_PRId ".",
                   IGRAPH_EINVAL, v, context->vcount);
   }
