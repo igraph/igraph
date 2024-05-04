@@ -1,0 +1,40 @@
+This is a simplified version of http://mrvar.fdv.uni-lj.si/pajek/data/sampsonl.net
+
+*Vertices 18
+1 "ROMUL_10"
+2 "BONAVEN_5"
+3 "AMBROSE_9"
+4 "BERTH_6"
+5 "PETER_4"
+6 "LOUIS_11"
+7 "VICTOR_8"
+8 "WINF_12"
+9 "JOHN_1"
+10 "GREG_2"
+11 "HUGH_14"
+12 "BONI_15"
+13 "MARK_7"
+14 "ALBERT_16"
+15 "AMAND_13"
+16 "BASIL_3"
+17 "ELIAS_17"
+18 "SIMP_18"
+*Arcslist
+1 3 5 14
+2 1 7 14
+3 1 2 17
+4 5 6 10
+5 4 11 13
+6 1 4 9
+7 2 8 16
+8 1 2 9
+9 5 8 16
+10 4 8 14
+11 5 8 14
+12 1 2 14
+13 5 7 18
+14 1 11 12 15
+15 1 2 14
+16 1 2 7
+17 3 13 18
+18 1 2 7
