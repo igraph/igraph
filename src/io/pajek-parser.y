@@ -448,11 +448,11 @@ arclistline: arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: integer { context->actfrom=labs($1)-1; };
+arclistfrom: vertex { context->actfrom=$1-1; };
 
-arclistto: integer {
+arclistto: vertex {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
-  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
 };
 
 edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
@@ -463,11 +463,11 @@ edgelistline: edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: integer { context->actfrom=labs($1)-1; };
+edgelistfrom: vertex { context->actfrom=$1-1; };
 
-edgelistto: integer {
+edgelistto: vertex {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
-  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
 };
 
 /* -----------------------------------------------------*/
