@@ -238,10 +238,12 @@ vertexline: vertex NEWLINE |
 
 vertex: integer {
   igraph_integer_t v = $1;
-  /* Per feedback from Pajek's authors, negative signs should be ignored.
+  /* Per feedback from Pajek's authors, negative signs should be ignored for vertex IDs.
    * See https://nascol.discourse.group/t/pajek-arcslist-edgelist-format/44/2 
-   * This applies to all of *Edges, *Arcs, *Edgeslist and *Arcslist section. */
-  if (v < 0) {
+   * This applies to all of *Edges, *Arcs, *Edgeslist, *Arcslist and *Vertices section.
+   * IGRAPH_INTEGER_MIN cannot be negated on typical platforms so we keep it as-is.
+   */
+  if (v < 0 && v > IGRAPH_INTEGER_MIN) {
     v = -v;
   }
   if (v < 1 || v > context->vcount) {
