@@ -113,6 +113,8 @@ int main(void) {
     igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE);
     igraph_distances_dijkstra(&g, &d2, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT);
     IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+    igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_HOURGLASS);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
 
     igraph_vector_destroy(&weights);
 

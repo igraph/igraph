@@ -55,6 +55,7 @@ static igraph_error_t distances_floyd_warshall_original(igraph_matrix_t *res) {
     return IGRAPH_SUCCESS;
 }
 
+#define enc_dec_negative(n) (-n - 1)
 
 static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
 
@@ -71,23 +72,23 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
     igraph_matrix_int_t successors;
     IGRAPH_MATRIX_INT_INIT_FINALLY(&successors, no_of_nodes, no_of_nodes);
 
-    /* children[children_start[u] + i] is the i-th child of u in a tree of shortest paths
+    /* children_in[children_start_in[u] + i] is the i-th child of u in a tree of shortest paths
        rooted at k, and ending in k, in the main loop below (IN_k). There are no_of_nodes-1
        child vertices in total, as the root vertex is excluded. This is essentially a contiguously
        stored adjacency list representation of IN_k. */
-    igraph_vector_int_t children;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&children, no_of_nodes-1);
+    igraph_vector_int_t children_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_in, no_of_nodes-1);
 
-    /* children_start[u] indicates where the children of u are stored in children[].
-       These are effectively the cumulative sums of no_of_children[], with the first
-       element being 0. The last element, children_start[no_of_nodes], is equal to the
+    /* children_start_in[u] indicates where the children of u are stored in children_in[].
+       These are effectively the cumulative sums of no_of_children_in[], with the first
+       element being 0. The last element, children_start_in[no_of_nodes], is equal to the
        total number of children in the tree, i.e. no_of_nodes-1. */
-    igraph_vector_int_t children_start;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_start, no_of_nodes+1);
+    igraph_vector_int_t children_start_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_start_in, no_of_nodes+1);
 
-    /* no_of_children[u] is the number of children that u has in IN_k in the main loop below. */
-    igraph_vector_int_t no_of_children;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children, no_of_nodes);
+    /* no_of_children_in[u] is the number of children that u has in IN_k in the main loop below. */
+    igraph_vector_int_t no_of_children_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children_in, no_of_nodes);
 
     /* dfs_traversal and dfs_skip arrays for running time optimization,
        see "Practical improvement" in Section 3.1 of the paper */
@@ -109,11 +110,11 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Count the children of each node in the shortest path tree, assuming that at
-           this point all elements of no_of_children[] are zeros. */
+           this point all elements of no_of_children_in[] are zeros. */
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
             if (v == k) continue;
             igraph_integer_t parent = MATRIX(successors, v, k);
-            VECTOR(no_of_children)[parent]++;
+            VECTOR(no_of_children_in)[parent]++;
         }
 
         /* Note: we do not use igraph_vector_int_cumsum() here as that function produces
@@ -121,21 +122,21 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
            one longer, with a 0 being prepended to what vector_cumsum() would produce. */
         igraph_integer_t cumsum = 0;
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
-            VECTOR(children_start)[v] = cumsum;
-            cumsum += VECTOR(no_of_children)[v];
+            VECTOR(children_start_in)[v] = cumsum;
+            cumsum += VECTOR(no_of_children_in)[v];
         }
-        VECTOR(children_start)[no_of_nodes] = cumsum;
+        VECTOR(children_start_in)[no_of_nodes] = cumsum;
 
         /* Constructing the tree IN_k (as in the paper) and representing it
            as a contiguously stored adjacency list. The entries of the no_of_children
            vector as re-used as an index of where to insert child node indices.
-           At the end of the calculation, all elements of no_of_children[] will be zeros,
+           At the end of the calculation, all elements of no_of_children_in[] will be zeros,
            making this vector ready for the next iteration of the outer loop. */
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
             if (v == k) continue;
             igraph_integer_t parent = MATRIX(successors, v, k);
-            VECTOR(no_of_children)[parent]--;
-            VECTOR(children)[ VECTOR(children_start)[parent] + VECTOR(no_of_children)[parent] ] = v;
+            VECTOR(no_of_children_in)[parent]--;
+            VECTOR(children_in)[ VECTOR(children_start_in)[parent] + VECTOR(no_of_children_in)[parent] ] = v;
         }
 
         /* constructing dfs-traversal and dfs-skip arrays for the IN_k tree */
@@ -148,12 +149,12 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
                 counter++;
                 /* a negative marker -parent - 1 that is popped right after
                    all the descendants of the parent were processed */
-                IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
-                for (igraph_integer_t l = VECTOR(children_start)[parent]; l < VECTOR(children_start)[parent + 1]; l++) {
-                    IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children)[l]));
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, enc_dec_negative(parent)));
+                for (igraph_integer_t l = VECTOR(children_start_in)[parent]; l < VECTOR(children_start_in)[parent + 1]; l++) {
+                    IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children_in)[l]));
                 }
             } else {
-                VECTOR(dfs_skip)[-(parent + 1)] = counter;
+                VECTOR(dfs_skip)[enc_dec_negative(parent)] = counter;
             }
         }
 
@@ -186,11 +187,224 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
     igraph_stack_int_destroy(&stack);
     igraph_vector_int_destroy(&dfs_traversal);
     igraph_vector_int_destroy(&dfs_skip);
-    igraph_vector_int_destroy(&no_of_children);
-    igraph_vector_int_destroy(&children_start);
-    igraph_vector_int_destroy(&children);
+    igraph_vector_int_destroy(&no_of_children_in);
+    igraph_vector_int_destroy(&children_start_in);
+    igraph_vector_int_destroy(&children_in);
     igraph_matrix_int_destroy(&successors);
     IGRAPH_FINALLY_CLEAN(7);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_distances_floyd_warshall_hourglass(
+        const igraph_t *graph, igraph_matrix_t *res,
+        const igraph_vector_t *weights) {
+
+    /* This is the "Tree" algorithm of Brodnik et al.
+     * A difference from the paper is that instead of using the OUT_k tree of shortest
+     * paths _starting_ in k, we use the IN_k tree of shortest paths _ending_ in k.
+     * This makes it easier to iterate through matrices in column-major order,
+     * i.e. storage order, thus increasing performance. */
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+
+    /* successors[v][u] is the second vertex on the shortest path from v to u,
+       i.e. the parent of v in the IN_u tree. */
+    igraph_matrix_int_t successors;
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&successors, no_of_nodes, no_of_nodes);
+
+     /* precessors[u][v] is the penultimate vertex on the shortest path from u to v,
+       i.e. the parent of v in the OUT_u tree. */
+    igraph_matrix_int_t predecessors;
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&predecessors, no_of_nodes, no_of_nodes);
+
+    /* children_in[children_start_in[u] + i] is the i-th child of u in a tree of shortest paths
+       rooted at k, and ending in k, in the main loop below (IN_k). There are no_of_nodes-1
+       child vertices in total, as the root vertex is excluded. This is essentially a contiguously
+       stored adjacency list representation of IN_k. */
+    igraph_vector_int_t children_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_in, no_of_nodes-1);
+
+    /* children_out[children_start_out[u] + i] is the i-th child of u in a tree of shortest paths
+       rooted at k, and starting at k, in the main loop below (OUT_k). There are no_of_nodes-1
+       child vertices in total, as the root vertex is excluded. This is essentially a contiguously
+       stored adjacency list representation of OUT_k. */
+    igraph_vector_int_t children_out;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_out, no_of_nodes-1);
+
+    /* children_start_in[u] indicates where the children of u are stored in children_in[].
+       These are effectively the cumulative sums of no_of_children_in[], with the first
+       element being 0. The last element, children_start_in[no_of_nodes], is equal to the
+       total number of children in the tree, i.e. no_of_nodes-1. */
+    igraph_vector_int_t children_start_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_start_in, no_of_nodes+1);
+
+     /* children_start_out[u] indicates where the children of u are stored in children_out[].
+       These are effectively the cumulative sums of no_of_children_out[], with the first
+       element being 0. The last element, children_start_out[no_of_nodes], is equal to the
+       total number of children in the tree, i.e. no_of_nodes-1. */
+    igraph_vector_int_t children_start_out;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children_start_out, no_of_nodes+1);
+
+    /* no_of_children_in[u] is the number of children that u has in IN_k in the main loop below. */
+    igraph_vector_int_t no_of_children_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children_in, no_of_nodes);
+
+    /* no_of_children_out[u] is the number of children that u has in OUT_k in the main loop below. */
+    igraph_vector_int_t no_of_children_out;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children_out, no_of_nodes);
+
+    /* dfs_traversal_in and dfs_skip_in arrays for running time optimization,
+       see "Practical improvement" in Section 3.1 of the paper */
+    igraph_vector_int_t dfs_traversal_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_traversal_in, no_of_nodes);
+    igraph_vector_int_t dfs_skip_in;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_skip_in, no_of_nodes);
+    
+
+    igraph_stack_int_t stack;
+    IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
+
+    for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+            MATRIX(successors, v, u) = u;
+        }
+    }
+
+    for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+            MATRIX(predecessors, u, v) = u;
+        }
+    }
+
+    for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        /* Count the children of each node in the shortest path trees, assuming that at
+           this point all elements of no_of_children_in[] are zeros. */
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+            if (v == k) continue;
+            igraph_integer_t parent = MATRIX(successors, v, k);
+            VECTOR(no_of_children_in)[parent]++;
+            parent = MATRIX(predecessors, k, v);
+            VECTOR(no_of_children_out)[parent]++;
+        }
+
+        /* Note: we do not use igraph_vector_int_cumsum() here as that function produces
+           an output vector of the same length as the input vector. Here we need an output
+           one longer, with a 0 being prepended to what vector_cumsum() would produce. */
+        igraph_integer_t cumsum_in = 0, cumsum_out = 0;
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+            VECTOR(children_start_in)[v] = cumsum_in;
+            cumsum_in += VECTOR(no_of_children_in)[v];
+            VECTOR(children_start_out)[v] = cumsum_out;
+            cumsum_out += VECTOR(no_of_children_out)[v];
+        }
+        VECTOR(children_start_in)[no_of_nodes] = cumsum_in;
+        VECTOR(children_start_out)[no_of_nodes] = cumsum_out;
+
+        /* Constructing the trees IN_k and OUT_k (as in the paper) and representing it
+           as a contiguously stored adjacency list. The entries of the no_of_children_out and no_of_children_in
+           vector are re-used as an index of where to insert child node indices.
+           At the end of the calculation, all elements of no_of_children_in[] and
+           no_of_children_out[] will be zeros,
+           making these vectors ready for the next iteration of the outer loop. */
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+            if (v == k) continue;
+            igraph_integer_t parent = MATRIX(successors, v, k);
+            VECTOR(no_of_children_in)[parent]--;
+            VECTOR(children_in)[ VECTOR(children_start_in)[parent] + VECTOR(no_of_children_in)[parent] ] = v;
+            parent = MATRIX(predecessors, k, v);
+            VECTOR(no_of_children_out)[parent]--;
+            VECTOR(children_out)[ VECTOR(children_start_out)[parent] + VECTOR(no_of_children_out)[parent] ] = v;
+        }
+
+        /* constructing dfs-traversal and dfs-skip arrays for the IN_k tree */
+        IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
+        igraph_integer_t counter = 0;
+        while (!igraph_stack_int_empty(&stack)) {
+            igraph_integer_t parent = igraph_stack_int_pop(&stack);
+            if (parent >= 0) {
+                VECTOR(dfs_traversal_in)[counter] = parent;
+                counter++;
+                /* a negative marker -parent - 1 that is popped right after
+                   all the descendants of the parent were processed */
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
+                for (igraph_integer_t l = VECTOR(children_start_in)[parent]; l < VECTOR(children_start_in)[parent + 1]; l++) {
+                    IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children_in)[l]));
+                }
+            } else {
+                VECTOR(dfs_skip_in)[-(parent + 1)] = counter;
+            }
+        }
+         
+        /* it is convenient due to the dynamic mofications of the skip list below
+           to have the index of the "first" child in dfs_traversal_in of the root k to be
+           its value in the skip list*/
+        VECTOR(dfs_skip_in)[k] = 1;
+
+        /* main inner loop */
+        IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
+        while (!igraph_stack_int_empty(&stack)) {
+            igraph_integer_t i = igraph_stack_int_pop(&stack);
+            if (i >= 0) {
+                igraph_real_t dki = MATRIX(*res, k, i);
+                if (!(dki == IGRAPH_INFINITY || i == k)) {
+                    /* prev_vertex is used to keep track of the last vertex whose subtree was not removed.
+                       It is used below to modify dfs_skip_in to simulate the pruning 
+                       of IN_k tree.
+                    */
+                    igraph_integer_t prev_vertex = k;
+                    igraph_integer_t counter_in = VECTOR(dfs_skip_in)[prev_vertex];
+                    while (counter_in < no_of_nodes) {
+                        igraph_integer_t j = VECTOR(dfs_traversal_in)[counter_in];
+                        igraph_real_t di = MATRIX(*res, j, k) + dki;
+                        igraph_real_t dd = MATRIX(*res, j, i);
+                        if (di < dd) {
+                            MATRIX(*res, j, i) = di;
+                            MATRIX(successors, j, i) = MATRIX(successors, j, k);
+                            MATRIX(predecessors, j, i) = MATRIX(predecessors, k, i);
+                            prev_vertex = j;
+                            counter_in++;
+                        } else {
+                            /* "removing" the subtree rooted at vertex j by modifying dfs_skip_in array.
+                                A negative marker -prev_vertex - 1 that is popped right after
+                                all the descendants of the vertex i in OUT_k tree were processed
+                            */
+                            counter_in = VECTOR(dfs_skip_in)[j]; 
+                            IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(dfs_skip_in)[prev_vertex]));
+                            IGRAPH_CHECK(igraph_stack_int_push(&stack, enc_dec_negative(prev_vertex)));
+                            VECTOR(dfs_skip_in)[prev_vertex] = counter_in; 
+                        }
+                        if (i == j && MATRIX(*res, i, i) < 0) {
+                            IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
+                                        IGRAPH_ENEGLOOP);
+                        }
+                    }
+                }
+                for (igraph_integer_t l = VECTOR(children_start_out)[i]; l < VECTOR(children_start_out)[i + 1]; l++) {
+                    IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children_out)[l]));
+                }                
+            } else {
+                /* reinserting the tree rooted at prev_vertex back to IN_k by modifying dfs_skip_in list */
+                igraph_integer_t prev_vertex = enc_dec_negative(i);
+                VECTOR(dfs_skip_in)[prev_vertex] = igraph_stack_int_pop(&stack);
+            }    
+        }
+    }
+
+    igraph_stack_int_destroy(&stack);
+    igraph_vector_int_destroy(&dfs_traversal_in);
+    igraph_vector_int_destroy(&dfs_skip_in);
+    igraph_vector_int_destroy(&no_of_children_in);
+    igraph_vector_int_destroy(&no_of_children_out);
+    igraph_vector_int_destroy(&children_start_in);
+    igraph_vector_int_destroy(&children_start_out);  
+    igraph_vector_int_destroy(&children_in);
+    igraph_vector_int_destroy(&children_out);
+    igraph_matrix_int_destroy(&successors);
+    igraph_matrix_int_destroy(&predecessors);
+    IGRAPH_FINALLY_CLEAN(11);
 
     return IGRAPH_SUCCESS;
 }
@@ -352,6 +566,9 @@ igraph_error_t igraph_distances_floyd_warshall(
     case IGRAPH_FLOYD_WARSHALL_AUTOMATIC:
     case IGRAPH_FLOYD_WARSHALL_TREE:
         IGRAPH_CHECK(distances_floyd_warshall_tree(res));
+        break;
+    case IGRAPH_FLOYD_WARSHALL_HOURGLASS:
+        IGRAPH_CHECK(igraph_distances_floyd_warshall_hourglass(graph, res, weights));
         break;
     default:
         IGRAPH_ERROR("Invalid method.", IGRAPH_EINVAL);
