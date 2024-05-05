@@ -181,7 +181,8 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
  *
  * </para><para>
  * When multi-edges are allowed, it is sufficient to check that the sum of degrees is the
- * same in the two partitions. For simple graphs, the Gale-Ryser theorem is used.
+ * same in the two partitions. For simple graphs, the Gale-Ryser theorem is used
+ * with Berger's relaxation.
  *
  * </para><para>
  * References:
@@ -863,7 +864,10 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
      *
      * \sum_{i=0}^k a_i <= \sum_{j=0}^{n_2} min(b_i, k+1)
      *
-     * for all 0 <= k < n_1
+     * for all 0 <= k < n_1.
+     *
+     * Additionally, based on Theorem 3 in [Berger 2014], it is sufficient to do the check
+     * for k such that a_k > a_{k+1} and for k=(n_1-1).
      */
 
     /* While this formulation does not require sorting degree2,
@@ -874,22 +878,20 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
     *res = true; /* be optimistic */
     lhs_sum = 0;
     partial_rhs_sum = 0; /* the sum of those elements in the rhs which are <= (k+1) */
-    partial_rhs_count = 0; /* number of elemnts in the rhs which are <= (k+1) */
-    a = n2; /* index in deg_freq1 */
+    partial_rhs_count = 0; /* number of elements in the rhs which are <= (k+1) */
     b = 0; /* index in deg_freq2 */
-    for (k = 0; k < n1; ++k) {
-        while (VECTOR(deg_freq1)[a] == 0) --a;
-        lhs_sum += a;
-        --VECTOR(deg_freq1)[a];
+    k = -1;
+    for (a = n2; a >= 0; --a) {
+        igraph_integer_t acount = VECTOR(deg_freq1)[a];
+        lhs_sum += a * acount;
+        k += acount;
 
-        while (true) {
-            while (b <= n1 && VECTOR(deg_freq2)[b] == 0) ++b;
+        while (b <= k + 1) {
+            igraph_integer_t bcount = VECTOR(deg_freq2)[b];
+            partial_rhs_sum += b * bcount;
+            partial_rhs_count += bcount;
 
-            if (b > k+1) break;
-
-            partial_rhs_sum += b;
-            ++partial_rhs_count;
-            --VECTOR(deg_freq2)[b];
+            ++b;
         }
 
         /* rhs_sum for a given k is partial_rhs_sum + (n2 - partial_rhs_count) * (k+1) */
