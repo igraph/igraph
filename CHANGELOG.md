@@ -80,6 +80,7 @@
  - `igraph_weighted_adjacency()` correctly passes through NaN values with `IGRAPH_ADJ_MAX`, and correctly recognizes symmetric adjacency matrices containing NaN values with `IGRAPH_ADJ_UNDIRECTED`.
  - `igraph_read_graph_gml()` can now read GML files that use ids larger than what is representable on 32 bits, provided that igraph was configured with a 64-bit `igraph_integer_t` size.
  - Fixed a performance issue in `igraph_read_graph_graphml()` with files containing a very large number of entities, such as `&gt;`.
+ - `igraph_read_graph_pajek()` has improved vertex ID validation that better matches that of Pajek's own behavior.
 
 ### Changed
 
