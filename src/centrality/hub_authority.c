@@ -261,7 +261,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
         if (value) {
-            *value = igraph_ecount(graph) ? 1.0 : IGRAPH_NAN;
+            *value = 0;
         }
         if (hub_vector) {
             IGRAPH_CHECK(igraph_vector_resize(hub_vector, no_of_nodes));
@@ -270,6 +270,9 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         if (authority_vector) {
             IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
             igraph_vector_fill(authority_vector, 1.0);
+        }
+        if (no_of_nodes > 1) {
+            IGRAPH_WARNING("The graph has no edges. Hub and authortiy scores are not meaningful.");
         }
         return IGRAPH_SUCCESS;
     }
@@ -291,7 +294,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
-                *value = IGRAPH_NAN;
+                *value = 0;
             }
             if (hub_vector) {
                 IGRAPH_CHECK(igraph_vector_resize(hub_vector, no_of_nodes));
@@ -301,6 +304,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
                 igraph_vector_fill(authority_vector, 1);
             }
+            IGRAPH_WARNING("All edge weights are zero. Hub and authortiy scores are not meaningful.");
             return IGRAPH_SUCCESS;
         }
     }
