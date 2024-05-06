@@ -89,6 +89,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://fosstodon.org/@kirill"><img src="https://avatars.githubusercontent.com/u/1741643?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kirill Müller</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=krlmlr" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/gendelpiekel"><img src="https://avatars.githubusercontent.com/u/14215028?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michael</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=gendelpiekel" title="Code">💻</a></td>
   </tr>
 </table>
 
