@@ -69,6 +69,8 @@
 
 ## [master]
 
+## [0.10.12] - 2024-05-06
+
 ### Added
 
  - `igraph_transitive_closure()` computes the transitive closure of a graph (experimental function).
@@ -1418,7 +1420,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.11..master
+[master]: https://github.com/igraph/igraph/compare/0.10.12..master
+[0.10.12]: https://github.com/igraph/igraph/compare/0.10.11..0.10.12
 [0.10.11]: https://github.com/igraph/igraph/compare/0.10.10..0.10.11
 [0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
 [0.10.9]: https://github.com/igraph/igraph/compare/0.10.8..0.10.9
