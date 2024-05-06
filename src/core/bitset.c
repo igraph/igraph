@@ -23,7 +23,7 @@
 #include "igraph_bitset.h"
 #include "igraph_memory.h"
 
-igraph_integer_t igraph_i_ctz32(igraph_integer_t x) {
+igraph_integer_t igraph_i_ctz32(igraph_uint_t x) {
 #ifdef HAVE__BITSCANFORWARD
     unsigned long index;
     return _BitScanForward(&index, x) ? index : 32;
@@ -37,7 +37,7 @@ igraph_integer_t igraph_i_ctz32(igraph_integer_t x) {
 #endif
 }
 
-igraph_integer_t igraph_i_clz32(igraph_integer_t x) {
+igraph_integer_t igraph_i_clz32(igraph_uint_t x) {
 #ifdef HAVE_BITSCANREVERSE
     unsigned long index;
     return _BitScanReverse(&index, x) ? 31 - index : 32;
@@ -51,7 +51,7 @@ igraph_integer_t igraph_i_clz32(igraph_integer_t x) {
 #endif
 }
 
-igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
+igraph_integer_t igraph_i_popcnt(igraph_uint_t x) {
     igraph_integer_t result = 0;
     while (x) {
         result++;
@@ -60,9 +60,9 @@ igraph_integer_t igraph_i_popcnt(igraph_integer_t x) {
     return result;
 }
 
-/* Fallbacks for 64-bit word (and igraph_integer_t) size */
+/* Fallbacks for 64-bit word (and igraph_integer_t/igraph_uint_t) size */
 #if IGRAPH_INTEGER_SIZE == 64
-igraph_integer_t igraph_i_ctz64(igraph_integer_t x) {
+igraph_integer_t igraph_i_ctz64(igraph_uint_t x) {
 #ifdef HAVE_BITSCANFORWARD64
     unsigned long index;
     return _BitScanForward64(&index, x) ? index : 64;
@@ -76,7 +76,7 @@ igraph_integer_t igraph_i_ctz64(igraph_integer_t x) {
 #endif
 }
 
-igraph_integer_t igraph_i_clz64(igraph_integer_t x) {
+igraph_integer_t igraph_i_clz64(igraph_uint_t x) {
 #ifdef HAVE_BITSCANREVERSE64
     unsigned long index;
     return _BitScanReverse64(&index, x) ? 63 - index : 64;
@@ -170,7 +170,7 @@ igraph_integer_t igraph_i_clz64(igraph_integer_t x) {
 
 igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size) {
     igraph_integer_t alloc_size = IGRAPH_BIT_NSLOTS(size);
-    bitset->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
+    bitset->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_uint_t);
     IGRAPH_CHECK_OOM(bitset->stor_begin, "Cannot initialize bitset");
     bitset->size = size;
     bitset->stor_end = bitset->stor_begin + alloc_size;
@@ -308,7 +308,7 @@ igraph_integer_t igraph_bitset_size(const igraph_bitset_t *bitset) {
 
 igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t capacity) {
     igraph_integer_t current_capacity;
-    igraph_integer_t *tmp;
+    igraph_uint_t *tmp;
 
     IGRAPH_ASSERT(bitset != NULL);
     IGRAPH_ASSERT(bitset->stor_begin != NULL);
@@ -320,7 +320,7 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(bitset->stor_begin, IGRAPH_BIT_NSLOTS(capacity), igraph_integer_t);
+    tmp = IGRAPH_REALLOC(bitset->stor_begin, IGRAPH_BIT_NSLOTS(capacity), igraph_uint_t);
     IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for bitset.");
 
     bitset->stor_begin = tmp;
@@ -396,8 +396,8 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
 igraph_integer_t igraph_bitset_popcount(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
-    const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
-    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - 1);
+    const igraph_uint_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_uint_t below */
+    const igraph_uint_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - 1);
     igraph_integer_t count = 0;
 
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
@@ -431,8 +431,8 @@ igraph_integer_t igraph_bitset_countl_zero(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t padding = IGRAPH_INTEGER_SIZE - final_block_size;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
-    const igraph_integer_t one = 1, zero = 0;
-    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
+    const igraph_uint_t one = 1, zero = 0;
+    const igraph_uint_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
 
     if (bitset->size && (mask & VECTOR(*bitset)[slots - 1]) != 0) {
         return IGRAPH_CLZ(mask & VECTOR(*bitset)[slots - 1]) - padding;
@@ -467,8 +467,8 @@ igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t padding = IGRAPH_INTEGER_SIZE - final_block_size;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
-    const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
-    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
+    const igraph_uint_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_uint_t below */
+    const igraph_uint_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
 
     if (bitset->size && (mask | VECTOR(*bitset)[slots - 1]) != ~zero) {
         return IGRAPH_CLO(mask | VECTOR(*bitset)[slots - 1]) - padding;
@@ -502,8 +502,8 @@ igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
 igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
-    const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
-    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
+    const igraph_uint_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_uint_t below */
+    const igraph_uint_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? ~zero : ((one << final_block_size) - one);
 
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         if (VECTOR(*bitset)[i] != zero) {
@@ -537,8 +537,8 @@ igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
 igraph_integer_t igraph_bitset_countr_one(const igraph_bitset_t *bitset) {
     const igraph_integer_t final_block_size = bitset->size % IGRAPH_INTEGER_SIZE ? bitset->size % IGRAPH_INTEGER_SIZE : IGRAPH_INTEGER_SIZE;
     const igraph_integer_t slots = IGRAPH_BIT_NSLOTS(bitset->size);
-    const igraph_integer_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_integer_t below */
-    const igraph_integer_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
+    const igraph_uint_t one = 1, zero = 0; /* to avoid the need to cast 1 and 0 to igraph_uint_t below */
+    const igraph_uint_t mask = final_block_size == IGRAPH_INTEGER_SIZE ? zero : ~((one << final_block_size) - one);
 
     for (igraph_integer_t i = 0; i + 1 < slots; ++i) {
         if (VECTOR(*bitset)[i] != ~zero) {

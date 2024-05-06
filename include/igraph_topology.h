@@ -40,7 +40,7 @@ __BEGIN_DECLS
 IGRAPH_EXPORT igraph_error_t igraph_topological_sorting(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
                                                 igraph_t *closure);
 
 /* -------------------------------------------------- */

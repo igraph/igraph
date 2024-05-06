@@ -1262,6 +1262,26 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                 VECTOR(*res)[i] += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
             }
         }
+    } else if (igraph_vs_is_all(&vids)) { /* no loops, calculating degree for all vertices */
+        // When calculating degree for all vertices, iterating over edges is faster
+        igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+        if (mode & IGRAPH_OUT) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                if (from != IGRAPH_TO(graph, edge)) {
+                    VECTOR(*res)[from]++;
+                }
+            }
+        }
+        if (mode & IGRAPH_IN) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                igraph_integer_t to = IGRAPH_TO(graph, edge);
+                if (IGRAPH_FROM(graph, edge) != to) {
+                    VECTOR(*res)[to]++;
+                }
+            }
+        }
     } else { /* no loops */
         if (mode & IGRAPH_OUT) {
             for (IGRAPH_VIT_RESET(vit), i = 0;

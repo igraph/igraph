@@ -1497,11 +1497,15 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
 /**
  * \ingroup structural
  * \function igraph_subcomponent
- * \brief The vertices in the same component as a given vertex.
+ * \brief The vertices reachable from a given vertex.
+ *
+ * This function returns the set of vertices reachable from a specified
+ * vertex. In undirected graphs, this is simple the set of vertices within
+ * the same component.
  *
  * \param graph The graph object.
- * \param res The result, vector with the IDs of the vertices in the
- *        same component.
+ * \param res The result, vector with the IDs of the vertices reachable
+ *        from \p vertex.
  * \param vertex The id of the vertex of which the component is
  *        searched.
  * \param mode Type of the component for directed graphs, possible
@@ -1534,7 +1538,9 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * edges in the graph.
  *
  * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
- * a given set of vertices and the edges between them.
+ * a given set of vertices and the edges between them;
+ * \ref igraph_reachability() to efficiently compute the reachable set from \em all
+ * vertices.
  */
 igraph_error_t igraph_subcomponent(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vertex,

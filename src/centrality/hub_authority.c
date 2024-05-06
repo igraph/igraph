@@ -197,9 +197,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * Time complexity: depends on the input graph, usually it is O(|V|),
  * the number of vertices.
  *
- * \sa \ref igraph_hub_score(), \ref igraph_authority_score()
- * for the separate calculations,
- * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
+ * \sa \ref igraph_pagerank(), \ref igraph_personalized_pagerank();
  * \ref igraph_eigenvector_centrality() for a similar measure intended
  * for undirected graphs.
  */

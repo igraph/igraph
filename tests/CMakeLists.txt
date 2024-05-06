@@ -351,7 +351,6 @@ add_legacy_tests(
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_similarity
   igraph_transitive_closure
-  igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
   igraph_unfold_tree
@@ -1010,6 +1009,7 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_strength
   igraph_transitivity
   igraph_tree_game
   igraph_vertex_connectivity
