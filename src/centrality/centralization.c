@@ -515,16 +515,18 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * \brief Calculate eigenvector centrality scores and graph centralization.
  *
  * This function calculates the eigenvector centrality of the vertices
- * by passing its arguments to \ref igraph_eigenvector_centrality);
+ * by passing its arguments to \ref igraph_eigenvector_centrality();
  * and it calculates the graph level centralization index based on the
  * results by calling \ref igraph_centralization().
+ *
  * \param graph The input graph.
  * \param vector A vector if you need the node-level eigenvector
  *      centrality scores, or a null pointer otherwise.
  * \param value If not a null pointer, then the leading eigenvalue is
  *      stored here.
- * \param scale If not zero then the result will be scaled, such that
- *     the absolute value of the maximum centrality is one.
+ * \param mode How to consider edge directions in directed graphs.
+ *     See \ref igraph_eigenvector_centrality() for details. Ignored
+ *     for directed graphs.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices) parameter and
@@ -552,8 +554,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
     const igraph_t *graph,
     igraph_vector_t *vector,
     igraph_real_t *value,
-    igraph_bool_t directed,
-    igraph_bool_t scale,
+    igraph_neimode_t mode,
     igraph_arpack_options_t *options,
     igraph_real_t *centralization,
     igraph_real_t *theoretical_max,
@@ -576,14 +577,12 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
         myvalue = &realvalue;
     }
 
-    IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, directed,
-                 scale, /*weights=*/ 0,
+    IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, mode,
+                 /*weights=*/ NULL,
                  options));
 
     IGRAPH_CHECK(igraph_centralization_eigenvector_centrality_tmax(
-                     graph, 0, directed,
-                     scale,
-                     tmax));
+                     graph, 0, mode, tmax));
 
     *centralization = igraph_centralization(scores, *tmax, normalized);
 
@@ -604,27 +603,29 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>directed</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p mode argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>directed</code>
- * arguments are considered.
+ * The other way is to supply a null pointer as the \p graph. argument.
+ * In this case the \p nodes and \p mode arguments are considered.
  *
  * </para><para>
- * The most centralized directed structure is the in-star. The most
- * centralized undirected structure is the graph with a single edge.
+ * The most centralized directed structure is the in-star with \p mode
+ * set to \c IGRAPH_OUT, and the out-star with \p mode set to \c IGRAPH_IN.
+ * The most centralized undirected structure is the graph with a single edge.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
  *     <code>graph</code> argument is not a null pointer.
- * \param directed Boolean scalar, whether to consider edge
- *     directions. This argument is ignored if
- *     <code>graph</code> is not a null pointer and it is undirected.
+ * \param mode How to consider edge directions in directed graphs.
+ *     See \ref igraph_eigenvector_centrality() for details. This argument
+ *     is ignored if <code>graph</code> is not a null pointer and it is
+ *     undirected.
  * \param scale Whether to rescale the node-level centrality scores to
  *     have a maximum of one.
  * \param res Pointer to a real variable, the result is stored here.
@@ -639,23 +640,20 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
 igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     const igraph_t *graph,
     igraph_integer_t nodes,
-    igraph_bool_t directed,
-    igraph_bool_t scale,
+    igraph_neimode_t mode,
     igraph_real_t *res) {
 
     if (graph) {
         nodes = igraph_vcount(graph);
-        directed = directed && igraph_is_directed(graph);
+        if (! igraph_is_directed(graph)) {
+            mode = IGRAPH_ALL;
+        }
     }
 
-    if (directed) {
+    if (mode != IGRAPH_ALL) {
         *res = nodes - 1;
     } else {
-        if (scale) {
-            *res = nodes - 2;
-        } else {
-            *res = (nodes - 2.0) / M_SQRT2;
-        }
+        *res = nodes - 2;
     }
 
     return IGRAPH_SUCCESS;

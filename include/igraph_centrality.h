@@ -117,10 +117,10 @@ IGRAPH_EXPORT igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *gra
                                                   const igraph_vector_t *weights, igraph_arpack_options_t *options);
 
 IGRAPH_EXPORT igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
-                                                igraph_real_t *value,
-                                                igraph_bool_t directed, igraph_bool_t scale,
-                                                const igraph_vector_t *weights,
-                                                igraph_arpack_options_t *options);
+                                                           igraph_real_t *value,
+                                                           igraph_neimode_t mode,
+                                                           const igraph_vector_t *weights,
+                                                           igraph_arpack_options_t *options);
 
 IGRAPH_EXPORT igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph, igraph_vector_t *hub_vector,
                                          igraph_vector_t *authority_vector,
@@ -171,22 +171,18 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_closeness_tmax(const igraph_t
                                                        igraph_neimode_t mode,
                                                        igraph_real_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality(
-    const igraph_t *graph,
-    igraph_vector_t *vector,
-    igraph_real_t *value,
-    igraph_bool_t directed,
-    igraph_bool_t scale,
-    igraph_arpack_options_t *options,
-    igraph_real_t *centralization,
-    igraph_real_t *theoretical_max,
-    igraph_bool_t normalized);
-IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
-    const igraph_t *graph,
-    igraph_integer_t nodes,
-    igraph_bool_t directed,
-    igraph_bool_t scale,
-    igraph_real_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality(const igraph_t *graph,
+                                                                          igraph_vector_t *vector,
+                                                                          igraph_real_t *value,
+                                                                          igraph_neimode_t mode,
+                                                                          igraph_arpack_options_t *options,
+                                                                          igraph_real_t *centralization,
+                                                                          igraph_real_t *theoretical_max,
+                                                                          igraph_bool_t normalized);
+IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality_tmax(const igraph_t *graph,
+                                                                               igraph_integer_t nodes,
+                                                                               igraph_neimode_t mode,
+                                                                               igraph_real_t *res);
 
 /* Deprecated functions: */
 
