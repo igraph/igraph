@@ -306,7 +306,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     }
 
     if (no_of_nodes > INT_MAX) {
-        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     if (!options) {
