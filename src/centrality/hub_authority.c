@@ -26,6 +26,7 @@
 
 #include "centrality/centrality_internal.h"
 
+#include <float.h>
 #include <limits.h>
 
 /* struct for the unweighted variant of the HITS algorithm */
@@ -43,6 +44,45 @@ typedef struct igraph_i_kleinberg_data2_t {
     igraph_vector_t *tmp;
     const igraph_vector_t *weights;
 } igraph_i_kleinberg_data2_t;
+
+/* Checks if at least a certain fraction of HITS centrality scores are zero.
+ * Any zero value indicates that the graphs corresponding to A A^T and A^T A are
+ * not connected, and therefore the solution is not unique. However, this situation
+ * is fairly common, and difficult to control. Thefore we only warn if the number
+ * of zero values exceeds a certain fraction.
+ *
+ * To account for numerical inaccuracies, a threshold of 'eps' is used when testing for zero.
+ * This function is intended to be used with centrality values scaled such that
+ * the maximum is 1. 'eps' is chosen accordinly.
+ *
+ * See the analogous function used in igraph_eigenvector_centrality() for details
+ * on the choice of 'eps'.
+ */
+static void warn_zero_entries(const igraph_vector_t *cent) {
+    const igraph_real_t tol = 10 * DBL_EPSILON;
+    const igraph_real_t frac = 0.3; /* warn if at least this fraction of centralities is zero */
+    const igraph_integer_t n = igraph_vector_size(cent);
+
+    /* Skip check for small graphs */
+    if (n < 10) {
+        return;
+    }
+
+    const igraph_integer_t max_zero_cnt = (igraph_integer_t) frac*n;
+    igraph_integer_t zero_cnt = 0;
+
+    for (igraph_integer_t i=0; i < n; i++) {
+        igraph_real_t x = VECTOR(*cent)[i];
+        if (-tol < x && x < tol) {
+            if (++zero_cnt > max_zero_cnt) {
+                IGRAPH_WARNING(
+                    "More than a fraction %g of hub or authority scores is zero. The presence of zero values "
+                    "indicates that the solution is not unique, thus the returned result may not be meaningful.");
+                return;
+            }
+        }
+    }
+}
 
 static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
         igraph_integer_t n, igraph_vector_t *to, const igraph_real_t *from,
@@ -317,7 +357,6 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                                            options, 0, &values, &vectors));
     }
 
-
     if (value) {
         *value = VECTOR(values)[0];
     }
@@ -354,6 +393,8 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                 VECTOR(*my_hub_vector_p)[i] = 0;
             }
         }
+
+        warn_zero_entries(my_hub_vector_p);
     }
 
     if (options->info) {
