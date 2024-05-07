@@ -360,14 +360,13 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  *
  * </para><para>
  * The idea behind this method is that the betweenness of the edges connecting
- * two communities is typically high, as many of the shortest paths
- * between nodes in separate communities pass through them. So we
- * gradually remove the edge with highest betweenness from the
- * network, and recalculate edge betweenness after every removal.
- * This way eventually the network splits into two components,
- * then one of these components splits again into two smaller
- * components, and so on, until all edges are removed. This is a divisive
- * hierarchical approach, the result of which is a dendrogram.
+ * two communities is typically high, as many of the shortest paths between
+ * vertices in separate communities pass through them. The algorithm
+ * successively removes edges with the highest betweenness, recalculating
+ * betweenness values after each removal. This way eventually the network splits
+ * into two components, then one of these components splits again, and so on,
+ * until all edges are removed. The resulting hierarhical partitioning of the
+ * vertices can be encoded as a dendrogram.
  *
  * </para><para>
  * In directed graphs, when \p directed is set to true, the directed version
@@ -405,13 +404,14 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * https://doi.org/10.1103/PhysRevE.70.056131
  *
  * \param graph The input graph.
- * \param removed_edges Pointer to an initialized vector, the result will be
- *     stored here, the IDs of the removed edges in the order of their
- *     removal. It will be resized as needed. It may be \c NULL if
+ * \param removed_edges Pointer to an initialized integer vector, which will
+ *     be resized as needed. The IDs of the removed edges in the order of their
+ *     removal will be stored here. This vector is suitable as input to
+ *     \ref igraph_community_eb_get_merges(). This parameter may be \c NULL if
  *     the edge IDs are not needed by the caller.
  * \param edge_betweenness Pointer to an initialized vector or
  *     \c NULL. In the former case the edge betweenness of the removed
- *     edge is stored here. The vector will be resized as needed.
+ *     edges is stored here. The vector will be resized as needed.
  *     Note that the betweenness values stored here are \em not divided
  *     by weights.
  * \param merges Pointer to an initialized matrix or \c NULL. If not \c NULL
