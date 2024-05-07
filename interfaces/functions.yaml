@@ -872,24 +872,10 @@ igraph_eigenvector_centrality:
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
-igraph_hub_score:
-    PARAMS: |-
-        GRAPH graph, OUT ALL_VERTEX_QTY vector, OUT REAL value,
-        BOOLEAN scale=True, EDGE_WEIGHTS weights=NULL,
-        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
-    DEPS: weights ON graph, vector ON graph
-
-igraph_authority_score:
-    PARAMS: |-
-        GRAPH graph, OUT ALL_VERTEX_QTY vector, OUT REAL value,
-        BOOLEAN scale=True, EDGE_WEIGHTS weights=NULL,
-        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
-    DEPS: weights ON graph, vector ON graph
-
 igraph_hub_and_authority_scores:
     PARAMS: |-
         GRAPH graph, OUT ALL_VERTEX_QTY hub_vector, OUT ALL_VERTEX_QTY authority_vector,
-        OUT REAL value, BOOLEAN scale=True, EDGE_WEIGHTS weights=NULL,
+        OUT REAL value, EDGE_WEIGHTS weights=NULL,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
 
 igraph_unfold_tree:

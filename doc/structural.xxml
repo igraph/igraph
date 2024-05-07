@@ -257,8 +257,6 @@
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_laplacian -->
-<!-- doxrox-include igraph_hub_score -->
-<!-- doxrox-include igraph_authority_score -->
 </section>
 
 </chapter>
