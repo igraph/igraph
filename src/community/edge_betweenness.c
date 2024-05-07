@@ -359,14 +359,14 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * algorithm.
  *
  * </para><para>
- * The idea is that the betweenness of the edges connecting two
- * communities is typically high, as many of the shortest paths
- * between nodes in separate communities go through them. So we
+ * The idea behind this method is that the betweenness of the edges connecting
+ * two communities is typically high, as many of the shortest paths
+ * between nodes in separate communities pass through them. So we
  * gradually remove the edge with highest betweenness from the
  * network, and recalculate edge betweenness after every removal.
- * This way sooner or later the network splits into two components,
- * then after a while one of these components splits again into two smaller
- * components, and so on until all edges are removed. This is a divisive
+ * This way eventually the network splits into two components,
+ * then one of these components splits again into two smaller
+ * components, and so on, until all edges are removed. This is a divisive
  * hierarchical approach, the result of which is a dendrogram.
  *
  * </para><para>
@@ -392,7 +392,7 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * see https://github.com/igraph/igraph/issues/2229 for additional details.
  *
  * </para><para>
- * References
+ * References:
  *
  * </para><para>
  * M. Girvan and M. E. J. Newman,
