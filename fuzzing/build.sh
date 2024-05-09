@@ -20,8 +20,7 @@ cd $SRC/igraph
 mkdir build && cd build
 # CMAKE_BUILD_TYPE=None is an arbitrary value that prevents the automatic Release
 # build type setting, allowing OSS-Fuzz to pass on its own optimization flags.
-# IEEE754_DOUBLE_ENDIANNESS_MATCHES=YES is necessary when cross-compiling to aarch64.
-cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH -DFLEX_KEEP_LINE_NUMBERS=ON -DIEEE754_DOUBLE_ENDIANNESS_MATCHES=YES
+cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH -DFLEX_KEEP_LINE_NUMBERS=ON
 make -j$(nproc)
 
 
