@@ -1,4 +1,19 @@
+# igraph-config.cmake
+# 
+# igraph CMake package
+#
+# The following variables are set:
+#
+#   - IGRAPH_VERSION          - The igraph version string.
+#   - IGRAPH_INTEGER_SIZE     - The integer size igraph was configured with (32 or 64).
+#   - IGRAPH_GLPK_SUPPORT     - Whether igraph was compiled with GLPK support.
+#   - IGRAPH_GRAPHML_SUPPORT  - Whether igraph was compiled with GraphML support.
+#
+
 set(IGRAPH_VERSION "@PACKAGE_VERSION_BASE@")
+set(IGRAPH_INTEGER_SIZE @IGRAPH_INTEGER_SIZE@)
+set(IGRAPH_GLPK_SUPPORT @IGRAPH_GLPK_SUPPORT@)
+set(IGRAPH_GRAPHML_SUPPORT @IGRAPH_GRAPHML_SUPPORT@)
 @PACKAGE_INIT@
 
 include("${CMAKE_CURRENT_LIST_DIR}/igraph-targets.cmake")
