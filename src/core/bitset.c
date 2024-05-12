@@ -370,7 +370,7 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
             IGRAPH_BIT_CLEAR(*bitset, i);
         }
         memset(bitset->stor_begin + IGRAPH_BIT_NSLOTS(bitset->size), 0,
-               sizeof(igraph_integer_t) * (IGRAPH_BIT_NSLOTS(new_size) - IGRAPH_BIT_NSLOTS(bitset->size)));
+               sizeof(igraph_uint_t) * (IGRAPH_BIT_NSLOTS(new_size) - IGRAPH_BIT_NSLOTS(bitset->size)));
     }
     bitset->size = new_size;
 
