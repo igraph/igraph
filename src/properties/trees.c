@@ -161,13 +161,13 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 /* count the number of vertices reachable from the root */
 static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode, igraph_integer_t *visited_count) {
     igraph_stack_int_t stack;
-    igraph_vector_bool_t visited;
+    igraph_bitset_t visited;
     igraph_vector_int_t neighbors;
     igraph_integer_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, igraph_vcount(graph));
+    IGRAPH_BITSET_INIT_FINALLY(&visited, igraph_vcount(graph));
 
     IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
@@ -183,8 +183,8 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
 
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);
-        if (IGRAPH_LIKELY(! VECTOR(visited)[u])) {
-            VECTOR(visited)[u] = true;
+        if (IGRAPH_LIKELY(! IGRAPH_BIT_TEST(visited, u))) {
+            IGRAPH_BIT_SET(visited, u);
             *visited_count += 1;
         }
 
@@ -193,7 +193,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
         ncount = igraph_vector_int_size(&neighbors);
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(neighbors)[i];
-            if (! VECTOR(visited)[v]) {
+            if (! IGRAPH_BIT_TEST(visited, v)) {
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
             }
         }
@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
 
     igraph_vector_int_destroy(&neighbors);
     igraph_stack_int_destroy(&stack);
-    igraph_vector_bool_destroy(&visited);
+    igraph_bitset_destroy(&visited);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -401,7 +401,7 @@ success:
  */
 static igraph_error_t igraph_i_is_forest_visitor(
         const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
-        igraph_vector_bool_t *visited, igraph_stack_int_t *stack, igraph_vector_int_t *neis,
+        igraph_bitset_t *visited, igraph_stack_int_t *stack, igraph_vector_int_t *neis,
         igraph_integer_t *visited_count, igraph_bool_t *res)
 {
     igraph_integer_t i;
@@ -420,8 +420,8 @@ static igraph_error_t igraph_i_is_forest_visitor(
          * Otherwise mark it as visited and continue.
          */
         u = igraph_stack_int_pop(stack);
-        if (IGRAPH_LIKELY(! VECTOR(*visited)[u])) {
-            VECTOR(*visited)[u] = true;
+        if (IGRAPH_LIKELY(! IGRAPH_BIT_TEST(*visited, u))) {
+            IGRAPH_BIT_SET(*visited, u);
             *visited_count += 1;
         }
         else {
@@ -447,7 +447,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
                  * an already discovered vertex (i.e. one that has already been
                  * pushed onto the stack).
                  */
-                if (IGRAPH_LIKELY(! VECTOR(*visited)[v])) {
+                if (IGRAPH_LIKELY(! IGRAPH_BIT_TEST(*visited, v))) {
                     IGRAPH_CHECK(igraph_stack_int_push(stack, v));
                 }
                 /* To check for a self-loop in undirected graph */
@@ -578,7 +578,7 @@ static igraph_error_t igraph_i_is_forest(
     const igraph_t *graph, igraph_bool_t *res,
     igraph_vector_int_t *roots, igraph_neimode_t mode
 ) {
-    igraph_vector_bool_t visited;
+    igraph_bitset_t visited;
     igraph_vector_int_t neis;
     igraph_stack_int_t stack;
     igraph_integer_t visited_count = 0;
@@ -621,7 +621,7 @@ static igraph_error_t igraph_i_is_forest(
 
     result = true; /* assume success */
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, vcount);
+    IGRAPH_BITSET_INIT_FINALLY(&visited, vcount);
 
     IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
@@ -648,7 +648,7 @@ static igraph_error_t igraph_i_is_forest(
                 if (!result) {
                     break;
                 }
-                if (! VECTOR(visited)[v]) {
+                if (! IGRAPH_BIT_TEST(visited, v)) {
                     if (roots) {
                         IGRAPH_CHECK(igraph_vector_int_push_back(roots, v));
                     }
@@ -713,7 +713,7 @@ static igraph_error_t igraph_i_is_forest(
 
     igraph_vector_int_destroy(&neis);
     igraph_stack_int_destroy(&stack);
-    igraph_vector_bool_destroy(&visited);
+    igraph_bitset_destroy(&visited);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
