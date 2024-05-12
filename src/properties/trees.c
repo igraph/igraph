@@ -24,6 +24,7 @@
 #include "igraph_structural.h"
 #include "igraph_topology.h"
 
+#include "igraph_bitset.h"
 #include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
@@ -65,8 +66,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_integer_t tree_vertex_count = no_of_nodes;
 
     igraph_vector_int_t edges;
-    igraph_vector_bool_t seen_vertices;
-    igraph_vector_bool_t seen_edges;
+    igraph_bitset_t seen_vertices;
+    igraph_bitset_t seen_edges;
 
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
@@ -81,8 +82,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_vertices, no_of_nodes);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_edges, no_of_edges);
+    IGRAPH_BITSET_INIT_FINALLY(&seen_vertices, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&seen_edges, no_of_edges);
 
     if (vertex_index) {
         IGRAPH_CHECK(igraph_vector_int_range(vertex_index, 0, no_of_nodes));
@@ -91,7 +92,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     for (igraph_integer_t r = 0; r < no_of_roots; r++) {
 
         igraph_integer_t root = VECTOR(*roots)[r];
-        VECTOR(seen_vertices)[root] = true;
+        IGRAPH_BIT_SET(seen_vertices, root);
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, root));
 
         while (!igraph_dqueue_int_empty(&Q)) {
@@ -107,16 +108,16 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                 igraph_integer_t to = IGRAPH_TO(graph, edge);
                 igraph_integer_t nei = IGRAPH_OTHER(graph, edge, actnode);
 
-                if (! VECTOR(seen_edges)[edge]) {
+                if (! IGRAPH_BIT_TEST(seen_edges, edge)) {
 
-                    VECTOR(seen_edges)[edge] = true;
+                    IGRAPH_BIT_SET(seen_edges, edge);
 
-                    if (! VECTOR(seen_vertices)[nei]) {
+                    if (! IGRAPH_BIT_TEST(seen_vertices, nei)) {
 
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
-                        VECTOR(seen_vertices)[nei] = true;
+                        IGRAPH_BIT_SET(seen_vertices, nei);
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
 
                     } else {
@@ -142,8 +143,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     } /* r < igraph_vector_int_size(roots) */
 
-    igraph_vector_bool_destroy(&seen_edges);
-    igraph_vector_bool_destroy(&seen_vertices);
+    igraph_bitset_destroy(&seen_edges);
+    igraph_bitset_destroy(&seen_vertices);
     igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(4);
