@@ -253,6 +253,11 @@ IGRAPH_EXPORT void igraph_bitset_fill(igraph_bitset_t *bitset, igraph_bool_t val
 IGRAPH_EXPORT void igraph_bitset_null(igraph_bitset_t *bitset);
 IGRAPH_EXPORT igraph_error_t igraph_bitset_fprint(const igraph_bitset_t *bitset, FILE *file);
 IGRAPH_EXPORT igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset);
+
+#define IGRAPH_BITSET_INIT_FINALLY(bitset, size) \
+do { IGRAPH_CHECK(igraph_bitset_init(bitset, size)); \
+     IGRAPH_FINALLY(igraph_bitset_destroy, bitset); } while (0)
+
 __END_DECLS
 
 #endif /* IGRAPH_BITSET_H */
