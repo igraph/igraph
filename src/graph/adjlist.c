@@ -22,6 +22,7 @@
 */
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_memory.h"
 #include "igraph_interface.h"
 
@@ -293,7 +294,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_neimode_t mode,
                                      igraph_bool_t loops) {
 
-    igraph_vector_bool_t seen;
+    igraph_bitset_t seen;
     igraph_vector_int_t neis;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
@@ -309,45 +310,45 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
     IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating complementer adjlist view.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, al->length);
+    IGRAPH_BITSET_INIT_FINALLY(&seen, al->length);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     for (igraph_integer_t i = 0; i < al->length; i++) {
-        /* For each vertex, we mark neighbors within the 'seen' bool vector.
+        /* For each vertex, we mark neighbors within the 'seen' bitset.
          * Then we iterate over 'seen' and record non-marked vertices in
          * the adjacency list. */
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Reset neighbor counter and 'seen' vector. */
-        igraph_vector_bool_null(&seen);
+        igraph_bitset_null(&seen);
         igraph_integer_t n = al->length;
 
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode));
 
         if (!loops) {
-            VECTOR(seen)[i] = true;
+            IGRAPH_BIT_SET(seen, i);
             n--;
         }
 
         igraph_integer_t neis_size = igraph_vector_int_size(&neis);
         for (igraph_integer_t j = 0; j < neis_size; j++) {
-            if (! VECTOR(seen)[ VECTOR(neis)[j] ] ) {
+            if (! IGRAPH_BIT_TEST(seen, VECTOR(neis)[j]) ) {
                 n--;
-                VECTOR(seen)[ VECTOR(neis)[j] ] = true;
+                IGRAPH_BIT_SET(seen, VECTOR(neis)[j]);
             }
         }
 
         /* Produce "non-neighbor" list in sorted order. */
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
         for (igraph_integer_t j = 0, k = 0; k < n; j++) {
-            if (!VECTOR(seen)[j]) {
+            if (!IGRAPH_BIT_TEST(seen, j)) {
                 VECTOR(al->adjs[i])[k++] = j;
             }
         }
     }
 
-    igraph_vector_bool_destroy(&seen);
+    igraph_bitset_destroy(&seen);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3); /* +1 for the adjlist itself */
 
