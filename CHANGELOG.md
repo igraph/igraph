@@ -2,6 +2,11 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_bitset_fill()` sets all elements of a bitset to the same value.
+ - `igraph_bitset_null()` clears all elements of a bitset.
+
 ## [0.10.12] - 2024-05-06
 
 ### Added
