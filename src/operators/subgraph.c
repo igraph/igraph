@@ -25,7 +25,6 @@
 #include "igraph_bitset.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 
 #include "core/interruption.h"
 #include "core/set.h"
@@ -44,7 +43,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_new_nodes_estimate;
     igraph_vector_int_t delete;
-    bool *remain;
+    igraph_bitset_t remain;
     igraph_integer_t i;
     igraph_vit_t vit;
 
@@ -52,10 +51,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
-
-    remain = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(remain, "Insufficient memory for taking subgraph.");
-    IGRAPH_FINALLY(igraph_free, remain);
+    IGRAPH_BITSET_INIT_FINALLY(&remain, no_of_nodes);
 
     /* Calculate how many nodes there will be in the new graph. The result is
      * a lower bound only as 'vit' may contain the same vertex more than once. */
@@ -67,18 +63,18 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_new_nodes_estimate));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        remain[ IGRAPH_VIT_GET(vit) ] = true;
+        IGRAPH_BIT_SET(remain, IGRAPH_VIT_GET(vit));
     }
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (! remain[i]) {
+        if (! IGRAPH_BIT_TEST(remain, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
 
-    IGRAPH_FREE(remain);
+    igraph_bitset_destroy(&remain);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_copy(res, graph));
