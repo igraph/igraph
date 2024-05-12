@@ -24,6 +24,7 @@
 #include "igraph_components.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -1069,7 +1070,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t nextptr;
     igraph_vector_int_t num, low;
-    igraph_vector_bool_t found;
+    igraph_bitset_t found;
     igraph_vector_int_t *adjedges;
     igraph_stack_int_t path;
     igraph_stack_int_t edgestack;
@@ -1082,7 +1083,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&found, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&found, no_of_nodes);
 
     IGRAPH_STACK_INT_INIT_FINALLY(&path, 100);
     IGRAPH_STACK_INT_INIT_FINALLY(&edgestack, 100);
@@ -1160,10 +1161,10 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                     }
                     /* Check for articulation point */
                     if (VECTOR(low)[act] >= VECTOR(num)[prev]) {
-                        if (articulation_points && !VECTOR(found)[prev]
+                        if (articulation_points && !IGRAPH_BIT_TEST(found, prev)
                             && prev != i /* the root */) {
                             IGRAPH_CHECK(igraph_vector_int_push_back(articulation_points, prev));
-                            VECTOR(found)[prev] = true;
+                            IGRAPH_BIT_SET(found, prev);
                         }
                         if (no) {
                             *no += 1;
@@ -1247,7 +1248,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_inclist_destroy(&inclist);
     igraph_stack_int_destroy(&edgestack);
     igraph_stack_int_destroy(&path);
-    igraph_vector_bool_destroy(&found);
+    igraph_bitset_destroy(&found);
     igraph_vector_int_destroy(&low);
     igraph_vector_int_destroy(&num);
     igraph_vector_int_destroy(&nextptr);
@@ -1439,7 +1440,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t il;
-    igraph_vector_bool_t visited;
+    igraph_bitset_t visited;
     igraph_vector_int_t vis; /* vis[u] time when vertex u was first visited */
     igraph_vector_int_t low; /* low[u] is the lowest visit time of vertices reachable from u */
     igraph_vector_int_t incoming_edge;
@@ -1450,7 +1451,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&visited, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vis, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
 
@@ -1464,7 +1465,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
 
     time = 0;
     for (igraph_integer_t start = 0; start < no_of_nodes; ++start) {
-        if (! VECTOR(visited)[start]) {
+        if (! IGRAPH_BIT_TEST(visited, start)) {
             /* Perform a DFS from 'start'.
              * The top of the su stack is u, the vertex currently being visited.
              * The top of the si stack is i, the index of u's neighbour that will
@@ -1480,7 +1481,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
                 if (i == 0) {
                     /* We are at the first step of visiting vertex u. */
 
-                    VECTOR(visited)[u] = true;
+                    IGRAPH_BIT_SET(visited, u);
 
                     time += 1;
 
@@ -1497,7 +1498,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
                     igraph_integer_t edge = VECTOR(*incedges)[i];
                     igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
 
-                    if (! VECTOR(visited)[v]) {
+                    if (! IGRAPH_BIT_TEST(visited, v)) {
                         VECTOR(incoming_edge)[v] = edge;
 
                         IGRAPH_CHECK(igraph_stack_int_push(&su, v));
@@ -1528,7 +1529,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
     igraph_vector_int_destroy(&vis);
-    igraph_vector_bool_destroy(&visited);
+    igraph_bitset_destroy(&visited);
     igraph_inclist_destroy(&il);
     IGRAPH_FINALLY_CLEAN(7);
 
