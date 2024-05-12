@@ -66,7 +66,7 @@ __BEGIN_DECLS
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_MASK(b) ((igraph_uint_t)(1) << ((b) % IGRAPH_INTEGER_SIZE))
+#define IGRAPH_BIT_MASK(i) ((igraph_uint_t)(1) << ((i) % IGRAPH_INTEGER_SIZE))
 
 /**
  * \ingroup bitset
@@ -81,11 +81,11 @@ __BEGIN_DECLS
  * \verbatim IGRAPH_BIT_SLOT(70) \endverbatim
  * will return 1 if using 64-bit words or 2 if using 32-bit words.
  *
- * \param b The bit index whose slot should be determined.
+ * \param i The bit index whose slot should be determined.
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_SLOT(b) ((b) / IGRAPH_INTEGER_SIZE)
+#define IGRAPH_BIT_SLOT(i) ((i) / IGRAPH_INTEGER_SIZE)
 
 /**
  * \ingroup bitset
@@ -98,12 +98,12 @@ __BEGIN_DECLS
  * \verbatim IGRAPH_BIT_SET(bitset, 3) \endverbatim
  * will set the fourth least significant bit in the bitset to 1.
  *
- * \param a The bitset
- * \param b The bit index that should have its bit set to 1 after the operation.
+ * \param bitset The bitset
+ * \param i The bit index that should have its bit set to 1 after the operation.
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_SET(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] |= IGRAPH_BIT_MASK(b))
+#define IGRAPH_BIT_SET(bitset, i) (VECTOR((bitset))[IGRAPH_BIT_SLOT(i)] |= IGRAPH_BIT_MASK(i))
 
 /**
  * \ingroup bitset
@@ -116,12 +116,12 @@ __BEGIN_DECLS
  * \verbatim IGRAPH_BIT_CLEAR(bitset, 4) \endverbatim
  * will set the fifth least significant bit in the bitset to 0.
  *
- * \param a The bitset
- * \param b The bit index that should have its bit set to 0 after the operation.
+ * \param bitset The bitset
+ * \param i The bit index that should have its bit set to 0 after the operation.
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_CLEAR(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] &= ~IGRAPH_BIT_MASK(b))
+#define IGRAPH_BIT_CLEAR(bitset, i) (VECTOR((bitset))[IGRAPH_BIT_SLOT(i)] &= ~IGRAPH_BIT_MASK(i))
 
 /**
  * \ingroup bitset
@@ -137,12 +137,12 @@ __BEGIN_DECLS
  * \verbatim IGRAPH_BIT_TEST(bitset, 7) \endverbatim
  * will test the eighth least significant bit in the bitset.
  *
- * \param a The bitset
- * \param b The bit index that should have its bit tested.
+ * \param bitset The bitset
+ * \param i The bit index that should have its bit tested.
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_TEST(a, b) (VECTOR((a))[IGRAPH_BIT_SLOT(b)] & IGRAPH_BIT_MASK(b))
+#define IGRAPH_BIT_TEST(bitset, i) (VECTOR((bitset))[IGRAPH_BIT_SLOT(i)] & IGRAPH_BIT_MASK(i))
 
 /**
  * \ingroup bitset
@@ -157,11 +157,11 @@ __BEGIN_DECLS
  * \verbatim IGRAPH_BIT_NSLOTS(128) \endverbatim
  * will return 2 if using 64-bit words and 4 if using 32-bit words.
  *
- * \param nb The specified number of bits.
+ * \param nbits The specified number of bits.
  *
  * Time complexity: O(1).
  */
-#define IGRAPH_BIT_NSLOTS(nb) ((nb + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
+#define IGRAPH_BIT_NSLOTS(nbits) ((nbits + IGRAPH_INTEGER_SIZE - (igraph_integer_t)(1)) / IGRAPH_INTEGER_SIZE)
 
 
 #if defined(__GNUC__)
