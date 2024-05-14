@@ -22,9 +22,9 @@
 
 #include "igraph_operators.h"
 
+#include "igraph_bitset.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 
 #include "core/interruption.h"
 #include "core/set.h"
@@ -43,7 +43,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_new_nodes_estimate;
     igraph_vector_int_t delete;
-    bool *remain;
+    igraph_bitset_t remain;
     igraph_integer_t i;
     igraph_vit_t vit;
 
@@ -51,10 +51,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
-
-    remain = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(remain, "Insufficient memory for taking subgraph.");
-    IGRAPH_FINALLY(igraph_free, remain);
+    IGRAPH_BITSET_INIT_FINALLY(&remain, no_of_nodes);
 
     /* Calculate how many nodes there will be in the new graph. The result is
      * a lower bound only as 'vit' may contain the same vertex more than once. */
@@ -66,18 +63,18 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_new_nodes_estimate));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        remain[ IGRAPH_VIT_GET(vit) ] = true;
+        IGRAPH_BIT_SET(remain, IGRAPH_VIT_GET(vit));
     }
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (! remain[i]) {
+        if (! IGRAPH_BIT_TEST(remain, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
 
-    IGRAPH_FREE(remain);
+    igraph_bitset_destroy(&remain);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_copy(res, graph));
@@ -556,21 +553,15 @@ igraph_error_t igraph_subgraph_from_edges(
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_edges_to_delete_estimate;
     igraph_vector_int_t delete = IGRAPH_VECTOR_NULL;
-    bool *vremain, *eremain;
-    igraph_integer_t i;
+    igraph_bitset_t vremain, eremain;
     igraph_eit_t eit;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
+    IGRAPH_BITSET_INIT_FINALLY(&vremain, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&eremain, no_of_edges);
 
     IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
-    vremain = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(vremain, "Insufficient memory for taking subgraph based on edges.");
-    IGRAPH_FINALLY(igraph_free, vremain);
-
-    eremain = IGRAPH_CALLOC(no_of_edges, bool);
-    IGRAPH_CHECK_OOM(eremain, "Insufficient memory for taking subgraph based on edges.");
-    IGRAPH_FINALLY(igraph_free, eremain);
 
     /* Calculate how many edges there will be in the new graph. The result is
      * a lower bound only as 'eit' may contain the same edge more than once. */
@@ -585,18 +576,23 @@ igraph_error_t igraph_subgraph_from_edges(
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
-        eremain[eid] = vremain[from] = vremain[to] = true;
+        IGRAPH_BIT_SET(eremain, eid);
+        IGRAPH_BIT_SET(vremain, from);
+        IGRAPH_BIT_SET(vremain, to);
     }
 
+    igraph_eit_destroy(&eit);
+    IGRAPH_FINALLY_CLEAN(1);
+
     /* Collect the edge IDs to be deleted */
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        if (! eremain[i]) {
+        if (! IGRAPH_BIT_TEST(eremain, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
 
-    IGRAPH_FREE(eremain);
+    igraph_bitset_destroy(&eremain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Delete the unnecessary edges */
@@ -607,15 +603,15 @@ igraph_error_t igraph_subgraph_from_edges(
     if (delete_vertices) {
         /* Collect the vertex IDs to be deleted */
         igraph_vector_int_clear(&delete);
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             IGRAPH_ALLOW_INTERRUPTION();
-            if (! vremain[i]) {
+            if (! IGRAPH_BIT_TEST(vremain, i)) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
             }
         }
     }
 
-    IGRAPH_FREE(vremain);
+    igraph_bitset_destroy(&vremain);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Delete the unnecessary vertices */
@@ -624,7 +620,7 @@ igraph_error_t igraph_subgraph_from_edges(
     }
 
     igraph_vector_int_destroy(&delete);
-    igraph_eit_destroy(&eit);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }

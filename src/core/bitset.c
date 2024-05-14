@@ -662,6 +662,47 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src) {
 
 /**
  * \ingroup bitset
+ * \function igraph_bitset_fill
+ * \brief Fills a bitset with a constant value.
+ *
+ * \experimental
+ *
+ * Sets all bits of a bitset to the same value.
+ *
+ * \param bitset The bitset object to modify.
+ * \param value The value to set for all bits.
+ *
+* \sa \ref igraph_bitset_null()
+ *
+ * Time complexity: O(n/w).
+ */
+
+void igraph_bitset_fill(igraph_bitset_t *bitset, igraph_bool_t value) {
+    memset(bitset->stor_begin,
+           value ? ~ (unsigned char) 0 : 0,
+           sizeof(igraph_uint_t) * IGRAPH_BIT_NSLOTS(bitset->size));
+}
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_null
+ * \brief Clears all bits in a bitset.
+ *
+ * \experimental
+ *
+ * \param bitset The bitset object to clear all bits in.
+ *
+ * \sa \ref igraph_bitset_fill()
+ *
+ * Time complexity: O(n/w).
+ */
+
+void igraph_bitset_null(igraph_bitset_t *bitset) {
+    igraph_bitset_fill(bitset, false);
+}
+
+/**
+ * \ingroup bitset
  * \function igraph_bitset_fprint
  * \brief Prints the bits of a bitset.
  *
