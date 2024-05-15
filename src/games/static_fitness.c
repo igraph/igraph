@@ -59,12 +59,12 @@
  * It can be shown that the \em expected degree of each vertex will be
  * proportional to its fitness, although the actual, observed degree will not
  * be. If you need to generate a graph with an exact degree sequence, consider
- * \ref igraph_degree_sequence_game instead.
+ * \ref igraph_degree_sequence_game() instead.
  *
  * </para><para>
  * This model is commonly used to generate static scale-free networks. To
  * achieve this, you have to draw the fitness scores from the desired power-law
- * distribution. Alternatively, you may use \ref igraph_static_power_law_game
+ * distribution. Alternatively, you may use \ref igraph_static_power_law_game()
  * which generates the fitnesses for you with a given exponent.
  *
  * </para><para>
@@ -296,23 +296,23 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
  * distributions may be specified separately.
  *
  * </para><para>
- * The game simply uses \ref igraph_static_fitness_game with appropriately
- * constructed fitness vectors. In particular, the fitness of vertex i
- * is i<superscript>-alpha</superscript>, where alpha = 1/(gamma-1)
- * and gamma is the exponent given in the arguments.
+ * The game simply uses \ref igraph_static_fitness_game() with appropriately
+ * constructed fitness vectors. In particular, the fitness of vertex \c i
+ * is <code>i^(-alpha)</code>, where <code>alpha = 1/(gamma-1)</code>
+ * and \c gamma is the exponent given in the arguments.
  *
  * </para><para>
  * To remove correlations between in- and out-degrees in case of directed
  * graphs, the in-fitness vector will be shuffled after it has been set up
- * and before \ref igraph_static_fitness_game is called.
+ * and before \ref igraph_static_fitness_game() is called.
  *
  * </para><para>
  * Note that significant finite size effects may be observed for exponents
  * smaller than 3 in the original formulation of the game. This function
  * provides an argument that lets you remove the finite size effects by
- * assuming that the fitness of vertex i is
- * (i+i0-1)<superscript>-alpha</superscript>,
- * where i0 is a constant chosen appropriately to ensure that the maximum
+ * assuming that the fitness of vertex \c i is
+ * <code>(i+i0-1)^(-alpha)</code>,
+ * where \c i0 is a constant chosen appropriately to ensure that the maximum
  * degree is less than the square root of the number of edges times the
  * average degree; see the paper of Chung and Lu, and Cho et al for more
  * details.
@@ -323,15 +323,18 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
  * </para><para>
  * Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
  * in scale-free networks. Phys Rev Lett 87(27):278701, 2001.
+ * https://doi.org/10.1103/PhysRevLett.87.278701
  *
  * </para><para>
  * Chung F and Lu L: Connected components in a random graph with given
  * degree sequences. Annals of Combinatorics 6, 125-145, 2002.
+ * https://doi.org/10.1007/PL00012580
  *
  * </para><para>
  * Cho YS, Kim JS, Park J, Kahng B, Kim D: Percolation transitions in
  * scale-free networks under the Achlioptas process. Phys Rev Lett
  * 103:135702, 2009.
+ * https://doi.org/10.1103/PhysRevLett.103.135702
  *
  * \param graph        Pointer to an uninitialized graph object.
  * \param no_of_nodes  The number of nodes in the generated graph.
