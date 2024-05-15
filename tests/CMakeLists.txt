@@ -204,6 +204,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
