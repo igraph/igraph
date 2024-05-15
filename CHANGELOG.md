@@ -9,6 +9,7 @@
 
 ### Other
 
+ - Documentation improvements.
  - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
 
 ## [0.10.12] - 2024-05-06
