@@ -115,6 +115,7 @@ add_library(
 
   games/barabasi.c
   games/callaway_traits.c
+  games/chung_lu.c
   games/citations.c
   games/correlated.c
   games/degree_sequence_vl/gengraph_degree_sequence.cpp

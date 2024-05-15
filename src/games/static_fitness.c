@@ -70,9 +70,8 @@
  * directed case.
  *
  * </para><para>
- * This model is similar to the better-known Chung-Lu model, but with a sharply fixed
- * edge count. Chung and Lu's construction method requires a quadratic number of steps
- * in the edge count, while this model runs in linear time.
+ * This model is similar to the better-known Chung-Lu model, implemented in igraph
+ * as \ref igraph_chung_lu_game(), but with a sharply fixed edge count.
  *
  * </para><para>
  * This model is commonly used to generate static scale-free networks. To
@@ -103,6 +102,9 @@
  *         \c IGRAPH_EINVAL: invalid parameter
  *         \c IGRAPH_ENOMEM: there is not enough
  *         memory for the operation.
+ *
+ * \sa \ref igraph_static_power_law_game(), \ref igraph_chung_lu_game(),
+ * \ref igraph_degree_sequence_game()
  *
  * Time complexity: O(|V| + |E| log |E|).
  */

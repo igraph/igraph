@@ -338,6 +338,11 @@ igraph_simple_interconnected_islands_game:
         OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size,
         REAL islands_pin, INTEGER n_inter
 
+igraph_chung_lu_game:
+    PARAMS: |-
+        OUT GRAPH graph, VECTOR expected_out_deg, OPTIONAL VECTOR expected_in_deg,
+        BOOLEAN loops=True, CHUNG_LU_VARIANT variant=ORIGINAL
+
 igraph_static_fitness_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
