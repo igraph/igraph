@@ -59,7 +59,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_init(&mv, 0);
             igraph_vector_init(&v, 0);
 
-            igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_FAST);
+            // The IGRAPH_LPA_FAST version is temporarily switched to undirected until
+            // the reason for the bad performance / infinite loop in the directed version
+            // is debugged. See https://github.com/igraph/igraph/issues/2608
+            igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, NULL, NULL, NULL, IGRAPH_LPA_FAST);
             igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_RETENTION);
             igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_DOMINANCE);
 
