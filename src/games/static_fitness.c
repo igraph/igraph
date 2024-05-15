@@ -39,27 +39,40 @@
  * \brief Non-growing random graph with edge probabilities proportional to node fitness scores.
  *
  * This game generates a directed or undirected random graph where the
- * probability of an edge between vertices i and j depends on the fitness
+ * probability of an edge between vertices \c i and \c j depends on the fitness
  * scores of the two vertices involved. For undirected graphs, each vertex
  * has a single fitness score. For directed graphs, each vertex has an out-
- * and an in-fitness, and the probability of an edge from i to j depends on
- * the out-fitness of vertex i and the in-fitness of vertex j.
+ * and an in-fitness, and the probability of an edge from \c i to \c j depends on
+ * the out-fitness of vertex \c i and the in-fitness of vertex \c j.
  *
  * </para><para>
- * The generation process goes as follows. We start from N disconnected nodes
- * (where N is given by the length of the fitness vector). Then we randomly
- * select two vertices i and j, with probabilities proportional to their
- * fitnesses. (When the generated graph is directed, i is selected according to
- * the out-fitnesses and j is selected according to the in-fitnesses). If the
+ * The generation process goes as follows. We start from \c N disconnected nodes
+ * (where \c N is given by the length of the fitness vector). Then we randomly
+ * select two vertices \c i and \c j, with probabilities proportional to their
+ * fitnesses. (When the generated graph is directed, \c i is selected according to
+ * the out-fitnesses and \c j is selected according to the in-fitnesses). If the
  * vertices are not connected yet (or if multiple edges are allowed), we
  * connect them; otherwise we select a new pair. This is repeated until the
  * desired number of links are created.
  *
  * </para><para>
- * It can be shown that the \em expected degree of each vertex will be
- * proportional to its fitness, although the actual, observed degree will not
- * be. If you need to generate a graph with an exact degree sequence, consider
- * \ref igraph_degree_sequence_game() instead.
+ * The \em expected degree (though not the actual degree) of each vertex will be
+ * proportional to its fitness. This is exactly true when self-loops and multi-edges
+ * are allowed, and approximately true otherwise. If you need to generate a graph
+ * with an exact degree sequence, consider \ref igraph_degree_sequence_game() and
+ * \ref igraph_realize_degree_sequence() instead.
+ *
+ * </para><para>
+ * To generate random undirected graphs with a given expected degree sequence, set
+ * \p fitness_out (and in the directed case \p fitness_out) to the desired expected
+ * degrees, and \p no_of_edges to the corresponding edge count, i.e. half the sum of
+ * expected degrees in the undirected case, and the sum of out- or in-degrees in the
+ * directed case.
+ *
+ * </para><para>
+ * This model is similar to the better-known Chung-Lu model, but with a sharply fixed
+ * edge count. Chung and Lu's construction method requires a quadratic number of steps
+ * in the edge count, while this model runs in linear time.
  *
  * </para><para>
  * This model is commonly used to generate static scale-free networks. To
