@@ -987,6 +987,7 @@ add_legacy_tests(
 add_benchmarks(
   NAMES
   connectivity
+  erdos_renyi
   graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
