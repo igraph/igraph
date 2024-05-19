@@ -141,6 +141,35 @@ static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec)
  *
  */
 
+static igraph_error_t igraph_i_simple_cycles_unblock_recursive(
+    igraph_simple_cycle_search_state_t *state, igraph_integer_t u)
+{
+    igraph_vector_int_t *neis;
+    igraph_integer_t w;
+
+    VECTOR(state->blocked)
+    [u] = false;
+
+    neis = igraph_adjlist_get(&state->B, u);
+    while (!igraph_vector_int_empty(neis))
+    {
+        w = igraph_vector_int_pop_back(neis);
+        if (VECTOR(state->blocked)[w])
+        {
+            IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, w));
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \experimental
+ *
+ * The implementation of procedure UNBLOCK from Johnson's paper
+ *
+ */
+
 static igraph_error_t igraph_i_simple_cycles_unblock(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t u)
 {
@@ -212,7 +241,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit_recursive(
     {
         IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, E));
     }
-    // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_vector_int_size(&state->vertex_stack), igraph_vector_int_list_size(results));
+    // printf("Pushing %" IGRAPH_PRId " to stack, stack size is %" IGRAPH_PRId ", result size is %" IGRAPH_PRId "\n", V, igraph_vector_int_size(&state->vertex_stack), igraph_vector_int_list_size(results));
     VECTOR(state->blocked)
     [V] = true;
 
@@ -308,7 +337,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit_recursive(
     // L2
     if (local_found)
     {
-        IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, V));
+        IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, V));
     }
     else
     {
@@ -326,7 +355,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit_recursive(
     IGRAPH_ASSERT(!igraph_vector_int_empty(&state->vertex_stack));
 
     // unstack v
-    // printf("Unstacking %lld\n", V);
+    // printf("Unstacking %" IGRAPH_PRId "\n", V);
     igraph_vector_int_pop_back(&state->vertex_stack);
     if (!igraph_vector_int_empty(&state->edge_stack))
     {
@@ -367,38 +396,38 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_vector_int_t *incident_edges;
     igraph_integer_t num_neighbors;
 
+    igraph_bool_t local_found = false;
+
     // keep track of what we were doing (rather than recursing)
     igraph_stack_int_t neigh_iteration_progress;
-    igraph_stack_int_init(&neigh_iteration_progress, 10);
+    igraph_stack_int_init(&neigh_iteration_progress, 0);
     IGRAPH_FINALLY(igraph_stack_int_destroy, &neigh_iteration_progress);
 
     igraph_stack_int_t v_stack;
-    igraph_stack_int_init(&v_stack, 10);
+    igraph_stack_int_init(&v_stack, 0);
     IGRAPH_FINALLY(igraph_stack_int_destroy, &v_stack);
 
     igraph_stack_int_t e_stack;
-    igraph_stack_int_init(&e_stack, 10);
+    igraph_stack_int_init(&e_stack, 0);
     IGRAPH_FINALLY(igraph_stack_int_destroy, &e_stack);
 
     igraph_bool_t recurse_deeper = true;
-    while (recurse_deeper && igraph_stack_int_size(&neigh_iteration_progress))
+    while (recurse_deeper || igraph_stack_int_size(&neigh_iteration_progress) > 0)
     {
-        igraph_bool_t local_found = false;
+        IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == igraph_stack_int_size(&e_stack));
+        IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == igraph_stack_int_size(&e_stack));
         igraph_integer_t i0 = 0;
         if (recurse_deeper)
         {
             // stack v & e
             IGRAPH_CHECK(igraph_vector_int_push_back(&state->vertex_stack, V));
-            IGRAPH_CHECK(igraph_stack_int_push(&v_stack, V));
-            IGRAPH_CHECK(igraph_stack_int_push(&e_stack, E));
             if (E >= 0)
             {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, E));
             }
-            // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_vector_int_size(&state->vertex_stack), igraph_vector_int_list_size(results));
+            // printf("Pushing %" IGRAPH_PRId " to stack, stack size is %" IGRAPH_PRId ", result size is %" IGRAPH_PRId "\n", V, igraph_vector_int_size(&state->vertex_stack), igraph_vector_int_list_size(vertices));
             VECTOR(state->blocked)
             [V] = true;
-            recurse_deeper = false;
         }
         else
         {
@@ -407,6 +436,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             V = igraph_stack_int_pop(&v_stack);
             E = igraph_stack_int_pop(&e_stack);
         }
+        recurse_deeper = false;
 
         // L1
         neighbors = igraph_adjlist_get(&state->AK, V);
@@ -492,8 +522,12 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             }
             else if (!(VECTOR(state->blocked)[W]))
             {
+                // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId "\n", V, W);
+
                 recurse_deeper = true;
-                igraph_stack_int_push(&neigh_iteration_progress, i);
+                IGRAPH_CHECK(igraph_stack_int_push(&neigh_iteration_progress, i+1));
+                IGRAPH_CHECK(igraph_stack_int_push(&v_stack, V));
+                IGRAPH_CHECK(igraph_stack_int_push(&e_stack, E));
                 V = W;
                 E = WE;
                 break;
@@ -505,6 +539,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             // L2
             if (local_found)
             {
+                // IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, V));
                 IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, V));
             }
             else
@@ -523,8 +558,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             IGRAPH_ASSERT(!igraph_vector_int_empty(&state->vertex_stack));
 
             // unstack v
-            // printf("Unstacking %lld\n", V);
-            V = igraph_vector_int_pop_back(&state->vertex_stack);
+            igraph_integer_t newV = igraph_vector_int_pop_back(&state->vertex_stack);
+            // printf("Unstacking %" IGRAPH_PRId " (%" IGRAPH_PRId ")\n", newV, V);
             if (!igraph_vector_int_empty(&state->edge_stack))
             {
                 // can be empty for the starting point.
@@ -532,9 +567,13 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 E = igraph_vector_int_pop_back(&state->edge_stack);
             }
         }
-        *found = local_found;
     }
 
+    *found = local_found;
+
+    IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
+    IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
+    IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
     igraph_stack_int_destroy(&neigh_iteration_progress);
     igraph_stack_int_destroy(&v_stack);
     igraph_stack_int_destroy(&e_stack);
