@@ -363,22 +363,34 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_vector_int_list_t *edges,
     igraph_bool_t *found)
 {
-    igraph_bool_t local_found = false;
     igraph_vector_int_t *neighbors;
     igraph_vector_int_t *incident_edges;
     igraph_integer_t num_neighbors;
 
+    // keep track of what we were doing (rather than recursing)
     igraph_stack_int_t neigh_iteration_progress;
     igraph_stack_int_init(&neigh_iteration_progress, 10);
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &neigh_iteration_progress);
 
-    // stack v & e
-    bool recurse_deeper = true;
+    igraph_stack_int_t v_stack;
+    igraph_stack_int_init(&v_stack, 10);
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &v_stack);
+
+    igraph_stack_int_t e_stack;
+    igraph_stack_int_init(&e_stack, 10);
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &e_stack);
+
+    igraph_bool_t recurse_deeper = true;
     while (recurse_deeper && igraph_stack_int_size(&neigh_iteration_progress))
     {
+        igraph_bool_t local_found = false;
         igraph_integer_t i0 = 0;
         if (recurse_deeper)
         {
+            // stack v & e
             IGRAPH_CHECK(igraph_vector_int_push_back(&state->vertex_stack, V));
+            IGRAPH_CHECK(igraph_stack_int_push(&v_stack, V));
+            IGRAPH_CHECK(igraph_stack_int_push(&e_stack, E));
             if (E >= 0)
             {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, E));
@@ -390,7 +402,10 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         }
         else
         {
+            // back to what we were doing before
             i0 = igraph_stack_int_pop(&neigh_iteration_progress);
+            V = igraph_stack_int_pop(&v_stack);
+            E = igraph_stack_int_pop(&e_stack);
         }
 
         // L1
@@ -487,7 +502,6 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 
         if (!recurse_deeper)
         {
-
             // L2
             if (local_found)
             {
@@ -518,8 +532,13 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 E = igraph_vector_int_pop_back(&state->edge_stack);
             }
         }
+        *found = local_found;
     }
-    *found = local_found;
+
+    igraph_stack_int_destroy(&neigh_iteration_progress);
+    igraph_stack_int_destroy(&v_stack);
+    igraph_stack_int_destroy(&e_stack);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
