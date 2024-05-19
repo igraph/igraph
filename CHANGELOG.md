@@ -7,6 +7,10 @@
  - `igraph_bitset_fill()` sets all elements of a bitset to the same value.
  - `igraph_bitset_null()` clears all elements of a bitset.
 
+### Fixed
+
+ - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
+
 ### Other
 
  - Documentation improvements.
