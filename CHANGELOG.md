@@ -10,6 +10,7 @@
 ### Fixed
 
  - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
+ - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
 
 ### Other
 
