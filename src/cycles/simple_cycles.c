@@ -137,7 +137,7 @@ static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec) {
 static igraph_error_t igraph_i_simple_cycles_unblock(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t u
 ) {
-    // TODO: introduce stack for w & neis in order to reduce the number of iterations.
+    // TODO: introduce stack for w & neis in order to reduce the number of iterations?
     igraph_vector_int_t* neis;
     igraph_integer_t w;
     igraph_stack_int_t u_stack;
