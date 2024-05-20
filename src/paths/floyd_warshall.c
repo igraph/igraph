@@ -297,7 +297,7 @@ igraph_error_t igraph_distances_floyd_warshall(
         in = true;
         break;
     default:
-        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode for Floyd-Warshall shortest path calculation.", IGRAPH_EINVMODE);
     }
 
     if (weights && igraph_vector_is_any_nan(weights)) {

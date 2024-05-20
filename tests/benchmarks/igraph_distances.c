@@ -68,7 +68,7 @@ int main(void) {
     BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
     );
-    BENCH(" 10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+    BENCH("10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 

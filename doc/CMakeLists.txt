@@ -20,6 +20,7 @@ set(
   attributes.xxml
   basicigraph.xxml
   bipartite.xxml
+  bitset.xxml
   cliques.xxml
   coloring.xxml
   community.xxml
