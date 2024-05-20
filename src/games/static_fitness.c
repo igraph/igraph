@@ -109,17 +109,17 @@
 igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
                                igraph_bool_t loops, igraph_bool_t multiple) {
-    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t outnodes, innodes, nodes;
+
+    const igraph_integer_t no_of_nodes = igraph_vector_size(fitness_out);
+    const igraph_bool_t directed = (fitness_in != NULL);
+    igraph_vector_int_t edges;
     igraph_vector_t cum_fitness_in, cum_fitness_out;
     igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
     igraph_real_t x, max_in, max_out;
     igraph_real_t max_no_of_edges;
-    igraph_bool_t is_directed = (fitness_in != 0);
     igraph_real_t num_steps;
-    igraph_integer_t step_counter = 0;
-    igraph_integer_t i, from, to, pos;
+    igraph_integer_t from, to, pos;
+    int iter = 0;
 
     IGRAPH_ASSERT(fitness_out != NULL);
 
@@ -127,29 +127,30 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         IGRAPH_ERRORF("Number of edges cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_edges);
     }
 
-    no_of_nodes = igraph_vector_size(fitness_out);
-    if (no_of_nodes == 0) {
-        IGRAPH_CHECK(igraph_empty(graph, 0, is_directed));
-        return IGRAPH_SUCCESS;
+    if (no_of_edges > IGRAPH_ECOUNT_MAX && (no_of_nodes == 0 && no_of_edges > 0)) {
+        IGRAPH_ERROR("Too many edges requested.", IGRAPH_EINVAL);
     }
 
-    if (is_directed && igraph_vector_size(fitness_in) != no_of_nodes) {
-        IGRAPH_ERROR("fitness_in must have the same size as fitness_out.", IGRAPH_EINVAL);
+    if (no_of_nodes == 0) {
+        return igraph_empty(graph, no_of_nodes, directed);
+    }
+
+    if (directed && igraph_vector_size(fitness_in) != no_of_nodes) {
+        IGRAPH_ERROR("The in-fitness vector must have the same length as the out-fitness vector.", IGRAPH_EINVAL);
     }
 
     /* Sanity checks for the fitnesses */
-    if (igraph_vector_min(fitness_out) < 0) {
-        IGRAPH_ERROR("Fitness scores must be non-negative.", IGRAPH_EINVAL);
-    }
-    if (fitness_in != 0 && igraph_vector_min(fitness_in) < 0) {
-        IGRAPH_ERROR("Fitness scores must be non-negative.", IGRAPH_EINVAL);
+    if (igraph_vector_min(fitness_out) < 0 && (!directed || igraph_vector_min(fitness_in) < 0)) {
+        IGRAPH_ERROR("Fitness scores must not be negative.", IGRAPH_EINVAL);
     }
 
-    /* Avoid getting into an infinite loop when too many edges are requested */
-    if (!multiple) {
-        if (is_directed) {
+    /* Avoid getting into an infinite loop when too many edges are requested. */
+    {
+        igraph_integer_t nodes;
+        if (directed) {
+            igraph_integer_t outnodes, innodes;
             outnodes = innodes = nodes = 0;
-            for (i = 0; i < no_of_nodes; i++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*fitness_out)[i] != 0) {
                     outnodes++;
                 }
@@ -163,7 +164,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
             max_no_of_edges = ((igraph_real_t) outnodes) * innodes - (loops ? 0 : nodes);
         } else {
             nodes = 0;
-            for (i = 0; i < no_of_nodes; i++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*fitness_out)[i] != 0) {
                     nodes++;
                 }
@@ -172,7 +173,14 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
                               ? nodes * ((igraph_real_t)nodes + 1) / 2
                               : nodes * ((igraph_real_t)nodes - 1) / 2;
         }
-        if (no_of_edges > max_no_of_edges) {
+        if (max_no_of_edges == 0 && no_of_edges > 0) {
+            /* This check is necessary even when multiple edges are allowed,
+             * for example when all fitnesses are zero or only one is nonzero
+             * not self-loops are disallowed. */
+            IGRAPH_ERRORF("No edges are possible with the given fitness scores, "
+                          "but %" IGRAPH_PRId " edges were requested.", IGRAPH_EINVAL, no_of_edges);
+        }
+        if (!multiple && no_of_edges > max_no_of_edges) {
             IGRAPH_ERROR("Too many edges requested.", IGRAPH_EINVAL);
         }
     }
@@ -182,7 +190,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     IGRAPH_CHECK(igraph_vector_cumsum(&cum_fitness_out, fitness_out));
     max_out = igraph_vector_tail(&cum_fitness_out);
     p_cum_fitness_out = &cum_fitness_out;
-    if (is_directed) {
+    if (directed) {
         IGRAPH_VECTOR_INIT_FINALLY(&cum_fitness_in, no_of_nodes);
         IGRAPH_CHECK(igraph_vector_cumsum(&cum_fitness_in, fitness_in));
         max_in = igraph_vector_tail(&cum_fitness_in);
@@ -202,7 +210,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
 
         while (no_of_edges > 0) {
             /* Report progress after every 10000 edges */
-            if ((step_counter++) % 10000 == 0) {
+            if ((iter++) % 10000 == 0) {
                 IGRAPH_PROGRESS("Static fitness game", 100.0 * (1 - no_of_edges / num_steps), NULL);
                 IGRAPH_ALLOW_INTERRUPTION();
             }
@@ -224,7 +232,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         }
 
         /* Create the graph */
-        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, is_directed));
+        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
 
         /* Clear the edge list */
         igraph_vector_int_destroy(&edges);
@@ -238,7 +246,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
         while (no_of_edges > 0) {
             /* Report progress after every 10000 edges */
-            if ((step_counter++) % 10000 == 0) {
+            if ((iter++) % 10000 == 0) {
                 IGRAPH_PROGRESS("Static fitness game", 100.0 * (1 - no_of_edges / num_steps), NULL);
                 IGRAPH_ALLOW_INTERRUPTION();
             }
@@ -254,7 +262,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
             }
 
             /* For undirected graphs, ensure that from < to */
-            if (!is_directed && from > to) {
+            if (!directed && from > to) {
                 pos = from; from = to; to = pos;
             }
 
@@ -274,7 +282,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
          * because we did not add edges in both directions in the adjacency list.
          * We will use igraph_to_undirected in an extra step. */
         IGRAPH_CHECK(igraph_adjlist(graph, &al, IGRAPH_OUT, 1));
-        if (!is_directed) {
+        if (!directed) {
             IGRAPH_CHECK(igraph_to_undirected(graph, IGRAPH_TO_UNDIRECTED_EACH, 0));
         }
 
@@ -287,7 +295,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     IGRAPH_PROGRESS("Static fitness game", 100.0, NULL);
 
     /* Cleanup before we create the graph */
-    if (is_directed) {
+    if (directed) {
         igraph_vector_destroy(&cum_fitness_in);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -381,8 +389,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                  igraph_bool_t finite_size_correction) {
 
     igraph_vector_t fitness_out, fitness_in;
-    igraph_real_t alpha_out = 0.0, alpha_in = 0.0;
-    igraph_integer_t i;
+    igraph_real_t alpha_out, alpha_in;
     igraph_real_t j;
 
     if (no_of_nodes < 0) {
@@ -409,7 +416,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
     if (j < no_of_nodes) {
         j = no_of_nodes;
     }
-    for (i = 0; i < no_of_nodes; i++, j--) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++, j--) {
         VECTOR(fitness_out)[i] = pow(j, alpha_out);
     }
 
@@ -433,7 +440,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         if (j < no_of_nodes) {
             j = no_of_nodes;
         }
-        for (i = 0; i < no_of_nodes; i++, j--) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++, j--) {
             VECTOR(fitness_in)[i] = pow(j, alpha_in);
         }
         IGRAPH_CHECK(igraph_vector_shuffle(&fitness_in));
