@@ -141,35 +141,6 @@ static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec)
  *
  */
 
-static igraph_error_t igraph_i_simple_cycles_unblock_recursive(
-    igraph_simple_cycle_search_state_t *state, igraph_integer_t u)
-{
-    igraph_vector_int_t *neis;
-    igraph_integer_t w;
-
-    VECTOR(state->blocked)
-    [u] = false;
-
-    neis = igraph_adjlist_get(&state->B, u);
-    while (!igraph_vector_int_empty(neis))
-    {
-        w = igraph_vector_int_pop_back(neis);
-        if (VECTOR(state->blocked)[w])
-        {
-            IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, w));
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \experimental
- *
- * The implementation of procedure UNBLOCK from Johnson's paper
- *
- */
-
 static igraph_error_t igraph_i_simple_cycles_unblock(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t u)
 {
@@ -204,165 +175,6 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
     }
 
     igraph_stack_int_destroy(&u_stack);
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \experimental
- *
- * The implementation of procedure CIRCUIT from Johnson's paper
- *
- * Arguments:
- *
- * - state: local state object of the search
- * - V: vertex to start the search from
- * - E: ID of edge leading into this vertex, -1 if this is the first vertex
- * - S:
- * - vertices: vector in which the results with the vertex IDs should be stored
- * - edges: vector in which the results with the edge IDs should be stored
- * - found: output argument, set to true if a cycle was found
- */
-
-static igraph_error_t igraph_i_simple_cycles_circuit_recursive(
-    igraph_simple_cycle_search_state_t *state, igraph_integer_t V,
-    igraph_integer_t E, igraph_integer_t S,
-    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
-    igraph_bool_t *found)
-{
-    igraph_bool_t local_found = false;
-    igraph_vector_int_t *neighbors;
-    igraph_vector_int_t *incident_edges;
-    igraph_integer_t num_neighbors;
-
-    // stack v & e
-    IGRAPH_CHECK(igraph_vector_int_push_back(&state->vertex_stack, V));
-    if (E >= 0)
-    {
-        IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, E));
-    }
-    // printf("Pushing %" IGRAPH_PRId " to stack, stack size is %" IGRAPH_PRId ", result size is %" IGRAPH_PRId "\n", V, igraph_vector_int_size(&state->vertex_stack), igraph_vector_int_list_size(results));
-    VECTOR(state->blocked)
-    [V] = true;
-
-    // L1
-    neighbors = igraph_adjlist_get(&state->AK, V);
-    incident_edges = igraph_inclist_get(&state->IK, V);
-    num_neighbors = igraph_vector_int_size(neighbors);
-    IGRAPH_ASSERT(igraph_vector_int_size(incident_edges) == num_neighbors);
-    for (igraph_integer_t i = 0; i < num_neighbors; ++i)
-    {
-        igraph_integer_t W = VECTOR(*neighbors)[i];
-        igraph_integer_t WE = VECTOR(*incident_edges)[i];
-        // NOTE: possibly dangerous fix for undirected graphs,
-        // disabling finding any two-vertex-loops
-        if (W == S)
-        {
-            IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, WE));
-            if (state->directed || igraph_vector_int_size(&state->vertex_stack) > 2)
-            {
-                local_found = true;
-                // output circuit composed of stack
-                // printf("Found cycle with size %" IGRAPH_PRId "\n", igraph_vector_int_size(&state->vertex_stack));
-
-                // copy output: from stack to vector. No need to reverse because
-                // we were putting vertices in the stack in reverse order anyway.
-                igraph_vector_int_t v_res;
-                IGRAPH_CHECK(igraph_vector_int_init_copy(&v_res, &state->vertex_stack));
-                IGRAPH_FINALLY(igraph_vector_int_destroy, &v_res);
-                unsigned long long vertex_hash = igraph_i_hash_vector_int(&v_res);
-
-                // same for edges
-                igraph_vector_int_t e_res;
-                IGRAPH_CHECK(igraph_vector_int_init_copy(&e_res, &state->edge_stack));
-                IGRAPH_FINALLY(igraph_vector_int_destroy, &e_res);
-                unsigned long long edge_hash = igraph_i_hash_vector_int(&e_res);
-
-                // undirected graphs lead to some cycles being found multiple
-                // times.
-                // this is our naïve filter for now
-                igraph_bool_t persist_result = true;
-                if (!state->directed)
-                {
-                    // print_vector_int(&v_res);
-                    // printf("Has hashes %llu, %llu\n", vertex_hash, edge_hash);
-                    igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, vertices, edges, &v_res, &e_res, vertex_hash, edge_hash);
-                    if (duplicate_found)
-                    {
-                        persist_result = false;
-                    }
-                    else
-                    {
-                        igraph_vector_int_push_back(&state->found_cycles_vertex_hashes, vertex_hash);
-                        igraph_vector_int_push_back(&state->found_cycles_edge_hashes, edge_hash);
-                    }
-                }
-                // end filter
-
-                if (persist_result)
-                {
-                    /* Order is important: e_res is at the top of the finally
-                     * stack so we need to deal with it first */
-                    if (edges != NULL)
-                    {
-                        /* e_res ownership transferred to 'edges' */
-                        IGRAPH_CHECK(igraph_vector_int_list_push_back(edges, &e_res));
-                    }
-                    else
-                    {
-                        igraph_vector_int_destroy(&e_res);
-                    }
-                    IGRAPH_FINALLY_CLEAN(1);
-
-                    /* v_res ownership transferred to 'vertices' */
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back(vertices, &v_res));
-                    IGRAPH_FINALLY_CLEAN(1);
-                }
-                else
-                {
-                    igraph_vector_int_destroy(&v_res);
-                    igraph_vector_int_destroy(&e_res);
-                    IGRAPH_FINALLY_CLEAN(2);
-                }
-            }
-            igraph_vector_int_pop_back(&state->edge_stack);
-        }
-        else if (!(VECTOR(state->blocked)[W]))
-        {
-            IGRAPH_CHECK(igraph_i_simple_cycles_circuit_recursive(state, W, WE, S, vertices, edges, &local_found));
-        }
-    }
-    *found = local_found;
-
-    // L2
-    if (local_found)
-    {
-        IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, V));
-    }
-    else
-    {
-        for (igraph_integer_t i = 0; i < num_neighbors; ++i)
-        {
-            igraph_integer_t W = VECTOR(*neighbors)[i];
-            igraph_integer_t pos;
-            if (!igraph_vector_int_search(igraph_adjlist_get(&state->B, W), 0, V, &pos))
-            {
-                IGRAPH_CHECK(igraph_vector_int_push_back(igraph_adjlist_get(&state->B, W), V));
-            }
-        }
-    }
-
-    IGRAPH_ASSERT(!igraph_vector_int_empty(&state->vertex_stack));
-
-    // unstack v
-    // printf("Unstacking %" IGRAPH_PRId "\n", V);
-    igraph_vector_int_pop_back(&state->vertex_stack);
-    if (!igraph_vector_int_empty(&state->edge_stack))
-    {
-        // can be empty for the starting point.
-        // alternatively, V == S
-        igraph_vector_int_pop_back(&state->edge_stack);
-    }
 
     return IGRAPH_SUCCESS;
 }
@@ -558,8 +370,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             IGRAPH_ASSERT(!igraph_vector_int_empty(&state->vertex_stack));
 
             // unstack v
-            igraph_integer_t newV = igraph_vector_int_pop_back(&state->vertex_stack);
-            // printf("Unstacking %" IGRAPH_PRId " (%" IGRAPH_PRId ")\n", newV, V);
+            igraph_vector_int_pop_back(&state->vertex_stack);
             if (!igraph_vector_int_empty(&state->edge_stack))
             {
                 // can be empty for the starting point.
