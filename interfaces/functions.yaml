@@ -338,6 +338,7 @@ igraph_simple_interconnected_islands_game:
         OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size,
         REAL islands_pin, INTEGER n_inter
 
+# Use a default of loops=True, as this is what's in the original Chung-Lu paper
 igraph_chung_lu_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR expected_out_deg, OPTIONAL VECTOR expected_in_deg,

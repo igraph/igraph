@@ -60,25 +60,26 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  *
  * \experimental
  *
- * In the Chung-Lu model, the probability that vertices \c i and \c j are
- * connected is <code>p_ij = w_i w_j / S</code>,
+ * In the Chung-Lu model, each pair of vertices \c i and \c j is connected with
+ * independent probability <code>p_ij = w_i w_j / S</code>,
  * where \c w_i is a weight associated with vertex \c i and
  * <code>S = sum_k w_k</code> is the sum of weights. In the directed variant,
- * vertices have both out-weights, <code>w^out</code>, and in-weights, <code>w^in</code>,
- * with equal sums, <code>S = sum_k w^out_k = sum_k w^in_k</code>.
+ * vertices have both out-weights, <code>w^out</code>, and in-weights,
+ * <code>w^in</code>, with equal sums,
+ * <code>S = sum_k w^out_k = sum_k w^in_k</code>.
  * The connection probability between \c i and \c j is
  * <code>p_ij = w^out_i w^in_j / S</code>.
  *
  * </para><para>
- * This model is commonly used to create random graphs with a fixed expected degree.
- * The expected degree of vertex \c i is approximately equal to the weight
- * \c w_i. Specifically, if the graph is directed and self-loops are allowed,
- * then the expected out- and in-degrees are precisely <code>w^out</code>
- * and <code>w^in</code>. If self-loops are disallowed, then the expected
- * out- and in-degrees are <code>w^out (S - w^in) / S</code> and
- * <code>w^in (S - w^out) / S</code>, respectively. If the graph is undirected,
- * then the expected degrees with or without self-loops are <code>w (S + w) / S</code>
- * and <code>w (S - w) / S</code>, respectively.
+ * This model is commonly used to create random graphs with a fixed \em expected
+ * degree sequence. The expected degree of vertex \c i is approximately equal
+ * to the weight \c w_i. Specifically, if the graph is directed and self-loops
+ * are allowed, then the expected out- and in-degrees are precisely
+ * <code>w^out</code> and <code>w^in</code>. If self-loops are disallowed,
+ * then the expected out- and in-degrees are <code>w^out (S - w^in) / S</code>
+ * and <code>w^in (S - w^out) / S</code>, respectively. If the graph is
+ * undirected, then the expected degrees with or without self-loops are
+ * <code>w (S + w) / S</code> and <code>w (S - w) / S</code>, respectively.
  *
  * </para><para>
  * A limitation of the original Chung-Lu model is that when some of the
@@ -152,12 +153,14 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * https://doi.org/10.1002/rsa.20450
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param out_weights The vertex weights (or out-weights). In sparse graph
+ * \param out_weights The vertex weights (or out-weights). In sparse graphs
  *    these will be approximately equal to the expected (out-)degrees.
  * \param in_weights The vertex in-weights, approximately equal
  *    to the expected in-degrees of the graph. May be set to \c NULL,
  *    in which case undirected graphs are generated.
- * \param loops Whether to allow self-loops.
+ * \param loops Whether to allow the creation of self-loops. Since vertex
+ *    pairs are connected independently, setting this to false is equivalent
+ *    to simply discarding self-loops from an existing loopy graph.
  * \param variant The model variant to sample from, with different definitions
  *    of the connection probability between vertices \c i and \c j. Given
  *    <code>q_ij = w_i w_j / S</code>, the following formulations are available:
