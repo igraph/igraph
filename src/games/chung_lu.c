@@ -78,7 +78,7 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * <code>w^out</code> and <code>w^in</code>. If self-loops are disallowed,
  * then the expected out- and in-degrees are <code>w^out (S - w^in) / S</code>
  * and <code>w^in (S - w^out) / S</code>, respectively. If the graph is
- * undirected, then the expected degrees with or without self-loops are
+ * undirected, then the expected degrees with and without self-loops are
  * <code>w (S + w) / S</code> and <code>w (S - w) / S</code>, respectively.
  *
  * </para><para>
@@ -92,8 +92,8 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  *
  * </para><para>
  * The overcome this limitation, this function implements additional variants of
- * the model, with modified expressions for the connection probability between
- * vertices \c i and \c j. Let <code>q_ij = w_i w_j / S</code>, or
+ * the model, with modified expressions for the connection probability \c p_ij
+ * between vertices \c i and \c j. Let <code>q_ij = w_i w_j / S</code>, or
  * <code>q_ij = w^out_i w^in_j / S</code> in the directed case. All model
  * variants become equivalent in the limit of sparse graphs where \c q_ij
  * approaches zero. In the original Chung-Lu model, selectable by setting
@@ -153,14 +153,15 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * https://doi.org/10.1002/rsa.20450
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param out_weights The vertex weights (or out-weights). In sparse graphs
- *    these will be approximately equal to the expected (out-)degrees.
- * \param in_weights The vertex in-weights, approximately equal
- *    to the expected in-degrees of the graph. May be set to \c NULL,
+ * \param out_weights A vector of non-negative vertex weights (or out-weights).
+ *    In sparse graphs these will be approximately equal to the expected
+ *    (out-)degrees.
+ * \param in_weights A vector of non-negative in-weights, approximately equal
+ *    to the expected in-degrees in sparse graphs. May be set to \c NULL,
  *    in which case undirected graphs are generated.
  * \param loops Whether to allow the creation of self-loops. Since vertex
  *    pairs are connected independently, setting this to false is equivalent
- *    to simply discarding self-loops from an existing loopy graph.
+ *    to simply discarding self-loops from an existing loopy Chung-Lu graph.
  * \param variant The model variant to sample from, with different definitions
  *    of the connection probability between vertices \c i and \c j. Given
  *    <code>q_ij = w_i w_j / S</code>, the following formulations are available:
