@@ -198,6 +198,7 @@
 <section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple graphs: Multiple and loop edges</title>
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
+<!-- doxrox-include igraph_count_loops -->
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
