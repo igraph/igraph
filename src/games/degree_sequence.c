@@ -762,8 +762,8 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  *           should match for directed graphs.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges
- *                  for \c IGRAPH_DEGSEQ_SIMPLE. The time complexity of the
- *                  other modes is not known.
+ * for \c IGRAPH_DEGSEQ_CONFIGURATION and \c IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE.
+ * The time complexity of the other modes is not known.
  *
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game_gnm(),
  *     \ref igraph_erdos_renyi_game_gnp(), \ref igraph_is_graphical()
