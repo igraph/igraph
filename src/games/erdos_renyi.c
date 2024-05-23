@@ -34,8 +34,12 @@
 /**
  * \section about_games
  *
- * <para>Games are randomized graph generators. Randomization means that
- * they generate a different graph every time you call them. </para>
+ * <para>Games are random graph generators, i.e. they generate a different
+ * graph every time they are called. igraph includes many such generators.
+ * Some implement stochastic graph construction processes inspired by real-world
+ * mechanics, such as preferential attachment, while others are designed to
+ * produce graphs with certain used properties (e.g. fixed number of edges,
+ * fixed degrees, etc.)</para>
  */
 
 /**
@@ -43,8 +47,12 @@
  * \function igraph_erdos_renyi_game_gnp
  * \brief Generates a random (Erdős-Rényi) graph with fixed edge probabilities.
  *
- * In this model, a graph with n vertices is generated such that every possible
- * edge is included in the graph with probability p.
+ * In the <code>G(n,p)</code> Erdős-Rényi model, also known as the Gilbert model,
+ * a graph with \p n vertices is generated such that every possible edge is
+ * included in the graph independently with probability \p p. This is equivalent
+ * to a maximum entropy random graph model model with a constraint on the
+ * \em expected edge count. Setting <code>p = 1/2</code> generates all graphs
+ * on \p n vertices with the same probability.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
@@ -58,8 +66,12 @@
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
- * \ref igraph_erdos_renyi_game_gnm()
+ * \sa \ref igraph_erdos_renyi_game_gnm() to generate random graphs with
+ * a sharply fixed edge count; \ref igraph_chung_lu_game() and
+ * \ref igraph_static_fitness_game() to generate random graphs with a
+ * fixed expected degree sequence; \ref igraph_bipartite_game_gnm() for the
+ * bipartite version of this model; \ref igraph_barabasi_game() and
+ * \ref igraph_growing_random_game() for other commonly used random graph models.
  *
  * \example examples/simple/igraph_erdos_renyi_game_gnp.c
  */
@@ -181,8 +193,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * \function igraph_erdos_renyi_game_gnm
  * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
  *
- * In this model, a graph with n vertices and m edges is generated such that the
- * edges are selected uniformly at random.
+ * In the <code>G(n, m)</code> Erdős-Rényi model, a graph with \p n vertices
+ * and \p m edges is generated uniformly at random.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
@@ -196,8 +208,12 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
- * \ref igraph_erdos_renyi_game_gnp()
+ * \sa \ref igraph_erdos_renyi_game_gnp() to sample from the related
+ * <code>G(n, p)</code> model, which constrains the \em expected edge count;
+ * \ref igraph_degree_sequence_game() to constrain the degree sequence;
+ * \ref igraph_bipartite_game_gnm() for the bipartite version of this model;
+ * \ref igraph_barabasi_game() and \ref igraph_growing_random_game() for other
+ * commonly used random graph models.
  *
  * \example examples/simple/igraph_erdos_renyi_game_gnm.c
  */
