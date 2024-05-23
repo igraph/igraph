@@ -250,7 +250,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
 
             /* This formulation not only terminates the loop when necessary,
              * but also protects against overflow when 'p' is very small
-             * and 'gap' becomes very large, perhaps larger than represetable
+             * and 'gap' becomes very large, perhaps larger than representable
              * in an igraph_integer_t. */
             if (gap >= no_of_nodes-j) {
                 break;
