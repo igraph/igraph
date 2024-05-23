@@ -17,6 +17,7 @@
 
  - Documentation improvements.
  - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
+ - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a few tens of millions of vertices.
 
 ## [0.10.12] - 2024-05-06
 
