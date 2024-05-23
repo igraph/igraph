@@ -99,14 +99,14 @@ const igraph_rng_type_t igraph_rngtype_pcg32 = {
     /* destroy= */   igraph_rng_pcg32_destroy,
     /* seed= */      igraph_rng_pcg32_seed,
     /* get= */       igraph_rng_pcg32_get,
-    /* get_int= */   0,
-    /* get_real= */  0,
-    /* get_norm= */  0,
-    /* get_geom= */  0,
-    /* get_binom= */ 0,
-    /* get_exp= */   0,
-    /* get_gamma= */ 0,
-    /* get_pois= */  0
+    /* get_int= */   NULL,
+    /* get_real= */  NULL,
+    /* get_norm= */  NULL,
+    /* get_geom= */  NULL,
+    /* get_binom= */ NULL,
+    /* get_exp= */   NULL,
+    /* get_gamma= */ NULL,
+    /* get_pois= */  NULL
 };
 
 /***** Default RNG, used upon igraph startup *****/
