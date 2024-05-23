@@ -7,6 +7,8 @@
  - `igraph_bitset_fill()` sets all elements of a bitset to the same value.
  - `igraph_bitset_null()` clears all elements of a bitset.
  - `igraph_chung_lu_game()` implements the classic Chung-Lu model, as well as a number of its variants (experimental function).
+ - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
+ - `igraph_count_loops()` counts self-loops in the graph (experimental function).
 
 ### Fixed
 
