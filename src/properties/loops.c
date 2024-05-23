@@ -69,8 +69,8 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_is_loop
  * \brief Find the loop edges in a graph.
  *
- * </para><para>
  * A loop edge is an edge from a vertex to itself.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result,
  *         it will be resized as needed.
@@ -86,18 +86,35 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
 igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                    igraph_es_t es) {
     igraph_eit_t eit;
-    igraph_integer_t i;
+    igraph_bool_t found_loop = false;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
 
-    for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t e = IGRAPH_EIT_GET(eit);
-        VECTOR(*res)[i] = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e));
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        ! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        igraph_vector_bool_null(res);
+        goto done;
     }
 
+    for (igraph_integer_t i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
+        igraph_integer_t e = IGRAPH_EIT_GET(eit);
+        igraph_bool_t is_loop = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e));
+        VECTOR(*res)[i] = is_loop;
+        if (is_loop) {
+            found_loop = true;
+        }
+    }
+
+    if (found_loop) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, true);
+    } else if (igraph_es_is_all(&es)) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
+    }
+
+done:
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(1);
 
