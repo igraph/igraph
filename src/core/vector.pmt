@@ -1020,10 +1020,10 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
  * \function igraph_vector_qsort_ind
  * \brief Returns a permutation of indices that sorts a vector.
  *
- * Takes an unsorted array \c v as input and computes an array of
- * indices inds such that v[ inds[i] ], with i increasing from 0, is
- * an ordered array (either ascending or descending, depending on
- * \v order). The order of indices for identical elements is not
+ * Takes an unsorted array \c v as input and computes an array of indices
+ * \p inds such that <code>v[ inds[i] ]</code>, with \c i increasing from 0,
+ * is an ordered array (either ascending or descending, depending on
+ * \p order). The order of indices for identical elements is not
  * defined. If the vector contains any NaN values, the ordering of
  * NaN values is undefined.
  *

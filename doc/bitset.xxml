@@ -29,6 +29,8 @@
 </section>
 
 <section id="bitset-operations"><title>Bitset operations</title>
+<!-- doxrox-include igraph_bitset_fill -->
+<!-- doxrox-include igraph_bitset_null -->
 <!-- doxrox-include igraph_bitset_or -->
 <!-- doxrox-include igraph_bitset_and -->
 <!-- doxrox-include igraph_bitset_xor -->

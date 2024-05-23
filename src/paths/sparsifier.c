@@ -20,6 +20,7 @@
 #include "igraph_paths.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
@@ -53,7 +54,7 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     const igraph_inclist_t *inclist,
     const igraph_vector_t *weights,
     const igraph_vector_int_t *clustering,
-    const igraph_vector_bool_t *is_cluster_sampled,
+    const igraph_bitset_t *is_cluster_sampled,
     igraph_integer_t v,
     igraph_vector_int_t *lightest_eid,
     igraph_vector_t *lightest_weight,
@@ -88,7 +89,7 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
             // the variables that store which is the lightest edge that connects
             // v to any of the sampled clusters.
             if (is_cluster_sampled) {
-                if ((VECTOR(*is_cluster_sampled)[neighbor_cluster]) && (lightest_weight_to_sampled > weight)) {
+                if ((IGRAPH_BIT_TEST(*is_cluster_sampled, neighbor_cluster)) && (lightest_weight_to_sampled > weight)) {
                     lightest_weight_to_sampled = weight;
                     *nearest_neighboring_sampled_cluster = neighbor_cluster;
                 }
@@ -162,8 +163,8 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     igraph_real_t sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
     igraph_vector_int_t clustering, lightest_eid;
     igraph_vector_t lightest_weight;
-    igraph_vector_bool_t is_cluster_sampled;
-    igraph_vector_bool_t is_edge_in_spanner;
+    igraph_bitset_t is_cluster_sampled;
+    igraph_bitset_t is_edge_in_spanner;
     igraph_vector_int_t new_clustering;
     igraph_vector_int_t dirty_vids;
     igraph_vector_int_t *adjacent_vertices;
@@ -235,8 +236,8 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
 
     // A boolean vector whose i-th element is 1 if the i-th vertex is a cluster
     // center that is sampled in the current iteration, 0 otherwise
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&is_cluster_sampled, no_of_nodes);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&is_edge_in_spanner, no_of_edges);
+    IGRAPH_BITSET_INIT_FINALLY(&is_cluster_sampled, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&is_edge_in_spanner, no_of_edges);
 
     // Temporary vector used by igraph_i_collect_lightest_edges_to_clusters()
     // to keep track of the nodes that it has written to
@@ -245,8 +246,8 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     sample_prob = pow(no_of_nodes, -1 / k);
 
 #define ADD_EDGE_TO_SPANNER \
-    if (!VECTOR(is_edge_in_spanner)[edge]) { \
-        VECTOR(is_edge_in_spanner)[edge] = true; \
+    if (!IGRAPH_BIT_TEST(is_edge_in_spanner, edge)) { \
+        IGRAPH_BIT_SET(is_edge_in_spanner, edge); \
         IGRAPH_CHECK(igraph_vector_int_push_back(spanner, edge)); \
     }
 
@@ -256,13 +257,13 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         IGRAPH_ALLOW_INTERRUPTION();
 
         igraph_vector_int_fill(&new_clustering, -1);
-        igraph_vector_bool_fill(&is_cluster_sampled, false);
+        igraph_bitset_null(&is_cluster_sampled);
 
         // Step 1: sample cluster centers
         RNG_BEGIN();
         for (j = 0; j < no_of_nodes; j++) {
             if (VECTOR(clustering)[j] == j && RNG_UNIF01() < sample_prob) {
-                VECTOR(is_cluster_sampled)[j] = true;
+                IGRAPH_BIT_SET(is_cluster_sampled, j);
             }
         }
         RNG_END();
@@ -271,7 +272,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         for (v = 0; v < no_of_nodes; v++) {
             // If v is inside a cluster and the cluster of v is sampled, then continue
             cluster = VECTOR(clustering)[v];
-            if (cluster != -1 && VECTOR(is_cluster_sampled)[cluster]) {
+            if (cluster != -1 && IGRAPH_BIT_TEST(is_cluster_sampled, cluster)) {
                 VECTOR(new_clustering)[v] = cluster;
                 continue;
             }
@@ -447,8 +448,8 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
 
     // Free memory
     igraph_vector_int_destroy(&dirty_vids);
-    igraph_vector_bool_destroy(&is_edge_in_spanner);
-    igraph_vector_bool_destroy(&is_cluster_sampled);
+    igraph_bitset_destroy(&is_edge_in_spanner);
+    igraph_bitset_destroy(&is_cluster_sampled);
     igraph_vector_int_destroy(&new_clustering);
     igraph_vector_destroy(&lightest_weight);
     igraph_vector_int_destroy(&lightest_eid);

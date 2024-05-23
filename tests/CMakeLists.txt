@@ -204,6 +204,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
@@ -986,6 +987,8 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  connectivity
+  erdos_renyi
   graphicality
   igraph_adjacency
   igraph_average_path_length_unweighted

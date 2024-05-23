@@ -294,6 +294,11 @@ BLISSSH:
     CTYPE: igraph_bliss_sh_t
     FLAGS: ENUM
 
+CHUNG_LU_VARIANT:
+    # Enum that describes the Chung-Lu model variants supported by igraph
+    CTYPE: igraph_chung_lu_t
+    FLAGS: ENUM
+
 COMMCMP:
     # Enum containing identifiers for community comparison methods
     CTYPE: igraph_community_comparison_t

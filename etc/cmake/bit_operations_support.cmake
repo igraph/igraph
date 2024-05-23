@@ -37,7 +37,7 @@ check_cxx_source_compiles("
 
     int main(void) {
         unsigned long long a = 0xDEADBEEF;
-        unsinged long b;
+        unsigned long b;
         volatile unsigned long c;
         c = _BitScanForward64(&b, a) ? b : 64;
         return 0;
@@ -51,7 +51,7 @@ check_cxx_source_compiles("
     #include <intrin.h>
 
     int main(void) {
-        unsigned long a = 0xDEADBEEF b;
+        unsigned long a = 0xDEADBEEF, b;
         volatile unsigned long c;
         c = _BitScanForward(&b, a) ? b : 64;
         return 0;
@@ -81,7 +81,7 @@ check_cxx_source_compiles("
 
     int main(void) {
         unsigned long a = 0xDEADBEEF, b;
-        volatile unsigned long long c;
+        volatile unsigned long c;
         c = _BitScanReverse(&b, a) ? b : 64;
         return 0;
     }

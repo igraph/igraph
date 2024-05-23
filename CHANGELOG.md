@@ -72,6 +72,22 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_bitset_fill()` sets all elements of a bitset to the same value.
+ - `igraph_bitset_null()` clears all elements of a bitset.
+ - `igraph_chung_lu_game()` implements the Chung-Lu models (experimental function).
+
+### Fixed
+
+ - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
+ - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
+
+### Other
+
+ - Documentation improvements.
+ - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
+
 ## [0.10.12] - 2024-05-06
 
 ### Added
