@@ -804,6 +804,9 @@ igraph_maxdegree:
 igraph_density:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=False
 
+igraph_mean_degree:
+    PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=True
+
 igraph_neighborhood_size:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT res, VERTEX_SELECTOR vids, INTEGER order,

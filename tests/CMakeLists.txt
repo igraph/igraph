@@ -341,6 +341,7 @@ add_legacy_tests(
   igraph_local_scan_k_ecount_them
   igraph_local_scan_subset_ecount
   igraph_local_transitivity
+  igraph_mean_degree
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
