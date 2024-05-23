@@ -47,12 +47,20 @@
  * \function igraph_erdos_renyi_game_gnp
  * \brief Generates a random (Erdős-Rényi) graph with fixed edge probabilities.
  *
- * In the <code>G(n,p)</code> Erdős-Rényi model, also known as the Gilbert model,
- * a graph with \p n vertices is generated such that every possible edge is
- * included in the graph independently with probability \p p. This is equivalent
- * to a maximum entropy random graph model model with a constraint on the
- * \em expected edge count. Setting <code>p = 1/2</code> generates all graphs
- * on \p n vertices with the same probability.
+ * In the <code>G(n, p)</code> Erdős-Rényi model, also known as the Gilbert model,
+ * or Bernoulli random graph, a graph with \p n vertices is generated such that
+ * every possible edge is included in the graph independently with probability
+ * \p p. This is equivalent to a maximum entropy random graph model model with
+ * a constraint on the \em expected edge count. Setting <code>p = 1/2</code>
+ * generates all graphs on \p n vertices with the same probability.
+ *
+ * </para><para>
+ * The expected mean degree of the graph is approximately <code>p n</code>;
+ * set <code>p = k/n</code> when a mean degree of approximately \c k is
+ * desired. More precisely, the expected mean degree is <code>p(n-1)</code>
+ * in (undirected or directed) graphs without self-loops,
+ * <code>p(n+1)</code> in undirected graphs with self-loops, and
+ * <code>p n</code> in directed graphs with self-loops.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
