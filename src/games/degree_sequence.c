@@ -765,8 +765,13 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  * for \c IGRAPH_DEGSEQ_CONFIGURATION and \c IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE.
  * The time complexity of the other modes is not known.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game_gnm(),
- *     \ref igraph_erdos_renyi_game_gnp(), \ref igraph_is_graphical()
+ * \sa \ref igraph_is_graphical() to determine if there exist graphs with a certain
+ * degree sequence; \ref igraph_erdos_renyi_game_gnm() to generate graphs with a
+ * fixed number of edges, without any degree constraints; \ref igraph_chung_lu_game()
+ * and \ref igraph_static_fitness_game() to sample random graphs with a prescribed
+ * \em expected degree sequence (but variable actual degrees);
+ * \ref igraph_realize_degree_sequence() and \ref igraph_realize_bipartite_degree_sequence()
+ * to generate a single (non-random) graph with given degrees.
  *
  * \example examples/simple/igraph_degree_sequence_game.c
  */
