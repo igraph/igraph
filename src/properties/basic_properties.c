@@ -93,6 +93,61 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 }
 
 /**
+ * \function igraph_mean_degree
+ * \brief The mean degree of a graph.
+ *
+ * \experimental
+ *
+ * This is a convenience function that computes the average of all vertex
+ * degrees. In directed graphs, the average of out-degrees and in-degrees is
+ * the same; this is the number that is returned. For the null graph, which
+ * has no vertices, NaN is returned.
+ *
+ * \param graph The input graph object.
+ * \param res Pointer to a real number, the result will be stored here.
+ * \param loops Whether to consider self-loops during the calculation.
+ * \return Error code.
+ *
+ * Time complexity: O(1) if self-loops are considered,
+ * O(|E|) where |E| is the number of edges if self-loops are ignored.
+ */
+igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
+                                  igraph_bool_t loops) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
+
+    if (no_of_nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* If we know that there are no self-loops, we can use the constant-time
+     * computation even if loop-exclusion was requested. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {
+        loops = true;
+    }
+
+    if (! loops) {
+        igraph_integer_t loop_count = 0;
+        for (igraph_integer_t e=0; e < no_of_edges; e++) {
+            if (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e)) {
+                loop_count++;
+            }
+        }
+        /* We already checked for loops, so take the opportunity to set the cache. */
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, loop_count > 0);
+        no_of_edges -= loop_count;
+    }
+
+    *res = (directed ? 1.0 : 2.0) * (igraph_real_t) no_of_edges / (igraph_real_t) no_of_nodes;
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_diversity
  * \brief Structural diversity index of the vertices.
  *

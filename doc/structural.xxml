@@ -241,6 +241,7 @@
 
 <section id="other-operations"><title>Other operations</title>
 <!-- doxrox-include igraph_density -->
+<!-- doxrox-include igraph_mean_degree -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
