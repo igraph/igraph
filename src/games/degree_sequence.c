@@ -672,6 +672,28 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  * \function igraph_degree_sequence_game
  * \brief Generates a random graph with a given degree sequence.
  *
+ * This function generates random graphs with a prescribed degree sequence.
+ * Several sampling methods are available, which respect different constraints
+ * (simple graph or multigraphs, connected graphs, etc.), and provide different
+ * tradeoffs between performance and unbiased sampling. See Section 2.1 of
+ * Horvát and Modes (2021) for an overview of sampling techniques for graphs
+ * with fixed degrees.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Fabien Viger, and Matthieu Latapy:
+ * Efficient and Simple Generation of Random Simple Connected Graphs with Prescribed Degree Sequence,
+ * Journal of Complex Networks 4, no. 1, pp. 15–37 (2015).
+ * https://doi.org/10.1093/comnet/cnv013.
+ *
+ * </para><para>
+ * Szabolcs Horvát, and Carl D Modes:
+ * Connectedness Matters: Construction and Exact Random Sampling of Connected Networks,
+ * Journal of Physics: Complexity 2, no. 1, pp. 015008 (2021).
+ * https://doi.org/10.1088/2632-072x/abced5.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param out_deg The degree sequence for an undirected graph (if
  *        \p in_seq is \c NULL or of length zero), or the out-degree
