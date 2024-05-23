@@ -120,3 +120,43 @@ done:
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_count_loops
+ * \brief Counts the self-loops in the graph.
+ *
+ * \experimental
+ *
+ * Counts loop edges, i.e. edges whose two endpoints coincide.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an integer, the number of self-loops will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|), linear in the number of edges.
+ */
+igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count) {
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t count;
+
+    /* Nothing to do if we know that there are no loops. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        *loop_count = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    count = 0;
+    for (igraph_integer_t e=0; e < no_of_edges; e++) {
+        if (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e)) {
+            count++;
+        }
+    }
+
+    /* We already checked for loops, so take the opportunity to set the cache. */
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, count > 0);
+
+    *loop_count = count;
+
+    return IGRAPH_SUCCESS;
+}

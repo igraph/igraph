@@ -859,6 +859,9 @@ igraph_has_loop:
 igraph_has_multiple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
+igraph_count_loops:
+    PARAMS: GRAPH graph, OUT INTEGER loop_count
+
 igraph_count_multiple:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, EDGE_SELECTOR es=ALL
     DEPS: es ON graph

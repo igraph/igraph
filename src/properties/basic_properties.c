@@ -123,22 +123,9 @@ igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
         return IGRAPH_SUCCESS;
     }
 
-    /* If we know that there are no self-loops, we can use the constant-time
-     * computation even if loop-exclusion was requested. */
-    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
-        !igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {
-        loops = true;
-    }
-
     if (! loops) {
-        igraph_integer_t loop_count = 0;
-        for (igraph_integer_t e=0; e < no_of_edges; e++) {
-            if (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e)) {
-                loop_count++;
-            }
-        }
-        /* We already checked for loops, so take the opportunity to set the cache. */
-        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, loop_count > 0);
+        igraph_integer_t loop_count;
+        IGRAPH_CHECK(igraph_count_loops(graph, &loop_count));
         no_of_edges -= loop_count;
     }
 
