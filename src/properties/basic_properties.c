@@ -49,9 +49,8 @@
  * on such graphs. This function does not check whether the graph has
  * parallel edges. The result it returns for such graphs is not meaningful.
  *
- * \param graph The input graph object.
- * \param res Pointer to a real number, the result will be stored
- *   here. It must not have parallel edges.
+ * \param graph The input graph object. It must not have parallel edges.
+ * \param res Pointer to a real number, the result will be stored here.
  * \param loops Logical constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
