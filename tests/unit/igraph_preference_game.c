@@ -25,25 +25,12 @@
 
 #include "test_utilities.h"
 
-/* How many "true" elements in the Boolean vector? */
-igraph_integer_t vector_bool_count(const igraph_vector_bool_t *vec) {
-    igraph_integer_t i, n = igraph_vector_bool_size(vec), cnt = 0;
-
-    for (i=0; i < n; ++i) {
-        if (VECTOR(*vec)[i]) {
-            cnt++;
-        }
-    }
-    return cnt;
-}
-
 int main(void) {
     igraph_t g;
     igraph_vector_t type_dist;
     igraph_matrix_t pref_mat, type_dist_mat;
     igraph_vector_int_t types, out_types, in_types;
     igraph_bool_t connected, has_loop, has_multi;
-    igraph_vector_bool_t is_loop;
     igraph_integer_t i, j, count;
 
     igraph_vector_int_init(&types, 0);
@@ -217,10 +204,8 @@ int main(void) {
     IGRAPH_ASSERT(igraph_ecount(&g) == 10000);
     IGRAPH_ASSERT(igraph_is_directed(&g));
 
-    igraph_vector_bool_init(&is_loop, 0);
-    igraph_is_loop(&g, &is_loop, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-    IGRAPH_ASSERT(vector_bool_count(&is_loop) == 100);
-    igraph_vector_bool_destroy(&is_loop);
+    igraph_count_loops(&g, &count);
+    IGRAPH_ASSERT(count == 100);
 
     igraph_has_multiple(&g, &has_multi);
     IGRAPH_ASSERT(! has_multi);
