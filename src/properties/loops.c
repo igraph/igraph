@@ -44,7 +44,7 @@
  *
  * Time complexity: O(e), the number of edges to check.
  *
- * \example examples/simple/igraph_has_loop.c
+ * \example examples/simple/igraph_is_loop.c
  */
 igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t i, m = igraph_ecount(graph);
@@ -134,6 +134,8 @@ done:
  * \return Error code.
  *
  * Time complexity: O(|E|), linear in the number of edges.
+ *
+ * \example examples/simple/igraph_is_loop.c
  */
 igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
