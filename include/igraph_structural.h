@@ -52,6 +52,7 @@ IGRAPH_EXPORT igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *
                                igraph_vector_int_t *circle);
 IGRAPH_EXPORT igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count);
 IGRAPH_EXPORT igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                                  igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
@@ -66,6 +67,8 @@ IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
                                    igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
+                                                igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                      igraph_bool_t ignore_loops,
                                      igraph_reciprocity_t mode);

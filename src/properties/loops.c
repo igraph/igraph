@@ -44,7 +44,7 @@
  *
  * Time complexity: O(e), the number of edges to check.
  *
- * \example examples/simple/igraph_has_loop.c
+ * \example examples/simple/igraph_is_loop.c
  */
 igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t i, m = igraph_ecount(graph);
@@ -69,8 +69,8 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_is_loop
  * \brief Find the loop edges in a graph.
  *
- * </para><para>
  * A loop edge is an edge from a vertex to itself.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result,
  *         it will be resized as needed.
@@ -86,20 +86,79 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
 igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                    igraph_es_t es) {
     igraph_eit_t eit;
-    igraph_integer_t i;
+    igraph_bool_t found_loop = false;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
 
-    for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t e = IGRAPH_EIT_GET(eit);
-        VECTOR(*res)[i] = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e));
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        ! igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        igraph_vector_bool_null(res);
+        goto done;
     }
 
+    for (igraph_integer_t i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
+        igraph_integer_t e = IGRAPH_EIT_GET(eit);
+        igraph_bool_t is_loop = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e));
+        VECTOR(*res)[i] = is_loop;
+        if (is_loop) {
+            found_loop = true;
+        }
+    }
+
+    if (found_loop) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, true);
+    } else if (igraph_es_is_all(&es)) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
+    }
+
+done:
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_count_loops
+ * \brief Counts the self-loops in the graph.
+ *
+ * \experimental
+ *
+ * Counts loop edges, i.e. edges whose two endpoints coincide.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an integer, the number of self-loops will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|), linear in the number of edges.
+ *
+ * \example examples/simple/igraph_is_loop.c
+ */
+igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count) {
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t count;
+
+    /* Nothing to do if we know that there are no loops. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        *loop_count = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    count = 0;
+    for (igraph_integer_t e=0; e < no_of_edges; e++) {
+        if (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e)) {
+            count++;
+        }
+    }
+
+    /* We already checked for loops, so take the opportunity to set the cache. */
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, count > 0);
+
+    *loop_count = count;
 
     return IGRAPH_SUCCESS;
 }

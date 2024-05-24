@@ -49,9 +49,8 @@
  * on such graphs. This function does not check whether the graph has
  * parallel edges. The result it returns for such graphs is not meaningful.
  *
- * \param graph The input graph object.
- * \param res Pointer to a real number, the result will be stored
- *   here. It must not have parallel edges.
+ * \param graph The input graph object. It must not have parallel edges.
+ * \param res Pointer to a real number, the result will be stored here.
  * \param loops Logical constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
@@ -89,6 +88,48 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
             *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes + 1);
         }
     }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_mean_degree
+ * \brief The mean degree of a graph.
+ *
+ * \experimental
+ *
+ * This is a convenience function that computes the average of all vertex
+ * degrees. In directed graphs, the average of out-degrees and in-degrees is
+ * the same; this is the number that is returned. For the null graph, which
+ * has no vertices, NaN is returned.
+ *
+ * \param graph The input graph object.
+ * \param res Pointer to a real number, the result will be stored here.
+ * \param loops Whether to consider self-loops during the calculation.
+ * \return Error code.
+ *
+ * Time complexity: O(1) if self-loops are considered,
+ * O(|E|) where |E| is the number of edges if self-loops are ignored.
+ */
+igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
+                                  igraph_bool_t loops) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
+
+    if (no_of_nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    if (! loops) {
+        igraph_integer_t loop_count;
+        IGRAPH_CHECK(igraph_count_loops(graph, &loop_count));
+        no_of_edges -= loop_count;
+    }
+
+    *res = (directed ? 1.0 : 2.0) * (igraph_real_t) no_of_edges / (igraph_real_t) no_of_nodes;
 
     return IGRAPH_SUCCESS;
 }

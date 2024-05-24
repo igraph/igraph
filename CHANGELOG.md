@@ -76,7 +76,9 @@
 
  - `igraph_bitset_fill()` sets all elements of a bitset to the same value.
  - `igraph_bitset_null()` clears all elements of a bitset.
- - `igraph_chung_lu_game()` implements the Chung-Lu models (experimental function).
+ - `igraph_chung_lu_game()` implements the classic Chung-Lu model, as well as a number of its variants (experimental function).
+ - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
+ - `igraph_count_loops()` counts self-loops in the graph (experimental function).
 
 ### Fixed
 
@@ -87,6 +89,7 @@
 
  - Documentation improvements.
  - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
+ - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a few tens of millions of vertices.
 
 ## [0.10.12] - 2024-05-06
 
