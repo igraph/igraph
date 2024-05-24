@@ -26,6 +26,7 @@
 <!-- doxrox-include igraph_kary_tree -->
 <!-- doxrox-include igraph_symmetric_tree -->
 <!-- doxrox-include igraph_regular_tree -->
+<!-- doxrox-include igraph_tree_from_parent_vector -->
 <!-- doxrox-include igraph_full -->
 <!-- doxrox-include igraph_full_citation -->
 <!-- doxrox-include igraph_full_multipartite -->

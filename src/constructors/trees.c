@@ -49,7 +49,7 @@
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param parents The parent vector. <code>parents[v]</code> is the ID of
- *    the parent vertex of \c v. <code>parents[v] < 0</code> indicates that
+ *    the parent vertex of \c v. <code>parents[v] &lt; 0</code> indicates that
  *    \c v does not have a parent.
  * \param type Constant, gives whether to create a directed tree, and
  *        if this is the case, also its orientation. Possible values:
