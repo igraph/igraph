@@ -324,13 +324,15 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outneis, 0);
 
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t ip, op;
+        igraph_integer_t ip, op, indeg, outdeg;
         IGRAPH_CHECK(igraph_neighbors(graph, &inneis, i, IGRAPH_IN));
         IGRAPH_CHECK(igraph_neighbors(graph, &outneis, i, IGRAPH_OUT));
 
+        indeg = igraph_vector_int_size(&inneis);
+        outdeg = igraph_vector_int_size(&outneis);
+
         ip = op = 0;
-        while (ip < igraph_vector_int_size(&inneis) &&
-               op < igraph_vector_int_size(&outneis)) {
+        while (ip < indeg && op < outdeg) {
             if (VECTOR(inneis)[ip] < VECTOR(outneis)[op]) {
                 nonrec += 1;
                 ip++;
@@ -353,8 +355,12 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                 op++;
             }
         }
-        nonrec += (igraph_vector_int_size(&inneis) - ip) +
-                  (igraph_vector_int_size(&outneis) - op);
+        nonrec += (indeg - ip) + (outdeg - op);
+    }
+
+    /* If we found non-loop mutual connections, we can set the cache. */
+    if (rec - (ignore_loops ? 0 : loops) > 0) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, true);
     }
 
     if (mode == IGRAPH_RECIPROCITY_DEFAULT) {
