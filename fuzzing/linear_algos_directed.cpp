@@ -65,6 +65,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_is_multiple(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO));
         igraph_is_mutual(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO), false);
         igraph_maxdegree(&graph, &i, igraph_vss_all(), IGRAPH_IN, true);
+        igraph_mean_degree(&graph, &r, IGRAPH_NO_LOOPS);
+        igraph_reciprocity(&graph, &r, true, IGRAPH_RECIPROCITY_DEFAULT);
 
         // These algorithms require a starting vertex,
         // so we require the graph to have at least one vertex.
