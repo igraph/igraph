@@ -86,11 +86,14 @@
 /* Coming from graph.c                                      */
 /* ---------------------------------------------------------*/
 
+#define ISEDGE(G, i, j) IGRAPH_BIT_TEST(G->isEdge, i * G->nbVertices + j)
+#define SETEDGE(G, i, j) IGRAPH_BIT_SET(G->isEdge, i * G->nbVertices + j)
+
 typedef struct {
     igraph_integer_t nbVertices; /* Number of vertices */
     igraph_vector_int_t nbSucc;
     igraph_adjlist_t succ;
-    igraph_matrix_char_t isEdge;
+    igraph_bitset_t isEdge;
 } Tgraph;
 
 static igraph_error_t igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
@@ -108,18 +111,17 @@ static igraph_error_t igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* g
         VECTOR(graph->nbSucc)[i] = igraph_vector_int_size(igraph_adjlist_get(&graph->succ, i));
     }
 
-    IGRAPH_CHECK(igraph_matrix_char_init(&graph->isEdge, no_of_nodes, no_of_nodes));
-    IGRAPH_FINALLY(igraph_matrix_char_destroy, &graph->isEdge);
+    IGRAPH_BITSET_INIT_FINALLY(&graph->isEdge, no_of_nodes * no_of_nodes);
 
     for (i = 0; i < no_of_nodes; i++) {
         neis = igraph_adjlist_get(&graph->succ, i);
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             igraph_integer_t v = VECTOR(*neis)[j];
-            if (MATRIX(graph->isEdge, i, v)) {
+            if (ISEDGE(graph, i, v)) {
                 IGRAPH_ERROR("LAD functions do not support graphs with multi-edges.", IGRAPH_EINVAL);
             }
-            MATRIX(graph->isEdge, i, v) = 1;
+            SETEDGE(graph, i, v);
         }
     }
 
@@ -129,7 +131,7 @@ static igraph_error_t igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* g
 }
 
 static void igraph_i_lad_destroyGraph(Tgraph *graph) {
-    igraph_matrix_char_destroy(&graph->isEdge);
+    igraph_bitset_destroy(&graph->isEdge);
     igraph_adjlist_destroy(&graph->succ);
     igraph_vector_int_destroy(&graph->nbSucc);
 }
@@ -390,11 +392,11 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                         return IGRAPH_SUCCESS;
                     }
                 }
-                if (MATRIX(Gp->isEdge, u, u2)) {
+                if (ISEDGE(Gp, u, u2)) {
                     /* remove from D[u2] vertices which are not adjacent to v */
                     j = VECTOR(D->firstVal)[u2];
                     while (j < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]) {
-                        if (MATRIX(Gt->isEdge, v, VECTOR(D->val)[j])) {
+                        if (ISEDGE(Gt, v, VECTOR(D->val)[j])) {
                             j++;
                         } else {
                             IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt, &result));
@@ -409,7 +411,7 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                     if (VECTOR(D->nbVal)[u2] < VECTOR(Gt->nbSucc)[v]) {
                         j = VECTOR(D->firstVal)[u2];
                         while (j < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]) {
-                            if (!MATRIX(Gt->isEdge, v, VECTOR(D->val)[j])) {
+                            if (!ISEDGE(Gt, v, VECTOR(D->val)[j])) {
                                 j++;
                             } else {
                                 IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt, &result));
@@ -1174,7 +1176,7 @@ static igraph_error_t igraph_i_lad_checkLAD(igraph_integer_t u, igraph_integer_t
         /* look for a support of edge (u, u2) for v */
         for (i = VECTOR(D->firstVal)[u2];
              i < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]; i++) {
-            if (MATRIX(Gt->isEdge, v, VECTOR(D->val)[i])) {
+            if (ISEDGE(Gt, v, VECTOR(D->val)[i])) {
                 VECTOR(D->matching)[ MATRIX(D->firstMatch, u, v) ] =
                     VECTOR(D->val)[i];
                 *result = true;
@@ -1230,7 +1232,7 @@ static igraph_error_t igraph_i_lad_checkLAD(igraph_integer_t u, igraph_integer_t
             for (j = VECTOR(D->firstVal)[u2];
                  j < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]; j++) {
                 v2 = VECTOR(D->val)[j]; /* v2 belongs to D[u2] */
-                if (MATRIX(Gt->isEdge, v, v2)) { /* v2 is a successor of v */
+                if (ISEDGE(Gt, v, v2)) { /* v2 is a successor of v */
                     if (num[v2] < 0) { /* v2 has not yet been added to V */
                         num[v2] = nbNum;
                         numInv[nbNum++] = v2;
