@@ -516,26 +516,18 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
     IGRAPH_BITSET_INIT_FINALLY(&dom, Gt->nbVertices);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->globalMatchingP, Gp->nbVertices);
-    igraph_vector_int_fill(&D->globalMatchingP, -1L);
+    igraph_vector_int_fill(&D->globalMatchingP, -1);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->globalMatchingT, Gt->nbVertices);
-    igraph_vector_int_fill(&D->globalMatchingT, -1L);
+    igraph_vector_int_fill(&D->globalMatchingT, -1);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->nbVal, Gp->nbVertices);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&D->firstVal, Gp->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->firstVal);
-
-    IGRAPH_CHECK(igraph_matrix_int_init(&D->posInVal,
-                                        Gp->nbVertices, Gt->nbVertices));
-    IGRAPH_FINALLY(igraph_matrix_int_destroy, &D->posInVal);
-
-    IGRAPH_CHECK(igraph_matrix_int_init(&D->firstMatch,
-                                        Gp->nbVertices, Gt->nbVertices));
-    IGRAPH_FINALLY(igraph_matrix_int_destroy, &D->firstMatch);
-
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->firstVal, Gp->nbVertices);
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&D->posInVal,
+                                   Gp->nbVertices, Gt->nbVertices);
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&D->firstMatch,
+                                   Gp->nbVertices, Gt->nbVertices);
     IGRAPH_BITSET_INIT_FINALLY(&D->markedToFilter, Gp->nbVertices);
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->toFilter, Gp->nbVertices);
 
     D->valSize = 0;
@@ -727,8 +719,7 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
     ALLOC_ARRAY(unmatched, sizeOfU, igraph_integer_t);
     ALLOC_ARRAY(posInUnmatched, sizeOfU, igraph_integer_t);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&path, 0));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &path);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
 
     /* initialize matchedWithV and unmatched */
     memset(matchedWithV, -1, (size_t)sizeOfV * sizeof(matchedWithV[0]));
@@ -1054,8 +1045,7 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
     ALLOC_ARRAY(numU, Gp->nbVertices, igraph_integer_t);
     IGRAPH_BITSET_INIT_FINALLY(&used, Gp->nbVertices * Gt->nbVertices);
     ALLOC_ARRAY(list, Gt->nbVertices, igraph_integer_t);
-    IGRAPH_CHECK(igraph_vector_int_init(&toMatch, Gp->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &toMatch);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&toMatch, Gp->nbVertices);
 
     for (u = 0; u < Gp->nbVertices; u++) {
         for (i = 0; i < VECTOR(D->nbVal)[u]; i++) {
@@ -1210,17 +1200,12 @@ static igraph_error_t igraph_i_lad_checkLAD(igraph_integer_t u, igraph_integer_t
        let V be the set of nodes that are adjacent to v, and that belong
        to domains of nodes of U */
     /* nbComp[u]=number of elements of V that are compatible with u */
-    IGRAPH_CHECK(igraph_vector_int_init(&nbComp, VECTOR(Gp->nbSucc)[u]));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nbComp);
-    IGRAPH_CHECK(igraph_vector_int_init(&firstComp, VECTOR(Gp->nbSucc)[u]));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &firstComp);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nbComp, VECTOR(Gp->nbSucc)[u]);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&firstComp, VECTOR(Gp->nbSucc)[u]);
     /* comp[firstComp[u]..firstComp[u]+nbComp[u]-1] = nodes of Gt that
        are compatible with u */
-    IGRAPH_CHECK(igraph_vector_int_init(&comp, (VECTOR(Gp->nbSucc)[u] *
-                                        Gt->nbVertices)));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
-    IGRAPH_CHECK(igraph_vector_int_init(&matchedWithU, VECTOR(Gp->nbSucc)[u]));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &matchedWithU);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&comp, (VECTOR(Gp->nbSucc)[u] * Gt->nbVertices));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&matchedWithU, VECTOR(Gp->nbSucc)[u]);
     memset(num, -1, (size_t) (Gt->nbVertices) * sizeof(num[0]));
     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
         u2 = VECTOR(*Gp_uneis)[i]; /* u2 is adjacent to u */
@@ -1628,8 +1613,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
         VECTOR(D.globalMatchingT)[ VECTOR(D.globalMatchingP)[u] ] = u;
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&toMatch, Gp.nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &toMatch);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&toMatch, Gp.nbVertices);
 
     for (u = 0; u < Gp.nbVertices; u++) {
         if (VECTOR(D.nbVal)[u] == 1) {
