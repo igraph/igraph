@@ -91,6 +91,8 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  *
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of vertices
  * and edges in the graph.
+ *
+ * \example examples/simple/igraph_contract_vertices.c
  */
 
 igraph_error_t igraph_connected_components(

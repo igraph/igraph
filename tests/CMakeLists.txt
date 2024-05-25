@@ -560,6 +560,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
+  igraph_contract_vertices
   igraph_difference
   igraph_disjoint_union
   igraph_join

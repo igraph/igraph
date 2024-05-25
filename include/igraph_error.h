@@ -232,6 +232,8 @@ __BEGIN_DECLS
  * enough. These functions should define their own error handlers and
  * restore the error handler before they return.
  * </para>
+ *
+ * \example examples/simple/igraph_contract_vertices.c
  */
 
 /**
