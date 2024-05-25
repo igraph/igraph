@@ -74,9 +74,9 @@ IGRAPH_EXPORT igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph
 IGRAPH_EXPORT igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
                                                 igraph_integer_t order, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
-                                  igraph_bool_t loops,
-                                  const igraph_attribute_combination_t *edge_comb);
+IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
+                                             igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
+                                             const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                               const igraph_vs_t vids,
                                               igraph_subgraph_implementation_t impl,

@@ -77,6 +77,8 @@ static igraph_error_t igraph_i_connected_components_strong(
  *
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of vertices
  * and edges in the graph.
+ *
+ * \example examples/simple/igraph_contract_vertices.c
  */
 
 igraph_error_t igraph_connected_components(
