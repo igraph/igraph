@@ -67,23 +67,19 @@
 /* helper to allocate an array of given size and free it using IGRAPH_FINALLY
  * when needed */
 #define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
-        VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
-        if (VAR == 0) {                    \
-            IGRAPH_ERROR("Cannot allocate '" #VAR "' array in LAD isomorphism search.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
-        }  \
-        IGRAPH_FINALLY(igraph_free, VAR);  \
+        VAR = IGRAPH_CALLOC(SIZE, TYPE); \
+        IGRAPH_CHECK_OOM(VAR, "Cannot allocate '" #VAR "' array in LAD isomorphism search."); \
+        IGRAPH_FINALLY(igraph_free, VAR); \
     }
 
 /* helper to allocate an array of given size and store its address in a
  * pointer array */
 #define ALLOC_ARRAY_IN_HISTORY(VAR, SIZE, TYPE, HISTORY) { \
-        VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
-        if (VAR == 0) {                    \
-            IGRAPH_ERROR("Cannot allocate '" #VAR "' array in LAD isomorphism search.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
-        }  \
-        IGRAPH_FINALLY(igraph_free, VAR);  \
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(HISTORY, VAR));  \
-        IGRAPH_FINALLY_CLEAN(1);           \
+        VAR = IGRAPH_CALLOC(SIZE, TYPE); \
+        IGRAPH_CHECK_OOM(VAR, "Cannot allocate '" #VAR "' array in LAD isomorphism search."); \
+        IGRAPH_FINALLY(igraph_free, VAR); \
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(HISTORY, VAR)); \
+        IGRAPH_FINALLY_CLEAN(1); \
     }
 
 /* ---------------------------------------------------------*/
@@ -570,15 +566,13 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                 matchingSize += VECTOR(Gp->nbSucc)[u];
                 if (VECTOR(Gp->nbSucc)[u] <= VECTOR(Gt->nbSucc)[v]) {
                     mu = IGRAPH_CALLOC(VECTOR(Gp->nbSucc)[u], igraph_integer_t);
-                    if (mu == 0) {
-                        igraph_free(val);
-                        IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                    }
+                    IGRAPH_CHECK_OOM(mu, "Insufficient memory for subisomorphism search with LAD.");
+                    IGRAPH_FINALLY(igraph_free, mu);
+
                     mv = IGRAPH_CALLOC(VECTOR(Gt->nbSucc)[v], igraph_integer_t);
-                    if (mv == 0) {
-                        igraph_free(mu); igraph_free(val);
-                        IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                    }
+                    IGRAPH_CHECK_OOM(mu, "Insufficient memory for subisomorphism search with LAD.");
+                    IGRAPH_FINALLY(igraph_free, mv);
+
                     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
                         mu[i] = VECTOR(Gp->nbSucc)[VECTOR(*Gp_uneis)[i]];
                     }
@@ -586,7 +580,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                         mv[i] = VECTOR(Gt->nbSucc)[VECTOR(*Gt_vneis)[i]];
                     }
                     if (igraph_i_lad_compare(VECTOR(Gp->nbSucc)[u], mu,
-                                             VECTOR(Gt->nbSucc)[v], mv) == 1) {
+                                             VECTOR(Gt->nbSucc)[v], mv)) {
                         val[D->valSize] = v;
                         VECTOR(D->nbVal)[u]++;
                         MATRIX(D->posInVal, u, v) = D->valSize++;
@@ -594,11 +588,11 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                         MATRIX(D->posInVal, u, v) =
                             VECTOR(D->firstVal)[u] + Gt->nbVertices;
                     }
-                    igraph_free(mu); mu = 0;
-                    igraph_free(mv); mv = 0;
+                    IGRAPH_FREE(mu);
+                    IGRAPH_FREE(mv);
+                    IGRAPH_FINALLY_CLEAN(2);
                 } else {  /* v not in D(u) */
-                    MATRIX(D->posInVal, u, v) =
-                        VECTOR(D->firstVal)[u] + Gt->nbVertices;
+                    MATRIX(D->posInVal, u, v) = VECTOR(D->firstVal)[u] + Gt->nbVertices;
                 }
             }
         }
@@ -1544,8 +1538,8 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
                              igraph_vector_int_list_t *maps,
                              igraph_bool_t induced, igraph_integer_t time_limit) {
 
-    bool firstSol = maps == 0;
-    bool initialDomains = domains != 0;
+    bool firstSol = maps == NULL;
+    bool initialDomains = domains != NULL;
     Tgraph Gp, Gt;
     Tdomain D;
     igraph_bool_t invalidDomain;
