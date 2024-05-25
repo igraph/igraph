@@ -165,7 +165,7 @@ typedef struct {
                          domain should be filtered */
     igraph_vector_int_t toFilter;  /* contain all pattern nodes whose
                                     domain should be filtered */
-    igraph_vector_char_t markedToFilter;  /* markedToFilter[u]=true if u
+    igraph_bitset_t markedToFilter;  /* markedToFilter[u]=true if u
                                            is in toFilter; false otherwise */
     igraph_vector_int_t globalMatchingP; /* globalMatchingP[u] = node of Gt
                                           matched to u in globalAllDiff(Np) */
@@ -181,7 +181,7 @@ static bool igraph_i_lad_toFilterEmpty(Tdomain* D) {
 
 static void igraph_i_lad_resetToFilter(Tdomain *D) {
     /* empty to filter and unmark the vertices that are marked to be filtered */
-    igraph_vector_char_null(&D->markedToFilter);
+    igraph_bitset_null(&D->markedToFilter);
     D->nextOutToFilter = -1;
 }
 
@@ -191,7 +191,7 @@ static igraph_integer_t igraph_i_lad_nextToFilter(Tdomain* D, igraph_integer_t s
        remove a node from toFilter (FIFO)
        unmark this node and return it */
     igraph_integer_t u = VECTOR(D->toFilter)[D->nextOutToFilter];
-    VECTOR(D->markedToFilter)[u] = false;
+    IGRAPH_BIT_CLEAR(D->markedToFilter, u);
     if (D->nextOutToFilter == D->lastInToFilter) {
         /* u was the last node in tofilter */
         D->nextOutToFilter = -1;
@@ -205,10 +205,10 @@ static igraph_integer_t igraph_i_lad_nextToFilter(Tdomain* D, igraph_integer_t s
 
 static void igraph_i_lad_addToFilter(igraph_integer_t u, Tdomain* D, igraph_integer_t size) {
     /* if u is not marked, then add it to toFilter and mark it */
-    if (VECTOR(D->markedToFilter)[u]) {
+    if (IGRAPH_BIT_TEST(D->markedToFilter, u)) {
         return;
     }
-    VECTOR(D->markedToFilter)[u] = true;
+    IGRAPH_BIT_SET(D->markedToFilter, u);
     if (D->nextOutToFilter < 0) {
         D->lastInToFilter = 0;
         D->nextOutToFilter = 0;
@@ -534,8 +534,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                                         Gp->nbVertices, Gt->nbVertices));
     IGRAPH_FINALLY(igraph_matrix_int_destroy, &D->firstMatch);
 
-    IGRAPH_CHECK(igraph_vector_char_init(&D->markedToFilter, Gp->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &D->markedToFilter);
+    IGRAPH_BITSET_INIT_FINALLY(&D->markedToFilter, Gp->nbVertices);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->toFilter, Gp->nbVertices);
 
@@ -554,7 +553,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                 IGRAPH_BIT_SET(dom, v);
             }
         }
-        VECTOR(D->markedToFilter)[u] = true;
+        IGRAPH_BIT_SET(D->markedToFilter, u);
         VECTOR(D->toFilter)[u] = u;
         VECTOR(D->nbVal)[u] = 0;
         VECTOR(D->firstVal)[u] = D->valSize;
@@ -641,7 +640,7 @@ static void igraph_i_lad_destroyDomains(Tdomain *D) {
     igraph_vector_int_destroy(&D->firstVal);
     igraph_matrix_int_destroy(&D->posInVal);
     igraph_matrix_int_destroy(&D->firstMatch);
-    igraph_vector_char_destroy(&D->markedToFilter);
+    igraph_bitset_destroy(&D->markedToFilter);
     igraph_vector_int_destroy(&D->toFilter);
 
     igraph_vector_int_destroy(&D->val);
@@ -1637,7 +1636,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
             VECTOR(toMatch)[nbToMatch++] = u;
         }
     }
-    IGRAPH_CHECK(igraph_i_lad_matchVertices(nbToMatch, &toMatch, (char) induced,
+    IGRAPH_CHECK(igraph_i_lad_matchVertices(nbToMatch, &toMatch, (bool) induced,
                                             &D, &Gp, &Gt, &invalidDomain));
     igraph_vector_int_destroy(&toMatch);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1648,7 +1647,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     IGRAPH_CHECK(igraph_vector_ptr_init(&alloc_history, 0));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &alloc_history);
 
-    IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (char) induced, &D,
+    IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (bool) induced, &D,
                                     &Gp, &Gt, &invalidDomain, iso, &vec, map, maps,
                                     &nbNodes, &nbFail, &nbSol, &begin,
                                     &alloc_history));
