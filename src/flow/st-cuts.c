@@ -1405,7 +1405,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
                      /*no=*/ &proj_nodes, IGRAPH_STRONG
                  ));
     IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL, /*vertex_comb=*/ NULL));
-    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true, /*edge_comb=*/ NULL));
+    IGRAPH_CHECK(igraph_simplify(&residual, /*remove_multiple=*/ true, /*remove_loops=*/ true, /*edge_comb=*/ NULL));
 
     /* We relabel the residual graph so that it is in topological sort order. */
     igraph_integer_t no_of_nodes_residual = igraph_vcount(&residual);

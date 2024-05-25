@@ -795,7 +795,7 @@ igraph_error_t igraph_minimum_size_separators(
     /* Work on a copy of 'graph' */
     IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
     IGRAPH_FINALLY(igraph_destroy, &graph_copy);
-    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* multiple */ true, /* loops */ true, NULL));
+    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* remove_multiple */ true, /* remove_loops */ true, NULL));
 
     /* ---------------------------------------------------------------- */
     /* 2 Find k vertices with the largest degrees (x1;..,xk). Check
