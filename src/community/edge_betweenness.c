@@ -24,6 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
@@ -328,20 +329,15 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 static igraph_integer_t igraph_i_which_max_active_ratio(
         const igraph_vector_t *v,
         const igraph_vector_t *w,
-        const bool *passive) {
+        igraph_bitset_t *passive) {
 
     const igraph_integer_t size = igraph_vector_size(v);
-    igraph_integer_t which, i = 0;
-    igraph_real_t max;
+    igraph_integer_t which = igraph_bitset_countr_one(passive); /* start with first active element */
+    igraph_real_t max = VECTOR(*v)[which] / (w ? VECTOR(*w)[which] : 1.0);
 
-    while (passive[i]) {
-        i++;
-    }
-    which = i;
-    max = VECTOR(*v)[which] / (w ? VECTOR(*w)[which] : 1.0);
-    for (i++; i < size; i++) {
+    for (igraph_integer_t i = which+1; i < size; i++) {
         igraph_real_t elem = VECTOR(*v)[i] / (w ? VECTOR(*w)[i] : 1.0);
-        if (!passive[i] && elem > max) {
+        if (! IGRAPH_BIT_TEST(*passive, i) && elem > max) {
             max = elem;
             which = i;
         }
@@ -476,8 +472,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_bool_t result_owned = false;
     igraph_stack_int_t stack;
     igraph_real_t steps, steps_done;
-
-    bool *passive;
+    igraph_bitset_t passive;
 
     /* Needed only for the unweighted case */
     igraph_dqueue_int_t q;
@@ -574,10 +569,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
-
-    passive = IGRAPH_CALLOC(no_of_edges, bool);
-    IGRAPH_CHECK_OOM(passive, "Insufficient memory for edge betweenness-based community detection.");
-    IGRAPH_FINALLY(igraph_free, passive);
+    IGRAPH_BITSET_INIT_FINALLY(&passive, no_of_edges);
 
     /* Estimate the number of steps to be taken.
      * It is assumed that one iteration is O(|E||V|), but |V| is constant
@@ -750,7 +742,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         /* Now look for the smallest edge betweenness */
         /* and eliminate that edge from the network */
-        maxedge = igraph_i_which_max_active_ratio(&eb, weights, passive);
+        maxedge = igraph_i_which_max_active_ratio(&eb, weights, &passive);
         VECTOR(*removed_edges)[e] = maxedge;
         if (edge_betweenness) {
             VECTOR(*edge_betweenness)[e] = VECTOR(eb)[maxedge];
@@ -758,7 +750,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 VECTOR(*edge_betweenness)[e] /= 2.0;
             }
         }
-        passive[maxedge] = true;
+        IGRAPH_BIT_SET(passive, maxedge);
         IGRAPH_CHECK(igraph_edge(graph, maxedge, &from, &to));
 
         neip = igraph_inclist_get(elist_in_p, to);
@@ -776,7 +768,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);
 
-    IGRAPH_FREE(passive);
+    igraph_bitset_destroy(&passive);
     igraph_vector_destroy(&eb);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(3);
