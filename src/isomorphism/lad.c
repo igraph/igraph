@@ -47,13 +47,15 @@
 */
 
 #include "igraph_topology.h"
-#include "igraph_interface.h"
+
 #include "igraph_adjlist.h"
-#include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_bitset.h"
+#include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
 #include "igraph_qsort.h"
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
 
 #include "core/interruption.h"
 
@@ -67,7 +69,7 @@
 #define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
         VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
-            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
+            IGRAPH_ERROR("Cannot allocate '" #VAR "' array in LAD isomorphism search.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         }  \
         IGRAPH_FINALLY(igraph_free, VAR);  \
     }
@@ -77,7 +79,7 @@
 #define ALLOC_ARRAY_IN_HISTORY(VAR, SIZE, TYPE, HISTORY) { \
         VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
-            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
+            IGRAPH_ERROR("Cannot allocate '" #VAR "' array in LAD isomorphism search.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         }  \
         IGRAPH_FINALLY(igraph_free, VAR);  \
         IGRAPH_CHECK(igraph_vector_ptr_push_back(HISTORY, VAR));  \
@@ -233,7 +235,7 @@ static igraph_error_t igraph_i_lad_augmentingPath(igraph_integer_t u, Tdomain* D
        E={(u, v), v in D(u)} U {(v, u), D->globalMatchingP[u]=v}
        update D-globalMatchingP and D->globalMatchingT consequently */
     igraph_integer_t *fifo, *pred;
-    bool *marked;
+    igraph_bitset_t marked;
     igraph_integer_t nextIn = 0;
     igraph_integer_t nextOut = 0;
     igraph_integer_t i, v, v2, u2;
@@ -243,7 +245,7 @@ static igraph_error_t igraph_i_lad_augmentingPath(igraph_integer_t u, Tdomain* D
     /* Allocate memory */
     ALLOC_ARRAY(fifo, nbV, igraph_integer_t);
     ALLOC_ARRAY(pred, nbV, igraph_integer_t);
-    ALLOC_ARRAY(marked, nbV, bool);
+    IGRAPH_BITSET_INIT_FINALLY(&marked, nbV);
 
     for (i = 0; i < VECTOR(D->nbVal)[u]; i++) {
         v = VECTOR(D->val)[ VECTOR(D->firstVal)[u] + i ]; /* v in D(u) */
@@ -257,7 +259,7 @@ static igraph_error_t igraph_i_lad_augmentingPath(igraph_integer_t u, Tdomain* D
         /* v is not free => add it to fifo */
         pred[v] = u;
         fifo[nextIn++] = v;
-        marked[v] = true;
+        IGRAPH_BIT_SET(marked, v);
     }
     while (nextOut < nextIn) {
         u2 = VECTOR(D->globalMatchingT)[fifo[nextOut++]];
@@ -277,10 +279,10 @@ static igraph_error_t igraph_i_lad_augmentingPath(igraph_integer_t u, Tdomain* D
                 *result = true;
                 goto cleanup;
             }
-            if (!marked[v]) { /* v is not free and not marked => add it to fifo */
+            if (!IGRAPH_BIT_TEST(marked, v)) { /* v is not free and not marked => add it to fifo */
                 pred[v] = u2;
                 fifo[nextIn++] = v;
-                marked[v] = true;
+                IGRAPH_BIT_SET(marked, v);
             }
         }
     }
@@ -288,7 +290,7 @@ static igraph_error_t igraph_i_lad_augmentingPath(igraph_integer_t u, Tdomain* D
 cleanup:
     igraph_free(fifo);
     igraph_free(pred);
-    igraph_free(marked);
+    igraph_bitset_destroy(&marked);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -507,13 +509,13 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
        compatibilities given in file
        return false if a domain is empty and true otherwise */
     igraph_integer_t *val;
-    bool *dom;
+    igraph_bitset_t dom;
     igraph_integer_t *mu, *mv;
     igraph_integer_t matchingSize, u, v, i, j;
     igraph_vector_int_t *vec;
 
     ALLOC_ARRAY(val, Gp->nbVertices * Gt->nbVertices, igraph_integer_t);
-    ALLOC_ARRAY(dom, Gt->nbVertices, bool);
+    IGRAPH_BITSET_INIT_FINALLY(&dom, Gt->nbVertices);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->globalMatchingP, Gp->nbVertices);
     igraph_vector_int_fill(&D->globalMatchingP, -1L);
@@ -548,10 +550,10 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
             /* read the list of target vertices which are compatible with u */
             vec = igraph_vector_int_list_get_ptr(domains, u);
             i = igraph_vector_int_size(vec);
-            memset(dom, false, sizeof(bool) * (size_t)(Gt->nbVertices));
+            igraph_bitset_null(&dom);
             for (j = 0; j < i; j++) {
                 v = VECTOR(*vec)[j];
-                dom[v] = true;
+                IGRAPH_BIT_SET(dom, v);
             }
         }
         VECTOR(D->markedToFilter)[u] = true;
@@ -560,7 +562,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
         VECTOR(D->firstVal)[u] = D->valSize;
         for (v = 0; v < Gt->nbVertices; v++) {
             igraph_vector_int_t *Gt_vneis = igraph_adjlist_get(&Gt->succ, v);
-            if ((initialDomains) && (!dom[v])) { /* v not in D(u) */
+            if ((initialDomains) && (!IGRAPH_BIT_TEST(dom, v))) { /* v not in D(u) */
                 MATRIX(D->posInVal, u, v) = VECTOR(D->firstVal)[u] +
                                             Gt->nbVertices;
             } else {
@@ -569,12 +571,12 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                 if (VECTOR(Gp->nbSucc)[u] <= VECTOR(Gt->nbSucc)[v]) {
                     mu = IGRAPH_CALLOC(VECTOR(Gp->nbSucc)[u], igraph_integer_t);
                     if (mu == 0) {
-                        igraph_free(val); igraph_free(dom);
+                        igraph_free(val);
                         IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     mv = IGRAPH_CALLOC(VECTOR(Gt->nbSucc)[v], igraph_integer_t);
                     if (mv == 0) {
-                        igraph_free(mu); igraph_free(val); igraph_free(dom);
+                        igraph_free(mu); igraph_free(val);
                         IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
@@ -604,7 +606,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
             *empty = true;  /* empty domain */
 
             igraph_free(val);
-            igraph_free(dom);
+            igraph_bitset_destroy(&dom);
 
             /* On this branch, 'val' and 'matching' are unused.
              * We init them anyway so that we can have a consistent destructor. */
@@ -629,7 +631,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
     *empty = false;
 
     igraph_free(val);
-    igraph_free(dom);
+    igraph_bitset_destroy(&dom);
 
     IGRAPH_FINALLY_CLEAN(12);
 
@@ -919,7 +921,7 @@ cleanup:
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_lad_DFS(igraph_integer_t nbU, igraph_integer_t nbV, igraph_integer_t u, bool* marked, igraph_integer_t* nbSucc,
+static void igraph_i_lad_DFS(igraph_integer_t nbU, igraph_integer_t nbV, igraph_integer_t u, igraph_bitset_t *marked, igraph_integer_t* nbSucc,
                       igraph_integer_t* succ, igraph_vector_int_t * matchedWithU,
                       igraph_integer_t* order, igraph_integer_t* nb) {
     /* perform a depth first search, starting from u, in the bipartite
@@ -934,10 +936,10 @@ static void igraph_i_lad_DFS(igraph_integer_t nbU, igraph_integer_t nbV, igraph_
        the vertices discovered by the DFS */
     igraph_integer_t i;
     igraph_integer_t v = VECTOR(*matchedWithU)[u]; /* the only one predecessor of v is u */
-    marked[u] = true;
+    IGRAPH_BIT_SET(*marked, u);
     if (v >= 0) {
         for (i = 0; i < nbSucc[v]; i++) {
-            if (!marked[succ[v * nbU + i]]) {
+            if (!IGRAPH_BIT_TEST(*marked, succ[v * nbU + i])) {
                 igraph_i_lad_DFS(nbU, nbV, succ[v * nbU + i], marked, nbSucc, succ,
                                  matchedWithU, order, nb);
             }
@@ -963,20 +965,20 @@ static igraph_error_t igraph_i_lad_SCC(igraph_integer_t nbU, igraph_integer_t nb
        Given a vertex v of Gt, nbSucc[v]=number of sucessors of v and
        succ[v]=list of successors of v */
     igraph_integer_t *order;
-    bool *marked;
+    igraph_bitset_t marked;
     igraph_integer_t *fifo;
     igraph_integer_t u, v, i, j, k, nbSCC, nb;
 
     /* Allocate memory */
     ALLOC_ARRAY(order, nbU, igraph_integer_t);
-    ALLOC_ARRAY(marked, nbU, bool);
+    IGRAPH_BITSET_INIT_FINALLY(&marked, nbU);
     ALLOC_ARRAY(fifo, nbV, igraph_integer_t);
 
     /* Order vertices of Gp wrt DFS */
     nb = nbU - 1;
     for (u = 0; u < nbU; u++) {
-        if (!marked[u]) {
-            igraph_i_lad_DFS(nbU, nbV, u, marked, nbSucc, succ, matchedWithU,
+        if (!IGRAPH_BIT_TEST(marked, u)) {
+            igraph_i_lad_DFS(nbU, nbV, u, &marked, nbSucc, succ, matchedWithU,
                              order, &nb);
         }
     }
@@ -1014,7 +1016,7 @@ static igraph_error_t igraph_i_lad_SCC(igraph_integer_t nbU, igraph_integer_t nb
 
     /* Free memory */
     igraph_free(fifo);
-    igraph_free(marked);
+    igraph_bitset_destroy(&marked);
     igraph_free(order);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -1043,7 +1045,7 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
     igraph_integer_t u, v, i, w, oldNbVal, nbToMatch;
     igraph_integer_t *numV, *numU;
     igraph_vector_int_t toMatch;
-    bool *used;
+    igraph_bitset_t used;
     igraph_integer_t *list;
     igraph_integer_t nb = 0;
     bool result;
@@ -1055,7 +1057,7 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
     ALLOC_ARRAY(succ, Gt->nbVertices * Gp->nbVertices, igraph_integer_t);
     ALLOC_ARRAY(numV, Gt->nbVertices, igraph_integer_t);
     ALLOC_ARRAY(numU, Gp->nbVertices, igraph_integer_t);
-    ALLOC_ARRAY(used, Gp->nbVertices * Gt->nbVertices, bool);
+    IGRAPH_BITSET_INIT_FINALLY(&used, Gp->nbVertices * Gt->nbVertices);
     ALLOC_ARRAY(list, Gt->nbVertices, igraph_integer_t);
     IGRAPH_CHECK(igraph_vector_int_init(&toMatch, Gp->nbVertices));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &toMatch);
@@ -1063,7 +1065,7 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
     for (u = 0; u < Gp->nbVertices; u++) {
         for (i = 0; i < VECTOR(D->nbVal)[u]; i++) {
             v = VECTOR(D->val)[ VECTOR(D->firstVal)[u] + i ]; /* v in D(u) */
-            used[u * Gt->nbVertices + v] = false;
+            IGRAPH_BIT_CLEAR(used, u * Gt->nbVertices + v);
             if (v != VECTOR(D->globalMatchingP)[u]) {
                 pred[u * Gt->nbVertices + (nbPred[u]++)] = v;
                 succ[v * Gp->nbVertices + (nbSucc[v]++)] = u;
@@ -1082,11 +1084,11 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
         v = list[--nb];
         for (i = 0; i < nbSucc[v]; i++) {
             u = succ[v * Gp->nbVertices + i];
-            used[u * Gt->nbVertices + v] = true;
+            IGRAPH_BIT_SET(used, u * Gt->nbVertices + v);
             if (numU[u] == false) {
                 numU[u] = true;
                 w = VECTOR(D->globalMatchingP)[u];
-                used[u * Gt->nbVertices + w] = true;
+                IGRAPH_BIT_SET(used, u * Gt->nbVertices + w);
                 if (numV[w] == false) {
                     list[nb++] = w;
                     numV[w] = true;
@@ -1108,7 +1110,7 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
         oldNbVal = VECTOR(D->nbVal)[u];
         for (i = 0; i < VECTOR(D->nbVal)[u]; i++) {
             v = VECTOR(D->val)[ VECTOR(D->firstVal)[u] + i ]; /* v in D(u) */
-            if ((!used[u * Gt->nbVertices + v]) && (numV[v] != numU[u]) &&
+            if ((!IGRAPH_BIT_TEST(used, u * Gt->nbVertices + v)) && (numV[v] != numU[u]) &&
                 (VECTOR(D->globalMatchingP)[u] != v)) {
                 IGRAPH_CHECK(igraph_i_lad_removeValue(u, v, D, Gp, Gt, &result));
                 if (!result) {
@@ -1133,7 +1135,7 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
 cleanup:
     igraph_vector_int_destroy(&toMatch);
     igraph_free(list);
-    igraph_free(used);
+    igraph_bitset_destroy(&used);
     igraph_free(numU);
     igraph_free(numV);
     igraph_free(succ);
@@ -1404,7 +1406,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
     if (minDom == -1) {
         /* All vertices are matched => Solution found */
         if (iso) {
-            *iso = 1;
+            *iso = true;
         }
         (*nbSol)++;
         if (map && igraph_vector_int_size(map) == 0) {
@@ -1621,7 +1623,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
         goto exit;
     }
 
-    IGRAPH_CHECK(igraph_i_lad_ensureGACallDiff((char) induced, &Gp, &Gt, &D,
+    IGRAPH_CHECK(igraph_i_lad_ensureGACallDiff((bool) induced, &Gp, &Gt, &D,
                  &invalidDomain));
     if (invalidDomain) {
         goto exit;
