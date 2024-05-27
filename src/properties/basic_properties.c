@@ -360,7 +360,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
     /* If we found non-loop mutual connections, we can set the cache. */
     if (rec - (ignore_loops ? 0 : loops) > 0) {
-        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, true);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MUTUAL, true);
     }
 
     if (mode == IGRAPH_RECIPROCITY_DEFAULT) {
