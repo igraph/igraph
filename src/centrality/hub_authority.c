@@ -419,9 +419,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
-        for (igraph_integer_t i = 0; i < options->n; i++) {
-            if (VECTOR(*my_hub_vector_p)[i] < 0) {
-                VECTOR(*my_hub_vector_p)[i] = 0;
+        if (! negative_weights) {
+            for (igraph_integer_t i = 0; i < options->n; i++) {
+                if (VECTOR(*my_hub_vector_p)[i] < 0) {
+                    VECTOR(*my_hub_vector_p)[i] = 0;
+                }
             }
         }
 
