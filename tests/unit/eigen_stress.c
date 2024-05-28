@@ -24,8 +24,10 @@
     do { \
         igraph_error_t err = expr; \
         if (err != IGRAPH_SUCCESS) { \
-            printf("FAILED on the following graph at line %d\n", __LINE__); \
-            print_graph(&g); \
+            fprintf(stderr, "FAILED on the following graph at line %d:\n", __LINE__); \
+            fprintf(stderr, "directed: %d, vcount: %d, ecount: %d\n", \
+                (int) igraph_is_directed(&g), (int) igraph_vcount(&g), (int) igraph_ecount(&g)); \
+            igraph_write_graph_edgelist(&g, stderr); \
             abort(); \
         } \
     } while (0)
@@ -34,7 +36,7 @@ int main(void) {
     igraph_vector_t vec;
     igraph_real_t val;
 
-    igraph_rng_seed(igraph_rng_default(), 759832);
+    igraph_rng_seed(igraph_rng_default(), 987);
     igraph_set_warning_handler(&igraph_warning_handler_ignore);
     igraph_set_error_handler(&igraph_error_handler_printignore);
 
