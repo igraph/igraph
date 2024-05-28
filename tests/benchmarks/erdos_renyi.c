@@ -10,7 +10,7 @@ void gnp(igraph_integer_t n, igraph_real_t p, igraph_bool_t directed, igraph_boo
 
 void gnm(igraph_integer_t n, igraph_real_t meandeg, igraph_bool_t directed, igraph_bool_t loops) {
     igraph_t g;
-    igraph_erdos_renyi_game_gnm(&g, n, round(directed ? n*meandeg : 0.5*n*meandeg), directed, loops);
+    igraph_erdos_renyi_game_gnm(&g, n, round(directed ? n*meandeg : 0.5*n*meandeg), directed, loops, IGRAPH_NO_MULTIPLE);
     igraph_destroy(&g);
 }
 

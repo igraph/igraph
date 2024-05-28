@@ -10,7 +10,7 @@ void run_bench(igraph_integer_t vcount, igraph_real_t meandeg, igraph_integer_t 
     igraph_vector_int_t ivec;
     char msg[255];
 
-    igraph_erdos_renyi_game_gnm(&g, vcount, round(meandeg * vcount / 2), IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnm(&g, vcount, round(meandeg * vcount / 2), IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_vector_int_init(&ivec, igraph_vcount(&g));
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
