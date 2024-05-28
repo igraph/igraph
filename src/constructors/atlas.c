@@ -25,27 +25,32 @@
  * \brief Create a small graph from the \quote Graph Atlas \endquote.
  *
  * </para><para>
- * The number of the graph is given as a parameter.
- * The graphs are listed: \olist
- *      \oli in increasing order of number of nodes;
- *      \oli for a fixed number of nodes, in increasing order of the
+ * The graph atlas contains all simple undirected unlabeled graphs on between
+ * 0 and 7 vertices. The number of the graph is given as a parameter.
+ * The graphs are listed:
+ *      \olist
+ *      \oli in increasing order of number of vertices;
+ *      \oli for a fixed number of vertices, in increasing order of the
  *           number of edges;
- *      \oli for fixed numbers of nodes and edges, in increasing
- *           order of the degree sequence, for example 111223 &lt; 112222;
+ *      \oli for fixed numbers of vertices and edges, in laxicographically
+ *           increasing order of the degree sequence, for example
+ *           111223 &lt; 112222;
  *      \oli for fixed degree sequence, in increasing number of
  *           automorphisms.
  *      \endolist
  *
  * </para><para>
  * The data was converted from the NetworkX software package,
- * see http://networkx.github.io .
+ * see https://networkx.org/.
  *
  * </para><para>
  * See \emb An Atlas of Graphs \eme by Ronald C. Read and Robin J. Wilson,
  * Oxford University Press, 1998.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param number The number of the graph to generate.
+ * \param number The number of the graph to generate. Must be between 0 and
+ *    1252 (inclusive). Graphs on 0-7 vertices start at numbers 0, 1, 2, 4,
+ *    8, 19, 53, and 209, respectively.
  *
  * Added in version 0.2.</para><para>
  *
