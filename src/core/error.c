@@ -91,7 +91,7 @@ static const char *igraph_i_error_strings[] = {
     /*  3 */ "Parse error",
     /*  4 */ "Invalid value",
     /*  5 */ "Already exists",
-    /*  6 */ "Invalid edge vector",    /* removed in 1.0 */
+    /*  6 */ NULL, // "Invalid edge vector",  /* removed in 1.0 */
     /*  7 */ "Invalid vertex ID",
     /*  8 */ "Invalid edge ID",
     /*  9 */ "Invalid mode",
@@ -102,59 +102,59 @@ static const char *igraph_i_error_strings[] = {
     /* 14 */ "Numeric procedure did not converge",
 
     /* ARPACK error codes moved to igraph_arpack_error_t in arpack.c from version 1.0 */
-    /* 15 */ "Matrix-vector product failed",
-    /* 16 */ "N must be positive",
-    /* 17 */ "NEV must be positive",
-    /* 18 */ "NCV must be greater than NEV and less than or equal to N "
-    "(and for the non-symmetric solver NCV-NEV >=2 must also hold)",
-    /* 19 */ "Maximum number of iterations should be positive",
-    /* 20 */ "Invalid WHICH parameter",
-    /* 21 */ "Invalid BMAT parameter",
-    /* 22 */ "WORKL is too small",
-    /* 23 */ "LAPACK error in tridiagonal eigenvalue calculation",
-    /* 24 */ "Starting vector is zero",
-    /* 25 */ "MODE is invalid",
-    /* 26 */ "MODE and BMAT are not compatible",
-    /* 27 */ "ISHIFT must be 0 or 1",
-    /* 28 */ "NEV and WHICH='BE' are incompatible",
-    /* 29 */ "Could not build an Arnoldi factorization",
-    /* 30 */ "No eigenvalues to sufficient accuracy",
-    /* 31 */ "HOWMNY is invalid",
-    /* 32 */ "HOWMNY='S' is not implemented",
-    /* 33 */ "Different number of converged Ritz values",
-    /* 34 */ "Error from calculation of a real Schur form",
-    /* 35 */ "LAPACK (dtrevc) error for calculating eigenvectors",
-    /* 36 */ "Unknown ARPACK error",
+    /* 15 */ "ARPACK error", // used to be "Matrix-vector product failed",
+    /* 16 */ NULL, // "N must be positive",
+    /* 17 */ NULL, // "NEV must be positive",
+    /* 18 */ NULL, // "NCV must be greater than NEV and less than or equal to N "
+                   // "(and for the non-symmetric solver NCV-NEV >=2 must also hold)",
+    /* 19 */ NULL, // "Maximum number of iterations should be positive",
+    /* 20 */ NULL, // "Invalid WHICH parameter",
+    /* 21 */ NULL, // "Invalid BMAT parameter",
+    /* 22 */ NULL, // "WORKL is too small",
+    /* 23 */ NULL, // "LAPACK error in tridiagonal eigenvalue calculation",
+    /* 24 */ NULL, // "Starting vector is zero",
+    /* 25 */ NULL, // "MODE is invalid",
+    /* 26 */ NULL, // "MODE and BMAT are not compatible",
+    /* 27 */ NULL, // "ISHIFT must be 0 or 1",
+    /* 28 */ NULL, // "NEV and WHICH='BE' are incompatible",
+    /* 29 */ NULL, // "Could not build an Arnoldi factorization",
+    /* 30 */ NULL, // "No eigenvalues to sufficient accuracy",
+    /* 31 */ NULL, // "HOWMNY is invalid",
+    /* 32 */ NULL, // "HOWMNY='S' is not implemented",
+    /* 33 */ NULL, // "Different number of converged Ritz values",
+    /* 34 */ NULL, // "Error from calculation of a real Schur form",
+    /* 35 */ NULL, // "LAPACK (dtrevc) error for calculating eigenvectors",
+    /* 36 */ NULL, // "Unknown ARPACK error",
     /* ARPACK error codes end here */
 
     /* 37 */ "Negative loop detected while calculating shortest paths",
     /* 38 */ "Internal error, likely a bug in igraph",
 
     /* More ARPACK error codes moved to igraph_arpack_error_t in arpack.c from version 1.0 */
-    /* 39 */ "Maximum number of iterations reached",
-    /* 40 */ "No shifts could be applied during a cycle of the "
-    "Implicitly restarted Arnoldi iteration. One possibility "
-    "is to increase the size of NCV relative to NEV",
-    /* 41 */ "The Schur form computed by LAPACK routine dlahqr "
-    "could not be reordered by LAPACK routine dtrsen.",
+    /* 39 */ NULL, // "Maximum number of iterations reached",
+    /* 40 */ NULL, // "No shifts could be applied during a cycle of the "
+                   // "Implicitly restarted Arnoldi iteration. One possibility "
+                   // "is to increase the size of NCV relative to NEV",
+    /* 41 */ NULL, // "The Schur form computed by LAPACK routine dlahqr "
+                   // "could not be reordered by LAPACK routine dtrsen.",
     /* ARPACK error codes end here */
 
-    /* 42 */ "Big integer division by zero",    /* removed in 1.0 */
-    /* 43 */ "GLPK Error, GLP_EBOUND",    /* removed in 1.0 */
-    /* 44 */ "GLPK Error, GLP_EROOT",    /* removed in 1.0 */
-    /* 45 */ "GLPK Error, GLP_ENOPFS",    /* removed in 1.0 */
-    /* 46 */ "GLPK Error, GLP_ENODFS",    /* removed in 1.0 */
-    /* 47 */ "GLPK Error, GLP_EFAIL",    /* removed in 1.0 */
-    /* 48 */ "GLPK Error, GLP_EMIPGAP",    /* removed in 1.0 */
-    /* 49 */ "GLPK Error, GLP_ETMLIM",    /* removed in 1.0 */
-    /* 50 */ "GLPK Error, GLP_STOP",    /* removed in 1.0 */
-    /* 51 */ "Internal attribute handler error",    /* removed in 1.0 */
+    /* 42 */ NULL, // "Big integer division by zero",    /* removed in 1.0 */
+    /* 43 */ NULL, // "GLPK Error, GLP_EBOUND",    /* removed in 1.0 */
+    /* 44 */ NULL, // "GLPK Error, GLP_EROOT",    /* removed in 1.0 */
+    /* 45 */ NULL, // "GLPK Error, GLP_ENOPFS",    /* removed in 1.0 */
+    /* 46 */ NULL, // "GLPK Error, GLP_ENODFS",    /* removed in 1.0 */
+    /* 47 */ NULL, // "GLPK Error, GLP_EFAIL",    /* removed in 1.0 */
+    /* 48 */ NULL, // "GLPK Error, GLP_EMIPGAP",    /* removed in 1.0 */
+    /* 49 */ NULL, // "GLPK Error, GLP_ETMLIM",    /* removed in 1.0 */
+    /* 50 */ NULL, // "GLPK Error, GLP_STOP",    /* removed in 1.0 */
+    /* 51 */ NULL, // "Internal attribute handler error",    /* removed in 1.0 */
     /* 52 */ "Unimplemented attribute combination for this type",
-    /* 53 */ "LAPACK call resulted in an error",    /* removed in 1.0 */
-    /* 54 */ "Internal DrL error",   /* removed in 1.0 */
+    /* 53 */ NULL, // "LAPACK call resulted in an error",    /* removed in 1.0 */
+    /* 54 */ NULL, // "Internal DrL error",   /* removed in 1.0 */
     /* 55 */ "Integer or double overflow",
-    /* 56 */ "Internal GPLK error",    /* removed in 1.0 */
-    /* 57 */ "CPU time exceeded",    /* removed in 1.0 */
+    /* 56 */ NULL, // "Internal GPLK error",    /* removed in 1.0 */
+    /* 57 */ NULL, // "CPU time exceeded",    /* removed in 1.0 */
     /* 58 */ "Integer or double underflow",
     /* 59 */ "Random walk got stuck",
     /* 60 */ "Search stopped; this error should never be visible to the user, "
@@ -180,7 +180,10 @@ const char *igraph_strerror(const igraph_error_t igraph_errno) {
         (int) igraph_errno >= sizeof(igraph_i_error_strings) / sizeof(igraph_i_error_strings[0])) {
         IGRAPH_FATALF("Invalid error code %d; no error string available.", (int) igraph_errno);
     }
-    return igraph_i_error_strings[igraph_errno];
+    const char *msg = igraph_i_error_strings[igraph_errno];
+    /* Messages removed in 1.0 were replaced by NULL and should not be used. */
+    IGRAPH_ASSERT(msg != NULL);
+    return msg;
 }
 
 
