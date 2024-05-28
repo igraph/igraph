@@ -186,9 +186,17 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(degree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(degree)[i] + RNG_UNIF(-1e-4, 1e-4);
+        } else if (! negative_weights) {
+            /* The eigenvector centrality of zero degree vertices is also zero. */
+            MATRIX(vectors, i, 0) = 0.0;
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            /* When negative weights are present, a zero strength may occur even
+             * if the degree is not zero, and some edges have non-zero weight. */
+            igraph_integer_t deg;
+            IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, IGRAPH_ALL, IGRAPH_LOOPS));
+            MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
+
     }
     RNG_END();
     igraph_vector_destroy(&degree);
@@ -380,8 +388,15 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+        } else if (! negative_weights) {
+            /* The eigenvector centrality of zero in-degree vertices is also zero. */
+            MATRIX(vectors, i, 0) = 0.0;
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            /* When negative weights are present, a zero in-strength may occur even
+             * if the in-degree is not zero, and some in-edges have non-zero weight. */
+            igraph_integer_t deg;
+            IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, mode, IGRAPH_LOOPS));
+            MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
     }
     RNG_END();
