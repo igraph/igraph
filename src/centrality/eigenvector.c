@@ -233,8 +233,6 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     }
 
     if (vector) {
-        igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
         IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
 
         /* Note: With non-negative weights, a zero eigenvalue should only occur
@@ -242,21 +240,11 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
          * caught earlier. Thus we do not handle the case of zero eigenvalues here .*/
 
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_real_t tmp;
             VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
-            tmp = fabs(VECTOR(*vector)[i]);
-            if (tmp > amax) {
-                amax = tmp;
-                which = i;
-            }
         }
 
         /* Scale result so that the largest value is 1.0. */
-        if (amax != 0) {
-            igraph_vector_scale(vector, 1 / VECTOR(*vector)[which]);
-        } else if (igraph_i_vector_mostly_negative(vector)) {
-            igraph_vector_scale(vector, -1.0);
-        }
+        igraph_i_vector_scale_by_max_abs(vector);
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
         if (! negative_weights) {
@@ -431,9 +419,6 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     }
 
     if (vector) {
-        igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
-
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
         if (!negative_weights && MATRIX(values, 0, 0) <= 0) {
@@ -445,21 +430,11 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             MATRIX(values, 0, 0) = 0;
         } else {
             for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-                igraph_real_t tmp;
                 VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
-                tmp = fabs(VECTOR(*vector)[i]);
-                if (tmp > amax) {
-                    amax = tmp;
-                    which = i;
-                }
             }
 
             /* Scale result so that the largest value is 1.0. */
-            if (amax != 0) {
-                igraph_vector_scale(vector, 1 / VECTOR(*vector)[which]);
-            } else if (igraph_i_vector_mostly_negative(vector)) {
-                igraph_vector_scale(vector, -1.0);
-            }
+            igraph_i_vector_scale_by_max_abs(vector);
         }
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */

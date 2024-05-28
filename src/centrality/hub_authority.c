@@ -85,6 +85,12 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
     }
 }
 
+/* Normalizes a real-valued vector so that the largest element is 1.0,
+ * i.e. divides by the element that is largest in magnitude. */
+static void scale_by_max_abs(igraph_vector_t *vec) {
+
+}
+
 static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
         igraph_integer_t n, igraph_vector_t *to, const igraph_real_t *from,
         igraph_adjlist_t *in) {
@@ -399,24 +405,13 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         } else {
             my_hub_vector_p = hub_vector;
         }
-        igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
 
         IGRAPH_CHECK(igraph_vector_resize(my_hub_vector_p, options->n));
         for (igraph_integer_t i = 0; i < options->n; i++) {
-            igraph_real_t tmp;
             VECTOR(*my_hub_vector_p)[i] = MATRIX(vectors, i, 0);
-            tmp = fabs(VECTOR(*my_hub_vector_p)[i]);
-            if (tmp > amax) {
-                amax = tmp;
-                which = i;
-            }
         }
-        if (amax != 0) {
-            igraph_vector_scale(my_hub_vector_p, 1 / VECTOR(*my_hub_vector_p)[which]);
-        } else if (igraph_i_vector_mostly_negative(my_hub_vector_p)) {
-            igraph_vector_scale(my_hub_vector_p, -1.0);
-        }
+
+        igraph_i_vector_scale_by_max_abs(my_hub_vector_p);
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
         if (! negative_weights) {
@@ -445,8 +440,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         } else {
             igraph_i_kleinberg_weighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &ininclist, graph, weights);
         }
-
-        igraph_vector_scale(authority_vector, 1.0 / igraph_vector_max(authority_vector));
+        igraph_i_vector_scale_by_max_abs(authority_vector);
     }
 
     if (!hub_vector && authority_vector) {
