@@ -2137,7 +2137,7 @@ FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
 
 #ifndef NOTORDERED
 
-igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, igraph_integer_t *pos, igraph_integer_t start, igraph_integer_t end);
 
 /**
@@ -2220,7 +2220,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(const TYPE(igraph_vector)
     return FUNCTION(igraph_i_vector, binsearch_slice)(v, what, pos, start, end);
 }
 
-igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, igraph_integer_t *pos, igraph_integer_t start, igraph_integer_t end) {
     igraph_integer_t left  = start;
     igraph_integer_t right = end - 1;
