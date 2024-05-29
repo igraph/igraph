@@ -9,7 +9,7 @@ void match(const igraph_t *graph,
 
     igraph_vector_int_list_clear(maps);
     for (igraph_integer_t i=0; i < n; i++) {
-        igraph_subisomorphic_lad(&patt[i], graph, NULL, NULL, NULL, maps, false, 0);
+        igraph_subisomorphic_lad(&patt[i], graph, NULL, NULL, NULL, maps, false);
     }
 }
 
