@@ -20,6 +20,7 @@
 ### Changed
 
  - `igraph_hub_and_authority_scores()` now warns when negative edge weights are present.
+ - Updated the internal heuristics used by igraph's ARPACK interface, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, to improve the robustness of calculations.
 
 ### Other
 
