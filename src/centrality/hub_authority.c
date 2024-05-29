@@ -206,6 +206,10 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights, igraph_arpack_options_t *options) {
 
+    /* The current implementation computes hub scores, i.e the principal
+     * eigenvector of A A^T, and transforms these to authority scores as
+     * authority = A^T hub. */
+
     igraph_adjlist_t inadjlist, outadjlist;
     igraph_inclist_t ininclist, outinclist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -216,7 +220,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     igraph_i_kleinberg_data2_t extra2;
     igraph_vector_t *my_hub_vector_p;
     igraph_vector_t my_hub_vector;
-
+    igraph_bool_t negative_weights = false;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -246,8 +250,19 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_vector_size(weights),
                     igraph_ecount(graph));
         }
+
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
+
+        if (min < 0.0) {
+            /* When there are negative weights, the principal eigenvalue and the eigenvector
+             * are no longer guaranteed to be non-negative. */
+            negative_weights = true;
+            IGRAPH_WARNING("Negative weight in graph. The largest eigenvalue "
+                           "will be selected, but it may not be the largest in magnitude. "
+                           "Some hub and authority scores may be negative.");
+        }
+
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -349,9 +364,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
-        for (igraph_integer_t i = 0; i < options->n; i++) {
-            if (VECTOR(*my_hub_vector_p)[i] < 0) {
-                VECTOR(*my_hub_vector_p)[i] = 0;
+        if (! negative_weights) {
+            for (igraph_integer_t i = 0; i < options->n; i++) {
+                if (VECTOR(*my_hub_vector_p)[i] < 0) {
+                    VECTOR(*my_hub_vector_p)[i] = 0;
+                }
             }
         }
     }
