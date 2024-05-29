@@ -542,7 +542,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
              *  - If the graph is not a forest, we don't need to look for roots.
              */
             if (! no_undirected_cycles) {
-                if (res) { res = false; }
+                if (res) { *res = false; }
                 if (roots) { igraph_vector_int_clear(roots); }
                 return IGRAPH_SUCCESS;
             }

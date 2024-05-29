@@ -17,6 +17,7 @@
  - `igraph_hub_and_authority_scores()` no longer clips negative results to zeros when negative weights are present.
  - `igraph_arpack_rnsolve()` used the incorrect error message text for some errors. This is now corrected.
  - Corrected a bug in the fallback implementation of `igraph_bitset_countl_zero()` when `IGRAPH_INTEGER_SIZE` was set to 32. This fallback implementation was _not_ used with GCC, Clang, or MSVC.
+ - `igraph_is_forest()` would fail to set the result variable when testing for a directed forest, and it was already cached that the graph was not an undirected forest.
 
 ### Changed
 
