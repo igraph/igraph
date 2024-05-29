@@ -1406,7 +1406,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
     if (options->ierr != 0) {
-        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));
+        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->ierr));
     }
 
     /* Save the result */

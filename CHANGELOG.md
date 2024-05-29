@@ -15,6 +15,7 @@
  - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
  - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
  - `igraph_hub_and_authority_scores()` no longer clips negative results to zeros when negative weights are present.
+ - `igraph_arpack_rnsolve()` used the incorrect error message text for some errors. This is now corrected.
 
 ### Changed
 
