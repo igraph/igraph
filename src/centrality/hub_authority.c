@@ -23,6 +23,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
+#include "igraph_random.h"
 
 #include "centrality/centrality_internal.h"
 
@@ -82,6 +83,12 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
             }
         }
     }
+}
+
+/* Normalizes a real-valued vector so that the largest element is 1.0,
+ * i.e. divides by the element that is largest in magnitude. */
+static void scale_by_max_abs(igraph_vector_t *vec) {
+
 }
 
 static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
@@ -246,6 +253,10 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_real_t *value,
         const igraph_vector_t *weights, igraph_arpack_options_t *options) {
 
+    /* The current implementation computes hub scores, i.e the principal
+     * eigenvector of A A^T, and transforms these to authority scores as
+     * authority = A^T hub. */
+
     igraph_adjlist_t inadjlist, outadjlist;
     igraph_inclist_t ininclist, outinclist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -256,7 +267,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     igraph_i_kleinberg_data2_t extra2;
     igraph_vector_t *my_hub_vector_p;
     igraph_vector_t my_hub_vector;
-
+    igraph_bool_t negative_weights = false;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -289,8 +300,19 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_vector_size(weights),
                     igraph_ecount(graph));
         }
+
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
+
+        if (min < 0.0) {
+            /* When there are negative weights, the principal eigenvalue and the eigenvector
+             * are no longer guaranteed to be non-negative. */
+            negative_weights = true;
+            IGRAPH_WARNING("Negative weight in graph. The largest eigenvalue "
+                           "will be selected, but it may not be the largest in magnitude. "
+                           "Some hub and authority scores may be negative.");
+        }
+
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -336,14 +358,25 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
-    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0, 0));
+    /* We calculate hub scores, which correlate with out-degrees / out-strengths.
+     * Thus we use out-strengths as starting values. */
+    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, true, weights));
+    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
-            MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
+            MATRIX(vectors, i, 0) = VECTOR(tmp)[i] + RNG_UNIF(-1e-4, 1e-4);
+        } else if (! negative_weights) {
+            /* The hub score of zero out-degree vertices is also zero. */
+            MATRIX(vectors, i, 0) = 0.0;
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            /* When negative weights are present, a zero out-strength may occur even
+             * if the out-degree is not zero, and some out-edges have non-zero weight. */
+            igraph_integer_t deg;
+            IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, IGRAPH_OUT, /* loops */ true));
+            MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
     }
+    RNG_END();
 
     extra.in = &inadjlist; extra.out = &outadjlist; extra.tmp = &tmp;
     extra2.in = &ininclist; extra2.out = &outinclist; extra2.tmp = &tmp;
@@ -372,29 +405,20 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         } else {
             my_hub_vector_p = hub_vector;
         }
-        igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
 
         IGRAPH_CHECK(igraph_vector_resize(my_hub_vector_p, options->n));
         for (igraph_integer_t i = 0; i < options->n; i++) {
-            igraph_real_t tmp;
             VECTOR(*my_hub_vector_p)[i] = MATRIX(vectors, i, 0);
-            tmp = fabs(VECTOR(*my_hub_vector_p)[i]);
-            if (tmp > amax) {
-                amax = tmp;
-                which = i;
-            }
-        }
-        if (amax != 0) {
-            igraph_vector_scale(my_hub_vector_p, 1 / VECTOR(*my_hub_vector_p)[which]);
-        } else if (igraph_i_vector_mostly_negative(my_hub_vector_p)) {
-            igraph_vector_scale(my_hub_vector_p, -1.0);
         }
 
+        igraph_i_vector_scale_by_max_abs(my_hub_vector_p);
+
         /* Correction for numeric inaccuracies (eliminating -0.0) */
-        for (igraph_integer_t i = 0; i < options->n; i++) {
-            if (VECTOR(*my_hub_vector_p)[i] < 0) {
-                VECTOR(*my_hub_vector_p)[i] = 0;
+        if (! negative_weights) {
+            for (igraph_integer_t i = 0; i < options->n; i++) {
+                if (VECTOR(*my_hub_vector_p)[i] < 0) {
+                    VECTOR(*my_hub_vector_p)[i] = 0;
+                }
             }
         }
 
@@ -416,8 +440,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         } else {
             igraph_i_kleinberg_weighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &ininclist, graph, weights);
         }
-
-        igraph_vector_scale(authority_vector, 1.0 / igraph_vector_max(authority_vector));
+        igraph_i_vector_scale_by_max_abs(authority_vector);
     }
 
     if (!hub_vector && authority_vector) {

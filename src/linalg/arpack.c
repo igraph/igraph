@@ -792,11 +792,15 @@ static void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
         options->ncv = 20;
     }
     /* ...but having ncv close to n leads to some problems with small graphs
-     * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
-     * to be larger than n / 2...
+     * (example: PageRank of "A <--> C, D <--> E, B"), so we try to keep it
+     * no more than min(n/2 + 2, n - 1), bounds found empirically using the
+     * eigen_stress.c test...
      */
-    if (options->ncv > options->n / 2) {
-        options->ncv = options->n / 2;
+    if (options->ncv > options->n / 2 + 2) {
+        options->ncv = options->n / 2 + 2;
+    }
+    if (options->ncv > options->n - 1) {
+        options->ncv = options->n - 1;
     }
     /* ...but we need at least min_ncv. */
     if (options->ncv < min_ncv) {
@@ -1328,7 +1332,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
     if (options->ierr != 0) {
-        IGRAPH_ARPACK_ERROR(igraph_i_arpack_err_dneupd(options->info));
+        IGRAPH_ARPACK_ERROR(igraph_i_arpack_err_dneupd(options->ierr));
     }
 
     /* Save the result */

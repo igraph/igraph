@@ -288,6 +288,10 @@ add_legacy_tests(
   components
   coreness
   efficiency
+# The eigen_stress test is disabled by default. The chance of failure on at
+# least some platforms, or with some BLAS/LAPACK/ARPACK versions is high
+# due to ARPACK's fickleness. The test is still useful for local testing.
+  # eigen_stress
   global_transitivity
   harmonic_centrality
   hub_and_authority
