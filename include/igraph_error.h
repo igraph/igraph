@@ -262,28 +262,9 @@ __BEGIN_DECLS
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
- * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed (not used any more).
- * \enumval IGRAPH_ARPACK_NPOS N must be positive.
- * \enumval IGRAPH_ARPACK_NEVNPOS NEV must be positive.
- * \enumval IGRAPH_ARPACK_NCVSMALL NCV must be bigger.
- * \enumval IGRAPH_ARPACK_NONPOSI Maximum number of iterations should be positive.
- * \enumval IGRAPH_ARPACK_WHICHINV Invalid WHICH parameter.
- * \enumval IGRAPH_ARPACK_BMATINV Invalid BMAT parameter.
- * \enumval IGRAPH_ARPACK_WORKLSMALL WORKL is too small.
- * \enumval IGRAPH_ARPACK_TRIDERR LAPACK error in tridiagonal eigenvalue calculation.
- * \enumval IGRAPH_ARPACK_ZEROSTART Starting vector is zero.
- * \enumval IGRAPH_ARPACK_MODEINV MODE is invalid.
- * \enumval IGRAPH_ARPACK_MODEBMAT MODE and BMAT are not compatible.
- * \enumval IGRAPH_ARPACK_ISHIFT ISHIFT must be 0 or 1.
- * \enumval IGRAPH_ARPACK_NEVBE NEV and WHICH='BE' are incompatible.
- * \enumval IGRAPH_ARPACK_NOFACT Could not build an Arnoldi factorization.
- * \enumval IGRAPH_ARPACK_FAILED No eigenvalues to sufficient accuracy.
- * \enumval IGRAPH_ARPACK_HOWMNY HOWMNY is invalid.
- * \enumval IGRAPH_ARPACK_HOWMNYS HOWMNY='S' is not implemented.
- * \enumval IGRAPH_ARPACK_EVDIFF Different number of converged Ritz values.
- * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
- * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
- * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
+ * \enumval IGRAPH_ARPACK An error happened inside a calculation implemented
+ *   in ARPACK. The calculation involved is most likely an eigenvector-related
+ *   calculation.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
