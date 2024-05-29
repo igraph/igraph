@@ -2945,64 +2945,13 @@ igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v) {
 
 #ifndef NOTORDERED
 
-igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
-    const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
-    const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
-    TYPE(igraph_vector) *result);
 
-/**
- * \function igraph_vector_intersect_sorted
- * \brief Set intersection of two sorted vectors.
- *
- * The elements that are contained in both vectors are stored in the result
- * vector. All three vectors must be initialized.
- *
- * </para><para>
- * Instead of the naive intersection which takes O(n), this function uses
- * the set intersection method of Ricardo Baeza-Yates, which is more efficient
- * when one of the vectors is significantly smaller than the other, and
- * gives similar performance on average when the two vectors are equal.
- *
- * </para><para>
- * The algorithm keeps the multiplicities of the elements: if an element appears
- * \c k1 times in the first vector and \c k2 times in the second, the result
- * will include that element <code>min(k1, k2)</code> times.
- *
- * </para><para>
- * Reference:
- *
- * </para><para>
- * Baeza-Yates R: A fast set intersection algorithm for sorted
- * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
- * 400--408, 2004. Springer Berlin/Heidelberg.
- * https://doi.org/10.1007/978-3-540-27801-6_30
- *
- * \param v1 the first vector
- * \param v2 the second vector
- * \param result the result vector, which will also be sorted.
- *
- * Time complexity: O(m log(n)) where m is the size of the smaller vector
- * and n is the size of the larger one.
+/*
+ * Sorted vector intersection
  */
-igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
-        const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
-    igraph_integer_t size1, size2;
 
-    size1 = FUNCTION(igraph_vector, size)(v1);
-    size2 = FUNCTION(igraph_vector, size)(v2);
-
-    FUNCTION(igraph_vector, clear)(result);
-
-    if (size1 == 0 || size2 == 0) {
-        return IGRAPH_SUCCESS;
-    }
-
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                     v1, 0, size1, v2, 0, size2, result));
-    return IGRAPH_SUCCESS;
-}
-
-igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
+/* Recursive Baeza-Yates intersection algorithm for sorted vector intersection. */
+static igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
     const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
     const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
     TYPE(igraph_vector) *result) {
@@ -3019,31 +2968,226 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
         probe1 = begin1 + (size1 >> 1);      /* pick the median element */
         FUNCTION(igraph_i_vector, binsearch_slice)(v2, VECTOR(*v1)[probe1], &probe2, begin2, end2);
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, begin1, probe1, v2, begin2, probe2, result
-                     ));
+            v1, begin1, probe1, v2, begin2, probe2, result
+        ));
         if (!(probe2 == end2 || VECTOR(*v1)[probe1] < VECTOR(*v2)[probe2])) {
             IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, VECTOR(*v2)[probe2]));
             probe2++;
         }
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, probe1 + 1, end1, v2, probe2, end2, result
-                     ));
+            v1, probe1 + 1, end1, v2, probe2, end2, result
+        ));
     } else {
         probe2 = begin2 + (size2 >> 1);      /* pick the median element */
         FUNCTION(igraph_i_vector, binsearch_slice)(v1, VECTOR(*v2)[probe2], &probe1, begin1, end1);
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, begin1, probe1, v2, begin2, probe2, result
-                     ));
+            v1, begin1, probe1, v2, begin2, probe2, result
+        ));
         if (!(probe1 == end1 || VECTOR(*v2)[probe2] < VECTOR(*v1)[probe1])) {
             IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, VECTOR(*v2)[probe2]));
             probe1++;
         }
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, probe1, end1, v2, probe2 + 1, end2, result
-                     ));
+            v1, probe1, end1, v2, probe2 + 1, end2, result
+        ));
     }
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_vector_intersect_sorted
+ * \brief Set intersection of two sorted vectors.
+ *
+ * The elements that are contained in both vectors are stored in the result
+ * vector. All three vectors must be initialized.
+ *
+ * </para><para>
+ * For similar-size vectors, this function uses a straightforward linear scan.
+ * When the vector sizes differ substantially, it uses the set intersection
+ * method of Ricardo Baeza-Yates, which takes logarithmic time in the length
+ * of the larger vector.
+ *
+ * </para><para>
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * \c k1 times in the first vector and \c k2 times in the second, the result
+ * will include that element <code>min(k1, k2)</code> times.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Baeza-Yates R: A fast set intersection algorithm for sorted
+ * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
+ * 400--408, 2004. Springer Berlin/Heidelberg.
+ * https://doi.org/10.1007/978-3-540-27801-6_30
+ *
+ * \param v1 The first vector
+ * \param v2 The second vector
+ * \param result The result vector, which will also be sorted.
+ * \return Error code.
+ *
+ * Time complexity: O(m log(n)) where m is the size of the smaller vector
+ * and n is the size of the larger one.
+ */
+igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
+        const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
+    igraph_integer_t size1, size2;
+    igraph_real_t r;
+
+    size1 = FUNCTION(igraph_vector, size)(v1);
+    size2 = FUNCTION(igraph_vector, size)(v2);
+
+    FUNCTION(igraph_vector, clear)(result);
+
+    if (size1 == 0 || size2 == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    r = size1 > size2 ? (igraph_real_t) size1 / size2 : (igraph_real_t) size2 / size1;
+
+    /* When the set size ratio is small, use a simple linear scan. See comments in
+     * igraph_vector_intersection_size_sorted() for the justification of this r threshold. */
+    if (r < 10) {
+        igraph_integer_t i1 = 0, i2 = 0;
+        while (i1 < size1 && i2 < size2) {
+            BASE e1 = VECTOR(*v1)[i1], e2 = VECTOR(*v2)[i2];
+            if (e1 < e2) {
+                i1++;
+            } else if (e1 > e2) {
+                i2++;
+            } else {
+                i1++; i2++;
+                IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, e1));
+            }
+        }
+    } else {
+        IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
+                         v1, 0, size1, v2, 0, size2, result));
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/* Recursive Baeza-Yates intersection algorithm for sorted vector intersection size. */
+static void FUNCTION(igraph_i_vector, intersection_size_sorted)(
+    const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
+    const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
+    igraph_integer_t *result) {
+
+    igraph_integer_t size1, size2, probe1, probe2;
+
+    if (begin1 == end1 || begin2 == end2) {
+        return;
+    }
+
+    size1 = end1 - begin1;
+    size2 = end2 - begin2;
+
+    if (size1 < size2) {
+        probe1 = begin1 + (size1 >> 1);      /* pick the median element */
+        FUNCTION(igraph_i_vector, binsearch_slice)(v2, VECTOR(*v1)[probe1], &probe2, begin2, end2);
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, begin1, probe1, v2, begin2, probe2, result
+        );
+        if (!(probe2 == end2 || VECTOR(*v1)[probe1] < VECTOR(*v2)[probe2])) {
+            (*result)++;
+            probe2++;
+        }
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, probe1 + 1, end1, v2, probe2, end2, result
+        );
+    } else {
+        probe2 = begin2 + (size2 >> 1);      /* pick the median element */
+        FUNCTION(igraph_i_vector, binsearch_slice)(v1, VECTOR(*v2)[probe2], &probe1, begin1, end1);
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, begin1, probe1, v2, begin2, probe2, result
+        );
+        if (!(probe1 == end1 || VECTOR(*v2)[probe2] < VECTOR(*v1)[probe1])) {
+            (*result)++;
+            probe1++;
+        }
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, probe1, end1, v2, probe2 + 1, end2, result
+        );
+    }
+}
+
+/**
+ * \function igraph_vector_intersection_size_sorted
+ * \brief Intersection size of two sorted vectors.
+ *
+ * \experimental
+ *
+ * Counts elements that are present in both vectors. This is particularly
+ * useful for counting common neighbours of two vertices.
+ *
+ * </para><para>
+ * For similar-size vectors, this function uses a straightforward linear scan.
+ * When the vector sizes differ substantially, it uses the set intersection
+ * method of Ricardo Baeza-Yates, which takes logarithmic time in the length
+ * of the larger vector.
+ *
+ * </para><para>
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * \c k1 times in the first vector and \c k2 times in the second, the result
+ * will include that element <code>min(k1, k2)</code> times.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Baeza-Yates R: A fast set intersection algorithm for sorted
+ * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
+ * 400--408, 2004. Springer Berlin/Heidelberg.
+ * https://doi.org/10.1007/978-3-540-27801-6_30
+ *
+ * \param v1 The first vector
+ * \param v2 The second vector
+ * \return The number of common elements.
+ *
+ * Time complexity: O(m log(n)) where m is the size of the smaller vector
+ * and n is the size of the larger one.
+ */
+
+igraph_integer_t FUNCTION(igraph_vector, intersection_size_sorted)(
+        const TYPE(igraph_vector) *v1,
+        const TYPE(igraph_vector) *v2) {
+
+    igraph_integer_t size1, size2, count;
+    igraph_real_t r;
+
+    size1 = FUNCTION(igraph_vector, size)(v1);
+    size2 = FUNCTION(igraph_vector, size)(v2);
+
+    count = 0;
+
+    if (size1 == 0 || size2 == 0) {
+        return count;
+    }
+
+    r = size1 > size2 ? (igraph_real_t) size1 / size2 : (igraph_real_t) size2 / size1;
+
+    /* When the set size ratio is small, use a simple linear scan. The ideal ratio
+     * seems to be affected by processor cache effects. It depends on the machine,
+     * as well as on the input sizes. The threshold of 10 was determined empirically
+     * by using the intersection.c (direct) and igraph_ecc.c (indirect) benchmarks.
+     * See https://github.com/igraph/igraph/pull/2618 */
+    if (r < 10) {
+        /* This is a fast branchless implementation that uses arithmetic
+         * instead of conditionals. */
+        igraph_integer_t i1 = 0, i2 = 0;
+        while (i1 < size1 && i2 < size2) {
+            BASE e1 = VECTOR(*v1)[i1], e2 = VECTOR(*v2)[i2];
+            igraph_integer_t d1 = (e1 <= e2), d2 = (e1 >= e2);
+            i1 += d1; i2 += d2;
+            count += (d1 == d2);
+        }
+    } else {
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, 0, size1, v2, 0, size2, &count);
+    }
+
+    return count;
 }
 
 /**
