@@ -42,7 +42,7 @@ igraph_integer_t igraph_i_clz32(igraph_uint_t x) {
     unsigned long index;
     return _BitScanReverse(&index, x) ? 31 - index : 32;
 #else
-    for (igraph_integer_t i = 0; i >= 0; --i) {
+    for (igraph_integer_t i = 31; i >= 0; --i) {
         if (IGRAPH_BIT_MASK(i) & x) {
             return 31 - i;
         }

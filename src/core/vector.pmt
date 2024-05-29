@@ -2952,7 +2952,7 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
 
 /**
  * \function igraph_vector_intersect_sorted
- * \brief Calculates the intersection of two sorted vectors.
+ * \brief Set intersection of two sorted vectors.
  *
  * The elements that are contained in both vectors are stored in the result
  * vector. All three vectors must be initialized.
@@ -2965,13 +2965,17 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
  *
  * </para><para>
  * The algorithm keeps the multiplicities of the elements: if an element appears
- * k1 times in the first vector and k2 times in the second, the result
- * will include that element min(k1, k2) times.
+ * \c k1 times in the first vector and \c k2 times in the second, the result
+ * will include that element <code>min(k1, k2)</code> times.
  *
  * </para><para>
- * Reference: Baeza-Yates R: A fast set intersection algorithm for sorted
+ * Reference:
+ *
+ * </para><para>
+ * Baeza-Yates R: A fast set intersection algorithm for sorted
  * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
- * 400--408, 2004. Springer Berlin/Heidelberg. ISBN: 978-3-540-22341-2.
+ * 400--408, 2004. Springer Berlin/Heidelberg.
+ * https://doi.org/10.1007/978-3-540-27801-6_30
  *
  * \param v1 the first vector
  * \param v2 the second vector
@@ -3044,7 +3048,7 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
 
 /**
  * \function igraph_vector_difference_sorted
- * \brief Calculates the difference between two sorted vectors (considered as sets).
+ * \brief Set difference of two sorted vectors.
  *
  * The elements that are contained in only the first vector but not the second are
  * stored in the result vector. All three vectors must be initialized.

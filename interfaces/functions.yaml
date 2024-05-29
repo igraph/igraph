@@ -338,6 +338,12 @@ igraph_simple_interconnected_islands_game:
         OUT GRAPH graph, INTEGER islands_n, INTEGER islands_size,
         REAL islands_pin, INTEGER n_inter
 
+# Use a default of loops=True, as this is what's in the original Chung-Lu paper
+igraph_chung_lu_game:
+    PARAMS: |-
+        OUT GRAPH graph, VECTOR expected_out_deg, OPTIONAL VECTOR expected_in_deg,
+        BOOLEAN loops=True, CHUNG_LU_VARIANT variant=ORIGINAL
+
 igraph_static_fitness_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
@@ -798,6 +804,9 @@ igraph_maxdegree:
 igraph_density:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=False
 
+igraph_mean_degree:
+    PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=True
+
 igraph_neighborhood_size:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT res, VERTEX_SELECTOR vids, INTEGER order,
@@ -849,6 +858,9 @@ igraph_has_loop:
 
 igraph_has_multiple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
+
+igraph_count_loops:
+    PARAMS: GRAPH graph, OUT INTEGER loop_count
 
 igraph_count_multiple:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, EDGE_SELECTOR es=ALL

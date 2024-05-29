@@ -170,6 +170,12 @@ IGRAPH_EXPORT igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                                igraph_bool_t loops, igraph_bool_t multiple,
                                                igraph_bool_t finite_size_correction);
 
+IGRAPH_EXPORT igraph_error_t igraph_chung_lu_game(igraph_t *graph,
+                                                  const igraph_vector_t *expected_out_deg,
+                                                  const igraph_vector_t *expected_in_deg,
+                                                  igraph_bool_t loops,
+                                                  igraph_chung_lu_t variant);
+
 IGRAPH_EXPORT igraph_error_t igraph_k_regular_game(igraph_t *graph,
                                         igraph_integer_t no_of_nodes, igraph_integer_t k,
                                         igraph_bool_t directed, igraph_bool_t multiple);

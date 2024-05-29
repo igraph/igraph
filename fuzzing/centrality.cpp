@@ -72,7 +72,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_spanner(&graph, &iv, 2.34, NULL);
 
             igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
-            igraph_simplify(&graph, /* multiple */ true, /* loops */ false, NULL);
+            igraph_simplify(&graph, /* remove_multiple */ true, /* remove_loops */ false, NULL);
             igraph_trussness(&graph, &iv);
 
             igraph_vector_int_destroy(&iv);

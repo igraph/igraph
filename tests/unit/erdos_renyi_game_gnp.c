@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int stress_test(void) {
+void stress_test(void) {
     igraph_rng_seed(igraph_rng_default(), 137);
 
     for (igraph_integer_t size=2; size < 5; size++) {
@@ -62,11 +62,9 @@ int stress_test(void) {
     }
 
     VERIFY_FINALLY_STACK();
-
-    return 0;
 }
 
-int test_examples(void) {
+void test_examples(void) {
     igraph_t g;
     igraph_bool_t simple;
 
@@ -164,20 +162,12 @@ int test_examples(void) {
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
-
-    return 0;
 }
 
 int main(void) {
-    int retval;
 
-    retval = test_examples();
-    if (retval) {
-        return retval;
-    }
+    test_examples();
+    stress_test();
 
-    retval = stress_test();
-    if (retval) {
-        return retval;
-    }
+    return 0;
 }

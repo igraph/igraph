@@ -909,9 +909,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     }
     */
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&ignored_edges, no_of_edges));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &ignored_edges);
-
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&ignored_edges, no_of_edges);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_to_the_left, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis1, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis2, 0);
@@ -958,9 +956,9 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
                 }
                 if (crossing) {
                     if (j_inner) {
-                        VECTOR(ignored_edges)[k] = 1;
+                        VECTOR(ignored_edges)[k] = true;
                     } else {
-                        VECTOR(ignored_edges)[j] = 1;
+                        VECTOR(ignored_edges)[j] = true;
                     }
                 }
             }

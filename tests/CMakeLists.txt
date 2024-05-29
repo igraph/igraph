@@ -204,6 +204,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
@@ -340,6 +341,7 @@ add_legacy_tests(
   igraph_local_scan_k_ecount_them
   igraph_local_scan_subset_ecount
   igraph_local_transitivity
+  igraph_mean_degree
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
@@ -559,6 +561,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
+  igraph_contract_vertices
   igraph_difference
   igraph_disjoint_union
   igraph_join
@@ -987,6 +990,7 @@ add_legacy_tests(
 add_benchmarks(
   NAMES
   connectivity
+  erdos_renyi
   graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
@@ -1015,6 +1019,7 @@ add_benchmarks(
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
+  lad
 )
 
 # dot product

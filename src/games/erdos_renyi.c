@@ -34,17 +34,93 @@
 /**
  * \section about_games
  *
- * <para>Games are randomized graph generators. Randomization means that
- * they generate a different graph every time you call them. </para>
+ * <para>Games are random graph generators, i.e. they generate a different
+ * graph every time they are called. igraph includes many such generators.
+ * Some implement stochastic graph construction processes inspired by real-world
+ * mechanics, such as preferential attachment, while others are designed to
+ * produce graphs with certain used properties (e.g. fixed number of edges,
+ * fixed degrees, etc.)</para>
  */
+
+/* This implementation is used only with very large vertex counts, above
+ * sqrt(MAX_EXACT_REAL) ~ 100 million, when the default implementation would
+ * fail due to overflow. While this version avoids overflow and uses less memory,
+ * it is also slower than the default implementation. */
+static igraph_error_t gnp_large(
+    igraph_t *graph, igraph_integer_t n, igraph_real_t p,
+    igraph_bool_t directed, igraph_bool_t loops, igraph_integer_t ecount_estimate
+) {
+
+    igraph_vector_int_t edges;
+    int iter = 0;
+
+    /* Necessitated by floating point arithmetic used in the implementation. */
+    if (n >= IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Number of vertices is too large.", IGRAPH_EOVERFLOW);
+    }
+
+    if (ecount_estimate > IGRAPH_ECOUNT_MAX) {
+        ecount_estimate = IGRAPH_ECOUNT_MAX;
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount_estimate));
+
+    RNG_BEGIN();
+    for (igraph_integer_t i=0; i < n; i++) {
+        igraph_integer_t j = directed ? 0 : i;
+
+        while (true) {
+            igraph_real_t gap = RNG_GEOM(p);
+
+            /* This formulation not only terminates the loop when necessary,
+             * but also protects against overflow when 'p' is very small
+             * and 'gap' becomes very large, perhaps larger than representable
+             * in an igraph_integer_t. */
+            if (gap >= n - j) {
+                break;
+            }
+
+            j += gap;
+
+            if (loops || i != j) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
+            }
+
+            j++;
+
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    }
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \ingroup generators
  * \function igraph_erdos_renyi_game_gnp
  * \brief Generates a random (Erdős-Rényi) graph with fixed edge probabilities.
  *
- * In this model, a graph with n vertices is generated such that every possible
- * edge is included in the graph with probability p.
+ * In the <code>G(n, p)</code> Erdős-Rényi model, also known as the Gilbert model,
+ * or Bernoulli random graph, a graph with \p n vertices is generated such that
+ * every possible edge is included in the graph independently with probability
+ * \p p. This is equivalent to a maximum entropy random graph model model with
+ * a constraint on the \em expected edge count. Setting <code>p = 1/2</code>
+ * generates all graphs on \p n vertices with the same probability.
+ *
+ * </para><para>
+ * The expected mean degree of the graph is approximately <code>p n</code>;
+ * set <code>p = k/n</code> when a mean degree of approximately \c k is
+ * desired. More precisely, the expected mean degree is <code>p(n-1)</code>
+ * in (undirected or directed) graphs without self-loops,
+ * <code>p(n+1)</code> in undirected graphs with self-loops, and
+ * <code>p n</code> in directed graphs with self-loops.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
@@ -58,8 +134,12 @@
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
- * \ref igraph_erdos_renyi_game_gnm()
+ * \sa \ref igraph_erdos_renyi_game_gnm() to generate random graphs with
+ * a sharply fixed edge count; \ref igraph_chung_lu_game() and
+ * \ref igraph_static_fitness_game() to generate random graphs with a
+ * fixed expected degree sequence; \ref igraph_bipartite_game_gnm() for the
+ * bipartite version of this model; \ref igraph_barabasi_game() and
+ * \ref igraph_growing_random_game() for other commonly used random graph models.
  *
  * \example examples/simple/igraph_erdos_renyi_game_gnp.c
  */
@@ -76,7 +156,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    igraph_integer_t vsize;
     int iter = 0;
 
     if (n < 0) {
@@ -91,9 +170,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     } else if (p == 1.0) {
         IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
     } else {
-
         igraph_real_t maxedges = n, last;
-        igraph_integer_t maxedges_int;
+        igraph_integer_t ecount_estimate, ecount;
 
         if (directed && loops) {
             maxedges *= n;
@@ -105,12 +183,15 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             maxedges *= (n - 1) / 2.0;
         }
 
+        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &ecount_estimate));
+
         if (maxedges > IGRAPH_MAX_EXACT_REAL) {
-            IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+            /* Use a slightly slower, but overflow-free implementation. */
+            return gnp_large(graph, n, p, directed, loops, ecount_estimate);
         }
+
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &maxedges_int));
-        IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges_int));
+        IGRAPH_CHECK(igraph_vector_reserve(&s, ecount_estimate));
 
         RNG_BEGIN();
 
@@ -124,13 +205,17 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
         RNG_END();
 
+        ecount = igraph_vector_size(&s);
+        if (ecount > IGRAPH_ECOUNT_MAX) {
+            IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+        }
+
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount));
 
         iter = 0;
-        vsize = igraph_vector_size(&s);
         if (directed && loops) {
-            for (igraph_integer_t i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < ecount; i++) {
                 igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
                 igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 igraph_vector_int_push_back(&edges, from);
@@ -138,7 +223,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else if (directed && !loops) {
-            for (igraph_integer_t i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < ecount; i++) {
                 igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
                 igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 if (from == to) {
@@ -149,7 +234,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else if (!directed && loops) {
-            for (igraph_integer_t i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < ecount; i++) {
                 igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
                 igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
@@ -157,7 +242,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else { /* !directed && !loops */
-            for (igraph_integer_t i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < ecount; i++) {
                 igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
                 igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
@@ -181,8 +266,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * \function igraph_erdos_renyi_game_gnm
  * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
  *
- * In this model, a graph with n vertices and m edges is generated such that the
- * edges are selected uniformly at random.
+ * In the <code>G(n, m)</code> Erdős-Rényi model, a graph with \p n vertices
+ * and \p m edges is generated uniformly at random.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
@@ -196,8 +281,12 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
- * \ref igraph_erdos_renyi_game_gnp()
+ * \sa \ref igraph_erdos_renyi_game_gnp() to sample from the related
+ * <code>G(n, p)</code> model, which constrains the \em expected edge count;
+ * \ref igraph_degree_sequence_game() to constrain the degree sequence;
+ * \ref igraph_bipartite_game_gnm() for the bipartite version of this model;
+ * \ref igraph_barabasi_game() and \ref igraph_growing_random_game() for other
+ * commonly used random graph models.
  *
  * \example examples/simple/igraph_erdos_renyi_game_gnm.c
  */

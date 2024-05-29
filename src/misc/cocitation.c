@@ -19,6 +19,7 @@
 #include "igraph_cocitation.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_interface.h"
 
 #include "core/interruption.h"
@@ -468,15 +469,15 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
     if (loops) {
         /* Add the loop edges */
 
-        igraph_vector_bool_t seen;
-        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, no_of_nodes);
+        igraph_bitset_t seen;
+        IGRAPH_BITSET_INIT_FINALLY(&seen, no_of_nodes);
 
         for (igraph_integer_t i = 0; i < k; i++) {
             igraph_integer_t j = VECTOR(*pairs)[i];
-            if (VECTOR(seen)[j]) {
+            if (IGRAPH_BIT_TEST(seen, j)) {
                 continue;
             }
-            VECTOR(seen)[j] = true;
+            IGRAPH_BIT_SET(seen, j);
             v1 = igraph_lazy_adjlist_get(&al, j);
             IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, j, &u)) {
@@ -484,7 +485,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
             }
         }
 
-        igraph_vector_bool_destroy(&seen);
+        igraph_bitset_destroy(&seen);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

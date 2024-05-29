@@ -321,9 +321,10 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
  * vertices from a graph, the opposite of this function.
  */
 igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
-                            const igraph_vs_t vids, igraph_subgraph_implementation_t impl) {
-    return igraph_induced_subgraph_map(graph, res, vids, impl, /* map= */ 0,
-                                       /* invmap= */ 0);
+                                       const igraph_vs_t vids,
+                                       igraph_subgraph_implementation_t impl) {
+    return igraph_induced_subgraph_map(graph, res, vids, impl,
+                                       /* map= */ NULL, /* invmap= */ NULL);
 }
 
 static igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
@@ -425,11 +426,13 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
  * vertices from a graph, the opposite of this function.
  */
 igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
-                                const igraph_vs_t vids,
-                                igraph_subgraph_implementation_t impl,
-                                igraph_vector_int_t *map,
-                                igraph_vector_int_t *invmap) {
-    return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ false);
+                                           const igraph_vs_t vids,
+                                           igraph_subgraph_implementation_t impl,
+                                           igraph_vector_int_t *map,
+                                           igraph_vector_int_t *invmap) {
+    return igraph_i_induced_subgraph_map(graph, res, vids, impl,
+                                         map, invmap,
+                                         /* map_is_prepared = */ false);
 }
 
 /**

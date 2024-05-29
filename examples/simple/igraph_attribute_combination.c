@@ -19,7 +19,7 @@ int main(void) {
                                  "type",   IGRAPH_ATTRIBUTE_COMBINE_FIRST,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&graph, /*multiple=*/ true, /*loops=*/ true, &comb);
+    igraph_simplify(&graph, /*remove_multiple=*/ true, /*remove_loops=*/ true, &comb);
     igraph_write_graph_graphml(&graph, stdout, /*prefixattr=*/ true);
 
     igraph_destroy(&graph);
