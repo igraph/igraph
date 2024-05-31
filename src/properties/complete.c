@@ -153,3 +153,72 @@ cleanup:
 
     return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * \ingroup structural
+ * \function igraph_is_clique
+ * \brief Does a set of vertices form a clique?
+ *
+ * \experimental
+ *
+ * Tests if all pairs within a set of vertices are connected, i.e. whether they
+ * form a clique. An empty set and singleton set are considered to be a clique.
+ *
+ * \param graph The input graph.
+ * \param candidate The vertex set to test for being a clique.
+ * \param directed Whether to take edge directions into account in directed graphs.
+ * \param res The result will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(n^2 log(d)) where n is the number of vertices in the
+ * candidate set and d is the typical vertex degree.
+ */
+igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
+                                igraph_bool_t directed, igraph_bool_t *res) {
+    igraph_vector_int_t vids;
+    igraph_integer_t n; /* clique size */
+    igraph_bool_t is_clique = true; /* be optimistic */
+
+    if (! igraph_is_directed(graph)) {
+        directed = false;
+    }
+
+    if (igraph_is_directed(graph) == directed && igraph_vs_is_all(&candidate)) {
+        return igraph_is_complete(graph, res);
+    }
+
+    /* The following implementation is optimized for testing for small cliques
+     * in large graphs. */
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
+    IGRAPH_CHECK(igraph_vs_as_vector(graph, candidate, &vids));
+
+    n = igraph_vector_int_size(&vids);
+
+    for (igraph_integer_t i = 0; i < n; i++) {
+        igraph_integer_t u = VECTOR(vids)[i];
+        for (igraph_integer_t j = directed ? 0 : i+1; j < n; j++) {
+            igraph_integer_t v = VECTOR(vids)[j];
+            /* Compare u and v for equality instead of i and j in case
+             * the vertex list contained duplicates. */
+            if (u != v) {
+                igraph_integer_t eid;
+                IGRAPH_CHECK(igraph_get_eid(graph, &eid, u, v, directed, false));
+                if (eid == -1) {
+                    is_clique = false;
+                    goto done;
+                }
+            }
+        }
+    }
+
+done:
+
+    *res = is_clique;
+
+    igraph_vector_int_destroy(&vids);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}

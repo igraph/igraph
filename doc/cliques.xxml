@@ -13,6 +13,7 @@ to cliques and independent vertex sets.
 
 <section id="cliques"><title>Cliques</title>
 <!-- doxrox-include igraph_is_complete -->
+<!-- doxrox-include igraph_is_clique -->
 <!-- doxrox-include igraph_cliques -->
 <!-- doxrox-include igraph_clique_size_hist -->
 <!-- doxrox-include igraph_cliques_callback -->
