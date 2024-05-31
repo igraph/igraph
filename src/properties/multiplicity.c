@@ -101,6 +101,10 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
                 if (VECTOR(neis)[j] == i) {
                     known_loop = true; has_loop = true; break;
                 }
+                /* Attention: If the graph is undirected, self-loops appears
+                 * twice in the neighbour list. This does not mean that there
+                 * are multi-edges. We do not need to worry about this as loop
+                 * are already caught above. */
                 if (j > 0 && VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
                     known_multi = true; has_multi = true; break;
                 }
