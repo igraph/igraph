@@ -19,6 +19,7 @@
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
+#include "core/interruption.h"
 #include "graph/internal.h"
 
 /**
@@ -42,13 +43,14 @@
  * Time complexity: O(|V| + |E|) at worst.
  */
 
-igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res)
-{
+igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res) {
+
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t complete_ecount;
     igraph_bool_t simple, directed = igraph_is_directed(graph);
     igraph_vector_int_t neighbours;
+    int iter = 0;
 
     /* If the graph is the null graph or the singleton graph, return early */
     if (vcount == 0 || vcount == 1) {
@@ -129,8 +131,7 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res)
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbours, vcount);
 
     for (igraph_integer_t i = 0; i < vcount; ++i) {
-
-        igraph_vector_int_clear(&neighbours);
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         IGRAPH_CHECK(igraph_i_neighbors(graph, &neighbours, i, IGRAPH_OUT,
                                         IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -162,6 +163,7 @@ static igraph_error_t is_clique(const igraph_t *graph, igraph_vs_t candidate,
     igraph_vector_int_t vids;
     igraph_integer_t n; /* clique size */
     igraph_bool_t result = true; /* be optimistic */
+    int iter = 0;
 
     /* The following implementation is optimized for testing for small cliques
      * in large graphs. */
@@ -193,6 +195,7 @@ static igraph_error_t is_clique(const igraph_t *graph, igraph_vs_t candidate,
                 }
             }
         }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
     }
 
 done:
