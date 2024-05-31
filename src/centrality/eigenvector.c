@@ -153,7 +153,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         if (VECTOR(degree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(degree)[i] + RNG_UNIF(-1e-4, 1e-4);
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            MATRIX(vectors, i, 0) = 0.01;
         }
     }
     RNG_END();
@@ -350,7 +350,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         if (VECTOR(indegree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            MATRIX(vectors, i, 0) = 0.01;
         }
     }
     RNG_END();
