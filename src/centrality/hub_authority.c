@@ -307,12 +307,12 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
-    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0, 0));
+    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, weights, NULL));
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
             MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            MATRIX(vectors, i, 0) = 0.01;
         }
     }
 
