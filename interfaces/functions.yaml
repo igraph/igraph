@@ -126,6 +126,9 @@ igraph_star:
 igraph_wheel:
     PARAMS: OUT GRAPH graph, INTEGER n, WHEEL_MODE mode=OUT, INTEGER center=0
 
+igraph_hypercube:
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False
+
 igraph_square_lattice:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
