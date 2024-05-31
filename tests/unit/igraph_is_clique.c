@@ -21,7 +21,7 @@
 
 int main(void) {
     igraph_t g;
-    igraph_bool_t is_clique;
+    igraph_bool_t is_clique, is_indep_set;
     igraph_vector_int_t vids;
 
     igraph_small(&g, 10, IGRAPH_DIRECTED,
@@ -104,6 +104,40 @@ int main(void) {
     is_clique = true;
     igraph_is_clique(&g, igraph_vss_all(), false, &is_clique);
     IGRAPH_ASSERT(! is_clique);
+
+    /* Independent sets */
+
+    /* Empty set */
+    igraph_vector_int_init(&vids, 0);
+    is_indep_set = false;
+    igraph_is_independent_vertex_set(&g, igraph_vss_vector(&vids), &is_indep_set);
+    IGRAPH_ASSERT(is_indep_set);
+    igraph_vector_int_destroy(&vids);
+
+    /* Singleton set */
+    is_indep_set = false;
+    igraph_is_independent_vertex_set(&g, igraph_vss_1(5), &is_indep_set);
+    IGRAPH_ASSERT(is_indep_set);
+
+    igraph_vector_int_init_int_end(&vids, -1,
+                                   6, 9, -1);
+    is_indep_set = false;
+    igraph_is_independent_vertex_set(&g, igraph_vss_vector(&vids), &is_indep_set);
+    IGRAPH_ASSERT(is_indep_set);
+    igraph_vector_int_destroy(&vids);
+
+    igraph_vector_int_init_int_end(&vids, -1,
+                                   5, 6, 9, -1);
+    is_indep_set = true;
+    igraph_is_independent_vertex_set(&g, igraph_vss_vector(&vids), &is_indep_set);
+    IGRAPH_ASSERT(! is_indep_set);
+    igraph_vector_int_destroy(&vids);
+
+    is_indep_set = true;
+    igraph_is_independent_vertex_set(&g, igraph_vss_all(), &is_indep_set);
+    IGRAPH_ASSERT(! is_indep_set);
+
+    igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
 
