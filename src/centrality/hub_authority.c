@@ -308,7 +308,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
-    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, weights, NULL));
+    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
     RNG_BEGIN();
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
