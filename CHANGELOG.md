@@ -12,6 +12,7 @@
  - `igraph_stack_capacity()` returns the allocated capacity of a stack.
  - `igraph_is_clique()` checks if all pairs within a set of vertices are connected (experimental function).
  - `igraph_is_independent_vertex_set()` checks if no pairs within a set of vertices are connected (experimental function).
+ - `igraph_hypercube()` creates a hypercube graph (experimental function).
 
 ### Fixed
 
