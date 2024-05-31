@@ -288,6 +288,7 @@ add_legacy_tests(
   components
   coreness
   efficiency
+  eigen_stress
   global_transitivity
   harmonic_centrality
   hub_and_authority
