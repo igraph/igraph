@@ -134,7 +134,7 @@ IGRAPH_EXPORT igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vec
 IGRAPH_EXPORT igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                                             igraph_vector_t *ins, igraph_vector_t *outs);
 
-IGRAPH_EXPORT igraph_real_t igraph_centralization(const igraph_vector_t *scores,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t igraph_centralization(const igraph_vector_t *scores,
                                                   igraph_real_t theoretical_max,
                                                   igraph_bool_t normalized);
 
