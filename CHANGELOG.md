@@ -9,6 +9,7 @@
  - `igraph_chung_lu_game()` implements the classic Chung-Lu model, as well as a number of its variants (experimental function).
  - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
  - `igraph_count_loops()` counts self-loops in the graph (experimental function).
+ - `igraph_stack_capacity()` returns the allocated capacity of a stack.
 
 ### Fixed
 
