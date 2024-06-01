@@ -554,8 +554,8 @@ igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
 
 typedef struct igraph_i_max_ind_vsets_data_t {
     igraph_integer_t matrix_size;
-    igraph_adjlist_t adj_list;         /* Adjacency list of the graph */
-    igraph_vector_int_t deg;                 /* Degrees of individual nodes */
+    igraph_adjlist_t adj_list;           /* Adjacency list of the graph */
+    igraph_vector_int_t deg;             /* Degrees of individual nodes */
     igraph_set_t* buckets;               /* Bucket array */
     /* The IS value for each node. Still to be explained :) */
     igraph_integer_t* IS;
