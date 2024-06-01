@@ -211,7 +211,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(
         igraph_integer_t start, igraph_integer_t end);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch)(
         const TYPE(igraph_vector) *v, BASE what, igraph_integer_t *pos);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
         const TYPE(igraph_vector) *v, BASE what);
 #endif
 
