@@ -444,7 +444,7 @@ igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs, const igraph_vector_int_t 
  *
  * Time complexity: O(1).
  *
- * \example examples/simple/igraph_vs_seq.c
+ * \example examples/simple/igraph_vs_range.c
  */
 
 igraph_error_t igraph_vs_range(igraph_vs_t *vs, igraph_integer_t start, igraph_integer_t end) {
@@ -1861,7 +1861,7 @@ static igraph_error_t igraph_i_eit_all_between(
  *
  * Time complexity: depends on the type of the edge selector. For edge
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
- * \ref igraph_es_1(), \ref igraph_es_vector(), \ref igraph_es_seq() it is
+ * \ref igraph_es_1(), \ref igraph_es_vector(), \ref igraph_es_range() it is
  * O(1). For \ref igraph_es_incident() it is O(d) where d is the number of
  * incident edges of the vertex.
  */

@@ -156,7 +156,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
   igraph_vs_nonadj
-  igraph_vs_seq
+  igraph_vs_range
   igraph_vs_vector
 )
 
