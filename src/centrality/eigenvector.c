@@ -391,6 +391,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     RNG_BEGIN();
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
+            /* Note: Keep random perturbation non-negative. */
             MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(0, 1e-4);
         } else if (! negative_weights) {
             /* The eigenvector centrality of zero in-degree vertices is also zero. */
