@@ -364,7 +364,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     RNG_BEGIN();
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
-            MATRIX(vectors, i, 0) = VECTOR(tmp)[i] + RNG_UNIF(-1e-4, 1e-4);
+            MATRIX(vectors, i, 0) = VECTOR(tmp)[i] + RNG_UNIF(0, 1e-4);
         } else if (! negative_weights) {
             /* The hub score of zero out-degree vertices is also zero. */
             MATRIX(vectors, i, 0) = 0.0;
