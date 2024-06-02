@@ -64,6 +64,9 @@
  - The deprecated `igraph_vector_copy()` and `igraph_matrix_copy()` were removed. Use `igraph_vector_init_copy()` and `igraph_matrix_init_copy()` instead.
  - The deprecated `igraph_vector_e()`, `igraph_vector_e_ptr()`, `igraph_matrix_e()` and `igraph_matrix_e_ptr()` were removed. Use the alternatives ending in `_get()` and `_get_ptr()` instead.
  - The deprecated `igraph_vs_seq()`, `igraph_vss_seq()`, `igraph_es_seq()`, `igraph_ess_range()`, and `igraph_vector_init_seq()` were removed. Use the `range` alternatives instead of the old `seq` ones.
+ - The deprecated `igraph_erdos_renyi_game()` and `igraph_bipartite_game()` were removed. Use the corresponding functions with `_gnm()` and `_gnp()` in the name instead.
+ - The deprecated `igraph_tree()` was removed. Use `igraph_kary_tree()` instead.
+ - The deprecated `igraph_lattice()` was removed. Use `igraph_square_lattice()` instead.
 
 ### Deprecated
 
