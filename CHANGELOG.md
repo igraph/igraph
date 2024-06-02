@@ -50,6 +50,7 @@
  - The order of edges in the graph returned by `igraph_(weighted_)adjacency()` and `igraph_biadjacency()` has changed. Note that these functions do not guarantee any specific edge order.
  - `igraph_eigenvector_centrality()` now warns about eigenvector centralities equal to zero, as these indicate a disconnected graph, for which eigenvector centrality is not meaningful.
  - `igraph_hub_and_authority_scores()` now warns when a large fraction of centrality scores are zero, as this indicates a non-unique solution, and thus the returned result may not be meaningful.
+ - `igraph_hub_and_authority_scores()` now warns when providing an undirected graph as input, and falls back to the equivalent eigenvector centrality computation.
 
 ### Fixed
 

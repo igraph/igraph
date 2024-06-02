@@ -263,6 +263,39 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     igraph_vector_t my_hub_vector;
     igraph_bool_t negative_weights = false;
 
+    if (! igraph_is_directed(graph)) {
+        /* In undirected graphs, hub and authority scores are the same as eigenvector
+         * centralities. We issue a warning to avoid user confusion.
+         * If Ax = lambda x then A^2 x = lambda^2 x. Therefore the principal
+         * eigenvector of A is also a principal eigenvector of A^2. However,
+         * if both lambda and -lambda are eigenvalues of A, then the lambda^2
+         * eigenvalue of A^2 will be degenerate. This happens for example in
+         * an even cycle graph where 2 and -2 are the largest eigenvalues in magnitude,
+         * therefore 4 is a degenerate eigenvalue of A^2, with eigenspace spanned by
+         * (0, 1, 0, 1, ...) and (1, 0, 1, ...). The vector (1, 1, ...), which
+         * would be expected by users based on symmetry considerations, may not be
+         * returned. We avoid such issues by falling back to igraph_eigenvector_centrality() */
+
+        IGRAPH_WARNING("Hub and authority scores requested for undirected graph. "
+                       "These are the same as eigenvector centralities.");
+        if (! hub_vector) {
+            IGRAPH_VECTOR_INIT_FINALLY(&my_hub_vector, no_of_nodes);
+            my_hub_vector_p = &my_hub_vector;
+        } else {
+            my_hub_vector_p = hub_vector;
+        }
+        IGRAPH_CHECK(igraph_eigenvector_centrality(graph, my_hub_vector_p, value, IGRAPH_ALL, weights, options));
+        *value = (*value) * (*value); /* adjust the eigenvalue, see comment at top */
+        if (authority_vector) {
+            IGRAPH_CHECK(igraph_vector_update(authority_vector, my_hub_vector_p));
+        }
+        if (! hub_vector) {
+            igraph_vector_destroy(&my_hub_vector);
+            IGRAPH_FINALLY_CLEAN(1);
+        }
+        return IGRAPH_SUCCESS;
+    }
+
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
         if (value) {
