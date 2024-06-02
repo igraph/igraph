@@ -85,12 +85,6 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
     }
 }
 
-/* Normalizes a real-valued vector so that the largest element is 1.0,
- * i.e. divides by the element that is largest in magnitude. */
-static void scale_by_max_abs(igraph_vector_t *vec) {
-
-}
-
 static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
         igraph_integer_t n, igraph_vector_t *to, const igraph_real_t *from,
         igraph_adjlist_t *in) {
