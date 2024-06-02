@@ -287,29 +287,6 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 
 /**
  * \ingroup generators
- * \function igraph_lattice
- * \brief Arbitrary dimensional square lattices (deprecated).
- *
- * \deprecated-by igraph_square_lattice 0.10.0
- */
-igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector,
-                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
-                   igraph_bool_t circular) {
-    igraph_vector_bool_t periodic;
-
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&periodic, igraph_vector_int_size(dimvector));
-    igraph_vector_bool_fill(&periodic, circular);
-
-    IGRAPH_CHECK(igraph_square_lattice(graph, dimvector, nei, directed, mutual, &periodic));
-
-    igraph_vector_bool_destroy(&periodic);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup generators
  * \function igraph_square_lattice
  * \brief Arbitrary dimensional square lattices.
  *
@@ -661,18 +638,6 @@ igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_integer_t n, igraph_inte
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup generators
- * \function igraph_tree
- * \brief Creates a k-ary tree in which almost all vertices have k children (deprecated alias).
- *
- * \deprecated-by igraph_kary_tree 0.10.0
- */
-igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
-                igraph_tree_mode_t type) {
-    return igraph_kary_tree(graph, n, children, type);
 }
 
 /**

@@ -33,8 +33,4 @@
 <!-- doxrox-include igraph_is_bipartite -->
 </section>
 
-<section id="deprecated-bipartite"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_bipartite_game -->
-</section>
-
 </chapter>

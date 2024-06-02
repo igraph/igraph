@@ -100,16 +100,6 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_v
                                             igraph_integer_t m, igraph_bool_t directed,
                                             igraph_neimode_t mode, igraph_bool_t multiple);
 
-/* Deprecated functions: */
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED  igraph_error_t igraph_bipartite_game(
-    igraph_t *graph, igraph_vector_bool_t *types,
-    igraph_erdos_renyi_t type,
-    igraph_integer_t n1, igraph_integer_t n2,
-    igraph_real_t p, igraph_integer_t m,
-    igraph_bool_t directed, igraph_neimode_t mode
-);
-
 __END_DECLS
 
 #endif

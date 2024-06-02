@@ -82,10 +82,4 @@
 <!-- doxrox-include igraph_simple_interconnected_islands_game -->
 </section>
 
-<section id="deprecated-graph-generators"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_erdos_renyi_game -->
-<!-- doxrox-include igraph_lattice -->
-<!-- doxrox-include igraph_tree -->
-</section>
-
 </chapter>
