@@ -52,7 +52,7 @@ static igraph_arpack_error_t last_arpack_error = IGRAPH_ARPACK_NO_ERROR;
 /* Pristine ARPACK options object that is not exposed to the user; this is used
  * as a template for \c igraph_i_arpack_options_default when the user requests
  * a pointer to the default object */
-const static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
+static const igraph_arpack_options_t igraph_i_arpack_options_pristine = {
     /* .bmat = */ { 'I' },
     /* .n = */ 0,
     /* .which = */ { 'X', 'X' },

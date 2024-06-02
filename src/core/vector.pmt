@@ -173,7 +173,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
 
 const TYPE(igraph_vector)* FUNCTION(igraph_vector, view) (const TYPE(igraph_vector) *v,
         const BASE *data, igraph_integer_t length) {
-    const static BASE dummy = ZERO;
+    static const BASE dummy = ZERO;
     TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
 
     /* When the length is zero, we allow 'data' to be NULL.
