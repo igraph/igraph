@@ -38,10 +38,6 @@ INT:
     # A C integer
     CTYPE: int
 
-LONGINT:
-    # A C long integer
-    CTYPE: long int
-
 CSTRING:
     # A null-terminated immutable C string
     CTYPE: const char*
@@ -325,13 +321,6 @@ EIGENWHICHPOS:
     # Enum representing which eigenvalues to use in the spectral embedding
     # algorithm
     CTYPE: igraph_eigen_which_position_t
-    FLAGS: ENUM
-
-ERDOS_RENYI_TYPE:
-    # Enum that says wheter a GNM (n vertices, m edges) or
-    # GNP (n vertices, every edge exists with probability p)
-    # graph is created
-    CTYPE: igraph_erdos_renyi_t
     FLAGS: ENUM
 
 FAS_ALGORITHM:
