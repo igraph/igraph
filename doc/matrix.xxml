@@ -128,10 +128,4 @@
 <!-- doxrox-include igraph_matrix_complex_zapsmall -->
 </section>
 
-<section id="matrix-deprecated"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_matrix_copy -->
-<!-- doxrox-include igraph_matrix_e -->
-<!-- doxrox-include igraph_matrix_e_ptr -->
-</section>
-
 </section>

@@ -162,11 +162,4 @@
 <!-- doxrox-include IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR -->
 </section>
 
-<section id="vector-deprecated"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_vector_copy -->
-<!-- doxrox-include igraph_vector_e -->
-<!-- doxrox-include igraph_vector_e_ptr -->
-<!-- doxrox-include igraph_vector_init_seq -->
-</section>
-
 </section>
