@@ -1637,38 +1637,6 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 
 /**
  * \ingroup vector
- * \function igraph_vector_init_seq
- * \brief Initializes a vector with a sequence, inclusive endpoints (deprecated).
- *
- * </para><para>
- * The vector will contain the numbers \p from, \p from+1, ..., \p to. Note that
- * both endpoints are \em inclusive, contrary to typical usage of ranges in C.
- *
- * \deprecated-by igraph_vector_init_range 0.10.0
- *
- * \param v Pointer to an uninitialized vector object.
- * \param from The lower limit in the sequence (inclusive).
- * \param to The upper limit in the sequence (inclusive).
- * \return Error code:
- *         \c IGRAPH_ENOMEM: out of memory.
- *
- * Time complexity: O(n), the number
- * of elements in the vector.
- */
-
-igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v, BASE from, BASE to) {
-    BASE *p;
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
-
-    for (p = v->stor_begin; p < v->end; p++) {
-        *p = from++;
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup vector
  * \function igraph_vector_init_range
  * \brief Initializes a vector with a range.
  *
