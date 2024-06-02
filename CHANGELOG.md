@@ -61,6 +61,9 @@
  - The deprecated `igraph_automorphisms()` was removed. Use `igraph_count_automorphisms()` or `igraph_count_automorphisms_bliss()` instead.
  - The deprecated `igraph_decompose_destroy()` was removed.
  - The deprecated `igraph_hub_score()` and `igraph_authority_score()` were removed.
+ - The deprecated `igraph_vector_copy()` and `igraph_matrix_copy()` were removed. Use `igraph_vector_init_copy()` and `igraph_matrix_init_copy()` instead.
+ - The deprecated `igraph_vector_e()`, `igraph_vector_e_ptr()`, `igraph_matrix_e()` and `igraph_matrix_e_ptr()` were removed. Use the alternatives ending in `_get()` and `_get_ptr()` instead.
+ - The deprecated `igraph_vs_seq()`, `igraph_vss_seq()`, `igraph_es_seq()`, `igraph_ess_range()`, and `igraph_vector_init_seq()` were removed. Use the `range` alternatives instead of the old `seq` ones.
 
 ### Deprecated
 
