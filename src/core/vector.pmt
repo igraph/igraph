@@ -677,36 +677,6 @@ BASE* FUNCTION(igraph_vector, get_ptr)  (const TYPE(igraph_vector)* v, igraph_in
 
 /**
  * \ingroup vector
- * \function igraph_vector_e
- * \brief Access an element of a vector (deprecated alias).
- *
- * \deprecated-by igraph_vector_get 0.10.0
- */
-
-BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
-    return FUNCTION(igraph_vector, get)(v, pos);
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_e_ptr
- * \brief Get the address of an element of a vector.
- *
- * \param v The \type igraph_vector_t object.
- * \param pos The position of the element, the position of the first
- *   element is zero.
- * \return Pointer to the desired element.
- * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
- *
- * Time complexity: O(1).
- */
-
-BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_integer_t pos) {
-    return FUNCTION(igraph_vector, get_ptr)(v, pos);
-}
-
-/**
- * \ingroup vector
  * \function igraph_vector_set
  * \brief Assignment to an element of a vector.
  *
@@ -1549,19 +1519,6 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(
     memcpy(to->stor_begin, from->stor_begin, from_size * sizeof(BASE));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_copy
- * \brief Initializes a vector from another vector object (deprecated alias).
- *
- * \deprecated-by igraph_vector_init_copy 0.10
- */
-
-igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                  const TYPE(igraph_vector) *from) {
-    return FUNCTION(igraph_vector, init_copy)(to, from);
 }
 
 /**
