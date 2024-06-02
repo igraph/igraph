@@ -151,7 +151,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     RNG_BEGIN();
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(degree)[i]) {
-            MATRIX(vectors, i, 0) = VECTOR(degree)[i] + RNG_UNIF(-1e-4, 1e-4);
+            /* Note: Keep random perturbation non-negative. */
+            MATRIX(vectors, i, 0) = VECTOR(degree)[i] + RNG_UNIF(0, 1e-4);
         } else {
             MATRIX(vectors, i, 0) = 0.01;
         }
@@ -348,7 +349,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     RNG_BEGIN();
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
-            MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+            /* Note: Keep random perturbation non-negative. */
+            MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(0, 1e-4);
         } else {
             MATRIX(vectors, i, 0) = 0.01;
         }

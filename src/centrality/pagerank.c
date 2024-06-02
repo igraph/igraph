@@ -612,7 +612,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
      * plus some small random noise to avoid convergence problems. */
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i] > 0) {
-            MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+            /* Note: Keep random perturbation non-negative. */
+            MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(0, 1e-4);
         } else {
             MATRIX(vectors, i, 0) = 1;
         }
