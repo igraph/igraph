@@ -481,7 +481,7 @@ igraph_error_t igraph_square_lattice(
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  *
- * \sa \ref igraph_lattice() for generating more general lattices.
+ * \sa \ref igraph_square_lattice() for generating more general lattices.
  *
  * \example examples/simple/igraph_ring.c
  */
@@ -579,8 +579,9 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
- * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \sa \ref igraph_regular_tree(), \ref igraph_symmetric_tree() and \ref igraph_star()
+ * for creating other regular structures; \ref igraph_from_prufer() and
+ * \ref igraph_tree_from_parent_vector() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
  * \example examples/simple/igraph_kary_tree.c
