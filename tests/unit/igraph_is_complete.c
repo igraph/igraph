@@ -201,5 +201,7 @@ int main(void)
     check(true, 50);
     check(true, 51);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

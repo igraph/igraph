@@ -10,6 +10,8 @@
  - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
  - `igraph_count_loops()` counts self-loops in the graph (experimental function).
  - `igraph_stack_capacity()` returns the allocated capacity of a stack.
+ - `igraph_is_clique()` checks if all pairs within a set of vertices are connected (experimental function).
+ - `igraph_is_independent_vertex_set()` checks if no pairs within a set of vertices are connected (experimental function).
 
 ### Fixed
 

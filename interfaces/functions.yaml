@@ -1301,6 +1301,11 @@ igraph_count_reachable:
 # Cliques
 #######################################
 
+igraph_is_clique:
+    PARAMS: |-
+        GRAPH graph, VERTEX_SELECTOR candidate, BOOLEAN directed=False,
+        OUT BOOLEAN res
+
 igraph_cliques:
     PARAMS: |-
         GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0,
@@ -1364,6 +1369,9 @@ igraph_largest_weighted_cliques:
 igraph_weighted_clique_number:
     PARAMS: GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT REAL res
     DEPS: vertex_weights ON graph
+
+igraph_is_independent_vertex_set:
+    PARAMS: GRAPH graph, VERTEX_SELECTOR candidate, OUT BOOLEAN res
 
 igraph_independent_vertex_sets:
     PARAMS: |-
