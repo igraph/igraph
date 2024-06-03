@@ -23,9 +23,10 @@
 ### Changed
 
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` are now linear-time in all cases (thanks to @gendelpiekel, contributed in #2605).
- - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a few tens of millions of vertices.
+ - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a hundred million vertices.
  - `igraph_hub_and_authority_scores()` now warns when negative edge weights are present.
  - Updated the internal heuristics used by igraph's ARPACK interface, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, to improve the robustness of calculations.
+ - Updated the initial vector construction in `igraph_hub_and_authority_scores()`, `igraph_eigenvector_centrality()` and `igraph_(personalized_)pagerank()` with `IGRAPH_PAGERANK_ALGO_ARPACK`. This improves the robustness and convergence of calculations.
 
 ### Other
 
