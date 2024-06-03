@@ -89,6 +89,10 @@ IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_boo
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
+                                              igraph_bool_t directed, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,
+                                                       igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                                const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,

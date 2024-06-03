@@ -126,6 +126,9 @@ igraph_star:
 igraph_wheel:
     PARAMS: OUT GRAPH graph, INTEGER n, WHEEL_MODE mode=OUT, INTEGER center=0
 
+igraph_hypercube:
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False
+
 igraph_square_lattice:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
@@ -1288,6 +1291,12 @@ igraph_count_reachable:
 # Cliques
 #######################################
 
+igraph_is_clique:
+    PARAMS: |-
+        GRAPH graph, VERTEX_SELECTOR candidate, BOOLEAN directed=False,
+        OUT BOOLEAN res
+    DEPS: candidate ON graph
+
 igraph_cliques:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES_LIST res, INTEGER min_size=0,
@@ -1351,6 +1360,10 @@ igraph_largest_weighted_cliques:
 igraph_weighted_clique_number:
     PARAMS: GRAPH graph, VERTEX_WEIGHTS vertex_weights=NULL, OUT REAL res
     DEPS: vertex_weights ON graph
+
+igraph_is_independent_vertex_set:
+    PARAMS: GRAPH graph, VERTEX_SELECTOR candidate, OUT BOOLEAN res
+    DEPS: candidate ON graph
 
 igraph_independent_vertex_sets:
     PARAMS: |-
