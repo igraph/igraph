@@ -667,62 +667,71 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * \function igraph_realize_degree_sequence
  * \brief Generates a graph with the given degree sequence.
  *
- * This function generates an undirected graph that realizes a given degree sequence,
- * or a directed graph that realized a given pair of out- and in-degree sequences.
+ * This function generates an undirected graph that realizes a given degree
+ * sequence, or a directed graph that realizes a given pair of out- and
+ * in-degree sequences.
  *
  * </para><para>
  * Simple undirected graphs are constructed using the Havel-Hakimi algorithm
  * (undirected case), or the analogous Kleitman-Wang algorithm (directed case).
- * These algorithms work by choosing an arbitrary vertex and connecting all its stubs
- * to other vertices of highest degree.  In the directed case, the "highest" (in, out) degree
- * pairs are determined based on lexicographic ordering. This step is repeated until all degrees
- * have been connected up.
+ * These algorithms work by choosing an arbitrary vertex and connecting all its
+ * stubs to other vertices of highest degree.  In the directed case, the
+ * "highest" (in, out) degree pairs are determined based on lexicographic
+ * ordering. This step is repeated until all degrees have been connected up.
  *
  * </para><para>
- * Loopless multigraphs are generated using an analogous algorithm: an arbitrary vertex is chosen,
- * and it is connected with a single connection to a highest remaining degee vertex. If self-loops
- * are also allowed, the same algorithm is used, but if a non-zero vertex remains at the end of the
- * procedure, the graph is completed by adding self-loops to it. Thus, the result will contain at most
- * one vertex with self-loops.
+ * Loopless multigraphs are generated using an analogous algorithm: an arbitrary
+ * vertex is chosen, and it is connected with a single connection to a highest
+ * remaining degee vertex. If self-loops are also allowed, the same algorithm
+ * is used, but if a non-zero vertex remains at the end of the procedure, the
+ * graph is completed by adding self-loops to it. Thus, the result will contain
+ * at most one vertex with self-loops.
  *
  * </para><para>
- * The \c method parameter controls the order in which the vertices to be connected are chosen.
+ * The \c method parameter controls the order in which the vertices to be
+ * connected are chosen. In the undirected case, \c IGRAPH_REALIZE_DEGSEQ_SMALLEST
+ * produces a connected graph when one exists. This makes this method suitable
+ * for constructing trees with a given degree sequence.
  *
  * </para><para>
  * References:
  *
  * </para><para>
- * V. Havel,
+ * V. Havel:
  * Poznámka o existenci konečných grafů (A remark on the existence of finite graphs),
  * Časopis pro pěstování matematiky 80, 477-480 (1955).
  * http://eudml.org/doc/19050
  *
  * </para><para>
- * S. L. Hakimi,
+ * S. L. Hakimi:
  * On Realizability of a Set of Integers as Degrees of the Vertices of a Linear Graph,
  * Journal of the SIAM 10, 3 (1962).
  * https://www.jstor.org/stable/2098770
  *
  * </para><para>
- * D. J. Kleitman and D. L. Wang,
+ * D. J. Kleitman and D. L. Wang:
  * Algorithms for Constructing Graphs and Digraphs with Given Valences and Factors,
  * Discrete Mathematics 6, 1 (1973).
  * https://doi.org/10.1016/0012-365X%2873%2990037-X
  *
+ * P. L. Erdős, I. Miklós, Z. Toroczkai:
+ * A simple Havel-Hakimi type algorithm to realize graphical degree sequences of directed graphs,
+ * The Electronic Journal of Combinatorics 17.1 (2010).
+ * http://eudml.org/doc/227072
+ *
  * </para><para>
- * Sz. Horvát and C. D. Modes,
+ * Sz. Horvát and C. D. Modes:
  * Connectedness matters: construction and exact random sampling of connected networks (2021).
  * https://doi.org/10.1088/2632-072X/abced5
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param outdeg The degree sequence of an undirected graph
- *        (if \p indeg is NULL), or the out-degree sequence of
- *        a directed graph (if \p indeg is given).
- * \param indeg The in-degree sequence of a directed graph.
- *        Pass \c NULL to generate an undirected graph.
- * \param allowed_edge_types The types of edges to allow in the graph. For directed graphs,
- *        only \c IGRAPH_SIMPLE_SW is implemented at this moment. For undirected
- *        graphs, the following values are valid:
+ * \param outdeg The degree sequence of an undirected graph (if \p indeg is NULL),
+ *    or the out-degree sequence of a directed graph (if \p indeg is given).
+ * \param indeg The in-degree sequence of a directed graph. Pass \c NULL to
+ *    generate an undirected graph.
+ * \param allowed_edge_types The types of edges to allow in the graph. For
+ *    directed graphs, only \c IGRAPH_SIMPLE_SW is implemented at this moment.
+ *    For undirected graphs, the following values are valid:
  *        \clist
  *          \cli IGRAPH_SIMPLE_SW
  *          simple graphs (i.e. no self-loops or multi-edges allowed).
@@ -736,21 +745,24 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * \param method The method to generate the graph. Possible values:
  *        \clist
  *          \cli IGRAPH_REALIZE_DEGSEQ_SMALLEST
- *          The vertex with smallest remaining degree is selected first. The result is usually
- *          a graph with high negative degree assortativity. In the undirected case, this method
- *          is guaranteed to generate a connected graph, regardless of whether multi-edges are allowed,
- *          provided that a connected realization exists (see Horvát and Modes, 2021, as well as
- *          http://szhorvat.net/pelican/hh-connected-graphs.html).
- *          In the directed case it tends to generate weakly connected graphs, but this is not
- *          guaranteed.
+ *          The vertex with smallest remaining degree is selected first. The
+ *          result is usually a graph with high negative degree assortativity.
+ *          In the undirected case, this method is guaranteed to generate a
+ *          connected graph, regardless of whether multi-edges are allowed,
+ *          provided that a connected realization exists (see Horvát and Modes,
+ *          2021, as well as http://szhorvat.net/pelican/hh-connected-graphs.html).
+ *          In the directed case it tends to generate weakly connected graphs,
+ *          but this is not guaranteed.
  *          \cli IGRAPH_REALIZE_DEGSEQ_LARGEST
- *          The vertex with the largest remaining degree is selected first. The result
- *          is usually a graph with high positive degree assortativity, and is often disconnected.
+ *          The vertex with the largest remaining degree is selected first. The
+ *          result is usually a graph with high positive degree assortativity, and
+ *          is often disconnected.
  *          \cli IGRAPH_REALIZE_DEGSEQ_INDEX
- *          The vertices are selected in order of their index (i.e. their position in the degree vector).
- *          Note that sorting the degree vector and using the \c INDEX method is not equivalent
- *          to the \c SMALLEST method above, as \c SMALLEST uses the smallest \em remaining
- *          degree for selecting vertices, not the smallest \em initial degree.
+ *          The vertices are selected in order of their index (i.e. their position
+ *          in the degree vector). Note that sorting the degree vector and using
+ *          the \c INDEX method is not equivalent to the \c SMALLEST method above,
+ *          as \c SMALLEST uses the smallest \em remaining degree for selecting
+ *          vertices, not the smallest \em initial degree.
  *         \endclist
  * \return Error code:
  *          \clist
@@ -764,10 +776,14 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *           and sum of \p outdeg and \p indeg should match for directed graphs.
  *          \endclist
  *
- * \sa  \ref igraph_is_graphical() to test graphicality without generating a graph;
- *      \ref igraph_degree_sequence_game() to generate random graphs with a given degree sequence;
- *      \ref igraph_k_regular_game() to generate random regular graphs;
- *      \ref igraph_rewire() to randomly rewire the edges of a graph while preserving its degree sequence.
+ * \sa \ref igraph_is_graphical() to test graphicality without generating a graph;
+ *     \ref igraph_realize_bipartite_degree_sequence() to create bipartite graphs
+ *          from two degree sequence;
+ *     \ref igraph_degree_sequence_game() to generate random graphs with a given
+ *          degree sequence;
+ *     \ref igraph_k_regular_game() to generate random regular graphs;
+ *     \ref igraph_rewire() to randomly rewire the edges of a graph while
+ *          preserving its degree sequence.
  *
  * \example examples/simple/igraph_realize_degree_sequence.c
  */
