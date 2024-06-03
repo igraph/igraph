@@ -1308,6 +1308,7 @@ igraph_is_clique:
     PARAMS: |-
         GRAPH graph, VERTEX_SELECTOR candidate, BOOLEAN directed=False,
         OUT BOOLEAN res
+    DEPS: candidate ON graph
 
 igraph_cliques:
     PARAMS: |-
@@ -1375,6 +1376,7 @@ igraph_weighted_clique_number:
 
 igraph_is_independent_vertex_set:
     PARAMS: GRAPH graph, VERTEX_SELECTOR candidate, OUT BOOLEAN res
+    DEPS: candidate ON graph
 
 igraph_independent_vertex_sets:
     PARAMS: |-
