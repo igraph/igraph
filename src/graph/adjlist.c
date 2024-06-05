@@ -910,6 +910,23 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 } else {
                     if (VECTOR(*v)[i] == index) {
                         *has_loops = true;
+                        /* If we haven't found multi-edges yet, we also need to check
+                         * if this is a multi-loop, to set 'has_multiple' correctly. */
+                        if (! *has_multiple) {
+                            if (mode == IGRAPH_ALL) {
+                                /* Undirected loops appear twice in the neighbour list,
+                                 * so we check two following items instead of one. */
+                                if (i < n - 2 &&
+                                    VECTOR(*v)[i + 1] == VECTOR(*v)[i] &&
+                                    VECTOR(*v)[i + 2] == VECTOR(*v)[i]) {
+                                    *has_multiple = true;
+                                }
+                            } else {
+                                if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
+                                    *has_multiple = true;
+                                }
+                            }
+                        }
                     } else if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
                         *has_multiple = true;
                     }
