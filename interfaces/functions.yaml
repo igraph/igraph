@@ -547,7 +547,7 @@ igraph_get_shortest_paths_bellman_ford:
         GRAPH graph, OPTIONAL OUT VERTEX_INDICES_LIST vertices,
         OPTIONAL OUT EDGE_INDICES_LIST edges, VERTEX from, VERTEX_SELECTOR to=ALL,
         EDGE_WEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OPTIONAL OUT VECTOR_INT parents=NULL
+        OPTIONAL OUT VECTOR_INT parents=NULL,
         OPTIONAL OUT VECTOR_INT inbound_edges=NULL
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
