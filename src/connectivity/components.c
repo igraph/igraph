@@ -1022,16 +1022,16 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * biconnected. Use \ref igraph_is_biconnected() for this purpose.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param no If not a NULL pointer, the number of biconnected components will
+ * \param no If not a \c NULL pointer, the number of biconnected components will
  *     be stored here.
- * \param tree_edges If not a NULL pointer, then the found components
+ * \param tree_edges If not a \c NULL pointer, then the found components
  *     are stored here, in a list of vectors. Every vector in the list
  *     is a biconnected component, represented by its edges. More precisely,
  *     a spanning tree of the biconnected component is returned.
- * \param component_edges If not a NULL pointer, then the edges of the
+ * \param component_edges If not a \c NULL pointer, then the edges of the
  *     biconnected components are stored here, in the same form as for
  *     \c tree_edges.
- * \param components If not a NULL pointer, then the vertices of the
+ * \param components If not a \c NULL pointer, then the vertices of the
  *     biconnected components are stored here, in the same format as
  *     for the previous two arguments.
  * \param articulation_points If not a NULL pointer, then the
