@@ -392,6 +392,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_biconnected_components
   igraph_bridges
   igraph_decompose_strong
   igraph_is_biconnected

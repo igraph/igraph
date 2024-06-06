@@ -878,7 +878,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_bool_t *has_multiple
 
 ) {
-    igraph_bool_t dummy1, dummy2;
+    igraph_bool_t dummy1 = true, dummy2 = true; /* set dummies to avoid uninitialized read */
     if (has_loops == NULL) {
         has_loops = &dummy1;
     }
