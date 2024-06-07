@@ -245,7 +245,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
  * \return Error code.
  *
- * Time complexity: O(|V|), linear in the number of vertices.
+ * Time complexity: O(n), linear in the number of vertices.
  */
 igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
 
@@ -424,11 +424,10 @@ igraph_error_t igraph_adjlist_init_from_inclist(
  * Free all memory allocated for an adjacency list.
  * \param al The adjacency list to destroy.
  *
- * Time complexity: depends on memory management.
+ * Time complexity: O(n), where n is the size of the adjacency list.
  */
 void igraph_adjlist_destroy(igraph_adjlist_t *al) {
-    igraph_integer_t i;
-    for (i = 0; i < al->length; i++) {
+    for (igraph_integer_t i = 0; i < al->length; i++) {
         /* This works if some igraph_vector_int_t's contain NULL,
            because igraph_vector_int_destroy can handle this. */
         igraph_vector_int_destroy(&al->adjs[i]);
@@ -438,15 +437,17 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
 
 /**
  * \function igraph_adjlist_clear
- * Removes all edges from an adjacency list.
+ * \brief Removes all edges from an adjacency list.
+ *
+ * The size of the adjacency list stays unchanged, but all adjacent
+ * vertices will be removed.
  *
  * \param al The adjacency list.
- * Time complexity: depends on memory management, typically O(n), where n is
- * the total number of elements in the adjacency list.
+ *
+ * Time complexity: O(n), where n is the size of the adjacency list.
  */
 void igraph_adjlist_clear(igraph_adjlist_t *al) {
-    igraph_integer_t i;
-    for (i = 0; i < al->length; i++) {
+    for (igraph_integer_t i = 0; i < al->length; i++) {
         igraph_vector_int_clear(&al->adjs[i]);
     }
 }
@@ -476,8 +477,8 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
  *
  * \param al The adjacency list.
  *
- * Time complexity: O(n log n), n is the total number of elements in
- * the adjacency list.
+ * Time complexity: O(m log m), m is the total number of neighbors stored
+ * in the adjacency list.
  */
 void igraph_adjlist_sort(igraph_adjlist_t *al) {
     igraph_integer_t i;
@@ -802,7 +803,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
  * \param n  The number of vertices in the incidence list.
  * \return Error code.
  *
- * Time complexity: O(|V|), linear in the number of vertices.
+ * Time complexity: O(n), linear in the number of vertices.
  */
 
 igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
@@ -829,12 +830,11 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
  *
  * \param eal The incidence list to destroy.
  *
- * Time complexity: depends on memory management.
+ * Time complexity: O(n), where n is the size of the incidence list.
  */
 
 void igraph_inclist_destroy(igraph_inclist_t *il) {
-    igraph_integer_t i;
-    for (i = 0; i < il->length; i++) {
+    for (igraph_integer_t i = 0; i < il->length; i++) {
         /* This works if some igraph_vector_int_t's contain NULL,
            because igraph_vector_int_destroy can handle this. */
         igraph_vector_int_destroy(&il->incs[i]);
@@ -846,10 +846,12 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
  * \function igraph_inclist_clear
  * \brief Removes all edges from an incidence list.
  *
+ * The size of the incidence list stays unchanged, but all incident edges
+ * will be removed.
+ *
  * \param il The incidence list.
  *
- * Time complexity: depends on memory management, typically O(n), where n is
- * the total number of elements in the incidence list.
+ * Time complexity: O(n), where n is the size of the incidence list.
  */
 void igraph_inclist_clear(igraph_inclist_t *il) {
     igraph_integer_t i;
