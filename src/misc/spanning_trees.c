@@ -347,6 +347,65 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_integer_t get_comp(igraph_vector_int_t *comp, igraph_integer_t i) {
+    igraph_integer_t k = i;
+    for (;;) {
+        igraph_integer_t next = VECTOR(*comp)[k];
+        if (next == k) {
+            VECTOR(*comp)[i] = k;
+            return k;
+        } else {
+            k = next;
+        }
+    }
+}
+
+static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_integer_t j) {
+    VECTOR(*comp)[i] = get_comp(comp, j);
+}
+
+static igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
+    const igraph_t *graph, igraph_vector_int_t *res, const igraph_vector_t *weights) {
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_vector_int_t idx, comp;
+    igraph_integer_t tree_edge_count;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_qsort_ind(weights, &idx, IGRAPH_ASCENDING));
+
+    igraph_vector_int_init_range(&comp, 0, no_of_nodes);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
+
+    igraph_vector_int_clear(res);
+    tree_edge_count = 0;
+    for (igraph_integer_t i=0; i < no_of_edges; i++) {
+        igraph_integer_t edge = VECTOR(idx)[i];
+        igraph_integer_t u = IGRAPH_FROM(graph, edge);
+        igraph_integer_t v = IGRAPH_TO(graph, edge);
+
+        igraph_integer_t cu = get_comp(&comp, u);
+        igraph_integer_t cv = get_comp(&comp, v);
+
+        if (cu != cv) {
+            merge_comp(&comp, u, v);
+            IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
+            tree_edge_count++;
+        }
+
+        if (tree_edge_count == no_of_nodes - 1) {
+            /* We have enough edges for a tree. */
+            break;
+        }
+    }
+
+    igraph_vector_int_destroy(&idx);
+    igraph_vector_int_destroy(&comp);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
 
 /* igraph_random_spanning_tree */
 
