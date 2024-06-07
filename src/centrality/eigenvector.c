@@ -497,7 +497,13 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * vertex is proportional to the sum of eigenvector centralities of its
  * neighbors. In practice, the centralities are determined by calculating the
  * eigenvector corresponding to the largest positive eigenvalue of the
- * adjacency matrix. In the undirected case, this function considers
+ * adjacency matrix. This is motivated by the the fact that the principal
+ * eigenvector is guaranteed to be non-negative, assuming that edge weights
+ * are also non-negative. In fact, in connected undirected graphs, this is
+ * the \em only non-negative eigenvector.
+ *
+ * </para><para>
+ * In the undirected case, this function considers
  * the diagonal entries of the adjacency matrix to be \em twice the number of
  * self-loops on the corresponding vertex.
  *
@@ -516,19 +522,25 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * Eigenvector centrality is meaningful only for (strongly) connected graphs.
  * Undirected graphs that are not connected should be decomposed into connected
  * components, and the eigenvector centrality calculated for each separately.
- * This function does not verify that the graph is connected. If it is not,
- * in the undirected case the scores of all but one component will be zeros.
+ * This function does not directly verify that the graph is connected. If it is
+ * not, in the undirected case the scores of all but one component will typically
+ * be zeros. When zeros are detected, a warning is issued.
  *
  * </para><para>
  * Also note that the adjacency matrix of a directed acyclic graph or the
- * adjacency matrix of an empty graph does not possess positive eigenvalues,
- * therefore the eigenvector centrality is not defined for these graphs.
- * igraph will return an eigenvalue of zero in such cases. The eigenvector
- * centralities will all be equal for an empty graph and will all be zeros
- * for a directed acyclic graph. Such pathological cases can be detected
- * by asking igraph to calculate the eigenvalue as well (using the \p value
- * parameter, see below) and checking whether the eigenvalue is very close
- * to zero.
+ * adjacency matrix of an empty graph (neither of which are strongly connected)
+ * does not possess positive eigenvalues, therefore the eigenvector centrality
+ * is not meaningful for these graphs. igraph will return an eigenvalue of zero
+ * in such cases. The eigenvector centralities will all be equal for an empty
+ * graph and will all be zeros for a directed acyclic graph, and a warning is
+ * issued. Such pathological cases can be detected by asking igraph to calculate
+ * the eigenvalue as well (using the \p value parameter, see below) and checking
+ * whether it is very close to zero.
+ *
+ * </para><para>
+ * Eigenvector centrality was developed for networks with non-negative edge
+ * weights. While igraph does not refuse to carry out the calculation with
+ * negative weights, it will issue a warning.
  *
  * </para><para>
  * When working with directed graphs, consider using hub and authority

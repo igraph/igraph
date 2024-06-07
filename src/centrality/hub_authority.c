@@ -190,15 +190,29 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * The hub and authority scores of the vertices are defined as the principal
  * eigenvectors of <code>A A^T</code> and <code>A^T A</code>, respectively,
  * where <code>A</code> is the adjacency matrix of the graph and <code>A^T</code>
- * is its transposed.
+ * is its transpose. The motivation for choosing the principal eigenvector
+ * is that it is guaranteed to be non-negative when edge weights are also
+ * non-negative.
  *
  * </para><para>
- * If vector \c h and \c a contain hub and authority scores, then the two
- * scores are related by <code>h = Aa</code> and <code>a = A^T h</code>.
+ * If vectors \c h and \c a contain hub and authority scores, then the two
+ * scores are related by <code>h = A a</code> and <code>a = A^T h</code>.
  * When the principal eigenvalue of <code>A A^T</code> is degenerate, there
  * is no unique solution to the hub- and authority-score problem.
  * igraph guarantees that the scores that are returned are matching, i.e. are
  * related by these formulas, even in this situation.
+ *
+ * </para><para>
+ * Note that hub and authority scores are not well behaved in extremely sparse
+ * graphs where no single connected component dominates the undirected graphs
+ * corresponding to <code>A A^T</code> and <code>A^T A</code>. In these cases,
+ * there are many different non-negative eigenvectors, all reasonable solutions
+ * to the HITS equations. The symptom of such a situation is that a large
+ * fraction of the scores are zeros. igraph issues a warning when this is
+ * detected.
+ *
+ * </para><para>
+ * Results are scaled so that the largest hub and authority scores are both 1.
  *
  * </para><para>
  * The concept of hub and authority scores were developed for \em directed graphs.
@@ -207,32 +221,33 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \ref igraph_eigenvector_centrality().
  *
  * </para><para>
- * Results are scaled so that the largest hub and authority scores are both 1.
+ * HITS scores were developed for networks with non-negative edge weights.
+ * While igraph does not refuse to carry out the calculation with negative
+ * weights, it will issue a warning.
  *
  * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
  * Algorithms, \eme 1998. Extended version in \emb Journal of the
- * ACM \eme 46(1999).
+ * ACM \eme 46 (1999).
  * https://doi.org/10.1145/324133.324140
- * Also appears as IBM Research Report RJ 10076, May
- * 1997.
+ * Also appears as IBM Research Report RJ 10076, May 1997.
  *
  * \param graph The input graph. Can be directed and undirected.
  * \param hub_vector Pointer to an initialized vector, the hub scores are
  *    stored here. If a null pointer then it is ignored.
- * \param authority_vector Pointer to an initialized vector, the authority scores are
- *    stored here. If a null pointer then it is ignored.
+ * \param authority_vector Pointer to an initialized vector, the authority
+ *    scores are stored here. If a null pointer then it is ignored.
  * \param value If not a null pointer then the eigenvalue
  *    corresponding to the calculated eigenvectors is stored here.
  * \param weights A null pointer (meaning no edge weights), or a vector
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Supply \c NULL here to use the defaults. Note that the function
- *    overwrites the <code>n</code> (number of vertices) parameter and
- *    it always starts the calculation from a non-random vector
- *    calculated based on the degree of the vertices.
+ *    for details. Supply \c NULL here to use the defaults. Note that the
+ *    function overwrites the <code>n</code> (number of vertices) parameter
+ *    and it always starts the calculation from a vector calculated based on
+ *    the degree of the vertices.
  * \return Error code.
  *
  * Time complexity: depends on the input graph, usually it is O(|V|),
