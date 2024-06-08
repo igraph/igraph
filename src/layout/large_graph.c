@@ -138,7 +138,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (repulserad <= 0) {
-        IGRAPH_ERRORF("Repusion cutoff radius must be positive, got %g.", IGRAPH_EINVAL, repulserad);
+        IGRAPH_ERRORF("Repulsion cutoff radius must be positive, got %g.", IGRAPH_EINVAL, repulserad);
     }
 
     if (cellsize <= 0) {
