@@ -58,6 +58,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_list_triangles(&graph, &iv1);
 
+        igraph_ecc(&graph, &v1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
+
         igraph_count_reachable(&graph, &iv1, IGRAPH_OUT);
 
         if (igraph_vcount(&graph) >= 2) {

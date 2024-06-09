@@ -245,6 +245,10 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_bitset_countl_zero(co
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_bitset_countr_one(const igraph_bitset_t *bitset);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_bitset_is_all_zero(const igraph_bitset_t *bitset);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_bitset_is_all_one(const igraph_bitset_t *bitset);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_bitset_is_any_zero(const igraph_bitset_t *bitset);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_bitset_is_any_one(const igraph_bitset_t *bitset);
 IGRAPH_EXPORT void igraph_bitset_or(igraph_bitset_t *dest, const igraph_bitset_t *src1, const igraph_bitset_t *src2);
 IGRAPH_EXPORT void igraph_bitset_and(igraph_bitset_t *dest, const igraph_bitset_t *src1, const igraph_bitset_t *src2);
 IGRAPH_EXPORT void igraph_bitset_xor(igraph_bitset_t *dest, const igraph_bitset_t *src1, const igraph_bitset_t *src2);
