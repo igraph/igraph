@@ -869,7 +869,7 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
                 goto fail;
             }
 
-            for (igraph_integer_t i=0;i<vd_src.degree;i++) {
+            for (igraph_integer_t i=0; i < vd_src.degree; i++) {
                 IGRAPH_ASSERT((*dest_vs)[i].degree - 1 >= 0);
 
                 (*dest_vs)[i].degree--;
