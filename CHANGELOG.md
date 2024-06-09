@@ -86,25 +86,25 @@
  - `igraph_chung_lu_game()` implements the classic Chung-Lu model, as well as a number of its variants (experimental function).
  - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
  - `igraph_count_loops()` counts self-loops in the graph (experimental function).
- - `igraph_stack_capacity()` returns the allocated capacity of a stack.
  - `igraph_is_clique()` checks if all pairs within a set of vertices are connected (experimental function).
  - `igraph_is_independent_vertex_set()` checks if no pairs within a set of vertices are connected (experimental function).
  - `igraph_hypercube()` creates a hypercube graph (experimental function).
+ - `igraph_stack_capacity()` returns the allocated capacity of a stack.
 
 ### Fixed
 
- - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
- - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
- - `igraph_hub_and_authority_scores()` no longer clips negative results to zeros when negative weights are present.
- - `igraph_arpack_rnsolve()` used the incorrect error message text for some errors. This is now corrected.
- - Corrected a bug in the fallback implementation of `igraph_bitset_countl_zero()` when `IGRAPH_INTEGER_SIZE` was set to 32. This fallback implementation was _not_ used with GCC, Clang, or MSVC.
- - `igraph_is_forest()` would fail to set the result variable when testing for a directed forest, and it was already cached that the graph was not an undirected forest.
  - Fixed a bug that incorrectly cached that a graph has no multiple edges when `igraph_init_adjlist()` was called with `IGRAPH_NO_LOOPS` and `IGRAPH_NO_MULTIPLE` and all the multi-edges were loop edges.
+ - `igraph_is_forest()` would fail to set the result variable when testing for a directed forest, and it was already cached that the graph was not an undirected forest.
+ - `igraph_hub_and_authority_scores()` no longer clips negative results to zeros when negative weights are present.
  - Fixed an assertion failure in `igraph_realize_bipartite_degree_sequence()` with some non-graphical degree sequences when requesting simple bipartite graphs.
+ - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
+ - `igraph_arpack_rnsolve()` used the incorrect error message text for some errors. This is now corrected.
+ - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
+ - Corrected a bug in the fallback implementation of `igraph_bitset_countl_zero()` when `IGRAPH_INTEGER_SIZE` was set to 32. This fallback implementation was _not_ used with GCC, Clang, or MSVC.
 
 ### Changed
 
- - `igraph_is_graphical()` and `igraph_is_bigraphical()` are now linear-time in all cases (thanks to @gendelpiekel, contributed in #2605).
+ - `igraph_is_graphical()` and `igraph_is_bigraphical()` are now linear-time in all cases, and generally several times faster than before (thanks to @gendelpiekel, contributed in #2605).
  - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a hundred million vertices.
  - `igraph_hub_and_authority_scores()` now warns when negative edge weights are present.
  - Updated the internal heuristics used by igraph's ARPACK interface, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, to improve the robustness of calculations.
