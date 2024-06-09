@@ -23,6 +23,7 @@
  - Corrected a bug in the fallback implementation of `igraph_bitset_countl_zero()` when `IGRAPH_INTEGER_SIZE` was set to 32. This fallback implementation was _not_ used with GCC, Clang, or MSVC.
  - `igraph_is_forest()` would fail to set the result variable when testing for a directed forest, and it was already cached that the graph was not an undirected forest.
  - Fixed a bug that incorrectly cached that a graph has no multiple edges when `igraph_init_adjlist()` was called with `IGRAPH_NO_LOOPS` and `IGRAPH_NO_MULTIPLE` and all the multi-edges were loop edges.
+ - Fixed an assertion failure in `igraph_realize_bipartite_degree_sequence()` with some non-graphical degree sequences when requesting simple bipartite graphs.
 
 ### Changed
 

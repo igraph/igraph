@@ -871,7 +871,11 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
             }
 
             for (igraph_integer_t i = 0; i < vd_src.degree; i++) {
-                IGRAPH_ASSERT((*dest_vs)[i].degree - 1 >= 0);
+                if ((*dest_vs)[i].degree == 0) {
+                    // Not enough non-zero remaining degree vertices in opposite partition.
+                    // Not graphical.
+                    goto fail;
+                }
 
                 (*dest_vs)[i].degree--;
 
@@ -1072,7 +1076,7 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
             vd_src = src_vs->front();
         }
 
-        IGRAPH_ASSERT(vd_src.degree != -1);
+        IGRAPH_ASSERT(vd_src.degree >= 0);
 
         if (!multiedges) {
             // Remove the smallest element
@@ -1090,10 +1094,13 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
                 goto fail;
             }
             for (igraph_integer_t i = 0; i < vd_src.degree; i++) {
-                // decrement the degree of the delta largest vertices in the opposite partition
+                // Decrement the degree of the delta largest vertices in the opposite partition
 
-                // We should never decrement below zero, but check just in case.
-                IGRAPH_ASSERT((*dest_vs)[i].degree - 1 >= 0);
+                if ((*dest_vs)[i].degree == 0) {
+                    // Not enough non-zero remaining degree vertices in opposite partition.
+                    // Not graphical.
+                    goto fail;
+                }
 
                 (*dest_vs)[i].degree--;
 
