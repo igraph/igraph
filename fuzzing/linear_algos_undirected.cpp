@@ -21,6 +21,8 @@
 #include <igraph.h>
 #include <cstdlib>
 
+#include "fuzz_utilities.h"
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -44,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_integer_t i, i2;
-        igraph_bool_t b, b2, loop, multi;
+        igraph_bool_t b, b2, loop, multi, graphical;
         igraph_real_t r;
         igraph_t g;
 
@@ -73,33 +75,57 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_has_loop(&graph, &loop);
         igraph_has_multiple(&graph, &multi);
         igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, true);
-        igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &b);
+        igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &graphical);
         if (!loop && !multi) {
-            IGRAPH_ASSERT(b);
+            IGRAPH_ASSERT(graphical);
+        }
+        if (graphical) {
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
             igraph_destroy(&g);
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
             igraph_destroy(&g);
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
             igraph_destroy(&g);
+        } else {
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX),
+                IGRAPH_EINVAL);
         }
-        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW, &b);
+        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW, &graphical);
         if (!multi) {
-            IGRAPH_ASSERT(b);
+            IGRAPH_ASSERT(graphical);
             /* Undirected realization is not yet implemented. */
         }
-        igraph_is_graphical(&iv1, NULL, IGRAPH_MULTI_SW, &b);
+        igraph_is_graphical(&iv1, NULL, IGRAPH_MULTI_SW, &graphical);
         if (!loop) {
-            IGRAPH_ASSERT(b);
+            IGRAPH_ASSERT(graphical);
+        }
+        if (graphical) {
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
             igraph_destroy(&g);
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
             igraph_destroy(&g);
             igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
             igraph_destroy(&g);
+        } else {
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX),
+                IGRAPH_EINVAL);
         }
-        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &b);
-        IGRAPH_ASSERT(b);
+        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &graphical);
+        IGRAPH_ASSERT(graphical);
         igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
         igraph_destroy(&g);
         igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
