@@ -915,13 +915,16 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
  * \param es Pointer to an uninitialized edge selector object.
  * \param order Constant giving the order in which the edges will be
  *        included in the selector. Possible values:
- *        \c IGRAPH_EDGEORDER_ID, edge ID order.
- *        \c IGRAPH_EDGEORDER_FROM, vertex ID order, the id of the
- *           \em source vertex counts for directed graphs. The order
- *           of the incident edges of a given vertex is arbitrary.
- *        \c IGRAPH_EDGEORDER_TO, vertex ID order, the ID of the \em
- *           target vertex counts for directed graphs. The order
- *           of the incident edges of a given vertex is arbitrary.
+ *        \clist
+ *        \cli IGRAPH_EDGEORDER_ID
+ *        Edge ID order; currently performs the fastest.
+ *        \cli IGRAPH_EDGEORDER_FROM
+ *        Vertex ID order, the id of the \em source vertex counts for directed
+ *        graphs. The order of the incident edges of a given vertex is arbitrary.
+ *        \cli IGRAPH_EDGEORDER_TO
+ *        Vertex ID order, the ID of the \em target vertex counts for directed
+ *        graphs. The order of the incident edges of a given vertex is arbitrary.
+ *        \endclist
  *        For undirected graph the latter two is the same.
  * \return Error code.
  * \sa \ref igraph_ess_all(), \ref igraph_es_destroy()
