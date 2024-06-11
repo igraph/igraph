@@ -135,8 +135,9 @@ static igraph_error_t igraph_i_connected_components_weak(
          * the null graph is considered disconnected, therefore any connected
          * graph has precisely one component. */
         if (membership) {
-            /* All vertices are members of the same component. */
-            igraph_vector_int_fill(membership, 0);
+            /* All vertices are members of the same component,
+             * component number 0. */
+            igraph_vector_int_null(membership);
         }
         if (csize) {
             /* The size of the single component is the same as the vertex count. */
@@ -241,8 +242,9 @@ static igraph_error_t igraph_i_connected_components_strong(
          * the null graph is considered disconnected, therefore any connected
          * graph has precisely one component. */
         if (membership) {
-            /* All vertices are members of the same component. */
-            igraph_vector_int_fill(membership, 0);
+            /* All vertices are members of the same component,
+             * component number 0. */
+            igraph_vector_int_null(membership);
         }
         if (csize) {
             /* The size of the single component is the same as the vertex count. */
