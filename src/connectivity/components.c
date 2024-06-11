@@ -491,11 +491,12 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 }
 
 static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t added_count;
     igraph_bitset_t already_added;
-    igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
-    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
+    igraph_vector_int_t neis;
+    igraph_dqueue_int_t q;
 
     /* By convention, the null graph is not considered connected.
      * See https://github.com/igraph/igraph/issues/1538 */
@@ -519,16 +520,16 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
 
     added_count = 1;
-    while ( !igraph_dqueue_int_empty(&q)) {
+    while (! igraph_dqueue_int_empty(&q)) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+        const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
-        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {
-            igraph_integer_t neighbor = VECTOR(neis)[i];
+            const igraph_integer_t neighbor = VECTOR(neis)[i];
             if (IGRAPH_BIT_TEST(already_added, neighbor)) {
                 continue;
             }
@@ -540,12 +541,12 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
             if (added_count == no_of_nodes) {
                 /* We have already reached all nodes: the graph is connected.
                  * We can stop the traversal now. */
-                igraph_dqueue_int_clear(&q);
-                break;
+                goto done;
             }
         }
     }
 
+done:
     /* Connected? */
     *res = (added_count == no_of_nodes);
 
@@ -556,7 +557,7 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
 
 exit:
     igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, *res);
-    if (igraph_is_directed(graph) && *res == 0) {
+    if (igraph_is_directed(graph) && !(*res)) {
         /* If the graph is not weakly connected, it is not strongly connected
          * either so we can also cache that */
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
