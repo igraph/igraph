@@ -459,7 +459,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_int_size(vertex_neis);
 
-    igraph_vector_char_fill(nei_mask, 0);
+    igraph_vector_char_null(nei_mask);
     neighbor_count = 0;
     for (i=0; i < vertex_neis_size; ++i) {
         igraph_integer_t v = VECTOR(*vertex_neis)[i];
@@ -563,7 +563,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_int_size(vertex_neis);
 
-    igraph_vector_char_fill(nei_mask, 0);
+    igraph_vector_char_null(nei_mask);
     neighbor_count = 0;
     for (i=0; i < vertex_neis_size; ++i) {
         igraph_integer_t v = VECTOR(*vertex_neis)[i];

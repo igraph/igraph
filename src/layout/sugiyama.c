@@ -581,7 +581,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
     IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
 
     if (no_of_edges == 0) {
-        igraph_vector_int_fill(membership, 0);
+        igraph_vector_int_null(membership);
         return IGRAPH_SUCCESS;
     }
 
