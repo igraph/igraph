@@ -1019,6 +1019,7 @@ add_benchmarks(
   igraph_tree_game
   igraph_vertex_connectivity
   igraph_voronoi
+  error_checking
   inc_vs_adj
   lad
   intersection
