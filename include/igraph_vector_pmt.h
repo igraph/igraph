@@ -308,6 +308,9 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TY
                                                              const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
                                                             const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, intersection_size_sorted)(
+        const TYPE(igraph_vector) *v1,
+        const TYPE(igraph_vector) *v2);
 #endif
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                                  TYPE(igraph_vector) *newv,

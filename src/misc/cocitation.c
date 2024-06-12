@@ -268,20 +268,9 @@ static igraph_error_t igraph_i_neisets_intersect(
     igraph_integer_t *len_union, igraph_integer_t *len_intersection
 ) {
     /* ASSERT: v1 and v2 are sorted */
-    igraph_integer_t i, j, i0, jj0;
-    i0 = igraph_vector_int_size(v1); jj0 = igraph_vector_int_size(v2);
-    *len_union = i0 + jj0; *len_intersection = 0;
-    i = 0; j = 0;
-    while (i < i0 && j < jj0) {
-        if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
-            (*len_intersection)++; (*len_union)--;
-            i++; j++;
-        } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) {
-            i++;
-        } else {
-            j++;
-        }
-    }
+    igraph_integer_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
+    *len_intersection = igraph_vector_int_intersection_size_sorted(v1, v2);
+    *len_union = n1 + n2 - *len_intersection;
     return IGRAPH_SUCCESS;
 }
 
