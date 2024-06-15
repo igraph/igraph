@@ -671,7 +671,7 @@ igraph_error_t igraph_delete_vertices_map(
     for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit) ) {
         igraph_integer_t vertex = IGRAPH_VIT_GET(vit);
         if (vertex < 0 || vertex >= no_of_nodes) {
-            IGRAPH_ERROR("Cannot delete vertices", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot delete vertices.", IGRAPH_EINVVID);
         }
         VECTOR(*my_vertex_recoding)[vertex] = 1;
     }
@@ -927,7 +927,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
         IGRAPH_ERROR("For a directed graph (with directions not ignored), "
-                     "IGRAPH_LOOPS_TWICE does not make sense.\n", IGRAPH_EINVAL);
+                     "IGRAPH_LOOPS_TWICE does not make sense.", IGRAPH_EINVAL);
     }
     /* Calculate needed space first & allocate it */
     /* Note that 'mode' is treated as a bit field here; it's okay because
@@ -1444,7 +1444,7 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
     if (*eid < 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot get edge ID, no such edge.", IGRAPH_EINVAL);
         }
     }
 
@@ -1509,12 +1509,12 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
     }
 
     if (n % 2 != 0) {
-        IGRAPH_ERROR("Cannot get edge IDs, invalid length of edge IDs",
+        IGRAPH_ERROR("Cannot get edge IDs, invalid length of vertex pair vector.",
                      IGRAPH_EINVAL);
     }
 
     if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot get edge IDs, invalid vertex ID", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid vertex ID.", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(eids, n / 2));
@@ -1532,7 +1532,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
 
             VECTOR(*eids)[i] = eid;
             if (eid < 0 && error) {
-                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge.", IGRAPH_EINVAL);
             }
         }
     } else {
@@ -1544,7 +1544,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
             FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
             VECTOR(*eids)[i] = eid;
             if (eid < 0 && error) {
-                IGRAPH_ERROR("Cannot get edge ID, no such edge", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot get edge ID, no such edge.", IGRAPH_EINVAL);
             }
         }
     }
@@ -1616,11 +1616,11 @@ igraph_error_t igraph_get_all_eids_between(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (source < 0 || source >= no_of_nodes) {
-        IGRAPH_ERROR("Cannot get edge IDs, invalid source vertex ID", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid source vertex ID.", IGRAPH_EINVVID);
     }
 
     if (target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Cannot get edge IDs, invalid target vertex ID", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot get edge IDs, invalid target vertex ID.", IGRAPH_EINVVID);
     }
 
     igraph_vector_int_clear(eids);
@@ -1693,7 +1693,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
         IGRAPH_ERROR("For a directed graph (with directions not ignored), "
-                     "IGRAPH_LOOPS_TWICE does not make sense.\n", IGRAPH_EINVAL);
+                     "IGRAPH_LOOPS_TWICE does not make sense.", IGRAPH_EINVAL);
     }
 
     /* Calculate needed space first & allocate it */
