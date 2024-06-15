@@ -620,8 +620,8 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  * </para><para>
  * This function changes the IDs of the vertices (except in some very
  * special cases, but these should not be relied on anyway). You can use the
- * \c idx argument to obtain the mapping from old vertex IDs to the new ones,
- * and the \c newidx argument to obtain the reverse mapping.
+ * \p map argument to obtain the mapping from old vertex IDs to the new ones,
+ * and the \p newmap argument to obtain the reverse mapping.
  *
  * </para><para>
  * This function invalidates all iterators.
