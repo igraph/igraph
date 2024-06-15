@@ -1027,6 +1027,7 @@ add_benchmarks(
   igraph_voronoi
   inc_vs_adj
   lad
+  intersection
 )
 
 # dot product

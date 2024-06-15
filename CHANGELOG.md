@@ -90,6 +90,7 @@
  - `igraph_is_clique()` checks if all pairs within a set of vertices are connected (experimental function).
  - `igraph_is_independent_vertex_set()` checks if no pairs within a set of vertices are connected (experimental function).
  - `igraph_hypercube()` creates a hypercube graph (experimental function).
+ - `igraph_vector_intersection_size_sorted()` counts elements common to two sorted vectors (experimental function).
  - `igraph_stack_capacity()` returns the allocated capacity of a stack.
 
 ### Fixed
@@ -115,6 +116,7 @@
 
  - Documentation improvements.
  - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
+ - `igraph_vector_intersect_sorted()` has better performance when the input vector sizes are similar.
 
 ## [0.10.12] - 2024-05-06
 
