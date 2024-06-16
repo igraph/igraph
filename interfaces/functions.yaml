@@ -344,7 +344,7 @@ igraph_simple_interconnected_islands_game:
 # Use a default of loops=True, as this is what's in the original Chung-Lu paper
 igraph_chung_lu_game:
     PARAMS: |-
-        OUT GRAPH graph, VECTOR expected_out_deg, OPTIONAL VECTOR expected_in_deg,
+        OUT GRAPH graph, VECTOR out_weights, OPTIONAL VECTOR in_weights,
         BOOLEAN loops=True, CHUNG_LU_VARIANT variant=ORIGINAL
 
 igraph_static_fitness_game:
