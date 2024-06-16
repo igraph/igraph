@@ -32,6 +32,7 @@
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` are now linear-time in all cases, and generally several times faster than before (thanks to @gendelpiekel, contributed in #2605).
  - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a hundred million vertices.
  - `igraph_hub_and_authority_scores()` now warns when negative edge weights are present.
+ - `igraph_layout_lgl()` now uses a BFS tree rooted in the vertex specified as `proot` to guide the layout. Previously it used an unspecified (arbitrary) spanning tree.
  - Updated the internal heuristics used by igraph's ARPACK interface, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, to improve the robustness of calculations.
  - Updated the initial vector construction in `igraph_hub_and_authority_scores()`, `igraph_eigenvector_centrality()` and `igraph_(personalized_)pagerank()` with `IGRAPH_PAGERANK_ALGO_ARPACK`. This improves the robustness and convergence of calculations.
 
