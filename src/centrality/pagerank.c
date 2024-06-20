@@ -192,6 +192,30 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t vertex_strength(const igraph_real_t *graph, igraph_real_t *vertex, directMode = c("all", "out", "in", "total"),
+                                      loops = TRUE, igraph_real_t *weight, void *extra) {
+
+    pagerank_data_weighted_t *data = extra;
+    const igraph_t *graph = data->graph;
+    const igraph_t *weights = data->weights;
+    const igraph_t *vertex = data->vertex;
+    igraph_real_t vertexSum = 0.0;
+    igraph_real_t fact = 1 - data->damping;
+
+    for (i = 0; i < n; i++) {
+        if (VECTOR(*outdegree)[i] > 0) {
+            vertexSum += from[i] * fact;
+            VECTOR(*vertex)[i] = from[i] / VECTOR(*outdegree)[i];
+        } else {
+            vertexSum += from[i];
+            VECTOR(*vertex)[i] = 0;
+        }
+    }
+    linkRank = pagerank_operator_weighted(vertex) * weight / vertex_strength(vertex);
+}
+
+
+
 /**
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
