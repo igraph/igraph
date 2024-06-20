@@ -1,0 +1,73 @@
+"C:\Program Files\JetBrains\CLion 2023.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2023.2.2/bin/ninja/win/x64/ninja.exe" -G Ninja -S "C:\Users\Kaiju League\OneDrive\Documents\GitHub\igraph" -B "C:\Users\Kaiju League\OneDrive\Documents\GitHub\igraph\cmake-build-debug"
+-- Version number from Git: 0.10.12-162-g412860730
+-- The C compiler identification is GNU 13.1.0
+-- The CXX compiler identification is GNU 13.1.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/JetBrains/CLion 2023.2.2/bin/mingw/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/JetBrains/CLion 2023.2.2/bin/mingw/bin/g++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG
+-- Performing Test COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG - Failed
+-- Performing Test COMPILER_HAS_DEPRECATED_ENUMVAL_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ENUMVAL_ATTR - Success
+-- Thread-local storage: supported (__thread)
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Could NOT find FLEX (missing: FLEX_EXECUTABLE) 
+-- Could NOT find BISON (missing: BISON_EXECUTABLE) 
+-- Looking for strcasecmp
+-- Looking for strcasecmp - found
+-- Looking for strncasecmp
+-- Looking for strncasecmp - found
+-- Looking for _stricmp
+-- Looking for _stricmp - found
+-- Looking for _strnicmp
+-- Looking for _strnicmp - found
+-- Looking for strdup
+-- Looking for strdup - found
+-- Looking for strndup
+-- Looking for strndup - not found
+-- Looking for include file xlocale.h
+-- Looking for include file xlocale.h - not found
+-- Looking for uselocale
+-- Looking for uselocale - not found
+-- Looking for _configthreadlocale
+-- Looking for _configthreadlocale - found
+-- Performing Test HAVE__UMUL128
+-- Performing Test HAVE__UMUL128 - Success
+-- Performing Test HAVE___UMULH
+-- Performing Test HAVE___UMULH - Failed
+-- Looking for C++ include sys/types.h
+-- Looking for C++ include sys/types.h - found
+-- Looking for C++ include stdint.h
+-- Looking for C++ include stdint.h - found
+-- Looking for C++ include stddef.h
+-- Looking for C++ include stddef.h - found
+-- Check size of __uint128_t
+-- Check size of __uint128_t - done
+-- Performing Test HAVE__POPCNT64
+-- Performing Test HAVE__POPCNT64 - Success
+-- Performing Test HAVE__POPCNT
+-- Performing Test HAVE__POPCNT - Success
+-- Performing Test HAVE__BITSCANFORWARD64
+-- Performing Test HAVE__BITSCANFORWARD64 - Success
+-- Performing Test HAVE__BITSCANFORWARD
+-- Performing Test HAVE__BITSCANFORWARD - Success
+-- Performing Test HAVE__BITSCANREVERSE64
+-- Performing Test HAVE__BITSCANREVERSE64 - Success
+-- Performing Test HAVE__BITSCANREVERSE
+-- Performing Test HAVE__BITSCANREVERSE - Success
+-- Performing Test HAVE_BUILTIN_OVERFLOW
+-- Performing Test HAVE_BUILTIN_OVERFLOW - Success
+CMake Error at src/CMakeLists.txt:24 (bison_target):
+  Unknown CMake command "bison_target".
+
+
+-- Configuring incomplete, errors occurred!

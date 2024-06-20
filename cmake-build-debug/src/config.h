@@ -1,0 +1,41 @@
+#ifndef IGRAPH_PRIVATE_CONFIG_H
+#define IGRAPH_PRIVATE_CONFIG_H
+
+#include "igraph_config.h"
+
+#define HAVE_STRCASECMP 1
+#define HAVE_STRNCASECMP 1
+#define HAVE__STRICMP 1
+#define HAVE__STRNICMP 1
+#define HAVE_STRDUP 1
+/* #undef HAVE_STRNDUP */
+/* #undef HAVE_USELOCALE */
+/* #undef HAVE_XLOCALE */
+#define HAVE__CONFIGTHREADLOCALE 1
+
+#define HAVE_BUILTIN_OVERFLOW 1
+
+#define HAVE__UMUL128 1
+/* #undef HAVE___UMULH */
+#define HAVE___UINT128_T 1
+
+#define HAVE__POPCNT64 1
+#define HAVE__POPCNT 1
+#define HAVE__BITSCANFORWARD64 1
+#define HAVE__BITSCANFORWARD 1
+#define HAVE__BITSCANREVERSE64 1
+#define HAVE__BITSCANREVERSE 1
+
+#define HAVE_GLPK 1
+/* #undef HAVE_LIBXML */
+
+#define INTERNAL_BLAS 1
+#define INTERNAL_LAPACK 1
+#define INTERNAL_ARPACK 1
+#define INTERNAL_GMP 1
+
+
+#define IGRAPH_F77_SAVE static __thread
+#define IGRAPH_THREAD_LOCAL __thread
+
+#endif
