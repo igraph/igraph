@@ -60,8 +60,13 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  *
  * \experimental
  *
- * In the Chung-Lu model, each pair of vertices \c i and \c j is connected with
- * independent probability <code>p_ij = w_i w_j / S</code>,
+ * The Chung-Lu model is useful for generating random graphs with fixed
+ * expected degrees. This function implements both the original model of Chung
+ * and Lu, as well as some additional variants with useful properties.
+ *
+ * </para><para>
+ * In the original Chung-Lu model, each pair of vertices \c i and \c j is
+ * connected with independent probability <code>p_ij = w_i w_j / S</code>,
  * where \c w_i is a weight associated with vertex \c i and
  * <code>S = sum_k w_k</code> is the sum of weights. In the directed variant,
  * vertices have both out-weights, <code>w^out</code>, and in-weights,
@@ -98,14 +103,14 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * variants become equivalent in the limit of sparse graphs where \c q_ij
  * approaches zero. In the original Chung-Lu model, selectable by setting
  * \p variant to \c IGRAPH_CHUNG_LU_ORIGINAL, <code>p_ij = min(q_ij, 1)</code>.
- * The \c IGRAPH_CHUNG_LU_GRG variant, often referred to a the generalized
+ * The \c IGRAPH_CHUNG_LU_MAXENT variant, sometiems referred to a the generalized
  * random graph, uses <code>p_ij = q_ij / (1 + q_ij)</code>, and is equivalent
  * to a maximum entropy model (i.e. exponential random graph model) with
- * a constraint on expected degrees, see Park and Newman (2004), Section B,
+ * a constraint on expected degrees; see Park and Newman (2004), Section B,
  * setting <code>exp(-Theta_ij) = w_i w_j / S</code>. This model is also
  * discussed by Britton, Deijfen and Martin-Löf (2006). By virtue of being
- * a degree-constrained maximum entropy model, it generates graphs having
- * the same degree sequence with the same probability.
+ * a degree-constrained maximum entropy model, it graphs with the same degree
+ * sequence are produced with the same probability.
  * A third variant can be requested with \c IGRAPH_CHUNG_LU_NR, and uses
  * <code>p_ij = 1 - exp(-q_ij)</code>. This is the underlying simple graph
  * of a multigraph model introduced by Norros and Reittu (2006).
@@ -168,9 +173,9 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  *    \clist
  *    \cli IGRAPH_CHUNG_LU_ORIGINAL
  *         the original Chung-Lu model, <code>p_ij = min(q_ij, 1)</code>.
- *    \cli IGRAPH_CHUNG_LU_GRG
- *         generalized random graph, a maximum entropy model with a soft
- *         constraint on degrees, <code>p_ij = q_ij / (1 + q_ij)</code>.
+ *    \cli IGRAPH_CHUNG_LU_MAXENT
+ *         maximum entropy model with fixed expected degrees,
+ *         <code>p_ij = q_ij / (1 + q_ij)</code>.
  *    \cli IGRAPH_CHUNG_LU_NR
  *         Norros and Reittu's model, <code>p_ij = 1 - exp(-q_ij)</code>.
  *    \endclist
@@ -275,7 +280,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
                     }
                 }
                 break;
-            case IGRAPH_CHUNG_LU_GRG:
+            case IGRAPH_CHUNG_LU_MAXENT:
                 q = q / (1 + q);
                 break;
             case IGRAPH_CHUNG_LU_NR:

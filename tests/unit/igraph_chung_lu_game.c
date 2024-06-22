@@ -94,28 +94,28 @@ int main(void) {
                                 2.0, 2.0, 2.0, 2.0, 0.0, 200.0, 2.0,
                                 -1.0);
 
-    igraph_chung_lu_game(&g, &outdeg, NULL, false, IGRAPH_CHUNG_LU_GRG);
+    igraph_chung_lu_game(&g, &outdeg, NULL, false, IGRAPH_CHUNG_LU_MAXENT);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
     igraph_is_simple(&g, &simple);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
-    igraph_chung_lu_game(&g, &outdeg, NULL, true, IGRAPH_CHUNG_LU_GRG);
+    igraph_chung_lu_game(&g, &outdeg, NULL, true, IGRAPH_CHUNG_LU_MAXENT);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
     igraph_has_multiple(&g, &multi);
     IGRAPH_ASSERT(!multi);
     igraph_destroy(&g);
 
-    igraph_chung_lu_game(&g, &outdeg, &indeg, false, IGRAPH_CHUNG_LU_GRG);
+    igraph_chung_lu_game(&g, &outdeg, &indeg, false, IGRAPH_CHUNG_LU_MAXENT);
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
     igraph_is_simple(&g, &simple);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
-    igraph_chung_lu_game(&g, &outdeg, &indeg, true, IGRAPH_CHUNG_LU_GRG);
+    igraph_chung_lu_game(&g, &outdeg, &indeg, true, IGRAPH_CHUNG_LU_MAXENT);
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
     igraph_has_multiple(&g, &multi);
