@@ -54,6 +54,7 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
 
     return IGRAPH_SUCCESS;
 }
+
 /**
  * \function igraph_chung_lu_game
  * \brief Samples graphs from the Chung-Lu model.
