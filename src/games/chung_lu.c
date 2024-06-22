@@ -186,7 +186,7 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * a sharp constraint on the number of edges;
  * \ref igraph_degree_sequence_game() samples random graphs with sharply
  * specified degrees; \ref igraph_erdos_renyi_game_gnp() creates random
- * graphs with a fixed connection probability \p between all vertex pairs.
+ * graphs with a fixed connection probability \c p between all vertex pairs.
  *
  * Time complexity: O(|E| + |V|), linear in the number of edges.
  */
