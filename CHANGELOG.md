@@ -15,6 +15,7 @@
  - `igraph_hypercube()` creates a hypercube graph (experimental function).
  - `igraph_vector_intersection_size_sorted()` counts elements common to two sorted vectors (experimental function).
  - `igraph_stack_capacity()` returns the allocated capacity of a stack.
+ - `igraph_vector_is_all_finite()` checks if all elements in a vector are finite (i.e. neither NaN nor Inf).
 
 ### Fixed
 
