@@ -33,15 +33,17 @@
  *
  * This function is a somewhat more user-friendly interface to
  * the \c dgemv function in BLAS. \c dgemv performs the operation
- * y = alpha*A*x + beta*y, where x and y are vectors and A is an
- * appropriately sized matrix (symmetric or non-symmetric).
+ * <code>y = alpha*A*x + beta*y</code>, where \p x and \p y are vectors
+ * and \p A is an appropriately sized matrix (symmetric or non-symmetric).
  *
- * \param transpose whether to transpose the matrix \p A
- * \param alpha     the constant \p alpha
- * \param a         the matrix \p A
- * \param x         the vector \p x
- * \param beta      the constant \p beta
- * \param y         the vector \p y (which will be modified in-place)
+ * \param transpose Whether to transpose the matrix \p A.
+ * \param alpha     The constant \p alpha.
+ * \param a         The matrix \p A.
+ * \param x         The vector \p x.
+ * \param beta      The constant \p beta.
+ * \param y         The vector \p y (which will be modified in-place).
+ *                  It must always have the correct length, but its
+ *                  elements need not be set when <code>beta=0</code>.
  *
  * Time complexity: O(nk) if the matrix is of size n x k
  *
