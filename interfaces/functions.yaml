@@ -732,6 +732,10 @@ igraph_personalized_pagerank_vs:
         vids ON graph, weights ON graph, vector ON graph vids,
         options ON algo
 
+igraph_subgraph_centrality:
+    PARAMS: GRAPH graph, OUT ALL_VERTEX_QTY res, BOOLEAN loops=True
+    DEPS: res ON graph
+
 igraph_rewire:
     PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRING_MODE mode=SIMPLE
 
