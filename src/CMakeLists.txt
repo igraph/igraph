@@ -330,7 +330,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.7")
+set_target_properties(igraph PROPERTIES VERSION "3.1.8")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
