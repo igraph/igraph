@@ -34,6 +34,7 @@ void run_bench(int i, int n, int r) {
      * with future compiler versions. */
     volatile igraph_integer_t res;
     BENCH(msg, REPEAT(res = igraph_vector_int_intersection_size_sorted(&a, &b), rep));
+    (void) res;  /* silence unused-but-set-variable warning */
 
     igraph_vector_int_destroy(&a);
     igraph_vector_int_destroy(&b);
