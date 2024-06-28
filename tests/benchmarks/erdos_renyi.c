@@ -24,7 +24,7 @@ void run_bench(igraph_integer_t vcount, igraph_real_t meandeg, igraph_integer_t 
     igraph_t g;
     igraph_real_t p = meandeg / vcount;
     igraph_vector_t outdeg, indeg;
-    char msg[255], msg2[255];
+    char msg[511], msg2[255];
 
     snprintf(msg2, sizeof(msg2) / sizeof(msg2[0]),
              "vcount=%" IGRAPH_PRId ", meandeg=%g, %" IGRAPH_PRId "x",
