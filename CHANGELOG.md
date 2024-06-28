@@ -79,6 +79,8 @@
 
 ## [master]
 
+## [0.10.13]
+
 ### Added
 
  - `igraph_bitset_fill()` sets all elements of a bitset to the same value (experimental function).
@@ -1471,7 +1473,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.12..master
+[master]: https://github.com/igraph/igraph/compare/0.10.13..master
+[0.10.13]: https://github.com/igraph/igraph/compare/0.10.12..0.10.13
 [0.10.12]: https://github.com/igraph/igraph/compare/0.10.11..0.10.12
 [0.10.11]: https://github.com/igraph/igraph/compare/0.10.10..0.10.11
 [0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
