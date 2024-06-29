@@ -1221,7 +1221,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* The edges too */
     IGRAPH_CHECK(igraph_vector_int_resize(&warning_shown, eattr_no));
-    igraph_vector_int_fill(&warning_shown, 0);
+    igraph_vector_int_null(&warning_shown);
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to = IGRAPH_TO(graph, i);

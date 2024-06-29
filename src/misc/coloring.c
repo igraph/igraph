@@ -36,7 +36,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
     igraph_vector_int_t neighbors, nei_colors;
 
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
-    igraph_vector_int_fill(colors, 0);
+    igraph_vector_int_null(colors);
 
     /* Nothing to do for 0 or 1 vertices.
      * Remember that colours are integers starting from 0,

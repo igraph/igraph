@@ -126,6 +126,9 @@ igraph_star:
 igraph_wheel:
     PARAMS: OUT GRAPH graph, INTEGER n, WHEEL_MODE mode=OUT, INTEGER center=0
 
+igraph_hypercube:
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False
+
 igraph_square_lattice:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
@@ -341,7 +344,7 @@ igraph_simple_interconnected_islands_game:
 # Use a default of loops=True, as this is what's in the original Chung-Lu paper
 igraph_chung_lu_game:
     PARAMS: |-
-        OUT GRAPH graph, VECTOR expected_out_deg, OPTIONAL VECTOR expected_in_deg,
+        OUT GRAPH graph, VECTOR out_weights, OPTIONAL VECTOR in_weights,
         BOOLEAN loops=True, CHUNG_LU_VARIANT variant=ORIGINAL
 
 igraph_static_fitness_game:
@@ -533,8 +536,8 @@ igraph_get_shortest_paths_dijkstra:
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEX_SELECTOR to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OPTIONAL OUT VECTOR_INT parents=0,
-        OPTIONAL OUT VECTOR_INT inbound_edges=0
+        OPTIONAL OUT VECTOR_INT parents=NULL,
+        OPTIONAL OUT VECTOR_INT inbound_edges=NULL
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
         weights ON graph
@@ -544,8 +547,8 @@ igraph_get_shortest_paths_bellman_ford:
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEX_SELECTOR to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OPTIONAL OUT VECTOR_INT parents=0,
-        OPTIONAL OUT VECTOR_INT inbound_edges=0
+        OPTIONAL OUT VECTOR_INT parents=NULL,
+        OPTIONAL OUT VECTOR_INT inbound_edges=NULL
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
         weights ON graph
@@ -1301,6 +1304,12 @@ igraph_count_reachable:
 # Cliques
 #######################################
 
+igraph_is_clique:
+    PARAMS: |-
+        GRAPH graph, VERTEX_SELECTOR candidate, BOOLEAN directed=False,
+        OUT BOOLEAN res
+    DEPS: candidate ON graph
+
 igraph_cliques:
     PARAMS: |-
         GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0,
@@ -1364,6 +1373,10 @@ igraph_largest_weighted_cliques:
 igraph_weighted_clique_number:
     PARAMS: GRAPH graph, VERTEXWEIGHTS vertex_weights=NULL, OUT REAL res
     DEPS: vertex_weights ON graph
+
+igraph_is_independent_vertex_set:
+    PARAMS: GRAPH graph, VERTEX_SELECTOR candidate, OUT BOOLEAN res
+    DEPS: candidate ON graph
 
 igraph_independent_vertex_sets:
     PARAMS: |-

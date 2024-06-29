@@ -78,7 +78,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     if (no_of_nodes < 2) {
         if (membership) {
             IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 0);
+            igraph_vector_int_null(membership);
         }
         return IGRAPH_SUCCESS;
     }

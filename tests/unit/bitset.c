@@ -330,6 +330,75 @@ int main(void) {
     igraph_bitset_destroy(&v1);
     printf("\n");
 
+    printf("Test checking all elements\n");
+    /* 0000 */
+    igraph_bitset_init(&v1, 4);
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    /* 1000 */
+    IGRAPH_BIT_SET(v1, 3);
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    /* 000 */
+    /* This resize leaves a set bit in the unused part of the last word of the.
+     * bitset. This helps test that masking out the unused part is working. */
+    igraph_bitset_resize(&v1, 3);
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    /* 001 */
+    IGRAPH_BIT_SET(v1, 0);
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    /* 111 */
+    IGRAPH_BIT_SET(v1, 1); IGRAPH_BIT_SET(v1, 2);
+    IGRAPH_ASSERT(igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_zero(&v1));
+    igraph_bitset_destroy(&v1);
+
+    igraph_bitset_init(&v1, 67);
+    /* all zeros */
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    /* some ones */
+    IGRAPH_BIT_SET(v1, 10);
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    /* all ones */
+    igraph_bitset_fill(&v1, true);
+    IGRAPH_ASSERT(igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_zero(&v1));
+    /* some zeros */
+    IGRAPH_BIT_CLEAR(v1, 20);
+    IGRAPH_ASSERT(! igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_any_zero(&v1));
+    igraph_bitset_destroy(&v1);
+
+    /* Empty bitset */
+    igraph_bitset_init(&v1, 0);
+    IGRAPH_ASSERT(igraph_bitset_is_all_one(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_one(&v1));
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&v1));
+    IGRAPH_ASSERT(! igraph_bitset_is_any_zero(&v1));
+    igraph_bitset_destroy(&v1);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

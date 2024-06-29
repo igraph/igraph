@@ -270,7 +270,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     if (no_of_nodes < 2) {
         if (membership) {
             IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 0);
+            igraph_vector_int_null(membership);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, nullptr, 1, igraph_is_directed(graph), modularity));
@@ -556,7 +556,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     if (no_of_nodes < 2) {
         if (membership) {
             IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 0);
+            igraph_vector_int_null(membership);
         }
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, membership, nullptr, 1, igraph_is_directed(graph), modularity));

@@ -94,8 +94,8 @@ IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igra
                                        igraph_integer_t length);
 IGRAPH_EXPORT igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_int_t *resverts,
                                      igraph_matrix_t *rescoords);
-IGRAPH_EXPORT igraph_bool_t igraph_almost_equals(double a, double b, double eps);
-IGRAPH_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_bool_t igraph_almost_equals(double a, double b, double eps);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST int igraph_cmp_epsilon(double a, double b, double eps);
 
 IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(
     const igraph_vector_t* vector, igraph_plfit_result_t* result,

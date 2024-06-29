@@ -96,6 +96,7 @@
 <!-- doxrox-include igraph_vector_maxdifference -->
 <!-- doxrox-include igraph_vector_is_nan -->
 <!-- doxrox-include igraph_vector_is_any_nan -->
+<!-- doxrox-include igraph_vector_is_all_finite -->
 </section>
 
 <section id="vector-searching-for-elements"><title>Searching for elements</title>
@@ -136,6 +137,7 @@
 
 <section id="set-operations-on-sorted-vectors"><title>Set operations on sorted vectors</title>
 <!-- doxrox-include igraph_vector_intersect_sorted -->
+<!-- doxrox-include igraph_vector_intersection_size_sorted -->
 <!-- doxrox-include igraph_vector_difference_sorted -->
 </section>
 

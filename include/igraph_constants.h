@@ -207,7 +207,7 @@ typedef enum { IGRAPH_VORONOI_FIRST = 0,
              } igraph_voronoi_tiebreaker_t;
 
 typedef enum { IGRAPH_CHUNG_LU_ORIGINAL = 0,
-               IGRAPH_CHUNG_LU_GRG,
+               IGRAPH_CHUNG_LU_MAXENT,
                IGRAPH_CHUNG_LU_NR
              } igraph_chung_lu_t;
 

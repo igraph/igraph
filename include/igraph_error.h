@@ -432,7 +432,7 @@ typedef void igraph_error_handler_t(const char *reason, const char *file,
  * program.
  */
 
-IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_abort;
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
@@ -543,7 +543,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
                                             int line, igraph_error_t igraph_errno,
                                             va_list ap);
 
-IGRAPH_EXPORT const char *igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(const igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -902,7 +902,7 @@ IGRAPH_EXPORT igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_hand
  * The default fatal error handler, prints an error message and aborts the program.
  */
 
-IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN igraph_fatal_handler_t igraph_fatal_handler_abort;
 
 IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason,
                                                          const char *file, int line);

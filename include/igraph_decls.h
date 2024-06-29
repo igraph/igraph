@@ -14,11 +14,19 @@
 /* The pure function attribute of GCC-compatible compilers indicates
  * that the function does not have side-effects, i.e. it does not
  * modify global memory. This enables additional compiler optimizations
- * such as common subexpression elimination. */
+ * such as common subexpression elimination.
+ *
+ * The const attribute is similar but with much more stringent requirements.
+ * The function must also not read global memory. Generally, const functions
+ * should not take pointers, and must compute the return value solely based
+ * on their input.
+ */
 #ifdef __GNUC__
 #define IGRAPH_FUNCATTR_PURE __attribute__((__pure__))
+#define IGRAPH_FUNCATTR_CONST __attribute__((__const__))
 #else
 #define IGRAPH_FUNCATTR_PURE
+#define IGRAPH_FUNCATTR_CONST
 #endif
 
 /* IGRAPH_ASSUME() provides hints to the compiler about conditions
