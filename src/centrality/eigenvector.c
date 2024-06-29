@@ -335,7 +335,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     /* Use higher NCV than usual as long directed cycles cause convergence issues.
      * According to numerical experiments, a cycle graph C_n tends to need about
      * NCV = n/4 at minimum. */
-    options->ncv = no_of_nodes > 30 ? 30 : no_of_nodes;
+    options->ncv = no_of_nodes > 30 ? 30 : options->n;
     /* LM mode is not OK here because +1 and -1 can be eigenvalues at the
      * same time, e.g.: a -> b -> a, c -> a */
     options->which[0] = 'L' ; options->which[1] = 'R';
