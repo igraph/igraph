@@ -44,6 +44,7 @@ if(CPACK_SOURCE_INSTALLED_DIRECTORIES)
         INSTALL
         "${SOURCE_DIR}/AUTHORS"
         "${SOURCE_DIR}/CMakeLists.txt"
+        "${SOURCE_DIR}/CONTRIBUTORS.txt"
         "${SOURCE_DIR}/COPYING"
         "${SOURCE_DIR}/ChangeLog"
         "${SOURCE_DIR}/INSTALL"

@@ -8,11 +8,6 @@ function(add_benchmark NAME NAMESPACE)
   add_dependencies(build_benchmarks ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
-  if (NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode
-    target_compile_definitions(${TARGET_NAME} PRIVATE IGRAPH_STATIC)
-  endif()
-
   # Some benchmarks include plfit_sampling.h from plfit. The following ensures
   # that the correct version is included, depending on whether plfit is vendored
   target_include_directories(

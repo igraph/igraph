@@ -501,7 +501,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
     /* We reuse the links_weight vector to store the old edge weights */
     IGRAPH_CHECK(igraph_vector_update(&links_weight, weights));
-    igraph_vector_fill(weights, 0);
+    igraph_vector_null(weights);
 
     for (igraph_integer_t i = 0; i < ecount; i++) {
         VECTOR(*weights)[VECTOR(edges)[i]] += VECTOR(links_weight)[i];

@@ -73,7 +73,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                         in order to be appendable to other vectors */
     igraph_vector_bool_t markto, added;
     igraph_vector_int_t nptr;
-    int iteration = 0;
+    int iter = 0;
 
     if (from < 0 || from >= no_nodes) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
@@ -120,10 +120,6 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
 
         n = igraph_vector_int_size(neis);
 
-        if (iteration == 0) {
-            IGRAPH_ALLOW_INTERRUPTION();
-        }
-
         within_dist = (curdist < cutoff || cutoff < 0);
         if (within_dist) {
             /* Search for a neighbor that was not yet visited */
@@ -152,10 +148,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
             VECTOR(nptr)[up] = 0;
         }
 
-        iteration++;
-        if (iteration >= 10000) {
-            iteration = 0;
-        }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 13);
     }
 
     igraph_vector_int_destroy(&nptr);

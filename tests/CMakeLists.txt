@@ -66,6 +66,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bitset
   heap
   igraph_array
   igraph_complex
@@ -155,7 +156,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
   igraph_vs_nonadj
-  igraph_vs_seq
+  igraph_vs_range
   igraph_vs_vector
 )
 
@@ -203,6 +204,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
@@ -268,7 +270,7 @@ add_examples(
   igraph_is_loop
   igraph_is_multiple
   igraph_list_triangles
-  igraph_knn
+  igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
@@ -283,9 +285,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  components
   coreness
   efficiency
   global_transitivity
+  harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
@@ -323,17 +327,22 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_clique
+  igraph_is_complete
   igraph_is_dag
   igraph_is_mutual
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_joint_degree_distribution
+  igraph_joint_type_distribution
   igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
   igraph_local_scan_subset_ecount
   igraph_local_transitivity
+  igraph_mean_degree
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
@@ -344,17 +353,18 @@ add_legacy_tests(
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_similarity
-  igraph_transitive_closure_dag
+  igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
   igraph_unfold_tree
   igraph_voronoi
   igraph_widest_paths
-  harmonic_centrality
+  igraph_spanner
+  knn
   random_spanning_tree
+  reachability
   single_target_shortest_path
   topological_sorting
-  igraph_spanner
 )
 
 add_legacy_tests(
@@ -363,6 +373,9 @@ add_legacy_tests(
   bug_1814
   bug_1970
   bug_2150
+  bug_2497
+  bug_2506
+  bug_2517
 )
 
 # components.at
@@ -370,12 +383,15 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_biconnected_components
   igraph_decompose
+  igraph_is_biconnected
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_biconnected_components
   igraph_bridges
   igraph_decompose_strong
+  igraph_is_biconnected
   igraph_subcomponent
 )
 
@@ -546,8 +562,10 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
+  igraph_contract_vertices
   igraph_difference
   igraph_disjoint_union
+  igraph_join
   igraph_intersection
   igraph_union
 )
@@ -556,14 +574,16 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
   igraph_connect_neighborhood
+  igraph_disjoint_union
   igraph_graph_power
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
-  igraph_intersection2
+  igraph_intersection
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
+  igraph_union
 )
 
 # conversion.at
@@ -800,6 +820,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_is_separator
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   igraph_cohesive_blocks
   igraph_minimum_size_separators
 )
@@ -965,6 +990,9 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  connectivity
+  erdos_renyi
+  graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted
@@ -986,10 +1014,14 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_strength
   igraph_transitivity
+  igraph_tree_game
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
+  lad
+  intersection
 )
 
 # dot product
@@ -1004,4 +1036,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        jdm
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        igraph_realize_bipartite_degree_sequence
 )

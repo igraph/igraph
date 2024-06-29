@@ -43,13 +43,12 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
                                        const igraph_vector_int_t *in_seq) {
 
     igraph_integer_t outsum = 0, insum = 0;
-    igraph_bool_t directed = (in_seq != 0 && igraph_vector_int_size(in_seq) != 0);
+    igraph_bool_t directed = (in_seq != NULL && igraph_vector_int_size(in_seq) != 0);
     igraph_bool_t degseq_ok;
     igraph_integer_t no_of_nodes, no_of_edges;
-    igraph_integer_t *bag1 = 0, *bag2 = 0;
+    igraph_integer_t *bag1, *bag2;
     igraph_integer_t bagp1 = 0, bagp2 = 0;
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
 
     IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &degseq_ok));
     if (!degseq_ok) {
@@ -66,24 +65,20 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     no_of_edges = directed ? outsum : outsum / 2;
 
     bag1 = IGRAPH_CALLOC(outsum, igraph_integer_t);
-    if (bag1 == 0) {
-        IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(bag1, "Insufficient memory for sampling from configuration model.");
     IGRAPH_FINALLY(igraph_free, bag1);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < VECTOR(*out_seq)[i]; j++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t j = 0; j < VECTOR(*out_seq)[i]; j++) {
             bag1[bagp1++] = i;
         }
     }
     if (directed) {
         bag2 = IGRAPH_CALLOC(insum, igraph_integer_t);
-        if (bag2 == 0) {
-            IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(bag2, "Insufficient memory for sampling from configuration model.");
         IGRAPH_FINALLY(igraph_free, bag2);
-        for (i = 0; i < no_of_nodes; i++) {
-            for (j = 0; j < VECTOR(*in_seq)[i]; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (igraph_integer_t j = 0; j < VECTOR(*in_seq)[i]; j++) {
                 bag2[bagp2++] = i;
             }
         }
@@ -95,7 +90,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     RNG_BEGIN();
 
     if (directed) {
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             igraph_integer_t from = RNG_INTEGER(0, bagp1 - 1);
             igraph_integer_t to = RNG_INTEGER(0, bagp2 - 1);
             igraph_vector_int_push_back(&edges, bag1[from]); /* safe, already reserved */
@@ -105,7 +100,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
             bagp1--; bagp2--;
         }
     } else {
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             igraph_integer_t from = RNG_INTEGER(0, bagp1 - 1);
             igraph_integer_t to;
             igraph_vector_int_push_back(&edges, bag1[from]); /* safe, already reserved */
@@ -677,6 +672,28 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  * \function igraph_degree_sequence_game
  * \brief Generates a random graph with a given degree sequence.
  *
+ * This function generates random graphs with a prescribed degree sequence.
+ * Several sampling methods are available, which respect different constraints
+ * (simple graph or multigraphs, connected graphs, etc.), and provide different
+ * tradeoffs between performance and unbiased sampling. See Section 2.1 of
+ * Horvát and Modes (2021) for an overview of sampling techniques for graphs
+ * with fixed degrees.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Fabien Viger, and Matthieu Latapy:
+ * Efficient and Simple Generation of Random Simple Connected Graphs with Prescribed Degree Sequence,
+ * Journal of Complex Networks 4, no. 1, pp. 15–37 (2015).
+ * https://doi.org/10.1093/comnet/cnv013.
+ *
+ * </para><para>
+ * Szabolcs Horvát, and Carl D Modes:
+ * Connectedness Matters: Construction and Exact Random Sampling of Connected Networks,
+ * Journal of Physics: Complexity 2, no. 1, pp. 015008 (2021).
+ * https://doi.org/10.1088/2632-072x/abced5.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param out_deg The degree sequence for an undirected graph (if
  *        \p in_seq is \c NULL or of length zero), or the out-degree
@@ -745,11 +762,16 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  *           should match for directed graphs.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges
- *                  for \c IGRAPH_DEGSEQ_SIMPLE. The time complexity of the
- *                  other modes is not known.
+ * for \c IGRAPH_DEGSEQ_CONFIGURATION and \c IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE.
+ * The time complexity of the other modes is not known.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game_gnm(),
- *     \ref igraph_erdos_renyi_game_gnp(), \ref igraph_is_graphical()
+ * \sa \ref igraph_is_graphical() to determine if there exist graphs with a certain
+ * degree sequence; \ref igraph_erdos_renyi_game_gnm() to generate graphs with a
+ * fixed number of edges, without any degree constraints; \ref igraph_chung_lu_game()
+ * and \ref igraph_static_fitness_game() to sample random graphs with a prescribed
+ * \em expected degree sequence (but variable actual degrees);
+ * \ref igraph_realize_degree_sequence() and \ref igraph_realize_bipartite_degree_sequence()
+ * to generate a single (non-random) graph with given degrees.
  *
  * \example examples/simple/igraph_degree_sequence_game.c
  */

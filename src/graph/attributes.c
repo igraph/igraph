@@ -32,10 +32,10 @@
 
 /* Should you ever want to have a thread-local attribute handler table, prepend
  * IGRAPH_THREAD_LOCAL to the following declaration and #include "config.h". */
-igraph_attribute_table_t *igraph_i_attribute_table = 0;
+igraph_attribute_table_t *igraph_i_attribute_table = NULL;
 
 igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr) {
-    graph->attr = 0;
+    graph->attr = NULL;
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->init(graph, attr);
     } else {
@@ -47,10 +47,12 @@ void igraph_i_attribute_destroy(igraph_t *graph) {
     if (igraph_i_attribute_table) {
         igraph_i_attribute_table->destroy(graph);
     }
+    graph->attr = NULL;
 }
 
 igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
                             igraph_bool_t va, igraph_bool_t ea) {
+    to->attr = NULL;
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->copy(to, from, ga, va, ea);
     } else {

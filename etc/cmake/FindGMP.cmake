@@ -9,7 +9,7 @@
 # Some modifications made by Tamas Nepusz to ensure that the module fits better
 # with the de facto conventions of FindXXX.cmake scripts
 
-find_path(GMP_INCLUDE_DIR 
+find_path(GMP_INCLUDE_DIR
   NAMES gmp.h
 )
 

@@ -262,37 +262,32 @@ static igraph_error_t igraph_i_adjacency_min(
  *        row i and column j in the adjacency matrix \p adjmatrix):
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
- *          the graph will be directed and
+ *          The graph will be directed and
  *          an element gives the number of edges between two vertices.
  *        \cli IGRAPH_ADJ_UNDIRECTED
- *          this is the same as \c IGRAPH_ADJ_MAX,
- *          for convenience.
+ *          The graph will be undirected and
+ *          an element gives the number of edges between two vertices.
+ *          If the input matrix is not symmetric, an error is thrown.
  *        \cli IGRAPH_ADJ_MAX
- *          undirected graph will be created
+ *          An undirected graph will be created
  *          and the number of edges between vertices
- *          i and
- *          j is
- *          max(A(i,j), A(j,i)).
+ *          i and j is max(A(i,j), A(j,i)).
  *        \cli IGRAPH_ADJ_MIN
- *          undirected graph will be created
+ *          An undirected graph will be created
  *          with min(A(i,j), A(j,i))
- *          edges between vertices
- *          i and
- *          j.
+ *          edges between vertices i and j.
  *        \cli IGRAPH_ADJ_PLUS
- *          undirected graph will be created
+ *          An undirected graph will be created
  *          with A(i,j)+A(j,i) edges
- *          between vertices
- *          i and
- *          j.
+ *          between vertices i and j.
  *        \cli IGRAPH_ADJ_UPPER
- *          undirected graph will be created,
- *          only the upper right triangle (including the diagonal) is
+ *          An undirected graph will be created.
+ *          Only the upper right triangle (including the diagonal) is
  *          used for the number of edges.
  *        \cli IGRAPH_ADJ_LOWER
- *          undirected graph will be created,
- *          only the lower left triangle (including the diagonal) is
- *          used for creating the edges.
+ *          An undirected graph will be created.
+ *          Only the lower left triangle (including the diagonal) is
+ *          used for the number of edges.
  *       \endclist
  * \param loops Constant to specify how the diagonal of the matrix should be
  *        treated when creating loop edges.
@@ -327,7 +322,7 @@ igraph_error_t igraph_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
@@ -517,7 +512,7 @@ static igraph_error_t igraph_i_weighted_adjacency_max(
         for (j = i + 1; j < no_of_nodes; j++) {
             M1 = MATRIX(*adjmatrix, i, j);
             M2 = MATRIX(*adjmatrix, j, i);
-            if (M1 < M2) {
+            if (M1 < M2 || isnan(M2)) {
                 M1 = M2;
             }
             if (M1 != 0.0) {
@@ -536,11 +531,21 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     igraph_vector_t *weights,
     igraph_loops_t loops
 ) {
-    if (!igraph_matrix_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR(
-            "Adjacency matrix should be symmetric to produce an undirected graph.",
-            IGRAPH_EINVAL
-        );
+    /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
+     * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
+     * returns false for these as NaN != NaN. */
+    igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
+    for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_integer_t j=0; j < i; j++) {
+            igraph_real_t a1 = MATRIX(*adjmatrix, i, j);
+            igraph_real_t a2 = MATRIX(*adjmatrix, j, i);
+            if (a1 != a2 && ! (isnan(a1) && isnan(a2))) {
+                IGRAPH_ERROR(
+                    "Adjacency matrix should be symmetric to produce an undirected graph.",
+                    IGRAPH_EINVAL
+                    );
+            }
+        }
     }
     return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
 }
@@ -644,7 +649,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
         for (j = i + 1; j < no_of_nodes; j++) {
             M1 = MATRIX(*adjmatrix, i, j);
             M2 = MATRIX(*adjmatrix, j, i);
-            if (M1 > M2) {
+            if (M1 > M2 || isnan(M2)) {
                 M1 = M2;
             }
             if (M1 != 0.0) {
@@ -742,7 +747,7 @@ igraph_error_t igraph_weighted_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);

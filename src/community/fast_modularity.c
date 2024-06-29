@@ -696,7 +696,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     } else {
         debug("Calculating degrees\n");
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, 1));
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
         for (i = 0; i < no_of_nodes; i++) {
             VECTOR(a)[i] = VECTOR(degrees)[i];
         }
@@ -1026,22 +1026,24 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
      * joining the communities with the least number of nodes results in the
      * smallest decrease in modularity every step. Now we're simply deleting
      * the excess rows from the merge matrix */
-    if (no_of_joins < total_joins) {
-        igraph_integer_t *ivec;
-        igraph_integer_t merges_nrow = igraph_matrix_int_nrow(merges);
+    if (merges != NULL) {
+        if (no_of_joins < total_joins) {
+            igraph_integer_t *ivec;
+            igraph_integer_t merges_nrow = igraph_matrix_int_nrow(merges);
 
-        ivec = IGRAPH_CALLOC(merges_nrow, igraph_integer_t);
-        IGRAPH_CHECK_OOM(ivec, "Insufficient memory for fast greedy community detection.");
-        IGRAPH_FINALLY(igraph_free, ivec);
+            ivec = IGRAPH_CALLOC(merges_nrow, igraph_integer_t);
+            IGRAPH_CHECK_OOM(ivec, "Insufficient memory for fast greedy community detection.");
+            IGRAPH_FINALLY(igraph_free, ivec);
 
-        for (i = 0; i < no_of_joins; i++) {
-            ivec[i] = i + 1;
+            for (i = 0; i < no_of_joins; i++) {
+                ivec[i] = i + 1;
+            }
+
+            igraph_matrix_int_permdelete_rows(merges, ivec, total_joins - no_of_joins);
+
+            IGRAPH_FREE(ivec);
+            IGRAPH_FINALLY_CLEAN(1);
         }
-
-        igraph_matrix_int_permdelete_rows(merges, ivec, total_joins - no_of_joins);
-
-        IGRAPH_FREE(ivec);
-        IGRAPH_FINALLY_CLEAN(1);
     }
     IGRAPH_PROGRESS("Fast greedy community detection", 100.0, 0);
 

@@ -34,19 +34,12 @@
 
 class Greedy {
 public:
-    Greedy(FlowGraph * fgraph);
+    explicit Greedy(FlowGraph *fgraph);
     // initialise les attributs par rapport au graph
 
     void setMove(const std::vector<igraph_integer_t> &moveTo);
-    //virtual void determMove(int *moveTo);
-
     bool optimize();
-    //virtual void move(bool &moved);
-
     void apply(bool sort);
-    //virtual void level(Node ***, bool sort);
-
-    /* void tune(void); */ /* unused */
 
     /**************************************************************************/
 
@@ -68,7 +61,7 @@ private:
 
     std::vector<igraph_integer_t> node_index;  // module number of each node
 
-    igraph_integer_t Nempty;
+    igraph_integer_t Nempty = 0;
     std::vector<igraph_integer_t> mod_empty;
 
     std::vector<double> mod_exit;  // version tmp de node

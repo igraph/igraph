@@ -85,6 +85,27 @@ int main(void) {
 
     printf("==============\n");
 
+    /* regression test for issue #2398 on GitHub */
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0, 1, 1, 2, -1);
+    igraph_vector_int_init_int_end(&keep, -1, 0, 1, 0, 1, 0, 1, -1);
+
+    igraph_induced_subgraph(&g, &sub,
+                            igraph_vss_vector(&keep),
+                            IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
+    print_graph(&sub);
+    igraph_destroy(&sub);
+
+    igraph_induced_subgraph(&g, &sub,
+                            igraph_vss_vector(&keep),
+                            IGRAPH_SUBGRAPH_COPY_AND_DELETE);
+    print_graph(&sub);
+    igraph_destroy(&sub);
+
+    igraph_vector_int_destroy(&keep);
+    igraph_destroy(&g);
+
+    printf("==============\n");
+
     VERIFY_FINALLY_STACK();
 
     return 0;

@@ -21,6 +21,7 @@
 #include "igraph_paths.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -78,7 +79,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     igraph_integer_t i;
     igraph_integer_t no_of_from, no_of_to;
     igraph_dqueue_int_t Q;
-    igraph_vector_bool_t clean_vertices;
+    igraph_bitset_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t fromvit, tovit;
     igraph_bool_t all_to;
@@ -102,7 +103,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                       IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
-    if (no_of_edges > 0 && igraph_vector_is_any_nan(weights)) {
+    if (igraph_vector_is_any_nan(weights)) {
         IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
@@ -111,7 +112,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     no_of_from = IGRAPH_VIT_SIZE(fromvit);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&clean_vertices, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&clean_vertices, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_queued, no_of_nodes);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
@@ -140,7 +141,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
         igraph_vector_fill(&dist, IGRAPH_INFINITY);
         VECTOR(dist)[source] = 0;
-        igraph_vector_bool_null(&clean_vertices);
+        igraph_bitset_null(&clean_vertices);
         igraph_vector_int_null(&num_queued);
 
         /* Fill the queue with vertices to be checked */
@@ -155,7 +156,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             }
 
             igraph_integer_t j = igraph_dqueue_int_pop(&Q);
-            VECTOR(clean_vertices)[j] = true;
+            IGRAPH_BIT_SET(clean_vertices, j);
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
                 IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
@@ -179,8 +180,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                 if (VECTOR(dist)[target] > altdist) {
                     /* relax the edge */
                     VECTOR(dist)[target] = altdist;
-                    if (VECTOR(clean_vertices)[target]) {
-                        VECTOR(clean_vertices)[target] = false;
+                    if (IGRAPH_BIT_TEST(clean_vertices, target)) {
+                        IGRAPH_BIT_CLEAR(clean_vertices, target);
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
                     }
                 }
@@ -210,7 +211,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
     igraph_vit_destroy(&fromvit);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_bool_destroy(&clean_vertices);
+    igraph_bitset_destroy(&clean_vertices);
     igraph_vector_int_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
@@ -238,12 +239,11 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \function igraph_get_shortest_paths_bellman_ford
  * \brief Weighted shortest paths from a vertex, allowing negative weights.
  *
- * This function calculates weighted shortest paths from or to a single vertex,
- * and allows negative weights. When there is more than one shortest path between
- * two vertices, only one of them is returned.
- *
- * If there are no negative weights, you are better off with
- * \ref igraph_get_shortest_paths_dijkstra() .
+ * This function calculates weighted shortest paths from or to a single vertex
+ * using the Bellman-Ford algorithm, whihc can handle negative weights. When
+ * there is more than one shortest path between two vertices, only one of them
+ * is returned. When there are no negative weights,
+ * \ref igraph_get_shortest_paths_dijkstra() is likely to be faster.
  *
  * \param graph The input graph, can be directed.
  * \param vertices The result, the IDs of the vertices along the paths.
@@ -301,9 +301,10 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * Time complexity: O(|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges.
  *
- * \sa \ref igraph_get_shortest_paths() for a faster unweighted version
- * or \ref igraph_get_shortest_paths_dijkstra() if you do not have negative
- * edge weights.
+ * \sa \ref igraph_distances_bellman_ford() to compute only shortest path
+ * lengths, but not the paths themselves; \ref igraph_get_shortest_paths() for
+ * a faster unweighted version or \ref igraph_get_shortest_paths_dijkstra()
+ * if you do not have negative edge weights.
  */
 
 igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
@@ -321,7 +322,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j, k;
     igraph_dqueue_int_t Q;
-    igraph_vector_bool_t clean_vertices;
+    igraph_bitset_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
     igraph_vector_t dist;
@@ -341,7 +342,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&clean_vertices, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&clean_vertices, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_queued, no_of_nodes);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
@@ -377,7 +378,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         }
 
         j = igraph_dqueue_int_pop(&Q);
-        VECTOR(clean_vertices)[j] = true;
+        IGRAPH_BIT_SET(clean_vertices, j);
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
             IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
@@ -396,7 +397,12 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         for (k = 0; k < nlen; k++) {
             igraph_integer_t nei = VECTOR(*neis)[k];
             igraph_integer_t target = IGRAPH_OTHER(graph, nei, j);
-            igraph_real_t altdist = VECTOR(dist)[j] + VECTOR(*weights)[nei];
+            igraph_real_t weight = VECTOR(*weights)[nei];
+            igraph_real_t altdist = VECTOR(dist)[j] + weight;
+
+            if (isnan(weight)) {
+                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
 
             /* infinite weights are handled correctly here; if an edge has
              * infinite weight, altdist will also be infinite so the condition
@@ -406,8 +412,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                 /* relax the edge */
                 VECTOR(dist)[target] = altdist;
                 parent_eids[target] = nei + 1;
-                if (VECTOR(clean_vertices)[target]) {
-                    VECTOR(clean_vertices)[target] = false;
+                if (IGRAPH_BIT_TEST(clean_vertices, target)) {
+                    IGRAPH_BIT_CLEAR(clean_vertices, target);
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
                 }
             }
@@ -501,7 +507,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     IGRAPH_FREE(parent_eids);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_bool_destroy(&clean_vertices);
+    igraph_bitset_destroy(&clean_vertices);
     igraph_vector_int_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);

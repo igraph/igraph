@@ -71,30 +71,27 @@
 %option bison-locations
 %option yylineno
 
-alnum [^ \t\r\n\0#]
+/* Anything except non-printable (00-1F), space (20), del (7F) and # */
+alnum [^\x00-\x20\x7f#]
+
+%s LINE
 
 %%
 
- /* --------------------------------------------------hashmark------*/
-#                    { return HASH; }
-
  /* ------------------------------------------------whitespace------*/
-[ \t]+               { }
+[ \t]+               { /* skip space */ }
 
- /* ---------------------------------------------------newline------*/
-\n\r|\r\n|\n|\r      { return NEWLINE; }
+ /* --------------------------------------------------hashmark------*/
+#                    { BEGIN(LINE); return HASH; }
 
  /* ----------------------------------------------alphanumeric------*/
-{alnum}+             { return ALNUM; }
+{alnum}+             { BEGIN(LINE); return ALNUM; }
 
-<<EOF>>           { if (yyextra->eof) {
-                       yyterminate();
-                    } else {
-                       yyextra->eof=1;
-                       return NEWLINE;
-                    }
-                  }
+ /* ---------------------------------------------------newline------*/
+\n\r|\r\n|\n|\r      |
+<LINE><<EOF>>        { BEGIN(INITIAL); return NEWLINE; }
 
+ /* ---------------------------------------------anything else------*/
 .                 { return ERROR; }
 
 %%

@@ -156,6 +156,18 @@ static const char *igraph_i_error_strings[] = {
     /* 62 */ "Input problem has no solution"
 };
 
+
+/**
+ * \function igraph_strerror
+ * \brief Textual description of an error.
+ *
+ * This is a simple utility function, it gives a short general textual
+ * description for an \a igraph error code.
+ *
+ * \param igraph_errno The \a igraph error code.
+ * \return pointer to the textual description of the error code.
+ */
+
 const char *igraph_strerror(const igraph_error_t igraph_errno) {
     if ((int) igraph_errno < 0 ||
         (int) igraph_errno >= sizeof(igraph_i_error_strings) / sizeof(igraph_i_error_strings[0])) {
@@ -164,8 +176,28 @@ const char *igraph_strerror(const igraph_error_t igraph_errno) {
     return igraph_i_error_strings[igraph_errno];
 }
 
+
+/**
+ * \function igraph_error
+ * \brief Reports an error.
+ *
+ * \a igraph functions usually call this function (most often via the
+ * \ref IGRAPH_ERROR macro) if they notice an error.
+ * It calls the currently installed error handler function with the
+ * supplied arguments.
+ *
+ * \param reason Textual description of the error.
+ * \param file The source file in which the error was noticed.
+ * \param line The number of line in the source file which triggered the
+ *   error.
+ * \param igraph_errno The \a igraph error code.
+ * \return the error code (if it returns)
+ *
+ * \sa \ref igraph_errorf()
+ */
+
 igraph_error_t igraph_error(const char *reason, const char *file, int line,
-                 igraph_error_t igraph_errno) {
+                            igraph_error_t igraph_errno) {
 
     if (igraph_i_error_handler) {
         igraph_i_error_handler(reason, file, line, igraph_errno);
@@ -177,8 +209,24 @@ igraph_error_t igraph_error(const char *reason, const char *file, int line,
     return igraph_errno;
 }
 
+
+/**
+ * \function igraph_errorf
+ * \brief Reports an error, printf-like version.
+ *
+ * \param reason Textual description of the error, interpreted as
+ *               a \c printf format string.
+ * \param file The source file in which the error was noticed.
+ * \param line The line in the source file which triggered the error.
+ * \param igraph_errno The \a igraph error code.
+ * \param ... Additional parameters, the values to substitute into the
+ *            format string.
+ *
+ * \sa \ref igraph_error()
+ */
+
 igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
-                  igraph_error_t igraph_errno, ...) {
+                             igraph_error_t igraph_errno, ...) {
     va_list ap;
     va_start(ap, igraph_errno);
     vsnprintf(igraph_i_errormsg_buffer,
@@ -221,6 +269,20 @@ void igraph_error_handler_printignore(const char *reason, const char *file,
     IGRAPH_FINALLY_FREE();
 }
 #endif
+
+
+/**
+ * \function igraph_set_error_handler
+ * \brief Sets a new error handler.
+ *
+ * Installs a new error handler. If called with \c NULL, it installs the
+ * default error handler (which is currently \ref igraph_error_handler_abort).
+ *
+ * \param new_handler The error handler function to install.
+ * \return The old error handler function. This should be saved and
+ *   restored if \p new_handler is not needed any
+ *   more.
+ */
 
 igraph_error_handler_t *igraph_set_error_handler(igraph_error_handler_t *new_handler) {
     igraph_error_handler_t *previous_handler = igraph_i_error_handler;
@@ -377,6 +439,23 @@ void igraph_warning_handler_print(const char *reason, const char *file, int line
 }
 #endif
 
+
+/**
+ * \function igraph_warning
+ * \brief Reports a warning.
+ *
+ * Call this function if you want to trigger a warning from within
+ * a function that uses \a igraph.
+ *
+ * \param reason Textual description of the warning.
+ * \param file The source file in which the warning was noticed.
+ * \param line The number of line in the source file which triggered the
+ *         warning.
+ * \param igraph_errno Warnings could have potentially error codes as well,
+ *        but this is currently not used in igraph.
+ * \return The supplied error code.
+ */
+
 void igraph_warning(const char *reason, const char *file, int line) {
 
     if (igraph_i_warning_handler) {
@@ -388,8 +467,27 @@ void igraph_warning(const char *reason, const char *file, int line) {
     }
 }
 
-void igraph_warningf(const char *reason, const char *file, int line,
-                    ...) {
+
+/**
+ * \function igraph_warningf
+ * \brief Reports a warning, printf-like version.
+ *
+ * This function is similar to \ref igraph_warning(), but
+ * uses a printf-like syntax. It substitutes the additional arguments
+ * into the \p reason template string and calls \ref igraph_warning().
+ *
+ * \param reason Textual description of the warning, a template string
+ *        with the same syntax as the standard printf C library function.
+ * \param file The source file in which the warning was noticed.
+ * \param line The number of line in the source file which triggered the
+ *         warning.
+ * \param igraph_errno Warnings could have potentially error codes as well,
+ *        but this is currently not used in igraph.
+ * \param ... The additional arguments to be substituted into the
+ *        template string.
+ */
+
+void igraph_warningf(const char *reason, const char *file, int line, ...) {
     va_list ap;
     va_start(ap, line);
     vsnprintf(igraph_i_warningmsg_buffer,
@@ -397,6 +495,19 @@ void igraph_warningf(const char *reason, const char *file, int line,
     va_end(ap);
     igraph_warning(igraph_i_warningmsg_buffer, file, line);
 }
+
+
+/**
+ * \function igraph_set_warning_handler
+ * \brief Installs a warning handler.
+ *
+ * Install the supplied warning handler function.
+ *
+ * \param new_handler The new warning handler function to install.
+ *        Supply a null pointer here to uninstall the current
+ *        warning handler, without installing a new one.
+ * \return The current warning handler function.
+ */
 
 igraph_warning_handler_t *igraph_set_warning_handler(igraph_warning_handler_t *new_handler) {
     igraph_warning_handler_t *previous_handler = igraph_i_warning_handler;
@@ -408,6 +519,22 @@ igraph_warning_handler_t *igraph_set_warning_handler(igraph_warning_handler_t *n
 /***** Handling fatal errors *****/
 
 static IGRAPH_THREAD_LOCAL igraph_fatal_handler_t *igraph_i_fatal_handler = NULL;
+
+/**
+ * \function igraph_set_fatal_handler
+ * \brief Installs a fatal error handler.
+ *
+ * Installs the supplied fatal error handler function.
+ *
+ * </para><para>
+ * Fatal error handler functions \em must not return. Typically, the fatal
+ * error handler would either call <code>abort()</code> or <code>longjmp()</code>.
+ *
+ * \param new_handler The new fatal error handler function to install.
+ *        Supply a null pointer here to uninstall the current
+ *        fatal error handler, without installing a new one.
+ * \return The current fatal error handler function.
+ */
 
 igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t *new_handler) {
     igraph_fatal_handler_t *previous_handler = igraph_i_fatal_handler;
@@ -422,6 +549,19 @@ void igraph_fatal_handler_abort(const char *reason, const char *file, int line) 
 }
 #endif
 
+
+/**
+ * \function igraph_fatal
+ * \brief Triggers a fatal error.
+ *
+ * This function triggers a fatal error. Typically it is called indirectly through
+ * \ref IGRAPH_FATAL() or \ref IGRAPH_ASSERT().
+ *
+ * \param reason Textual description of the error.
+ * \param file The source file in which the error was noticed.
+ * \param line The number of line in the source file which triggered the error.
+ */
+
 void igraph_fatal(const char *reason, const char *file, int line) {
     if (igraph_i_fatal_handler) {
         igraph_i_fatal_handler(reason, file, line);
@@ -434,6 +574,21 @@ void igraph_fatal(const char *reason, const char *file, int line) {
        It is here to satisfy the compiler that this function indeed does not return. */
     igraph_abort();
 }
+
+
+/**
+ * \function igraph_fatalf
+ * \brief Triggers a fatal error, printf-like syntax.
+ *
+ * This function is similar to \ref igraph_fatal(), but
+ * uses a printf-like syntax. It substitutes the additional arguments
+ * into the \p reason template string and calls \ref igraph_fatal().
+ *
+ * \param reason Textual description of the error.
+ * \param file The source file in which the error was noticed.
+ * \param line The number of line in the source file which triggered the error.
+ * \param ... The additional arguments to be substituted into the template string.
+ */
 
 void igraph_fatalf(const char *reason, const char *file, int line, ...) {
     va_list ap;

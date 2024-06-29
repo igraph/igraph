@@ -1204,7 +1204,8 @@ igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
  *
  * \sa \ref igraph_strength() for the version that takes into account
  * edge weights; \ref igraph_degree_1() to efficiently compute the
- * degree of a single vertex.
+ * degree of a single vertex; \ref igraph_maxdegree() if you only need
+ * the largest degree.
  *
  * \example examples/simple/igraph_degree.c
  */
@@ -1221,6 +1222,15 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Invalid mode for degree calculation.", IGRAPH_EINVMODE);
+    }
+
+    if (! loops) {
+        /* If the graph is known not to have loops, we can use the faster
+         * loops == true code path, which has O(1) complexity instead of of O(d). */
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+            loops = true;
+        }
     }
 
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
@@ -1246,6 +1256,26 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                  IGRAPH_VIT_NEXT(vit), i++) {
                 igraph_integer_t vid = IGRAPH_VIT_GET(vit);
                 VECTOR(*res)[i] += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
+            }
+        }
+    } else if (igraph_vs_is_all(&vids)) { /* no loops, calculating degree for all vertices */
+        // When calculating degree for all vertices, iterating over edges is faster
+        igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+        if (mode & IGRAPH_OUT) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                if (from != IGRAPH_TO(graph, edge)) {
+                    VECTOR(*res)[from]++;
+                }
+            }
+        }
+        if (mode & IGRAPH_IN) {
+            for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                igraph_integer_t to = IGRAPH_TO(graph, edge);
+                if (IGRAPH_FROM(graph, edge) != to) {
+                    VECTOR(*res)[to]++;
+                }
             }
         }
     } else { /* no loops */
@@ -1306,7 +1336,7 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
    in 'eid' if it is found; otherwise 'eid' is left intact.
    */
 
-#define BINSEARCH(start,end,value,iindex,edgelist,N,result,result_pos) \
+#define BINSEARCH(start, end, value, iindex, edgelist, N, result, result_pos) \
     do { \
         while ((start) < (end)) { \
             igraph_integer_t mid =(start)+((end)-(start))/2; \
@@ -1351,20 +1381,23 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
 
 /**
  * \function igraph_get_eid
- * \brief Get the edge ID from the end points of an edge.
+ * \brief Get the edge ID from the endpoints of an edge.
  *
  * For undirected graphs \c from and \c to are exchangeable.
  *
  * \param graph The graph object.
  * \param eid Pointer to an integer, the edge ID will be stored here.
+ *        If \p error is false and no edge was found, <code>-1</code>
+ *        will be returned.
  * \param from The starting point of the edge.
  * \param to The end point of the edge.
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge
- *        was not found. If it is false, then -1 will be assigned to \p eid.
- *        Note that invalid vertex IDs in input arguments (\p from or \p to)
- *        always return an error code.
+ *        was not found. If it is false, then <code>-1</code> will be
+ *        assigned to \p eid. Note that invalid vertex IDs in input
+ *        arguments (\p from or \p to) always trigger an error,
+ *        regardless of this setting.
  * \return Error code.
  * \sa \ref igraph_edge() for the opposite operation, \ref igraph_get_all_eids_between()
  *     to retrieve all edge IDs between a pair of vertices.
@@ -1518,7 +1551,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
 
-#define FIND_ALL_DIRECTED_EDGES(graph,xfrom,xto,eidvec) \
+#define FIND_ALL_DIRECTED_EDGES(graph, xfrom, xto, eidvec) \
     do { \
         igraph_integer_t start = VECTOR(graph->os)[xfrom]; \
         igraph_integer_t end = VECTOR(graph->os)[xfrom+1]; \
@@ -1529,7 +1562,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
         igraph_integer_t eid = -1; \
         igraph_integer_t pos = -1; \
         if (end-start < end2-start2) { \
-            BINSEARCH(start, end, xto, graph->oi, graph->to, N, &eid,&pos); \
+            BINSEARCH(start, end, xto, graph->oi, graph->to, N, &eid, &pos); \
             while (pos >= 0 && pos < N) { \
                 eid = VECTOR(graph->oi)[pos++]; \
                 if (VECTOR(graph->to)[eid] != xto) { break; } \
@@ -1545,7 +1578,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
         } \
     } while (0)
 
-#define FIND_ALL_UNDIRECTED_EDGES(graph,from,to,eidvec) \
+#define FIND_ALL_UNDIRECTED_EDGES(graph, from, to, eidvec) \
     do { \
         igraph_integer_t xfrom1 = from > to ? from : to; \
         igraph_integer_t xto1 = from > to ? to : from; \

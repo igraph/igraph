@@ -36,7 +36,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
     igraph_vector_int_t neighbors, nei_colors;
 
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
-    igraph_vector_int_fill(colors, 0);
+    igraph_vector_int_null(colors);
 
     /* Nothing to do for 0 or 1 vertices.
      * Remember that colours are integers starting from 0,
@@ -51,7 +51,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
         igraph_vector_int_t degree;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 0));
+        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, false));
 
         vertex = igraph_vector_int_which_max(&degree);
         maxdeg = VECTOR(degree)[vertex];
@@ -82,7 +82,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
         IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_ALL));
         igraph_integer_t nei_count = igraph_vector_int_size(&neighbors);
 
-        /* Colour current vertex by finding smallest available non-0 color.
+        /* Colour current vertex by finding the smallest available non-0 color.
          * Note that self-loops are effectively skipped as they merely prevent
          * the current vertex from being colored with the color value it presently
          * has, which is 0 (meaning uncolored). */

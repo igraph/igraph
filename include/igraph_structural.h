@@ -40,7 +40,8 @@ __BEGIN_DECLS
 /* Basic query functions                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_are_adjacent(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res, igraph_integer_t eid);
 IGRAPH_EXPORT igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
@@ -51,6 +52,7 @@ IGRAPH_EXPORT igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *
                                igraph_vector_int_t *circle);
 IGRAPH_EXPORT igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count);
 IGRAPH_EXPORT igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                                  igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
@@ -65,6 +67,8 @@ IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
                                    igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
+                                                igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                      igraph_bool_t ignore_loops,
                                      igraph_reciprocity_t mode);
@@ -84,6 +88,11 @@ IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_boo
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
+IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
+                                              igraph_bool_t directed, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,
+                                                       igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                                const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
@@ -116,6 +125,11 @@ IGRAPH_EXPORT igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *
                                                      igraph_vector_t *knn,
                                                      igraph_vector_t *knnk,
                                                      const igraph_vector_t *weights);
+IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *knnk,
+        igraph_neimode_t from_mode, igraph_neimode_t to_mode,
+        igraph_bool_t directed_neighbors);
 
 IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
                                           const igraph_vector_t *weights, igraph_fas_algorithm_t algo);

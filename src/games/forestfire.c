@@ -40,8 +40,7 @@ typedef struct igraph_i_forest_fire_data_t {
 
 
 static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
-    igraph_integer_t i;
-    for (i = 0; i < data->no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < data->no_of_nodes; i++) {
         igraph_vector_int_destroy(data->inneis + i);
         igraph_vector_int_destroy(data->outneis + i);
     }
@@ -54,9 +53,8 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * The forest fire model intends to reproduce the following network
  * characteristics, observed in real networks:
  * \ilist
- * \ili Heavy-tailed in-degree distribution.
- * \ili Heavy-tailed out-degree distribution.
- * \ili Communities.
+ * \ili Heavy-tailed in- and out-degree distributions.
+ * \ili Community structure.
  * \ili Densification power-law. The network is densifying in time,
  *      according to a power-law rule.
  * \ili Shrinking diameter. The diameter of the network decreases in
@@ -141,15 +139,13 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     inneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
-    if (!inneis) {
-        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(inneis, "Insufficient memory for forest fire model.");
     IGRAPH_FINALLY(igraph_free, inneis);
+
     outneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
-    if (!outneis) {
-        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(outneis, "Insufficient memory for forest fire model.");
     IGRAPH_FINALLY(igraph_free, outneis);
+
     data.inneis = inneis;
     data.outneis = outneis;
     data.no_of_nodes = no_of_nodes;

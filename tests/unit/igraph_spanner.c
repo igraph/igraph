@@ -190,6 +190,13 @@ int main(void) {
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 
+    /* Regression test for https://github.com/igraph/igraph/issues/2487
+     * Edge directions should be ignored in directed graphs. */
+    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_small(&graph, 2, IGRAPH_DIRECTED, 0, 1, -1);
+    igraph_spanner(&graph, &spanner, 1.72, NULL);
+    igraph_destroy(&graph);
+
     igraph_vector_int_destroy(&spanner);
 
     return IGRAPH_SUCCESS;

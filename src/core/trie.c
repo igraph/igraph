@@ -27,6 +27,7 @@
 #include "core/trie.h"
 #include "internal/hacks.h" /* strdup */
 
+#include <assert.h>
 #include <string.h>
 
 
@@ -72,12 +73,11 @@ igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
 }
 
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
-    igraph_integer_t i;
     igraph_strvector_destroy(&t->strs);
     igraph_integer_t children_size = igraph_vector_ptr_size(&t->children);
-    for (i = 0; i < children_size; i++) {
+    for (igraph_integer_t i = 0; i < children_size; i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
-        if (child != 0) {
+        if (child != NULL) {
             igraph_i_trie_destroy_node_helper(child, true);
         }
     }
@@ -128,18 +128,16 @@ static igraph_error_t igraph_i_trie_get_node(
     igraph_trie_node_t *t, const char *key, igraph_integer_t newvalue,
     igraph_integer_t *id
 ) {
-    const char *str;
-    igraph_integer_t i;
-    igraph_bool_t add;
+    assert(key != NULL);
 
     /* If newvalue is negative, we don't add the node if nonexistent, only check
      * for its existence */
-    add = (newvalue >= 0);
+    igraph_bool_t add = (newvalue >= 0);
 
     igraph_integer_t strs_size = igraph_strvector_size(&t->strs);
-    for (i = 0; i < strs_size; i++) {
+    for (igraph_integer_t i = 0; i < strs_size; i++) {
         size_t diff;
-        str = igraph_strvector_get(&t->strs, i);
+        const char *str = igraph_strvector_get(&t->strs, i);
         diff = igraph_i_strdiff(str, key);
 
         if (diff == 0) {
@@ -165,24 +163,23 @@ static igraph_error_t igraph_i_trie_get_node(
             /* ------------------------------------ */
             /* str is prefix of key, follow its link if there is one */
             igraph_trie_node_t *node = VECTOR(t->children)[i];
-            if (node != 0) {
+            if (node != NULL) {
                 return igraph_i_trie_get_node(node, key + diff, newvalue, id);
             } else if (add) {
-                igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
-                if (! node) {
-                    IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                }
-                IGRAPH_FINALLY(igraph_free, node);
-                IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
-                IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
-                IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 1);
-                IGRAPH_CHECK(igraph_strvector_set(&node->strs, 0, key + diff));
+                igraph_trie_node_t *new_node = IGRAPH_CALLOC(1, igraph_trie_node_t);
+                IGRAPH_CHECK_OOM(new_node, "Cannot add to trie.");
+                IGRAPH_FINALLY(igraph_free, new_node);
+
+                IGRAPH_STRVECTOR_INIT_FINALLY(&new_node->strs, 1);
+                IGRAPH_VECTOR_PTR_INIT_FINALLY(&new_node->children, 1);
+                IGRAPH_VECTOR_INT_INIT_FINALLY(&new_node->values, 1);
+                IGRAPH_CHECK(igraph_strvector_set(&new_node->strs, 0, key + diff));
                 IGRAPH_FINALLY_CLEAN(4);
 
-                VECTOR(node->children)[0] = 0;
-                VECTOR(node->values)[0] = newvalue;
+                VECTOR(new_node->children)[0] = 0;
+                VECTOR(new_node->values)[0] = newvalue;
 
-                VECTOR(t->children)[i] = node;
+                VECTOR(t->children)[i] = new_node;
 
                 *id = newvalue;
                 return IGRAPH_SUCCESS;
@@ -198,10 +195,9 @@ static igraph_error_t igraph_i_trie_get_node(
             char *str2;
 
             igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
-            if (! node) {
-                IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(node, "Cannot add to trie.");
             IGRAPH_FINALLY(igraph_free, node);
+
             IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
             IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
             IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 1);
@@ -212,9 +208,8 @@ static igraph_error_t igraph_i_trie_get_node(
 
             str2 = strdup(str);
             IGRAPH_CHECK_OOM(str2, "Cannot add to trie.");
-
-            str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
+            str2[diff] = '\0';
 
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
 
@@ -234,10 +229,9 @@ static igraph_error_t igraph_i_trie_get_node(
             char *str2;
 
             igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
-            if (! node) {
-                IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(node, "Cannot add to trie.");
             IGRAPH_FINALLY(igraph_free, node);
+
             IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 2);
             IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 2);
             IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 2);
@@ -303,6 +297,12 @@ static igraph_error_t igraph_i_trie_get_node(
  */
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+    assert(key != NULL);
+
+    if (*key == '\0') {
+        IGRAPH_ERROR("Keys in a trie cannot be empty.", IGRAPH_EINVAL);
+    }
+
     if (!t->storekeys) {
         IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id));
         if (*id > t->maxvalue) {
@@ -316,13 +316,13 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
         ret = igraph_strvector_push_back(&t->keys, key);
         if (ret != IGRAPH_SUCCESS) {
             IGRAPH_FINALLY_EXIT();
-            IGRAPH_ERROR("cannot get element from trie", ret);
+            IGRAPH_ERROR("Cannot get element from trie.", ret);
         }
         ret = igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id);
         if (ret != IGRAPH_SUCCESS) {
             igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1); /* shrinks, error safe */
             IGRAPH_FINALLY_EXIT();
-            IGRAPH_ERROR("cannot get element from trie", ret);
+            IGRAPH_ERROR("Cannot get element from trie.", ret);
         }
 
         /* everything is fine */
@@ -358,9 +358,7 @@ igraph_error_t igraph_trie_get_len(
         igraph_integer_t *id) {
 
     char *tmp = strndup(key, length);
-    if (! tmp) {
-        IGRAPH_ERROR("Cannot get from trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot get from trie.");
     IGRAPH_FINALLY(igraph_free, tmp);
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     IGRAPH_FREE(tmp);

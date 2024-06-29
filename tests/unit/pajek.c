@@ -27,6 +27,7 @@
 
 int main(void) {
     igraph_t g;
+    igraph_bool_t simple;
     FILE *ifile;
 
     /* turn on attribute handling */
@@ -51,6 +52,51 @@ int main(void) {
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 10);
     IGRAPH_ASSERT(igraph_ecount(&g) == 9);
+
+    igraph_destroy(&g);
+
+    /* This file starts with a UTF-8 BOM, which Pajek itself supports.
+     * It also contains some custom attributes. */
+    ifile = fopen("utf8_with_bom.net", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    igraph_read_graph_pajek(&g, ifile);
+    fclose(ifile);
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 6);
+
+    igraph_destroy(&g);
+
+    /* File in Arcslist format */
+    ifile = fopen("pajek_arcslist.net", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    igraph_read_graph_pajek(&g, ifile);
+    fclose(ifile);
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 18);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 55);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+
+    igraph_is_simple(&g, &simple);
+    IGRAPH_ASSERT(simple);
+
+    igraph_destroy(&g);
+
+    /* File in Edgeslist format */
+    ifile = fopen("pajek_edgeslist.net", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    igraph_read_graph_pajek(&g, ifile);
+    fclose(ifile);
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 3);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 3);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+
+    igraph_is_simple(&g, &simple);
+    IGRAPH_ASSERT(simple);
 
     igraph_destroy(&g);
 

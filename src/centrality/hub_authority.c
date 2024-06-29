@@ -21,9 +21,10 @@
 #include "igraph_centrality.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_interface.h"
-#include "igraph_structural.h"
 #include "igraph_blas.h"
+#include "igraph_interface.h"
+#include "igraph_random.h"
+#include "igraph_structural.h"
 
 #include "centrality/centrality_internal.h"
 
@@ -137,19 +138,28 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
 
 /**
  * \function igraph_hub_and_authority_scores
- * \brief Kleinberg's hub and authority scores.
+ * \brief Kleinberg's hub and authority scores (HITS).
  *
  * Hub and authority scores are a generalization of the ideas behind
  * eigenvector centrality to directed graphs. The authority score of
  * a vertex is proportional to the sum of the hub scores of vertices
  * that point to it. Conversely, the hub score of a vertex is proportional
- * to the sum of authority scores of vertices that it points to.
+ * to the sum of authority scores of vertices that it points to. These
+ * concepts are also known under the name Hyperlink-Induced Topic Search (HITS).
  *
  * </para><para>
  * The hub and authority scores of the vertices are defined as the principal
  * eigenvectors of <code>A A^T</code> and <code>A^T A</code>, respectively,
  * where <code>A</code> is the adjacency matrix of the graph and <code>A^T</code>
  * is its transposed.
+ *
+ * </para><para>
+ * If vector \c h and \c a contain hub and authority scores, then the two
+ * scores are related by <code>h = Aa</code> and <code>a = A^T h</code>.
+ * When the principal eigenvalue of <code>A A^T</code> is degenerate, there
+ * is no unique solution to the hub- and authority-score problem.
+ * igraph guarantees that the scores that are returned are matching, i.e. are
+ * related by these formulas, even in this situation.
  *
  * </para><para>
  * The concept of hub and authority scores were developed for \em directed graphs.
@@ -181,16 +191,14 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the function
  *    overwrites the <code>n</code> (number of vertices) parameter and
- *    it always starts the calculation from a non-random vector
- *    calculated based on the degree of the vertices.
+ *    it always starts the calculation from a vector calculated based
+ *    on the degree of the vertices.
  * \return Error code.
  *
  * Time complexity: depends on the input graph, usually it is O(|V|),
  * the number of vertices.
  *
- * \sa \ref igraph_hub_score(), \ref igraph_authority_score()
- * for the separate calculations,
- * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
+ * \sa \ref igraph_pagerank(), \ref igraph_personalized_pagerank();
  * \ref igraph_eigenvector_centrality() for a similar measure intended
  * for undirected graphs.
  */
@@ -198,6 +206,10 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_vector_t *hub_vector, igraph_vector_t *authority_vector,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights, igraph_arpack_options_t *options) {
+
+    /* The current implementation computes hub scores, i.e the principal
+     * eigenvector of A A^T, and transforms these to authority scores as
+     * authority = A^T hub. */
 
     igraph_adjlist_t inadjlist, outadjlist;
     igraph_inclist_t ininclist, outinclist;
@@ -209,7 +221,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     igraph_i_kleinberg_data2_t extra2;
     igraph_vector_t *my_hub_vector_p;
     igraph_vector_t my_hub_vector;
-
+    igraph_bool_t negative_weights = false;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -239,8 +251,19 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_vector_size(weights),
                     igraph_ecount(graph));
         }
+
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
+
+        if (min < 0.0) {
+            /* When there are negative weights, the principal eigenvalue and the eigenvector
+             * are no longer guaranteed to be non-negative. */
+            negative_weights = true;
+            IGRAPH_WARNING("Negative weight in graph. The largest eigenvalue "
+                           "will be selected, but it may not be the largest in magnitude. "
+                           "Some hub and authority scores may be negative.");
+        }
+
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -285,14 +308,17 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
-    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0, 0));
+    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
+    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
-            MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
+            /* Note: Keep random perturbation non-negative. */
+            MATRIX(vectors, i, 0) = VECTOR(tmp)[i] + RNG_UNIF(0, 1e-4);
         } else {
-            MATRIX(vectors, i, 0) = 1.0;
+            MATRIX(vectors, i, 0) = 0.01;
         }
     }
+    RNG_END();
 
     extra.in = &inadjlist; extra.out = &outadjlist; extra.tmp = &tmp;
     extra2.in = &ininclist; extra2.out = &outinclist; extra2.tmp = &tmp;
@@ -342,9 +368,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
-        for (igraph_integer_t i = 0; i < options->n; i++) {
-            if (VECTOR(*my_hub_vector_p)[i] < 0) {
-                VECTOR(*my_hub_vector_p)[i] = 0;
+        if (! negative_weights) {
+            for (igraph_integer_t i = 0; i < options->n; i++) {
+                if (VECTOR(*my_hub_vector_p)[i] < 0) {
+                    VECTOR(*my_hub_vector_p)[i] = 0;
+                }
             }
         }
     }

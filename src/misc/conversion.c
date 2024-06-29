@@ -899,9 +899,9 @@ igraph_error_t igraph_get_stochastic_sparse(
     IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, weights, IGRAPH_LOOPS_TWICE));
 
     if (column_wise) {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ 0));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ false));
     } else {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ 0));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ false));
     }
 
     return IGRAPH_SUCCESS;

@@ -68,45 +68,31 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_SLIST
-#define IGRAPH_HRG_SLIST
-class slist {
-public:
-    std::string x;         // stored elementd in linked-list
-    slist* next;          // pointer to next elementd
-    slist(): x(""), next(0) { }
-    ~slist() { }
+struct slist {
+    std::string x;          // stored elementd in linked-list
+    slist* next = nullptr;  // pointer to next elementd
 };
-#endif
 
-class keyValuePairSplit {
-public:
-    std::string x;         // elementsp split (string)
-    double y;         // stored weight   (double)
-    int c;            // stored count    (int)
-    keyValuePairSplit* next;  // linked-list pointer
-    keyValuePairSplit(): x(""), y(0.0), c(0), next(0) { }
-    ~keyValuePairSplit() { }
+struct keyValuePairSplit {
+    std::string x;          // elementsp split (string)
+    double y = 0.0;         // stored weight   (double)
+    int c = 0;              // stored count    (int)
+    keyValuePairSplit* next = nullptr;  // linked-list pointer
 };
 
 // ******** Tree elementsp Class *****************************************
 
-class elementsp {
-public:
+struct elementsp {
     std::string split;             // split represented as a string
-    double weight;            // total weight of this split
-    int count;                // number of observations of this split
+    double weight = 0.0;            // total weight of this split
+    int count = 0;                // number of observations of this split
 
-    bool color;           // F: BLACK, T: RED
-    short int mark;       // marker
+    bool color = false;           // F: BLACK, T: RED
+    short int mark = 0;       // marker
 
-    elementsp *parent;        // pointer to parent node
-    elementsp *left;      // pointer for left subtree
-    elementsp *right;     // pointer for right subtree
-
-    elementsp(): split(""), weight(0.0), count(0), color(false), mark(0),
-        parent(0), left(0), right(0) { }
-    ~elementsp() { }
+    elementsp *parent = nullptr;        // pointer to parent node
+    elementsp *left = nullptr;      // pointer for left subtree
+    elementsp *right = nullptr;     // pointer for right subtree
 };
 
 // ******** Red-Black Tree Class *****************************************
@@ -120,12 +106,11 @@ public:
 //
 
 class splittree {
-private:
     elementsp* root;      // binary tree root
     elementsp* leaf;      // all leaf nodes
-    int support;          // number of nodes in the tree
-    double total_weight;      // total weight stored
-    int total_count;      // total number of observations stored
+    int support = 0;          // number of nodes in the tree
+    double total_weight = 0.0;      // total weight stored
+    int total_count = 0;      // total number of observations stored
 
     // left-rotation operator
     void rotateLeft(elementsp*);
@@ -147,17 +132,17 @@ public:
     // default constructor/destructor
     splittree(); ~splittree();
     // returns value associated with searchKey
-    double returnValue(const std::string);
+    double returnValue(const std::string &);
     // returns T if searchKey found, and points foundNode at the
     // corresponding node
-    elementsp* findItem(const std::string);
+    elementsp* findItem(const std::string &);
     // update total_count and total_weight
     void finishedThisRound();
     // insert a new key with stored value
-    bool insertItem(std::string, double);
+    bool insertItem(const std::string &, double);
     void clearTree();
     // delete a node with given key
-    void deleteItem(std::string);
+    void deleteItem(const std::string &);
     // delete the entire tree
     void deleteTree();
     // return array of keys in tree
@@ -173,9 +158,9 @@ public:
     // returns number of items in tree
     int returnNodecount();
     // returns list of splits with given number of Ms
-    keyValuePairSplit* returnTheseSplits(const int);
+    keyValuePairSplit* returnTheseSplits(int);
     // returns sum of stored values
-    double returnTotal();
+    double returnTotal() const;
 };
 
 } // namespace fitHRG

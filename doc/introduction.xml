@@ -60,7 +60,8 @@ to add and what to improve.
 </para>
 
 <para>
-igraph is open source and distributed under the terms of the GNU GPL.
+igraph is open source and distributed under the terms of the GNU GPL
+version 2 or (at your option) any later version.
 We strongly believe that all the algorithms used in science, let that
 be graph theory or not, should have an efficient open-source
 implementation allowing use and modification for anyone.
@@ -74,7 +75,7 @@ implementation allowing use and modification for anyone.
 </para><para>
     Copyright (C) 2005-2019  Gábor Csárdi &lt;csardi.gabor@gmail.com> and Tamás Nepusz &lt;ntamas@gmail.com>
 </para><para>
-    Copyright (C) 2020-2022  The igraph development team
+    Copyright (C) 2020-2023  The igraph development team
 </para><para>
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

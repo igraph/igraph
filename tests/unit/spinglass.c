@@ -176,6 +176,169 @@ int main(void) {
     IGRAPH_ASSERT(isnan(modularity));
     igraph_destroy(&g);
 
+    printf("\nTest on a random graph to verify consistency of output.\n");
+    igraph_barabasi_game(&g, 20, 1, 3, NULL, true, 0, false, IGRAPH_BARABASI_PSUMTREE, NULL);
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,    /* no of spins */
+                               false, /* parallel update */
+                               1.0,   /* start temperature */
+                               0.01,  /* stop temperature */
+                               0.99,  /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    printf("Zero temp:\n");
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,    /* no of spins */
+                               false, /* parallel update */
+                               0.0,   /* start temperature */
+                               0.0,   /* stop temperature */
+                               0.99,  /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    printf("Parallel update:\n");
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               true, /* parallel update */
+                               1.0,  /* start temperature */
+                               0.01, /* stop temperature */
+                               0.99, /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    printf("Parallel update, zero temp:\n");
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               true, /* parallel update */
+                               0.0,  /* start temperature */
+                               0.0,  /* stop temperature */
+                               0.0,  /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    printf("Negative implementation:\n");
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               false, /* parallel update */
+                               1.0,  /* start temperature */
+                               0.01, /* stop temperature */
+                               0.99, /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_NEG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    printf("With weights:\n");
+    igraph_vector_t weights;
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&g)+1);
+
+    igraph_community_spinglass(&g,
+                               &weights,
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,    /* no of spins */
+                               false, /* parallel update */
+                               1.0,   /* start temperature */
+                               0.01,  /* stop temperature */
+                               0.99,  /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    printf("Parallel update:\n");
+    igraph_community_spinglass(&g,
+                               &weights,
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               true, /* parallel update */
+                               1.0,  /* start temperature */
+                               0.01, /* stop temperature */
+                               0.99, /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    const igraph_integer_t half_ec = igraph_ecount(&g) / 2;
+    igraph_vector_range(&weights, -half_ec, igraph_ecount(&g) - half_ec);
+    printf("Negative implementation:\n");
+    igraph_community_spinglass(&g,
+                               &weights,
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               false, /* parallel update */
+                               1.0,  /* start temperature */
+                               0.01, /* stop temperature */
+                               0.99, /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_NEG,
+                               /*gamma_minus =*/ 0);
+    printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
+    print_vector_int(&membership);
+
+    igraph_vector_destroy(&weights);
+
+    igraph_destroy(&g);
+
+
     igraph_vector_int_destroy(&membership);
     igraph_vector_int_destroy(&csize);
 

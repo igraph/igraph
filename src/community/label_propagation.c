@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2020 The igraph development team
+   Copyright (C) 2007-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_community.h"
@@ -28,6 +25,8 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
+
+#include "core/interruption.h"
 
 /**
  * \ingroup communities
@@ -132,8 +131,9 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_bool_t running, control_iteration;
     igraph_bool_t unlabelled_left;
     igraph_neimode_t reversed_mode;
+    int iter = 0; /* interruption counter */
 
-    igraph_vector_t label_counters;
+    igraph_vector_t label_counters; /* real type, stores weight sums */
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
 
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
@@ -267,6 +267,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         igraph_vector_int_t *neis;
         igraph_vector_int_t *ineis;
         igraph_bool_t was_zero;
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         if (control_iteration) {
             /* If we are in the control iteration, we expect in the beginning of
@@ -413,7 +415,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_CHECK(igraph_dqueue_int_init(&q, 0));
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
-        for (i=0; i < no_of_nodes; ++i) {
+        for (i=0; i < no_of_not_fixed_nodes; ++i) {
             igraph_integer_t v = VECTOR(node_order)[i];
 
             /* Is this node unlabelled? */

@@ -24,6 +24,7 @@
 
 #include "igraph_interface.h"
 
+#include "core/interruption.h"
 #include "math/safe_intop.h"
 
 /**
@@ -63,6 +64,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
     igraph_integer_t no_of_nodes, no_of_edges;
     igraph_vector_int_t edges;
     igraph_integer_t i, j;
+    int iter = 0;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph",
@@ -100,6 +102,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
             igraph_vector_int_push_back(&edges, i);
             igraph_vector_int_push_back(&edges, basis + j);
         }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));

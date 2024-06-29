@@ -1,0 +1,13 @@
+Version 1
+graph
+[
+  directed 0
+  node
+  [
+    id 0
+  ]
+  node
+  [
+    id 1
+  ]
+]

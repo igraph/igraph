@@ -62,8 +62,8 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get(igraph_trie_t *t, const cha
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_integer_t length,
                                            igraph_integer_t *id);
-IGRAPH_PRIVATE_EXPORT const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx);
-IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_trie_size(igraph_trie_t *t);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_trie_size(igraph_trie_t *t);
 
 const igraph_strvector_t* igraph_i_trie_borrow_keys(igraph_trie_t *t);
 

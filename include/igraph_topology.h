@@ -40,7 +40,7 @@ __BEGIN_DECLS
 IGRAPH_EXPORT igraph_error_t igraph_topological_sorting(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
                                                 igraph_t *closure);
 
 /* -------------------------------------------------- */
@@ -296,8 +296,6 @@ IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(
 );
 
 /* Functions for small graphs (<= 4 vertices for directed graphs, <= 6 for undirected graphs) */
-IGRAPH_EXPORT igraph_error_t igraph_isomorphic_small(const igraph_t *graph1, const igraph_t *graph2,
-                                       igraph_bool_t *iso);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
                                            igraph_integer_t *isoclass);

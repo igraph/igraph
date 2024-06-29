@@ -154,9 +154,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         nodetypes = node_type_vec;
     } else {
         nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (nodetypes == 0) {
-            IGRAPH_ERROR("Insufficient memory for preference_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(nodetypes, "Insufficient memory for preference_game.");
         IGRAPH_FINALLY(igraph_free, nodetypes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);
     }

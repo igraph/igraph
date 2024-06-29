@@ -56,22 +56,22 @@ int main(void) {
     /* Loop & multiple edges */
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, -1);
-    igraph_simplify(&g, /* multiple */ true, /* loop */ false, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /* remove_multiple */ true, /* remove_loops */ false, /*edge_comb=*/ NULL);
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, -1);
-    igraph_simplify(&g, /* multiple */ true, /* loop */ false, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /* remove_multiple */ true, /* remove_loops */ false, /*edge_comb=*/ NULL);
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 2, 2, 2, 2, 2, 2, 3, 2, -1);
-    igraph_simplify(&g, /* multiple */ false, /* loop */ true, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /* remove_multiple */ false, /* remove_loops */ true, /*edge_comb=*/ NULL);
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 3, 3, 3, 3, 3, 4, -1);
-    igraph_simplify(&g, /* multiple */ false, /* loop */ true, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /* remove_multiple */ false, /* remove_loops */ true, /*edge_comb=*/ NULL);
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
 

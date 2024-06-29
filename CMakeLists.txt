@@ -5,7 +5,7 @@
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 #  * cmake -E cat (3.18)
-cmake_minimum_required(VERSION 3.18...3.27)
+cmake_minimum_required(VERSION 3.18...3.29)
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
@@ -62,6 +62,16 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 include(debugging)
 include(sanitizers)
 
+# Enable fuzzer instrumentation if needed
+# FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is a conventional
+# macro used to adapt code for fuzzability, for example by
+# reducing largest allowed graph sizes when reading various
+# file formats.
+if(BUILD_FUZZING)
+  add_compile_options(-fsanitize=fuzzer-no-link)
+  add_compile_definitions(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+endif()
+
 # Add version information
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_version.h.in
@@ -103,10 +113,11 @@ endif()
 check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
 
-# Check for 128-bit integer multiplication support, floating-point endianness
-# and support for built-in overflow detection.
+# Check for 128-bit integer multiplication support, floating-point endianness,
+# support for built-in overflow detection and fast bit operation support.
 include(ieee754_endianness)
 include(uint128_support)
+include(bit_operations_support)
 include(safe_math_support)
 
 if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
@@ -156,6 +167,9 @@ add_subdirectory(src)
 add_subdirectory(interfaces)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
+endif()
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_FUZZING)
+  add_subdirectory(fuzzing)
 endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   add_subdirectory(doc)

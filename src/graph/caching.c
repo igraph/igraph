@@ -30,7 +30,7 @@
 igraph_error_t igraph_i_property_cache_init(igraph_i_property_cache_t *cache) {
     IGRAPH_STATIC_ASSERT(IGRAPH_PROP_I_SIZE <= 32);
 
-    memset(cache->value, 0, sizeof(cache->value) / sizeof(cache->value[0]));
+    memset(cache->value, 0, sizeof(cache->value));
     cache->known = 0;
     return IGRAPH_SUCCESS;
 }
@@ -100,6 +100,35 @@ void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_prope
      * intact, will often update the cache. */
     graph->cache->value[prop] = value;
     graph->cache->known |= (1 << prop);
+}
+
+/**
+ * \brief Stores a property value in the cache.
+ *
+ * This function asserts that if the value of \p prop was already known,
+ * then \p value is consistent with the previously stored value.
+ * If this is not the case, a fatal error is triggered, with the reasoning
+ * that the cache must have become invalid/inconsistent due to a bug.
+ *
+ * Therefore, this function cannot be used to change an already stored
+ * property to a different value. If this is your intention, invalidate
+ * the cache explicitly first.
+ *
+ * \param graph  the graph whose cache is to be modified
+ * \param prop   the property to update in the cache
+ * \param value  the value of the property to add to the cache
+ */
+void igraph_i_property_cache_set_bool_checked(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value) {
+    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
+    assert(graph->cache != NULL);
+    /* Even though graph is const, updating the cache is not considered modification.
+     * Functions that merely compute graph properties, and thus leave the graph structure
+     * intact, will often update the cache. */
+    if (graph->cache->known & (1 << prop)) {
+        IGRAPH_ASSERT(graph->cache->value[prop] == value);
+    } else {
+        igraph_i_property_cache_set_bool(graph, prop, value);
+    }
 }
 
 /**

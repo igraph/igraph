@@ -18,17 +18,50 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+void run_test(igraph_integer_t n, igraph_bool_t directed, const igraph_vector_int_t *outseq, const igraph_t *start) {
+    igraph_barabasi_algorithm_t algos[] = { IGRAPH_BARABASI_BAG, IGRAPH_BARABASI_PSUMTREE, IGRAPH_BARABASI_PSUMTREE_MULTIPLE };
+    igraph_t g;
+    igraph_bool_t simple;
+
+    for (size_t i=0; i < sizeof(algos) / sizeof(algos[0]); i++) {
+        igraph_barabasi_algorithm_t algo = algos[i];
+        igraph_barabasi_game(&g, n, 1, 2, outseq, true, 1, directed, algo, start);
+        IGRAPH_ASSERT(igraph_vcount(&g) == n);
+        IGRAPH_ASSERT(igraph_is_directed(&g) == directed);
+        if (algo == IGRAPH_BARABASI_PSUMTREE) {
+            igraph_is_simple(&g, &simple);
+            IGRAPH_ASSERT(simple);
+        }
+        igraph_destroy(&g);
+    }
+}
+
 int main(void) {
     igraph_vector_int_t v;
     igraph_t g;
 
-    CHECK_ERROR(igraph_barabasi_game(&g, -10, /*power=*/ 1, 1, 0, 0, /*A=*/ 1, 0,
-                               IGRAPH_BARABASI_BAG, /*start_from=*/ 0), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_barabasi_game(&g, 10, /*power=*/ 1, -2, 0, 0, /*A=*/ 1, 0,
-                               IGRAPH_BARABASI_BAG, /*start_from=*/ 0), IGRAPH_EINVAL);
+    run_test(10, true, NULL, NULL);
+    run_test(10, false, NULL, NULL);
+
+    igraph_ring(&g, 5, IGRAPH_DIRECTED, false, true);
+    run_test(13, true, NULL, &g);
+    igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_EACH, NULL);
+    run_test(13, false, NULL, &g);
+    igraph_destroy(&g);
+
+    igraph_vector_int_init_int(&v, 4,
+                               1, 2, 1, 3);
+    run_test(4, true, &v, NULL);
+    run_test(4, false, &v, NULL);
+    igraph_vector_int_destroy(&v);
+
+    CHECK_ERROR(igraph_barabasi_game(&g, -10, /*power=*/ 1, 1, NULL, false, /*A=*/ 1, IGRAPH_UNDIRECTED,
+                               IGRAPH_BARABASI_BAG, /*start_from=*/ NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_barabasi_game(&g, 10, /*power=*/ 1, -2, NULL, false, /*A=*/ 1, IGRAPH_UNDIRECTED,
+                               IGRAPH_BARABASI_BAG, /*start_from=*/ NULL), IGRAPH_EINVAL);
     igraph_vector_int_init(&v, 9);
-    CHECK_ERROR(igraph_barabasi_game(&g, 10, /*power=*/ 1, 0, &v, 0, /*A=*/ 1, 0,
-                               IGRAPH_BARABASI_BAG, /*start_from=*/ 0), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_barabasi_game(&g, 10, /*power=*/ 1, 0, &v, false, /*A=*/ 1, IGRAPH_UNDIRECTED,
+                               IGRAPH_BARABASI_BAG, /*start_from=*/ NULL), IGRAPH_EINVAL);
     igraph_vector_int_destroy(&v);
 
     VERIFY_FINALLY_STACK();

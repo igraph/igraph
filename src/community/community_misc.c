@@ -85,7 +85,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     igraph_integer_t no_of_nodes = nodes;
     igraph_integer_t components = no_of_nodes - steps;
     igraph_integer_t i, found = 0;
-    igraph_vector_t tmp;
+    igraph_vector_int_t tmp;
     igraph_vector_bool_t already_merged;
     igraph_vector_int_t own_membership;
     igraph_bool_t using_own_membership = false;
@@ -121,7 +121,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     }
 
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&already_merged, steps + no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, steps);
 
     for (i = steps - 1; i >= 0; i--) {
         igraph_integer_t c1 = MATRIX(*merges, i, 0);
@@ -191,7 +191,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         }
     }
 
-    igraph_vector_destroy(&tmp);
+    igraph_vector_int_destroy(&tmp);
     igraph_vector_bool_destroy(&already_merged);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -248,11 +248,6 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     i_nb_clusters = 1;
     for (i = 0; i < n; i++) {
         igraph_integer_t c = VECTOR(*membership)[i];
-
-        if (c < 0) {
-            IGRAPH_ERRORF("Membership indices should non-negative. "
-            "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
-        }
 
         if (c < 0) {
             IGRAPH_ERRORF("Membership indices should be non-negative. "
@@ -346,6 +341,8 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * <code>VI(C_1, C_2) = [H(C_1) - MI(C_1, C_2)] + [H(C_2) - MI(C_1, C_2)]</code>.
  * Lower values of the variation of information indicate a smaller difference between
  * the two clusterings, with <code>VI = 0</code> achieved precisely when they coincide.
+ * igraph uses natural units for the variation of information, i.e. it uses the
+ * natural logarithm when computing entropies.
  *
  * </para><para>
  * The Rand index is defined as the probability that the two clusterings agree
@@ -566,7 +563,7 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     igraph_integer_t i, n;
     igraph_integer_t k1;
     igraph_integer_t k2;
-    double *p1, *p2;
+    igraph_real_t *p1, *p2;
     igraph_sparsemat_t m;
     igraph_sparsemat_t mu; /* uncompressed */
     igraph_sparsemat_iterator_t mit;
@@ -580,12 +577,12 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     }
     k1 = igraph_vector_int_max(v1) + 1;
     k2 = igraph_vector_int_max(v2) + 1;
-    p1 = IGRAPH_CALLOC(k1, double);
+    p1 = IGRAPH_CALLOC(k1, igraph_real_t);
     if (p1 == 0) {
         IGRAPH_ERROR("Insufficient memory for computing community entropy.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, p1);
-    p2 = IGRAPH_CALLOC(k2, double);
+    p2 = IGRAPH_CALLOC(k2, igraph_real_t);
     if (p2 == 0) {
         IGRAPH_ERROR("Insufficient memory for computing community entropy.", IGRAPH_ENOMEM);
     }
@@ -833,8 +830,8 @@ static igraph_error_t igraph_i_compare_communities_rand(
     igraph_sparsemat_iterator_t mit;
     igraph_vector_t rowsums, colsums;
     igraph_integer_t i, nrow, ncol;
-    double rand, n;
-    double frac_pairs_in_1, frac_pairs_in_2;
+    igraph_real_t rand, n;
+    igraph_real_t frac_pairs_in_1, frac_pairs_in_2;
 
     if (igraph_vector_int_size(v1) <= 1) {
         IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
@@ -878,7 +875,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
     /* Calculate row and column sums */
     nrow = igraph_sparsemat_nrow(&mu);
     ncol = igraph_sparsemat_ncol(&mu);
-    n = igraph_vector_int_size(v1) + 0.0;
+    n = igraph_vector_int_size(v1);
     IGRAPH_VECTOR_INIT_FINALLY(&rowsums, nrow);
     IGRAPH_VECTOR_INIT_FINALLY(&colsums, ncol);
     IGRAPH_CHECK(igraph_sparsemat_rowsums(&mu, &rowsums));

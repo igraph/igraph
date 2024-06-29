@@ -76,10 +76,10 @@
  * Time complexity: O(n), where n is the number of elements in the vector.
  */
 igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_int_t *to) {
-    igraph_integer_t i, n = igraph_vector_size(from);
+    const igraph_integer_t n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_int_resize(to, n));
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         VECTOR(*to)[i] = floor(VECTOR(*from)[i]);
     }
 
@@ -87,10 +87,10 @@ igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_in
 }
 
 igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_int_t *to) {
-    igraph_integer_t i, n = igraph_vector_size(from);
+    const igraph_integer_t n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_int_resize(to, n));
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         VECTOR(*to)[i] = round(VECTOR(*from)[i]);
     }
 
@@ -662,7 +662,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
  * \brief Check if any element is NaN.
  *
  * \param v The \type igraph_vector_t object to check.
- * \return 1 if any element is NaN, 0 otherwise.
+ * \return True if any element is NaN, false otherwise.
  *
  * Time complexity: O(n), the number of elements.
  */
@@ -679,4 +679,30 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
         ptr++;
     }
     return false;
+}
+
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_is_all_finite
+ * \brief Check if all elements are finite.
+ *
+ * \param v The \type igraph_vector_t object to check.
+ * \return True if none of the elements are infinite or NaN.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+igraph_bool_t igraph_vector_is_all_finite(const igraph_vector_t *v)
+{
+    igraph_real_t *ptr;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    ptr = v->stor_begin;
+    while (ptr < v->end) {
+        if (!isfinite(*ptr)) {
+            return false;
+        }
+        ptr++;
+    }
+    return true;
 }
