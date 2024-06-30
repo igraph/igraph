@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
+
 ## [0.10.13]
 
 ### Added
