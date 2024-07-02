@@ -2554,15 +2554,20 @@ igraph_is_complete:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_minimum_spanning_tree:
-    PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGE_WEIGHTS weights=NULL
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGE_WEIGHTS weights=NULL, MSTALGORITHM method=AUTOMATIC
     DEPS: res ON graph, weights ON graph
 
 igraph_minimum_spanning_tree_unweighted:
-    PARAMS: GRAPH graph, OUT GRAPH mst
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res
+    DEPS: res ON graph
 
 igraph_minimum_spanning_tree_prim:
-    PARAMS: GRAPH graph, OUT GRAPH mst, EDGE_WEIGHTS weights
-    DEPS: weights ON graph
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGE_WEIGHTS weights=NULL
+    DEPS: res ON graph, weights ON graph
+
+igraph_minimum_spanning_tree_kruskal:
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGE_WEIGHTS weights=NULL
+    DEPS: res ON graph, weights ON graph
 
 igraph_random_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, OPTIONAL VERTEX vid

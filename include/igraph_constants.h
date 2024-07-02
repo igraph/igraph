@@ -210,6 +210,12 @@ typedef enum { IGRAPH_ROW_MAJOR = 0,
                IGRAPH_COLUMN_MAJOR = 1
              } igraph_matrix_storage_t;
 
+typedef enum { IGRAPH_MST_AUTOMATIC = 0,
+               IGRAPH_MST_UNWEIGHTED,
+               IGRAPH_MST_PRIM,
+               IGRAPH_MST_KRUSKAL
+             } igraph_mst_algorithm_t;
+
 /**
  * \typedef igraph_lpa_variant_t
  * \brief Label propagation algorithm variants of implementation

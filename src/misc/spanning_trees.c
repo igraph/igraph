@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2011-2023  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2011-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,88 +33,107 @@
  * \function igraph_minimum_spanning_tree
  * \brief Calculates a minimum spanning tree of a graph.
  *
- * Finds a spanning tree of the graph. If the graph is not connected
- * then its minimum spanning forest is returned. This is the set of the
- * minimum spanning trees of each component.
+ * Finds a minimum weight spanning tree of the graph. If the graph is not
+ * connected then its minimum spanning forest is returned, i.e. the set
+ * of the minimum spanning trees of each component.
  *
  * </para><para>
- * Directed graphs are considered as undirected for this computation.
+ * Directed graphs are treated as undirected for this computation.
  *
  * </para><para>
  * This function is deterministic, i.e. it always returns the same
  * spanning tree. See \ref igraph_random_spanning_tree() for the uniform
  * random sampling of spanning trees of a graph.
  *
- * \param graph The graph object.
+ * \param graph The graph object. Edge directions will be ignored.
  * \param res An initialized vector, the IDs of the edges that constitute
  *        a spanning tree will be returned here. Use
  *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
  *        a separate graph object.
- * \param weights A vector containing the weights of the edges
- *        in the same order as the simple edge iterator visits them
- *        (i.e. in increasing order of edge IDs).
- * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ * \param weights A vector containing the weights of the edges in the order
+ *        of edge IDs. Weights must not be NaN. Supply \c NULL to treat all
+ *        edges as having the same weight.
+ * \param method The type of the algorithm used.
+ *        \clist
+ *        \cli IGRAPH_MST_AUTOMATIC
+ *          tries to select the best performing algorithm for the current graph.
+ *        \cli IGRAPH_MST_UNWEIGHTED
+ *          ignores edge weights and produces an arbitrary spanning tree,
+ *          see \ref igraph_minimum_spanning_tree_unweighted().
+ *        \cli IGRAPH_MST_PRIM
+ *          uses Prim's algorithm, see \ref igraph_minimum_spanning_tree_prim().
+ *        \cli IGRAPH_MST_KRUSKAL
+ *          uses Kruskal's algorithm, see \ref igraph_minimum_spanning_tree_kruskal().
+ *        \endclist
+ * \return Error code.
  *
- * Time complexity: O(|V|+|E|) for the unweighted case, O(|E| log |V|)
- * for the weighted case. |V| is the number of vertices, |E| the
- * number of edges in the graph.
+ * Time complexity: See the functions implementing the specific algorithms.
  *
- * \sa \ref igraph_minimum_spanning_tree_unweighted() and
- *     \ref igraph_minimum_spanning_tree_prim() if you only need the
- *     tree as a separate graph object.
+ * \sa \ref igraph_random_spanning_tree() to compute a random spanning tree
+ *   instead of a minimum one.
  *
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 igraph_error_t igraph_minimum_spanning_tree(
-    const igraph_t *graph, igraph_vector_int_t *res, const igraph_vector_t *weights
-) {
-    if (weights == NULL) {
-        IGRAPH_CHECK(igraph_minimum_spanning_tree_unweighted(graph, res));
-    } else {
-        IGRAPH_CHECK(igraph_minimum_spanning_tree_prim(graph, res, weights));
+    const igraph_t *graph, igraph_vector_int_t *res,
+    const igraph_vector_t *weights, igraph_mst_algorithm_t method)
+{
+    if (method == IGRAPH_MST_AUTOMATIC) {
+        if (weights == NULL) {
+            method = IGRAPH_MST_UNWEIGHTED;
+        } else {
+            method = IGRAPH_MST_KRUSKAL;
+        }
     }
-    return IGRAPH_SUCCESS;
+    switch (method) {
+    case IGRAPH_MST_UNWEIGHTED:
+        return igraph_minimum_spanning_tree_unweighted(graph, res);
+    case IGRAPH_MST_PRIM:
+        return igraph_minimum_spanning_tree_prim(graph, res, weights);
+    case IGRAPH_MST_KRUSKAL:
+        return igraph_minimum_spanning_tree_kruskal(graph, res, weights);
+    default:
+        IGRAPH_ERROR("Invalid method for minimum spanning tree.", IGRAPH_EINVAL);
+    }
 }
+
+
+/* Unweighted case -- just a simple BFS */
 
 /**
  * \ingroup structural
  * \function igraph_minimum_spanning_tree_unweighted
- * \brief Calculates one minimum spanning tree of an unweighted graph.
+ * \brief A spanning tree of an unweighted graph.
  *
- * If the graph has more minimum spanning trees (this is always the
- * case, except if it is a forest) this implementation returns only
- * the same one.
+ * Produces an arbitrary spanning tree of the graph.
  *
  * </para><para>
- * Directed graphs are considered as undirected for this computation.
+ * Directed graphs are treated as undirected for this computation.
  *
  * </para><para>
- * If the graph is not connected then its minimum spanning forest is
- * returned. This is the set of the minimum spanning trees of each
- * component.
+ * If the graph is not connected then a spanning forest is returned.
+ * This is a set of spanning trees of each component.
  *
  * \param graph The graph object. Edge directions will be ignored.
- * \param mst The minimum spanning tree, another graph object. Do
- *        \em not initialize this object before passing it to
- *        this function, but be sure to call \ref igraph_destroy() on it if
- *        you don't need it any more.
+ * \param res An initialized vector, the IDs of the edges that constitute
+ *        a spanning tree will be returned here. Use
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
+ *        a separate graph object.
  * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *
  * Time complexity: O(|V|+|E|),
  * |V| is the
  * number of vertices, |E| the number
  * of edges in the graph.
  *
- * \sa \ref igraph_minimum_spanning_tree_prim() for weighted graphs,
- *     \ref igraph_minimum_spanning_tree() if you need the IDs of the
- *     edges that constitute the spanning tree.
+ * \sa \ref igraph_minimum_spanning_tree() for a common interface to all
+ * minimum spanning tree algorithms.
  */
 
-igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t* graph, igraph_vector_int_t* res) {
+igraph_error_t igraph_minimum_spanning_tree_unweighted(
+        const igraph_t* graph,
+        igraph_vector_int_t* res) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -170,17 +189,20 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t* graph, ig
     return IGRAPH_SUCCESS;
 }
 
+
+/* Prims' algorithm */
+
 /**
  * \ingroup structural
  * \function igraph_minimum_spanning_tree_prim
- * \brief Calculates one minimum spanning tree of a weighted graph.
+ * \brief A minimum spanning tree of a weighted graph using Prim's method.
  *
  * Finds a spanning tree or spanning forest for which the sum of edge
  * weights is the smallest. This function uses Prim's method for carrying
  * out the computation.
  *
  * </para><para>
- * Directed graphs are considered as undirected for this computation.
+ * Directed graphs are treated as undirected for this computation.
  *
  * </para><para>
  * Reference:
@@ -193,33 +215,32 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t* graph, ig
  * https://doi.org/10.1002/j.1538-7305.1957.tb01515.x
  *
  * \param graph The graph object. Edge directions will be ignored.
- * \param mst The result of the computation, a graph object containing
- *        the minimum spanning tree of the graph.
- *        Do \em not initialize this object before passing it to
- *        this function, but be sure to call \ref igraph_destroy() on it if
- *        you don't need it any more.
- * \param weights A vector containing the weights of the edges
- *        in the same order as the simple edge iterator visits them
- *        (i.e. in increasing order of edge IDs).
+ * \param res An initialized vector, the IDs of the edges that constitute
+ *        a spanning tree will be returned here. Use
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
+ *        a separate graph object.
+ * \param weights A vector containing the weights of the edges in the order
+ *        of edge IDs. Weights must not be NaN.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory.
  *         \c IGRAPH_EINVAL, length of weight vector does not
- *           match number of edges.
+ *           match number of edges, or NaN in weights.
  *
  * Time complexity: O(|E| log |V|),
  * |V| is the number of vertices,
  * |E| the number of edges in the
  * graph.
  *
- * \sa \ref igraph_minimum_spanning_tree_unweighted() for unweighted graphs,
- *     \ref igraph_minimum_spanning_tree() if you need the IDs of the
- *     edges that constitute the spanning tree.
+ * \sa \ref igraph_minimum_spanning_tree() for a common interface to all
+ * minimum spanning tree algorithms.
  *
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
 igraph_error_t igraph_minimum_spanning_tree_prim(
-    const igraph_t* graph, igraph_vector_int_t* res, const igraph_vector_t *weights) {
+        const igraph_t* graph,
+        igraph_vector_int_t* res,
+        const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -344,7 +365,7 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
  * out the computation.
  *
  * </para><para>
- * Directed graphs are considered as undirected for this computation.
+ * Directed graphs are treated as undirected for this computation.
  *
  * </para><para>
  * Reference:
@@ -360,15 +381,14 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
  *        a spanning tree will be returned here. Use
  *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
  *        a separate graph object.
- * \param weights A vector containing the weights of the edges
- *        in the same order as the simple edge iterator visits them
- *        (i.e. in increasing order of edge IDs).
+ * \param weights A vector containing the weights of the edges in the order
+ *        of edge IDs. Weights must not be NaN.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory.
  *         \c IGRAPH_EINVAL, length of weight vector does not
  *           match number of edges, or NaN in weights.
  *
- * Time complexity: O(|E| log |V|),
+ * Time complexity: O(|E| log |E|),
  * |V| is the number of vertices,
  * |E| the number of edges in the
  * graph.
@@ -388,6 +408,7 @@ igraph_error_t igraph_minimum_spanning_tree_kruskal(
     const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t idx, comp;
     igraph_integer_t tree_edge_count;
+    int iter = 0;
 
     if (weights == NULL) {
         return igraph_minimum_spanning_tree_unweighted(graph, res);
@@ -408,6 +429,8 @@ igraph_error_t igraph_minimum_spanning_tree_kruskal(
     IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
 
     igraph_vector_int_clear(res);
+    IGRAPH_CHECK(igraph_vector_int_reserve(res, no_of_edges < no_of_nodes ? no_of_edges : no_of_nodes - 1));
+
     tree_edge_count = 0;
     for (igraph_integer_t i=0; i < no_of_edges; i++) {
         igraph_integer_t edge = VECTOR(idx)[i];
@@ -419,7 +442,7 @@ igraph_error_t igraph_minimum_spanning_tree_kruskal(
 
         if (cu != cv) {
             merge_comp(&comp, u, v);
-            IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
+            igraph_vector_int_push_back(res, edge); /* reserved */
             tree_edge_count++;
         }
 
@@ -427,6 +450,8 @@ igraph_error_t igraph_minimum_spanning_tree_kruskal(
             /* We have enough edges for a tree. */
             break;
         }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 16);
     }
 
     igraph_vector_int_destroy(&idx);
