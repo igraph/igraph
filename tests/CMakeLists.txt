@@ -365,6 +365,7 @@ add_legacy_tests(
   igraph_widest_paths
   igraph_spanner
   knn
+  minimum_spanning_tree
   random_spanning_tree
   reachability
   single_target_shortest_path
@@ -1028,6 +1029,7 @@ add_benchmarks(
   inc_vs_adj
   lad
   intersection
+  spanning_tree
 )
 
 # dot product
