@@ -34,12 +34,16 @@
  - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` now use a `mode` parameter with possible values `IGRAPH_OUT`, `IGRAPH_IN` or `IGRAPH_ALL` to control how edge directions are considered. Previously they used a boolean `directed` parameter.
  - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` no longer have a `scale` parameter. The result is now always scaled so that the largest centrality value is 1.
  - `igraph_hub_and_authority_scores()` no longer has a `scale` parameter. The result is now always scaled so that the largest hub and authority scores are each 1.
+ - `igraph_minimum_spanning_tree_unweighted()` now produces the set of edge IDs making up the tree instead of a graph object. Use `igraph_subgraph_from_edges()` to create the corresponding graph object.
+ - `igraph_minimum_spanning_tree_prim()` now produces the set of edge IDs making up the tree instead of a graph object. Use `igraph_subgraph_from_edges()` to create the corresponding graph object.
+ - `igraph_minimum_spanning_tree()` takes a new `method` parameter that controls the algorithm used for finding the spanning tree.
 
 ### Added
 
  - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges
  - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges
  - `igraph_weighted_biadjacency()` created a weighted graph from a bipartite adjacency matrix.
+ - `igraph_minimum_spanning_tree_kruskal()` finds a minimum weight spanning tree using Kruskal's algorithm.
 
 ### Changed
 
