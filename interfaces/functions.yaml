@@ -578,7 +578,7 @@ igraph_distances_floyd_warshall:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
         VERTEX_SELECTOR to=ALL, EDGE_WEIGHTS weights=NULL, NEIMODE mode=OUT,
-        FWALGORITHM method
+        FWALGORITHM method=AUTOMATIC
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_voronoi:

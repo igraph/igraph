@@ -149,7 +149,7 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
  * are used according to the \p mode parameter.
  *
  * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian, <code>L = D - A</code>.
- * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
+ * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetrically normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
  * \enumval IGRAPH_LAPLACIAN_LEFT Left-stochastic normalized Laplacian, <code>L = I - D^-1 A</code>.
  * \enumval IGRAPH_LAPLACIAN_RIGHT Right-stochastic normalized Laplacian, <code>L = I - A D^-1</code>.
  */

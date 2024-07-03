@@ -79,6 +79,11 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
+ - Removed broken interruption support from `igraph_community_spinglass_single()`.
+
 ## [0.10.13]
 
 ### Added
