@@ -109,8 +109,9 @@ using namespace igraph::walktrap;
  *     cluster is created from two other clusters and its id will be
  *     one larger than the largest cluster id so far. This means that
  *     before the first merge we have \c n clusters (the number of
- *     vertices in the graph) numbered from zero to \c n-1. The first
- *     merge creates cluster \c n, the second cluster \c n+1, etc.
+ *     vertices in the graph) numbered from zero to <code>n - 1</code>.
+ *     The first merge creates cluster \c n, the second cluster
+ *     <code>n + 1</code>, etc.
  * \param modularity Pointer to a vector. If not \c NULL then the
  *     modularity score of the current clustering is stored here after
  *     each merge operation.

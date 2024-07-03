@@ -199,7 +199,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    the number of vertices in the graph. So if the first line
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
- *    component <code>n+1</code>, etc. The matrix will be resized as needed.
+ *    component <code>n + 1</code>, etc. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     \c NULL then the indices into \p edges of all edges which caused
  *     one of the merges will be put here. This is equal to all edge removals
