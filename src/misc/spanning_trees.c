@@ -33,83 +33,12 @@ static igraph_integer_t max_tree_edges(igraph_integer_t no_of_nodes, igraph_inte
     return no_of_nodes - 1;
 }
 
-/**
- * \ingroup structural
- * \function igraph_minimum_spanning_tree
- * \brief Calculates a minimum spanning tree of a graph.
- *
- * Finds a minimum weight spanning tree of the graph. If the graph is not
- * connected then its minimum spanning forest is returned, i.e. the set
- * of the minimum spanning trees of each component.
- *
- * </para><para>
- * Directed graphs are treated as undirected for this computation.
- *
- * </para><para>
- * This function is deterministic, i.e. it always returns the same
- * spanning tree. See \ref igraph_random_spanning_tree() for the uniform
- * random sampling of spanning trees of a graph.
- *
- * \param graph The graph object. Edge directions will be ignored.
- * \param res An initialized vector, the IDs of the edges that constitute
- *        a spanning tree will be returned here. Use
- *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
- *        a separate graph object.
- * \param weights A vector containing the weights of the edges in the order
- *        of edge IDs. Weights must not be NaN. Supply \c NULL to treat all
- *        edges as having the same weight.
- * \param method The type of the algorithm used.
- *        \clist
- *        \cli IGRAPH_MST_AUTOMATIC
- *          tries to select the best performing algorithm for the current graph.
- *        \cli IGRAPH_MST_UNWEIGHTED
- *          ignores edge weights and produces an arbitrary spanning tree,
- *          see \ref igraph_minimum_spanning_tree_unweighted().
- *        \cli IGRAPH_MST_PRIM
- *          uses Prim's algorithm, see \ref igraph_minimum_spanning_tree_prim().
- *        \cli IGRAPH_MST_KRUSKAL
- *          uses Kruskal's algorithm, see \ref igraph_minimum_spanning_tree_kruskal().
- *        \endclist
- * \return Error code.
- *
- * Time complexity: See the functions implementing the specific algorithms.
- *
- * \sa \ref igraph_random_spanning_tree() to compute a random spanning tree
- *   instead of a minimum one.
- *
- * \example examples/simple/igraph_minimum_spanning_tree.c
- */
-igraph_error_t igraph_minimum_spanning_tree(
-    const igraph_t *graph, igraph_vector_int_t *res,
-    const igraph_vector_t *weights, igraph_mst_algorithm_t method)
-{
-    if (method == IGRAPH_MST_AUTOMATIC) {
-        /* For now we use igraph_minimum_spanning_tree_kruskal() unconditionally
-         * for the weighted case; see benchmarks. */
-        if (weights == NULL) {
-            method = IGRAPH_MST_UNWEIGHTED;
-        } else {
-            method = IGRAPH_MST_KRUSKAL;
-        }
-    }
-    switch (method) {
-    case IGRAPH_MST_UNWEIGHTED:
-        return igraph_minimum_spanning_tree_unweighted(graph, res);
-    case IGRAPH_MST_PRIM:
-        return igraph_minimum_spanning_tree_prim(graph, res, weights);
-    case IGRAPH_MST_KRUSKAL:
-        return igraph_minimum_spanning_tree_kruskal(graph, res, weights);
-    default:
-        IGRAPH_ERROR("Invalid method for minimum spanning tree.", IGRAPH_EINVAL);
-    }
-}
-
 
 /* Unweighted case -- just a simple BFS */
 
 /**
  * \ingroup structural
- * \function igraph_minimum_spanning_tree_unweighted
+ * \function igraph_i_minimum_spanning_tree_unweighted
  * \brief A spanning tree of an unweighted graph.
  *
  * Produces an arbitrary spanning tree of the graph.
@@ -138,7 +67,7 @@ igraph_error_t igraph_minimum_spanning_tree(
  * minimum spanning tree algorithms.
  */
 
-igraph_error_t igraph_minimum_spanning_tree_unweighted(
+igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
         const igraph_t* graph,
         igraph_vector_int_t* res) {
 
@@ -202,7 +131,7 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(
 
 /**
  * \ingroup structural
- * \function igraph_minimum_spanning_tree_prim
+ * \function igraph_i_minimum_spanning_tree_prim
  * \brief A minimum spanning tree of a weighted graph using Prim's method.
  *
  * Finds a spanning tree or spanning forest for which the sum of edge
@@ -245,7 +174,7 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_minimum_spanning_tree_prim(
+igraph_error_t igraph_i_minimum_spanning_tree_prim(
         const igraph_t* graph,
         igraph_vector_int_t* res,
         const igraph_vector_t *weights) {
@@ -258,7 +187,7 @@ igraph_error_t igraph_minimum_spanning_tree_prim(
     igraph_vector_int_t adj;
 
     if (weights == NULL) {
-        return igraph_minimum_spanning_tree_unweighted(graph, res);
+        return igraph_i_minimum_spanning_tree_unweighted(graph, res);
     }
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
@@ -364,7 +293,7 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
 
 /**
  * \ingroup structural
- * \function igraph_minimum_spanning_tree_kruskal
+ * \function igraph_i_minimum_spanning_tree_kruskal
  * \brief A minimum spanning tree of a weighted graph using Kruskal's method.
  *
  * Finds a spanning tree or spanning forest for which the sum of edge
@@ -406,7 +335,7 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_minimum_spanning_tree_kruskal(
+igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
         const igraph_t *graph,
         igraph_vector_int_t *res,
         const igraph_vector_t *weights) {
@@ -418,7 +347,7 @@ igraph_error_t igraph_minimum_spanning_tree_kruskal(
     int iter = 0;
 
     if (weights == NULL) {
-        return igraph_minimum_spanning_tree_unweighted(graph, res);
+        return igraph_i_minimum_spanning_tree_unweighted(graph, res);
     }
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
@@ -466,6 +395,93 @@ igraph_error_t igraph_minimum_spanning_tree_kruskal(
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_minimum_spanning_tree
+ * \brief Calculates a minimum spanning tree of a graph.
+ *
+ * Finds a minimum weight spanning tree of the graph. If the graph is not
+ * connected then its minimum spanning forest is returned, i.e. the set
+ * of the minimum spanning trees of each component.
+ *
+ * </para><para>
+ * Directed graphs are treated as undirected for this computation.
+ *
+ * </para><para>
+ * This function is deterministic, i.e. it always returns the same
+ * spanning tree. See \ref igraph_random_spanning_tree() for the uniform
+ * random sampling of spanning trees of a graph.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Prim, R.C.: Shortest connection networks and some
+ * generalizations, Bell System Technical
+ * Journal, Vol. 36,
+ * 1957, 1389--1401.
+ * https://doi.org/10.1002/j.1538-7305.1957.tb01515.x
+ *
+ * </para><para>
+ * Kruskal, J. B.:
+ * On the shortest spanning subtree of a graph and the traveling salesman problem,
+ * Proc. Amer. Math. Soc. 7 (1956), 48-50
+ * https://doi.org/10.1090%2FS0002-9939-1956-0078686-7
+ *
+ * \param graph The graph object. Edge directions will be ignored.
+ * \param res An initialized vector, the IDs of the edges that constitute
+ *        a spanning tree will be returned here. Use
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
+ *        a separate graph object.
+ * \param weights A vector containing the weights of the edges in the order
+ *        of edge IDs. Weights must not be NaN. Supply \c NULL to treat all
+ *        edges as having the same weight.
+ * \param method The type of the algorithm used.
+ *        \clist
+ *        \cli IGRAPH_MST_AUTOMATIC
+ *          tries to select the best performing algorithm for the current graph.
+ *        \cli IGRAPH_MST_UNWEIGHTED
+ *          ignores edge weights and produces an arbitrary spanning tree.
+ *        \cli IGRAPH_MST_PRIM
+ *          uses Prim's algorithm.
+ *        \cli IGRAPH_MST_KRUSKAL
+ *          uses Kruskal's algorithm.
+ *        \endclist
+ * \return Error code.
+ *
+ * Time complexity: See the functions implementing the specific algorithms.
+ *
+ * \sa \ref igraph_random_spanning_tree() to compute a random spanning tree
+ *   instead of a minimum one.
+ *
+ * \example examples/simple/igraph_minimum_spanning_tree.c
+ */
+igraph_error_t igraph_minimum_spanning_tree(
+    const igraph_t *graph, igraph_vector_int_t *res,
+    const igraph_vector_t *weights, igraph_mst_algorithm_t method)
+{
+    if (method == IGRAPH_MST_AUTOMATIC) {
+        /* For now we use igraph_minimum_spanning_tree_kruskal() unconditionally
+         * for the weighted case; see benchmarks. */
+        if (weights == NULL) {
+            method = IGRAPH_MST_UNWEIGHTED;
+        } else {
+            method = IGRAPH_MST_KRUSKAL;
+        }
+    }
+    switch (method) {
+    case IGRAPH_MST_UNWEIGHTED:
+        return igraph_i_minimum_spanning_tree_unweighted(graph, res);
+    case IGRAPH_MST_PRIM:
+        return igraph_i_minimum_spanning_tree_prim(graph, res, weights);
+    case IGRAPH_MST_KRUSKAL:
+        return igraph_i_minimum_spanning_tree_kruskal(graph, res, weights);
+    default:
+        IGRAPH_ERROR("Invalid method for minimum spanning tree.", IGRAPH_EINVAL);
+    }
 }
 
 

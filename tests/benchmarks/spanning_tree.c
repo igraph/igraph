@@ -31,17 +31,17 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights, int rep, c
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "%s, vcount=%" IGRAPH_PRId ", ecount=%" IGRAPH_PRId ", unweigthed, %dx",
              name, vcount, ecount, rep);
-    BENCH(msg, REPEAT(igraph_minimum_spanning_tree_unweighted(graph, &edges), rep));
+    BENCH(msg, REPEAT(igraph_minimum_spanning_tree(graph, &edges, NULL, IGRAPH_MST_UNWEIGHTED), rep));
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "%s, vcount=%" IGRAPH_PRId ", ecount=%" IGRAPH_PRId ", Prim, %dx",
              name, vcount, ecount, rep);
-    BENCH(msg, REPEAT(igraph_minimum_spanning_tree_prim(graph, &edges, weights), rep));
+    BENCH(msg, REPEAT(igraph_minimum_spanning_tree(graph, &edges, weights, IGRAPH_MST_UNWEIGHTED), rep));
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "%s, vcount=%" IGRAPH_PRId ", ecount=%" IGRAPH_PRId ", Kruskal, %dx",
              name, vcount, ecount, rep);
-    BENCH(msg, REPEAT(igraph_minimum_spanning_tree_kruskal(graph, &edges, weights), rep));
+    BENCH(msg, REPEAT(igraph_minimum_spanning_tree(graph, &edges, weights, IGRAPH_MST_UNWEIGHTED), rep));
 
     printf("\n");
 

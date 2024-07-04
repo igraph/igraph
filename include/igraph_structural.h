@@ -96,12 +96,6 @@ IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *gr
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(
     const igraph_t *graph, igraph_vector_int_t *res,
     const igraph_vector_t *weights, igraph_mst_algorithm_t method);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(
-    const igraph_t* graph, igraph_vector_int_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_prim(
-    const igraph_t* graph, igraph_vector_int_t *res, const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_kruskal(
-    const igraph_t *graph, igraph_vector_int_t *res, const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                               igraph_integer_t vid);
 
