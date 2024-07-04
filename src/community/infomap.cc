@@ -36,7 +36,9 @@
 #include "core/exceptions.h"
 #include "core/interruption.h"
 
-#include "infomap/src/Infomap.h"
+#ifdef HAVE_INFOMAP
+    #include "Infomap.h"
+#endif
 
 #include <cmath>
 #include <vector>
@@ -112,6 +114,9 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              igraph_vector_int_t *membership,
                              igraph_real_t *codelength) {
 
+#ifdef HAVE_INFOMAP
+    IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
+#else
     IGRAPH_HANDLE_EXCEPTIONS(
 
         // Create infomap wrapper
@@ -148,5 +153,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     return IGRAPH_SUCCESS;
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
+
+#endif
 }
 
