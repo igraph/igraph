@@ -19,7 +19,6 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t graph;
     igraph_vector_t eb;
     igraph_vector_int_t edges;
@@ -34,16 +33,17 @@ int main(void) {
     igraph_vector_init(&eb, igraph_ecount(&graph));
     igraph_edge_betweenness(&graph, &eb, IGRAPH_UNDIRECTED, /*weights=*/ NULL);
 
-    /* Use Prim's algoorthm to compute the edges that belong to the minimum weight
+    /* Use Prim's algorithm to compute the edges that belong to the minimum weight
      * spanning tree, using edge betweenness values as edge weights. */
-    igraph_minimum_spanning_tree_prim(&graph, &edges, &eb);
+    igraph_minimum_spanning_tree(&graph, &edges, &eb, IGRAPH_MST_PRIM);
     printf("Minimum spanning tree edges:\n");
     igraph_vector_int_print(&edges);
 
     /* A maximum spanning tree can be computed by first negating the weights. */
     igraph_vector_scale(&eb, -1);
 
-    /* Compute and output the edges that belong to the maximum weight spanning tree. */
+    /* Compute and output the edges that belong to the maximum weight spanning tree,
+     * letting igraph automatically select the most suitable algorithm. */
     igraph_minimum_spanning_tree(&graph, &edges, &eb, IGRAPH_MST_AUTOMATIC);
     printf("\nMaximum spanning tree edges:\n");
     igraph_vector_int_print(&edges);
