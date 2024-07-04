@@ -157,14 +157,6 @@ add_library(
   community/edge_betweenness.c
   community/fast_modularity.c
   community/fluid.c
-  community/infomap.cc
-  community/infomap/src/core/BiasedMapEquation.cpp
-  community/infomap/src/core/InfoEdge.cpp
-  community/infomap/src/core/InfomapBase.cpp
-  community/infomap/src/core/InfoNode.cpp
-  community/infomap/src/core/MemMapEquation.cpp
-  community/infomap/src/core/MetaMapEquation.cpp
-  community/infomap/src/core/StateNetwork.cpp  
   community/label_propagation.c
   community/leading_eigenvector.c
   community/leiden.c
@@ -326,6 +318,7 @@ add_library(
   $<IF:$<BOOL:${ARPACK_IS_VENDORED}>,$<TARGET_OBJECTS:arpack_vendored>,>
   $<IF:$<BOOL:${BLAS_IS_VENDORED}>,$<TARGET_OBJECTS:blas_vendored>,>
   $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_OBJECTS:glpk_vendored>,>
+  $<IF:$<BOOL:${INFOMAP_IS_VENDORED}>,$<TARGET_OBJECTS:infomap_vendored>,>
   $<IF:$<BOOL:${GMP_IS_VENDORED}>,$<TARGET_OBJECTS:gmp_vendored>,>
   $<IF:$<BOOL:${LAPACK_IS_VENDORED}>,$<TARGET_OBJECTS:lapack_vendored>,>
   $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
@@ -371,10 +364,12 @@ target_include_directories(
 
   # Vendored library include paths
   "$<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>"
+  "$<$<BOOL:${INFOMAP_IS_VENDORED}>:$<TARGET_PROPERTY:infomap_vendored,INCLUDE_DIRECTORIES>>"
   "$<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>"
 
   # Include paths for dependencies
   "$<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>"
+  "$<$<BOOL:${INFOMAP_INCLUDE_DIR}>:${INFOMAP_INCLUDE_DIR}>"
   "$<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>"
   "$<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>"
   "$<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>"
@@ -394,6 +389,10 @@ endif()
 
 if(GLPK_LIBRARIES)
   target_link_libraries(igraph PRIVATE ${GLPK_LIBRARIES})
+endif()
+
+if(INFOMAP_LIBRARIES)
+  target_link_libraries(igraph PRIVATE ${INFOMAP_LIBRARIES})
 endif()
 
 if(GMP_LIBRARIES)
