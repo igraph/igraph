@@ -361,7 +361,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no_of_edges);
     IGRAPH_CHECK(igraph_vector_qsort_ind(weights, &idx, IGRAPH_ASCENDING));
 
-    igraph_vector_int_init_range(&comp, 0, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_int_init_range(&comp, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
 
     igraph_vector_int_clear(res);
