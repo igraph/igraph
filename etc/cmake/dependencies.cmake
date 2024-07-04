@@ -23,6 +23,10 @@ macro(find_dependencies)
   tristate(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_PLFIT "Compile igraph with internal plfit" AUTO)
 
+  # Infomap currently does not support being built as an external library, so will
+  # only be supported through the internal vendored build
+  set(IGRAPH_USE_INTERNAL_INFOMAP ON)
+
   # Declare dependencies
   set(REQUIRED_DEPENDENCIES "")
   set(OPTIONAL_DEPENDENCIES FLEX BISON OpenMP)
