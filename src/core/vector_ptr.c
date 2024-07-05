@@ -262,6 +262,23 @@ igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_capacity
+ * \brief Returns the allocated capacity of the pointer vector.
+ *
+ * \param v The pointer vector object.
+ * \return The allocated capacity.
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t igraph_vector_ptr_capacity(const igraph_vector_ptr_t* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_end - v->stor_begin;
+}
+
+/**
+ * \ingroup vectorptr
  * \function igraph_vector_ptr_clear
  * \brief Removes all elements from a pointer vector.
  *
