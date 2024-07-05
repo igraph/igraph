@@ -81,6 +81,7 @@
  - The deprecated `igraph_isomorphic_function_vf2()` was removed. Use `igraph_get_isomorphisms_vf2_callback()` instead.
  - The deprecated `igraph_subisomorphic_function_vf2()` was removed. Use `igraph_get_subisomorphisms_vf2_callback()` instead.
  - The deprecated `igraph_isomorphic_34()` was removed. Its functionality is accessible through `igraph_isomorphic()`.
+ - The deprecated `igraph_transitive_closure_dag()` was removed. Use `igraph_transitive_closure()` instead, which works for all graphs, not just DAGs.
 
 ### Deprecated
 
