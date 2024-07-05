@@ -291,7 +291,7 @@ igraph_bool_t igraph_vector_ptr_empty(const igraph_vector_ptr_t* v) {
 
 igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
     IGRAPH_ASSERT(v != NULL);
-    /*  IGRAPH_ASSERT(v->stor_begin != NULL);       */ /* TODO */
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->end - v->stor_begin;
 }
 
