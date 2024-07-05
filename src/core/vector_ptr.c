@@ -27,6 +27,8 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
+#include "math/safe_intop.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdint.h>         /* uintptr_t */
 #include <stdlib.h>
@@ -594,14 +596,24 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
 }
 
 igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    igraph_integer_t origsize = igraph_vector_ptr_size(to);
-    igraph_integer_t othersize = igraph_vector_ptr_size(from);
-    igraph_integer_t i;
+    const igraph_integer_t to_size = igraph_vector_ptr_size(to);
+    const igraph_integer_t from_size = igraph_vector_ptr_size(from);
+    const igraph_integer_t to_capacity = igraph_vector_ptr_capacity(to);
+    igraph_integer_t new_to_size;
 
-    IGRAPH_CHECK(igraph_vector_ptr_resize(to, origsize + othersize));
-    for (i = 0; i < othersize; i++, origsize++) {
-        to->stor_begin[origsize] = from->stor_begin[i];
+    IGRAPH_SAFE_ADD(to_size, from_size, &new_to_size);
+
+    if (to_capacity < new_to_size) {
+        igraph_integer_t new_to_capacity = to_capacity < IGRAPH_INTEGER_MAX/2 ? to_capacity * 2 : IGRAPH_INTEGER_MAX;
+        if (new_to_capacity < new_to_size) {
+            new_to_capacity = new_to_size;
+        }
+        IGRAPH_CHECK(igraph_vector_ptr_reserve(to, new_to_capacity));
     }
+
+    memcpy(to->stor_begin + to_size, from->stor_begin,
+           sizeof(void *) * from_size);
+    to->end = to->stor_begin + new_to_size;
 
     return IGRAPH_SUCCESS;
 }
