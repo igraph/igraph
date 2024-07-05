@@ -36,8 +36,4 @@
 <!-- doxrox-include igraph_reverse_edges -->
 </section>
 
-<section id="deprecated-operators"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_subgraph_edges -->
-</section>
-
 </chapter>

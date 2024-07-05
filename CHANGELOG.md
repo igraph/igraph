@@ -76,6 +76,7 @@
  - The deprecated `igraph_get_stochastic_sparsemat()` was removed. Use `igraph_get_stochastic_sparse()` instead.
  - The deprecated `igraph_are_connected()` was removed. Use `igraph_are_adjacent()` instead.
  - The deprecated `igraph_laplacian()` was removed. Use `igraph_get_laplacian()` or `igraph_get_laplacian_sparse()` instead.
+ - The deprecated `igraph_subgraph_edges()` was removed. Use `igraph_subgraph_from_edges()` instead.
 
 ### Deprecated
 
