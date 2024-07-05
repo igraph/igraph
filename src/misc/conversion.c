@@ -282,33 +282,6 @@ igraph_error_t igraph_get_adjacency_sparse(
 
 #undef WEIGHT_OF
 
-/**
- * \function igraph_get_sparsemat
- * \brief Converts an igraph graph to a sparse matrix (deprecated).
- *
- * If the graph is undirected, then a symmetric matrix is created.
- *
- * </para><para>
- * This function is deprecated in favour of \ref igraph_get_adjacency_sparse(),
- * but does not work in an identical way. This function takes an \em uninitialized
- * \c igraph_sparsemat_t while \ref igraph_get_adjacency_sparse() takes
- * an already initialized one.
- *
- * \param graph The input graph.
- * \param res Pointer to an \em uninitialized sparse matrix. The result
- *    will be stored here.
- * \return Error code.
- *
- * \deprecated-by igraph_get_adjacency_sparse 0.10.0
- */
-
-igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
-}
 
 /**
  * \ingroup conversion
@@ -900,37 +873,6 @@ igraph_error_t igraph_get_stochastic_sparse(
     }
 
     return IGRAPH_SUCCESS;
-}
-
-
-/**
- * \function igraph_get_stochastic_sparsemat
- * \brief Stochastic adjacency matrix of a graph (deprecated).
- *
- * This function is deprecated in favour of \ref igraph_get_stochastic_sparse(),
- * but does not work in an identical way. This function takes an \em uninitialized
- * \c igraph_sparsemat_t while \ref igraph_get_stochastic_sparse() takes
- * an already initialized one.
- *
- * \param graph The input graph.
- * \param res Pointer to an \em uninitialized sparse matrix, the
- *    result is stored here. The matrix will be resized as needed.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
- * \return Error code.
- *
- * \deprecated-by igraph_get_stochastic_sparse 0.10.0
- */
-
-igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
-                                               igraph_sparsemat_t *res,
-                                               igraph_bool_t column_wise) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_stochastic_sparse(graph, res, column_wise, NULL);
 }
 
 

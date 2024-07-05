@@ -72,6 +72,8 @@
  - The deprecated `igraph_lattice()` was removed. Use `igraph_square_lattice()` instead.
  - The deprecated `igraph_minimum_spanning_tree_prim()` was removed. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
  - The deprecated `igraph_minimum_spanning_tree_unweighted()` was removed. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+ - The deprecated `igraph_get_sparsemat()` was removed. Use `igraph_get_adjacency_sparse()` instead.
+ - The deprecated `igraph_get_stochastic_sparsemat()` was removed. Use `igraph_get_stochastic_sparse()` instead.
 
 ### Deprecated
 
