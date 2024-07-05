@@ -105,11 +105,6 @@ IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
     const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
 );
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_zeroin(
-    igraph_real_t *ax, igraph_real_t *bx, igraph_real_t (*f)(igraph_real_t x, void *info),
-    void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res
-);
-
 __END_DECLS
 
 #endif
