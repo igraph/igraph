@@ -42,6 +42,7 @@
  - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges
  - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges
  - `igraph_weighted_biadjacency()` created a weighted graph from a bipartite adjacency matrix.
+ - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
 
 ### Changed
 
