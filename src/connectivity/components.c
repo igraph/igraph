@@ -579,11 +579,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \param maxcompno The maximum number of components to return. The
  *    first \p maxcompno components will be returned (which hold at
  *    least \p minelements vertices, see the next parameter), the
- *    others will be ignored. Supply -1 here if you don't want to limit
- *    the number of components.
+ *    others will be ignored. Supply <code>-1</code> here if you don't
+ *    want to limit the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. Eg. supply 2 here to ignore isolated vertices.
+ *    vector. For example, supplying 2 here ignored isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *
