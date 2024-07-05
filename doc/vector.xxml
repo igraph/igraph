@@ -153,6 +153,7 @@
 <!-- doxrox-include igraph_vector_ptr_clear -->
 <!-- doxrox-include igraph_vector_ptr_reserve -->
 <!-- doxrox-include igraph_vector_ptr_resize -->
+<!-- doxrox-include igraph_vector_ptr_resize_min -->
 <!-- doxrox-include igraph_vector_ptr_push_back -->
 <!-- doxrox-include igraph_vector_ptr_pop_back -->
 <!-- doxrox-include igraph_vector_ptr_insert -->
