@@ -766,7 +766,7 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src) {
  * \param bitset The bitset object to modify.
  * \param value The value to set for all bits.
  *
-* \sa \ref igraph_bitset_null()
+ * \sa \ref igraph_bitset_null()
  *
  * Time complexity: O(n/w).
  */
