@@ -207,10 +207,10 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_reserve
  * \brief Reserves memory for a pointer vector for later use.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \return Error code.
  */
 
 igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_t capacity) {
