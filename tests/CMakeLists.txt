@@ -296,7 +296,7 @@ add_legacy_tests(
   harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
-  igraph_are_connected
+  igraph_are_adjacent
   igraph_average_path_length
   igraph_average_path_length_dijkstra
   igraph_betweenness

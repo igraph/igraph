@@ -41,7 +41,6 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_are_adjacent(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res, igraph_integer_t eid);
 IGRAPH_EXPORT igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
@@ -166,10 +165,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_laplacian_sparse(
    const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
    igraph_laplacian_normalization_t normalization,
    const igraph_vector_t *weights
-);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_laplacian(
-   const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
-   igraph_bool_t normalized, const igraph_vector_t *weights
 );
 
 __END_DECLS
