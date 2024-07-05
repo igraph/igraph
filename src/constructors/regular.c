@@ -902,8 +902,6 @@ igraph_error_t igraph_extended_chordal_ring(
  * \function igraph_hypercube
  * \brief The n-dimensional hypercube graph.
  *
- * \experimental
- *
  * The hypercube graph \c Q_n has <code>2^n</code> vertices and
  * <code>2^(n-1) n</code> edges. Two vertices are connected when the binary
  * representations of their zero-based vertex IDs differs in precisely one bit.

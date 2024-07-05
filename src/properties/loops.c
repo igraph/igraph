@@ -125,8 +125,6 @@ done:
  * \function igraph_count_loops
  * \brief Counts the self-loops in the graph.
  *
- * \experimental
- *
  * Counts loop edges, i.e. edges whose two endpoints coincide.
  *
  * \param graph The input graph.
