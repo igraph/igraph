@@ -17,8 +17,9 @@ types they currently support:
 <glossentry><glossterm>vector</glossterm><glossdef><para>
   Vector is currently defined for <type>igraph_real_t</type>,
   <type>igraph_integer_t</type> (int), <type>char</type> (char),
-  <type>igraph_bool_t</type> (bool) and <type>igraph_complex_t</type>
-  (complex). The default is <type>igraph_real_t</type>.
+  <type>igraph_bool_t</type> (bool), <type>igraph_complex_t</type>
+  (complex) and  and <type>void *</type> (ptr). The default is
+  <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
 <glossentry><glossterm>matrix</glossterm><glossdef><para>
@@ -37,8 +38,8 @@ types they currently support:
 
 <glossentry><glossterm>stack</glossterm><glossdef><para>
   Stack is currently defined for <type>igraph_real_t</type>,
-  <type>igraph_integer_t</type> (int), <type>char</type> (char),
-  <type>igraph_bool_t</type> (bool) and <type>void*</type> (ptr).
+  <type>igraph_integer_t</type> (int), <type>char</type> (char) and
+  <type>igraph_bool_t</type> (bool).
   The default is <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
