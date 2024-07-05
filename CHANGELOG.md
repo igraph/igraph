@@ -55,6 +55,7 @@
  - `igraph_hub_and_authority_scores()` now warns when a large fraction of centrality scores are zero, as this indicates a non-unique solution, and thus the returned result may not be meaningful.
  - `igraph_hub_and_authority_scores()` now warns when providing an undirected graph as input, and falls back to the equivalent eigenvector centrality computation.
  - `igraph_get_stochastic_sparse()` no longer throws an error when some row or column sums are zero. This brings its behaviour in line with `igraph_get_stochastic()`.
+ - `igraph_vector_append()`, `igraph_strvector_append()` and `igraph_vector_ptr_append()` now use a different allocation strategy: if the `to` vector has insufficient capacity, they doubles its capacity. Previously they reserved precisely as much capacity as needed for appending the `from` vector.
 
 ### Fixed
 
