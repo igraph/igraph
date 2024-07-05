@@ -2370,17 +2370,28 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
  */
 
 igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
-                                    const TYPE(igraph_vector) *from) {
-    igraph_integer_t tosize, fromsize;
-    igraph_integer_t newsize;
+                                               const TYPE(igraph_vector) *from) {
+    IGRAPH_ASSERT(to != NULL);
+    IGRAPH_ASSERT(to->stor_begin != NULL);
 
-    tosize = FUNCTION(igraph_vector, size)(to);
-    fromsize = FUNCTION(igraph_vector, size)(from);
-    IGRAPH_SAFE_ADD(tosize, fromsize, &newsize);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, newsize));
-    memcpy(to->stor_begin + tosize, from->stor_begin,
-           sizeof(BASE) * fromsize);
-    to->end = to->stor_begin + tosize + fromsize;
+    const igraph_integer_t to_size = FUNCTION(igraph_vector, size)(to);
+    const igraph_integer_t from_size = FUNCTION(igraph_vector, size)(from);
+    const igraph_integer_t to_capacity = FUNCTION(igraph_vector, capacity)(to);
+    igraph_integer_t new_to_size;
+
+    IGRAPH_SAFE_ADD(to_size, from_size, &new_to_size);
+
+    if (to_capacity < new_to_size) {
+        igraph_integer_t new_to_capacity = to_capacity < IGRAPH_INTEGER_MAX/2 ? to_capacity * 2 : IGRAPH_INTEGER_MAX;
+        if (new_to_capacity < new_to_size) {
+            new_to_capacity = new_to_size;
+        }
+        IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(to, new_to_capacity));
+    }
+
+    memcpy(to->stor_begin + to_size, from->stor_begin,
+           sizeof(BASE) * from_size);
+    to->end = to->stor_begin + new_to_size;
 
     return IGRAPH_SUCCESS;
 }
