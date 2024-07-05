@@ -61,7 +61,7 @@
 #include "igraph_structural.h"
 #include "igraph_transitivity.h"
 #include "igraph_neighborhood.h"
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 #include "igraph_bipartite.h"
 #include "igraph_cliques.h"
 #include "igraph_layout.h"

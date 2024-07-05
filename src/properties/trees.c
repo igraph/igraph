@@ -22,10 +22,10 @@
 */
 
 #include "igraph_structural.h"
-#include "igraph_topology.h"
 
 #include "igraph_bitset.h"
 #include "igraph_constructors.h"
+#include "igraph_cycles.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"

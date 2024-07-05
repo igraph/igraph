@@ -10,6 +10,19 @@
 
 __BEGIN_DECLS
 
+/* -------------------------------------------------- */
+/* Directed acyclic graphs                            */
+/* -------------------------------------------------- */
+
+IGRAPH_EXPORT igraph_error_t igraph_topological_sorting(
+        const igraph_t *graph, igraph_vector_int_t *res, igraph_neimode_t mode);
+
+IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
+
+/* -------------------------------------------------- */
+/* Cycle bases                                        */
+/* -------------------------------------------------- */
+
 IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(
         const igraph_t *graph,
         igraph_vector_int_list_t *result,

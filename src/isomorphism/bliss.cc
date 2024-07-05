@@ -19,7 +19,7 @@
 
 #include "bliss/graph.hh"
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"

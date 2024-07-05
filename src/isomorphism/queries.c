@@ -20,7 +20,7 @@
 
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_interface.h"
 #include "igraph_structural.h"

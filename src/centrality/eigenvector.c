@@ -21,10 +21,10 @@
 #include "igraph_centrality.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_cycles.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_structural.h"
-#include "igraph_topology.h"
 
 #include "centrality/centrality_internal.h"
 

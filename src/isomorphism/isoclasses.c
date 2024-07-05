@@ -19,7 +19,7 @@
    02110-1301 USA
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
