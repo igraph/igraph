@@ -330,16 +330,6 @@ IGRAPH_EXPORT igraph_error_t igraph_vertex_path_from_edge_path(
         const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
         igraph_neimode_t mode);
 
-/* Deprecated functions: */
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
-                                                            const igraph_vector_t *weights,
-                                                            igraph_vector_int_t *edgewalk,
-                                                            igraph_integer_t start,
-                                                            igraph_neimode_t mode,
-                                                            igraph_integer_t steps,
-                                                            igraph_random_walk_stuck_t stuck);
-
 __END_DECLS
 
 #endif

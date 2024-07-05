@@ -91,6 +91,7 @@
  - The deprecated `igraph_sparsemat_eye()` was removed. Use `igraph_sparsemat_init_eye()` instead.
  - The deprecated `igraph_sparsemat_diag()` was removed. Use `igraph_sparsemat_init_diag()` instead.
  - The deprecated `igraph_zeroin()` was removed.
+ - The deprecated `igraph_random_edge_walk()` was removed. Its functionality is incorporated in `igraph_random_walk()`.
 
 ### Deprecated
 
