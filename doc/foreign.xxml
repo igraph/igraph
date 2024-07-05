@@ -56,9 +56,4 @@
 <!-- doxrox-include igraph_exit_safelocale -->
 </section>
 
-<section id="deprecated-formats"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_read_graph_dimacs -->
-<!-- doxrox-include igraph_write_graph_dimacs -->
-</section>
-
 </chapter>

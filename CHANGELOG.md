@@ -77,6 +77,7 @@
  - The deprecated `igraph_are_connected()` was removed. Use `igraph_are_adjacent()` instead.
  - The deprecated `igraph_laplacian()` was removed. Use `igraph_get_laplacian()` or `igraph_get_laplacian_sparse()` instead.
  - The deprecated `igraph_subgraph_edges()` was removed. Use `igraph_subgraph_from_edges()` instead.
+ - The deprecated `igraph_read_graph_dimacs()` and `igraph_write_graph_dimacs()` were removed. These names may be re-used in the future. Use `igraph_read_graph_dimacs_flow()` and `igraph_write_graph_dimacs_flow()` instead.
 
 ### Deprecated
 
