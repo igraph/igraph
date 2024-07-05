@@ -166,17 +166,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_isomorphisms_vf2_callback(
     igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
     igraph_isocompat_t *edge_compat_fn, void *arg
 );
-
-/* Deprecated alias to igraph_get_isomorphisms_vf2_callback(), will be removed in 0.11 */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_isomorphic_function_vf2(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-);
-
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
                                            const igraph_vector_int_t *vertex_color1,
                                            const igraph_vector_int_t *vertex_color2,
@@ -208,16 +197,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *grap
                                                  igraph_isocompat_t *edge_compat_fn,
                                                  void *arg);
 IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2_callback(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-);
-
-/* Deprecated alias to igraph_get_subisomorphisms_vf2_callback(), will be removed in 0.11 */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subisomorphic_function_vf2(
     const igraph_t *graph1, const igraph_t *graph2,
     const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
     const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
@@ -309,12 +288,6 @@ IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_inte
                                          igraph_integer_t number, igraph_bool_t directed);
 
 IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count);
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_isomorphic_34(
-    const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
-);
-
-
 
 __END_DECLS
 

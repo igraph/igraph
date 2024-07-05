@@ -78,6 +78,9 @@
  - The deprecated `igraph_laplacian()` was removed. Use `igraph_get_laplacian()` or `igraph_get_laplacian_sparse()` instead.
  - The deprecated `igraph_subgraph_edges()` was removed. Use `igraph_subgraph_from_edges()` instead.
  - The deprecated `igraph_read_graph_dimacs()` and `igraph_write_graph_dimacs()` were removed. These names may be re-used in the future. Use `igraph_read_graph_dimacs_flow()` and `igraph_write_graph_dimacs_flow()` instead.
+ - The deprecated `igraph_isomorphic_function_vf2()` was removed. Use `igraph_get_isomorphisms_vf2_callback()` instead.
+ - The deprecated `igraph_subisomorphic_function_vf2()` was removed. Use `igraph_get_subisomorphisms_vf2_callback()` instead.
+ - The deprecated `igraph_isomorphic_34()` was removed. Its functionality is accessible through `igraph_isomorphic()`.
 
 ### Deprecated
 
