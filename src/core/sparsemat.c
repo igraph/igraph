@@ -172,19 +172,6 @@ igraph_error_t igraph_sparsemat_init_copy(
 }
 
 /**
- * \function igraph_sparsemat_copy
- * \brief Copies a sparse matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_copy 0.10
- */
-
-igraph_error_t igraph_sparsemat_copy(
-    igraph_sparsemat_t *to, const igraph_sparsemat_t *from
-) {
-    return igraph_sparsemat_init_copy(to, from);
-}
-
-/**
  * \function igraph_sparsemat_destroy
  * \brief Deallocates memory used by a sparse matrix.
  *
@@ -1537,20 +1524,6 @@ igraph_error_t igraph_sparsemat_init_eye(
     }
 }
 
-/**
- * \function igraph_sparsemat_eye
- * \brief Creates a sparse identity matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_eye 0.10
- */
-
-igraph_error_t igraph_sparsemat_eye(
-    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
-    igraph_real_t value, igraph_bool_t compress
-) {
-    return igraph_sparsemat_init_eye(A, n, nzmax, value, compress);
-}
-
 static igraph_error_t igraph_i_sparsemat_init_diag_triplet(
     igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values
 ) {
@@ -1615,20 +1588,6 @@ igraph_error_t igraph_sparsemat_init_diag(
     } else {
         return (igraph_i_sparsemat_init_diag_triplet(A, nzmax, values));
     }
-}
-
-/**
- * \function igraph_sparsemat_diag
- * \brief Creates a sparse diagonal matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_diag 0.10
- */
-
-igraph_error_t igraph_sparsemat_diag(
-    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values,
-    igraph_bool_t compress
-) {
-    return igraph_sparsemat_init_diag(A, nzmax, values, compress);
 }
 
 static igraph_error_t igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
