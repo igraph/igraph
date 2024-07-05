@@ -75,7 +75,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_local_efficiency(&graph, &v, igraph_vss_all(), &weights, IGRAPH_DIRECTED, IGRAPH_OUT);
             igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &v, &r, igraph_vss_all(), IGRAPH_DIRECTED, 0.6, &weights, NULL);
             igraph_constraint(&graph, &v, igraph_vss_all(), &weights);
-            igraph_spanner(&graph, &iv, 2.34, &weights);
+            igraph_transitivity_barrat(&graph, &v, igraph_vss_all(), &weights, IGRAPH_TRANSITIVITY_NAN);
 
             {
                 igraph_attribute_combination_t comb;
