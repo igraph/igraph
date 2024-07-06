@@ -24,9 +24,9 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights, int rep, c
     igraph_vector_int_t edges;
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
-    char msg[256];
+    char msg[128];
 
-    igraph_vector_int_init(&edges, igraph_vcount(graph) - 1);
+    igraph_vector_int_init(&edges, vcount - 1);
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "%s, vcount=%" IGRAPH_PRId ", ecount=%" IGRAPH_PRId ", unweigthed, %dx",
