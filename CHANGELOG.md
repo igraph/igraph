@@ -114,6 +114,7 @@
 
 ### Other
 
+ - Fixed multiple memory leaks in benchmark programs.
  - Documentation improvements.
 
 ## [0.10.13]
