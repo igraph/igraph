@@ -49,14 +49,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_real_t r;
         igraph_vector_int_list_t ivl1;
-        igraph_vector_t v1, v2;
+        igraph_vector_t v1;
         igraph_vector_int_t iv1, iv2;
         igraph_matrix_t m;
         igraph_attribute_combination_t comb;
 
         igraph_vector_int_list_init(&ivl1, 0);
         igraph_vector_init(&v1, 0);
-        igraph_vector_init(&v2, 0);
         igraph_vector_int_init(&iv1, 0);
         igraph_vector_int_init(&iv2, 0);
         igraph_matrix_init(&m, 0, 0);
@@ -124,7 +123,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_matrix_destroy(&m);
         igraph_vector_int_destroy(&iv2);
         igraph_vector_int_destroy(&iv1);
-        igraph_vector_destroy(&v2);
         igraph_vector_destroy(&v1);
         igraph_vector_int_list_destroy(&ivl1);
 
