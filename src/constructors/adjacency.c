@@ -322,7 +322,7 @@ igraph_error_t igraph_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
@@ -512,7 +512,7 @@ static igraph_error_t igraph_i_weighted_adjacency_max(
         for (j = i + 1; j < no_of_nodes; j++) {
             M1 = MATRIX(*adjmatrix, i, j);
             M2 = MATRIX(*adjmatrix, j, i);
-            if (M1 < M2) {
+            if (M1 < M2 || isnan(M2)) {
                 M1 = M2;
             }
             if (M1 != 0.0) {
@@ -531,11 +531,21 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     igraph_vector_t *weights,
     igraph_loops_t loops
 ) {
-    if (!igraph_matrix_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR(
-            "Adjacency matrix should be symmetric to produce an undirected graph.",
-            IGRAPH_EINVAL
-        );
+    /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
+     * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
+     * returns false for these as NaN != NaN. */
+    igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
+    for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_integer_t j=0; j < i; j++) {
+            igraph_real_t a1 = MATRIX(*adjmatrix, i, j);
+            igraph_real_t a2 = MATRIX(*adjmatrix, j, i);
+            if (a1 != a2 && ! (isnan(a1) && isnan(a2))) {
+                IGRAPH_ERROR(
+                    "Adjacency matrix should be symmetric to produce an undirected graph.",
+                    IGRAPH_EINVAL
+                    );
+            }
+        }
     }
     return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
 }
@@ -639,7 +649,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
         for (j = i + 1; j < no_of_nodes; j++) {
             M1 = MATRIX(*adjmatrix, i, j);
             M2 = MATRIX(*adjmatrix, j, i);
-            if (M1 > M2) {
+            if (M1 > M2 || isnan(M2)) {
                 M1 = M2;
             }
             if (M1 != 0.0) {
@@ -737,7 +747,7 @@ igraph_error_t igraph_weighted_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -814,7 +824,7 @@ igraph_error_t igraph_weighted_adjacency(
  *             in-adjacency list
  * \param duplicate Logical, for undirected graphs this specified
  *        whether each edge is included twice, in the vectors of
- *        both adjacent vertices. If this is false (0), then it is
+ *        both adjacent vertices. If this is \c false, then it is
  *        assumed that every edge is included only once. This argument
  *        is ignored for directed graphs.
  * \return Error code.
@@ -827,16 +837,15 @@ igraph_error_t igraph_weighted_adjacency(
 igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                    igraph_neimode_t mode, igraph_bool_t duplicate) {
 
-    igraph_integer_t no_of_nodes = igraph_adjlist_size(adjlist);
+    const igraph_integer_t no_of_nodes = igraph_adjlist_size(adjlist);
     igraph_integer_t no_of_edges = 0;
-    igraph_integer_t i;
 
     igraph_vector_int_t edges;
     igraph_integer_t edgeptr = 0;
 
     duplicate = duplicate && (mode == IGRAPH_ALL); /* only duplicate if undirected */
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         no_of_edges += igraph_vector_int_size(igraph_adjlist_get(adjlist, i));
     }
 
@@ -846,12 +855,12 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * no_of_edges);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, i);
-        igraph_integer_t j, n = igraph_vector_int_size(neis);
+        const igraph_integer_t n = igraph_vector_int_size(neis);
         igraph_integer_t loops = 0;
 
-        for (j = 0; j < n; j++) {
+        for (igraph_integer_t j = 0; j < n; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (nei == i) {
                 loops++;
@@ -859,7 +868,7 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                 if (! duplicate || nei > i) {
                     if (edgeptr + 2 > 2 * no_of_edges) {
                         IGRAPH_ERROR("Invalid adjacency list, most probably not correctly"
-                                     " duplicated edges for an undirected graph", IGRAPH_EINVAL);
+                                     " duplicated edges for an undirected graph.", IGRAPH_EINVAL);
                     }
                     if (mode == IGRAPH_IN) {
                         VECTOR(edges)[edgeptr++] = nei;
@@ -877,18 +886,19 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
         }
         if (edgeptr + 2 * loops > 2 * no_of_edges) {
             IGRAPH_ERROR("Invalid adjacency list, most probably not correctly"
-                         " duplicated edges for an undirected graph", IGRAPH_EINVAL);
+                         " duplicated edges for an undirected graph.", IGRAPH_EINVAL);
         }
-        for (j = 0; j < loops; j++) {
+        for (igraph_integer_t j = 0; j < loops; j++) {
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = i;
         }
     }
 
-    if (mode == IGRAPH_ALL)
-        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 0));
-    else
-        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 1));
+    if (mode == IGRAPH_ALL) {
+        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+    } else {
+        IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
+    }
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

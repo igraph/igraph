@@ -13,6 +13,9 @@ jobs:
   coverity:
     runs-on: ubuntu-latest
 
+    # Do not run in forks
+    if: github.repository == 'igraph/igraph'
+
     steps:
     - name: Install dependencies
       run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
@@ -21,6 +24,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        ref: 'develop'
 
     - name: Create build environment
       run: cmake -E make_directory ${{github.workspace}}/build

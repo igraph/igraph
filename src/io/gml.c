@@ -29,6 +29,7 @@
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strdup, strncasecmp */
+#include "math/safe_intop.h"
 
 #include "io/gml-header.h"
 #include "io/parsers/gml-parser.h"
@@ -1057,7 +1058,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         }
         for (i = 0; i < no_of_nodes; ++i) {
             igraph_real_t val = VECTOR(*myid)[i];
-            if (val != (igraph_integer_t) val) {
+            igraph_real_t trunc_val = trunc(val);
+            if (! (val == trunc_val && igraph_i_is_real_representable_as_integer(trunc_val))) {
                 IGRAPH_WARNINGF("%g is not a valid integer id for GML files, ignoring all supplied ids.", val);
                 if (myid == &v_myid) {
                     igraph_vector_destroy(&v_myid);
@@ -1219,7 +1221,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* The edges too */
     IGRAPH_CHECK(igraph_vector_int_resize(&warning_shown, eattr_no));
-    igraph_vector_int_fill(&warning_shown, 0);
+    igraph_vector_int_null(&warning_shown);
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to = IGRAPH_TO(graph, i);

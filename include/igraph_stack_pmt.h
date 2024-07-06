@@ -39,6 +39,7 @@ IGRAPH_EXPORT void FUNCTION(igraph_stack, destroy)(TYPE(igraph_stack)* s);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_integer_t capacity);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_stack, empty)(TYPE(igraph_stack)* s);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_stack, size)(const TYPE(igraph_stack)* s);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_stack, capacity)(const TYPE(igraph_stack)* s);
 IGRAPH_EXPORT void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem);
 IGRAPH_EXPORT BASE FUNCTION(igraph_stack, pop)(TYPE(igraph_stack)* s);

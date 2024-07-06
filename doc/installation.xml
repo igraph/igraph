@@ -547,7 +547,7 @@ $ cmake .. \
       specify a pre-generated version of the <literal>arith.h</literal> header
       file through the <literal>F2C_EXTERNAL_ARITH_HEADER</literal>
       CMake option. An example version of this header follows for the
-      x86_64 and arm64 target architecures on macOS. Warning: Do not use this
+      x86_64 and arm64 target architectures on macOS. Warning: Do not use this
       version of <literal>arith.h</literal> on other systems or architectures.
     </para>
     <para>

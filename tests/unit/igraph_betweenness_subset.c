@@ -56,7 +56,7 @@ int main(void) {
                                          /* algo= */     IGRAPH_BARABASI_BAG,
                                          /* start_from= */ 0);
 
-    igraph_simplify(&g, /* multiple= */ true, /* loops= */ true, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /* remove_multiple= */ true, /* remove_loops= */ true, /*edge_comb=*/ NULL);
 
     igraph_vector_init(&bet, 0);
     igraph_vs_range(&vs_source, 0, 501);

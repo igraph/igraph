@@ -137,6 +137,22 @@ int main(void) {
     igraph_vector_int_init_int_end(&ds, -1, 1, 1, 4, -1);
     graphical_print_destroy(&ds);
 
+    /* Extra cases for undirected simple with single loops */
+    igraph_vector_int_init_int_end(&ds, -1, 7, 7, 3, 2, 2, 1, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_int_init_int_end(&ds, -1, 7, 7, 3, 3, 2, 2, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_int_init_int_end(&ds, -1, 6, 6, 6, 4, 2, 0, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_int_init_int_end(&ds, -1, 6, 6, 6, 4, 4, 0, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_int_init_int_end(&ds, -1, 6, 6, 6, 4, 3, 1, -1);
+    graphical_print_destroy(&ds);
+
     /* The following two sequences are realizable as simple graphs.
      * The algorithm that checks this exits the last loop with these
      * two sequences. An earlier buggy version of the function failed

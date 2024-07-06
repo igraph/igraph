@@ -1,6 +1,17 @@
- 2 4 5
- 0 1 2 3
- 4 5 6
- 0 1 2 3
- 4 5
- 0 1 2
+Number of components: 4
+
+Component 0:
+Vertices: 5 4 2
+Edges: 5--2 5--4 4--2 
+
+Component 1:
+Vertices: 3 2 1 0
+Edges: 3--0 3--2 2--1 1--0 
+
+Component 2:
+Vertices: 6 0
+Edges: 6--0 
+
+Component 3:
+Vertices: 7 0
+Edges: 7--0 

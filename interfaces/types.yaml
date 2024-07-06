@@ -213,12 +213,18 @@ GRAPH_PTR_LIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEX_QTY:
+ALL_VERTEX_QTY:
     # A vector of floating-point numbers where each entry corresponds to
     # one of the vertices in a graph and its value represents some quantity
     # associated to the vertex with the same index. Higher-level interfaces may
     # use this type to provide a "named vector" such that each entry can be
     # indexed either by the vertex index or by the vertex name.
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+VERTEX_QTY:
+    # Same as ALL_VERTEX_QTY, but only for a subset of vertices,
+    # typically referred to by a `vids` argument.
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
@@ -286,6 +292,11 @@ BARABASI_ALGORITHM:
 BLISSSH:
     # Enum containing splitting heuristics for the Bliss algorithm
     CTYPE: igraph_bliss_sh_t
+    FLAGS: ENUM
+
+CHUNG_LU_VARIANT:
+    # Enum that describes the Chung-Lu model variants supported by igraph
+    CTYPE: igraph_chung_lu_t
     FLAGS: ENUM
 
 COMMCMP:

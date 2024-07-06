@@ -83,7 +83,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                                          "strength", IGRAPH_ATTRIBUTE_COMBINE_MAX,
                                          IGRAPH_NO_MORE_ATTRIBUTES);
 
-            igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, &weights, NULL, NULL);
+            // Ignore edge directions in label propagation for now, as on some weighted graphs the
+            // algorithm seems to never complete. See https://github.com/igraph/igraph/issues/2561
+            igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, &weights, NULL, NULL);
+
             igraph_community_walktrap(&graph, &weights, 3, &merges, &mv, &membership);
             igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, &weights);
 

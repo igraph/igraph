@@ -37,7 +37,7 @@ typedef enum {
    IGRAPH_MERGE_MODE_INTERSECTION = 2
 } igraph_i_merge_mode_t;
 
-int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2);
+IGRAPH_FUNCATTR_PURE int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2);
 igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2);

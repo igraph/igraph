@@ -136,16 +136,17 @@ IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_bool_t igraph_vector_e_tol(const igraph_v
                                                                   const igraph_vector_t *rhs,
                                                                   igraph_real_t tol);
 
-IGRAPH_EXPORT igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
-                                                       const igraph_vector_t *rhs,
-                                                       igraph_real_t eps);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
+                                                                            const igraph_vector_t *rhs,
+                                                                            igraph_real_t eps);
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_zapsmall(igraph_vector_complex_t *v, igraph_real_t tol) ;
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v,
-                                       igraph_vector_bool_t *is_nan);
-IGRAPH_EXPORT igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v);
+                                                  igraph_vector_bool_t *is_nan);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_vector_is_all_finite(const igraph_vector_t *v);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_vector_order2(igraph_vector_t *v);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_int_t *res,

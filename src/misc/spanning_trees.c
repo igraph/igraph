@@ -17,10 +17,10 @@
 */
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_random.h"
 #include "igraph_structural.h"
@@ -88,6 +88,8 @@ igraph_error_t igraph_minimum_spanning_tree(
  * \function igraph_minimum_spanning_tree_unweighted
  * \brief Calculates one minimum spanning tree of an unweighted graph.
  *
+ * \deprecated-by igraph_minimum_spanning_tree 0.10.14
+ *
  * If the graph has more minimum spanning trees (this is always the
  * case, except if it is a forest) this implementation returns only
  * the same one.
@@ -138,6 +140,8 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \ingroup structural
  * \function igraph_minimum_spanning_tree_prim
  * \brief Calculates one minimum spanning tree of a weighted graph.
+ *
+ * \deprecated-by igraph_minimum_spanning_tree 0.10.14
  *
  * Finds a spanning tree or spanning forest for which the sum of edge
  * weights is the smallest. This function uses Prim's method for carrying
@@ -201,33 +205,27 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    bool *already_added, *added_edges;
+    igraph_bitset_t already_added, added_edges;
 
     igraph_dqueue_int_t q;
     igraph_vector_int_t eids;
 
     igraph_vector_int_clear(res);
 
-    added_edges = IGRAPH_CALLOC(no_of_edges, bool);
-    IGRAPH_CHECK_OOM(added_edges, "Insufficient memory for unweighted spanning tree.");
-    IGRAPH_FINALLY(igraph_free, added_edges);
-
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for unweighted spanning tree.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
+    IGRAPH_BITSET_INIT_FINALLY(&added_edges, no_of_edges);
+    IGRAPH_BITSET_INIT_FINALLY(&already_added, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     /* Perform a BFS */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        if (already_added[i]) {
+        if (IGRAPH_BIT_TEST(already_added, i)) {
             continue;
         }
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[i] = true;
+        IGRAPH_BIT_SET(already_added, i);
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
         while (! igraph_dqueue_int_empty(&q)) {
             igraph_integer_t eids_size;
@@ -237,11 +235,11 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
             eids_size = igraph_vector_int_size(&eids);
             for (igraph_integer_t j = 0; j < eids_size; j++) {
                 igraph_integer_t edge = VECTOR(eids)[j];
-                if (! added_edges[edge]) {
+                if (! IGRAPH_BIT_TEST(added_edges, edge)) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
-                    if (! already_added[to]) {
-                        already_added[to] = true;
-                        added_edges[edge] = true;
+                    if (! IGRAPH_BIT_TEST(already_added, to)) {
+                        IGRAPH_BIT_SET(already_added, to);
+                        IGRAPH_BIT_SET(added_edges, edge);
                         IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, to));
                     }
@@ -252,8 +250,8 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&eids);
-    IGRAPH_FREE(already_added);
-    IGRAPH_FREE(added_edges);
+    igraph_bitset_destroy(&already_added);
+    igraph_bitset_destroy(&added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -264,7 +262,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    bool *already_added, *added_edges;
+    igraph_bitset_t already_added, added_edges;
 
     igraph_d_indheap_t heap;
     const igraph_neimode_t mode = IGRAPH_ALL;
@@ -285,13 +283,8 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
     }
 
-    added_edges = IGRAPH_CALLOC(no_of_edges, bool);
-    IGRAPH_CHECK_OOM(added_edges, "Insufficient memory for minimum spanning tree calculation.");
-    IGRAPH_FINALLY(igraph_free, added_edges);
-
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for minimum spanning tree calculation.");
-    IGRAPH_FINALLY(igraph_free, already_added);
+    IGRAPH_BITSET_INIT_FINALLY(&added_edges, no_of_edges);
+    IGRAPH_BITSET_INIT_FINALLY(&already_added, no_of_nodes);
 
     IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
     IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
@@ -300,19 +293,19 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t adj_size;
-        if (already_added[i]) {
+        if (IGRAPH_BIT_TEST(already_added, i)) {
             continue;
         }
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[i] = true;
+        IGRAPH_BIT_SET(already_added, i);
         /* add all edges of the first vertex */
         IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
         adj_size = igraph_vector_int_size(&adj);
         for (igraph_integer_t j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, i);
-            if (! already_added[neighbor]) {
+            if (! IGRAPH_BIT_TEST(already_added, neighbor)) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i, edgeno));
             }
         }
@@ -326,13 +319,13 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
             igraph_d_indheap_delete_max(&heap);
 
             /* Is this edge already included? */
-            if (! added_edges[edge]) {
+            if (! IGRAPH_BIT_TEST(added_edges, edge)) {
                 igraph_integer_t to = IGRAPH_OTHER(graph, edge, from);
 
                 /* Does it point to a visited node? */
-                if (! already_added[to]) {
-                    already_added[to] = true;
-                    added_edges[edge] = true;
+                if (! IGRAPH_BIT_TEST(already_added, to)) {
+                    IGRAPH_BIT_SET(already_added, to);
+                    IGRAPH_BIT_SET(added_edges, edge);
                     IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                     /* add all outgoing edges */
                     IGRAPH_CHECK(igraph_incident(graph, &adj, to, mode));
@@ -340,7 +333,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
                     for (igraph_integer_t j = 0; j < adj_size; j++) {
                         igraph_integer_t edgeno = VECTOR(adj)[j];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, to);
-                        if (! already_added[neighbor]) {
+                        if (! IGRAPH_BIT_TEST(already_added, neighbor)) {
                             IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to, edgeno));
                         }
                     }
@@ -349,10 +342,10 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         } /* while in the same component */
     } /* for all nodes */
 
-    igraph_d_indheap_destroy(&heap);
-    IGRAPH_FREE(already_added);
     igraph_vector_int_destroy(&adj);
-    IGRAPH_FREE(added_edges);
+    igraph_d_indheap_destroy(&heap);
+    igraph_bitset_destroy(&already_added);
+    igraph_bitset_destroy(&added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;

@@ -66,6 +66,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bitset
   heap
   igraph_array
   igraph_complex
@@ -155,7 +156,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
   igraph_vs_nonadj
-  igraph_vs_seq
+  igraph_vs_range
   igraph_vs_vector
 )
 
@@ -203,6 +204,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
@@ -326,6 +328,7 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_clique
   igraph_is_complete
   igraph_is_dag
   igraph_is_mutual
@@ -340,6 +343,7 @@ add_legacy_tests(
   igraph_local_scan_k_ecount_them
   igraph_local_scan_subset_ecount
   igraph_local_transitivity
+  igraph_mean_degree
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
@@ -350,7 +354,7 @@ add_legacy_tests(
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_similarity
-  igraph_transitive_closure_dag
+  igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
   igraph_unfold_tree
@@ -359,6 +363,7 @@ add_legacy_tests(
   igraph_spanner
   knn
   random_spanning_tree
+  reachability
   single_target_shortest_path
   topological_sorting
 )
@@ -384,6 +389,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_biconnected_components
   igraph_bridges
   igraph_decompose_strong
   igraph_is_biconnected
@@ -557,6 +563,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
+  igraph_contract_vertices
   igraph_difference
   igraph_disjoint_union
   igraph_join
@@ -568,11 +575,12 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
   igraph_connect_neighborhood
+  igraph_disjoint_union
   igraph_graph_power
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
-  igraph_intersection2
+  igraph_intersection
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
@@ -983,6 +991,9 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  community
+  connectivity
+  erdos_renyi
   graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
@@ -1005,11 +1016,14 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_strength
   igraph_transitivity
   igraph_tree_game
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
+  lad
+  intersection
 )
 
 # dot product
