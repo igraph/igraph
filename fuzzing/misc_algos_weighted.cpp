@@ -52,7 +52,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_t v1;
         igraph_vector_int_t iv1, iv2;
         igraph_matrix_t m;
-        igraph_attribute_combination_t comb;
 
         igraph_vector_int_list_init(&ivl1, 0);
         igraph_vector_init(&v1, 0);
@@ -74,6 +73,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_average_path_length_dijkstra(&graph, &r, &r, &weights, true, true);
         igraph_radius_dijkstra(&graph, &weights, &r, IGRAPH_OUT);
 
+        igraph_feedback_arc_set(&graph, &iv1, &weights, IGRAPH_FAS_APPROX_EADES);
+
         if (igraph_vcount(&graph) >= 1) {
             igraph_random_walk(&graph, &weights, &iv1, &iv2, 0, IGRAPH_ALL, igraph_ecount(&graph), IGRAPH_RANDOM_WALK_STUCK_RETURN);
             igraph_distances_dijkstra(&graph, &m, igraph_vss_1(0), igraph_vss_all(), &weights, IGRAPH_OUT);
@@ -88,6 +89,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         /* Undirected */
 
         {
+            igraph_attribute_combination_t comb;
+
             SETEANV(&graph, "weight", &weights);
             igraph_attribute_combination(&comb,
                                          "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
