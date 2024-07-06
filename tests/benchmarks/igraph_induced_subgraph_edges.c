@@ -86,6 +86,9 @@ void bench_induced_subgraph_edges(void) {
 #undef INDUCED_SUBGRAPH_VERTEX_COUNT
 
 #undef REP
+
+    igraph_destroy(&g);
+    igraph_vector_int_destroy(&vertices);
 }
 
 int main(void) {
