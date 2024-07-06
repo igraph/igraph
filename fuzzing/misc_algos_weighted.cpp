@@ -87,14 +87,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         /* Undirected */
 
-        SETEANV(&graph, "weight", &weights);
-
-        igraph_attribute_combination(&comb,
-                                     "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
-                                     IGRAPH_NO_MORE_ATTRIBUTES);
-
-        igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, &comb);
-        EANV(&graph, "weight", &weights);
+        {
+            SETEANV(&graph, "weight", &weights);
+            igraph_attribute_combination(&comb,
+                                         "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
+                                         IGRAPH_NO_MORE_ATTRIBUTES);
+            igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, &comb);
+            igraph_attribute_combination_destroy(&comb);
+            EANV(&graph, "weight", &weights);
+        }
 
         igraph_get_adjacency(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_LOOPS_ONCE);
         igraph_get_laplacian(&graph, &m, IGRAPH_OUT, IGRAPH_LAPLACIAN_UNNORMALIZED, &weights);
