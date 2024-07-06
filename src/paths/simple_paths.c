@@ -20,6 +20,7 @@
 #include "igraph_paths.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
 #include "igraph_vector_list.h"
@@ -84,7 +85,7 @@ igraph_error_t igraph_get_all_simple_paths(
     igraph_lazy_adjlist_t adjlist;
     igraph_vector_int_t stack, dist; /* used as a stack, but represented as a vector,
                                         in order to be appendable the result vector list */
-    igraph_vector_bool_t markto, added;
+    igraph_bitset_t markto, added;
     igraph_vector_int_t nptr;
     int iter = 0;
 
@@ -93,17 +94,17 @@ igraph_error_t igraph_get_all_simple_paths(
     }
 
     if (!toall) {
-        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&markto, vcount);
+        IGRAPH_BITSET_INIT_FINALLY(&markto, vcount);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-            VECTOR(markto)[ IGRAPH_VIT_GET(vit) ] = true;
+            IGRAPH_BIT_SET(markto, IGRAPH_VIT_GET(vit));
         }
         igraph_vit_destroy(&vit);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, vcount);
+    IGRAPH_BITSET_INIT_FINALLY(&added, vcount);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&stack, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dist, 100);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(
@@ -118,7 +119,7 @@ igraph_error_t igraph_get_all_simple_paths(
     igraph_vector_int_clear(&dist);
     igraph_vector_int_push_back(&stack, from);
     igraph_vector_int_push_back(&dist, 0);
-    VECTOR(added)[from] = true;
+    IGRAPH_BIT_SET(added, from);
     while (!igraph_vector_int_empty(&stack)) {
         const igraph_integer_t act = igraph_vector_int_tail(&stack);
         const igraph_integer_t curdist = igraph_vector_int_tail(&dist);
@@ -138,7 +139,7 @@ igraph_error_t igraph_get_all_simple_paths(
             any = false;
             while (!any && (*ptr) < n) {
                 nei = VECTOR(*neis)[(*ptr)];
-                any = !VECTOR(added)[nei];
+                any = !IGRAPH_BIT_TEST(added, nei);
                 (*ptr) ++;
             }
         }
@@ -146,9 +147,9 @@ igraph_error_t igraph_get_all_simple_paths(
             /* There is such a neighbor, add it */
             IGRAPH_CHECK(igraph_vector_int_push_back(&stack, nei));
             IGRAPH_CHECK(igraph_vector_int_push_back(&dist, curdist + 1));
-            VECTOR(added)[nei] = true;
+            IGRAPH_BIT_SET(added, nei);
             /* Add to results */
-            if (toall || VECTOR(markto)[nei]) {
+            if (toall || IGRAPH_BIT_TEST(markto, nei)) {
                 if (curdist + 1 >= minlen) {
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &stack));
                 }
@@ -157,7 +158,7 @@ igraph_error_t igraph_get_all_simple_paths(
             /* There is no such neighbor, finished with the subtree */
             igraph_integer_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
-            VECTOR(added)[up] = false;
+            IGRAPH_BIT_CLEAR(added, up);
             VECTOR(nptr)[up] = 0;
         }
 
@@ -168,11 +169,11 @@ igraph_error_t igraph_get_all_simple_paths(
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&dist);
     igraph_vector_int_destroy(&stack);
-    igraph_vector_bool_destroy(&added);
+    igraph_bitset_destroy(&added);
     IGRAPH_FINALLY_CLEAN(5);
 
     if (!toall) {
-        igraph_vector_bool_destroy(&markto);
+        igraph_bitset_destroy(&markto);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
