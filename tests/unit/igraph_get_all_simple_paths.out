@@ -1,21 +1,70 @@
-Paths for cutoff 0:
+TEST MINLEN
+
+Paths for minlen=0:
+{
+  0: ( 0 1 2 3 4 5 )
+  1: ( 0 1 2 3 5 )
+  2: ( 0 1 2 5 )
+  3: ( 0 3 2 5 )
+  4: ( 0 3 4 5 )
+  5: ( 0 3 5 )
+}
+Paths for minlen=1:
+{
+  0: ( 0 1 2 3 4 5 )
+  1: ( 0 1 2 3 5 )
+  2: ( 0 1 2 5 )
+  3: ( 0 3 2 5 )
+  4: ( 0 3 4 5 )
+  5: ( 0 3 5 )
+}
+Paths for minlen=2:
+{
+  0: ( 0 1 2 3 4 5 )
+  1: ( 0 1 2 3 5 )
+  2: ( 0 1 2 5 )
+  3: ( 0 3 2 5 )
+  4: ( 0 3 4 5 )
+  5: ( 0 3 5 )
+}
+Paths for minlen=3:
+{
+  0: ( 0 1 2 3 4 5 )
+  1: ( 0 1 2 3 5 )
+  2: ( 0 1 2 5 )
+  3: ( 0 3 2 5 )
+  4: ( 0 3 4 5 )
+}
+Paths for minlen=4:
+{
+  0: ( 0 1 2 3 4 5 )
+  1: ( 0 1 2 3 5 )
+}
+Paths for minlen=5:
+{
+  0: ( 0 1 2 3 4 5 )
+}
+
+TEST MAXLEN
+
+Paths for maxlen=0:
 {
 }
-Paths for cutoff 1:
+Paths for maxlen=1:
 {
 }
-Paths for cutoff 2:
+Paths for maxlen=2:
 {
   0: ( 0 3 5 )
 }
-Paths for cutoff 3:
+Paths for maxlen=3:
 {
   0: ( 0 1 2 5 )
   1: ( 0 3 2 5 )
   2: ( 0 3 4 5 )
   3: ( 0 3 5 )
 }
-Paths for cutoff 4:
+Paths for maxlen=4:
 {
   0: ( 0 1 2 3 5 )
   1: ( 0 1 2 5 )
@@ -23,7 +72,7 @@ Paths for cutoff 4:
   3: ( 0 3 4 5 )
   4: ( 0 3 5 )
 }
-Paths for cutoff 5:
+Paths for maxlen=5:
 {
   0: ( 0 1 2 3 4 5 )
   1: ( 0 1 2 3 5 )

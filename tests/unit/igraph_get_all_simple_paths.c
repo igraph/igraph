@@ -32,16 +32,25 @@ int main(void) {
 
     igraph_vector_int_list_init(&res, 0);
 
+    printf("TEST MINLEN\n\n");
     for (igraph_integer_t i = 0; i <= 5; i++) {
-        igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);
+        igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, -1, IGRAPH_ALL);
 
-        printf("Paths for cutoff %" IGRAPH_PRId ":\n", i);
+        printf("Paths for minlen=%" IGRAPH_PRId ":\n", i);
+        print_vector_int_list(&res);
+    }
+
+    printf("\nTEST MAXLEN\n\n");
+    for (igraph_integer_t i = 0; i <= 5; i++) {
+        igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), -1, i, IGRAPH_ALL);
+
+        printf("Paths for maxlen=%" IGRAPH_PRId ":\n", i);
         print_vector_int_list(&res);
     }
 
     igraph_vector_int_list_init(&res_all, 0);
 
-    igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, IGRAPH_ALL);
+    igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, -1, IGRAPH_ALL);
 
     n = igraph_vector_int_list_size(&res);
     IGRAPH_ASSERT(igraph_vector_int_list_size(&res_all) == n);

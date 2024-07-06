@@ -261,7 +261,8 @@ IGRAPH_EXPORT igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                                          igraph_vector_int_list_t *res,
                                                          igraph_integer_t from,
                                                          const igraph_vs_t to,
-                                                         igraph_integer_t cutoff,
+                                                         igraph_integer_t minlen,
+                                                         igraph_integer_t maxlen,
                                                          igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph,
