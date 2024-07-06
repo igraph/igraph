@@ -134,6 +134,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
 
     igraph_vector_int_destroy(&edges);
+    igraph_vector_destroy(&weights);
 
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
 
