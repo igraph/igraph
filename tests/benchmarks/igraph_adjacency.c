@@ -28,6 +28,18 @@
  * many non-zero elements, creating the graphfrom its edge list dominates.
  */
 
+void adjacency(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops) {
+    igraph_t g;
+    igraph_adjacency(&g, adjmatrix, mode, loops);
+    igraph_destroy(&g);
+}
+
+void weighted_adjacency(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_vector_t *weights, igraph_loops_t loops) {
+    igraph_t g;
+    igraph_weighted_adjacency(&g, adjmatrix, mode, weights, loops);
+    igraph_destroy(&g);
+}
+
 void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer_t rep) {
     igraph_t g;
     igraph_matrix_t mat;
@@ -55,15 +67,13 @@ void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer
                  "%2d vcount=%" IGRAPH_PRId ", meandeg=%3" IGRAPH_PRId ", %8s, unweighted, %" IGRAPH_PRId "x",
                  (int) i+1, vcount, meandeg, names[i], rep);
 
-        BENCH(msg, REPEAT(igraph_adjacency(&g, &mat, types[i], IGRAPH_LOOPS_ONCE), rep));
-        igraph_destroy(&g);
+        BENCH(msg, REPEAT(adjacency(&mat, types[i], IGRAPH_LOOPS_ONCE), rep));
 
         snprintf(msg, sizeof(msg) / sizeof(msg[0]),
                  "%2d vcount=%" IGRAPH_PRId ", meandeg=%3" IGRAPH_PRId ", %8s,   weighted, %" IGRAPH_PRId "x",
                  (int) i+1, vcount, meandeg, names[i], rep);
 
-        BENCH(msg, REPEAT(igraph_weighted_adjacency(&g, &mat, types[i], &weights, IGRAPH_LOOPS_ONCE), rep));
-        igraph_destroy(&g);
+        BENCH(msg, REPEAT(weighted_adjacency(&mat, types[i], &weights, IGRAPH_LOOPS_ONCE), rep));
     }
     printf("\n");
 
