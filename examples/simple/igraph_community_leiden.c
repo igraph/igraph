@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,20 +13,17 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
+#include <stdio.h>
 
 int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership;
-    igraph_vector_int_t degree;
     igraph_vector_t weights;
-    igraph_integer_t nb_clusters, i;
+    igraph_integer_t nb_clusters;
     igraph_real_t quality;
 
     /* Set default seed to get reproducible results */
@@ -57,13 +52,9 @@ int main(void) {
     igraph_vector_int_print(&membership);
     printf("\n");
 
-    /* Initialize degree vector to use for optimizing modularity */
-    igraph_vector_int_init(&degree, igraph_vcount(&graph));
-    igraph_degree(&graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1);
-    igraph_vector_init(&weights, igraph_vector_int_size(&degree));
-    for (i = 0; i < igraph_vector_int_size(&degree); i++) {
-        VECTOR(weights)[i] = VECTOR(degree)[i];
-    }
+    /* Use degrees as vertex weights for optimizing modularity */
+    igraph_vector_init(&weights, igraph_vcount(&graph));
+    igraph_strength(&graph, &weights, igraph_vss_all(), IGRAPH_ALL, /*loops*/ true, NULL);
 
     /* Perform Leiden algorithm using modularity until stable iteration */
     igraph_community_leiden(&graph, NULL, &weights, 1.0 / (2 * igraph_ecount(&graph)), 0.01, 0, -1, &membership, &nb_clusters, &quality);
@@ -74,7 +65,6 @@ int main(void) {
     printf("\n");
 
     igraph_vector_destroy(&weights);
-    igraph_vector_int_destroy(&degree);
     igraph_vector_int_destroy(&membership);
     igraph_destroy(&graph);
 

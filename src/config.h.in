@@ -19,6 +19,13 @@
 #cmakedefine HAVE___UMULH 1
 #cmakedefine HAVE___UINT128_T 1
 
+#cmakedefine HAVE__POPCNT64 1
+#cmakedefine HAVE__POPCNT 1
+#cmakedefine HAVE__BITSCANFORWARD64 1
+#cmakedefine HAVE__BITSCANFORWARD 1
+#cmakedefine HAVE__BITSCANREVERSE64 1
+#cmakedefine HAVE__BITSCANREVERSE 1
+
 #cmakedefine HAVE_GLPK 1
 #cmakedefine HAVE_LIBXML 1
 
@@ -26,6 +33,7 @@
 #cmakedefine INTERNAL_LAPACK 1
 #cmakedefine INTERNAL_ARPACK 1
 #cmakedefine INTERNAL_GMP 1
+
 
 #define IGRAPH_F77_SAVE static @TLS_KEYWORD@
 #define IGRAPH_THREAD_LOCAL @TLS_KEYWORD@

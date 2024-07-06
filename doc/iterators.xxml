@@ -56,6 +56,7 @@
 <!-- doxrox-include igraph_es_incident -->
 <!-- doxrox-include igraph_es_none -->
 <!-- doxrox-include igraph_es_1 -->
+<!-- doxrox-include igraph_es_all_between -->
 <!-- doxrox-include igraph_es_vector -->
 <!-- doxrox-include igraph_es_range -->
 <!-- doxrox-include igraph_es_pairs -->
@@ -90,13 +91,6 @@
 <!-- doxrox-include IGRAPH_EIT_SIZE -->
 <!-- doxrox-include IGRAPH_EIT_RESET -->
 <!-- doxrox-include IGRAPH_EIT_GET -->
-</section>
-
-<section id="deprecated-vertex-edge-selectors"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_es_seq -->
-<!-- doxrox-include igraph_ess_seq -->
-<!-- doxrox-include igraph_vs_seq -->
-<!-- doxrox-include igraph_vss_seq -->
 </section>
 
 <!--

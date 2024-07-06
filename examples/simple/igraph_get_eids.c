@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2008-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,22 +13,11 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 #include <stdlib.h>
-
-void print_vector_int(igraph_vector_int_t *v, FILE *f) {
-    igraph_integer_t i;
-    for (i = 0; i < igraph_vector_int_size(v); i++) {
-        fprintf(f, " %" IGRAPH_PRId, VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
 
 int main(void) {
     igraph_t g;
@@ -52,14 +39,14 @@ int main(void) {
         igraph_vector_int_clear(&path);
         igraph_vector_int_clear(&eids);
 
-        igraph_erdos_renyi_game_gnp(&g, nodes, p, /*directed=*/ 0, /*loops=*/ 0);
+        igraph_erdos_renyi_game_gnp(&g, nodes, p, /*directed=*/ false, /*loops=*/ false);
         ecount = igraph_ecount(&g);
         for (e = 0; e < edges; e++) {
             igraph_integer_t edge = RNG_INTEGER(0, ecount - 1);
             VECTOR(pairs)[2 * e] = IGRAPH_FROM(&g, edge);
             VECTOR(pairs)[2 * e + 1] = IGRAPH_TO(&g, edge);
         }
-        igraph_get_eids(&g, &eids, &pairs, /* directed= */ 0, /*error=*/ 1);
+        igraph_get_eids(&g, &eids, &pairs, /* directed= */ false, /*error=*/ true);
         for (e = 0; e < edges; e++) {
             igraph_integer_t edge = VECTOR(eids)[e];
             igraph_integer_t from1 = VECTOR(pairs)[2 * e];
@@ -75,11 +62,11 @@ int main(void) {
             }
         }
 
-        igraph_diameter(&g, /*res=*/ 0, /*from=*/ 0, /*to=*/ 0, &path, NULL,
-                        IGRAPH_UNDIRECTED, /*unconn=*/ 1);
+        igraph_diameter(&g, /*res=*/ NULL, /*from=*/ NULL, /*to=*/ NULL, &path, NULL,
+                        IGRAPH_UNDIRECTED, /*unconn=*/ true);
         igraph_vector_int_update(&pairs, &path);
         igraph_expand_path_to_pairs(&pairs);
-        igraph_get_eids(&g, &eids, &pairs, 0, /*error=*/ 1);
+        igraph_get_eids(&g, &eids, &pairs, 0, /*error=*/ true);
         for (e = 0; e < igraph_vector_int_size(&path) - 1; e++) {
             igraph_integer_t edge = VECTOR(eids)[e];
             igraph_integer_t from1 = VECTOR(path)[e];

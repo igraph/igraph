@@ -23,15 +23,16 @@
 #include "igraph_flow.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
 #include "igraph_components.h"
+#include "igraph_cycles.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_operators.h"
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
-#include "igraph_topology.h"
 
 #include "core/estack.h"
 #include "core/marked_queue.h"
@@ -610,8 +611,8 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
 typedef struct igraph_i_all_st_cuts_minimal_dfs_data_t {
     igraph_stack_int_t *stack;
-    igraph_vector_bool_t *nomark;
-    const igraph_vector_bool_t *GammaX;
+    igraph_bitset_t *nomark;
+    const igraph_bitset_t *GammaX;
     igraph_integer_t root;
     const igraph_vector_int_t *map;
 } igraph_i_all_st_cuts_minimal_dfs_data_t;
@@ -624,17 +625,17 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
 
     igraph_i_all_st_cuts_minimal_dfs_data_t *data = extra;
     igraph_stack_int_t *stack = data->stack;
-    igraph_vector_bool_t *nomark = data->nomark;
-    const igraph_vector_bool_t *GammaX = data->GammaX;
+    igraph_bitset_t *nomark = data->nomark;
+    const igraph_bitset_t *GammaX = data->GammaX;
     const igraph_vector_int_t *map = data->map;
     igraph_integer_t realvid = VECTOR(*map)[vid];
 
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
-    if (VECTOR(*GammaX)[realvid]) {
+    if (IGRAPH_BIT_TEST(*GammaX, realvid)) {
         if (!igraph_stack_int_empty(stack)) {
             igraph_integer_t top = igraph_stack_int_top(stack);
-            VECTOR(*nomark)[top] = true; /* we just found a smaller one */
+            IGRAPH_BIT_SET(*nomark, top); /* we just found a smaller one */
         }
         IGRAPH_CHECK(igraph_stack_int_push(stack, realvid));
     }
@@ -666,20 +667,20 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
         const igraph_t *domtree,
         igraph_integer_t root,
         const igraph_marked_queue_int_t *X,
-        const igraph_vector_bool_t *GammaX,
+        const igraph_bitset_t *GammaX,
         const igraph_vector_int_t *invmap,
         igraph_vector_int_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_stack_int_t stack;
-    igraph_vector_bool_t nomark;
+    igraph_bitset_t nomark;
     igraph_i_all_st_cuts_minimal_dfs_data_t data;
     igraph_integer_t i;
 
     IGRAPH_UNUSED(X);
 
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, 10);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&nomark, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&nomark, no_of_nodes);
 
     data.stack = &stack;
     data.nomark = &nomark;
@@ -690,9 +691,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
     /* We mark all GammaX elements as minimal first.
        TODO: actually, we could just use GammaX to return the minimal
        elements. */
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(nomark)[i] = (VECTOR(*GammaX)[i] == 0);
-    }
+    igraph_bitset_not(&nomark, GammaX);
 
     /* We do a reverse DFS from root. If, along a path we find a GammaX
        vertex after (=below) another GammaX vertex, we mark the higher
@@ -708,12 +707,12 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 
     igraph_vector_int_clear(minimal);
     for (i = 0; i < no_of_nodes; i++) {
-        if (!VECTOR(nomark)[i]) {
+        if (!IGRAPH_BIT_TEST(nomark, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(minimal, i));
         }
     }
 
-    igraph_vector_bool_destroy(&nomark);
+    igraph_bitset_destroy(&nomark);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -736,7 +735,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     igraph_integer_t i, nomin, n;
     igraph_integer_t root;
     igraph_vector_int_t M;
-    igraph_vector_bool_t GammaS;
+    igraph_bitset_t GammaS;
     igraph_vector_int_t Nuv;
     igraph_vector_int_t Isv_min;
     igraph_vector_int_t GammaS_vec;
@@ -782,10 +781,9 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
     /* First we create GammaS */
     /* TODO: use the adjacency list, instead of neighbors() */
-    IGRAPH_CHECK(igraph_vector_bool_init(&GammaS, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &GammaS);
+    IGRAPH_BITSET_INIT_FINALLY(&GammaS, no_of_nodes);
     if (igraph_marked_queue_int_size(S) == 0) {
-        VECTOR(GammaS)[VECTOR(Sbar_map)[source]] = true;
+        IGRAPH_BIT_SET(GammaS, VECTOR(Sbar_map)[source]);
     } else {
         for (i = 0; i < no_of_nodes; i++) {
             if (igraph_marked_queue_int_iselement(S, i)) {
@@ -798,7 +796,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (!igraph_marked_queue_int_iselement(S, nei)) {
-                        VECTOR(GammaS)[nei] = true;
+                        IGRAPH_BIT_SET(GammaS, nei);
                     }
                 }
                 igraph_vector_int_destroy(&neis);
@@ -814,7 +812,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     n = igraph_vector_int_size(&leftout);
     for (i = 0; i < n; i++) {
         VECTOR(leftout)[i] = VECTOR(Sbar_invmap)[VECTOR(leftout)[i]];
-        VECTOR(GammaS)[VECTOR(leftout)[i]] = false;
+        IGRAPH_BIT_CLEAR(GammaS, VECTOR(leftout)[i]);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&M, 0);
@@ -828,7 +826,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv_min, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&GammaS_vec, 0);
     for (i = 0; i < no_of_nodes; i++) {
-        if (VECTOR(GammaS)[i]) {
+        if (IGRAPH_BIT_TEST(GammaS, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&GammaS_vec, i));
         }
     }
@@ -914,7 +912,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_FINALLY_CLEAN(3);
 
     igraph_vector_int_destroy(&M);
-    igraph_vector_bool_destroy(&GammaS);
+    igraph_bitset_destroy(&GammaS);
     igraph_destroy(&domtree);
     igraph_vector_int_destroy(&leftout);
     igraph_destroy(&Sbar);
@@ -1148,16 +1146,16 @@ igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
 
 static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
         const igraph_marked_queue_int_t *S,
-        const igraph_vector_bool_t *active,
+        const igraph_bitset_t *active,
         igraph_vector_int_t *minimal) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(residual);
     igraph_integer_t i;
     igraph_vector_int_t neis;
-    igraph_vector_bool_t connected_to_minimal;
+    igraph_bitset_t connected_to_minimal;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&connected_to_minimal, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&connected_to_minimal, no_of_nodes);
 
     // Clear minimal nodes, we will push back to vector as required.
     igraph_vector_int_clear(minimal);
@@ -1181,8 +1179,8 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
                 /* If connected to node that is connected to node that is minimal,
                 * this node is also connected to node that is minimal.
                 */
-                if (VECTOR(connected_to_minimal)[nei]) {
-                    VECTOR(connected_to_minimal)[i] = true;
+                if (IGRAPH_BIT_TEST(connected_to_minimal, nei)) {
+                    IGRAPH_BIT_SET(connected_to_minimal, i);
                     break;
                 }
             }
@@ -1190,19 +1188,19 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
             /* If this node is not connected to node that is minimal, and this node
             * is minimal and active itself, set it as a minimal node.
             */
-            if (!VECTOR(connected_to_minimal)[i] && VECTOR(*active)[i]) {
+            if (!IGRAPH_BIT_TEST(connected_to_minimal, i) && IGRAPH_BIT_TEST(*active, i)) {
 
                 igraph_vector_int_push_back(minimal, i);
                 /* Also mark this node as connected to minimal, to make sure that
                 * any descendants will be marked as being connected to a minimal
                 * node.
                 */
-                VECTOR(connected_to_minimal)[i] = true;
+                IGRAPH_BIT_SET(connected_to_minimal, i);
             }
         }
     }
 
-    igraph_vector_bool_destroy(&connected_to_minimal);
+    igraph_bitset_destroy(&connected_to_minimal);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -1210,7 +1208,7 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
 }
 
 typedef struct igraph_i_all_st_mincuts_data_t {
-    const igraph_vector_bool_t *active;
+    const igraph_bitset_t *active;
 } igraph_i_all_st_mincuts_data_t;
 
 static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
@@ -1223,7 +1221,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
         void *arg) {
 
     igraph_i_all_st_mincuts_data_t *data = arg;
-    const igraph_vector_bool_t *active = data->active;
+    const igraph_bitset_t *active = data->active;
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, j;
@@ -1349,7 +1347,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_marked_queue_int_t S;
     igraph_estack_t T;
     igraph_i_all_st_mincuts_data_t pivot_data;
-    igraph_vector_bool_t VE1bool;
+    igraph_bitset_t VE1bool;
     igraph_integer_t i, nocuts;
     igraph_integer_t proj_nodes;
     igraph_vector_int_t revmap_ptr, revmap_next;
@@ -1405,7 +1403,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
                      /*no=*/ &proj_nodes, IGRAPH_STRONG
                  ));
     IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL, /*vertex_comb=*/ NULL));
-    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true, /*edge_comb=*/ NULL));
+    IGRAPH_CHECK(igraph_simplify(&residual, /*remove_multiple=*/ true, /*remove_loops=*/ true, /*edge_comb=*/ NULL));
 
     /* We relabel the residual graph so that it is in topological sort order. */
     igraph_integer_t no_of_nodes_residual = igraph_vcount(&residual);
@@ -1445,19 +1443,18 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* -------------------------------------------------------------------- */
     /* Determine the active vertices in the projection */
-    IGRAPH_CHECK(igraph_vector_bool_init(&VE1bool, proj_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &VE1bool);
+    IGRAPH_BITSET_INIT_FINALLY(&VE1bool, proj_nodes);
     for (i = 0; i < no_of_edges; i++) {
         if (VECTOR(flow)[i] > 0) {
             igraph_integer_t from = IGRAPH_FROM(graph, i);
             igraph_integer_t to = IGRAPH_TO(graph, i);
             igraph_integer_t pfrom = VECTOR(NtoL)[from];
             igraph_integer_t pto = VECTOR(NtoL)[to];
-            if (!VECTOR(VE1bool)[pfrom]) {
-                VECTOR(VE1bool)[pfrom] = true;
+            if (!IGRAPH_BIT_TEST(VE1bool, pfrom)) {
+                IGRAPH_BIT_SET(VE1bool, pfrom);
             }
-            if (!VECTOR(VE1bool)[pto]) {
-                VECTOR(VE1bool)[pto] = true;
+            if (!IGRAPH_BIT_TEST(VE1bool, pto)) {
+                IGRAPH_BIT_SET(VE1bool, pto);
             }
         }
     }
@@ -1561,7 +1558,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_vector_int_destroy(&cut);
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
-    igraph_vector_bool_destroy(&VE1bool);
+    igraph_bitset_destroy(&VE1bool);
     igraph_vector_int_destroy(&NtoL);
     igraph_destroy(&residual);
     igraph_vector_destroy(&flow);

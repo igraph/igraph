@@ -115,6 +115,21 @@ int main(void) {
     igraph_vector_destroy(&v2);
     igraph_vector_destroy(&v3);
 
+    igraph_vector_init_range(&v1, 0, 50);
+    igraph_vector_init_range(&v2, 20, 23);
+    igraph_vector_init(&v3, 0);
+
+    igraph_vector_intersect_sorted(&v1, &v2, &v3);
+    print_vector_format(&v3, stdout, "%g");
+    igraph_vector_difference_sorted(&v1, &v2, &v3);
+    print_vector_format(&v3, stdout, "%g");
+    igraph_vector_difference_sorted(&v2, &v1, &v3);
+    print_vector_format(&v3, stdout, "%g");
+
+    igraph_vector_destroy(&v1);
+    igraph_vector_destroy(&v2);
+    igraph_vector_destroy(&v3);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

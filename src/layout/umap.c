@@ -163,7 +163,6 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * for more information.
  *
  * </para><para>
- *
  * An early step in UMAP is to compute exponentially decaying "weights" from the
  * distance graph. Connectivities can also be viewed as edge weights that quantify
  * similarity between two vertices. This function computes weights from the
@@ -171,12 +170,12 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * \ref igraph_layout_umap() with the \p distances_are_weights argument set to \c true.
  *
  * </para><para>
- *
  * While the distance graph can be directed (e.g. in a k-nearest neighbors, it is
- * clear *who* you are a neighbor of), the weights are usually undirected. Whenever two
- * vertices are doubly connected in the distance graph, the resulting weight W is set as:
+ * clear \em whom you are a neighbor of), the weights are usually undirected. Whenever two
+ * vertices are doubly connected in the distance graph, the resulting weight \c W is set as:
  *
- * W = W1 + W2 - W1 * W2
+ * </para><para>
+ * <code>W = W1 + W2 - W1 * W2</code>
  *
  * Because UMAP weights are interpreted as probabilities, this is just the probability
  * that either edge is present, without double counting. It is called "fuzzy union" in
@@ -188,7 +187,6 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * as 0, so that it will be skipped in the UMAP gradient descent later on.
  *
  * </para><para>
- *
  * Technical note: For each vertex, this function computes its scale factor (sigma),
  * its connectivity correction (rho), and finally the weights themselves.
  *
@@ -196,7 +194,9 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * References:
  *
  * </para><para>
- * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
+ * Leland McInnes, John Healy, and James Melville:
+ * UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction (2020)
+ * https://arxiv.org/abs/1802.03426
  *
  * \param graph Pointer to the distance graph. This can be directed (e.g. connecting
  *   each vertex to its neighbors in a k-nearest neighbor) or undirected, but must
@@ -211,8 +211,9 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  *   direction are present in the input graph, only one of the weights is set and the other
  *   is fixed to zero. That format is accepted by \ref igraph_layout_umap(), which skips
  *   all zero-weight edges from the layout optimization.
- *
  * \return Error code.
+ *
+ * \sa \ref igraph_layout_umap(), \ref igraph_layout_umap_3d()
  */
 igraph_error_t igraph_layout_umap_compute_weights(
         const igraph_t *graph,
@@ -1157,7 +1158,6 @@ static igraph_error_t igraph_i_layout_umap(
  * graph layout algorithm as well.
  *
  * </para><para>
- *
  * The general UMAP workflow is to start from vectors, compute a sparse distance
  * graph that only contains edges between simiar points (e.g. a k-nearest neighbors
  * graph), and then convert these distances into exponentially decaying weights
@@ -1166,28 +1166,29 @@ static igraph_error_t igraph_i_layout_umap(
  * all weights will be set to 1.
  *
  * </para><para>
- *
  * If you are trying to use this function to embed high-dimensional vectors, you should
  * first compute a k-nearest neighbors graph between your vectors and compute the
  * associated distances, and then call this function on that graph. If you already
  * have a distance graph, or you have a graph with no distances, you can call this
  * function directly. If you already have a graph with meaningful weights
  * associated to each edge, you can also call this function, but set the argument
- * distances_are_weights to true. To compute weights from distances
+ * \p distances_are_weights to true. To compute weights from distances
  * without computing the layout, see \ref igraph_layout_umap_compute_weights().
  *
  * </para><para>
  * References:
  *
  * </para><para>
- * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
-
+ * Leland McInnes, John Healy, and James Melville:
+ * UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction (2020)
+ * https://arxiv.org/abs/1802.03426
+ *
  * \param graph Pointer to the graph to find a layout for (i.e. to embed). This is
  *   typically a sparse graph with only edges for the shortest distances stored, e.g.
  *   a k-nearest neighbors graph.
  * \param res Pointer to the n by 2 matrix where the layout coordinates will be stored.
- * \param use_seed Logical, if true the supplied values in the \p res argument are used
- *   as an initial layout, if false a random initial layout is used.
+ * \param use_seed Logical, if \c true the supplied values in the \p res argument are
+ *   used as an initial layout, if \c false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all weights will be set to 1.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices
@@ -1196,10 +1197,12 @@ static igraph_error_t igraph_i_layout_umap(
  * \param epochs Number of iterations of the main stochastic gradient descent loop on
  *   the cross-entropy. Typical values are between 30 and 500.
  * \param distances_are_weights Whether to use precomputed weights. If
- *   true, the "distances" vector contains precomputed weights. If false (the
+ *   true, the \p distances vector contains precomputed weights. If \c false (the
  *   typical use case), this function will compute weights from distances and
  *   then use them to compute the layout.
  * \return Error code.
+ *
+ * \sa \ref igraph_layout_umap_3d()
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   igraph_matrix_t *res,
@@ -1218,8 +1221,6 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \brief 3D layout using UMAP.
  *
  * \experimental
- *
- * </para><para>
  *
  * This is the 3D version of the UMAP algorithm
  * (see \ref igraph_layout_umap() for the 2D version).
@@ -1241,10 +1242,12 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   the cross-entropy. Typical values are between 30 and 500.
  * \param distances_are_weights Whether to use precomputed weights. If \c false (the
  *   typical use case), this function will compute weights from distances and
- *   then use them to compute the layout.  If \c true, the "distances" vector contains
+ *   then use them to compute the layout.  If \c true, the \p distances vector contains
  *   precomputed weights, including possibly some weights equal to zero that are
  *   inconsequential for the layout optimization.
  * \return Error code.
+ *
+ * \sa \ref igraph_layout_umap()
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_matrix_t *res,

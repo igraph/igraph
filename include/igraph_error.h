@@ -232,6 +232,8 @@ __BEGIN_DECLS
  * enough. These functions should define their own error handlers and
  * restore the error handler before they return.
  * </para>
+ *
+ * \example examples/simple/igraph_contract_vertices.c
  */
 
 /**
@@ -260,28 +262,9 @@ __BEGIN_DECLS
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
- * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed (not used any more).
- * \enumval IGRAPH_ARPACK_NPOS N must be positive.
- * \enumval IGRAPH_ARPACK_NEVNPOS NEV must be positive.
- * \enumval IGRAPH_ARPACK_NCVSMALL NCV must be bigger.
- * \enumval IGRAPH_ARPACK_NONPOSI Maximum number of iterations should be positive.
- * \enumval IGRAPH_ARPACK_WHICHINV Invalid WHICH parameter.
- * \enumval IGRAPH_ARPACK_BMATINV Invalid BMAT parameter.
- * \enumval IGRAPH_ARPACK_WORKLSMALL WORKL is too small.
- * \enumval IGRAPH_ARPACK_TRIDERR LAPACK error in tridiagonal eigenvalue calculation.
- * \enumval IGRAPH_ARPACK_ZEROSTART Starting vector is zero.
- * \enumval IGRAPH_ARPACK_MODEINV MODE is invalid.
- * \enumval IGRAPH_ARPACK_MODEBMAT MODE and BMAT are not compatible.
- * \enumval IGRAPH_ARPACK_ISHIFT ISHIFT must be 0 or 1.
- * \enumval IGRAPH_ARPACK_NEVBE NEV and WHICH='BE' are incompatible.
- * \enumval IGRAPH_ARPACK_NOFACT Could not build an Arnoldi factorization.
- * \enumval IGRAPH_ARPACK_FAILED No eigenvalues to sufficient accuracy.
- * \enumval IGRAPH_ARPACK_HOWMNY HOWMNY is invalid.
- * \enumval IGRAPH_ARPACK_HOWMNYS HOWMNY='S' is not implemented.
- * \enumval IGRAPH_ARPACK_EVDIFF Different number of converged Ritz values.
- * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
- * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
- * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
+ * \enumval IGRAPH_ARPACK An error happened inside a calculation implemented
+ *   in ARPACK. The calculation involved is most likely an eigenvector-related
+ *   calculation.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
@@ -388,7 +371,7 @@ typedef void igraph_error_handler_t(const char *reason, const char *file,
  * program.
  */
 
-IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_abort;
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
@@ -499,7 +482,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
                                             int line, igraph_error_t igraph_errno,
                                             va_list ap);
 
-IGRAPH_EXPORT const char *igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(const igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -697,9 +680,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 #define IGRAPH_CHECK_CALLBACK(expr, code) \
     do { \
         igraph_error_t igraph_i_ret = (expr); \
-        if (code) { \
-            *(code) = igraph_i_ret; \
-        } \
+        *(code) = igraph_i_ret; \
         if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS && igraph_i_ret != IGRAPH_STOP)) { \
             IGRAPH_ERROR("", igraph_i_ret); \
         } \
@@ -860,7 +841,7 @@ IGRAPH_EXPORT igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_hand
  * The default fatal error handler, prints an error message and aborts the program.
  */
 
-IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN igraph_fatal_handler_t igraph_fatal_handler_abort;
 
 IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason,
                                                          const char *file, int line);

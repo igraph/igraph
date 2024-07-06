@@ -117,9 +117,9 @@ IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng
 IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed);
-IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng);
-IGRAPH_EXPORT igraph_uint_t igraph_rng_max(const igraph_rng_t *rng);
-IGRAPH_EXPORT const char *igraph_rng_name(const igraph_rng_t *rng);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_uint_t igraph_rng_max(const igraph_rng_t *rng);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_rng_name(const igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_integer_t igraph_rng_get_integer(
     igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h

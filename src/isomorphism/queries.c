@@ -20,7 +20,7 @@
 
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_interface.h"
 #include "igraph_structural.h"
@@ -159,33 +159,6 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
     }
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_isomorphic_34
- * \brief Graph isomorphism for 3-4 vertices (deprecated).
- *
- * \deprecated-by igraph_isomorphic 0.10.0
- *
- * If you really care about performance and you \em know for sure that your
- * input graphs are simple and have either 3 or 4 vertices for directed graphs,
- * or 3-6 vertices for undirected graphs, you can compare their isomorphism
- * classes obtained from \ref igraph_isoclass() directly instead of calling
- * \ref igraph_isomorphic(); this saves the cost of checking whether the graphs
- * do not contain multiple edges or self-loops.
- *
- * \param graph1 The first input graph.
- * \param graph2 The second input graph. Must have the same
- *   directedness as \p graph1.
- * \param iso Pointer to a boolean, the result is stored here.
- * \return Error code.
- *
- * Time complexity: O(1).
- */
-igraph_error_t igraph_isomorphic_34(
-    const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
-) {
-    return igraph_i_isomorphic_small(graph1, graph2, iso);
 }
 
 /**

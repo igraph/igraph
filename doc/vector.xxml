@@ -96,6 +96,7 @@
 <!-- doxrox-include igraph_vector_maxdifference -->
 <!-- doxrox-include igraph_vector_is_nan -->
 <!-- doxrox-include igraph_vector_is_any_nan -->
+<!-- doxrox-include igraph_vector_is_all_finite -->
 </section>
 
 <section id="vector-searching-for-elements"><title>Searching for elements</title>
@@ -136,6 +137,7 @@
 
 <section id="set-operations-on-sorted-vectors"><title>Set operations on sorted vectors</title>
 <!-- doxrox-include igraph_vector_intersect_sorted -->
+<!-- doxrox-include igraph_vector_intersection_size_sorted -->
 <!-- doxrox-include igraph_vector_difference_sorted -->
 </section>
 
@@ -147,26 +149,22 @@
 <!-- doxrox-include igraph_vector_ptr_free_all -->
 <!-- doxrox-include igraph_vector_ptr_destroy_all -->
 <!-- doxrox-include igraph_vector_ptr_size -->
+<!-- doxrox-include igraph_vector_ptr_capacity -->
 <!-- doxrox-include igraph_vector_ptr_clear -->
+<!-- doxrox-include igraph_vector_ptr_reserve -->
+<!-- doxrox-include igraph_vector_ptr_resize -->
+<!-- doxrox-include igraph_vector_ptr_resize_min -->
 <!-- doxrox-include igraph_vector_ptr_push_back -->
 <!-- doxrox-include igraph_vector_ptr_pop_back -->
 <!-- doxrox-include igraph_vector_ptr_insert -->
 <!-- doxrox-include igraph_vector_ptr_get -->
 <!-- doxrox-include igraph_vector_ptr_set -->
-<!-- doxrox-include igraph_vector_ptr_resize -->
 <!-- doxrox-include igraph_vector_ptr_sort -->
 <!-- doxrox-include igraph_vector_ptr_sort_ind -->
 <!-- doxrox-include igraph_vector_ptr_permute -->
 <!-- doxrox-include igraph_vector_ptr_get_item_destructor -->
 <!-- doxrox-include igraph_vector_ptr_set_item_destructor -->
 <!-- doxrox-include IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR -->
-</section>
-
-<section id="vector-deprecated"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_vector_copy -->
-<!-- doxrox-include igraph_vector_e -->
-<!-- doxrox-include igraph_vector_e_ptr -->
-<!-- doxrox-include igraph_vector_init_seq -->
 </section>
 
 </section>

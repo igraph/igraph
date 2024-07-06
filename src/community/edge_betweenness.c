@@ -24,6 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
@@ -198,7 +199,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    the number of vertices in the graph. So if the first line
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
- *    component <code>n+1</code>, etc. The matrix will be resized as needed.
+ *    component <code>n + 1</code>, etc. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     \c NULL then the indices into \p edges of all edges which caused
  *     one of the merges will be put here. This is equal to all edge removals
@@ -328,20 +329,15 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 static igraph_integer_t igraph_i_which_max_active_ratio(
         const igraph_vector_t *v,
         const igraph_vector_t *w,
-        const bool *passive) {
+        igraph_bitset_t *passive) {
 
     const igraph_integer_t size = igraph_vector_size(v);
-    igraph_integer_t which, i = 0;
-    igraph_real_t max;
+    igraph_integer_t which = igraph_bitset_countr_one(passive); /* start with first active element */
+    igraph_real_t max = VECTOR(*v)[which] / (w ? VECTOR(*w)[which] : 1.0);
 
-    while (passive[i]) {
-        i++;
-    }
-    which = i;
-    max = VECTOR(*v)[which] / (w ? VECTOR(*w)[which] : 1.0);
-    for (i++; i < size; i++) {
+    for (igraph_integer_t i = which+1; i < size; i++) {
         igraph_real_t elem = VECTOR(*v)[i] / (w ? VECTOR(*w)[i] : 1.0);
-        if (!passive[i] && elem > max) {
+        if (! IGRAPH_BIT_TEST(*passive, i) && elem > max) {
             max = elem;
             which = i;
         }
@@ -359,15 +355,14 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * algorithm.
  *
  * </para><para>
- * The idea is that the betweenness of the edges connecting two
- * communities is typically high, as many of the shortest paths
- * between nodes in separate communities go through them. So we
- * gradually remove the edge with highest betweenness from the
- * network, and recalculate edge betweenness after every removal.
- * This way sooner or later the network splits into two components,
- * then after a while one of these components splits again into two smaller
- * components, and so on until all edges are removed. This is a divisive
- * hierarchical approach, the result of which is a dendrogram.
+ * The idea behind this method is that the betweenness of the edges connecting
+ * two communities is typically high, as many of the shortest paths between
+ * vertices in separate communities pass through them. The algorithm
+ * successively removes edges with the highest betweenness, recalculating
+ * betweenness values after each removal. This way eventually the network splits
+ * into two components, then one of these components splits again, and so on,
+ * until all edges are removed. The resulting hierarhical partitioning of the
+ * vertices can be encoded as a dendrogram.
  *
  * </para><para>
  * In directed graphs, when \p directed is set to true, the directed version
@@ -392,7 +387,7 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * see https://github.com/igraph/igraph/issues/2229 for additional details.
  *
  * </para><para>
- * References
+ * References:
  *
  * </para><para>
  * M. Girvan and M. E. J. Newman,
@@ -405,13 +400,14 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  * https://doi.org/10.1103/PhysRevE.70.056131
  *
  * \param graph The input graph.
- * \param removed_edges Pointer to an initialized vector, the result will be
- *     stored here, the IDs of the removed edges in the order of their
- *     removal. It will be resized as needed. It may be \c NULL if
+ * \param removed_edges Pointer to an initialized integer vector, which will
+ *     be resized as needed. The IDs of the removed edges in the order of their
+ *     removal will be stored here. This vector is suitable as input to
+ *     \ref igraph_community_eb_get_merges(). This parameter may be \c NULL if
  *     the edge IDs are not needed by the caller.
  * \param edge_betweenness Pointer to an initialized vector or
  *     \c NULL. In the former case the edge betweenness of the removed
- *     edge is stored here. The vector will be resized as needed.
+ *     edges is stored here. The vector will be resized as needed.
  *     Note that the betweenness values stored here are \em not divided
  *     by weights.
  * \param merges Pointer to an initialized matrix or \c NULL. If not \c NULL
@@ -476,8 +472,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_bool_t result_owned = false;
     igraph_stack_int_t stack;
     igraph_real_t steps, steps_done;
-
-    bool *passive;
+    igraph_bitset_t passive;
 
     /* Needed only for the unweighted case */
     igraph_dqueue_int_t q;
@@ -574,10 +569,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
-
-    passive = IGRAPH_CALLOC(no_of_edges, bool);
-    IGRAPH_CHECK_OOM(passive, "Insufficient memory for edge betweenness-based community detection.");
-    IGRAPH_FINALLY(igraph_free, passive);
+    IGRAPH_BITSET_INIT_FINALLY(&passive, no_of_edges);
 
     /* Estimate the number of steps to be taken.
      * It is assumed that one iteration is O(|E||V|), but |V| is constant
@@ -750,7 +742,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         /* Now look for the smallest edge betweenness */
         /* and eliminate that edge from the network */
-        maxedge = igraph_i_which_max_active_ratio(&eb, weights, passive);
+        maxedge = igraph_i_which_max_active_ratio(&eb, weights, &passive);
         VECTOR(*removed_edges)[e] = maxedge;
         if (edge_betweenness) {
             VECTOR(*edge_betweenness)[e] = VECTOR(eb)[maxedge];
@@ -758,7 +750,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 VECTOR(*edge_betweenness)[e] /= 2.0;
             }
         }
-        passive[maxedge] = true;
+        IGRAPH_BIT_SET(passive, maxedge);
         IGRAPH_CHECK(igraph_edge(graph, maxedge, &from, &to));
 
         neip = igraph_inclist_get(elist_in_p, to);
@@ -776,7 +768,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);
 
-    IGRAPH_FREE(passive);
+    igraph_bitset_destroy(&passive);
     igraph_vector_destroy(&eb);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(3);

@@ -1,0 +1,8 @@
+*Network "C_3 cycle graph"
+*Vertices 3
+1 "Alice"
+2 "Bob"
+3 "Cedric"
+*Edgeslist
+1 2 3
+2 3

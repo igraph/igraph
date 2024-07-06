@@ -39,8 +39,8 @@ int main(void) {
     igraph_vector_init(&vector, 0);
 
     /* Compute eigenvector centrality. */
-    igraph_eigenvector_centrality(&graph, &vector, &value, IGRAPH_UNDIRECTED,
-                                  /*scale=*/ true, &weights, /*options=*/ NULL);
+    igraph_eigenvector_centrality(&graph, &vector, &value, IGRAPH_OUT,
+                                  &weights, /*options=*/ NULL);
 
     /* Print results. */
     printf("eigenvalue: %g\n", value);

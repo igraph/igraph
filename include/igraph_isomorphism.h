@@ -21,8 +21,8 @@
 
 */
 
-#ifndef IGRAPH_TOPOLOGY_H
-#define IGRAPH_TOPOLOGY_H
+#ifndef IGRAPH_ISOMORPHISM_H
+#define IGRAPH_ISOMORPHISM_H
 
 #include "igraph_decls.h"
 #include "igraph_constants.h"
@@ -33,15 +33,6 @@
 
 __BEGIN_DECLS
 
-/* -------------------------------------------------- */
-/* Directed acyclic graphs                            */
-/* -------------------------------------------------- */
-
-IGRAPH_EXPORT igraph_error_t igraph_topological_sorting(
-    const igraph_t *graph, igraph_vector_int_t *res, igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
-                                                igraph_t *closure);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */
@@ -166,17 +157,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_isomorphisms_vf2_callback(
     igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
     igraph_isocompat_t *edge_compat_fn, void *arg
 );
-
-/* Deprecated alias to igraph_get_isomorphisms_vf2_callback(), will be removed in 0.11 */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_isomorphic_function_vf2(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-);
-
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
                                            const igraph_vector_int_t *vertex_color1,
                                            const igraph_vector_int_t *vertex_color2,
@@ -208,16 +188,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *grap
                                                  igraph_isocompat_t *edge_compat_fn,
                                                  void *arg);
 IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2_callback(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-);
-
-/* Deprecated alias to igraph_get_subisomorphisms_vf2_callback(), will be removed in 0.11 */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subisomorphic_function_vf2(
     const igraph_t *graph1, const igraph_t *graph2,
     const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
     const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
@@ -302,8 +272,6 @@ IGRAPH_EXPORT igraph_error_t igraph_automorphism_group_bliss(
 );
 
 /* Functions for small graphs (<= 4 vertices for directed graphs, <= 6 for undirected graphs) */
-IGRAPH_EXPORT igraph_error_t igraph_isomorphic_small(const igraph_t *graph1, const igraph_t *graph2,
-                                       igraph_bool_t *iso);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
                                            igraph_integer_t *isoclass);
@@ -311,12 +279,6 @@ IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_inte
                                          igraph_integer_t number, igraph_bool_t directed);
 
 IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count);
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_isomorphic_34(
-    const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
-);
-
-
 
 __END_DECLS
 

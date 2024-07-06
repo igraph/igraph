@@ -25,7 +25,7 @@ int main(void) {
     igraph_integer_t n_vertices = 10;
 
     /* Create an undirected complete graph. */
-    /* Use IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS instead of 1/TRUE and 0/FALSE for better readability. */
+    /* Use IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS instead of true and false for better readability. */
     igraph_full(&graph, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     printf("The undirected complete graph on %" IGRAPH_PRId " vertices has %" IGRAPH_PRId " edges.\n",
           igraph_vcount(&graph), igraph_ecount(&graph));

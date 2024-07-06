@@ -218,12 +218,14 @@ IGRAPH_EXPORT igraph_error_t igraph_community_fluid_communities(const igraph_t *
                                                      igraph_integer_t no_of_communities,
                                                      igraph_vector_int_t *membership);
 
+
 IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_int_t *membership,
                                                      igraph_neimode_t mode,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_int_t *initial,
-                                                     const igraph_vector_bool_t *fixed);
+                                                     const igraph_vector_bool_t *fixed,
+                                                     igraph_lpa_variant_t variant);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               const igraph_vector_t *weights,

@@ -28,6 +28,7 @@
 #include "igraph_conversion.h"
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
+#include "igraph_cycles.h"
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
@@ -35,7 +36,6 @@
 #include "igraph_progress.h"
 #include "igraph_operators.h"
 #include "igraph_structural.h"
-#include "igraph_topology.h"
 
 #include "core/buckets.h"
 #include "core/cutheap.h"

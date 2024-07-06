@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,13 +13,11 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
+#include <stdio.h>
 
 int main(void) {
 
@@ -29,7 +25,6 @@ int main(void) {
     igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
     igraph_vector_t x;
-    igraph_arpack_options_t options;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -54,15 +49,18 @@ int main(void) {
     igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_int_init(&membership, 0);
     igraph_vector_init(&x, 0);
-    igraph_arpack_options_init(&options);
 
-    igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges,
-                                         &membership, 1,
-                                         &options, /*modularity=*/ 0,
-                                         /*start=*/ 0, /*eigenvalues=*/ 0,
-                                         /*eigenvectors=*/ 0, /*history=*/ 0,
-                                         /*callback=*/ 0,
-                                         /*callback_extra=*/ 0);
+    igraph_community_leading_eigenvector(&g, /*weights=*/ NULL,
+                                         &merges, &membership,
+                                         /*stpes=*/ 1,
+                                         /*options=*/ NULL,
+                                         /*modularity=*/ NULL,
+                                         /*start=*/ NULL,
+                                         /*eigenvalues=*/ NULL,
+                                         /*eigenvectors=*/ NULL,
+                                         /*history=*/ NULL,
+                                         /*callback=*/ NULL,
+                                         /*callback_extra=*/ NULL);
 
     igraph_matrix_int_print(&merges);
     igraph_vector_int_print(&membership);
@@ -70,13 +68,17 @@ int main(void) {
     printf("\n");
 
     /* Make all the steps */
-    igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges,
-                                         &membership, igraph_vcount(&g),
-                                         &options, /*modularity=*/ 0,
-                                         /*start=*/ 0, /*eigenvalues=*/ 0,
-                                         /*eigenvectors=*/ 0, /*history=*/ 0,
-                                         /*callback=*/ 0,
-                                         /*callback_extra=*/ 0);
+    igraph_community_leading_eigenvector(&g, /*weights=*/ NULL,
+                                         &merges, &membership,
+                                         /*steps=*/ igraph_vcount(&g),
+                                         /*options=*/ NULL,
+                                         /*modularity=*/ NULL,
+                                         /*start=*/ NULL,
+                                         /*eigenvalues=*/ NULL,
+                                         /*eigenvectors=*/ NULL,
+                                         /*history=*/ NULL,
+                                         /*callback=*/ NULL,
+                                         /*callback_extra=*/ NULL);
 
     igraph_matrix_int_print(&merges);
     igraph_vector_int_print(&membership);

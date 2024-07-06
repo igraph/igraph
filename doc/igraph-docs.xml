@@ -101,6 +101,7 @@
     <xi:include href="vectorlist.xml"/>
     <xi:include href="adjlist.xml"/>
     <xi:include href="psumtree.xml"/>
+    <xi:include href="bitset.xml"/>
   </chapter>
 
   <xi:include href="random.xml"/>

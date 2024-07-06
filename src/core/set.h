@@ -51,13 +51,13 @@ typedef struct s_set {
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_init(igraph_set_t* set, igraph_integer_t size);
 IGRAPH_PRIVATE_EXPORT void igraph_set_destroy(igraph_set_t* set);
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_inited(igraph_set_t* set);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_set_inited(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t size);
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_empty(const igraph_set_t* set);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_set_empty(const igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT void igraph_set_clear(igraph_set_t* set);
-IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_set_size(const igraph_set_t* set);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_set_size(const igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_add(igraph_set_t* v, igraph_integer_t e);
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t* state,
                                                        igraph_integer_t* element);
 

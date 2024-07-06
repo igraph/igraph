@@ -125,20 +125,20 @@ jobs:
 
   - job: windows_static
     pool:
-       vmImage: windows-2022
+       vmImage: windows-latest
 
     steps:
       - template: .azure/build-win.yml
 
   - job: windows_shared
     pool:
-       vmImage: windows-2022
+       vmImage: windows-latest
 
     steps:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
-          vsver: '14.29' # use VS 2019 instead of 2017
+          vsver: '14.4' # latest VS2022
           vcpkg_target_triplet: x64-windows
 
   - job: documentation

@@ -40,6 +40,8 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 add_library(
   igraph
   core/array.c
+  core/bitset.c
+  core/bitset_list.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c
@@ -113,6 +115,7 @@ add_library(
 
   games/barabasi.c
   games/callaway_traits.c
+  games/chung_lu.c
   games/citations.c
   games/correlated.c
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
@@ -177,6 +180,7 @@ add_library(
   connectivity/cohesive_blocks.c
   connectivity/components.c
   connectivity/separators.c
+  connectivity/reachability.c
 
   flow/flow.c
   flow/flow_conversion.c
@@ -308,7 +312,6 @@ add_library(
   internal/qsort_r.c
   internal/qsort.c
   internal/utils.c
-  internal/zeroin.c
 
   version.c
 
@@ -326,7 +329,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.6")
+set_target_properties(igraph PROPERTIES VERSION "3.1.8")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

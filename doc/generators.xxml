@@ -19,6 +19,7 @@
 <!-- doxrox-include igraph_adjlist -->
 <!-- doxrox-include igraph_star -->
 <!-- doxrox-include igraph_wheel -->
+<!-- doxrox-include igraph_hypercube -->
 <!-- doxrox-include igraph_square_lattice -->
 <!-- doxrox-include igraph_triangular_lattice -->
 <!-- doxrox-include igraph_hexagonal_lattice -->
@@ -26,6 +27,7 @@
 <!-- doxrox-include igraph_kary_tree -->
 <!-- doxrox-include igraph_symmetric_tree -->
 <!-- doxrox-include igraph_regular_tree -->
+<!-- doxrox-include igraph_tree_from_parent_vector -->
 <!-- doxrox-include igraph_full -->
 <!-- doxrox-include igraph_full_citation -->
 <!-- doxrox-include igraph_full_multipartite -->
@@ -57,6 +59,7 @@
 <!-- doxrox-include igraph_k_regular_game -->
 <!-- doxrox-include igraph_static_fitness_game -->
 <!-- doxrox-include igraph_static_power_law_game -->
+<!-- doxrox-include igraph_chung_lu_game -->
 <!-- doxrox-include igraph_forest_fire_game -->
 <!-- doxrox-include igraph_rewire -->
 <!-- doxrox-include igraph_growing_random_game -->
@@ -78,12 +81,6 @@
 <!-- doxrox-include igraph_correlated_game -->
 <!-- doxrox-include igraph_correlated_pair_game -->
 <!-- doxrox-include igraph_simple_interconnected_islands_game -->
-</section>
-
-<section id="deprecated-graph-generators"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_erdos_renyi_game -->
-<!-- doxrox-include igraph_lattice -->
-<!-- doxrox-include igraph_tree -->
 </section>
 
 </chapter>

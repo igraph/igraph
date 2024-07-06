@@ -27,6 +27,8 @@
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
 
+#include "math/safe_intop.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdint.h>         /* uintptr_t */
 #include <stdlib.h>
@@ -205,10 +207,10 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_reserve
  * \brief Reserves memory for a pointer vector for later use.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \return Error code.
  */
 
 igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_t capacity) {
@@ -230,6 +232,39 @@ igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_
     v->end = v->stor_begin + actual_size;
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_resize_min
+ * \brief Deallocate the unused memory of a pointer vector.
+ *
+ * This function attempts to deallocate the unused reserved storage
+ * of a pointer vector. If it succeeds, \ref igraph_vector_ptr_size() and
+ * \ref igraph_vector_ptr_capacity() will be the same. The data in the
+ * pointer vector is always preserved, even if deallocation is not successful.
+ *
+ * \param v Pointer to an initialized pointer vector.
+ *
+ * \sa \ref igraph_vector_ptr_resize(), \ref igraph_vector_ptr_reserve().
+ *
+ * Time complexity: operating system dependent, O(n) at worst.
+ */
+
+void igraph_vector_ptr_resize_min(igraph_vector_ptr_t* v) {
+    igraph_integer_t size;
+    void **tmp;
+    if (v->stor_end == v->end) {
+        return;
+    }
+
+    size = (v->end - v->stor_begin);
+    tmp = IGRAPH_REALLOC(v->stor_begin, size, void *);
+
+    if (tmp != NULL) {
+        v->stor_begin = tmp;
+        v->stor_end = v->end = v->stor_begin + size;
+    }
 }
 
 /**
@@ -256,8 +291,25 @@ igraph_bool_t igraph_vector_ptr_empty(const igraph_vector_ptr_t* v) {
 
 igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
     IGRAPH_ASSERT(v != NULL);
-    /*  IGRAPH_ASSERT(v->stor_begin != NULL);       */ /* TODO */
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->end - v->stor_begin;
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_capacity
+ * \brief Returns the allocated capacity of the pointer vector.
+ *
+ * \param v The pointer vector object.
+ * \return The allocated capacity.
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t igraph_vector_ptr_capacity(const igraph_vector_ptr_t* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_end - v->stor_begin;
 }
 
 /**
@@ -577,14 +629,24 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
 }
 
 igraph_error_t igraph_vector_ptr_append(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    igraph_integer_t origsize = igraph_vector_ptr_size(to);
-    igraph_integer_t othersize = igraph_vector_ptr_size(from);
-    igraph_integer_t i;
+    const igraph_integer_t to_size = igraph_vector_ptr_size(to);
+    const igraph_integer_t from_size = igraph_vector_ptr_size(from);
+    const igraph_integer_t to_capacity = igraph_vector_ptr_capacity(to);
+    igraph_integer_t new_to_size;
 
-    IGRAPH_CHECK(igraph_vector_ptr_resize(to, origsize + othersize));
-    for (i = 0; i < othersize; i++, origsize++) {
-        to->stor_begin[origsize] = from->stor_begin[i];
+    IGRAPH_SAFE_ADD(to_size, from_size, &new_to_size);
+
+    if (to_capacity < new_to_size) {
+        igraph_integer_t new_to_capacity = to_capacity < IGRAPH_INTEGER_MAX/2 ? to_capacity * 2 : IGRAPH_INTEGER_MAX;
+        if (new_to_capacity < new_to_size) {
+            new_to_capacity = new_to_size;
+        }
+        IGRAPH_CHECK(igraph_vector_ptr_reserve(to, new_to_capacity));
     }
+
+    memcpy(to->stor_begin + to_size, from->stor_begin,
+           sizeof(void *) * from_size);
+    to->end = to->stor_begin + new_to_size;
 
     return IGRAPH_SUCCESS;
 }

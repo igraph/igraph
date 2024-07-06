@@ -31,6 +31,7 @@
 __BEGIN_DECLS
 
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector);
+void igraph_i_vector_scale_by_max_abs(igraph_vector_t *vec);
 
 __END_DECLS
 

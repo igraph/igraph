@@ -39,24 +39,6 @@
 #define IGRAPH_DIMACS_MAX_EDGE_COUNT   INT32_MAX
 #endif
 
-/**
- * \function igraph_read_graph_dimacs
- * \brief Read a graph in DIMACS format (deprecated alias).
- *
- * \deprecated-by igraph_read_graph_dimacs_flow 0.10.0
- */
-igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
-                             igraph_strvector_t *problem,
-                             igraph_vector_int_t *label,
-                             igraph_integer_t *source,
-                             igraph_integer_t *target,
-                             igraph_vector_t *capacity,
-                             igraph_bool_t directed) {
-    return igraph_read_graph_dimacs_flow(
-        graph, instream, problem, label, source, target, capacity, directed
-    );
-}
-
 #define EXPECT(actual, expected) \
     do { \
         if ((actual) != (expected)) { \
@@ -120,7 +102,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  * Time complexity: O(|V|+|E|+c), the number of vertices plus the
  * number of edges, plus the size of the file in characters.
  *
- * \sa \ref igraph_write_graph_dimacs()
+ * \sa \ref igraph_write_graph_dimacs_flow()
  */
 igraph_error_t igraph_read_graph_dimacs_flow(
         igraph_t *graph, FILE *instream,
@@ -303,18 +285,6 @@ igraph_error_t igraph_read_graph_dimacs_flow(
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_write_graph_dimacs
- * \brief Write a graph in DIMACS format (deprecated alias).
- *
- * \deprecated-by igraph_write_graph_dimacs_flow 0.10.0
- */
-igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
-                              igraph_integer_t source, igraph_integer_t target,
-                              const igraph_vector_t *capacity) {
-    return igraph_write_graph_dimacs_flow(graph, outstream, source, target, capacity);
 }
 
 /**

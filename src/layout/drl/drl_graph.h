@@ -65,7 +65,7 @@ public:
     void scan_int ( char *filename );
     void read_int ( char *file_name );
     void draw_graph ( int int_out, char *coord_file );
-    int draw_graph (igraph_matrix_t *res);
+    igraph_error_t draw_graph(igraph_matrix_t *res);
     void write_coord ( const char *file_name );
     void write_sim ( const char *file_name );
     float get_tot_energy ( );

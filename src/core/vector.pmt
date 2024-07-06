@@ -171,9 +171,9 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
  * Time complexity: O(1)
  */
 
-const TYPE(igraph_vector)* FUNCTION(igraph_vector, view) (const TYPE(igraph_vector) *v,
+const TYPE(igraph_vector)* FUNCTION(igraph_vector, view)(const TYPE(igraph_vector) *v,
         const BASE *data, igraph_integer_t length) {
-    const static BASE dummy = ZERO;
+    static const BASE dummy = ZERO;
     TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
 
     /* When the length is zero, we allow 'data' to be NULL.
@@ -560,7 +560,7 @@ void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v) {
  * complexity of memory allocation is at most linear.)
  */
 
-igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e) {
+igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vector)* v, BASE e) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
@@ -673,36 +673,6 @@ BASE* FUNCTION(igraph_vector, get_ptr)  (const TYPE(igraph_vector)* v, igraph_in
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->stor_begin + pos;
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_e
- * \brief Access an element of a vector (deprecated alias).
- *
- * \deprecated-by igraph_vector_get 0.10.0
- */
-
-BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
-    return FUNCTION(igraph_vector, get)(v, pos);
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_e_ptr
- * \brief Get the address of an element of a vector.
- *
- * \param v The \type igraph_vector_t object.
- * \param pos The position of the element, the position of the first
- *   element is zero.
- * \return Pointer to the desired element.
- * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
- *
- * Time complexity: O(1).
- */
-
-BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_integer_t pos) {
-    return FUNCTION(igraph_vector, get_ptr)(v, pos);
 }
 
 /**
@@ -1020,10 +990,10 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
  * \function igraph_vector_qsort_ind
  * \brief Returns a permutation of indices that sorts a vector.
  *
- * Takes an unsorted array \c v as input and computes an array of
- * indices inds such that v[ inds[i] ], with i increasing from 0, is
- * an ordered array (either ascending or descending, depending on
- * \v order). The order of indices for identical elements is not
+ * Takes an unsorted array \c v as input and computes an array of indices
+ * \p inds such that <code>v[ inds[i] ]</code>, with \c i increasing from 0,
+ * is an ordered array (either ascending or descending, depending on
+ * \p order). The order of indices for identical elements is not
  * defined. If the vector contains any NaN values, the ordering of
  * NaN values is undefined.
  *
@@ -1553,19 +1523,6 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(
 
 /**
  * \ingroup vector
- * \function igraph_vector_copy
- * \brief Initializes a vector from another vector object (deprecated alias).
- *
- * \deprecated-by igraph_vector_init_copy 0.10
- */
-
-igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                  const TYPE(igraph_vector) *from) {
-    return FUNCTION(igraph_vector, init_copy)(to, from);
-}
-
-/**
- * \ingroup vector
  * \function igraph_vector_sum
  * \brief Calculates the sum of the elements in the vector.
  *
@@ -1677,38 +1634,6 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 }
 
 #ifndef NOTORDERED
-
-/**
- * \ingroup vector
- * \function igraph_vector_init_seq
- * \brief Initializes a vector with a sequence, inclusive endpoints (deprecated).
- *
- * </para><para>
- * The vector will contain the numbers \p from, \p from+1, ..., \p to. Note that
- * both endpoints are \em inclusive, contrary to typical usage of ranges in C.
- *
- * \deprecated-by igraph_vector_init_range 0.10.0
- *
- * \param v Pointer to an uninitialized vector object.
- * \param from The lower limit in the sequence (inclusive).
- * \param to The upper limit in the sequence (inclusive).
- * \return Error code:
- *         \c IGRAPH_ENOMEM: out of memory.
- *
- * Time complexity: O(n), the number
- * of elements in the vector.
- */
-
-igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v, BASE from, BASE to) {
-    BASE *p;
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
-
-    for (p = v->stor_begin; p < v->end; p++) {
-        *p = from++;
-    }
-
-    return IGRAPH_SUCCESS;
-}
 
 /**
  * \ingroup vector
@@ -1854,14 +1779,6 @@ igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
            sizeof(BASE) * (end - begin));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \deprecated-by igraph_vector_move_interval 0.10.0
- */
-igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
-        igraph_integer_t begin, igraph_integer_t end, igraph_integer_t to) {
-    return FUNCTION(igraph_vector, move_interval)(v, begin, end, to);
 }
 
 #ifndef NOTORDERED
@@ -2137,7 +2054,7 @@ FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
 
 #ifndef NOTORDERED
 
-igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, igraph_integer_t *pos, igraph_integer_t start, igraph_integer_t end);
 
 /**
@@ -2220,7 +2137,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(const TYPE(igraph_vector)
     return FUNCTION(igraph_i_vector, binsearch_slice)(v, what, pos, start, end);
 }
 
-igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, igraph_integer_t *pos, igraph_integer_t start, igraph_integer_t end) {
     igraph_integer_t left  = start;
     igraph_integer_t right = end - 1;
@@ -2445,17 +2362,28 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
  */
 
 igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
-                                    const TYPE(igraph_vector) *from) {
-    igraph_integer_t tosize, fromsize;
-    igraph_integer_t newsize;
+                                               const TYPE(igraph_vector) *from) {
+    IGRAPH_ASSERT(to != NULL);
+    IGRAPH_ASSERT(to->stor_begin != NULL);
 
-    tosize = FUNCTION(igraph_vector, size)(to);
-    fromsize = FUNCTION(igraph_vector, size)(from);
-    IGRAPH_SAFE_ADD(tosize, fromsize, &newsize);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, newsize));
-    memcpy(to->stor_begin + tosize, from->stor_begin,
-           sizeof(BASE) * fromsize);
-    to->end = to->stor_begin + tosize + fromsize;
+    const igraph_integer_t to_size = FUNCTION(igraph_vector, size)(to);
+    const igraph_integer_t from_size = FUNCTION(igraph_vector, size)(from);
+    const igraph_integer_t to_capacity = FUNCTION(igraph_vector, capacity)(to);
+    igraph_integer_t new_to_size;
+
+    IGRAPH_SAFE_ADD(to_size, from_size, &new_to_size);
+
+    if (to_capacity < new_to_size) {
+        igraph_integer_t new_to_capacity = to_capacity < IGRAPH_INTEGER_MAX/2 ? to_capacity * 2 : IGRAPH_INTEGER_MAX;
+        if (new_to_capacity < new_to_size) {
+            new_to_capacity = new_to_size;
+        }
+        IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(to, new_to_capacity));
+    }
+
+    memcpy(to->stor_begin + to_size, from->stor_begin,
+           sizeof(BASE) * from_size);
+    to->end = to->stor_begin + new_to_size;
 
     return IGRAPH_SUCCESS;
 }
@@ -2939,60 +2867,13 @@ igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v) {
 
 #ifndef NOTORDERED
 
-igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
-    const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
-    const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
-    TYPE(igraph_vector) *result);
 
-/**
- * \function igraph_vector_intersect_sorted
- * \brief Calculates the intersection of two sorted vectors.
- *
- * The elements that are contained in both vectors are stored in the result
- * vector. All three vectors must be initialized.
- *
- * </para><para>
- * Instead of the naive intersection which takes O(n), this function uses
- * the set intersection method of Ricardo Baeza-Yates, which is more efficient
- * when one of the vectors is significantly smaller than the other, and
- * gives similar performance on average when the two vectors are equal.
- *
- * </para><para>
- * The algorithm keeps the multiplicities of the elements: if an element appears
- * k1 times in the first vector and k2 times in the second, the result
- * will include that element min(k1, k2) times.
- *
- * </para><para>
- * Reference: Baeza-Yates R: A fast set intersection algorithm for sorted
- * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
- * 400--408, 2004. Springer Berlin/Heidelberg. ISBN: 978-3-540-22341-2.
- *
- * \param v1 the first vector
- * \param v2 the second vector
- * \param result the result vector, which will also be sorted.
- *
- * Time complexity: O(m log(n)) where m is the size of the smaller vector
- * and n is the size of the larger one.
+/*
+ * Sorted vector intersection
  */
-igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
-        const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
-    igraph_integer_t size1, size2;
 
-    size1 = FUNCTION(igraph_vector, size)(v1);
-    size2 = FUNCTION(igraph_vector, size)(v2);
-
-    FUNCTION(igraph_vector, clear)(result);
-
-    if (size1 == 0 || size2 == 0) {
-        return IGRAPH_SUCCESS;
-    }
-
-    IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                     v1, 0, size1, v2, 0, size2, result));
-    return IGRAPH_SUCCESS;
-}
-
-igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
+/* Recursive Baeza-Yates intersection algorithm for sorted vector intersection. */
+static igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
     const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
     const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
     TYPE(igraph_vector) *result) {
@@ -3009,36 +2890,231 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
         probe1 = begin1 + (size1 >> 1);      /* pick the median element */
         FUNCTION(igraph_i_vector, binsearch_slice)(v2, VECTOR(*v1)[probe1], &probe2, begin2, end2);
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, begin1, probe1, v2, begin2, probe2, result
-                     ));
+            v1, begin1, probe1, v2, begin2, probe2, result
+        ));
         if (!(probe2 == end2 || VECTOR(*v1)[probe1] < VECTOR(*v2)[probe2])) {
             IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, VECTOR(*v2)[probe2]));
             probe2++;
         }
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, probe1 + 1, end1, v2, probe2, end2, result
-                     ));
+            v1, probe1 + 1, end1, v2, probe2, end2, result
+        ));
     } else {
         probe2 = begin2 + (size2 >> 1);      /* pick the median element */
         FUNCTION(igraph_i_vector, binsearch_slice)(v1, VECTOR(*v2)[probe2], &probe1, begin1, end1);
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, begin1, probe1, v2, begin2, probe2, result
-                     ));
+            v1, begin1, probe1, v2, begin2, probe2, result
+        ));
         if (!(probe1 == end1 || VECTOR(*v2)[probe2] < VECTOR(*v1)[probe1])) {
             IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, VECTOR(*v2)[probe2]));
             probe1++;
         }
         IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
-                         v1, probe1, end1, v2, probe2 + 1, end2, result
-                     ));
+            v1, probe1, end1, v2, probe2 + 1, end2, result
+        ));
     }
 
     return IGRAPH_SUCCESS;
 }
 
 /**
+ * \function igraph_vector_intersect_sorted
+ * \brief Set intersection of two sorted vectors.
+ *
+ * The elements that are contained in both vectors are stored in the result
+ * vector. All three vectors must be initialized.
+ *
+ * </para><para>
+ * For similar-size vectors, this function uses a straightforward linear scan.
+ * When the vector sizes differ substantially, it uses the set intersection
+ * method of Ricardo Baeza-Yates, which takes logarithmic time in the length
+ * of the larger vector.
+ *
+ * </para><para>
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * \c k1 times in the first vector and \c k2 times in the second, the result
+ * will include that element <code>min(k1, k2)</code> times.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Baeza-Yates R: A fast set intersection algorithm for sorted
+ * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
+ * 400--408, 2004. Springer Berlin/Heidelberg.
+ * https://doi.org/10.1007/978-3-540-27801-6_30
+ *
+ * \param v1 The first vector
+ * \param v2 The second vector
+ * \param result The result vector, which will also be sorted.
+ * \return Error code.
+ *
+ * Time complexity: O(m log(n)) where m is the size of the smaller vector
+ * and n is the size of the larger one.
+ */
+igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
+        const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
+    igraph_integer_t size1, size2;
+    igraph_real_t r;
+
+    size1 = FUNCTION(igraph_vector, size)(v1);
+    size2 = FUNCTION(igraph_vector, size)(v2);
+
+    FUNCTION(igraph_vector, clear)(result);
+
+    if (size1 == 0 || size2 == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    r = size1 > size2 ? (igraph_real_t) size1 / size2 : (igraph_real_t) size2 / size1;
+
+    /* When the set size ratio is small, use a simple linear scan. See comments in
+     * igraph_vector_intersection_size_sorted() for the justification of this r threshold. */
+    if (r < 10) {
+        igraph_integer_t i1 = 0, i2 = 0;
+        while (i1 < size1 && i2 < size2) {
+            BASE e1 = VECTOR(*v1)[i1], e2 = VECTOR(*v2)[i2];
+            if (e1 < e2) {
+                i1++;
+            } else if (e1 > e2) {
+                i2++;
+            } else {
+                i1++; i2++;
+                IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, e1));
+            }
+        }
+    } else {
+        IGRAPH_CHECK(FUNCTION(igraph_i_vector, intersect_sorted)(
+                         v1, 0, size1, v2, 0, size2, result));
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/* Recursive Baeza-Yates intersection algorithm for sorted vector intersection size. */
+static void FUNCTION(igraph_i_vector, intersection_size_sorted)(
+    const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
+    const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
+    igraph_integer_t *result) {
+
+    igraph_integer_t size1, size2, probe1, probe2;
+
+    if (begin1 == end1 || begin2 == end2) {
+        return;
+    }
+
+    size1 = end1 - begin1;
+    size2 = end2 - begin2;
+
+    if (size1 < size2) {
+        probe1 = begin1 + (size1 >> 1);      /* pick the median element */
+        FUNCTION(igraph_i_vector, binsearch_slice)(v2, VECTOR(*v1)[probe1], &probe2, begin2, end2);
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, begin1, probe1, v2, begin2, probe2, result
+        );
+        if (!(probe2 == end2 || VECTOR(*v1)[probe1] < VECTOR(*v2)[probe2])) {
+            (*result)++;
+            probe2++;
+        }
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, probe1 + 1, end1, v2, probe2, end2, result
+        );
+    } else {
+        probe2 = begin2 + (size2 >> 1);      /* pick the median element */
+        FUNCTION(igraph_i_vector, binsearch_slice)(v1, VECTOR(*v2)[probe2], &probe1, begin1, end1);
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, begin1, probe1, v2, begin2, probe2, result
+        );
+        if (!(probe1 == end1 || VECTOR(*v2)[probe2] < VECTOR(*v1)[probe1])) {
+            (*result)++;
+            probe1++;
+        }
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, probe1, end1, v2, probe2 + 1, end2, result
+        );
+    }
+}
+
+/**
+ * \function igraph_vector_intersection_size_sorted
+ * \brief Intersection size of two sorted vectors.
+ *
+ * \experimental
+ *
+ * Counts elements that are present in both vectors. This is particularly
+ * useful for counting common neighbours of two vertices.
+ *
+ * </para><para>
+ * For similar-size vectors, this function uses a straightforward linear scan.
+ * When the vector sizes differ substantially, it uses the set intersection
+ * method of Ricardo Baeza-Yates, which takes logarithmic time in the length
+ * of the larger vector.
+ *
+ * </para><para>
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * \c k1 times in the first vector and \c k2 times in the second, the result
+ * will include that element <code>min(k1, k2)</code> times.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Baeza-Yates R: A fast set intersection algorithm for sorted
+ * sequences. In: Lecture Notes in Computer Science, vol. 3109/2004, pp.
+ * 400--408, 2004. Springer Berlin/Heidelberg.
+ * https://doi.org/10.1007/978-3-540-27801-6_30
+ *
+ * \param v1 The first vector
+ * \param v2 The second vector
+ * \return The number of common elements.
+ *
+ * Time complexity: O(m log(n)) where m is the size of the smaller vector
+ * and n is the size of the larger one.
+ */
+
+igraph_integer_t FUNCTION(igraph_vector, intersection_size_sorted)(
+        const TYPE(igraph_vector) *v1,
+        const TYPE(igraph_vector) *v2) {
+
+    igraph_integer_t size1, size2, count;
+    igraph_real_t r;
+
+    size1 = FUNCTION(igraph_vector, size)(v1);
+    size2 = FUNCTION(igraph_vector, size)(v2);
+
+    count = 0;
+
+    if (size1 == 0 || size2 == 0) {
+        return count;
+    }
+
+    r = size1 > size2 ? (igraph_real_t) size1 / size2 : (igraph_real_t) size2 / size1;
+
+    /* When the set size ratio is small, use a simple linear scan. The ideal ratio
+     * seems to be affected by processor cache effects. It depends on the machine,
+     * as well as on the input sizes. The threshold of 10 was determined empirically
+     * by using the intersection.c (direct) and igraph_ecc.c (indirect) benchmarks.
+     * See https://github.com/igraph/igraph/pull/2618 */
+    if (r < 10) {
+        /* This is a fast branchless implementation that uses arithmetic
+         * instead of conditionals. */
+        igraph_integer_t i1 = 0, i2 = 0;
+        while (i1 < size1 && i2 < size2) {
+            BASE e1 = VECTOR(*v1)[i1], e2 = VECTOR(*v2)[i2];
+            igraph_integer_t d1 = (e1 <= e2), d2 = (e1 >= e2);
+            i1 += d1; i2 += d2;
+            count += (d1 == d2);
+        }
+    } else {
+        FUNCTION(igraph_i_vector, intersection_size_sorted)(
+            v1, 0, size1, v2, 0, size2, &count);
+    }
+
+    return count;
+}
+
+/**
  * \function igraph_vector_difference_sorted
- * \brief Calculates the difference between two sorted vectors (considered as sets).
+ * \brief Set difference of two sorted vectors.
  *
  * The elements that are contained in only the first vector but not the second are
  * stored in the result vector. All three vectors must be initialized.

@@ -45,13 +45,14 @@
  * eigenvectors of matrices, Phys Rev E 74:036104 (2006).</para>
  *
  * <para>
- * The heart of the method is the definition of the modularity matrix,
- * B, which is B=A-P, A being the adjacency matrix of the (undirected)
- * network, and P contains the probability that certain edges are
- * present according to the <quote>configuration model</quote> In
- * other words, a Pij element of P is the probability that there is an
- * edge between vertices i and j in a random network in which the
- * degrees of all vertices are the same as in the input graph.</para>
+ * The heart of the method is the definition of the modularity matrix
+ * <code>B = A - P</code>, \c A being the adjacency matrix of the (undirected)
+ * network, and \c P contains the probability that certain edges are
+ * present according to the <quote>configuration model</quote>. In
+ * other words, a \c P_ij element of \c P is the probability that there is an
+ * edge between vertices \c i and \c j in a random network in which the
+ * degrees of all vertices are the same as in the input graph. See
+ * \ref igraph_modularity_matrix() for more details.</para>
  *
  * <para>
  * The leading eigenvector method works by calculating the eigenvector
@@ -252,11 +253,11 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    community detection functions in igraph, the integers in this matrix
  *    represent community indices, not vertex indices. If at the end of
  *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
- *    communities, then these are numbered from zero to <quote>p-1</quote>.
+ *    communities, then these are numbered from zero to <code>p-1</code>.
  *    The first line of the matrix contains the first <quote>merge</quote>
  *    (which is in reality the last split) of two communities into
- *    community <quote>p</quote>, the merge in the second line forms
- *    community <quote>p+1</quote>, etc. The matrix should be
+ *    community <code>p</code>, the merge in the second line forms
+ *    community <code>p+1</code>, etc. The matrix should be
  *    initialized before calling and will be resized as needed.
  *    This argument is ignored if it is \c NULL.
  * \param membership The membership of the vertices after all the

@@ -24,6 +24,7 @@
 #include "igraph_components.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -76,6 +77,8 @@ static igraph_error_t igraph_i_connected_components_strong(
  *
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of vertices
  * and edges in the graph.
+ *
+ * \example examples/simple/igraph_contract_vertices.c
  */
 
 igraph_error_t igraph_connected_components(
@@ -98,7 +101,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_components;
-    bool *already_added;
+    igraph_bitset_t already_added;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
 
@@ -118,8 +121,9 @@ static igraph_error_t igraph_i_connected_components_weak(
          * the null graph is considered disconnected, therefore any connected
          * graph has precisely one component. */
         if (membership) {
-            /* All vertices are members of the same component. */
-            igraph_vector_int_fill(membership, 0);
+            /* All vertices are members of the same component,
+             * component number 0. */
+            igraph_vector_int_null(membership);
         }
         if (csize) {
             /* The size of the single component is the same as the vertex count. */
@@ -132,10 +136,7 @@ static igraph_error_t igraph_i_connected_components_weak(
         return IGRAPH_SUCCESS;
     }
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
+    IGRAPH_BITSET_INIT_FINALLY(&already_added, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
@@ -145,12 +146,12 @@ static igraph_error_t igraph_i_connected_components_weak(
     for (igraph_integer_t first_node = 0; first_node < no_of_nodes; ++first_node) {
         igraph_integer_t act_component_size;
 
-        if (already_added[first_node]) {
+        if (IGRAPH_BIT_TEST(already_added, first_node)) {
             continue;
         }
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[first_node] = true;
+        IGRAPH_BIT_SET(already_added, first_node);
         act_component_size = 1;
         if (membership) {
             VECTOR(*membership)[first_node] = no_of_components;
@@ -163,11 +164,11 @@ static igraph_error_t igraph_i_connected_components_weak(
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
-                if (already_added[neighbor]) {
+                if (IGRAPH_BIT_TEST(already_added, neighbor)) {
                     continue;
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
-                already_added[neighbor] = true;
+                IGRAPH_BIT_SET(already_added, neighbor);
                 act_component_size++;
                 if (membership) {
                     VECTOR(*membership)[neighbor] = no_of_components;
@@ -188,7 +189,7 @@ static igraph_error_t igraph_i_connected_components_weak(
     }
 
     /* Clean up */
-    IGRAPH_FREE(already_added);
+    igraph_bitset_destroy(&already_added);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
@@ -227,8 +228,9 @@ static igraph_error_t igraph_i_connected_components_strong(
          * the null graph is considered disconnected, therefore any connected
          * graph has precisely one component. */
         if (membership) {
-            /* All vertices are members of the same component. */
-            igraph_vector_int_fill(membership, 0);
+            /* All vertices are members of the same component,
+             * component number 0. */
+            igraph_vector_int_null(membership);
         }
         if (csize) {
             /* The size of the single component is the same as the vertex count. */
@@ -477,11 +479,12 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 }
 
 static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t added_count;
-    bool *already_added;
-    igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
-    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
+    igraph_bitset_t already_added;
+    igraph_vector_int_t neis;
+    igraph_dqueue_int_t q;
 
     /* By convention, the null graph is not considered connected.
      * See https://github.com/igraph/igraph/issues/1538 */
@@ -496,56 +499,53 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
         goto exit;
     }
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for computing weakly connected components.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
+    IGRAPH_BITSET_INIT_FINALLY(&already_added, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 10);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     /* Try to find at least two components */
-    already_added[0] = true;
+    IGRAPH_BIT_SET(already_added, 0);
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
 
     added_count = 1;
-    while ( !igraph_dqueue_int_empty(&q)) {
+    while (! igraph_dqueue_int_empty(&q)) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+        const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
-        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {
-            igraph_integer_t neighbor = VECTOR(neis)[i];
-            if (already_added[neighbor]) {
+            const igraph_integer_t neighbor = VECTOR(neis)[i];
+            if (IGRAPH_BIT_TEST(already_added, neighbor)) {
                 continue;
             }
 
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
             added_count++;
-            already_added[neighbor] = true;
+            IGRAPH_BIT_SET(already_added, neighbor);
 
             if (added_count == no_of_nodes) {
                 /* We have already reached all nodes: the graph is connected.
                  * We can stop the traversal now. */
-                igraph_dqueue_int_clear(&q);
-                break;
+                goto done;
             }
         }
     }
 
+done:
     /* Connected? */
     *res = (added_count == no_of_nodes);
 
-    IGRAPH_FREE(already_added);
+    igraph_bitset_destroy(&already_added);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
 
 exit:
     igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, *res);
-    if (igraph_is_directed(graph) && *res == 0) {
+    if (igraph_is_directed(graph) && !(*res)) {
         /* If the graph is not weakly connected, it is not strongly connected
          * either so we can also cache that */
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
@@ -579,11 +579,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \param maxcompno The maximum number of components to return. The
  *    first \p maxcompno components will be returned (which hold at
  *    least \p minelements vertices, see the next parameter), the
- *    others will be ignored. Supply -1 here if you don't want to limit
- *    the number of components.
+ *    others will be ignored. Supply <code>-1</code> here if you don't
+ *    want to limit the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. Eg. supply 2 here to ignore isolated vertices.
+ *    vector. For example, supplying 2 here ignored isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *
@@ -614,7 +614,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_integer_t actstart;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t resco = 0;   /* number of graphs created so far */
-    bool *already_added;
+    igraph_bitset_t already_added;
     igraph_dqueue_int_t q;
     igraph_vector_int_t verts;
     igraph_vector_int_t neis;
@@ -630,10 +630,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_graph_list_clear(components);
 
     /* already_added keeps track of what nodes made it into a graph already */
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for decomponsing graph into connected components.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
+    IGRAPH_BITSET_INIT_FINALLY(&already_added, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
@@ -648,7 +645,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
        then switch to next node that has not been added already */
     for (actstart = 0; resco < maxcompno && actstart < no_of_nodes; actstart++) {
 
-        if (already_added[actstart]) {
+        if (IGRAPH_BIT_TEST(already_added, actstart)) {
             continue;
         }
         IGRAPH_ALLOW_INTERRUPTION();
@@ -656,7 +653,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         igraph_vector_int_clear(&verts);
 
         /* add the node itself */
-        already_added[actstart] = true;
+        IGRAPH_BIT_SET(already_added, actstart);
         IGRAPH_CHECK(igraph_vector_int_push_back(&verts, actstart));
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, actstart));
 
@@ -669,11 +666,11 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
             /* iterate over the neighbors */
             for (i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
-                if (already_added[neighbor]) {
+                if (IGRAPH_BIT_TEST(already_added, neighbor)) {
                     continue;
                 }
                 /* add neighbor */
-                already_added[neighbor] = true;
+                IGRAPH_BIT_SET(already_added, neighbor);
 
                 /* recursion: append neighbor to the queues */
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
@@ -707,7 +704,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&verts);
     igraph_dqueue_int_destroy(&q);
-    IGRAPH_FREE(already_added);
+    igraph_bitset_destroy(&already_added);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
@@ -989,16 +986,16 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * biconnected. Use \ref igraph_is_biconnected() for this purpose.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param no If not a NULL pointer, the number of biconnected components will
+ * \param no If not a \c NULL pointer, the number of biconnected components will
  *     be stored here.
- * \param tree_edges If not a NULL pointer, then the found components
+ * \param tree_edges If not a \c NULL pointer, then the found components
  *     are stored here, in a list of vectors. Every vector in the list
  *     is a biconnected component, represented by its edges. More precisely,
  *     a spanning tree of the biconnected component is returned.
- * \param component_edges If not a NULL pointer, then the edges of the
+ * \param component_edges If not a \c NULL pointer, then the edges of the
  *     biconnected components are stored here, in the same form as for
  *     \c tree_edges.
- * \param components If not a NULL pointer, then the vertices of the
+ * \param components If not a \c NULL pointer, then the vertices of the
  *     biconnected components are stored here, in the same format as
  *     for the previous two arguments.
  * \param articulation_points If not a NULL pointer, then the
@@ -1030,7 +1027,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t nextptr;
     igraph_vector_int_t num, low;
-    igraph_vector_bool_t found;
+    igraph_bitset_t found;
     igraph_vector_int_t *adjedges;
     igraph_stack_int_t path;
     igraph_stack_int_t edgestack;
@@ -1043,7 +1040,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&found, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&found, no_of_nodes);
 
     IGRAPH_STACK_INT_INIT_FINALLY(&path, 100);
     IGRAPH_STACK_INT_INIT_FINALLY(&edgestack, 100);
@@ -1121,10 +1118,10 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                     }
                     /* Check for articulation point */
                     if (VECTOR(low)[act] >= VECTOR(num)[prev]) {
-                        if (articulation_points && !VECTOR(found)[prev]
+                        if (articulation_points && !IGRAPH_BIT_TEST(found, prev)
                             && prev != i /* the root */) {
                             IGRAPH_CHECK(igraph_vector_int_push_back(articulation_points, prev));
-                            VECTOR(found)[prev] = true;
+                            IGRAPH_BIT_SET(found, prev);
                         }
                         if (no) {
                             *no += 1;
@@ -1208,7 +1205,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_inclist_destroy(&inclist);
     igraph_stack_int_destroy(&edgestack);
     igraph_stack_int_destroy(&path);
-    igraph_vector_bool_destroy(&found);
+    igraph_bitset_destroy(&found);
     igraph_vector_int_destroy(&low);
     igraph_vector_int_destroy(&num);
     igraph_vector_int_destroy(&nextptr);
@@ -1398,7 +1395,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t il;
-    igraph_vector_bool_t visited;
+    igraph_bitset_t visited;
     igraph_vector_int_t vis; /* vis[u] time when vertex u was first visited */
     igraph_vector_int_t low; /* low[u] is the lowest visit time of vertices reachable from u */
     igraph_vector_int_t incoming_edge;
@@ -1409,7 +1406,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&visited, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vis, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
 
@@ -1423,7 +1420,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
 
     time = 0;
     for (igraph_integer_t start = 0; start < no_of_nodes; ++start) {
-        if (! VECTOR(visited)[start]) {
+        if (! IGRAPH_BIT_TEST(visited, start)) {
             /* Perform a DFS from 'start'.
              * The top of the su stack is u, the vertex currently being visited.
              * The top of the si stack is i, the index of u's neighbour that will
@@ -1439,7 +1436,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
                 if (i == 0) {
                     /* We are at the first step of visiting vertex u. */
 
-                    VECTOR(visited)[u] = true;
+                    IGRAPH_BIT_SET(visited, u);
 
                     time += 1;
 
@@ -1456,7 +1453,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
                     igraph_integer_t edge = VECTOR(*incedges)[i];
                     igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
 
-                    if (! VECTOR(visited)[v]) {
+                    if (! IGRAPH_BIT_TEST(visited, v)) {
                         VECTOR(incoming_edge)[v] = edge;
 
                         IGRAPH_CHECK(igraph_stack_int_push(&su, v));
@@ -1487,7 +1484,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
     igraph_vector_int_destroy(&vis);
-    igraph_vector_bool_destroy(&visited);
+    igraph_bitset_destroy(&visited);
     igraph_inclist_destroy(&il);
     IGRAPH_FINALLY_CLEAN(7);
 
@@ -1497,11 +1494,15 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
 /**
  * \ingroup structural
  * \function igraph_subcomponent
- * \brief The vertices in the same component as a given vertex.
+ * \brief The vertices reachable from a given vertex.
+ *
+ * This function returns the set of vertices reachable from a specified
+ * vertex. In undirected graphs, this is simple the set of vertices within
+ * the same component.
  *
  * \param graph The graph object.
- * \param res The result, vector with the IDs of the vertices in the
- *        same component.
+ * \param res The result, vector with the IDs of the vertices reachable
+ *        from \p vertex.
  * \param vertex The id of the vertex of which the component is
  *        searched.
  * \param mode Type of the component for directed graphs, possible
@@ -1534,7 +1535,9 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * edges in the graph.
  *
  * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
- * a given set of vertices and the edges between them.
+ * a given set of vertices and the edges between them;
+ * \ref igraph_reachability() to efficiently compute the reachable set from \em all
+ * vertices.
  */
 igraph_error_t igraph_subcomponent(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vertex,
@@ -1543,7 +1546,7 @@ igraph_error_t igraph_subcomponent(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-    bool *already_added;
+    igraph_bitset_t already_added;
     igraph_integer_t i, vsize;
     igraph_vector_int_t tmp = IGRAPH_VECTOR_NULL;
 
@@ -1555,18 +1558,15 @@ igraph_error_t igraph_subcomponent(
         IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for computing subcomponent.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
     igraph_vector_int_clear(res);
 
+    IGRAPH_BITSET_INIT_FINALLY(&already_added, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, vertex));
     IGRAPH_CHECK(igraph_vector_int_push_back(res, vertex));
-    already_added[vertex] = true;
+    IGRAPH_BIT_SET(already_added, vertex);
 
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
@@ -1578,10 +1578,10 @@ igraph_error_t igraph_subcomponent(
         for (i = 0; i < vsize; i++) {
             igraph_integer_t neighbor = VECTOR(tmp)[i];
 
-            if (already_added[neighbor]) {
+            if (IGRAPH_BIT_TEST(already_added, neighbor)) {
                 continue;
             }
-            already_added[neighbor] = true;
+            IGRAPH_BIT_SET(already_added, neighbor);
             IGRAPH_CHECK(igraph_vector_int_push_back(res, neighbor));
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
         }
@@ -1589,7 +1589,7 @@ igraph_error_t igraph_subcomponent(
 
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&tmp);
-    IGRAPH_FREE(already_added);
+    igraph_bitset_destroy(&already_added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;

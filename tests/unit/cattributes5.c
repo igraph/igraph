@@ -26,7 +26,7 @@
 #include "test_utilities.h"
 
 static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
-    igraph_simplify(g, /*multiple=*/ true, /*loops=*/ true, comb);
+    igraph_simplify(g, /*remove_multiple=*/ true, /*remove_loops=*/ true, comb);
     igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ true);
     igraph_attribute_combination_destroy(comb);
     igraph_destroy(g);

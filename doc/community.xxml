@@ -7,6 +7,8 @@
 <chapter id="igraph-Community">
 <title>Detecting community structure</title>
 
+<!-- doxrox-include about_community -->
+
 <section id="common-functions-related-to-community-detection"><title>Common functions related to community structure</title>
 <!-- doxrox-include igraph_modularity -->
 <!-- doxrox-include igraph_modularity_matrix -->

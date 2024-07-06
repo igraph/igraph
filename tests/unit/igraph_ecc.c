@@ -180,6 +180,21 @@ int main(void) {
     test_ecc(&g);
     igraph_destroy(&g);
 
+    /* Large degrees */
+    {
+        igraph_vector_int_t deg;
+        printf("\nGraph with large degrees:\n");
+        igraph_vector_int_init_range(&deg, 0, 30);
+        for (igraph_integer_t i=0; i < igraph_vector_int_size(&deg); i++) {
+            VECTOR(deg)[i] /= 2;
+            VECTOR(deg)[i] += 1;
+        }
+        igraph_realize_degree_sequence(&g, &deg, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+        test_ecc(&g);
+        igraph_destroy(&g);
+        igraph_vector_int_destroy(&deg);
+    }
+
     /* Karate club */
 
     printf("\nZachary karate club:\n");

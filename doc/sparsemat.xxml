@@ -107,10 +107,4 @@
 <!-- doxrox-include igraph_sparsemat_print -->
 </section>
 
-<section id="sparse-matrix-deprecated"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_sparsemat_copy -->
-<!-- doxrox-include igraph_sparsemat_diag -->
-<!-- doxrox-include igraph_sparsemat_eye -->
-</section>
-
 </section>

@@ -170,6 +170,12 @@ IGRAPH_EXPORT igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                                igraph_bool_t loops, igraph_bool_t multiple,
                                                igraph_bool_t finite_size_correction);
 
+IGRAPH_EXPORT igraph_error_t igraph_chung_lu_game(igraph_t *graph,
+                                                  const igraph_vector_t *expected_out_deg,
+                                                  const igraph_vector_t *expected_in_deg,
+                                                  igraph_bool_t loops,
+                                                  igraph_chung_lu_t variant);
+
 IGRAPH_EXPORT igraph_error_t igraph_k_regular_game(igraph_t *graph,
                                         igraph_integer_t no_of_nodes, igraph_integer_t k,
                                         igraph_bool_t directed, igraph_bool_t multiple);
@@ -216,13 +222,6 @@ IGRAPH_EXPORT igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, i
 
 IGRAPH_EXPORT igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
                                           igraph_matrix_t *res);
-
-/* Deprecated functions: */
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_erdos_renyi_game(
-    igraph_t *graph, igraph_erdos_renyi_t type, igraph_integer_t n,
-    igraph_real_t p_or_m, igraph_bool_t directed, igraph_bool_t loops
-);
 
 __END_DECLS
 

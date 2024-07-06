@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,41 +13,43 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_bool_t *v, FILE *f) {
-    igraph_integer_t i;
-    for (i = 0; i < igraph_vector_bool_size(v); i++) {
-        fprintf(f, " %i", VECTOR(*v)[i] ? 1 : 0);
-    }
-    fprintf(f, "\n");
+void analyze_loops(const igraph_t *graph) {
+    igraph_vector_bool_t is_loop;
+    igraph_bool_t has_loop;
+    igraph_integer_t loop_count;
+
+    igraph_has_loop(graph, &has_loop);
+    printf("Has loops? %s\n", has_loop ? "Yes" : "No");
+
+    igraph_count_loops(graph, &loop_count);
+    printf("How many? %" IGRAPH_PRId "\n", loop_count);
+
+    igraph_vector_bool_init(&is_loop, 0);
+    igraph_is_loop(graph, &is_loop, igraph_ess_all(IGRAPH_EDGEORDER_ID));
+    printf("Loop positions: "); igraph_vector_bool_print(&is_loop);
+    igraph_vector_bool_destroy(&is_loop);
+
+    printf("\n");
 }
 
 int main(void) {
 
     igraph_t graph;
-    igraph_vector_bool_t v;
 
-    igraph_vector_bool_init(&v, 0);
-
-    igraph_small(&graph, 0, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 1, 0, 1, 1, 0, 3, 4, 11, 10, -1);
-    igraph_is_loop(&graph, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-    print_vector(&v, stdout);
+    igraph_small(&graph, 0, IGRAPH_DIRECTED,
+                 0,1, 1,2, 2,1, 0,1, 1,0, 3,4, 11,10, -1);
+    analyze_loops(&graph);
     igraph_destroy(&graph);
 
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
-                 0, 0, 1, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6, 2, 2, 0, 0, -1);
-    igraph_is_loop(&graph, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-    print_vector(&v, stdout);
+                 0,0, 1,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,2, 0,0, -1);
+    analyze_loops(&graph);
     igraph_destroy(&graph);
-
-    igraph_vector_bool_destroy(&v);
 
     return 0;
 }
