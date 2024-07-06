@@ -996,6 +996,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  community
   connectivity
   erdos_renyi
   graphicality
