@@ -28,6 +28,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
+#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -384,6 +385,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     q = igraph_i_multilevel_community_modularity(&communities, resolution);
     /* pass = 1; */
 
+    RNG_BEGIN();
     do { /* Pass begin */
         igraph_integer_t temp_communities_no = communities.communities_no;
 
@@ -392,6 +394,18 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
         /* Save the current membership, it will be restored in case of worse result */
         IGRAPH_CHECK(igraph_vector_int_update(&temp_membership, communities.membership));
+
+        /* Apply a random inversion to the node_order permutation vector to help escape
+         * rare situations of an infinite loop. A full re-shuffling of node_order would
+         * have a measurable performance impact, hence the single inversion.
+         * See https://github.com/igraph/igraph/issues/2650 for details. */
+        if (vcount > 1) {
+            igraph_integer_t i1 = RNG_INTEGER(0, vcount-1);
+            igraph_integer_t i2 = RNG_INTEGER(0, vcount-1);
+            igraph_integer_t tmp = VECTOR(node_order)[i1];
+            VECTOR(node_order)[i1] = VECTOR(node_order)[i2];
+            VECTOR(node_order)[i2] = tmp;
+        }
 
         for (igraph_integer_t i = 0; i < vcount; i++) {
             /* Exclude vertex from its current community */
@@ -475,6 +489,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
         IGRAPH_ALLOW_INTERRUPTION();
     } while (changed && (q > pass_q)); /* Pass end */
+    RNG_END();
 
     if (modularity) {
         *modularity = q;
