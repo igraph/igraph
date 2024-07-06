@@ -68,27 +68,27 @@ int main(void) {
 
     igraph_vector_init(&weights, 0);
 
-    igraph_erdos_renyi_game_gnm(&graph, 100, 500, false, false);
+    igraph_erdos_renyi_game_gnm(&graph, 100, 500, false, false, false);
     rand_weights(&graph, &weights);
     run_bench(&graph, &weights, "G(n,m)", 1000);
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 5000, false, false);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 5000, false, false, false);
     rand_weights(&graph, &weights);
     run_bench(&graph, &weights, "G(n,m)", 100);
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 50000, false, false);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 50000, false, false, false);
     rand_weights(&graph, &weights);
     run_bench(&graph, &weights, "G(n,m)", 10);
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 10000, 50000, false, false);
+    igraph_erdos_renyi_game_gnm(&graph, 10000, 50000, false, false, false);
     rand_weights(&graph, &weights);
     run_bench(&graph, &weights, "G(n,m)", 10);
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 100000, 500000, false, false);
+    igraph_erdos_renyi_game_gnm(&graph, 100000, 500000, false, false, false);
     rand_weights(&graph, &weights);
     run_bench(&graph, &weights, "G(n,m)", 1);
     igraph_destroy(&graph);
