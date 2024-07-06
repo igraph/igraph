@@ -1,8 +1,5 @@
-/* -*- mode: C -*-  */
-/*
-   IGraph library.
-   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+/* IGraph library.
+   Copyright (C) 2010-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
@@ -27,8 +21,8 @@
 
 int main(void) {
     igraph_t g;
-    igraph_vector_int_t res, res_all;
-    igraph_integer_t i;
+    igraph_vector_int_list_t res, res_all;
+    igraph_integer_t n;
 
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 2, 5,
@@ -36,23 +30,29 @@ int main(void) {
                  3, 2, 3, 5,
                  -1);
 
-    igraph_vector_int_init(&res, 0);
+    igraph_vector_int_list_init(&res, 0);
 
-    for (i = 0; i <= 5; i++) {
+    for (igraph_integer_t i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);
 
         printf("Paths for cutoff %" IGRAPH_PRId ":\n", i);
-        igraph_vector_int_print(&res);
+        print_vector_int_list(&res);
     }
 
-    igraph_vector_int_init(&res_all, 0);
+    igraph_vector_int_list_init(&res_all, 0);
 
     igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, IGRAPH_ALL);
 
-    IGRAPH_ASSERT(igraph_vector_int_all_e(&res, &res_all) && "Paths of all lengths does not equal result for maximum cutoff.");
+    n = igraph_vector_int_list_size(&res);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&res_all) == n);
+    for (igraph_integer_t i = 0; i < n; i++) {
+        IGRAPH_ASSERT(igraph_vector_int_all_e(
+                          igraph_vector_int_list_get_ptr(&res, i),
+                          igraph_vector_int_list_get_ptr(&res_all, i)));
+    }
 
-    igraph_vector_int_destroy(&res_all);
-    igraph_vector_int_destroy(&res);
+    igraph_vector_int_list_destroy(&res_all);
+    igraph_vector_int_list_destroy(&res);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

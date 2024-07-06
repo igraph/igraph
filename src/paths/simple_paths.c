@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2014-2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2014-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,9 +19,10 @@
 
 #include "igraph_paths.h"
 
+#include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
-#include "igraph_adjlist.h"
+#include "igraph_vector_list.h"
 
 #include "core/interruption.h"
 
@@ -40,10 +41,9 @@
  * parameter when you do not need long paths.
  *
  * \param graph The input graph.
- * \param res Initialized integer vector. The paths are
- *        returned here in terms of their vertices, separated
- *        by <code>-1</code> markers. The paths are included in arbitrary
- *        order, as they are found.
+ * \param res Initialized integer vector list. The paths are
+ *        returned here in terms of their vertices. The paths
+ *        are included in arbitrary order, as they are found.
  * \param from The start vertex.
  * \param to The target vertices.
  * \param cutoff Maximum length of path that is considered. If
@@ -58,16 +58,17 @@
  * vertices.
  */
 
-igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
-                                igraph_vector_int_t *res,
-                                igraph_integer_t from,
-                                const igraph_vs_t to,
-                                igraph_integer_t cutoff,
-                                igraph_neimode_t mode) {
+igraph_error_t igraph_get_all_simple_paths(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *res,
+        igraph_integer_t from,
+        const igraph_vs_t to,
+        igraph_integer_t cutoff,
+        igraph_neimode_t mode) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_bool_t toall = igraph_vs_is_all(&to);
     igraph_vit_t vit;
-    igraph_bool_t toall = igraph_vs_is_all(&to);
     igraph_lazy_adjlist_t adjlist;
     igraph_vector_int_t stack, dist; /* used as a stack, but represented as a vector,
                                         in order to be appendable to other vectors */
@@ -75,12 +76,12 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_t nptr;
     int iter = 0;
 
-    if (from < 0 || from >= no_nodes) {
+    if (from < 0 || from >= vcount) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
 
     if (!toall) {
-        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&markto, no_nodes);
+        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&markto, vcount);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
@@ -90,16 +91,16 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, no_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, vcount);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&stack, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dist, 100);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(
         graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, no_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, vcount);
 
-    igraph_vector_int_clear(res);
+    igraph_vector_int_list_clear(res);
 
     igraph_vector_int_clear(&stack);
     igraph_vector_int_clear(&dist);
@@ -107,18 +108,17 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_push_back(&dist, 0);
     VECTOR(added)[from] = true;
     while (!igraph_vector_int_empty(&stack)) {
-        igraph_integer_t act = igraph_vector_int_tail(&stack);
-        igraph_integer_t curdist = igraph_vector_int_tail(&dist);
-        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        igraph_integer_t n;
+        const igraph_integer_t act = igraph_vector_int_tail(&stack);
+        const igraph_integer_t curdist = igraph_vector_int_tail(&dist);
+
+        const igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
+        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+
+        const igraph_integer_t n = igraph_vector_int_size(neis);
         igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
         igraph_integer_t nei;
-
-        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
-
-        n = igraph_vector_int_size(neis);
 
         within_dist = (curdist < cutoff || cutoff < 0);
         if (within_dist) {
@@ -137,8 +137,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
             VECTOR(added)[nei] = true;
             /* Add to results */
             if (toall || VECTOR(markto)[nei]) {
-                IGRAPH_CHECK(igraph_vector_int_append(res, &stack));
-                IGRAPH_CHECK(igraph_vector_int_push_back(res, -1));
+                IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &stack));
             }
         } else {
             /* There is no such neighbor, finished with the subtree */

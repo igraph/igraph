@@ -585,7 +585,7 @@ igraph_voronoi:
 
 igraph_get_all_simple_paths:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES res, VERTEX from,
+        GRAPH graph, OUT VERTEX_INDICES_LIST res, VERTEX from,
         VERTEX_SELECTOR to=ALL, INTEGER cutoff=-1, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, res ON graph
 
