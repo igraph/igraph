@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2003-2021 The igraph development team
+   Copyright (C) 2003-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_games.h"
@@ -42,18 +37,18 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
                                        const igraph_vector_int_t *out_seq,
                                        const igraph_vector_int_t *in_seq) {
 
+    const igraph_bool_t directed = (in_seq != NULL && igraph_vector_int_size(in_seq) != 0);
     igraph_integer_t outsum = 0, insum = 0;
-    igraph_bool_t directed = (in_seq != NULL && igraph_vector_int_size(in_seq) != 0);
-    igraph_bool_t degseq_ok;
+    igraph_bool_t graphical;
     igraph_integer_t no_of_nodes, no_of_edges;
     igraph_integer_t *bag1, *bag2;
     igraph_integer_t bagp1 = 0, bagp2 = 0;
-    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges;
 
-    IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &degseq_ok));
-    if (!degseq_ok) {
-        IGRAPH_ERROR(in_seq ? "No directed graph can realize the given degree sequences" :
-                     "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
+    IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &graphical));
+    if (!graphical) {
+        IGRAPH_ERROR(in_seq ? "No directed graph can realize the given degree sequences." :
+                     "No undirected graph can realize the given degree sequence.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(out_seq, &outsum));
@@ -130,7 +125,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
 }
 
 static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
-    igraph_t *graph, const igraph_vector_int_t *seq) {
+        igraph_t *graph, const igraph_vector_int_t *seq) {
 
     igraph_vector_int_t stubs;
     igraph_vector_int_t *neis;
@@ -141,10 +136,11 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
     igraph_integer_t from, to, dummy;
     igraph_integer_t i, j, k;
     igraph_integer_t no_of_nodes, outsum = 0;
-    igraph_bool_t degseq_ok;
+    igraph_bool_t graphical;
+    int iter = 0;
 
-    IGRAPH_CHECK(igraph_is_graphical(seq, 0, IGRAPH_SIMPLE_SW, &degseq_ok));
-    if (!degseq_ok) {
+    IGRAPH_CHECK(igraph_is_graphical(seq, 0, IGRAPH_SIMPLE_SW, &graphical));
+    if (!graphical) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence.",
                      IGRAPH_EINVAL);
     }
@@ -168,7 +164,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
      * until it finally succeeds. */
     finished = false;
     while (!finished) {
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         /* Be optimistic :) */
         failed = false;
@@ -273,18 +269,18 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
 
 static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t *graph,
         const igraph_vector_int_t *out_seq, const igraph_vector_int_t *in_seq) {
+
     igraph_adjlist_t al;
     igraph_bool_t deg_seq_ok, failed, finished;
     igraph_vector_int_t in_stubs;
     igraph_vector_int_t out_stubs;
     igraph_vector_int_t *neis;
-    igraph_vector_int_t residual_in_degrees = IGRAPH_VECTOR_NULL;
-    igraph_vector_int_t residual_out_degrees = IGRAPH_VECTOR_NULL;
-    igraph_set_t incomplete_in_vertices;
-    igraph_set_t incomplete_out_vertices;
+    igraph_vector_int_t residual_in_degrees, residual_out_degrees;
+    igraph_set_t incomplete_in_vertices, incomplete_out_vertices;
     igraph_integer_t from, to;
     igraph_integer_t i, j, k;
     igraph_integer_t no_of_nodes, outsum;
+    int iter = 0;
 
     IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_SIMPLE_SW, &deg_seq_ok));
     if (!deg_seq_ok) {
@@ -316,7 +312,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
      * until it finally succeeds. */
     finished = false;
     while (!finished) {
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         /* Be optimistic :) */
         failed = false;
@@ -407,7 +403,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
     IGRAPH_FINALLY_CLEAN(6);
 
     /* Create the graph */
-    IGRAPH_CHECK(igraph_adjlist(graph, &al, IGRAPH_OUT, 1));
+    IGRAPH_CHECK(igraph_adjlist(graph, &al, IGRAPH_OUT, true));
 
     /* Clear the adjacency list */
     igraph_adjlist_destroy(&al);
@@ -428,13 +424,14 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
 static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirected(igraph_t *graph, const igraph_vector_int_t *degseq) {
     igraph_vector_int_t stubs;
     igraph_vector_int_t edges;
-    igraph_bool_t degseq_ok;
+    igraph_bool_t graphical;
     igraph_vector_ptr_t adjlist;
     igraph_integer_t i, j;
     igraph_integer_t vcount, ecount, stub_count;
+    int iter = 0;
 
-    IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &degseq_ok));
-    if (!degseq_ok) {
+    IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &graphical));
+    if (!graphical) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence.", IGRAPH_EINVAL);
     }
 
@@ -462,9 +459,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
-        if (! set) {
-            IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(set, "Insufficient memory for configuation model (simple graphs).");
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*degseq)[i]));
@@ -518,7 +513,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
             igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
         }
 
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
     }
 
     RNG_END();
@@ -527,7 +522,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     igraph_vector_int_destroy(&stubs);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, /* directed = */ 0));
+    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -538,15 +533,17 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
 
 static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directed(
     igraph_t *graph, const igraph_vector_int_t *out_deg, const igraph_vector_int_t *in_deg) {
+
     igraph_vector_int_t out_stubs, in_stubs;
     igraph_vector_int_t edges;
-    igraph_bool_t degseq_ok;
+    igraph_bool_t graphical;
     igraph_vector_ptr_t adjlist;
     igraph_integer_t i, j;
     igraph_integer_t vcount, ecount;
+    int iter = 0;
 
-    IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &degseq_ok));
-    if (!degseq_ok) {
+    IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &graphical));
+    if (!graphical) {
         IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
@@ -581,9 +578,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
-        if (! set) {
-            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(set, "Insufficient memory for directed configuration model (simple graphs).");
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));
@@ -635,7 +630,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
             igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
         }
 
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
     }
 
     RNG_END();
@@ -645,7 +640,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
     igraph_vector_int_destroy(&in_stubs);
     IGRAPH_FINALLY_CLEAN(3);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, /* directed = */ 1));
+    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, IGRAPH_DIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -780,7 +775,7 @@ igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_
                                 const igraph_vector_int_t *in_deg,
                                 igraph_degseq_t method) {
     if (in_deg && igraph_vector_int_empty(in_deg) && !igraph_vector_int_empty(out_deg)) {
-        in_deg = 0;
+        in_deg = NULL;
     }
 
     switch (method) {
@@ -791,14 +786,14 @@ igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_
         return igraph_degree_sequence_game_vl(graph, out_deg, in_deg);
 
     case IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE:
-        if (in_deg == 0) {
+        if (! in_deg) {
             return igraph_i_degree_sequence_game_fast_heur_undirected(graph, out_deg);
         } else {
             return igraph_i_degree_sequence_game_fast_heur_directed(graph, out_deg, in_deg);
         }
 
     case IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE:
-        if (in_deg == 0) {
+        if (! in_deg) {
             return igraph_i_degree_sequence_game_configuration_simple_undirected(graph, out_deg);
         } else {
             return igraph_i_degree_sequence_game_configuration_simple_directed(graph, out_deg, in_deg);

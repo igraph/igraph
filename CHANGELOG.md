@@ -2,6 +2,19 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
+ - Removed broken interruption support from `igraph_community_spinglass_single()`.
+
+### Deprecated
+
+ - `igraph_minimum_spanning_tree_prim()` and `igraph_minimum_spanning_tree_unweighted()` are deprecated. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.13]
 
 ### Added

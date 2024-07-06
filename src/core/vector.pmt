@@ -171,7 +171,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
  * Time complexity: O(1)
  */
 
-const TYPE(igraph_vector)* FUNCTION(igraph_vector, view) (const TYPE(igraph_vector) *v,
+const TYPE(igraph_vector)* FUNCTION(igraph_vector, view)(const TYPE(igraph_vector) *v,
         const BASE *data, igraph_integer_t length) {
     static const BASE dummy = ZERO;
     TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
@@ -560,7 +560,7 @@ void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v) {
  * complexity of memory allocation is at most linear.)
  */
 
-igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e) {
+igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vector)* v, BASE e) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 

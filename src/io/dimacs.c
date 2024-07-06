@@ -120,7 +120,7 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  * Time complexity: O(|V|+|E|+c), the number of vertices plus the
  * number of edges, plus the size of the file in characters.
  *
- * \sa \ref igraph_write_graph_dimacs()
+ * \sa \ref igraph_write_graph_dimacs_flow()
  */
 igraph_error_t igraph_read_graph_dimacs_flow(
         igraph_t *graph, FILE *instream,

@@ -248,7 +248,7 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
  * \param method The type of the algorithm used.
  *        \clist
  *        \cli IGRAPH_FLOYD_WARSHALL_AUTOMATIC
- *          tried to select the best performing variant for the current graph;
+ *          tries to select the best performing variant for the current graph;
  *          presently this option always uses the "Tree" method.
  *        \cli IGRAPH_FLOYD_WARSHALL_ORIGINAL
  *          the basic Floyd-Warshall algorithm.
