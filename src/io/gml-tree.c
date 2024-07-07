@@ -48,9 +48,7 @@ igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
 
     /* children */
     p = IGRAPH_CALLOC(1, igraph_integer_t);
-    if (!p) {
-        IGRAPH_ERROR("Cannot create integer GML tree node.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(p, "Cannot create integer GML tree node.");
     *p = value;
     VECTOR(t->children)[0] = p;
 
@@ -81,9 +79,7 @@ igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
 
     /* children */
     p = IGRAPH_CALLOC(1, igraph_real_t);
-    if (!p) {
-        IGRAPH_ERROR("Cannot create real GML tree node.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(p, "Cannot create real GML tree node.");
     *p = value;
     VECTOR(t->children)[0] = p;
 

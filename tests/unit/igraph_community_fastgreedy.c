@@ -179,6 +179,34 @@ int main(void) {
      * providing a merge matrix or a modularity vector */
     igraph_community_fastgreedy(&g, 0, 0, 0, &membership);
     show_results(&g, 0, 0, &membership, stdout);
+
+    /* Regression test -- asking for modularity but nothing else */
+    igraph_community_fastgreedy(&g, 0, 0, &modularity, 0);
+    show_results(&g, &modularity, 0, 0, stdout);
+
+    igraph_destroy(&g);
+
+    printf("Testing a trivial disconnected graph\n");
+
+    /* Test a disconnected graph */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0,1, 2,3,
+                 -1);
+
+    /* Asking for all output to verify the result from the following
+     * two tests. */
+    igraph_community_fastgreedy(&g, 0, &merges, &modularity, &membership);
+    show_results(&g, &modularity, &merges, &membership, stdout);
+
+    /* Regression test -- asking for optimal membership vector but not
+     * providing a merge matrix or a modularity vector */
+    igraph_community_fastgreedy(&g, 0, 0, 0, &membership);
+    show_results(&g, 0, 0, &membership, stdout);
+
+    /* Regression test -- asking for modularity but nothing else */
+    igraph_community_fastgreedy(&g, 0, 0, &modularity, 0);
+    show_results(&g, &modularity, 0, 0, stdout);
+
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&membership);

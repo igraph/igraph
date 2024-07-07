@@ -1,0 +1,55 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: igraph
+message: >-
+  If you use igraph, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Gábor
+    family-names: Csárdi
+    orcid: 'https://orcid.org/0000-0001-7098-9676'
+  - given-names: Tamás
+    family-names: Nepusz
+    orcid: 'https://orcid.org/0000-0002-1451-338X'
+  - given-names: Szabolcs
+    family-names: Horvát
+    orcid: 'https://orcid.org/0000-0002-3100-523X'
+  - given-names: Vincent Antonio
+    family-names: Traag
+    orcid: 'https://orcid.org/0000-0003-3170-3879'
+  - given-names: Fabio
+    family-names: Zanini
+    orcid: 'https://orcid.org/0000-0001-7097-8539'
+  - given-names: Daniel
+    family-names: Noom
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.3630268
+    description: Zenodo
+repository-code: 'https://github.com/igraph/igraph'
+url: 'https://igraph.org'
+abstract: >-
+  igraph is a C library for complex network analysis and
+  graph theory, with emphasis on efficiency, portability and
+  ease of use.
+keywords:
+  - network analysis
+  - graph theory
+license: GPL-2.0-or-later
+preferred-citation:
+  type: article
+  authors:
+    - given-names: Gábor
+      family-names: Csárdi
+      orcid: 'https://orcid.org/0000-0001-7098-9676'
+    - given-names: Tamás
+      family-names: Nepusz
+      orcid: 'https://orcid.org/0000-0002-1451-338X'
+  journal: "InterJournal, Complex Systems"
+  start: 1695 # First page number
+  title: "The igraph software package for complex network research"
+  year: 2006
+  type: article

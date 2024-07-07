@@ -7,11 +7,6 @@
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
-#include "igraph_error.h"
-#include "linalg/blas_internal.h"
-#include "linalg/lapack_internal.h"
-#include "linalg/arpack_internal.h"
-
 typedef int integer;
 typedef unsigned int uinteger;
 typedef char *address;
@@ -235,5 +230,12 @@ typedef doublereal E_f; /* real function with -R not specified */
 #endif
 
 #include "config.h"
+
+/* It is an ugly hack that we add these headers here, but it is needed to make
+ * the combination of external BLAS/LAPACK and internal ARPACK work */
+
+#include "linalg/blas_internal.h"
+#include "linalg/lapack_internal.h"
+#include "linalg/arpack_internal.h"
 
 #endif

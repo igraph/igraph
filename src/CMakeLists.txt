@@ -40,6 +40,8 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 add_library(
   igraph
   core/array.c
+  core/bitset.c
+  core/bitset_list.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c
@@ -113,6 +115,7 @@ add_library(
 
   games/barabasi.c
   games/callaway_traits.c
+  games/chung_lu.c
   games/citations.c
   games/correlated.c
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
@@ -168,6 +171,7 @@ add_library(
   community/spinglass/NetDataTypes.cpp
   community/spinglass/NetRoutines.cpp
   community/spinglass/pottsmodel_2.cpp
+  community/voronoi.c
   community/walktrap/walktrap_communities.cpp
   community/walktrap/walktrap_graph.cpp
   community/walktrap/walktrap_heap.cpp
@@ -176,6 +180,7 @@ add_library(
   connectivity/cohesive_blocks.c
   connectivity/components.c
   connectivity/separators.c
+  connectivity/reachability.c
 
   flow/flow.c
   flow/flow_conversion.c
@@ -230,6 +235,7 @@ add_library(
   operators/difference.c
   operators/disjoint_union.c
   operators/intersection.c
+  operators/join.c
   operators/misc_internal.c
   operators/permute.c
   operators/reverse.c
@@ -257,6 +263,7 @@ add_library(
   paths/widest_paths.c
 
   properties/basic_properties.c
+  properties/complete.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c
@@ -323,7 +330,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.0.0")
+set_target_properties(igraph PROPERTIES VERSION "3.1.8")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
@@ -408,7 +415,7 @@ target_link_libraries(
 )
 
 if (NOT BUILD_SHARED_LIBS)
-  target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
+  target_compile_definitions(igraph PUBLIC IGRAPH_STATIC)
 else()
   target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()

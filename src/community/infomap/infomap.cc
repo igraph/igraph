@@ -151,25 +151,17 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
             oldCodeLength = greedy.codeLength;
             bool moved = true;
-            //igraph_integer_t count = 0;
             double inner_oldCodeLength = 1000;
 
             while (moved) { // main greedy optimizing loop
                 inner_oldCodeLength = greedy.codeLength;
                 moved = greedy.optimize();
 
-                //count++;
-
                 if (fabs(greedy.codeLength - inner_oldCodeLength) < 1.0e-10)
                     // if the move does'n reduce the codelenght -> exit !
                 {
                     moved = false;
                 }
-
-                //if (count == 10) {
-                //  greedy->tune();
-                //  count = 0;
-                //}
             }
 
             // transform the network to network of modules:
@@ -193,17 +185,18 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * \brief Find community structure that minimizes the expected description length of a random walker trajectory.
  *
  * Implementation of the Infomap community detection algorithm of
- * Martin Rosvall and Carl T. Bergstrom.
+ * Martin Rosvall and Carl T. Bergstrom. This algorithm takes edge directions
+ * into account.
  *
  * </para><para>
  * For more details, see the visualization of the math and the map generator
  * at https://www.mapequation.org . The original paper describing the algorithm
  * is: M. Rosvall and C. T. Bergstrom, Maps of information flow reveal community
  * structure in complex networks, PNAS 105, 1118 (2008)
- * (http://dx.doi.org/10.1073/pnas.0706851105, http://arxiv.org/abs/0707.0609).
+ * (https://dx.doi.org/10.1073/pnas.0706851105, https://arxiv.org/abs/0707.0609).
  * A more detailed paper about the algorithm is: M. Rosvall, D. Axelsson, and
  * C. T. Bergstrom, The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).
- * (http://dx.doi.org/10.1140/epjst/e2010-01179-1, http://arxiv.org/abs/0906.1405)
+ * (https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405)
 
  * </para><para>
  * The original C++ implementation of Martin Rosvall is used,
@@ -218,7 +211,7 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * If you want to specify a random seed (as in the original
  * implementation) you can use \ref igraph_rng_seed().
  *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are taken into account.
  * \param e_weights Numeric vector giving the weights of the edges.
  *     The random walker will favour edges with high weights over
  *     edges with low weights; the probability of picking a particular
@@ -320,7 +313,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         }
     }
 
-    *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
+    *codelength = shortestCodeLength / log(2.0);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 

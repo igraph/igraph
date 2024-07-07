@@ -66,7 +66,7 @@ int main(void) {
 
     igraph_vector_int_init(&edges, 0);
     igraph_vector_init(&prob, 0);
-    igraph_hrg_predict(&karate, &edges, &prob, /* hrg= */ 0, /* start= */ 0,
+    igraph_hrg_predict(&karate, &edges, &prob, /* hrg= */ NULL, /* start= */ false,
                        /* num_samples= */ 100, /* num_bins= */ 25);
 
     /* We do some simple validity tests on the results only; the exact results

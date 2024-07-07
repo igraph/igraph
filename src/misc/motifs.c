@@ -986,29 +986,31 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_real_t *mut,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
-                           igraph_real_t *res4) {
+static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph,
+                                               igraph_real_t *res2,
+                                               igraph_real_t *res4) {
 
-    igraph_integer_t vc = igraph_vcount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
     igraph_vector_int_t seen;
     igraph_vector_int_t *neis, *neis2;
-    igraph_integer_t i, j, k, s, neilen, neilen2, ign;
+    igraph_integer_t s, neilen, neilen2, ign;
     igraph_adjlist_t adjlist;
+    int iter = 0;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vc);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vcount);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     *res2 = *res4 = 0;
 
-    for (i = 0; i < vc; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 12);
 
         neis = igraph_adjlist_get(&adjlist, i);
         neilen = igraph_vector_int_size(neis);
         /* mark neighbors of i & i itself */
         VECTOR(seen)[i] = i + 1;
         ign = 0;
-        for (j = 0; j < neilen; j++) {
+        for (igraph_integer_t j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (VECTOR(seen)[nei] == i + 1 || VECTOR(seen)[nei] == -(i + 1)) {
                 /* multiple edges or loop edge */
@@ -1019,7 +1021,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
             }
         }
 
-        for (j = 0; j < neilen; j++) {
+        for (igraph_integer_t j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (nei <= i || (j > 0 && nei == VECTOR(*neis)[j - 1])) {
                 continue;
@@ -1027,7 +1029,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
             neis2 = igraph_adjlist_get(&adjlist, nei);
             neilen2 = igraph_vector_int_size(neis2);
             s = 0;
-            for (k = 0; k < neilen2; k++) {
+            for (igraph_integer_t k = 0; k < neilen2; k++) {
                 igraph_integer_t nei2 = VECTOR(*neis2)[k];
                 if (k > 0 && nei2 == VECTOR(*neis2)[k - 1]) {
                     continue;
@@ -1037,9 +1039,9 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
                 }
             }
             if (VECTOR(seen)[nei] > 0) {
-                *res2 += vc - s - neilen + ign - 1;
+                *res2 += vcount - s - neilen + ign - 1;
             } else {
-                *res4 += vc - s - neilen + ign - 1;
+                *res4 += vcount - s - neilen + ign - 1;
             }
         }
     }
@@ -1055,49 +1057,51 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * \function igraph_triad_census
  * \brief Triad census, as defined by Davis and Leinhardt.
  *
- * </para><para>
  * Calculating the triad census means classifying every triple of
- * vertices in a directed graph. A triple can be in one of 16 states:
+ * vertices in a directed graph based on the type of pairwise
+ * connections it contains, i.e. mutual, asymmetric or no connection.
+ * A triple can be in one of 16 states, commonly described using
+ * Davis and Leinhardt's "MAN labels". The \p res vector will
+ * contain the counts of these in the following order:
+ *
  * \clist
- * \cli 003
+ * \cli &#xa0;0: 003
  *      A, B, C, the empty graph.
- * \cli 012
+ * \cli &#xa0;1: 012
  *      A->B, C, a graph with a single directed edge.
- * \cli 102
+ * \cli &#xa0;2: 102
  *      A&lt;->B, C, a graph with a mutual connection between two vertices.
- * \cli 021D
+ * \cli &#xa0;3: 021D
  *      A&lt;-B->C, the binary out-tree.
- * \cli 021U
+ * \cli &#xa0;4: 021U
  *      A->B&lt;-C, the binary in-tree.
- * \cli 021C
+ * \cli &#xa0;5: 021C
  *      A->B->C, the directed line.
- * \cli 111D
+ * \cli &#xa0;6: 111D
  *      A&lt;->B&lt;-C.
- * \cli 111U
+ * \cli &#xa0;7: 111U
  *      A&lt;->B->C.
- * \cli 030T
+ * \cli &#xa0;8: 030T
  *      A->B&lt;-C, A->C.
- * \cli 030C
+ * \cli &#xa0;9: 030C
  *      A&lt;-B&lt;-C, A->C.
- * \cli 201
+ * \cli 10: 201
  *      A&lt;->B&lt;->C.
- * \cli 120D
+ * \cli 11: 120D
  *      A&lt;-B->C, A&lt;->C.
- * \cli 120U
+ * \cli 12: 120U
  *      A->B&lt;-C, A&lt;->C.
- * \cli 120C
+ * \cli 13: 120C
  *      A->B->C, A&lt;->C.
- * \cli 210
+ * \cli 14: 210
  *      A->B&lt;->C, A&lt;->C.
- * \cli 300
+ * \cli 15: 300
  *      A&lt;->B&lt;->C, A&lt;->C, the complete graph.
  * \endclist
  *
  * </para><para>
- * See also Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
- * Positive Interpersonal Relations in Small Groups.  In J. Berger
- * (Ed.), Sociological Theories in Progress, Volume 2, 218-251.
- * Boston: Houghton Mifflin.
+ * This function is intended for directed graphs. If the input is undirected,
+ * a warning is shown, and undirected edges will be interpreted as mutual.
  *
  * </para><para>
  * This function calls \ref igraph_motifs_randesu() which is an
@@ -1106,8 +1110,16 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * triads is not the same for \ref igraph_triad_census() and \ref
  * igraph_motifs_randesu().
  *
- * \param graph The input graph. A warning is given for undirected
- *   graphs, as the result is undefined for those.
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
+ * Positive Interpersonal Relations in Small Groups.  In J. Berger
+ * (Ed.), Sociological Theories in Progress, Volume 2, 218-251.
+ * Boston: Houghton Mifflin.
+ *
+ * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *   here in the same order as given in the list above. Note that this
  *   order is different than the one used by \ref igraph_motifs_randesu().
@@ -1120,14 +1132,13 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
 
 igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
-    igraph_vector_t cut_prob;
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_vector_t cut_prob, tmp;
     igraph_real_t m2, m4;
-    igraph_vector_t tmp;
-    igraph_integer_t vc = igraph_vcount(graph);
     igraph_real_t total;
 
     if (!igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Triad census called on an undirected graph");
+        IGRAPH_WARNING("Triad census called on an undirected graph. All connections will be treated as mutual.");
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
@@ -1137,8 +1148,8 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
     IGRAPH_CHECK(igraph_i_triad_census_24(graph, &m2, &m4));
 
-    total = ((igraph_real_t)vc) * (vc - 1);
-    total *= (vc - 2);
+    total = ((igraph_real_t) vcount) * (vcount - 1);
+    total *= (vcount - 2);
     total /= 6;
 
     /* Reorder */

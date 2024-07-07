@@ -100,7 +100,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            igraph_real_t *codelength);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                                    igraph_vector_int_t *result,
+                                                    igraph_vector_int_t *removed_edges,
                                                     igraph_vector_t *edge_betweenness,
                                                     igraph_matrix_int_t *merges,
                                                     igraph_vector_int_t *bridges,
@@ -132,6 +132,12 @@ IGRAPH_EXPORT igraph_error_t igraph_le_community_to_membership(const igraph_matr
                                                     igraph_integer_t steps,
                                                     igraph_vector_int_t *membership,
                                                     igraph_vector_int_t *csize);
+
+IGRAPH_EXPORT igraph_error_t igraph_community_voronoi(
+    const igraph_t *graph,
+    igraph_vector_int_t *membership, igraph_vector_int_t *generators, igraph_real_t *modularity,
+    const igraph_vector_t *lengths, const igraph_vector_t *weights,
+    igraph_neimode_t mode, igraph_real_t r);
 
 IGRAPH_EXPORT igraph_error_t igraph_modularity(const igraph_t *graph,
                                     const igraph_vector_int_t *membership,

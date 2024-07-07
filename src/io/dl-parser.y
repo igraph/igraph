@@ -239,7 +239,7 @@ elabel: LABEL {
   if (igraph_strvector_size(&context->labels) != 0) {
     igraph_integer_t i, id, n=igraph_strvector_size(&context->labels);
     for (i=0; i<n; i++) {
-      IGRAPH_YY_CHECK(igraph_trie_get(&context->trie, STR(context->labels, i), &id));
+      IGRAPH_YY_CHECK(igraph_trie_get(&context->trie, igraph_strvector_get(&context->labels, i), &id));
     }
     igraph_strvector_clear(&context->labels);
   }

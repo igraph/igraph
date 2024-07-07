@@ -22,3 +22,11 @@ simple: true, multi: true
 ( 2 3 1 )
 simple: true, multi: true
 
+( 5 2 )
+( 1 2 2 2 )
+simple: false, multi: true
+
+( -2 2 6 )
+( 0 2 2 2 )
+simple: false, multi: false
+

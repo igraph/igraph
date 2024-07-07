@@ -83,7 +83,7 @@ int main(void) {
     /* Erroneous calls */
     VECTOR(dimvector)[0] = -3;
     CHECK_ERROR(igraph_hexagonal_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
-    
+
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
 

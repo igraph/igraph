@@ -74,36 +74,27 @@
 #include <string>
 #include <cmath>
 
-using namespace fitHRG;
+using std::string;
 
 namespace fitHRG {
 
 // ***********************************************************************
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_LIST
-#define IGRAPH_HRG_LIST
-
-class list {
-public:
-    int x;            // stored elementd in linked-list
-    list* next;           // pointer to next elementd
-    list::list(): x(-1), next(0) { }
-    list::~list() { }
-};
-#endif
-
 enum {DENDRO, GRAPH, LEFT, RIGHT};
+
 struct block {
     double x;
     int y;
 };
+
 struct ipair {
-    int    x;
+    int x;
     int y;
     short int t;
-    std::string sp;
+    string sp;
 };
+
 struct child {
     int index;
     short int type;
@@ -113,48 +104,42 @@ struct child {
 // ***********************************************************************
 // ******** Cnode Class **************************************************
 
-#ifndef IGRAPH_HRG_CNODE
-#define IGRAPH_HRG_CNODE
-class cnode {
-public:
-    int index;            // array index of this node
-    int degree;           // number of children in list
-    int parent;           // index of parent node
-    double weight;        // sampled posterior weight
-    child* children;      // list of children (and their types)
-    child* lastChild;     // pointer to last child in list
-    cnode(): index(-1), degree(0), parent(-1), weight(0.0),
-        children(0), lastChild(0)  { }
+struct cnode {
+    int index = -1;             // array index of this node
+    int degree = 0;             // number of children in list
+    int parent = -1;            // index of parent node
+    double weight = 0.0;        // sampled posterior weight
+    child* children = nullptr;  // list of children (and their types)
+    child* lastChild = nullptr; // pointer to last child in list
+    cnode() = default;
+    cnode(const cnode &) = delete;
+    cnode & operator = (const cnode &) = delete;
     ~cnode() {
-        child *curr, *prev;
-        curr = children;
-        while (curr != NULL) {
-            prev = curr;
+        child *curr = children;
+        while (curr != nullptr) {
+            child *prev = curr;
             curr = curr->next;
             delete prev;
-            prev = NULL;
         }
-        lastChild = NULL;
+        lastChild = nullptr;
     }
 };
-#endif
 
 // ***********************************************************************
 // ******** Split Class **************************************************
 
 class split {
 public:
-    std::string s;           // partition assignment of leaf vertices
-    split(): s("") { }
-    ~split() { }
+    string s;           // partition assignment of leaf vertices
+    split() = default;
     void initializeSplit(const int n) {
         s = "";
         for (int i = 0; i < n; i++) {
             s += "-";
         }
     }
-    bool checkSplit() {
-        if (s.empty() || s.find("-", 0) != std::string::npos) {
+    bool checkSplit() const {
+        if (s.empty() || s.find('-', 0) != string::npos) {
             return false;
         } else {
             return true;
@@ -176,97 +161,97 @@ public:
 // partition defined by the split.
 
 class interns {
-private:
     ipair* edgelist;   // list of internal edges represented
-    std::string* splitlist; // split representation of the internal edges
+    string* splitlist; // split representation of the internal edges
     int** indexLUT;    // table of indices of internal edges in edgelist
     int q;         // number of internal edges
     int count;         // (for adding edges) edgelist index of new edge to add
 public:
-    interns(const int);
+    explicit interns(int);
     ~interns();
 
     // add an internal edge, O(1)
-    bool addEdge(const int, const int, const short int);
+    bool addEdge(int, int, short int);
     // returns the ith edge of edgelist, O(1)
-    ipair* getEdge(const int);
+    ipair* getEdge(int) const;
     // returns a uniformly random internal edge, O(1)
-    ipair* getRandomEdge();
+    ipair* getRandomEdge() const;
     // returns the ith split of the splitlist, O(1)
-    std::string getSplit(const int);
+    string getSplit(int) const;
     // replace an existing split, O(1)
-    bool replaceSplit(const int, const std::string);
+    bool replaceSplit(int i, const string &sp);
     // swaps two edges, O(1)
-    bool swapEdges(const int, const int, const short int, const int,
-                   const int, const short int);
+    bool swapEdges(int, int, short int, int, int, short int);
 };
 
 // ***********************************************************************
 // ******** Tree elementd Class ******************************************
 
-class elementd {
-public:
-    short int type; // either DENDRO or GRAPH
-    double logL;    // log-likelihood contribution of this internal node
-    double p;       // probability p_i that an edge exists between L and
+struct elementd {
+    short int type = DENDRO;    // either DENDRO or GRAPH
+    double logL = 0.0;          // log-likelihood contribution of this internal node
+    double p = 0.0;             // probability p_i that an edge exists between L and
     // R subtrees
-    int e;      // number of edges between L and R subtrees
-    int n;      // number of leafs in subtree rooted here
-    int label;      // subtree label: smallest leaf index
-    int index;      // index in containing array
+    int e = 0;      // number of edges between L and R subtrees
+    int n = 0;      // number of leafs in subtree rooted here
+    int label = -1; // subtree label: smallest leaf index
+    int index = -1; // index in containing array
 
-    elementd *M;          // pointer to parent node
-    elementd *L;          // pointer for L subtree
-    elementd *R;          // pointer for R subtree
-
-    elementd(): type(DENDRO), logL(0.0), p(0.0), e(0), n(0),
-        label(-1), index(-1), M(0), L(0), R(0) { }
-    ~elementd() { }
+    elementd *M = nullptr;  // pointer to parent node
+    elementd *L = nullptr;  // pointer for L subtree
+    elementd *R = nullptr;  // pointer for R subtree
 };
 
 // ***********************************************************************
 // ******** Dendrogram Class *********************************************
 
 class dendro {
-private:
-    elementd* root;     // root of the dendrogram
-    elementd* internal; // array of n-1 internal vertices (the dendrogram D)
-    elementd* leaf;     // array of n   leaf vertices (the graph G)
-    int n;          // number of leaf vertices to allocate
-    interns* d;         // list of internal edges of dendrogram D
-    splittree* splithist;       // histogram of cumulative split weights
-    list** paths;           // array of path-lists from root to leaf
-    double L;        // log-likelihood of graph G given dendrogram D
-    rbtree subtreeL, subtreeR;  // trees for computeEdgeCount() function
-    cnode* ctree;       // (consensus tree) array of internal tree nodes
-    int* cancestor;     // (consensus tree) oldest ancetor's index for
+    elementd* root = nullptr;       // root of the dendrogram
+    elementd* internal = nullptr;   // array of n-1 internal vertices (the dendrogram D)
+    elementd* leaf = nullptr;       // array of n   leaf vertices (the graph G)
+    int n;                          // number of leaf vertices to allocate
+    interns* d = nullptr;           // list of internal edges of dendrogram D
+    splittree* splithist = nullptr; // histogram of cumulative split weights
+    list** paths = nullptr;         // array of path-lists from root to leaf
+    double L;                       // log-likelihood of graph G given dendrogram D
+    rbtree subtreeL, subtreeR;      // trees for computeEdgeCount() function
+    cnode* ctree = nullptr;         // (consensus tree) array of internal tree nodes
+    int* cancestor = nullptr;       // (consensus tree) oldest ancetor's index for
     // each leaf
 
     // insert node i according to binary search property
     void binarySearchInsert(elementd*, elementd*);
     // return path to root from leaf
-    list* binarySearchFind(const double);
+    list* binarySearchFind(double) const;
     // build split for this internal edge
-    std::string buildSplit(elementd*);
+    string buildSplit(elementd*) const;
     // compute number of edges between two internal subtrees
-    int computeEdgeCount(const int, const short int, const int,
-                         const short int);
+    int computeEdgeCount(int, short int, int, short int);
     // (consensus tree) counts children
-    size_t countChildren(const std::string);
+    static size_t countChildren(const string &s);
     // find internal node of D that is common ancestor of i,j
-    elementd* findCommonAncestor(list**, const int, const int);
+    elementd* findCommonAncestor(list**, int, int);
     // return reverse of path to leaf from root
-    list* reversePathToRoot(const int);
-// quicksort functions
-    void QsortMain(block*, int, int);
-    int QsortPartition(block*, int, int, int);
+    list* reversePathToRoot(int);
+    // quicksort functions
+    static void QsortMain(block*, int, int);
+    static int QsortPartition(block*, int, int, int);
+
+    // underlying G (dangerously accessible)
+    graph* g = nullptr;
 
 public:
-    // underlying G (dangerously accessible)
-    graph* g;
 
     // constructor / destructor
-    dendro(); ~dendro();
+    dendro() = default;
+    dendro(const dendro &) = delete;
+    dendro & operator = (const dendro &) = delete;
+    ~dendro();
+
+    igraph_error_t setGraph(const igraph_t *igraph);
+    void setGraph(graph *ig) { g = ig; }
+    const graph *getGraph() const { return g; }
+
     // build dendrogram from g
     void buildDendrogram();
     // delete dendrograph in prep for importDendrogramStructure
@@ -278,24 +263,24 @@ public:
     // return size of consensus split
     int getConsensusSize();
     // return split tree with consensus splits
-    splittree* getConsensusSplits();
+    splittree* getConsensusSplits() const;
     // return likelihood of G given D
-    double getLikelihood();
+    double getLikelihood() const;
     // store splits in this splittree
-    void getSplitList(splittree*);
+    void getSplitList(splittree*) const;
     // return total weight of splittree
-    double getSplitTotalWeight();
+    double getSplitTotalWeight() const;
     // make random G from D
     void makeRandomGraph();
     // make single MCMC move
-    bool monteCarloMove(double&, bool&, const double);
+    void monteCarloMove(double &, bool &, double);
     // record consensus tree from splithist
     void recordConsensusTree(igraph_vector_int_t *parents,
                              igraph_vector_t *weights);
     // record D structure
-    void recordDendrogramStructure(igraph_hrg_t *hrg);
+    void recordDendrogramStructure(igraph_hrg_t *hrg) const noexcept;
     // record G structure to igraph graph
-    void recordGraphStructure(igraph_t *graph);
+    igraph_error_t recordGraphStructure(igraph_t *graph) const noexcept;
     // force refresh of log-likelihood value
     void refreshLikelihood();
     // sample dendrogram edge likelihoods and update edge histograms
@@ -303,9 +288,7 @@ public:
     // reset the dendrograph structures
     void resetDendrograph();
     // sample dendrogram's splits and update the split histogram
-    bool sampleSplitLikelihoods(igraph_integer_t&);
-    // reset splits histogram
-    //void resetAllSplits();
+    bool sampleSplitLikelihoods();
 };
 
 } // namespace fitHRG

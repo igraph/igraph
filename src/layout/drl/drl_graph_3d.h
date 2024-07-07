@@ -60,7 +60,7 @@ public:
     void init_parms ( int rand_seed, float edge_cut, float real_parm );
     void init_parms ( const igraph_layout_drl_options_t *options );
     int read_real ( const igraph_matrix_t *real_mat );
-    int draw_graph (igraph_matrix_t *res);
+    igraph_error_t draw_graph(igraph_matrix_t *res);
     float get_tot_energy ( );
 
     // Con/Decon

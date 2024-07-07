@@ -31,21 +31,22 @@
 
 struct Node {
 
-    Node() : selfLink(0.0), exit(0.0), size(0.0) {}
-    Node(igraph_integer_t modulenr, double tpweight) : Node() {
-        teleportWeight = tpweight;
+    Node() = default;
+    Node(igraph_integer_t modulenr, double tpweight) :
+        teleportWeight(tpweight)
+    {
         members.push_back(modulenr); // members = [nodenr]
     }
 
     std::vector<igraph_integer_t> members;
     std::vector< std::pair<igraph_integer_t, double> > inLinks;
     std::vector< std::pair<igraph_integer_t, double> > outLinks;
-    double selfLink;
+    double selfLink = 0.0;
 
-    double teleportWeight;
-    double danglingSize;
-    double exit;
-    double size;
+    double teleportWeight = 0.0;
+    double danglingSize = 0.0;
+    double exit = 0.0;
+    double size = 0.0;
 };
 
 #endif // INFOMAP_NODE_H

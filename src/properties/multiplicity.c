@@ -50,47 +50,80 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
 
-    if (
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
-        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI)
-    ) {
-        /* use the cached result */
-        *res = (
-            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP) &&
-            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)
-        );
-        return IGRAPH_SUCCESS;
+    /* Is it already known whether the graph has loops or multi-edges? */
+    igraph_bool_t known_loop, known_multi;
+
+    /* If it is known, does the graph have them? */
+    igraph_bool_t has_loop, has_multi;
+
+    known_loop  = igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP);
+    if (known_loop) {
+        has_loop = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP);
+        if (has_loop) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
     }
+
+    known_multi = igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI);
+    if (known_multi) {
+        has_multi = igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI);
+        if (has_multi) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    if (known_loop && known_multi) {
+        if (!has_loop && !has_multi) {
+            *res = true;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    /* Up to now, these variables were used to store the cache status.
+     * From here on, we re-use them to store the outcome of explicit
+     * checks. */
+
+    known_loop = known_multi = false;
+    has_loop = has_multi = false; /* be optimistic */
 
     if (vc == 0 || ec == 0) {
         *res = true;
+        known_loop = known_multi = true;
     } else {
         igraph_vector_int_t neis;
-        igraph_integer_t i, j, n;
-        igraph_bool_t found = false;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-        for (i = 0; i < vc; i++) {
+        for (igraph_integer_t i = 0; i < vc; i++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-            n = igraph_vector_int_size(&neis);
-            for (j = 0; j < n; j++) {
+            const igraph_integer_t n = igraph_vector_int_size(&neis);
+            for (igraph_integer_t j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
-                    found = true; break;
+                    known_loop = true; has_loop = true; break;
                 }
+                /* Attention: If the graph is undirected, self-loops appears
+                 * twice in the neighbour list. This does not mean that there
+                 * are multi-edges. We do not need to worry about this as loop
+                 * are already caught above. */
                 if (j > 0 && VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
-                    found = true; break;
+                    known_multi = true; has_multi = true; break;
                 }
             }
         }
-        *res = !found;
+        *res = !has_loop && !has_multi;
+        if (*res) {
+            known_multi = known_loop = true;
+        }
         igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    /* If the graph turned out to be simple, we can cache that it has no loop
-     * and no multiple edges */
-    if (*res) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, 0);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, 0);
+    if (known_loop) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, has_loop);
+    }
+
+    if (known_multi) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, has_multi);
     }
 
     return IGRAPH_SUCCESS;
@@ -161,7 +194,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, *res);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, *res);
 
     return IGRAPH_SUCCESS;
 }
@@ -184,7 +217,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  *        to check all edges.
  * \return Error code.
  *
- * \sa \ref igraph_count_multiple(), \ref igraph_has_multiple() and \ref igraph_simplify().
+ * \sa \ref igraph_count_multiple(), \ref igraph_count_multiple_1(),
+ * \ref igraph_has_multiple() and \ref igraph_simplify().
  *
  * Time complexity: O(e*d), e is the number of edges to check and d is the
  * average degree (out-degree in directed graphs) of the vertices at the
@@ -193,7 +227,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  * \example examples/simple/igraph_is_multiple.c
  */
 igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
-                       igraph_es_t es) {
+                                  igraph_es_t es) {
     igraph_eit_t eit;
     igraph_integer_t i, j, n;
     igraph_lazy_inclist_t inclist;
@@ -256,7 +290,8 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
  * average degree (out-degree in directed graphs) of the vertices at the
  * tail of the edges.
  */
-igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es) {
+igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res,
+                                     igraph_es_t es) {
     igraph_eit_t eit;
     igraph_integer_t i, j, n;
     igraph_lazy_adjlist_t adjlist;
@@ -309,7 +344,8 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  *
  * Time complexity: O(d), where d is the out-degree of the tail of the edge.
  */
-igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res, igraph_integer_t eid)
+igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res,
+                                       igraph_integer_t eid)
 {
     igraph_integer_t i, n, count;
     igraph_integer_t from = IGRAPH_FROM(graph, eid);
@@ -365,7 +401,8 @@ igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *
  * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
  * |E| is the number of edges in the graph.
  */
-igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es, igraph_bool_t loops) {
+igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res,
+                                igraph_es_t es, igraph_bool_t loops) {
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;
@@ -438,7 +475,8 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
  *
  * Time complexity: O(|E| log(d)) where d is the maximum in-degree.
  */
-igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igraph_bool_t loops) {
+igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res,
+                                 igraph_bool_t loops) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_lazy_adjlist_t adjlist;
 
@@ -496,7 +534,7 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
 
     /* cache the result if loops are not treated as mutual */
     if (!loops) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MUTUAL, *res);
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MUTUAL, *res);
     }
 
     return IGRAPH_SUCCESS;

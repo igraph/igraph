@@ -1,3 +1,20 @@
+/*
+   IGraph library.
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
@@ -68,7 +85,7 @@ int main(void) {
     BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
     );
-    BENCH(" 10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+    BENCH("10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 

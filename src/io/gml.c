@@ -29,6 +29,7 @@
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strdup, strncasecmp */
+#include "math/safe_intop.h"
 
 #include "io/gml-header.h"
 #include "io/parsers/gml-parser.h"
@@ -162,12 +163,11 @@ static igraph_error_t entity_decode(const char *src, char **dest, igraph_bool_t 
 }
 
 static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
-    igraph_integer_t i;
+
     igraph_vector_ptr_t *vec;
-    for (i = 0; i < 3; i++) {
-        igraph_integer_t j;
+    for (igraph_integer_t i = 0; i < 3; i++) {
         vec = ptr[i];
-        for (j = 0; j < igraph_vector_ptr_size(vec); j++) {
+        for (igraph_integer_t j = 0; j < igraph_vector_ptr_size(vec); j++) {
             igraph_attribute_record_t *atrec = VECTOR(*vec)[j];
             if (atrec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *value = (igraph_vector_t*)atrec->value;
@@ -241,8 +241,8 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer
 
 igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t *context) {
     context->depth = 0;
-    context->scanner = 0;
-    context->tree = 0;
+    context->scanner = NULL;
+    context->tree = NULL;
     context->errmsg[0] = '\0';
     context->igraph_errno = IGRAPH_SUCCESS;
 
@@ -250,14 +250,14 @@ igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t *context) {
 }
 
 void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t *context) {
-    if (context->tree != 0) {
+    if (context->tree != NULL) {
         igraph_gml_tree_destroy(context->tree);
-        context->tree = 0;
+        context->tree = NULL;
     }
 
-    if (context->scanner != 0) {
+    if (context->scanner != NULL) {
         (void) igraph_gml_yylex_destroy(context->scanner);
-        context->scanner = 0;
+        context->scanner = NULL;
     }
 }
 
@@ -297,15 +297,13 @@ static igraph_error_t create_or_update_attribute(const char *name,
     if (trieid == triesize) {
         /* new attribute */
         igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-        if (!atrec) {
-            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(atrec, "Cannot read GML file.");
         IGRAPH_FINALLY(igraph_free, atrec);
+
         atrec->name = strdup(name);
-        if (! atrec->name) {
-            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(atrec->name, "Cannot read GML file.");
         IGRAPH_FINALLY(igraph_free, (char *) atrec->name);
+
         if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
             atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         } else if (type == IGRAPH_I_GML_TREE_STRING) {
@@ -346,9 +344,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
         igraph_attribute_type_t type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
-            if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(p, "Cannot read GML file.");
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_vector_init(p, no_of_items));
             igraph_vector_fill(p, IGRAPH_NAN); /* use NaN as default */
@@ -356,9 +352,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
             IGRAPH_FINALLY_CLEAN(1);
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
-            if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(p, "Cannot read GML file.");
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_items));
             atrec->value = p;
@@ -457,7 +451,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     case 0: /* success */
         break;
     case 1: /* parse error */
-        if (context.errmsg[0] != 0) {
+        if (context.errmsg[0] != '\0') {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
         } else if (context.igraph_errno != IGRAPH_SUCCESS) {
             IGRAPH_ERROR("", context.igraph_errno);
@@ -538,7 +532,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                               igraph_gml_tree_line(gtree, i));
             }
             node = igraph_gml_tree_get_tree(gtree, i);
-            hasid = 0;
+            hasid = false;
             for (igraph_integer_t j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *name = igraph_gml_tree_name(node, j);
                 igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, j);
@@ -566,7 +560,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         IGRAPH_ERRORF("Duplicate node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
-                    hasid = 1;
+                    hasid = true;
                 }
             }
             if (!hasid) {
@@ -840,9 +834,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
         }
     }
     *key = IGRAPH_CALLOC(newlen + 1, char);
-    if (! *key) {
-        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(*key, "Writing GML format failed.");
     memcpy(*key, strno, plen * sizeof(char));
     for (i = 0; i < len; i++) {
         if (isalnum(orig[i])) {
@@ -1066,8 +1058,13 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         }
         for (i = 0; i < no_of_nodes; ++i) {
             igraph_real_t val = VECTOR(*myid)[i];
-            if (val != (igraph_integer_t) val) {
+            igraph_real_t trunc_val = trunc(val);
+            if (! (val == trunc_val && igraph_i_is_real_representable_as_integer(trunc_val))) {
                 IGRAPH_WARNINGF("%g is not a valid integer id for GML files, ignoring all supplied ids.", val);
+                if (myid == &v_myid) {
+                    igraph_vector_destroy(&v_myid);
+                    IGRAPH_FINALLY_CLEAN(1);
+                }
                 myid = NULL;
                 break;
             }
@@ -1079,6 +1076,10 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_vector_is_duplicate_free(myid, &duplicate_free));
         if (! duplicate_free) {
             IGRAPH_WARNING("Duplicate id values found, ignoring supplies ids.");
+            if (myid == &v_myid) {
+                igraph_vector_destroy(&v_myid);
+                IGRAPH_FINALLY_CLEAN(1);
+            }
             myid = NULL;
         }
     }
@@ -1093,7 +1094,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         name = igraph_strvector_get(&gnames, i);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
         IGRAPH_FINALLY(igraph_free, newname);
-        if (!strcmp(newname, "directed")) {
+        if (!strcmp(newname, "directed")|| !strcmp(newname, "edge") || !strcmp(newname, "node")) {
             IGRAPH_WARNINGF("The graph attribute '%s' was ignored while writing GML format.", name);
         } else {
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -1220,7 +1221,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* The edges too */
     IGRAPH_CHECK(igraph_vector_int_resize(&warning_shown, eattr_no));
-    igraph_vector_int_fill(&warning_shown, 0);
+    igraph_vector_int_null(&warning_shown);
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to = IGRAPH_TO(graph, i);

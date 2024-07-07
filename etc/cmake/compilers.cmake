@@ -1,5 +1,13 @@
 include(CheckCCompilerFlag)
 
+# Enable POSIX features. This needs to be set here instead of in source files so
+# that it affects CMake-based feature tests.
+#
+# See:
+#  - https://pubs.opengroup.org/onlinepubs/007904875/functions/xsh_chap02_02.html
+#  - https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html
+add_compile_definitions(_POSIX_C_SOURCE=200809L)
+
 if(MSVC)
   add_compile_options(/FS)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS) # necessary to compile for UWP
@@ -40,9 +48,9 @@ macro(use_all_warnings TARGET_NAME)
       /wd4800 # forcing value to 'true' or 'false' (performance warning)
       /wd4204 # nonstandard extension used: non-constant aggregate initializer
       /wd4701 # potentially uninitialized local variable
-      /wd4054 # 'type cast': from function pointer '...' to data pointer 'void *'
-      /wd4055 # from data pointer 'void *' to function pointer '...'
       /wd4221 # nonstandard extension used: '...': cannot be initialized using address of automatic variable '...'
+      /wd4127 # conditional expression is constant
+      /wd4702 # unreachable code
     )
   else()
     # Notes:

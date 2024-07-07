@@ -38,8 +38,8 @@
  * may change the edge order, even if the input was already a simple graph.
  *
  * \param graph The graph object.
- * \param multiple Logical, if true, multiple edges will be removed.
- * \param loops Logical, if true, loops (self edges) will be removed.
+ * \param remove_multiple Logical, if true, multiple edges will be removed.
+ * \param remove_loops Logical, if true, loops (self edges) will be removed.
  * \param edge_comb What to do with the edge attributes. \c NULL means to
  *        discard the edge attributes after the operation, even for edges
  *        that were unaffected. See the igraph manual section about attributes
@@ -53,7 +53,7 @@
  */
 
 igraph_error_t igraph_simplify(igraph_t *graph,
-                               igraph_bool_t multiple, igraph_bool_t loops,
+                               igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
                                const igraph_attribute_combination_t *edge_comb) {
 
     igraph_vector_int_t edges;
@@ -68,13 +68,25 @@ igraph_error_t igraph_simplify(igraph_t *graph,
     igraph_vector_int_t mergeinto;
     igraph_integer_t actedge;
 
-    if (!multiple && !loops)
+    /* if we already know there are no multi-edges, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        remove_multiple = false;
+    }
+
+    /* if we already know there are no loops, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        remove_loops = false;
+    }
+
+    if (!remove_multiple && !remove_loops)
         /* nothing to do */
     {
         return IGRAPH_SUCCESS;
     }
 
-    if (!multiple) {
+    if (!remove_multiple) {
         igraph_vector_int_t edges_to_delete;
 
         /* removing loop edges only, this is simple. No need to combine anything
@@ -106,6 +118,8 @@ igraph_error_t igraph_simplify(igraph_t *graph,
         igraph_vector_int_destroy(&edges_to_delete);
         IGRAPH_FINALLY_CLEAN(1);
 
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
+
         return IGRAPH_SUCCESS;
     }
 
@@ -125,20 +139,20 @@ igraph_error_t igraph_simplify(igraph_t *graph,
         from = IGRAPH_FROM(graph, edge);
         to = IGRAPH_TO(graph, edge);
 
-        if (loops && from == to) {
+        if (remove_loops && from == to) {
             /* Loop edge to be removed */
             if (attr) {
                 VECTOR(mergeinto)[edge] = -1;
             }
-        } else if (multiple && from == pfrom && to == pto) {
+        } else if (remove_multiple && from == pfrom && to == pto) {
             /* Multiple edge to be contracted */
             if (attr) {
                 VECTOR(mergeinto)[edge] = actedge;
             }
         } else {
             /* Edge to be kept */
-            igraph_vector_int_push_back(&edges, from);
-            igraph_vector_int_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from);  /* reserved */
+            igraph_vector_int_push_back(&edges, to);  /* reserved */
             if (attr) {
                 actedge++;
                 VECTOR(mergeinto)[edge] = actedge;
@@ -176,6 +190,21 @@ igraph_error_t igraph_simplify(igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
     igraph_destroy(graph);
     *graph = res;
+
+    /* The cache must be set as the very last step, only after all functions that can
+     * potentially return with an error have finished. */
+
+    if (remove_loops) {
+        /* Loop edges were removed so we know for sure that there aren't any
+         * loop edges now */
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
+    }
+
+    if (remove_multiple) {
+        /* Multi-edges were removed so we know for sure that there aren't any
+         * multi-edges now */
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, false);
+    }
 
     return IGRAPH_SUCCESS;
 }

@@ -35,7 +35,7 @@
  * \function igraph_reverse_edges
  * \brief Reverses some edges of a directed graph.
  *
- * This functon reverses some edges of a directed graph. The modification is done in place.
+ * This function reverses some edges of a directed graph. The modification is done in place.
  * All attributes, as well as the ordering of edges and vertices are preserved.
  *
  * </para><para>
@@ -70,7 +70,7 @@ igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
 
     /* Convert graph to edge list. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*no_of_edges);
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ 0));
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
 
     /* Reverse the edges. */
 
@@ -89,7 +89,7 @@ igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     IGRAPH_FINALLY(igraph_destroy, &new_graph);
 
     IGRAPH_I_ATTRIBUTE_DESTROY(&new_graph);
-    IGRAPH_I_ATTRIBUTE_COPY(&new_graph, graph, 1, 1, 1); /* does IGRAPH_CHECK */
+    IGRAPH_I_ATTRIBUTE_COPY(&new_graph, graph, true, true, true); /* does IGRAPH_CHECK */
 
     igraph_eit_destroy(&eit);
     igraph_vector_int_destroy(&edges);

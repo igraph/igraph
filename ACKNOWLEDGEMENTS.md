@@ -188,7 +188,7 @@ Moscow Aviation Institute, Moscow, Russia. E-mail: <mao@gnu.org>.
 License: [GNU GPLv3][gpl3] or later
 
 
-#### [GMP (GNU Multiple Precision Arithmetic Library)](https://gmplib.org/)
+#### [GMP (GNU Multiple Precision Arithmetic Library) and mini-gmp](https://gmplib.org/)
 
 Copyright (C) Free Software Foundation, Inc.
 

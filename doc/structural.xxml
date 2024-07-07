@@ -10,7 +10,7 @@
 <!-- doxrox-include about_structural -->
 
 <section id="basic-properties"><title>Basic properties</title>
-<!-- doxrox-include igraph_are_connected -->
+<!-- doxrox-include igraph_are_adjacent -->
 </section>
 
 <section id="Sparsifiers"><title>Sparsifiers</title>
@@ -45,9 +45,12 @@
 <!-- doxrox-include igraph_girth -->
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_eccentricity_dijkstra -->
-<!-- doxrox-include igraph_graph_center -->
 <!-- doxrox-include igraph_radius -->
+<!-- doxrox-include igraph_radius_dijkstra -->
+<!-- doxrox-include igraph_graph_center -->
+<!-- doxrox-include igraph_graph_center_dijkstra -->
 <!-- doxrox-include igraph_pseudo_diameter -->
+<!-- doxrox-include igraph_pseudo_diameter_dijkstra -->
 <!-- doxrox-include igraph_voronoi -->
 <!-- doxrox-include igraph_vertex_path_from_edge_path -->
 </section>
@@ -96,9 +99,13 @@
 <!-- doxrox-include igraph_is_connected -->
 <!-- doxrox-include igraph_decompose -->
 <!-- doxrox-include igraph_decompose_destroy -->
+<!-- doxrox-include igraph_reachability -->
+<!-- doxrox-include igraph_count_reachable -->
+<!-- doxrox-include igraph_transitive_closure -->
 <!-- doxrox-include igraph_biconnected_components -->
 <!-- doxrox-include igraph_articulation_points -->
 <!-- doxrox-include igraph_bridges -->
+<!-- doxrox-include igraph_is_biconnected -->
 </section>
 
 <section id="degree-sequences"><title>Degree sequences</title>
@@ -131,8 +138,8 @@
 </section>
 
 <section id="subset-limited-centrality-measures"><title>Subset-limited centrality measures</title>
-<!-- doxrox-include igraph_betweenness_subset-->
-<!-- doxrox-include igraph_edge_betweenness_subset-->
+<!-- doxrox-include igraph_betweenness_subset -->
+<!-- doxrox-include igraph_edge_betweenness_subset -->
 </section>
 
 <section id="centralization"><title>Centralization</title>
@@ -191,6 +198,8 @@
 <section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple graphs: Multiple and loop edges</title>
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
+<!-- doxrox-include igraph_has_loop -->
+<!-- doxrox-include igraph_count_loops -->
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
@@ -201,6 +210,9 @@
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_joint_type_distribution -->
+<!-- doxrox-include igraph_joint_degree_distribution -->
+<!-- doxrox-include igraph_joint_degree_matrix -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>
@@ -231,10 +243,13 @@
 
 <section id="other-operations"><title>Other operations</title>
 <!-- doxrox-include igraph_density -->
+<!-- doxrox-include igraph_mean_degree -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
+<!-- doxrox-include igraph_has_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->
@@ -244,6 +259,7 @@
 </section>
 
 <section id="structural-properties-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_are_connected -->
 <!-- doxrox-include igraph_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_shortest_paths_bellman_ford -->

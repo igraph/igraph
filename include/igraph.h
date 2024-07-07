@@ -24,10 +24,6 @@
 #ifndef IGRAPH_H
 #define IGRAPH_H
 
-#ifndef _GNU_SOURCE
-    #define _GNU_SOURCE 1
-#endif
-
 #include "igraph_version.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
@@ -40,6 +36,7 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 #include "igraph_array.h"
+#include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
 #include "igraph_heap.h"
@@ -99,5 +96,6 @@
 #include "igraph_eulerian.h"
 #include "igraph_graphicality.h"
 #include "igraph_cycles.h"
+#include "igraph_reachability.h"
 
 #endif

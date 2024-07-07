@@ -249,9 +249,16 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);
 
+IGRAPH_EXPORT igraph_error_t igraph_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights,
+                                                    igraph_real_t *radius, igraph_neimode_t mode);
+
 IGRAPH_EXPORT igraph_error_t igraph_graph_center(const igraph_t *graph,
                                  igraph_vector_int_t *res,
                                  igraph_neimode_t mode);
+
+IGRAPH_EXPORT igraph_error_t igraph_graph_center_dijkstra(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_vector_int_t *res, igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                                          igraph_real_t *diameter,

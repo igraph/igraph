@@ -72,14 +72,14 @@ int main(void) {
     IGRAPH_ASSERT(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&graph) == 2);
     IGRAPH_ASSERT(igraph_ecount(&graph) == 1);
-    IGRAPH_ASSERT(igraph_are_connected(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_are_adjacent(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(are_connected);
     igraph_destroy(&graph);
 
     IGRAPH_ASSERT(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&graph) == 2);
     IGRAPH_ASSERT(igraph_ecount(&graph) == 1);
-    IGRAPH_ASSERT(igraph_are_connected(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_are_adjacent(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(are_connected);
     igraph_destroy(&graph);
 

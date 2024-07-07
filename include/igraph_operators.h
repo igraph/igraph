@@ -49,6 +49,8 @@ IGRAPH_EXPORT igraph_error_t igraph_union(igraph_t *res, const igraph_t *left, c
                                igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2);
 IGRAPH_EXPORT igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
                                     igraph_vector_int_list_t *edgemaps);
+IGRAPH_EXPORT igraph_error_t igraph_join(igraph_t *res, const igraph_t *left,
+                                         const igraph_t *right);
 IGRAPH_EXPORT igraph_error_t igraph_intersection(igraph_t *res,
                                       const igraph_t *left, const igraph_t *right,
                                       igraph_vector_int_t *edge_map1,
@@ -69,10 +71,12 @@ IGRAPH_EXPORT igraph_error_t igraph_permute_vertices(const igraph_t *graph, igra
                                           const igraph_vector_int_t *permutation);
 IGRAPH_EXPORT igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
                                               igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
+                                                igraph_integer_t order, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
-                                  igraph_bool_t loops,
-                                  const igraph_attribute_combination_t *edge_comb);
+IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
+                                             igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
+                                             const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                               const igraph_vs_t vids,
                                               igraph_subgraph_implementation_t impl,

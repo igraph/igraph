@@ -95,7 +95,7 @@ int main(void) {
     igraph_contract_vertices(&graph, &membership, NULL);
     igraph_vector_int_destroy(&membership);
 
-    igraph_simplify(&graph, /* multiple */ true, /* loops */ false, &comb);
+    igraph_simplify(&graph, /* remove_multiple */ true, /* remove_loops */ false, &comb);
 
     igraph_vector_int_init_range(&membership, 0, igraph_vcount(&graph));
     EANV(&graph, "weight", &weights);

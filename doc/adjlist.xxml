@@ -13,6 +13,7 @@
 <!-- doxrox-include igraph_adjlist_init -->
 <!-- doxrox-include igraph_adjlist_init_empty -->
 <!-- doxrox-include igraph_adjlist_init_complementer -->
+<!-- doxrox-include igraph_adjlist_init_from_inclist -->
 <!-- doxrox-include igraph_adjlist_destroy -->
 <!-- doxrox-include igraph_adjlist_get -->
 <!-- doxrox-include igraph_adjlist_size -->

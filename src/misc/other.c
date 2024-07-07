@@ -362,7 +362,7 @@ igraph_error_t igraph_vertex_path_from_edge_path(
                 break;
 
             default:
-                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVMODE);
         }
 
         if (!next_edge_ok) {

@@ -41,5 +41,7 @@ int main(void) {
     igraph_vector_destroy(&w);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
