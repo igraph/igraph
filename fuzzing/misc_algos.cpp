@@ -51,6 +51,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_int_init(&iv2, 0);
 
         igraph_minimum_cycle_basis(&graph, &ivl1, -1, true, true, NULL);
+        igraph_fundamental_cycles(&graph, &ivl1, -1, -1, NULL);
 
         igraph_vector_resize(&v2, 3);
         igraph_vector_null(&v2);
