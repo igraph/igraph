@@ -43,6 +43,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_int_list_t ivl1;
         igraph_vector_t v1, v2;
         igraph_vector_int_t iv1, iv2;
+        igraph_t g;
 
         igraph_vector_int_list_init(&ivl1, 0);
         igraph_vector_init(&v1, 0);
@@ -62,6 +63,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_ecc(&graph, &v1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
 
         igraph_count_reachable(&graph, &iv1, IGRAPH_OUT);
+        igraph_transitive_closure(&graph, &g);
+        igraph_destroy(&g);
 
         if (igraph_vcount(&graph) >= 2) {
             igraph_get_all_simple_paths(&graph,&iv1,  0, igraph_vss_1(1), 5, IGRAPH_ALL);
