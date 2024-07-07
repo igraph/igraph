@@ -66,11 +66,12 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, i
  * \define igraph_adjlist_get
  * \brief Query a vector in an adjacency list.
  *
- * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
+ * Returns a pointer to an \ref igraph_vector_int_t object from an
  * adjacency list. The vector can be modified as desired.
+ *
  * \param al The adjacency list object.
  * \param no The vertex whose adjacent vertices will be returned.
- * \return Pointer to the <type>igraph_vector_int_t</type> object.
+ * \return Pointer to the \ref igraph_vector_int_t object.
  *
  * Time complexity: O(1).
  */
