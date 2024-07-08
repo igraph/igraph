@@ -151,8 +151,6 @@ IGRAPH_EXPORT igraph_error_t igraph_vector_int_pair_order(const igraph_vector_in
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
                                            igraph_vector_int_t* res, igraph_integer_t maxval);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_vector_int_rank(const igraph_vector_int_t *v, igraph_vector_int_t *res,
-                                     igraph_integer_t nodes);
 
 __END_DECLS
 

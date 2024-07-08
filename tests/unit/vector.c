@@ -333,7 +333,7 @@ int main(void) {
     printf("Test rank\n");
     igraph_vector_int_init_int_end(&v2, -1, 0, 1, 2, 6, 5, 2, 1, 0, -1);
     igraph_vector_int_init(&v4, 0);
-    igraph_vector_int_rank(&v2, &v4, 7);
+    igraph_i_vector_int_rank(&v2, &v4, 7);
     print_vector_int(&v2);
     print_vector_int(&v4);
     igraph_vector_int_destroy(&v2);

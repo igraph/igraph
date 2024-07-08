@@ -146,6 +146,41 @@
  * (28) We just call igraph_vertex_connectivity, see (20).
  */
 
+
+/* internal helper function */
+igraph_error_t igraph_i_vector_int_rank(
+    const igraph_vector_int_t *v, igraph_vector_int_t *res, igraph_integer_t nodes) {
+
+    igraph_vector_int_t rad;
+    igraph_vector_int_t ptr;
+    igraph_integer_t edges = igraph_vector_int_size(v);
+    igraph_integer_t i, c = 0;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, edges);
+    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
+
+    for (i = 0; i < edges; i++) {
+        igraph_integer_t elem = VECTOR(*v)[i];
+        VECTOR(ptr)[i] = VECTOR(rad)[elem];
+        VECTOR(rad)[elem] = i + 1;
+    }
+
+    for (i = 0; i < nodes; i++) {
+        igraph_integer_t p = VECTOR(rad)[i];
+        while (p != 0) {
+            VECTOR(*res)[p - 1] = c++;
+            p = VECTOR(ptr)[p - 1];
+        }
+    }
+
+    igraph_vector_int_destroy(&ptr);
+    igraph_vector_int_destroy(&rad);
+    IGRAPH_FINALLY_CLEAN(2);
+    return IGRAPH_SUCCESS;
+}
+
+
 /*
  * This is an internal function that calculates the maximum flow value
  * on undirected graphs, either for an s-t vertex pair or for the
@@ -595,7 +630,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
     /* Create the basic data structure */
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-    IGRAPH_CHECK(igraph_vector_int_rank(&edges, &rank, no_of_nodes));
+    IGRAPH_CHECK(igraph_i_vector_int_rank(&edges, &rank, no_of_nodes));
 
     for (igraph_integer_t i = 0; i < no_of_edges; i += 2) {
         const igraph_integer_t pos = VECTOR(rank)[i];

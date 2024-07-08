@@ -153,6 +153,11 @@ IGRAPH_EXPORT igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph,
                                         igraph_vector_t *flows,
                                         const igraph_vector_t *capacity);
 
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_vector_int_rank(
+    const igraph_vector_int_t *v,
+    igraph_vector_int_t *res,
+    igraph_integer_t nodes);
+
 __END_DECLS
 
 #endif
