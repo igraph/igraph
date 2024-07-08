@@ -44,14 +44,18 @@ int main(void) {
 
     /* Null graph */
     igraph_vector_int_init(&membership, 0);
+
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
-
     igraph_destroy(&graph);
+
     igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
+    igraph_destroy(&graph);
+
+    igraph_vector_int_destroy(&membership);
 
     /* Simple unweighted graph */
     igraph_small(&graph, 10, IGRAPH_UNDIRECTED,
