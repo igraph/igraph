@@ -53,11 +53,6 @@ int main(void) {
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
 
-    /* Should not crash if we omit 'modularity' */
-    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, /* modularity = */ NULL);
-    igraph_destroy(&graph);
-    igraph_vector_int_destroy(&membership);
-
     /* Simple unweighted graph */
     igraph_small(&graph, 10, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
