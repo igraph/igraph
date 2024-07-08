@@ -16,6 +16,9 @@ jobs:
     # Do not run in forks
     if: github.repository == 'igraph/igraph'
 
+    env:
+      DEFAULT_BRANCH: 'develop'
+
     steps:
     - name: Install dependencies
       run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
@@ -24,7 +27,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        ref: 'develop'
+        ref: ${{ github.event.inputs.branch || env.DEFAULT_BRANCH }}
 
     - name: Create build environment
       run: cmake -E make_directory ${{github.workspace}}/build
