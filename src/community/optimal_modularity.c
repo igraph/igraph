@@ -124,12 +124,20 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
 
     /* Avoid problems with the null graph */
     if (no_of_nodes < 2) {
+        /* Cater for the case when membership was not given, but modularity was requested. */
+        igraph_vector_int_t imembership, *pmembership;
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_null(membership);
+            pmembership = membership;
+        } else {
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&imembership, no_of_nodes);
+            pmembership = &imembership;
         }
+
+        IGRAPH_CHECK(igraph_vector_int_resize(pmembership, no_of_nodes));
+        igraph_vector_int_null(pmembership);
+
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+            IGRAPH_CHECK(igraph_modularity(graph, pmembership, NULL, 1, igraph_is_directed(graph), modularity));
         }
         return IGRAPH_SUCCESS;
     }
