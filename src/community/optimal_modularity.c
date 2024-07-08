@@ -139,6 +139,12 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
         if (modularity) {
             IGRAPH_CHECK(igraph_modularity(graph, pmembership, NULL, 1, igraph_is_directed(graph), modularity));
         }
+
+        if (! membership) {
+            igraph_vector_int_destroy(&imembership);
+            IGRAPH_FINALLY_CLEAN(1);
+        }
+
         return IGRAPH_SUCCESS;
     }
 
