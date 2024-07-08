@@ -37,8 +37,6 @@
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 /* #define SUGIYAMA_DEBUG */

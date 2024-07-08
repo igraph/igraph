@@ -24,7 +24,7 @@
 #include "igraph_statusbar.h"
 #include "igraph_error.h"
 
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 #include <stdio.h>
 #include <stdarg.h>

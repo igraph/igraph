@@ -24,7 +24,6 @@
 #ifndef IGRAPH_ATTRIBUTES_H
 #define IGRAPH_ATTRIBUTES_H
 
-#include "igraph_config.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_datatype.h"
