@@ -39,33 +39,33 @@ __BEGIN_DECLS
 /* Conversion                                         */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_get_adjacency(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_adjacency(
    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
    const igraph_vector_t *weights, igraph_loops_t loops
 );
-IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_sparse(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_adjacency_sparse(
    const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type,
    const igraph_vector_t *weights, igraph_loops_t loops
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_get_stochastic(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_stochastic(
    const igraph_t *graph, igraph_matrix_t *matrix, igraph_bool_t column_wise,
    const igraph_vector_t *weights
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_get_stochastic_sparse(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_stochastic_sparse(
    const igraph_t *graph, igraph_sparsemat_t *res, igraph_bool_t column_wise,
    const igraph_vector_t *weights
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol);
 
-IGRAPH_EXPORT igraph_error_t igraph_to_directed(igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_to_directed(igraph_t *graph,
                                      igraph_to_directed_t flags);
-IGRAPH_EXPORT igraph_error_t igraph_to_undirected(igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_to_undirected(igraph_t *graph,
                                        igraph_to_undirected_t mode,
                                        const igraph_attribute_combination_t *edge_comb);
-IGRAPH_EXPORT igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
 
 __END_DECLS
 

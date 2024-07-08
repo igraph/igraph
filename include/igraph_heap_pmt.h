@@ -27,13 +27,13 @@ typedef struct TYPE(igraph_heap) {
     BASE* end;
 } TYPE(igraph_heap);
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t capacity);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *t, const BASE *data, igraph_integer_t len);
-IGRAPH_EXPORT void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_heap, top)(const TYPE(igraph_heap)* h);
-IGRAPH_EXPORT BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_heap, size)(const TYPE(igraph_heap)* h);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t capacity);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) BASE FUNCTION(igraph_heap, top)(const TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_integer_t FUNCTION(igraph_heap, size)(const TYPE(igraph_heap)* h);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t capacity);

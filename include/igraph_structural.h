@@ -49,56 +49,56 @@ IGRAPH_EXPORT igraph_error_t igraph_diversity(const igraph_t *graph, const igrap
                                    igraph_vector_t *res, const igraph_vs_t vs);
 IGRAPH_EXPORT igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
                                igraph_vector_int_t *circle);
-IGRAPH_EXPORT igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count);
-IGRAPH_EXPORT igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                                  igraph_es_t es);
-IGRAPH_EXPORT igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                                      igraph_es_t es);
-IGRAPH_EXPORT igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es, igraph_bool_t loops);
-IGRAPH_EXPORT igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igraph_bool_t loops);
-IGRAPH_EXPORT igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es, igraph_bool_t loops);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igraph_bool_t loops);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
                                     igraph_vector_int_t *roots, igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
                                    igraph_bool_t loops);
-IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
                                                 igraph_bool_t loops);
-IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                      igraph_bool_t ignore_loops,
                                      igraph_reciprocity_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
                                   const igraph_vs_t vids, igraph_neimode_t mode,
                                   igraph_bool_t loops, const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
                                                    igraph_vector_int_t *outvids,
                                                    igraph_vs_t vids,
                                                    igraph_neimode_t mode,
                                                    igraph_bool_t loops,
                                                    igraph_order_t order,
                                                    igraph_bool_t only_indices);
-IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect);
 
 /* -------------------------------------------------- */
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,4) igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
                                               igraph_bool_t directed, igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,
                                                        igraph_bool_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_minimum_spanning_tree(
     const igraph_t *graph, igraph_vector_int_t *res,
     const igraph_vector_t *weights, igraph_mst_algorithm_t method);
-IGRAPH_EXPORT igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                               igraph_integer_t vid);
 
-IGRAPH_EXPORT igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vid,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_subcomponent(const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vid,
                                       igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,

@@ -1498,7 +1498,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
                     const igraph_vector_int_t *pairs,
                     igraph_bool_t directed, igraph_bool_t error) {
 
-    igraph_integer_t n = pairs ? igraph_vector_int_size(pairs) : 0;
+    igraph_integer_t n = igraph_vector_int_size(pairs);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
     igraph_integer_t eid = -1;

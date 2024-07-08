@@ -50,69 +50,69 @@ typedef struct {
 /* Allocation         */
 /*--------------------*/
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size);
-IGRAPH_EXPORT igraph_error_t FUNCTION(init_copy)(TYPE* to, const TYPE* from);
-IGRAPH_EXPORT void FUNCTION(destroy)(TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(init_copy)(TYPE* to, const TYPE* from);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(destroy)(TYPE* v);
 
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos);
-IGRAPH_EXPORT void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v);
 
 /*-----------------*/
 /* List properties */
 /*-----------------*/
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(capacity)(const TYPE* v);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(empty)(const TYPE* v);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(size)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_integer_t FUNCTION(capacity)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_bool_t FUNCTION(empty)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_integer_t FUNCTION(size)(const TYPE* v);
 
 /*------------------------*/
 /* Resizing operations    */
 /*------------------------*/
 
-IGRAPH_EXPORT void FUNCTION(clear)(TYPE* v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity);
-IGRAPH_EXPORT igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(clear)(TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size);
 
 /*------------------------*/
 /* Adding/removing items  */
 /*------------------------*/
 
-IGRAPH_EXPORT void FUNCTION(discard)(TYPE* v, igraph_integer_t index);
-IGRAPH_EXPORT void FUNCTION(discard_back)(TYPE* v);
-IGRAPH_EXPORT void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index);
-IGRAPH_EXPORT igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
-IGRAPH_EXPORT igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_TYPE* e);
-IGRAPH_EXPORT igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** result);
-IGRAPH_EXPORT igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e);
-IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e);
-IGRAPH_EXPORT igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** result);
-IGRAPH_EXPORT ITEM_TYPE FUNCTION(pop_back)(TYPE* v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
-IGRAPH_EXPORT igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
-IGRAPH_EXPORT void FUNCTION(replace)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(discard)(TYPE* v, igraph_integer_t index);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(discard_back)(TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** result);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** result);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) ITEM_TYPE FUNCTION(pop_back)(TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(replace)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
 IGRAPH_EXPORT void FUNCTION(remove_consecutive_duplicates)(TYPE *v, igraph_bool_t (*eq)(const ITEM_TYPE*, const ITEM_TYPE*));
 
 /*------------------*/
 /* Exchanging items */
 /*------------------*/
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t *index);
-IGRAPH_EXPORT igraph_error_t FUNCTION(reverse)(TYPE *v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2);
-IGRAPH_EXPORT igraph_error_t FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t *index);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(reverse)(TYPE *v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
 
 /*-----------*/
 /* Sorting   */
 /*-----------*/
 
-IGRAPH_EXPORT void FUNCTION(sort)(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void FUNCTION(sort)(
         TYPE *v, int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*));
-IGRAPH_EXPORT igraph_error_t FUNCTION(sort_ind)(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t FUNCTION(sort_ind)(
         TYPE *v, igraph_vector_int_t *ind,
         int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)
 );

@@ -175,9 +175,7 @@ igraph_error_t FUNCTION(init_copy)(TYPE* to, const TYPE* from) {
  */
 
 void FUNCTION(destroy)(TYPE *v) {
-    IGRAPH_ASSERT(v != 0);
-
-    if (v->stor_begin != 0) {
+    if (v->stor_begin != NULL) {
         FUNCTION(clear)(v);
         IGRAPH_FREE(v->stor_begin);
         v->stor_begin = NULL;
@@ -767,8 +765,6 @@ igraph_error_t FUNCTION(insert_new)(TYPE *v, igraph_integer_t pos, ITEM_TYPE** e
 igraph_error_t FUNCTION(remove)(TYPE *v, igraph_integer_t index, ITEM_TYPE *result) {
     igraph_integer_t size = FUNCTION(size)(v);
 
-    IGRAPH_ASSERT(result != 0);
-
     if (index < 0 || index >= size) {
         IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
     }
@@ -831,8 +827,6 @@ ITEM_TYPE FUNCTION(pop_back)(TYPE *v) {
  */
 igraph_error_t FUNCTION(remove_fast)(TYPE *v, igraph_integer_t index, ITEM_TYPE *result) {
     igraph_integer_t size = FUNCTION(size)(v);
-
-    IGRAPH_ASSERT(result != 0);
 
     if (index < 0 || index >= size) {
         IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);

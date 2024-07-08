@@ -24,9 +24,11 @@
 #ifdef __GNUC__
 #define IGRAPH_FUNCATTR_PURE __attribute__((__pure__))
 #define IGRAPH_FUNCATTR_CONST __attribute__((__const__))
+#define IGRAPH_FUNCATTR_NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
 #else
 #define IGRAPH_FUNCATTR_PURE
 #define IGRAPH_FUNCATTR_CONST
+#define IGRAPH_FUNCATTR_NONNULL(...)
 #endif
 
 /* IGRAPH_ASSUME() provides hints to the compiler about conditions

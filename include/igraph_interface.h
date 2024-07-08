@@ -37,59 +37,59 @@ __BEGIN_DECLS
 /* Interface                                          */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_empty_attrs(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_empty_attrs(
     igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
     const igraph_attribute_record_list_t* attr
 );
-IGRAPH_EXPORT void igraph_destroy(igraph_t *graph);
-IGRAPH_EXPORT igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from);
-IGRAPH_EXPORT igraph_error_t igraph_add_edges(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void igraph_destroy(igraph_t *graph);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_add_edges(
     igraph_t *graph, const igraph_vector_int_t *edges,
     const igraph_attribute_record_list_t* attr
 );
-IGRAPH_EXPORT igraph_error_t igraph_add_vertices(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_add_vertices(
     igraph_t *graph, igraph_integer_t nv,
     const igraph_attribute_record_list_t* attr
 );
-IGRAPH_EXPORT igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
-IGRAPH_EXPORT igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
-IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_map(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_delete_vertices_map(
     igraph_t *graph, const igraph_vs_t vertices, igraph_vector_int_t *map,
     igraph_vector_int_t *invmap
 );
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_vcount(const igraph_t *graph);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_ecount(const igraph_t *graph);
-IGRAPH_EXPORT igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t vid,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_integer_t igraph_vcount(const igraph_t *graph);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_integer_t igraph_ecount(const igraph_t *graph);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t vid,
                                    igraph_neimode_t mode);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_is_directed(const igraph_t *graph);
-IGRAPH_EXPORT igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_bool_t igraph_is_directed(const igraph_t *graph);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
                                              igraph_integer_t vid, igraph_neimode_t mode, igraph_bool_t loops);
-IGRAPH_EXPORT igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                                 const igraph_vs_t vids, igraph_neimode_t mode,
                                 igraph_bool_t loops);
-IGRAPH_EXPORT igraph_error_t igraph_edge(const igraph_t *graph, igraph_integer_t eid,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3,4) igraph_error_t igraph_edge(const igraph_t *graph, igraph_integer_t eid,
                               igraph_integer_t *from, igraph_integer_t *to);
-IGRAPH_EXPORT igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,3) igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
                                igraph_vector_int_t *edges);
-IGRAPH_EXPORT igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
                                  igraph_integer_t from, igraph_integer_t to,
                                  igraph_bool_t directed, igraph_bool_t error);
-IGRAPH_EXPORT igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2,3) igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
                                   const igraph_vector_int_t *pairs,
                                   igraph_bool_t directed, igraph_bool_t error);
-IGRAPH_EXPORT igraph_error_t igraph_get_all_eids_between(const igraph_t *graph, igraph_vector_int_t *eids,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_get_all_eids_between(const igraph_t *graph, igraph_vector_int_t *eids,
                                   igraph_integer_t source, igraph_integer_t target, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t vid,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t vid,
                                   igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2) igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res);
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
-IGRAPH_EXPORT void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value);
-IGRAPH_EXPORT void igraph_i_property_cache_set_bool_checked(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value);
-IGRAPH_EXPORT void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop);
-IGRAPH_EXPORT void igraph_i_property_cache_invalidate_all(const igraph_t *graph);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE IGRAPH_FUNCATTR_NONNULL(1) igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void igraph_i_property_cache_set_bool_checked(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) void igraph_i_property_cache_invalidate_all(const igraph_t *graph);
 
 #define IGRAPH_RETURN_IF_CACHED_BOOL(graphptr, prop, resptr) \
     do { \

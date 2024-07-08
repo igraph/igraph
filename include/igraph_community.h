@@ -140,20 +140,20 @@ IGRAPH_EXPORT igraph_error_t igraph_community_voronoi(
     const igraph_vector_t *lengths, const igraph_vector_t *weights,
     igraph_neimode_t mode, igraph_real_t r);
 
-IGRAPH_EXPORT igraph_error_t igraph_modularity(const igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,2,6) igraph_error_t igraph_modularity(const igraph_t *graph,
                                     const igraph_vector_int_t *membership,
                                     const igraph_vector_t *weights,
                                     const igraph_real_t resolution,
                                     const igraph_bool_t directed,
                                     igraph_real_t *modularity);
 
-IGRAPH_EXPORT igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1,4) igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            const igraph_real_t resolution,
                                            igraph_matrix_t *modmat,
                                            igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NONNULL(1) igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
                                             igraph_vector_int_t *new_to_old,
                                             igraph_integer_t *nb_clusters);
 
