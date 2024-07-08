@@ -318,11 +318,13 @@ int main(void) {
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
-    printf("Test rank\n");
+    printf("Test igraph_i_vector_int_rank and igraph_i_vector_int_order\n");
     igraph_vector_int_init_int_end(&v2, -1, 0, 1, 2, 6, 5, 2, 1, 0, -1);
     igraph_vector_int_init(&v4, 0);
     igraph_i_vector_int_rank(&v2, &v4, 7);
     print_vector_int(&v2);
+    print_vector_int(&v4);
+    igraph_i_vector_int_order(&v2, &v4, 7);
     print_vector_int(&v4);
     igraph_vector_int_destroy(&v2);
     igraph_vector_int_destroy(&v4);
@@ -358,8 +360,10 @@ int main(void) {
 
     printf("Test igraph_vector_int_init_range, igraph_i_vector_int_order\n");
     igraph_vector_int_init_range(&v4, 1, 11);
+    igraph_vector_int_reverse(&v4);
+    igraph_vector_int_scale(&v4, 3);
     igraph_vector_int_init(&v5, 0);
-    igraph_i_vector_int_order(&v4, &v5, 10);
+    igraph_i_vector_int_order(&v4, &v5, /* maxval */ igraph_vector_int_max(&v4));
     print_vector_int(&v5);
     igraph_vector_int_destroy(&v4);
     igraph_vector_int_destroy(&v5);

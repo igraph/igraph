@@ -59,8 +59,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#include "core/indheap.h"
-
 /**
  * \ingroup vector
  * \function igraph_vector_floor
@@ -183,23 +181,36 @@ igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_vector_int_order(const igraph_vector_int_t* v,
-                             igraph_vector_int_t* res,
-                             igraph_integer_t nodes) {
-    igraph_integer_t edges = igraph_vector_int_size(v);
+/**
+ * \function igraph_i_vector_int_order
+ *
+ * \param v Integer vector with non-negative entries.
+ * \param res The indices of the elements of \p v will be written here
+ *    in sorted order.
+ * \param maxval The largest value in \p v must be provided here.
+ * \return Error code.
+ *
+ * Time complexity: O(maxval).
+ */
+igraph_error_t igraph_i_vector_int_order(
+        const igraph_vector_int_t *v,
+        igraph_vector_int_t *res,
+        igraph_integer_t maxval) {
+
+    const igraph_integer_t size = igraph_vector_int_size(v);
     igraph_vector_int_t ptr;
     igraph_vector_int_t rad;
-    igraph_integer_t i, j;
+    igraph_integer_t j;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, nodes + 1);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, edges);
-    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, maxval + 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, size);
+    IGRAPH_CHECK(igraph_vector_int_resize(res, size));
 
-    for (i = 0; i < edges; i++) {
-        igraph_integer_t radix = v->stor_begin[i];
+    for (igraph_integer_t i = 0; i < size; i++) {
+        igraph_integer_t radix = VECTOR(*v)[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -207,13 +218,13 @@ igraph_error_t igraph_i_vector_int_order(const igraph_vector_int_t* v,
     }
 
     j = 0;
-    for (i = 0; i < nodes + 1; i++) {
+    for (igraph_integer_t i = 0; i < maxval + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
             igraph_integer_t next = VECTOR(ptr)[i] - 1;
-            res->stor_begin[j++] = next;
+            VECTOR(*res)[j++] = next;
             while (VECTOR(rad)[next] != 0) {
                 next = VECTOR(rad)[next] - 1;
-                res->stor_begin[j++] = next;
+                VECTOR(*res)[j++] = next;
             }
         }
     }
