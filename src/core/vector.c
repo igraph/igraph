@@ -242,38 +242,6 @@ igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_rank(
-        const igraph_vector_t *v, igraph_vector_int_t *res, igraph_integer_t nodes) {
-
-    igraph_vector_int_t rad;
-    igraph_vector_int_t ptr;
-    igraph_integer_t edges = igraph_vector_size(v);
-    igraph_integer_t i, c = 0;
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, edges);
-    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
-
-    for (i = 0; i < edges; i++) {
-        igraph_integer_t elem = VECTOR(*v)[i];
-        VECTOR(ptr)[i] = VECTOR(rad)[elem];
-        VECTOR(rad)[elem] = i + 1;
-    }
-
-    for (i = 0; i < nodes; i++) {
-        igraph_integer_t p = VECTOR(rad)[i];
-        while (p != 0) {
-            VECTOR(*res)[p - 1] = c++;
-            p = VECTOR(ptr)[p - 1];
-        }
-    }
-
-    igraph_vector_int_destroy(&ptr);
-    igraph_vector_int_destroy(&rad);
-    IGRAPH_FINALLY_CLEAN(2);
-    return IGRAPH_SUCCESS;
-}
-
 igraph_error_t igraph_vector_int_rank(
         const igraph_vector_int_t *v, igraph_vector_int_t *res, igraph_integer_t nodes) {
 
