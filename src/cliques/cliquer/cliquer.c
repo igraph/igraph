@@ -17,7 +17,7 @@
 
 #include "cliquer.h"
 
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 /* Default cliquer options */
 IGRAPH_THREAD_LOCAL clique_options clique_default_options = {

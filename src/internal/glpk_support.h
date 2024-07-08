@@ -25,7 +25,7 @@
 #ifndef IGRAPH_GLPK_SUPPORT_H
 #define IGRAPH_GLPK_SUPPORT_H
 
-#include "config.h"
+#include "config.h" /* HAVE_GLPK, IGRAPH_THREAD_LOCAL */
 
 /* Note: only files calling the GLPK routines directly need to
    include this header.

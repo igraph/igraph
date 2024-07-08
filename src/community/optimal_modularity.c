@@ -32,12 +32,6 @@
 #include "internal/glpk_support.h"
 #include "math/safe_intop.h"
 
-#include "config.h"
-
-#ifdef HAVE_GLPK
-    #include <glpk.h>
-#endif
-
 #include <limits.h>
 
 /**
