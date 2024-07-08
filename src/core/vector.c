@@ -183,7 +183,7 @@ igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
+igraph_error_t igraph_i_vector_int_order(const igraph_vector_int_t* v,
                              igraph_vector_int_t* res,
                              igraph_integer_t nodes) {
     igraph_integer_t edges = igraph_vector_int_size(v);

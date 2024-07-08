@@ -356,10 +356,10 @@ int main(void) {
     }
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_int_init_range, igraph_vector_int_order1\n");
+    printf("Test igraph_vector_int_init_range, igraph_i_vector_int_order\n");
     igraph_vector_int_init_range(&v4, 1, 11);
     igraph_vector_int_init(&v5, 0);
-    igraph_vector_int_order1(&v4, &v5, 10);
+    igraph_i_vector_int_order(&v4, &v5, 10);
     print_vector_int(&v5);
     igraph_vector_int_destroy(&v4);
     igraph_vector_int_destroy(&v5);
