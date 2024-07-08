@@ -7,6 +7,8 @@
  - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
  - Removed broken interruption support from `igraph_community_spinglass_single()`.
  - In rare cases `igraph_community_multilevel()` could enter an infinite loop. This is now corrected.
+ - Fixed null-dereference in `igraph_community_voronoi()` when requesting `modularity` but not `membershiop`.
+ - Fixed null-dereference in `igraph_community_optimal_modularity()` when requesting `modularity` but not `membershiop` and passing a null graph or singleton graph.
 
 ### Deprecated
 
