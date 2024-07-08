@@ -97,23 +97,6 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_in
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
-    igraph_indheap_t heap;
-
-    IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
-    IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
-
-    igraph_vector_clear(v);
-    while (!igraph_indheap_empty(&heap)) {
-        IGRAPH_CHECK(igraph_vector_push_back(v, igraph_indheap_max_index(&heap) - 1));
-        igraph_indheap_delete_max(&heap);
-    }
-
-    igraph_indheap_destroy(&heap);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \ingroup vector
  * \function igraph_vector_int_pair_order

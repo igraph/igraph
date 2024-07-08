@@ -304,18 +304,6 @@ int main(void) {
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
-    printf("Test order2\n");
-    igraph_vector_init_int_end(&v, -1, 10, 9, 8, 7, 6, 7, 8, 9, 10, -1);
-    igraph_vector_order2(&v);
-    print_vector_format(&v, stdout, "%g");
-    igraph_vector_destroy(&v);
-
-    printf("Test order2 on empty vector\n");
-    igraph_vector_init_int_end(&v, -1, -1);
-    igraph_vector_order2(&v);
-    print_vector_format(&v, stdout, "%g");
-    igraph_vector_destroy(&v);
-
     printf("Test filter_smaller, quite special....\n");
     igraph_vector_init_int_end(&v, -1, 0, 1, 2, 3, 4, 4, 4, 4, 5, 6, 7, 8, -1);
     igraph_vector_filter_smaller(&v, 4);

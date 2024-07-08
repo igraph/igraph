@@ -48,10 +48,6 @@ Test igraph_vector_init_real
 ( 1 2 3 4 5 6 7 8 9 10 )
 Test igraph_vector_init_int
 ( 1 2 3 4 5 6 7 8 9 10 )
-Test order2
-( 0 8 1 7 6 2 3 5 4 )
-Test order2 on empty vector
-( )
 Test filter_smaller, quite special....
 ( 4 4 5 6 7 8 )
 ( 1 2 3 4 4 4 4 5 6 7 8 )
