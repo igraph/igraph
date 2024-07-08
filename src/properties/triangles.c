@@ -189,7 +189,7 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
             maxdegree = deg;
         }
     }
-    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree + 1));
+    IGRAPH_CHECK(igraph_i_vector_int_order(&degree, &order, maxdegree + 1));
     igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_VECTOR_INIT_FINALLY(&rank, affected_nodes);
@@ -542,7 +542,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
     maxdegree = igraph_vector_int_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+    IGRAPH_CHECK(igraph_i_vector_int_order(&degree, &order, maxdegree));
 
     igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
@@ -727,7 +727,7 @@ static igraph_error_t igraph_i_transitivity_barrat4(
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                                IGRAPH_LOOPS));
     maxdegree = igraph_vector_int_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+    IGRAPH_CHECK(igraph_i_vector_int_order(&degree, &order, maxdegree));
 
     IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL,
                                  IGRAPH_LOOPS, weights));

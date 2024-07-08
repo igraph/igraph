@@ -595,7 +595,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
     /* Create the basic data structure */
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-    IGRAPH_CHECK(igraph_vector_int_rank(&edges, &rank, no_of_nodes));
+    IGRAPH_CHECK(igraph_i_vector_int_rank(&edges, &rank, no_of_nodes));
 
     for (igraph_integer_t i = 0; i < no_of_edges; i += 2) {
         const igraph_integer_t pos = VECTOR(rank)[i];

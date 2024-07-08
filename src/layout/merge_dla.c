@@ -31,6 +31,23 @@
 #include "layout/merge_grid.h"
 #include "layout/layout_internal.h"
 
+static igraph_error_t vector_order(igraph_vector_t *v) {
+    const igraph_integer_t n = igraph_vector_size(v);
+    igraph_vector_int_t ind;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ind, n);
+    IGRAPH_CHECK(igraph_vector_qsort_ind(v, &ind, IGRAPH_DESCENDING));
+
+    for (igraph_integer_t i=0; i < n; i++) {
+        VECTOR(*v)[i] = VECTOR(ind)[i];
+    }
+
+    igraph_vector_int_destroy(&ind);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_layout_merge_dla
  * \brief Merges multiple layouts by using a DLA algorithm.
@@ -109,7 +126,7 @@ igraph_error_t igraph_layout_merge_dla(
                                   igraph_vector_get_ptr(&ny, i),
                                   igraph_vector_get_ptr(&nr, i));
     }
-    igraph_vector_order2(&sizes); /* largest first */
+    vector_order(&sizes); /* largest first */
 
     /* 0. create grid */
     minx = miny = -sqrt(5 * area);
