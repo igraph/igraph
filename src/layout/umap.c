@@ -602,7 +602,7 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
 
             /* Compare and if we are going back uphill, undo last step and break */
 #ifdef UMAP_DEBUG
-            printf("during line search, k = %d, old SSR:, %g, new SSR (half a,b):, %g\n", k,
+            printf("during line search, k = %" IGRAPH_PRId ", old SSR:, %g, new SSR (half a,b):, %g\n", k,
                     squared_sum_res_tmp, squared_sum_res);
 #endif
             if (squared_sum_res > squared_sum_res_tmp - tol) {
@@ -825,7 +825,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                     force_d = igraph_i_umap_clip_force(force_d, UMAP_FORCE_LIMIT);
 
             #ifdef UMAP_DEBUG
-                    fprintf(stderr, "force attractive: delta[%ld] = %g, forces[%ld] = %g\n", d, VECTOR(delta)[d], d, force_d);
+                    fprintf(stderr, "force attractive: delta[%" IGRAPH_PRId "] = %g, forces[%" IGRAPH_PRId "] = %g\n", d, VECTOR(delta)[d], d, force_d);
             #endif
 
                     MATRIX(*layout, from, d) += learning_rate * force_d;
@@ -888,7 +888,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                     force_d = igraph_i_umap_clip_force(force_d, UMAP_FORCE_LIMIT);
 
                 #ifdef UMAP_DEBUG
-                    fprintf(stderr, "force repulsive: delta[%ld] = %g, forces[%ld] = %g\n", d, VECTOR(delta)[d], d, force_d);
+                    fprintf(stderr, "force repulsive: delta[%" IGRAPH_PRId "] = %g, forces[%" IGRAPH_PRId "] = %g\n", d, VECTOR(delta)[d], d, force_d);
                 #endif
 
                     MATRIX(*layout, from, d) += learning_rate * force_d;
@@ -957,7 +957,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
      * function Phi.
      * */
 #ifdef UMAP_DEBUG
-    igraph_umap_compute_cross_entropy(
+    igraph_i_umap_compute_cross_entropy(
             graph, umap_weights, layout, a, b, &cross_entropy);
 #endif
 
@@ -977,7 +977,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
 #ifdef UMAP_DEBUG
         /* Recompute CE and check how it's going*/
         cross_entropy_old = cross_entropy;
-        igraph_umap_compute_cross_entropy(
+        igraph_i_umap_compute_cross_entropy(
                 graph, umap_weights, layout, a, b, &cross_entropy);
 
         printf("Cross-entropy before shift: %g, after shift: %g\n", cross_entropy_old, cross_entropy);
