@@ -258,11 +258,12 @@ IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *gra
                                                   igraph_bool_t unconn);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
-                                              igraph_vector_int_t *res,
-                                              igraph_integer_t from,
-                                              const igraph_vs_t to,
-                                              igraph_integer_t cutoff,
-                                              igraph_neimode_t mode);
+                                                         igraph_vector_int_list_t *res,
+                                                         igraph_integer_t from,
+                                                         const igraph_vs_t to,
+                                                         igraph_integer_t minlen,
+                                                         igraph_integer_t maxlen,
+                                                         igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph,
                                      const igraph_vector_t *weights,
