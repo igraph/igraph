@@ -1058,6 +1058,10 @@ static igraph_error_t igraph_i_layout_umap(
 
     }
 
+    if (distances == NULL) {
+        distances_are_weights = false;
+    }
+
     /* Compute weights (exponential weights) from distances if required.
      * If the weights have already been computed, they are stored in
      * the "distances" vector and we can recycle the pointer. */
