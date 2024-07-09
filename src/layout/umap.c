@@ -993,14 +993,12 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
     return IGRAPH_SUCCESS;
 }
 
-/* Center layout around (0,0) at the end, just for convenience */
+/* Center 2D layout around (0,0) at the end, just for convenience */
 static void igraph_i_umap_center_layout(igraph_matrix_t *layout) {
     igraph_integer_t no_of_vertices = igraph_matrix_nrow(layout);
     igraph_real_t xm = 0, ym = 0;
 
     /* Compute center */
-    xm = 0;
-    ym = 0;
     for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
         xm += MATRIX(*layout, i, 0);
         ym += MATRIX(*layout, i, 1);
@@ -1012,6 +1010,29 @@ static void igraph_i_umap_center_layout(igraph_matrix_t *layout) {
     for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
         MATRIX(*layout, i, 0) -= xm;
         MATRIX(*layout, i, 1) -= ym;
+    }
+}
+
+/* Center 3D layout around (0,0,0) at the end, just for convenience */
+static void igraph_i_umap_center_layout_3d(igraph_matrix_t *layout) {
+    igraph_integer_t no_of_vertices = igraph_matrix_nrow(layout);
+    igraph_real_t xm = 0, ym = 0, zm = 0;
+
+    /* Compute center */
+    for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
+        xm += MATRIX(*layout, i, 0);
+        ym += MATRIX(*layout, i, 1);
+        zm += MATRIX(*layout, i, 2);
+    }
+    xm /= no_of_vertices;
+    ym /= no_of_vertices;
+    zm /= no_of_vertices;
+
+    /* Shift vertices */
+    for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
+        MATRIX(*layout, i, 0) -= xm;
+        MATRIX(*layout, i, 1) -= ym;
+        MATRIX(*layout, i, 2) -= zm;
     }
 }
 
@@ -1139,7 +1160,11 @@ static igraph_error_t igraph_i_layout_umap(
     }
 
     /* Center layout */
-    igraph_i_umap_center_layout(res);
+    if (ndim == 2) {
+        igraph_i_umap_center_layout(res);
+    } else {
+        igraph_i_umap_center_layout_3d(res);
+    }
 
     return IGRAPH_SUCCESS;
 }
