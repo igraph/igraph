@@ -35,7 +35,6 @@
 #include "igraph_complex.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
-#include "igraph_array.h"
 #include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
