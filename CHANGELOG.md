@@ -9,6 +9,8 @@
  - In rare cases `igraph_community_multilevel()` could enter an infinite loop. This is now corrected.
  - Fixed null-dereference in `igraph_community_voronoi()` when requesting `modularity` but not `membership`.
  - Fixed null-dereference in `igraph_community_optimal_modularity()` when requesting `modularity` but not `membership` and passing a null graph or singleton graph.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash when passing `distances=NULL` and `distances_are_weights=true`. This is now fixed.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash on interruption. This is now fixed.
 
 ### Deprecated
 
