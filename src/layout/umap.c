@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2008-2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-   */
+*/
 
 #include "igraph_layout.h"
 
@@ -853,7 +852,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                 if (avoid_neighbor_repulsion) {
                     /* NOTE: the efficiency of this step could be improved but it
                      * should be only used for small graphs anyway, so it's fine */
-                    igraph_bool_t skip = 0;
+                    igraph_bool_t skip = false;
                     IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL));
                     nneis = igraph_vector_int_size(&neis);
                     for (igraph_integer_t k = 0; k < nneis; k++) {
@@ -862,11 +861,11 @@ static igraph_error_t igraph_i_umap_apply_forces(
                         from2 = IGRAPH_FROM(graph, eid2);
                         to2 = IGRAPH_TO(graph, eid2);
                         if (((from2 == from) && (to2 == to)) || ((from2 == to) && (from == to2))) {
-                            skip = 1;
+                            skip = true;
                             break;
                         }
                     }
-                    if (skip == 1) {
+                    if (skip) {
                         continue;
                     }
                 }
@@ -944,9 +943,9 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
      * relies on an approximation that only works if the graph is sparse, which is never
      * quite true for small graphs (i.e. |V| << |E| << |V|^2 is hard to judge if
      * |V| is small) */
-    igraph_bool_t avoid_neighbor_repulsion = 0;
+    igraph_bool_t avoid_neighbor_repulsion = false;
     if (igraph_vcount(graph) < 100) {
-        avoid_neighbor_repulsion = 1;
+        avoid_neighbor_repulsion = true;
     }
 
     /* Measure the (variable part of the) cross-entropy terms for debugging:
