@@ -963,7 +963,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
 
     for (igraph_integer_t e = 0; e < epochs; e++) {
         /* Apply (stochastic) forces */
-        igraph_i_umap_apply_forces(
+        IGRAPH_CHECK(igraph_i_umap_apply_forces(
                 graph,
                 umap_weights,
                 layout,
@@ -972,7 +972,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(
                 avoid_neighbor_repulsion,
                 negative_sampling_rate,
                 e,
-                &next_epoch_sample_per_edge);
+                &next_epoch_sample_per_edge));
 
 #ifdef UMAP_DEBUG
         /* Recompute CE and check how it's going*/
