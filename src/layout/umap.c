@@ -750,18 +750,17 @@ static igraph_error_t igraph_i_umap_apply_forces(
         igraph_integer_t epoch,
         igraph_vector_t *next_epoch_sample_per_edge)
 {
-    igraph_integer_t no_of_vertices = igraph_matrix_nrow(layout);
-    igraph_integer_t ndim = igraph_matrix_ncol(layout);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t from, to, nneis;
+    const igraph_integer_t no_of_vertices = igraph_matrix_nrow(layout);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t ndim = igraph_matrix_ncol(layout);
     igraph_vector_t from_emb, to_emb, delta;
-    igraph_real_t force = 0, dsq, force_d;
+
     /* The following is only used for small graphs, to avoid repelling your neighbors
      * For large sparse graphs, it's not necessary. For large dense graphs, you should
-     * not be doing UMAP.
-     * */
+     * not be doing UMAP. */
     igraph_vector_int_t neis, negative_vertices;
-    igraph_integer_t n_negative_vertices = (no_of_vertices - 1 < negative_sampling_rate) ? (no_of_vertices - 1) : negative_sampling_rate;
+    const igraph_integer_t n_negative_vertices =
+        (no_of_vertices - 1 < negative_sampling_rate) ? (no_of_vertices - 1) : negative_sampling_rate;
 
     /* Initialize vectors */
     IGRAPH_VECTOR_INIT_FINALLY(&from_emb, ndim);
@@ -774,6 +773,9 @@ static igraph_error_t igraph_i_umap_apply_forces(
 
     /* Iterate over edges. Stronger edges are sampled more often */
     for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
+        igraph_integer_t from, to;
+        igraph_real_t force, dsq, force_d;
+
         /* Zero-weight edges do not affect vertex positions. They can
          * also emerge during the weight symmetrization. */
         if (VECTOR(*umap_weights)[eid] <= 0) {
@@ -853,7 +855,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                      * should be only used for small graphs anyway, so it's fine */
                     igraph_bool_t skip = false;
                     IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL));
-                    nneis = igraph_vector_int_size(&neis);
+                    const igraph_integer_t nneis = igraph_vector_int_size(&neis);
                     for (igraph_integer_t k = 0; k < nneis; k++) {
                         igraph_integer_t eid2 = VECTOR(neis)[k];
                         igraph_integer_t from2, to2;
