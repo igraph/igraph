@@ -365,40 +365,40 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        const igraph_vector_t *miny,
                                        const igraph_vector_t *maxy) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
                      "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
-    if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
+    if (use_seed && (igraph_matrix_nrow(res) != vcount ||
                      igraph_matrix_ncol(res) != 2)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
                      "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
-    if (weights && igraph_vector_size(weights) != no_edges) {
+    if (weights && igraph_vector_size(weights) != ecount) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
-    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
+    if (weights && ecount > 0 && igraph_vector_min(weights) <= 0) {
         IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
-    if (minx && igraph_vector_size(minx) != no_nodes) {
+    if (minx && igraph_vector_size(minx) != vcount) {
         IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
-    if (maxx && igraph_vector_size(maxx) != no_nodes) {
+    if (maxx && igraph_vector_size(maxx) != vcount) {
         IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
         IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
-    if (miny && igraph_vector_size(miny) != no_nodes) {
+    if (miny && igraph_vector_size(miny) != vcount) {
         IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
-    if (maxy && igraph_vector_size(maxy) != no_nodes) {
+    if (maxy && igraph_vector_size(maxy) != vcount) {
         IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
@@ -406,7 +406,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
     }
 
     if (grid == IGRAPH_LAYOUT_AUTOGRID) {
-        if (no_nodes > 1000) {
+        if (vcount > 1000) {
             grid = IGRAPH_LAYOUT_GRID;
         } else {
             grid = IGRAPH_LAYOUT_NOGRID;
