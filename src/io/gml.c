@@ -332,6 +332,8 @@ static igraph_error_t allocate_attributes(
          * so we need to take care of this */
         if (atrec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             IGRAPH_CHECK(igraph_attribute_record_resize(atrec, no_of_items));
+        } else {
+            IGRAPH_WARNINGF("Composite %s attribute '%s' ignored in GML file.", kind, atrec->name);
         }
     }
     return IGRAPH_SUCCESS;
