@@ -594,6 +594,7 @@ igraph_error_t igraph_attribute_record_set_type(
 static igraph_error_t igraph_i_attribute_record_list_init_item(
     const igraph_attribute_record_list_t* list, igraph_attribute_record_t* item
 ) {
+    IGRAPH_UNUSED(list);
     return igraph_attribute_record_init(item, NULL, IGRAPH_ATTRIBUTE_UNSPECIFIED);
 }
 
