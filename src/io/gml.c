@@ -325,10 +325,10 @@ static igraph_error_t allocate_attributes(
     for (i = 0; i < n; i++) {
         igraph_attribute_record_t *atrec = igraph_attribute_record_list_get_ptr(attrs, i);
 
-        /* Ww have unspecified attribute types in the attribute record list at
+        /* We have unspecified attribute types in the attribute record list at
          * this point because we need to keep the same order in the attribute
          * record list as it was in the trie that we use to look up an
-         * attribute record by name. However, we cannot reside unknown attributes
+         * attribute record by name. However, we cannot resize unknown attributes
          * so we need to take care of this */
         if (atrec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             IGRAPH_CHECK(igraph_attribute_record_resize(atrec, no_of_items));
