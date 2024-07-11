@@ -33,12 +33,23 @@ int main(void) {
     IGRAPH_FREE(a);
     IGRAPH_ASSERT(!a); /* IGRAPH_FREE(a) sets 'a' to NULL */
 
+    a = IGRAPH_MALLOC(0);
+    IGRAPH_ASSERT(a);
+
+    IGRAPH_FREE(a);
+    IGRAPH_ASSERT(!a);
+
     /* Functions */
 
     a = igraph_calloc(0, sizeof(int));
     IGRAPH_ASSERT(a);
 
     a = igraph_realloc(a, 0);
+    IGRAPH_ASSERT(a);
+
+    igraph_free(a);
+
+    a = igraph_malloc(0);
     IGRAPH_ASSERT(a);
 
     igraph_free(a);
