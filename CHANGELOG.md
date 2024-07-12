@@ -7,6 +7,7 @@
  - igraph now requires a C++ compiler that supports the C++14 standard.
  - Interruption handlers do not take a `void*` argument any more; this is relevant to maintainers of higher-level interfaces only.
  - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
+ - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
  - `igraph_delete_vertices_map()` (formerly called `igraph_delete_vertices_idx()`) and `igraph_induced_subgraph_map()` now use -1 to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. (Note that the inverse map always behaved this way, this change makes the two mappings consistent).
  - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
  - `igraph_vector_shuffle()` no longer returns an error code.
@@ -14,7 +15,6 @@
  - `igraph_matrix_swap()` no longer returns an error code.
  - `igraph_vector_list_swap()` and `igraph_graph_list_swap()` no longer return an error code.
  - `igraph_vector_list_swap_elements()` and `igraph_graph_list_swap_elements()` no longer return an error code.
- - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
  - `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices to create vertex pairs of, instead of one.
  - `igraph_subisomorphic_lad()` does not have a CPU time limit parameter any more. If you wish to stop the calculation from another thread or a higher level interface, use igraph's interruption mechanism.
  - `igraph_read_graph_ncol()` and `igraph_read_graph_lgl()` now uses a default edge weight of 1 instead of 0 for files that do not contain edge weights for at least some of the edges.
