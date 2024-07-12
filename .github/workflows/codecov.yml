@@ -3,6 +3,7 @@ name: Codecov.io
 on: [push, pull_request]
 
 env:
+  CMAKE_COLOR_DIAGNOSTICS: ON
   BUILD_TYPE: Debug
 
 jobs:
