@@ -42,7 +42,7 @@
 
 __BEGIN_DECLS
 
-typedef struct igraph_i_glpk_error_info_s {
+typedef struct {
     jmp_buf jmp;            /* used for bailing when there is a GLPK error */
     bool    is_interrupted; /* Boolean; true if there was an interruption */
     bool    is_error;       /* Boolean; true if the error hook was called */
