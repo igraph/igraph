@@ -442,14 +442,12 @@ void FUNCTION(replace)(TYPE *v, igraph_integer_t pos, ITEM_TYPE *e) {
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2) {
+void FUNCTION(swap)(TYPE *v1, TYPE *v2) {
     TYPE tmp;
 
     tmp = *v1;
     *v1 = *v2;
     *v2 = tmp;
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -467,11 +465,10 @@ igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2) {
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(swap_elements)(TYPE *v1, igraph_integer_t i, igraph_integer_t j) {
+void FUNCTION(swap_elements)(TYPE *v1, igraph_integer_t i, igraph_integer_t j) {
     ITEM_TYPE tmp = v1->stor_begin[i];
     v1->stor_begin[i] = v1->stor_begin[j];
     v1->stor_begin[j] = tmp;
-    return IGRAPH_SUCCESS;
 }
 
 /**
