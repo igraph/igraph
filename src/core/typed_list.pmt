@@ -1081,7 +1081,7 @@ static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE *v) {
 }
 
 /**
- * Helper function passed to qsort from  igraph_vector_qsort_ind
+ * Helper function passed to qsort from  igraph_vector_list_sort_ind
  */
 static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2) {
     int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*) = (int (*)(const ITEM_TYPE*, const ITEM_TYPE*)) thunk;
