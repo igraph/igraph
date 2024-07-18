@@ -582,7 +582,7 @@ igraph_bool_t igraph_adjlist_has_edge(
     const igraph_vector_int_t *fromvec;
     ADJLIST_CANON_EDGE(from, to, directed);
     fromvec = igraph_adjlist_get(al, from);
-    return igraph_vector_int_binsearch2(fromvec, to);
+    return igraph_vector_int_contains_sorted(fromvec, to);
 }
 
 igraph_error_t igraph_adjlist_replace_edge(

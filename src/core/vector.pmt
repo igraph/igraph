@@ -2185,11 +2185,11 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
 
 /**
  * \ingroup vector
- * \function igraph_vector_binsearch2
- * \brief Binary search, without returning the index.
+ * \function igraph_vector_contains_sorted
+ * \brief Binary search in a sorted vector.
  *
- * </para><para>
  * It is assumed that the vector is sorted.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \return True if \p what is found in the vector, false otherwise.
@@ -2197,8 +2197,7 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
  * Time complexity: O(log(n)), n is the number of elements in \p v.
  */
 
-igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
-        BASE what) {
+igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector) *v, BASE what) {
     igraph_integer_t left = 0;
     igraph_integer_t right = FUNCTION(igraph_vector, size)(v) - 1;
 
@@ -2215,6 +2214,18 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
     }
 
     return false;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_binsearch2
+ * \brief Binary search, without returning the index.
+ *
+ * \deprecated-by igraph_vector_contains_sorted 0.10.14
+ */
+igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
+                                                  BASE what) {
+    return FUNCTION(igraph_vector, contains_sorted)(v, what);
 }
 
 #endif
@@ -2272,21 +2283,22 @@ void FUNCTION(igraph_vector, add_constant)(TYPE(igraph_vector) *v, BASE plus) {
  *
  * Check whether the supplied element is included in the vector, by
  * linear search.
+ *
  * \param v The input vector.
- * \param e The element to look for.
+ * \param what The element to look for.
  * \return \c true if the element is found and \c false otherwise.
  *
  * Time complexity: O(n), the length of the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v,
-        BASE e) {
-    BASE *p = v->stor_begin;
+        BASE what) {
+    const BASE *p = v->stor_begin;
     while (p < v->end) {
 #ifdef EQ
-        if (EQ(*p, e)) {
+        if (EQ(*p, what)) {
 #else
-        if (*p == e) {
+        if (*p == what) {
 #endif
             return true;
         }

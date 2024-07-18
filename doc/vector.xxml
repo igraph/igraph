@@ -105,7 +105,7 @@
 <!-- doxrox-include igraph_vector_search -->
 <!-- doxrox-include igraph_vector_binsearch -->
 <!-- doxrox-include igraph_vector_binsearch_slice -->
-<!-- doxrox-include igraph_vector_binsearch2 -->
+<!-- doxrox-include igraph_vector_contains_sorted -->
 </section>
 
 <section id="vector-resizing-operations"><title>Resizing operations</title>
