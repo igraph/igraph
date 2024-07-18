@@ -170,7 +170,7 @@ static igraph_error_t choose_generators(
 
     /* ord[i] is the index of the ith largest element of local_rel_dens */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ord, 0);
-    IGRAPH_CHECK(igraph_vector_qsort_ind(local_rel_dens, &ord, IGRAPH_DESCENDING));
+    IGRAPH_CHECK(igraph_vector_sort_ind(local_rel_dens, &ord, IGRAPH_DESCENDING));
 
     /* If excluded[v] is true, then v is closer to some already chosen generator than r */
     IGRAPH_BITSET_INIT_FINALLY(&excluded, no_of_nodes);

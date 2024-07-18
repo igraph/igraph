@@ -239,8 +239,11 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, remove_section)(
 
 IGRAPH_EXPORT void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, qsort_ind)(
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, sort_ind)(
         const TYPE(igraph_vector) *v, igraph_vector_int_t *inds, igraph_order_t order);
+
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, qsort_ind)(
+    const TYPE(igraph_vector) *v, igraph_vector_int_t *inds, igraph_order_t order);
 
 #endif
 
