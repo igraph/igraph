@@ -1046,17 +1046,6 @@ igraph_error_t FUNCTION(igraph_vector, sort_ind)(
 }
 
 /**
- * \function igraph_vector_qsort_ind
- * \brief Returns a permutation of indices that sorts a vector (deprecated alias).
- *
- * \deprecated-by igraph_vector_sort_ind 0.10.14
- */
-igraph_error_t FUNCTION(igraph_vector, qsort_ind)(const TYPE(igraph_vector) *v,
-                                                 igraph_vector_int_t *inds, igraph_order_t order) {
-    return FUNCTION(igraph_vector, sort_ind)(v, inds, order);
-}
-
-/**
  * \function igraph_vector_lex_cmp
  * \brief Lexicographical comparison of two vectors (type-safe variant).
  *

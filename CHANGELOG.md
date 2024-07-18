@@ -96,6 +96,7 @@
  - The deprecated `igraph_sparsemat_diag()` was removed. Use `igraph_sparsemat_init_diag()` instead.
  - The deprecated `igraph_zeroin()` was removed.
  - The deprecated `igraph_random_edge_walk()` was removed. Its functionality is incorporated in `igraph_random_walk()`.
+ - The deprecated `igraph_vector_qsort_ind()` was removed. Use `igraph_vector_sort_ind()` instead.
 
 ### Deprecated
 

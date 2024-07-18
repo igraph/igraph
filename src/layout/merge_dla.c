@@ -36,7 +36,7 @@ static igraph_error_t vector_order(igraph_vector_t *v) {
     igraph_vector_int_t ind;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ind, n);
-    IGRAPH_CHECK(igraph_vector_qsort_ind(v, &ind, IGRAPH_DESCENDING));
+    IGRAPH_CHECK(igraph_vector_sort_ind(v, &ind, IGRAPH_DESCENDING));
 
     for (igraph_integer_t i=0; i < n; i++) {
         VECTOR(*v)[i] = VECTOR(ind)[i];
