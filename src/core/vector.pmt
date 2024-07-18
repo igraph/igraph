@@ -2279,11 +2279,11 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
 
 /**
  * \ingroup vector
- * \function igraph_vector_binsearch2
- * \brief Binary search, without returning the index.
+ * \function igraph_vector_contains_sorted
+ * \brief Binary search in a sorted vector.
  *
- * </para><para>
  * It is assumed that the vector is sorted.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \return True if \p what is found in the vector, false otherwise.
@@ -2291,8 +2291,7 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
  * Time complexity: O(log(n)), n is the number of elements in \p v.
  */
 
-igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
-        BASE what) {
+igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector) *v, BASE what) {
     igraph_integer_t left = 0;
     igraph_integer_t right = FUNCTION(igraph_vector, size)(v) - 1;
 
@@ -2309,6 +2308,18 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
     }
 
     return false;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_binsearch2
+ * \brief Binary search, without returning the index.
+ *
+ * \deprecated-by igraph_vector_contains_sorted 0.10.14
+ */
+igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
+                                                  BASE what) {
+    return FUNCTION(igraph_vector, contains_sorted)(v, what);
 }
 
 #endif

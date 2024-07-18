@@ -439,7 +439,7 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
            out-list of to */
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
         IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
-        VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
+        VECTOR(*res)[i] = igraph_vector_int_contains_sorted(neis, from);
     }
 
     igraph_lazy_adjlist_destroy(&adjlist);
@@ -523,7 +523,7 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res,
            out-list of to */
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
         IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
-        if (igraph_vector_int_binsearch2(neis, from)) {
+        if (igraph_vector_int_contains_sorted(neis, from)) {
             *res = true;
             break;
         }

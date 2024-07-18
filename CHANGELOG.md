@@ -17,6 +17,7 @@
  - `igraph_minimum_spanning_tree_prim()` and `igraph_minimum_spanning_tree_unweighted()` are deprecated. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
  - `igraph_array3_t` and all associated functions are deprecated and scheduled for removal in igraph 1.0.
  - `igraph_vector_qsort_ind()` is deprecated in favour of `igraph_vector_sort_ind()`.
+ - `igraph_vector_binsearch2()` is deprecated in favour of `igraph_vector_contains_sorted()`.
 
 ### Other
 
