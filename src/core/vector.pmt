@@ -2377,21 +2377,22 @@ void FUNCTION(igraph_vector, add_constant)(TYPE(igraph_vector) *v, BASE plus) {
  *
  * Check whether the supplied element is included in the vector, by
  * linear search.
+ *
  * \param v The input vector.
- * \param e The element to look for.
+ * \param what The element to look for.
  * \return \c true if the element is found and \c false otherwise.
  *
  * Time complexity: O(n), the length of the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v,
-        BASE e) {
-    BASE *p = v->stor_begin;
+        BASE what) {
+    const BASE *p = v->stor_begin;
     while (p < v->end) {
 #ifdef EQ
-        if (EQ(*p, e)) {
+        if (EQ(*p, what)) {
 #else
-        if (*p == e) {
+        if (*p == what) {
 #endif
             return true;
         }
