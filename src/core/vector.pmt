@@ -2216,18 +2216,6 @@ igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector)
     return false;
 }
 
-/**
- * \ingroup vector
- * \function igraph_vector_binsearch2
- * \brief Binary search, without returning the index.
- *
- * \deprecated-by igraph_vector_contains_sorted 0.10.14
- */
-igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
-                                                  BASE what) {
-    return FUNCTION(igraph_vector, contains_sorted)(v, what);
-}
-
 #endif
 
 /**
