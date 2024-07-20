@@ -2,6 +2,11 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
+ - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
+
 ### Fixed
 
  - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
