@@ -26,7 +26,6 @@
 #include "igraph_bitset.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
-#include "igraph_types.h"
 
 __BEGIN_DECLS
 

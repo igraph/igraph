@@ -26,6 +26,7 @@
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_vector.h"
+#include "igraph_types.h"
 
 /* Required for MSVC intrinsics such as __popcnt and __popcnt64 */
 #ifdef _MSC_VER

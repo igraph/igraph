@@ -24,7 +24,6 @@
 #ifndef IGRAPH_CONSTANTS_H
 #define IGRAPH_CONSTANTS_H
 
-#include "igraph_config.h"
 #include "igraph_decls.h"
 
 __BEGIN_DECLS
