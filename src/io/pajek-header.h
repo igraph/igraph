@@ -24,7 +24,6 @@
 #include "igraph_bitset.h"
 #include "igraph_error.h"
 #include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
 
 #include "core/trie.h"
 
