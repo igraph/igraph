@@ -21,6 +21,7 @@
 */
 
 #include "igraph_attributes.h"
+#include "igraph_bitset.h"
 #include "igraph_error.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
@@ -49,6 +50,7 @@ typedef struct {
     char errmsg[300];
     igraph_error_t igraph_errno;
     igraph_vector_int_t *vector;
+    igraph_bitset_t *seen;
     igraph_bool_t directed;
     igraph_integer_t vcount, vcount2;
     igraph_integer_t actfrom;
