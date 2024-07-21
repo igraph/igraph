@@ -416,7 +416,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
                                   const igraph_vector_t *miny, const igraph_vector_t *maxy,
                                   const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    const igraph_integer_t vcount= igraph_vcount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(vcount);
     igraph_matrix_t dij, lij, kij;
