@@ -71,13 +71,13 @@
     #endif
 #endif
 
-static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* item);
-static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE* dest, const ITEM_TYPE* source);
-static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item);
+static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE *list, ITEM_TYPE *item);
+static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE *dest, const ITEM_TYPE *source);
+static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE *item);
 
-static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end);
-static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end);
-static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* list);
+static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE *list, ITEM_TYPE *start, ITEM_TYPE *end);
+static void INTERNAL_FUNCTION(destroy_slice)(const TYPE *list, ITEM_TYPE *start, ITEM_TYPE *end);
+static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE *list);
 static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2);
 
 /**
@@ -105,7 +105,7 @@ static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const vo
  * n is the number of elements.
  */
 
-igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
+igraph_error_t FUNCTION(init)(TYPE *v, igraph_integer_t size) {
     igraph_integer_t alloc_size = size > 0 ? size : 1;
     IGRAPH_ASSERT(size >= 0);
     v->stor_begin = IGRAPH_CALLOC(alloc_size, ITEM_TYPE);
@@ -140,7 +140,7 @@ igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
  * Time complexity: operating system dependent.
  */
 
-void FUNCTION(destroy)(TYPE* v) {
+void FUNCTION(destroy)(TYPE *v) {
     IGRAPH_ASSERT(v != 0);
 
     if (v->stor_begin != 0) {
@@ -167,7 +167,7 @@ void FUNCTION(destroy)(TYPE* v) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t FUNCTION(capacity)(const TYPE* v) {
+igraph_integer_t FUNCTION(capacity)(const TYPE *v) {
     return v->stor_end - v->stor_begin;
 }
 
@@ -197,7 +197,7 @@ igraph_integer_t FUNCTION(capacity)(const TYPE* v) {
  * O(n), n is the new allocated size of the list.
  */
 
-igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
+igraph_error_t FUNCTION(reserve)(TYPE *v, igraph_integer_t capacity) {
     igraph_integer_t current_capacity;
     ITEM_TYPE *tmp;
 
@@ -232,7 +232,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
  * Time complexity: O(1).
  */
 
-igraph_bool_t FUNCTION(empty)(const TYPE* v) {
+igraph_bool_t FUNCTION(empty)(const TYPE *v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->stor_begin == v->end;
@@ -241,7 +241,9 @@ igraph_bool_t FUNCTION(empty)(const TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_size
- * \brief Returns the size (=length) of the vector.
+ * \brief The size of the vector list.
+ *
+ * Returns the number of vectors stored in the list.
  *
  * \param v The list object
  * \return The size of the list.
@@ -249,7 +251,7 @@ igraph_bool_t FUNCTION(empty)(const TYPE* v) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t FUNCTION(size)(const TYPE* v) {
+igraph_integer_t FUNCTION(size)(const TYPE *v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->end - v->stor_begin;
@@ -258,7 +260,7 @@ igraph_integer_t FUNCTION(size)(const TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_resize
- * \brief Resize the list of vectors.
+ * \brief Resizes the list of vectors.
  *
  * </para><para>
  * Note that this function does not free any memory, just sets the
@@ -286,7 +288,7 @@ igraph_integer_t FUNCTION(size)(const TYPE* v) {
  * size is larger. In the latter case it is usually around O(n), where n is the
  * new size of the vector.
  */
-igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
+igraph_error_t FUNCTION(resize)(TYPE *v, igraph_integer_t new_size) {
     igraph_integer_t old_size;
 
     IGRAPH_ASSERT(v != NULL);
@@ -312,7 +314,6 @@ igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
  * \function igraph_vector_list_clear
  * \brief Removes all elements from a list of vectors.
  *
- * </para><para>
  * This function sets the size of the list to zero, and it also destroys all
  * the vectors that were placed in the list before clearing it.
  *
@@ -320,7 +321,7 @@ igraph_error_t FUNCTION(resize)(TYPE* v, igraph_integer_t new_size) {
  *
  * Time complexity: O(n), n is the number of items being deleted.
  */
-void FUNCTION(clear)(TYPE* v) {
+void FUNCTION(clear)(TYPE *v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     INTERNAL_FUNCTION(destroy_slice)(v, v->stor_begin, v->end);
@@ -330,7 +331,8 @@ void FUNCTION(clear)(TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_get_ptr
- * \brief Retrieve the address of a vector in the vector list.
+ * \brief The address of a vector in the vector list.
+ *
  * \param v The list object.
  * \param pos The position of the vector in the list. The position of the first
  *     vector is zero.
@@ -339,7 +341,7 @@ void FUNCTION(clear)(TYPE* v) {
  *
  * Time complexity: O(1).
  */
-ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {
+ITEM_TYPE *FUNCTION(get_ptr)(const TYPE *v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->stor_begin + pos;
@@ -364,7 +366,7 @@ ITEM_TYPE* FUNCTION(get_ptr)(const TYPE* v, igraph_integer_t pos) {
  *
  * Time complexity: O(1).
  */
-void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
+void FUNCTION(set)(TYPE *v, igraph_integer_t pos, ITEM_TYPE *e) {
     INTERNAL_FUNCTION(destroy_item)(v->stor_begin + pos);
     v->stor_begin[pos] = *e;
 }
@@ -389,7 +391,7 @@ void FUNCTION(set)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
  *
  * Time complexity: O(1).
  */
-void FUNCTION(replace)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
+void FUNCTION(replace)(TYPE *v, igraph_integer_t pos, ITEM_TYPE *e) {
     ITEM_TYPE old_value = *(FUNCTION(get_ptr)(v, pos));
     v->stor_begin[pos] = *e;
     *e = old_value;
@@ -421,6 +423,7 @@ igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2) {
  * \brief Swap two elements in a vector list.
  *
  * Note that currently no range checking is performed.
+ *
  * \param v The input list.
  * \param i Index of the first element.
  * \param j Index of the second element (may be the same as the
@@ -440,14 +443,15 @@ igraph_error_t FUNCTION(swap_elements)(TYPE *v1, igraph_integer_t i, igraph_inte
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_tail_ptr
- * \brief Retrieve the address of the last vector in the vector list.
+ * \brief The address of the last vector in the vector list.
+ *
  * \param v The list object.
  * \return A pointer to the last vector in the list, or \c NULL if the list
  *     is empty.
  *
  * Time complexity: O(1).
  */
-ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v) {
+ITEM_TYPE *FUNCTION(tail_ptr)(const TYPE *v) {
     igraph_integer_t size = FUNCTION(size)(v);
     return size > 0 ? FUNCTION(get_ptr)(v, size - 1) : 0;
 }
@@ -455,9 +459,8 @@ ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_discard
- * \brief Discard the item at the given index in the vector list.
+ * \brief Discards the item at the given index in the vector list.
  *
- * </para><para>
  * This function removes the vector at the given index from the list, and
  * moves all subsequent items in the list by one slot to the left to fill
  * the gap. The vector that was removed from the list is destroyed automatically.
@@ -470,7 +473,7 @@ ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v) {
  *
  * Time complexity: O(n), where n is the number of items in the list.
  */
-void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
+void FUNCTION(discard)(TYPE *v, igraph_integer_t index) {
     igraph_integer_t size = FUNCTION(size)(v);
 
     if (size > 0) {
@@ -483,16 +486,15 @@ void FUNCTION(discard)(TYPE* v, igraph_integer_t index) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_discard_back
- * \brief Discard the last item in the vector list.
+ * \brief Discards the last item in the vector list.
  *
- * </para><para>
  * This function removes the last vector from the list and destroys it.
  *
  * \param v The list object.
  *
  * Time complexity: O(1).
  */
-void FUNCTION(discard_back)(TYPE* v) {
+void FUNCTION(discard_back)(TYPE *v) {
     igraph_integer_t size = FUNCTION(size)(v);
     if (size > 0) {
         INTERNAL_FUNCTION(destroy_item)(v->end - 1);
@@ -503,9 +505,8 @@ void FUNCTION(discard_back)(TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_discard_fast
- * \brief Discard the item at the given index in the vector list and move the last item to its place.
+ * \brief Discards the item at the given index in the vector list and moves the last item to its place.
  *
- * </para><para>
  * This function removes the vector at the given index from the list, and
  * moves the last item in the list to \p index to fill the gap. The vector that
  * was removed from the list is destroyed automatically.
@@ -518,7 +519,7 @@ void FUNCTION(discard_back)(TYPE* v) {
  *
  * Time complexity: O(1).
  */
-void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index) {
+void FUNCTION(discard_fast)(TYPE *v, igraph_integer_t index) {
     igraph_integer_t size = FUNCTION(size)(v);
 
     if (size > 0) {
@@ -531,9 +532,8 @@ void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_push_back
- * \brief Append an existing vector to the list, transferring ownership.
+ * \brief Appends an existing vector to the list, transferring ownership.
  *
- * </para><para>
  * This function resizes the list to be one element longer, and sets the very last
  * element in the list to the specified vector \p e . The list takes ownership
  * of the vector so the user is not responsible for freeing \p e any more;
@@ -554,7 +554,7 @@ void FUNCTION(discard_fast)(TYPE* v, igraph_integer_t index) {
  * as the vector's current length. (We assume here that the time
  * complexity of memory allocation is at most linear).
  */
-igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
+igraph_error_t FUNCTION(push_back)(TYPE *v, ITEM_TYPE *e) {
     IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
     *(v->end) = *e;
     v->end += 1;
@@ -564,9 +564,8 @@ igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_push_back_copy
- * \brief Append the copy of a vector to the list.
+ * \brief Appends the copy of a vector to the list.
  *
- * </para><para>
  * This function resizes the list to be one element longer, and copies the
  * specified vector given as an argument to the last element. The newly added
  * element is owned by the list, but the ownership of the original vector is
@@ -580,7 +579,7 @@ igraph_error_t FUNCTION(push_back)(TYPE* v, ITEM_TYPE* e) {
  * Time complexity: same as \ref igraph_vector_list_push_back() plus the time
  * needed to copy the vector (which is O(n) for n elements in the vector).
  */
-igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e) {
+igraph_error_t FUNCTION(push_back_copy)(TYPE *v, const ITEM_TYPE *e) {
     ITEM_TYPE copy;
     IGRAPH_CHECK(INTERNAL_FUNCTION(copy_item)(&copy, e));
     IGRAPH_FINALLY(INTERNAL_FUNCTION(destroy_item), &copy);
@@ -592,9 +591,8 @@ igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_push_back_new
- * \brief Append a new vector to the list.
+ * \brief Appends a new vector to the list.
  *
- * </para><para>
  * This function resizes the list to be one element longer. The newly added
  * element will be an empty vector that is owned by the list. A pointer to
  * the newly added element is returned in the last argument if it is not
@@ -609,7 +607,7 @@ igraph_error_t FUNCTION(push_back_copy)(TYPE* v, const ITEM_TYPE* e) {
  *
  * Time complexity: same as \ref igraph_vector_list_push_back().
  */
-igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
+igraph_error_t FUNCTION(push_back_new)(TYPE *v, ITEM_TYPE** e) {
     IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
     IGRAPH_CHECK(INTERNAL_FUNCTION(init_item)(v, v->end));
     if (e) {
@@ -622,9 +620,8 @@ igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_insert
- * \brief Insert an existing vector into the list, transferring ownership.
+ * \brief Inserts an existing vector into the list, transferring ownership.
  *
- * </para><para>
  * This function inserts \p e into the list at the given index, moving other
  * items towards the end of the list as needed. The list takes ownership
  * of the vector so the user is not responsible for freeing \p e any more;
@@ -639,7 +636,7 @@ igraph_error_t FUNCTION(push_back_new)(TYPE* v, ITEM_TYPE** e) {
  *
  * Time complexity: O(n).
  */
-igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
+igraph_error_t FUNCTION(insert)(TYPE *v, igraph_integer_t pos, ITEM_TYPE *e) {
     igraph_integer_t size = FUNCTION(size)(v);
     IGRAPH_ASSERT(0 <= pos && pos <= size);
     IGRAPH_CHECK(INTERNAL_FUNCTION(expand_if_full)(v));
@@ -654,9 +651,8 @@ igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_insert_copy
- * \brief Insert the copy of a vector to the list.
+ * \brief Inserts the copy of a vector to the list.
  *
- * </para><para>
  * This function inserts a copy of \p e into the list at the given index, moving
  * other items towards the end of the list as needed. The newly added
  * element is owned by the list, but the ownership of the original vector is
@@ -671,7 +667,7 @@ igraph_error_t FUNCTION(insert)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e) {
  * Time complexity: same as \ref igraph_vector_list_insert() plus the time
  * needed to copy the vector (which is O(n) for n elements in the vector).
  */
-igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_TYPE* e) {
+igraph_error_t FUNCTION(insert_copy)(TYPE *v, igraph_integer_t pos, const ITEM_TYPE *e) {
     ITEM_TYPE copy;
     IGRAPH_CHECK(INTERNAL_FUNCTION(copy_item)(&copy, e));
     IGRAPH_FINALLY(INTERNAL_FUNCTION(destroy_item), &copy);
@@ -683,9 +679,8 @@ igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_T
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_insert_new
- * \brief Insert a new vector into the list.
+ * \brief Inserts a new vector into the list.
  *
- * </para><para>
  * This function inserts a newly created empty vector into the list at the given
  * index, moving other items towards the end of the list as needed. The newly
  * added vector is owned by the list. A pointer to the new element is returned
@@ -701,7 +696,7 @@ igraph_error_t FUNCTION(insert_copy)(TYPE* v, igraph_integer_t pos, const ITEM_T
  *
  * Time complexity: same as \ref igraph_vector_list_push_back().
  */
-igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** e) {
+igraph_error_t FUNCTION(insert_new)(TYPE *v, igraph_integer_t pos, ITEM_TYPE** e) {
     ITEM_TYPE copy;
     IGRAPH_CHECK(INTERNAL_FUNCTION(init_item)(v, &copy));
     IGRAPH_FINALLY(INTERNAL_FUNCTION(destroy_item), &copy);
@@ -716,9 +711,8 @@ igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** e
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_remove
- * \brief Remove the item at the given index from the vector list and transfer ownership to the caller.
+ * \brief Removes the item at the given index from the vector list and transfer ownership to the caller.
  *
- * </para><para>
  * This function removes the vector at the given index from the list, and
  * moves all subsequent items in the list by one slot to the left to fill
  * the gap. The vector that was removed from the list is returned in \p e
@@ -727,7 +721,7 @@ igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** e
  *
  * \param v The list object.
  * \param index Index of the item to be removed.
- * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
+ * \param result Pointer to an \ref igraph_vector_t object; it will be updated to the
  *        item that was removed from the list. Ownership of this vector is
  *        passed on to the caller. It is an error to supply a null pointer here.
  * \sa \ref igraph_vector_list_discard() if you are not interested in the item
@@ -736,7 +730,7 @@ igraph_error_t FUNCTION(insert_new)(TYPE* v, igraph_integer_t pos, ITEM_TYPE** e
  *
  * Time complexity: O(n), where n is the number of items in the list.
  */
-igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* result) {
+igraph_error_t FUNCTION(remove)(TYPE *v, igraph_integer_t index, ITEM_TYPE *result) {
     igraph_integer_t size = FUNCTION(size)(v);
 
     IGRAPH_ASSERT(result != 0);
@@ -756,9 +750,8 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_pop_back
- * \brief Remove the last item from the vector list and transfer ownership to the caller.
+ * \brief Removes the last item from the vector list and transfer ownership to the caller.
  *
- * </para><para>
  * This function removes the last vector from the list. The vector that was
  * removed from the list is returned and its ownership is passed back to the
  * caller; in other words, the caller becomes responsible for destroying
@@ -768,13 +761,13 @@ igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* resu
  * It is an error to call this function with an empty vector.
  *
  * \param v The list object.
- * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
+ * \param result Pointer to an \ref igraph_vector_t object; it will be updated to the
  *        item that was removed from the list. Ownership of this vector is
  *        passed on to the caller.
  *
  * Time complexity: O(1).
  */
-ITEM_TYPE FUNCTION(pop_back)(TYPE* v) {
+ITEM_TYPE FUNCTION(pop_back)(TYPE *v) {
     IGRAPH_ASSERT(!FUNCTION(empty)(v));
     v->end -= 1;
     return *(v->end);
@@ -783,9 +776,8 @@ ITEM_TYPE FUNCTION(pop_back)(TYPE* v) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_remove_fast
- * \brief Remove the item at the given index in the vector list, move the last item to its place and transfer ownership to the caller.
+ * \brief Removes the item at the given index in the vector list, move the last item to its place and transfer ownership to the caller.
  *
- * </para><para>
  * This function removes the vector at the given index from the list,
  * moves the last item in the list to \p index to fill the gap, and then
  * transfers ownership of the removed vector back to the caller; in other words,
@@ -794,7 +786,7 @@ ITEM_TYPE FUNCTION(pop_back)(TYPE* v) {
  *
  * \param v The list object.
  * \param index Index of the item to be removed.
- * \param result Pointer to an \c igraph_vector_t object; it will be updated to the
+ * \param result Pointer to an \ref igraph_vector_t object; it will be updated to the
  *        item that was removed from the list. Ownership of this vector is
  *        passed on to the caller. It is an error to supply a null pointer here.
  * \sa \ref igraph_vector_list_remove() if you want to preserve the order of the
@@ -803,7 +795,7 @@ ITEM_TYPE FUNCTION(pop_back)(TYPE* v) {
  *
  * Time complexity: O(1).
  */
-igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* result) {
+igraph_error_t FUNCTION(remove_fast)(TYPE *v, igraph_integer_t index, ITEM_TYPE *result) {
     igraph_integer_t size = FUNCTION(size)(v);
 
     IGRAPH_ASSERT(result != 0);
@@ -848,8 +840,8 @@ igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE*
  *
  * Time complexity: O(n), the number of items in the list.
  */
-igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
-    ITEM_TYPE* work;
+igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t* index) {
+    ITEM_TYPE *work;
     igraph_integer_t i, size;
 
     IGRAPH_ASSERT(v != NULL);
@@ -1026,16 +1018,16 @@ igraph_error_t FUNCTION(reverse)(TYPE *v) {
 
 #ifndef CUSTOM_INIT_DESTROY
 
-static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* item) {
+static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE *list, ITEM_TYPE *item) {
     IGRAPH_UNUSED(list);
     return ITEM_FUNCTION(init)(item, 0);
 }
 
-static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE* dest, const ITEM_TYPE* source) {
+static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE *dest, const ITEM_TYPE *source) {
     return ITEM_FUNCTION(init_copy)(dest, source);
 }
 
-static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item) {
+static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE *item) {
     ITEM_FUNCTION(destroy)(item);
 }
 
@@ -1043,8 +1035,8 @@ static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item) {
 
 /* ************************************************************************ */
 
-static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end) {
-    ITEM_TYPE* current;
+static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE *list, ITEM_TYPE *start, ITEM_TYPE *end) {
+    ITEM_TYPE *current;
     igraph_error_t retval;
 
     for (current = start; current < end; current++) {
@@ -1058,7 +1050,7 @@ static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE*
     return IGRAPH_SUCCESS;
 }
 
-static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end) {
+static void INTERNAL_FUNCTION(destroy_slice)(const TYPE *list, ITEM_TYPE *start, ITEM_TYPE *end) {
     IGRAPH_UNUSED(list);
     for (; start < end; start++) {
         INTERNAL_FUNCTION(destroy_item)(start);
@@ -1069,7 +1061,7 @@ static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start,
  * Ensures that the vector has at least one extra slot at the end of its
  * allocated storage area.
  */
-static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* v) {
+static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE *v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
@@ -1089,7 +1081,7 @@ static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* v) {
 }
 
 /**
- * Helper function passed to qsort from  igraph_vector_qsort_ind
+ * Helper function passed to qsort from  igraph_vector_list_sort_ind
  */
 static int INTERNAL_FUNCTION(sort_ind_cmp)(void *thunk, const void *p1, const void *p2) {
     int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*) = (int (*)(const ITEM_TYPE*, const ITEM_TYPE*)) thunk;

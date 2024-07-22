@@ -37,8 +37,6 @@
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 /* #define SUGIYAMA_DEBUG */
@@ -344,7 +342,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     if (no_of_nodes > 0) {
         igraph_vector_int_t inds;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
-        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&layers_own, &inds, IGRAPH_ASCENDING));
+        IGRAPH_CHECK(igraph_vector_int_sort_ind(&layers_own, &inds, IGRAPH_ASCENDING));
         j = -1; dx = VECTOR(layers_own)[VECTOR(inds)[0]] - 1;
         for (i = 0; i < no_of_nodes; i++) {
             k = VECTOR(inds)[i];
@@ -791,7 +789,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
             printf("Vertices: "); igraph_vector_int_print(layer_members);
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
-            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
+            IGRAPH_CHECK(igraph_vector_sort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
             for (i = 0; i < n; i++) {
                 nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(new_layer_members)[i] = nei;
@@ -825,7 +823,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
 
-            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
+            IGRAPH_CHECK(igraph_vector_sort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
             for (i = 0; i < n; i++) {
                 nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(new_layer_members)[i] = nei;
@@ -1140,7 +1138,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
                 for (k = 0; k < n; k++) {
                     VECTOR(xs)[k] = X_POS(VECTOR(neis)[k]);
                 }
-                IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, IGRAPH_ASCENDING));
+                IGRAPH_CHECK(igraph_vector_sort_ind(&xs, &inds, IGRAPH_ASCENDING));
 
                 if (n % 2 == 1) {
                     /* Odd number of neighbors, so the median is unique */

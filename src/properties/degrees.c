@@ -731,7 +731,7 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
     igraph_vector_int_t vs_vec;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-    IGRAPH_CHECK(igraph_vector_int_qsort_ind(&degrees, outvids, order));
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(&degrees, outvids, order));
     if (only_indices || igraph_vs_is_all(&vids) ) {
         igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);

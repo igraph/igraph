@@ -2,6 +2,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  CMAKE_COLOR_DIAGNOSTICS: ON
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M

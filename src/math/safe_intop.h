@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-#include "config.h"
+#include "config.h" /* HAVE_BUILTIN_OVERFLOW */
 
 #include <float.h>
 

@@ -224,7 +224,7 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&coreness, no_of_nodes);
     IGRAPH_CHECK(igraph_coreness(graph, &coreness, /*mode=*/ IGRAPH_ALL));
-    IGRAPH_CHECK(igraph_vector_int_qsort_ind(&coreness, &order, IGRAPH_ASCENDING));
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(&coreness, &order, IGRAPH_ASCENDING));
     for (ii = 0; ii < no_of_nodes; ii++) {
         igraph_integer_t v = VECTOR(order)[ii];
         VECTOR(rank)[v] = ii;

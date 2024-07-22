@@ -284,7 +284,7 @@ int main(void) {
 
     printf("Test Binsearch in empty vector\n");
     igraph_vector_init(&v, 0);
-    IGRAPH_ASSERT(!igraph_vector_binsearch2(&v, 0));
+    IGRAPH_ASSERT(!igraph_vector_contains_sorted(&v, 0));
     IGRAPH_ASSERT(!igraph_vector_binsearch(&v, 1, &pos));
     IGRAPH_ASSERT(pos == 0);
     igraph_vector_destroy(&v);

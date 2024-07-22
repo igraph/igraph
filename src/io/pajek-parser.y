@@ -211,6 +211,7 @@ verticeshead: VERTICESLINE integer {
   if (context->vcount > IGRAPH_PAJEK_MAX_VERTEX_COUNT) {
     IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
+  IGRAPH_YY_CHECK(igraph_bitset_resize(context->seen, context->vcount));
             }
             | VERTICESLINE integer integer {
   context->vcount=$2;
@@ -228,12 +229,20 @@ verticeshead: VERTICESLINE integer {
     IGRAPH_YY_ERRORF("2-mode vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount2);
   }
   IGRAPH_YY_CHECK(add_bipartite_type(context));
+  IGRAPH_YY_CHECK(igraph_bitset_resize(context->seen, context->vcount));
 };
 
 vertdefs: /* empty */  | vertdefs vertexline;
 
 vertexline: vertex NEWLINE |
-            vertex { context->actvertex=$1; } vertexid vertexcoords shape vertparams NEWLINE { }
+            vertex { context->actvertex=$1; } vertexid vertexcoords shape vertparams NEWLINE {
+              igraph_integer_t v = $1-1; /* zero-based vertex ID */
+              if (IGRAPH_BIT_TEST(*context->seen, v)) {
+                IGRAPH_WARNINGF("Vertex ID %" IGRAPH_PRId " appears twice in Pajek file. Duplicate attributes will be overwritten.", v+1);
+              } else {
+                IGRAPH_BIT_SET(*context->seen, v);
+              }
+            }
 ;
 
 vertex: integer {

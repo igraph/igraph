@@ -58,12 +58,6 @@ __BEGIN_DECLS
 #define IGRAPH_VECTOR_LIST_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_vector_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_list_destroy, v); } while (0)
-#define IGRAPH_VECTOR_BOOL_LIST_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_vector_bool_list_init(v, size)); \
-        IGRAPH_FINALLY(igraph_vector_bool_list_destroy, v); } while (0)
-#define IGRAPH_VECTOR_CHAR_LIST_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_char_list_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_char_list_destroy, v); } while (0)
 #define IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_vector_int_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_int_list_destroy, v); } while (0)

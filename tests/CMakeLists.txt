@@ -68,7 +68,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bitset
   heap
-  igraph_array
   igraph_complex
   igraph_psumtree
   igraph_sparsemat5
@@ -99,7 +98,7 @@ add_legacy_tests(
   vector_list
   vector_ptr
   vector_ptr_sort_ind
-  vector_qsort_ind
+  vector_sort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))

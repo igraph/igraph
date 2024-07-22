@@ -189,7 +189,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             break;
         default:
             RNG_END();
-            IGRAPH_ERROR("unknown rewiring mode", IGRAPH_EINVMODE);
+            IGRAPH_ERROR("Invalid rewiring mode.", IGRAPH_EINVAL);
         }
         num_swaps++;
     }

@@ -8,9 +8,9 @@ mkdir $DEPS_PATH
 # It may be necessary to leave CMAKE_BUILD_TYPE empty and specify LIBXML2_WITH_MODULES=OFF
 # in order for fuzz introspector builds to succeed (details unverified).
 cd $SRC
-wget https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.1.tar.xz
-tar xf libxml2-2.13.1.tar.xz
-cd libxml2-2.13.1
+wget https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.2.tar.xz
+tar xf libxml2-2.13.2.tar.xz
+cd libxml2-2.13.2
 mkdir build && cd build
 CFLAGS="$CFLAGS -O2" cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_MODULES=OFF
 make install -j$(nproc)
@@ -93,7 +93,7 @@ XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 # disabled for UBSan:
 #  - read_dimacs_flow, needs a complete rewrite, see https://github.com/igraph/igraph/issues/1924
 #  - write_all_gml|graphml, uses `(igraph_integer_t) x == x` to check representability as integer; this triggers UBSan
-TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected centrality community weighted_centrality weighted_community misc_algos"
+TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_connectivity vertex_separators basic_properties_directed basic_properties_undirected linear_algos_directed linear_algos_undirected centrality community weighted_centrality weighted_community misc_algos misc_algos_weighted"
 if [ "$SANITIZER" != "undefined" ]
 then
   TARGETS="$TARGETS read_dimacs_flow write_all_gml write_all_graphml"
