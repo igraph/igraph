@@ -273,17 +273,19 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with a cycle of length 4 and a multi-edge
-Finished search, found 2 cycles.
+Finished search, found 3 cycles.
 
 Vertex IDs in cycles:
 {
   0: ( 1 2 3 4 )
   1: ( 1 2 3 4 )
+  2: ( 2 3 )
 }
 Edge IDs in cycles:
 {
   0: ( 0 2 3 4 )
   1: ( 0 1 3 4 )
+  2: ( 2 1 )
 }
 
 Testing graph with single self-loop
@@ -296,4 +298,46 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
   0: ( 0 )
+}
+
+Testing undirected graph with single length-2-loop
+Finished search, found 1 cycles.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 )
+}
+Edge IDs in cycles:
+{
+  0: ( 1 0 )
+}
+
+Testing undirected graph with 3 length-2-loops
+Finished search, found 3 cycles.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 )
+  1: ( 0 1 )
+  2: ( 0 1 )
+}
+Edge IDs in cycles:
+{
+  0: ( 2 1 )
+  1: ( 2 0 )
+  2: ( 1 0 )
+}
+
+Testing undirected graph with single length-2-loop and a self-loop
+Finished search, found 2 cycles.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 )
+  1: ( 0 1 )
+}
+Edge IDs in cycles:
+{
+  0: ( 2 )
+  1: ( 1 0 )
 }

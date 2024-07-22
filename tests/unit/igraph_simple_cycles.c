@@ -163,13 +163,31 @@ int main(void) {
     // same, but undirected
     printf("\nTesting undirected graph with a cycle of length 4 and a multi-edge\n");
     igraph_small(&g, 5, IGRAPH_UNDIRECTED, 1, 2, 2, 3, 2, 3, 3, 4, 4, 1, -1);
-    check_cycles(&g, 2);
+    check_cycles(&g, 3);
     igraph_destroy(&g);
 
     // check that self-loops are handled
     printf("\nTesting graph with single self-loop\n");
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0, 0, -1);
     check_cycles(&g, 1);
+    igraph_destroy(&g);
+
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2243053770
+    printf("\nTesting undirected graph with single length-2-loop\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, -1);
+    check_cycles(&g, 1);
+    igraph_destroy(&g);
+
+    printf("\nTesting undirected graph with 3 length-2-loops\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, 0, 1, -1);
+    check_cycles(&g, 3);
+    igraph_destroy(&g);
+
+    // and in https://github.com/igraph/igraph/pull/2181#issuecomment-2243060608
+    printf("\nTesting undirected graph with single length-2-loop and a self-loop\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, 0, 0, -1);
+    check_cycles(&g, 2);
     igraph_destroy(&g);
 
     ////////////////////////////////

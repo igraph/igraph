@@ -264,7 +264,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             if (W == S)
             {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, WE));
-                if (state->directed || igraph_vector_int_size(&state->vertex_stack) > 2)
+                if (state->directed || igraph_vector_int_size(&state->vertex_stack) > 2 || E != WE)
                 {
                     local_found = true;
                     // output circuit composed of stack
