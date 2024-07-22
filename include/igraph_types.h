@@ -54,6 +54,8 @@ typedef uint32_t igraph_uint_t;
 #  error "Invalid igraph integer size; check the value of IGRAPH_INTEGER_SIZE when compiling"
 #endif
 
+typedef igraph_integer_t igraph_int_t;
+
 typedef double igraph_real_t;
 
 /* IGRAPH_BOOL_TYPE is set to 'bool' by default, and it is not meant to be

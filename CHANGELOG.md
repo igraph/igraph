@@ -43,6 +43,7 @@
 
 ### Added
 
+ - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
  - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges
  - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges
  - `igraph_weighted_biadjacency()` created a weighted graph from a bipartite adjacency matrix.
