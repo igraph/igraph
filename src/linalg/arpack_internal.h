@@ -29,7 +29,7 @@
 */
 
 #include "igraph_decls.h"
-#include "config.h"
+#include "config.h" /* INTERNAL_ARPACK */
 
 __BEGIN_DECLS
 

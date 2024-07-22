@@ -680,3 +680,29 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
     }
     return false;
 }
+
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_is_all_finite
+ * \brief Check if all elements are finite.
+ *
+ * \param v The \type igraph_vector_t object to check.
+ * \return True if none of the elements are infinite or NaN.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+igraph_bool_t igraph_vector_is_all_finite(const igraph_vector_t *v)
+{
+    igraph_real_t *ptr;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    ptr = v->stor_begin;
+    while (ptr < v->end) {
+        if (!isfinite(*ptr)) {
+            return false;
+        }
+        ptr++;
+    }
+    return true;
+}

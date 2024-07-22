@@ -40,6 +40,14 @@ int main(void) {
     igraph_vector_int_init_int_end(&deg2, -1, 2, 3, 1, -1);
     BIGRAPHICAL_PRINT_DESTROY(deg1, deg2);
 
+    igraph_vector_int_init_int_end(&deg1, -1, 5, 2, -1);
+    igraph_vector_int_init_int_end(&deg2, -1, 1, 2, 2, 2, -1);
+    BIGRAPHICAL_PRINT_DESTROY(deg1, deg2);
+
+    igraph_vector_int_init_int_end(&deg1, -1, -2, 2, 6, -1);
+    igraph_vector_int_init_int_end(&deg2, -1, 0, 2, 2, 2, -1);
+    BIGRAPHICAL_PRINT_DESTROY(deg1, deg2);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

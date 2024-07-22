@@ -1007,8 +1007,9 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
  * \function igraph_bipartite_game_gnp
  * \brief Generates a random bipartite graph with a fixed connection probability.
  *
- * In the G(n1, n2, p) model, every possible edge between the \p n1 bottom vertices
- * and \p n2 top vertices is realized with probability \p p.
+ * In the <code>G(n1, n2, p)</code> model, every possible edge between the \p n1
+ * bottom vertices and \p n2 top vertices is realized independently with
+ * probability \p p.
  *
  * \param graph Pointer to an uninitialized igraph graph, the result
  *    is stored here.
@@ -1032,7 +1033,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
  * \return Error code.
  *
  * \sa \ref igraph_erdos_renyi_game_gnp() for the unipartite version,
- * \ref igraph_bipartite_game_gnm() for the G(n1, n2, m) model.
+ * \ref igraph_bipartite_game_gnm() for the <code>G(n1, n2, m)</code> model.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
@@ -1145,14 +1146,14 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
  * \function igraph_bipartite_game_gnm
  * \brief Generate a random bipartite graph with a fixed number of edges.
  *
- * In the G(n1, n2, m) model we uniformly choose \p m edges to realize
- * between the \p n1 bottom vertices and \p n2 top vertices.
+ * The <code>G(n1, n2, m)</code> model uniformly samples bipartite graphs with
+ * \p n1 bottom vertices and \p n2 top vertices, and precisely \p m edges.
  *
  * \param graph Pointer to an uninitialized igraph graph, the result
  *    is stored here.
  * \param types Pointer to an initialized boolean vector, or a null
  *    pointer. If not a null pointer, then the vertex types are stored
- *    here. Bottom vertices come first, n1 of them, then n2 top
+ *    here. Bottom vertices come first, \p n1 of them, then \p n2 top
  *    vertices.
  * \param n1 The number of bottom vertices.
  * \param n2 The number of top vertices.
@@ -1170,7 +1171,8 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
  * \return Error code.
  *
  * \sa \ref igraph_erdos_renyi_game_gnm() for the unipartite version,
- * \ref igraph_bipartite_game_gnp() for the G(n1, n2, p) model.
+ * \ref igraph_bipartite_game_gnp() for the <code>G(n1, n2, p)</code>
+ * model.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.

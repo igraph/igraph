@@ -19,6 +19,7 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
 #include "igraph_nongraph.h"
@@ -161,7 +162,7 @@ static igraph_error_t choose_generators(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t ord;
-    igraph_vector_bool_t excluded;
+    igraph_bitset_t excluded;
     igraph_integer_t excluded_count;
     igraph_inclist_t il;
     igraph_2wheap_t q;
@@ -169,10 +170,10 @@ static igraph_error_t choose_generators(
 
     /* ord[i] is the index of the ith largest element of local_rel_dens */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ord, 0);
-    IGRAPH_CHECK(igraph_vector_qsort_ind(local_rel_dens, &ord, IGRAPH_DESCENDING));
+    IGRAPH_CHECK(igraph_vector_sort_ind(local_rel_dens, &ord, IGRAPH_DESCENDING));
 
     /* If excluded[v] is true, then v is closer to some already chosen generator than r */
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&excluded, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&excluded, no_of_nodes);
     excluded_count = 0;
 
     /* The input graph is expected to be simple, but we still set IGRAPH_LOOPS,
@@ -188,7 +189,7 @@ static igraph_error_t choose_generators(
     for (igraph_integer_t i=0; i < no_of_nodes; i++) {
         igraph_integer_t g = VECTOR(ord)[i];
 
-        if (VECTOR(excluded)[g]) continue;
+        if (IGRAPH_BIT_TEST(excluded, g)) continue;
 
         IGRAPH_CHECK(igraph_vector_int_push_back(generators, g));
 
@@ -204,8 +205,8 @@ static igraph_error_t choose_generators(
             /* Note: We cannot stop the search after hitting an excluded vertex
              * because it is possible that another non-excluded one is reachable only
              * through this one. */
-            if (! VECTOR(excluded)[vid]) {
-                VECTOR(excluded)[vid] = true;
+            if (! IGRAPH_BIT_TEST(excluded, vid)) {
+                IGRAPH_BIT_SET(excluded, vid);
                 excluded_count++;
             }
 
@@ -250,7 +251,7 @@ static igraph_error_t choose_generators(
 
     igraph_2wheap_destroy(&q);
     igraph_inclist_destroy(&il);
-    igraph_vector_bool_destroy(&excluded);
+    igraph_bitset_destroy(&excluded);
     igraph_vector_int_destroy(&ord);
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -634,7 +635,7 @@ igraph_error_t igraph_community_voronoi(
         IGRAPH_CHECK(choose_generators(graph, pgenerators, NULL, &local_rel_dens, &lengths2, mode, r));
         IGRAPH_CHECK(igraph_voronoi(graph, membership, NULL, pgenerators, &lengths2, mode, IGRAPH_VORONOI_RANDOM));
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, weights, 1,
+            IGRAPH_CHECK(igraph_modularity(graph, pmembership, weights, 1,
                                            mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED, modularity));
         }
     }

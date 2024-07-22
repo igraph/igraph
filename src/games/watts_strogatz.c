@@ -51,8 +51,9 @@
  *
  * </para><para>
  * Duncan J Watts and Steven H Strogatz:
- * Collective dynamics of <quote>small world</quote> networks, Nature
- * 393, 440-442, 1998.
+ * Collective dynamics of <quote>small world</quote> networks,
+ * Nature 393, 440-442, 1998.
+ * https://doi.org/10.1038/30918
  *
  * \param graph The graph to initialize.
  * \param dim The dimension of the lattice.

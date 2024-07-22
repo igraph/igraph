@@ -30,7 +30,7 @@
 */
 
 #include "igraph_decls.h"
-#include "config.h"
+#include "config.h" /* INTERNAL_BLAS */
 
 __BEGIN_DECLS
 

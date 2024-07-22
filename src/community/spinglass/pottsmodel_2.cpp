@@ -45,7 +45,7 @@
 #include "pottsmodel_2.h"
 
 #include "igraph_random.h"
-#include "core/interruption.h"
+// #include "core/interruption.h"
 
 #include <cstring>
 #include <cmath>
@@ -838,7 +838,8 @@ double PottsModel::FindCommunityFromStart(
         //calculate the affinity changes of all nodes for adding every node in the to_do list to the community
         //##############################
 
-        IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+        // TODO
+        // IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
 
         max_delta_aff = 0.0;
         max_aff_node = nullptr;
@@ -956,7 +957,8 @@ double PottsModel::FindCommunityFromStart(
             //add the node to to_do again
             to_do.Push(max_aff_node);
         }
-        IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+        // TODO
+        // IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
     }
     //###################
     //write the node in the community to a file

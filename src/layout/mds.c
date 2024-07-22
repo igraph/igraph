@@ -73,12 +73,12 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
     /* Handle the trivial cases */
     if (no_of_nodes == 1) {
         IGRAPH_CHECK(igraph_matrix_resize(res, 1, dim));
-        igraph_matrix_fill(res, 0);
+        igraph_matrix_null(res);
         return IGRAPH_SUCCESS;
     }
     if (no_of_nodes == 2) {
         IGRAPH_CHECK(igraph_matrix_resize(res, 2, dim));
-        igraph_matrix_fill(res, 0);
+        igraph_matrix_null(res);
         for (j = 0; j < dim; j++) {
             MATRIX(*res, 1, j) = 1;
         }

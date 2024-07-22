@@ -126,7 +126,7 @@ static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
 /* Pristine ARPACK options object that is not exposed to the user; this is used
  * as a template for \c igraph_i_arpack_options_default when the user requests
  * a pointer to the default object */
-const static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
+static const igraph_arpack_options_t igraph_i_arpack_options_pristine = {
     /* .bmat = */ { 'I' },
     /* .n = */ 0,
     /* .which = */ { 'X', 'X' },
@@ -866,11 +866,15 @@ static void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
         options->ncv = 20;
     }
     /* ...but having ncv close to n leads to some problems with small graphs
-     * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
-     * to be larger than n / 2...
+     * (example: PageRank of "A <--> C, D <--> E, B"), so we try to keep it
+     * no more than min(n/2 + 2, n - 1), bounds found empirically using the
+     * eigen_stress.c test...
      */
-    if (options->ncv > options->n / 2) {
-        options->ncv = options->n / 2;
+    if (options->ncv > options->n / 2 + 2) {
+        options->ncv = options->n / 2 + 2;
+    }
+    if (options->ncv > options->n - 1) {
+        options->ncv = options->n - 1;
     }
     /* ...but we need at least min_ncv. */
     if (options->ncv < min_ncv) {
@@ -1402,7 +1406,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
     if (options->ierr != 0) {
-        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));
+        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->ierr));
     }
 
     /* Save the result */

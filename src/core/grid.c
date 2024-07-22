@@ -74,8 +74,8 @@ igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords
     IGRAPH_VECTOR_INT_INIT_FINALLY(&grid->next, no_of_points);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&grid->prev, no_of_points);
 
-    igraph_vector_int_fill(&grid->prev, 0);
-    igraph_vector_int_fill(&grid->next, 0);
+    igraph_vector_int_null(&grid->prev);
+    igraph_vector_int_null(&grid->next);
 
     grid->massx = 0;
     grid->massy = 0;

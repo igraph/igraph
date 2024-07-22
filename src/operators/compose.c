@@ -36,17 +36,17 @@
  * and only if there is a k vertex, such that the first graph
  * contains an (i,k) edge and the second graph a (k,j) edge.
  *
- * </para><para>This is of course exactly the composition of two
- * binary relations.
+ * </para><para>
+ * This is of course exactly the composition of two binary relations.
  *
- * </para><para>The two graphs must have the same directedness,
- * otherwise the function returns with an error.
- * Note that for undirected graphs the two relations are by definition
- * symmetric.
+ * </para><para>
+ * The two graphs must have the same directedness, otherwise the function
+ * returns with an error. Note that for undirected graphs the two relations
+ * are by definition symmetric.
  *
  * \param res Pointer to an uninitialized graph object, the result
  *        will be stored here.
- * \param g1 The firs operand, a graph object.
+ * \param g1 The first operand, a graph object.
  * \param g2 The second operand, another graph object.
  * \param edge_map1 If not a null pointer, then it must be a pointer
  *        to an initialized vector, and a mapping from the edges of
@@ -64,24 +64,24 @@
  *
  * \example examples/simple/igraph_compose.c
  */
-igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
-                   igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2) {
+igraph_error_t igraph_compose(igraph_t *res,
+                              const igraph_t *g1,
+                              const igraph_t *g2,
+                              igraph_vector_int_t *edge_map1,
+                              igraph_vector_int_t *edge_map2) {
 
-    igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
-    igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
-    igraph_integer_t no_of_nodes;
-    igraph_bool_t directed = igraph_is_directed(g1);
+    const igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
+    const igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
+    const igraph_bool_t directed = igraph_is_directed(g1);
+    const igraph_integer_t no_of_nodes = no_of_nodes_left > no_of_nodes_right ?
+                                             no_of_nodes_left : no_of_nodes_right;
     igraph_vector_int_t edges;
     igraph_vector_int_t neis1, neis2;
-    igraph_integer_t i;
 
     if (directed != igraph_is_directed(g2)) {
         IGRAPH_ERROR("Cannot compose directed and undirected graph",
                      IGRAPH_EINVAL);
     }
-
-    no_of_nodes = no_of_nodes_left > no_of_nodes_right ?
-                  no_of_nodes_left : no_of_nodes_right;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis1, 0);
@@ -94,22 +94,20 @@ igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t 
         igraph_vector_int_clear(edge_map2);
     }
 
-    for (i = 0; i < no_of_nodes_left; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes_left; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_incident(g1, &neis1, i,
-                                     IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_incident(g1, &neis1, i, IGRAPH_OUT));
         while (!igraph_vector_int_empty(&neis1)) {
-            igraph_integer_t con = igraph_vector_int_pop_back(&neis1);
-            igraph_integer_t v1 = IGRAPH_OTHER(g1, con, i);
+            const igraph_integer_t con = igraph_vector_int_pop_back(&neis1);
+            const igraph_integer_t v1 = IGRAPH_OTHER(g1, con, i);
             if (v1 < no_of_nodes_right) {
-                IGRAPH_CHECK(igraph_incident(g2, &neis2, v1,
-                                             IGRAPH_OUT));
+                IGRAPH_CHECK(igraph_incident(g2, &neis2, v1, IGRAPH_OUT));
             } else {
                 continue;
             }
             while (!igraph_vector_int_empty(&neis2)) {
-                igraph_integer_t con2 = igraph_vector_int_pop_back(&neis2);
-                igraph_integer_t v2 = IGRAPH_OTHER(g2, con2, v1);
+                const igraph_integer_t con2 = igraph_vector_int_pop_back(&neis2);
+                const igraph_integer_t v2 = IGRAPH_OTHER(g2, con2, v1);
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v2));
                 if (edge_map1) {

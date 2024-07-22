@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,17 +20,39 @@
 #include "test_utilities.h"
 
 int main(void) {
-    int *a = IGRAPH_CALLOC(0, int);
+    int *a;
 
+    /* Macros */
+
+    a = IGRAPH_CALLOC(0, int);
     IGRAPH_ASSERT(a);
 
     a = IGRAPH_REALLOC(a, 0, int);
-
     IGRAPH_ASSERT(a);
 
     IGRAPH_FREE(a);
+    IGRAPH_ASSERT(!a); /* IGRAPH_FREE(a) sets 'a' to NULL */
 
+    a = IGRAPH_MALLOC(0);
+    IGRAPH_ASSERT(a);
+
+    IGRAPH_FREE(a);
     IGRAPH_ASSERT(!a);
+
+    /* Functions */
+
+    a = igraph_calloc(0, sizeof(int));
+    IGRAPH_ASSERT(a);
+
+    a = igraph_realloc(a, 0);
+    IGRAPH_ASSERT(a);
+
+    igraph_free(a);
+
+    a = igraph_malloc(0);
+    IGRAPH_ASSERT(a);
+
+    igraph_free(a);
 
     VERIFY_FINALLY_STACK();
     return 0;

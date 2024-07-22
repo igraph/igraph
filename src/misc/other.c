@@ -168,7 +168,7 @@ igraph_error_t igraph_convex_hull(
 
     /* Sort points by angles */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_qsort_ind(&angles, &order, IGRAPH_ASCENDING));
+    IGRAPH_CHECK(igraph_vector_sort_ind(&angles, &order, IGRAPH_ASCENDING));
 
     /* Check if two points have the same angle. If so, keep only the point that
      * is farthest from the pivot */
@@ -362,7 +362,7 @@ igraph_error_t igraph_vertex_path_from_edge_path(
                 break;
 
             default:
-                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVMODE);
         }
 
         if (!next_edge_ok) {

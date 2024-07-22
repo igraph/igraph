@@ -54,7 +54,7 @@
 // see readme.txt for more details
 
 #include "walktrap_communities.h"
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 #include <algorithm>
 #include <cmath>
 

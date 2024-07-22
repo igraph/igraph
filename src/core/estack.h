@@ -25,14 +25,14 @@
 #define IGRAPH_ESTACK_H
 
 #include "igraph_decls.h"
+#include "igraph_bitset.h"
 #include "igraph_stack.h"
-#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
 typedef struct igraph_estack_t {
     igraph_stack_int_t stack;
-    igraph_vector_bool_t isin;
+    igraph_bitset_t isin;
 } igraph_estack_t;
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_init(
@@ -41,9 +41,9 @@ IGRAPH_PRIVATE_EXPORT void igraph_estack_destroy(igraph_estack_t *s);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_push(igraph_estack_t *s, igraph_integer_t elem);
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_estack_pop(igraph_estack_t *s);
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_estack_iselement(const igraph_estack_t *s,
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_estack_iselement(const igraph_estack_t *s,
                                                             igraph_integer_t elem);
-IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_estack_size(const igraph_estack_t *s);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_estack_size(const igraph_estack_t *s);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_print(const igraph_estack_t *s);
 

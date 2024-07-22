@@ -23,6 +23,7 @@
 #include "igraph_eulerian.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_interface.h"
 #include "igraph_components.h"
 #include "igraph_stack.h"
@@ -351,7 +352,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
     igraph_integer_t n, m;
     igraph_inclist_t il;
     igraph_stack_int_t path, tracker, edge_tracker, edge_path;
-    igraph_vector_bool_t visited_list;
+    igraph_bitset_t visited_list;
     igraph_vector_int_t degree;
 
     n = igraph_vcount(graph);
@@ -376,7 +377,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
     IGRAPH_STACK_INT_INIT_FINALLY(&tracker, n);
     IGRAPH_STACK_INT_INIT_FINALLY(&edge_path, n);
     IGRAPH_STACK_INT_INIT_FINALLY(&edge_tracker, n);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited_list, m);
+    IGRAPH_BITSET_INIT_FINALLY(&visited_list, m);
 
     IGRAPH_CHECK(igraph_stack_int_push(&tracker, start_of_path));
 
@@ -399,7 +400,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
 
             for (j = 0; j < nc; j++) {
                 edge = VECTOR(*incedges)[j];
-                if (!VECTOR(visited_list)[edge]) {
+                if (!IGRAPH_BIT_TEST(visited_list, edge)) {
                     break;
                 }
             }
@@ -411,7 +412,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
             /* remove edge here */
             VECTOR(degree)[curr]--;
             VECTOR(degree)[next]--;
-            VECTOR(visited_list)[edge] = 1;
+            IGRAPH_BIT_SET(visited_list, edge);
 
             curr = next;
         } else { /* back track to find remaining circuit */
@@ -442,7 +443,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
     igraph_stack_int_destroy(&tracker);
     igraph_stack_int_destroy(&edge_path);
     igraph_stack_int_destroy(&edge_tracker);
-    igraph_vector_bool_destroy(&visited_list);
+    igraph_bitset_destroy(&visited_list);
     igraph_inclist_destroy(&il);
     igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(7);
@@ -459,7 +460,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
     igraph_integer_t n, m;
     igraph_inclist_t il;
     igraph_stack_int_t path, tracker, edge_tracker, edge_path;
-    igraph_vector_bool_t visited_list;
+    igraph_bitset_t visited_list;
     igraph_vector_int_t remaining_out_edges;
 
     n = igraph_vcount(graph);
@@ -481,7 +482,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
     IGRAPH_STACK_INT_INIT_FINALLY(&tracker, n);
     IGRAPH_STACK_INT_INIT_FINALLY(&edge_path, n);
     IGRAPH_STACK_INT_INIT_FINALLY(&edge_tracker, n);
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited_list, m);
+    IGRAPH_BITSET_INIT_FINALLY(&visited_list, m);
 
     IGRAPH_CHECK(igraph_stack_int_push(&tracker, start_of_path));
 
@@ -507,7 +508,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
 
             for (j = 0; j < nc; j++) {
                 edge = VECTOR(*incedges)[j];
-                if (!VECTOR(visited_list)[edge]) {
+                if (!IGRAPH_BIT_TEST(visited_list, edge)) {
                     break;
                 }
             }
@@ -518,7 +519,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
 
             /* remove edge here */
             VECTOR(remaining_out_edges)[curr]--;
-            VECTOR(visited_list)[edge] = 1;
+            IGRAPH_BIT_SET(visited_list, edge);
 
             curr = next;
         } else { /* back track to find remaining circuit */
@@ -549,7 +550,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
     igraph_stack_int_destroy(&tracker);
     igraph_stack_int_destroy(&edge_path);
     igraph_stack_int_destroy(&edge_tracker);
-    igraph_vector_bool_destroy(&visited_list);
+    igraph_bitset_destroy(&visited_list);
     igraph_inclist_destroy(&il);
     igraph_vector_int_destroy(&remaining_out_edges);
     IGRAPH_FINALLY_CLEAN(7);
@@ -577,7 +578,8 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  *                 belonging to the cycle will be stored here. May be \c NULL
  *                 if it is not needed by the caller.
  * \param vertex_res Pointer to an initialised vector. The indices of vertices
- *                   belonging to the cycle will be stored here. May be \c NULL
+ *                   belonging to the cycle will be stored here. The first and
+ *                   last vertex in the vector will be the same. May be \c NULL
  *                   if it is not needed by the caller.
  * \return Error code:
  *        \clist

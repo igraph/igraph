@@ -820,7 +820,7 @@ float graph::get_tot_energy ( ) {
 }
 
 
-int graph::draw_graph(igraph_matrix_t *res) {
+igraph_error_t graph::draw_graph(igraph_matrix_t *res) {
     while (ReCompute()) {
         IGRAPH_ALLOW_INTERRUPTION();
     }
@@ -831,7 +831,7 @@ int graph::draw_graph(igraph_matrix_t *res) {
         MATRIX(*res, i, 1) = positions[i].y;
         MATRIX(*res, i, 2) = positions[i].z;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 } // namespace drl3d

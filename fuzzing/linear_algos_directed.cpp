@@ -21,6 +21,8 @@
 #include <igraph.h>
 #include <cstdlib>
 
+#include "fuzz_utilities.h"
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -44,8 +46,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_integer_t i, i2;
-        igraph_bool_t b, b2;
+        igraph_bool_t b, b2, loop, multi, graphical;
         igraph_real_t r;
+        igraph_t g;
 
         igraph_vector_int_list_init(&ivl1, 0);
         igraph_vector_int_list_init(&ivl2, 0);
@@ -65,6 +68,75 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_is_multiple(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO));
         igraph_is_mutual(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO), false);
         igraph_maxdegree(&graph, &i, igraph_vss_all(), IGRAPH_IN, true);
+        igraph_mean_degree(&graph, &r, IGRAPH_NO_LOOPS);
+        igraph_reciprocity(&graph, &r, true, IGRAPH_RECIPROCITY_DEFAULT);
+
+        /* Graphicality and graph realization based on the degrees of 'graph'. */
+        igraph_has_loop(&graph, &loop);
+        igraph_has_multiple(&graph, &multi);
+        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_OUT, true);
+        igraph_degree(&graph, &iv2, igraph_vss_all(), IGRAPH_IN, true);
+        igraph_is_graphical(&iv1, &iv2, IGRAPH_SIMPLE_SW, &graphical);
+        if (!loop && !multi) {
+            IGRAPH_ASSERT(graphical);
+        }
+        if (graphical) {
+            igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+            igraph_destroy(&g);
+            igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+            igraph_destroy(&g);
+            igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+            igraph_destroy(&g);
+        } else {
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX),
+                IGRAPH_EINVAL);
+        }
+        igraph_is_graphical(&iv1, &iv2, IGRAPH_LOOPS_SW, &graphical);
+        if (!multi) {
+            IGRAPH_ASSERT(graphical);
+        }
+        if (graphical) {
+            /* Directed realization with loops but no multi-edges is not yet implemented. */
+            /* Realize as bipartite (equivalent). */
+            igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+            igraph_destroy(&g);
+            igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+            igraph_destroy(&g);
+            igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+            igraph_destroy(&g);
+        } else {
+            CHECK_ERROR(
+                igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX),
+                IGRAPH_EINVAL);
+        }
+        igraph_is_graphical(&iv1, &iv2, IGRAPH_MULTI_SW, &graphical);
+        if (!loop) {
+            IGRAPH_ASSERT(graphical);
+            /* Directed realization with multi-edges but no loops is not yet implemented. */
+        }
+        igraph_is_graphical(&iv1, &iv2, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &graphical);
+        IGRAPH_ASSERT(graphical);
+        /* Directed realization with loops and multi-edges is not yet implemented. */
+        /* Realize as bipartite (equivalent). */
+        igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+        igraph_destroy(&g);
+        igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+        igraph_destroy(&g);
+        igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+        igraph_destroy(&g);
 
         // These algorithms require a starting vertex,
         // so we require the graph to have at least one vertex.
@@ -83,7 +155,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, true);
             igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
 
-            igraph_t g;
             igraph_vector_int_resize(&iv1, 1);
             VECTOR(iv1)[0] = 0;
             igraph_unfold_tree(&graph, &g, IGRAPH_IN, &iv1, &iv2);

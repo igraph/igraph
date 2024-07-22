@@ -476,7 +476,7 @@ igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 2));
             neighbors.read_real(res);
         }
-        neighbors.draw_graph(res);
+        IGRAPH_CHECK(neighbors.draw_graph(res));
 
         RNG_END();
     );

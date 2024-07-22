@@ -25,7 +25,7 @@
 #ifndef IGRAPH_GLPK_SUPPORT_H
 #define IGRAPH_GLPK_SUPPORT_H
 
-#include "config.h"
+#include "config.h" /* HAVE_GLPK, IGRAPH_THREAD_LOCAL */
 
 /* Note: only files calling the GLPK routines directly need to
    include this header.
@@ -54,7 +54,7 @@ extern IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 
 igraph_error_t igraph_i_glpk_check(int retval, const char* message);
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info);
-void igraph_i_glpk_error_hook(void *info);
+IGRAPH_FUNCATTR_NORETURN void igraph_i_glpk_error_hook(void *info);
 int igraph_i_glpk_terminal_hook(void *info, const char *s);
 void igraph_i_glp_delete_prob(glp_prob *p);
 

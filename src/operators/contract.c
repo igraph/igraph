@@ -56,6 +56,8 @@
  *
  * Time complexity: O(|V|+|E|), linear in the number
  * or vertices plus edges.
+ *
+ * \example examples/simple/igraph_contract_vertices.c
  */
 
 igraph_error_t igraph_contract_vertices(igraph_t *graph,
