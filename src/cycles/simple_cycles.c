@@ -144,8 +144,8 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
     igraph_vector_int_t *neis;
     igraph_integer_t w;
     igraph_stack_int_t u_stack;
-    igraph_stack_int_init(&u_stack, 0);
-    igraph_stack_int_push(&u_stack, u);
+    IGRAPH_STACK_INT_INIT_FINALLY(&u_stack, 0);
+    IGRAPH_CHECK(igraph_stack_int_push(&u_stack, u));
 
     while (igraph_stack_int_size(&u_stack) > 0) {
         igraph_integer_t current_u = igraph_stack_int_top(&u_stack);
@@ -156,7 +156,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
         while (!igraph_vector_int_empty(neis) && !recurse_deeper) {
             w = igraph_vector_int_pop_back(neis);
             if (VECTOR(state->blocked)[w]) {
-                igraph_stack_int_push(&u_stack, w);
+                IGRAPH_CHECK(igraph_stack_int_push(&u_stack, w));
                 recurse_deeper = true;
             }
         }
@@ -166,6 +166,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
         }
     }
 
+    IGRAPH_FINALLY_CLEAN(1);
     igraph_stack_int_destroy(&u_stack);
 
     return IGRAPH_SUCCESS;
@@ -203,16 +204,13 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 
     // keep track of what we were doing (rather than recursing)
     igraph_stack_int_t neigh_iteration_progress;
-    igraph_stack_int_init(&neigh_iteration_progress, 0);
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &neigh_iteration_progress);
+    IGRAPH_STACK_INT_INIT_FINALLY(&neigh_iteration_progress, 0);
 
     igraph_stack_int_t v_stack;
-    igraph_stack_int_init(&v_stack, 0);
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &v_stack);
+    IGRAPH_STACK_INT_INIT_FINALLY(&v_stack, 0);
 
     igraph_stack_int_t e_stack;
-    igraph_stack_int_init(&e_stack, 0);
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &e_stack);
+    IGRAPH_STACK_INT_INIT_FINALLY(&e_stack, 0);
 
     igraph_bool_t recurse_deeper = true;
     while (recurse_deeper || igraph_stack_int_size(&neigh_iteration_progress) > 0) {
@@ -270,11 +268,11 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     // this is our naïve filter for now
                     igraph_bool_t persist_result = true;
                     if (!state->directed) {
-                        // my_print_vec_int(&v_res);
-                        // my_print_vec_int(&e_res);
-                        // printf("\n");
-                        // printf("Has hashes %llu, %llu\n", vertex_hash, edge_hash);
-                        igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, vertices, edges, &v_res, &e_res, vertex_hash, edge_hash);
+                    // my_print_vec_int(&v_res);
+                    // my_print_vec_int(&e_res);
+                    // printf("\n");
+                    // printf("Has hashes %llu, %llu\n", vertex_hash, edge_hash);
+                    igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, vertices, edges, &v_res, &e_res, vertex_hash, edge_hash);
                         if (duplicate_found) {
                             persist_result = false;
                         } else {
@@ -285,9 +283,9 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     // end filter
 
                     if (persist_result) {
-                        /* Order is important: e_res is at the top of the finally
-                         * stack so we need to deal with it first */
-                        if (edges != NULL) {
+                    /* Order is important: e_res is at the top of the finally
+                     * stack so we need to deal with it first */
+                    if (edges != NULL) {
                             /* e_res ownership transferred to 'edges' */
                             IGRAPH_CHECK(igraph_vector_int_list_push_back(edges, &e_res));
                         } else {
@@ -316,7 +314,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 E = WE;
                 break;
             } else {
-            //   printf("Vertex %" IGRAPH_PRId ", neighbour of %" IGRAPH_PRId ", is blocked\n", W, V);
+                //   printf("Vertex %" IGRAPH_PRId ", neighbour of %" IGRAPH_PRId ", is blocked\n", W, V);
             }
         }
 
@@ -380,12 +378,10 @@ igraph_error_t igraph_simple_cycle_search_state_init(
     state->N = igraph_vcount(graph);
     state->NE = igraph_ecount(graph);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&state->vertex_stack, 0));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->vertex_stack, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&state->vertex_stack, 8));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->vertex_stack);
-    IGRAPH_CHECK(igraph_vector_int_init(&state->edge_stack, 0));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->edge_stack, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&state->edge_stack, 8));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->edge_stack);
     IGRAPH_CHECK(igraph_vector_bool_init(&state->blocked, state->N));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &state->blocked);
     IGRAPH_CHECK(igraph_inclist_init(graph, &state->IK, IGRAPH_OUT, IGRAPH_LOOPS_ONCE)); // TODO: understand what we actually want to include
@@ -397,12 +393,10 @@ igraph_error_t igraph_simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
     if (!state->directed) {
-        IGRAPH_CHECK(igraph_vector_int_init(&state->found_cycles_vertex_hashes, 0));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&state->found_cycles_vertex_hashes, 0);
         IGRAPH_CHECK(igraph_vector_int_reserve(&state->found_cycles_vertex_hashes, 8));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &state->found_cycles_vertex_hashes);
-        IGRAPH_CHECK(igraph_vector_int_init(&state->found_cycles_edge_hashes, 0));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&state->found_cycles_edge_hashes, 0);
         IGRAPH_CHECK(igraph_vector_int_reserve(&state->found_cycles_edge_hashes, 8));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &state->found_cycles_edge_hashes);
     }
 
     IGRAPH_FINALLY_CLEAN(state->directed ? 6 : 8);
