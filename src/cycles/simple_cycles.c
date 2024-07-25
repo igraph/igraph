@@ -22,8 +22,9 @@
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
-
 #include "core/interruption.h"
+
+// #include <math.h>
 
 /* Johnson's cycle detection algorithm
  *
@@ -41,6 +42,9 @@
 typedef struct igraph_simple_cycle_search_state_t {
     /* Number of vertices in the graph */
     igraph_integer_t N;
+
+    /* Number of edges in the graph */
+    igraph_integer_t NE;
 
     /* The incidence list of the graph */
     igraph_inclist_t IK;
@@ -107,19 +111,24 @@ static igraph_bool_t igraph_i_cycle_has_been_found_already(
  *
  * A hashing algorithm
  */
-static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec) {
+static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec, igraph_integer_t basis) {
 
     unsigned long long hash_product = 1.;
     unsigned long long hash_sum = 0;
     unsigned int hash_xor = 0;
 
     for (igraph_integer_t i = 0; i < igraph_vector_int_size(vec); ++i) {
-        hash_product *= VECTOR(*vec)[i];
-        hash_sum += VECTOR(*vec)[i];
-        hash_xor ^= VECTOR(*vec)[i];
+        // need to not use zeros
+        igraph_integer_t v = VECTOR(*vec)[i] + 1;
+        hash_product *= v;
+        hash_sum += v;
+        hash_xor ^= v;
     }
 
-    return hash_product + hash_sum + ((unsigned long long)hash_xor << 32);
+    // unsigned long long max_sum = (basis + 1)*(basis / 2);
+
+    // return hash_sum + (hash_product << (int)log2(max_sum)) + ((unsigned long long)hash_xor << 32);
+    return hash_sum + hash_product + ((unsigned long long)hash_xor << 32);
 }
 
 /**
@@ -247,13 +256,13 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     igraph_vector_int_t v_res;
                     IGRAPH_CHECK(igraph_vector_int_init_copy(&v_res, &state->vertex_stack));
                     IGRAPH_FINALLY(igraph_vector_int_destroy, &v_res);
-                    unsigned long long vertex_hash = igraph_i_hash_vector_int(&v_res);
+                    unsigned long long vertex_hash = igraph_i_hash_vector_int(&v_res, state->N);
 
                     // same for edges
                     igraph_vector_int_t e_res;
                     IGRAPH_CHECK(igraph_vector_int_init_copy(&e_res, &state->edge_stack));
                     IGRAPH_FINALLY(igraph_vector_int_destroy, &e_res);
-                    unsigned long long edge_hash = igraph_i_hash_vector_int(&e_res);
+                    unsigned long long edge_hash = igraph_i_hash_vector_int(&e_res, state->NE);
 
                     // undirected graphs lead to some cycles being found multiple
                     // times.
@@ -261,6 +270,9 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     igraph_bool_t persist_result = true;
                     if (!state->directed) {
                         // print_vector_int(&v_res);
+                        // my_print_vec_int(&v_res);
+                        // my_print_vec_int(&e_res);
+                        // printf("\n");
                         // printf("Has hashes %llu, %llu\n", vertex_hash, edge_hash);
                         igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, vertices, edges, &v_res, &e_res, vertex_hash, edge_hash);
                         if (duplicate_found) {
@@ -363,6 +375,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 igraph_error_t igraph_simple_cycle_search_state_init(
     igraph_simple_cycle_search_state_t *state, const igraph_t *graph) {
     state->N = igraph_vcount(graph);
+    state->NE = igraph_ecount(graph);
 
     IGRAPH_CHECK(igraph_vector_int_init(&state->vertex_stack, 0));
     IGRAPH_CHECK(igraph_vector_int_reserve(&state->vertex_stack, 8));
