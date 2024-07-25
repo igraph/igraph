@@ -152,11 +152,12 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
         VECTOR(state->blocked)[current_u] = false;
 
         neis = igraph_adjlist_get(&state->B, current_u);
-        bool recurse_deeper = false;
+        igraph_bool_t recurse_deeper = false;
         while (!igraph_vector_int_empty(neis) && !recurse_deeper) {
             w = igraph_vector_int_pop_back(neis);
             if (VECTOR(state->blocked)[w]) {
                 igraph_stack_int_push(&u_stack, w);
+                recurse_deeper = true;
             }
         }
 
@@ -269,7 +270,6 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     // this is our naïve filter for now
                     igraph_bool_t persist_result = true;
                     if (!state->directed) {
-                        // print_vector_int(&v_res);
                         // my_print_vec_int(&v_res);
                         // my_print_vec_int(&e_res);
                         // printf("\n");
@@ -315,6 +315,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 V = W;
                 E = WE;
                 break;
+            } else {
+            //   printf("Vertex %" IGRAPH_PRId ", neighbour of %" IGRAPH_PRId ", is blocked\n", W, V);
             }
         }
 
@@ -336,12 +338,13 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             IGRAPH_ASSERT(!igraph_vector_int_empty(&state->vertex_stack));
 
             // unstack v
-            igraph_vector_int_pop_back(&state->vertex_stack);
+            V = igraph_vector_int_pop_back(&state->vertex_stack);
             if (!igraph_vector_int_empty(&state->edge_stack)) {
                 // can be empty for the starting point.
                 // alternatively, V == S
                 E = igraph_vector_int_pop_back(&state->edge_stack);
             }
+            // printf("Unstacked v %" IGRAPH_PRId ", e %" IGRAPH_PRId "\n", V, E);
         }
     }
 
