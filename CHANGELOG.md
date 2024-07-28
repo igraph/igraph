@@ -6,6 +6,7 @@
 
  - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
  - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
+ - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
 
 ### Fixed
 
