@@ -2508,22 +2508,19 @@ void FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) 
  * \brief Swap two elements in a vector.
  *
  * Note that currently no range checking is performed.
+ *
  * \param v The input vector.
  * \param i Index of the first element.
- * \param j Index of the second element (may be the same as the
- * first one).
- * \return Error code, currently always \c IGRAPH_SUCCESS.
+ * \param j Index of the second element (may be the same as the first one).
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
-        igraph_integer_t i, igraph_integer_t j) {
+void FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
+                                    igraph_integer_t i, igraph_integer_t j) {
     BASE tmp = VECTOR(*v)[i];
     VECTOR(*v)[i] = VECTOR(*v)[j];
     VECTOR(*v)[j] = tmp;
-
-    return IGRAPH_SUCCESS;
 }
 
 /**

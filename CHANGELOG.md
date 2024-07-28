@@ -14,6 +14,7 @@
  - `igraph_vector_swap()` no longer returns an error code.
  - `igraph_matrix_swap()` no longer returns an error code.
  - `igraph_vector_list_swap()` and `igraph_graph_list_swap()` no longer return an error code.
+ - `igraph_vector_swap_elements()` no longer returns an error code.
  - `igraph_vector_list_swap_elements()` and `igraph_graph_list_swap_elements()` no longer return an error code.
  - `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices to create vertex pairs of, instead of one.
  - `igraph_subisomorphic_lad()` does not have a CPU time limit parameter any more. If you wish to stop the calculation from another thread or a higher level interface, use igraph's interruption mechanism.
@@ -40,6 +41,7 @@
  - `igraph_minimum_spanning_tree()` takes a new `method` parameter that controls the algorithm used for finding the spanning tree. Kruskal's algorithm was added.
  - `igraph_get_all_simple_paths()` returns its results in an integer vector list (`igraph_vector_int_list_t`) instead of a single integer vector.
  - `igraph_get_all_simple_paths()` now has an additional parameter that allows restricting paths by minimum length as well.
+
 
 ### Added
 
