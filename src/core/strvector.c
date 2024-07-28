@@ -621,17 +621,17 @@ igraph_error_t igraph_strvector_push_back_len(
 /**
  * \ingroup strvector
  * \function igraph_strvector_print
- * \brief Prints a string vector.
+ * \brief Prints a string vector to a file.
  *
  * \param sv The string vector.
  * \param file The file to write to.
  * \param sep The separator to print between strings.
  * \return Error code.
  */
-igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
-                           const char *sep) {
+igraph_error_t igraph_strvector_fprint(const igraph_strvector_t *sv, FILE *file,
+                                       const char *sep) {
 
-    igraph_integer_t n = igraph_strvector_size(sv);
+    const igraph_integer_t n = igraph_strvector_size(sv);
     if (n != 0) {
         fprintf(file, "%s", igraph_strvector_get(sv, 0));
     }
@@ -640,6 +640,22 @@ igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
     }
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_print
+ * \brief Prints a string vector.
+ *
+ * \param sv The string vector.
+ * \param sep The separator to print between strings.
+ * \return Error code.
+ */
+#ifndef USING_R
+igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv,
+                                      const char *sep) {
+    return igraph_strvector_fprint(sv, stdout, sep);
+}
+#endif
 
 /**
  * \ingroup strvector
