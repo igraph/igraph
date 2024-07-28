@@ -719,7 +719,7 @@ void igraph_strvector_swap(igraph_strvector_t *v1, igraph_strvector_t *v2) {
  * Time complexity: O(1).
  */
 void igraph_strvector_swap_elements(igraph_strvector_t *sv, igraph_integer_t i, igraph_integer_t j) {
-    char *tmp = sv->stor_begin[i];
+    const char *tmp = sv->stor_begin[i];
     sv->stor_begin[i] = sv->stor_begin[j];
     sv->stor_begin[j] = tmp;
 }
