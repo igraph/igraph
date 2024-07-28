@@ -89,6 +89,7 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_merge(
     igraph_strvector_t *to, igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_resize(
     igraph_strvector_t* v, igraph_integer_t newsize);
+IGRAPH_EXPORT void igraph_strvector_resize_min(igraph_strvector_t *sv);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v,
         const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *v,
