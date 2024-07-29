@@ -238,8 +238,9 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading Pajek file.", err);
     }
 
+    igraph_pajek_yylex_destroy(context.scanner);
     igraph_bitset_destroy(&seen);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     /* Prepare attributes */
     const igraph_integer_t eattr_count = igraph_vector_ptr_size(&eattrs);
@@ -282,8 +283,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_trie_destroy(&eattrnames);
     igraph_i_pajek_destroy_attr_vector(&vattrs);
     igraph_trie_destroy(&vattrnames);
-    igraph_pajek_yylex_destroy(context.scanner);
-    IGRAPH_FINALLY_CLEAN(7); /* +1 for 'graph' */
+    IGRAPH_FINALLY_CLEAN(6); /* +1 for 'graph' */
 
     return IGRAPH_SUCCESS;
 }

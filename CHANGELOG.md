@@ -6,6 +6,7 @@
 
  - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
  - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
+ - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
 
 ### Fixed
 
@@ -17,6 +18,7 @@
  - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash when passing `distances=NULL` and `distances_are_weights=true`. This is now fixed.
  - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash on interruption. This is now fixed.
  - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
+ - The documented `igraph_strvector_resize_min()` was missing from headers.
 
 ### Deprecated
 
