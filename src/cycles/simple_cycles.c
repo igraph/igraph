@@ -85,27 +85,38 @@ typedef struct igraph_simple_cycle_search_state_t {
  * rather than an expensive iteration over all found cycles.
  */
 
-static igraph_bool_t igraph_i_cycle_has_been_found_already(
-    igraph_simple_cycle_search_state_t *state,
-    igraph_vector_int_t *vertex_hash, igraph_vector_int_t *edge_hash) {
-    IGRAPH_ASSERT(state!= NULL && vertex_hash!= NULL && edge_hash!= NULL);
-    IGRAPH_ASSERT(igraph_vector_int_list_size(&state->found_cycles_vertex_hashes) == igraph_vector_int_list_size(&state->found_cycles_edge_hashes));
-    for (igraph_integer_t i = 0; i < igraph_vector_int_list_size(&state->found_cycles_vertex_hashes); ++i) {
-        igraph_vector_int_t *v_hashes = igraph_vector_int_list_get_ptr(&state->found_cycles_vertex_hashes, i);
-        igraph_vector_int_t *e_hashes = igraph_vector_int_list_get_ptr(&state->found_cycles_edge_hashes, i);
-        if ((igraph_vector_int_size(v_hashes) != igraph_vector_int_size(vertex_hash))
-                || (igraph_vector_int_size(e_hashes) != igraph_vector_int_size(edge_hash))) {
+static igraph_bool_t
+igraph_i_cycle_has_been_found_already(igraph_simple_cycle_search_state_t *state,
+                                      igraph_vector_int_t *vertex_hash,
+                                      igraph_vector_int_t *edge_hash) {
+    IGRAPH_ASSERT(state != NULL && vertex_hash != NULL && edge_hash != NULL);
+    IGRAPH_ASSERT(
+        igraph_vector_int_list_size(&state->found_cycles_vertex_hashes) ==
+        igraph_vector_int_list_size(&state->found_cycles_edge_hashes));
+    for (igraph_integer_t i = 0;
+            i < igraph_vector_int_list_size(&state->found_cycles_vertex_hashes);
+            ++i) {
+        igraph_vector_int_t *v_hashes =
+            igraph_vector_int_list_get_ptr(&state->found_cycles_vertex_hashes, i);
+        igraph_vector_int_t *e_hashes =
+            igraph_vector_int_list_get_ptr(&state->found_cycles_edge_hashes, i);
+        if ((igraph_vector_int_size(v_hashes) !=
+                igraph_vector_int_size(vertex_hash)) ||
+                (igraph_vector_int_size(e_hashes) !=
+                 igraph_vector_int_size(edge_hash))) {
             continue;
         }
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(e_hashes); ++j) {
-            if (igraph_vector_int_get(e_hashes, j) != igraph_vector_int_get(edge_hash, j)) {
+            if (igraph_vector_int_get(e_hashes, j) !=
+                    igraph_vector_int_get(edge_hash, j)) {
                 goto next_cycle;
             }
         }
-        // TODO: reconsider whether it is even possible to find a cycle with the same edges
-        // but different vertices
+        // TODO: reconsider whether it is even possible to find a cycle with the
+        // same edges but different vertices
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(v_hashes); ++j) {
-            if (igraph_vector_int_get(v_hashes, j)!= igraph_vector_int_get(vertex_hash, j)) {
+            if (igraph_vector_int_get(v_hashes, j) !=
+                    igraph_vector_int_get(vertex_hash, j)) {
                 goto next_cycle;
             }
         }
@@ -124,16 +135,22 @@ next_cycle:
  */
 static void igraph_i_hash_vector_int(igraph_vector_int_t *vec,
                                      igraph_vector_int_t *hash) {
-    // iterate igraph_integer_t in vec, set the corresponding bit in the appropriate entry in the hash vector
+    // iterate igraph_integer_t in vec, set the corresponding bit in the
+    // appropriate entry in the hash vector
     igraph_integer_t max_val = igraph_vector_int_max(vec);
-    igraph_integer_t n_bits_per_entries = (sizeof(igraph_integer_t) * __CHAR_BIT__);
+    igraph_integer_t n_bits_per_entries = IGRAPH_INTEGER_SIZE;
     // round up to the nearest multiple of n_bits_per_entries
-    igraph_integer_t n_entries_in_hash = (max_val + n_bits_per_entries) / n_bits_per_entries;
+    igraph_integer_t n_entries_in_hash =
+        (max_val + n_bits_per_entries) / n_bits_per_entries;
     igraph_vector_int_resize(hash, n_entries_in_hash);
     igraph_vector_int_null(hash);
     for (igraph_integer_t i = 0; i < igraph_vector_int_size(vec); ++i) {
-        igraph_integer_t rel_idx = igraph_vector_int_get(vec, i) / n_bits_per_entries;
-        igraph_vector_int_set(hash, rel_idx, igraph_vector_int_get(hash, rel_idx) | 1 << (igraph_vector_int_get(vec, i) % (n_bits_per_entries)));
+        igraph_integer_t rel_idx =
+            igraph_vector_int_get(vec, i) / n_bits_per_entries;
+        igraph_vector_int_set(
+                         hash, rel_idx,
+                         igraph_vector_int_get(hash, rel_idx) |
+                         1 << (igraph_vector_int_get(vec, i) % (n_bits_per_entries)));
     }
 }
 
@@ -268,36 +285,38 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     IGRAPH_CHECK(
                         igraph_vector_int_init_copy(&v_res, &state->vertex_stack));
                     IGRAPH_FINALLY(igraph_vector_int_destroy, &v_res);
-                    igraph_vector_int_t vertex_hash;
-                    // IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_hash, 0);
-                    igraph_vector_int_init(&vertex_hash, 0);
-                    igraph_i_hash_vector_int(&v_res, &vertex_hash);
 
                     // same for edges
                     igraph_vector_int_t e_res;
                     IGRAPH_CHECK(igraph_vector_int_init_copy(&e_res, &state->edge_stack));
                     IGRAPH_FINALLY(igraph_vector_int_destroy, &e_res);
-                    igraph_vector_int_t edge_hash;
-                    // IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_hash, 0);
-                    igraph_vector_int_init(&edge_hash, 0);
-                    igraph_i_hash_vector_int(&e_res, &edge_hash);
 
                     // undirected graphs lead to some cycles being found multiple
                     // times.
                     // this is our naïve filter for now
                     igraph_bool_t persist_result = true;
                     if (!state->directed) {
+                        igraph_vector_int_t vertex_hash;
+                        IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_hash, 0);
+                        igraph_i_hash_vector_int(&v_res, &vertex_hash);
+                        igraph_vector_int_t edge_hash;
+                        IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_hash, 0);
+                        igraph_i_hash_vector_int(&e_res, &edge_hash);
                         // printf("Has hashes %llu, %llu\n", vertex_hash, edge_hash);
                         igraph_bool_t duplicate_found =
-                            igraph_i_cycle_has_been_found_already(state,
-                                &vertex_hash, &edge_hash);
+                            igraph_i_cycle_has_been_found_already(state, &vertex_hash,
+                                &edge_hash);
                         if (duplicate_found) {
                             persist_result = false;
+                            igraph_vector_int_destroy(&vertex_hash);
+                            igraph_vector_int_destroy(&edge_hash);
+                            IGRAPH_FINALLY_CLEAN(2);
                         } else {
-                            igraph_vector_int_list_push_back(&state->found_cycles_vertex_hashes,
-                                                             &vertex_hash);
+                            igraph_vector_int_list_push_back(
+                                &state->found_cycles_vertex_hashes, &vertex_hash);
                             igraph_vector_int_list_push_back(&state->found_cycles_edge_hashes,
                                                              &edge_hash);
+                            IGRAPH_FINALLY_CLEAN(2);
                         }
                     }
                     // end filter
@@ -320,13 +339,12 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                         igraph_vector_int_destroy(&v_res);
                         igraph_vector_int_destroy(&e_res);
                         IGRAPH_FINALLY_CLEAN(2);
-                        igraph_vector_int_destroy(&vertex_hash);
-                        igraph_vector_int_destroy(&edge_hash);
                     }
                 }
                 igraph_vector_int_pop_back(&state->edge_stack);
             } else if (!(VECTOR(state->blocked)[W])) {
-                // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId "\n",
+                // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId
+                // "\n",
                 //        V, W);
 
                 recurse_deeper = true;
@@ -424,9 +442,11 @@ igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_state_t *state,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
     if (!state->directed) {
         igraph_vector_int_list_init(&state->found_cycles_vertex_hashes, 0);
-        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &state->found_cycles_vertex_hashes);
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy,
+                       &state->found_cycles_vertex_hashes);
         igraph_vector_int_list_init(&state->found_cycles_edge_hashes, 0);
-        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &state->found_cycles_edge_hashes);
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy,
+                       &state->found_cycles_edge_hashes);
     }
 
     IGRAPH_FINALLY_CLEAN(state->directed ? 6 : 8);
