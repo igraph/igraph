@@ -15,6 +15,7 @@
  - `igraph_matrix_swap()` no longer returns an error code.
  - `igraph_vector_list_swap()` and `igraph_graph_list_swap()` no longer return an error code.
  - `igraph_vector_swap_elements()` no longer returns an error code.
+ - `igraph_vector_reverse()` no longer returns an error code.
  - `igraph_vector_list_swap_elements()` and `igraph_graph_list_swap_elements()` no longer return an error code.
  - `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices to create vertex pairs of, instead of one.
  - `igraph_subisomorphic_lad()` does not have a CPU time limit parameter any more. If you wish to stop the calculation from another thread or a higher level interface, use igraph's interruption mechanism.

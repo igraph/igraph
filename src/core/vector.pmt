@@ -2553,16 +2553,14 @@ void FUNCTION(igraph_vector, reverse_section)(TYPE(igraph_vector) *v, igraph_int
  * first, etc.
  *
  * \param v The input vector.
- * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * \sa igraph_vector_reverse_section() to reverse only a section of a vector.
  *
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
+void FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
     FUNCTION(igraph_vector, reverse_section)(v, 0, FUNCTION(igraph_vector, size)(v));
-    return IGRAPH_SUCCESS;
 }
 
 /**
