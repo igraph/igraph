@@ -2524,28 +2524,71 @@ void FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
 }
 
 /**
+ * \function igraph_vector_reverse_section
+ * \brief Reverse the elements in a section of a vector.
+ *
+ * \param v The input vector.
+ * \param from Index of the first element to include in the reversal.
+ * \param to Index of the first element \em not to include in the reversal.
+ *
+ * \sa igraph_vector_reverse() to reverse the entire vector.
+ *
+ * Time complexity: O(to - from), the number of elements to reverse.
+ */
+
+void FUNCTION(igraph_vector, reverse_section)(TYPE(igraph_vector) *v, igraph_integer_t from, igraph_integer_t to) {
+    const igraph_integer_t mid = (from + to) / 2;
+    for (igraph_integer_t i = from, j = to - 1; i < mid; i++, j--) {
+        BASE tmp = VECTOR(*v)[i];
+        VECTOR(*v)[i] = VECTOR(*v)[j];
+        VECTOR(*v)[j] = tmp;
+    }
+}
+
+/**
  * \function igraph_vector_reverse
  * \brief Reverse the elements of a vector.
  *
  * The first element will be last, the last element will be
  * first, etc.
+ *
  * \param v The input vector.
  * \return Error code, currently always \c IGRAPH_SUCCESS.
+ *
+ * \sa igraph_vector_reverse_section() to reverse only a section of a vector.
  *
  * Time complexity: O(n), the number of elements.
  */
 
 igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
-
-    igraph_integer_t n = FUNCTION(igraph_vector, size)(v), n2 = n / 2;
-    igraph_integer_t i, j;
-    for (i = 0, j = n - 1; i < n2; i++, j--) {
-        BASE tmp;
-        tmp = VECTOR(*v)[i];
-        VECTOR(*v)[i] = VECTOR(*v)[j];
-        VECTOR(*v)[j] = tmp;
-    }
+    FUNCTION(igraph_vector, reverse_section)(v, 0, FUNCTION(igraph_vector, size)(v));
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_vector_rotate_left
+ * \brief Rotates the elements of a vector to the left.
+ *
+ * Rotates the elements of a vector to the left by the given number of steps.
+ * Element index \p n will have index 0 after the rotation.
+ * For example, rotating <code>(0, 1, 2, 3, 4, 5)</code> by 2 yields
+ * <code>(2, 3, 4, 5, 0, 1)</code>.
+ *
+ * \param v The input vector.
+ * \param n The number of steps to rotate by. Passing a negative value rotates
+ *    to the right.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+
+void FUNCTION(igraph_vector, rotate_left)(TYPE(igraph_vector) *v, igraph_integer_t n) {
+    const igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
+    n = n % size;
+    if (n < 0) n += size;
+    if (n == 0) return;
+    FUNCTION(igraph_vector, reverse_section)(v, 0, n);
+    FUNCTION(igraph_vector, reverse_section)(v, n, size);
+    FUNCTION(igraph_vector, reverse_section)(v, 0, size);
 }
 
 /**

@@ -49,6 +49,8 @@
 <section id="vector-exchanging-elements"><title>Exchanging elements</title>
 <!-- doxrox-include igraph_vector_swap_elements -->
 <!-- doxrox-include igraph_vector_reverse -->
+<!-- doxrox-include igraph_vector_reverse_section -->
+<!-- doxrox-include igraph_vector_rotate_left -->
 <!-- doxrox-include igraph_vector_shuffle -->
 <!-- doxrox-include igraph_vector_permute -->
 </section>
