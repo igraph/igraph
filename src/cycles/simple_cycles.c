@@ -437,7 +437,6 @@ igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_state_t *state,
     IGRAPH_FINALLY(igraph_inclist_destroy, &state->IK);
     IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &state->AK, &state->IK));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->AK);
-    igraph_adjlist_sort(&state->AK);
     state->directed = igraph_is_directed(graph);
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
@@ -511,9 +510,11 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, -1, s, vertices, edges, &found));
 
     for (igraph_integer_t i = 0; i < state->N; ++i) {
-        // we want to remove the vertex with value s, not at position s
+        // We want to remove the vertex with value s, not at position s.
+        // It's fine to use binary search since we never add to, only remove from
+        // an already sorted adjacency list.
         igraph_integer_t pos;
-        if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, i), 0, s, &pos)) {
+        if (igraph_vector_int_binsearch(igraph_adjlist_get(&state->AK, i), s, &pos)) {
             igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
             igraph_vector_int_remove(igraph_inclist_get(&state->IK, i), pos);
         }
