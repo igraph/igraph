@@ -40,7 +40,7 @@
  * single struct allows us to resume the algorithm from any point and yield the
  * cycles one by one in an iterator-like manner.
  */
-typedef struct igraph_simple_cycle_search_state_t {
+struct igraph_simple_cycle_search_state_t {
     /* Number of vertices in the graph */
     igraph_integer_t N;
 
@@ -74,7 +74,7 @@ typedef struct igraph_simple_cycle_search_state_t {
 
     /* Hashes of the edges of found cycles (for filtering in undirected graphs) */
     igraph_vector_int_list_t found_cycles_edge_hashes;
-} igraph_simple_cycle_search_state_t;
+};
 
 /**
  * \experimental
@@ -215,8 +215,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t V,
     igraph_integer_t E, igraph_integer_t S, igraph_vector_int_list_t *vertices,
     igraph_vector_int_list_t *edges, igraph_bool_t *found) {
-    igraph_vector_int_t *neighbors;
-    igraph_vector_int_t *incident_edges;
+    const igraph_vector_int_t *neighbors;
+    const igraph_vector_int_t *incident_edges;
     igraph_integer_t num_neighbors;
 
     igraph_bool_t local_found = false;
@@ -372,8 +372,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             } else {
                 for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
                     igraph_integer_t W = VECTOR(*neighbors)[i];
-                    igraph_integer_t pos;
-                    if (!igraph_vector_int_search(igraph_adjlist_get(&state->B, W), 0, V, &pos)) {
+                    if (!igraph_vector_int_contains(igraph_adjlist_get(&state->B, W), V)) {
                         IGRAPH_CHECK(igraph_vector_int_push_back(
                                          igraph_adjlist_get(&state->B, W), V));
                     }
