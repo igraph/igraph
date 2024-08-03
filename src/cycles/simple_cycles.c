@@ -18,11 +18,12 @@
 
 #include "igraph_cycles.h"
 
-#include "core/interruption.h"
 #include "igraph_adjlist.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
+
+#include "core/interruption.h"
 
 // #include <math.h>
 
@@ -89,13 +90,15 @@ static igraph_bool_t
 igraph_i_cycle_has_been_found_already(igraph_simple_cycle_search_state_t *state,
                                       igraph_vector_int_t *vertex_hash,
                                       igraph_vector_int_t *edge_hash) {
+
     IGRAPH_ASSERT(state != NULL && vertex_hash != NULL && edge_hash != NULL);
     IGRAPH_ASSERT(
         igraph_vector_int_list_size(&state->found_cycles_vertex_hashes) ==
         igraph_vector_int_list_size(&state->found_cycles_edge_hashes));
+
     for (igraph_integer_t i = 0;
-            i < igraph_vector_int_list_size(&state->found_cycles_vertex_hashes);
-            ++i) {
+         i < igraph_vector_int_list_size(&state->found_cycles_vertex_hashes);
+         ++i) {
         igraph_vector_int_t *v_hashes =
             igraph_vector_int_list_get_ptr(&state->found_cycles_vertex_hashes, i);
         igraph_vector_int_t *e_hashes =
@@ -107,16 +110,14 @@ igraph_i_cycle_has_been_found_already(igraph_simple_cycle_search_state_t *state,
             continue;
         }
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(e_hashes); ++j) {
-            if (igraph_vector_int_get(e_hashes, j) !=
-                    igraph_vector_int_get(edge_hash, j)) {
+            if (VECTOR(*e_hashes)[j] != VECTOR(*edge_hash)[j]) {
                 goto next_cycle;
             }
         }
         // TODO: reconsider whether it is even possible to find a cycle with the
         // same edges but different vertices
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(v_hashes); ++j) {
-            if (igraph_vector_int_get(v_hashes, j) !=
-                    igraph_vector_int_get(vertex_hash, j)) {
+            if (VECTOR(*v_hashes)[j] != VECTOR(*vertex_hash)[j]) {
                 goto next_cycle;
             }
         }
@@ -145,12 +146,9 @@ static void igraph_i_hash_vector_int(igraph_vector_int_t *vec,
     igraph_vector_int_resize(hash, n_entries_in_hash);
     igraph_vector_int_null(hash);
     for (igraph_integer_t i = 0; i < igraph_vector_int_size(vec); ++i) {
-        igraph_integer_t rel_idx =
-            igraph_vector_int_get(vec, i) / n_bits_per_entries;
-        igraph_vector_int_set(
-                         hash, rel_idx,
-                         igraph_vector_int_get(hash, rel_idx) |
-                         1 << (igraph_vector_int_get(vec, i) % (n_bits_per_entries)));
+        igraph_integer_t rel_idx = VECTOR(*vec)[i] / n_bits_per_entries;
+        VECTOR(*hash)[rel_idx] =
+            VECTOR(*hash)[rel_idx] | (1 << (VECTOR(*vec)[i] % n_bits_per_entries));
     }
 }
 
@@ -370,8 +368,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
                     igraph_integer_t W = VECTOR(*neighbors)[i];
                     igraph_integer_t pos;
-                    if (!igraph_vector_int_search(igraph_adjlist_get(&state->B, W), 0, V,
-                                                  &pos)) {
+                    if (!igraph_vector_int_search(igraph_adjlist_get(&state->B, W), 0, V, &pos)) {
                         IGRAPH_CHECK(igraph_vector_int_push_back(
                                          igraph_adjlist_get(&state->B, W), V));
                     }
@@ -513,8 +510,7 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     for (igraph_integer_t i = 0; i < state->N; ++i) {
         // we want to remove the vertex with value s, not at position s
         igraph_integer_t pos;
-        if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, i), 0, s,
-                                     &pos)) {
+        if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, i), 0, s, &pos)) {
             igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
             igraph_vector_int_remove(igraph_inclist_get(&state->IK, i), pos);
         }
@@ -548,15 +544,15 @@ igraph_error_t
 igraph_simple_cycles_search_all(const igraph_t *graph,
                                 igraph_vector_int_list_t *v_result,
                                 igraph_vector_int_list_t *e_result) {
+
     igraph_simple_cycle_search_state_t state;
-    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_simple_cycle_search_state_init(&state, graph));
     IGRAPH_FINALLY(igraph_simple_cycle_search_state_destroy, &state);
 
     // TODO: depending on the graph, it is rather unreasonable to search cycles
     // from each and every node
-    for (i = 0; i < state.N; i++) {
+    for (igraph_integer_t i = 0; i < state.N; i++) {
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_simple_cycles_search_from_one_vertex(
                              &state, i, v_result, e_result));
