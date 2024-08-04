@@ -336,8 +336,13 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
 igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
                             const igraph_vector_t *weights, igraph_fas_algorithm_t algo) {
 
-    if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Weight vector length must match the number of edges.", IGRAPH_EINVAL);
+    if (weights) {
+        if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+            IGRAPH_ERROR("Weight vector length must match the number of edges.", IGRAPH_EINVAL);
+        }
+        if (! igraph_vector_is_all_finite(weights)) {
+            IGRAPH_ERROR("Weights must not be infinite or NaN.", IGRAPH_EINVAL);
+        }
     }
 
     if (!igraph_is_directed(graph)) {

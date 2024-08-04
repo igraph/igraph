@@ -27,6 +27,7 @@
  - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash on interruption. This is now fixed.
  - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
  - The documented `igraph_strvector_resize_min()` was missing from headers.
+ - `igraph_feedback_arc_set()` now validates the edge weights.
 
 ### Deprecated
 
