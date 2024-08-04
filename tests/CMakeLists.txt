@@ -805,6 +805,7 @@ add_legacy_tests(
   igraph_is_eulerian
   igraph_eulerian_cycle
   igraph_eulerian_path
+  igraph_find_cycle
 )
 
 # separators.at

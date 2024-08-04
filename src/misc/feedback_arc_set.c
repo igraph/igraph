@@ -25,10 +25,15 @@
 #include "igraph_structural.h"
 #include "misc/feedback_arc_set.h"
 
+#include "igraph_bitset.h"
 #include "igraph_components.h"
+#include "igraph_cycles.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_stack.h"
+#include "igraph_topology.h"
+#include "igraph_vector.h"
 #include "igraph_vector_list.h"
 #include "igraph_visitor.h"
 
@@ -36,6 +41,228 @@
 #include "math/safe_intop.h"
 
 #include <limits.h>
+
+/**
+ * \param found If not NULL, will indicate if any cycles were found.
+ * \param  A bitset the same length as the edge count, indicating which edges
+ *    to consider non-existent.
+ *
+ * See igraph_find_cycle() for the other parameters.
+ *
+ * \return Error code.
+ */
+static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
+                                          igraph_vector_int_t *vertices,
+                                          igraph_vector_int_t *edges,
+                                          igraph_bool_t *found,
+                                          igraph_neimode_t mode,
+                                          const igraph_bitset_t *removed) {
+
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_stack_int_t stack;
+    igraph_vector_int_t inc;
+    igraph_vector_int_t vpath, epath;
+    igraph_vector_char_t seen;
+    igraph_integer_t ea, va;
+    igraph_integer_t depth;
+
+    if (vertices) {
+        igraph_vector_int_clear(vertices);
+    }
+    if (edges) {
+        igraph_vector_int_clear(edges);
+    }
+    if (found) {
+        *found = false;
+    }
+
+    if (ecount == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+#define PATH_PUSH(v, e) \
+    do { \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&epath, e)); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&vpath, v)); \
+        VECTOR(seen)[v] = 1; \
+    } while (0)
+
+#define PATH_POP() \
+    do { \
+        igraph_vector_int_pop_back(&epath); \
+        VECTOR(seen)[igraph_vector_int_pop_back(&vpath)] = 2; \
+    } while (0)
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vpath, 100);
+    igraph_vector_int_clear(&vpath);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&epath, 100);
+    igraph_vector_int_clear(&epath);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&inc, 10);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&seen, vcount);
+    IGRAPH_STACK_INT_INIT_FINALLY(&stack, 200);
+
+    for (igraph_integer_t v=0; v < vcount; v++) {
+        if (VECTOR(seen)[v]) {
+            continue;
+        }
+
+        IGRAPH_CHECK(igraph_stack_int_push(&stack, -1));
+        IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
+
+        while (! igraph_stack_int_empty(&stack)) {
+            igraph_integer_t x = igraph_stack_int_pop(&stack);
+            if (x == -1) {
+                PATH_POP();
+                continue;
+            } else {
+                va = x;
+                ea = igraph_stack_int_pop(&stack);
+
+                if (VECTOR(seen)[va] == 1) {
+                    goto finish;
+                } else if (VECTOR(seen)[va] == 2) {
+                    continue;
+                }
+            }
+
+            PATH_PUSH(va, ea);
+
+            IGRAPH_CHECK(igraph_stack_int_push(&stack, -1));
+            IGRAPH_CHECK(igraph_incident(graph, &inc, va, mode));
+            igraph_integer_t n = igraph_vector_int_size(&inc);
+            for (igraph_integer_t i=0; i < n; i++) {
+                igraph_integer_t eb = VECTOR(inc)[i];
+                igraph_integer_t vb = IGRAPH_OTHER(graph, eb, va);
+                if (eb == ea) continue;
+                if (VECTOR(seen)[vb] == 2) continue;
+                if (removed && IGRAPH_BIT_TEST(*removed, eb)) continue;
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, eb));
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, vb));
+            }
+        }
+    }
+
+
+finish:
+
+    igraph_stack_int_destroy(&stack);
+    igraph_vector_char_destroy(&seen);
+    igraph_vector_int_destroy(&inc);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    depth = igraph_vector_int_size(&vpath);
+
+    if (depth > 0) {
+        igraph_integer_t i = depth;
+        while (VECTOR(vpath)[i-1] != va) i--;
+        for (; i < depth; i++) {
+            if (vertices) {
+                igraph_vector_int_push_back(vertices, VECTOR(vpath)[i]);
+            }
+            if (edges) {
+                igraph_vector_int_push_back(edges, VECTOR(epath)[i]);
+            }
+        }
+        if (vertices) {
+            igraph_vector_int_push_back(vertices, va);
+        }
+        if (edges) {
+            igraph_vector_int_push_back(edges, ea);
+        }
+        if (found) {
+            *found = true;
+        }
+    }
+
+    igraph_vector_int_destroy(&epath);
+    igraph_vector_int_destroy(&vpath);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+
+#undef PATH_PUSH
+#undef PATH_POP
+}
+
+/**
+ * \function igraph_find_cycle
+ * \brief Finds a single cycle in the graph.
+ *
+ * \experimental
+ *
+ * This function returns a cycle of the graph, if there is one. If the graph
+ * is acyclic, it returns empty vectors.
+ *
+ * \param graph The input graph.
+ * \param vertices Pointer to an integer vector. If a cycle is found, its
+ *    vertices will be stored here. Otherwise the vector will be empty.
+ * \param edges Pointer to an integer vector. If a cycle is found, its
+ *    edges will be stored here. Otherwise the vector will be empty.
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. Valid modes are:
+ *        \c IGRAPH_OUT, follows edge directions;
+ *        \c IGRAPH_IN, follows the opposite directions; and
+ *        \c IGRAPH_ALL, ignores edge directions. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
+ * vertices and edges in the original input graph.
+ *
+ * \sa \ref igraph_is_acyclic() to determine if a graph is acyclic,
+ * without returning a specific cycle.
+ */
+igraph_error_t igraph_find_cycle(const igraph_t *graph,
+                                 igraph_vector_int_t *vertices,
+                                 igraph_vector_int_t *edges,
+                                 igraph_neimode_t mode) {
+
+    /* If the graph is cached to be acyclic, we don't need to run the algorithm. */
+
+    igraph_bool_t known_acyclic = false;
+    igraph_bool_t found;
+
+    if (! igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    if (mode == IGRAPH_ALL) /* undirected */ {
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+            igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST)) {
+            known_acyclic = true;
+        }
+    } else /* directed */ {
+        if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_DAG) &&
+            igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_DAG)) {
+            known_acyclic = true;
+        }
+    }
+
+    if (known_acyclic) {
+        if (vertices) {
+            igraph_vector_int_clear(vertices);
+        }
+        if (edges) {
+            igraph_vector_int_clear(edges);
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_CHECK(igraph_i_find_cycle(graph, vertices, edges, &found, mode, NULL));
+
+    if (! found) {
+        if (mode == IGRAPH_ALL) /* undirected */ {
+            igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, true);
+        } else /* directed */ {
+            igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_DAG, true);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \ingroup structural

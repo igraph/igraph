@@ -7,6 +7,10 @@
 <chapter id="igraph-Cycles">
 <title>Graph cycles</title>
 
+<section><title>Finding cycles</title>
+<!-- doxrox-include igraph_find_cycle -->
+</section>
+
 <section><title>Eulerian cycles and paths</title>
 <!-- doxrox-include about_eulerian -->
 <!-- doxrox-include igraph_is_eulerian -->
