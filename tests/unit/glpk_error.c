@@ -28,7 +28,7 @@ int main(void) {
     /* Skip test when igraph does not have GLPK support. */
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1, -1);
     ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
-    if (igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP_TO) == IGRAPH_UNIMPLEMENTED) {
+    if (igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP_TI) == IGRAPH_UNIMPLEMENTED) {
         igraph_destroy(&graph);
         igraph_vector_int_destroy(&res);
         return 77;
@@ -43,7 +43,7 @@ int main(void) {
     igraph_full(&graph, 700, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
 
     ehandler = igraph_set_error_handler(igraph_error_handler_printignore);
-    IGRAPH_ASSERT(igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP_TO) == IGRAPH_EGLP);
+    IGRAPH_ASSERT(igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP_TI) == IGRAPH_EGLP);
     igraph_set_error_handler(ehandler);
 
     igraph_destroy(&graph);
@@ -59,7 +59,7 @@ int main(void) {
     igraph_set_interruption_handler(interruption_handler);
     ehandler = igraph_set_error_handler(igraph_error_handler_printignore);
     start = clock();
-    IGRAPH_ASSERT(igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP_TO) == IGRAPH_INTERRUPTED);
+    IGRAPH_ASSERT(igraph_feedback_arc_set(&graph, &res, NULL, IGRAPH_FAS_EXACT_IP_TI) == IGRAPH_INTERRUPTED);
     igraph_set_error_handler(ehandler);
     igraph_set_interruption_handler(NULL);
 

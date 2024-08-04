@@ -41,7 +41,7 @@ void compare_methods(const igraph_t *graph, const igraph_vector_t *weights) {
     igraph_vector_int_init(&fas1, 0);
     igraph_vector_int_init(&fas2, 0);
 
-    igraph_feedback_arc_set(graph, &fas1, weights, IGRAPH_FAS_EXACT_IP_TO);
+    igraph_feedback_arc_set(graph, &fas1, weights, IGRAPH_FAS_EXACT_IP_TI);
     check_fas(graph, &fas1);
 
     igraph_feedback_arc_set(graph, &fas2, weights, IGRAPH_FAS_EXACT_IP_CG);
@@ -128,7 +128,7 @@ void test_directed(void) {
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_CG);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
-    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TO);
+    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TI);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
     igraph_destroy(&graph);
 
@@ -138,7 +138,7 @@ void test_directed(void) {
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_CG);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
-    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TO);
+    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TI);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
     igraph_destroy(&graph);
 
@@ -148,7 +148,7 @@ void test_directed(void) {
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_CG);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
-    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TO);
+    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TI);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 0);
     igraph_destroy(&graph);
 
@@ -162,7 +162,7 @@ void test_directed(void) {
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_CG);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 1);
     IGRAPH_ASSERT(VECTOR(result)[0] == 0);
-    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TO);
+    igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_TI);
     IGRAPH_ASSERT(igraph_vector_int_size(&result) == 1);
     IGRAPH_ASSERT(VECTOR(result)[0] == 0);
     igraph_destroy(&graph);
