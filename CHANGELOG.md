@@ -4,6 +4,7 @@
 
 ### Added
 
+ - `igraph_bitset_update()` copies the contents of one bitset into another (experimental function).
  - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
  - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
  - `igraph_vector_reverse_section()` reverses a contiguous section of a vector.
