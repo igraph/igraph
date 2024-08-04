@@ -731,6 +731,9 @@ static igraph_error_t igraph_i_is_forest(
         is stored here.
  * \return Error code.
  *
+ * \sa \ref igraph_find_cycle() to find a cycle that demonstrates
+ * that the graph is not acyclic.
+ *
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
  * vertices and edges in the original input graph.
  */
