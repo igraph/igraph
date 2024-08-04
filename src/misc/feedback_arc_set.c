@@ -271,17 +271,17 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  *
  * A feedback arc set is a set of edges whose removal makes the graph acyclic.
  * We are usually interested in \em minimum feedback arc sets, i.e. sets of edges
- * whose total weight is minimal among all the feedback arc sets.
+ * whose total weight is the smallest among all the feedback arc sets.
  *
  * </para><para>
- * For undirected graphs, the problem is simple: one has to find a maximum weight
+ * For undirected graphs, the solution is simple: one has to find a maximum weight
  * spanning tree and then remove all the edges not in the spanning tree. For directed
  * graphs, this is an NP-complete problem, and various heuristics are usually used to
  * find an approximate solution to the problem. This function implements both exact
  * methods and heuristics, selectable with the \p algo parameter.
  *
  * </para><para>
- * Reference:
+ * References:
  *
  * </para><para>
  * Eades P, Lin X and Smyth WF:
@@ -289,10 +289,16 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  * Information Processing Letters 47(6), pp 319-323 (1993).
  * https://doi.org/10.1016/0020-0190(93)90079-O
  *
- * \param graph  The graph object.
- * \param result An initialized vector, the result will be returned here.
- * \param weights Weight vector or NULL if no weights are specified.
- * \param algo   The algorithm to use to solve the problem if the graph is directed.
+ * </para><para>
+ * Baharev A, Hermann S, Arnold N and Tobias A:
+ * An Exact Method for the Minimum Feedback Arc Set Problem.
+ * ACM Journal of Experimental Algorithmics 26, 1–28 (2021).
+ * https://doi.org/10.1145/3446429.
+ *
+ * \param graph The graph object.
+ * \param result An initialized vector, the result will be written here.
+ * \param weights Weight vector or \c NULL if no weights are specified.
+ * \param algo The algorithm to use to solve the problem if the graph is directed.
  *        Possible values:
  *        \clist
  *        \cli IGRAPH_FAS_EXACT_IP
@@ -301,23 +307,29 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  *          always \c IGRAPH_FAS_EXACT_IP_CG). The complexity is of course
  *          at least exponential.
  *        \cli IGRAPH_FAS_EXACT_IP_CG
- *          This is an integer programming approach using incremental constraint
- *          generation, added in igraph 0.10.14. We minimize
- *          <code>sum_e w_e b_e</code> subject to the constraints
- *          <code>sum_e c_e b_e &gt;= 1</code> for all cycles \c c.
+ *          This is an integer programming approach based on a minimum set cover
+ *          formulation and using incremental constraint generation (CG), added
+ *          in igraph 0.10.14. We minimize <code>sum_e w_e b_e</code> subject to
+ *          the constraints <code>sum_e c_e b_e &gt;= 1</code> for all cycles \c c.
  *          Here \c w_e is the weight of edge \c e, \c b_e is a binary variable
  *          (0 or 1) indicating whether edge \c e is in the feedback set,
  *          and \c c_e is a binary coefficient indicating whether edge \c e
- *          is in cycle \c c. The constraint expresses the necessity that all
- *          cycles must intersect with (be broken by) the feedback set represented
+ *          is in cycle \c c. The constraint expresses the requirement that all
+ *          cycles must intersect with (be broken by) the edge set represented
  *          by \c b. Since there are a very large number of cycles in the graph,
- *          the constraints are generated incrementally, re-solving the problem
- *          after each one until all cycles are broken.
- *        \cli IGRAPH_FAS_EXACT_IP_TO
+ *          constraints are generated incrementally, iteratively adding some cycles
+ *          that do not intersect with the current edge set \c b, then solving for
+ *          \c b again, until finally no unbroken cycles remain. This approach is
+ *          similar to that described by Baharev et al (though with a simpler
+ *          cycle generation scheme), and to what is implemented by SageMath's.
+ *          \c feedback_edge_set function.
+ *        \cli IGRAPH_FAS_EXACT_IP_TI
  *          This is another integer programming approach based on finding a
- *          maximal (largest weight) edge set that adhere to some topological
- *          ordering. It was used before igraph 0.10.14, and is typically much
- *          slower than \c IGRAPH_FAS_EXACT_IP_CG.
+ *          maximum (largest weight) edge set that adheres to a topological
+ *          order. It uses the common formulation through triangle inequalities
+ *          (TI), see Section 3.1 of Baharev et al (2021) for an overview. This
+ *          method was used before igraph 0.10.14, and is typically much slower
+ *          than \c IGRAPH_FAS_EXACT_IP_CG.
  *        \cli IGRAPH_FAS_APPROX_EADES
  *          Finds a feedback arc set using the heuristic of Eades, Lin and
  *          Smyth (1993). This is guaranteed to be smaller than |E|/2 - |V|/6,
@@ -333,8 +345,11 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  *
  * Time complexity: depends on \p algo, see the time complexities there.
  */
-igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
-                            const igraph_vector_t *weights, igraph_fas_algorithm_t algo) {
+igraph_error_t igraph_feedback_arc_set(
+        const igraph_t *graph,
+        igraph_vector_int_t *result,
+        const igraph_vector_t *weights,
+        igraph_fas_algorithm_t algo) {
 
     if (weights) {
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
@@ -354,8 +369,8 @@ igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_
     case IGRAPH_FAS_EXACT_IP_CG:
         return igraph_i_feedback_arc_set_ip_cg(graph, result, weights);
 
-    case IGRAPH_FAS_EXACT_IP_TO:
-        return igraph_i_feedback_arc_set_ip(graph, result, weights);
+    case IGRAPH_FAS_EXACT_IP_TI:
+        return igraph_i_feedback_arc_set_ip_ti(graph, result, weights);
 
     case IGRAPH_FAS_APPROX_EADES:
         return igraph_i_feedback_arc_set_eades(graph, result, weights, NULL);
@@ -698,10 +713,11 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     return IGRAPH_SUCCESS;
 }
 
-/**
- * Solves the feedback arc set problem using integer programming.
+/*
+ * Solves the feedback arc set problem with integer programming,
+ * using the triangle inequalities formulation.
  */
-igraph_error_t igraph_i_feedback_arc_set_ip(
+igraph_error_t igraph_i_feedback_arc_set_ip_ti(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights) {
 #ifndef HAVE_GLPK
