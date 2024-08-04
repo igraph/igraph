@@ -276,9 +276,18 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  * </para><para>
  * For undirected graphs, the problem is simple: one has to find a maximum weight
  * spanning tree and then remove all the edges not in the spanning tree. For directed
- * graphs, this is an NP-hard problem, and various heuristics are usually used to
- * find an approximate solution to the problem. This function implements a few of
- * these heuristics.
+ * graphs, this is an NP-complete problem, and various heuristics are usually used to
+ * find an approximate solution to the problem. This function implements both exact
+ * methods and heuristics, selectable with the \p algo parameter.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Eades P, Lin X and Smyth WF:
+ * A fast and effective heuristic for the feedback arc set problem.
+ * Information Processing Letters 47(6), pp 319-323 (1993).
+ * https://doi.org/10.1016/0020-0190(93)90079-O
  *
  * \param graph  The graph object.
  * \param result An initialized vector, the result will be returned here.
@@ -287,15 +296,32 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
  *        Possible values:
  *        \clist
  *        \cli IGRAPH_FAS_EXACT_IP
- *          Finds a \em minimum feedback arc set using integer programming (IP).
- *          The complexity of this algorithm is exponential of course.
+ *          Finds a \em minimum feedback arc set using integer programming (IP),
+ *          automatically selecting the best method of this type (currently
+ *          always \c IGRAPH_FAS_EXACT_IP_CG). The complexity is of course
+ *          at least exponential.
+ *        \cli IGRAPH_FAS_EXACT_IP_CG
+ *          This is an integer programming approach using incremental constraint
+ *          generation, added in igraph 0.10.14. We minimize
+ *          <code>sum_e w_e b_e</code> subject to the constraints
+ *          <code>sum_e c_e b_e &gt;= 1</code> for all cycles \c c.
+ *          Here \c w_e is the weight of edge \c e, \c b_e is a binary variable
+ *          (0 or 1) indicating whether edge \c e is in the feedback set,
+ *          and \c c_e is a binary coefficient indicating whether edge \c e
+ *          is in cycle \c c. The constraint expresses the necessity that all
+ *          cycles must intersect with (be broken by) the feedback set represented
+ *          by \c b. Since there are a very large number of cycles in the graph,
+ *          the constraints are generated incrementally, re-solving the problem
+ *          after each one until all cycles are broken.
+ *        \cli IGRAPH_FAS_EXACT_IP_TO
+ *          This is another integer programming approach based on finding a
+ *          maximal (largest weight) edge set that adhere to some topological
+ *          ordering. It was used before igraph 0.10.14, and is typically much
+ *          slower than \c IGRAPH_FAS_EXACT_IP_CG.
  *        \cli IGRAPH_FAS_APPROX_EADES
  *          Finds a feedback arc set using the heuristic of Eades, Lin and
  *          Smyth (1993). This is guaranteed to be smaller than |E|/2 - |V|/6,
- *          and it is linear in the number of edges (i.e. O(|E|)).
- *          For more details, see Eades P, Lin X and Smyth WF: A fast and effective
- *          heuristic for the feedback arc set problem. In: Proc Inf Process Lett
- *          319-323, 1993.
+ *          and it is linear in the number of edges (i.e. O(|E|)) to compute.
  *        \endclist
  *
  * \return Error code:
@@ -310,23 +336,27 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
 igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
                             const igraph_vector_t *weights, igraph_fas_algorithm_t algo) {
 
-    if (weights && igraph_vector_size(weights) < igraph_ecount(graph))
-        IGRAPH_ERROR("cannot calculate feedback arc set, weight vector too short",
-                     IGRAPH_EINVAL);
+    if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
+        IGRAPH_ERROR("Weight vector length must match the number of edges.", IGRAPH_EINVAL);
+    }
 
     if (!igraph_is_directed(graph)) {
-        return igraph_i_feedback_arc_set_undirected(graph, result, weights, 0);
+        return igraph_i_feedback_arc_set_undirected(graph, result, weights, NULL);
     }
 
     switch (algo) {
     case IGRAPH_FAS_EXACT_IP:
+    case IGRAPH_FAS_EXACT_IP_CG:
+        return igraph_i_feedback_arc_set_ip_cg(graph, result, weights);
+
+    case IGRAPH_FAS_EXACT_IP_TO:
         return igraph_i_feedback_arc_set_ip(graph, result, weights);
 
     case IGRAPH_FAS_APPROX_EADES:
-        return igraph_i_feedback_arc_set_eades(graph, result, weights, 0);
+        return igraph_i_feedback_arc_set_eades(graph, result, weights, NULL);
 
     default:
-        IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid feedback arc set algorithm.", IGRAPH_EINVAL);
     }
 }
 
@@ -387,16 +417,16 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
                                 /* root = */ 0,
                                 /* roots = */ &roots,
                                 /* mode = */ IGRAPH_OUT,
-                                /* unreachable = */ 0,
-                                /* restricted = */ 0,
-                                /* order = */ 0,
-                                /* rank = */ 0,
-                                /* parents = */ 0,
-                                /* pred = */ 0,
-                                /* succ = */ 0,
+                                /* unreachable = */ false,
+                                /* restricted = */ NULL,
+                                /* order = */ NULL,
+                                /* rank = */ NULL,
+                                /* parents = */ NULL,
+                                /* pred = */ NULL,
+                                /* succ = */ NULL,
                                 /* dist = */ layering,
-                                /* callback = */ 0,
-                                /* extra = */ 0));
+                                /* callback = */ NULL,
+                                /* extra = */ NULL));
 
         igraph_vector_destroy(&degrees);
         igraph_vector_int_destroy(&roots);
@@ -666,8 +696,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 /**
  * Solves the feedback arc set problem using integer programming.
  */
-igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_int_t *result,
-                                 const igraph_vector_t *weights) {
+igraph_error_t igraph_i_feedback_arc_set_ip(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights) {
 #ifndef HAVE_GLPK
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
@@ -690,7 +721,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_vector_int_clear(result);
 
     /* Decompose the graph into connected components */
-    IGRAPH_CHECK(igraph_connected_components(graph, &membership, 0, &no_of_components, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, &membership, NULL, &no_of_components, IGRAPH_WEAK));
 
     /* Construct vertex and edge lists for each of the components */
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vertices_by_components, no_of_components);
@@ -889,3 +920,208 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     return IGRAPH_SUCCESS;
 #endif
 }
+
+
+/* Incremental constraint generation based IP implementation.
+ *
+ * b_e are binary variables indicating the presence of edge e in the FAS.
+ * w_e is the weight of edge e.
+ *
+ * We minimize
+ *
+ * sum_e w_e b_e
+ *
+ * subject to the constraints
+ *
+ * sum_e c^i_e b_e >= 1
+ *
+ * where c^i_e is a binary coefficient indicating if edge e is present in
+ * directed cycle i.
+ *
+ * While this must hold for all cycles (all cycles must be broken),
+ * we generate cycles incrementally, re-solving the problem after
+ * each step. New cycles are generated in such a way as to avoid
+ * the feedback arc set from the previous solution step.
+ */
+
+#define VAR_TO_EID(j) ((j) - 1)
+
+/* Helper data structure for adding rows to GLPK problems.
+ * ind[] and val[] use one-based indexing, in line with GLPK's convention. */
+typedef struct {
+    int alloc_size;
+    int *ind;
+    double *val;
+} rowdata_t;
+
+static igraph_error_t rowdata_init(rowdata_t *rd, int size) {
+    int *ind0 = IGRAPH_CALLOC(size, int);
+    IGRAPH_CHECK_OOM(ind0, "Insufficient memory for feedback arc set.");
+    IGRAPH_FINALLY(igraph_free, ind0);
+    double *val0 = IGRAPH_CALLOC(size, double);
+    for (int i=0; i < size; i++) {
+        val0[i] = 1.0;
+    }
+    IGRAPH_CHECK_OOM(val0, "Insufficient memory for feedback arc set.");
+    rd->alloc_size = size;
+    rd->ind = ind0 - 1;
+    rd->val = val0 - 1;
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t rowdata_set(rowdata_t *rd, const igraph_vector_int_t *idx) {
+    int size = igraph_vector_int_size(idx);
+
+    /* Expand size if needed */
+    if (size > rd->alloc_size) {
+        int new_alloc_size = 2 * rd->alloc_size;
+        if (size > new_alloc_size) {
+            new_alloc_size = size;
+        }
+        int *ind0 = rd->ind + 1;
+        double *val0 = rd->val + 1;
+        ind0 = IGRAPH_REALLOC(ind0, new_alloc_size, int);
+        IGRAPH_CHECK_OOM(ind0, "Insufficient memory for feedback arc set.");
+        rd->ind = ind0 - 1;
+
+        val0 = IGRAPH_REALLOC(val0, new_alloc_size, double);
+        IGRAPH_CHECK_OOM(val0, "Insufficient memory for feedback arc set.");
+        for (int i = rd->alloc_size; i < new_alloc_size; i++) {
+            val0[i] = 1.0;
+        }
+        rd->val = val0 - 1;
+
+        rd->alloc_size = new_alloc_size;
+    }
+
+    for (int i = 0; i < size; i++) {
+        rd->ind[i+1] = VECTOR(*idx)[i] + 1;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+static void rowdata_destroy(rowdata_t *rd) {
+    igraph_free(rd->ind + 1);
+    igraph_free(rd->val + 1);
+}
+
+
+igraph_error_t igraph_i_feedback_arc_set_ip_cg(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights) {
+
+#ifndef HAVE_GLPK
+    IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
+#else
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_bool_t is_dag;
+    igraph_bitset_t removed;
+    igraph_vector_int_t cycle;
+    glp_prob *ip;
+    glp_iocp parm;
+    rowdata_t rd;
+    int var_count;
+
+    IGRAPH_CHECK(igraph_is_dag(graph, &is_dag));
+
+    if (is_dag) {
+        igraph_vector_int_clear(result);
+        return IGRAPH_SUCCESS;
+    }
+
+    if (ecount > INT_MAX) {
+        IGRAPH_ERROR("Feedback arc set problem too large for GLPK.", IGRAPH_EOVERFLOW);
+    }
+
+    var_count = ecount;
+
+    /* TODO: In-depth investigation of whether decomposing to SCCs
+     * helps performance. Basic benchmarking on sparse random graphs
+     * with mean degrees between 1-1.5 indicate no benefit from avoiding
+     * creating GLPK variables for non-cycle edges. */
+
+    IGRAPH_BITSET_INIT_FINALLY(&removed, ecount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&cycle, 0);
+
+    IGRAPH_CHECK(rowdata_init(&rd, 20));
+    IGRAPH_FINALLY(rowdata_destroy, &rd);
+
+    /* Configure GLPK */
+    IGRAPH_GLPK_SETUP();
+    glp_init_iocp(&parm);
+    parm.br_tech = GLP_BR_MFV;
+    parm.bt_tech = GLP_BT_BLB;
+    parm.pp_tech = GLP_PP_ALL;
+    parm.presolve = GLP_ON;
+    parm.cb_func = igraph_i_glpk_interruption_hook;
+
+    ip = glp_create_prob();
+    IGRAPH_FINALLY(igraph_i_glp_delete_prob, ip);
+
+    glp_set_obj_dir(ip, GLP_MIN);
+
+    glp_add_cols(ip, var_count);
+    for (int j = 1; j <= var_count; j++) {
+        glp_set_obj_coef(ip, j, weights ? VECTOR(*weights)[ VAR_TO_EID(j) ] : 1);
+        glp_set_col_kind(ip, j, GLP_BV);
+    }
+
+    while (true) {
+        int cycle_size, row;
+
+        IGRAPH_CHECK(igraph_i_find_cycle(graph, NULL, &cycle, NULL, IGRAPH_OUT, &removed));
+
+        cycle_size = igraph_vector_int_size(&cycle);
+
+        if (cycle_size == 0) break; /* no more cycles, we're done */
+
+        IGRAPH_CHECK(rowdata_set(&rd, &cycle));
+
+        row = glp_add_rows(ip, 1);
+        glp_set_row_bnds(ip, row, GLP_LO, 1, 0);
+        glp_set_mat_row(ip, row, cycle_size, rd.ind, rd.val);
+
+        /* Add as many edge-disjoint cycles at once as possible. */
+        while (true) {
+            for (int i=0; i < cycle_size; i++) {
+                IGRAPH_BIT_SET(removed, VECTOR(cycle)[i]);
+            }
+            IGRAPH_CHECK(igraph_i_find_cycle(graph, NULL, &cycle, NULL, IGRAPH_OUT, &removed));
+
+            cycle_size = igraph_vector_int_size(&cycle);
+            if (cycle_size == 0) break; /* no more edge disjoint cycles */
+
+            IGRAPH_CHECK(rowdata_set(&rd, &cycle));
+
+            row = glp_add_rows(ip, 1);
+            glp_set_row_bnds(ip, row, GLP_LO, 1, 0);
+            glp_set_mat_row(ip, row, cycle_size, rd.ind, rd.val);
+        }
+
+        IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
+
+        igraph_vector_int_clear(result);
+        igraph_bitset_null(&removed);
+        for (int j=1; j <= var_count; j++) {
+            if (glp_mip_col_val(ip, j) > 0) {
+                igraph_integer_t i = VAR_TO_EID(j);
+                IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
+                IGRAPH_BIT_SET(removed, i);
+            }
+        }
+    }
+
+    /* Clean up */
+    glp_delete_prob(ip);
+    rowdata_destroy(&rd);
+    igraph_vector_int_destroy(&cycle);
+    igraph_bitset_destroy(&removed);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
+#endif
+}
+
+#undef VAR_TO_EID

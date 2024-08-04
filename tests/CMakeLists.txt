@@ -312,7 +312,7 @@ add_legacy_tests(
   igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
-  igraph_feedback_arc_set_undirected
+  igraph_feedback_arc_set
   igraph_get_all_simple_paths
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
