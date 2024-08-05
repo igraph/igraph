@@ -181,6 +181,7 @@ finish:
 #undef PATH_POP
 }
 
+
 /**
  * \function igraph_find_cycle
  * \brief Finds a single cycle in the graph.
@@ -257,6 +258,7 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
 
 /**
  * \ingroup structural
@@ -374,6 +376,7 @@ igraph_error_t igraph_feedback_arc_set(
     }
 }
 
+
 /**
  * Solves the feedback arc set problem for undirected graphs.
  */
@@ -452,6 +455,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
 
     return IGRAPH_SUCCESS;
 }
+
 
 /**
  * Solves the feedback arc set problem using the heuristics of Eades et al.
@@ -695,7 +699,8 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     return IGRAPH_SUCCESS;
 }
 
-/*
+
+/**
  * Solves the feedback arc set problem with integer programming,
  * using the triangle inequalities formulation.
  */
@@ -706,9 +711,9 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
+    const igraph_integer_t no_of_vertices = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_components;
-    igraph_integer_t no_of_vertices = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t membership, *vec;
     igraph_vector_int_t ordering, vertex_remapping;
     igraph_vector_int_list_t vertices_by_components, edges_by_components;
@@ -875,7 +880,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
         }
 
         /* Solve the problem */
-        IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
+        IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm),
+                          "Feedback arc set using IP with triangle inequalities failed");
 
         /* Find the ordering of the vertices */
         IGRAPH_CHECK(igraph_vector_int_resize(&ordering, n));
@@ -925,7 +931,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
 }
 
 
-/* Incremental constraint generation based IP implementation.
+/**
+ * Incremental constraint generation based integer programming implementation.
  *
  * b_e are binary variables indicating the presence of edge e in the FAS.
  * w_e is the weight of edge e.
@@ -962,10 +969,10 @@ static igraph_error_t rowdata_init(rowdata_t *rd, int size) {
     IGRAPH_CHECK_OOM(ind0, "Insufficient memory for feedback arc set.");
     IGRAPH_FINALLY(igraph_free, ind0);
     double *val0 = IGRAPH_CALLOC(size, double);
+    IGRAPH_CHECK_OOM(val0, "Insufficient memory for feedback arc set.");
     for (int i=0; i < size; i++) {
         val0[i] = 1.0;
     }
-    IGRAPH_CHECK_OOM(val0, "Insufficient memory for feedback arc set.");
     rd->alloc_size = size;
     rd->ind = ind0 - 1;
     rd->val = val0 - 1;
@@ -1010,7 +1017,6 @@ static void rowdata_destroy(rowdata_t *rd) {
     igraph_free(rd->val + 1);
 }
 
-
 igraph_error_t igraph_i_feedback_arc_set_ip_cg(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights) {
@@ -1027,8 +1033,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
     rowdata_t rd;
     int var_count;
 
+    /* Avoid starting up the IP machinery for DAGs. */
     IGRAPH_CHECK(igraph_is_dag(graph, &is_dag));
-
     if (is_dag) {
         igraph_vector_int_clear(result);
         return IGRAPH_SUCCESS;
@@ -1038,12 +1044,11 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
         IGRAPH_ERROR("Feedback arc set problem too large for GLPK.", IGRAPH_EOVERFLOW);
     }
 
-    var_count = ecount;
+    var_count = (int) ecount;
 
-    /* TODO: In-depth investigation of whether decomposing to SCCs
-     * helps performance. Basic benchmarking on sparse random graphs
-     * with mean degrees between 1-1.5 indicate no benefit from avoiding
-     * creating GLPK variables for non-cycle edges. */
+    /* TODO: In-depth investigation of whether decomposing to SCCs helps performance.
+     * Basic benchmarking on sparse random graphs with mean degrees between 1-2
+     * indicate no benefit from avoiding creating GLPK variables for non-cycle edges. */
 
     IGRAPH_BITSET_INIT_FINALLY(&removed, ecount);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&cycle, 0);
@@ -1076,7 +1081,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
 
         IGRAPH_CHECK(igraph_i_find_cycle(graph, NULL, &cycle, NULL, IGRAPH_OUT, &removed));
 
-        cycle_size = igraph_vector_int_size(&cycle);
+        cycle_size = (int) igraph_vector_int_size(&cycle);
 
         if (cycle_size == 0) break; /* no more cycles, we're done */
 
@@ -1093,7 +1098,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
             }
             IGRAPH_CHECK(igraph_i_find_cycle(graph, NULL, &cycle, NULL, IGRAPH_OUT, &removed));
 
-            cycle_size = igraph_vector_int_size(&cycle);
+            cycle_size = (int) igraph_vector_int_size(&cycle);
             if (cycle_size == 0) break; /* no more edge disjoint cycles */
 
             IGRAPH_CHECK(rowdata_set(&rd, &cycle));
@@ -1103,7 +1108,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
             glp_set_mat_row(ip, row, cycle_size, rd.ind, rd.val);
         }
 
-        IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm), "Feedback arc set using IP failed");
+        IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm),
+                          "Feedback arc set using IP with incremental cycle generation failed");
 
         igraph_vector_int_clear(result);
         igraph_bitset_null(&removed);
