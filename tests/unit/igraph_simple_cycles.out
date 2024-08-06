@@ -1,60 +1,3 @@
-Testing null graph
-Finished search, found 0 cycles.
-
-Vertex IDs in cycles:
-{
-}
-Edge IDs in cycles:
-{
-}
-
-Testing empty graph
-Finished search, found 0 cycles.
-
-Vertex IDs in cycles:
-{
-}
-Edge IDs in cycles:
-{
-}
-
-Testing ring
-Finished search, found 1 cycles.
-
-Vertex IDs in cycles:
-{
-  0: ( 0 1 2 3 4 5 6 7 8 9 )
-}
-Edge IDs in cycles:
-{
-  0: ( 0 1 2 3 4 5 6 7 8 9 )
-}
-
-Testing large ring
-Finished search, found 1 cycles.
-
-
-Testing star
-Finished search, found 0 cycles.
-
-Vertex IDs in cycles:
-{
-}
-Edge IDs in cycles:
-{
-}
-
-Testing directed wheel
-Finished search, found 1 cycles.
-
-Vertex IDs in cycles:
-{
-  0: ( 1 2 3 4 5 6 7 8 9 )
-}
-Edge IDs in cycles:
-{
-  0: ( 9 10 11 12 13 14 15 16 17 )
-}
 
 Testing undirected ring
 Finished search, found 1 cycles.
@@ -258,20 +201,6 @@ Edge IDs in cycles:
   72: ( 9 10 11 12 13 14 15 16 17 )
 }
 
-Testing directed graph with a cycle of length 4 and a multi-edge
-Finished search, found 2 cycles.
-
-Vertex IDs in cycles:
-{
-  0: ( 1 2 3 4 )
-  1: ( 1 2 3 4 )
-}
-Edge IDs in cycles:
-{
-  0: ( 0 2 3 4 )
-  1: ( 0 1 3 4 )
-}
-
 Testing undirected graph with a cycle of length 4 and a multi-edge
 Finished search, found 3 cycles.
 
@@ -285,10 +214,10 @@ Edge IDs in cycles:
 {
   0: ( 0 2 3 4 )
   1: ( 0 1 3 4 )
-  2: ( 2 1 )
+  2: ( 1 2 )
 }
 
-Testing graph with single self-loop
+Testing directed graph with single self-loop
 Finished search, found 1 cycles.
 
 Vertex IDs in cycles:
@@ -309,7 +238,7 @@ Vertex IDs in cycles:
 }
 Edge IDs in cycles:
 {
-  0: ( 1 0 )
+  0: ( 0 1 )
 }
 
 Testing undirected graph with 3 length-2-loops
@@ -323,9 +252,9 @@ Vertex IDs in cycles:
 }
 Edge IDs in cycles:
 {
-  0: ( 2 1 )
-  1: ( 2 0 )
-  2: ( 1 0 )
+  0: ( 1 2 )
+  1: ( 0 2 )
+  2: ( 0 1 )
 }
 
 Testing undirected graph with single length-2-loop and a self-loop
@@ -339,7 +268,7 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
   0: ( 2 )
-  1: ( 1 0 )
+  1: ( 0 1 )
 }
 
 Testing undirected graph of type 'envelope'

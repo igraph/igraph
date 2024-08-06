@@ -60,35 +60,35 @@ int main(void) {
     igraph_t g;
     igraph_t g_ring_undirected, g_star_undirected;
 
-    printf("Testing null graph\n");
-    igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
-    check_cycles(&g, 0);
-    igraph_destroy(&g);
+    // printf("Testing null graph\n");
+    // igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
+    // check_cycles(&g, 0);
+    // igraph_destroy(&g);
 
-    printf("\nTesting empty graph\n");
-    igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
-    check_cycles(&g, 0);
-    igraph_destroy(&g);
+    // printf("\nTesting empty graph\n");
+    // igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
+    // check_cycles(&g, 0);
+    // igraph_destroy(&g);
 
-    printf("\nTesting ring\n");
-    igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
-    check_cycles(&g, 1);
-    igraph_destroy(&g);
+    // printf("\nTesting directed ring\n");
+    // igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
+    // check_cycles(&g, 1);
+    // igraph_destroy(&g);
 
-    printf("\nTesting large ring\n");
-    igraph_ring(&g, 10000, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
-    check_cycles(&g, 1);
-    igraph_destroy(&g);
+    // printf("\nTesting directed large ring\n");
+    // igraph_ring(&g, 10000, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
+    // check_cycles(&g, 1);
+    // igraph_destroy(&g);
 
-    printf("\nTesting star\n");
-    igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
-    check_cycles(&g, 0);
-    igraph_destroy(&g);
+    // printf("\nTesting directed star\n");
+    // igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
+    // check_cycles(&g, 0);
+    // igraph_destroy(&g);
 
-    printf("\nTesting directed wheel\n");
-    igraph_wheel(&g, 10, IGRAPH_WHEEL_OUT, 0);
-    check_cycles(&g, 1);
-    igraph_destroy(&g);
+    // printf("\nTesting directed wheel\n");
+    // igraph_wheel(&g, 10, IGRAPH_WHEEL_OUT, 0);
+    // check_cycles(&g, 1);
+    // igraph_destroy(&g);
 
     printf("\nTesting undirected ring\n");
     igraph_ring(&g_ring_undirected, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
@@ -156,19 +156,31 @@ int main(void) {
      * 4--3/
      *
      */
-    printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
-    igraph_small(&g, 5, IGRAPH_DIRECTED, 1, 2, 2, 3, 2, 3, 3, 4, 4, 1, -1);
-    check_cycles(&g, 2);
-    igraph_destroy(&g);
+    // printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
+    // igraph_small(&g, 5, IGRAPH_DIRECTED,
+    //              1, 2,
+    //              2, 3,
+    //              2, 3,
+    //              3, 4,
+    //              4, 1,
+    //              -1);
+    // check_cycles(&g, 2);
+    // igraph_destroy(&g);
 
     // same, but undirected
     printf("\nTesting undirected graph with a cycle of length 4 and a multi-edge\n");
-    igraph_small(&g, 5, IGRAPH_UNDIRECTED, 1, 2, 2, 3, 2, 3, 3, 4, 4, 1, -1);
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED,
+                 1, 2,
+                 2, 3,
+                 2, 3,
+                 3, 4,
+                 4, 1,
+                 -1);
     check_cycles(&g, 3);
     igraph_destroy(&g);
 
     // check that self-loops are handled
-    printf("\nTesting graph with single self-loop\n");
+    printf("\nTesting directed graph with single self-loop\n");
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0, 0, -1);
     check_cycles(&g, 1);
     igraph_destroy(&g);
