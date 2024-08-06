@@ -2,6 +2,7 @@
 #ifndef IGRAPH_CYCLES_H
 #define IGRAPH_CYCLES_H
 
+#include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
@@ -38,6 +39,12 @@ IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_all(
     const igraph_t *graph,
     igraph_vector_int_list_t *v_result,
     igraph_vector_int_list_t *e_result);
+
+IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
+        const igraph_t *graph,
+        igraph_vector_int_t *vertices,
+        igraph_vector_int_t *edges,
+        igraph_neimode_t mode);
 
 __END_DECLS
 
