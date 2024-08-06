@@ -42,7 +42,7 @@
  - `igraph_minimum_spanning_tree()` takes a new `method` parameter that controls the algorithm used for finding the spanning tree. Kruskal's algorithm was added.
  - `igraph_get_all_simple_paths()` returns its results in an integer vector list (`igraph_vector_int_list_t`) instead of a single integer vector.
  - `igraph_get_all_simple_paths()` now has an additional parameter that allows restricting paths by minimum length as well.
-
+ - `igraph_strvector_print()` no longer takes a file parameter. Use `igraph_strvector_fprint()` to print to a file.
 
 ### Added
 
@@ -52,6 +52,7 @@
  - `igraph_weighted_biadjacency()` created a weighted graph from a bipartite adjacency matrix.
  - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
+ - `igraph_strvector_fprint()` prints a string vector to a file.
 
 ### Changed
 
