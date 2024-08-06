@@ -957,11 +957,13 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
 #define VAR_TO_EID(j) ((j) - 1)
 
 /* Helper data structure for adding rows to GLPK problems.
- * ind[] and val[] use one-based indexing, in line with GLPK's convention. */
+ * ind[] and val[] use one-based indexing, in line with GLPK's convention.
+ * Storing the zero-based ind0/val0 and the offset ind/val is necessary
+ * to avoid GCC warnings. */
 typedef struct {
     int alloc_size;
-    int *ind;
-    double *val;
+    int *ind0, *ind;
+    double *val0, *val;
 } rowdata_t;
 
 static igraph_error_t rowdata_init(rowdata_t *rd, int size) {
@@ -974,7 +976,9 @@ static igraph_error_t rowdata_init(rowdata_t *rd, int size) {
         val0[i] = 1.0;
     }
     rd->alloc_size = size;
+    rd->ind0 = ind0;
     rd->ind = ind0 - 1;
+    rd->val0 = val0;
     rd->val = val0 - 1;
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
@@ -989,10 +993,13 @@ static igraph_error_t rowdata_set(rowdata_t *rd, const igraph_vector_int_t *idx)
         if (size > new_alloc_size) {
             new_alloc_size = size;
         }
-        int *ind0 = rd->ind + 1;
-        double *val0 = rd->val + 1;
+
+        int *ind0 = rd->ind0;
+        double *val0 = rd->val0;
+
         ind0 = IGRAPH_REALLOC(ind0, new_alloc_size, int);
         IGRAPH_CHECK_OOM(ind0, "Insufficient memory for feedback arc set.");
+        rd->ind0 = ind0;
         rd->ind = ind0 - 1;
 
         val0 = IGRAPH_REALLOC(val0, new_alloc_size, double);
@@ -1000,21 +1007,22 @@ static igraph_error_t rowdata_set(rowdata_t *rd, const igraph_vector_int_t *idx)
         for (int i = rd->alloc_size; i < new_alloc_size; i++) {
             val0[i] = 1.0;
         }
+        rd->val0 = val0;
         rd->val = val0 - 1;
 
         rd->alloc_size = new_alloc_size;
     }
 
     for (int i = 0; i < size; i++) {
-        rd->ind[i+1] = VECTOR(*idx)[i] + 1;
+        rd->ind0[i] = VECTOR(*idx)[i] + 1;
     }
 
     return IGRAPH_SUCCESS;
 }
 
 static void rowdata_destroy(rowdata_t *rd) {
-    igraph_free(rd->ind + 1);
-    igraph_free(rd->val + 1);
+    igraph_free(rd->ind0);
+    igraph_free(rd->val0);
 }
 
 igraph_error_t igraph_i_feedback_arc_set_ip_cg(
