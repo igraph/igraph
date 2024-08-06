@@ -2490,6 +2490,16 @@ igraph_solve_lsap:
     PARAMS: MATRIX c, INTEGER n, OUT VECTOR_INT p
 
 #######################################
+# Finding cycles
+#######################################
+
+igraph_find_cycle:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
+        NEIMODE mode
+    DEPS: vertices ON graph, edges ON graph
+
+#######################################
 # Eulerian functions
 #######################################
 

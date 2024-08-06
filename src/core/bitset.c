@@ -238,6 +238,37 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
 
 /**
  * \ingroup bitset
+ * \function igraph_bitset_update
+ * \brief Update a bitset from another one.
+ *
+ * \experimental
+ *
+ * The size and contents of \p dest will be identical to that of \p src.
+ *
+ * \param dest Pointer to an initialized bitset object. This will be updated.
+ * \param src The bitset to update from.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, usually
+ * O(n/w),
+ * n is the size of the bitset,
+ * w is the word size of the machine (32 or 64).
+ */
+
+igraph_error_t igraph_bitset_update(igraph_bitset_t *dest, const igraph_bitset_t *src) {
+    IGRAPH_ASSERT(src != NULL);
+    IGRAPH_ASSERT(src->stor_begin != NULL);
+    IGRAPH_CHECK(igraph_bitset_reserve(dest, src->size));
+    dest->size = src->size;
+    for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
+        VECTOR(*dest)[i] = VECTOR(*src)[i];
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup bitset
  * \function igraph_bitset_capacity
  * \brief Returns the allocated capacity of the bitset.
  *
