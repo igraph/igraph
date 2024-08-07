@@ -84,7 +84,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  *    \cli IGRAPH_WEAK
  *       Compute weakly connected components, i.e. ignore edge directions.
  *    \cli IGRAPH_STRONG
- *       Compute strongly connnected components, i.e. considr edge directions.
+ *       Compute strongly connnected components, i.e. consider edge directions.
  *    \endclist
  *    This parameter is ignored for undirected graphs.
  * \return Error code.
