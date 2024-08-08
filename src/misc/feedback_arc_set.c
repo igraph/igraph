@@ -57,7 +57,7 @@ static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
     igraph_stack_int_t stack;
     igraph_vector_int_t inc;
     igraph_vector_int_t vpath, epath;
-    igraph_vector_char_t seen;
+    igraph_vector_char_t seen; /* 0 = unseen, 1 = acestor of current, 2 = seen, non-ancestor */
     igraph_integer_t ea, va;
     igraph_integer_t depth;
 
