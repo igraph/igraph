@@ -11,6 +11,7 @@
  - `igraph_vector_rotate_left()` applies a cyclic permutation to a vector.
  - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
  - `igraph_find_cycle()` finds a single cycle in a graph, if it exists (experimental function).
+ - `igraph_feefback_vertex_set()` finds a minimum feedback vertex set in a directed or undirected graph (experimental function).
 
 ### Changed
 
