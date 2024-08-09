@@ -113,10 +113,11 @@ endif()
 check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
 
-# Check for 128-bit integer multiplication support, floating-point endianness
-# and support for built-in overflow detection.
+# Check for 128-bit integer multiplication support, floating-point endianness,
+# support for built-in overflow detection and fast bit operation support.
 include(ieee754_endianness)
 include(uint128_support)
+include(bit_operations_support)
 include(safe_math_support)
 
 if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)

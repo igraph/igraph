@@ -300,9 +300,6 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                     "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                     igraph_vector_size(weights), igraph_ecount(graph));
         }
-        if (igraph_is_directed(graph)) {
-            IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
-        }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);

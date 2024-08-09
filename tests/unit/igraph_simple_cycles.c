@@ -41,6 +41,9 @@ void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
         print_vector_int_list(&results_e);
     }
 
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_v) == expected);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_e) == expected);
+
     for (i = 0; i < expected; i++) {
         igraph_vector_int_t *vertices, *edges;
 
@@ -48,9 +51,6 @@ void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
         edges = igraph_vector_int_list_get_ptr(&results_e, i);
         IGRAPH_ASSERT(igraph_vector_int_size(vertices) == igraph_vector_int_size(edges));
     }
-
-    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_v) == expected);
-    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_e) == expected);
 
     igraph_vector_int_list_destroy(&results_v);
     igraph_vector_int_list_destroy(&results_e);

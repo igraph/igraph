@@ -238,9 +238,17 @@ vertexline: vertex NEWLINE |
 
 vertex: integer {
   igraph_integer_t v = $1;
+  /* Per feedback from Pajek's authors, negative signs should be ignored for vertex IDs.
+   * See https://nascol.discourse.group/t/pajek-arcslist-edgelist-format/44/2
+   * This applies to all of *Edges, *Arcs, *Edgeslist, *Arcslist and *Vertices section.
+   * IGRAPH_INTEGER_MIN cannot be negated on typical platforms so we keep it as-is.
+   */
+  if (v < 0 && v > IGRAPH_INTEGER_MIN) {
+    v = -v;
+  }
   if (v < 1 || v > context->vcount) {
       IGRAPH_YY_ERRORF(
-                  "Invalid vertex id (%" IGRAPH_PRId ") in Pajek file. "
+                  "Invalid vertex ID (%" IGRAPH_PRId ") in Pajek file. "
                   "The number of vertices is %" IGRAPH_PRId ".",
                   IGRAPH_EINVAL, v, context->vcount);
   }
@@ -448,11 +456,11 @@ arclistline: arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: integer { context->actfrom=labs($1)-1; };
+arclistfrom: vertex { context->actfrom=$1-1; };
 
-arclistto: integer {
+arclistto: vertex {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
-  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
 };
 
 edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
@@ -463,11 +471,11 @@ edgelistline: edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: integer { context->actfrom=labs($1)-1; };
+edgelistfrom: vertex { context->actfrom=$1-1; };
 
-edgelistto: integer {
+edgelistto: vertex {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
-  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
+  IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
 };
 
 /* -----------------------------------------------------*/

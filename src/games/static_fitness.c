@@ -39,32 +39,45 @@
  * \brief Non-growing random graph with edge probabilities proportional to node fitness scores.
  *
  * This game generates a directed or undirected random graph where the
- * probability of an edge between vertices i and j depends on the fitness
+ * probability of an edge between vertices \c i and \c j depends on the fitness
  * scores of the two vertices involved. For undirected graphs, each vertex
  * has a single fitness score. For directed graphs, each vertex has an out-
- * and an in-fitness, and the probability of an edge from i to j depends on
- * the out-fitness of vertex i and the in-fitness of vertex j.
+ * and an in-fitness, and the probability of an edge from \c i to \c j depends on
+ * the out-fitness of vertex \c i and the in-fitness of vertex \c j.
  *
  * </para><para>
- * The generation process goes as follows. We start from N disconnected nodes
- * (where N is given by the length of the fitness vector). Then we randomly
- * select two vertices i and j, with probabilities proportional to their
- * fitnesses. (When the generated graph is directed, i is selected according to
- * the out-fitnesses and j is selected according to the in-fitnesses). If the
+ * The generation process goes as follows. We start from \c N disconnected nodes
+ * (where \c N is given by the length of the fitness vector). Then we randomly
+ * select two vertices \c i and \c j, with probabilities proportional to their
+ * fitnesses. (When the generated graph is directed, \c i is selected according to
+ * the out-fitnesses and \c j is selected according to the in-fitnesses). If the
  * vertices are not connected yet (or if multiple edges are allowed), we
  * connect them; otherwise we select a new pair. This is repeated until the
  * desired number of links are created.
  *
  * </para><para>
- * It can be shown that the \em expected degree of each vertex will be
- * proportional to its fitness, although the actual, observed degree will not
- * be. If you need to generate a graph with an exact degree sequence, consider
- * \ref igraph_degree_sequence_game instead.
+ * The \em expected degree (though not the actual degree) of each vertex will be
+ * proportional to its fitness. This is exactly true when self-loops and multi-edges
+ * are allowed, and approximately true otherwise. If you need to generate a graph
+ * with an exact degree sequence, consider \ref igraph_degree_sequence_game() and
+ * \ref igraph_realize_degree_sequence() instead.
+ *
+ * </para><para>
+ * To generate random undirected graphs with a given expected degree sequence, set
+ * \p fitness_out (and in the directed case \p fitness_out) to the desired expected
+ * degrees, and \p no_of_edges to the corresponding edge count, i.e. half the sum of
+ * expected degrees in the undirected case, and the sum of out- or in-degrees in the
+ * directed case.
+ *
+ * </para><para>
+ * This model is similar to the better-known Chung-Lu model, but with a sharply fixed
+ * edge count. Chung and Lu's construction method requires a quadratic number of steps
+ * in the edge count, while this model runs in linear time.
  *
  * </para><para>
  * This model is commonly used to generate static scale-free networks. To
  * achieve this, you have to draw the fitness scores from the desired power-law
- * distribution. Alternatively, you may use \ref igraph_static_power_law_game
+ * distribution. Alternatively, you may use \ref igraph_static_power_law_game()
  * which generates the fitnesses for you with a given exponent.
  *
  * </para><para>
@@ -296,23 +309,23 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
  * distributions may be specified separately.
  *
  * </para><para>
- * The game simply uses \ref igraph_static_fitness_game with appropriately
- * constructed fitness vectors. In particular, the fitness of vertex i
- * is i<superscript>-alpha</superscript>, where alpha = 1/(gamma-1)
- * and gamma is the exponent given in the arguments.
+ * The game simply uses \ref igraph_static_fitness_game() with appropriately
+ * constructed fitness vectors. In particular, the fitness of vertex \c i
+ * is <code>i^(-alpha)</code>, where <code>alpha = 1/(gamma-1)</code>
+ * and \c gamma is the exponent given in the arguments.
  *
  * </para><para>
  * To remove correlations between in- and out-degrees in case of directed
  * graphs, the in-fitness vector will be shuffled after it has been set up
- * and before \ref igraph_static_fitness_game is called.
+ * and before \ref igraph_static_fitness_game() is called.
  *
  * </para><para>
  * Note that significant finite size effects may be observed for exponents
  * smaller than 3 in the original formulation of the game. This function
  * provides an argument that lets you remove the finite size effects by
- * assuming that the fitness of vertex i is
- * (i+i0-1)<superscript>-alpha</superscript>,
- * where i0 is a constant chosen appropriately to ensure that the maximum
+ * assuming that the fitness of vertex \c i is
+ * <code>(i+i0-1)^(-alpha)</code>,
+ * where \c i0 is a constant chosen appropriately to ensure that the maximum
  * degree is less than the square root of the number of edges times the
  * average degree; see the paper of Chung and Lu, and Cho et al for more
  * details.
@@ -323,15 +336,18 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
  * </para><para>
  * Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
  * in scale-free networks. Phys Rev Lett 87(27):278701, 2001.
+ * https://doi.org/10.1103/PhysRevLett.87.278701
  *
  * </para><para>
  * Chung F and Lu L: Connected components in a random graph with given
  * degree sequences. Annals of Combinatorics 6, 125-145, 2002.
+ * https://doi.org/10.1007/PL00012580
  *
  * </para><para>
  * Cho YS, Kim JS, Park J, Kahng B, Kim D: Percolation transitions in
  * scale-free networks under the Achlioptas process. Phys Rev Lett
  * 103:135702, 2009.
+ * https://doi.org/10.1103/PhysRevLett.103.135702
  *
  * \param graph        Pointer to an uninitialized graph object.
  * \param no_of_nodes  The number of nodes in the generated graph.

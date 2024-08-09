@@ -66,6 +66,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bitset
   heap
   igraph_array
   igraph_complex
@@ -350,7 +351,7 @@ add_legacy_tests(
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_simple_cycles
   igraph_similarity
-  igraph_transitive_closure_dag
+  igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
   igraph_unfold_tree
@@ -359,6 +360,7 @@ add_legacy_tests(
   igraph_spanner
   knn
   random_spanning_tree
+  reachability
   single_target_shortest_path
   topological_sorting
 )
@@ -984,6 +986,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  connectivity
   graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
@@ -1006,6 +1009,7 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_strength
   igraph_transitivity
   igraph_tree_game
   igraph_vertex_connectivity

@@ -492,7 +492,7 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         in = true;
         break;
     default:
-        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode for Floyd-Warshall shortest path calculation.", IGRAPH_EINVMODE);
     }
 
     /* Fill out adjacency matrix */

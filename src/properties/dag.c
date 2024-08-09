@@ -80,7 +80,7 @@ igraph_error_t igraph_topological_sorting(
     } else if (mode == IGRAPH_IN) {
         deg_mode = IGRAPH_OUT;
     } else {
-        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode for topological sorting.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);

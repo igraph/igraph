@@ -40,6 +40,8 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 add_library(
   igraph
   core/array.c
+  core/bitset.c
+  core/bitset_list.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c
@@ -177,6 +179,7 @@ add_library(
   connectivity/cohesive_blocks.c
   connectivity/components.c
   connectivity/separators.c
+  connectivity/reachability.c
 
   cycles/simple_cycles.c
 
@@ -328,7 +331,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.6")
+set_target_properties(igraph PROPERTIES VERSION "3.1.7")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

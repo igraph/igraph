@@ -108,7 +108,7 @@ igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
  * Avoids invoking undefined behaviour.
  * Must not be called with an input that has a non-zero fractional part.
  */
-inline igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value) {
+igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value) {
     /* IGRAPH_INTEGER_MAX is one less than a power of 2, and may not be representable as
      * a floating point number. Thus we cannot safely check that value <= IGRAPH_INTEGER_MAX,
      * as this would convert IGRAPH_INTEGER_MAX to floating point, potentially changing its value.

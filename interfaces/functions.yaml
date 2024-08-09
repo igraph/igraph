@@ -1120,6 +1120,9 @@ igraph_average_local_efficiency:
 igraph_transitive_closure_dag:
     PARAMS: GRAPH graph, OUT GRAPH closure
 
+igraph_transitive_closure:
+    PARAMS: GRAPH graph, OUT GRAPH closure
+
 igraph_trussness:
     PARAMS: GRAPH graph, OUT VECTOR_INT trussness
 
@@ -1278,6 +1281,9 @@ igraph_bridges:
 
 igraph_is_biconnected:
     PARAMS: GRAPH graph, OUT BOOLEAN res
+
+igraph_count_reachable:
+    PARAMS: GRAPH graph, OUT VECTOR_INT counts, NEIMODE mode
 
 #######################################
 # Cliques
