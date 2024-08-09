@@ -133,10 +133,27 @@ int test_basic_operations_undirected(void) {
     return 0;
 }
 
+int test_multi_loops_adjlist_init(void) {
+    igraph_t g;
+    igraph_adjlist_t al;
+    igraph_bool_t multi;
+
+    igraph_small(&g, 1, IGRAPH_UNDIRECTED,
+                 0,0, 0,0, -1);
+    igraph_adjlist_init(&g, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_has_multiple(&g, &multi);
+    IGRAPH_ASSERT(multi);
+    igraph_adjlist_destroy(&al);
+    igraph_destroy(&g);
+
+    return 0;
+}
+
 int main(void) {
 
     RUN_TEST(test_basic_operations_directed);
     RUN_TEST(test_basic_operations_undirected);
+    RUN_TEST(test_multi_loops_adjlist_init);
 
     return 0;
 }

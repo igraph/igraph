@@ -2,6 +2,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  CMAKE_COLOR_DIAGNOSTICS: ON
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M
@@ -138,7 +139,7 @@ jobs:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
-          vsver: '14.3' # VS2022
+          vsver: '14.4' # latest VS2022
           vcpkg_target_triplet: x64-windows
 
   - job: documentation

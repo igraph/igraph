@@ -4,17 +4,85 @@
 
 ### Added
 
- - `igraph_bitset_fill()` sets all elements of a bitset to the same value.
- - `igraph_bitset_null()` clears all elements of a bitset.
+ - `igraph_bitset_update()` copies the contents of one bitset into another (experimental function).
+ - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
+ - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
+ - `igraph_vector_reverse_section()` reverses a contiguous section of a vector.
+ - `igraph_vector_rotate_left()` applies a cyclic permutation to a vector.
+ - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
+ - `igraph_find_cycle()` finds a single cycle in a graph, if it exists (experimental function).
+
+### Changed
+
+ - `igraph_feedback_arc_set()` uses a much faster method for solving the exact minimum feedback arc set problem. The new method (`IGRAPH_FAS_EXACT_IP_CG`) is used by default (i.e. with `IGRAPH_FAS_EXACT_IP`), but the previous method is also kept available (`IGRAPH_FAS_EXACT_IP_TI`).
 
 ### Fixed
 
+ - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
+ - Removed broken interruption support from `igraph_community_spinglass_single()`.
+ - In rare cases `igraph_community_multilevel()` could enter an infinite loop. This is now corrected.
+ - Fixed null-dereference in `igraph_community_voronoi()` when requesting `modularity` but not `membership`.
+ - Fixed null-dereference in `igraph_community_optimal_modularity()` when requesting `modularity` but not `membership` and passing a null graph or singleton graph.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash when passing `distances=NULL` and `distances_are_weights=true`. This is now fixed.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash on interruption. This is now fixed.
+ - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
+ - The documented `igraph_strvector_resize_min()` was missing from headers.
+ - `igraph_feedback_arc_set()` now validates the edge weights.
+
+### Deprecated
+
+ - `igraph_minimum_spanning_tree_prim()` and `igraph_minimum_spanning_tree_unweighted()` are deprecated. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+ - `igraph_array3_t` and all associated functions are deprecated and scheduled for removal in igraph 1.0.
+ - `igraph_vector_qsort_ind()` is deprecated in favour of `igraph_vector_sort_ind()`.
+ - `igraph_vector_binsearch2()` is deprecated in favour of `igraph_vector_contains_sorted()`.
+
+### Other
+
+ - Fixed multiple memory leaks in benchmark programs.
+ - Documentation improvements.
+
+## [0.10.13]
+
+### Added
+
+ - `igraph_bitset_fill()` sets all elements of a bitset to the same value (experimental function).
+ - `igraph_bitset_null()` clears all elements of a bitset (experimental function).
+ - `igraph_bitset_is_all_zero()`, `igraph_bitset_is_all_one()`, `igraph_bitset_is_any_zero()`, `igraph_bitset_is_any_one()` check if any/all elements of a bitset are zeros/ones (experimental functions).
+ - `igraph_chung_lu_game()` implements the classic Chung-Lu model, as well as a number of its variants (experimental function).
+ - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
+ - `igraph_count_loops()` counts self-loops in the graph (experimental function).
+ - `igraph_is_clique()` checks if all pairs within a set of vertices are connected (experimental function).
+ - `igraph_is_independent_vertex_set()` checks if no pairs within a set of vertices are connected (experimental function).
+ - `igraph_hypercube()` creates a hypercube graph (experimental function).
+ - `igraph_vector_intersection_size_sorted()` counts elements common to two sorted vectors (experimental function).
+ - `igraph_stack_capacity()` returns the allocated capacity of a stack.
+ - `igraph_vector_is_all_finite()` checks if all elements in a vector are finite (i.e. neither NaN nor Inf).
+
+### Fixed
+
+ - Fixed a bug that incorrectly cached that a graph has no multiple edges when `igraph_init_adjlist()` was called with `IGRAPH_NO_LOOPS` and `IGRAPH_NO_MULTIPLE` and all the multi-edges were loop edges.
+ - `igraph_is_forest()` would fail to set the result variable when testing for a directed forest, and it was already cached that the graph was not an undirected forest.
+ - `igraph_hub_and_authority_scores()` no longer clips negative results to zeros when negative weights are present.
+ - Fixed an assertion failure in `igraph_realize_bipartite_degree_sequence()` with some non-graphical degree sequences when requesting simple bipartite graphs.
+ - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
+ - `igraph_arpack_rnsolve()` used the incorrect error message text for some errors. This is now corrected.
  - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
+ - Corrected a bug in the fallback implementation of `igraph_bitset_countl_zero()` when `IGRAPH_INTEGER_SIZE` was set to 32. This fallback implementation was _not_ used with GCC, Clang, or MSVC.
+
+### Changed
+
+ - `igraph_is_graphical()` and `igraph_is_bigraphical()` are now linear-time in all cases, and generally several times faster than before (thanks to @gendelpiekel, contributed in #2605).
+ - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a hundred million vertices.
+ - `igraph_hub_and_authority_scores()` now warns when negative edge weights are present.
+ - `igraph_layout_lgl()` now uses a BFS tree rooted in the vertex specified as `proot` to guide the layout. Previously it used an unspecified (arbitrary) spanning tree.
+ - Updated the internal heuristics used by igraph's ARPACK interface, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, to improve the robustness of calculations.
+ - Updated the initial vector construction in `igraph_hub_and_authority_scores()`, `igraph_eigenvector_centrality()` and `igraph_(personalized_)pagerank()` with `IGRAPH_PAGERANK_ALGO_ARPACK`. This improves the robustness and convergence of calculations.
 
 ### Other
 
  - Documentation improvements.
  - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
+ - `igraph_vector_intersect_sorted()` has better performance when the input vector sizes are similar.
 
 ## [0.10.12] - 2024-05-06
 
@@ -1366,7 +1434,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.12..master
+[master]: https://github.com/igraph/igraph/compare/0.10.13..master
+[0.10.13]: https://github.com/igraph/igraph/compare/0.10.12..0.10.13
 [0.10.12]: https://github.com/igraph/igraph/compare/0.10.11..0.10.12
 [0.10.11]: https://github.com/igraph/igraph/compare/0.10.10..0.10.11
 [0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10

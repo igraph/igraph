@@ -29,6 +29,30 @@
 #include <math.h>
 
 /**
+ * \section about_community
+ *
+ * <para>
+ * Community detection is concerned with clustering the vertices of networks
+ * into tightly connected subgraphs called "communities". The following
+ * references provide a good introduction to the topic of community detection:
+ * </para>
+ *
+ * <para>
+ * S. Fortunato:
+ * "Community Detection in Graphs".
+ * Physics Reports 486, no. 3–5 (2010): 75–174.
+ * https://doi.org/16/j.physrep.2009.11.002.
+ * </para>
+ *
+ * <para>
+ * S. Fortunato and D. Hric:
+ * "Community Detection in Networks: A User Guide".
+ * Physics Reports 659 (2016): 1–44.
+ * https://doi.org/10.1016/j.physrep.2016.09.002.
+ * </para>
+ */
+
+/**
  * \function igraph_community_to_membership
  * \brief Creates a membership vector from a community structure dendrogram.
  *
@@ -313,7 +337,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * of cluster \c i. Then the entropy of the clustering is
  *
  * </para><para>
- * <code>H(C) = - \sum_i p_i log p_i</code>
+ * <code>H(C) = - sum_i p_i log p_i</code>
  *
  * </para><para>
  * Similarly, we can define the joint entropy of two clusterings \c C_1 and \c C_2
@@ -321,7 +345,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * in the first clustering and cluster \c j in the second one:
  *
  * </para><para>
- * <code>H(C_1, C_2) = - \sum_ii p_ij log p_ij</code>
+ * <code>H(C_1, C_2) = - sum_ii p_ij log p_ij</code>
  *
  * </para><para>
  * The mutual information of \c C_1 and \c C_2 is then

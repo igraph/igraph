@@ -584,10 +584,10 @@ loop not cached
 multi not cached
 graph: multiloop, loop: 0 multi: 0, mode: 0
 loop cached: 1
-multi cached: 0
+multi cached: 1
 graph: multiloop, loop: 0 multi: 0, mode: 1
 loop cached: 1
-multi cached: 0
+multi cached: 1
 graph: multiloop, loop: 0 multi: 1, mode: 0
 loop cached: 1
 multi not cached

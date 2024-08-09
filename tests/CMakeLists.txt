@@ -68,7 +68,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bitset
   heap
-  igraph_array
   igraph_complex
   igraph_psumtree
   igraph_sparsemat5
@@ -99,7 +98,7 @@ add_legacy_tests(
   vector_list
   vector_ptr
   vector_ptr_sort_ind
-  vector_qsort_ind
+  vector_sort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
@@ -156,7 +155,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
   igraph_vs_nonadj
-  igraph_vs_seq
+  igraph_vs_range
   igraph_vs_vector
 )
 
@@ -204,6 +203,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
@@ -312,7 +312,7 @@ add_legacy_tests(
   igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
-  igraph_feedback_arc_set_undirected
+  igraph_feedback_arc_set
   igraph_get_all_simple_paths
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
@@ -326,6 +326,7 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_clique
   igraph_is_complete
   igraph_is_dag
   igraph_is_mutual
@@ -340,6 +341,7 @@ add_legacy_tests(
   igraph_local_scan_k_ecount_them
   igraph_local_scan_subset_ecount
   igraph_local_transitivity
+  igraph_mean_degree
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
@@ -386,6 +388,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_biconnected_components
   igraph_bridges
   igraph_decompose_strong
   igraph_is_biconnected
@@ -559,6 +562,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
+  igraph_contract_vertices
   igraph_difference
   igraph_disjoint_union
   igraph_join
@@ -802,6 +806,7 @@ add_legacy_tests(
   igraph_is_eulerian
   igraph_eulerian_cycle
   igraph_eulerian_path
+  igraph_find_cycle
 )
 
 # separators.at
@@ -986,7 +991,9 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  community
   connectivity
+  erdos_renyi
   graphicality
   igraph_average_path_length_unweighted
   igraph_betweenness
@@ -1015,6 +1022,8 @@ add_benchmarks(
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
+  lad
+  intersection
 )
 
 # dot product

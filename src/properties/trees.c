@@ -542,7 +542,7 @@ igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
              *  - If the graph is not a forest, we don't need to look for roots.
              */
             if (! no_undirected_cycles) {
-                if (res) { res = false; }
+                if (res) { *res = false; }
                 if (roots) { igraph_vector_int_clear(roots); }
                 return IGRAPH_SUCCESS;
             }
@@ -730,6 +730,9 @@ static igraph_error_t igraph_i_is_forest(
  * \param res Pointer to a boolean constant, the result
         is stored here.
  * \return Error code.
+ *
+ * \sa \ref igraph_find_cycle() to find a cycle that demonstrates
+ * that the graph is not acyclic.
  *
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
  * vertices and edges in the original input graph.

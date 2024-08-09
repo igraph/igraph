@@ -15,5 +15,6 @@
 <!-- doxrox-include igraph_psumtree_sum -->
 <!-- doxrox-include igraph_psumtree_search -->
 <!-- doxrox-include igraph_psumtree_update -->
+<!-- doxrox-include igraph_psumtree_reset -->
 
 </section>

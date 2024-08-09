@@ -24,34 +24,10 @@
 
 #include "core/interruption.h"
 
-/* Computes the size of the intersection of two sorted vectors, treated as sets.
- * It is assumed that the vectors contain no duplicates.
- *
- * We rely on (lazy_)adjlist_get() producing sorted neighbor lists and
- * (lazy_)adjlist_init() being called with IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
- * to prevent duplicate entries.
+/* This implementation of ECC relies on (lazy_)adjlist_get() producing sorted
+ * neighbor lists and (lazy_)adjlist_init() being called with IGRAPH_NO_LOOPS
+ * and IGRAPH_NO_MULTIPLE to prevent duplicate entries.
  */
-static igraph_integer_t vector_int_intersection_size_sorted(
-        const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
-    igraph_integer_t i1 = 0, i2 = 0;
-    igraph_integer_t count = 0;
-
-    while (i1 < n1 && i2 < n2) {
-        igraph_integer_t e1 = VECTOR(*v1)[i1], e2 = VECTOR(*v2)[i2];
-        if (e1 < e2) {
-            i1++;
-        } else if (e1 == e2) {
-            count++;
-            i1++; i2++;
-        } else { /* e2 > e1 */
-            i2++;
-        }
-    }
-
-    return count;
-}
-
 
 /* Optimized for the case when computing ECC for all edges. */
 static igraph_error_t igraph_i_ecc3_1(
@@ -95,7 +71,7 @@ static igraph_error_t igraph_i_ecc3_1(
             const igraph_vector_int_t *a1 = igraph_adjlist_get(&al, v1), *a2 = igraph_adjlist_get(&al, v2);
             igraph_integer_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
 
-            z = vector_int_intersection_size_sorted(a1, a2);
+            z = igraph_vector_int_intersection_size_sorted(a1, a2);
             s = (d1 < d2 ? d1 : d2) - 1.0;
         }
 
@@ -153,7 +129,7 @@ static igraph_error_t igraph_i_ecc3_2(
             IGRAPH_CHECK(igraph_degree_1(graph, &d1, v1, IGRAPH_ALL, IGRAPH_LOOPS));
             IGRAPH_CHECK(igraph_degree_1(graph, &d2, v2, IGRAPH_ALL, IGRAPH_LOOPS));
 
-            z = vector_int_intersection_size_sorted(a1, a2);
+            z = igraph_vector_int_intersection_size_sorted(a1, a2);
             s = (d1 < d2 ? d1 : d2) - 1.0;
         }
 
@@ -226,7 +202,7 @@ static igraph_error_t igraph_i_ecc4_1(
 
                 const igraph_vector_int_t *a2 = igraph_adjlist_get(&al, v2), *a3 = igraph_adjlist_get(&al, v3);
 
-                z += vector_int_intersection_size_sorted(a2, a3) - 1.0;
+                z += igraph_vector_int_intersection_size_sorted(a2, a3) - 1.0;
             }
 
             igraph_integer_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
@@ -309,7 +285,7 @@ static igraph_error_t igraph_i_ecc4_2(
                 igraph_vector_int_t *a2 = igraph_lazy_adjlist_get(&al, v2);
                 igraph_vector_int_t *a3 = igraph_lazy_adjlist_get(&al, v3);
 
-                z += vector_int_intersection_size_sorted(a2, a3) - 1.0;
+                z += igraph_vector_int_intersection_size_sorted(a2, a3) - 1.0;
             }
 
             s = (d1 - 1.0) * (d2 - 1.0);

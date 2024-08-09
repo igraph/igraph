@@ -138,8 +138,8 @@
 </section>
 
 <section id="subset-limited-centrality-measures"><title>Subset-limited centrality measures</title>
-<!-- doxrox-include igraph_betweenness_subset-->
-<!-- doxrox-include igraph_edge_betweenness_subset-->
+<!-- doxrox-include igraph_betweenness_subset -->
+<!-- doxrox-include igraph_edge_betweenness_subset -->
 </section>
 
 <section id="centralization"><title>Centralization</title>
@@ -198,6 +198,8 @@
 <section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple graphs: Multiple and loop edges</title>
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
+<!-- doxrox-include igraph_has_loop -->
+<!-- doxrox-include igraph_count_loops -->
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
@@ -241,9 +243,11 @@
 
 <section id="other-operations"><title>Other operations</title>
 <!-- doxrox-include igraph_density -->
+<!-- doxrox-include igraph_mean_degree -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
+<!-- doxrox-include igraph_has_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->

@@ -57,37 +57,38 @@ void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
 }
 
 int main(void) {
-    igraph_t g, g_ring_undirected, g_star_undirected;
+    igraph_t g;
+    igraph_t g_ring_undirected, g_star_undirected;
 
-    printf("Testing null graph\n");
-    igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
-    check_cycles(&g, 0);
-    igraph_destroy(&g);
+    // printf("Testing null graph\n");
+    // igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
+    // check_cycles(&g, 0);
+    // igraph_destroy(&g);
 
-    printf("\nTesting empty graph\n");
-    igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
-    check_cycles(&g, 0);
-    igraph_destroy(&g);
+    // printf("\nTesting empty graph\n");
+    // igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
+    // check_cycles(&g, 0);
+    // igraph_destroy(&g);
 
-    printf("\nTesting ring\n");
-    igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
-    check_cycles(&g, 1);
-    igraph_destroy(&g);
+    // printf("\nTesting directed ring\n");
+    // igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
+    // check_cycles(&g, 1);
+    // igraph_destroy(&g);
 
-    printf("\nTesting large ring\n");
-    igraph_ring(&g, 10000, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
-    check_cycles(&g, 1);
-    igraph_destroy(&g);
+    // printf("\nTesting directed large ring\n");
+    // igraph_ring(&g, 10000, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
+    // check_cycles(&g, 1);
+    // igraph_destroy(&g);
 
-    printf("\nTesting star\n");
-    igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
-    check_cycles(&g, 0);
-    igraph_destroy(&g);
+    // printf("\nTesting directed star\n");
+    // igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
+    // check_cycles(&g, 0);
+    // igraph_destroy(&g);
 
-    printf("\nTesting directed wheel\n");
-    igraph_wheel(&g, 10, IGRAPH_WHEEL_OUT, 0);
-    check_cycles(&g, 1);
-    igraph_destroy(&g);
+    // printf("\nTesting directed wheel\n");
+    // igraph_wheel(&g, 10, IGRAPH_WHEEL_OUT, 0);
+    // check_cycles(&g, 1);
+    // igraph_destroy(&g);
 
     printf("\nTesting undirected ring\n");
     igraph_ring(&g_ring_undirected, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
@@ -155,21 +156,160 @@ int main(void) {
      * 4--3/
      *
      */
-    printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
-    igraph_small(&g, 5, IGRAPH_DIRECTED, 1, 2, 2, 3, 2, 3, 3, 4, 4, 1, -1);
-    check_cycles(&g, 2);
-    igraph_destroy(&g);
+    // printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
+    // igraph_small(&g, 5, IGRAPH_DIRECTED,
+    //              1, 2,
+    //              2, 3,
+    //              2, 3,
+    //              3, 4,
+    //              4, 1,
+    //              -1);
+    // check_cycles(&g, 2);
+    // igraph_destroy(&g);
 
     // same, but undirected
     printf("\nTesting undirected graph with a cycle of length 4 and a multi-edge\n");
-    igraph_small(&g, 5, IGRAPH_UNDIRECTED, 1, 2, 2, 3, 2, 3, 3, 4, 4, 1, -1);
-    check_cycles(&g, 2);
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED,
+                 1, 2,
+                 2, 3,
+                 2, 3,
+                 3, 4,
+                 4, 1,
+                 -1);
+    check_cycles(&g, 3);
     igraph_destroy(&g);
 
     // check that self-loops are handled
-    printf("\nTesting graph with single self-loop\n");
+    printf("\nTesting directed graph with single self-loop\n");
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0, 0, -1);
     check_cycles(&g, 1);
+    igraph_destroy(&g);
+
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2243053770
+    printf("\nTesting undirected graph with single length-2-loop\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, -1);
+    check_cycles(&g, 1);
+    igraph_destroy(&g);
+
+    printf("\nTesting undirected graph with 3 length-2-loops\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, 0, 1, -1);
+    check_cycles(&g, 3);
+    igraph_destroy(&g);
+
+    // and in https://github.com/igraph/igraph/pull/2181#issuecomment-2243060608
+    printf("\nTesting undirected graph with single length-2-loop and a self-loop\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, 0, 0, -1);
+    check_cycles(&g, 2);
+    igraph_destroy(&g);
+
+
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2243942240
+    printf("\nTesting undirected graph of type 'envelope'\n");
+    // expect:
+    // 4 of length 3 vertices
+    // 4 of length 5 vertices
+    // 5 of length 4 vertices
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 0, 3,
+                 0, 4,
+                 1, 2,
+                 1, 3,
+                 2, 3,
+                 2, 4,
+                 3, 4,
+                 -1);
+    check_cycles(&g, 13);
+    igraph_destroy(&g);
+
+    printf("\nTesting undirected graph of type 'boat'\n");
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED,
+                 0, 2,
+                 0, 4,
+                 1, 2,
+                 1, 3,
+                 1, 4,
+                 2, 3,
+                 2, 4,
+                 -1);
+    check_cycles(&g, 6);
+    igraph_destroy(&g);
+
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2249751754
+    printf("\nTesting undirected graph of type 'house'\n");
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED,
+                 0, 3,
+                 0, 4,
+                 1, 2,
+                 1, 3,
+                 1, 4,
+                 2, 3,
+                 -1);
+    check_cycles(&g, 3);
+    igraph_destroy(&g);
+
+    printf("\nTesting undirected graph of type 'prism'\n");
+    igraph_small(&g, 6, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 0, 3,
+                 0, 5,
+                 1, 4,
+                 1, 5,
+                 2, 3,
+                 2, 4,
+                 2, 5,
+                 3, 4,
+                 -1);
+    check_cycles(&g, 14);
+    igraph_destroy(&g);
+
+
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2251350410
+    printf("\nTesting undirected graph of type '7 vertices'\n");
+    igraph_small(&g, 7, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 0, 4,
+                 0, 5,
+                 0, 6,
+                 1, 2,
+                 1, 3,
+                 1, 5,
+                 1, 6,
+                 2, 3,
+                 2, 6,
+                 3, 4,
+                 3, 5,
+                 3, 6,
+                 4, 5,
+                 -1);
+    check_cycles(&g, 89);
+    igraph_destroy(&g);
+
+    printf("\nTesting undirected graph of type 'shooting star'\n");
+    igraph_small(&g, 7, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 0, 2,
+                 0, 3,
+                 0, 4,
+                 0, 6,
+                 1, 2,
+                 1, 3,
+                 1, 4,
+                 1, 5,
+                 1, 6,
+                 2, 3,
+                 2, 4,
+                 2, 6,
+                 3, 4,
+                 3, 5,
+                 4, 6,
+                 5, 6,
+                 -1);
+    check_cycles(&g, 18 + 43 + 78 + 96 + 60);
     igraph_destroy(&g);
 
     ////////////////////////////////

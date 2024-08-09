@@ -198,7 +198,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    the number of vertices in the graph. So if the first line
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
- *    component <code>n+1</code>, etc. The matrix will be resized as needed.
+ *    component <code>n + 1</code>, etc. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     \c NULL then the indices into \p edges of all edges which caused
  *     one of the merges will be put here. This is equal to all edge removals
@@ -342,10 +342,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \brief Community finding based on edge betweenness.
  *
  * Community structure detection based on the betweenness of the edges
- * in the network. The algorithm was invented by M. Girvan and
- * M. Newman, see: M. Girvan and M. E. J. Newman: Community structure in
- * social and biological networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826
- * (2002). https://doi.org/10.1073/pnas.122653799
+ * in the network, known as the Grivan-Newman algorithm.
  *
  * </para><para>
  * The idea is that the betweenness of the edges connecting two
@@ -362,6 +359,15 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * In directed graphs, when \p directed is set to true, the directed version
  * of betweenness and modularity are used, however, only splits into
  * \em weakly connected components are detected.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * M. Girvan and M. E. J. Newman:
+ * Community structure in social and biological networks.
+ * Proc. Nat. Acad. Sci. USA 99, 7821-7826 (2002).
+ * https://doi.org/10.1073/pnas.122653799
  *
  * \param graph The input graph.
  * \param removed_edges Pointer to an initialized vector, the result will be

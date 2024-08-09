@@ -108,8 +108,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * \sa \ref igraph_is_bigraphical() to check if a bi-degree-sequence can be realized as a bipartite graph;
  * \ref igraph_realize_degree_sequence() to construct a graph with a given degree sequence.
  *
- * Time complexity: O(n log n) for directed graphs with at most one self-loop per vertex,
- * and O(n) for all other cases, where n is the length of the degree sequence(s).
+ * Time complexity: O(n), where n is the length of the degree sequence(s).
  */
 igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
                         const igraph_vector_int_t *in_degrees,
@@ -215,8 +214,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
  *
  * \sa \ref igraph_is_graphical()
  *
- * Time complexity: O(n log n) for simple graphs, O(n) for multigraphs,
- * where n is the length of the larger degree sequence.
+ * Time complexity: O(n), where n is the length of the larger degree sequence.
  */
 igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
                           const igraph_vector_int_t *degrees2,
@@ -303,8 +301,8 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igra
  *  - Use the modification of the Erdős-Gallai theorem due to Cairns and Mendan.
  */
 static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_int_t *degrees, igraph_bool_t *res) {
-    igraph_vector_int_t work;
-    igraph_integer_t w, b, s, c, n, k;
+    igraph_vector_int_t num_degs;
+    igraph_integer_t w, b, s, c, n, k, wd, kd;
 
     n = igraph_vector_int_size(degrees);
 
@@ -344,18 +342,40 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
      * w and k are zero-based here, unlike in the statement of the theorem above.
      */
 
-    IGRAPH_CHECK(igraph_vector_int_init_copy(&work, degrees));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &work);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num_degs, n+2);
 
-    igraph_vector_int_reverse_sort(&work);
+    for (igraph_integer_t i = 0; i < n; ++i) {
+        igraph_integer_t degree = VECTOR(*degrees)[i];
 
+        /* Negative degrees are already checked in igraph_i_is_graphical_undirected_multi_loops() */
+        if (degree > n+1) {
+            *res = false;
+            goto undirected_loopy_simple_finish;
+        }
+
+        ++VECTOR(num_degs)[degree];
+    }
+
+    /* Convert num_degs to a cumulative sum array. */
+    for (igraph_integer_t d = n; d >= 0; --d) {
+        VECTOR(num_degs)[d] += VECTOR(num_degs)[d+1];
+    }
+
+    wd = 0, kd = n+1;
     *res = true;
     w = n - 1; b = 0; s = 0; c = 0;
     for (k = 0; k < n; k++) {
-        b += VECTOR(work)[k];
+        while (k >= VECTOR(num_degs)[kd]) {
+            --kd;
+        }
+        b += kd;
         c += w;
-        while (w > k && VECTOR(work)[w] <= k + 1) {
-            s += VECTOR(work)[w];
+        while (w > k) {
+            while (wd + 1 <= n + 1 && w < VECTOR(num_degs)[wd + 1]) {
+                wd++;
+            }
+            if (wd > k + 1) break;
+            s += wd;
             c -= (k + 1);
             w--;
         }
@@ -368,7 +388,8 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
         }
     }
 
-    igraph_vector_int_destroy(&work);
+undirected_loopy_simple_finish:
+    igraph_vector_int_destroy(&num_degs);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -777,10 +798,10 @@ static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_int_t *d
  *  - Use the Gale-Ryser theorem.
  */
 static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *degrees1, const igraph_vector_int_t *degrees2, igraph_bool_t *res) {
-    igraph_vector_int_t sorted_deg1, sorted_deg2;
     igraph_integer_t n1 = igraph_vector_int_size(degrees1), n2 = igraph_vector_int_size(degrees2);
-    igraph_integer_t i, k;
-    igraph_integer_t lhs_sum, partial_rhs_sum;
+    igraph_vector_int_t deg_freq1, deg_freq2;
+    igraph_integer_t lhs_sum, partial_rhs_sum, partial_rhs_count;
+    igraph_integer_t a, b, k;
 
     if (n1 == 0 && n2 == 0) {
         *res = true;
@@ -807,15 +828,27 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
         n2 = n;
     }
 
-    /* Copy and sort both vectors: */
+    /* Counting sort the degrees. */
+    /* Since the graph is simple, a vertex's degree can be at most the size of the other partition. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_freq1, n2+1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_freq2, n1+1);
 
-    IGRAPH_CHECK(igraph_vector_int_init_copy(&sorted_deg1, degrees1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sorted_deg1);
-    igraph_vector_int_reverse_sort(&sorted_deg1); /* decreasing sort */
-
-    IGRAPH_CHECK(igraph_vector_int_init_copy(&sorted_deg2, degrees2));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sorted_deg2);
-    igraph_vector_int_sort(&sorted_deg2); /* increasing sort */
+    for (igraph_integer_t i = 0; i < n1; ++i) {
+        igraph_integer_t degree = VECTOR(*degrees1)[i];
+        if (degree > n2) {
+            *res = false;
+            goto bigraphical_simple_done;
+        }
+        ++VECTOR(deg_freq1)[degree];
+    }
+    for (igraph_integer_t i = 0; i < n2; ++i) {
+        igraph_integer_t degree = VECTOR(*degrees2)[i];
+        if (degree > n1) {
+            *res = false;
+            goto bigraphical_simple_done;
+        }
+        ++VECTOR(deg_freq2)[degree];
+    }
 
     /*
      * We follow the description of the Gale-Ryser theorem in:
@@ -831,7 +864,10 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
      *
      * \sum_{i=0}^k a_i <= \sum_{j=0}^{n_2} min(b_i, k+1)
      *
-     * for all 0 <= k < n_1
+     * for all 0 <= k < n_1.
+     *
+     * Additionally, based on Theorem 3 in [Berger 2014], it is sufficient to do the check
+     * for k such that a_k > a_{k+1} and for k=(n_1-1).
      */
 
     /* While this formulation does not require sorting degree2,
@@ -841,31 +877,33 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
 
     *res = true; /* be optimistic */
     lhs_sum = 0;
-    partial_rhs_sum = 0; /* the sum of those elements in sorted_deg2 which are <= (k+1) */
-    i = 0; /* points past the first element of sorted_deg2 which > (k+1) */
-    for (k = 0; k < n1; ++k) {
-        lhs_sum += VECTOR(sorted_deg1)[k];
+    partial_rhs_sum = 0; /* the sum of those elements in the rhs which are <= (k+1) */
+    partial_rhs_count = 0; /* number of elements in the rhs which are <= (k+1) */
+    b = 0; /* index in deg_freq2 */
+    k = -1;
+    for (a = n2; a >= 0; --a) {
+        igraph_integer_t acount = VECTOR(deg_freq1)[a];
+        lhs_sum += a * acount;
+        k += acount;
 
-        /* Based on Theorem 3 in [Berger 2014], it is sufficient to do the check
-         * for k such that a_k > a_{k+1} and for k=(n_1-1).
-         */
-        if (k < n1-1 && VECTOR(sorted_deg1)[k] == VECTOR(sorted_deg1)[k+1])
-            continue;
+        while (b <= k + 1) {
+            igraph_integer_t bcount = VECTOR(deg_freq2)[b];
+            partial_rhs_sum += b * bcount;
+            partial_rhs_count += bcount;
 
-        while (i < n2 && VECTOR(sorted_deg2)[i] <= k+1) {
-            partial_rhs_sum += VECTOR(sorted_deg2)[i];
-            i++;
+            ++b;
         }
 
-        /* rhs_sum for a given k is partial_rhs_sum + (n2 - i) * (k+1) */
-        if (lhs_sum > partial_rhs_sum + (n2 - i) * (k+1) ) {
+        /* rhs_sum for a given k is partial_rhs_sum + (n2 - partial_rhs_count) * (k+1) */
+        if (lhs_sum > partial_rhs_sum + (n2 - partial_rhs_count) * (k+1) ) {
             *res = false;
             break;
         }
     }
 
-    igraph_vector_int_destroy(&sorted_deg2);
-    igraph_vector_int_destroy(&sorted_deg1);
+bigraphical_simple_done:
+    igraph_vector_int_destroy(&deg_freq1);
+    igraph_vector_int_destroy(&deg_freq2);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

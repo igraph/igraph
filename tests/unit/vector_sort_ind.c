@@ -34,7 +34,7 @@ int main(void) {
     /* Special case: empty vector */
     igraph_vector_init(&vector, 0);
     igraph_vector_int_init(&indices, 0);
-    igraph_vector_qsort_ind(&vector, &indices, IGRAPH_ASCENDING);
+    igraph_vector_sort_ind(&vector, &indices, IGRAPH_ASCENDING);
     print_vector_int(&indices);
     igraph_vector_int_destroy(&indices);
     igraph_vector_destroy(&vector);
@@ -42,12 +42,12 @@ int main(void) {
     /* Non-empty vector, descending */
     igraph_vector_view(&vector, values, sizeof(values) / sizeof(values[0]));
     igraph_vector_int_init(&indices, 0);
-    igraph_vector_qsort_ind(&vector, &indices, IGRAPH_DESCENDING);
+    igraph_vector_sort_ind(&vector, &indices, IGRAPH_DESCENDING);
     print_vector_int(&indices);
 
     /* Non-empty vector, ascending */
     igraph_vector_view(&vector, values2, sizeof(values2) / sizeof(values2[0]));
-    igraph_vector_qsort_ind(&vector, &indices, IGRAPH_ASCENDING);
+    igraph_vector_sort_ind(&vector, &indices, IGRAPH_ASCENDING);
     print_vector_int(&indices);
 
     /* Permute the vector by the index vector */

@@ -138,9 +138,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     if (no_of_edges == 0) {
         /* Special case: the modularity of graphs with no edges is not
          * well-defined */
-        if (modularity) {
-            *modularity = IGRAPH_NAN;
-        }
+        *modularity = IGRAPH_NAN;
         return IGRAPH_SUCCESS;
     }
 

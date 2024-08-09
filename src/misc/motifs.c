@@ -986,29 +986,31 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_real_t *mut,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
-                           igraph_real_t *res4) {
+static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph,
+                                               igraph_real_t *res2,
+                                               igraph_real_t *res4) {
 
-    igraph_integer_t vc = igraph_vcount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
     igraph_vector_int_t seen;
     igraph_vector_int_t *neis, *neis2;
-    igraph_integer_t i, j, k, s, neilen, neilen2, ign;
+    igraph_integer_t s, neilen, neilen2, ign;
     igraph_adjlist_t adjlist;
+    int iter = 0;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vc);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vcount);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     *res2 = *res4 = 0;
 
-    for (i = 0; i < vc; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 12);
 
         neis = igraph_adjlist_get(&adjlist, i);
         neilen = igraph_vector_int_size(neis);
         /* mark neighbors of i & i itself */
         VECTOR(seen)[i] = i + 1;
         ign = 0;
-        for (j = 0; j < neilen; j++) {
+        for (igraph_integer_t j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (VECTOR(seen)[nei] == i + 1 || VECTOR(seen)[nei] == -(i + 1)) {
                 /* multiple edges or loop edge */
@@ -1019,7 +1021,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
             }
         }
 
-        for (j = 0; j < neilen; j++) {
+        for (igraph_integer_t j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (nei <= i || (j > 0 && nei == VECTOR(*neis)[j - 1])) {
                 continue;
@@ -1027,7 +1029,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
             neis2 = igraph_adjlist_get(&adjlist, nei);
             neilen2 = igraph_vector_int_size(neis2);
             s = 0;
-            for (k = 0; k < neilen2; k++) {
+            for (igraph_integer_t k = 0; k < neilen2; k++) {
                 igraph_integer_t nei2 = VECTOR(*neis2)[k];
                 if (k > 0 && nei2 == VECTOR(*neis2)[k - 1]) {
                     continue;
@@ -1037,9 +1039,9 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
                 }
             }
             if (VECTOR(seen)[nei] > 0) {
-                *res2 += vc - s - neilen + ign - 1;
+                *res2 += vcount - s - neilen + ign - 1;
             } else {
-                *res4 += vc - s - neilen + ign - 1;
+                *res4 += vcount - s - neilen + ign - 1;
             }
         }
     }
@@ -1130,10 +1132,9 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
 
 igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
-    igraph_vector_t cut_prob;
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_vector_t cut_prob, tmp;
     igraph_real_t m2, m4;
-    igraph_vector_t tmp;
-    igraph_integer_t vc = igraph_vcount(graph);
     igraph_real_t total;
 
     if (!igraph_is_directed(graph)) {
@@ -1147,8 +1148,8 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
     IGRAPH_CHECK(igraph_i_triad_census_24(graph, &m2, &m4));
 
-    total = ((igraph_real_t)vc) * (vc - 1);
-    total *= (vc - 2);
+    total = ((igraph_real_t) vcount) * (vcount - 1);
+    total *= (vcount - 2);
     total /= 6;
 
     /* Reorder */
