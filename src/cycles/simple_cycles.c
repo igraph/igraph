@@ -67,13 +67,6 @@ struct igraph_simple_cycle_search_state_t {
 
     /* Whether the graph is directed */
     igraph_bool_t directed;
-
-    /* Hashes of the vertices of found cycles (for filtering in undirected graphs)
-     */
-    igraph_vector_int_list_t found_cycles_vertex_hashes;
-
-    /* Hashes of the edges of found cycles (for filtering in undirected graphs) */
-    igraph_vector_int_list_t found_cycles_edge_hashes;
 };
 
 /**
