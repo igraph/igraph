@@ -332,7 +332,7 @@ igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_state_t *state,
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &state->v_blocked);
     IGRAPH_CHECK(igraph_inclist_init(
                      graph, &state->IK, IGRAPH_OUT,
-                     IGRAPH_LOOPS_ONCE)); // TODO: understand what we actually want to include
+                     IGRAPH_LOOPS_ONCE)); // each self-loop counts as a single cycle in directed graphs
     IGRAPH_FINALLY(igraph_inclist_destroy, &state->IK);
     IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &state->AK, &state->IK));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->AK);
