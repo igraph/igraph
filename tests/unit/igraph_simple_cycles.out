@@ -1,6 +1,6 @@
 
 Testing undirected ring
-Finished search, found 1 cycles.
+Finished search, found 1 cycles, expected 1.
 
 Vertex IDs in cycles:
 {
@@ -12,7 +12,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected star
-Finished search, found 0 cycles.
+Finished search, found 0 cycles, expected 0.
 
 Vertex IDs in cycles:
 {
@@ -22,7 +22,7 @@ Edge IDs in cycles:
 }
 
 Testing union of undirected wheel and star
-Finished search, found 1 cycles.
+Finished search, found 1 cycles, expected 1.
 
 Vertex IDs in cycles:
 {
@@ -34,7 +34,7 @@ Edge IDs in cycles:
 }
 
 Testing union of undirected wheel, star and a single edge
-Finished search, found 1 cycles.
+Finished search, found 1 cycles, expected 1.
 
 Vertex IDs in cycles:
 {
@@ -46,7 +46,7 @@ Edge IDs in cycles:
 }
 
 Created undirected wheel
-Finished search, found 73 cycles.
+Finished search, found 73 cycles, expected 73.
 
 Vertex IDs in cycles:
 {
@@ -200,9 +200,79 @@ Edge IDs in cycles:
   71: ( 7 16 8 )
   72: ( 9 10 11 12 13 14 15 16 17 )
 }
+Finished search, found 9 cycles, expected 9.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 0 1 9 )
+  2: ( 0 2 3 )
+  3: ( 0 3 4 )
+  4: ( 0 4 5 )
+  5: ( 0 5 6 )
+  6: ( 0 6 7 )
+  7: ( 0 7 8 )
+  8: ( 0 8 9 )
+}
+Edge IDs in cycles:
+{
+  0: ( 0 9 1 )
+  1: ( 0 17 8 )
+  2: ( 1 10 2 )
+  3: ( 2 11 3 )
+  4: ( 3 12 4 )
+  5: ( 4 13 5 )
+  6: ( 5 14 6 )
+  7: ( 6 15 7 )
+  8: ( 7 16 8 )
+}
+Finished search, found 18 cycles, expected 18.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 0 1 2 3 )
+  2: ( 0 1 9 )
+  3: ( 0 1 9 8 )
+  4: ( 0 2 1 9 )
+  5: ( 0 2 3 )
+  6: ( 0 2 3 4 )
+  7: ( 0 3 4 )
+  8: ( 0 3 4 5 )
+  9: ( 0 4 5 )
+  10: ( 0 4 5 6 )
+  11: ( 0 5 6 )
+  12: ( 0 5 6 7 )
+  13: ( 0 6 7 )
+  14: ( 0 6 7 8 )
+  15: ( 0 7 8 )
+  16: ( 0 7 8 9 )
+  17: ( 0 8 9 )
+}
+Edge IDs in cycles:
+{
+  0: ( 0 9 1 )
+  1: ( 0 9 10 2 )
+  2: ( 0 17 8 )
+  3: ( 0 17 16 7 )
+  4: ( 1 9 17 8 )
+  5: ( 1 10 2 )
+  6: ( 1 10 11 3 )
+  7: ( 2 11 3 )
+  8: ( 2 11 12 4 )
+  9: ( 3 12 4 )
+  10: ( 3 12 13 5 )
+  11: ( 4 13 5 )
+  12: ( 4 13 14 6 )
+  13: ( 5 14 6 )
+  14: ( 5 14 15 7 )
+  15: ( 6 15 7 )
+  16: ( 6 15 16 8 )
+  17: ( 7 16 8 )
+}
 
 Testing undirected graph with a cycle of length 4 and a multi-edge
-Finished search, found 3 cycles.
+Finished search, found 3 cycles, expected 3.
 
 Vertex IDs in cycles:
 {
@@ -218,7 +288,7 @@ Edge IDs in cycles:
 }
 
 Testing directed graph with single self-loop
-Finished search, found 1 cycles.
+Finished search, found 1 cycles, expected 1.
 
 Vertex IDs in cycles:
 {
@@ -230,7 +300,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with single length-2-loop
-Finished search, found 1 cycles.
+Finished search, found 1 cycles, expected 1.
 
 Vertex IDs in cycles:
 {
@@ -242,7 +312,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with 3 length-2-loops
-Finished search, found 3 cycles.
+Finished search, found 3 cycles, expected 3.
 
 Vertex IDs in cycles:
 {
@@ -258,7 +328,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with single length-2-loop and a self-loop
-Finished search, found 2 cycles.
+Finished search, found 2 cycles, expected 2.
 
 Vertex IDs in cycles:
 {
@@ -272,7 +342,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'envelope'
-Finished search, found 13 cycles.
+Finished search, found 13 cycles, expected 13.
 
 Vertex IDs in cycles:
 {
@@ -308,7 +378,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'boat'
-Finished search, found 6 cycles.
+Finished search, found 6 cycles, expected 6.
 
 Vertex IDs in cycles:
 {
@@ -330,7 +400,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'house'
-Finished search, found 3 cycles.
+Finished search, found 3 cycles, expected 3.
 
 Vertex IDs in cycles:
 {
@@ -346,7 +416,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'prism'
-Finished search, found 14 cycles.
+Finished search, found 14 cycles, expected 14.
 
 Vertex IDs in cycles:
 {
@@ -384,7 +454,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type '7 vertices'
-Finished search, found 89 cycles.
+Finished search, found 89 cycles, expected 89.
 
 Vertex IDs in cycles:
 {
@@ -572,7 +642,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'shooting star'
-Finished search, found 295 cycles.
+Finished search, found 295 cycles, expected 295.
 
 Vertex IDs in cycles:
 {

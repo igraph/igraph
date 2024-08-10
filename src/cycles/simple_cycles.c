@@ -119,19 +119,19 @@ igraph_i_simple_cycles_unblock(igraph_simple_cycle_search_state_t *state,
  *
  * Arguments:
  *
- * - state: local state object of the search
- * - V: vertex to start the search from
- * - E: ID of edge leading into this vertex, -1 if this is the first vertex
- * - S:
- * - vertices: vector in which the results with the vertex IDs should be stored
- * - edges: vector in which the results with the edge IDs should be stored
- * - found: output argument, set to true if a cycle was found
+ * \param state: local state object of the search
+ * \param V: vertex to start the search from
+ * \param E: ID of edge leading into this vertex, -1 if this is the first vertex
+ * \param S:
+ * \param vertices: vector in which the results with the vertex IDs should be stored
+ * \param edges: vector in which the results with the edge IDs should be stored
+ * \param max_cycle_length Limit the maximum length of cycles to search for. Negative for no limit
  */
 
 static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t V,
     igraph_integer_t E, igraph_integer_t S, igraph_vector_int_list_t *vertices,
-    igraph_vector_int_list_t *edges, igraph_bool_t *found) {
+    igraph_vector_int_list_t *edges, igraph_integer_t max_cycle_length) {
     const igraph_vector_int_t *neighbors;
     const igraph_vector_int_t *incident_edges;
     igraph_integer_t num_neighbors;
@@ -233,21 +233,27 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 }
                 IGRAPH_FINALLY_CLEAN(1);
 
-                /* v_res ownership transferred to 'vertices' */
-                IGRAPH_CHECK(igraph_vector_int_list_push_back(vertices, &v_res));
+                if (vertices != NULL) {
+                    /* v_res ownership transferred to 'vertices' */
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back(vertices, &v_res));
+                } else {
+                    igraph_vector_int_destroy(&v_res);
+                }
                 IGRAPH_FINALLY_CLEAN(1);
 
                 igraph_vector_int_pop_back(&state->edge_stack);
             } else if (!(VECTOR(state->v_blocked)[W])) {
                 // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId "\n",
                 //        V, W);
-                recurse_deeper = true;
-                IGRAPH_CHECK(igraph_stack_int_push(&neigh_iteration_progress, i + 1));
-                IGRAPH_CHECK(igraph_stack_int_push(&v_stack, V));
-                IGRAPH_CHECK(igraph_stack_int_push(&e_stack, E));
-                V = W;
-                E = WE;
-                break;
+                recurse_deeper = (( max_cycle_length < 0) || (igraph_vector_int_size(&state->vertex_stack) <= max_cycle_length - 1));
+                if (recurse_deeper) {
+                    IGRAPH_CHECK(igraph_stack_int_push(&neigh_iteration_progress, i + 1));
+                    IGRAPH_CHECK(igraph_stack_int_push(&v_stack, V));
+                    IGRAPH_CHECK(igraph_stack_int_push(&e_stack, E));
+                    V = W;
+                    E = WE;
+                    break;
+                }
             } else {
                 // printf("Vertex %" IGRAPH_PRId ", neighbour of %" IGRAPH_PRId
                 //        ", is blocked\n",
@@ -283,8 +289,6 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             // printf("Unstacked v %" IGRAPH_PRId ", e %" IGRAPH_PRId "\n", V, E);
         }
     }
-
-    *found = local_found;
 
     IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
     IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
@@ -371,6 +375,7 @@ void igraph_simple_cycle_search_state_destroy(
  * \param s The vertex index to start search with
  * \param vertices The vertex IDs of each cycle will be stored here
  * \param edges The edge IDs of each cycle will be stored here
+ * \param max_cycle_length Limit the maximum length of cycles to search for. Negative for no limit.
  * \return Error code.
  *
  * @see https://en.wikipedia.org/wiki/Johnson%27s_algorithm
@@ -379,16 +384,16 @@ void igraph_simple_cycle_search_state_destroy(
  */
 igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t s,
-    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges) {
+    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+    igraph_integer_t max_cycle_length) {
     // L3:
     for (igraph_integer_t i = s; i < state->N; ++i) {
         VECTOR(state->v_blocked)[i] = false;
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
 
-    igraph_bool_t found = false;
     IGRAPH_CHECK(
-        igraph_i_simple_cycles_circuit(state, s, -1, s, vertices, edges, &found));
+        igraph_i_simple_cycles_circuit(state, s, -1, s, vertices, edges, max_cycle_length));
 
     for (igraph_integer_t i = 0; i < state->N; ++i) {
         // We want to remove the vertex with value s, not at position s.
@@ -424,12 +429,17 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  * \param graph The graph to search for
  * \param vertices The vertex IDs of each cycle will be stored here
  * \param edges The edge IDs of each cycle will be stored here
+ * \param max_cycle_length Limit the maximum length of cycles to search for. Negative for no limit.
  * \return Error code.
  */
 igraph_error_t
 igraph_simple_cycles_search_all(const igraph_t *graph,
                                 igraph_vector_int_list_t *v_result,
-                                igraph_vector_int_list_t *e_result) {
+                                igraph_vector_int_list_t *e_result,
+                                igraph_integer_t max_cycle_length) {
+    if (max_cycle_length == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     igraph_simple_cycle_search_state_t state;
 
@@ -441,7 +451,7 @@ igraph_simple_cycles_search_all(const igraph_t *graph,
     for (igraph_integer_t i = 0; i < state.N; i++) {
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_simple_cycles_search_from_one_vertex(
-                             &state, i, v_result, e_result));
+                             &state, i, v_result, e_result, max_cycle_length));
         }
     }
 

@@ -21,7 +21,7 @@
 #include "test_utilities.h"
 #include <stdlib.h>
 
-void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
+void check_cycles_max(const igraph_t *graph, igraph_integer_t expected, igraph_integer_t max_cycle_length) {
     igraph_vector_int_list_t results_v;
     igraph_vector_int_list_t results_e;
     igraph_integer_t i;
@@ -29,9 +29,9 @@ void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
     igraph_vector_int_list_init(&results_v, 0);
     igraph_vector_int_list_init(&results_e, 0);
 
-    igraph_simple_cycles_search_all(graph, &results_v, &results_e);
+    igraph_simple_cycles_search_all(graph, &results_v, &results_e, max_cycle_length);
 
-    printf("Finished search, found %" IGRAPH_PRId " cycles.\n\n", igraph_vector_int_list_size(&results_v));
+    printf("Finished search, found %" IGRAPH_PRId " cycles, expected %" IGRAPH_PRId ".\n\n", igraph_vector_int_list_size(&results_v), expected);
 
     if (igraph_vcount(graph) < 100) {
         printf("Vertex IDs in cycles:\n");
@@ -50,10 +50,16 @@ void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
         vertices = igraph_vector_int_list_get_ptr(&results_v, i);
         edges = igraph_vector_int_list_get_ptr(&results_e, i);
         IGRAPH_ASSERT(igraph_vector_int_size(vertices) == igraph_vector_int_size(edges));
+        if (max_cycle_length >= 0) {
+            IGRAPH_ASSERT(igraph_vector_int_size(vertices) <= max_cycle_length);
+        }
     }
 
     igraph_vector_int_list_destroy(&results_v);
     igraph_vector_int_list_destroy(&results_e);
+}
+void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
+    check_cycles_max(graph, expected, -1);
 }
 
 int main(void) {
@@ -109,26 +115,6 @@ int main(void) {
     igraph_destroy(&g_star_undirected);
     igraph_destroy(&g_ring_undirected);
 
-    /*
-     * This test is temporarily disabled until we sort out the issues with the
-     * smaller test cases
-     *
-    printf("\nTesting undirected wheel\n");
-    igraph_wheel(&g, 10, IGRAPH_WHEEL_UNDIRECTED, 0);
-    // call cycles finder, expect 65 cycles to be found (
-    // 1 cycle of 10 nodes,
-    // 10 cycles of 9 nodes,
-    // 9 cycles of 8 nodes,
-    // 9 cycles of 7 nodes,
-    // 9 cycles of 6 nodes,
-    // 9 cycles of 5 nodes,
-    // 9 cycles of 4 nodes
-    // 9 cycles of 3 nodes,
-    // )
-    check_cycles(&g, 65);
-    igraph_destroy(&g);
-    */
-
     igraph_t g_wheel_undirected_2;
     igraph_wheel(&g_wheel_undirected_2, 10, IGRAPH_WHEEL_UNDIRECTED, 0);
     printf("\nCreated undirected wheel\n");
@@ -143,6 +129,9 @@ int main(void) {
     // 9 cycles of 3 nodes,
     // )
     check_cycles(&g_wheel_undirected_2, 73);
+    // test the max_cycle_length parameter
+    check_cycles_max(&g_wheel_undirected_2, 9, 3);
+    check_cycles_max(&g_wheel_undirected_2, 18, 4);
     // clean up
     igraph_destroy(&g_wheel_undirected_2);
 
