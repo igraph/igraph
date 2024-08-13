@@ -5,29 +5,35 @@
 ]>
 
 <chapter id="igraph-Cycles">
-<title>Graph cycles</title>
+  <title>Graph cycles</title>
 
-<section><title>Finding cycles</title>
-<!-- doxrox-include igraph_find_cycle -->
-</section>
+  <section>
+    <title>Finding cycles</title>
+    <!-- doxrox-include igraph_find_cycle -->
+  </section>
 
-<section><title>Eulerian cycles and paths</title>
-<!-- doxrox-include about_eulerian -->
-<!-- doxrox-include igraph_is_eulerian -->
-<!-- doxrox-include igraph_eulerian_cycle -->
-<!-- doxrox-include igraph_eulerian_path -->
-</section>
+  <section>
+    <title>Eulerian cycles and paths</title>
+    <!-- doxrox-include about_eulerian -->
+    <!-- doxrox-include igraph_is_eulerian -->
+    <!-- doxrox-include igraph_eulerian_cycle -->
+    <!-- doxrox-include igraph_eulerian_path -->
+  </section>
 
-<section><title>Cycle bases</title>
-<!-- doxrox-include igraph_fundamental_cycles -->
-<!-- doxrox-include igraph_minimum_cycle_basis -->
-</section>
+  <section>
+    <title>Cycle bases</title>
+    <!-- doxrox-include igraph_fundamental_cycles -->
+    <!-- doxrox-include igraph_minimum_cycle_basis -->
+  </section>
 
-<section><title>Simple cycles</title>
-<!-- doxrox-include igraph_simple_cycle_search_state_init -->
-<!-- doxrox-include igraph_simple_cycle_search_state_destroy -->
-<!-- doxrox-include igraph_simple_cycles_search_all -->
-<!-- doxrox-include igraph_simple_cycles_search_from_one_vertex -->
-</section>
+  <section>
+    <title>Simple cycles</title>
+    <!-- doxrox-include igraph_simple_cycle_search_state_init -->
+    <!-- doxrox-include igraph_simple_cycle_search_state_destroy -->
+    <!-- doxrox-include igraph_simple_cycles_search_all -->
+    <!-- doxrox-include igraph_simple_cycles_search_callback -->
+    <!-- doxrox-include igraph_simple_cycles_search_from_one_vertex -->
+    <!-- doxrox-include igraph_simple_cycles_search_callback_from_one_vertex -->
+  </section>
 
 </chapter>

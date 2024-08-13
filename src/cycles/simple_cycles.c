@@ -73,8 +73,13 @@ struct igraph_simple_cycle_search_state_t {
   igraph_bool_t stop_search;
 };
 
+/**
+ * A struct to store one cycle found by the algorithm. 
+ */
 typedef struct {
+  /* the vertices in the cycle */
   igraph_vector_int_list_t *vertices;
+  /* the edges in the cycle */
   igraph_vector_int_list_t *edges;
 } igraph_i_simple_cycle_results_t;
 
@@ -84,7 +89,6 @@ typedef struct {
  * The implementation of procedure UNBLOCK from Johnson's paper
  *
  */
-
 static igraph_error_t
 igraph_i_simple_cycles_unblock(igraph_simple_cycle_search_state_t *state,
                                igraph_integer_t u) {
@@ -411,8 +415,10 @@ igraph_i_append_simple_cycle_result(const igraph_vector_int_t *vertices,
  * \param s The vertex index to start search with
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  * Negative for no limit.
- * \param cycle_handler The callback function to call when a cycle is found
+ * \param cycle_handler The callback function to call when a cycle is found.
+ * See \ref igraph_simple_cycle_handler_t() for details.
  * \param arg The additional argument(s) for the callback function
+ * 
  * \return Error code.
  *
  * @see https://en.wikipedia.org/wiki/Johnson%27s_algorithm
@@ -461,8 +467,12 @@ igraph_simple_cycles_search_callback_from_one_vertex(
  * \param vertices The vertex IDs of each cycle will be stored here
  * \param edges The edge IDs of each cycle will be stored here
  * \param max_cycle_length Limit the maximum length of cycles to search for.
- * Negative for no limit. \return Error code.
+ * Negative for no limit. 
+ * 
+ * \return Error code.
  *
+ * See also: \ref igraph_simple_cycles_search_callback_from_one_vertex()
+ * 
  * @see https://en.wikipedia.org/wiki/Johnson%27s_algorithm
  * @see https://stackoverflow.com/a/35922906/3909202
  * @see https://epubs.siam.org/doi/epdf/10.1137/0204007
@@ -488,7 +498,7 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
 
 /**
  * \function igraph_simple_cycles_search_callback
- * \brief Search all simple cycles
+ * \brief Search all simple cycles, use a callback function to handle found cycles
  *
  * \experimental
  *
@@ -499,11 +509,13 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  * SIAM J Comput 4(1):77-84.
  * https://epubs.siam.org/doi/10.1137/0204007
  *
+ * See also: \ref igraph_simple_cycles_search_callback()
  *
  * \param graph The graph to search for
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  * Negative for no limit. 
- * \param cycle_handler The callback function to call when a cycle is found
+ * \param cycle_handler The callback function to call when a cycle is found.
+ * See \ref igraph_simple_cycle_handler_t() for details.
  * \param arg The additional argument(s) for the callback function
  * 
  * \return Error code.
@@ -558,7 +570,9 @@ igraph_error_t igraph_simple_cycles_search_callback(
  * \param vertices The vertex IDs of each cycle will be stored here
  * \param edges The edge IDs of each cycle will be stored here
  * \param max_cycle_length Limit the maximum length of cycles to search for.
- * Negative for no limit. \return Error code.
+ * Negative for no limit. 
+ * 
+ * \return Error code.
  */
 igraph_error_t igraph_simple_cycles_search_all(
     const igraph_t *graph, igraph_vector_int_list_t *v_result,

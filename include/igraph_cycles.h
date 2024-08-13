@@ -32,7 +32,7 @@ IGRAPH_EXPORT void igraph_simple_cycle_search_state_destroy(
     igraph_simple_cycle_search_state_t *state);
 
 /**
- * \brief 
+ * \brief The interface for the callback function for when a cycle is found.
  * 
  * \param vertices The vertices of the current cycle.
  * \param edges The edges of the current cycle.
