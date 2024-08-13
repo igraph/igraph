@@ -840,7 +840,7 @@ igraph_feedback_arc_set:
     DEPS: result ON graph, weights ON graph
 
 igraph_feedback_vertex_set:
-    PARAMS: GRAPH graph, OUT EDGE_INDICES result, VERTEXWEIGHTS weights=NULL, FVS_ALGORITHM algo=EXACT_IP
+    PARAMS: GRAPH graph, OUT VERTEX_INDICES result, VERTEXWEIGHTS weights=NULL, FVS_ALGORITHM algo=EXACT_IP
     DEPS: result ON graph, weights ON graph
 
 igraph_is_loop:
