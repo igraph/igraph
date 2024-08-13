@@ -1,4 +1,4 @@
-
+version: ~> 1.0
 language: c
 cache: ccache
 os: linux
