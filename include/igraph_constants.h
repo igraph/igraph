@@ -184,6 +184,9 @@ typedef enum { IGRAPH_FAS_EXACT_IP = 0,
                IGRAPH_FAS_EXACT_IP_TI
              } igraph_fas_algorithm_t;
 
+typedef enum { IGRAPH_FVS_EXACT_IP = 0
+             } igraph_fvs_algorithm_t;
+
 typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
                IGRAPH_SUBGRAPH_COPY_AND_DELETE,
                IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH

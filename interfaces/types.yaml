@@ -339,6 +339,11 @@ FAS_ALGORITHM:
     CTYPE: igraph_fas_algorithm_t
     FLAGS: ENUM
 
+FVS_ALGORITHM:
+    # Enum representing feedback vertex set algorithms
+    CTYPE: igraph_fvs_algorithm_t
+    FLAGS: ENUM
+
 FWALGORITHM:
     # Enum that describes the variant of the Floyd-Warshall algorithm to use in
     # Floyd-Warshall graph distances computing function

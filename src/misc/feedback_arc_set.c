@@ -378,6 +378,55 @@ igraph_error_t igraph_feedback_arc_set(
 
 
 /**
+ * \function igraph_feedback_vertex_set
+ * \brief Feedback vertex set of a graph.
+ *
+ * \experimental
+ *
+ * A feedback vertex set is a set of vertices whose removal makes the graph
+ * acyclic. Finding a \em minimum feedback vertex set is an NP-complete
+ * problem, both on directed and undirected graphs.
+ *
+ * \param graph The graph.
+ * \param result An initialized vector, the result will be written here.
+ * \param vertex_weights Vertex weight vector or \c NULL if no weights are specified.
+ * \param algo Algorithm to use. Possible values:
+ *        \clist
+ *        \cli IGRAPH_FVS_EXACT_IP
+ *         Finds a \em miniumum feedback vertex set using integer programming
+ *         (IP). The complexity is of course at least exponential. Currently
+ *         this method uses an approach analogous to that of the
+ *         \c IGRAPH_FVS_EXACT_IP_CG algorithm of \ref  igraph_feedback_arc_set().
+ *        \endclist
+ *
+ * \return Error code.
+ *
+ * Time complexity: depends on \p algo, see the time complexities there.
+ */
+igraph_error_t igraph_feedback_vertex_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo) {
+
+    if (vertex_weights) {
+        if (igraph_vector_size(vertex_weights) != igraph_vcount(graph)) {
+            IGRAPH_ERROR("Vertex weight vector length must match the number of vertices.", IGRAPH_EINVAL);
+        }
+        if (! igraph_vector_is_all_finite(vertex_weights)) {
+            IGRAPH_ERROR("Vertex weights must not be infinite or NaN.", IGRAPH_EINVAL);
+        }
+    }
+
+    switch (algo) {
+    case IGRAPH_FVS_EXACT_IP:
+        return igraph_i_feedback_vertex_set_ip_cg(graph, result, vertex_weights);
+
+    default:
+        IGRAPH_ERROR("Invalid feedback vertex set algorithm.", IGRAPH_EINVAL);
+    }
+}
+
+
+/**
  * Solves the feedback arc set problem for undirected graphs.
  */
 igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_int_t *result,
@@ -932,29 +981,30 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
 
 
 /**
- * Incremental constraint generation based integer programming implementation.
+ * Incremental constraint generation based integer programming implementation
+ * for feedback arc set (FAS) and feedback vertex set (FVS).
  *
- * b_e are binary variables indicating the presence of edge e in the FAS.
- * w_e is the weight of edge e.
+ * b_i are binary variables indicating the presence of edge/vertex i in the
+ * FAS/FVS. w_i is the weight of edge/vertex i.
  *
  * We minimize
  *
- * sum_e w_e b_e
+ * sum_i w_i b_i
  *
  * subject to the constraints
  *
- * sum_e c^i_e b_e >= 1
+ * sum_i c^k_i b_i >= 1
  *
- * where c^i_e is a binary coefficient indicating if edge e is present in
- * directed cycle i.
+ * where c^k_i is a binary coefficient indicating if edge/vertex i is present
+ * in cycle k.
  *
  * While this must hold for all cycles (all cycles must be broken),
  * we generate cycles incrementally, re-solving the problem after
  * each step. New cycles are generated in such a way as to avoid
- * the feedback arc set from the previous solution step.
+ * the feedback set from the previous solution step.
  */
 
-#define VAR_TO_EID(j) ((j) - 1)
+#define VAR_TO_ID(j) ((j) - 1)
 
 /* Helper data structure for adding rows to GLPK problems.
  * ind[] and val[] use one-based indexing, in line with GLPK's convention.
@@ -1080,7 +1130,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
 
     glp_add_cols(ip, var_count);
     for (int j = 1; j <= var_count; j++) {
-        glp_set_obj_coef(ip, j, weights ? VECTOR(*weights)[ VAR_TO_EID(j) ] : 1);
+        glp_set_obj_coef(ip, j, weights ? VECTOR(*weights)[ VAR_TO_ID(j) ] : 1);
         glp_set_col_kind(ip, j, GLP_BV);
     }
 
@@ -1123,7 +1173,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
         igraph_bitset_null(&removed);
         for (int j=1; j <= var_count; j++) {
             if (glp_mip_col_val(ip, j) > 0) {
-                igraph_integer_t i = VAR_TO_EID(j);
+                igraph_integer_t i = VAR_TO_ID(j);
                 IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
                 IGRAPH_BIT_SET(removed, i);
             }
@@ -1141,4 +1191,134 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
 #endif
 }
 
-#undef VAR_TO_EID
+
+igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *vertex_weights) {
+#ifndef HAVE_GLPK
+    IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
+#else
+
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_bool_t is_acyclic;
+    igraph_bitset_t removed;
+    igraph_vector_int_t cycle;
+    igraph_vector_int_t incident;
+    glp_prob *ip;
+    glp_iocp parm;
+    rowdata_t rd;
+    int var_count;
+
+    /* Avoid starting up the IP machinery for acyclic graphs. */
+    IGRAPH_CHECK(igraph_is_acyclic(graph, &is_acyclic));
+
+    if (is_acyclic) {
+        igraph_vector_int_clear(result);
+        return IGRAPH_SUCCESS;
+    }
+
+    if (vcount > INT_MAX) {
+        IGRAPH_ERROR("Feedback vertex set problem too large for GLPK.", IGRAPH_EOVERFLOW);
+    }
+
+    var_count = (int) vcount;
+
+    IGRAPH_BITSET_INIT_FINALLY(&removed, ecount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&cycle, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incident, 0);
+    IGRAPH_CHECK(rowdata_init(&rd, 20));
+    IGRAPH_FINALLY(rowdata_destroy, &rd);
+
+    /* Configure GLPK */
+    IGRAPH_GLPK_SETUP();
+    glp_init_iocp(&parm);
+    parm.br_tech = GLP_BR_MFV;
+    parm.bt_tech = GLP_BT_BLB;
+    parm.pp_tech = GLP_PP_ALL;
+    parm.presolve = GLP_ON;
+    parm.cb_func = igraph_i_glpk_interruption_hook;
+
+    ip = glp_create_prob();
+    IGRAPH_FINALLY(igraph_i_glp_delete_prob, ip);
+
+    glp_set_obj_dir(ip, GLP_MIN);
+
+    glp_add_cols(ip, var_count);
+    for (int j = 1; j <= var_count; j++) {
+        glp_set_obj_coef(ip, j, vertex_weights ? VECTOR(*vertex_weights)[ VAR_TO_ID(j) ] : 1);
+        glp_set_col_kind(ip, j, GLP_BV);
+    }
+
+    while (true) {
+        int cycle_size, row;
+
+        IGRAPH_CHECK(igraph_i_find_cycle(graph, &cycle, NULL, NULL, IGRAPH_OUT, &removed));
+
+        cycle_size = (int) igraph_vector_int_size(&cycle);
+
+        if (cycle_size == 0) break; /* no more cycles, we're done */
+
+        IGRAPH_CHECK(rowdata_set(&rd, &cycle));
+
+        row = glp_add_rows(ip, 1);
+        glp_set_row_bnds(ip, row, GLP_LO, 1, 0);
+        glp_set_mat_row(ip, row, cycle_size, rd.ind, rd.val);
+
+        /* Add as many vertex-disjoint cycles at once as possible. */
+        while (true) {
+            for (int i=0; i < cycle_size; i++) {
+                IGRAPH_CHECK(igraph_incident(graph, &incident, VECTOR(cycle)[i], IGRAPH_ALL));
+                const igraph_integer_t incident_size = igraph_vector_int_size(&incident);
+                for (igraph_integer_t j = 0; j < incident_size; j++) {
+                    igraph_integer_t eid = VECTOR(incident)[j];
+                    IGRAPH_BIT_SET(removed, eid);
+                }
+            }
+            IGRAPH_CHECK(igraph_i_find_cycle(graph, &cycle, NULL, NULL, IGRAPH_OUT, &removed));
+
+            cycle_size = (int) igraph_vector_int_size(&cycle);
+            if (cycle_size == 0) break; /* no more vertex disjoint cycles */
+
+            IGRAPH_CHECK(rowdata_set(&rd, &cycle));
+
+            row = glp_add_rows(ip, 1);
+            glp_set_row_bnds(ip, row, GLP_LO, 1, 0);
+            glp_set_mat_row(ip, row, cycle_size, rd.ind, rd.val);
+        }
+
+        IGRAPH_GLPK_CHECK(glp_intopt(ip, &parm),
+                          "Feedback vertex set using IP with incremental cycle generation failed");
+
+        igraph_vector_int_clear(result);
+        igraph_bitset_null(&removed);
+
+        for (int j=1; j <= var_count; j++) {
+            if (glp_mip_col_val(ip, j) > 0) {
+                igraph_integer_t i = VAR_TO_ID(j);
+                IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
+
+                IGRAPH_CHECK(igraph_incident(graph, &incident, i, IGRAPH_ALL));
+
+                const igraph_integer_t incident_size = igraph_vector_int_size(&incident);
+                for (igraph_integer_t k = 0; k < incident_size; k++) {
+                    igraph_integer_t eid = VECTOR(incident)[k];
+                    IGRAPH_BIT_SET(removed, eid);
+                }
+            }
+        }
+    }
+
+    /* Clean up */
+    glp_delete_prob(ip);
+    rowdata_destroy(&rd);
+    igraph_vector_int_destroy(&cycle);
+    igraph_vector_int_destroy(&incident);
+    igraph_bitset_destroy(&removed);
+    IGRAPH_FINALLY_CLEAN(5);
+
+    return IGRAPH_SUCCESS;
+#endif
+}
+
+#undef VAR_TO_ID

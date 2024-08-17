@@ -839,6 +839,10 @@ igraph_feedback_arc_set:
     PARAMS: GRAPH graph, OUT EDGE_INDICES result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=APPROX_EADES
     DEPS: result ON graph, weights ON graph
 
+igraph_feedback_vertex_set:
+    PARAMS: GRAPH graph, OUT VERTEX_INDICES result, VERTEXWEIGHTS weights=NULL, FVS_ALGORITHM algo=EXACT_IP
+    DEPS: result ON graph, weights ON graph
+
 igraph_is_loop:
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGE_SELECTOR es=ALL
     DEPS: es ON graph
