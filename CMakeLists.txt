@@ -5,7 +5,7 @@
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 #  * cmake -E cat (3.18)
-cmake_minimum_required(VERSION 3.18...3.29)
+cmake_minimum_required(VERSION 3.18...3.30)
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
