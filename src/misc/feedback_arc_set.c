@@ -396,7 +396,7 @@ igraph_error_t igraph_feedback_arc_set(
  *         Finds a \em miniumum feedback vertex set using integer programming
  *         (IP). The complexity is of course at least exponential. Currently
  *         this method uses an approach analogous to that of the
- *         \c IGRAPH_FVS_EXACT_IP_CG algorithm of \ref  igraph_feedback_arc_set().
+ *         \c IGRAPH_FAS_EXACT_IP_CG algorithm of \ref  igraph_feedback_arc_set().
  *        \endclist
  *
  * \return Error code.
