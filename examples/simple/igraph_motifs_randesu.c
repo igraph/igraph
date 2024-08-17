@@ -14,15 +14,13 @@ int main(void) {
 
     igraph_t graph;
     igraph_vector_t hist;
-    igraph_real_t zeros[] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-    igraph_vector_t cut_prob;
 
     /* Compute the 4-motif distritbuion in Zachary's karate club network. */
 
     igraph_famous(&graph, "Zachary");
     igraph_vector_init(&hist, 0);
 
-    igraph_motifs_randesu(&graph, &hist, 4, igraph_vector_view(&cut_prob, zeros, 4));
+    igraph_motifs_randesu(&graph, &hist, 4, NULL);
 
     /* Compute the total number of motifs (connected 4-vertex subgraphs)
      * so that we can print the normalized distribution. */
@@ -47,7 +45,7 @@ int main(void) {
     /* Identify the vertices of each three-motif in a small Kautz graph. */
 
     igraph_kautz(&graph, 2, 1);
-    igraph_motifs_randesu_callback(&graph, 3, igraph_vector_view(&cut_prob, zeros, 3), &print_motif, NULL);
+    igraph_motifs_randesu_callback(&graph, 3, NULL, &print_motif, NULL);
     igraph_destroy(&graph);
 
     return 0;

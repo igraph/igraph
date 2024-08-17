@@ -16,6 +16,7 @@
 ### Changed
 
  - `igraph_feedback_arc_set()` uses a much faster method for solving the exact minimum feedback arc set problem. The new method (`IGRAPH_FAS_EXACT_IP_CG`) is used by default (i.e. with `IGRAPH_FAS_EXACT_IP`), but the previous method is also kept available (`IGRAPH_FAS_EXACT_IP_TI`).
+ - `igraph_motifs_randesu()`, `igraph_motifs_randesu_callback()`, `igraph_motifs_randesu_estimate()` and `igraph_motifs_randesu_no()` now accept `NULL` for their `cut_prob` parameter, signifying that a complete search should be performed.
 
 ### Fixed
 
