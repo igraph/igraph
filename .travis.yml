@@ -76,17 +76,17 @@ jobs:
         - mkdir build && cd build
         - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=OFF -DIGRAPH_USE_INTERNAL_LAPACK=OFF -DIGRAPH_USE_INTERNAL_ARPACK=OFF -DIGRAPH_USE_INTERNAL_GLPK=OFF -DIGRAPH_USE_INTERNAL_GMP=OFF -DIGRAPH_VERIFY_FINALLY_STACK=OFF -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON -DUSE_SANITIZER=Address
 
-    # - name: "Linux ppc64"
-    #   os: linux
-    #   arch: ppc64le
+    - name: "Linux ppc64"
+      os: linux
+      arch: ppc64le
 
-    # - name: "Linux s390x"
-    #   os: linux
-    #   arch: s390x
-    #   # Do not enable ASan, as it leads to linking errors.
-    #   before_script:
-    #     - mkdir build && cd build
-    #     - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON
+    - name: "Linux s390x"
+      os: linux
+      arch: s390x
+      # Do not enable ASan, as it leads to linking errors.
+      before_script:
+        - mkdir build && cd build
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON
 
 #notifications:
 #  email:
