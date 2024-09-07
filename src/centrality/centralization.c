@@ -168,15 +168,15 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>mode</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p mode argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>mode</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p mode
  * arguments are considered.
  *
  * </para><para>
@@ -187,11 +187,11 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
+ *     \p graph argument is not a null pointer.
  * \param mode Constant, whether the calculation is based on in-degree
- *     (<code>IGRAPH_IN</code>), out-degree (<code>IGRAPH_OUT</code>)
- *     or total degree (<code>IGRAPH_ALL</code>). This is ignored if
- *     the <code>graph</code> argument is not a null pointer and the
+ *     (\c IGRAPH_IN), out-degree (\c IGRAPH_OUT)
+ *     or total degree (\c IGRAPH_ALL). This is ignored if
+ *     the \p graph argument is not a null pointer and the
  *     given graph is undirected.
  * \param loops Boolean scalar, whether to consider loop edges in the
  *     calculation.
@@ -324,15 +324,15 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>directed</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p directed argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>directed</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p directed
  * arguments are considered.
  *
  * </para><para>
@@ -341,10 +341,10 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
+ *     \p graph argument is not a null pointer.
  * \param directed Boolean scalar, whether to use directed paths in
  *     the betweenness calculation. This argument is ignored if
- *     <code>graph</code> is not a null pointer and it is undirected.
+ *     \p graph is not a null pointer and it is undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
  *
@@ -455,27 +455,28 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>mode</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p mode argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>mode</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p mode
  * arguments are considered.
  *
  * </para><para>
  * The most centralized structure is the star.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
- * \param mode Constant, specifies what kinf of distances to consider
- *     to calculate closeness. See the <code>mode</code> argument of
+ *     \p graph argument is not a null pointer.
+ * \param mode Constant, specifies what kind of distances to consider
+ *     to calculate closeness. See the \p mode argument of
  *     \ref igraph_closeness() for details. This argument is ignored
- *     if <code>graph</code> is not a null pointer and it is
+ *     if \p graph is not a null pointer and it is
  *     undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
@@ -604,27 +605,28 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>directed</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p directed argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>directed</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p directed
  * arguments are considered.
  *
  * </para><para>
  * The most centralized directed structure is the in-star. The most
  * centralized undirected structure is the graph with a single edge.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
+ *     \p graph argument is not a null pointer.
  * \param directed Boolean scalar, whether to consider edge
  *     directions. This argument is ignored if
- *     <code>graph</code> is not a null pointer and it is undirected.
+ *     \p graph is not a null pointer and it is undirected.
  * \param scale Whether to rescale the node-level centrality scores to
  *     have a maximum of one.
  * \param res Pointer to a real variable, the result is stored here.
