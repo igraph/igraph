@@ -29,14 +29,10 @@ void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
 
 int main(void) {
     igraph_t g_0, g_1, g_50_full, g_4_3_1;
-    igraph_vector_t cut_prob_0_3;
-    igraph_vector_t cut_prob_0_4;
     igraph_vector_t cut_prob_01;
     igraph_vector_int_t parsample;
     igraph_integer_t estimate;
 
-    igraph_vector_init_real(&cut_prob_0_3, 3, 0.0, 0.0, 0.0);
-    igraph_vector_init_real(&cut_prob_0_4, 4, 0.0, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
     igraph_vector_int_init_range(&parsample, 0, 41);
 
@@ -48,47 +44,45 @@ int main(void) {
     igraph_small(&g_4_3_1, 4, 0, 0,1, 1,2, 2,0, -1);
 
     printf("No vertices:\n");
-    call_and_print(&g_0, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 1, /*parsample*/ NULL);
+    call_and_print(&g_0, /*size*/ 3, NULL, /*sample_size*/ 1, /*parsample*/ NULL);
 
     printf("One vertex:\n");
-    call_and_print(&g_1, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 1, /*parsample*/ NULL);
+    call_and_print(&g_1, /*size*/ 3, NULL, /*sample_size*/ 1, /*parsample*/ NULL);
 
     printf("Full graph of 50 vertices, motif size 3, sample all, (50 choose 3 = 19600):\n");
-    call_and_print(&g_50_full, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 50, /*parsample*/ NULL);
+    call_and_print(&g_50_full, /*size*/ 3, NULL, /*sample_size*/ 50, /*parsample*/ NULL);
 
     printf("Full graph of 50 vertices, motif size 3, sample all, cut_prob 0.1 at each level:\n");
     call_and_print(&g_50_full, /*size*/ 3, &cut_prob_01, /*sample_size*/ 50, /*parsample*/ NULL);
 
     printf("Full graph of 50 vertices, motif size 3, sample 20:\n");
-    call_and_print(&g_50_full, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 20, /*parsample*/ NULL);
+    call_and_print(&g_50_full, /*size*/ 3, NULL, /*sample_size*/ 20, /*parsample*/ NULL);
 
     printf("Full graph of 50 vertices, motif size 3, sample first 40:\n");
-    call_and_print(&g_50_full, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 0, &parsample);
+    call_and_print(&g_50_full, /*size*/ 3, NULL, /*sample_size*/ 0, &parsample);
 
     printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300):\n");
-    call_and_print(&g_50_full, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 20, /*parsample*/ NULL);
+    call_and_print(&g_50_full, /*size*/ 4, NULL, /*sample_size*/ 20, /*parsample*/ NULL);
 
     printf("Triangle and a vertex, motif size 4, sample all:\n");
-    call_and_print(&g_4_3_1, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 4, /*parsample*/ NULL);
+    call_and_print(&g_4_3_1, /*size*/ 4, NULL, /*sample_size*/ 4, /*parsample*/ NULL);
 
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Cut prob too short.\n");
-    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 14, &cut_prob_0_3, /*sample_size*/ 4, /*parsample*/ NULL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 14, &cut_prob_01, /*sample_size*/ 4, /*parsample*/ NULL) == IGRAPH_EINVAL);
 
     printf("Too many samples.\n");
-    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 40, /*parsample*/ NULL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, NULL, /*sample_size*/ 40, /*parsample*/ NULL) == IGRAPH_EINVAL);
 
     printf("Too many parsamples.\n");
-    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 4, /*parsample*/ &parsample) == IGRAPH_EINVVID);
+    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, NULL, /*sample_size*/ 4, /*parsample*/ &parsample) == IGRAPH_EINVVID);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
     igraph_destroy(&g_50_full);
     igraph_destroy(&g_4_3_1);
-    igraph_vector_destroy(&cut_prob_0_3);
-    igraph_vector_destroy(&cut_prob_0_4);
     igraph_vector_destroy(&cut_prob_01);
     igraph_vector_int_destroy(&parsample);
 

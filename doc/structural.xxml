@@ -220,6 +220,7 @@
 <!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
 <!-- doxrox-include igraph_feedback_arc_set -->
+<!-- doxrox-include igraph_feedback_vertex_set -->
 </section>
 
 <section id="maximum-cardinality-search-chordal-graphs"><title>Maximum cardinality search and chordal graphs</title>

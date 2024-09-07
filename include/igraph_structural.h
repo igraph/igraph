@@ -127,8 +127,13 @@ IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
-                                          const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
