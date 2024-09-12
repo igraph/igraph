@@ -144,11 +144,14 @@ igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
  *
  * </para><para>
  * It is simply the (normalized) Shannon entropy of the
- * incident edges' weights. D(i)=H(i)/log(k[i]), and
- * H(i) = -sum(p[i,j] log(p[i,j]), j=1..k[i]),
- * where p[i,j]=w[i,j]/sum(w[i,l], l=1..k[i]),  k[i] is the (total)
- * degree of vertex i, and w[i,j] is the weight of the edge(s) between
- * vertex i and j. The diversity of isolated vertices will be NaN
+ * incident edges' weights.
+ * <code>D(i) = H(i) / log(k[i])</code>,
+ * and
+ * <code>H(i) = -sum(p[i,j] log(p[i,j]), j=1..k[i])</code>,
+ * where <code>p[i,j] = w[i,j] / sum(w[i,l], l=1..k[i])</code>,
+ * <code>k[i]</code> is the (total) degree of vertex \c i,
+ * and <code>w[i,j]</code> is the weight of the edge(s) between
+ * vertex \c i and \c j. The diversity of isolated vertices will be NaN
  * (not-a-number), while that of vertices with a single connection
  * will be zero.
  *

@@ -210,7 +210,7 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
                                       igraph_bool_t loops,
                                       igraph_real_t *res) {
 
-    igraph_bool_t directed = mode != IGRAPH_ALL;
+    igraph_bool_t directed = (mode != IGRAPH_ALL);
     igraph_real_t real_nodes;
 
     if (graph) {
@@ -476,8 +476,7 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
  * \param mode Constant, specifies what kind of distances to consider
  *     to calculate closeness. See the \p mode argument of
  *     \ref igraph_closeness() for details. This argument is ignored
- *     if \p graph is not a null pointer and it is
- *     undirected.
+ *     if \p graph is not a null pointer and it is undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
  *
