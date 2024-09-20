@@ -31,6 +31,7 @@
  - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
  - The documented `igraph_strvector_resize_min()` was missing from headers.
  - `igraph_feedback_arc_set()` now validates the edge weights.
+ - `igraph_layout_lgl()` was not working correctly since igraph 0.10.0 due to a poor choice of initial coordinates. This is now fixed.
 
 ### Deprecated
 
