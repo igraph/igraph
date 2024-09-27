@@ -198,6 +198,7 @@ add_library(
   io/graphdb.c
   io/leda.c
   io/lgl.c
+  io/nauty.c
   io/ncol.c
   io/pajek.c
   io/parse_utils.c
