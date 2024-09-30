@@ -17,6 +17,7 @@
 
  - `igraph_feedback_arc_set()` uses a much faster method for solving the exact minimum feedback arc set problem. The new method (`IGRAPH_FAS_EXACT_IP_CG`) is used by default (i.e. with `IGRAPH_FAS_EXACT_IP`), but the previous method is also kept available (`IGRAPH_FAS_EXACT_IP_TI`).
  - `igraph_motifs_randesu()`, `igraph_motifs_randesu_callback()`, `igraph_motifs_randesu_estimate()` and `igraph_motifs_randesu_no()` now accept `NULL` for their `cut_prob` parameter, signifying that a complete search should be performed.
+ - `igraph_centralization_eigenvector_centrality_tmax()` and `igraph_centralization_eigenvector_centrality()` cannot produce meaningful results without normalizing vertex-level eigenvector centrality in a well-defined way. This was not the case when using `scale=false`. These functions now ignore the value of the `scale` parameter and always scale vertex-level centrality scores to have a maximum of 1. If you require a different type of normalization for the vertex-level eigenvector centrality scores, perform this normalization manually, and call `igraph_centralization()` to compute the centralization.
 
 ### Fixed
 
@@ -30,6 +31,7 @@
  - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
  - The documented `igraph_strvector_resize_min()` was missing from headers.
  - `igraph_feedback_arc_set()` now validates the edge weights.
+ - `igraph_layout_lgl()` was not working correctly since igraph 0.10.0 due to a poor choice of initial coordinates. This is now fixed.
 
 ### Deprecated
 

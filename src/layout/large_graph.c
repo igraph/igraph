@@ -187,7 +187,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     /* Place the vertices randomly */
     IGRAPH_CHECK(igraph_layout_random(graph, res));
-    igraph_matrix_scale(res, 1e6);
+    igraph_matrix_scale(res, sqrt(area / M_PI));
 
     /* This is the grid for calculating the vertices near to a given vertex */
     IGRAPH_CHECK(igraph_2dgrid_init(&grid, res,
@@ -231,7 +231,13 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_integer_t par = VECTOR(parents)[vid];
 
             if (par < 0) {
-                /* this is either the root vertex or an unreachable node */
+                if (par == -1) {
+                    /* this is either the root vertex ... */
+                    MATRIX(*res, vid, 0) = 0;
+                    MATRIX(*res, vid, 1) = 0;
+                } else {
+                    /* ... or an unreachable node */
+                }
                 continue;
             }
 

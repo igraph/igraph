@@ -719,7 +719,8 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
  * and |E| is the number of edges in the graph. The timing decreases with smaller
  * cutoffs in a way that depends on the graph structure.
  *
- * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
+ * \sa \ref igraph_harmonic_centrality() to calculate the exact harmonic centrality.
+ * Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
  */
 
 igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
