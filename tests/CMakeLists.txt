@@ -352,6 +352,7 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_simple_cycles
   igraph_similarity
   igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
