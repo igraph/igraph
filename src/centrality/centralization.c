@@ -223,6 +223,15 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
     if (graph) {
         directed = igraph_is_directed(graph);
         nodes = igraph_vcount(graph);
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
     }
 
     real_nodes = nodes;    /* implicit cast to igraph_real_t */
@@ -370,6 +379,15 @@ igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
     if (graph) {
         directed = directed && igraph_is_directed(graph);
         nodes = igraph_vcount(graph);
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
     }
 
     real_nodes = nodes;    /* implicit cast to igraph_real_t */
@@ -504,6 +522,15 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
         if (!igraph_is_directed(graph)) {
             mode = IGRAPH_ALL;
         }
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
     }
 
     real_nodes = nodes;    /* implicit cast to igraph_real_t */
@@ -697,6 +724,20 @@ igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     if (graph) {
         nodes = igraph_vcount(graph);
         directed = directed && igraph_is_directed(graph);
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    if (nodes == 1) {
+        *res = 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (directed) {
