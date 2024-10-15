@@ -508,16 +508,17 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * Eigenvector centrality is meaningful only for (strongly) connected graphs.
  * Undirected graphs that are not connected should be decomposed into connected
  * components, and the eigenvector centrality calculated for each separately.
+ * The scores between components will not be comparable.
  * This function does not verify that the graph is connected. If it is not,
  * in the undirected case the scores of all but one component will be zeros.
  *
  * </para><para>
  * Also note that the adjacency matrix of a directed acyclic graph or the
  * adjacency matrix of an empty graph does not possess positive eigenvalues,
- * therefore the eigenvector centrality is not defined for these graphs.
- * igraph will return an eigenvalue of zero in such cases. The eigenvector
- * centralities will all be equal for an empty graph and will all be zeros
- * for a directed acyclic graph. Such pathological cases can be detected
+ * therefore the eigenvector centrality is not meaningful for these graphs.
+ * igraph will return an eigenvalue of zero in such cases. The returned
+ * eigenvector centralities will all be equal for vertices with zero out-degree,
+ * and zeros for other vertices. Such pathological cases can be detected
  * by asking igraph to calculate the eigenvalue as well (using the \p value
  * parameter, see below) and checking whether the eigenvalue is very close
  * to zero.
