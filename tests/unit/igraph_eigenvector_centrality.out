@@ -43,9 +43,14 @@ Eigenvalue: 2
 Eigenvector:
 1 0.5 0.5 0.5 0.5
 
-Directed star graph with weights:
+Directed out-star graph with weights:
 Eigenvalue: 0
 Eigenvector:
-0 0 0 0 0
+0 1 1 1 1
+
+Directed in-star graph with weights:
+Eigenvalue: 0
+Eigenvector:
+1 0 0 0 0
 
 Check handling of wrong number of weights.
