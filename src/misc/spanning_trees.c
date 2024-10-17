@@ -33,6 +33,12 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
 static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     const igraph_t *graph, igraph_vector_int_t *result, const igraph_vector_t *weights);
 
+typedef enum {
+  IGRAPH_MST_UNWEIGHTED,
+  IGRAPH_MST_PRIM,
+  IGRAPH_MST_KRUSKAL
+} igraph_mst_algorithm_t;
+
 /**
  * \ingroup structural
  * \function igraph_minimum_spanning_tree
@@ -66,21 +72,35 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
  * for the weighted case. |V| is the number of vertices, |E| the
  * number of edges in the graph.
  *
- * \sa \ref igraph_minimum_spanning_tree_unweighted() and
- *     \ref igraph_minimum_spanning_tree_prim() if you only need the
- *     tree as a separate graph object.
+ * \sa \ref igraph_minimum_spanning_tree_unweighted() for unweighted graphs,
+ *     \ref igraph_minimum_spanning_tree_prim() for weighted graphs, and
+ *     \ref igraph_random_spanning_tree_kruskal() for weighted graphs.
  *
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
-igraph_error_t igraph_minimum_spanning_tree(
-    const igraph_t *graph, igraph_vector_int_t *res, const igraph_vector_t *weights
-) {
-    if (weights == NULL) {
-        IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, res));
-    } else {
+
+igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph,
+                                            igraph_vector_int_t *res,
+                                            const igraph_vector_t *weights,
+                                            igraph_mst_algorithm_t algorithm) {
+  if (weights == NULL) {
+    // Use the unweighted MST algorithm if no weights are provided
+    IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, res));
+  } else {
+    // Select the appropriate algorithm based on the parameter
+    switch (algorithm) {
+      case IGRAPH_MST_PRIM:
         IGRAPH_CHECK(igraph_i_minimum_spanning_tree_prim(graph, res, weights));
+        break;
+      case IGRAPH_MST_KRUSKAL:
+        IGRAPH_CHECK(
+            igraph_i_minimum_spanning_tree_kruskal(graph, res, weights));
+        break;
+      default:
+        return IGRAPH_EINVAL;  // Invalid algorithm specified
     }
-    return IGRAPH_SUCCESS;
+  }
+  return IGRAPH_SUCCESS;
 }
 
 /**
@@ -351,6 +371,194 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     return IGRAPH_SUCCESS;
 }
 
+typedef struct {
+  igraph_vector_int_t parent;
+  igraph_vector_int_t rank;
+} igraph_union_find_t;
+
+// Initialize Union-Find structure
+static igraph_error_t igraph_union_find_init(igraph_union_find_t *uf,
+                                             igraph_integer_t n) {
+  IGRAPH_CHECK(igraph_vector_int_init(&uf->parent, n));
+  IGRAPH_CHECK(igraph_vector_int_init(&uf->rank, n));
+  for (igraph_integer_t i = 0; i < n; i++) {
+    VECTOR(uf->parent)[i] = i;  // each node is its own parent initially
+    VECTOR(uf->rank)[i] = 0;    // rank is initially zero
+  }
+  return IGRAPH_SUCCESS;
+}
+
+// Find the root of the set containing element i with path compression
+static igraph_integer_t igraph_union_find_find(igraph_union_find_t *uf,
+                                               igraph_integer_t i) {
+  if (VECTOR(uf->parent)[i] != i) {
+    VECTOR(uf->parent)
+    [i] =
+        igraph_union_find_find(uf, VECTOR(uf->parent)[i]);  // path compression
+  }
+  return VECTOR(uf->parent)[i];
+}
+
+// Union of two sets containing elements x and y, by rank
+static void igraph_union_find_union(igraph_union_find_t *uf, igraph_integer_t x,
+                                    igraph_integer_t y) {
+  igraph_integer_t root_x = igraph_union_find_find(uf, x);
+  igraph_integer_t root_y = igraph_union_find_find(uf, y);
+
+  if (root_x != root_y) {
+    // Union by rank
+    if (VECTOR(uf->rank)[root_x] > VECTOR(uf->rank)[root_y]) {
+      VECTOR(uf->parent)[root_y] = root_x;
+    } else if (VECTOR(uf->rank)[root_x] < VECTOR(uf->rank)[root_y]) {
+      VECTOR(uf->parent)[root_x] = root_y;
+    } else {
+      VECTOR(uf->parent)[root_y] = root_x;
+      VECTOR(uf->rank)[root_x]++;
+    }
+  }
+}
+
+// Destroy Union-Find structure
+static void igraph_union_find_destroy(igraph_union_find_t *uf) {
+  igraph_vector_int_destroy(&uf->parent);
+  igraph_vector_int_destroy(&uf->rank);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_minimum_spanning_tree_kruskal
+ * \brief Calculates one minimum spanning tree of a weighted graph.
+ *
+ * \deprecated-by igraph_minimum_spanning_tree 0.10.14
+ *
+ * Finds a spanning tree or spanning forest for which the sum of edge
+ * weights is the smallest. This function uses Kruskal's method for carrying
+ * out the computation.
+ *
+ * </para><para>
+ * Directed graphs are considered as undirected for this computation.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Kruskal, J.B.: On the shortest spanning subtree of a graph and the traveling
+ * salesman problem, American Mathematical Society
+ * https://doi.org/10.1090/S0002-9939-1956-0078686-7
+ *
+ * \param graph The graph object. Edge directions will be ignored.
+ * \param mst The result of the computation, a graph object containing
+ *        the minimum spanning tree of the graph.
+ *        Do \em not initialize this object before passing it to
+ *        this function, but be sure to call \ref igraph_destroy() on it if
+ *        you don't need it any more.
+ * \param weights A vector containing the weights of the edges
+ *        in the same order as the simple edge iterator visits them
+ *        (i.e. in increasing order of edge IDs).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory.
+ *         \c IGRAPH_EINVAL, length of weight vector does not
+ *           match number of edges.
+ *
+ * Time complexity: O(|E| log |V|),
+ * |V| is the number of vertices,
+ * |E| the number of edges in the
+ * graph.
+ *
+ * \sa \ref igraph_minimum_spanning_tree_unweighted() for unweighted graphs,
+ *     \ref igraph_minimum_spanning_tree() if you need the IDs of the
+ *     edges that constitute the spanning tree.
+ *
+ * \example examples/simple/igraph_minimum_spanning_tree.c
+ */
+
+igraph_error_t igraph_minimum_spanning_tree_kruskal(
+    const igraph_t *graph, igraph_t *mst, const igraph_vector_t *weights) {
+  igraph_vector_int_t edges;
+
+  IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, igraph_vcount(graph) - 1);
+  IGRAPH_CHECK(igraph_i_minimum_spanning_tree_kruskal(graph, &edges, weights));
+  IGRAPH_CHECK(igraph_subgraph_from_edges(graph, mst, igraph_ess_vector(&edges),
+                                          /* delete_vertices = */ false));
+  igraph_vector_int_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
+    const igraph_t *graph, igraph_vector_int_t *res,
+    const igraph_vector_t *weights) {
+  igraph_integer_t no_of_edges = igraph_ecount(graph);
+  igraph_integer_t no_of_nodes = igraph_vcount(graph);
+
+  // Edge list and corresponding weights
+  igraph_vector_t sorted_edges;
+  IGRAPH_VECTOR_INIT_FINALLY(&sorted_edges, no_of_edges);
+
+  igraph_vector_int_clear(res);
+
+  if (weights == NULL || igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid or missing weight vector", IGRAPH_EINVAL);
+  }
+
+  // Pair edges with their weights
+  typedef struct {
+    igraph_integer_t edge_id;
+    igraph_real_t weight;
+  } edge_weight_t;
+
+  edge_weight_t *edge_weight_pairs =
+      (edge_weight_t *)malloc(no_of_edges * sizeof(edge_weight_t));
+  if (!edge_weight_pairs) {
+    IGRAPH_ERROR("Cannot allocate memory for edge-weight pairs.",
+                 IGRAPH_ENOMEM);
+  }
+
+  for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    edge_weight_pairs[i].edge_id = i;
+    edge_weight_pairs[i].weight = VECTOR(*weights)[i];
+  }
+
+  // Sort edges by weight (non-decreasing)
+  qsort(edge_weight_pairs, no_of_edges, sizeof(edge_weight_t),
+        [](const void *a, const void *b) {
+          edge_weight_t *ea = (edge_weight_t *)a;
+          edge_weight_t *eb = (edge_weight_t *)b;
+          return (ea->weight < eb->weight)   ? -1
+                 : (ea->weight > eb->weight) ? 1
+                                             : 0;
+        });
+
+  // Initialize Union-Find data structure
+  igraph_union_find_t uf;
+  IGRAPH_CHECK(igraph_union_find_init(&uf, no_of_nodes));
+  IGRAPH_FINALLY(igraph_union_find_destroy, &uf);
+
+  // Kruskal's algorithm: add edges without creating cycles
+  for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    igraph_integer_t edge = edge_weight_pairs[i].edge_id;
+    igraph_integer_t from = IGRAPH_FROM(graph, edge);
+    igraph_integer_t to = IGRAPH_TO(graph, edge);
+
+    if (igraph_union_find_find(&uf, from) != igraph_union_find_find(&uf, to)) {
+      igraph_vector_int_push_back(res, edge);  // Add edge to result
+      igraph_union_find_union(&uf, from,
+                              to);  // Union the sets of the two vertices
+    }
+
+    // Stop if we already have (V-1) edges in the MST
+    if (igraph_vector_int_size(res) == no_of_nodes - 1) {
+      break;
+    }
+  }
+
+  free(edge_weight_pairs);
+  igraph_union_find_destroy(&uf);
+  IGRAPH_FINALLY_CLEAN(2);  // Clean up both uf and sorted_edges
+
+  return IGRAPH_SUCCESS;
+}
 
 /* igraph_random_spanning_tree */
 
