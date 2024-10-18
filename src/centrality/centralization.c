@@ -558,12 +558,12 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * a natural scale. As with any eigenvector, their interpretation is
  * invariant to scaling by a constant factor. However, due to how
  * graph-level \em centralization is defined, its value depends on the
- * specific scale/normalization used for vertex-level scores. This is
- * true even when the graph-level centralization itself is normalized
- * by its theoretical maximum value. This function makes the specific
- * choice of scaling vertex-level centrality scores by their maximum
- * (i.e. it uses the ∞-norm). Other normalization choices, such as the
- * 1-norm or 2-norm are not currently implemented.
+ * specific scale/normalization used for vertex-level scores. Which of
+ * two graphs will have a higher eigenvector \em centralization depends
+ * on the choice of normalization for centralities. This function makes
+ * the specific choice of scaling vertex-level centrality scores by their
+ * maximum (i.e. it uses the ∞-norm). Other normalization choices, such
+ * as the 1-norm or 2-norm are not currently implemented.
  *
  * \param graph The input graph.
  * \param vector A vector if you need the node-level eigenvector
@@ -671,20 +671,25 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  * arguments are considered.
  *
  * </para><para>
- * The most centralized directed structure is the in-star. The most
- * centralized undirected structure is the graph with a single edge.
+ * The most centralized directed structure is assumed to bethe in-star.
+ * The most centralized undirected structure is assumed to be the graph
+ * with a single edge. igraph continues to implement these choices for
+ * historical reason. Keep in mind that neither of these two structures
+ * is connected, which makes their use debatable in the context of
+ * eigenvector centrality calculations. Eigenvector centrality is not
+ * uniquely defined for disconnected structures.
  *
  * </para><para>
  * Note that vertex-level eigenvector centrality scores do not have
  * a natural scale. As with any eigenvector, their interpretation is
  * invariant to scaling by a constant factor. However, due to how
  * graph-level \em centralization is defined, its value depends on the
- * specific scale/normalization used for vertex-level scores. This is
- * true even when the graph-level centralization itself is normalized
- * by its theoretical maximum value. This function makes the specific
- * choice of scaling vertex-level centrality scores by their maximum
- * (i.e. it uses the ∞-norm). Other normalization choices, such as the
- * 1-norm or 2-norm are not currently implemented.
+ * specific scale/normalization used for vertex-level scores. Moreover,
+ * which of two graphs will have a higher eigenvector \em centralization
+ * also depends on the choice of normalization for centralities. This
+ * function makes the specific choice of scaling vertex-level centrality
+ * scores by their maximum (i.e. it uses the ∞-norm). Other normalization
+ * choices, such as the 1-norm or 2-norm are not currently implemented.
  *
  * \param graph A graph object or a null pointer, see the description
  *     above.
