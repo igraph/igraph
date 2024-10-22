@@ -318,6 +318,7 @@ int main(void) {
     check_cycles_max(&g, 0, 3);
     check_cycles_max(&g, 1, 4);
     check_cycles_max(&g, 2, 5);
+    igraph_destroy(&g);
 
     ////////////////////////////////
 
