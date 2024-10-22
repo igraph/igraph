@@ -152,6 +152,7 @@ igraph_i_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state,
   igraph_integer_t E = -1; // edge start
 
   igraph_bool_t local_found = false;
+  igraph_bool_t loop_length_stop = false;
 
   // keep track of what we were doing (rather than recursing)
   igraph_stack_int_t neigh_iteration_progress;
@@ -192,6 +193,7 @@ igraph_i_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state,
       E = igraph_stack_int_pop(&e_stack);
     }
     recurse_deeper = false;
+    loop_length_stop = false;
 
     // L1
     neighbors = igraph_adjlist_get(&state->AK, V);
@@ -248,6 +250,8 @@ igraph_i_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state,
           V = W;
           E = WE;
           break;
+        } else {
+          loop_length_stop = true;
         }
       } else {
         // printf("Vertex %" IGRAPH_PRId ", neighbour of %" IGRAPH_PRId
@@ -258,7 +262,7 @@ igraph_i_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state,
 
     if (!recurse_deeper) {
       // L2
-      if (local_found) {
+      if (local_found || loop_length_stop) {
         // IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, V));
         IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, V));
       } else {

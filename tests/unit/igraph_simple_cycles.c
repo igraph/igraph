@@ -145,16 +145,17 @@ int main(void) {
      * 4--3/
      *
      */
-    // printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
-    // igraph_small(&g, 5, IGRAPH_DIRECTED,
-    //              1, 2,
-    //              2, 3,
-    //              2, 3,
-    //              3, 4,
-    //              4, 1,
-    //              -1);
-    // check_cycles(&g, 2);
-    // igraph_destroy(&g);
+    printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
+    igraph_small(&g, 5, IGRAPH_DIRECTED,
+                 1, 2,
+                 2, 3,
+                 2, 3,
+                 3, 4,
+                 4, 1,
+                 -1);
+    check_cycles(&g, 2);
+    check_cycles_max(&g, 2, 4);
+    igraph_destroy(&g);
 
     // same, but undirected
     printf("\nTesting undirected graph with a cycle of length 4 and a multi-edge\n");
@@ -166,6 +167,7 @@ int main(void) {
                  4, 1,
                  -1);
     check_cycles(&g, 3);
+    check_cycles_max(&g, 3, 4);
     igraph_destroy(&g);
 
     // check that self-loops are handled
@@ -300,6 +302,22 @@ int main(void) {
                  -1);
     check_cycles(&g, 18 + 43 + 78 + 96 + 60);
     igraph_destroy(&g);
+
+
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2428987492
+    igraph_small(&g, 5, IGRAPH_DIRECTED,
+        0, 1,
+        1, 2,
+        2, 3,
+        3, 0,
+        1, 4,
+        4, 2,
+    -1);
+    check_cycles(&g, 2);
+    check_cycles_max(&g, 0, 3);
+    check_cycles_max(&g, 1, 4);
+    check_cycles_max(&g, 2, 5);
 
     ////////////////////////////////
 
