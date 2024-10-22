@@ -600,6 +600,12 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
         sample_size = igraph_vector_int_size(sample);
     }
 
+    if (sample_size <= 0) {
+        IGRAPH_ERRORF("The number of vertices to use as a sample for motif count "
+                     "estimation must be at least one, got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, sample_size);
+    }
+
     *est = 0;
 
     RNG_BEGIN();
