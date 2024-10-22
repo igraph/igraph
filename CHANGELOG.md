@@ -36,6 +36,7 @@
  - `igraph_centralization_degree_tmax()`, `igraph_centralization_betweenness_tmax()`, `igraph_centralization_closeness_tmax()`, and `igraph_centralization_eigenvector_centrality_tmax()` now validate their `nodes` parameter.
  - `igraph_centralization_degree_tmax()`, `igraph_centralization_betweenness_tmax()`, `igraph_centralization_closeness_tmax()`, and `igraph_centralization_eigenvector_centrality_tmax()` now return NaN for zero-vertex graphs. Previously they would return invalid values.
  - `igraph_centralization_eigenvector_centrality_tmax()` now returns 0 for the undirected singleton graph. Previous it would return an invalid value.
+ - `igraph_motifs_randesu_estimate()` now validates the sample size.
 
 ### Deprecated
 
