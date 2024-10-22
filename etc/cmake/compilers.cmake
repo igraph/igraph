@@ -54,7 +54,7 @@ macro(use_all_warnings TARGET_NAME)
     )
   else()
     # Notes:
-    # GCC does not complain when encountering an unsupported "no"-prefixed wanring option such as -Wno-foo.
+    # GCC does not complain when encountering an unsupported "no"-prefixed warning option such as -Wno-foo.
     # Clang does complain, but these complaints can be silenced with -Wno-unknown-warning-option.
     # Therefore it is generally safe to use -Wno-... options that are only supported by recent GCC/Clang.
     target_compile_options(${TARGET_NAME} PRIVATE
