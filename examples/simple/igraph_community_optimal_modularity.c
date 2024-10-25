@@ -69,37 +69,48 @@ int main(void) {
     igraph_set_error_handler(&igraph_error_handler_printignore);
 
     /* Zachary karate club, unweighted */
-    retval = igraph_community_optimal_modularity(&graph, &modularity,
-             &membership, 0);
+    retval = igraph_community_optimal_modularity(&graph, NULL, 1, &modularity, &membership);
     if (retval == IGRAPH_UNIMPLEMENTED) {
         return 77;
     }
     if (fabs(modularity - 0.4197896) > 0.0000001) {
         return 2;
     }
+
     /* Zachary karate club, weighted */
     prepare_weights_vector(&weights, &graph);
-    igraph_community_optimal_modularity(&graph, &modularity,
-                                        &membership, &weights);
+    igraph_community_optimal_modularity(&graph, &weights, 1, &modularity, &membership);
     if (fabs(modularity - 0.5115767) > 0.0000001) {
+        return 3;
+    }
+
+    /* Zachary karate club, unweighted, resolution=2 */
+    igraph_community_optimal_modularity(&graph, NULL, 2, &modularity, &membership);
+    if (fabs(modularity - 0.1645299) > 0.0000001) {
         return 4;
     }
+
+    /* Zachary karate club, weighted, resolution=2 */
+    igraph_community_optimal_modularity(&graph, &weights, 2, &modularity, &membership);
+    if (fabs(modularity - 0.2671622) > 0.0000001) {
+        return 5;
+    }
+
     igraph_destroy(&graph);
 
     /* simple graph with loop edges, unweighted */
     igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0, 0, 0, 2, 2, -1);
-    igraph_community_optimal_modularity(&graph, &modularity,
-                                        &membership, 0);
+    igraph_community_optimal_modularity(&graph, NULL, 1, &modularity,
+                                        &membership);
     if (fabs(modularity - 0.28125) > 0.00001) {
-        return 3;
+        return 6;
     }
     /* simple graph with loop edges, weighted */
     prepare_weights_vector(&weights, &graph);
-    igraph_community_optimal_modularity(&graph, &modularity,
-                                        &membership, &weights);
+    igraph_community_optimal_modularity(&graph, &weights, 1, &modularity, &membership);
     if (fabs(modularity - 0.36686) > 0.00001) {
-        return 5;
+        return 7;
     }
     igraph_destroy(&graph);
 

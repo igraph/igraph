@@ -1707,8 +1707,8 @@ igraph_community_multilevel:
 
 igraph_community_optimal_modularity:
     PARAMS: |-
-        GRAPH graph, OUT REAL modularity, OPTIONAL OUT VECTOR_INT membership,
-        OPTIONAL EDGE_WEIGHTS weights
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, REAL resolution=1.0,
+        OPTIONAL OUT REAL modularity, OPTIONAL OUT VECTOR_INT membership
     DEPS: weights ON graph
 
 igraph_community_leiden:
