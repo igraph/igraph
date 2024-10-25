@@ -230,6 +230,141 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
 }
 
 
+/**
+ * \function igraph_is_potentially_connected
+ * \brief Is there a connected graph with the given graphical degree sequence?
+ *
+ * This function determines if there is a connected graph with a given graphical
+ * degree sequence. While it is safe to pass any sequence of non-negative integers
+ * as input, the result will only be meaningful if the sequence was graphical.
+ * This can be checked using \ref igraph_is_graphical().
+ *
+ * \param out_degrees A vector of integers specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees A vector of integers specifying the in-degree sequence for
+ *     directed graphs. For undirected graphs, it must be \c NULL.
+ * \param allowed_edge_types The types of edges to allow in the graph:
+ *     \clist
+ *     \cli IGRAPH_SIMPLE_SW
+ *       simple graphs (i.e. no self-loops or multi-edges allowed).
+ *     \cli IGRAPH_LOOPS_SW
+ *       single self-loops are allowed, but not multi-edges.
+ *     \cli IGRAPH_MULTI_SW
+ *       multi-edges are allowed, but not self-loops.
+ *     \cli IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW
+ *       both self-loops and multi-edges are allowed.
+ *     \endclist
+ * \param mode Can be \c IGRAPH_WEAK or \c IGRAPH_STRONG. Controls checking
+ *     for a weakly or strongly connected realization of the degrees.
+ *     Ignored in the undirected case.
+ * \param res Pointer to a Boolean. The result will be stored here.
+ *
+ * \return Error code.
+ */
+igraph_error_t igraph_is_potentially_connected(
+        const igraph_vector_int_t *out_degrees,
+        const igraph_vector_int_t *in_degrees,
+        const igraph_edge_type_sw_t allowed_edge_types,
+        igraph_connectedness_t mode,
+        igraph_bool_t *res) {
+
+    const igraph_bool_t directed = in_degrees != NULL;
+    const igraph_integer_t n = igraph_vector_int_size(out_degrees);
+    igraph_integer_t m;
+    igraph_integer_t min_d = IGRAPH_INTEGER_MAX;
+    igraph_integer_t min_outd = IGRAPH_INTEGER_MAX, min_ind = IGRAPH_INTEGER_MAX;
+
+    if (! directed) {
+        mode = IGRAPH_WEAK;
+    }
+
+    if (directed) {
+        igraph_integer_t outdegsum = 0, indegsum = 0;
+
+        for (igraph_integer_t i=0; i < n; i++) {
+            const igraph_integer_t outd = VECTOR(*out_degrees)[i];
+            const igraph_integer_t ind =  VECTOR(*in_degrees)[i];
+            if (outd < 0) {
+                IGRAPH_ERROR("Out-degrees must not be negative.", IGRAPH_EINVAL);
+            }
+            if (ind < 0) {
+                IGRAPH_ERROR("In-degrees must not be negative.", IGRAPH_EINVAL);
+            }
+            outdegsum += outd; indegsum += ind;
+            if (outd < min_outd) min_outd = outd;
+            if (ind < min_ind) min_ind = ind;
+            if (outd + ind < min_d) min_d = outd + ind;
+        }
+        if (outdegsum != indegsum) {
+            /* Not graphical */
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+        m = outdegsum;
+    }
+    else /* undirected */ {
+        igraph_integer_t degsum = 0;
+
+        for (igraph_integer_t i=0; i < n; i++) {
+            const igraph_integer_t d = VECTOR(*out_degrees)[i];
+            if (d < 0) {
+                IGRAPH_ERROR("Degrees must not be negative.", IGRAPH_EINVAL);
+            }
+            degsum += d;
+            if (d < min_d) min_d = d;
+        }
+        if (degsum % 2 == 1) {
+            /* Not graphical */
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+        m = degsum / 2;
+    }
+
+    /* The null graph is disconnected. */
+    if (n == 0) {
+        *res = false;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* The singleton graph is connected, regardless of its degree. */
+    if (n == 1) {
+        *res = true;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* From here on, we assume n >= 2 */
+
+    if (mode == IGRAPH_WEAK) {
+
+        /* Special case: Undirected graph, multi-edges disallowed, self-loops allowed.
+         * The degree sequence (2, 2) has only a disconnected realization (a self loop
+         * on each vertex), even though its edge count is larger than that of a tree.
+         */
+        if (n == 2 && !directed && !(allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW)) {
+            if (VECTOR(*out_degrees)[0] == 2) {
+                *res = false;
+                return IGRAPH_SUCCESS;
+            }
+        }
+
+        *res = min_d > 0 && m >= n-1;
+        return IGRAPH_SUCCESS;
+    } else {
+        if (min_outd == 0 || min_ind ==0) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        } else {
+            if (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) {
+                *res = true;
+                return IGRAPH_SUCCESS;
+            } else {
+                // TODO
+            }
+        }
+    }
+}
+
 /***** Undirected case *****/
 
 /* Undirected graph with multi-self-loops:
