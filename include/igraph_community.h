@@ -53,9 +53,10 @@ IGRAPH_EXPORT igraph_error_t igraph_trussness(
 /* TODO:  */
 
 IGRAPH_EXPORT igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
-                                                      igraph_real_t *modularity,
-                                                      igraph_vector_int_t *membership,
-                                                      const igraph_vector_t *weights);
+                                                                 const igraph_vector_t *weights,
+                                                                 const igraph_real_t resolution,
+                                                                 igraph_real_t *modularity,
+                                                                 igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                              const igraph_vector_t *weights,

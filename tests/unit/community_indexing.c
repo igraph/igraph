@@ -71,7 +71,7 @@ int main(void) {
     igraph_grg_game(&graph, 20, 0.5, false, NULL, NULL);
 
     handler = igraph_set_error_handler(&igraph_error_handler_ignore);
-    ret = igraph_community_optimal_modularity(&graph, NULL, &membership, NULL);
+    ret = igraph_community_optimal_modularity(&graph, NULL, 1, NULL, &membership);
     igraph_set_error_handler(handler);
     if (ret != IGRAPH_UNIMPLEMENTED) { /* Test only when GLPK is available */
         IGRAPH_ASSERT(ret == IGRAPH_SUCCESS);

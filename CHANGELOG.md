@@ -43,6 +43,7 @@
  - `igraph_get_all_simple_paths()` returns its results in an integer vector list (`igraph_vector_int_list_t`) instead of a single integer vector.
  - `igraph_get_all_simple_paths()` now has an additional parameter that allows restricting paths by minimum length as well.
  - `igraph_strvector_print()` no longer takes a file parameter. Use `igraph_strvector_fprint()` to print to a file.
+ - `igraph_community_optimal_modularity()` now takes a `resolution` parameter and its `weight` parameter was moved to the second place.
 
 ### Added
 
