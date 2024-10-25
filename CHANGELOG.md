@@ -47,9 +47,9 @@
 ### Added
 
  - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
- - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges
- - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges
- - `igraph_weighted_biadjacency()` created a weighted graph from a bipartite adjacency matrix.
+ - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges.
+ - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges.
+ - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
  - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
  - `igraph_strvector_fprint()` prints a string vector to a file.
@@ -65,7 +65,7 @@
  - `igraph_hub_and_authority_scores()` now warns when a large fraction of centrality scores are zero, as this indicates a non-unique solution, and thus the returned result may not be meaningful.
  - `igraph_hub_and_authority_scores()` now warns when providing an undirected graph as input, and falls back to the equivalent eigenvector centrality computation.
  - `igraph_get_stochastic_sparse()` no longer throws an error when some row or column sums are zero. This brings its behaviour in line with `igraph_get_stochastic()`.
- - `igraph_vector_append()`, `igraph_strvector_append()` and `igraph_vector_ptr_append()` now use a different allocation strategy: if the `to` vector has insufficient capacity, they doubles its capacity. Previously they reserved precisely as much capacity as needed for appending the `from` vector.
+ - `igraph_vector_append()`, `igraph_strvector_append()` and `igraph_vector_ptr_append()` now use a different allocation strategy: if the `to` vector has insufficient capacity, they double its capacity. Previously they reserved precisely as much capacity as needed for appending the `from` vector.
 
 ### Fixed
 
