@@ -56,7 +56,7 @@
  * graphs. Graphs with up to fifty vertices should be fine, graphs
  * with a couple of hundred vertices might be possible.
  *
- * \param graph The input graph. It is always treated as undirected.
+ * \param graph The input graph. It may be undirected or directed.
  * \param modularity Pointer to a real number, or a null pointer.
  *        If it is not a null pointer, then a optimal modularity value
  *        is returned here.
