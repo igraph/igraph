@@ -47,7 +47,7 @@
  *    igraph_layout_umap_compute_weights.
  * 3. Compute a layout for the graph, using its associated weights as edge
  *    weights. This step is exposed via igraph_layout_umap and its 3D counterpart.
- *    These two fuctions can also compute steps 2 and 3 in one go, since that's the
+ *    These two functions can also compute steps 2 and 3 in one go, since that's the
  *    most common use case: the argument "distances_are_weights" should be
  *    set to false.
  *
