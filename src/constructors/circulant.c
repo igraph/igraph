@@ -41,9 +41,10 @@
  * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_generalized_petersen(), \ref igraph_extended_chordal_ring()
+ * \sa \ref igraph_ring(), \ref igraph_generalized_petersen(),
+ * \ref igraph_extended_chordal_ring(), \ref igraph_lcf()
  *
- * Time complexity: O(|V||shifts|), the number of vertices in the graph times the number
+ * Time complexity: O(|V| |shifts|), the number of vertices in the graph times the number
  * of shifts.
  */
 
