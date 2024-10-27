@@ -625,7 +625,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  *    want to limit the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. For example, supplying 2 here ignored isolated vertices.
+ *    vector. For example, supplying 2 here ignores isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *

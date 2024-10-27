@@ -200,7 +200,7 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  *     or total degree (\c IGRAPH_ALL). This is ignored if
  *     the \p graph argument is not a null pointer and the
  *     given graph is undirected.
- * \param loops Boolean scalar, whether to consider loop edges in the
+ * \param loops Boolean, whether to consider loop edges in the
  *     calculation.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
@@ -358,7 +358,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  *     above.
  * \param nodes The number of nodes. This is ignored if the
  *     \p graph argument is not a null pointer.
- * \param directed Boolean scalar, whether to use directed paths in
+ * \param directed Boolean, whether to use directed paths in
  *     the betweenness calculation. This argument is ignored if
  *     \p graph is not a null pointer and it is undirected.
  * \param res Pointer to a real variable, the result is stored here.
@@ -695,7 +695,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  *     above.
  * \param nodes The number of nodes. This is ignored if the
  *     \p graph argument is not a null pointer.
- * \param directed Boolean scalar, whether to consider edge
+ * \param directed Boolean, whether to consider edge
  *     directions. This argument is ignored if
  *     \p graph is not a null pointer and it is undirected.
  * \param scale This parameter is deprecated and ignored since igraph 0.10.14.

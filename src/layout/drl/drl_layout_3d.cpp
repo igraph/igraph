@@ -68,7 +68,7 @@ using namespace drl3d;
  * </para><para> This function uses a modified DrL generator that does
  * the layout in three dimensions.
  * \param graph The input graph.
- * \param use_seed Logical scalar, if true, then the coordinates
+ * \param use_seed Boolean, if true, then the coordinates
  *    supplied in the \p res argument are used as starting points.
  * \param res Pointer to a matrix, the result layout is stored
  *    here. It will be resized as needed.

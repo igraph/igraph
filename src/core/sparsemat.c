@@ -933,9 +933,9 @@ igraph_error_t igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
  *
  * \param A The first input matrix, in column-compressed format.
  * \param B The second input matrix, in column-compressed format.
- * \param alpha Real scalar, \p A is multiplied by \p alpha before the
+ * \param alpha Real value, \p A is multiplied by \p alpha before the
  *    addition.
- * \param beta Real scalar, \p B is multiplied by \p beta before the
+ * \param beta Real value, \p B is multiplied by \p beta before the
  *    addition.
  * \param res Pointer to an uninitialized sparse matrix, the result
  *    is stored here.
@@ -1291,8 +1291,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
  * \param graph Pointer to an uninitialized igraph_t object, the
  *    graphs is stored here.
  * \param A The input matrix, in triplet or column-compressed format.
- * \param directed Boolean scalar, whether to create a directed
- *    graph.
+ * \param directed Whether to create a directed graph.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -2104,9 +2103,9 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
  * \param res An uninitialized sparse matrix, the result is stored
  *    here.
  * \param mat The dense input matrix.
- * \param tol Real scalar, the tolerance. Values closer than \p tol to
- *    zero are considered as zero, and will not be included in the
- *    sparse matrix.
+ * \param tol The tolerance for zero comparisons. Values closer than
+ *    \p tol to zero are considered as zero, and will not be included
+ *    in the sparse matrix.
  * \return Error code.
  *
  * \sa \ref igraph_sparsemat_as_matrix() for the reverse conversion.
@@ -2358,10 +2357,10 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  * \function igraph_sparsemat_count_nonzerotol
  * \brief Counts nonzero elements of a sparse matrix, ignoring elements close to zero.
  *
- * Count the number of matrix entries that are closer to zero than \p
- * tol.
+ * Count the number of matrix entries that are closer to zero than \p tol.
+ *
  * \param The input matrix, column-compressed.
- * \param Real scalar, the tolerance.
+ * \param The tolerance for zero comparisons.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -2850,7 +2849,8 @@ igraph_error_t igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
  * \function igraph_sparsemat_scale
  * \brief Scales a sparse matrix.
  *
- * Multiplies all elements of a sparse matrix, by the given scalar.
+ * Multiplies all elements of a sparse matrix, by the given factor.
+ *
  * \param A The input matrix.
  * \param by The scaling factor.
  * \return Error code.

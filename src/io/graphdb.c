@@ -81,7 +81,7 @@ static igraph_error_t handle_input_error(FILE *instream) {
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read from. It should be opened
  *    in binary mode.
- * \param directed Logical scalar, whether to create a directed graph.
+ * \param directed Whether to create a directed graph.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the

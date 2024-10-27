@@ -600,7 +600,7 @@ igraph_error_t igraph_i_strength_all(
  * \param mode Gives whether to count only outgoing (\c IGRAPH_OUT),
  *   incoming (\c IGRAPH_IN) edges or both (\c IGRAPH_ALL).
  *   This parameter is ignored for undirected graphs.
- * \param loops A logical scalar, whether to count loop edges as well.
+ * \param loops Boolean, whether to count loop edges as well.
  * \param weights A vector giving the edge weights. If this is a \c NULL
  *   pointer, then \ref igraph_degree() is called to perform the
  *   calculation.

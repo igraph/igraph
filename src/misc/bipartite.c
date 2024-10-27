@@ -540,8 +540,7 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
  * \param edges Vector giving the edges of the graph. The highest
  *   vertex ID in this vector must be smaller than the length of the
  *   \p types vector.
- * \param directed Boolean scalar, whether to create a directed
- *   graph.
+ * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
