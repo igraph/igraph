@@ -640,13 +640,18 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                      igraph_connectedness_t mode,
                      igraph_integer_t maxcompno, igraph_integer_t minelements) {
-    if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
-    } else if (mode == IGRAPH_STRONG) {
-        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_WEAK;
     }
 
-    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
+    switch (mode) {
+    case IGRAPH_WEAK:
+        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
+    case IGRAPH_STRONG:
+        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    default:
+        IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
