@@ -573,8 +573,6 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * \param mode How to consider edge directions in directed graphs.
  *     See \ref igraph_eigenvector_centrality() for details. Ignored
  *     for directed graphs.
- * \param scale This parameter is deprecated and ignored since igraph 0.10.14.
- *     Vertex-level centrality scores are always scaled to have a maximum of one.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices) parameter and
@@ -674,8 +672,6 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  *     See \ref igraph_eigenvector_centrality() for details. This argument
  *     is ignored if \p graph is not a null pointer and it is
  *     undirected.
- * \param scale Whether to rescale the node-level centrality scores to
- *     have a maximum of one.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
  *
