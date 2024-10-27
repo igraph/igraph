@@ -169,7 +169,7 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
  *      A * X = B  or  A' * X = B
  * with a general N-by-N matrix A using the LU factorization
  * computed by \ref igraph_lapack_dgetrf.
- * \param transpose Logical scalar, whether to transpose the input
+ * \param transpose Boolean, whether to transpose the input
  *      matrix.
  * \param a A matrix containing the L and U factors from the
  *      factorization A = P*L*U. L is expected to be unitriangular,
@@ -748,8 +748,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Users' Guide. Note that the eigenvectors obtained for the balanced
  * matrix are backtransformed to those of \p A.
  *
- * \param balance Scalar that indicated, whether the input matrix
- *   should be balanced. Possible values:
+ * \param balance Indicates whether the input matrix should be balanced.
+ *   Possible values:
  *   \clist
  *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_NONE
  *          no not diagonally scale or permute.
@@ -765,13 +765,13 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *          both diagonally scale and permute A.
  *   \endclist
  * \param A The input matrix, must be square.
- * \param valuesreal An initialized vector, or a NULL pointer. If not
- *   a NULL pointer, then the real parts of the eigenvalues are stored
+ * \param valuesreal An initialized vector, or a \c NULL pointer. If not
+ *   a \c NULL pointer, then the real parts of the eigenvalues are stored
  *   here. The vector will be resized, as needed.
- * \param valuesimag An initialized vector, or a NULL pointer. If not
- *   a NULL pointer, then the imaginary parts of the eigenvalues are stored
+ * \param valuesimag An initialized vector, or a \c NULL pointer. If not
+ *   a \c NULL pointer, then the imaginary parts of the eigenvalues are stored
  *   here. The vector will be resized, as needed.
- * \param vectorsleft An initialized matrix or a NULL pointer. If not
+ * \param vectorsleft An initialized matrix or a \c NULL pointer. If not
  *   a null pointer, then the left eigenvectors are stored here. The
  *   order corresponds to the eigenvalues and the eigenvectors are
  *   stored in a compressed form. If the j-th eigenvalue is real then
@@ -779,7 +779,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
  *   and (j+1)-th columns contain the real and imaginary parts of the
  *   corresponding eigenvectors.
- * \param vectorsright An initialized matrix or a NULL pointer. If not
+ * \param vectorsright An initialized matrix or a \c NULL pointer. If not
  *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo

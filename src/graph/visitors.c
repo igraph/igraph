@@ -56,7 +56,7 @@
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param unreachable Logical scalar, whether the search should visit
+ * \param unreachable Boolean, whether the search should visit
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
@@ -442,7 +442,7 @@ igraph_error_t igraph_bfs_simple(
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param unreachable Logical scalar, whether the search should visit
+ * \param unreachable Boolean, whether the search should visit
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
