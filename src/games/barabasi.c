@@ -482,7 +482,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * \param m The number of outgoing edges generated for each
  *        vertex. Only used when \p outseq is \c NULL.
  * \param outseq Gives the (out-)degrees of the vertices. If this is
- *        constant, this can be a \c NULL pointer or an empty vector.
+ *        constant, this can be a \c NULL pointer.
  *        In this case \p m contains the constant out-degree.
  *        The very first vertex has by definition no outgoing edges,
  *        so the first number in this vector is ignored.
@@ -547,10 +547,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t start_nodes = start_from ? igraph_vcount(start_from) : 0;
     igraph_integer_t newn = start_from ? n - start_nodes : n;
 
-    /* Fix obscure parameterizations */
-    if (outseq && igraph_vector_int_empty(outseq)) {
-        outseq = NULL;
-    }
+    /* In undirected graphs, always consider the total degree. */
     if (!directed) {
         outpref = true;
     }
@@ -570,7 +567,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     if (!outseq && m < 0) {
         IGRAPH_ERROR("Number of edges added per step must not be negative.", IGRAPH_EINVAL);
     }
-    if (outseq && igraph_vector_int_min(outseq) < 0) {
+    if (outseq && newn > 0 && igraph_vector_int_min(outseq) < 0) {
         IGRAPH_ERROR("Negative out-degree in sequence.", IGRAPH_EINVAL);
     }
     if (!outpref && A <= 0) {
