@@ -73,12 +73,11 @@ static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
  *
  * \param old_graph The original graph, it must be simple.
  * \param new_graph The new graph will be stored here.
- * \param corr A scalar in the unit interval [0,1], the target Pearson
+ * \param corr A value in the unit interval [0,1], the target Pearson
  *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
- * \param p A numeric scalar, the probability of an edge between two
- *        vertices, it must in the open (0,1) interval. Typically,
- *        the density of \p old_graph.
+ * \param p The probability of an edge between two vertices. It must in the
+ *        open (0,1) interval. Typically, the density of \p old_graph.
  * \param permutation A permutation to apply to the vertices of the
  *        generated graph. It can also be a null pointer, in which case
  *        the vertices will not be permuted.

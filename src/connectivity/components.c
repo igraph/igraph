@@ -625,7 +625,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  *    want to limit the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. For example, supplying 2 here ignored isolated vertices.
+ *    vector. For example, supplying 2 here ignores isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *
@@ -640,13 +640,18 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                      igraph_connectedness_t mode,
                      igraph_integer_t maxcompno, igraph_integer_t minelements) {
-    if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
-    } else if (mode == IGRAPH_STRONG) {
-        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_WEAK;
     }
 
-    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
+    switch (mode) {
+    case IGRAPH_WEAK:
+        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
+    case IGRAPH_STRONG:
+        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    default:
+        IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
