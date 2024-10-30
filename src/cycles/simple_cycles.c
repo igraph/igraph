@@ -193,7 +193,6 @@ igraph_i_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state,
       E = igraph_stack_int_pop(&e_stack);
     }
     recurse_deeper = false;
-    loop_length_stop = false;
 
     // L1
     neighbors = igraph_adjlist_get(&state->AK, V);

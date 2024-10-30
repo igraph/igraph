@@ -31,7 +31,10 @@ void check_cycles_max(const igraph_t *graph, igraph_integer_t expected, igraph_i
 
     igraph_simple_cycles_search_all(graph, &results_v, &results_e, max_cycle_length);
 
-    printf("Finished search, found %" IGRAPH_PRId " cycles, expected %" IGRAPH_PRId ".\n\n", igraph_vector_int_list_size(&results_v), expected);
+    printf("Finished search, found %" IGRAPH_PRId
+           " cycles, expected %" IGRAPH_PRId " of maximal %" IGRAPH_PRId
+           " vertices.\n\n",
+           igraph_vector_int_list_size(&results_v), expected, max_cycle_length);
 
     if (igraph_vcount(graph) < 100) {
         printf("Vertex IDs in cycles:\n");
@@ -321,7 +324,7 @@ int main(void) {
     igraph_destroy(&g);
 
     ////////////////////////////////
-
+    printf("\nTesting directed graph of type 'stable boat'\n");
     igraph_small(&g, 5, IGRAPH_DIRECTED,
          0, 2,
          0, 3,
@@ -332,30 +335,35 @@ int main(void) {
          4, 1,
          4, 3,
         -1);
+    check_cycles(&g, 4);
     check_cycles_max(&g, 1, 2);
     check_cycles_max(&g, 2, 3);
     check_cycles_max(&g, 3, 4);
     igraph_destroy(&g);
 
+    printf("\nTesting directed graph of type 'stable letter'\n");
     igraph_small(&g, 5, IGRAPH_DIRECTED,
                  0, 2, 0, 3, 1, 2, 1, 4, 2, 3, 2, 4, 3, 1, 4, 0, 4, 2,
                  -1);
-    check_cycles_max(&g, 1, 0);
-    check_cycles_max(&g, 2, 1);
+    check_cycles(&g, 7);
+    check_cycles_max(&g, 0, 1);
+    check_cycles_max(&g, 1, 2);
     check_cycles_max(&g, 3, 3);
-    check_cycles_max(&g, 5, 5);
-    check_cycles_max(&g, 5, 7);
+    check_cycles_max(&g, 5, 4);
+    check_cycles_max(&g, 7, 5);
     igraph_destroy(&g);
 
+    printf("\nTesting directed graph of type 'double square'\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED,
                  0, 2, 0, 4, 1, 3, 2, 5, 3, 0, 4, 1, 5, 4,
                  -1);
-    check_cycles_max(&g, 1, 0);
-    check_cycles_max(&g, 2, 0);
-    check_cycles_max(&g, 3, 0);
-    check_cycles_max(&g, 5, 1);
-    check_cycles_max(&g, 5, 1);
-    check_cycles_max(&g, 6, 2);
+    check_cycles(&g, 2);
+    check_cycles_max(&g, 0, 1);
+    check_cycles_max(&g, 0, 2);
+    check_cycles_max(&g, 0, 3);
+    check_cycles_max(&g, 1, 4);
+    check_cycles_max(&g, 1, 5);
+    check_cycles_max(&g, 2, 6);
     igraph_destroy(&g);
 
     // clean up test
