@@ -313,7 +313,7 @@ int main(void) {
         3, 0,
         1, 4,
         4, 2,
-    -1);
+        -1);
     check_cycles(&g, 2);
     check_cycles_max(&g, 0, 3);
     check_cycles_max(&g, 1, 4);
@@ -321,6 +321,42 @@ int main(void) {
     igraph_destroy(&g);
 
     ////////////////////////////////
+
+    igraph_small(&g, 5, IGRAPH_DIRECTED,
+         0, 2,
+         0, 3,
+         0, 4,
+         1, 0,
+         2, 3,
+         3, 4,
+         4, 1,
+         4, 3,
+        -1);
+    check_cycles_max(&g, 1, 2);
+    check_cycles_max(&g, 2, 3);
+    check_cycles_max(&g, 3, 4);
+    igraph_destroy(&g);
+
+    igraph_small(&g, 5, IGRAPH_DIRECTED,
+                 0, 2, 0, 3, 1, 2, 1, 4, 2, 3, 2, 4, 3, 1, 4, 0, 4, 2,
+                 -1);
+    check_cycles_max(&g, 1, 0);
+    check_cycles_max(&g, 2, 1);
+    check_cycles_max(&g, 3, 3);
+    check_cycles_max(&g, 5, 5);
+    check_cycles_max(&g, 5, 7);
+    igraph_destroy(&g);
+
+    igraph_small(&g, 6, IGRAPH_DIRECTED,
+                 0, 2, 0, 4, 1, 3, 2, 5, 3, 0, 4, 1, 5, 4,
+                 -1);
+    check_cycles_max(&g, 1, 0);
+    check_cycles_max(&g, 2, 0);
+    check_cycles_max(&g, 3, 0);
+    check_cycles_max(&g, 5, 1);
+    check_cycles_max(&g, 5, 1);
+    check_cycles_max(&g, 6, 2);
+    igraph_destroy(&g);
 
     // clean up test
     VERIFY_FINALLY_STACK();
