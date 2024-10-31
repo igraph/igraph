@@ -2272,7 +2272,7 @@ igraph_isomorphic_vf2:
 igraph_count_isomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
-        VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
+        OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
         OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
@@ -2283,8 +2283,8 @@ igraph_count_isomorphisms_vf2:
 igraph_get_isomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
-        VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
-        EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
+        OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
+        OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OUT VECTOR_INT_LIST maps, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
@@ -2322,8 +2322,8 @@ igraph_get_subisomorphisms_vf2_callback:
 igraph_count_subisomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
-        VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
-        EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
+        OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
+        OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
@@ -2333,8 +2333,8 @@ igraph_count_subisomorphisms_vf2:
 igraph_get_subisomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
-        VERTEX_COLOR vertex_color1, VERTEX_COLOR vertex_color2,
-        EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
+        OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
+        OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OUT VECTOR_INT_LIST maps, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
