@@ -122,7 +122,7 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
         }
     }
 
-    if (types != 0) {
+    if (types) {
         /* Matched vertices must be of different types */
         for (i = 0; i < no_of_nodes; i++) {
             j = VECTOR(*matching)[i];
@@ -180,7 +180,7 @@ igraph_error_t igraph_is_maximal_matching(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    valid = 1;
+    valid = true;
     for (i = 0; i < no_of_nodes; i++) {
         j = VECTOR(*matching)[i];
         if (j != -1) {
@@ -192,9 +192,9 @@ igraph_error_t igraph_is_maximal_matching(const igraph_t *graph,
         n = igraph_vector_int_size(&neis);
         for (j = 0; j < n; j++) {
             if (VECTOR(*matching)[VECTOR(neis)[j]] == -1) {
-                if (types == 0 ||
+                if (types == NULL ||
                     VECTOR(*types)[i] != VECTOR(*types)[VECTOR(neis)[j]]) {
-                    valid = 0; break;
+                    valid = false; break;
                 }
             }
         }
