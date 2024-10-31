@@ -2273,7 +2273,7 @@ igraph_count_isomorphisms_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
-        EDGE_COLOR edge_color1, EDGE_COLOR edge_color2,
+        OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
         ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
     DEPS: |-
