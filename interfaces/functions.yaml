@@ -1225,7 +1225,7 @@ igraph_get_biadjacency:
     DEPS: types ON graph
 
 igraph_is_bipartite:
-    PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT BIPARTITE_TYPES type
+    PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT BIPARTITE_TYPES types
 
 igraph_bipartite_game_gnp:
     PARAMS: |-
