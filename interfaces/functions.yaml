@@ -522,13 +522,13 @@ igraph_get_all_shortest_paths:
 igraph_distances_dijkstra:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        VERTEX_SELECTOR to=ALL, OPTIONAL EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_dijkstra_cutoff:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT, REAL cutoff=-1
+        VERTEX_SELECTOR to=ALL, OPTIONAL EDGEWEIGHTS weights, NEIMODE mode=OUT, REAL cutoff=-1
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_shortest_paths_dijkstra:
@@ -557,7 +557,7 @@ igraph_get_all_shortest_paths_dijkstra:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
-        VERTEX from, VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights,
+        VERTEX from, VERTEX_SELECTOR to=ALL, OPTIONAL EDGEWEIGHTS weights,
         NEIMODE mode=OUT
     DEPS: |-
         weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
@@ -565,13 +565,13 @@ igraph_get_all_shortest_paths_dijkstra:
 igraph_distances_bellman_ford:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        VERTEX_SELECTOR to=ALL, OPTIONAL EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_johnson:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights
+        VERTEX_SELECTOR to=ALL, OPTIONAL EDGEWEIGHTS weights
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_floyd_warshall:
