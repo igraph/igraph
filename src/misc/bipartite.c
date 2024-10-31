@@ -96,20 +96,23 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
                                      igraph_integer_t *vcount2,
                                      igraph_integer_t *ecount2) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t vc1 = 0, ec1 = 0, vc2 = 0, ec2 = 0;
     igraph_adjlist_t adjlist;
     igraph_vector_int_t added;
-    igraph_integer_t i;
+
+    if (igraph_vector_bool_size(types) != no_of_nodes) {
+        IGRAPH_ERROR("Invalid bipartite type vector length.", IGRAPH_EINVAL);
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&added, no_of_nodes);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis1;
-        igraph_integer_t neilen1, j;
+        igraph_integer_t neilen1;
         igraph_integer_t *ecptr;
         if (VECTOR(*types)[i]) {
             vc2++;
@@ -120,15 +123,15 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
         }
         neis1 = igraph_adjlist_get(&adjlist, i);
         neilen1 = igraph_vector_int_size(neis1);
-        for (j = 0; j < neilen1; j++) {
-            igraph_integer_t k, neilen2, nei = VECTOR(*neis1)[j];
+        for (igraph_integer_t j = 0; j < neilen1; j++) {
+            igraph_integer_t neilen2, nei = VECTOR(*neis1)[j];
             igraph_vector_int_t *neis2 = igraph_adjlist_get(&adjlist, nei);
             if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                 IGRAPH_ERROR("Non-bipartite edge found in bipartite projection.",
                              IGRAPH_EINVAL);
             }
             neilen2 = igraph_vector_int_size(neis2);
-            for (k = 0; k < neilen2; k++) {
+            for (igraph_integer_t k = 0; k < neilen2; k++) {
                 igraph_integer_t nei2 = VECTOR(*neis2)[k];
                 if (nei2 <= i) {
                     continue;
