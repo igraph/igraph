@@ -1194,14 +1194,14 @@ igraph_dfs:
 
 igraph_bipartite_projection_size:
     PARAMS: |-
-        GRAPH graph, OPTIONAL BIPARTITE_TYPES types,
+        GRAPH graph, BIPARTITE_TYPES types,
         OUT INTEGER vcount1, OUT INTEGER ecount1,
         OUT INTEGER vcount2, OUT INTEGER ecount2
     DEPS: types ON graph
 
 igraph_bipartite_projection:
     PARAMS: |-
-        GRAPH graph, OPTIONAL BIPARTITE_TYPES types,
+        GRAPH graph, BIPARTITE_TYPES types,
         OUT GRAPH proj1, OUT GRAPH proj2,
         OPTIONAL OUT VECTOR_INT multiplicity1,
         OPTIONAL OUT VECTOR_INT multiplicity2, INTEGER probe1=-1
@@ -1220,7 +1220,7 @@ igraph_biadjacency:
 
 igraph_get_biadjacency:
     PARAMS: |-
-        GRAPH graph, OPTIONAL BIPARTITE_TYPES types, OUT MATRIX res,
+        GRAPH graph, BIPARTITE_TYPES types, OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
     DEPS: types ON graph
 
@@ -1528,7 +1528,7 @@ igraph_layout_mds:
 
 igraph_layout_bipartite:
     PARAMS: |-
-        GRAPH graph, OPTIONAL BIPARTITE_TYPES types, OUT MATRIX res,
+        GRAPH graph, BIPARTITE_TYPES types, OUT MATRIX res,
         REAL hgap=1, REAL vgap=1, INTEGER maxiter=100
     DEPS: types ON graph
 
@@ -2404,7 +2404,7 @@ igraph_is_maximal_matching:
 
 igraph_maximum_bipartite_matching:
     PARAMS: |-
-        GRAPH graph, OPTIONAL BIPARTITE_TYPES types,
+        GRAPH graph, BIPARTITE_TYPES types,
         OPTIONAL OUT INTEGER matching_size,
         OPTIONAL OUT REAL matching_weight,
         OUT INDEX_VECTOR matching,
