@@ -81,16 +81,15 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
     igraph_dqueue_int_t history;
-    igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of vertices cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (have_outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
+    if (outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%" IGRAPH_PRId ") does not equal the number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
-    if (!have_outseq && m < 0) {
+    if (!outseq && m < 0) {
         IGRAPH_ERRORF("Number of edges per step cannot be negative, got %" IGRAPH_PRId ".",
                        IGRAPH_EINVAL, m);
     }
@@ -101,12 +100,14 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
-    if (nodes == 0) {
+    /* This effectively also hanbdles an outseq size of 0.
+     * From here on we assume that outseq has a size of at least 1. */
+    if (no_of_nodes == 0) {
         igraph_empty(graph, 0, directed);
         return IGRAPH_SUCCESS;
     }
 
-    if (!have_outseq) {
+    if (!outseq) {
         no_of_neighbors = m;
         IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
@@ -136,7 +137,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
         igraph_integer_t to;
-        if (have_outseq) {
+        if (outseq) {
             no_of_neighbors = VECTOR(*outseq)[i];
         }
 
@@ -252,20 +253,15 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
     igraph_dqueue_int_t history;
-    igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
-    if (no_of_nodes == 0) {
-        igraph_empty(graph, 0, directed);
-        return IGRAPH_SUCCESS;
-    }
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of nodes should not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (have_outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
+    if (outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%" IGRAPH_PRId ") does not equal the number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
-    if (!have_outseq && m < 0) {
+    if (!outseq && m < 0) {
         IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bins <= 0) {
@@ -278,7 +274,14 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
-    if (!have_outseq) {
+    /* This effectively also hanbdles an outseq size of 0.
+     * From here on we assume that outseq has a size of at least 1. */
+    if (no_of_nodes == 0) {
+        igraph_empty(graph, 0, directed);
+        return IGRAPH_SUCCESS;
+    }
+
+    if (!outseq) {
         no_of_neighbors = m;
         IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
@@ -311,7 +314,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         igraph_real_t sum;
         igraph_integer_t to;
 
-        if (have_outseq) {
+        if (outseq) {
             no_of_neighbors = VECTOR(*outseq)[i];
         }
 
