@@ -103,7 +103,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     /* This effectively also hanbdles an outseq size of 0.
      * From here on we assume that outseq has a size of at least 1. */
     if (no_of_nodes == 0) {
-        igraph_empty(graph, 0, directed);
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         return IGRAPH_SUCCESS;
     }
 
@@ -277,7 +277,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     /* This effectively also hanbdles an outseq size of 0.
      * From here on we assume that outseq has a size of at least 1. */
     if (no_of_nodes == 0) {
-        igraph_empty(graph, 0, directed);
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         return IGRAPH_SUCCESS;
     }
 
