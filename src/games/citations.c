@@ -275,7 +275,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     if (nodes == 0) {
-        igraph_empty(graph, 0, directed);
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         return IGRAPH_SUCCESS;
     }
 
