@@ -101,8 +101,8 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
-    if (nodes == 0) {
-        igraph_empty(graph, 0, directed);
+    if (no_of_nodes == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         return IGRAPH_SUCCESS;
     }
 
@@ -254,10 +254,6 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_dqueue_int_t history;
     igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
-    if (no_of_nodes == 0) {
-        igraph_empty(graph, 0, directed);
-        return IGRAPH_SUCCESS;
-    }
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of nodes should not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
@@ -276,6 +272,11 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     }
     if (zero_appeal < 0) {
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
+    }
+
+    if (no_of_nodes == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+        return IGRAPH_SUCCESS;
     }
 
     if (!have_outseq) {
