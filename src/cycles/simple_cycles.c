@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 #include "igraph_stack.h"
 
 #include "core/interruption.h"
-
-// #include <math.h>
 
 /* Johnson's cycle detection algorithm
  *
@@ -93,8 +91,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t u) {
 
-    // TODO: introduce stack for w & neis in order to reduce the number of
-    // iterations.
+    // TODO: introduce stack for w & neis in order to reduce the number of iterations.
     igraph_vector_int_t *neis;
     igraph_integer_t w;
     igraph_stack_int_t u_stack;
@@ -381,7 +378,7 @@ void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t
  *
  * \return IGRAPH_SUCCESS if the operation was successful, IGRAPH_STOP otherwise.
  * */
-igraph_error_t igraph_i_append_simple_cycle_result(
+static igraph_error_t igraph_i_append_simple_cycle_result(
         const igraph_vector_int_t *vertices,
         const igraph_vector_int_t *edges,
         void *arg) {
@@ -430,7 +427,7 @@ igraph_error_t igraph_i_append_simple_cycle_result(
  * @see https://stackoverflow.com/a/35922906/3909202
  * @see https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
+igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_integer_t max_cycle_length,
