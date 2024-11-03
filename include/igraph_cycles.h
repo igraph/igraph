@@ -52,7 +52,7 @@ typedef igraph_error_t igraph_cycle_handler_t(
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph, igraph_integer_t max_cycle_length,
-        igraph_cycle_handler_t *cycle_handler, void *arg
+        igraph_cycle_handler_t *callback, void *arg
 );
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(

@@ -502,9 +502,9 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  * \param graph The graph to search for
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
- * \param cycle_handler A function to call for each cycle that is found.
+ * \param callback A function to call for each cycle that is found.
  *   See also \ref igraph_cycle_handler_t
- * \param arg This parameter will be passed to \p cycle_handler.
+ * \param arg This parameter will be passed to \p callback.
  *
  * \sa \ref igraph_simple_cycles() to store the found cycles;
  * \ref igraph_find_cycle() to find a single cycle;
@@ -517,7 +517,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
 igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_integer_t max_cycle_length,
-        igraph_cycle_handler_t *cycle_handler,
+        igraph_cycle_handler_t *callback,
         void *arg) {
 
     if (max_cycle_length == 0) {
@@ -534,7 +534,7 @@ igraph_error_t igraph_simple_cycles_callback(
     for (igraph_integer_t i = 0; i < state.N; i++) {
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_simple_cycles_search_callback_from_one_vertex(
-                             &state, i, max_cycle_length, cycle_handler, arg));
+                    &state, i, max_cycle_length, callback, arg));
             IGRAPH_ALLOW_INTERRUPTION();
         }
         if (state.stop_search) {
