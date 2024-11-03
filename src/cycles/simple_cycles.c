@@ -38,7 +38,7 @@
  * single struct allows us to resume the algorithm from any point and yield the
  * cycles one by one in an iterator-like manner.
  */
-struct igraph_simple_cycle_search_state_t {
+typedef struct igraph_simple_cycle_search_state_t {
     /* Number of vertices in the graph */
     igraph_integer_t N;
 
@@ -66,7 +66,7 @@ struct igraph_simple_cycle_search_state_t {
     /* Boolean indicating whether the algorithm should stop searching for cycles
      */
     igraph_bool_t stop_search;
-};
+} igraph_simple_cycle_search_state_t;
 
 /**
  * A struct to store one cycle found by the algorithm.
@@ -311,7 +311,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  *
  * \ref igraph_simple_cycle_search_state_destroy
  */
-igraph_error_t igraph_simple_cycle_search_state_init(
+static igraph_error_t igraph_simple_cycle_search_state_init(
         igraph_simple_cycle_search_state_t *state,
         const igraph_t *graph) {
 
@@ -359,7 +359,7 @@ igraph_error_t igraph_simple_cycle_search_state_init(
  *
  * \ref igraph_simple_cycle_search_state_init
  */
-void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state) {
+static void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state) {
     igraph_vector_int_destroy(&state->vertex_stack);
     igraph_vector_int_destroy(&state->edge_stack);
     igraph_vector_bool_destroy(&state->v_blocked);
@@ -429,7 +429,7 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
  * @see https://stackoverflow.com/a/35922906/3909202
  * @see https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
-igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
+static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_integer_t max_cycle_length,
@@ -482,7 +482,7 @@ igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
  * @see https://stackoverflow.com/a/35922906/3909202
  * @see https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
-igraph_error_t igraph_simple_cycles_search_from_one_vertex(
+static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_vector_int_list_t *vertices,
