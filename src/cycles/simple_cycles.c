@@ -485,7 +485,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
 
 /**
  * \function igraph_simple_cycles_callback
- * \brief Find all simple cycles (callback version).
+ * \brief Finds all simple cycles (callback version).
  *
  * \experimental
  *
@@ -555,7 +555,7 @@ igraph_error_t igraph_simple_cycles_callback(
 
 /**
  * \function igraph_simple_cycles
- * \brief Find all simple cycles.
+ * \brief Finds all simple cycles.
  *
  * \experimental
  *
