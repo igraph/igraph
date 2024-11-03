@@ -1,6 +1,59 @@
+Testing null graph
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+}
+Edge IDs in cycles:
+{
+}
+
+Testing edgeless graph
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+}
+Edge IDs in cycles:
+{
+}
+
+Testing directed cycle graph
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 2 3 4 5 6 7 8 9 )
+}
+Edge IDs in cycles:
+{
+  0: ( 0 1 2 3 4 5 6 7 8 9 )
+}
+
+Testing directed star
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+}
+Edge IDs in cycles:
+{
+}
+
+Testing directed wheel
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 1 2 3 4 5 6 7 8 9 )
+}
+Edge IDs in cycles:
+{
+  0: ( 9 10 11 12 13 14 15 16 17 )
+}
 
 Testing undirected ring
-Finished search, found 1 cycles, expected 1 of maximal -1 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -12,7 +65,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected star
-Finished search, found 0 cycles, expected 0 of maximal -1 vertices.
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -22,7 +75,7 @@ Edge IDs in cycles:
 }
 
 Testing union of undirected wheel and star
-Finished search, found 1 cycles, expected 1 of maximal -1 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -34,7 +87,7 @@ Edge IDs in cycles:
 }
 
 Testing union of undirected wheel, star and a single edge
-Finished search, found 1 cycles, expected 1 of maximal -1 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -46,7 +99,7 @@ Edge IDs in cycles:
 }
 
 Created undirected wheel
-Finished search, found 73 cycles, expected 73 of maximal -1 vertices.
+Finished search, found 73 cycles, expected 73 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -200,7 +253,7 @@ Edge IDs in cycles:
   71: ( 7 16 8 )
   72: ( 9 10 11 12 13 14 15 16 17 )
 }
-Finished search, found 9 cycles, expected 9 of maximal 3 vertices.
+Finished search, found 9 cycles, expected 9 cycles. Max cycle length was 3 vertices.
 
 Vertex IDs in cycles:
 {
@@ -226,7 +279,7 @@ Edge IDs in cycles:
   7: ( 6 15 7 )
   8: ( 7 16 8 )
 }
-Finished search, found 18 cycles, expected 18 of maximal 4 vertices.
+Finished search, found 18 cycles, expected 18 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -272,7 +325,7 @@ Edge IDs in cycles:
 }
 
 Testing directed graph with a cycle of length 4 and a multi-edge
-Finished search, found 2 cycles, expected 2 of maximal -1 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -284,7 +337,7 @@ Edge IDs in cycles:
   0: ( 0 2 3 4 )
   1: ( 0 1 3 4 )
 }
-Finished search, found 2 cycles, expected 2 of maximal 4 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -298,7 +351,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with a cycle of length 4 and a multi-edge
-Finished search, found 3 cycles, expected 3 of maximal -1 vertices.
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -312,7 +365,7 @@ Edge IDs in cycles:
   1: ( 0 1 3 4 )
   2: ( 1 2 )
 }
-Finished search, found 3 cycles, expected 3 of maximal 4 vertices.
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -328,7 +381,7 @@ Edge IDs in cycles:
 }
 
 Testing directed graph with single self-loop
-Finished search, found 1 cycles, expected 1 of maximal -1 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -340,7 +393,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with single length-2-loop
-Finished search, found 1 cycles, expected 1 of maximal -1 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -352,7 +405,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with 3 length-2-loops
-Finished search, found 3 cycles, expected 3 of maximal -1 vertices.
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -368,7 +421,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph with single length-2-loop and a self-loop
-Finished search, found 2 cycles, expected 2 of maximal -1 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -382,7 +435,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'envelope'
-Finished search, found 13 cycles, expected 13 of maximal -1 vertices.
+Finished search, found 13 cycles, expected 13 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -418,7 +471,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'boat'
-Finished search, found 6 cycles, expected 6 of maximal -1 vertices.
+Finished search, found 6 cycles, expected 6 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -440,7 +493,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'house'
-Finished search, found 3 cycles, expected 3 of maximal -1 vertices.
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -456,7 +509,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'prism'
-Finished search, found 14 cycles, expected 14 of maximal -1 vertices.
+Finished search, found 14 cycles, expected 14 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -494,7 +547,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type '7 vertices'
-Finished search, found 89 cycles, expected 89 of maximal -1 vertices.
+Finished search, found 89 cycles, expected 89 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -682,7 +735,7 @@ Edge IDs in cycles:
 }
 
 Testing undirected graph of type 'shooting star'
-Finished search, found 295 cycles, expected 295 of maximal -1 vertices.
+Finished search, found 295 cycles, expected 295 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1280,7 +1333,7 @@ Edge IDs in cycles:
   293: ( 11 15 12 )
   294: ( 13 15 16 14 )
 }
-Finished search, found 2 cycles, expected 2 of maximal -1 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1292,7 +1345,7 @@ Edge IDs in cycles:
   0: ( 0 1 2 3 )
   1: ( 0 4 5 2 3 )
 }
-Finished search, found 0 cycles, expected 0 of maximal 3 vertices.
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was 3 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1300,7 +1353,7 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
 }
-Finished search, found 1 cycles, expected 1 of maximal 4 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1310,7 +1363,7 @@ Edge IDs in cycles:
 {
   0: ( 0 1 2 3 )
 }
-Finished search, found 2 cycles, expected 2 of maximal 5 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was 5 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1324,7 +1377,7 @@ Edge IDs in cycles:
 }
 
 Testing directed graph of type 'stable boat'
-Finished search, found 4 cycles, expected 4 of maximal -1 vertices.
+Finished search, found 4 cycles, expected 4 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1340,7 +1393,7 @@ Edge IDs in cycles:
   2: ( 2 6 3 )
   3: ( 5 7 )
 }
-Finished search, found 1 cycles, expected 1 of maximal 2 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was 2 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1350,7 +1403,7 @@ Edge IDs in cycles:
 {
   0: ( 5 7 )
 }
-Finished search, found 2 cycles, expected 2 of maximal 3 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was 3 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1362,7 +1415,7 @@ Edge IDs in cycles:
   0: ( 2 6 3 )
   1: ( 5 7 )
 }
-Finished search, found 3 cycles, expected 3 of maximal 4 vertices.
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1378,7 +1431,7 @@ Edge IDs in cycles:
 }
 
 Testing directed graph of type 'stable letter'
-Finished search, found 7 cycles, expected 7 of maximal -1 vertices.
+Finished search, found 7 cycles, expected 7 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1400,7 +1453,7 @@ Edge IDs in cycles:
   5: ( 3 8 4 6 )
   6: ( 5 8 )
 }
-Finished search, found 0 cycles, expected 0 of maximal 1 vertices.
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was 1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1408,7 +1461,7 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
 }
-Finished search, found 1 cycles, expected 1 of maximal 2 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was 2 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1418,7 +1471,7 @@ Edge IDs in cycles:
 {
   0: ( 5 8 )
 }
-Finished search, found 3 cycles, expected 3 of maximal 3 vertices.
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was 3 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1432,7 +1485,7 @@ Edge IDs in cycles:
   1: ( 2 4 6 )
   2: ( 5 8 )
 }
-Finished search, found 5 cycles, expected 5 of maximal 4 vertices.
+Finished search, found 5 cycles, expected 5 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1450,7 +1503,7 @@ Edge IDs in cycles:
   3: ( 3 8 4 6 )
   4: ( 5 8 )
 }
-Finished search, found 7 cycles, expected 7 of maximal 5 vertices.
+Finished search, found 7 cycles, expected 7 cycles. Max cycle length was 5 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1474,7 +1527,7 @@ Edge IDs in cycles:
 }
 
 Testing directed graph of type 'double square'
-Finished search, found 2 cycles, expected 2 of maximal -1 vertices.
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1486,7 +1539,7 @@ Edge IDs in cycles:
   0: ( 0 3 6 5 2 4 )
   1: ( 1 5 2 4 )
 }
-Finished search, found 0 cycles, expected 0 of maximal 1 vertices.
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was 1 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1494,7 +1547,7 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
 }
-Finished search, found 0 cycles, expected 0 of maximal 2 vertices.
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was 2 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1502,7 +1555,7 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
 }
-Finished search, found 0 cycles, expected 0 of maximal 3 vertices.
+Finished search, found 0 cycles, expected 0 cycles. Max cycle length was 3 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1510,17 +1563,7 @@ Vertex IDs in cycles:
 Edge IDs in cycles:
 {
 }
-Finished search, found 1 cycles, expected 1 of maximal 4 vertices.
-
-Vertex IDs in cycles:
-{
-  0: ( 0 4 1 3 )
-}
-Edge IDs in cycles:
-{
-  0: ( 1 5 2 4 )
-}
-Finished search, found 1 cycles, expected 1 of maximal 5 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was 4 vertices.
 
 Vertex IDs in cycles:
 {
@@ -1530,7 +1573,17 @@ Edge IDs in cycles:
 {
   0: ( 1 5 2 4 )
 }
-Finished search, found 2 cycles, expected 2 of maximal 6 vertices.
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was 5 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 4 1 3 )
+}
+Edge IDs in cycles:
+{
+  0: ( 1 5 2 4 )
+}
+Finished search, found 2 cycles, expected 2 cycles. Max cycle length was 6 vertices.
 
 Vertex IDs in cycles:
 {

@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
 */
 
 #include <igraph.h>
-#include "igraph_cycles.h"
+
 #include "test_utilities.h"
-#include <stdlib.h>
 
 void check_cycles_max(const igraph_t *graph, igraph_integer_t expected, igraph_integer_t max_cycle_length) {
     igraph_vector_int_list_t results_v;
     igraph_vector_int_list_t results_e;
-    igraph_integer_t i;
 
     igraph_vector_int_list_init(&results_v, 0);
     igraph_vector_int_list_init(&results_e, 0);
@@ -32,8 +30,8 @@ void check_cycles_max(const igraph_t *graph, igraph_integer_t expected, igraph_i
     igraph_simple_cycles(graph, &results_v, &results_e, max_cycle_length);
 
     printf("Finished search, found %" IGRAPH_PRId
-           " cycles, expected %" IGRAPH_PRId " of maximal %" IGRAPH_PRId
-           " vertices.\n\n",
+           " cycles, expected %" IGRAPH_PRId " cycles."
+           " Max cycle length was %" IGRAPH_PRId " vertices.\n\n",
            igraph_vector_int_list_size(&results_v), expected, max_cycle_length);
 
     if (igraph_vcount(graph) < 100) {
@@ -47,7 +45,7 @@ void check_cycles_max(const igraph_t *graph, igraph_integer_t expected, igraph_i
     IGRAPH_ASSERT(igraph_vector_int_list_size(&results_v) == expected);
     IGRAPH_ASSERT(igraph_vector_int_list_size(&results_e) == expected);
 
-    for (i = 0; i < expected; i++) {
+    for (igraph_integer_t i = 0; i < expected; i++) {
         igraph_vector_int_t *vertices, *edges;
 
         vertices = igraph_vector_int_list_get_ptr(&results_v, i);
@@ -61,6 +59,7 @@ void check_cycles_max(const igraph_t *graph, igraph_integer_t expected, igraph_i
     igraph_vector_int_list_destroy(&results_v);
     igraph_vector_int_list_destroy(&results_e);
 }
+
 void check_cycles(const igraph_t *graph, igraph_integer_t expected) {
     check_cycles_max(graph, expected, -1);
 }
@@ -69,38 +68,38 @@ int main(void) {
     igraph_t g;
     igraph_t g_ring_undirected, g_star_undirected;
 
-    // printf("Testing null graph\n");
-    // igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
-    // check_cycles(&g, 0);
-    // igraph_destroy(&g);
+    printf("Testing null graph\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    check_cycles(&g, 0);
+    igraph_destroy(&g);
 
-    // printf("\nTesting empty graph\n");
-    // igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
-    // check_cycles(&g, 0);
-    // igraph_destroy(&g);
+    printf("\nTesting edgeless graph\n");
+    igraph_empty(&g, 5, IGRAPH_UNDIRECTED);
+    check_cycles(&g, 0);
+    igraph_destroy(&g);
 
-    // printf("\nTesting directed ring\n");
-    // igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
+    printf("\nTesting directed cycle graph\n");
+    igraph_ring(&g, 10, IGRAPH_DIRECTED, /*mutual=*/ false, /*circular=*/ true);
+    check_cycles(&g, 1);
+    igraph_destroy(&g);
+
+    // printf("\nTesting large directed cycle graph\n");
+    // igraph_ring(&g, 10000, IGRAPH_DIRECTED, /*mutual=*/ false, /*circular=*/ true);
     // check_cycles(&g, 1);
     // igraph_destroy(&g);
 
-    // printf("\nTesting directed large ring\n");
-    // igraph_ring(&g, 10000, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
-    // check_cycles(&g, 1);
-    // igraph_destroy(&g);
+    printf("\nTesting directed star\n");
+    igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
+    check_cycles(&g, 0);
+    igraph_destroy(&g);
 
-    // printf("\nTesting directed star\n");
-    // igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
-    // check_cycles(&g, 0);
-    // igraph_destroy(&g);
-
-    // printf("\nTesting directed wheel\n");
-    // igraph_wheel(&g, 10, IGRAPH_WHEEL_OUT, 0);
-    // check_cycles(&g, 1);
-    // igraph_destroy(&g);
+    printf("\nTesting directed wheel\n");
+    igraph_wheel(&g, 10, IGRAPH_WHEEL_OUT, 0);
+    check_cycles(&g, 1);
+    igraph_destroy(&g);
 
     printf("\nTesting undirected ring\n");
-    igraph_ring(&g_ring_undirected, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
+    igraph_ring(&g_ring_undirected, 10, IGRAPH_UNDIRECTED, /*mutual=*/ false, /*circular=*/ true);
     check_cycles(&g_ring_undirected, 1);
 
     igraph_star(&g_star_undirected, 7, IGRAPH_STAR_UNDIRECTED, 1);
@@ -138,7 +137,7 @@ int main(void) {
     // clean up
     igraph_destroy(&g_wheel_undirected_2);
 
-    ////////////////////////////////
+
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-1326064152
     /*
      * This graph looks like:
@@ -179,7 +178,6 @@ int main(void) {
     check_cycles(&g, 1);
     igraph_destroy(&g);
 
-    ////////////////////////////////
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2243053770
     printf("\nTesting undirected graph with single length-2-loop\n");
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, 0, 1, -1);
@@ -198,7 +196,6 @@ int main(void) {
     igraph_destroy(&g);
 
 
-    ////////////////////////////////
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2243942240
     printf("\nTesting undirected graph of type 'envelope'\n");
     // expect:
@@ -231,7 +228,7 @@ int main(void) {
     check_cycles(&g, 6);
     igraph_destroy(&g);
 
-    ////////////////////////////////
+
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2249751754
     printf("\nTesting undirected graph of type 'house'\n");
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
@@ -261,7 +258,6 @@ int main(void) {
     igraph_destroy(&g);
 
 
-    ////////////////////////////////
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2251350410
     printf("\nTesting undirected graph of type '7 vertices'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
@@ -307,7 +303,6 @@ int main(void) {
     igraph_destroy(&g);
 
 
-    ////////////////////////////////
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2428987492
     igraph_small(&g, 5, IGRAPH_DIRECTED,
         0, 1,
@@ -366,7 +361,6 @@ int main(void) {
     check_cycles_max(&g, 2, 6);
     igraph_destroy(&g);
 
-    // clean up test
     VERIFY_FINALLY_STACK();
 
     return 0;
