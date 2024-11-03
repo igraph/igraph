@@ -90,19 +90,20 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
 
     // TODO: introduce stack for w & neis in order to reduce the number of iterations.
     igraph_vector_int_t *neis;
-    igraph_integer_t w;
     igraph_stack_int_t u_stack;
+
     IGRAPH_STACK_INT_INIT_FINALLY(&u_stack, 0);
     IGRAPH_CHECK(igraph_stack_int_push(&u_stack, u));
 
     while (igraph_stack_int_size(&u_stack) > 0) {
-        igraph_integer_t current_u = igraph_stack_int_top(&u_stack);
+        igraph_bool_t recurse_deeper = false;
+        const igraph_integer_t current_u = igraph_stack_int_top(&u_stack);
+
         VECTOR(state->v_blocked)[current_u] = false;
 
         neis = igraph_adjlist_get(&state->B, current_u);
-        igraph_bool_t recurse_deeper = false;
         while (!igraph_vector_int_empty(neis) && !recurse_deeper) {
-            w = igraph_vector_int_pop_back(neis);
+            const igraph_integer_t w = igraph_vector_int_pop_back(neis);
             if (VECTOR(state->v_blocked)[w]) {
                 IGRAPH_CHECK(igraph_stack_int_push(&u_stack, w));
                 recurse_deeper = true;
@@ -205,8 +206,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 local_found = true;
 
                 if ((!state->directed &&
-                igraph_vector_int_size(&state->edge_stack) == 1 &&
-                igraph_vector_int_get(&state->edge_stack, 0) == WE)) {
+                    igraph_vector_int_size(&state->edge_stack) == 1 &&
+                    igraph_vector_int_get(&state->edge_stack, 0) == WE)) {
                     // printf("Skipping cycle to prevent self-loop: \n");
                     continue;
                 }
@@ -261,9 +262,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, V));
             } else {
                 for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
-                    igraph_integer_t W = VECTOR(*neighbors)[i];
-                    if (!igraph_vector_int_contains(igraph_adjlist_get(&state->B, W),
-                                                    V)) {
+                    const igraph_integer_t W = VECTOR(*neighbors)[i];
+                    if (!igraph_vector_int_contains(igraph_adjlist_get(&state->B, W), V)) {
                         IGRAPH_CHECK(igraph_vector_int_push_back(
                                          igraph_adjlist_get(&state->B, W), V));
                     }
@@ -288,6 +288,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
     IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
     IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+
     igraph_stack_int_destroy(&neigh_iteration_progress);
     igraph_stack_int_destroy(&v_stack);
     igraph_stack_int_destroy(&e_stack);
@@ -315,22 +316,28 @@ igraph_error_t igraph_simple_cycle_search_state_init(
         const igraph_t *graph) {
 
     state->N = igraph_vcount(graph);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->vertex_stack, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&state->vertex_stack, 8));
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->edge_stack, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&state->edge_stack, 8));
-    IGRAPH_CHECK(igraph_vector_bool_init(&state->v_blocked, state->N));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &state->v_blocked);
-    IGRAPH_CHECK(igraph_inclist_init(
-                     graph, &state->IK, IGRAPH_OUT,
-                     IGRAPH_LOOPS_ONCE)); // each self-loop counts as a single cycle in
-    // directed graphs
-    IGRAPH_FINALLY(igraph_inclist_destroy, &state->IK);
-    IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &state->AK, &state->IK));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &state->AK);
     state->directed = igraph_is_directed(graph);
     state->stop_search = false;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->vertex_stack, 8);
+    igraph_vector_int_clear(&state->vertex_stack);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->edge_stack, 8);
+    igraph_vector_int_clear(&state->edge_stack);
+
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&state->v_blocked, state->N);
+
+    IGRAPH_CHECK(igraph_inclist_init(
+        graph,
+        &state->IK,
+        IGRAPH_OUT,
+        IGRAPH_LOOPS_ONCE // each self-loop counts as a single cycle
+    ));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &state->IK);
+
+    IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &state->AK, &state->IK));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &state->AK);
+
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
@@ -443,8 +450,7 @@ igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         // It's fine to use binary search since we never add to, only remove from
         // an already sorted adjacency list.
         igraph_integer_t pos;
-        if (igraph_vector_int_binsearch(igraph_adjlist_get(&state->AK, i), s,
-                                        &pos)) {
+        if (igraph_vector_int_binsearch(igraph_adjlist_get(&state->AK, i), s, &pos)) {
             igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
             igraph_vector_int_remove(igraph_inclist_get(&state->IK, i), pos);
         }
