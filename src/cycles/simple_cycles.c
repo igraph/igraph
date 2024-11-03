@@ -195,10 +195,11 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             igraph_integer_t WE = VECTOR(*incident_edges)[i];
 
             if (W == S) {
+                igraph_error_t ret;
+
                 // need to unblock no matter whether we store the result or not (in
                 // undirected case, we may not necessarily)
                 local_found = true;
-                igraph_error_t ret;
 
                 if ((!state->directed &&
                     igraph_vector_int_size(&state->edge_stack) == 1 &&
