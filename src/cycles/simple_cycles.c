@@ -488,16 +488,12 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
         igraph_vector_int_list_t *edges,
         igraph_integer_t max_cycle_length) {
 
-    igraph_error_t (*callback)(const igraph_vector_int_t *vertices,
-                               const igraph_vector_int_t *edges, void *args) =
-                                   &igraph_i_append_simple_cycle_result;
-
     igraph_i_simple_cycle_results_t result_list;
     result_list.vertices = vertices;
     result_list.edges = edges;
 
     igraph_simple_cycles_search_callback_from_one_vertex(
-        state, s, max_cycle_length, callback, &result_list);
+        state, s, max_cycle_length, &igraph_i_append_simple_cycle_result, &result_list);
 
     return IGRAPH_SUCCESS;
 }
@@ -589,15 +585,12 @@ igraph_error_t igraph_simple_cycles_search_all(
         igraph_vector_int_list_t *e_result,
         igraph_integer_t max_cycle_length) {
 
-    igraph_error_t (*callback)(const igraph_vector_int_t *vertices,
-                               const igraph_vector_int_t *edges, void *args) =
-                                   &igraph_i_append_simple_cycle_result;
-
     igraph_i_simple_cycle_results_t result_list;
     result_list.vertices = v_result;
     result_list.edges = e_result;
 
-    igraph_simple_cycles_search_callback(graph, max_cycle_length, callback,
+    igraph_simple_cycles_search_callback(graph, max_cycle_length,
+                                         &igraph_i_append_simple_cycle_result,
                                          &result_list);
 
     return IGRAPH_SUCCESS;
