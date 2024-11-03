@@ -500,7 +500,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
 }
 
 /**
- * \function igraph_simple_cycles_search_callback
+ * \function igraph_simple_cycles_callback
  * \brief Search all simple cycles, use a callback function to handle found cycles
  *
  * \experimental
@@ -512,7 +512,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  * SIAM J Comput 4(1):77-84.
  * https://epubs.siam.org/doi/10.1137/0204007
  *
- * See also: \ref igraph_simple_cycles_search_callback()
+ * See also: \ref igraph_simple_cycles_callback()
  *
  * \param graph The graph to search for
  * \param max_cycle_length Limit the maximum length of cycles to search for.
@@ -523,7 +523,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  *
  * \return Error code.
  */
-igraph_error_t igraph_simple_cycles_search_callback(
+igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_integer_t max_cycle_length,
         igraph_simple_cycle_handler_t *cycle_handler,
@@ -559,7 +559,7 @@ igraph_error_t igraph_simple_cycles_search_callback(
 }
 
 /**
- * \function igraph_simple_cycles_search_all
+ * \function igraph_simple_cycles
  * \brief Search all simple cycles
  *
  * \experimental
@@ -580,7 +580,7 @@ igraph_error_t igraph_simple_cycles_search_callback(
  *
  * \return Error code.
  */
-igraph_error_t igraph_simple_cycles_search_all(
+igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
         igraph_vector_int_list_t *v_result,
         igraph_vector_int_list_t *e_result,
@@ -590,9 +590,9 @@ igraph_error_t igraph_simple_cycles_search_all(
     result_list.vertices = v_result;
     result_list.edges = e_result;
 
-    igraph_simple_cycles_search_callback(graph, max_cycle_length,
-                                         &igraph_i_append_simple_cycle_result,
-                                         &result_list);
+    igraph_simple_cycles_callback(graph, max_cycle_length,
+                                  &igraph_i_append_simple_cycle_result,
+                                  &result_list);
 
     return IGRAPH_SUCCESS;
 }

@@ -34,7 +34,7 @@ IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
 
 /**
  * \brief The interface for the callback function for when a cycle is found.
- * 
+ *
  * \param vertices The vertices of the current cycle.
  * \param edges The edges of the current cycle.
  * \return Error code; \c IGRAPH_SUCCESS to continue the search or
@@ -42,12 +42,12 @@ IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
  */
 typedef igraph_error_t igraph_simple_cycle_handler_t(const igraph_vector_int_t *vertices, const igraph_vector_int_t *edges, void *arg);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_callback(
+IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
     const igraph_t *graph, igraph_integer_t max_cycle_length,
     igraph_simple_cycle_handler_t *cycle_handler, void *arg
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_all(
+IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
     const igraph_t *graph, igraph_vector_int_list_t *v_result,
     igraph_vector_int_list_t *e_result, igraph_integer_t max_cycle_length);
 

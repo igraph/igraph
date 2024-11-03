@@ -24,8 +24,8 @@
 </section>
 
 <section><title>Simple cycles</title>
-<!-- doxrox-include igraph_simple_cycles_search_all -->
-<!-- doxrox-include igraph_simple_cycles_search_callback -->
+<!-- doxrox-include igraph_simple_cycles -->
+<!-- doxrox-include igraph_simple_cycles_callback -->
 </section>
 
 </chapter>
