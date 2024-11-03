@@ -590,6 +590,13 @@ igraph_error_t igraph_simple_cycles(
     result_list.vertices = v_result;
     result_list.edges = e_result;
 
+    if (v_result) {
+        igraph_vector_int_list_clear(v_result);
+    }
+    if (e_result) {
+        igraph_vector_int_list_clear(e_result);
+    }
+
     igraph_simple_cycles_callback(graph, max_cycle_length,
                                   &igraph_i_append_simple_cycle_result,
                                   &result_list);
