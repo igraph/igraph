@@ -258,7 +258,6 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         if (!recurse_deeper) {
             // L2
             if (local_found || loop_length_stop) {
-                // IGRAPH_CHECK(igraph_i_simple_cycles_unblock_recursive(state, V));
                 IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, V));
             } else {
                 for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
