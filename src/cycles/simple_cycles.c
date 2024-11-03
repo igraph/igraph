@@ -63,8 +63,7 @@ typedef struct igraph_simple_cycle_search_state_t {
     /* Whether the graph is directed */
     igraph_bool_t directed;
 
-    /* Boolean indicating whether the algorithm should stop searching for cycles
-     */
+    /* Boolean indicating whether the algorithm should stop searching for cycles */
     igraph_bool_t stop_search;
 } igraph_simple_cycle_search_state_t;
 
@@ -79,10 +78,7 @@ typedef struct {
 } igraph_i_simple_cycle_results_t;
 
 /**
- * \experimental
- *
  * The implementation of procedure UNBLOCK from Johnson's paper
- *
  */
 static igraph_error_t igraph_i_simple_cycles_unblock(
         igraph_simple_cycle_search_state_t *state,
@@ -122,8 +118,6 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
 }
 
 /**
- * \experimental
- *
  * The implementation of procedure CIRCUIT from Johnson's paper
  *
  * Arguments:
@@ -131,8 +125,8 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
  * \param state: local state object of the search
  * \param V: vertex to start the search from
  * \param result_callback: callback function to handle the found cycles
- * \param max_cycle_length Limit the maximum length of cycles to search
- * for. Negative for no limit
+ * \param max_cycle_length Limit the maximum length of cycles to search for.
+ *   Pass a negative value for no limit
  * \param arg: argument to pass to the callback function
  */
 
@@ -299,12 +293,10 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 
 /**
  * \function igraph_simple_cycle_search_state_init
- * \brief Initialize the cycle search state
+ * \brief Initializes the cycle search state.
  *
- * \experimental
- *
- * \param state The state structure to initialize
- * \param graph The graph object
+ * \param state The state structure to initialize.
+ * \param graph The graph object.
  * \return Error code.
  *
  * Time complexity: O(|V|*|E|*log(|V|*|E|))
@@ -348,9 +340,7 @@ static igraph_error_t igraph_simple_cycle_search_state_init(
 
 /**
  * \function igraph_simple_cycle_search_state_destroy
- * \brief Destroy the cycle search state
- *
- * \experimental
+ * \brief Destroys the cycle search state.
  *
  * \param state The state structure to destroy
  * \return Error code.
@@ -369,17 +359,9 @@ static void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_
 }
 
 /**
- * \function igraph_i_append_simple_cycle_result
- * \brief Implements `igraph_cycle_handler_t` to simply append the found cycle to a list
- *
- * \experimental
- *
- * \param vertices The vertices of the cycle
- * \param edges The edges of the cycle
- * \param arg The result list (pointer to `igraph_i_simple_cycle_results_t`) to append the cycle to
- *
- * \return IGRAPH_SUCCESS if the operation was successful, IGRAPH_STOP otherwise.
- * */
+ * A cycle handler that simply appends cycles to a vector list.
+ * Use by \ref igraph_simple_cycles()
+ */
 static igraph_error_t igraph_i_append_simple_cycle_result(
         const igraph_vector_int_t *vertices,
         const igraph_vector_int_t *edges,
@@ -411,23 +393,21 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
 
 /**
  * \function igraph_simple_cycles_search_callback_from_one_vertex
- * \brief Search simple cycles starting from one vertex
+ * \brief Search simple cycles starting from one vertex.
  *
- * \experimental
- *
- * \param state The state structure to search on
- * \param s The vertex index to start search with
+ * \param state The state structure to search on.
+ * \param s The vertex index to start search with.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
- * Negative for no limit.
+ *   Pass a negative value for no limit.
  * \param cycle_handler The callback function to call when a cycle is found.
- * See \ref igraph_cycle_handler_t() for details.
- * \param arg The additional argument(s) for the callback function
+ *   See \ref igraph_cycle_handler_t() for details.
+ * \param arg The additional argument(s) for the callback function.
  *
  * \return Error code.
  *
- * @see https://en.wikipedia.org/wiki/Johnson%27s_algorithm
- * @see https://stackoverflow.com/a/35922906/3909202
- * @see https://epubs.siam.org/doi/epdf/10.1137/0204007
+ * https://en.wikipedia.org/wiki/Johnson%27s_algorithm
+ * https://stackoverflow.com/a/35922906/3909202
+ * https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
 static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
@@ -463,24 +443,24 @@ static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
 
 /**
  * \function igraph_simple_cycles_search_from_one_vertex
- * \brief Search simple cycles starting from one vertex
+ * \brief Search simple cycles starting from one vertex.
  *
  * \experimental
  *
- * \param state The state structure to search on
- * \param s The vertex index to start search with
- * \param vertices The vertex IDs of each cycle will be stored here
- * \param edges The edge IDs of each cycle will be stored here
+ * \param state The state structure to search on.
+ * \param s The vertex index to start search with.
+ * \param vertices The vertex IDs of each cycle will be stored here.
+ * \param edges The edge IDs of each cycle will be stored here.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
- * Negative for no limit.
+ *   Pass a negative value for no limit.
  *
  * \return Error code.
  *
  * See also: \ref igraph_simple_cycles_search_callback_from_one_vertex()
  *
- * @see https://en.wikipedia.org/wiki/Johnson%27s_algorithm
- * @see https://stackoverflow.com/a/35922906/3909202
- * @see https://epubs.siam.org/doi/epdf/10.1137/0204007
+ * https://en.wikipedia.org/wiki/Johnson%27s_algorithm
+ * https://stackoverflow.com/a/35922906/3909202
+ * https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
 static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
@@ -505,10 +485,9 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  *
  * \experimental
  *
- * \experimental
- *
  * This function searches for all simple cycles using Johnson's cycle
  * detection algorithm, and calls a function for each.
+ * A simple cycle is a cycle (i.e. closed path) without repeated vertices.
  *
  * </para><para>
  * Reference:
@@ -578,6 +557,7 @@ igraph_error_t igraph_simple_cycles_callback(
  *
  * This function searches for all simple cycles using Johnson's cycle
  * detection algorithm, and stores them in the provided vector lists.
+ * A simple cycle is a cycle (i.e. closed path) without repeated vertices.
  *
  * </para><para>
  * Reference:
