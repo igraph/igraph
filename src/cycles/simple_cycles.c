@@ -124,7 +124,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
  *
  * \param state: local state object of the search
  * \param V: vertex to start the search from
- * \param result_callback: callback function to handle the found cycles
+ * \param callback: callback function to handle the found cycles
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value for no limit
  * \param arg: argument to pass to the callback function
@@ -133,7 +133,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
 static igraph_error_t igraph_i_simple_cycles_circuit(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t V,
-        igraph_cycle_handler_t *result_callback,
+        igraph_cycle_handler_t *callback,
         igraph_integer_t max_cycle_length, void *arg) {
 
     const igraph_vector_int_t *neighbors;
@@ -198,6 +198,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 // need to unblock no matter whether we store the result or not (in
                 // undirected case, we may not necessarily)
                 local_found = true;
+                igraph_error_t ret;
 
                 if ((!state->directed &&
                     igraph_vector_int_size(&state->edge_stack) == 1 &&
@@ -220,8 +221,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 // printf("Found cycle with size %" IGRAPH_PRId "\n",
                 //        igraph_vector_int_size(&state->vertex_stack));
 
-                if ((*result_callback)(&state->vertex_stack, &state->edge_stack, arg) !=
-                        IGRAPH_SUCCESS) {
+                IGRAPH_CHECK_CALLBACK(callback(&state->vertex_stack, &state->edge_stack, arg), &ret);
+                if (ret == IGRAPH_STOP) {
                     state->stop_search = true;
                     break;
                 }
