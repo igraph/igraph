@@ -414,7 +414,7 @@ static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_integer_t max_cycle_length,
-        igraph_cycle_handler_t *cycle_handler,
+        igraph_cycle_handler_t *callback,
         void *arg) {
 
     // L3:
@@ -423,8 +423,7 @@ static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
 
-    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, cycle_handler,
-                 max_cycle_length, arg));
+    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, callback, max_cycle_length, arg));
 
     for (igraph_integer_t i = 0; i < state->N; ++i) {
         // We want to remove the vertex with value s, not at position s.
