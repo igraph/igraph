@@ -42,9 +42,6 @@ struct igraph_simple_cycle_search_state_t {
     /* Number of vertices in the graph */
     igraph_integer_t N;
 
-    /* Number of edges in the graph */
-    igraph_integer_t NE;
-
     /* The incidence list of the graph */
     igraph_inclist_t IK;
 
@@ -319,7 +316,6 @@ igraph_error_t igraph_simple_cycle_search_state_init(
         const igraph_t *graph) {
 
     state->N = igraph_vcount(graph);
-    state->NE = igraph_ecount(graph);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&state->vertex_stack, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&state->vertex_stack, 8));
