@@ -33,23 +33,31 @@ IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
         igraph_neimode_t mode);
 
 /**
- * \brief The interface for the callback function for when a cycle is found.
+ * \typedef igraph_cycle_handler_t
+ * \brief Type of cycle handler functions.
  *
- * \param vertices The vertices of the current cycle.
- * \param edges The edges of the current cycle.
+ * Callback type, called by \ref igraph_simple_cycles_callback() when
+ * a cycle is found.
+ *
+ * \param vertices The vertices of the current cycle. Must not be modified.
+ * \param edges The edges of the current cycle. Must not be modified.
+ * \param arg The extra parameter passed to \ref igraph_simple_cycles_callback()
  * \return Error code; \c IGRAPH_SUCCESS to continue the search or
  *   \c IGRAPH_STOP to stop the search without signaling an error.
  */
-typedef igraph_error_t igraph_simple_cycle_handler_t(const igraph_vector_int_t *vertices, const igraph_vector_int_t *edges, void *arg);
+typedef igraph_error_t igraph_cycle_handler_t(
+        const igraph_vector_int_t *vertices,
+        const igraph_vector_int_t *edges,
+        void *arg);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
-    const igraph_t *graph, igraph_integer_t max_cycle_length,
-    igraph_simple_cycle_handler_t *cycle_handler, void *arg
+        const igraph_t *graph, igraph_integer_t max_cycle_length,
+        igraph_cycle_handler_t *cycle_handler, void *arg
 );
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
-    const igraph_t *graph, igraph_vector_int_list_t *v_result,
-    igraph_vector_int_list_t *e_result, igraph_integer_t max_cycle_length);
+        const igraph_t *graph, igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges, igraph_integer_t max_cycle_length);
 
 __END_DECLS
 

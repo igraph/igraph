@@ -139,7 +139,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
 static igraph_error_t igraph_i_simple_cycles_circuit(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t V,
-        igraph_simple_cycle_handler_t *result_callback,
+        igraph_cycle_handler_t *result_callback,
         igraph_integer_t max_cycle_length, void *arg) {
 
     const igraph_vector_int_t *neighbors;
@@ -370,7 +370,7 @@ static void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_
 
 /**
  * \function igraph_i_append_simple_cycle_result
- * \brief Implements `igraph_simple_cycle_handler_t` to simply append the found cycle to a list
+ * \brief Implements `igraph_cycle_handler_t` to simply append the found cycle to a list
  *
  * \experimental
  *
@@ -420,7 +420,7 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  * Negative for no limit.
  * \param cycle_handler The callback function to call when a cycle is found.
- * See \ref igraph_simple_cycle_handler_t() for details.
+ * See \ref igraph_cycle_handler_t() for details.
  * \param arg The additional argument(s) for the callback function
  *
  * \return Error code.
@@ -433,7 +433,7 @@ static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
         igraph_simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_integer_t max_cycle_length,
-        igraph_simple_cycle_handler_t *cycle_handler,
+        igraph_cycle_handler_t *cycle_handler,
         void *arg) {
 
     // L3:
@@ -501,32 +501,44 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
 
 /**
  * \function igraph_simple_cycles_callback
- * \brief Search all simple cycles, use a callback function to handle found cycles
+ * \brief Find all simple cycles (callback version).
  *
  * \experimental
  *
- * This function searches for all simple cycles,
- * using Johnson's cycle detection algorithm
- * based on the original implementation in:
+ * \experimental
+ *
+ * This function searches for all simple cycles using Johnson's cycle
+ * detection algorithm, and calls a function for each.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
  * Johnson DB: Finding all the elementary circuits of a directed graph.
- * SIAM J Comput 4(1):77-84.
- * https://epubs.siam.org/doi/10.1137/0204007
+ * SIAM J. Comput. 4(1):77-84.
+ * https://doi.org/10.1137/0204007
  *
  * See also: \ref igraph_simple_cycles_callback()
  *
  * \param graph The graph to search for
  * \param max_cycle_length Limit the maximum length of cycles to search for.
- * Negative for no limit.
- * \param cycle_handler The callback function to call when a cycle is found.
- * See \ref igraph_simple_cycle_handler_t() for details.
- * \param arg The additional argument(s) for the callback function
+ *   Pass a negative value to search for all cycles.
+ * \param cycle_handler A function to call for each cycle that is found.
+ *   See also \ref igraph_cycle_handler_t
+ * \param arg This parameter will be passed to \p cycle_handler.
+ *
+ * \sa \ref igraph_simple_cycles() to store the found cycles;
+ * \ref igraph_find_cycle() to find a single cycle;
+ * \ref igraph_fundamental_cycles() and igraph_minimum_cycle_basis()
+ * to find a cycle basis, a compact representation of the cycle structure
+ * of the graph.
  *
  * \return Error code.
  */
 igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_integer_t max_cycle_length,
-        igraph_simple_cycle_handler_t *cycle_handler,
+        igraph_cycle_handler_t *cycle_handler,
         void *arg) {
 
     if (max_cycle_length == 0) {
@@ -560,41 +572,50 @@ igraph_error_t igraph_simple_cycles_callback(
 
 /**
  * \function igraph_simple_cycles
- * \brief Search all simple cycles
+ * \brief Find all simple cycles.
  *
  * \experimental
  *
- * This function searches for all simple cycles,
- * using Johnson's cycle detection algorithm
- * based on the original implementation in:
+ * This function searches for all simple cycles using Johnson's cycle
+ * detection algorithm, and stores them in the provided vector lists.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
  * Johnson DB: Finding all the elementary circuits of a directed graph.
- * SIAM J Comput 4(1):77-84.
- * https://epubs.siam.org/doi/10.1137/0204007
+ * SIAM J. Comput. 4(1):77-84.
+ * https://doi.org/10.1137/0204007
  *
- *
- * \param graph The graph to search for
- * \param vertices The vertex IDs of each cycle will be stored here
- * \param edges The edge IDs of each cycle will be stored here
+ * \param graph The graph to search for cycles in.
+ * \param vertices The vertex IDs of each cycle will be stored here.
+ * \param edges The edge IDs of each cycle will be stored here.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
- * Negative for no limit.
+ *   Pass a negative value to search for all cycles.
+ *
+ * \sa \ref igraph_simple_cycles() to call a function for each found cycle;
+ * \ref igraph_find_cycle() to find a single cycle;
+ * \ref igraph_fundamental_cycles() and igraph_minimum_cycle_basis()
+ * to find a cycle basis, a compact representation of the cycle structure
+ * of the graph.
  *
  * \return Error code.
  */
 igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
-        igraph_vector_int_list_t *v_result,
-        igraph_vector_int_list_t *e_result,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
         igraph_integer_t max_cycle_length) {
 
     igraph_i_simple_cycle_results_t result_list;
-    result_list.vertices = v_result;
-    result_list.edges = e_result;
+    result_list.vertices = vertices;
+    result_list.edges = edges;
 
-    if (v_result) {
-        igraph_vector_int_list_clear(v_result);
+    if (vertices) {
+        igraph_vector_int_list_clear(vertices);
     }
-    if (e_result) {
-        igraph_vector_int_list_clear(e_result);
+    if (edges) {
+        igraph_vector_int_list_clear(edges);
     }
 
     igraph_simple_cycles_callback(graph, max_cycle_length,

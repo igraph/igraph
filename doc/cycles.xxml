@@ -26,6 +26,7 @@
 <section><title>Simple cycles</title>
 <!-- doxrox-include igraph_simple_cycles -->
 <!-- doxrox-include igraph_simple_cycles_callback -->
+<!-- doxrox-include igraph_cycle_handler_t -->
 </section>
 
 </chapter>
