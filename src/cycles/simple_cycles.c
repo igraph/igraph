@@ -441,6 +441,8 @@ static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
     return IGRAPH_SUCCESS;
 }
 
+#if 0
+/* Currently unused and unexposed, temporarily disabled with #if 0 ... #endif. */
 /**
  * \function igraph_simple_cycles_search_from_one_vertex
  * \brief Search simple cycles starting from one vertex.
@@ -478,6 +480,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
 
     return IGRAPH_SUCCESS;
 }
+#endif
 
 /**
  * \function igraph_simple_cycles_callback
