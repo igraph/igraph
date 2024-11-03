@@ -2525,8 +2525,6 @@ igraph_simple_cycles_callback:
         INTEGER max_cycle_length=-1,
         CYCLE_FUNC cycle_handler, EXTRA arg
 
-    DEPS: vertices ON graph, edges ON graph
-
 #######################################
 # Eulerian functions
 #######################################
