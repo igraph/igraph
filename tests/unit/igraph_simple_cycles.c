@@ -96,6 +96,7 @@ int main(void) {
     printf("\nTesting directed wheel\n");
     igraph_wheel(&g, 8, IGRAPH_WHEEL_OUT, 0);
     check_cycles(&g, IGRAPH_OUT, 1);
+    check_cycles(&g, IGRAPH_IN, 1);
     check_cycles(&g, IGRAPH_ALL, 43);
     igraph_destroy(&g);
 
@@ -117,6 +118,18 @@ int main(void) {
     igraph_destroy(&g);
     igraph_destroy(&g_star_undirected);
     igraph_destroy(&g_ring_undirected);
+
+    printf("\nTesting a tree\n");
+    igraph_kary_tree(&g, 20, 3, IGRAPH_TREE_OUT);
+    check_cycles(&g, IGRAPH_OUT, 0);
+    check_cycles(&g, IGRAPH_ALL, 0);
+    igraph_destroy(&g);
+
+    printf("\nTesting a complete DAG\n");
+    igraph_full_citation(&g, 5, IGRAPH_DIRECTED);
+    check_cycles(&g, IGRAPH_OUT, 0);
+    check_cycles(&g, IGRAPH_ALL, 37);
+    igraph_destroy(&g);
 
     igraph_t g_wheel_undirected_2;
     igraph_wheel(&g_wheel_undirected_2, 10, IGRAPH_WHEEL_UNDIRECTED, 0);
