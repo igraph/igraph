@@ -220,6 +220,10 @@ igraph_error_t igraph_find_cycle(const igraph_t *graph,
     igraph_bool_t known_acyclic = false;
     igraph_bool_t found;
 
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for finding cycles.", IGRAPH_EINVAL);
+    }
+
     if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
