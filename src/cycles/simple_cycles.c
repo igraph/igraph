@@ -299,6 +299,12 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  *
  * \param state The state structure to initialize.
  * \param graph The graph object.
+ * \param mode A constant specifying how edge directions are
+ *   considered in directed graphs. Valid modes are:
+ *   \c IGRAPH_OUT, follows edge directions;
+ *   \c IGRAPH_IN, follows the opposite directions; and
+ *   \c IGRAPH_ALL, ignores edge directions. This argument is
+ *   ignored for undirected graphs.
  * \return Error code.
  *
  * Time complexity: O(|V|*|E|*log(|V|*|E|))
@@ -307,10 +313,15 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  */
 static igraph_error_t igraph_simple_cycle_search_state_init(
         igraph_simple_cycle_search_state_t *state,
-        const igraph_t *graph) {
+        const igraph_t *graph,
+        igraph_neimode_t mode) {
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for finding cycles.", IGRAPH_EINVAL);
+    }
 
     state->N = igraph_vcount(graph);
-    state->directed = igraph_is_directed(graph);
+    state->directed = igraph_is_directed(graph) && mode != IGRAPH_ALL;
     state->stop_search = false;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&state->vertex_stack, 8);
@@ -324,7 +335,7 @@ static igraph_error_t igraph_simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_inclist_init(
         graph,
         &state->IK,
-        IGRAPH_OUT,
+        mode,
         IGRAPH_LOOPS_ONCE // each self-loop counts as a single cycle
     ));
     IGRAPH_FINALLY(igraph_inclist_destroy, &state->IK);
@@ -504,6 +515,12 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  * See also: \ref igraph_simple_cycles_callback()
  *
  * \param graph The graph to search for
+ * \param mode A constant specifying how edge directions are
+ *   considered in directed graphs. Valid modes are:
+ *   \c IGRAPH_OUT, follows edge directions;
+ *   \c IGRAPH_IN, follows the opposite directions; and
+ *   \c IGRAPH_ALL, ignores edge directions. This argument is
+ *   ignored for undirected graphs.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
  * \param callback A function to call for each cycle that is found.
@@ -520,6 +537,7 @@ static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  */
 igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
+        igraph_neimode_t mode,
         igraph_integer_t max_cycle_length,
         igraph_cycle_handler_t *callback,
         void *arg) {
@@ -530,7 +548,7 @@ igraph_error_t igraph_simple_cycles_callback(
 
     igraph_simple_cycle_search_state_t state;
 
-    IGRAPH_CHECK(igraph_simple_cycle_search_state_init(&state, graph));
+    IGRAPH_CHECK(igraph_simple_cycle_search_state_init(&state, graph, mode));
     IGRAPH_FINALLY(igraph_simple_cycle_search_state_destroy, &state);
 
     // TODO: depending on the graph, it is rather unreasonable to search cycles
@@ -574,6 +592,12 @@ igraph_error_t igraph_simple_cycles_callback(
  * \param graph The graph to search for cycles in.
  * \param vertices The vertex IDs of each cycle will be stored here.
  * \param edges The edge IDs of each cycle will be stored here.
+ * \param mode A constant specifying how edge directions are
+ *   considered in directed graphs. Valid modes are:
+ *   \c IGRAPH_OUT, follows edge directions;
+ *   \c IGRAPH_IN, follows the opposite directions; and
+ *   \c IGRAPH_ALL, ignores edge directions. This argument is
+ *   ignored for undirected graphs.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
  *
@@ -589,6 +613,7 @@ igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
+        igraph_neimode_t mode,
         igraph_integer_t max_cycle_length) {
 
     igraph_i_simple_cycle_results_t result_list;
@@ -602,7 +627,7 @@ igraph_error_t igraph_simple_cycles(
         igraph_vector_int_list_clear(edges);
     }
 
-    igraph_simple_cycles_callback(graph, max_cycle_length,
+    igraph_simple_cycles_callback(graph, mode, max_cycle_length,
                                   &igraph_i_append_simple_cycle_result,
                                   &result_list);
 

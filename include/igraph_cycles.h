@@ -51,13 +51,14 @@ typedef igraph_error_t igraph_cycle_handler_t(
         void *arg);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
-        const igraph_t *graph, igraph_integer_t max_cycle_length,
-        igraph_cycle_handler_t *callback, void *arg
-);
+        const igraph_t *graph,
+        igraph_neimode_t mode, igraph_integer_t max_cycle_length,
+        igraph_cycle_handler_t *callback, void *arg);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
-        const igraph_t *graph, igraph_vector_int_list_t *vertices,
-        igraph_vector_int_list_t *edges, igraph_integer_t max_cycle_length);
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+        igraph_neimode_t mode, igraph_integer_t max_cycle_length);
 
 __END_DECLS
 
