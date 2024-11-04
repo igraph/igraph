@@ -33,7 +33,8 @@
  * https://epubs.siam.org/doi/10.1137/0204007
  */
 
-/*
+
+/**
  * State of the cycle search algorithm. Storing all the state variables in a
  * single struct allows us to resume the algorithm from any point and yield the
  * cycles one by one in an iterator-like manner.
@@ -65,7 +66,8 @@ typedef struct igraph_simple_cycle_search_state_t {
 
     /* Boolean indicating whether the algorithm should stop searching for cycles */
     igraph_bool_t stop_search;
-} igraph_simple_cycle_search_state_t;
+} igraph_i_simple_cycle_search_state_t;
+
 
 /**
  * A struct to store one cycle found by the algorithm.
@@ -77,11 +79,12 @@ typedef struct {
     igraph_vector_int_list_t *edges;
 } igraph_i_simple_cycle_results_t;
 
+
 /**
  * The implementation of procedure UNBLOCK from Johnson's paper
  */
 static igraph_error_t igraph_i_simple_cycles_unblock(
-        igraph_simple_cycle_search_state_t *state,
+        igraph_i_simple_cycle_search_state_t *state,
         igraph_integer_t u) {
 
     // TODO: introduce stack for w & neis in order to reduce the number of iterations.
@@ -117,6 +120,7 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
     return IGRAPH_SUCCESS;
 }
 
+
 /**
  * The implementation of procedure CIRCUIT from Johnson's paper
  *
@@ -129,9 +133,8 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
  *   Pass a negative value for no limit
  * \param arg: argument to pass to the callback function
  */
-
 static igraph_error_t igraph_i_simple_cycles_circuit(
-        igraph_simple_cycle_search_state_t *state,
+        igraph_i_simple_cycle_search_state_t *state,
         igraph_integer_t V,
         igraph_cycle_handler_t *callback,
         igraph_integer_t max_cycle_length, void *arg) {
@@ -293,8 +296,9 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     return IGRAPH_SUCCESS;
 }
 
+
 /**
- * \function igraph_simple_cycle_search_state_init
+ * \function igraph_i_simple_cycle_search_state_init
  * \brief Initializes the cycle search state.
  *
  * \param state The state structure to initialize.
@@ -309,10 +313,10 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  *
  * Time complexity: O(|V|*|E|*log(|V|*|E|))
  *
- * \ref igraph_simple_cycle_search_state_destroy
+ * \ref igraph_i_simple_cycle_search_state_destroy
  */
-static igraph_error_t igraph_simple_cycle_search_state_init(
-        igraph_simple_cycle_search_state_t *state,
+static igraph_error_t igraph_i_simple_cycle_search_state_init(
+        igraph_i_simple_cycle_search_state_t *state,
         const igraph_t *graph,
         igraph_neimode_t mode) {
 
@@ -351,8 +355,9 @@ static igraph_error_t igraph_simple_cycle_search_state_init(
     return IGRAPH_SUCCESS;
 }
 
+
 /**
- * \function igraph_simple_cycle_search_state_destroy
+ * \function igraph_i_simple_cycle_search_state_destroy
  * \brief Destroys the cycle search state.
  *
  * \param state The state structure to destroy
@@ -360,9 +365,9 @@ static igraph_error_t igraph_simple_cycle_search_state_init(
  *
  * Time complexity: O(1).
  *
- * \ref igraph_simple_cycle_search_state_init
+ * \ref igraph_i_simple_cycle_search_state_init
  */
-static void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state) {
+static void igraph_i_simple_cycle_search_state_destroy(igraph_i_simple_cycle_search_state_t *state) {
     igraph_vector_int_destroy(&state->vertex_stack);
     igraph_vector_int_destroy(&state->edge_stack);
     igraph_vector_bool_destroy(&state->v_blocked);
@@ -370,6 +375,7 @@ static void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_
     igraph_inclist_destroy(&state->IK);
     igraph_adjlist_destroy(&state->B);
 }
+
 
 /**
  * A cycle handler that simply appends cycles to a vector list.
@@ -404,15 +410,16 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
     return IGRAPH_SUCCESS;
 }
 
+
 /**
- * \function igraph_simple_cycles_search_callback_from_one_vertex
+ * \function igraph_i_simple_cycles_search_callback_from_one_vertex
  * \brief Search simple cycles starting from one vertex.
  *
  * \param state The state structure to search on.
  * \param s The vertex index to start search with.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value for no limit.
- * \param cycle_handler The callback function to call when a cycle is found.
+ * \param callback The callback function to call when a cycle is found.
  *   See \ref igraph_cycle_handler_t() for details.
  * \param arg The additional argument(s) for the callback function.
  *
@@ -422,8 +429,8 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
  * https://stackoverflow.com/a/35922906/3909202
  * https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
-static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
-        igraph_simple_cycle_search_state_t *state,
+static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
+        igraph_i_simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_integer_t max_cycle_length,
         igraph_cycle_handler_t *callback,
@@ -453,46 +460,6 @@ static igraph_error_t igraph_simple_cycles_search_callback_from_one_vertex(
     return IGRAPH_SUCCESS;
 }
 
-#if 0
-/* Currently unused and unexposed, temporarily disabled with #if 0 ... #endif. */
-/**
- * \function igraph_simple_cycles_search_from_one_vertex
- * \brief Search simple cycles starting from one vertex.
- *
- * \experimental
- *
- * \param state The state structure to search on.
- * \param s The vertex index to start search with.
- * \param vertices The vertex IDs of each cycle will be stored here.
- * \param edges The edge IDs of each cycle will be stored here.
- * \param max_cycle_length Limit the maximum length of cycles to search for.
- *   Pass a negative value for no limit.
- *
- * \return Error code.
- *
- * See also: \ref igraph_simple_cycles_search_callback_from_one_vertex()
- *
- * https://en.wikipedia.org/wiki/Johnson%27s_algorithm
- * https://stackoverflow.com/a/35922906/3909202
- * https://epubs.siam.org/doi/epdf/10.1137/0204007
- */
-static igraph_error_t igraph_simple_cycles_search_from_one_vertex(
-        igraph_simple_cycle_search_state_t *state,
-        igraph_integer_t s,
-        igraph_vector_int_list_t *vertices,
-        igraph_vector_int_list_t *edges,
-        igraph_integer_t max_cycle_length) {
-
-    igraph_i_simple_cycle_results_t result_list;
-    result_list.vertices = vertices;
-    result_list.edges = edges;
-
-    igraph_simple_cycles_search_callback_from_one_vertex(
-        state, s, max_cycle_length, &igraph_i_append_simple_cycle_result, &result_list);
-
-    return IGRAPH_SUCCESS;
-}
-#endif
 
 /**
  * \function igraph_simple_cycles_callback
@@ -546,16 +513,16 @@ igraph_error_t igraph_simple_cycles_callback(
         return IGRAPH_SUCCESS;
     }
 
-    igraph_simple_cycle_search_state_t state;
+    igraph_i_simple_cycle_search_state_t state;
 
-    IGRAPH_CHECK(igraph_simple_cycle_search_state_init(&state, graph, mode));
-    IGRAPH_FINALLY(igraph_simple_cycle_search_state_destroy, &state);
+    IGRAPH_CHECK(igraph_i_simple_cycle_search_state_init(&state, graph, mode));
+    IGRAPH_FINALLY(igraph_i_simple_cycle_search_state_destroy, &state);
 
     // TODO: depending on the graph, it is rather unreasonable to search cycles
     // from each and every node
     for (igraph_integer_t i = 0; i < state.N; i++) {
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
-            IGRAPH_CHECK(igraph_simple_cycles_search_callback_from_one_vertex(
+            IGRAPH_CHECK(igraph_i_simple_cycles_search_callback_from_one_vertex(
                     &state, i, max_cycle_length, callback, arg));
             IGRAPH_ALLOW_INTERRUPTION();
         }
@@ -565,11 +532,12 @@ igraph_error_t igraph_simple_cycles_callback(
         }
     }
 
-    igraph_simple_cycle_search_state_destroy(&state);
+    igraph_i_simple_cycle_search_state_destroy(&state);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
+
 
 /**
  * \function igraph_simple_cycles
