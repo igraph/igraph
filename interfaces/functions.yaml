@@ -2509,7 +2509,7 @@ igraph_solve_lsap:
 igraph_find_cycle:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
-        NEIMODE mode
+        NEIMODE mode=OUT
     DEPS: vertices ON graph, edges ON graph
 
 #######################################
