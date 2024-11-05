@@ -1171,7 +1171,7 @@ igraph_bfs:
         OUT VERTEX_INDICES order, OUT VECTOR_INT rank,
         OUT VECTOR_INT parents,
         OUT VECTOR_INT pred, OUT VECTOR_INT succ,
-        OUT VECTOR_INT dist, BFS_FUNC callback, EXTRA extra
+        OUT VECTOR_INT dist, OPTIONAL BFS_FUNC callback, OPTIONAL EXTRA extra
 
 igraph_bfs_simple:
     PARAMS: |-
@@ -1186,7 +1186,7 @@ igraph_dfs:
         GRAPH graph, VERTEX root, NEIMODE mode=OUT, BOOLEAN unreachable,
         OUT VERTEX_INDICES order, OUT VERTEX_INDICES order_out,
         OUT VECTOR_INT father, OUT VECTOR_INT dist,
-        DFS_FUNC in_callback, DFS_FUNC out_callback, EXTRA extra
+        OPTIONAL DFS_FUNC in_callback, OPTIONAL DFS_FUNC out_callback, OPTIONAL EXTRA extra
 
 #######################################
 # Bipartite graphs
@@ -1323,7 +1323,7 @@ igraph_cliques:
 igraph_cliques_callback:
     PARAMS: |-
         GRAPH graph, INTEGER min_size=0, INTEGER max_size=0,
-        CLIQUE_FUNC cliquehandler_fn, EXTRA arg
+        CLIQUE_FUNC cliquehandler_fn, OPTIONAL EXTRA arg
 
 igraph_clique_size_hist:
     PARAMS: |-
@@ -1345,7 +1345,7 @@ igraph_maximal_cliques_subset:
 
 igraph_maximal_cliques_callback:
     PARAMS: |-
-        GRAPH graph, CLIQUE_FUNC cliquehandler_fn, EXTRA arg,
+        GRAPH graph, CLIQUE_FUNC cliquehandler_fn, OPTIONAL EXTRA arg,
         INTEGER min_size=0, INTEGER max_size=0
 
 igraph_maximal_cliques_count:
@@ -1710,7 +1710,8 @@ igraph_community_leading_eigenvector:
         OPTIONAL OUT VECTOR eigenvalues,
         OPTIONAL OUT VECTOR_LIST eigenvectors,
         OPTIONAL OUT VECTOR history,
-        LEVCFUNC callback, EXTRA callback_extra
+        OPTIONAL LEVCFUNC callback,
+        OPTIONAL EXTRA callback_extra
 
 igraph_community_fluid_communities:
     PARAMS: |-
@@ -2264,7 +2265,7 @@ igraph_isomorphic_vf2:
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
         OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
-        EXTRA extra
+        OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2274,8 +2275,10 @@ igraph_count_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
-        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
+        OUT INTEGER count, 
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2285,8 +2288,10 @@ igraph_get_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT VECTOR_INT_LIST maps, ISOCOMPAT_FUNC node_compat_fn,
-        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
+        OUT VECTOR_INT_LIST maps, 
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2301,8 +2306,9 @@ igraph_subisomorphic_vf2:
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OUT BOOLEAN iso,
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
-        OPTIONAL ISOCOMPAT_FUNC node_compat_fn, OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
-        EXTRA extra
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
+        OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2313,8 +2319,10 @@ igraph_get_subisomorphisms_vf2_callback:
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
-        ISOMORPHISM_FUNC ishohandler_fn, OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, EXTRA arg
+        ISOMORPHISM_FUNC ishohandler_fn, 
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL EXTRA arg
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2324,8 +2332,10 @@ igraph_count_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT INTEGER count, ISOCOMPAT_FUNC node_compat_fn,
-        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
+        OUT INTEGER count, 
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2335,8 +2345,10 @@ igraph_get_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT VECTOR_INT_LIST maps, ISOCOMPAT_FUNC node_compat_fn,
-        ISOCOMPAT_FUNC edge_compat_fn, EXTRA extra
+        OUT VECTOR_INT_LIST maps, 
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2489,13 +2501,13 @@ igraph_cmp_epsilon:
 
 igraph_eigen_matrix:
     PARAMS: |-
-        MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
+        MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, OPTIONAL EXTRA extra,
         EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         INOUT ARPACKSTORAGE storage, OUT VECTOR_COMPLEX values, OUT MATRIX_COMPLEX vectors
 
 igraph_eigen_matrix_symmetric:
     PARAMS: |-
-        MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
+        MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, OPTIONAL EXTRA extra,
         EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors
 
@@ -2523,7 +2535,7 @@ igraph_simple_cycles_callback:
     PARAMS: |-
         GRAPH graph,
         NEIMODE mode=OUT, INTEGER max_cycle_length=-1,
-        CYCLE_FUNC cycle_handler, EXTRA arg
+        CYCLE_FUNC cycle_handler, OPTIONAL EXTRA arg
 
 #######################################
 # Eulerian functions
@@ -2650,10 +2662,10 @@ igraph_has_attribute_table:
 #######################################
 
 igraph_progress:
-    PARAMS: CSTRING message, REAL percent, EXTRA data
+    PARAMS: CSTRING message, REAL percent, OPTIONAL EXTRA data
 
 igraph_status:
-    PARAMS: CSTRING message, EXTRA data
+    PARAMS: CSTRING message, OPTIONAL EXTRA data
 
 igraph_strerror:
     PARAMS: ERROR igraph_errno
