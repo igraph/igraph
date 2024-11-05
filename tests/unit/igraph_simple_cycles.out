@@ -1819,3 +1819,71 @@ Edge IDs in cycles:
   0: ( 0 3 6 5 2 4 )
   1: ( 1 5 2 4 )
 }
+
+Testing undirected graph of type 'Mickey'
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 )
+  1: ( 0 1 2 )
+  2: ( 0 3 4 5 )
+}
+Edge IDs in cycles:
+{
+  0: ( 3 )
+  1: ( 0 1 2 )
+  2: ( 4 5 6 7 )
+}
+
+Testing undirected graph of type 'Mickey2'
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 0 3 4 5 )
+  2: ( 1 )
+}
+Edge IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 4 5 6 7 )
+  2: ( 3 )
+}
+Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 0 3 4 5 )
+  2: ( 1 )
+}
+Edge IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 4 5 6 7 )
+  2: ( 3 )
+}
+
+Testing undirected graph of type 'Mickey3'
+Finished search, found 6 cycles, expected 6 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 0 3 4 5 )
+  2: ( 1 )
+  3: ( 5 )
+  4: ( 5 )
+  5: ( 5 6 )
+}
+Edge IDs in cycles:
+{
+  0: ( 0 1 2 )
+  1: ( 3 4 5 6 )
+  2: ( 7 )
+  3: ( 11 )
+  4: ( 10 )
+  5: ( 8 9 )
+}
