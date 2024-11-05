@@ -206,7 +206,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 
                 if ((!state->directed &&
                     igraph_vector_int_size(&state->edge_stack) == 1 &&
-                    igraph_vector_int_get(&state->edge_stack, 0) == WE)) {
+                    VECTOR(state->edge_stack)[0] == WE)) {
                     // printf("Skipping cycle to prevent self-loop: \n");
                     continue;
                 }
@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 // prevent duplicates in undirected graphs by forcing a direction for
                 // the closing edge
                 if ((!state->directed &&
-                     igraph_vector_int_get(&state->edge_stack, 0) > WE)) {
+                     VECTOR(state->edge_stack)[0] > WE)) {
                     // printf("Skipping cycle to prevent duplicates: \n");
                     continue;
                 }
