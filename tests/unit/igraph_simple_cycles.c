@@ -27,7 +27,7 @@ void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_integ
     igraph_vector_int_list_init(&results_v, 0);
     igraph_vector_int_list_init(&results_e, 0);
 
-    igraph_simple_cycles(graph, &results_v, &results_e, mode, max_cycle_length);
+    igraph_simple_cycles(graph, &results_v, &results_e, mode, 0, max_cycle_length);
 
     printf("Finished search, found %" IGRAPH_PRId
            " cycles, expected %" IGRAPH_PRId " cycles."
@@ -376,7 +376,66 @@ int main(void) {
     check_cycles_max(&g, IGRAPH_OUT, 2, 6);
     igraph_destroy(&g);
 
+    printf("\nTesting directed graph of type 'unnamed'\n");
+    igraph_small(&g, 7, IGRAPH_DIRECTED,
+                     0,1, 
+                     1,2, 
+                     2,0,
+                     0,0,
+                     0,3, 
+                     3,4, 
+                     4,5, 
+                     5,0,
+                     -1);
+    check_cycles(&g, IGRAPH_OUT, 3);
+    igraph_destroy(&g);
+
+    printf("\nTesting directed graph of type 'unnamed2'\n");
+    igraph_small(&g, 7, IGRAPH_DIRECTED,
+                     0,1, 
+                     1,2, 
+                     2,0,
+                     1,1,
+                     0,3, 
+                     3,4, 
+                     4,5, 
+                     5,0,
+                     -1);
+    check_cycles(&g, IGRAPH_OUT, 3);
+    igraph_destroy(&g);
+
     VERIFY_FINALLY_STACK();
+
+    {
+        igraph_vector_int_list_t v;
+
+        igraph_vector_int_list_init(&v, 0);
+
+        igraph_small(&g, 7, IGRAPH_DIRECTED,
+                     0,1, 1,2, 2,0,
+                     0,0,
+                     0,3, 3,4, 4,5, 5,0,
+                     -1);
+
+        // Check that passing NULL vector lists doesn't crash.
+        igraph_simple_cycles(&g, NULL, NULL, IGRAPH_ALL, -1, -1);
+
+        // Test limit on minimum cycle size.
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, -1, -1);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
+
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 1, -1);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
+
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, 2, -1);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 2);
+
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 2, 3);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 1);
+
+        igraph_destroy(&g);
+        igraph_vector_int_list_destroy(&v);
+    }
 
     return 0;
 }
