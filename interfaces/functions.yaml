@@ -59,7 +59,7 @@ igraph_is_directed:
 igraph_degree:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL,
-        BOOLEAN loops
+        BOOLEAN loops=True
     DEPS: vids ON graph
 
 igraph_edge:
