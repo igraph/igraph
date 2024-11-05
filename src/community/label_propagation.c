@@ -26,6 +26,8 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 /**
  * \ingroup communities
  * \function igraph_community_label_propagation
@@ -129,6 +131,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_bool_t running, control_iteration;
     igraph_bool_t unlabelled_left;
     igraph_neimode_t reversed_mode;
+    int iter = 0; /* interruption counter */
 
     igraph_vector_t label_counters; /* real type, stores weight sums */
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
@@ -264,6 +267,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         igraph_vector_int_t *neis;
         igraph_vector_int_t *ineis;
         igraph_bool_t was_zero;
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         if (control_iteration) {
             /* If we are in the control iteration, we expect in the beginning of
@@ -410,7 +415,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_CHECK(igraph_dqueue_int_init(&q, 0));
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
-        for (i=0; i < no_of_nodes; ++i) {
+        for (i=0; i < no_of_not_fixed_nodes; ++i) {
             igraph_integer_t v = VECTOR(node_order)[i];
 
             /* Is this node unlabelled? */

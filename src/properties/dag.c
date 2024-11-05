@@ -80,7 +80,7 @@ igraph_error_t igraph_topological_sorting(
     } else if (mode == IGRAPH_IN) {
         deg_mode = IGRAPH_OUT;
     } else {
-        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode for topological sorting.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
@@ -216,7 +216,7 @@ finalize:
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
 
-    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_DAG, *res);
+    igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_DAG, *res);
 
     return IGRAPH_SUCCESS;
 }

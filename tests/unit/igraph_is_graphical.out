@@ -49,6 +49,21 @@ simple: false, loops: false, multi: false, multiloops:  true
 ( 1 1 4 )
 simple: false, loops:  true, multi: false, multiloops:  true
 
+( 7 7 3 2 2 1 )
+simple: false, loops: false, multi:  true, multiloops:  true
+
+( 7 7 3 3 2 2 )
+simple: false, loops:  true, multi:  true, multiloops:  true
+
+( 6 6 6 4 2 0 )
+simple: false, loops: false, multi:  true, multiloops:  true
+
+( 6 6 6 4 4 0 )
+simple: false, loops:  true, multi:  true, multiloops:  true
+
+( 6 6 6 4 3 1 )
+simple: false, loops:  true, multi:  true, multiloops:  true
+
 ( 2 2 2 2 4 )
 simple:  true, loops:  true, multi:  true, multiloops:  true
 
@@ -118,4 +133,36 @@ simple:  true, loops:  true, multi:  true, multiloops:  true
 ( 1 0 2 )
 ( 0 1 2 )
 simple: false, loops:  true, multi: false, multiloops:  true
+
+( 4 3 0 3 4 )
+( 3 3 4 3 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 4 4 3 3 4 )
+( 4 4 4 4 2 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 2 4 0 3 1 )
+( 3 2 3 1 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 11 0 0 0 7 0 9 0 13 0 0 0 0 0 0 )
+( 3 4 4 4 3 4 3 4 2 3 2 2 1 1 0 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 8 4 0 0 5 0 8 9 7 0 0 11 14 13 0 )
+( 8 8 9 9 8 8 6 5 6 4 3 2 1 1 1 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 8 4 1 0 5 0 8 9 7 0 0 11 14 13 0 )
+( 8 8 10 9 8 8 6 5 6 4 3 2 1 1 1 )
+simple: false, loops:  true, multi:  true, multiloops:  true
+
+( 9 4 0 0 5 0 8 9 7 0 0 11 14 13 0 )
+( 8 9 9 9 8 8 6 5 6 4 3 2 1 1 1 )
+simple: false, loops:  true, multi:  true, multiloops:  true
+
+( 8 4 0 0 5 0 8 9 7 0 0 11 14 14 0 )
+( 8 8 9 9 8 8 6 5 6 4 3 3 1 1 1 )
+simple: false, loops: false, multi:  true, multiloops:  true
 

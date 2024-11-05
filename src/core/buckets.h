@@ -42,8 +42,8 @@ void igraph_buckets_destroy(igraph_buckets_t *b);
 void igraph_buckets_clear(igraph_buckets_t *b);
 igraph_integer_t igraph_buckets_popmax(igraph_buckets_t *b);
 igraph_integer_t igraph_buckets_pop(igraph_buckets_t *b, igraph_integer_t bucket);
-igraph_bool_t igraph_buckets_empty(const igraph_buckets_t *b);
-igraph_bool_t igraph_buckets_empty_bucket(const igraph_buckets_t *b,
+IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_buckets_empty(const igraph_buckets_t *b);
+IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_buckets_empty_bucket(const igraph_buckets_t *b,
         igraph_integer_t bucket);
 void igraph_buckets_add(igraph_buckets_t *b, igraph_integer_t bucket,
                         igraph_integer_t elem);
@@ -59,8 +59,8 @@ void igraph_dbuckets_destroy(igraph_dbuckets_t *b);
 void igraph_dbuckets_clear(igraph_dbuckets_t *b);
 igraph_integer_t igraph_dbuckets_popmax(igraph_dbuckets_t *b);
 igraph_integer_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_integer_t bucket);
-igraph_bool_t igraph_dbuckets_empty(const igraph_dbuckets_t *b);
-igraph_bool_t igraph_dbuckets_empty_bucket(const igraph_dbuckets_t *b,
+IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_dbuckets_empty(const igraph_dbuckets_t *b);
+IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_dbuckets_empty_bucket(const igraph_dbuckets_t *b,
         igraph_integer_t bucket);
 void igraph_dbuckets_add(igraph_dbuckets_t *b, igraph_integer_t bucket,
                          igraph_integer_t elem);

@@ -79,7 +79,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: failure
+          name: failure-${{ matrix.arch }}-${{ matrix.shared_libs }}
           path: |
             build-${{ matrix.arch }}/tests/*
             !build-${{ matrix.arch }}/tests/*.exe

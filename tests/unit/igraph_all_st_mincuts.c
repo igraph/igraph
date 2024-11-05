@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2023  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2023-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ int main(void) {
     igraph_vector_int_list_t cuts;
     igraph_real_t value;
 
+    printf("Graph 1:\n");
     igraph_small(&g, 5, IGRAPH_DIRECTED,
                  0, 1, 1, 2, 2, 3, 3, 4,
                  -1);
@@ -66,47 +67,52 @@ int main(void) {
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 0, /*target=*/ 4,
-                          /*capacity=*/ 0);
+                          /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
     /* ---------------------------------------------------------------- */
 
+    printf("Graph 2:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, 4, 5, -1);
     igraph_vector_int_list_init(&partitions, 0);
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
-                          /*source=*/ 0, /*target=*/ 5, /*capacity=*/ 0);
+                          /*source=*/ 0, /*target=*/ 5, /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
     /* ---------------------------------------------------------------- */
 
+    printf("Graph 3:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, 4, 5, -1);
     igraph_vector_int_list_init(&partitions, 0);
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
-                          /*source=*/ 0, /*target=*/ 4, /*capacity=*/ 0);
+                          /*source=*/ 0, /*target=*/ 4, /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
     /* ---------------------------------------------------------------- */
 
+    printf("Graph 4:\n");
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,
                  -1);
     igraph_vector_int_list_init(&partitions, 0);
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
-                          /*source=*/ 0, /*target=*/ 3, /*capacity=*/ 0);
+                          /*source=*/ 0, /*target=*/ 3, /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
     /* ---------------------------------------------------------------- */
+
+    printf("Graph 5:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED,
                  1, 0, 2, 0, 2, 1, 3, 2,
                  -1);
@@ -114,12 +120,14 @@ int main(void) {
     igraph_vector_int_list_init(&partitions, 0);
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
-                          /*source=*/ 2, /*target=*/ 0, /*capacity=*/ 0);
+                          /*source=*/ 2, /*target=*/ 0, /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
     /* ---------------------------------------------------------------- */
+
+    printf("Graph 6:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED,
                  1, 0, 2, 0, 2, 1, 2, 3,
                  -1);
@@ -127,12 +135,14 @@ int main(void) {
     igraph_vector_int_list_init(&partitions, 0);
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
-                          /*source=*/ 2, /*target=*/ 0, /*capacity=*/ 0);
+                          /*source=*/ 2, /*target=*/ 0, /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);
 
     /* ---------------------------------------------------------------- */
+
+    printf("Graph 7:\n");
     igraph_small(&g, 9, IGRAPH_DIRECTED,
                  0, 4,  0, 7,  1, 6,  2, 1,  3, 8,  4, 0,  4, 2,
                  4, 5,  5, 0,  5, 3,  6, 7,  7, 8,
@@ -141,7 +151,37 @@ int main(void) {
     igraph_vector_int_list_init(&partitions, 0);
     igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
-                          /*source=*/ 0, /*target=*/ 8, /*capacity=*/ 0);
+                          /*source=*/ 0, /*target=*/ 8, /*capacity=*/ NULL);
+
+    print_and_destroy(&g, value, &partitions, &cuts);
+    igraph_destroy(&g);
+
+    /* ---------------------------------------------------------------- */
+
+    printf("Graph 8:\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 2, 3, 0, 1, 2, 5, 1, 2, 4, 3, 5, 5, 4,
+                 -1);
+
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
+    igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
+                          /*source=*/ 3, /*target=*/ 4, /*capacity=*/ NULL);
+
+    print_and_destroy(&g, value, &partitions, &cuts);
+    igraph_destroy(&g);
+
+    /* ---------------------------------------------------------------- */
+
+    printf("Graph 9:\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 1, 2, 0, 3, 0, 4, 0, 0, 5, 3, 1, 1, 4, 3, 2, 2, 5, 4, 3, 5, 3, 5, 4,
+                 -1);
+
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
+    igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
+                          /*source=*/ 3, /*target=*/ 0, /*capacity=*/ NULL);
 
     print_and_destroy(&g, value, &partitions, &cuts);
     igraph_destroy(&g);

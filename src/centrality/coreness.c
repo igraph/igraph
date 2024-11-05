@@ -63,7 +63,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     igraph_neimode_t omode;
 
     if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
-        IGRAPH_ERROR("Invalid mode in k-cores.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode in k-cores.", IGRAPH_EINVMODE);
     }
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;

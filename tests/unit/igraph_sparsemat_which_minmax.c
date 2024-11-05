@@ -140,10 +140,9 @@ int doit(int which) {
     printf("Random triplet matrix\n");
     igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ M, /*nzmax=*/ NZ + 5);
     for (i = 0; i < NZ; i++) {
-        int r = igraph_rng_get_integer(igraph_rng_default(), 0, N - 1);
-        int c = igraph_rng_get_integer(igraph_rng_default(), 0, M - 1);
-        igraph_real_t x = igraph_rng_get_integer(igraph_rng_default(),
-                          -10, 10);
+        igraph_integer_t r = RNG_INTEGER(0, N-1);
+        igraph_integer_t c = RNG_INTEGER(0, M-1);
+        igraph_real_t x = RNG_INTEGER(-10, 10);
         IGRAPH_ASSERT(x >= -10 && x <= 10);
         igraph_sparsemat_entry(&A, r, c, x);
     }

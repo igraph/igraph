@@ -82,6 +82,14 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/larah19"><img src="https://avatars.githubusercontent.com/u/54937363?v=4?s=100" width="100px;" alt=""/><br /><sub><b>larah19</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=larah19" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Biswa96"><img src="https://avatars.githubusercontent.com/u/31443074?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Biswapriyo Nath</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Biswa96" title="Code">💻</a></td>
     <td align="center"><a href="http://cecinestpasunefromage.wordpress.com/"><img src="https://avatars.githubusercontent.com/u/2363820?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gwyn Ciesla</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=limburgher" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/aagon"><img src="https://avatars.githubusercontent.com/u/10883752?v=4?s=100" width="100px;" alt=""/><br /><sub><b>aagon</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=aagon" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/GanzuraTheConsumer"><img src="https://avatars.githubusercontent.com/u/19657136?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Quinn Buratynski</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=GanzuraTheConsumer" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Tagl"><img src="https://avatars.githubusercontent.com/u/7704746?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Arnar Bjarni Arnarson</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Tagl" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/SoapGentoo"><img src="https://avatars.githubusercontent.com/u/16636962?v=4?s=100" width="100px;" alt=""/><br /><sub><b>David Seifert</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=SoapGentoo" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://fosstodon.org/@kirill"><img src="https://avatars.githubusercontent.com/u/1741643?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kirill Müller</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=krlmlr" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/gendelpiekel"><img src="https://avatars.githubusercontent.com/u/14215028?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michael</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=gendelpiekel" title="Code">💻</a></td>
   </tr>
 </table>
 

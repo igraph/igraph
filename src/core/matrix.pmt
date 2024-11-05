@@ -154,7 +154,7 @@ const TYPE(igraph_matrix)* FUNCTION(igraph_matrix, view)(
  * Time complexity: O(1).
  */
 
-IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
+const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
     const TYPE(igraph_matrix) *m, const TYPE(igraph_vector) *v,
     igraph_integer_t nrow
 ) {
@@ -720,9 +720,9 @@ BASE FUNCTION(igraph_matrix, sum)(const TYPE(igraph_matrix) *m) {
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    equal to the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the dimensions of the matrices don't match.
+ * \return True if the elements in the \p lhs are all
+ *    equal to the corresponding elements in \p rhs. Returns false
+ *    if the dimensions of the matrices don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
  */
@@ -747,9 +747,9 @@ FUNCTION(igraph_matrix, is_equal)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    less than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the dimensions of the matrices don't match.
+ * \return True if the elements in the \p lhs are all
+ *    less than the corresponding elements in \p rhs. Returns false
+ *    if the dimensions of the matrices don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
  */
@@ -766,9 +766,9 @@ igraph_bool_t FUNCTION(igraph_matrix, all_l)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    greater than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the dimensions of the matrices don't match.
+ * \return True if the elements in the \p lhs are all
+ *    greater than the corresponding elements in \p rhs. Returns false
+ *    if the dimensions of the matrices don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
  */
@@ -785,9 +785,9 @@ igraph_bool_t FUNCTION(igraph_matrix, all_g)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    less than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the dimensions of the matrices
+ *    rhs. Returns false if the dimensions of the matrices
  *    don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
@@ -806,9 +806,9 @@ FUNCTION(igraph_matrix, all_le)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    greater than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the dimensions of the matrices
+ *    rhs. Returns false if the dimensions of the matrices
  *    don't match.
  *
  * Time complexity: O(nm), the size of the matrices.

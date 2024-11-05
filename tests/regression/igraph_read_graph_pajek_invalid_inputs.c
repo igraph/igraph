@@ -18,7 +18,7 @@
    02110-1301 USA
 */
 
-#include "igraph.h"
+#include <igraph.h>
 #include <stdio.h>
 
 int test_file(const char* fname) {

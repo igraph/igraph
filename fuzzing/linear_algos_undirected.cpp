@@ -21,10 +21,7 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
+#include "fuzz_utilities.h"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
@@ -36,7 +33,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, Size-1));
+    igraph_vector_int_init(&edges, Size-1);
     for (size_t i=0; i < Size-1; ++i) {
         VECTOR(edges)[i] = Data[i+1];
     }
@@ -49,19 +46,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_integer_t i, i2;
-        igraph_bool_t b, b2;
+        igraph_bool_t b, b2, loop, multi, graphical;
         igraph_real_t r;
         igraph_t g;
 
-        check_err(igraph_vector_int_list_init(&ivl1, 0));
-        check_err(igraph_vector_int_list_init(&ivl2, 0));
-        check_err(igraph_vector_int_init(&iv1, 0));
-        check_err(igraph_vector_int_init(&iv2, 0));
-        check_err(igraph_vector_int_init(&iv3, 0));
-        check_err(igraph_vector_int_init(&iv4, 0));
-        check_err(igraph_vector_int_init(&iv5, 0));
-        check_err(igraph_vector_bool_init(&bv, 0));
-        check_err(igraph_matrix_init(&m, 0, 0));
+        igraph_vector_int_list_init(&ivl1, 0);
+        igraph_vector_int_list_init(&ivl2, 0);
+        igraph_vector_int_init(&iv1, 0);
+        igraph_vector_int_init(&iv2, 0);
+        igraph_vector_int_init(&iv3, 0);
+        igraph_vector_int_init(&iv4, 0);
+        igraph_vector_int_init(&iv5, 0);
+        igraph_vector_bool_init(&bv, 0);
+        igraph_matrix_init(&m, 0, 0);
 
         igraph_biconnected_components(&graph, &i, NULL, &ivl1, &ivl2, &iv1);
         igraph_maximum_cardinality_search(&graph, &iv1, &iv2);
@@ -73,6 +70,68 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_is_loop(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO));
         igraph_is_multiple(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_ID));
         igraph_maxdegree(&graph, &i, igraph_vss_all(), IGRAPH_ALL, true);
+
+        /* Graphicality and graph realization based on the degrees of 'graph'. */
+        igraph_has_loop(&graph, &loop);
+        igraph_has_multiple(&graph, &multi);
+        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, true);
+        igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &graphical);
+        if (!loop && !multi) {
+            IGRAPH_ASSERT(graphical);
+        }
+        if (graphical) {
+            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+            igraph_destroy(&g);
+            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+            igraph_destroy(&g);
+            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+            igraph_destroy(&g);
+        } else {
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX),
+                IGRAPH_EINVAL);
+        }
+        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW, &graphical);
+        if (!multi) {
+            IGRAPH_ASSERT(graphical);
+            /* Undirected realization is not yet implemented. */
+        }
+        igraph_is_graphical(&iv1, NULL, IGRAPH_MULTI_SW, &graphical);
+        if (!loop) {
+            IGRAPH_ASSERT(graphical);
+        }
+        if (graphical) {
+            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+            igraph_destroy(&g);
+            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+            igraph_destroy(&g);
+            igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+            igraph_destroy(&g);
+        } else {
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST),
+                IGRAPH_EINVAL);
+            CHECK_ERROR(
+                igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX),
+                IGRAPH_EINVAL);
+        }
+        igraph_is_graphical(&iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &graphical);
+        IGRAPH_ASSERT(graphical);
+        igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+        igraph_destroy(&g);
+        igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+        igraph_destroy(&g);
+        igraph_realize_degree_sequence(&g, &iv1, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
+        igraph_destroy(&g);
 
         // These algorithms require a starting vertex,
         // so we require the graph to have at least one vertex.
@@ -103,6 +162,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_is_eulerian(&graph, &b, &b2);
         if (b) igraph_eulerian_path(&graph, &iv1, &iv2);
         if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
+
+        igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS);
+        igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_DSATUR);
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
         igraph_minimum_spanning_tree_unweighted(&graph, &g);
@@ -136,12 +198,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
         }
 
+        /* Basic graph modification */
         igraph_add_vertices(&graph, 3, NULL);
         igraph_degree_1(&graph, &i, 0, IGRAPH_ALL, IGRAPH_NO_LOOPS);
         igraph_delete_vertices(&graph, igraph_vss_1(0));
         igraph_add_edge(&graph, 0, 1);
         igraph_count_multiple_1(&graph, &i, 0);
         igraph_delete_edges(&graph, igraph_ess_1(0));
+
+        if (igraph_vcount(&graph) >= 4) {
+            igraph_rewire(&graph, igraph_ecount(&graph) + 1, IGRAPH_REWIRING_SIMPLE);
+        }
 
         igraph_matrix_destroy(&m);
         igraph_vector_bool_destroy(&bv);

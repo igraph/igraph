@@ -39,14 +39,14 @@ static igraph_error_t igraph_to_cliquer(const igraph_t *ig, graph_t **cg) {
     igraph_integer_t i;
 
     if (igraph_is_directed(ig)) {
-        IGRAPH_WARNING("Edge directions are ignored for clique calculations");
+        IGRAPH_WARNING("Edge directions are ignored for clique calculations.");
     }
 
     vcount = igraph_vcount(ig);
     ecount = igraph_ecount(ig);
 
     if (vcount > INT_MAX) {
-        IGRAPH_ERROR("Graph too large for Cliquer", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph too large for Cliquer.", IGRAPH_EOVERFLOW);
     }
 
     *cg = graph_new((int) vcount);
@@ -71,16 +71,16 @@ static igraph_error_t set_weights(const igraph_vector_t *vertex_weights, graph_t
     IGRAPH_ASSERT(vertex_weights != NULL);
 
     if (igraph_vector_size(vertex_weights) != g->n) {
-        IGRAPH_ERROR("Invalid vertex weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex weight vector length.", IGRAPH_EINVAL);
     }
 
     for (i = 0; i < g->n; ++i) {
         g->weights[i] = VECTOR(*vertex_weights)[i];
         if (g->weights[i] != VECTOR(*vertex_weights)[i]) {
-            IGRAPH_WARNING("Only integer vertex weights are supported; weights will be truncated to their integer parts");
+            IGRAPH_WARNING("Only integer vertex weights are supported; weights will be truncated to their integer parts.");
         }
         if (g->weights[i] <= 0) {
-            IGRAPH_ERROR("Vertex weights must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Vertex weights must be positive.", IGRAPH_EINVAL);
         }
     }
 
@@ -155,7 +155,8 @@ igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int
     }
 
     if (max_size > 0 && max_size < min_size) {
-        IGRAPH_ERROR("max_size must not be smaller than min_size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Maximum clique size must not be smaller than the minimum clique size.",
+                     IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
@@ -301,7 +302,8 @@ igraph_error_t igraph_i_cliquer_callback(const igraph_t *graph,
     }
 
     if (max_size > 0 && max_size < min_size) {
-        IGRAPH_ERROR("max_size must not be smaller than min_size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Maximum clique size must not be smaller than the minimum clique size.",
+                     IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
@@ -340,12 +342,12 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
     }
 
     if (min_weight != (int) min_weight) {
-        IGRAPH_WARNING("Only integer vertex weights are supported; the minimum weight will be truncated to its integer part");
+        IGRAPH_WARNING("Only integer vertex weights are supported; the minimum weight will be truncated to its integer part.");
         min_weight  = (int) min_weight;
     }
 
     if (max_weight != (int) max_weight) {
-        IGRAPH_WARNING("Only integer vertex weights are supported; the maximum weight will be truncated to its integer part");
+        IGRAPH_WARNING("Only integer vertex weights are supported; the maximum weight will be truncated to its integer part.");
         max_weight = (int) max_weight;
     }
 
@@ -357,7 +359,8 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
     }
 
     if (max_weight > 0 && max_weight < min_weight) {
-        IGRAPH_ERROR("max_weight must not be smaller than min_weight", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Maximum clique weight must not be smaller than minimum clique weight.",
+                     IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));

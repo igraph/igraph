@@ -57,12 +57,12 @@
  * \param types Number of node types.
  * \param edges_per_step The number of connections tried in each time step.
  * \param type_dist Vector giving the distribution of the vertex types.
- * If \c NULL, the distribution is assumed to be uniform.
+ *    If \c NULL, the distribution is assumed to be uniform.
  * \param pref_matrix Matrix giving the connection probabilities for
- * the vertex types.
+ *    the vertex types.
  * \param directed Logical, whether to generate a directed graph.
  * \param node_type_vec An initialized vector or \c NULL.
- * If not \c NULL, the type of each node will be stored here.
+ *    If not \c NULL, the type of each node will be stored here.
  * \return Error code.
  *
  * Added in version 0.2.</para><para>
@@ -158,9 +158,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         IGRAPH_CHECK(igraph_vector_int_resize(nodetypes, nodes));
     } else {
         nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (! nodetypes) {
-            IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(nodetypes, "Insufficient memory for Callaway traits game.");
         IGRAPH_FINALLY(igraph_free, nodetypes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);
     }

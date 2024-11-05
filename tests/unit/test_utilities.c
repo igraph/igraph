@@ -250,8 +250,8 @@ void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
 
 /* Edge comparison function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {
-    const igraph_integer_t *edge1 = (igraph_integer_t *) e1;
-    const igraph_integer_t *edge2 = (igraph_integer_t *) e2;
+    const igraph_integer_t *edge1 = (const igraph_integer_t *) e1;
+    const igraph_integer_t *edge2 = (const igraph_integer_t *) e2;
     if (edge1[0] < edge2[0]) {
         return -1;
     } else if (edge1[0] > edge2[0]) {
@@ -589,4 +589,22 @@ void record_last_warning(const char *reason, const char *file, int line) {
     }
 
     expect_warning_ctx.observed = strdup(reason);
+}
+
+void print_bitset(const igraph_bitset_t* bitset) {
+    printf("(");
+    for (igraph_integer_t i = bitset->size - 1; i >= 0; --i) {
+        printf(" %d", !!IGRAPH_BIT_TEST(*bitset, i));
+    }
+    printf(" )\n");
+}
+
+void print_bitset_list(const igraph_bitset_list_t *v) {
+    igraph_integer_t i, n = igraph_bitset_list_size(v);
+    printf("{\n");
+    for (i = 0; i < n; ++i) {
+        printf("  %" IGRAPH_PRId ": ", i);
+        print_bitset(igraph_bitset_list_get_ptr(v, i));
+    }
+    printf("}\n");
 }

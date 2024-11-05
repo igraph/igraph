@@ -181,5 +181,52 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
+    /* Compare to the hypercube graph. */
+    {
+        igraph_t g1, g2;
+        igraph_vector_int_t dims;
+        igraph_bool_t iso;
+
+        /* Q_1 is the singleton graph */
+
+        igraph_hypercube(&g1, 0, IGRAPH_UNDIRECTED);
+        IGRAPH_ASSERT(igraph_vcount(&g1) == 1);
+        IGRAPH_ASSERT(igraph_ecount(&g1) == 0);
+        IGRAPH_ASSERT(!igraph_is_directed(&g1));
+        igraph_destroy(&g1);
+
+        /* Q_4 undirected */
+
+        igraph_vector_int_init(&dims, 4);
+        igraph_vector_int_fill(&dims, 2);
+
+        igraph_square_lattice(&g2, &dims, 1, IGRAPH_UNDIRECTED, false, NULL);
+        igraph_hypercube(&g1, 4, IGRAPH_UNDIRECTED);
+        igraph_isomorphic(&g1, &g2, &iso);
+        IGRAPH_ASSERT(iso);
+        igraph_destroy(&g1);
+        igraph_destroy(&g2);
+
+        igraph_vector_int_destroy(&dims);
+
+        /* Q_5 directed */
+
+        igraph_vector_int_init(&dims, 5);
+        igraph_vector_int_fill(&dims, 2);
+
+        igraph_square_lattice(&g2, &dims, 1, IGRAPH_DIRECTED, false, NULL);
+        igraph_hypercube(&g1, 5, IGRAPH_DIRECTED);
+        igraph_isomorphic(&g1, &g2, &iso);
+        IGRAPH_ASSERT(iso);
+        igraph_destroy(&g1);
+        igraph_destroy(&g2);
+
+        igraph_vector_int_destroy(&dims);
+
+        CHECK_ERROR(igraph_hypercube(&g1, 128, false), IGRAPH_EINVAL);
+    }
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
