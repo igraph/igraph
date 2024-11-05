@@ -1820,7 +1820,7 @@ Edge IDs in cycles:
   1: ( 1 5 2 4 )
 }
 
-Testing directed graph of type 'unnamed'
+Testing undirected graph of type 'unnamed'
 Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:
@@ -1836,7 +1836,7 @@ Edge IDs in cycles:
   2: ( 4 5 6 7 )
 }
 
-Testing directed graph of type 'unnamed2'
+Testing undirected graph of type 'unnamed2'
 Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
 
 Vertex IDs in cycles:

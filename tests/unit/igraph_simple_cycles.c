@@ -376,7 +376,7 @@ int main(void) {
     check_cycles_max(&g, IGRAPH_OUT, 2, 6);
     igraph_destroy(&g);
 
-    printf("\nTesting directed graph of type 'unnamed'\n");
+    printf("\nTesting undirected graph of type 'unnamed'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
                      0,1, 
                      1,2, 
@@ -390,7 +390,7 @@ int main(void) {
     check_cycles(&g, IGRAPH_ALL, 3);
     igraph_destroy(&g);
 
-    printf("\nTesting directed graph of type 'unnamed2'\n");
+    printf("\nTesting undirected graph of type 'unnamed2'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
                      0,1, 
                      1,2, 
