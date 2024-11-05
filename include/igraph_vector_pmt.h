@@ -26,9 +26,9 @@
 /*--------------------*/
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init)(
-        TYPE(igraph_vector)* v, igraph_integer_t size);
+        TYPE(igraph_vector) *v, igraph_integer_t size);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_array)(
-        TYPE(igraph_vector)* v, const BASE* data, igraph_integer_t length);
+        TYPE(igraph_vector) *v, const BASE *data, igraph_integer_t length);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
         TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 
@@ -39,7 +39,7 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, init_seq)
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(
         TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
-IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector)* v);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector) *v);
 
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
 
@@ -57,7 +57,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, capa
  * \verbatim VECTOR(v)[0] \endverbatim
  * to access the first element of the vector, you can also use this in
  * assignments, like:
- * \verbatim VECTOR(v)[10]=5; \endverbatim
+ * \verbatim VECTOR(v)[10] = 5; \endverbatim
  *
  * Note that there are no range checks right now.
  *
@@ -68,22 +68,22 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, capa
 #define VECTOR(v) ((v).stor_begin)
 #endif
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE value);
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector) *v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector) *v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector) *v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector) *v, igraph_integer_t pos);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, set)(TYPE(igraph_vector) *v, igraph_integer_t pos, BASE value);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
 
 /*-----------------------*/
 /* Initializing elements */
 /*-----------------------*/
 
-IGRAPH_EXPORT void FUNCTION(igraph_vector, null)(TYPE(igraph_vector)* v);
-IGRAPH_EXPORT void FUNCTION(igraph_vector, fill)(TYPE(igraph_vector)* v, BASE e);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, null)(TYPE(igraph_vector) *v);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, fill)(TYPE(igraph_vector) *v, BASE e);
 
 #ifndef NOTORDERED
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector)*v, BASE start, BASE end);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector) *v, BASE start, BASE end);
 #endif
 
 /*-----------------------*/
@@ -98,7 +98,7 @@ IGRAPH_EXPORT const TYPE(igraph_vector) *FUNCTION(igraph_vector, view)(const TYP
 /* Copying vectors       */
 /*-----------------------*/
 
-IGRAPH_EXPORT void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE* to);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
                                                   const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
@@ -112,6 +112,10 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, swap_elements)(
         TYPE(igraph_vector) *v, igraph_integer_t i, igraph_integer_t j);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, reverse_section)(
+    TYPE(igraph_vector) *v, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, rotate_left)(
+    TYPE(igraph_vector) *v, igraph_integer_t n);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, permute)(TYPE(igraph_vector) *v,
                                                          const igraph_vector_int_t *ind);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v);
@@ -211,7 +215,9 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(
         igraph_integer_t start, igraph_integer_t end);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch)(
         const TYPE(igraph_vector) *v, BASE what, igraph_integer_t *pos);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(
+    const TYPE(igraph_vector) *v, BASE what);
+IGRAPH_DEPRECATED IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
         const TYPE(igraph_vector) *v, BASE what);
 #endif
 
@@ -244,8 +250,11 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, remove_section)(
 
 IGRAPH_EXPORT void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, qsort_ind)(
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, sort_ind)(
         const TYPE(igraph_vector) *v, igraph_vector_int_t *inds, igraph_order_t order);
+
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, qsort_ind)(
+    const TYPE(igraph_vector) *v, igraph_vector_int_t *inds, igraph_order_t order);
 
 #endif
 

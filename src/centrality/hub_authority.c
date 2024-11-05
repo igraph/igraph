@@ -289,7 +289,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         options = igraph_arpack_options_get_default();
     }
 
-    options->n = no_of_nodes;
+    options->n = (int) no_of_nodes;
     options->start = 1;   /* no random start vector */
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);

@@ -1391,9 +1391,9 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  *        will be returned.
  * \param from The starting point of the edge.
  * \param to The end point of the edge.
- * \param directed Logical constant, whether to search for directed
+ * \param directed Boolean, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
- * \param error Logical scalar, whether to report an error if the edge
+ * \param error Boolean, whether to report an error if the edge
  *        was not found. If it is false, then <code>-1</code> will be
  *        assigned to \p eid. Note that invalid vertex IDs in input
  *        arguments (\p from or \p to) always trigger an error,
@@ -1476,9 +1476,9 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
  * \param eids Pointer to an initialized vector, the result is stored
  *        here. It will be resized as needed.
  * \param pairs Vector giving pairs of vertices to fetch the edges for.
- * \param directed Logical scalar, whether to consider edge directions
+ * \param directed Boolean, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
- * \param error Logical scalar, whether it is an error to supply
+ * \param error Boolean, whether it is an error to supply
  *        non-connected vertices. If false, then -1 is
  *        returned for non-connected pairs.
  * \return Error code.
@@ -1597,7 +1597,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
  *        here. It will be resized as needed.
  * \param source The ID of the source vertex
  * \param target The ID of the target vertex
- * \param directed Logical scalar, whether to consider edge directions
+ * \param directed Boolean, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
  * \return Error code.
  *

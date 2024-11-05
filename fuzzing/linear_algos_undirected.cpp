@@ -60,6 +60,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_init(&bv, 0);
         igraph_matrix_init(&m, 0, 0);
 
+        igraph_find_cycle(&graph, &iv1, &iv2, IGRAPH_ALL);
         igraph_biconnected_components(&graph, &i, NULL, &ivl1, &ivl2, &iv1);
         igraph_maximum_cardinality_search(&graph, &iv1, &iv2);
         igraph_coreness(&graph, &iv1, IGRAPH_ALL);
@@ -167,7 +168,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_DSATUR);
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
-        igraph_minimum_spanning_tree_unweighted(&graph, &g);
+        igraph_minimum_spanning_tree(&graph, &iv1, NULL);
+        igraph_subgraph_from_edges(&graph, &g, igraph_ess_vector(&iv1), false);
         if (i == 1 && igraph_vcount(&g) >= 2) {
             // 'g' is a tree (not a forest) when 'graph' had exactly one
             // connected component.

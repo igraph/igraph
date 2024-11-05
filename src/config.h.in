@@ -1,8 +1,6 @@
 #ifndef IGRAPH_PRIVATE_CONFIG_H
 #define IGRAPH_PRIVATE_CONFIG_H
 
-#include "igraph_config.h"
-
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE_STRNCASECMP 1
 #cmakedefine HAVE__STRICMP 1

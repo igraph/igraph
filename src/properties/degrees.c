@@ -600,7 +600,7 @@ igraph_error_t igraph_i_strength_all(
  * \param mode Gives whether to count only outgoing (\c IGRAPH_OUT),
  *   incoming (\c IGRAPH_IN) edges or both (\c IGRAPH_ALL).
  *   This parameter is ignored for undirected graphs.
- * \param loops A logical scalar, whether to count loop edges as well.
+ * \param loops Boolean, whether to count loop edges as well.
  * \param weights A vector giving the edge weights. If this is a \c NULL
  *   pointer, then \ref igraph_degree() is called to perform the
  *   calculation.
@@ -731,7 +731,7 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
     igraph_vector_int_t vs_vec;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-    IGRAPH_CHECK(igraph_vector_int_qsort_ind(&degrees, outvids, order));
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(&degrees, outvids, order));
     if (only_indices || igraph_vs_is_all(&vids) ) {
         igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);

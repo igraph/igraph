@@ -2,6 +2,56 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_bitset_update()` copies the contents of one bitset into another (experimental function).
+ - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
+ - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
+ - `igraph_vector_reverse_section()` reverses a contiguous section of a vector.
+ - `igraph_vector_rotate_left()` applies a cyclic permutation to a vector.
+ - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
+ - `igraph_find_cycle()` finds a single cycle in a graph, if it exists (experimental function).
+ - `igraph_feedback_vertex_set()` finds a minimum feedback vertex set in a directed or undirected graph (experimental function).
+ - `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` find all simple cycles in a graph, optionally with an upper bound on the cycle length (experimental functions). Many thanks to Tim Bernhard @GenieTim for contributing this functionality in #2181.
+
+### Changed
+
+ - `igraph_feedback_arc_set()` uses a much faster method for solving the exact minimum feedback arc set problem. The new method (`IGRAPH_FAS_EXACT_IP_CG`) is used by default (i.e. with `IGRAPH_FAS_EXACT_IP`), but the previous method is also kept available (`IGRAPH_FAS_EXACT_IP_TI`).
+ - `igraph_motifs_randesu()`, `igraph_motifs_randesu_callback()`, `igraph_motifs_randesu_estimate()` and `igraph_motifs_randesu_no()` now accept `NULL` for their `cut_prob` parameter, signifying that a complete search should be performed.
+ - `igraph_centralization_eigenvector_centrality_tmax()` and `igraph_centralization_eigenvector_centrality()` cannot produce meaningful results without normalizing vertex-level eigenvector centrality in a well-defined way. This was not the case when using `scale=false`. These functions now ignore the value of the `scale` parameter and always scale vertex-level centrality scores to have a maximum of 1. If you require a different type of normalization for the vertex-level eigenvector centrality scores, perform this normalization manually, and call `igraph_centralization()` to compute the centralization.
+ - When `igraph_eigenvector_centrality()` receives a directed acyclic graph as input, it now produces an eigenvector which has 1s in sink vertices and 0s everywhere else. Previously, it would return an all-zero vector. Note that eigenvector centrality is not uniquely defined for graphs that are not (strongly) connected, and both of these results can be considered valid. This change is to ensure consistency with the definition of the theoretical maximum of eigenvector centralization, which assumes the in-star to be the most centralized directed network.
+
+### Fixed
+
+ - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
+ - Removed broken interruption support from `igraph_community_spinglass_single()`.
+ - In rare cases `igraph_community_multilevel()` could enter an infinite loop. This is now corrected.
+ - Fixed null-dereference in `igraph_community_voronoi()` when requesting `modularity` but not `membership`.
+ - Fixed null-dereference in `igraph_community_optimal_modularity()` when requesting `modularity` but not `membership` and passing a null graph or singleton graph.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash when passing `distances=NULL` and `distances_are_weights=true`. This is now fixed.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash on interruption. This is now fixed.
+ - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
+ - The documented `igraph_strvector_resize_min()` was missing from headers.
+ - `igraph_feedback_arc_set()` now validates the edge weights.
+ - `igraph_layout_lgl()` was not working correctly since igraph 0.10.0 due to a poor choice of initial coordinates. This is now fixed.
+ - `igraph_centralization_degree_tmax()`, `igraph_centralization_betweenness_tmax()`, `igraph_centralization_closeness_tmax()`, and `igraph_centralization_eigenvector_centrality_tmax()` now validate their `nodes` parameter.
+ - `igraph_centralization_degree_tmax()`, `igraph_centralization_betweenness_tmax()`, `igraph_centralization_closeness_tmax()`, and `igraph_centralization_eigenvector_centrality_tmax()` now return NaN for zero-vertex graphs. Previously they would return invalid values.
+ - `igraph_centralization_eigenvector_centrality_tmax()` now returns 0 for the undirected singleton graph. Previous it would return an invalid value.
+ - `igraph_motifs_randesu_estimate()` now validates the sample size.
+ - `igraph_bipartite_projection_size()` now validates the bipartite `types` vector.
+
+### Deprecated
+
+ - `igraph_minimum_spanning_tree_prim()` and `igraph_minimum_spanning_tree_unweighted()` are deprecated. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+ - `igraph_array3_t` and all associated functions are deprecated and scheduled for removal in igraph 1.0.
+ - `igraph_vector_qsort_ind()` is deprecated in favour of `igraph_vector_sort_ind()`.
+ - `igraph_vector_binsearch2()` is deprecated in favour of `igraph_vector_contains_sorted()`.
+
+### Other
+
+ - Fixed multiple memory leaks in benchmark programs.
+ - Documentation improvements.
+
 ## [0.10.13]
 
 ### Added
@@ -65,7 +115,7 @@
 
 ### Changed
 
- - `igraph_eigenvector_centrality()` no longer issues a warning when the input is directed and weighted. When using this function, keep in mind that eigenvector centrality is well-defined only for (strongly) connected graphs, and edges with a zero weights are effectively treated as absent.
+ - `igraph_eigenvector_centrality()` no longer issues a warning when the input is directed and weighted. When using this function, keep in mind that eigenvector centrality is well-defined only for (strongly) connected graphs, and edges with zero weights are effectively treated as absent.
 
 ### Deprecated
 
@@ -414,7 +464,7 @@ Some of the highlights are:
  - The random number generator interface, `igraph_rng_type_t`, has been overhauled. Check the declaration of the type for details.
  - The default random number generator has been changed from Mersenne Twister to PCG32.
  - Functions related to spectral coarse graining (i.e. all functions starting with `igraph_scg_...`) were separated into a project of its own. If you wish to keep on using these functions, please refer to the repository hosting the spectral coarse graining code at https://github.com/igraph/igraph-scg . The spectral coarse graining code was updated to support igraph 0.10.
- - Since `igraph_integer_t` aims to be the largest integer size that is feasible on a particular platform, there is no need for generic data types based on `long int` any more. The `long` variants of generic data types (e.g., `igraph_vector_long_t`) are therefore removed; you should use the corresponding `int` variant instead, whose elements are of type `igraph_integer_t`.
+ - Since `igraph_integer_t` aims to be the largest integer size that is feasible on a particular platform, there is no need for generic data types based on `long int` anymore. The `long` variants of generic data types (e.g., `igraph_vector_long_t`) are therefore removed; you should use the corresponding `int` variant instead, whose elements are of type `igraph_integer_t`.
  - Generic data types based on `float` were removed as they were not used anywhere in the library.
  - Several igraph functions that used to take a `long int` or return a `long int` now takes or returns an `igraph_integer_t` instead to make the APIs more consistent. Similarly, igraph functions that used `igraph_vector_t` for arguments that take or return _integral_ vectors (e.g., vertex or edge indices) now take `igraph_vector_int_t` instead. Graph-related functions where the API was changed due to this reason are listed below, one by one.
  - Similarly, igraph functions that used to accept the `long` variant of a generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int` variant of the same data type.

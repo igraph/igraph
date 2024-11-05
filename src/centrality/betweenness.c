@@ -461,6 +461,14 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
  *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Ulrik Brandes: A faster algorithm for betweenness centrality.
+ * The Journal of Mathematical Sociology, 25(2), 163–177 (2001).
+ * https://doi.org/10.1080/0022250X.2001.9990249
+ *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
@@ -694,6 +702,14 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Ulrik Brandes: A faster algorithm for betweenness centrality.
+ * The Journal of Mathematical Sociology, 25(2), 163–177 (2001).
+ * https://doi.org/10.1080/0022250X.2001.9990249
  *
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the

@@ -32,7 +32,7 @@
  *
  * For a centrality score defined on the vertices of a graph, it is
  * possible to define a graph level centralization index, by
- * calculating the sum of the deviation from the maximum centrality
+ * calculating the sum of the deviations from the maximum centrality
  * score. Consequently, the higher the centralization index of the
  * graph, the more centralized the structure is.
  *
@@ -43,15 +43,22 @@
  * of the most centralized structure with the same number of vertices.
  *
  * </para><para>
- * For most centrality indices the most centralized
- * structure is the star graph, a single center connected to all other
- * nodes in the network. There are some variation depending on whether
- * the graph is directed or not, whether loop edges are allowed, etc.
+ * For most centrality indices, the most centralized structure is the
+ * star graph, a single center connected to all other nodes in the network.
+ * There is some variation depending on whether the graph is directed or not,
+ * whether loop edges are allowed, etc.
  *
  * </para><para>
  * This function simply calculates the graph level index, if the node
  * level scores and the theoretical maximum are given. It is called by
- * all the measure-specific centralization functions.
+ * all the measure-specific centralization functions. It uses the calculation
+ *
+ * </para><para>
+ * <code>C = sum_v ((max_u c_u) - c_v)</code>
+ *
+ * </para><para>
+ * where \c c are the centrality scores passed in \p scores. If \p normalized
+ * is \c true, then <code>C/theoretical_max</code> is returned.
  *
  * \param scores A vector containing the node-level centrality scores.
  * \param theoretical_max The graph level centrality score of the most
@@ -168,15 +175,15 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>mode</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p mode argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>mode</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p mode
  * arguments are considered.
  *
  * </para><para>
@@ -187,13 +194,13 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
+ *     \p graph argument is not a null pointer.
  * \param mode Constant, whether the calculation is based on in-degree
- *     (<code>IGRAPH_IN</code>), out-degree (<code>IGRAPH_OUT</code>)
- *     or total degree (<code>IGRAPH_ALL</code>). This is ignored if
- *     the <code>graph</code> argument is not a null pointer and the
+ *     (\c IGRAPH_IN), out-degree (\c IGRAPH_OUT)
+ *     or total degree (\c IGRAPH_ALL). This is ignored if
+ *     the \p graph argument is not a null pointer and the
  *     given graph is undirected.
- * \param loops Boolean scalar, whether to consider loop edges in the
+ * \param loops Boolean, whether to consider loop edges in the
  *     calculation.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
@@ -210,12 +217,21 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
                                       igraph_bool_t loops,
                                       igraph_real_t *res) {
 
-    igraph_bool_t directed = mode != IGRAPH_ALL;
+    igraph_bool_t directed = (mode != IGRAPH_ALL);
     igraph_real_t real_nodes;
 
     if (graph) {
         directed = igraph_is_directed(graph);
         nodes = igraph_vcount(graph);
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
     }
 
     real_nodes = nodes;    /* implicit cast to igraph_real_t */
@@ -324,15 +340,15 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>directed</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p directed argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>directed</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p directed
  * arguments are considered.
  *
  * </para><para>
@@ -341,10 +357,10 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
- * \param directed Boolean scalar, whether to use directed paths in
+ *     \p graph argument is not a null pointer.
+ * \param directed Boolean, whether to use directed paths in
  *     the betweenness calculation. This argument is ignored if
- *     <code>graph</code> is not a null pointer and it is undirected.
+ *     \p graph is not a null pointer and it is undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
  *
@@ -363,6 +379,15 @@ igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
     if (graph) {
         directed = directed && igraph_is_directed(graph);
         nodes = igraph_vcount(graph);
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
     }
 
     real_nodes = nodes;    /* implicit cast to igraph_real_t */
@@ -455,28 +480,28 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>mode</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p mode argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>mode</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p mode
  * arguments are considered.
  *
  * </para><para>
  * The most centralized structure is the star.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
- * \param mode Constant, specifies what kinf of distances to consider
- *     to calculate closeness. See the <code>mode</code> argument of
+ *     \p graph argument is not a null pointer.
+ * \param mode Constant, specifies what kind of distances to consider
+ *     to calculate closeness. See the \p mode argument of
  *     \ref igraph_closeness() for details. This argument is ignored
- *     if <code>graph</code> is not a null pointer and it is
- *     undirected.
+ *     if \p graph is not a null pointer and it is undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
  *
@@ -497,6 +522,15 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
         if (!igraph_is_directed(graph)) {
             mode = IGRAPH_ALL;
         }
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
     }
 
     real_nodes = nodes;    /* implicit cast to igraph_real_t */
@@ -518,13 +552,26 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * by passing its arguments to \ref igraph_eigenvector_centrality);
  * and it calculates the graph level centralization index based on the
  * results by calling \ref igraph_centralization().
+ *
+ * </para><para>
+ * Note that vertex-level eigenvector centrality scores do not have
+ * a natural scale. As with any eigenvector, their interpretation is
+ * invariant to scaling by a constant factor. However, due to how
+ * graph-level \em centralization is defined, its value depends on the
+ * specific scale/normalization used for vertex-level scores. Which of
+ * two graphs will have a higher eigenvector \em centralization depends
+ * on the choice of normalization for centralities. This function makes
+ * the specific choice of scaling vertex-level centrality scores by their
+ * maximum (i.e. it uses the ∞-norm). Other normalization choices, such
+ * as the 1-norm or 2-norm are not currently implemented.
+ *
  * \param graph The input graph.
  * \param vector A vector if you need the node-level eigenvector
  *      centrality scores, or a null pointer otherwise.
  * \param value If not a null pointer, then the leading eigenvalue is
  *      stored here.
- * \param scale If not zero then the result will be scaled, such that
- *     the absolute value of the maximum centrality is one.
+ * \param scale This parameter is deprecated and ignored since igraph 0.10.14.
+ *     Vertex-level centrality scores are always scaled to have a maximum of one.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices) parameter and
@@ -563,6 +610,14 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
     igraph_vector_t *scores = vector;
     igraph_real_t realvalue, *myvalue = value;
     igraph_real_t *tmax = theoretical_max, mytmax;
+
+    if (! scale) {
+        scale = true;
+        IGRAPH_WARNING("Computing eigenvector centralization requires normalized "
+                       "eigenvector centrality scores. Normalizing eigenvector centralities "
+                       "by their maximum even though 'scale=false' was requested. The 'scale' "
+                       "parameter will be removed in the future.");
+    }
 
     if (!tmax) {
         tmax = &mytmax;
@@ -604,28 +659,47 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  *
  * </para><para>
  * There are two ways to call this function, the first is to supply a
- * graph as the <code>graph</code> argument, and then the number of
+ * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
- * considered as well. The <code>nodes</code> argument is ignored in
- * this case. The <code>directed</code> argument is also ignored if the
+ * considered as well. The \p nodes argument is ignored in
+ * this case. The \p directed argument is also ignored if the
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the <code>graph</code>
- * argument. In this case the <code>nodes</code> and <code>directed</code>
+ * The other way is to supply a null pointer as the \p graph
+ * argument. In this case the \p nodes and \p directed
  * arguments are considered.
  *
  * </para><para>
- * The most centralized directed structure is the in-star. The most
- * centralized undirected structure is the graph with a single edge.
+ * The most centralized directed structure is assumed to bethe in-star.
+ * The most centralized undirected structure is assumed to be the graph
+ * with a single edge. igraph continues to implement these choices for
+ * historical reason. Keep in mind that neither of these two structures
+ * is connected, which makes their use debatable in the context of
+ * eigenvector centrality calculations. Eigenvector centrality is not
+ * uniquely defined for disconnected structures.
+ *
+ * </para><para>
+ * Note that vertex-level eigenvector centrality scores do not have
+ * a natural scale. As with any eigenvector, their interpretation is
+ * invariant to scaling by a constant factor. However, due to how
+ * graph-level \em centralization is defined, its value depends on the
+ * specific scale/normalization used for vertex-level scores. Moreover,
+ * which of two graphs will have a higher eigenvector \em centralization
+ * also depends on the choice of normalization for centralities. This
+ * function makes the specific choice of scaling vertex-level centrality
+ * scores by their maximum (i.e. it uses the ∞-norm). Other normalization
+ * choices, such as the 1-norm or 2-norm are not currently implemented.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
- *     <code>graph</code> argument is not a null pointer.
- * \param directed Boolean scalar, whether to consider edge
+ *     \p graph argument is not a null pointer.
+ * \param directed Boolean, whether to consider edge
  *     directions. This argument is ignored if
- *     <code>graph</code> is not a null pointer and it is undirected.
- * \param scale Whether to rescale the node-level centrality scores to
+ *     \p graph is not a null pointer and it is undirected.
+ * \param scale This parameter is deprecated and ignored since igraph 0.10.14.
+ *     Vertex-level centrality scores are always assumed to be scaled to
  *     have a maximum of one.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
@@ -643,9 +717,32 @@ igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     igraph_bool_t scale,
     igraph_real_t *res) {
 
+    if (! scale) {
+        scale = true;
+        IGRAPH_WARNING("Theoretical maximum for eigenvector centralization can "
+                       "only be computed with normalized eigenvector centrality "
+                       "scores. Assuming that eigenvector centralities are normalized "
+                       "by their maximum even though 'scale=false' was passed. The 'scale' "
+                       "parameter will be removed in the future.");
+    }
+
     if (graph) {
         nodes = igraph_vcount(graph);
         directed = directed && igraph_is_directed(graph);
+    } else {
+        if (nodes < 0) {
+            IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
+        }
+    }
+
+    if (nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    if (nodes == 1) {
+        *res = 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (directed) {

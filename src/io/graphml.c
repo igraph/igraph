@@ -28,7 +28,7 @@
 #include "internal/hacks.h" /* strcasecmp & strdup */
 #include "io/parse_utils.h"
 
-#include "config.h"
+#include "config.h" /* HAVE_LIBXML */
 
 #include <ctype.h>   /* isdigit */
 #include <math.h>    /* isnan */

@@ -60,6 +60,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_init(&bv, 0);
         igraph_matrix_init(&m, 0, 0);
 
+        igraph_find_cycle(&graph, &iv1, &iv2, IGRAPH_IN);
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_STRONG);
         igraph_coreness(&graph, &iv1, IGRAPH_OUT);
         igraph_assortativity_degree(&graph, &r, IGRAPH_DIRECTED);

@@ -386,11 +386,11 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
- * \sa \ref igraph_distances_dijkstra() if you only need the path length but
+ * \sa \ref igraph_distances_dijkstra() if you only need the path lengths but
  * not the paths themselves; \ref igraph_get_shortest_paths() if all edge
  * weights are equal; \ref igraph_get_all_shortest_paths() to find all
  * shortest paths between (source, target) pairs;
- * \ref igraph_get_shortest_paths_bellman_ford() if some edge weighted are
+ * \ref igraph_get_shortest_paths_bellman_ford() if some edge weights are
  * negative.
  *
  * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
@@ -768,7 +768,7 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  * vertices and |E| is the number of edges
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path
- * length but not the paths themselves, \ref igraph_get_all_shortest_paths()
+ * lengths but not the paths themselves, \ref igraph_get_all_shortest_paths()
  * if all edge weights are equal.
  *
  * \example examples/simple/igraph_get_all_shortest_paths_dijkstra.c

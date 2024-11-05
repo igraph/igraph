@@ -81,7 +81,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
                 continue;
             }
             igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
-            igraph_blas_ddot(&v1, &v2, &prob);
+            IGRAPH_CHECK(igraph_blas_ddot(&v1, &v2, &prob));
             if (prob < 0 && ! warned_neg) {
                 warned_neg = true;
                 IGRAPH_WARNING("Negative connection probability in dot-product graph.");

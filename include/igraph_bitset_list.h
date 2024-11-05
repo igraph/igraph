@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2024  The igraph development team
@@ -17,7 +16,6 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 #ifndef IGRAPH_BITSET_LIST_H

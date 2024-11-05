@@ -90,7 +90,7 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * </para><para>
  * A limitation of the original Chung-Lu model is that when some of the
  * weights are large, the formula for \c p_ij yields values larger than 1.
- * Chung and Lu's original paper exludes the use of such weights. When
+ * Chung and Lu's original paper excludes the use of such weights. When
  * <code>p_ij > 1</code>, this function simply issues a warning and creates
  * a connection between \c i and \c j. However, in this case the expected degrees
  * will no longer relate to the weights in the manner stated above. Thus the
@@ -110,8 +110,8 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * a constraint on expected degrees; see Park and Newman (2004), Section B,
  * setting <code>exp(-Theta_ij) = w_i w_j / S</code>. This model is also
  * discussed by Britton, Deijfen and Martin-Löf (2006). By virtue of being
- * a degree-constrained maximum entropy model, it graphs with the same degree
- * sequence are produced with the same probability.
+ * a degree-constrained maximum entropy model, it produces graphs with the
+ * same degree sequence with the same probability.
  * A third variant can be requested with \c IGRAPH_CHUNG_LU_NR, and uses
  * <code>p_ij = 1 - exp(-q_ij)</code>. This is the underlying simple graph
  * of a multigraph model introduced by Norros and Reittu (2006).
@@ -232,7 +232,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, 0);
 
-    igraph_vector_qsort_ind(in_weights, &idx, IGRAPH_DESCENDING);
+    igraph_vector_sort_ind(in_weights, &idx, IGRAPH_DESCENDING);
 
     RNG_BEGIN();
     for (igraph_integer_t i=0; i < no_of_nodes; i++) {

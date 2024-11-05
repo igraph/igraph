@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
@@ -109,14 +107,20 @@ igraph_integer_t igraph_i_clz64(igraph_uint_t x) {
  *
  * <para>The elements in an \type igraph_bitset_t object and its variants are
  * indexed from zero, we follow the usual C convention here. Bitsets are indexed
- * from right to left, meaning index 0 is the least significant bit and index n-1
- * is the most significant bit.</para>
+ * from right to left, meaning index 0 is the least significant bit and index
+ * <code>n - 1</code> is the most significant bit.</para>
  *
  * <para>The elements of a bitset always occupy a single block of
  * memory, the starting address of this memory block can be queried
  * with the \ref VECTOR() macro. This way, bitset objects can be used
  * with standard mathematical libraries, like the GNU Scientific
  * Library.</para>
+ *
+ * <para>Note that while the interface of bitset functions is similar to
+ * igraph's vector functions, there is one major difference: bitset functions
+ * such as \ref igraph_bitset_and() do not verify that that sizes of input
+ * parameters are compatible, and do not automatically resize the output
+ * parameter. Doing so is the responsibility of the user.</para>
  */
 
 /**
@@ -184,7 +188,6 @@ igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size
  *
  * \experimental
  *
- * </para><para>
  * All bitsets initialized by \ref igraph_bitset_init() should be properly
  * destroyed by this function. A destroyed bitset needs to be
  * reinitialized by \ref igraph_bitset_init() or
@@ -209,10 +212,9 @@ void igraph_bitset_destroy(igraph_bitset_t *bitset) {
  *
  * \experimental
  *
- * </para><para>
- *
  * The contents of the existing bitset object will be copied to
  * the new one.
+ *
  * \param dest Pointer to a not yet initialized bitset object.
  * \param src The original bitset object to copy.
  * \return Error code:
@@ -228,6 +230,37 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
     IGRAPH_ASSERT(src != NULL);
     IGRAPH_ASSERT(src->stor_begin != NULL);
     IGRAPH_CHECK(igraph_bitset_init(dest, src->size));
+    for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
+        VECTOR(*dest)[i] = VECTOR(*src)[i];
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_update
+ * \brief Update a bitset from another one.
+ *
+ * \experimental
+ *
+ * The size and contents of \p dest will be identical to that of \p src.
+ *
+ * \param dest Pointer to an initialized bitset object. This will be updated.
+ * \param src The bitset to update from.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, usually
+ * O(n/w),
+ * n is the size of the bitset,
+ * w is the word size of the machine (32 or 64).
+ */
+
+igraph_error_t igraph_bitset_update(igraph_bitset_t *dest, const igraph_bitset_t *src) {
+    IGRAPH_ASSERT(src != NULL);
+    IGRAPH_ASSERT(src->stor_begin != NULL);
+    IGRAPH_CHECK(igraph_bitset_reserve(dest, src->size));
+    dest->size = src->size;
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
         VECTOR(*dest)[i] = VECTOR(*src)[i];
     }
@@ -282,7 +315,6 @@ igraph_integer_t igraph_bitset_size(const igraph_bitset_t *bitset) {
  *
  * \experimental
  *
- * </para><para>
  * \a igraph bitsets are flexible, they can grow and
  * shrink. Growing
  * however occasionally needs the data in the bitset to be copied.
@@ -295,6 +327,7 @@ igraph_integer_t igraph_bitset_size(const igraph_bitset_t *bitset) {
  * reserve space for 100 elements and the size of your
  * bitset was (and still is) 60, then you can surely add additional 40
  * elements to your bitset before it will be copied.
+ *
  * \param bitset The bitset object.
  * \param capacity The new \em allocated size of the bitset.
  * \return Error code:
@@ -336,7 +369,6 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
  *
  * \experimental
  *
- * </para><para>
  * Note that this function does not free any memory, just sets the
  * size of the bitset to the given one. It may, on the other hand,
  * allocate more memory if the new size is larger than the previous
@@ -661,8 +693,8 @@ igraph_bool_t igraph_bitset_is_any_one(const igraph_bitset_t *bitset) {
  * must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src1 A bitset
- * \param src2 A bitset
+ * \param src1 A bitset. Must have have same size as \p dest.
+ * \param src2 A bitset. Must have have same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -689,8 +721,8 @@ void igraph_bitset_or(igraph_bitset_t *dest,
  * must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src1 A bitset
- * \param src2 A bitset
+ * \param src1 A bitset. Must have have same size as \p dest.
+ * \param src2 A bitset. Must have have same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -716,8 +748,8 @@ void igraph_bitset_and(igraph_bitset_t *dest, const igraph_bitset_t *src1, const
  * must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src1 A bitset
- * \param src2 A bitset
+ * \param src1 A bitset. Must have have same size as \p dest.
+ * \param src2 A bitset. Must have have same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -743,7 +775,7 @@ void igraph_bitset_xor(igraph_bitset_t *dest,
  * sizes of the bitsets passed to it, the caller must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src A bitset
+ * \param src A bitset. Must have have same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -766,7 +798,7 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src) {
  * \param bitset The bitset object to modify.
  * \param value The value to set for all bits.
  *
-* \sa \ref igraph_bitset_null()
+ * \sa \ref igraph_bitset_null()
  *
  * Time complexity: O(n/w).
  */
