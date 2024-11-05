@@ -65,6 +65,8 @@ Arnar Bjarni Arnarson (@Tagl)
 David Seifert (@SoapGentoo)
 Kirill Müller (@krlmlr)
 Michael (@gendelpiekel)
+Tim Bernhard (@GenieTim)
+Maëlle Salmon (@maelle)
 
 This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
 
