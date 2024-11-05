@@ -378,5 +378,36 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
+    {
+        igraph_vector_int_list_t v;
+
+        igraph_vector_int_list_init(&v, 0);
+
+        igraph_small(&g, 7, IGRAPH_DIRECTED,
+                     0,1, 1,2, 2,0,
+                     0,0,
+                     0,3, 3,4, 4,5, 5,0,
+                     -1);
+
+        // Check that passing NULL vector lists doesn't crash.
+        igraph_simple_cycles(&g, NULL, NULL, IGRAPH_ALL, -1, -1);
+
+        // Test limit on minimum cycle size.
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, -1, -1);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
+
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 1, -1);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
+
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, 2, -1);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 2);
+
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 2, 3);
+        IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 1);
+
+        igraph_destroy(&g);
+        igraph_vector_int_list_destroy(&v);
+    }
+
     return 0;
 }
