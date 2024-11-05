@@ -376,6 +376,35 @@ int main(void) {
     check_cycles_max(&g, IGRAPH_OUT, 2, 6);
     igraph_destroy(&g);
 
+
+    printf("\nTesting directed graph of type 'unnamed'\n");
+    igraph_small(&g, 7, IGRAPH_DIRECTED,
+                     0,1, 
+                     1,2, 
+                     2,0,
+                     0,0,
+                     0,3, 
+                     3,4, 
+                     4,5, 
+                     5,0,
+                     -1);
+    check_cycles(&g, IGRAPH_OUT, 3);
+    igraph_destroy(&g);
+
+    printf("\nTesting directed graph of type 'unnamed2'\n");
+    igraph_small(&g, 7, IGRAPH_DIRECTED,
+                     0,1, 
+                     1,2, 
+                     2,0,
+                     1,1,
+                     0,3, 
+                     3,4, 
+                     4,5, 
+                     5,0,
+                     -1);
+    check_cycles(&g, IGRAPH_OUT, 3);
+    igraph_destroy(&g);
+
     VERIFY_FINALLY_STACK();
 
     {
