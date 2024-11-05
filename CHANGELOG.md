@@ -12,6 +12,7 @@
  - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
  - `igraph_find_cycle()` finds a single cycle in a graph, if it exists (experimental function).
  - `igraph_feedback_vertex_set()` finds a minimum feedback vertex set in a directed or undirected graph (experimental function).
+ - `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` find all simple cycles in a graph, optionally with an upper bound on the cycle length (experimental functions). Many thanks to Tim Bernhard @GenieTim for contributing this functionality in #2181.
 
 ### Changed
 

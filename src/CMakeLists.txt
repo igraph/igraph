@@ -182,6 +182,8 @@ add_library(
   connectivity/separators.c
   connectivity/reachability.c
 
+  cycles/simple_cycles.c
+
   flow/flow.c
   flow/flow_conversion.c
   flow/st-cuts.c

@@ -51,6 +51,34 @@ IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
         igraph_vector_int_t *edges,
         igraph_neimode_t mode);
 
+/**
+ * \typedef igraph_cycle_handler_t
+ * \brief Type of cycle handler functions.
+ *
+ * Callback type, called by \ref igraph_simple_cycles_callback() when
+ * a cycle is found.
+ *
+ * \param vertices The vertices of the current cycle. Must not be modified.
+ * \param edges The edges of the current cycle. Must not be modified.
+ * \param arg The extra parameter passed to \ref igraph_simple_cycles_callback()
+ * \return Error code; \c IGRAPH_SUCCESS to continue the search or
+ *   \c IGRAPH_STOP to stop the search without signaling an error.
+ */
+typedef igraph_error_t igraph_cycle_handler_t(
+        const igraph_vector_int_t *vertices,
+        const igraph_vector_int_t *edges,
+        void *arg);
+
+IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
+        const igraph_t *graph,
+        igraph_neimode_t mode, igraph_integer_t max_cycle_length,
+        igraph_cycle_handler_t *callback, void *arg);
+
+IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+        igraph_neimode_t mode, igraph_integer_t max_cycle_length);
+
 __END_DECLS
 
 #endif

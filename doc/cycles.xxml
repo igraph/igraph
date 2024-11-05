@@ -9,6 +9,9 @@
 
 <section><title>Finding cycles</title>
 <!-- doxrox-include igraph_find_cycle -->
+<!-- doxrox-include igraph_simple_cycles -->
+<!-- doxrox-include igraph_simple_cycles_callback -->
+<!-- doxrox-include igraph_cycle_handler_t -->
 </section>
 
 <section><title>Eulerian cycles and paths</title>
