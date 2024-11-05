@@ -2542,13 +2542,13 @@ igraph_simple_cycles:
     PARAMS: |-
         GRAPH graph,
         OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
-        NEIMODE mode=OUT, INTEGER max_cycle_length=-1
+        NEIMODE mode=OUT, INTEGER min_cycle_length=-1, INTEGER max_cycle_length=-1
     DEPS: vertices ON graph, edges ON graph
 
 igraph_simple_cycles_callback:
     PARAMS: |-
         GRAPH graph,
-        NEIMODE mode=OUT, INTEGER max_cycle_length=-1,
+        NEIMODE mode=OUT, INTEGER min_cycle_length=-1, INTEGER max_cycle_length=-1,
         CYCLE_FUNC cycle_handler, OPTIONAL EXTRA arg
 
 #######################################

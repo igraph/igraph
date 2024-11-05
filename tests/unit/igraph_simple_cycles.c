@@ -27,7 +27,7 @@ void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_integ
     igraph_vector_int_list_init(&results_v, 0);
     igraph_vector_int_list_init(&results_e, 0);
 
-    igraph_simple_cycles(graph, &results_v, &results_e, mode, max_cycle_length);
+    igraph_simple_cycles(graph, &results_v, &results_e, mode, 0, max_cycle_length);
 
     printf("Finished search, found %" IGRAPH_PRId
            " cycles, expected %" IGRAPH_PRId " cycles."

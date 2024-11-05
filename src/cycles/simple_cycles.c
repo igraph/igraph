@@ -137,7 +137,9 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         igraph_i_simple_cycle_search_state_t *state,
         igraph_integer_t V,
         igraph_cycle_handler_t *callback,
-        igraph_integer_t max_cycle_length, void *arg) {
+        igraph_integer_t min_cycle_length,
+        igraph_integer_t max_cycle_length,
+        void *arg) {
 
     const igraph_vector_int_t *neighbors;
     const igraph_vector_int_t *incident_edges;
@@ -225,10 +227,12 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 // printf("Found cycle with size %" IGRAPH_PRId "\n",
                 //        igraph_vector_int_size(&state->vertex_stack));
 
-                IGRAPH_CHECK_CALLBACK(callback(&state->vertex_stack, &state->edge_stack, arg), &ret);
-                if (ret == IGRAPH_STOP) {
-                    state->stop_search = true;
-                    break;
+                if (igraph_vector_int_size(&state->edge_stack) >= min_cycle_length) {
+                    IGRAPH_CHECK_CALLBACK(callback(&state->vertex_stack, &state->edge_stack, arg), &ret);
+                    if (ret == IGRAPH_STOP) {
+                        state->stop_search = true;
+                        break;
+                    }
                 }
                 igraph_vector_int_pop_back(&state->edge_stack);
             } else if (!(VECTOR(state->v_blocked)[W])) {
@@ -432,6 +436,7 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
 static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
         igraph_i_simple_cycle_search_state_t *state,
         igraph_integer_t s,
+        igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length,
         igraph_cycle_handler_t *callback,
         void *arg) {
@@ -442,7 +447,8 @@ static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
 
-    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, callback, max_cycle_length, arg));
+    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, callback,
+                                                min_cycle_length, max_cycle_length, arg));
 
     for (igraph_integer_t i = 0; i < state->N; ++i) {
         // We want to remove the vertex with value s, not at position s.
@@ -488,6 +494,8 @@ static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
  *   \c IGRAPH_IN, follows the opposite directions; and
  *   \c IGRAPH_ALL, ignores edge directions. This argument is
  *   ignored for undirected graphs.
+ * \param max_cycle_length Limit the minimum length of cycles to search for.
+ *   Pass a negative value to search for all cycles.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
  * \param callback A function to call for each cycle that is found.
@@ -505,6 +513,7 @@ static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
 igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_neimode_t mode,
+        igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length,
         igraph_cycle_handler_t *callback,
         void *arg) {
@@ -523,7 +532,7 @@ igraph_error_t igraph_simple_cycles_callback(
     for (igraph_integer_t i = 0; i < state.N; i++) {
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_i_simple_cycles_search_callback_from_one_vertex(
-                    &state, i, max_cycle_length, callback, arg));
+                    &state, i, min_cycle_length, max_cycle_length, callback, arg));
             IGRAPH_ALLOW_INTERRUPTION();
         }
         if (state.stop_search) {
@@ -566,6 +575,8 @@ igraph_error_t igraph_simple_cycles_callback(
  *   \c IGRAPH_IN, follows the opposite directions; and
  *   \c IGRAPH_ALL, ignores edge directions. This argument is
  *   ignored for undirected graphs.
+ * \param max_cycle_length Limit the minimum length of cycles to search for.
+ *   Pass a negative value to search for all cycles.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
  *
@@ -582,6 +593,7 @@ igraph_error_t igraph_simple_cycles(
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
         igraph_neimode_t mode,
+        igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length) {
 
     igraph_i_simple_cycle_results_t result_list;
@@ -595,7 +607,7 @@ igraph_error_t igraph_simple_cycles(
         igraph_vector_int_list_clear(edges);
     }
 
-    igraph_simple_cycles_callback(graph, mode, max_cycle_length,
+    igraph_simple_cycles_callback(graph, mode, min_cycle_length, max_cycle_length,
                                   &igraph_i_append_simple_cycle_result,
                                   &result_list);
 
