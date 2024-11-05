@@ -178,7 +178,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
             // printf("Pushing %" IGRAPH_PRId " to stack, stack size is %" IGRAPH_PRId
             //        ", result size is %" IGRAPH_PRId "\n",
             //        V, igraph_vector_int_size(&state->vertex_stack),
-            //        igraph_vector_int_list_size(vertices));
+            //        igraph_stack_int_size(&v_stack));
             VECTOR(state->v_blocked)[V] = true;
         } else {
             // back to what we were doing before
@@ -207,15 +207,16 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 if ((!state->directed &&
                     igraph_vector_int_size(&state->edge_stack) == 1 &&
                     VECTOR(state->edge_stack)[0] == WE)) {
-                    // printf("Skipping cycle to prevent self-loop: \n");
+                    // printf("Skipping cycle to %" IGRAPH_PRId " via %" IGRAPH_PRId " to prevent self-loop.\n", W, WE);
                     continue;
                 }
 
                 // prevent duplicates in undirected graphs by forcing a direction for
                 // the closing edge
                 if ((!state->directed &&
-                     VECTOR(state->edge_stack)[0] > WE)) {
-                    // printf("Skipping cycle to prevent duplicates: \n");
+                    igraph_vector_int_size(&state->edge_stack) > 0 &&
+                    VECTOR(state->edge_stack)[0] > WE)) {                    
+                        // printf("Skipping cycle to %" IGRAPH_PRId " via %" IGRAPH_PRId " to prevent duplicates.\n", W, WE);
                     continue;
                 }
 
@@ -234,9 +235,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 }
                 igraph_vector_int_pop_back(&state->edge_stack);
             } else if (!(VECTOR(state->v_blocked)[W])) {
-                // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId
-                // "\n",
-                //        V, W);
+                // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId "\n", V, W);
                 recurse_deeper = ((max_cycle_length < 0) ||
                                   (igraph_vector_int_size(&state->vertex_stack) <=
                                        max_cycle_length - 1));
