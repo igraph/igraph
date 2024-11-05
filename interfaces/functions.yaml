@@ -2276,9 +2276,9 @@ igraph_get_isomorphisms_vf2_callback:
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
-        ISOMORPHISM_FUNC ishohandler_fn, 
+        ISOMORPHISM_FUNC ishohandler_fn,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA arg
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -2289,9 +2289,9 @@ igraph_count_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT INTEGER count, 
+        OUT INTEGER count,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -2302,9 +2302,9 @@ igraph_get_isomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT VECTOR_INT_LIST maps, 
+        OUT VECTOR_INT_LIST maps,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -2320,7 +2320,7 @@ igraph_subisomorphic_vf2:
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OUT BOOLEAN iso,
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
-        OPTIONAL ISOCOMPAT_FUNC node_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
         OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA extra
     DEPS: |-
@@ -2333,9 +2333,9 @@ igraph_get_subisomorphisms_vf2_callback:
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
-        ISOMORPHISM_FUNC ishohandler_fn, 
+        ISOMORPHISM_FUNC ishohandler_fn,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA arg
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -2346,9 +2346,9 @@ igraph_count_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT INTEGER count, 
+        OUT INTEGER count,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
@@ -2359,9 +2359,9 @@ igraph_get_subisomorphisms_vf2:
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
         OPTIONAL EDGE_COLOR edge_color1, OPTIONAL EDGE_COLOR edge_color2,
-        OUT VECTOR_INT_LIST maps, 
+        OUT VECTOR_INT_LIST maps,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
-        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn, 
+        OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
         OPTIONAL EXTRA extra
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
