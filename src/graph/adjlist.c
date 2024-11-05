@@ -562,15 +562,33 @@ igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) 
         }                      \
     } while (0);
 
-igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed) {
-    igraph_vector_int_t* fromvec;
+/**
+ * \function igraph_adjlist_has_edge
+ * \brief Checks if an adjacency list contains an edge.
+ *
+ * \param al The adjacency list. It must be sorted.
+ * \param from The source vertex of the edge.
+ * \param to The target vertex of the edge.
+ * \param directed Whether to treat the graph as directed.
+ * \return
+ */
+
+igraph_bool_t igraph_adjlist_has_edge(
+        igraph_adjlist_t* al,
+        igraph_integer_t from, igraph_integer_t to,
+        igraph_bool_t directed) {
+
+    const igraph_vector_int_t *fromvec;
     ADJLIST_CANON_EDGE(from, to, directed);
     fromvec = igraph_adjlist_get(al, from);
-    return igraph_vector_int_binsearch2(fromvec, to);
-
+    return igraph_vector_int_contains_sorted(fromvec, to);
 }
 
-igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
+igraph_error_t igraph_adjlist_replace_edge(
+        igraph_adjlist_t* al,
+        igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto,
+        igraph_bool_t directed) {
+
     igraph_vector_int_t *oldfromvec, *newfromvec;
     igraph_bool_t found_old, found_new;
     igraph_integer_t oldpos, newpos;

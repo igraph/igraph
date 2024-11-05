@@ -26,7 +26,8 @@
 
 #include "igraph_decls.h"
 #include "igraph_interrupt.h"
-#include "config.h"
+
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 __BEGIN_DECLS
 

@@ -278,22 +278,6 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         return IGRAPH_SUCCESS;
     }
 
-    /* Quick check: if the graph is a DAG, all the eigenvector centralities are
-     * zeros, and so is the eigenvalue */
-    IGRAPH_CHECK(igraph_is_dag(graph, &dag));
-    if (dag) {
-        /* special case: graph is a DAG */
-        IGRAPH_WARNING("Graph is directed and acyclic; eigenvector centralities will be zeros.");
-        if (value) {
-            *value = 0;
-        }
-        if (vector) {
-            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
-            igraph_vector_fill(vector, 0);
-        }
-        return IGRAPH_SUCCESS;
-    }
-
     if (weights) {
         igraph_real_t min, max;
 
@@ -325,6 +309,49 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         }
     }
 
+    /* If the graph is a DAG, the eigenvalue is zero, and degenerate. Vectors that
+     * are zero in all vertices that have some out-edges, as well as their linear
+     * combinations, are all valid eigenvectors.
+     *
+     * ARPACK may converge to one of these, or it may converge to an all-zero
+     * vector, depending on chance. To eliminate this uncertainty, we return
+     * an eigenvector that has 1s in sinks (vertices with no out-edges) and 0s
+     * everywhere else. This ensures that the in-star, which is treated as the
+     * "most centralized network" for eigenvector centralization, has a non-zero
+     * centrality score in its centre. See https://github.com/igraph/igraph/issues/2679
+     * for a discussion of the topic.
+     *
+     * For simplicity, we identify sinks by checking for zero out-strength. This
+     * also identifies effective sinks where out-edges exist, but they all have zero
+     * weight. This test is valid only when there are no negative weights, otherwise
+     * non-zero weights may still add up to a zero strength. Since negative weights
+     * are problematic anyway, we leave that case entirely up to ARPACK, without
+     * special treatment.
+     */
+    if (! negative_weights) {
+        IGRAPH_CHECK(igraph_is_dag(graph, &dag));
+        if (dag) {
+            /* special case: graph is a DAG */
+            IGRAPH_WARNING("Graph is directed and acyclic; "
+                           "returning eigenvector centralities of 1 in sink vertices, "
+                           "and 0 everywhere else.");
+            if (value) {
+                *value = 0;
+            }
+            if (vector) {
+                IGRAPH_CHECK(igraph_strength(graph, vector, igraph_vss_all(), IGRAPH_OUT, true, weights));
+                for (i=0; i < no_of_nodes; i++) {
+                    if (VECTOR(*vector)[i] == 0) {
+                        VECTOR(*vector)[i] = 1;
+                    } else {
+                        VECTOR(*vector)[i] = 0;
+                    }
+                }
+            }
+            return IGRAPH_SUCCESS;
+        }
+    }
+
     if (no_of_nodes > INT_MAX) {
         IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
@@ -335,7 +362,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     /* Use higher NCV than usual as long directed cycles cause convergence issues.
      * According to numerical experiments, a cycle graph C_n tends to need about
      * NCV = n/4 at minimum. */
-    options->ncv = no_of_nodes > 30 ? 30 : no_of_nodes;
+    options->ncv = no_of_nodes > 30 ? 30 : options->n;
     /* LM mode is not OK here because +1 and -1 can be eigenvalues at the
      * same time, e.g.: a -> b -> a, c -> a */
     options->which[0] = 'L' ; options->which[1] = 'R';
@@ -481,16 +508,17 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * Eigenvector centrality is meaningful only for (strongly) connected graphs.
  * Undirected graphs that are not connected should be decomposed into connected
  * components, and the eigenvector centrality calculated for each separately.
+ * The scores between components will not be comparable.
  * This function does not verify that the graph is connected. If it is not,
  * in the undirected case the scores of all but one component will be zeros.
  *
  * </para><para>
  * Also note that the adjacency matrix of a directed acyclic graph or the
  * adjacency matrix of an empty graph does not possess positive eigenvalues,
- * therefore the eigenvector centrality is not defined for these graphs.
- * igraph will return an eigenvalue of zero in such cases. The eigenvector
- * centralities will all be equal for an empty graph and will all be zeros
- * for a directed acyclic graph. Such pathological cases can be detected
+ * therefore the eigenvector centrality is not meaningful for these graphs.
+ * igraph will return an eigenvalue of zero in such cases. The returned
+ * eigenvector centralities will all be equal for vertices with zero out-degree,
+ * and zeros for other vertices. Such pathological cases can be detected
  * by asking igraph to calculate the eigenvalue as well (using the \p value
  * parameter, see below) and checking whether the eigenvalue is very close
  * to zero.

@@ -22,7 +22,6 @@
  * the RANDESU motif finder */
 void test_k_motifs(const igraph_t *graph, const int k, const int class_count, igraph_bool_t directed) {
     igraph_vector_t randesu_counts, lad_counts;
-    igraph_vector_t cut_prob;
     igraph_bool_t equal;
     igraph_integer_t i, n;
     igraph_integer_t vcount;
@@ -53,9 +52,8 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
         igraph_destroy(&pattern);
     }
 
-    igraph_vector_init(&cut_prob, k);
     igraph_vector_init(&randesu_counts, 0);
-    igraph_motifs_randesu(graph, &randesu_counts, k, &cut_prob);
+    igraph_motifs_randesu(graph, &randesu_counts, k, NULL);
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
@@ -85,7 +83,6 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
     igraph_vector_destroy(&randesu_counts);
     igraph_vector_destroy(&lad_counts);
-    igraph_vector_destroy(&cut_prob);
 }
 
 void test_motifs(void) {

@@ -49,6 +49,23 @@ int main(void) {
     igraph_vector_reverse(&v2);
     print_vector_format(&v2, stdout, "%g");
 
+    /* reverse an odd number of elements */
+    igraph_vector_reverse_section(&v2, 3, 6);
+    print_vector_format(&v2, stdout, "%g");
+    igraph_vector_reverse_section(&v2, 3, 6);
+    print_vector_format(&v2, stdout, "%g");
+
+    /* reverse an even number of elements */
+    igraph_vector_reverse_section(&v2, 3, 7);
+    print_vector_format(&v2, stdout, "%g");
+    igraph_vector_reverse_section(&v2, 3, 7);
+    print_vector_format(&v2, stdout, "%g");
+
+    igraph_vector_rotate_left(&v2, 3);
+    print_vector_format(&v2, stdout, "%g");
+    igraph_vector_rotate_left(&v2, -3);
+    print_vector_format(&v2, stdout, "%g");
+
     igraph_vector_destroy(&v1);
     igraph_vector_destroy(&v2);
 

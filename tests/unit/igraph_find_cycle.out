@@ -1,0 +1,29 @@
+Null graph:
+( )
+( )
+Several isolated vertices:
+( )
+( )
+Isolated vertices with self-loops:
+( 1 )
+( 0 )
+Small directed graph:
+OUT
+( 1 2 0 )
+( 0 1 4 )
+IN
+( 2 1 0 )
+( 4 1 0 )
+ALL
+( 2 1 0 )
+( 4 1 0 )
+Small undirected multigraph:
+( 4 3 )
+( 1 2 )
+Directed acyclic graph:
+OUT
+( )
+( )
+IN
+( )
+( )

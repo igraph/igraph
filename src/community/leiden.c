@@ -869,15 +869,13 @@ static igraph_error_t igraph_i_community_leiden(
  * \brief Finding community structure using the Leiden algorithm.
  *
  * This function implements the Leiden algorithm for finding community
- * structure, see Traag, V. A., Waltman, L., &amp; van Eck, N. J. (2019). From
- * Louvain to Leiden: guaranteeing well-connected communities. Scientific
- * reports, 9(1), 5233. http://dx.doi.org/10.1038/s41598-019-41695-z
+ * structure.
  *
  * </para><para>
  * It is similar to the multilevel algorithm, often called the Louvain
  * algorithm, but it is faster and yields higher quality solutions. It can
  * optimize both modularity and the Constant Potts Model, which does not suffer
- * from the resolution-limit (see preprint http://arxiv.org/abs/1104.3083).
+ * from the resolution-limit (see Tragg, Van Dooren &amp; Nesterov).
  *
  * </para><para>
  * The Leiden algorithm consists of three phases: (1) local moving of nodes, (2)
@@ -908,17 +906,33 @@ static igraph_error_t igraph_i_community_leiden(
  * The objective function being optimized is
  *
  * </para><para>
- * 1 / 2m sum_ij (A_ij - gamma n_i n_j)d(s_i, s_j)
+ * <code>1 / 2m sum_ij (A_ij - γ n_i n_j) δ(s_i, s_j)</code>
  *
  * </para><para>
- * where m is the total edge weight, A_ij is the weight of edge (i, j), gamma is
- * the so-called resolution parameter, n_i is the node weight of node i, s_i is
- * the cluster of node i and d(x, y) = 1 if and only if x = y and 0 otherwise.
- * By setting n_i = k_i, the degree of node i, and dividing gamma by 2m, you
- * effectively obtain an expression for modularity. Hence, the standard
- * modularity will be optimized when you supply the degrees as \c node_weights
- * and by supplying as a resolution parameter 1.0/(2*m), with m the number of
- * edges.
+ * where m is the total edge weight, <code>A_ij</code> is the weight of edge
+ * (i, j), \c γ is the so-called resolution parameter, <code>n_i</code>
+ * is the node weight of node \c i, <code>s_i</code> is the cluster of node
+ * \c i and <code>δ(x, y) = 1</code> if and only if <code>x = y</code> and 0
+ * otherwise. By setting <code>n_i = k_i</code>, the degree of node \c i, and
+ * dividing \c γ by <code>2m</code>, we effectively obtain an expression for
+ * modularity. Hence, the standard modularity will be optimized when you supply
+ * the degrees as \c node_weights and by supplying as a resolution parameter
+ * <code>1/(2m)</code>, with \c m the number of edges.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * V. A. Traag, L. Waltman, N. J. van Eck:
+ * From Louvain to Leiden: guaranteeing well-connected communities.
+ * Scientific Reports, 9(1), 5233 (2019).
+ * http://dx.doi.org/10.1038/s41598-019-41695-z
+ *
+ * </para><para>
+ * V. A. Traag, P. Van Dooren, and Y. Nesterov:
+ * Narrow scope for resolution-limit-free community detection.
+ * Phys. Rev. E 84, 016114 (2011).
+ * https://doi.org/10.1103/PhysRevE.84.016114
  *
  * \param graph The input graph. It must be an undirected graph.
  * \param edge_weights Numeric vector containing edge weights. If \c NULL, every edge

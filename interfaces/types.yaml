@@ -339,6 +339,11 @@ FAS_ALGORITHM:
     CTYPE: igraph_fas_algorithm_t
     FLAGS: ENUM
 
+FVS_ALGORITHM:
+    # Enum representing feedback vertex set algorithms
+    CTYPE: igraph_fvs_algorithm_t
+    FLAGS: ENUM
+
 FWALGORITHM:
     # Enum that describes the variant of the Floyd-Warshall algorithm to use in
     # Floyd-Warshall graph distances computing function
@@ -527,9 +532,14 @@ ARPACKFUNC:
     CTYPE: igraph_arpack_function_t
 
 CLIQUE_FUNC:
-    # Callback function for igraph_cliques_callback(). called with every clique
+    # Callback function for igraph_cliques_callback(). Called with every clique
     # that was found by the function.
     CTYPE: igraph_clique_handler_t
+
+CYCLE_FUNC:
+    # Callback function for igraph_simple_cycles_callback(). Called with every
+    # cycle that was found by the function.
+    CTYPE: igraph_cycle_handler_t
 
 BFS_FUNC:
     # Callback function for igraph_bfs(). Called with every vertex that was

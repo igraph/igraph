@@ -573,7 +573,7 @@ igraph_error_t igraph_roots_for_tree_layout(
 
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, no_of_nodes);
         IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(), mode));
-        IGRAPH_CHECK(igraph_vector_qsort_ind(&ecc, &order, IGRAPH_ASCENDING));
+        IGRAPH_CHECK(igraph_vector_sort_ind(&ecc, &order, IGRAPH_ASCENDING));
 
         igraph_vector_destroy(&ecc);
         IGRAPH_FINALLY_CLEAN(1);

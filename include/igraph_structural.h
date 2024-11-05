@@ -95,9 +95,9 @@ IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *gr
                                                        igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                                const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
                                                           igraph_t *mst);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
                                                     const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                               igraph_integer_t vid);
@@ -131,8 +131,13 @@ IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
-                                          const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
@@ -149,7 +154,7 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
  * are used according to the \p mode parameter.
  *
  * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian, <code>L = D - A</code>.
- * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
+ * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetrically normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
  * \enumval IGRAPH_LAPLACIAN_LEFT Left-stochastic normalized Laplacian, <code>L = I - D^-1 A</code>.
  * \enumval IGRAPH_LAPLACIAN_RIGHT Right-stochastic normalized Laplacian, <code>L = I - A D^-1</code>.
  */

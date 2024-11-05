@@ -68,7 +68,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bitset
   heap
-  igraph_array
   igraph_complex
   igraph_psumtree
   igraph_sparsemat5
@@ -99,7 +98,7 @@ add_legacy_tests(
   vector_list
   vector_ptr
   vector_ptr_sort_ind
-  vector_qsort_ind
+  vector_sort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
@@ -313,7 +312,8 @@ add_legacy_tests(
   igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
-  igraph_feedback_arc_set_undirected
+  igraph_feedback_arc_set
+  igraph_feedback_vertex_set
   igraph_get_all_simple_paths
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
@@ -352,6 +352,7 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_simple_cycles
   igraph_similarity
   igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
@@ -806,6 +807,7 @@ add_legacy_tests(
   igraph_is_eulerian
   igraph_eulerian_cycle
   igraph_eulerian_path
+  igraph_find_cycle
 )
 
 # separators.at
@@ -990,6 +992,7 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  community
   connectivity
   erdos_renyi
   graphicality

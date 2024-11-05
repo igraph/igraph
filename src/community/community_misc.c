@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2020 The igraph development team
+   Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_community.h"
@@ -27,6 +22,30 @@
 
 #include <string.h>
 #include <math.h>
+
+/**
+ * \section about_community
+ *
+ * <para>
+ * Community detection is concerned with clustering the vertices of networks
+ * into tightly connected subgraphs called "communities". The following
+ * references provide a good introduction to the topic of community detection:
+ * </para>
+ *
+ * <para>
+ * S. Fortunato:
+ * "Community Detection in Graphs".
+ * Physics Reports 486, no. 3–5 (2010): 75–174.
+ * https://doi.org/16/j.physrep.2009.11.002.
+ * </para>
+ *
+ * <para>
+ * S. Fortunato and D. Hric:
+ * "Community Detection in Networks: A User Guide".
+ * Physics Reports 659 (2016): 1–44.
+ * https://doi.org/10.1016/j.physrep.2016.09.002.
+ * </para>
+ */
 
 /**
  * \function igraph_community_to_membership
@@ -82,9 +101,9 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
                                    igraph_vector_int_t *membership,
                                    igraph_vector_int_t *csize) {
 
-    igraph_integer_t no_of_nodes = nodes;
-    igraph_integer_t components = no_of_nodes - steps;
-    igraph_integer_t i, found = 0;
+    const igraph_integer_t no_of_nodes = nodes;
+    const igraph_integer_t components = no_of_nodes - steps;
+    igraph_integer_t found = 0;
     igraph_vector_int_t tmp;
     igraph_vector_bool_t already_merged;
     igraph_vector_int_t own_membership;
@@ -103,7 +122,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         IGRAPH_ERRORF("Number of steps should be non-negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
     }
 
-    if (csize != 0 && membership == 0) {
+    if (csize != NULL && membership == NULL) {
         /* we need a membership vector to calculate 'csize' but the user did
          * not provide one; let's allocate one ourselves */
         IGRAPH_VECTOR_INT_INIT_FINALLY(&own_membership, no_of_nodes);
@@ -123,9 +142,9 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&already_merged, steps + no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, steps);
 
-    for (i = steps - 1; i >= 0; i--) {
-        igraph_integer_t c1 = MATRIX(*merges, i, 0);
-        igraph_integer_t c2 = MATRIX(*merges, i, 1);
+    for (igraph_integer_t i = steps - 1; i >= 0; i--) {
+        const igraph_integer_t c1 = MATRIX(*merges, i, 0);
+        const igraph_integer_t c2 = MATRIX(*merges, i, 1);
 
         if (VECTOR(already_merged)[c1] == 0) {
             VECTOR(already_merged)[c1] = true;
@@ -145,7 +164,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         }
 
         if (c1 < no_of_nodes) {
-            igraph_integer_t cid = VECTOR(tmp)[i] - 1;
+            const igraph_integer_t cid = VECTOR(tmp)[i] - 1;
             if (membership) {
                 VECTOR(*membership)[c1] = cid + 1;
             }
@@ -157,7 +176,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         }
 
         if (c2 < no_of_nodes) {
-            igraph_integer_t cid = VECTOR(tmp)[i] - 1;
+            const igraph_integer_t cid = VECTOR(tmp)[i] - 1;
             if (membership) {
                 VECTOR(*membership)[c2] = cid + 1;
             }
@@ -171,13 +190,13 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     }
 
     if (membership || csize) {
-        /* it can never happen that csize != 0 and membership == 0; we have
+        /* it can never happen that csize != NULL and membership == NULL; we have
          * handled that case above */
-        for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t tmp = VECTOR(*membership)[i];
-            if (tmp != 0) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            const igraph_integer_t c = VECTOR(*membership)[i];
+            if (c != 0) {
                 if (membership) {
-                    VECTOR(*membership)[i] = tmp - 1;
+                    VECTOR(*membership)[i] = c - 1;
                 }
             } else {
                 if (csize) {
@@ -313,7 +332,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * of cluster \c i. Then the entropy of the clustering is
  *
  * </para><para>
- * <code>H(C) = - \sum_i p_i log p_i</code>
+ * <code>H(C) = - sum_i p_i log p_i</code>
  *
  * </para><para>
  * Similarly, we can define the joint entropy of two clusterings \c C_1 and \c C_2
@@ -321,7 +340,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * in the first clustering and cluster \c j in the second one:
  *
  * </para><para>
- * <code>H(C_1, C_2) = - \sum_ii p_ij log p_ij</code>
+ * <code>H(C_1, C_2) = - sum_ii p_ij log p_ij</code>
  *
  * </para><para>
  * The mutual information of \c C_1 and \c C_2 is then

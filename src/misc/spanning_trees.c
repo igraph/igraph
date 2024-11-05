@@ -88,6 +88,8 @@ igraph_error_t igraph_minimum_spanning_tree(
  * \function igraph_minimum_spanning_tree_unweighted
  * \brief Calculates one minimum spanning tree of an unweighted graph.
  *
+ * \deprecated-by igraph_minimum_spanning_tree 0.10.14
+ *
  * If the graph has more minimum spanning trees (this is always the
  * case, except if it is a forest) this implementation returns only
  * the same one.
@@ -138,6 +140,8 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \ingroup structural
  * \function igraph_minimum_spanning_tree_prim
  * \brief Calculates one minimum spanning tree of a weighted graph.
+ *
+ * \deprecated-by igraph_minimum_spanning_tree 0.10.14
  *
  * Finds a spanning tree or spanning forest for which the sum of edge
  * weights is the smallest. This function uses Prim's method for carrying
