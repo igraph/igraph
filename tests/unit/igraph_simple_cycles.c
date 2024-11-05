@@ -385,7 +385,7 @@ int main(void) {
 
         igraph_small(&g, 7, IGRAPH_DIRECTED,
                      0,1, 1,2, 2,0,
-                     1,1,
+                     0,0,
                      0,3, 3,4, 4,5, 5,0,
                      -1);
 
