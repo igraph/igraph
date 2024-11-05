@@ -416,6 +416,7 @@ int main(void) {
     check_cycles(&g, IGRAPH_ALL, 3);
     igraph_destroy(&g);
 
+    // as requested in https://github.com/igraph/igraph/issues/2692#issuecomment-2457627378
     printf("\nTesting undirected graph of type 'Mickey3'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
                      0, 1, 
