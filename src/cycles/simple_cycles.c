@@ -342,7 +342,7 @@ static igraph_error_t igraph_i_simple_cycle_search_state_init(
         graph,
         &state->IK,
         mode,
-        IGRAPH_LOOPS_ONCE // each self-loop counts as a single cycle
+        IGRAPH_NO_LOOPS // ignore self-loops
     ));
     IGRAPH_FINALLY(igraph_inclist_destroy, &state->IK);
 
@@ -526,17 +526,45 @@ igraph_error_t igraph_simple_cycles_callback(
     IGRAPH_CHECK(igraph_i_simple_cycle_search_state_init(&state, graph, mode));
     IGRAPH_FINALLY(igraph_i_simple_cycle_search_state_destroy, &state);
 
+    // Special case: identify self-loops in advance.
+    // We will skip them during the main cycle search.
+    // Re-use state.vertex_stack and state.edge_stack for convenience.
+    if (min_cycle_length <= 1) {
+        const igraph_integer_t ecount = igraph_ecount(graph);
+
+        IGRAPH_CHECK(igraph_vector_int_resize(&state.vertex_stack, 1));
+        IGRAPH_CHECK(igraph_vector_int_resize(&state.edge_stack, 1));
+
+        for (igraph_integer_t eid = 0; eid < ecount; eid++) {
+            const igraph_integer_t v = IGRAPH_FROM(graph, eid);
+            if (IGRAPH_TO(graph, eid) == v) {
+                igraph_error_t ret;
+
+                VECTOR(state.vertex_stack)[0] = v;
+                VECTOR(state.edge_stack)[0] = eid;
+                IGRAPH_CHECK_CALLBACK(callback(&state.vertex_stack, &state.edge_stack, arg), &ret);
+                if (ret == IGRAPH_STOP) {
+                    state.stop_search = true;
+                    break;
+                }
+            }
+        }
+
+        igraph_vector_int_clear(&state.vertex_stack);
+        igraph_vector_int_clear(&state.edge_stack);
+    }
+
     // TODO: depending on the graph, it is rather unreasonable to search cycles
     // from each and every node
     for (igraph_integer_t i = 0; i < state.N; i++) {
+        if (state.stop_search) {
+            state.stop_search = false;
+            break;
+        }
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_i_simple_cycles_search_callback_from_one_vertex(
                     &state, i, min_cycle_length, max_cycle_length, callback, arg));
             IGRAPH_ALLOW_INTERRUPTION();
-        }
-        if (state.stop_search) {
-            state.stop_search = false;
-            break;
         }
     }
 
