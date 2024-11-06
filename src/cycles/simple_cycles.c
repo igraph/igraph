@@ -215,7 +215,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 // the closing edge
                 if ((!state->directed &&
                     igraph_vector_int_size(&state->edge_stack) > 0 &&
-                    VECTOR(state->edge_stack)[0] > WE)) {                    
+                    VECTOR(state->edge_stack)[0] > WE)) {
                         // printf("Skipping cycle to %" IGRAPH_PRId " via %" IGRAPH_PRId " to prevent duplicates.\n", W, WE);
                     continue;
                 }
