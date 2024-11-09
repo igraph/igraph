@@ -14,6 +14,7 @@ env:
   OMP_NUM_THREADS: 1
   CCACHE_DIR: ${{ github.workspace }}/ccache
   CCACHE_MAXSIZE: 128M
+  CTEST_PARALLEL_LEVEL: 0 # Since CMake 3.29, a setting of 0 will try to use all available resources
 
 jobs:
   build:
@@ -70,7 +71,7 @@ jobs:
 
       # The glpk_error test is temporarily disabled, see https://github.com/igraph/igraph/issues/1850
       - name: Test
-        run: ctest -j $(nproc) --exclude-regex glpk_error --output-on-failure --timeout 180
+        run: ctest --exclude-regex glpk_error --output-on-failure --timeout 180
         working-directory: build-${{ matrix.arch }}
 
       - name: Ccache stats
