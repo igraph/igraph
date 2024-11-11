@@ -20,7 +20,6 @@ add_dependencies(check build_tests)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
-  COMMAND true
   COMMENT "Running benchmarks..."
 )
 add_dependencies(benchmark build_benchmarks)

@@ -5,7 +5,12 @@
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 #  * cmake -E cat (3.18)
-cmake_minimum_required(VERSION 3.18...3.30)
+cmake_minimum_required(VERSION 3.18...3.31)
+
+# Need USES_TERMINAL when adding custom commands to the benchmark target
+if(POLICY CMP0175)
+  cmake_policy(SET CMP0175 OLD)
+endif()
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
