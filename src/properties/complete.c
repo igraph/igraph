@@ -251,7 +251,7 @@ igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
  * \experimental
  *
  * Tests if no pairs within a set of vertices are adjacenct, i.e. whether they
- * form a an independent set. An empty set and singleton set are both considered
+ * form an independent set. An empty set and singleton set are both considered
  * to be an independent set.
  *
  * \param graph The input graph.
