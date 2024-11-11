@@ -224,7 +224,10 @@ done:
  * \param res The result will be stored here.
  * \return Error code.
  *
- * \sa \ref igraph_is_complete(), \ref igraph_is_independent_vertex_set()
+ * \sa \ref igraph_is_complete() to test if a graph is complete;
+ * \ref igraph_is_independent_vertex_set() to test for independent vertex sets;
+ * \ref igraph_cliques(), \ref igraph_maximal_cliques() and
+ * \ref igraph_largest_cliques() to find cliques.
  *
  * Time complexity: O(n^2 log(d)) where n is the number of vertices in the
  * candidate set and d is the typical vertex degree.
@@ -259,7 +262,9 @@ igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
  * \param res The result will be stored here.
  * \return Error code.
  *
- * \sa \ref igraph_is_clique()
+ * \sa \ref igraph_is_clique() to test for cliques; \ref igraph_independent_vertex_sets(),
+ * \ref igraph_maximal_independent_vertex_sets() and
+ * \ref igraph_largest_independent_vertex_sets() to find independent vertex sets.
  *
  * Time complexity: O(n^2 log(d)) where n is the number of vertices in the
  * candidate set and d is the typical vertex degree.
