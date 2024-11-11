@@ -459,7 +459,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
-        IGRAPH_CHECK_OOM(set, "Insufficient memory for configuation model (simple graphs).");
+        IGRAPH_CHECK_OOM(set, "Insufficient memory for configuration model (simple graphs).");
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*degseq)[i]));

@@ -9,6 +9,7 @@ variables:
   ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
   UBSAN_OPTIONS: print_stacktrace=1:color=always
   OMP_NUM_THREADS: 1
+  CTEST_PARALLEL_LEVEL: 0 # Since CMake 3.29, a setting of 0 will try to use all available resources
 
 jobs:
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested

@@ -580,7 +580,7 @@ igraph_error_t igraph_simple_cycles_callback(
  *
  * \sa \ref igraph_simple_cycles() to call a function for each found cycle;
  * \ref igraph_find_cycle() to find a single cycle;
- * \ref igraph_fundamental_cycles() and igraph_minimum_cycle_basis()
+ * \ref igraph_fundamental_cycles() and \ref igraph_minimum_cycle_basis()
  * to find a cycle basis, a compact representation of the cycle structure
  * of the graph.
  *

@@ -117,6 +117,10 @@
 
 ## [master]
 
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.15]
 
 ### Added
