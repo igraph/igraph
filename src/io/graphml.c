@@ -41,7 +41,7 @@
 #include <libxml/globals.h>
 #include <libxml/parser.h>
 
-xmlEntity blankEntityStruct = {
+static xmlEntity blankEntityStruct = {
 #ifndef XML_WITHOUT_CORBA
     NULL, /* _private */
 #endif
@@ -72,7 +72,7 @@ xmlEntity blankEntityStruct = {
 #endif
 };
 
-xmlEntityPtr blankEntity = &blankEntityStruct;
+static xmlEntityPtr blankEntity = &blankEntityStruct;
 
 #define toXmlChar(a)   (BAD_CAST(a))
 #define fromXmlChar(a) ((char *)(a)) /* not the most elegant way... */
