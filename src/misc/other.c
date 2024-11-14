@@ -295,74 +295,77 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
 
 /**
  * \function igraph_vertex_path_from_edge_path
- * \brief Converts a path of edge IDs to the traversed vertex IDs.
+ * \brief Converts a walk of edge IDs to the traversed vertex IDs.
  *
- * </para><para>
  * This function is useful when you have a sequence of edge IDs representing a
- * continuous path in a graph and you would like to obtain the vertex IDs that
- * the path traverses. The function is used implicitly by several shortest path
+ * continuous walk in a graph and you would like to obtain the vertex IDs that
+ * the walk traverses. The function is used implicitly by several shortest path
  * related functions to convert a path of edge IDs to the corresponding
  * representation that describes the path in terms of vertex IDs instead.
  *
- * \param  graph  the graph that the edge IDs refer to
- * \param  start  the start vertex of the path
- * \param  edge_path  the sequence of edge IDs that describe the path
- * \param  vertex_path  the sequence of vertex IDs traversed will be returned here
+ * </para><para>
+ * The walk is allowed to traverse the same vertex more than once. It is
+ * suitable for use on paths, cycles, or arbitrary walks.
+ *
+ * \param  graph The graph that the edge IDs refer to.
+ * \param  start The start vertex of the path.
+ * \param  edge_path The sequence of edge IDs that describe the path.
+ * \param  vertex_path The sequence of vertex IDs traversed will be returned here.
  * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory,
  *         \c IGRAPH_EINVAL if the edge path does not start at the given vertex
  *         or if there is at least one edge whose start vertex does not match
- *         the end vertex of the previous edge
+ *         the end vertex of the previous edge.
+ *
+ * Time complexity: O(n) where n is the length of the walk.
  */
 igraph_error_t igraph_vertex_path_from_edge_path(
    const igraph_t *graph, igraph_integer_t start,
    const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
    igraph_neimode_t mode
 ) {
-    igraph_integer_t i, no_of_edges;
-    igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_bool_t next_edge_ok;
-    igraph_integer_t next_start;
+    const igraph_integer_t no_of_edges = igraph_vector_int_size(edge_path);
 
     igraph_vector_int_clear(vertex_path);
-
-    no_of_edges = igraph_vector_int_size(edge_path);
     IGRAPH_CHECK(igraph_vector_int_reserve(vertex_path, no_of_edges + 1));
 
-    if (!directed) {
+    if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(*edge_path)[i]);
-        igraph_integer_t to = IGRAPH_TO(graph, VECTOR(*edge_path)[i]);
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+        const igraph_integer_t edge = VECTOR(*edge_path)[i];
+        const igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        const igraph_integer_t to = IGRAPH_TO(graph, edge);
+        igraph_bool_t next_edge_ok;
+        igraph_integer_t next_start;
 
         igraph_vector_int_push_back(vertex_path, start);  /* reserved */
 
         switch (mode) {
-            case IGRAPH_OUT:
-                next_edge_ok = from == start;
+        case IGRAPH_OUT:
+            next_edge_ok = from == start;
+            next_start = to;
+            break;
+
+        case IGRAPH_IN:
+            next_edge_ok = to == start;
+            next_start = from;
+            break;
+
+        case IGRAPH_ALL:
+            if (from == start) {
+                next_edge_ok = true;
                 next_start = to;
-                break;
-
-            case IGRAPH_IN:
-                next_edge_ok = to == start;
+            } else if (to == start) {
+                next_edge_ok = true;
                 next_start = from;
-                break;
+            } else {
+                next_edge_ok = false;
+            }
+            break;
 
-            case IGRAPH_ALL:
-                if (from == start) {
-                    next_edge_ok = true;
-                    next_start = to;
-                } else if (to == start) {
-                    next_edge_ok = true;
-                    next_start = from;
-                } else {
-                    next_edge_ok = false;
-                }
-                break;
-
-            default:
-                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVMODE);
+        default:
+            IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVMODE);
         }
 
         if (!next_edge_ok) {
