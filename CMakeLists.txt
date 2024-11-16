@@ -7,7 +7,11 @@
 #  * cmake -E cat (3.18)
 cmake_minimum_required(VERSION 3.18...3.31)
 
-# Need USES_TERMINAL when adding custom commands to the benchmark target
+# TODO:
+# CMake 3.31.0 issues warnings due to the following bug:
+# https://gitlab.kitware.com/cmake/cmake/-/issues/26449
+# Setting policy CMP0175 to OLD avoids the warnings. Remove this or restrict to
+# affected CMake versions when the bug is fixed.
 if(POLICY CMP0175)
   cmake_policy(SET CMP0175 OLD)
 endif()
