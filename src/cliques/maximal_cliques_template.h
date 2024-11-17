@@ -81,10 +81,10 @@
     } while (0)
 #define CLEANUP
 #define FOR_LOOP_OVER_VERTICES \
-    nn= subset ? igraph_vector_int_size(subset) : no_of_nodes; \
+    nn = subset ? igraph_vector_int_size(subset) : no_of_nodes; \
     for (ii=0; ii<nn; ii++)
 #define FOR_LOOP_OVER_VERTICES_PREPARE do { \
-        i= subset ? VECTOR(*subset)[ii] : ii; \
+        i = subset ? VECTOR(*subset)[ii] : ii; \
     } while (0)
 #endif
 
@@ -205,19 +205,20 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
     /* Implementation details. TODO */
 
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t PX, R, H, pos, nextv;
     igraph_vector_int_t coreness;
     igraph_vector_int_t order;
     igraph_vector_int_t rank; /* TODO: this is not needed */
-    igraph_integer_t i, ii, nn, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, ii, nn;
     igraph_adjlist_t adjlist, fulladjlist;
     igraph_real_t pgreset = round(no_of_nodes / 100.0), pg = pgreset, pgc = 0;
     igraph_error_t err;
-    IGRAPH_UNUSED(nn);
+
+    IGRAPH_UNUSED(nn); /* not used by all implementations */
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Edge directions are ignored for maximal clique "
-                       "calculation");
+        IGRAPH_WARNING("Edge directions are ignored for maximal clique calculations.");
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
