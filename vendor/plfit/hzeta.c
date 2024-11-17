@@ -50,7 +50,18 @@
 #include <stdio.h>
 #include "hzeta.h"
 #include "plfit_error.h"
-#include "platform.h"   /* because of NAN */
+
+/* Work around bug in some Windows SDK / MSVC versions where NAN is not a
+ * constant expression, triggering an error in the definition of
+ * hsl_sf_hzeta_eulermaclaurin_series_coeffs[] and 
+ * hsl_sf_hzeta_eulermaclaurin_series_majorantratios[] below.
+ * We re-define NAN to the value it had in earlier MSVC versions.
+ * See https://github.com/igraph/igraph/issues/2701
+ */
+#ifdef _MSC_VER
+#undef NAN
+#define NAN (-(float)(((float)(1e+300 * 1e+300)) * 0.0F))
+#endif
 
 /* imported from gsl_machine.h */
 

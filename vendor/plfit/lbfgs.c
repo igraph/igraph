@@ -65,20 +65,11 @@ licence.
 #include "config.h"
 #endif/*HAVE_CONFIG_H*/
 
-#ifndef _MSC_VER
 #include <stdint.h>
-#endif
-
 #include <stdio.h>
 #include <math.h>
 
 #include "lbfgs.h"
-#include "platform.h"
-
-#ifdef  _MSC_VER
-#define inline  __inline
-typedef unsigned int uint32_t;
-#endif/*_MSC_VER*/
 
 #if     defined(USE_SSE) && defined(__SSE2__) && LBFGS_FLOAT == 64
 /* Use SSE2 optimization for 64bit double precision. */

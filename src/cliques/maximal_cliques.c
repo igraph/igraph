@@ -318,27 +318,30 @@ static igraph_error_t igraph_i_maximal_cliques_up(
  * \function igraph_maximal_cliques
  * \brief Finds all maximal cliques in a graph.
  *
- * </para><para>
- * A maximal clique is a clique which can't be extended any more by
- * adding a new vertex to it.
+ * This function lists maximal cliques within a size range, ignoring edge
+ * directions. A clique is a subset of vertices in which all vertex pairs are
+ * connected. A \em maximal clique is a clique which is not a strict subset
+ * of any larger clique.
  *
  * </para><para>
- * If you are only interested in the size of the largest clique in the
- * graph, use \ref igraph_clique_number() instead.
+ * No guarantees are given about the order in which cliques are returned.
  *
  * </para><para>
- * The current implementation uses a modified Bron-Kerbosch
- * algorithm to find the maximal cliques, see: David Eppstein,
- * Maarten Löffler, Darren Strash: Listing All Maximal Cliques in
- * Sparse Graphs in Near-Optimal Time. Algorithms and Computation,
- * Lecture Notes in Computer Science Volume 6506, 2010, pp 403-414.
+ * The current implementation uses a modified Bron-Kerbosch algorithm due to
+ * Eppstein, Löffler and Strash.
  *
- * </para><para>The implementation of this function changed between
- * igraph 0.5 and 0.6 and also between 0.6 and 0.7, so the order of
- * the cliques and the order of vertices within the cliques will
- * almost surely be different between these three versions.
+ * </para><para>
+ * Reference:
  *
- * \param graph The input graph.
+ * </para><para>
+ * David Eppstein, Maarten Löffler, Darren Strash:
+ * Listing All Maximal Cliques in Sparse Graphs in Near-Optimal Time.
+ * Algorithms and Computation, Lecture Notes in Computer Science,
+ * volume 6506, pp 403-414 (2010).
+ * https://doi.org/10.1007/978-3-642-17517-6_36
+ * https://arxiv.org/abs/1006.5440
+ *
+ * \param graph The input graph. Edge directions are ignored.
  * \param res Pointer to list of integer vectors. The maximal cliques
  *   will be returned here as vectors of vertex IDs. Note that vertices
  *   of a clique may be returned in arbitrary order.
@@ -348,8 +351,10 @@ static igraph_error_t igraph_i_maximal_cliques_up(
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
- * \sa \ref igraph_maximal_independent_vertex_sets(), \ref
- * igraph_clique_number()
+ * \sa \ref igraph_maximal_independent_vertex_sets() to find maximal
+ * independent sets, which are cliques of the complement graph;
+ * \ref igraph_clique_number() to find the size of the largest clique;
+ * \ref igraph_cliques() to find all cliques.
  *
  * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
  * of the graph, this is typically small for sparse graphs.
@@ -370,13 +375,9 @@ igraph_error_t igraph_maximal_cliques(
  * \function igraph_maximal_cliques_count
  * \brief Count the number of maximal cliques in a graph.
  *
- * The current implementation uses a modified Bron-Kerbosch
- * algorithm to find the maximal cliques, see: David Eppstein,
- * Maarten Löffler, Darren Strash: Listing All Maximal Cliques in
- * Sparse Graphs in Near-Optimal Time. Algorithms and Computation,
- * Lecture Notes in Computer Science Volume 6506, 2010, pp 403-414.
+ * See \ref igraph_maximal_cliques() for details.
  *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are ignored.
  * \param res Pointer to an \c igraph_integer_t; the number of maximal
  *   cliques will be stored here.
  * \param min_size Integer giving the minimum size of the cliques to be
@@ -406,15 +407,11 @@ igraph_error_t igraph_maximal_cliques_count(const igraph_t *graph,
  * \function igraph_maximal_cliques_file
  * \brief Find maximal cliques and write them to a file.
  *
- * This function enumerates all maximal cliques and writes them to file.
+ * This function enumerates all maximal cliques within a size range
+ * and writes them to file. See \ref igraph_maximal_cliques() for
+ * details
  *
- * </para><para>
- *
- * Edge directions are ignored.
- *
- * </para><para>
- *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are ignored.
  * \param outfile Pointer to the output file, it should be writable.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
@@ -443,16 +440,14 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  * \brief Maximal cliques for a subset of initial vertices.
  *
  * This function enumerates all maximal cliques for a subset of initial
- * vertices and writes them to file.
+ * vertices and writes them to file. See \ref igraph_maximal_cliques()
+ * for details.
  *
- * </para><para>
- * Edge directions are ignored.
- *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are ignored.
  * \param subset Pointer to an \c  igraph_vector_int_t containing the
- *   subset of initial vertices
+ *   subset of initial vertices.
  * \param res Pointer to a list of integer vectors; the cliques will be
- *   stored here
+ *   stored here.
  * \param no Pointer to an \c igraph_integer_t; the number of maximal
  *   cliques will be stored here.
  * \param outfile Pointer to an output file or \c NULL.
@@ -492,10 +487,7 @@ igraph_error_t igraph_maximal_cliques_subset(
  * copy of the vector using \ref igraph_vector_int_init_copy() if they want to
  * hold on to it.
  *
- * </para><para>
- * Edge directions are ignored.
- *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are ignored.
  * \param cliquehandler_fn Callback function to be called for each clique.
  * See also \ref igraph_clique_handler_t.
  * \param arg Extra argument to supply to \p cliquehandler_fn.
@@ -505,7 +497,7 @@ igraph_error_t igraph_maximal_cliques_subset(
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
- * \sa \ref igraph_maximal_cliques().
+ * \sa \ref igraph_maximal_cliques(), \ref igraph_cliques_callback().
  *
  * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
  * of the graph, this is typically small for sparse graphs.
@@ -526,15 +518,9 @@ igraph_error_t igraph_maximal_cliques_callback(const igraph_t *graph,
  * \brief Counts the number of maximal cliques of each size in a graph.
  *
  * This function counts how many maximal cliques of each size are present in
- * the graph. Size-1 maximal cliques are simply isolated vertices.
+ * the graph. Maximal cliques of size one are simply isolated vertices.
  *
- * </para><para>
- *
- * Edge directions are ignored.
- *
- * </para><para>
- *
- * \param graph The input graph.
+ * \param graph The input graph. Edge directions are ignored.
  * \param hist Pointer to an initialized vector. The result will be stored
  * here. The first element will store the number of size-1 maximal cliques,
  * the second element the number of size-2 maximal cliques, etc.
@@ -545,7 +531,7 @@ igraph_error_t igraph_maximal_cliques_callback(const igraph_t *graph,
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
- * \sa \ref igraph_maximal_cliques().
+ * \sa \ref igraph_maximal_cliques(), \ref igraph_clique_size_hist().
  *
  * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
  * of the graph, this is typically small for sparse graphs.

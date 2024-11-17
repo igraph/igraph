@@ -4,12 +4,12 @@
     "name": "igraph dev environment",
 
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04",
 
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
         "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-            "packages": "build-essential,clang,cmake,cmake-curses-gui,ninja-build,ccache,colordiff,astyle,bison,flex,libxml2-dev,libarpack2-dev,libglpk-dev,libgmp-dev,xmlto,texinfo,source-highlight,libxml2-utils,xsltproc,fop,docbook2x"
+            "packages": "cmake-curses-gui,ninja-build,ccache,colordiff,astyle,bison,flex,libxml2-dev,libarpack2-dev,libglpk-dev,libgmp-dev,libplfit-dev,xmlto,texinfo,source-highlight,libxml2-utils,xsltproc,fop,docbook2x"
         }
     },
 
@@ -29,7 +29,6 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "ms-vscode.cpptools-extension-pack", // C/C++ and CMake support
                 "daohong-emilio.yash" // flex/bison support
             ]
         }

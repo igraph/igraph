@@ -27,7 +27,6 @@
 #include "plfit_error.h"
 #include "gss.h"
 #include "lbfgs.h"
-#include "platform.h"
 #include "plfit.h"
 #include "kolmogorov.h"
 #include "plfit_sampling.h"

@@ -14,12 +14,7 @@
 #ifndef __PLFIT_MT_H__
 #define __PLFIT_MT_H__
 
-/* VS 2010, i.e. _MSC_VER == 1600, already has stdint.h */
-#if defined(_MSC_VER) && _MSC_VER < 1600
-#  define uint32_t unsigned __int32
-#else
-#  include <stdint.h>
-#endif
+#include <stdint.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS

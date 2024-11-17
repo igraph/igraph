@@ -325,7 +325,7 @@ DATA &HugeArray<DATA>::Set(igraph_integer_t index) {
     igraph_integer_t data_size;
     while (size < index + 1) {
         highest_field_index++;
-        data_size = 1UL << highest_field_index;
+        data_size = igraph_integer_t(1) << highest_field_index;
         data = new DATA[data_size];
         for (igraph_integer_t i = 0; i < data_size; i++) {
             data[i] = 0;

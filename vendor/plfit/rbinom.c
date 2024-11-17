@@ -44,7 +44,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include "plfit_sampling.h"
-#include "platform.h"
 
 #define repeat for(;;)
 

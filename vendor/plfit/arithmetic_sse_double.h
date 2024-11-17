@@ -43,7 +43,7 @@
 
 inline static void* vecalloc(size_t size)
 {
-#ifdef	_MSC_VER
+#ifdef	_WIN32
     void *memblock = _aligned_malloc(size, 16);
 #elif defined(__APPLE__)
 	/* Memory on Mac OS X is already aligned to 16 bytes */
@@ -59,7 +59,7 @@ inline static void* vecalloc(size_t size)
 
 inline static void vecfree(void *memblock)
 {
-#ifdef	_MSC_VER
+#ifdef	_WIN32
     _aligned_free(memblock);
 #else
     free(memblock);
