@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Deprecated
+
+ - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
+
 ### Other
 
  - Workaround for bug in CMake 3.31.0, see https://gitlab.kitware.com/cmake/cmake/-/issues/26449
