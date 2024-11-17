@@ -4,6 +4,7 @@
 
 ### Other
 
+ - Workaround for bug in CMake 3.31.0, see https://gitlab.kitware.com/cmake/cmake/-/issues/26449
  - Documentation improvements.
 
 ## [0.10.15]
