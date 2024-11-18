@@ -24,12 +24,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "plfit_error.h"
 #include "gss.h"
 #include "lbfgs.h"
 #include "plfit.h"
 #include "kolmogorov.h"
-#include "plfit_sampling.h"
 #include "hzeta.h"
 
 /* #define PLFIT_DEBUG */

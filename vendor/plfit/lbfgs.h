@@ -29,9 +29,9 @@
 #ifndef __LBFGS_H__
 #define __LBFGS_H__
 
-#ifdef  __cplusplus
-extern "C" {
-#endif/*__cplusplus*/
+#include "plfit_decls.h"
+
+__BEGIN_DECLS
 
 /*
  * The default precision of floating point values is 64bit (double).
@@ -517,9 +517,7 @@ void lbfgs_free(lbfgsfloatval_t *x);
 
 /** @} */
 
-#ifdef  __cplusplus
-}
-#endif/*__cplusplus*/
+__END_DECLS
 
 
 
