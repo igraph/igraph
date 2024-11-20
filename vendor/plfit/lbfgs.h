@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-/* $Id: lbfgs.h 65 2010-01-29 12:19:16Z naoaki $ */
+/* $Id$ */
 
 #ifndef __LBFGS_H__
 #define __LBFGS_H__
@@ -59,7 +59,7 @@ typedef double lbfgsfloatval_t;
 #endif
 
 
-/**
+/** 
  * \addtogroup liblbfgs_api libLBFGS API
  * @{
  *
@@ -68,7 +68,7 @@ typedef double lbfgsfloatval_t;
 
 /**
  * Return values of lbfgs().
- *
+ * 
  *  Roughly speaking, a negative value indicates an error.
  */
 enum {
@@ -233,7 +233,7 @@ typedef struct {
      *      (f' - f) / f < \ref delta,
      *  where f' is the objective value of \ref past iterations ago, and f is
      *  the objective value of the current iteration.
-     *  The default value is \c 0.
+     *  The default value is \c 1e-5.
      */
     lbfgsfloatval_t delta;
 
@@ -257,7 +257,7 @@ typedef struct {
     /**
      * The maximum number of trials for the line search.
      *  This parameter controls the number of function and gradients evaluations
-     *  per iteration for the line search routine. The default value is \c 20.
+     *  per iteration for the line search routine. The default value is \c 40.
      */
     int             max_linesearch;
 
@@ -303,7 +303,7 @@ typedef struct {
      *  evaluations are inexpensive with respect to the cost of the
      *  iteration (which is sometimes the case when solving very large
      *  problems) it may be advantageous to set this parameter to a small
-     *  value. A typical small value is \c 0.1. This parameter shuold be
+     *  value. A typical small value is \c 0.1. This parameter should be
      *  greater than the \ref ftol parameter (\c 1e-4) and smaller than
      *  \c 1.0.
      */
@@ -365,7 +365,7 @@ typedef struct {
  *  function and its gradients when needed. A client program must implement
  *  this function to evaluate the values of the objective function and its
  *  gradients, given current values of variables.
- *
+ *  
  *  @param  instance    The user data sent for lbfgs() function by the client.
  *  @param  x           The current values of variables.
  *  @param  g           The gradient vector. The callback function must compute
@@ -502,18 +502,25 @@ void lbfgs_parameter_init(lbfgs_parameter_t *param);
  *  when libLBFGS is built with SSE/SSE2 optimization routines. A user does
  *  not have to use this function for libLBFGS built without SSE/SSE2
  *  optimization.
- *
+ *  
  *  @param  n           The number of variables.
  */
 lbfgsfloatval_t* lbfgs_malloc(int n);
 
 /**
  * Free an array of variables.
- *
+ *  
  *  @param  x           The array of variables allocated by ::lbfgs_malloc
  *                      function.
  */
 void lbfgs_free(lbfgsfloatval_t *x);
+
+/**
+ * Get string description of an lbfgs() return code.
+ *
+ *  @param err          A value returned by lbfgs().
+ */
+const char* lbfgs_strerror(int err);
 
 /** @} */
 
@@ -571,7 +578,7 @@ Among the various ports of L-BFGS, this library provides several features:
   The library is thread-safe, which is the secondary gain from the callback
   interface.
 - <b>Cross platform.</b> The source code can be compiled on Microsoft Visual
-  Studio 2005, GNU C Compiler (gcc), etc.
+  Studio 2010, GNU C Compiler (gcc), etc.
 - <b>Configurable precision</b>: A user can choose single-precision (float)
   or double-precision (double) accuracy by changing ::LBFGS_FLOAT macro.
 - <b>SSE/SSE2 optimization</b>:
@@ -585,17 +592,28 @@ This library is used by:
 - <a href="http://www.chokkan.org/software/classias/">Classias: A collection of machine-learning algorithms for classification</a>
 - <a href="http://www.public.iastate.edu/~gdancik/mlegp/">mlegp: an R package for maximum likelihood estimates for Gaussian processes</a>
 - <a href="http://infmath.uibk.ac.at/~matthiasf/imaging2/">imaging2: the imaging2 class library</a>
-- <a href="http://search.cpan.org/~laye/Algorithm-LBFGS-0.16/">Algorithm::LBFGS - Perl extension for L-BFGS</a>
-- <a href="http://www.cs.kuleuven.be/~bernd/yap-lbfgs/">YAP-LBFGS (an interface to call libLBFGS from YAP Prolog)</a>
 
 @section download Download
 
-- <a href="http://www.chokkan.org/software/dist/liblbfgs-1.9.tar.gz">Source code</a>
+- <a href="https://github.com/downloads/chokkan/liblbfgs/liblbfgs-1.10.tar.gz">Source code</a>
+- <a href="https://github.com/chokkan/liblbfgs">GitHub repository</a>
 
 libLBFGS is distributed under the term of the
 <a href="http://opensource.org/licenses/mit-license.php">MIT license</a>.
 
+@section modules Third-party modules
+- <a href="http://cran.r-project.org/web/packages/lbfgs/index.html">lbfgs: Limited-memory BFGS Optimization (a wrapper for R)</a> maintained by Antonio Coppola.
+- <a href="http://search.cpan.org/~laye/Algorithm-LBFGS-0.16/">Algorithm::LBFGS - Perl extension for L-BFGS</a> maintained by Lei Sun.
+- <a href="http://www.cs.kuleuven.be/~bernd/yap-lbfgs/">YAP-LBFGS (an interface to call libLBFGS from YAP Prolog)</a> maintained by Bernd Gutmann.
+
 @section changelog History
+- Version 1.10 (2010-12-22):
+    - Fixed compiling errors on Mac OS X; this patch was kindly submitted by
+      Nic Schraudolph.
+    - Reduced compiling warnings on Mac OS X; this patch was kindly submitted
+      by Tamas Nepusz.
+    - Replaced memalign() with posix_memalign().
+    - Updated solution and project files for Microsoft Visual Studio 2010.
 - Version 1.9 (2010-01-29):
     - Fixed a mistake in checking the validity of the parameters "ftol" and
       "wolfe"; this was discovered by Kevin S. Van Horn.
@@ -716,6 +734,7 @@ Special thanks go to:
     - Yoshimasa Tsuruoka and Daisuke Okanohara for technical information about
       OWL-QN
     - Takashi Imamichi for the useful enhancements of the backtracking method
+    - Kevin S. Van Horn, Nic Schraudolph, and Tamas Nepusz for bug fixes
 
 Finally I would like to thank the original author, Jorge Nocedal, who has been
 distributing the effieicnt and explanatory implementation in an open source
