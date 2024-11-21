@@ -13,39 +13,39 @@
 #include "f2c.h"
 
 
-/*     %---------------------------------------------%   
-       | Initialize statistic and timing information |   
-       | for nonsymmetric Arnoldi code.              |   
-       %---------------------------------------------%   
+/*     %---------------------------------------------%
+       | Initialize statistic and timing information |
+       | for nonsymmetric Arnoldi code.              |
+       %---------------------------------------------%
 
-   \Author   
-       Danny Sorensen               Phuong Vu   
-       Richard Lehoucq              CRPC / Rice University   
-       Dept. of Computational &     Houston, Texas   
-       Applied Mathematics   
-       Rice University   
-       Houston, Texas   
+   \Author
+       Danny Sorensen               Phuong Vu
+       Richard Lehoucq              CRPC / Rice University
+       Dept. of Computational &     Houston, Texas
+       Applied Mathematics
+       Rice University
+       Houston, Texas
 
-   \SCCS Information: @(#)   
-   FILE: statn.F   SID: 2.4   DATE OF SID: 4/20/96   RELEASE: 2   
+   \SCCS Information: @(#)
+   FILE: statn.F   SID: 2.4   DATE OF SID: 4/20/96   RELEASE: 2
 
    Subroutine */ int igraphdstatn_(void)
 {
-    integer nbx, nopx;
-    real trvec, tmvbx, tnaup2, tgetv0, tneigh;
-    integer nitref;
-    real tnaupd, titref, tnaitr, tngets, tnapps, tnconv;
-    integer nrorth, nrstrt;
-    real tmvopx;
+    integer nbx=0, nopx=0;
+    real trvec=0, tmvbx=0, tnaup2=0, tgetv0=0, tneigh=0;
+    integer nitref=0;
+    real tnaupd=0, titref=0, tnaitr=0, tngets=0, tnapps=0, tnconv=0;
+    integer nrorth=0, nrstrt=0;
+    real tmvopx=0;
 
 
-/*     %--------------------------------%   
-       | See stat.doc for documentation |   
-       %--------------------------------%   
+/*     %--------------------------------%
+       | See stat.doc for documentation |
+       %--------------------------------%
 
 
-       %-----------------------%   
-       | Executable Statements |   
+       %-----------------------%
+       | Executable Statements |
        %-----------------------% */
 
     nopx = 0;
@@ -65,8 +65,8 @@
     tgetv0 = 0.f;
     trvec = 0.f;
 
-/*     %----------------------------------------------------%   
-       | User time including reverse communication overhead |   
+/*     %----------------------------------------------------%
+       | User time including reverse communication overhead |
        %----------------------------------------------------% */
 
     tmvopx = 0.f;
@@ -75,8 +75,8 @@
     return 0;
 
 
-/*     %---------------%   
-       | End of dstatn |   
+/*     %---------------%
+       | End of dstatn |
        %---------------% */
 
 } /* igraphdstatn_ */
