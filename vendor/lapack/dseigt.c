@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -77,7 +77,7 @@ static integer c__1 = 1;
        dstqrb  ARPACK routine that computes the eigenvalues and the   
                last components of the eigenvectors of a symmetric   
                and tridiagonal matrix.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dvout   ARPACK utility routine that prints vectors.   
        dcopy   Level 1 BLAS that copies one vector to another.   
 
@@ -112,14 +112,14 @@ static integer c__1 = 1;
 
     /* Local variables */
     integer k;
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal 
-	    *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, mseigt = 0;
+	    *, integer *, char *, ftnlen), igrapharscnd_(real *);
+    integer logfil, ndigit, mseigt;
     extern /* Subroutine */ int igraphdstqrb_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *);
-    real tseigt = 0.0;
+    real tseigt;
     integer msglvl;
 
 
@@ -171,7 +171,7 @@ static integer c__1 = 1;
     h__ -= h_offset;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = mseigt;
 
     if (msglvl > 0) {
@@ -207,7 +207,7 @@ static integer c__1 = 1;
 /* L30: */
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tseigt += t1 - t0;
 
 L9000:

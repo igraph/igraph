@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -155,7 +155,7 @@ static integer c__2 = 2;
    \Routines called:   
        dgetv0  ARPACK routine to generate the initial vector.   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dmout   ARPACK utility routine that prints matrices   
        dvout   ARPACK utility routine that prints vectors.   
        dlabad  LAPACK routine that computes machine constants.   
@@ -248,10 +248,10 @@ static integer c__2 = 2;
     /* Local variables */
     integer i__;
     IGRAPH_F77_SAVE integer j;
-    IGRAPH_F77_SAVE real t0, t1, t2, t3, t4, t5;
+    real t0, t1, t2, t3, t4, t5;
     integer jj;
     IGRAPH_F77_SAVE integer ipj, irj;
-    integer nbx = 0;
+    integer nbx;
     IGRAPH_F77_SAVE integer ivj;
     IGRAPH_F77_SAVE doublereal ulp;
     doublereal tst1;
@@ -259,7 +259,7 @@ static integer c__2 = 2;
 	    integer *);
     IGRAPH_F77_SAVE integer ierr, iter;
     IGRAPH_F77_SAVE doublereal unfl, ovfl;
-    integer nopx = 0;
+    integer nopx;
     IGRAPH_F77_SAVE integer itry;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     doublereal temp1;
@@ -276,7 +276,7 @@ static integer c__2 = 2;
 	    *, integer *, integer *, doublereal *, integer *, integer *, char 
 	    *, ftnlen);
     doublereal xtemp[2];
-    real tmvbx = 0;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
     IGRAPH_F77_SAVE doublereal wnorm;
@@ -291,15 +291,15 @@ static integer c__2 = 2;
 	    integer *, integer *);
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
-    extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil = 0, ndigit, nitref = 0, mnaitr = 0;
-    real titref = 0, tnaitr = 0;
+    extern /* Subroutine */ int igrapharscnd_(real *);
+    integer logfil, ndigit, nitref, mnaitr;
+    real titref, tnaitr;
     IGRAPH_F77_SAVE integer msglvl;
     IGRAPH_F77_SAVE doublereal smlnum;
-    integer nrorth = 0;
+    integer nrorth;
     IGRAPH_F77_SAVE logical rstart;
-    integer nrstrt = 0;
-    real tmvopx = 0;
+    integer nrstrt;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   
@@ -393,7 +393,7 @@ static integer c__2 = 2;
           | & message level for debugging |   
           %-------------------------------% */
 
-	igraphsecond_(&t0);
+	igrapharscnd_(&t0);
 	msglvl = mnaitr;
 
 /*        %------------------------------%   
@@ -462,7 +462,7 @@ L1000:
 
 /*        %---------------------------------------------------%   
           | STEP 1: Check if the B norm of j-th residual      |   
-          | vector is zero. Equivalent to determing whether   |   
+          | vector is zero. Equivalent to determining whether |   
           | an exact j-step Arnoldi factorization is present. |   
           %---------------------------------------------------% */
 
@@ -519,7 +519,7 @@ L30:
                 %------------------------------------------------% */
 
 	*info = j - 1;
-	igraphsecond_(&t1);
+	igrapharscnd_(&t1);
 	tnaitr += t1 - t0;
 	*ido = 99;
 	goto L9000;
@@ -559,7 +559,7 @@ L40:
 
     step3 = TRUE_;
     ++nopx;
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     igraphdcopy_(n, &v[j * v_dim1 + 1], &c__1, &workd[ivj], &c__1);
     ipntr[1] = ivj;
     ipntr[2] = irj;
@@ -579,7 +579,7 @@ L50:
           | if step3 = .true.                |   
           %----------------------------------% */
 
-    igraphsecond_(&t3);
+    igrapharscnd_(&t3);
     tmvopx += t3 - t2;
     step3 = FALSE_;
 
@@ -594,7 +594,7 @@ L50:
           |          factorization to length j.   |   
           %---------------------------------------% */
 
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	step4 = TRUE_;
@@ -619,7 +619,7 @@ L60:
           %----------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -666,11 +666,11 @@ L60:
 	h__[j + (j - 1) * h_dim1] = betaj;
     }
 
-    igraphsecond_(&t4);
+    igrapharscnd_(&t4);
 
     orth1 = TRUE_;
 
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[irj], &c__1);
@@ -694,7 +694,7 @@ L70:
           %---------------------------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -773,7 +773,7 @@ L80:
     igraphdaxpy_(&j, &c_b25, &workd[irj], &c__1, &h__[j * h_dim1 + 1], &c__1);
 
     orth2 = TRUE_;
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[irj], &c__1);
@@ -797,7 +797,7 @@ L90:
           %---------------------------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -879,7 +879,7 @@ L100:
     rstart = FALSE_;
     orth2 = FALSE_;
 
-    igraphsecond_(&t5);
+    igrapharscnd_(&t5);
     titref += t5 - t4;
 
 /*        %------------------------------------%   
@@ -888,7 +888,7 @@ L100:
 
     ++j;
     if (j > *k + *np) {
-	igraphsecond_(&t1);
+	igrapharscnd_(&t1);
 	tnaitr += t1 - t0;
 	*ido = 99;
 	i__1 = *k + *np - 1;

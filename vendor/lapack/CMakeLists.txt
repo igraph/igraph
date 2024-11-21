@@ -53,7 +53,7 @@ add_library(
   arpack_vendored
   OBJECT
   EXCLUDE_FROM_ALL
-  dnaupd.c dnaup2.c dgetv0.c dvout.c second.c dmout.c dnaitr.c ivout.c dnapps.c
+  dnaupd.c dnaup2.c dgetv0.c dvout.c arscnd.c dmout.c dnaitr.c ivout.c dnapps.c
   dnconv.c dneigh.c dlaqrb.c dngets.c dsortc.c dstatn.c dneupd.c dsaupd.c
   dsaup2.c dsaitr.c dsapps.c dsconv.c dseigt.c dstqrb.c dsgets.c dsortr.c
   dstats.c dseupd.c dsesrt.c

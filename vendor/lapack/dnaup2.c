@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -26,7 +26,7 @@ static integer c__2 = 2;
    \Name: dnaup2   
 
    \Description:   
-    Intermediate level interface called by dnaupd.   
+    Intermediate level interface called by dnaupd .   
 
    \Usage:   
     call dnaup2   
@@ -36,8 +36,8 @@ static integer c__2 = 2;
 
    \Arguments   
 
-    IDO, BMAT, N, WHICH, NEV, TOL, RESID: same as defined in dnaupd.   
-    MODE, ISHIFT, MXITER: see the definition of IPARAM in dnaupd.   
+    IDO, BMAT, N, WHICH, NEV, TOL, RESID: same as defined in dnaupd .   
+    MODE, ISHIFT, MXITER: see the definition of IPARAM in dnaupd .   
 
     NP      Integer.  (INPUT/OUTPUT)   
             Contains the number of implicit shifts to apply during   
@@ -49,7 +49,7 @@ static integer c__2 = 2;
             The logic for adjusting is contained within the current   
             subroutine.   
             If ISHIFT=0, NP is the number of shifts the user needs   
-            to provide via reverse comunication. 0 < NP < NCV-NEV.   
+            to provide via reverse communication. 0 < NP < NCV-NEV.   
             NP may be less than NCV-NEV for two reasons. The first, is   
             to keep complex conjugate pairs of "wanted" Ritz values   
             together. The second, is that a leading block of the current   
@@ -62,7 +62,7 @@ static integer c__2 = 2;
             IUPD .EQ. 0: use explicit restart instead implicit update.   
             IUPD .NE. 0: use implicit update.   
 
-    V       Double precision N by (NEV+NP) array.  (INPUT/OUTPUT)   
+    V       Double precision  N by (NEV+NP) array.  (INPUT/OUTPUT)   
             The Arnoldi basis vectors are returned in the first NEV   
             columns of V.   
 
@@ -70,22 +70,22 @@ static integer c__2 = 2;
             Leading dimension of V exactly as declared in the calling   
             program.   
 
-    H       Double precision (NEV+NP) by (NEV+NP) array.  (OUTPUT)   
+    H       Double precision  (NEV+NP) by (NEV+NP) array.  (OUTPUT)   
             H is used to store the generated upper Hessenberg matrix   
 
     LDH     Integer.  (INPUT)   
             Leading dimension of H exactly as declared in the calling   
             program.   
 
-    RITZR,  Double precision arrays of length NEV+NP.  (OUTPUT)   
+    RITZR,  Double precision  arrays of length NEV+NP.  (OUTPUT)   
     RITZI   RITZR(1:NEV) (resp. RITZI(1:NEV)) contains the real (resp.   
             imaginary) part of the computed Ritz values of OP.   
 
-    BOUNDS  Double precision array of length NEV+NP.  (OUTPUT)   
+    BOUNDS  Double precision  array of length NEV+NP.  (OUTPUT)   
             BOUNDS(1:NEV) contain the error bounds corresponding to   
             the computed Ritz values.   
 
-    Q       Double precision (NEV+NP) by (NEV+NP) array.  (WORKSPACE)   
+    Q       Double precision  (NEV+NP) by (NEV+NP) array.  (WORKSPACE)   
             Private (replicated) work array used to accumulate the   
             rotation in the shift application step.   
 
@@ -93,7 +93,7 @@ static integer c__2 = 2;
             Leading dimension of Q exactly as declared in the calling   
             program.   
 
-    WORKL   Double precision work array of length at least   
+    WORKL   Double precision  work array of length at least   
             (NEV+NP)**2 + 3*(NEV+NP).  (INPUT/WORKSPACE)   
             Private (replicated) array on each PE or array allocated on   
             the front end.  It is used in shifts calculation, shifts   
@@ -102,7 +102,7 @@ static integer c__2 = 2;
             On exit, the last 3*(NEV+NP) locations of WORKL contain   
             the Ritz values (real,imaginary) and associated Ritz   
             estimates of the current Hessenberg matrix.  They are   
-            listed in the same order as returned from dneigh.   
+            listed in the same order as returned from dneigh .   
 
             If ISHIFT .EQ. O and IDO .EQ. 3, the first 2*NP locations   
             of WORKL are used in reverse communication to hold the user   
@@ -118,7 +118,7 @@ static integer c__2 = 2;
                       shift-and-invert mode.  X is the current operand.   
             -------------------------------------------------------------   
 
-    WORKD   Double precision work array of length 3*N.  (WORKSPACE)   
+    WORKD   Double precision  work array of length 3*N.  (WORKSPACE)   
             Distributed array to be used in the basic Arnoldi iteration   
             for reverse communication.  The user should not use WORKD   
             as temporary workspace during the iteration !!!!!!!!!!   
@@ -158,23 +158,23 @@ static integer c__2 = 2;
        TR95-13, Department of Computational and Applied Mathematics.   
 
    \Routines called:   
-       dgetv0  ARPACK initial vector generation routine.   
-       dnaitr  ARPACK Arnoldi factorization routine.   
-       dnapps  ARPACK application of implicit shifts routine.   
-       dnconv  ARPACK convergence of Ritz values routine.   
-       dneigh  ARPACK compute Ritz values and error bounds routine.   
-       dngets  ARPACK reorder Ritz values and error bounds routine.   
-       dsortc  ARPACK sorting routine.   
+       dgetv0   ARPACK initial vector generation routine.   
+       dnaitr   ARPACK Arnoldi factorization routine.   
+       dnapps   ARPACK application of implicit shifts routine.   
+       dnconv   ARPACK convergence of Ritz values routine.   
+       dneigh   ARPACK compute Ritz values and error bounds routine.   
+       dngets   ARPACK reorder Ritz values and error bounds routine.   
+       dsortc   ARPACK sorting routine.   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
-       dmout   ARPACK utility routine that prints matrices   
-       dvout   ARPACK utility routine that prints vectors.   
-       dlamch  LAPACK routine that determines machine constants.   
-       dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.   
-       dcopy   Level 1 BLAS that copies one vector to another .   
-       ddot    Level 1 BLAS that computes the scalar product of two vectors.   
-       dnrm2   Level 1 BLAS that computes the norm of a vector.   
-       dswap   Level 1 BLAS that swaps two vectors.   
+       arscnd  ARPACK utility routine for timing.   
+       dmout    ARPACK utility routine that prints matrices   
+       dvout    ARPACK utility routine that prints vectors.   
+       dlamch   LAPACK routine that determines machine constants.   
+       dlapy2   LAPACK routine to compute sqrt(x**2+y**2) carefully.   
+       dcopy    Level 1 BLAS that copies one vector to another .   
+       ddot     Level 1 BLAS that computes the scalar product of two vectors.   
+       dnrm2    Level 1 BLAS that computes the norm of a vector.   
+       dswap    Level 1 BLAS that swaps two vectors.   
 
    \Author   
        Danny Sorensen               Phuong Vu   
@@ -185,7 +185,7 @@ static integer c__2 = 2;
        Houston, Texas   
 
    \SCCS Information: @(#)   
-   FILE: naup2.F   SID: 2.4   DATE OF SID: 7/30/96   RELEASE: 2   
+   FILE: naup2.F   SID: 2.8   DATE OF SID: 10/17/00   RELEASE: 2   
 
    \Remarks   
        1. None   
@@ -209,18 +209,22 @@ static integer c__2 = 2;
     /* Builtin functions */
     double pow_dd(doublereal *, doublereal *);
     integer s_cmp(char *, char *, ftnlen, ftnlen);
-    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double sqrt(doublereal);
 
     /* Local variables */
-    IGRAPH_F77_SAVE integer j;
-    IGRAPH_F77_SAVE real t0, t1, t2, t3;
-    IGRAPH_F77_SAVE integer kp[4], np0, nbx, nev0;
+    integer j;
+    real t0, t1, t2, t3;
+    integer kp[4];
+    IGRAPH_F77_SAVE integer np0;
+    integer nbx;
+    IGRAPH_F77_SAVE integer nev0;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     IGRAPH_F77_SAVE doublereal eps23;
-    IGRAPH_F77_SAVE integer ierr, iter;
-    IGRAPH_F77_SAVE doublereal temp;
+    integer ierr;
+    IGRAPH_F77_SAVE integer iter;
+    doublereal temp;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     IGRAPH_F77_SAVE logical getv0, cnorm;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
@@ -230,22 +234,22 @@ static integer c__2 = 2;
 	    doublereal *, integer *, integer *, char *, ftnlen);
     IGRAPH_F77_SAVE logical initv;
     IGRAPH_F77_SAVE doublereal rnorm;
-    IGRAPH_F77_SAVE real tmvbx;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    IGRAPH_F77_SAVE integer mnaup2;
-    IGRAPH_F77_SAVE real tnaup2;
+    integer mnaup2;
+    real tnaup2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdneigh_(doublereal *, integer *, doublereal *,
 	     integer *, doublereal *, doublereal *, doublereal *, doublereal *
 	    , integer *, doublereal *, integer *);
     IGRAPH_F77_SAVE integer nevbef;
-    extern /* Subroutine */ int igraphsecond_(real *);
-    IGRAPH_F77_SAVE integer logfil, ndigit;
+    extern /* Subroutine */ int igrapharscnd_(real *);
+    integer logfil, ndigit;
     extern /* Subroutine */ int igraphdnaitr_(integer *, char *, integer *, integer 
 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublereal *, 
@@ -260,8 +264,10 @@ static integer c__2 = 2;
 	    doublereal *, doublereal *, integer *), igraphdsortc_(char *, logical *,
 	     integer *, doublereal *, doublereal *, doublereal *);
     IGRAPH_F77_SAVE logical ushift;
-    IGRAPH_F77_SAVE char wprime[2];
-    IGRAPH_F77_SAVE integer msglvl, nptemp, numcnv, kplusp;
+    char wprime[2];
+    IGRAPH_F77_SAVE integer msglvl;
+    integer nptemp;
+    IGRAPH_F77_SAVE integer numcnv, kplusp;
 
 
 /*     %----------------------------------------------------%   
@@ -334,7 +340,7 @@ static integer c__2 = 2;
     /* Function Body */
     if (*ido == 0) {
 
-	igraphsecond_(&t0);
+	igrapharscnd_(&t0);
 
 	msglvl = mnaup2;
 
@@ -481,7 +487,7 @@ L1000:
 /*        %-----------------------------------------------------------%   
           | Compute NP additional steps of the Arnoldi factorization. |   
           | Adjust NP since NEV might have been updated by last call  |   
-          | to the shift application routine dnapps.                  |   
+          | to the shift application routine dnapps .                  |   
           %-----------------------------------------------------------% */
 
     *np = kplusp - *nev;
@@ -541,7 +547,7 @@ L20:
 
 /*        %----------------------------------------------------%   
           | Make a copy of eigenvalues and corresponding error |   
-          | bounds obtained from dneigh.                       |   
+          | bounds obtained from dneigh .                       |   
           %----------------------------------------------------%   
 
    Computing 2nd power */
@@ -565,7 +571,7 @@ L20:
           | and NP may be updated if the NEV-th wanted Ritz   |   
           | value has a non zero imaginary part. In this case |   
           | NEV is increased by one and NP decreased by one.  |   
-          | NOTE: The last two arguments of dngets are no     |   
+          | NOTE: The last two arguments of dngets  are no     |   
           | longer used as of version 2.1.                    |   
           %---------------------------------------------------% */
 
@@ -655,10 +661,10 @@ L20:
 	h__[h_dim1 + 3] = rnorm;
 
 /*           %----------------------------------------------%   
-             | To be consistent with dngets, we first do a  |   
+             | To be consistent with dngets , we first do a  |   
              | pre-processing sort in order to keep complex |   
              | conjugate pairs together.  This is similar   |   
-             | to the pre-processing sort used in dngets    |   
+             | to the pre-processing sort used in dngets     |   
              | except that the sort is done in the opposite |   
              | order.                                       |   
              %----------------------------------------------% */
@@ -717,7 +723,7 @@ L20:
              | by 1 / max(eps23,magnitude of the Ritz value).   |   
              %--------------------------------------------------% */
 
-	i__1 = nev0;
+	i__1 = numcnv;
 	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    d__1 = eps23, d__2 = igraphdlapy2_(&ritzr[j], &ritzi[j]);
@@ -734,14 +740,14 @@ L20:
              %----------------------------------------------------% */
 
 	s_copy(wprime, "LR", (ftnlen)2, (ftnlen)2);
-	igraphdsortc_(wprime, &c_true, &nev0, &bounds[1], &ritzr[1], &ritzi[1]);
+	igraphdsortc_(wprime, &c_true, &numcnv, &bounds[1], &ritzr[1], &ritzi[1]);
 
 /*           %----------------------------------------------%   
              | Scale the Ritz estimate back to its original |   
              | value.                                       |   
              %----------------------------------------------% */
 
-	i__1 = nev0;
+	i__1 = numcnv;
 	for (j = 1; j <= i__1; ++j) {
 /* Computing MAX */
 	    d__1 = eps23, d__2 = igraphdlapy2_(&ritzr[j], &ritzi[j]);
@@ -803,6 +809,17 @@ L20:
 	} else if (*nev == 1 && kplusp > 3) {
 	    *nev = 2;
 	}
+/*           %---- Scipy fix ------------------------------------------------   
+             | We must keep nev below this value, as otherwise we can get   
+             | np == 0 (note that dngets below can bump nev by 1). If np == 0,   
+             | the next call to `dnaitr` will write out-of-bounds.   
+             | */
+	if (*nev > kplusp - 2) {
+	    *nev = kplusp - 2;
+	}
+/*           |   
+             %---- Scipy fix end -------------------------------------------- */
+
 	*np = kplusp - *nev;
 
 /*           %---------------------------------------%   
@@ -837,7 +854,7 @@ L20:
     if (*ishift == 0) {
 
 /*           %-------------------------------------------------------%   
-             | User specified shifts: reverse comminucation to       |   
+             | User specified shifts: reverse communication to       |   
              | compute the shifts. They are returned in the first    |   
              | 2*NP locations of WORKL.                              |   
              %-------------------------------------------------------% */
@@ -896,11 +913,11 @@ L50:
 /*        %---------------------------------------------%   
           | Compute the B-norm of the updated residual. |   
           | Keep B*RESID in WORKD(1:N) to be used in    |   
-          | the first step of the next call to dnaitr.  |   
+          | the first step of the next call to dnaitr .  |   
           %---------------------------------------------% */
 
     cnorm = TRUE_;
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[*n + 1], &c__1);
@@ -925,7 +942,7 @@ L100:
           %----------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -964,13 +981,13 @@ L1200:
        | Error Exit |   
        %------------% */
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tnaup2 = t1 - t0;
 
 L9000:
 
 /*     %---------------%   
-       | End of dnaup2 |   
+       | End of dnaup2  |   
        %---------------% */
 
     return 0;

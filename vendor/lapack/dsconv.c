@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -52,7 +52,7 @@ static doublereal c_b3 = .66666666666666663;
    \BeginLib   
 
    \Routines called:   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dlamch  LAPACK routine that determines machine constants.   
 
    \Author   
@@ -86,11 +86,11 @@ static doublereal c_b3 = .66666666666666663;
 
     /* Local variables */
     integer i__;
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     doublereal eps23, temp;
     extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphsecond_(real *);
-    real tsconv = 0;
+    extern /* Subroutine */ int igrapharscnd_(real *);
+    real tsconv;
 
 
 /*     %----------------------------------------------------%   
@@ -131,7 +131,7 @@ static doublereal c_b3 = .66666666666666663;
     --ritz;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
 
     eps23 = igraphdlamch_("Epsilon-Machine");
     eps23 = pow_dd(&eps23, &c_b3);
@@ -155,7 +155,7 @@ static doublereal c_b3 = .66666666666666663;
 /* L10: */
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tsconv += t1 - t0;
 
     return 0;

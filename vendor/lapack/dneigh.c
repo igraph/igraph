@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -16,8 +16,8 @@
 
 static logical c_true = TRUE_;
 static integer c__1 = 1;
-static doublereal c_b18 = 1.;
-static doublereal c_b20 = 0.;
+static doublereal c_b23 = 1.;
+static doublereal c_b25 = 0.;
 
 /* -----------------------------------------------------------------------   
    \BeginDoc   
@@ -70,7 +70,7 @@ static doublereal c_b20 = 0.;
             of H and also in the calculation of the eigenvectors of H.   
 
     IERR    Integer.  (OUTPUT)   
-            Error exit flag from dlaqrb or dtrevc.   
+            Error exit flag from dlahqr or dtrevc.   
 
    \EndDoc   
 
@@ -82,9 +82,9 @@ static doublereal c_b20 = 0.;
        xxxxxx  real   
 
    \Routines called:   
-       dlaqrb  ARPACK routine to compute the real Schur form of an   
+       dlahqr  LAPACK routine to compute the real Schur form of an   
                upper Hessenberg matrix and last row of the Schur vectors.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dmout   ARPACK utility routine that prints matrices   
        dvout   ARPACK utility routine that prints vectors.   
        dlacpy  LAPACK matrix copy routine.   
@@ -127,8 +127,8 @@ static doublereal c_b20 = 0.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    integer i__;
-    IGRAPH_F77_SAVE real t0, t1;
+    integer i__, j;
+    real t0, t1;
     doublereal vl[1], temp;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
@@ -141,15 +141,15 @@ static doublereal c_b20 = 0.;
 	    ftnlen), igraphdvout_(integer *, integer *, doublereal *, integer *, 
 	    char *, ftnlen);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    extern /* Subroutine */ int igraphdlaqrb_(logical *, integer *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *);
-    integer mneigh = 0;
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *);
+    integer mneigh;
+    extern /* Subroutine */ int igrapharscnd_(real *), igraphdlahqr_(logical *, logical *,
+	     integer *, integer *, integer *, doublereal *, integer *, 
+	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
+	    integer *, integer *), igraphdlacpy_(char *, integer *, integer *, 
+	    doublereal *, integer *, doublereal *, integer *);
     integer logfil, ndigit;
     logical select[1];
-    real tneigh = 0.;
+    real tneigh;
     extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
@@ -219,7 +219,7 @@ static doublereal c_b20 = 0.;
     q -= q_offset;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = mneigh;
 
     if (msglvl > 2) {
@@ -231,13 +231,19 @@ static doublereal c_b20 = 0.;
        | 1. Compute the eigenvalues, the last components of the    |   
        |    corresponding Schur vectors and the full Schur form T  |   
        |    of the current upper Hessenberg matrix H.              |   
-       | dlaqrb returns the full Schur form of H in WORKL(1:N**2)  |   
+       | dlahqr returns the full Schur form of H in WORKL(1:N**2)  |   
        | and the last components of the Schur vectors in BOUNDS.   |   
        %-----------------------------------------------------------% */
 
     igraphdlacpy_("All", n, n, &h__[h_offset], ldh, &workl[1], n);
-    igraphdlaqrb_(&c_true, n, &c__1, n, &workl[1], n, &ritzr[1], &ritzi[1], &bounds[
-	    1], ierr);
+    i__1 = *n - 1;
+    for (j = 1; j <= i__1; ++j) {
+	bounds[j] = 0.;
+/* L5: */
+    }
+    bounds[*n] = 1.;
+    igraphdlahqr_(&c_true, &c_true, n, &c__1, n, &workl[1], n, &ritzr[1], &ritzi[1],
+	     &c__1, &c__1, &bounds[1], &c__1, ierr);
     if (*ierr != 0) {
 	goto L9000;
     }
@@ -311,7 +317,7 @@ static doublereal c_b20 = 0.;
 /* L10: */
     }
 
-    igraphdgemv_("T", n, n, &c_b18, &q[q_offset], ldq, &bounds[1], &c__1, &c_b20, &
+    igraphdgemv_("T", n, n, &c_b23, &q[q_offset], ldq, &bounds[1], &c__1, &c_b25, &
 	    workl[1], &c__1);
 
     if (msglvl > 1) {
@@ -363,7 +369,7 @@ static doublereal c_b20 = 0.;
 		"the eigenvalues of H", (ftnlen)47);
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tneigh += t1 - t0;
 
 L9000:

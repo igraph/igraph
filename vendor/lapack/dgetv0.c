@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -15,9 +15,9 @@
 /* Table of constant values */
 
 static integer c__1 = 1;
-static doublereal c_b24 = 1.;
-static doublereal c_b26 = 0.;
-static doublereal c_b29 = -1.;
+static doublereal c_b26 = 1.;
+static doublereal c_b28 = 0.;
+static doublereal c_b31 = -1.;
 
 /* -----------------------------------------------------------------------   
    \BeginDoc   
@@ -114,7 +114,7 @@ static doublereal c_b29 = -1.;
        TR95-13, Department of Computational and Applied Mathematics.   
 
    \Routines called:   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dvout   ARPACK utility routine for vector output.   
        dlarnv  LAPACK routine for generating a random vector.   
        dgemv   Level 2 BLAS routine for matrix vector multiplication.   
@@ -131,7 +131,7 @@ static doublereal c_b29 = -1.;
        Houston, Texas   
 
    \SCCS Information: @(#)   
-   FILE: getv0.F   SID: 2.6   DATE OF SID: 8/27/96   RELEASE: 2   
+   FILE: getv0.F   SID: 2.7   DATE OF SID: 04/07/99   RELEASE: 2   
 
    \EndLib   
 
@@ -153,13 +153,13 @@ static doublereal c_b29 = -1.;
     double sqrt(doublereal);
 
     /* Local variables */
-    IGRAPH_F77_SAVE real t0, t1, t2, t3;
-    integer jj, nbx = 0;
+    real t0, t1, t2, t3;
+    integer jj, nbx;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     IGRAPH_F77_SAVE integer iter;
     IGRAPH_F77_SAVE logical orth;
-    integer nopx = 0;
+    integer nopx;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     IGRAPH_F77_SAVE integer iseed[4];
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
@@ -169,18 +169,18 @@ static doublereal c_b29 = -1.;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     IGRAPH_F77_SAVE logical first;
-    real tmvbx = 0;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
-    integer mgetv0 = 0;
-    real tgetv0 = 0;
+    integer mgetv0;
+    real tgetv0;
     IGRAPH_F77_SAVE doublereal rnorm0;
-    extern /* Subroutine */ int igraphsecond_(real *);
+    extern /* Subroutine */ int igrapharscnd_(real *);
     integer logfil, ndigit;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
     IGRAPH_F77_SAVE integer msglvl;
-    real tmvopx = 0;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   
@@ -262,7 +262,7 @@ static doublereal c_b29 = -1.;
           | & message level for debugging |   
           %-------------------------------% */
 
-	igraphsecond_(&t0);
+	igrapharscnd_(&t0);
 	msglvl = mgetv0;
 
 	*ierr = 0;
@@ -289,14 +289,16 @@ static doublereal c_b29 = -1.;
           | the generalized problem when B is possibly (singular).   |   
           %----------------------------------------------------------% */
 
-	igraphsecond_(&t2);
-	if (*(unsigned char *)bmat == 'G') {
+	igrapharscnd_(&t2);
+	if (*itry == 1) {
 	    ++nopx;
 	    ipntr[1] = 1;
 	    ipntr[2] = *n + 1;
 	    igraphdcopy_(n, &resid[1], &c__1, &workd[1], &c__1);
 	    *ido = -1;
 	    goto L9000;
+	} else if (*itry > 1 && *(unsigned char *)bmat == 'G') {
+	    igraphdcopy_(n, &resid[1], &c__1, &workd[*n + 1], &c__1);
 	}
     }
 
@@ -309,7 +311,7 @@ static doublereal c_b29 = -1.;
     }
 
 /*     %-----------------------------------------------%   
-       | Back from computing B*(orthogonalized-vector) |   
+       | Back from computing OP*(orthogonalized-vector) |   
        %-----------------------------------------------% */
 
     if (orth) {
@@ -317,7 +319,7 @@ static doublereal c_b29 = -1.;
     }
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvopx += t3 - t2;
     }
 
@@ -326,11 +328,13 @@ static doublereal c_b29 = -1.;
        | Compute B-norm of starting vector.                   |   
        %------------------------------------------------------% */
 
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     first = TRUE_;
+    if (*itry == 1) {
+	igraphdcopy_(n, &workd[*n + 1], &c__1, &resid[1], &c__1);
+    }
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
-	igraphdcopy_(n, &workd[*n + 1], &c__1, &resid[1], &c__1);
 	ipntr[1] = *n + 1;
 	ipntr[2] = 1;
 	*ido = 2;
@@ -342,7 +346,7 @@ static doublereal c_b29 = -1.;
 L20:
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -379,17 +383,17 @@ L20:
 L30:
 
     i__1 = *j - 1;
-    igraphdgemv_("T", n, &i__1, &c_b24, &v[v_offset], ldv, &workd[1], &c__1, &c_b26,
+    igraphdgemv_("T", n, &i__1, &c_b26, &v[v_offset], ldv, &workd[1], &c__1, &c_b28,
 	     &workd[*n + 1], &c__1);
     i__1 = *j - 1;
-    igraphdgemv_("N", n, &i__1, &c_b29, &v[v_offset], ldv, &workd[*n + 1], &c__1, &
-	    c_b24, &resid[1], &c__1);
+    igraphdgemv_("N", n, &i__1, &c_b31, &v[v_offset], ldv, &workd[*n + 1], &c__1, &
+	    c_b26, &resid[1], &c__1);
 
 /*     %----------------------------------------------------------%   
        | Compute the B-norm of the orthogonalized starting vector |   
        %----------------------------------------------------------% */
 
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[*n + 1], &c__1);
@@ -404,7 +408,7 @@ L30:
 L40:
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -431,7 +435,7 @@ L40:
     }
 
     ++iter;
-    if (iter <= 1) {
+    if (iter <= 5) {
 
 /*        %-----------------------------------%   
           | Perform iterative refinement step |   
@@ -460,13 +464,13 @@ L50:
 	igraphdvout_(&logfil, &c__1, rnorm, &ndigit, "_getv0: B-norm of initial / "
 		"restarted starting vector", (ftnlen)53);
     }
-    if (msglvl > 2) {
+    if (msglvl > 3) {
 	igraphdvout_(&logfil, n, &resid[1], &ndigit, "_getv0: initial / restarted "
 		"starting vector", (ftnlen)43);
     }
     *ido = 99;
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tgetv0 += t1 - t0;
 
 L9000:

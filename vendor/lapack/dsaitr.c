@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -242,15 +242,15 @@ static integer c__2 = 2;
     /* Local variables */
     integer i__;
     IGRAPH_F77_SAVE integer j;
-    IGRAPH_F77_SAVE real t0, t1, t2, t3, t4, t5;
+    real t0, t1, t2, t3, t4, t5;
     integer jj;
     IGRAPH_F77_SAVE integer ipj, irj;
-    integer nbx = 0;
+    integer nbx;
     IGRAPH_F77_SAVE integer ivj;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     IGRAPH_F77_SAVE integer ierr, iter;
-    integer nopx = 0;
+    integer nopx;
     IGRAPH_F77_SAVE integer itry;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     doublereal temp1;
@@ -263,7 +263,7 @@ static integer c__2 = 2;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     doublereal xtemp[2];
-    real tmvbx = 0;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
     IGRAPH_F77_SAVE doublereal wnorm;
@@ -275,18 +275,18 @@ static integer c__2 = 2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
-	    integer *, integer *), igraphsecond_(real *);
+	    integer *, integer *), igrapharscnd_(real *);
     integer logfil;
     IGRAPH_F77_SAVE doublereal safmin;
-    integer ndigit = 0, nitref = 0;
-    real titref = 0;
-    integer msaitr = 0;
+    integer ndigit, nitref;
+    real titref;
+    integer msaitr;
     IGRAPH_F77_SAVE integer msglvl;
-    real tsaitr = 0;
-    integer nrorth = 0;
+    real tsaitr;
+    integer nrorth;
     IGRAPH_F77_SAVE logical rstart;
-    integer nrstrt = 0;
-    real tmvopx = 0;
+    integer nrstrt;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   
@@ -368,7 +368,7 @@ static integer c__2 = 2;
           | & message level for debugging |   
           %-------------------------------% */
 
-	igraphsecond_(&t0);
+	igrapharscnd_(&t0);
 	msglvl = msaitr;
 
 /*        %------------------------------%   
@@ -449,8 +449,8 @@ L1000:
     }
 
 /*        %---------------------------------------------------------%   
-          | Check for exact zero. Equivalent to determing whether a |   
-          | j-step Arnoldi factorization is present.                |   
+          | Check for exact zero. Equivalent to determining whether |   
+          | a j-step Arnoldi factorization is present.              |   
           %---------------------------------------------------------% */
 
     if (*rnorm > 0.) {
@@ -504,7 +504,7 @@ L30:
                 %------------------------------------------------% */
 
 	*info = j - 1;
-	igraphsecond_(&t1);
+	igrapharscnd_(&t1);
 	tsaitr += t1 - t0;
 	*ido = 99;
 	goto L9000;
@@ -544,7 +544,7 @@ L40:
 
     step3 = TRUE_;
     ++nopx;
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     igraphdcopy_(n, &v[j * v_dim1 + 1], &c__1, &workd[ivj], &c__1);
     ipntr[1] = ivj;
     ipntr[2] = irj;
@@ -563,7 +563,7 @@ L50:
           | WORKD(IRJ:IRJ+N-1) := OP*v_{j}.   |   
           %-----------------------------------% */
 
-    igraphsecond_(&t3);
+    igrapharscnd_(&t3);
     tmvopx += t3 - t2;
 
     step3 = FALSE_;
@@ -586,7 +586,7 @@ L50:
     if (*mode == 2) {
 	goto L65;
     }
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	step4 = TRUE_;
@@ -610,7 +610,7 @@ L60:
           %-----------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -678,12 +678,12 @@ L65:
     } else {
 	h__[j + h_dim1] = *rnorm;
     }
-    igraphsecond_(&t4);
+    igrapharscnd_(&t4);
 
     orth1 = TRUE_;
     iter = 0;
 
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[irj], &c__1);
@@ -707,7 +707,7 @@ L70:
           %---------------------------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -785,7 +785,7 @@ L80:
     h__[j + (h_dim1 << 1)] += workd[irj + j - 1];
 
     orth2 = TRUE_;
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[irj], &c__1);
@@ -809,7 +809,7 @@ L90:
           %---------------------------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -885,7 +885,7 @@ L100:
     rstart = FALSE_;
     orth2 = FALSE_;
 
-    igraphsecond_(&t5);
+    igrapharscnd_(&t5);
     titref += t5 - t4;
 
 /*        %----------------------------------------------------------%   
@@ -909,7 +909,7 @@ L100:
 
     ++j;
     if (j > *k + *np) {
-	igraphsecond_(&t1);
+	igrapharscnd_(&t1);
 	tsaitr += t1 - t0;
 	*ido = 99;
 

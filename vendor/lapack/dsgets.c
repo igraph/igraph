@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -84,7 +84,7 @@ static integer c__1 = 1;
    \Routines called:   
        dsortr  ARPACK utility sorting routine.   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dvout   ARPACK utility routine that prints vectors.   
        dcopy   Level 1 BLAS that copies one vector to another.   
        dswap   Level 1 BLAS that swaps the contents of two vectors.   
@@ -119,15 +119,15 @@ static integer c__1 = 1;
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     integer kevd2;
     extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdcopy_(integer *, doublereal *, integer 
 	    *, doublereal *, integer *), igraphdvout_(integer *, integer *, 
 	    doublereal *, integer *, char *, ftnlen), igraphivout_(integer *, 
-	    integer *, integer *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, msgets = 0, msglvl;
-    real tsgets = 0.0;
+	    integer *, integer *, integer *, char *, ftnlen), igrapharscnd_(real *);
+    integer logfil, ndigit, msgets, msglvl;
+    real tsgets;
     extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
 	    doublereal *, doublereal *);
 
@@ -182,7 +182,7 @@ static integer c__1 = 1;
     --ritz;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = msgets;
 
     if (s_cmp(which, "BE", (ftnlen)2, (ftnlen)2) == 0) {
@@ -235,7 +235,7 @@ static integer c__1 = 1;
 	igraphdcopy_(np, &ritz[1], &c__1, &shifts[1], &c__1);
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tsgets += t1 - t0;
 
     if (msglvl > 0) {

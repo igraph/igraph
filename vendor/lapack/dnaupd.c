@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -27,12 +27,12 @@ static integer c__1 = 1;
     a symmetric positive semi-definite real matrix B. B may be the identity   
     matrix. NOTE: If the linear operator "OP" is real and symmetric   
     with respect to the real positive semi-definite symmetric matrix B,   
-    i.e. B*OP = (OP')*B, then subroutine ssaupd should be used instead.   
+    i.e. B*OP = (OP`)*B, then subroutine dsaupd  should be used instead.   
 
     The computed approximate eigenvalues are called Ritz values and   
     the corresponding approximate eigenvectors are called Ritz vectors.   
 
-    dnaupd is usually called iteratively to solve one of the   
+    dnaupd  is usually called iteratively to solve one of the   
     following problems:   
 
     Mode 1:  A*x = lambda*x.   
@@ -82,11 +82,11 @@ static integer c__1 = 1;
    \Arguments   
     IDO     Integer.  (INPUT/OUTPUT)   
             Reverse communication flag.  IDO must be zero on the first   
-            call to dnaupd.  IDO will be set internally to   
+            call to dnaupd .  IDO will be set internally to   
             indicate the type of operation to be performed.  Control is   
             then given back to the calling routine which has the   
             responsibility to carry out the requested operation and call   
-            dnaupd with the result.  The operand is given in   
+            dnaupd  with the result.  The operand is given in   
             WORKD(IPNTR(1)), the result must be put in WORKD(IPNTR(2)).   
             -------------------------------------------------------------   
             IDO =  0: first call to the reverse communication interface   
@@ -131,14 +131,14 @@ static integer c__1 = 1;
     NEV     Integer.  (INPUT)   
             Number of eigenvalues of OP to be computed. 0 < NEV < N-1.   
 
-    TOL     Double precision scalar.  (INPUT)   
+    TOL     Double precision  scalar.  (INPUT/OUTPUT)   
             Stopping criterion: the relative accuracy of the Ritz value   
             is considered acceptable if BOUNDS(I) .LE. TOL*ABS(RITZ(I))   
             where ABS(RITZ(I)) is the magnitude when RITZ(I) is complex.   
-            DEFAULT = DLAMCH('EPS')  (machine precision as computed   
-                      by the LAPACK auxiliary subroutine DLAMCH).   
+            DEFAULT = DLAMCH ('EPS')  (machine precision as computed   
+                      by the LAPACK auxiliary subroutine DLAMCH ).   
 
-    RESID   Double precision array of length N.  (INPUT/OUTPUT)   
+    RESID   Double precision  array of length N.  (INPUT/OUTPUT)   
             On INPUT:   
             If INFO .EQ. 0, a random initial residual vector is used.   
             If INFO .NE. 0, RESID contains the initial residual vector,   
@@ -158,7 +158,7 @@ static integer c__1 = 1;
             NOTE: 2 <= NCV-NEV in order that complex conjugate pairs of Ritz   
             values are kept together. (See remark 4 below)   
 
-    V       Double precision array N by NCV.  (OUTPUT)   
+    V       Double precision  array N by NCV.  (OUTPUT)   
             Contains the final set of Arnoldi basis vectors.   
 
     LDV     Integer.  (INPUT)   
@@ -200,12 +200,12 @@ static integer c__1 = 1;
 
             IPARAM(7) = MODE   
             On INPUT determines what type of eigenproblem is being solved.   
-            Must be 1,2,3,4; See under \Description of dnaupd for the   
+            Must be 1,2,3,4; See under \Description of dnaupd  for the   
             four modes available.   
 
             IPARAM(8) = NP   
             When ido = 3 and the user provides shifts through reverse   
-            communication (IPARAM(1)=0), dnaupd returns NP, the number   
+            communication (IPARAM(1)=0), dnaupd  returns NP, the number   
             of shifts the user is to provide. 0 < NP <=NCV-NEV. See Remark   
             5 below.   
 
@@ -235,7 +235,7 @@ static integer c__1 = 1;
 
             IPNTR(14): pointer to the NP shifts in WORKL. See Remark 5 below.   
 
-            Note: IPNTR(9:13) is only referenced by dneupd. See Remark 2 below.   
+            Note: IPNTR(9:13) is only referenced by dneupd . See Remark 2 below.   
 
             IPNTR(9):  pointer to the real part of the NCV RITZ values of the   
                        original system.   
@@ -246,19 +246,19 @@ static integer c__1 = 1;
                        Schur matrix for H.   
             IPNTR(13): pointer to the NCV by NCV matrix of eigenvectors   
                        of the upper Hessenberg matrix H. Only referenced by   
-                       dneupd if RVEC = .TRUE. See Remark 2 below.   
+                       dneupd  if RVEC = .TRUE. See Remark 2 below.   
             -------------------------------------------------------------   
 
-    WORKD   Double precision work array of length 3*N.  (REVERSE COMMUNICATION)   
+    WORKD   Double precision  work array of length 3*N.  (REVERSE COMMUNICATION)   
             Distributed array to be used in the basic Arnoldi iteration   
             for reverse communication.  The user should not use WORKD   
             as temporary workspace during the iteration. Upon termination   
             WORKD(1:N) contains B*RESID(1:N). If an invariant subspace   
             associated with the converged Ritz values is desired, see remark   
-            2 below, subroutine dneupd uses this output.   
+            2 below, subroutine dneupd  uses this output.   
             See Data Distribution Note below.   
 
-    WORKL   Double precision work array of length LWORKL.  (OUTPUT/WORKSPACE)   
+    WORKL   Double precision  work array of length LWORKL.  (OUTPUT/WORKSPACE)   
             Private (replicated) array on each PE or array allocated on   
             the front end.  See Data Distribution Note below.   
 
@@ -291,7 +291,7 @@ static integer c__1 = 1;
             = -8: Error return from LAPACK eigenvalue calculation;   
             = -9: Starting vector is zero.   
             = -10: IPARAM(7) must be 1,2,3,4.   
-            = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatable.   
+            = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible.   
             = -12: IPARAM(1) must be equal to 0 or 1.   
             = -9999: Could not build an Arnoldi factorization.   
                      IPARAM(5) returns the size of the current Arnoldi   
@@ -301,19 +301,19 @@ static integer c__1 = 1;
     1. The computed Ritz values are approximate eigenvalues of OP. The   
        selection of WHICH should be made with this in mind when   
        Mode = 3 and 4.  After convergence, approximate eigenvalues of the   
-       original problem may be obtained with the ARPACK subroutine dneupd.   
+       original problem may be obtained with the ARPACK subroutine dneupd .   
 
     2. If a basis for the invariant subspace corresponding to the converged Ritz   
-       values is needed, the user must call dneupd immediately following   
-       completion of dnaupd. This is new starting with release 2 of ARPACK.   
+       values is needed, the user must call dneupd  immediately following   
+       completion of dnaupd . This is new starting with release 2 of ARPACK.   
 
-    3. If M can be factored into a Cholesky factorization M = LL'   
+    3. If M can be factored into a Cholesky factorization M = LL`   
        then Mode = 2 should not be selected.  Instead one should use   
-       Mode = 1 with  OP = inv(L)*A*inv(L').  Appropriate triangular   
-       linear systems should be solved with L and L' rather   
+       Mode = 1 with  OP = inv(L)*A*inv(L`).  Appropriate triangular   
+       linear systems should be solved with L and L` rather   
        than computing inverses.  After convergence, an approximate   
        eigenvector z of the original problem is recovered by solving   
-       L'z = x  where x is a Ritz vector of OP.   
+       L`z = x  where x is a Ritz vector of OP.   
 
     4. At present there is no a-priori analysis to guide the selection   
        of NCV relative to NEV.  The only formal requrement is that NCV > NEV + 2.   
@@ -352,7 +352,7 @@ static integer c__1 = 1;
 
     Fortran-D syntax:   
     ================   
-    Double precision resid(n), v(ldv,ncv), workd(3*n), workl(lworkl)   
+    Double precision  resid(n), v(ldv,ncv), workd(3*n), workl(lworkl)   
     decompose  d1(n), d2(n,ncv)   
     align      resid(i) with d1(i)   
     align      v(i,j)   with d2(i,j)   
@@ -364,7 +364,7 @@ static integer c__1 = 1;
 
     Cray MPP syntax:   
     ===============   
-    Double precision  resid(n), v(ldv,ncv), workd(n,3), workl(lworkl)   
+    Double precision   resid(n), v(ldv,ncv), workd(n,3), workl(lworkl)   
     shared     resid(block), v(block,:), workd(block,:)   
     replicated workl(lworkl)   
 
@@ -394,12 +394,12 @@ static integer c__1 = 1;
        pp 575-595, (1987).   
 
    \Routines called:   
-       dnaup2  ARPACK routine that implements the Implicitly Restarted   
+       dnaup2   ARPACK routine that implements the Implicitly Restarted   
                Arnoldi Iteration.   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
-       dvout   ARPACK utility routine that prints vectors.   
-       dlamch  LAPACK routine that determines machine constants.   
+       arscnd  ARPACK utility routine for timing.   
+       dvout    ARPACK utility routine that prints vectors.   
+       dlamch   LAPACK routine that determines machine constants.   
 
    \Author   
        Danny Sorensen               Phuong Vu   
@@ -413,7 +413,7 @@ static integer c__1 = 1;
        12/16/93: Version '1.1'   
 
    \SCCS Information: @(#)   
-   FILE: naupd.F   SID: 2.5   DATE OF SID: 8/27/96   RELEASE: 2   
+   FILE: naupd.F   SID: 2.8   DATE OF SID: 04/10/01   RELEASE: 2   
 
    \Remarks   
 
@@ -463,14 +463,13 @@ static integer c__1 = 1;
 
     /* Local variables */
     integer j;
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
-    integer nbx = 0;
+    integer nbx;
     IGRAPH_F77_SAVE integer nev0, mode;
     integer ierr;
     IGRAPH_F77_SAVE integer iupd, next;
-    integer nopx = 0;
-    IGRAPH_F77_SAVE integer levec;
+    integer nopx;
     real trvec, tmvbx;
     IGRAPH_F77_SAVE integer ritzi;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
@@ -485,10 +484,10 @@ static integer c__1 = 1;
 	    integer *);
     real tnaup2, tgetv0;
     extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphsecond_(real *);
+    extern /* Subroutine */ int igrapharscnd_(real *);
     integer logfil, ndigit;
     real tneigh;
-    integer mnaupd = 0;
+    integer mnaupd;
     IGRAPH_F77_SAVE integer ishift;
     integer nitref;
     IGRAPH_F77_SAVE integer bounds;
@@ -498,12 +497,12 @@ static integer c__1 = 1;
     IGRAPH_F77_SAVE integer msglvl;
     real tngets, tnapps, tnconv;
     IGRAPH_F77_SAVE integer mxiter;
-    integer nrorth = 0, nrstrt = 0;
+    integer nrorth, nrstrt;
     real tmvopx;
 
     /* Fortran I/O blocks */
-    static cilist io___30 = { 0, 6, 0, fmt_1000, 0 };
-    static cilist io___31 = { 0, 6, 0, fmt_1100, 0 };
+    static cilist io___29 = { 0, 6, 0, fmt_1000, 0 };
+    static cilist io___30 = { 0, 6, 0, fmt_1100, 0 };
 
 
 
@@ -565,7 +564,7 @@ static integer c__1 = 1;
           %-------------------------------% */
 
 	igraphdstatn_();
-	igraphsecond_(&t0);
+	igrapharscnd_(&t0);
 	msglvl = mnaupd;
 
 /*        %----------------%   
@@ -574,9 +573,10 @@ static integer c__1 = 1;
 
 	ierr = 0;
 	ishift = iparam[1];
-	levec = iparam[2];
+/*         levec  = iparam(2) */
 	mxiter = iparam[3];
-	nb = iparam[4];
+/*         nb     = iparam(4) */
+	nb = 1;
 
 /*        %--------------------------------------------%   
           | Revision 2 performs only implicit restart. |   
@@ -607,7 +607,7 @@ static integer c__1 = 1;
 	    i__1 = *ncv;
 	    if (*lworkl < i__1 * i__1 * 3 + *ncv * 6) {
 		ierr = -7;
-	    } else if (mode < 1 || mode > 5) {
+	    } else if (mode < 1 || mode > 4) {
 		ierr = -10;
 	    } else if (mode == 1 && *(unsigned char *)bmat == 'G') {
 		ierr = -11;
@@ -670,8 +670,8 @@ static integer c__1 = 1;
           | workl(ncv*ncv+2*ncv+1:ncv*ncv+3*ncv) := error bounds        |   
           | workl(ncv*ncv+3*ncv+1:2*ncv*ncv+3*ncv) := rotation matrix Q |   
           | workl(2*ncv*ncv+3*ncv+1:3*ncv*ncv+6*ncv) := workspace       |   
-          | The final workspace is needed by subroutine dneigh called   |   
-          | by dnaup2. Subroutine dneigh calls LAPACK routines for      |   
+          | The final workspace is needed by subroutine dneigh  called   |   
+          | by dnaup2 . Subroutine dneigh  calls LAPACK routines for      |   
           | calculating eigenvalues and the last row of the eigenvector |   
           | matrix.                                                     |   
           %-------------------------------------------------------------% */
@@ -726,7 +726,7 @@ static integer c__1 = 1;
 
 /*     %------------------------------------%   
        | Exit if there was an informational |   
-       | error within dnaup2.               |   
+       | error within dnaup2 .               |   
        %------------------------------------% */
 
     if (*info < 0) {
@@ -749,7 +749,7 @@ static integer c__1 = 1;
 		"tz estimates", (ftnlen)33);
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tnaupd = t1 - t0;
 
     if (msglvl > 0) {
@@ -758,9 +758,9 @@ static integer c__1 = 1;
           | Version Number & Version Date are defined in version.h |   
           %--------------------------------------------------------% */
 
-	s_wsfe(&io___30);
+	s_wsfe(&io___29);
 	e_wsfe();
-	s_wsfe(&io___31);
+	s_wsfe(&io___30);
 	do_fio(&c__1, (char *)&mxiter, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&nopx, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&nbx, (ftnlen)sizeof(integer));
@@ -787,7 +787,7 @@ L9000:
     return 0;
 
 /*     %---------------%   
-       | End of dnaupd |   
+       | End of dnaupd  |   
        %---------------% */
 
 } /* igraphdnaupd_ */

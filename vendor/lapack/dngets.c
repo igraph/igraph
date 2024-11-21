@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -122,15 +122,15 @@ static integer c__1 = 1;
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
-	    , integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, mngets = 0;
+	    , integer *, char *, ftnlen), igrapharscnd_(real *);
+    integer logfil, ndigit, mngets;
     extern /* Subroutine */ int igraphdsortc_(char *, logical *, integer *, 
 	    doublereal *, doublereal *, doublereal *);
     integer msglvl;
-    real tngets = 0.;
+    real tngets;
 
 
 /*     %----------------------------------------------------%   
@@ -185,7 +185,7 @@ static integer c__1 = 1;
     --shifti;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = mngets;
 
 /*     %----------------------------------------------------%   
@@ -248,7 +248,7 @@ static integer c__1 = 1;
 	igraphdsortc_("SR", &c_true, np, &bounds[1], &ritzr[1], &ritzi[1]);
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tngets += t1 - t0;
 
     if (msglvl > 0) {

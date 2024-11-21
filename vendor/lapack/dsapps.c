@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -112,7 +112,7 @@ static doublereal c_b20 = -1.;
 
    \Routines called:   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dvout   ARPACK utility routine that prints vectors.   
        dlamch  LAPACK routine that determines machine constants.   
        dlartg  LAPACK Givens rotation construction routine.   
@@ -132,10 +132,10 @@ static doublereal c_b20 = -1.;
        Houston, Texas   
 
    \Revision history:   
-       12/16/93: Version ' 2.1'   
+       12/16/93: Version ' 2.4'   
 
    \SCCS Information: @(#)   
-   FILE: sapps.F   SID: 2.5   DATE OF SID: 4/19/96   RELEASE: 2   
+   FILE: sapps.F   SID: 2.6   DATE OF SID: 3/28/97   RELEASE: 2   
 
    \Remarks   
     1. In this version, each shift is applied to all the subblocks of   
@@ -167,7 +167,7 @@ static doublereal c_b20 = -1.;
     doublereal c__, f, g;
     integer i__, j;
     doublereal r__, s, a1, a2, a3, a4;
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     integer jj;
     doublereal big;
     integer iend, itop;
@@ -181,13 +181,13 @@ static doublereal c_b20 = -1.;
 	    igraphivout_(integer *, integer *, integer *, integer *, char *, ftnlen)
 	    ;
     extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *), igraphdlartg_(doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *), igraphdlaset_(char *, integer *, integer *,
-	     doublereal *, doublereal *, doublereal *, integer *);
+    extern /* Subroutine */ int igrapharscnd_(real *), igraphdlartg_(doublereal *, 
+	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlaset_(
+	    char *, integer *, integer *, doublereal *, doublereal *, 
+	    doublereal *, integer *);
     IGRAPH_F77_SAVE doublereal epsmch;
-    integer logfil, ndigit, msapps = 0, msglvl, istart;
-    real tsapps = 0;
+    integer logfil, ndigit, msapps, msglvl, istart;
+    real tsapps;
     integer kplusp;
 
 
@@ -233,7 +233,7 @@ static doublereal c_b20 = -1.;
 
 
        %----------------%   
-       | Data statments |   
+       | Data statements |   
        %----------------%   
 
        Parameter adjustments */
@@ -267,7 +267,7 @@ static doublereal c_b20 = -1.;
        | & message level for debugging |   
        %-------------------------------% */
 
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = msapps;
 
     kplusp = *kev + *np;
@@ -322,8 +322,8 @@ L20:
 		if (msglvl > 0) {
 		    igraphivout_(&logfil, &c__1, &i__, &ndigit, "_sapps: deflation"
 			    " at row/column no.", (ftnlen)35);
-		    igraphivout_(&logfil, &c__1, &jj, &ndigit, "_sapps: occured be"
-			    "fore shift number.", (ftnlen)36);
+		    igraphivout_(&logfil, &c__1, &jj, &ndigit, "_sapps: occurred b"
+			    "efore shift number.", (ftnlen)37);
 		    igraphdvout_(&logfil, &c__1, &h__[i__ + 1 + h_dim1], &ndigit, 
 			    "_sapps: the corresponding off diagonal element", 
 			    (ftnlen)46);
@@ -449,7 +449,7 @@ L40:
                  %----------------------------------------------------%   
 
    Computing MIN */
-		i__4 = j + jj;
+		i__4 = i__ + jj;
 		i__3 = min(i__4,kplusp);
 		for (j = 1; j <= i__3; ++j) {
 		    a1 = c__ * q[j + i__ * q_dim1] + s * q[j + (i__ + 1) * 
@@ -568,7 +568,12 @@ L90:
        |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |   
        %-------------------------------------------------% */
 
-    igraphdlacpy_("All", n, kev, &v[(*np + 1) * v_dim1 + 1], ldv, &v[v_offset], ldv);
+    i__1 = *kev;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	igraphdcopy_(n, &v[(*np + i__) * v_dim1 + 1], &c__1, &v[i__ * v_dim1 + 1], &
+		c__1);
+/* L140: */
+    }
 
 /*     %--------------------------------------------%   
        | Copy the (kev+1)-st column of (V*Q) in the |   
@@ -607,7 +612,7 @@ L90:
 	}
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tsapps += t1 - t0;
 
 L9000:

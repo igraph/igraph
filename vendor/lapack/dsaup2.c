@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -50,7 +50,7 @@ static integer c__2 = 2;
             The logic for adjusting is contained within the current   
             subroutine.   
             If ISHIFT=0, NP is the number of shifts the user needs   
-            to provide via reverse comunication. 0 < NP < NCV-NEV.   
+            to provide via reverse communication. 0 < NP < NCV-NEV.   
             NP may be less than NCV-NEV since a leading block of the current   
             upper Tridiagonal matrix has split off and contains "unwanted"   
             Ritz values.   
@@ -71,7 +71,7 @@ static integer c__2 = 2;
     H       Double precision (NEV+NP) by 2 array.  (OUTPUT)   
             H is used to store the generated symmetric tridiagonal matrix   
             The subdiagonal is stored in the first column of H starting   
-            at H(2,1).  The main diagonal is stored in the second column   
+            at H(2,1).  The main diagonal is stored in the arscnd column   
             of H starting at H(1,2). If dsaup2 converges store the   
             B-norm of the final residual vector in H(1,1).   
 
@@ -171,7 +171,7 @@ static integer c__2 = 2;
        dsgets  ARPACK reorder Ritz values and error bounds routine.   
        dsortr  ARPACK sorting routine.   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dvout   ARPACK utility routine that prints vectors.   
        dlamch  LAPACK routine that determines machine constants.   
        dcopy   Level 1 BLAS that copies one vector to another.   
@@ -193,7 +193,7 @@ static integer c__2 = 2;
        xx/xx/95: Version ' 2.4'.  (R.B. Lehoucq)   
 
    \SCCS Information: @(#)   
-   FILE: saup2.F   SID: 2.6   DATE OF SID: 8/16/96   RELEASE: 2   
+   FILE: saup2.F   SID: 2.7   DATE OF SID: 5/19/98   RELEASE: 2   
 
    \EndLib   
 
@@ -214,15 +214,15 @@ static integer c__2 = 2;
     /* Builtin functions */
     double pow_dd(doublereal *, doublereal *);
     integer s_cmp(char *, char *, ftnlen, ftnlen);
-    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
+    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
     double sqrt(doublereal);
 
     /* Local variables */
     integer j;
-    IGRAPH_F77_SAVE real t0, t1, t2, t3;
+    real t0, t1, t2, t3;
     integer kp[3];
     IGRAPH_F77_SAVE integer np0;
-    integer nbx = 0;
+    integer nbx;
     IGRAPH_F77_SAVE integer nev0;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
@@ -241,18 +241,18 @@ static integer c__2 = 2;
     IGRAPH_F77_SAVE integer nconv;
     IGRAPH_F77_SAVE logical initv;
     IGRAPH_F77_SAVE doublereal rnorm;
-    real tmvbx = 0.0;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    integer msaup2 = 0;
+    integer msaup2;
     real tsaup2;
     extern doublereal igraphdlamch_(char *);
     integer nevbef;
-    extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil = 0, ndigit;
+    extern /* Subroutine */ int igrapharscnd_(real *);
+    integer logfil, ndigit;
     extern /* Subroutine */ int igraphdseigt_(doublereal *, integer *, doublereal *,
 	     integer *, doublereal *, doublereal *, doublereal *, integer *);
     IGRAPH_F77_SAVE logical update;
@@ -343,7 +343,7 @@ static integer c__2 = 2;
           | & message level for debugging |   
           %-------------------------------% */
 
-	igraphsecond_(&t0);
+	igrapharscnd_(&t0);
 	msglvl = msaup2;
 
 /*        %---------------------------------%   
@@ -641,9 +641,10 @@ L20:
 	    s_copy(wprime, "SA", (ftnlen)2, (ftnlen)2);
 	    igraphdsortr_(wprime, &c_true, &kplusp, &ritz[1], &bounds[1])
 		    ;
-	    nevd2 = *nev / 2;
-	    nevm2 = *nev - nevd2;
+	    nevd2 = nev0 / 2;
+	    nevm2 = nev0 - nevd2;
 	    if (*nev > 1) {
+		*np = kplusp - nev0;
 		i__1 = min(nevd2,*np);
 /* Computing MAX */
 		i__2 = kplusp - nevd2 + 1, i__3 = kplusp - *np + 1;
@@ -651,9 +652,9 @@ L20:
 			&c__1);
 		i__1 = min(nevd2,*np);
 /* Computing MAX */
-		i__2 = kplusp - nevd2 + 1, i__3 = kplusp - *np;
+		i__2 = kplusp - nevd2 + 1, i__3 = kplusp - *np + 1;
 		igraphdswap_(&i__1, &bounds[nevm2 + 1], &c__1, &bounds[max(i__2,
-			i__3) + 1], &c__1);
+			i__3)], &c__1);
 	    }
 
 	} else {
@@ -894,7 +895,7 @@ L50:
           %---------------------------------------------% */
 
     cnorm = TRUE_;
-    igraphsecond_(&t2);
+    igrapharscnd_(&t2);
     if (*(unsigned char *)bmat == 'G') {
 	++nbx;
 	igraphdcopy_(n, &resid[1], &c__1, &workd[*n + 1], &c__1);
@@ -919,7 +920,7 @@ L100:
           %----------------------------------% */
 
     if (*(unsigned char *)bmat == 'G') {
-	igraphsecond_(&t3);
+	igrapharscnd_(&t3);
 	tmvbx += t3 - t2;
     }
 
@@ -962,7 +963,7 @@ L1200:
        | Error exit |   
        %------------% */
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tsaup2 = t1 - t0;
 
 L9000:

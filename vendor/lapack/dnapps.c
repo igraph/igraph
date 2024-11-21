@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -51,7 +51,7 @@ static doublereal c_b43 = -1.;
     KEV     Integer.  (INPUT/OUTPUT)   
             KEV+NP is the size of the input matrix H.   
             KEV is the size of the updated matrix HNEW.  KEV is only   
-            updated on ouput when fewer than NP shifts are applied in   
+            updated on output when fewer than NP shifts are applied in   
             order to keep the conjugate pair together.   
 
     NP      Integer.  (INPUT)   
@@ -118,7 +118,7 @@ static doublereal c_b43 = -1.;
 
    \Routines called:   
        ivout   ARPACK utility routine that prints integers.   
-       second  ARPACK utility routine for timing.   
+       arscnd  ARPACK utility routine for timing.   
        dmout   ARPACK utility routine that prints matrices.   
        dvout   ARPACK utility routine that prints vectors.   
        dlabad  LAPACK routine that computes machine constants.   
@@ -145,10 +145,10 @@ static doublereal c_b43 = -1.;
        Houston, Texas   
 
    \Revision history:   
-       xx/xx/92: Version ' 2.1'   
+       xx/xx/92: Version ' 2.4'   
 
    \SCCS Information: @(#)   
-   FILE: napps.F   SID: 2.3   DATE OF SID: 4/20/96   RELEASE: 2   
+   FILE: napps.F   SID: 2.4   DATE OF SID: 3/28/97   RELEASE: 2   
 
    \Remarks   
     1. In this version, each shift is applied to all the sublocks of   
@@ -179,7 +179,7 @@ static doublereal c_b43 = -1.;
     doublereal c__, f, g;
     integer i__, j;
     doublereal r__, s, t, u[3];
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     doublereal h11, h12, h21, h22, h32;
     integer jj, ir, nr;
     doublereal tau;
@@ -206,17 +206,17 @@ static doublereal c_b43 = -1.;
     extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
 	     integer *, doublereal *);
     doublereal sigmai;
+    extern /* Subroutine */ int igrapharscnd_(real *);
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *), igraphdlaset_(char *, integer *, integer *, doublereal *, 
-	    doublereal *, doublereal *, integer *), igraphdlartg_(
-	    doublereal *, doublereal *, doublereal *, doublereal *, 
+    extern /* Subroutine */ int igraphdlaset_(char *, integer *, integer *, 
+	    doublereal *, doublereal *, doublereal *, integer *), 
+	    igraphdlartg_(doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
     integer logfil, ndigit;
     doublereal sigmar;
-    integer mnapps = 0, msglvl;
-    real tnapps = 0.;
+    integer mnapps, msglvl;
+    real tnapps;
     integer istart;
     IGRAPH_F77_SAVE doublereal smlnum;
     integer kplusp;
@@ -263,7 +263,7 @@ static doublereal c_b43 = -1.;
 
 
        %----------------%   
-       | Data statments |   
+       | Data statements |   
        %----------------%   
 
        Parameter adjustments */
@@ -310,7 +310,7 @@ static doublereal c_b43 = -1.;
        | & message level for debugging |   
        %-------------------------------% */
 
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = mnapps;
     kplusp = *kev + *np;
 
@@ -474,7 +474,7 @@ L40:
 	    for (i__ = istart; i__ <= i__2; ++i__) {
 
 /*              %-----------------------------------------------------%   
-                | Contruct the plane rotation G to zero out the bulge |   
+                | Construct the plane rotation G to zero out the bulge |   
                 %-----------------------------------------------------% */
 
 		igraphdlartg_(&f, &g, &c__, &s, &r__);
@@ -530,7 +530,7 @@ L40:
                 %----------------------------------------------------%   
 
    Computing MIN */
-		i__4 = j + jj;
+		i__4 = i__ + jj;
 		i__3 = min(i__4,kplusp);
 		for (j = 1; j <= i__3; ++j) {
 		    t = c__ * q[j + i__ * q_dim1] + s * q[j + (i__ + 1) * 
@@ -741,8 +741,12 @@ L110:
        |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). |   
        %-------------------------------------------------% */
 
-    igraphdlacpy_("A", n, kev, &v[(kplusp - *kev + 1) * v_dim1 + 1], ldv, &v[
-	    v_offset], ldv);
+    i__1 = *kev;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	igraphdcopy_(n, &v[(kplusp - *kev + i__) * v_dim1 + 1], &c__1, &v[i__ * 
+		v_dim1 + 1], &c__1);
+/* L150: */
+    }
 
 /*     %--------------------------------------------------------------%   
        | Copy the (kev+1)-st column of (V*Q) in the appropriate place |   
@@ -782,7 +786,7 @@ L110:
     }
 
 L9000:
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tnapps += t1 - t0;
 
     return 0;

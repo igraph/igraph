@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -198,11 +198,11 @@ f">
 {
     /* Initialized data */
 
-    static integer locu12[4] = { 3,4,1,2 };
-    static integer locl21[4] = { 2,1,4,3 };
-    static integer locu22[4] = { 4,3,2,1 };
-    static logical xswpiv[4] = { FALSE_,FALSE_,TRUE_,TRUE_ };
-    static logical bswpiv[4] = { FALSE_,TRUE_,FALSE_,TRUE_ };
+    IGRAPH_F77_SAVE integer locu12[4] = { 3,4,1,2 };
+    IGRAPH_F77_SAVE integer locl21[4] = { 2,1,4,3 };
+    IGRAPH_F77_SAVE integer locu22[4] = { 4,3,2,1 };
+    IGRAPH_F77_SAVE logical xswpiv[4] = { FALSE_,FALSE_,TRUE_,TRUE_ };
+    IGRAPH_F77_SAVE logical bswpiv[4] = { FALSE_,TRUE_,FALSE_,TRUE_ };
 
     /* System generated locals */
     integer b_dim1, b_offset, tl_dim1, tl_offset, tr_dim1, tr_offset, x_dim1, 
