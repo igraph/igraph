@@ -9,7 +9,7 @@
 ### Other
 
  - Workaround for bug in CMake 3.31.0, see https://gitlab.kitware.com/cmake/cmake/-/issues/26449
- - Updated the vendored `plfit` library. This works around a bug in some MSVC / Windows SDK versions that define a `NAN` macro that is not a compile-time constant.
+ - Updated the vendored `plfit` library to version 1.0.0. This works around a bug in some MSVC / Windows SDK versions that define a `NAN` macro that is not a compile-time constant.
  - Documentation improvements.
 
 ## [0.10.15]
