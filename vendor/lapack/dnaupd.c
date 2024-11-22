@@ -492,7 +492,6 @@ static integer c__1 = 1;
     integer nitref=0;
     IGRAPH_F77_SAVE integer bounds;
     real tnaupd=0;
-    extern /* Subroutine */ int igraphdstatn_(void);
     real titref=0, tnaitr=0;
     IGRAPH_F77_SAVE integer msglvl;
     real tngets=0, tnapps=0, tnconv=0;
@@ -563,7 +562,6 @@ static integer c__1 = 1;
           | & message level for debugging |
           %-------------------------------% */
 
-	igraphdstatn_();
 	igrapharscnd_(&t0);
 	msglvl = mnaupd;
 
