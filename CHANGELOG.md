@@ -2,6 +2,14 @@
 
 ## [master]
 
+### Changed
+
+ - `igraph_vertex_path_from_edge_path()` can now determine the start vertex automatically.
+
+### Fixed
+
+- `igraph_vertex_path_from_edge_path()` now validates the start vertex.
+
 ### Deprecated
 
  - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
