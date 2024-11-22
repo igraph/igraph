@@ -47,14 +47,29 @@ Akind {
 	int   kind;
 	} Akind;
 
+ typedef struct
+ErrnoTest {
+	double (*f)(double);
+	double *x;
+	} ErrnoTest;
+
+ static double Big = 1e10, Two = 2., t_nan;
+
+ static ErrnoTest Entest[] = {
+	{ log, &t_nan },
+	{ exp, &Big },
+	{ asin, &Two },
+	{ acos, &Two },
+	{ sqrt, &t_nan }};
+
+ static int nEntest = sizeof(Entest)/sizeof(ErrnoTest);
+
  static Akind
 IEEE_8087	= { "IEEE_8087", 1 },
 IEEE_MC68k	= { "IEEE_MC68k", 2 },
 IBM		= { "IBM", 3 },
 VAX		= { "VAX", 4 },
 CRAY		= { "CRAY", 5};
-
- static double t_nan;
 
  static Akind *
 Lcheck(void)
@@ -110,21 +125,8 @@ icheck(void)
 	return 0;
 	}
 
-/* avoid possible warning message with printf("") */
-const char *const emptyfmt = "";
-
-#ifdef __GNUC__
-#  pragma GCC diagnostic push
-#  ifndef __clang__
-#    pragma GCC diagnostic ignored "-Wformat-security"
-#    pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#  else
-#    pragma GCC diagnostic ignored "-Wformat-zero-length"
-#  endif
-#endif
-
  static Akind *
-ccheck(void)
+ccheck(int ac, char **av)
 {
 	union {
 		double d;
@@ -133,10 +135,11 @@ ccheck(void)
 	long Cray1;
 
 	/* Cray1 = 4617762693716115456 -- without overflow on non-Crays */
-	Cray1 = printf(emptyfmt) < 0 ? 0 : 4617762;
-	if (printf(emptyfmt, Cray1) >= 0)
+	/* The next three tests should always be true. */
+	Cray1 = ac >= -2 ? 4617762 : 0;
+	if (ac >= -1)
 		Cray1 = 1000000*Cray1 + 693716;
-	if (printf(emptyfmt, Cray1) >= 0)
+	if (av || ac >= 0)
 		Cray1 = 1000000*Cray1 + 115456;
 	u.d = 1e13;
 	if (u.L == Cray1)
@@ -163,26 +166,6 @@ fzcheck(void)
 	return b == 0.;
 	}
 
- static int
-need_nancheck(void)
-{
-	double t;
-
-	errno = 0;
-	t = log(t_nan);
-	if (errno == 0)
-		return 1;
-	errno = 0;
-	t = sqrt(t_nan);
-	return errno == 0;
-	}
-
-#ifdef __GNUC__
-#  ifndef __clang__
-#    pragma GCC diagnostic pop
-#  endif
-#endif
-
  void
 get_nanbits(unsigned int *b, int k)
 {
@@ -197,13 +180,17 @@ get_nanbits(unsigned int *b, int k)
 	}
 
  int
-main(void)
+main(int argc, char **argv)
 {
 	FILE *f;
-	Akind *a = 0;
-	int Ldef = 0;
+	Akind *a;
+	ErrnoTest *et, *ete;
+	int Ldef, goodbits, gooderrno, w0;
+	union { double d; unsigned int u[2]; } u;
 	unsigned int nanbits[2];
 
+	a = 0;
+	Ldef = 0;
 	fpinit_ASL();
 #ifdef WRITE_ARITH_H	/* for Symantec's buggy "make" */
 	f = fopen("arith.h", "w");
@@ -222,7 +209,7 @@ main(void)
 		a = icheck();
 		}
 	else if (sizeof(double) == sizeof(long))
-		a = ccheck();
+		a = ccheck(argc, argv);
 	if (a) {
 		fprintf(f, "#define %s\n#define Arith_Kind_ASL %d\n",
 			a->name, a->kind);
@@ -233,20 +220,39 @@ main(void)
 		if (sizeof(char*) == 8)
 			fprintf(f, "#define X64_bit_pointers\n");
 #ifndef NO_LONG_LONG
+		if (sizeof(long long) > sizeof(long)
+		 && sizeof(long long) == sizeof(void*))
+			fprintf(f, "#define LONG_LONG_POINTERS\n");
 		if (sizeof(long long) < 8)
 #endif
 			fprintf(f, "#define NO_LONG_LONG\n");
+
 		if (a->kind <= 2) {
 			if (fzcheck())
 				fprintf(f, "#define Sudden_Underflow\n");
 			t_nan = -a->kind;
-			if (need_nancheck())
-				fprintf(f, "#define NANCHECK\n");
 			if (sizeof(double) == 2*sizeof(unsigned int)) {
 				get_nanbits(nanbits, a->kind);
 				fprintf(f, "#define QNaN0 0x%x\n", nanbits[0]);
 				fprintf(f, "#define QNaN1 0x%x\n", nanbits[1]);
 				}
+			w0 = 2 - a->kind;
+			goodbits = gooderrno = 0;
+			ete = Entest + nEntest;
+			for(et = Entest; et < ete; ++et) {
+				errno = 0;
+				u.d = et->f(*et->x);
+				if (errno)
+					++gooderrno;
+				if ((u.u[w0] & 0x7ff00000) == 0x7ff00000)
+					++goodbits;
+				}
+			if (goodbits) {
+				if (goodbits < nEntest && gooderrno)
+					fprintf(f, "#define ALSO_CHECK_ERRNO\n");
+				}
+			else if (gooderrno)
+				fprintf(f, "#define CHECK_ERRNO\n");
 			}
 		return 0;
 		}

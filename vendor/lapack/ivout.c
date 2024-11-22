@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -16,22 +16,22 @@
 
 static integer c__1 = 1;
 
-/* -----------------------------------------------------------------------   
-    Routine:    IVOUT   
+/* -----------------------------------------------------------------------
+    Routine:    IVOUT
 
-    Purpose:    Integer vector output routine.   
+    Purpose:    Integer vector output routine.
 
-    Usage:      CALL IVOUT (LOUT, N, IX, IDIGIT, IFMT)   
+    Usage:      CALL IVOUT (LOUT, N, IX, IDIGIT, IFMT)
 
-    Arguments   
-       N      - Length of array IX. (Input)   
-       IX     - Integer array to be printed. (Input)   
-       IFMT   - Format to be used in printing array IX. (Input)   
-       IDIGIT - Print up to ABS(IDIGIT) decimal digits / number. (Input)   
-                If IDIGIT .LT. 0, printing is done with 72 columns.   
-                If IDIGIT .GT. 0, printing is done with 132 columns.   
+    Arguments
+       N      - Length of array IX. (Input)
+       IX     - Integer array to be printed. (Input)
+       IFMT   - Format to be used in printing array IX. (Input)
+       IDIGIT - Print up to ABS(IDIGIT) decimal digits / number. (Input)
+                If IDIGIT .LT. 0, printing is done with 72 columns.
+                If IDIGIT .GT. 0, printing is done with 132 columns.
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
    Subroutine */ int igraphivout_(integer *lout, integer *n, integer *ix, integer *
 	idigit, char *ifmt, ftnlen ifmt_len)
@@ -54,7 +54,7 @@ static integer c__1 = 1;
     /* Local variables */
     integer i__, k1, k2, lll;
     char line[80];
-    integer ndigit;
+    integer ndigit=-3;
 
     /* Fortran I/O blocks */
     static cilist io___4 = { 0, 0, 0, fmt_2000, 0 };
@@ -69,18 +69,18 @@ static integer c__1 = 1;
     static cilist io___16 = { 0, 0, 0, fmt_1004, 0 };
 
 
-/*     ...   
-       ... SPECIFICATIONS FOR ARGUMENTS   
-       ...   
-       ... SPECIFICATIONS FOR LOCAL VARIABLES   
-       ...   
-       ... SPECIFICATIONS INTRINSICS   
+/*     ...
+       ... SPECIFICATIONS FOR ARGUMENTS
+       ...
+       ... SPECIFICATIONS FOR LOCAL VARIABLES
+       ...
+       ... SPECIFICATIONS INTRINSICS
 
 
        Parameter adjustments */
     --ix;
 
-    /* Function Body   
+    /* Function Body
    Computing MIN */
     i__1 = i_len(ifmt, ifmt_len);
     lll = min(i__1,80);
@@ -109,8 +109,8 @@ static integer c__1 = 1;
 	ndigit = 4;
     }
 
-/* =======================================================================   
-               CODE FOR OUTPUT USING 72 COLUMNS FORMAT   
+/* =======================================================================
+               CODE FOR OUTPUT USING 72 COLUMNS FORMAT
    ======================================================================= */
 
     if (*idigit < 0) {
@@ -189,8 +189,8 @@ static integer c__1 = 1;
 	    }
 	}
 
-/* =======================================================================   
-               CODE FOR OUTPUT USING 132 COLUMNS FORMAT   
+/* =======================================================================
+               CODE FOR OUTPUT USING 132 COLUMNS FORMAT
    ======================================================================= */
 
     } else {

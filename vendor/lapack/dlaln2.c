@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -236,9 +236,9 @@ f">
 {
     /* Initialized data */
 
-    static logical zswap[4] = { FALSE_,FALSE_,TRUE_,TRUE_ };
-    static logical rswap[4] = { FALSE_,TRUE_,FALSE_,TRUE_ };
-    static integer ipivot[16]	/* was [4][4] */ = { 1,2,3,4,2,1,4,3,3,4,1,2,
+    IGRAPH_F77_SAVE logical zswap[4] = { FALSE_,FALSE_,TRUE_,TRUE_ };
+    IGRAPH_F77_SAVE logical rswap[4] = { FALSE_,TRUE_,FALSE_,TRUE_ };
+    IGRAPH_F77_SAVE integer ipivot[16]	/* was [4][4] */ = { 1,2,3,4,2,1,4,3,3,4,1,2,
 	    4,3,2,1 };
 
     /* System generated locals */

@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -197,7 +197,7 @@ f">
     char ch__1[2];
 
     /* Builtin functions   
-       Subroutine */ void s_cat(char *, char **, integer *, integer *, ftnlen);
+       Subroutine */ int s_cat(char *, char **, integer *, integer *, ftnlen);
 
     /* Local variables */
     integer i1, i2, nb, mi, ni, nq, nw;

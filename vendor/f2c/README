@@ -38,7 +38,7 @@ This assumes you have the xsum program whose source, xsum.c,
 is distributed as part of "all from f2c/src", and that it
 is installed somewhere in your search path.  If you do not
 have xsum, you can obtain xsum.c by sending the following E-mail
-message to netlib@netlib.bell-labs.com
+message to netlib@netlib.org
 	send xsum.c from f2c/src
 
 For convenience, the f2c.h0 in this directory is a copy of netlib's

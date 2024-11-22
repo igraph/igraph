@@ -53,7 +53,7 @@
 
 /* Work around bug in some Windows SDK / MSVC versions where NAN is not a
  * constant expression, triggering an error in the definition of
- * hsl_sf_hzeta_eulermaclaurin_series_coeffs[] and 
+ * hsl_sf_hzeta_eulermaclaurin_series_coeffs[] and
  * hsl_sf_hzeta_eulermaclaurin_series_majorantratios[] below.
  * We re-define NAN to the value it had in earlier MSVC versions.
  * See https://github.com/igraph/igraph/issues/2701

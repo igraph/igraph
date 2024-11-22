@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -349,7 +349,7 @@ f">
     logical swap;
     doublereal scale;
     extern logical igraphlsame_(char *, char *);
-    integer isave[3], lwmin = 0;
+    integer isave[3], lwmin;
     logical wantq, wants;
     doublereal rnorm;
     extern /* Subroutine */ int igraphdlacn2_(integer *, doublereal *, doublereal *,

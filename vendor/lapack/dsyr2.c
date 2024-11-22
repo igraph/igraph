@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -136,9 +136,7 @@
    > \author Univ. of Colorado Denver   
    > \author NAG Ltd.   
 
-   > \date December 2016   
-
-   > \ingroup double_blas_level2   
+   > \ingroup her2   
 
    > \par Further Details:   
     =====================   
@@ -169,10 +167,9 @@
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
-/*  -- Reference BLAS level2 routine (version 3.7.0) --   
+/*  -- Reference BLAS level2 routine --   
     -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       December 2016   
 
 
     =====================================================================   
@@ -319,7 +316,7 @@
 
     return 0;
 
-/*     End of DSYR2 . */
+/*     End of DSYR2 */
 
 } /* igraphdsyr2_ */
 
