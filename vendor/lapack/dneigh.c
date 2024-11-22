@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -16,109 +16,109 @@
 
 static logical c_true = TRUE_;
 static integer c__1 = 1;
-static doublereal c_b18 = 1.;
-static doublereal c_b20 = 0.;
+static doublereal c_b23 = 1.;
+static doublereal c_b25 = 0.;
 
-/* -----------------------------------------------------------------------   
-   \BeginDoc   
+/* -----------------------------------------------------------------------
+   \BeginDoc
 
-   \Name: dneigh   
+   \Name: dneigh
 
-   \Description:   
-    Compute the eigenvalues of the current upper Hessenberg matrix   
-    and the corresponding Ritz estimates given the current residual norm.   
+   \Description:
+    Compute the eigenvalues of the current upper Hessenberg matrix
+    and the corresponding Ritz estimates given the current residual norm.
 
-   \Usage:   
-    call dneigh   
-       ( RNORM, N, H, LDH, RITZR, RITZI, BOUNDS, Q, LDQ, WORKL, IERR )   
+   \Usage:
+    call dneigh
+       ( RNORM, N, H, LDH, RITZR, RITZI, BOUNDS, Q, LDQ, WORKL, IERR )
 
-   \Arguments   
-    RNORM   Double precision scalar.  (INPUT)   
-            Residual norm corresponding to the current upper Hessenberg   
-            matrix H.   
+   \Arguments
+    RNORM   Double precision scalar.  (INPUT)
+            Residual norm corresponding to the current upper Hessenberg
+            matrix H.
 
-    N       Integer.  (INPUT)   
-            Size of the matrix H.   
+    N       Integer.  (INPUT)
+            Size of the matrix H.
 
-    H       Double precision N by N array.  (INPUT)   
-            H contains the current upper Hessenberg matrix.   
+    H       Double precision N by N array.  (INPUT)
+            H contains the current upper Hessenberg matrix.
 
-    LDH     Integer.  (INPUT)   
-            Leading dimension of H exactly as declared in the calling   
-            program.   
+    LDH     Integer.  (INPUT)
+            Leading dimension of H exactly as declared in the calling
+            program.
 
-    RITZR,  Double precision arrays of length N.  (OUTPUT)   
-    RITZI   On output, RITZR(1:N) (resp. RITZI(1:N)) contains the real   
-            (respectively imaginary) parts of the eigenvalues of H.   
+    RITZR,  Double precision arrays of length N.  (OUTPUT)
+    RITZI   On output, RITZR(1:N) (resp. RITZI(1:N)) contains the real
+            (respectively imaginary) parts of the eigenvalues of H.
 
-    BOUNDS  Double precision array of length N.  (OUTPUT)   
-            On output, BOUNDS contains the Ritz estimates associated with   
-            the eigenvalues RITZR and RITZI.  This is equal to RNORM   
-            times the last components of the eigenvectors corresponding   
-            to the eigenvalues in RITZR and RITZI.   
+    BOUNDS  Double precision array of length N.  (OUTPUT)
+            On output, BOUNDS contains the Ritz estimates associated with
+            the eigenvalues RITZR and RITZI.  This is equal to RNORM
+            times the last components of the eigenvectors corresponding
+            to the eigenvalues in RITZR and RITZI.
 
-    Q       Double precision N by N array.  (WORKSPACE)   
-            Workspace needed to store the eigenvectors of H.   
+    Q       Double precision N by N array.  (WORKSPACE)
+            Workspace needed to store the eigenvectors of H.
 
-    LDQ     Integer.  (INPUT)   
-            Leading dimension of Q exactly as declared in the calling   
-            program.   
+    LDQ     Integer.  (INPUT)
+            Leading dimension of Q exactly as declared in the calling
+            program.
 
-    WORKL   Double precision work array of length N**2 + 3*N.  (WORKSPACE)   
-            Private (replicated) array on each PE or array allocated on   
-            the front end.  This is needed to keep the full Schur form   
-            of H and also in the calculation of the eigenvectors of H.   
+    WORKL   Double precision work array of length N**2 + 3*N.  (WORKSPACE)
+            Private (replicated) array on each PE or array allocated on
+            the front end.  This is needed to keep the full Schur form
+            of H and also in the calculation of the eigenvectors of H.
 
-    IERR    Integer.  (OUTPUT)   
-            Error exit flag from dlaqrb or dtrevc.   
+    IERR    Integer.  (OUTPUT)
+            Error exit flag from dlahqr or dtrevc.
 
-   \EndDoc   
+   \EndDoc
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
-   \BeginLib   
+   \BeginLib
 
-   \Local variables:   
-       xxxxxx  real   
+   \Local variables:
+       xxxxxx  real
 
-   \Routines called:   
-       dlaqrb  ARPACK routine to compute the real Schur form of an   
-               upper Hessenberg matrix and last row of the Schur vectors.   
-       second  ARPACK utility routine for timing.   
-       dmout   ARPACK utility routine that prints matrices   
-       dvout   ARPACK utility routine that prints vectors.   
-       dlacpy  LAPACK matrix copy routine.   
-       dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.   
-       dtrevc  LAPACK routine to compute the eigenvectors of a matrix   
-               in upper quasi-triangular form   
-       dgemv   Level 2 BLAS routine for matrix vector multiplication.   
-       dcopy   Level 1 BLAS that copies one vector to another .   
-       dnrm2   Level 1 BLAS that computes the norm of a vector.   
-       dscal   Level 1 BLAS that scales a vector.   
+   \Routines called:
+       dlahqr  LAPACK routine to compute the real Schur form of an
+               upper Hessenberg matrix and last row of the Schur vectors.
+       arscnd  ARPACK utility routine for timing.
+       dmout   ARPACK utility routine that prints matrices
+       dvout   ARPACK utility routine that prints vectors.
+       dlacpy  LAPACK matrix copy routine.
+       dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
+       dtrevc  LAPACK routine to compute the eigenvectors of a matrix
+               in upper quasi-triangular form
+       dgemv   Level 2 BLAS routine for matrix vector multiplication.
+       dcopy   Level 1 BLAS that copies one vector to another .
+       dnrm2   Level 1 BLAS that computes the norm of a vector.
+       dscal   Level 1 BLAS that scales a vector.
 
 
-   \Author   
-       Danny Sorensen               Phuong Vu   
-       Richard Lehoucq              CRPC / Rice University   
-       Dept. of Computational &     Houston, Texas   
-       Applied Mathematics   
-       Rice University   
-       Houston, Texas   
+   \Author
+       Danny Sorensen               Phuong Vu
+       Richard Lehoucq              CRPC / Rice University
+       Dept. of Computational &     Houston, Texas
+       Applied Mathematics
+       Rice University
+       Houston, Texas
 
-   \Revision history:   
-       xx/xx/92: Version ' 2.1'   
+   \Revision history:
+       xx/xx/92: Version ' 2.1'
 
-   \SCCS Information: @(#)   
-   FILE: neigh.F   SID: 2.3   DATE OF SID: 4/20/96   RELEASE: 2   
+   \SCCS Information: @(#)
+   FILE: neigh.F   SID: 2.3   DATE OF SID: 4/20/96   RELEASE: 2
 
-   \Remarks   
-       None   
+   \Remarks
+       None
 
-   \EndLib   
+   \EndLib
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
-   Subroutine */ int igraphdneigh_(doublereal *rnorm, integer *n, doublereal *h__, 
+   Subroutine */ int igraphdneigh_(doublereal *rnorm, integer *n, doublereal *h__,
 	integer *ldh, doublereal *ritzr, doublereal *ritzi, doublereal *
 	bounds, doublereal *q, integer *ldq, doublereal *workl, integer *ierr)
 {
@@ -127,84 +127,84 @@ static doublereal c_b20 = 0.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    integer i__;
-    IGRAPH_F77_SAVE real t0, t1;
+    integer i__, j;
+    real t0, t1;
     doublereal vl[1], temp;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
+    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *,
 	    integer *);
     integer iconj;
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *), igraphdmout_(integer *, 
-	    integer *, integer *, doublereal *, integer *, integer *, char *, 
-	    ftnlen), igraphdvout_(integer *, integer *, doublereal *, integer *, 
+    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *,
+	    doublereal *, doublereal *, integer *, doublereal *, integer *,
+	    doublereal *, doublereal *, integer *), igraphdmout_(integer *,
+	    integer *, integer *, doublereal *, integer *, integer *, char *,
+	    ftnlen), igraphdvout_(integer *, integer *, doublereal *, integer *,
 	    char *, ftnlen);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    extern /* Subroutine */ int igraphdlaqrb_(logical *, integer *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *);
-    integer mneigh = 0;
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *);
-    integer logfil, ndigit;
+    integer mneigh=0;
+    extern /* Subroutine */ int igrapharscnd_(real *), igraphdlahqr_(logical *, logical *,
+	     integer *, integer *, integer *, doublereal *, integer *,
+	    doublereal *, doublereal *, integer *, integer *, doublereal *,
+	    integer *, integer *), igraphdlacpy_(char *, integer *, integer *,
+	    doublereal *, integer *, doublereal *, integer *);
+    integer logfil=6, ndigit=-3;
     logical select[1];
-    real tneigh = 0.;
-    extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
+    real tneigh=0;
+    extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *,
+	    doublereal *, integer *, doublereal *, integer *, doublereal *,
 	    integer *, integer *, integer *, doublereal *, integer *);
     integer msglvl;
 
 
-/*     %----------------------------------------------------%   
-       | Include files for debugging and timing information |   
-       %----------------------------------------------------%   
+/*     %----------------------------------------------------%
+       | Include files for debugging and timing information |
+       %----------------------------------------------------%
 
 
-       %------------------%   
-       | Scalar Arguments |   
-       %------------------%   
+       %------------------%
+       | Scalar Arguments |
+       %------------------%
 
 
-       %-----------------%   
-       | Array Arguments |   
-       %-----------------%   
+       %-----------------%
+       | Array Arguments |
+       %-----------------%
 
 
-       %------------%   
-       | Parameters |   
-       %------------%   
+       %------------%
+       | Parameters |
+       %------------%
 
 
-       %------------------------%   
-       | Local Scalars & Arrays |   
-       %------------------------%   
+       %------------------------%
+       | Local Scalars & Arrays |
+       %------------------------%
 
 
-       %----------------------%   
-       | External Subroutines |   
-       %----------------------%   
+       %----------------------%
+       | External Subroutines |
+       %----------------------%
 
 
-       %--------------------%   
-       | External Functions |   
-       %--------------------%   
+       %--------------------%
+       | External Functions |
+       %--------------------%
 
 
-       %---------------------%   
-       | Intrinsic Functions |   
-       %---------------------%   
+       %---------------------%
+       | Intrinsic Functions |
+       %---------------------%
 
 
-       %-----------------------%   
-       | Executable Statements |   
-       %-----------------------%   
+       %-----------------------%
+       | Executable Statements |
+       %-----------------------%
 
 
-       %-------------------------------%   
-       | Initialize timing statistics  |   
-       | & message level for debugging |   
-       %-------------------------------%   
+       %-------------------------------%
+       | Initialize timing statistics  |
+       | & message level for debugging |
+       %-------------------------------%
 
        Parameter adjustments */
     --workl;
@@ -219,7 +219,7 @@ static doublereal c_b20 = 0.;
     q -= q_offset;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = mneigh;
 
     if (msglvl > 2) {
@@ -227,17 +227,23 @@ static doublereal c_b20 = 0.;
 		"g upper Hessenberg matrix H ", (ftnlen)43);
     }
 
-/*     %-----------------------------------------------------------%   
-       | 1. Compute the eigenvalues, the last components of the    |   
-       |    corresponding Schur vectors and the full Schur form T  |   
-       |    of the current upper Hessenberg matrix H.              |   
-       | dlaqrb returns the full Schur form of H in WORKL(1:N**2)  |   
-       | and the last components of the Schur vectors in BOUNDS.   |   
+/*     %-----------------------------------------------------------%
+       | 1. Compute the eigenvalues, the last components of the    |
+       |    corresponding Schur vectors and the full Schur form T  |
+       |    of the current upper Hessenberg matrix H.              |
+       | dlahqr returns the full Schur form of H in WORKL(1:N**2)  |
+       | and the last components of the Schur vectors in BOUNDS.   |
        %-----------------------------------------------------------% */
 
     igraphdlacpy_("All", n, n, &h__[h_offset], ldh, &workl[1], n);
-    igraphdlaqrb_(&c_true, n, &c__1, n, &workl[1], n, &ritzr[1], &ritzi[1], &bounds[
-	    1], ierr);
+    i__1 = *n - 1;
+    for (j = 1; j <= i__1; ++j) {
+	bounds[j] = 0.;
+/* L5: */
+    }
+    bounds[*n] = 1.;
+    igraphdlahqr_(&c_true, &c_true, n, &c__1, n, &workl[1], n, &ritzr[1], &ritzi[1],
+	     &c__1, &c__1, &bounds[1], &c__1, ierr);
     if (*ierr != 0) {
 	goto L9000;
     }
@@ -247,14 +253,14 @@ static doublereal c_b20 = 0.;
 		"ur matrix for H", (ftnlen)42);
     }
 
-/*     %-----------------------------------------------------------%   
-       | 2. Compute the eigenvectors of the full Schur form T and  |   
-       |    apply the last components of the Schur vectors to get  |   
-       |    the last components of the corresponding eigenvectors. |   
-       | Remember that if the i-th and (i+1)-st eigenvalues are    |   
-       | complex conjugate pairs, then the real & imaginary part   |   
-       | of the eigenvector components are split across adjacent   |   
-       | columns of Q.                                             |   
+/*     %-----------------------------------------------------------%
+       | 2. Compute the eigenvectors of the full Schur form T and  |
+       |    apply the last components of the Schur vectors to get  |
+       |    the last components of the corresponding eigenvectors. |
+       | Remember that if the i-th and (i+1)-st eigenvalues are    |
+       | complex conjugate pairs, then the real & imaginary part   |
+       | of the eigenvector components are split across adjacent   |
+       | columns of Q.                                             |
        %-----------------------------------------------------------% */
 
     igraphdtrevc_("R", "A", select, n, &workl[1], n, vl, n, &q[q_offset], ldq, n, n,
@@ -264,13 +270,13 @@ static doublereal c_b20 = 0.;
 	goto L9000;
     }
 
-/*     %------------------------------------------------%   
-       | Scale the returning eigenvectors so that their |   
-       | euclidean norms are all one. LAPACK subroutine |   
-       | dtrevc returns each eigenvector normalized so  |   
-       | that the element of largest magnitude has      |   
-       | magnitude 1; here the magnitude of a complex   |   
-       | number (x,y) is taken to be |x| + |y|.         |   
+/*     %------------------------------------------------%
+       | Scale the returning eigenvectors so that their |
+       | euclidean norms are all one. LAPACK subroutine |
+       | dtrevc returns each eigenvector normalized so  |
+       | that the element of largest magnitude has      |
+       | magnitude 1; here the magnitude of a complex   |
+       | number (x,y) is taken to be |x| + |y|.         |
        %------------------------------------------------% */
 
     iconj = 0;
@@ -278,8 +284,8 @@ static doublereal c_b20 = 0.;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	if ((d__1 = ritzi[i__], abs(d__1)) <= 0.) {
 
-/*           %----------------------%   
-             | Real eigenvalue case |   
+/*           %----------------------%
+             | Real eigenvalue case |
              %----------------------% */
 
 	    temp = igraphdnrm2_(n, &q[i__ * q_dim1 + 1], &c__1);
@@ -287,12 +293,12 @@ static doublereal c_b20 = 0.;
 	    igraphdscal_(n, &d__1, &q[i__ * q_dim1 + 1], &c__1);
 	} else {
 
-/*           %-------------------------------------------%   
-             | Complex conjugate pair case. Note that    |   
-             | since the real and imaginary part of      |   
-             | the eigenvector are stored in consecutive |   
-             | columns, we further normalize by the      |   
-             | square root of two.                       |   
+/*           %-------------------------------------------%
+             | Complex conjugate pair case. Note that    |
+             | since the real and imaginary part of      |
+             | the eigenvector are stored in consecutive |
+             | columns, we further normalize by the      |
+             | square root of two.                       |
              %-------------------------------------------% */
 
 	    if (iconj == 0) {
@@ -311,7 +317,7 @@ static doublereal c_b20 = 0.;
 /* L10: */
     }
 
-    igraphdgemv_("T", n, n, &c_b18, &q[q_offset], ldq, &bounds[1], &c__1, &c_b20, &
+    igraphdgemv_("T", n, n, &c_b23, &q[q_offset], ldq, &bounds[1], &c__1, &c_b25, &
 	    workl[1], &c__1);
 
     if (msglvl > 1) {
@@ -319,8 +325,8 @@ static doublereal c_b20 = 0.;
 		"nvector matrix for H", (ftnlen)48);
     }
 
-/*     %----------------------------%   
-       | Compute the Ritz estimates |   
+/*     %----------------------------%
+       | Compute the Ritz estimates |
        %----------------------------% */
 
     iconj = 0;
@@ -328,19 +334,19 @@ static doublereal c_b20 = 0.;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	if ((d__1 = ritzi[i__], abs(d__1)) <= 0.) {
 
-/*           %----------------------%   
-             | Real eigenvalue case |   
+/*           %----------------------%
+             | Real eigenvalue case |
              %----------------------% */
 
 	    bounds[i__] = *rnorm * (d__1 = workl[i__], abs(d__1));
 	} else {
 
-/*           %-------------------------------------------%   
-             | Complex conjugate pair case. Note that    |   
-             | since the real and imaginary part of      |   
-             | the eigenvector are stored in consecutive |   
-             | columns, we need to take the magnitude    |   
-             | of the last components of the two vectors |   
+/*           %-------------------------------------------%
+             | Complex conjugate pair case. Note that    |
+             | since the real and imaginary part of      |
+             | the eigenvector are stored in consecutive |
+             | columns, we need to take the magnitude    |
+             | of the last components of the two vectors |
              %-------------------------------------------% */
 
 	    if (iconj == 0) {
@@ -363,14 +369,14 @@ static doublereal c_b20 = 0.;
 		"the eigenvalues of H", (ftnlen)47);
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tneigh += t1 - t0;
 
 L9000:
     return 0;
 
-/*     %---------------%   
-       | End of dneigh |   
+/*     %---------------%
+       | End of dneigh |
        %---------------% */
 
 } /* igraphdneigh_ */

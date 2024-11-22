@@ -10,6 +10,8 @@
 
  - Workaround for bug in CMake 3.31.0, see https://gitlab.kitware.com/cmake/cmake/-/issues/26449
  - Updated the vendored `plfit` library to version 1.0.0. This works around a bug in some MSVC / Windows SDK versions that define a `NAN` macro that is not a compile-time constant.
+ - Updated vendored BLAS to 3.12.0 and vendored ARPACK to ARPACK-NG 3.7.0.
+ - Re-translated vendored BLAS/LAPACK/ARPACK sources with f2c version 20240504.
  - Documentation improvements.
 
 ## [0.10.15]
