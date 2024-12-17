@@ -21,9 +21,6 @@
 
 #include <igraph.h>
 
-#define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
-#define R_UNIF(a,b) (igraph_rng_get_unif(igraph_rng_default(), (a), (b)))
-
 int main(void) {
     igraph_real_t d;
     igraph_vector_t u, v;
@@ -33,20 +30,22 @@ int main(void) {
      * Example usage
      ********************************/
 
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
+
     /* Sequences with one element. Such sequences are trivially permuted.
      * The result of any Fisher-Yates shuffle on a sequence with one element
      * must be the original sequence itself.
      */
     n = 1;
     igraph_vector_init(&v, n);
-    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
-    k = R_INTEGER(-1000, 1000);
+
+    k = RNG_INTEGER(-1000, 1000);
     VECTOR(v)[0] = k;
     igraph_vector_shuffle(&v);
     if (VECTOR(v)[0] != k) {
         return 1;
     }
-    d = R_UNIF(-1000.0, 1000.0);
+    d = RNG_UNIF(-1000.0, 1000.0);
 
     VECTOR(v)[0] = d;
     igraph_vector_shuffle(&v);
@@ -73,7 +72,7 @@ int main(void) {
     igraph_vector_init(&v, n);
 
     for (i = 0; i < n; i++) {
-        k = R_INTEGER(-1000, 1000);
+        k = RNG_INTEGER(-1000, 1000);
         VECTOR(u)[i] = k;
         VECTOR(v)[i] = k;
     }

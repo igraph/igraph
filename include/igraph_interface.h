@@ -25,11 +25,11 @@
 #define IGRAPH_INTERFACE_H
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
-#include "igraph_datatype.h"
 #include "igraph_attributes.h"
+#include "igraph_datatype.h"
 #include "igraph_error.h"
 #include "igraph_iterators.h"
+#include "igraph_types.h"
 
 __BEGIN_DECLS
 
@@ -82,11 +82,12 @@ IGRAPH_EXPORT igraph_error_t igraph_get_all_eids_between(const igraph_t *graph, 
                                   igraph_integer_t source, igraph_integer_t target, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t vid,
                                   igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *igraph2, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res);
 
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
-IGRAPH_EXPORT void igraph_i_property_cache_set_bool(const igraph_t *cache, igraph_cached_property_t prop, igraph_bool_t value);
+IGRAPH_EXPORT void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value);
+IGRAPH_EXPORT void igraph_i_property_cache_set_bool_checked(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value);
 IGRAPH_EXPORT void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop);
 IGRAPH_EXPORT void igraph_i_property_cache_invalidate_all(const igraph_t *graph);
 

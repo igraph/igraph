@@ -531,6 +531,87 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "limburgher",
+      "name": "Gwyn Ciesla",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2363820?v=4",
+      "profile": "http://cecinestpasunefromage.wordpress.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "aagon",
+      "name": "aagon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10883752?v=4",
+      "profile": "https://github.com/aagon",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "GanzuraTheConsumer",
+      "name": "Quinn Buratynski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19657136?v=4",
+      "profile": "https://github.com/GanzuraTheConsumer",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Tagl",
+      "name": "Arnar Bjarni Arnarson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7704746?v=4",
+      "profile": "https://github.com/Tagl",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "SoapGentoo",
+      "name": "David Seifert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16636962?v=4",
+      "profile": "https://github.com/SoapGentoo",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "krlmlr",
+      "name": "Kirill Müller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1741643?v=4",
+      "profile": "https://fosstodon.org/@kirill",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "gendelpiekel",
+      "name": "Michael",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14215028?v=4",
+      "profile": "https://github.com/gendelpiekel",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "GenieTim",
+      "name": "Tim Bernhard",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8596965?v=4",
+      "profile": "https://github.com/GenieTim",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "maelle",
+      "name": "Maëlle Salmon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8360597?v=4",
+      "profile": "https://masalmon.eu/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

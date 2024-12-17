@@ -17,18 +17,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef __ERROR_H__
-#define __ERROR_H__
+#ifndef PLFIT_ERROR_H
+#define PLFIT_ERROR_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
+#include "plfit_decls.h"
 
 __BEGIN_DECLS
 
@@ -66,22 +58,15 @@ enum {
 
 typedef void plfit_error_handler_t(const char*, const char*, int, int);
 
-extern plfit_error_handler_t plfit_error_handler_abort;
-extern plfit_error_handler_t plfit_error_handler_ignore;
-extern plfit_error_handler_t plfit_error_handler_printignore;
+PLFIT_EXPORT extern plfit_error_handler_t plfit_error_handler_abort;
+PLFIT_EXPORT extern plfit_error_handler_t plfit_error_handler_ignore;
+PLFIT_EXPORT extern plfit_error_handler_t plfit_error_handler_printignore;
 
-plfit_error_handler_t* plfit_set_error_handler(plfit_error_handler_t* new_handler);
+PLFIT_EXPORT plfit_error_handler_t* plfit_set_error_handler(plfit_error_handler_t* new_handler);
 
-void plfit_error(const char *reason, const char *file, int line, int plfit_errno);
-const char* plfit_strerror(const int plfit_errno);
-
-void plfit_error_handler_abort(const char *reason, const char *file, int line,
-		int plfit_errno);
-void plfit_error_handler_ignore(const char *reason, const char *file, int line,
-		int plfit_errno);
-void plfit_error_handler_printignore(const char *reason, const char *file, int line,
-		int plfit_errno);
+PLFIT_EXPORT void plfit_error(const char *reason, const char *file, int line, int plfit_errno);
+PLFIT_EXPORT const char* plfit_strerror(const int plfit_errno);
 
 __END_DECLS
 
-#endif /* __ERROR_H__ */
+#endif /* PLFIT_ERROR_H */

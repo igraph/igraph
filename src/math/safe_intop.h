@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-#include "config.h"
+#include "config.h" /* HAVE_BUILTIN_OVERFLOW */
 
 #include <float.h>
 
@@ -119,6 +119,8 @@ __BEGIN_DECLS
         if (_safe_n % 2 == 0) IGRAPH_SAFE_MULT(_safe_n / 2, _safe_n - 1, res); \
         else IGRAPH_SAFE_MULT(_safe_n, (_safe_n - 1) / 2, res); \
     } while (0)
+
+IGRAPH_FUNCATTR_CONST igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value);
 
 igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result);
 igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result);

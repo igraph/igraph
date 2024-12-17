@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2022  The igraph development team
+   Copyright (C) 2021-2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,16 +21,10 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(igraph_error_t err) {
-    if (err != IGRAPH_SUCCESS)
-        abort();
-}
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     /* We work with small, up-to 16-vertex graphs, as the algorithms
@@ -42,7 +36,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         return 0;
     }
 
-    check_err(igraph_vector_int_init(&edges, 2*Size));
+    igraph_vector_int_init(&edges, 2*Size);
     size_t j = 0;
     for (size_t i=0; i < Size; ++i) {
         VECTOR(edges)[j++] = Data[i] / 16;
@@ -50,20 +44,58 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
 
     if (igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
-        {
-            igraph_vector_int_list_t separators;
-            check_err(igraph_vector_int_list_init(&separators, 0));
-            check_err(igraph_all_minimal_st_separators(&graph, &separators));
-            igraph_vector_int_list_destroy(&separators);
+        igraph_vector_int_list_t ivl;
+        igraph_vector_int_t iv1, iv2;
+        igraph_bool_t is_separator, is_minimal_separator;
+
+        igraph_vector_int_list_init(&ivl, 0);
+        igraph_vector_int_init(&iv1, 0);
+        igraph_vector_int_init(&iv2, 0);
+
+        igraph_all_minimal_st_separators(&graph, &ivl);
+
+        // Check that all returned sets are indeed separators.
+        for (igraph_integer_t i=0; i < igraph_vector_int_list_size(&ivl); i++) {
+            igraph_is_separator(
+                &graph,
+                igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),
+                &is_separator);
+            IGRAPH_ASSERT(is_separator);
+        }
+
+        igraph_minimum_size_separators(&graph, &ivl);
+
+        // Simplification is necessary for cohesive_blocks() and
+        // enables a straightforward check for complete graphs below.
+        igraph_simplify(&graph, true, true, NULL);
+
+        const igraph_integer_t vcount = igraph_vcount(&graph);
+        const igraph_integer_t ecount = igraph_ecount(&graph);
+
+        if (ecount != vcount*(vcount-1)/2) {
+            // minimum_size_separators() returns all size n-1 subsets
+            // of the complete graph K_n. is_minimal_separator() does not
+            // consider these to be separators. Therefore we skip complete
+            // graphs. For non-complete graphs we check that all results
+            // are minimal separators.
+            for (igraph_integer_t i=0; i < igraph_vector_int_list_size(&ivl); i++) {
+                igraph_is_minimal_separator(
+                    &graph,
+                    igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),
+                    &is_minimal_separator);
+                IGRAPH_ASSERT(is_minimal_separator);
+            }
         }
 
         {
-            igraph_vector_int_list_t separators;
-            check_err(igraph_vector_int_list_init(&separators, 0));
-            check_err(igraph_minimum_size_separators(&graph, &separators));
-            igraph_vector_int_list_destroy(&separators);
+            igraph_t g;
+            igraph_cohesive_blocks(&graph, &ivl, &iv1, &iv2, &g);
+            igraph_destroy(&g);
         }
 
+        igraph_vector_int_destroy(&iv2);
+        igraph_vector_int_destroy(&iv1);
+        igraph_vector_int_list_destroy(&ivl);
         igraph_destroy(&graph);
     }
 

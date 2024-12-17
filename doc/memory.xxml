@@ -7,10 +7,16 @@
 <chapter id="igraph-Memory">
 <title>Memory (de)allocation</title>
 
-<!-- doxrox-include about-alloc-funcs -->
+<section id="about-alloc-funcs">
+<!-- doxrox-include about_alloc_funcs -->
+</section>
+
+<section id="available-alloc-funcs">
+<title>Available allocation functions</title>
 <!-- doxrox-include igraph_malloc -->
 <!-- doxrox-include igraph_calloc -->
 <!-- doxrox-include igraph_realloc -->
 <!-- doxrox-include igraph_free -->
+</section>
 
 </chapter>

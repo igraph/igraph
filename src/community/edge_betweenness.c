@@ -24,6 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
@@ -198,7 +199,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    the number of vertices in the graph. So if the first line
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
- *    component <code>n+1</code>, etc. The matrix will be resized as needed.
+ *    component <code>n + 1</code>, etc. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     \c NULL then the indices into \p edges of all edges which caused
  *     one of the merges will be put here. This is equal to all edge removals
@@ -234,7 +235,10 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_integer_t max_merges;
 
     if (! igraph_vector_int_isininterval(edges, 0, no_of_edges-1)) {
-        IGRAPH_ERROR("Invalid edge ID.", IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+            "Cannot calculate merges of edge betweenness community detection.",
+            IGRAPH_EINVEID
+        );
     }
     if (no_removed_edges < no_of_edges) {
             IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "
@@ -316,19 +320,24 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/* Find the smallest active element in the vector */
-static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
-                                                   const bool *passive) {
-    igraph_integer_t which, i = 0, size = igraph_vector_size(v);
-    igraph_real_t max;
-    while (passive[i]) {
-        i++;
-    }
-    which = i;
-    max = VECTOR(*v)[which];
-    for (i++; i < size; i++) {
-        igraph_real_t elem = VECTOR(*v)[i];
-        if (!passive[i] && elem > max) {
+/* Find the index i for which v[i] / w[i] is the largest
+ * and the corresponding element is active (i.e. !passive[i]).
+ * If w is a null pointer then all w[i] are assumed to be 1,
+ * and the ranking is done solely based on v.
+ *
+ * This function requires that at least one element is active. */
+static igraph_integer_t igraph_i_which_max_active_ratio(
+        const igraph_vector_t *v,
+        const igraph_vector_t *w,
+        igraph_bitset_t *passive) {
+
+    const igraph_integer_t size = igraph_vector_size(v);
+    igraph_integer_t which = igraph_bitset_countr_one(passive); /* start with first active element */
+    igraph_real_t max = VECTOR(*v)[which] / (w ? VECTOR(*w)[which] : 1.0);
+
+    for (igraph_integer_t i = which+1; i < size; i++) {
+        igraph_real_t elem = VECTOR(*v)[i] / (w ? VECTOR(*w)[i] : 1.0);
+        if (! IGRAPH_BIT_TEST(*passive, i) && elem > max) {
             max = elem;
             which = i;
         }
@@ -342,35 +351,65 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \brief Community finding based on edge betweenness.
  *
  * Community structure detection based on the betweenness of the edges
- * in the network. The algorithm was invented by M. Girvan and
- * M. Newman, see: M. Girvan and M. E. J. Newman: Community structure in
- * social and biological networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826
- * (2002). https://doi.org/10.1073/pnas.122653799
+ * in the network. This method is also known as the Girvan-Newman
+ * algorithm.
  *
  * </para><para>
- * The idea is that the betweenness of the edges connecting two
- * communities is typically high, as many of the shortest paths
- * between nodes in separate communities go through them. So we
- * gradually remove the edge with highest betweenness from the
- * network, and recalculate edge betweenness after every removal.
- * This way sooner or later the network splits into two components,
- * then after a while one of these components splits again into two smaller
- * components, and so on until all edges are removed. This is a divisive
- * hierarchical approach, the result of which is a dendrogram.
+ * The idea behind this method is that the betweenness of the edges connecting
+ * two communities is typically high, as many of the shortest paths between
+ * vertices in separate communities pass through them. The algorithm
+ * successively removes edges with the highest betweenness, recalculating
+ * betweenness values after each removal. This way eventually the network splits
+ * into two components, then one of these components splits again, and so on,
+ * until all edges are removed. The resulting hierarhical partitioning of the
+ * vertices can be encoded as a dendrogram.
  *
  * </para><para>
  * In directed graphs, when \p directed is set to true, the directed version
  * of betweenness and modularity are used, however, only splits into
  * \em weakly connected components are detected.
  *
+ * </para><para>
+ * When edge weights are given, the ratio of betweenness and weight values
+ * is used to choose which edges to remove first, as described in
+ * M. E. J. Newman: Analysis of Weighted Networks (2004), Section C.
+ * Thus, edges with large weights are treated as strong connections,
+ * and will be removed later than weak connections having similar betweenness.
+ * Weights are also used for calculating modularity.
+ *
+ * </para><para>
+ * If lengths are given, they will be considered for shortest path length
+ * calculations while computing betweenness values.
+ *
+ * </para><para>
+ * Note: In igraph 0.10, this function interpreted weights in a different,
+ * erroneous way, and issued a warning when weights were used. Please
+ * see https://github.com/igraph/igraph/issues/2229 for additional details.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * M. Girvan and M. E. J. Newman,
+ * Community Structure in Social and Biological Networks, PNAS 99, 7821 (2002).
+ * https://doi.org/10.1073/pnas.122653799
+ *
+ * </para><para>
+ * M. E. J. Newman,
+ * Analysis of Weighted Networks, Phys. Rev. E 70, 9 (2004).
+ * https://doi.org/10.1103/PhysRevE.70.056131
+ *
  * \param graph The input graph.
- * \param result Pointer to an initialized vector, the result will be
- *     stored here, the IDs of the removed edges in the order of their
- *     removal. It will be resized as needed. It may be \c NULL if
+ * \param removed_edges Pointer to an initialized integer vector, which will
+ *     be resized as needed. The IDs of the removed edges in the order of their
+ *     removal will be stored here. This vector is suitable as input to
+ *     \ref igraph_community_eb_get_merges(). This parameter may be \c NULL if
  *     the edge IDs are not needed by the caller.
  * \param edge_betweenness Pointer to an initialized vector or
  *     \c NULL. In the former case the edge betweenness of the removed
- *     edge is stored here. The vector will be resized as needed.
+ *     edges is stored here. The vector will be resized as needed.
+ *     Note that the betweenness values stored here are \em not divided
+ *     by weights.
  * \param merges Pointer to an initialized matrix or \c NULL. If not \c NULL
  *     then merges performed by the algorithm are stored here. Even if
  *     this is a divisive algorithm, we can replay it backwards and
@@ -391,10 +430,12 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *    betweenness (i.e. directed paths) for directed graphs, and whether
  *    to use the directed version of modularity. It is ignored for undirected
  *    graphs.
- * \param weights An optional vector containing edge weights. If null,
- *     the unweighted edge betweenness scores will be calculated and
- *     used. If not null, the weighted edge betweenness scores will be
- *     calculated and used.
+ * \param weights An optional vector containing edge weights. If not \c NULL,
+ *     the weights will be used to divide the edge betweenness scores,
+ *     as well as for the calculation of modularity.
+ * \param lengths An optional vector containing edge lengths. If not \c NULL,
+ *     path lengths used in the betweenness calculation will take these
+ *     lengths into account.
  * \return Error code.
  *
  * \sa \ref igraph_community_eb_get_merges(), \ref
@@ -406,14 +447,15 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * \example examples/simple/igraph_community_edge_betweenness.c
  */
 igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                      igraph_vector_int_t *result,
+                                      igraph_vector_int_t *removed_edges,
                                       igraph_vector_t *edge_betweenness,
                                       igraph_matrix_int_t *merges,
                                       igraph_vector_int_t *bridges,
                                       igraph_vector_t *modularity,
                                       igraph_vector_int_t *membership,
                                       igraph_bool_t directed,
-                                      const igraph_vector_t *weights) {
+                                      const igraph_vector_t *weights,
+                                      const igraph_vector_t *lengths) {
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -430,8 +472,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_bool_t result_owned = false;
     igraph_stack_int_t stack;
     igraph_real_t steps, steps_done;
-
-    bool *passive;
+    igraph_bitset_t passive;
 
     /* Needed only for the unweighted case */
     igraph_dqueue_int_t q;
@@ -439,12 +480,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     /* Needed only for the weighted case */
     igraph_2wheap_t heap;
 
-    if (result == NULL) {
-        result = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        IGRAPH_CHECK_OOM(result, "Insufficient memory for edge betweenness-based community detection.");
-        IGRAPH_FINALLY(igraph_free, result);
+    if (removed_edges == NULL) {
+        removed_edges = IGRAPH_CALLOC(1, igraph_vector_int_t);
+        IGRAPH_CHECK_OOM(removed_edges, "Insufficient memory for edge betweenness-based community detection.");
+        IGRAPH_FINALLY(igraph_free, removed_edges);
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(result, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(removed_edges, 0);
         result_owned = true;
     }
 
@@ -474,9 +515,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for edge betweenness-based community detection.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
-    if (weights == NULL) {
-        IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
-    } else {
+    if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
         }
@@ -492,17 +531,25 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }
+    }
 
-        if (membership != NULL) {
-            IGRAPH_WARNING("Membership vector will be selected based on the highest "
-                           "modularity score.");
+    if (lengths == NULL) {
+        IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
+    } else {
+        if (igraph_vector_size(lengths) != no_of_edges) {
+            IGRAPH_ERROR("Egde length vector size must agree with number of edges.", IGRAPH_EINVAL);
         }
 
-        if (modularity != NULL || membership != NULL) {
-            IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "
-                           "community detection might not make sense -- modularity treats edge "
-                           "weights as similarities while edge betwenness treats them as "
-                           "distances.");
+        if (no_of_edges > 0) {
+            /* Must not call vector_min on empty vector */
+            igraph_real_t minlength = igraph_vector_min(lengths);
+            if (minlength <= 0) {
+                IGRAPH_ERROR("Egde lengths must be strictly positive.", IGRAPH_EINVAL);
+            }
+
+            if (isnan(minlength)) {
+                IGRAPH_ERROR("Egde lengths must not be NaN.", IGRAPH_EINVAL);
+            }
         }
 
         IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
@@ -513,7 +560,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_vector_int_resize(result, no_of_edges));
+    IGRAPH_CHECK(igraph_vector_int_resize(removed_edges, no_of_edges));
     if (edge_betweenness) {
         IGRAPH_CHECK(igraph_vector_resize(edge_betweenness, no_of_edges));
         if (no_of_edges > 0) {
@@ -522,10 +569,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
-
-    passive = IGRAPH_CALLOC(no_of_edges, bool);
-    IGRAPH_CHECK_OOM(passive, "Insufficient memory for edge betweenness-based community detection.");
-    IGRAPH_FINALLY(igraph_free, passive);
+    IGRAPH_BITSET_INIT_FINALLY(&passive, no_of_edges);
 
     /* Estimate the number of steps to be taken.
      * It is assumed that one iteration is O(|E||V|), but |V| is constant
@@ -542,7 +586,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         igraph_vector_null(&eb);
 
-        if (weights == NULL) {
+        if (lengths == NULL) {
             /* Unweighted variant follows */
 
             /* The following for loop is copied almost intact from
@@ -642,7 +686,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     for (igraph_integer_t i = 0; i < neino; i++) {
                         igraph_integer_t edge = VECTOR(*neip)[i];
                         igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
-                        igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
+                        igraph_real_t altdist = mindist + VECTOR(*lengths)[edge];
                         igraph_real_t curdist = distance[to];
                         igraph_vector_int_t *v;
 
@@ -698,15 +742,15 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         /* Now look for the smallest edge betweenness */
         /* and eliminate that edge from the network */
-        maxedge = igraph_i_vector_which_max_not_null(&eb, passive);
-        VECTOR(*result)[e] = maxedge;
+        maxedge = igraph_i_which_max_active_ratio(&eb, weights, &passive);
+        VECTOR(*removed_edges)[e] = maxedge;
         if (edge_betweenness) {
             VECTOR(*edge_betweenness)[e] = VECTOR(eb)[maxedge];
             if (!directed) {
                 VECTOR(*edge_betweenness)[e] /= 2.0;
             }
         }
-        passive[maxedge] = true;
+        IGRAPH_BIT_SET(passive, maxedge);
         IGRAPH_CHECK(igraph_edge(graph, maxedge, &from, &to));
 
         neip = igraph_inclist_get(elist_in_p, to);
@@ -724,12 +768,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);
 
-    IGRAPH_FREE(passive);
+    igraph_bitset_destroy(&passive);
     igraph_vector_destroy(&eb);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(3);
 
-    if (weights == NULL) {
+    if (lengths == NULL) {
         igraph_dqueue_int_destroy(&q);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
@@ -752,14 +796,14 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     if (merges || bridges || modularity || membership) {
-        IGRAPH_CHECK(igraph_community_eb_get_merges(graph, directed, result, weights, merges,
+        IGRAPH_CHECK(igraph_community_eb_get_merges(graph, directed, removed_edges, weights, merges,
                      bridges, modularity,
                      membership));
     }
 
     if (result_owned) {
-        igraph_vector_int_destroy(result);
-        IGRAPH_FREE(result);
+        igraph_vector_int_destroy(removed_edges);
+        IGRAPH_FREE(removed_edges);
         IGRAPH_FINALLY_CLEAN(2);
     }
 

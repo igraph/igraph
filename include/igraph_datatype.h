@@ -107,7 +107,7 @@ typedef enum {
  * The storage requirements for a graph with \c |V| vertices
  * and \c |E| edges is \c O(|E|+|V|).
  */
-typedef struct igraph_s {
+typedef struct {
     igraph_integer_t n;
     igraph_bool_t directed;
     igraph_vector_int_t from;

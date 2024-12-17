@@ -128,25 +128,25 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows.", IGRAPH_FAILURE);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of columns.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of columns.", IGRAPH_FAILURE);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_FAILURE);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_FAILURE);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_FAILURE);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_FAILURE);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_FAILURE);
             break;
         }
     }
@@ -169,7 +169,7 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
  *      A * X = B  or  A' * X = B
  * with a general N-by-N matrix A using the LU factorization
  * computed by \ref igraph_lapack_dgetrf.
- * \param transpose Logical scalar, whether to transpose the input
+ * \param transpose Boolean, whether to transpose the input
  *      matrix.
  * \param a A matrix containing the L and U factors from the
  *      factorization A = P*L*U. L is expected to be unitriangular,
@@ -208,7 +208,7 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     ldb = n > 0 ? n : 1;
 
     if (n != igraph_matrix_ncol(a)) {
-        IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot LU solve non-square matrix.", IGRAPH_EINVAL);
     }
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
@@ -233,34 +233,34 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     if (info < 0) {
         switch (info) {
         case -1:
-            IGRAPH_ERROR("Invalid transpose argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid transpose argument.", IGRAPH_FAILURE);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_FAILURE);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_FAILURE);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LU matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LU matrix.", IGRAPH_FAILURE);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_FAILURE);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_FAILURE);
             break;
         case -7:
-            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_FAILURE);
             break;
         case -8:
-            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_FAILURE);
             break;
         case -9:
-            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_FAILURE);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_FAILURE);
             break;
         }
     }
@@ -320,7 +320,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
     igraph_vector_fortran_int_t vipiv;
 
     if (n != igraph_matrix_ncol(a)) {
-        IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot LU solve non-square matrix.", IGRAPH_EINVAL);
     }
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
@@ -337,31 +337,31 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_FAILURE);
             break;
         case -2:
-            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_FAILURE);
             break;
         case -3:
-            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid input matrix.", IGRAPH_FAILURE);
             break;
         case -4:
-            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDA parameter.", IGRAPH_FAILURE);
             break;
         case -5:
-            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid pivot vector.", IGRAPH_FAILURE);
             break;
         case -6:
-            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid RHS matrix.", IGRAPH_FAILURE);
             break;
         case -7:
-            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid LDB parameter.", IGRAPH_FAILURE);
             break;
         case -8:
-            IGRAPH_ERROR("Invalid info argument.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Invalid info argument.", IGRAPH_FAILURE);
             break;
         default:
-            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Unknown LAPACK error.", IGRAPH_FAILURE);
             break;
         }
     }
@@ -459,7 +459,7 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
     int lwork = -1, liwork = -1;
 
     if (n != igraph_matrix_ncol(A)) {
-        IGRAPH_ERROR("Cannot find eigenvalues/vectors.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot find eigenvalues/vectors of non-square matrix.", IGRAPH_EINVAL);
     }
     if (which == IGRAPH_LAPACK_DSYEV_INTERVAL &&
         (vestimate < 1 || vestimate > n)) {
@@ -641,7 +641,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
     int error = *info;
 
     if (igraph_matrix_ncol(A) != n) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot calculate eigenvalues of non-square matrix.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
@@ -684,10 +684,10 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                  VECTOR(work), &lwork, info);
 
     if (*info < 0) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
     } else if (*info > 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
         } else {
             IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev).");
         }
@@ -748,8 +748,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Users' Guide. Note that the eigenvectors obtained for the balanced
  * matrix are backtransformed to those of \p A.
  *
- * \param balance Scalar that indicated, whether the input matrix
- *   should be balanced. Possible values:
+ * \param balance Indicates whether the input matrix should be balanced.
+ *   Possible values:
  *   \clist
  *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_NONE
  *          no not diagonally scale or permute.
@@ -765,13 +765,13 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *          both diagonally scale and permute A.
  *   \endclist
  * \param A The input matrix, must be square.
- * \param valuesreal An initialized vector, or a NULL pointer. If not
- *   a NULL pointer, then the real parts of the eigenvalues are stored
+ * \param valuesreal An initialized vector, or a \c NULL pointer. If not
+ *   a \c NULL pointer, then the real parts of the eigenvalues are stored
  *   here. The vector will be resized, as needed.
- * \param valuesimag An initialized vector, or a NULL pointer. If not
- *   a NULL pointer, then the imaginary parts of the eigenvalues are stored
+ * \param valuesimag An initialized vector, or a \c NULL pointer. If not
+ *   a \c NULL pointer, then the imaginary parts of the eigenvalues are stored
  *   here. The vector will be resized, as needed.
- * \param vectorsleft An initialized matrix or a NULL pointer. If not
+ * \param vectorsleft An initialized matrix or a \c NULL pointer. If not
  *   a null pointer, then the left eigenvectors are stored here. The
  *   order corresponds to the eigenvalues and the eigenvectors are
  *   stored in a compressed form. If the j-th eigenvalue is real then
@@ -779,7 +779,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
  *   and (j+1)-th columns contain the real and imaginary parts of the
  *   corresponding eigenvectors.
- * \param vectorsright An initialized matrix or a NULL pointer. If not
+ * \param vectorsright An initialized matrix or a \c NULL pointer. If not
  *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo
@@ -868,7 +868,7 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
         ihi = &ihi_dummy;
     }
     if (igraph_matrix_ncol(A) != n) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx).", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot calculate eigenvalues of non-square matrix.", IGRAPH_EINVAL);
     }
 
     switch (balance) {
@@ -953,10 +953,10 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     if (*info < 0) {
-        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+        IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
     } else if (*info > 0) {
         if (error) {
-            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_ELAPACK);
+            IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_FAILURE);
         } else {
             IGRAPH_WARNING("Cannot calculate eigenvalues (dgeev).");
         }
@@ -1003,7 +1003,7 @@ igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
     int i;
 
     if (igraph_matrix_ncol(A) != n) {
-        IGRAPH_ERROR("Hessenberg reduction failed.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Hessenberg reduction failed on non-square matrix.", IGRAPH_EINVAL);
     }
 
     if (ilo < 1 || ihi > n || ilo > ihi) {

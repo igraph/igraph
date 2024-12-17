@@ -41,7 +41,7 @@
  * in the above description should be distinguished from the mathematical
  * definition of the empty or null graph. Strictly speaking, the empty or null
  * graph in graph theory is the graph with no vertices and no edges. However
- * by "empty graph" as used in \c igraph we mean a graph having zero or more
+ * by "empty graph" as used in \a igraph we mean a graph having zero or more
  * vertices, but no edges.
  * \param graph Pointer to a not-yet initialized graph object.
  * \param n The number of vertices in the graph, a non-negative
@@ -133,7 +133,7 @@ igraph_error_t igraph_edge(
 ) {
 
     if (eid < 0 || eid >= igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid edge ID when retrieving edge endpoints.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot retrieve edge endpoints.", IGRAPH_EINVEID);
     }
 
     if (igraph_is_directed(graph)) {

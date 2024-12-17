@@ -20,7 +20,6 @@ add_dependencies(check build_tests)
 add_custom_target(build_benchmarks)
 add_custom_target(
   benchmark
-  COMMAND true
   COMMENT "Running benchmarks..."
 )
 add_dependencies(benchmark build_benchmarks)
@@ -66,8 +65,8 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bitset
   heap
-  igraph_array
   igraph_complex
   igraph_psumtree
   igraph_sparsemat5
@@ -98,7 +97,7 @@ add_legacy_tests(
   vector_list
   vector_ptr
   vector_ptr_sort_ind
-  vector_qsort_ind
+  vector_sort_ind
 )
 
 if ((NOT BUILD_SHARED_LIBS) OR (NOT BLAS_IS_VENDORED AND NOT ARPACK_IS_VENDORED))
@@ -155,7 +154,7 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
   igraph_vs_nonadj
-  igraph_vs_seq
+  igraph_vs_range
   igraph_vs_vector
 )
 
@@ -203,6 +202,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
+  igraph_chung_lu_game
   igraph_circulant
   igraph_cited_type_game
   igraph_citing_cited_type_game
@@ -286,11 +286,15 @@ add_legacy_tests(
   components
   coreness
   efficiency
+# The eigen_stress test is disabled by default. The chance of failure on at
+# least some platforms, or with some BLAS/LAPACK/ARPACK versions is high
+# due to ARPACK's fickleness. The test is still useful for local testing.
+  # eigen_stress
   global_transitivity
   harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
-  igraph_are_connected
+  igraph_are_adjacent
   igraph_average_path_length
   igraph_average_path_length_dijkstra
   igraph_betweenness
@@ -311,7 +315,8 @@ add_legacy_tests(
   igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
-  igraph_feedback_arc_set_undirected
+  igraph_feedback_arc_set
+  igraph_feedback_vertex_set
   igraph_get_all_simple_paths
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
@@ -325,6 +330,8 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_clique
+  igraph_is_complete
   igraph_is_dag
   igraph_is_mutual
   igraph_is_tree
@@ -338,6 +345,7 @@ add_legacy_tests(
   igraph_local_scan_k_ecount_them
   igraph_local_scan_subset_ecount
   igraph_local_transitivity
+  igraph_mean_degree
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
@@ -347,8 +355,9 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_simple_cycles
   igraph_similarity
-  igraph_transitive_closure_dag
+  igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
   igraph_unfold_tree
@@ -356,7 +365,9 @@ add_legacy_tests(
   igraph_widest_paths
   igraph_spanner
   knn
+  minimum_spanning_tree
   random_spanning_tree
+  reachability
   single_target_shortest_path
   topological_sorting
 )
@@ -367,6 +378,9 @@ add_legacy_tests(
   bug_1814
   bug_1970
   bug_2150
+  bug_2497
+  bug_2506
+  bug_2517
 )
 
 # components.at
@@ -374,12 +388,15 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_biconnected_components
   igraph_decompose
+  igraph_is_biconnected
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_biconnected_components
   igraph_bridges
   igraph_decompose_strong
+  igraph_is_biconnected
   igraph_subcomponent
 )
 
@@ -552,8 +569,10 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
+  igraph_contract_vertices
   igraph_difference
   igraph_disjoint_union
+  igraph_join
   igraph_intersection
   igraph_union
 )
@@ -562,11 +581,12 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
   igraph_connect_neighborhood
+  igraph_disjoint_union
   igraph_graph_power
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
-  igraph_intersection2
+  igraph_intersection
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
@@ -662,6 +682,7 @@ add_legacy_tests(
   igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_community_optimal_modularity
   igraph_community_voronoi
   igraph_compare_communities
   igraph_le_community_to_membership
@@ -774,6 +795,7 @@ add_legacy_tests(
   igraph_bipartite_projection
   igraph_biadjacency
   igraph_get_biadjacency
+  igraph_weighted_biadjacency
 )
 
 # centralization.at
@@ -793,6 +815,7 @@ add_legacy_tests(
   igraph_is_eulerian
   igraph_eulerian_cycle
   igraph_eulerian_path
+  igraph_find_cycle
 )
 
 # separators.at
@@ -803,6 +826,11 @@ add_examples(
   igraph_is_separator
   igraph_minimal_separators
   igraph_minimum_size_separators
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_is_separator
 )
 
 add_legacy_tests(
@@ -972,6 +1000,11 @@ add_legacy_tests(
 # benchmarks
 add_benchmarks(
   NAMES
+  community
+  connectivity
+  erdos_renyi
+  graphicality
+  igraph_adjacency
   igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted
@@ -993,10 +1026,15 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_strength
   igraph_transitivity
+  igraph_tree_game
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
+  lad
+  intersection
+  spanning_tree
 )
 
 # dot product
@@ -1016,4 +1054,9 @@ add_legacy_tests(
 add_legacy_tests(
         FOLDER tests/unit NAMES
         jdm
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        igraph_realize_bipartite_degree_sequence
 )

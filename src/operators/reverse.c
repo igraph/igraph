@@ -70,7 +70,7 @@ igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
 
     /* Convert graph to edge list. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*no_of_edges);
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ 0));
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
 
     /* Reverse the edges. */
 

@@ -37,96 +37,22 @@
 
 /* The ARPACK example file dssimp.f is used as a template */
 
-static igraph_error_t igraph_i_arpack_err_dsaupd(int error) {
-    switch (error) {
-    case  1:      return IGRAPH_ARPACK_MAXIT;
-    case  3:      return IGRAPH_ARPACK_NOSHIFT;
-    case -1:      return IGRAPH_ARPACK_NPOS;
-    case -2:      return IGRAPH_ARPACK_NEVNPOS;
-    case -3:      return IGRAPH_ARPACK_NCVSMALL;
-    case -4:      return IGRAPH_ARPACK_NONPOSI;
-    case -5:      return IGRAPH_ARPACK_WHICHINV;
-    case -6:      return IGRAPH_ARPACK_BMATINV;
-    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:      return IGRAPH_ARPACK_TRIDERR;
-    case -9:      return IGRAPH_ARPACK_ZEROSTART;
-    case -10:     return IGRAPH_ARPACK_MODEINV;
-    case -11:     return IGRAPH_ARPACK_MODEBMAT;
-    case -12:     return IGRAPH_ARPACK_ISHIFT;
-    case -13:     return IGRAPH_ARPACK_NEVBE;
-    case -9999:   return IGRAPH_ARPACK_NOFACT;
-    default:      return IGRAPH_ARPACK_UNKNOWN;
-    }
-}
+static igraph_arpack_error_t igraph_i_arpack_err_dsaupd(int error);
+static igraph_arpack_error_t igraph_i_arpack_err_dseupd(int error);
+static igraph_arpack_error_t igraph_i_arpack_err_dnaupd(int error);
+static igraph_arpack_error_t igraph_i_arpack_err_dneupd(int error);
 
-static igraph_error_t igraph_i_arpack_err_dseupd(int error) {
-    switch (error) {
-    case -1:      return IGRAPH_ARPACK_NPOS;
-    case -2:      return IGRAPH_ARPACK_NEVNPOS;
-    case -3:      return IGRAPH_ARPACK_NCVSMALL;
-    case -5:      return IGRAPH_ARPACK_WHICHINV;
-    case -6:      return IGRAPH_ARPACK_BMATINV;
-    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:      return IGRAPH_ARPACK_TRIDERR;
-    case -9:      return IGRAPH_ARPACK_ZEROSTART;
-    case -10:     return IGRAPH_ARPACK_MODEINV;
-    case -11:     return IGRAPH_ARPACK_MODEBMAT;
-    case -12:     return IGRAPH_ARPACK_NEVBE;
-    case -14:     return IGRAPH_ARPACK_FAILED;
-    case -15:     return IGRAPH_ARPACK_HOWMNY;
-    case -16:     return IGRAPH_ARPACK_HOWMNYS;
-    case -17:     return IGRAPH_ARPACK_EVDIFF;
-    default:      return IGRAPH_ARPACK_UNKNOWN;
-    }
+static igraph_arpack_error_t last_arpack_error = IGRAPH_ARPACK_NO_ERROR;
 
-}
-
-static igraph_error_t igraph_i_arpack_err_dnaupd(int error) {
-    switch (error) {
-    case  1:      return IGRAPH_ARPACK_MAXIT;
-    case  3:      return IGRAPH_ARPACK_NOSHIFT;
-    case -1:      return IGRAPH_ARPACK_NPOS;
-    case -2:      return IGRAPH_ARPACK_NEVNPOS;
-    case -3:      return IGRAPH_ARPACK_NCVSMALL;
-    case -4:      return IGRAPH_ARPACK_NONPOSI;
-    case -5:      return IGRAPH_ARPACK_WHICHINV;
-    case -6:      return IGRAPH_ARPACK_BMATINV;
-    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:      return IGRAPH_ARPACK_TRIDERR;
-    case -9:      return IGRAPH_ARPACK_ZEROSTART;
-    case -10:     return IGRAPH_ARPACK_MODEINV;
-    case -11:     return IGRAPH_ARPACK_MODEBMAT;
-    case -12:     return IGRAPH_ARPACK_ISHIFT;
-    case -9999:   return IGRAPH_ARPACK_NOFACT;
-    default:      return IGRAPH_ARPACK_UNKNOWN;
-    }
-}
-
-static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
-    switch (error) {
-    case  1:      return IGRAPH_ARPACK_REORDER;
-    case -1:      return IGRAPH_ARPACK_NPOS;
-    case -2:      return IGRAPH_ARPACK_NEVNPOS;
-    case -3:      return IGRAPH_ARPACK_NCVSMALL;
-    case -5:      return IGRAPH_ARPACK_WHICHINV;
-    case -6:      return IGRAPH_ARPACK_BMATINV;
-    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:      return IGRAPH_ARPACK_SHUR;
-    case -9:      return IGRAPH_ARPACK_LAPACK;
-    case -10:     return IGRAPH_ARPACK_MODEINV;
-    case -11:     return IGRAPH_ARPACK_MODEBMAT;
-    case -12:     return IGRAPH_ARPACK_HOWMNYS;
-    case -13:     return IGRAPH_ARPACK_HOWMNY;
-    case -14:     return IGRAPH_ARPACK_FAILED;
-    case -15:     return IGRAPH_ARPACK_EVDIFF;
-    default:      return IGRAPH_ARPACK_UNKNOWN;
-    }
+#define IGRAPH_ARPACK_ERROR(code) { \
+    last_arpack_error = code; \
+    IGRAPH_ERROR(igraph_arpack_error_to_string(code), IGRAPH_EARPACK); \
 }
 
 /* Pristine ARPACK options object that is not exposed to the user; this is used
  * as a template for \c igraph_i_arpack_options_default when the user requests
  * a pointer to the default object */
-const static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
+static const igraph_arpack_options_t igraph_i_arpack_options_pristine = {
     /* .bmat = */ { 'I' },
     /* .n = */ 0,
     /* .which = */ { 'X', 'X' },
@@ -346,7 +272,7 @@ static igraph_error_t igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun,
     int nev = options->nev;
 
     if (nev <= 0) {
-        IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_NEVNPOS);
     }
 
     /* Probe the value in the matrix */
@@ -379,7 +305,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun,
     int nev = options->nev;
 
     if (nev <= 0) {
-        IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_NEVNPOS);
     }
 
     /* Probe the value in the matrix */
@@ -418,7 +344,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     int nev = options->nev;
 
     if (nev <= 0) {
-        IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_NEVNPOS);
     }
     if (nev > 2) {
         nev = 2;
@@ -478,7 +404,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
             /* eval1 must be the one with the smallest imaginary part */
             swap_evals = (IGRAPH_IMAG(eval1) > IGRAPH_IMAG(eval2));
         } else {
-            IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+            IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
         }
     } else if (options->which[0] == 'L') {
         if (options->which[1] == 'M') {
@@ -491,13 +417,13 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
             /* eval1 must be the one with the largest imaginary part */
             swap_evals = (IGRAPH_IMAG(eval1) < IGRAPH_IMAG(eval2));
         } else {
-            IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+            IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
         }
     } else if (options->which[0] == 'X' && options->which[1] == 'X') {
         /* No preference on the ordering of eigenvectors */
     } else {
         /* fprintf(stderr, "%c%c\n", options->which[0], options->which[1]); */
-        IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
     }
 
     options->nconv = nev;
@@ -563,7 +489,7 @@ static igraph_error_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun,
     int nev = options->nev;
 
     if (nev <= 0) {
-        IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_NEVNPOS);
     }
     if (nev > 2) {
         nev = 2;
@@ -612,7 +538,7 @@ static igraph_error_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun,
     } else if (options->which[0] == 'X' && options->which[1] == 'X') {
         /* No preference on the ordering of eigenvectors */
     } else {
-        IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_WHICHINV);
+        IGRAPH_ARPACK_ERROR(IGRAPH_ARPACK_WHICHINV);
     }
 
     options->nconv = nev;
@@ -866,11 +792,15 @@ static void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
         options->ncv = 20;
     }
     /* ...but having ncv close to n leads to some problems with small graphs
-     * (example: PageRank of "A <--> C, D <--> E, B"), so we don't let it
-     * to be larger than n / 2...
+     * (example: PageRank of "A <--> C, D <--> E, B"), so we try to keep it
+     * no more than min(n/2 + 2, n - 1), bounds found empirically using the
+     * eigen_stress.c test...
      */
-    if (options->ncv > options->n / 2) {
-        options->ncv = options->n / 2;
+    if (options->ncv > options->n / 2 + 2) {
+        options->ncv = options->n / 2 + 2;
+    }
+    if (options->ncv > options->n - 1) {
+        options->ncv = options->n - 1;
     }
     /* ...but we need at least min_ncv. */
     if (options->ncv < min_ncv) {
@@ -1095,7 +1025,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
         igraph_i_arpack_report_no_convergence(options);
     }
     if (options->info != 0) {
-        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
+        IGRAPH_ARPACK_ERROR(igraph_i_arpack_err_dsaupd(options->info));
     }
 
     options->ierr = 0;
@@ -1117,7 +1047,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
     if (options->ierr != 0) {
-        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
+        IGRAPH_ARPACK_ERROR(igraph_i_arpack_err_dseupd(options->ierr));
     }
 
     /* Save the result */
@@ -1380,7 +1310,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
         igraph_i_arpack_report_no_convergence(options);
     }
     if (options->info != 0 && options->info != -9999) {
-        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dnaupd(options->info));
+        IGRAPH_ARPACK_ERROR(igraph_i_arpack_err_dnaupd(options->info));
     }
 
     options->ierr = 0;
@@ -1402,7 +1332,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
     if (options->ierr != 0) {
-        IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));
+        IGRAPH_ARPACK_ERROR(igraph_i_arpack_err_dneupd(options->ierr));
     }
 
     /* Save the result */
@@ -1549,4 +1479,161 @@ igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_mat
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
+}
+
+/* ************************************************************************* */
+
+/* Helper functions to map ARPACK error codes to \c igraph_arpack_error_t    */
+
+static igraph_arpack_error_t igraph_i_arpack_err_dsaupd(int error) {
+    switch (error) {
+    case  0:      return IGRAPH_ARPACK_NO_ERROR;
+    case  1:      return IGRAPH_ARPACK_MAXIT;
+    case  3:      return IGRAPH_ARPACK_NOSHIFT;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -4:      return IGRAPH_ARPACK_NONPOSI;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_TRIDERR;
+    case -9:      return IGRAPH_ARPACK_ZEROSTART;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_ISHIFT;
+    case -13:     return IGRAPH_ARPACK_NEVBE;
+    case -9999:   return IGRAPH_ARPACK_NOFACT;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
+    }
+}
+
+static igraph_arpack_error_t igraph_i_arpack_err_dseupd(int error) {
+    switch (error) {
+    case  0:      return IGRAPH_ARPACK_NO_ERROR;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_TRIDERR;
+    case -9:      return IGRAPH_ARPACK_ZEROSTART;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_NEVBE;
+    case -14:     return IGRAPH_ARPACK_FAILED;
+    case -15:     return IGRAPH_ARPACK_HOWMNY;
+    case -16:     return IGRAPH_ARPACK_HOWMNYS;
+    case -17:     return IGRAPH_ARPACK_EVDIFF;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
+    }
+
+}
+
+static igraph_arpack_error_t igraph_i_arpack_err_dnaupd(int error) {
+    switch (error) {
+    case  0:      return IGRAPH_ARPACK_NO_ERROR;
+    case  1:      return IGRAPH_ARPACK_MAXIT;
+    case  3:      return IGRAPH_ARPACK_NOSHIFT;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -4:      return IGRAPH_ARPACK_NONPOSI;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_TRIDERR;
+    case -9:      return IGRAPH_ARPACK_ZEROSTART;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_ISHIFT;
+    case -9999:   return IGRAPH_ARPACK_NOFACT;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
+    }
+}
+
+static igraph_arpack_error_t igraph_i_arpack_err_dneupd(int error) {
+    switch (error) {
+    case  0:      return IGRAPH_ARPACK_NO_ERROR;
+    case  1:      return IGRAPH_ARPACK_REORDER;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_SHUR;
+    case -9:      return IGRAPH_ARPACK_LAPACK;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_HOWMNYS;
+    case -13:     return IGRAPH_ARPACK_HOWMNY;
+    case -14:     return IGRAPH_ARPACK_FAILED;
+    case -15:     return IGRAPH_ARPACK_EVDIFF;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
+    }
+}
+
+static const char* igraph_i_arpack_error_strings[] = {
+    /* 15 */ "Matrix-vector product failed",
+    /* 16 */ "N must be positive",
+    /* 17 */ "NEV must be positive",
+    /* 18 */ "NCV must be greater than NEV and less than or equal to N "
+    "(and for the non-symmetric solver NCV-NEV >=2 must also hold)",
+    /* 19 */ "Maximum number of iterations should be positive",
+    /* 20 */ "Invalid WHICH parameter",
+    /* 21 */ "Invalid BMAT parameter",
+    /* 22 */ "WORKL is too small",
+    /* 23 */ "LAPACK error in tridiagonal eigenvalue calculation",
+    /* 24 */ "Starting vector is zero",
+    /* 25 */ "MODE is invalid",
+    /* 26 */ "MODE and BMAT are not compatible",
+    /* 27 */ "ISHIFT must be 0 or 1",
+    /* 28 */ "NEV and WHICH='BE' are incompatible",
+    /* 29 */ "Could not build an Arnoldi factorization",
+    /* 30 */ "No eigenvalues to sufficient accuracy",
+    /* 31 */ "HOWMNY is invalid",
+    /* 32 */ "HOWMNY='S' is not implemented",
+    /* 33 */ "Different number of converged Ritz values",
+    /* 34 */ "Error from calculation of a real Schur form",
+    /* 35 */ "LAPACK (dtrevc) error for calculating eigenvectors",
+    /* 36 */ "Unknown ARPACK error",
+    /* 37 */ 0,
+    /* 38 */ 0,
+    /* 39 */ "Maximum number of iterations reached",
+    /* 40 */ "No shifts could be applied during a cycle of the "
+    "Implicitly restarted Arnoldi iteration. One possibility "
+    "is to increase the size of NCV relative to NEV",
+    /* 41 */ "The Schur form computed by LAPACK routine dlahqr "
+    "could not be reordered by LAPACK routine dtrsen."
+};
+
+/**
+ * \function igraph_arpack_error_to_string
+ * \brief Convert an ARPACK error code to a human-readable representation.
+ */
+const char* igraph_arpack_error_to_string(igraph_arpack_error_t error) {
+    if (error == IGRAPH_ARPACK_NO_ERROR) {
+        return "No error";
+    }
+
+    int index = (error >= IGRAPH_ARPACK_PROD)
+        ? error - IGRAPH_ARPACK_PROD
+        : -1;
+    const char* message = 0;
+
+    if (index >= 0 && index < sizeof(igraph_i_arpack_error_strings) / sizeof(igraph_i_arpack_error_strings[0])) {
+        message = igraph_i_arpack_error_strings[index];
+    }
+
+    return message ? message : "Unknown ARPACK error";
+}
+
+/**
+ * \function igraph_arpack_get_last_error
+ * \brief Returns the last error code returned from an ARPACK function.
+ */
+igraph_arpack_error_t igraph_arpack_get_last_error(void) {
+    return last_arpack_error;
 }

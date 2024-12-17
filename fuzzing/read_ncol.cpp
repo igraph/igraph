@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2022-2023  The igraph development team
+   Copyright (C) 2022-2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
    02110-1301 USA
 */
 
-#include "igraph.h"
+#include <igraph.h>
 #include <cstdio>
 
 extern "C"
@@ -39,6 +39,15 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // Do the fuzzing
     igraph_t g;
     if (igraph_read_graph_ncol(&g, ifile, NULL, 1, IGRAPH_ADD_WEIGHTS_IF_PRESENT, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
+
+        FILE *ofile = fopen("/dev/null", "w");
+        if (ofile) {
+            // The "weight" attribute may not exist.
+            // In this case it is ignored with a warning.
+            igraph_write_graph_ncol(&g, ofile, "name", "weight");
+            fclose(ofile);
+        }
+
         // Clean up
         igraph_destroy(&g);
     }

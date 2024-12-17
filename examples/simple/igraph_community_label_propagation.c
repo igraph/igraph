@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,13 +34,13 @@ int main(void) {
     igraph_vector_int_init(&membership, 0);
     igraph_community_label_propagation(
         &graph, &membership, /* mode = */ IGRAPH_ALL,
-        /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL
-        );
+        /* weights= */ NULL, /* initial= */ NULL, /* fixed= */ NULL,
+        IGRAPH_LPA_DOMINANCE);
 
     /* Also calculate the modularity of the partition */
     igraph_modularity(
         &graph, &membership, /* weights= */ NULL, /* resolution = */ 1,
-        /* directed= */ 0, &modularity);
+        /* directed= */ false, &modularity);
 
     printf("%" IGRAPH_PRId " communities found; modularity score is %g.\n",
            igraph_vector_int_max(&membership) + 1, modularity);

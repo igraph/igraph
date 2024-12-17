@@ -193,10 +193,10 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * at https://www.mapequation.org . The original paper describing the algorithm
  * is: M. Rosvall and C. T. Bergstrom, Maps of information flow reveal community
  * structure in complex networks, PNAS 105, 1118 (2008)
- * (http://dx.doi.org/10.1073/pnas.0706851105, http://arxiv.org/abs/0707.0609).
+ * (https://dx.doi.org/10.1073/pnas.0706851105, https://arxiv.org/abs/0707.0609).
  * A more detailed paper about the algorithm is: M. Rosvall, D. Axelsson, and
  * C. T. Bergstrom, The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).
- * (http://dx.doi.org/10.1140/epjst/e2010-01179-1, http://arxiv.org/abs/0906.1405)
+ * (https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405)
 
  * </para><para>
  * The original C++ implementation of Martin Rosvall is used,

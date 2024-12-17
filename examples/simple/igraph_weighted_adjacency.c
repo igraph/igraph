@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,36 +17,48 @@
 */
 
 #include <igraph.h>
-#include <stdarg.h>
 
 int main(void) {
+    igraph_t graph;
+    igraph_real_t data[4][4] = { {   0, 1.2, 2.3,   0 },
+                                 { 2.0,   0,   0, 1.0 },
+                                 {   0,   0, 1.5,   0 },
+                                 {   0, 1.0,   0,   0 } };
     igraph_matrix_t mat;
-    igraph_t g;
-    int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 } };
     igraph_vector_t weights;
-    igraph_vector_int_t el;
-    igraph_integer_t i, j, n;
-    igraph_vector_int_init(&el, 0);
+    igraph_vector_int_t edges;
+    igraph_integer_t n;
+
+    /* C arryas use row-major storage, while igraph's matrix uses column-major.
+     * The matrix 'mat' will be the transpose of 'data'. */
+    igraph_matrix_view(&mat, *data, sizeof(data[0]) / sizeof(data[0][0]), sizeof(data) / sizeof(data[0]));
+
+    /* Initialize vector into which weights will be written. */
     igraph_vector_init(&weights, 0);
 
-    igraph_matrix_init(&mat, 4, 4);
-    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {
-        MATRIX(mat, i, j) = m[i][j];
-    }
+    igraph_weighted_adjacency(&graph, &mat, IGRAPH_ADJ_DIRECTED, &weights, IGRAPH_LOOPS_ONCE);
 
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, &weights, IGRAPH_LOOPS_ONCE);
+    /* When igraph_weighted_adjacency() returns, 'weights' will typically have
+     * more capacity allocated than what it uses. We may optionally free any
+     * unused capacity to save memory, although in most applications this
+     * is not necessary. */
+    igraph_vector_resize_min(&weights);
 
-    igraph_get_edgelist(&g, &el, 0);
-    n = igraph_ecount(&g);
+    /* Get the edge list of the graph and output it, along with the weights. */
 
-    for (i = 0, j = 0; i < n; i++, j += 2) {
+    igraph_vector_int_init(&edges, 0);
+    igraph_get_edgelist(&graph, &edges, 0);
+    n = igraph_ecount(&graph);
+
+    for (igraph_integer_t i = 0; i < n; i++) {
         printf("%" IGRAPH_PRId " --> %" IGRAPH_PRId ": %g\n",
-               VECTOR(el)[j], VECTOR(el)[j + 1], VECTOR(weights)[i]);
+               VECTOR(edges)[2*i], VECTOR(edges)[2*i + 1], VECTOR(weights)[i]);
     }
 
-    igraph_matrix_destroy(&mat);
+    /* Free all allocated storage. */
+    igraph_vector_int_destroy(&edges);
+    igraph_destroy(&graph);
     igraph_vector_destroy(&weights);
-    igraph_vector_int_destroy(&el);
-    igraph_destroy(&g);
 
+    return 0;
 }

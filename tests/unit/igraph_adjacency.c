@@ -219,7 +219,7 @@ int main(void) {
     {
         int e[] = {1, 2, 0};
         matrix_init_int_row_major(&adjmatrix, 3, 1, e);
-        check_error(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NONSQUARE);
+        check_error(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
     printf("\nCheck handling of negative number of edges error.\n");

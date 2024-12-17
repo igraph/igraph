@@ -62,7 +62,7 @@ for (i = 0; i < no_of_nodes; i++) {
 }
 
 maxdegree = igraph_vector_int_max(&degree) + 1;
-IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+IGRAPH_CHECK(igraph_i_vector_int_order(&degree, &order, maxdegree));
 IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
 for (i = 0; i < no_of_nodes; i++) {
     VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;

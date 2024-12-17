@@ -28,15 +28,14 @@ int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t result;
-    igraph_integer_t i, j, n;
+    igraph_integer_t n;
     igraph_integer_t alpha;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
-    igraph_set_warning_handler(igraph_warning_handler_ignore);
     igraph_vector_int_list_init(&result, 0);
 
     igraph_kary_tree(&g, 5, 2, IGRAPH_TREE_OUT);
-    for (j = 0; j < sizeof(params) / (2 * sizeof(params[0])); j++) {
+    for (size_t j = 0; j < sizeof(params) / (2 * sizeof(params[0])); j++) {
         if (params[2 * j + 1] != 0) {
             igraph_independent_vertex_sets(&g, &result, params[2 * j], params[2 * j + 1]);
         } else {
@@ -44,7 +43,7 @@ int main(void) {
         }
         n = igraph_vector_int_list_size(&result);
         printf("%" IGRAPH_PRId " independent sets found\n", n);
-        for (i = 0; i < n; i++) {
+        for (igraph_integer_t i = 0; i < n; i++) {
             igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
         }
     }
@@ -54,7 +53,7 @@ int main(void) {
     igraph_maximal_independent_vertex_sets(&g, &result);
     n = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal independent sets found\n", n);
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
     }
 

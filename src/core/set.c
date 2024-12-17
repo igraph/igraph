@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_memory.h"
@@ -71,7 +66,7 @@ igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
  *
  * Time complexity: operating system dependent.
  */
-void igraph_set_destroy(igraph_set_t* set) {
+void igraph_set_destroy(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     if (set->stor_begin != NULL) {
         IGRAPH_FREE(set->stor_begin); /* sets to NULL */
@@ -93,7 +88,7 @@ void igraph_set_destroy(igraph_set_t* set) {
  *
  * Time complexity: O(1)
  */
-igraph_bool_t igraph_set_inited(igraph_set_t* set) {
+igraph_bool_t igraph_set_inited(igraph_set_t *set) {
     return (set->stor_begin != NULL);
 }
 
@@ -108,7 +103,7 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set) {
  * Time complexity: operating system dependent, should be around
  * O(n), n is the new allocated size of the set.
  */
-igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) {
+igraph_error_t igraph_set_reserve(igraph_set_t *set, igraph_integer_t capacity) {
     igraph_integer_t actual_size = igraph_set_size(set);
     igraph_integer_t *tmp;
     IGRAPH_ASSERT(set != NULL);
@@ -133,12 +128,11 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
  * \brief Decides whether the size of the set is zero.
  *
  * \param set The set object.
- * \return Non-zero number if the size of the set is not zero and
- *         zero otherwise.
+ * \return True if the size of the set is not zero and false otherwise.
  *
  * Time complexity: O(1).
  */
-igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
+igraph_bool_t igraph_set_empty(const igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     return set->stor_begin == set->end;
@@ -149,16 +143,16 @@ igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
  * \function igraph_set_clear
  * \brief Removes all elements from the set.
  *
- * </para><para>
  * This function simply sets the size of the set to zero, it does
  * not free any allocated memory. For that you have to call
+ *
  * \ref igraph_set_destroy().
  *
  * \param set The set object.
  *
  * Time complexity: O(1).
  */
-void igraph_set_clear(igraph_set_t* set) {
+void igraph_set_clear(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     set->end = set->stor_begin;
@@ -178,7 +172,7 @@ void igraph_set_clear(igraph_set_t* set) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t igraph_set_size(const igraph_set_t* set) {
+igraph_integer_t igraph_set_size(const igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     return set->end - set->stor_begin;
@@ -197,7 +191,7 @@ igraph_integer_t igraph_set_size(const igraph_set_t* set) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
+igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
     igraph_integer_t left, right, middle;
     igraph_integer_t size;
     IGRAPH_ASSERT(set != NULL);
@@ -259,11 +253,11 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
  *
  * \param set The set object.
  * \param e The element being sought.
- * \return Positive integer (true) if \p e is found, zero (false) otherwise.
+ * \return True if \p e is found, false otherwise.
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
+igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e) {
     igraph_integer_t left, right, middle;
 
     IGRAPH_ASSERT(set != NULL);
@@ -300,14 +294,14 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
  *
  * \param set The set object.
  * \param state Internal state of the iteration.
- *   This should be a pointer to an \c igraph_integer_t variable
+ *   This should be a pointer to a \type igraph_integer_t variable
  *   which must be zero for the first invocation.
  *   The object must not be adjusted and its value should
  *   not be used for anything during the iteration.
  * \param element The next element or 0 (if the iteration
  *   has ended) is returned here.
  *
- * \return Nonzero if there are more elements, zero otherwise.
+ * \return True if there are more elements, false otherwise.
  */
 igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t *state,
                                  igraph_integer_t *element) {

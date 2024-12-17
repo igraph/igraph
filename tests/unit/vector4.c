@@ -22,26 +22,10 @@
 int main(void) {
     igraph_vector_t v;
     igraph_vector_t v2;
-    igraph_real_t result;
     igraph_bool_t result_bool;
     igraph_real_t nan[3] = {1, IGRAPH_NAN, 2};
     igraph_real_t basic[3] = {1, 5, 2};
     igraph_real_t basic_small[3] = {0, -5, -2};
-
-    printf("Taking sum of squares of empty vector:\n");
-    igraph_vector_view(&v, NULL, 0);
-    result = igraph_vector_sumsq(&v);
-    printf("%g\n", result);
-
-    printf("Taking sum of squares of vector with NaN:\n");
-    igraph_vector_view(&v, nan, 3);
-    result = igraph_vector_sumsq(&v);
-    print_real(stdout, result, "%g");
-
-    printf("\nTaking sum of squares of vector:\n");
-    igraph_vector_view(&v, basic, 3);
-    result = igraph_vector_sumsq(&v);
-    printf("%g\n", result);
 
     printf("Checking if vector is equal to itself:\n");
     igraph_vector_view(&v, basic, 3);

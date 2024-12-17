@@ -88,12 +88,13 @@ void print_lazy_adjlist(igraph_lazy_adjlist_t *adjlist);
  */
 void print_lazy_inclist(igraph_lazy_inclist_t *inclist);
 
-/* Edge comparison function used for sorting in print_graph_canon(). */
-int edge_compare(const void *e1, const void *e2);
-
 /* Print a graph using a sorted edge list. Other than sorting (i.e. canonicalizing) the edge list,
  * this function is identical to print_graph(). */
 void print_graph_canon(const igraph_t *graph);
+
+/* Print a weighted graph using a sorted edge list. Other than sorting (i.e. canonicalizing)
+ * the edge list, this function is identical to print_graph(). */
+void print_weighted_graph_canon(const igraph_t *graph, const igraph_vector_t *weights);
 
 /* Print a vector, ensuring that the first nonzero element is positive. */
 void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, const char* format);
@@ -149,6 +150,10 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
     } while (0)
 
 void record_last_warning(const char *reason, const char *file, int line);
+
+void print_bitset(const igraph_bitset_t* bitset);
+
+void print_bitset_list(const igraph_bitset_list_t* bitset);
 
 #define EXPECT_WARNING(funcall, expected_warning) \
     do { \

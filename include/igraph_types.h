@@ -38,6 +38,7 @@ __BEGIN_DECLS
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 
@@ -52,6 +53,8 @@ typedef uint32_t igraph_uint_t;
 #else
 #  error "Invalid igraph integer size; check the value of IGRAPH_INTEGER_SIZE when compiling"
 #endif
+
+typedef igraph_integer_t igraph_int_t;
 
 typedef double igraph_real_t;
 
@@ -137,15 +140,6 @@ IGRAPH_EXPORT int igraph_real_snprintf_precise(char *str, size_t size, igraph_re
 #define IGRAPH_INFINITY ((double)INFINITY)
 #define IGRAPH_POSINFINITY IGRAPH_INFINITY
 #define IGRAPH_NEGINFINITY (-IGRAPH_INFINITY)
-
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_finite(double x);
-#define IGRAPH_FINITE(x) igraph_finite(x)
-
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_nan(double x);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_inf(double x);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_posinf(double x);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_is_neginf(double x);
-
 #define IGRAPH_NAN ((double)NAN)
 
 __END_DECLS

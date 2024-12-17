@@ -3,7 +3,7 @@ exclude: "(^vendor/|\\.patch$)"
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.6.0
     hooks:
       - id: mixed-line-ending
         args: ["--fix=lf"]
@@ -14,6 +14,7 @@ repos:
         exclude: "\\.out$"
       - id: check-merge-conflict
       - id: fix-byte-order-marker
+        exclude: "utf8_with_bom.net$"
 
   - repo: local
     hooks:

@@ -25,7 +25,7 @@
 #ifndef IGRAPH_GLPK_SUPPORT_H
 #define IGRAPH_GLPK_SUPPORT_H
 
-#include "config.h"
+#include "config.h" /* HAVE_GLPK, IGRAPH_THREAD_LOCAL */
 
 /* Note: only files calling the GLPK routines directly need to
    include this header.
@@ -42,7 +42,7 @@
 
 __BEGIN_DECLS
 
-typedef struct igraph_i_glpk_error_info_s {
+typedef struct {
     jmp_buf jmp;            /* used for bailing when there is a GLPK error */
     bool    is_interrupted; /* Boolean; true if there was an interruption */
     bool    is_error;       /* Boolean; true if the error hook was called */
@@ -54,7 +54,7 @@ extern IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 
 igraph_error_t igraph_i_glpk_check(int retval, const char* message);
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info);
-void igraph_i_glpk_error_hook(void *info);
+IGRAPH_FUNCATTR_NORETURN void igraph_i_glpk_error_hook(void *info);
 int igraph_i_glpk_terminal_hook(void *info, const char *s);
 void igraph_i_glp_delete_prob(glp_prob *p);
 
@@ -131,13 +131,13 @@ void igraph_i_glp_delete_prob(glp_prob *p);
                         igraph_i_glpk_error_info.msg_ptr--; \
                     } \
                     *igraph_i_glpk_error_info.msg_ptr = '\0'; \
-                    igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                    igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FAILURE); \
                 } else if (igraph_i_glpk_error_info.is_error) { \
                     /* This branch can never be reached unless compiled with USING_R and using */ \
                     /* the hack to support pre-4.57 GLPK versions. See comments in glpk_support.c. */ \
-                    igraph_error("Error while running GLPK solver.", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                    igraph_error("Error while running GLPK solver.", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FAILURE); \
                 } \
-                return IGRAPH_EGLP; \
+                return IGRAPH_FAILURE; \
             } \
         } \
     } while (0)

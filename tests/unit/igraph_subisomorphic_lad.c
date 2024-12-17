@@ -22,7 +22,6 @@
  * the RANDESU motif finder */
 void test_k_motifs(const igraph_t *graph, const int k, const int class_count, igraph_bool_t directed) {
     igraph_vector_t randesu_counts, lad_counts;
-    igraph_vector_t cut_prob;
     igraph_bool_t equal;
     igraph_integer_t i, n;
     igraph_integer_t vcount;
@@ -42,7 +41,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
         igraph_isoclass_create(&pattern, k, i, directed);
         igraph_vector_int_list_init(&maps, 0);
 
-        igraph_subisomorphic_lad(&pattern, graph, NULL, NULL, NULL, &maps, /* induced = */ true, 0);
+        igraph_subisomorphic_lad(&pattern, graph, NULL, NULL, NULL, &maps, /* induced = */ true);
 
         igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
 
@@ -53,9 +52,8 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
         igraph_destroy(&pattern);
     }
 
-    igraph_vector_init(&cut_prob, k);
     igraph_vector_init(&randesu_counts, 0);
-    igraph_motifs_randesu(graph, &randesu_counts, k, &cut_prob);
+    igraph_motifs_randesu(graph, &randesu_counts, k, NULL);
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
@@ -85,7 +83,6 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
     igraph_vector_destroy(&randesu_counts);
     igraph_vector_destroy(&lad_counts);
-    igraph_vector_destroy(&cut_prob);
 }
 
 void test_motifs(void) {
@@ -161,7 +158,7 @@ int main(void) {
 
     igraph_small(&pattern, 0, IGRAPH_UNDIRECTED, -1);
     igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ NULL, &iso, &map, &maps,
-                             /*induced=*/ false, /*time_limit=*/ 0);
+                             /*induced=*/ false);
 
     IGRAPH_ASSERT(iso);
     IGRAPH_ASSERT(igraph_vector_int_size(&map) == 0);
@@ -179,9 +176,11 @@ int main(void) {
     igraph_vector_int_init(&map, 0);
     igraph_vector_int_list_init(&maps, 0);
     igraph_small(&pattern, 0, IGRAPH_DIRECTED, -1);
-    CHECK_ERROR(igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0,
-                                      &iso, &map, &maps, /*induced=*/ 0,
-                                      /*time_limit=*/ 0), IGRAPH_EINVAL);
+    CHECK_ERROR(
+        igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0,
+        &iso, &map, &maps, /*induced=*/ 0),
+        IGRAPH_EINVAL
+    );
     igraph_vector_int_destroy(&map);
     igraph_vector_int_list_destroy(&maps);
     igraph_destroy(&pattern);

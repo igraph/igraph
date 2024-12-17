@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
-   IGraph R package.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,15 +13,13 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_visitor.h"
-#include "igraph_memory.h"
+
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_interface.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
@@ -60,7 +56,7 @@
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param unreachable Logical scalar, whether the search should visit
+ * \param unreachable Boolean, whether the search should visit
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
@@ -121,7 +117,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     igraph_dqueue_int_t Q;
     igraph_integer_t actroot = 0;
-    igraph_vector_char_t added;
+    igraph_bitset_t added;
 
     igraph_lazy_adjlist_t adjlist;
 
@@ -152,7 +148,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&added, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&added, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -163,10 +159,10 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
        the restricted set, but are to be used as 'root' vertices. */
     if (restricted) {
         igraph_integer_t i, n = igraph_vector_int_size(restricted);
-        igraph_vector_char_fill(&added, true);
+        igraph_bitset_fill(&added, true);
         for (i = 0; i < n; i++) {
             igraph_integer_t v = VECTOR(*restricted)[i];
-            VECTOR(added)[v] = false;
+            IGRAPH_BIT_CLEAR(added, v);
         }
     }
 
@@ -211,12 +207,12 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         }
 
         /* OK, we have a new root, start BFS */
-        if (VECTOR(added)[actroot]) {
+        if (IGRAPH_BIT_TEST(added, actroot)) {
             continue;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actroot));
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
-        VECTOR(added)[actroot] = true;
+        IGRAPH_BIT_SET(added, actroot);
         if (parents) {
             VECTOR(*parents)[actroot] = -1;
         }
@@ -247,8 +243,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
             for (igraph_integer_t i = 0; i < n; i++) {
                 igraph_integer_t nei = VECTOR(*neis)[i];
-                if (! VECTOR(added)[nei]) {
-                    VECTOR(added)[nei] = true;
+                if (! IGRAPH_BIT_TEST(added, nei)) {
+                    IGRAPH_BIT_SET(added, nei);
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actdist + 1));
                     if (parents) {
@@ -284,7 +280,7 @@ cleanup:
 
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_char_destroy(&added);
+    igraph_bitset_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -339,7 +335,7 @@ igraph_error_t igraph_bfs_simple(
     igraph_dqueue_int_t q;
     igraph_integer_t num_visited = 0;
     igraph_vector_int_t neis;
-    bool *added;
+    igraph_bitset_t added;
     igraph_integer_t lastlayer = -1;
 
     if (!igraph_is_directed(graph)) {
@@ -353,10 +349,7 @@ igraph_error_t igraph_bfs_simple(
 
     /* temporary storage */
 
-    added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(added, "Insufficient memory for BFS.");
-    IGRAPH_FINALLY(igraph_free, added);
-
+    IGRAPH_BITSET_INIT_FINALLY(&added, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
@@ -386,7 +379,7 @@ igraph_error_t igraph_bfs_simple(
         VECTOR(*parents)[root] = -1;
     }
     num_visited++;
-    added[root] = true;
+    IGRAPH_BIT_SET(added, root);
 
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
@@ -396,8 +389,8 @@ igraph_error_t igraph_bfs_simple(
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         for (igraph_integer_t i = 0; i < nei_count; i++) {
             const igraph_integer_t neighbor = VECTOR(neis)[i];
-            if (! added[neighbor]) {
-                added[neighbor] = true;
+            if (! IGRAPH_BIT_TEST(added, neighbor)) {
+                IGRAPH_BIT_SET(added, neighbor);
                 if (parents) {
                     VECTOR(*parents)[neighbor] = actvect;
                 }
@@ -421,7 +414,7 @@ igraph_error_t igraph_bfs_simple(
 
     igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&q);
-    IGRAPH_FREE(added);
+    igraph_bitset_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -449,7 +442,7 @@ igraph_error_t igraph_bfs_simple(
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param unreachable Logical scalar, whether the search should visit
+ * \param unreachable Boolean, whether the search should visit
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
@@ -493,7 +486,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t adjlist;
     igraph_stack_int_t stack;
-    igraph_vector_char_t added;
+    igraph_bitset_t added;
     igraph_vector_int_t nptr;
     igraph_error_t ret;
     igraph_integer_t act_rank = 0;
@@ -513,7 +506,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&added, no_of_nodes);
+    IGRAPH_BITSET_INIT_FINALLY(&added, no_of_nodes);
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, 100);
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -525,7 +518,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
         igraph_vector_int_destroy(&nptr); \
         igraph_lazy_adjlist_destroy(&adjlist); \
         igraph_stack_int_destroy(&stack); \
-        igraph_vector_char_destroy(&added); \
+        igraph_bitset_destroy(&added); \
         IGRAPH_FINALLY_CLEAN(4); } while (0)
 
     /* Resize result vectors and fill them with the initial value */
@@ -542,7 +535,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 # undef VINIT
 
     IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
-    VECTOR(added)[root] = true;
+    IGRAPH_BIT_SET(added, root);
     if (parents) {
         VECTOR(*parents)[root] = -1;
     }
@@ -567,12 +560,12 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             if (!unreachable) {
                 break;
             }
-            if (VECTOR(added)[actroot]) {
+            if (IGRAPH_BIT_TEST(added, actroot)) {
                 actroot++;
                 continue;
             }
             IGRAPH_CHECK(igraph_stack_int_push(&stack, actroot));
-            VECTOR(added)[actroot] = true;
+            IGRAPH_BIT_SET(added, actroot);
             if (parents) {
                 VECTOR(*parents)[actroot] = -1;
             }
@@ -608,13 +601,13 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             igraph_integer_t nei = 0;
             while (!any && (*ptr) < n) {
                 nei = VECTOR(*neis)[(*ptr)];
-                any = !VECTOR(added)[nei];
+                any = !IGRAPH_BIT_TEST(added, nei);
                 (*ptr) ++;
             }
             if (any) {
                 /* There is such a neighbor, add it */
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, nei));
-                VECTOR(added)[nei] = true;
+                IGRAPH_BIT_SET(added, nei);
                 if (parents) {
                     VECTOR(*parents)[ nei ] = actvect;
                 }

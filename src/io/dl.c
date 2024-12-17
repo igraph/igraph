@@ -28,11 +28,11 @@
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"
 
-int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
-                                void* scanner);
-int igraph_dl_yylex_destroy (void *scanner );
-int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
-void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
+int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t *user_defined,
+                                void *scanner);
+int igraph_dl_yylex_destroy(void *scanner);
+int igraph_dl_yyparse(igraph_i_dl_parsedata_t *context);
+void igraph_dl_yyset_in(FILE *in_str, void *yyscanner);
 
 /* for IGRAPH_FINALLY, which assumes that destructor functions return void */
 void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
@@ -55,7 +55,7 @@ void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read the DL file from.
- * \param directed Logical scalar, whether to create a directed file.
+ * \param directed Boolean, whether to create a directed file.
  * \return Error code.
  *
  * Time complexity: linear in terms of the number of edges and

@@ -77,10 +77,10 @@ whitespace [ \t]
 digit [0-9]
 
 /* Any use of {newline} below must use yy_set_bol(true) in order to mark the character
-   following a single \r as the first on a new line, and allow the ^ pattern to match. 
+   following a single \r as the first on a new line, and allow the ^ pattern to match.
    This pattern must match single newlines only, in order to follow Pajek's "no newline
    after *Vertices" convention. */
-newline (\n|\r|\r\n|\n\r) 
+newline (\n|\r|\r\n|\n\r)
 
 /* Anything except non-printable (00-1F), space (20), del (7F), '"' and '*'. */
 word [^\x00-\x20\x7f"*]

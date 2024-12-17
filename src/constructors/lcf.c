@@ -104,7 +104,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  * number of vertices in the graph, a list of shifts giving additional
  * edges to a cycle backbone, and another integer giving how many times
  * the shifts should be performed. See
- * http://mathworld.wolfram.com/LCFNotation.html for details.
+ * https://mathworld.wolfram.com/LCFNotation.html for details.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.
@@ -112,8 +112,9 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  *        plus an additional 0 to mark the end of the arguments.
  * \return Error code.
  *
- * \sa See \ref igraph_lcf_vector() for a similar function using a
- * vector_t instead of the variable length argument list.
+ * \sa See \ref igraph_lcf_vector() for a similar function using an
+ * \ref igraph_vector_t instead of the variable length argument list;
+ * \ref igraph_circulant() to create circulant graphs.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.

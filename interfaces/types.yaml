@@ -38,10 +38,6 @@ INT:
     # A C integer
     CTYPE: int
 
-LONGINT:
-    # A C long integer
-    CTYPE: long int
-
 CSTRING:
     # A null-terminated immutable C string
     CTYPE: const char*
@@ -213,12 +209,18 @@ GRAPH_PTR_LIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEX_QTYS:
+ALL_VERTEX_QTY:
     # A vector of floating-point numbers where each entry corresponds to
     # one of the vertices in a graph and its value represents some quantity
     # associated to the vertex with the same index. Higher-level interfaces may
     # use this type to provide a "named vector" such that each entry can be
     # indexed either by the vertex index or by the vertex name.
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
+VERTEX_QTY:
+    # Same as ALL_VERTEX_QTY, but only for a subset of vertices,
+    # typically referred to by a `vids` argument.
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
@@ -288,6 +290,11 @@ BLISSSH:
     CTYPE: igraph_bliss_sh_t
     FLAGS: ENUM
 
+CHUNG_LU_VARIANT:
+    # Enum that describes the Chung-Lu model variants supported by igraph
+    CTYPE: igraph_chung_lu_t
+    FLAGS: ENUM
+
 COMMCMP:
     # Enum containing identifiers for community comparison methods
     CTYPE: igraph_community_comparison_t
@@ -316,16 +323,14 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
-ERDOS_RENYI_TYPE:
-    # Enum that says wheter a GNM (n vertices, m edges) or
-    # GNP (n vertices, every edge exists with probability p)
-    # graph is created
-    CTYPE: igraph_erdos_renyi_t
-    FLAGS: ENUM
-
 FAS_ALGORITHM:
     # Enum representing feedback arc set algorithms
     CTYPE: igraph_fas_algorithm_t
+    FLAGS: ENUM
+
+FVS_ALGORITHM:
+    # Enum representing feedback vertex set algorithms
+    CTYPE: igraph_fvs_algorithm_t
     FLAGS: ENUM
 
 FWALGORITHM:
@@ -373,6 +378,11 @@ LSETYPE:
     # Enum storing the possible types (definitions) of the Laplacian matrix
     # to use in the Laplacian spectral embedding algorithms
     CTYPE: igraph_laplacian_spectral_embedding_type_t
+    FLAGS: ENUM
+
+MSTALGORITHM:
+    # Enum that describes the algorithm for computing a minimum spanning tree
+    CTYPE: igraph_mst_algorithm_t
     FLAGS: ENUM
 
 NEIMODE:
@@ -492,6 +502,11 @@ WHEEL_MODE:
     CTYPE: igraph_wheel_mode_t
     FLAGS: ENUM
 
+LPA_VARIANT:
+    # Enum that describes the label propagation algorithm variant
+    CTYPE: igraph_lpa_variant_t
+    FLAGS: ENUM
+
 ###############################################################################
 # Switches / flags / bits
 ###############################################################################
@@ -516,9 +531,14 @@ ARPACK_FUNC:
     CTYPE: igraph_arpack_function_t
 
 CLIQUE_FUNC:
-    # Callback function for igraph_cliques_callback(). called with every clique
+    # Callback function for igraph_cliques_callback(). Called with every clique
     # that was found by the function.
     CTYPE: igraph_clique_handler_t
+
+CYCLE_FUNC:
+    # Callback function for igraph_simple_cycles_callback(). Called with every
+    # cycle that was found by the function.
+    CTYPE: igraph_cycle_handler_t
 
 BFS_FUNC:
     # Callback function for igraph_bfs(). Called with every vertex that was

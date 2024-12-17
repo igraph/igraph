@@ -5,7 +5,14 @@
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 #  * cmake -E cat (3.18)
-cmake_minimum_required(VERSION 3.18...3.27)
+cmake_minimum_required(VERSION 3.18...3.31)
+
+# CMake 3.31.0 issues warnings due to the following bug:
+# https://gitlab.kitware.com/cmake/cmake/-/issues/26449
+# Setting policy CMP0175 to OLD avoids the warnings.
+if(CMAKE_VERSION VERSION_EQUAL "3.31.0")
+  cmake_policy(SET CMP0175 OLD)
+endif()
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
@@ -113,10 +120,11 @@ endif()
 check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
 
-# Check for 128-bit integer multiplication support, floating-point endianness
-# and support for built-in overflow detection.
+# Check for 128-bit integer multiplication support, floating-point endianness,
+# support for built-in overflow detection and fast bit operation support.
 include(ieee754_endianness)
 include(uint128_support)
+include(bit_operations_support)
 include(safe_math_support)
 
 if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)

@@ -95,8 +95,9 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  *        isomorphism code.
  * \param cut_prob Vector of probabilities for cutting the search tree
  *        at a given level. The first element is the first level, etc.
- *        Supply all zeros here (of length \p size) to find all motifs
- *        in a graph.
+ *        To perform a complete search and find all motifs, supply
+ *        either an all-zero vector of length \p size, or (since
+ *        igraph 0.10.14) a \c NULL pointer.
  * \return Error code.
  *
  * \sa \ref igraph_motifs_randesu_estimate() for estimating the number
@@ -150,7 +151,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
         }
     }
 
-    if (igraph_vector_size(cut_prob) != size) {
+    if (cut_prob != NULL && igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
@@ -223,8 +224,9 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
  *        motif finding code, but the graph isomorphism code.
  * \param cut_prob Vector of probabilities for cutting the search tree
  *        at a given level. The first element is the first level, etc.
- *        Supply all zeros here (of length \c size) to find all motifs
- *        in a graph.
+ *        To perform a complete search and find all motifs, supply
+ *        either an all-zero vector of length \p size, or (since
+ *        igraph 0.10.14) a \c NULL pointer.
  * \param callback A pointer to a function of type \ref igraph_motifs_handler_t.
  *        This function will be called whenever a new motif is found.
  * \param extra Extra argument to pass to the callback function.
@@ -303,7 +305,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
         }
     }
 
-    if (igraph_vector_size(cut_prob) != size) {
+    if (cut_prob != NULL && igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
@@ -333,8 +335,10 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (VECTOR(*cut_prob)[0] == 1 || RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
-            continue;
+        if (cut_prob) {
+            if (VECTOR(*cut_prob)[0] == 1 || RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
+                continue;
+            }
         }
 
         /* init G */
@@ -359,7 +363,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
         igraph_stack_int_clear(&stack);
 
         while (level > 1 || !igraph_vector_int_empty(&adjverts)) {
-            igraph_real_t cp = VECTOR(*cut_prob)[level];
+            igraph_real_t cp = cut_prob ? VECTOR(*cut_prob)[level] : 0;
 
             if (level == size - 1) {
                 s = igraph_vector_int_size(&adjverts) / 2;
@@ -520,10 +524,11 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
  * \param graph The graph object to study.
  * \param est Pointer to an integer, the result will be stored here.
  * \param size The size of the subgraphs to look for.
- * \param cut_prob Vector giving the probabilities to cut a branch of
- *        the search tree and omit counting the motifs in that branch.
- *        It contains a probability for each level. Supply \p size
- *        zeros here to count all the motifs in the sample.
+ * \param cut_prob Vector of probabilities for cutting the search tree
+ *        at a given level. The first element is the first level, etc.
+ *        To perform a complete search and find all motifs, supply
+ *        either an all-zero vector of length \p size, or (since
+ *        igraph 0.10.14) a \c NULL pointer.
  * \param sample_size The number of vertices to use as the
  *        sample. This parameter is only used if the \p parsample
  *        argument is a null pointer.
@@ -560,7 +565,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
                       IGRAPH_EINVAL, size);
     }
 
-    if (igraph_vector_size(cut_prob) != size) {
+    if (cut_prob != NULL && igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
@@ -595,6 +600,12 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
         sample_size = igraph_vector_int_size(sample);
     }
 
+    if (sample_size <= 0) {
+        IGRAPH_ERRORF("The number of vertices to use as a sample for motif count "
+                     "estimation must be at least one, got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, sample_size);
+    }
+
     *est = 0;
 
     RNG_BEGIN();
@@ -605,9 +616,10 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (VECTOR(*cut_prob)[0] == 1 ||
-            RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
-            continue;
+        if (cut_prob) {
+            if (VECTOR(*cut_prob)[0] == 1 || RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
+                continue;
+            }
         }
 
         /* init G */
@@ -632,7 +644,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
         igraph_stack_int_clear(&stack);
 
         while (level > 1 || !igraph_vector_int_empty(&adjverts)) {
-            igraph_real_t cp = VECTOR(*cut_prob)[level];
+            igraph_real_t cp = cut_prob ? VECTOR(*cut_prob)[level] : 0.0;
 
             if (level == size - 1) {
                 s = igraph_vector_int_size(&adjverts) / 2;
@@ -739,8 +751,11 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
  * \param no Pointer to an integer type, the result will be stored
  *        here.
  * \param size The size of the motifs to count.
- * \param cut_prob Vector giving the probabilities that a branch of
- *        the search tree will be cut at a given level.
+ * \param cut_prob Vector of probabilities for cutting the search tree
+ *        at a given level. The first element is the first level, etc.
+ *        To perform a complete search and find all connected subgraphs,
+ *        supply either an all-zero vector of length \p size, or (since
+ *        igraph 0.10.14) a \c NULL pointer.
  * \return Error code.
  * \sa \ref igraph_motifs_randesu(), \ref
  *     igraph_motifs_randesu_estimate().
@@ -765,7 +780,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
                       IGRAPH_EINVAL, size);
     }
 
-    if (igraph_vector_size(cut_prob) != size) {
+    if (cut_prob != NULL && igraph_vector_size(cut_prob) != size) {
         IGRAPH_ERRORF("Cut probability vector size (%" IGRAPH_PRId ") must agree with motif size (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
@@ -788,9 +803,10 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (VECTOR(*cut_prob)[0] == 1 ||
-            RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
-            continue;
+        if (cut_prob) {
+            if (VECTOR(*cut_prob)[0] == 1 || RNG_UNIF01() < VECTOR(*cut_prob)[0]) {
+                continue;
+            }
         }
 
         /* init G */
@@ -815,7 +831,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
         igraph_stack_int_clear(&stack);
 
         while (level > 1 || !igraph_vector_int_empty(&adjverts)) {
-            igraph_real_t cp = VECTOR(*cut_prob)[level];
+            igraph_real_t cp = cut_prob ? VECTOR(*cut_prob)[level] : 0.0;
 
             if (level == size - 1) {
                 s = igraph_vector_int_size(&adjverts) / 2;
@@ -986,29 +1002,31 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_real_t *mut,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
-                           igraph_real_t *res4) {
+static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph,
+                                               igraph_real_t *res2,
+                                               igraph_real_t *res4) {
 
-    igraph_integer_t vc = igraph_vcount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
     igraph_vector_int_t seen;
     igraph_vector_int_t *neis, *neis2;
-    igraph_integer_t i, j, k, s, neilen, neilen2, ign;
+    igraph_integer_t s, neilen, neilen2, ign;
     igraph_adjlist_t adjlist;
+    int iter = 0;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vc);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&seen, vcount);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     *res2 = *res4 = 0;
 
-    for (i = 0; i < vc; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 12);
 
         neis = igraph_adjlist_get(&adjlist, i);
         neilen = igraph_vector_int_size(neis);
         /* mark neighbors of i & i itself */
         VECTOR(seen)[i] = i + 1;
         ign = 0;
-        for (j = 0; j < neilen; j++) {
+        for (igraph_integer_t j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (VECTOR(seen)[nei] == i + 1 || VECTOR(seen)[nei] == -(i + 1)) {
                 /* multiple edges or loop edge */
@@ -1019,7 +1037,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
             }
         }
 
-        for (j = 0; j < neilen; j++) {
+        for (igraph_integer_t j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (nei <= i || (j > 0 && nei == VECTOR(*neis)[j - 1])) {
                 continue;
@@ -1027,7 +1045,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
             neis2 = igraph_adjlist_get(&adjlist, nei);
             neilen2 = igraph_vector_int_size(neis2);
             s = 0;
-            for (k = 0; k < neilen2; k++) {
+            for (igraph_integer_t k = 0; k < neilen2; k++) {
                 igraph_integer_t nei2 = VECTOR(*neis2)[k];
                 if (k > 0 && nei2 == VECTOR(*neis2)[k - 1]) {
                     continue;
@@ -1037,9 +1055,9 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
                 }
             }
             if (VECTOR(seen)[nei] > 0) {
-                *res2 += vc - s - neilen + ign - 1;
+                *res2 += vcount - s - neilen + ign - 1;
             } else {
-                *res4 += vc - s - neilen + ign - 1;
+                *res4 += vcount - s - neilen + ign - 1;
             }
         }
     }
@@ -1130,10 +1148,9 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
 
 igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
-    igraph_vector_t cut_prob;
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_vector_t cut_prob, tmp;
     igraph_real_t m2, m4;
-    igraph_vector_t tmp;
-    igraph_integer_t vc = igraph_vcount(graph);
     igraph_real_t total;
 
     if (!igraph_is_directed(graph)) {
@@ -1147,8 +1164,8 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
     IGRAPH_CHECK(igraph_i_triad_census_24(graph, &m2, &m4));
 
-    total = ((igraph_real_t)vc) * (vc - 1);
-    total *= (vc - 2);
+    total = ((igraph_real_t) vcount) * (vcount - 1);
+    total *= (vcount - 2);
     total /= 6;
 
     /* Reorder */

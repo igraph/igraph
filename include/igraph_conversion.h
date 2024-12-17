@@ -58,14 +58,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_stochastic_sparse(
    const igraph_vector_t *weights
 );
 
-/* Deprecated, will be removed in 0.11. Use igraph_get_adjacency_sparse() instead, paying attention to differences. */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
-
-/* Deprecated, will be removed in 0.11. Use igraph_get_stochastic_sparse() instead, paying attention to differences. */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
-                                                  igraph_sparsemat_t *res,
-                                                  igraph_bool_t column_wise);
-
 IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol);
 
 IGRAPH_EXPORT igraph_error_t igraph_to_directed(igraph_t *graph,

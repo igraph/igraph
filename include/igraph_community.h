@@ -53,9 +53,10 @@ IGRAPH_EXPORT igraph_error_t igraph_trussness(
 /* TODO:  */
 
 IGRAPH_EXPORT igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
-                                                      igraph_real_t *modularity,
-                                                      igraph_vector_int_t *membership,
-                                                      const igraph_vector_t *weights);
+                                                                 const igraph_vector_t *weights,
+                                                                 const igraph_real_t resolution,
+                                                                 igraph_real_t *modularity,
+                                                                 igraph_vector_int_t *membership);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                              const igraph_vector_t *weights,
@@ -100,14 +101,15 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            igraph_real_t *codelength);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
-                                                    igraph_vector_int_t *result,
+                                                    igraph_vector_int_t *removed_edges,
                                                     igraph_vector_t *edge_betweenness,
                                                     igraph_matrix_int_t *merges,
                                                     igraph_vector_int_t *bridges,
                                                     igraph_vector_t *modularity,
                                                     igraph_vector_int_t *membership,
                                                     igraph_bool_t directed,
-                                                    const igraph_vector_t *weights);
+                                                    const igraph_vector_t *weights,
+                                                    const igraph_vector_t *lengths);
 IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                                  const igraph_bool_t directed,
                                                  const igraph_vector_int_t *edges,
@@ -217,12 +219,14 @@ IGRAPH_EXPORT igraph_error_t igraph_community_fluid_communities(const igraph_t *
                                                      igraph_integer_t no_of_communities,
                                                      igraph_vector_int_t *membership);
 
+
 IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                                      igraph_vector_int_t *membership,
                                                      igraph_neimode_t mode,
                                                      const igraph_vector_t *weights,
                                                      const igraph_vector_int_t *initial,
-                                                     const igraph_vector_bool_t *fixed);
+                                                     const igraph_vector_bool_t *fixed,
+                                                     igraph_lpa_variant_t variant);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               const igraph_vector_t *weights,

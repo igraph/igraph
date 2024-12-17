@@ -43,9 +43,44 @@ Eigenvalue: 2
 Eigenvector:
 1 0.5 0.5 0.5 0.5
 
-Directed star graph with weights:
+Directed out-star graph with weights:
 Eigenvalue: 0
 Eigenvector:
-0 0 0 0 0
+0 1 1 1 1
+
+Directed in-star graph with weights:
+Eigenvalue: 0
+Eigenvector:
+1 0 0 0 0
+
+Small directed graph, OUT:
+Eigenvalue: 1.22074
+Eigenvector:
+0.819173 0.671044 0.5497 1
+
+Small directed graph, IN:
+Eigenvalue: 1.22074
+Eigenvector:
+0.819173 1 0.5497 0.671044
+
+Small directed graph, ALL:
+Eigenvalue: 2.56155
+Eigenvector:
+0.780776 1 0.780776 1
+
+Small directed graph with weights, OUT:
+Eigenvalue: 3.0334
+Eigenvector:
+1 0.329663 0.217355 0.75835
+
+Small directed graph with weights, IN:
+Eigenvalue: 3.0334
+Eigenvector:
+0.329663 1 0.429924 0.434711
+
+Small directed graph with weights, ALL:
+Eigenvalue: 8.17656
+Eigenvector:
+0.589808 0.822599 0.568111 1
 
 Check handling of wrong number of weights.

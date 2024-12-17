@@ -282,33 +282,6 @@ igraph_error_t igraph_get_adjacency_sparse(
 
 #undef WEIGHT_OF
 
-/**
- * \function igraph_get_sparsemat
- * \brief Converts an igraph graph to a sparse matrix (deprecated).
- *
- * If the graph is undirected, then a symmetric matrix is created.
- *
- * </para><para>
- * This function is deprecated in favour of \ref igraph_get_adjacency_sparse(),
- * but does not work in an identical way. This function takes an \em uninitialized
- * \c igraph_sparsemat_t while \ref igraph_get_adjacency_sparse() takes
- * an already initialized one.
- *
- * \param graph The input graph.
- * \param res Pointer to an \em uninitialized sparse matrix. The result
- *    will be stored here.
- * \return Error code.
- *
- * \deprecated-by igraph_get_adjacency_sparse 0.10.0
- */
-
-igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
-}
 
 /**
  * \ingroup conversion
@@ -801,16 +774,26 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * \brief Stochastic adjacency matrix of a graph.
  *
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
- * its adjacency matrix, normalized row-wise or column-wise, such that
- * the sum of each row (or column) is one.
+ * its adjacency matrix, normalized row-wise (or column-wise), such that
+ * the sum of each row (or column) is one. The row-wise normalized matrix
+ * is also called a \em right-stochastic and containt the transition
+ * probabilities of a random walk that follows edge directions in a directed
+ * graph. The column-wise normalized matrix is called \em left-stochastic and
+ * is related to random walks moving against edge directions.
+ *
+ * </para><para>
+ * When the out-degree (or in-degree) of a vertex is zero, the corresponding
+ * row (or column) of the row-wise (or column-wise) normalized stochastic
+ * matrix will be zero.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result is stored here.
  *   It will be resized as needed.
- * \param column_wise Whether to normalize column-wise.
+ * \param column_wise If \c false, row-wise normalization is used.
+ *                    If \c true, column-wise normalization is used.
  * \return Error code.
  *
- * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
+ * Time complexity: O(|V|^2), |V| is the number of vertices in the graph.
  *
  * \sa \ref igraph_get_stochastic_sparse(), the sparse version of this
  * function.
@@ -823,7 +806,7 @@ igraph_error_t igraph_get_stochastic(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t i, from, to;
+    igraph_integer_t from, to;
     igraph_vector_t sums;
     igraph_real_t sum;
 
@@ -833,25 +816,29 @@ igraph_error_t igraph_get_stochastic(
     IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_nodes);
 
     if (directed) {
+        /* Directed */
+
         IGRAPH_CHECK(igraph_strength(
             graph, &sums, igraph_vss_all(),
             column_wise ? IGRAPH_IN : IGRAPH_OUT,
             /* loops = */ true, weights
         ));
 
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             sum = VECTOR(sums)[column_wise ? to : from];
             MATRIX(*res, from, to) += WEIGHT_OF(i) / sum;
         }
     } else {
+        /* Undirected */
+
         IGRAPH_CHECK(igraph_strength(
             graph, &sums, igraph_vss_all(), IGRAPH_ALL,
             /* loops = */ true, weights
         ));
 
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             MATRIX(*res, from, to) += WEIGHT_OF(i) / VECTOR(sums)[column_wise ? to : from];
@@ -871,14 +858,14 @@ igraph_error_t igraph_get_stochastic(
  * \function igraph_get_stochastic_sparse
  * \brief The stochastic adjacency matrix of a graph.
  *
- * Stochastic matrix of a graph. The stochastic matrix of a graph is
- * its adjacency matrix, normalized row-wise or column-wise, such that
- * the sum of each row (or column) is one.
+ * Stochastic matrix of a graph in sparse format. See \ref igraph_get_stochastic()
+ * for the information on stochastic matrices.
  *
  * \param graph The input graph.
  * \param res Pointer to an \em initialized sparse matrix, the
  *    result is stored here. The matrix will be resized as needed.
- * \param column_wise Whether to normalize column-wise.
+ * \param column_wise If \c false, row-wise normalization is used.
+ *                    If \c true, column-wise normalization is used.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -894,43 +881,12 @@ igraph_error_t igraph_get_stochastic_sparse(
     IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, weights, IGRAPH_LOOPS_TWICE));
 
     if (column_wise) {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ false));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ true));
     } else {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ false));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ true));
     }
 
     return IGRAPH_SUCCESS;
-}
-
-
-/**
- * \function igraph_get_stochastic_sparsemat
- * \brief Stochastic adjacency matrix of a graph (deprecated).
- *
- * This function is deprecated in favour of \ref igraph_get_stochastic_sparse(),
- * but does not work in an identical way. This function takes an \em uninitialized
- * \c igraph_sparsemat_t while \ref igraph_get_stochastic_sparse() takes
- * an already initialized one.
- *
- * \param graph The input graph.
- * \param res Pointer to an \em uninitialized sparse matrix, the
- *    result is stored here. The matrix will be resized as needed.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
- * \return Error code.
- *
- * \deprecated-by igraph_get_stochastic_sparse 0.10.0
- */
-
-igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
-                                               igraph_sparsemat_t *res,
-                                               igraph_bool_t column_wise) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_stochastic_sparse(graph, res, column_wise, NULL);
 }
 
 

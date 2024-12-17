@@ -248,7 +248,7 @@ igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trus
         IGRAPH_CHECK(igraph_has_mutual(graph, &is_multigraph, /* loops */ false));
     }
     if (is_multigraph) {
-        IGRAPH_ERROR("Trussness is not implemented for graph with multi-edges.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Trussness is not implemented for graphs with multi-edges.", IGRAPH_UNIMPLEMENTED);
     }
 
     /* Manage the stack to make it memory safe: do not change the order of

@@ -28,6 +28,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
+#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -384,6 +385,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     q = igraph_i_multilevel_community_modularity(&communities, resolution);
     /* pass = 1; */
 
+    RNG_BEGIN();
     do { /* Pass begin */
         igraph_integer_t temp_communities_no = communities.communities_no;
 
@@ -392,6 +394,18 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
         /* Save the current membership, it will be restored in case of worse result */
         IGRAPH_CHECK(igraph_vector_int_update(&temp_membership, communities.membership));
+
+        /* Apply a random inversion to the node_order permutation vector to help escape
+         * rare situations of an infinite loop. A full re-shuffling of node_order would
+         * have a measurable performance impact, hence the single inversion.
+         * See https://github.com/igraph/igraph/issues/2650 for details. */
+        if (vcount > 1) {
+            igraph_integer_t i1 = RNG_INTEGER(0, vcount-1);
+            igraph_integer_t i2 = RNG_INTEGER(0, vcount-1);
+            igraph_integer_t tmp = VECTOR(node_order)[i1];
+            VECTOR(node_order)[i1] = VECTOR(node_order)[i2];
+            VECTOR(node_order)[i2] = tmp;
+        }
 
         for (igraph_integer_t i = 0; i < vcount; i++) {
             /* Exclude vertex from its current community */
@@ -475,6 +489,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
         IGRAPH_ALLOW_INTERRUPTION();
     } while (changed && (q > pass_q)); /* Pass end */
+    RNG_END();
 
     if (modularity) {
         *modularity = q;
@@ -501,7 +516,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
     /* We reuse the links_weight vector to store the old edge weights */
     IGRAPH_CHECK(igraph_vector_update(&links_weight, weights));
-    igraph_vector_fill(weights, 0);
+    igraph_vector_null(weights);
 
     for (igraph_integer_t i = 0; i < ecount; i++) {
         VECTOR(*weights)[VECTOR(edges)[i]] += VECTOR(links_weight)[i];
@@ -520,16 +535,10 @@ static igraph_error_t igraph_i_community_multilevel_step(
 /**
  * \ingroup communities
  * \function igraph_community_multilevel
- * \brief Finding community structure by multi-level optimization of modularity.
+ * \brief Finding community structure by multi-level optimization of modularity (Louvain).
  *
- * This function implements the multi-level modularity optimization
- * algorithm for finding community structure, see
- * Blondel, V. D., Guillaume, J.-L., Lambiotte, R., &amp; Lefebvre, E. (2008). Fast
- * unfolding of communities in large networks. Journal of Statistical Mechanics:
- * Theory and Experiment, 10008(10), 6.
- * https://doi.org/10.1088/1742-5468/2008/10/P10008 for the details (preprint:
- * http://arxiv.org/abs/0803.0476). The algorithm is sometimes known as the
- * "Louvain" algorithm.
+ * This function implements a multi-level modularity optimization algorithm
+ * for finding community structure, sometimes known as the Louvain algorithm.
  *
  * </para><para>
  * The algorithm is based on the modularity measure and a hierarchical approach.
@@ -542,15 +551,24 @@ static igraph_error_t igraph_i_community_multilevel_step(
  * the modularity cannot be increased any more in a step.
  *
  * </para><para>
- * The resolution parameter \c gamma allows finding communities at different
+ * The resolution parameter \c γ allows finding communities at different
  * resolutions. Higher values of the resolution parameter typically result in
  * more, smaller communities. Lower values typically result in fewer, larger
  * communities. The original definition of modularity is retrieved when setting
- * <code>gamma=1</code>. Note that the returned modularity value is calculated using
+ * <code>γ=1</code>. Note that the returned modularity value is calculated using
  * the indicated resolution parameter. See \ref igraph_modularity() for more details.
  *
  * </para><para>
  * The original version of this function was contributed by Tom Gregorovic.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Blondel, V. D., Guillaume, J.-L., Lambiotte, R., &amp; Lefebvre, E.:
+ * Fast unfolding of communities in large networks.
+ * Journal of Statistical Mechanics: Theory and Experiment, 10008(10), 6 (2008).
+ * https://doi.org/10.1088/1742-5468/2008/10/P10008
  *
  * \param graph       The input graph. It must be an undirected graph.
  * \param weights     Numeric vector containing edge weights. If \c NULL, every edge

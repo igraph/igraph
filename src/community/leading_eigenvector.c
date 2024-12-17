@@ -45,13 +45,14 @@
  * eigenvectors of matrices, Phys Rev E 74:036104 (2006).</para>
  *
  * <para>
- * The heart of the method is the definition of the modularity matrix,
- * B, which is B=A-P, A being the adjacency matrix of the (undirected)
- * network, and P contains the probability that certain edges are
- * present according to the <quote>configuration model</quote> In
- * other words, a Pij element of P is the probability that there is an
- * edge between vertices i and j in a random network in which the
- * degrees of all vertices are the same as in the input graph.</para>
+ * The heart of the method is the definition of the modularity matrix
+ * <code>B = A - P</code>, \c A being the adjacency matrix of the (undirected)
+ * network, and \c P contains the probability that certain edges are
+ * present according to the <quote>configuration model</quote>. In
+ * other words, a \c P_ij element of \c P is the probability that there is an
+ * edge between vertices \c i and \c j in a random network in which the
+ * degrees of all vertices are the same as in the input graph. See
+ * \ref igraph_modularity_matrix() for more details.</para>
  *
  * <para>
  * The leading eigenvector method works by calculating the eigenvector
@@ -252,11 +253,11 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    community detection functions in igraph, the integers in this matrix
  *    represent community indices, not vertex indices. If at the end of
  *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
- *    communities, then these are numbered from zero to <quote>p-1</quote>.
+ *    communities, then these are numbered from zero to <code>p-1</code>.
  *    The first line of the matrix contains the first <quote>merge</quote>
  *    (which is in reality the last split) of two communities into
- *    community <quote>p</quote>, the merge in the second line forms
- *    community <quote>p+1</quote>, etc. The matrix should be
+ *    community <code>p</code>, the merge in the second line forms
+ *    community <code>p+1</code>, etc. The matrix should be
  *    initialized before calling and will be resized as needed.
  *    This argument is ignored if it is \c NULL.
  * \param membership The membership of the vertices after all the
@@ -380,7 +381,7 @@ igraph_error_t igraph_community_leading_eigenvector(
 
     if (start && membership &&
         igraph_vector_int_size(membership) != no_of_nodes) {
-        IGRAPH_ERROR("Supplied memberhsip vector length does not match number of vertices.",
+        IGRAPH_ERROR("Supplied membership vector length does not match number of vertices.",
                      IGRAPH_EINVAL);
     }
 
@@ -554,13 +555,19 @@ igraph_error_t igraph_community_leading_eigenvector(
                     igraph_set_error_handler(igraph_i_error_handler_none);
             retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
-            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
-                IGRAPH_ERROR("ARPACK call failed", retval);
+            if (retval == IGRAPH_EARPACK) {
+                /* TODO(ntamas): get last ARPACK error code. Some errors are OK. */
+                igraph_arpack_error_t arpack_error = igraph_arpack_get_last_error();
+                if (arpack_error != IGRAPH_ARPACK_MAXIT && arpack_error != IGRAPH_ARPACK_NOSHIFT) {
+                    IGRAPH_ERROR(igraph_arpack_error_to_string(arpack_error), IGRAPH_EARPACK);
+                }
+            } else if (retval != IGRAPH_SUCCESS) {
+                IGRAPH_ERROR("Leading eigenvector calculation failed.", retval);
             }
         }
 
         if (options->nconv < 1) {
-            IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
+            IGRAPH_ERROR(igraph_arpack_error_to_string(IGRAPH_ARPACK_FAILED), IGRAPH_EARPACK);
         }
 
         /* Ok, we have the leading eigenvector of the modularity matrix */

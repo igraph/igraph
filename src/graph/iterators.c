@@ -444,7 +444,7 @@ igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs, const igraph_vector_int_t 
  *
  * Time complexity: O(1).
  *
- * \example examples/simple/igraph_vs_seq.c
+ * \example examples/simple/igraph_vs_range.c
  */
 
 igraph_error_t igraph_vs_range(igraph_vs_t *vs, igraph_integer_t start, igraph_integer_t end) {
@@ -472,52 +472,6 @@ igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end) {
     vs.data.range.start = start;
     vs.data.range.end = end;
     return vs;
-}
-
-/**
- * \function igraph_vs_seq
- * \brief Vertex set, an interval of vertices with inclusive endpoints (deprecated).
- *
- * Creates a vertex selector containing all vertices with vertex ID
- * equal to or bigger than \p from and equal to or smaller than \p to.
- * Note that both endpoints are inclusive, contrary to C conventions.
- *
- * \deprecated-by igraph_vs_range 0.10.0
- *
- * \param vs Pointer to an uninitialized vertex selector object.
- * \param from The first vertex ID to be included in the vertex selector.
- * \param to The last vertex ID to be included in the vertex selector.
- * \return Error code.
- * \sa \ref igraph_vs_range(), \ref igraph_vss_seq(), \ref igraph_vs_destroy()
- *
- * Time complexity: O(1).
- *
- * \example examples/simple/igraph_vs_seq.c
- */
-
-igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to) {
-    *vs = igraph_vss_range(from, to + 1);
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_vss_seq
- * \brief An interval of vertices with inclusive endpoints (immediate version, deprecated).
- *
- * The immediate version of \ref igraph_vs_seq().
- *
- * \deprecated-by igraph_vss_range 0.10.0
- *
- * \param from The first vertex ID to be included in the vertex selector.
- * \param to The last vertex ID to be included in the vertex selector.
- * \return Error code.
- * \sa \ref igraph_vss_range(), \ref igraph_vs_seq()
- *
- * Time complexity: O(1).
- */
-
-igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
-    return igraph_vss_range(from, to + 1);
 }
 
 /**
@@ -915,13 +869,16 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
  * \param es Pointer to an uninitialized edge selector object.
  * \param order Constant giving the order in which the edges will be
  *        included in the selector. Possible values:
- *        \c IGRAPH_EDGEORDER_ID, edge ID order.
- *        \c IGRAPH_EDGEORDER_FROM, vertex ID order, the id of the
- *           \em source vertex counts for directed graphs. The order
- *           of the incident edges of a given vertex is arbitrary.
- *        \c IGRAPH_EDGEORDER_TO, vertex ID order, the ID of the \em
- *           target vertex counts for directed graphs. The order
- *           of the incident edges of a given vertex is arbitrary.
+ *        \clist
+ *        \cli IGRAPH_EDGEORDER_ID
+ *        Edge ID order; currently performs the fastest.
+ *        \cli IGRAPH_EDGEORDER_FROM
+ *        Vertex ID order, the id of the \em source vertex counts for directed
+ *        graphs. The order of the incident edges of a given vertex is arbitrary.
+ *        \cli IGRAPH_EDGEORDER_TO
+ *        Vertex ID order, the ID of the \em target vertex counts for directed
+ *        graphs. The order of the incident edges of a given vertex is arbitrary.
+ *        \endclist
  *        For undirected graph the latter two is the same.
  * \return Error code.
  * \sa \ref igraph_ess_all(), \ref igraph_es_destroy()
@@ -1191,47 +1148,6 @@ igraph_es_t igraph_ess_range(igraph_integer_t start, igraph_integer_t end) {
 }
 
 /**
- * \function igraph_es_seq
- * \brief Edge selector, a sequence of edge IDs, with inclusive endpoints (deprecated).
- *
- * All edge IDs between \p from and \p to (inclusive) will be
- * included in the edge selection.
- *
- * \deprecated-by igraph_es_range 0.10.0
- *
- * \param es Pointer to an uninitialized edge selector object.
- * \param from The first edge ID to be included.
- * \param to The last edge ID to be included.
- * \return Error code.
- * \sa \ref igraph_ess_seq(), \ref igraph_es_destroy()
- *
- * Time complexity: O(1).
- */
-
-igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to) {
-    *es = igraph_ess_range(from, to + 1);
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_ess_seq
- * \brief Immediate version of the sequence edge selector, with inclusive endpoints.
- *
- * \deprecated-by igraph_ess_range 0.10.0
- *
- * \param from The first edge ID to include.
- * \param to The last edge ID to include.
- * \return The initialized edge selector.
- * \sa \ref igraph_es_seq()
- *
- * Time complexity: O(1).
- */
-
-igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
-    return igraph_ess_range(from, to + 1);
-}
-
-/**
  * \function igraph_es_pairs
  * \brief Edge selector, multiple edges defined by their endpoints in a vector.
  *
@@ -1426,7 +1342,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int
  *
  * Time complexity: O(1).
  */
-IGRAPH_EXPORT igraph_error_t igraph_es_all_between(
+igraph_error_t igraph_es_all_between(
     igraph_es_t *es, igraph_integer_t from, igraph_integer_t to,
     igraph_bool_t directed
 ) {
@@ -1948,7 +1864,7 @@ static igraph_error_t igraph_i_eit_all_between(
  *
  * Time complexity: depends on the type of the edge selector. For edge
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
- * \ref igraph_es_1(), \ref igraph_es_vector(), \ref igraph_es_seq() it is
+ * \ref igraph_es_1(), \ref igraph_es_vector(), \ref igraph_es_range() it is
  * O(1). For \ref igraph_es_incident() it is O(d) where d is the number of
  * incident edges of the vertex.
  */
@@ -1982,7 +1898,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
         if (eit->pos >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_EINVEID);
         }
         break;
     case IGRAPH_ES_VECTOR:
@@ -1993,7 +1909,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
         eit->vec = es.data.vecptr;
         eit->end = igraph_vector_int_size(eit->vec);
         if (!igraph_vector_int_isininterval(eit->vec, 0, igraph_ecount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create iterator.", IGRAPH_EINVEID);
         }
         break;
     case IGRAPH_ES_RANGE:
@@ -2002,10 +1918,10 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
             if (es.data.range.start < 0 ||
                 es.data.range.start > no_of_edges ||
                 (no_of_edges > 0 && es.data.range.start == no_of_edges)) {
-                IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVEID);
             }
             if (es.data.range.end < 0 || es.data.range.end > no_of_edges) {
-                IGRAPH_ERROR("Cannot create range iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Cannot create range iterator, ending edge ID out of range.", IGRAPH_EINVEID);
             }
         }
         eit->type = IGRAPH_EIT_RANGE;

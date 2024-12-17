@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2020-2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2020-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -91,10 +91,10 @@ int main(void) {
     ud.list = &list;
 
     /* Check that the callback function finds the same cliques as igraph_maximal_cliques() */
-    igraph_maximal_cliques_callback(&graph, &handler, (void *) &ud, 0, 0);
+    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, &handler, (void *) &ud, 0, 0) == IGRAPH_SUCCESS);
 
     /* Check that the search can be stopped correctly */
-    igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0);
+    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0) == IGRAPH_SUCCESS);
 
     igraph_vector_int_list_destroy(&list);
 

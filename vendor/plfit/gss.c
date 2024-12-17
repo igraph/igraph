@@ -22,7 +22,6 @@
 #include <string.h>
 #include "plfit_error.h"
 #include "gss.h"
-#include "platform.h"
 
 /**
  * \def PHI

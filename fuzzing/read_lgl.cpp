@@ -18,7 +18,7 @@
    02110-1301 USA
 */
 
-#include "igraph.h"
+#include <igraph.h>
 #include <cstdio>
 
 extern "C"
@@ -39,6 +39,15 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // Do the fuzzing
     igraph_t g;
     if (igraph_read_graph_lgl(&g, ifile, 1, IGRAPH_ADD_WEIGHTS_IF_PRESENT, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
+
+        FILE *ofile = fopen("/dev/null", "w");
+        if (ofile) {
+            // The "weight" attribute may not exist.
+            // In this case it is ignored with a warning.
+            igraph_write_graph_lgl(&g, ofile, "name", "weight", true);
+            fclose(ofile);
+        }
+
         // Clean up
         igraph_destroy(&g);
     }

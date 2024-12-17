@@ -10,9 +10,11 @@ on:
   pull_request:
 
 env:
+  CMAKE_COLOR_DIAGNOSTICS: ON
   OMP_NUM_THREADS: 1
   CCACHE_DIR: ${{ github.workspace }}/ccache
   CCACHE_MAXSIZE: 128M
+  CTEST_PARALLEL_LEVEL: 0 # Since CMake 3.29, a setting of 0 will try to use all available resources
 
 jobs:
   build:
@@ -54,7 +56,7 @@ jobs:
           cmake .. -GNinja -DBUILD_SHARED_LIBS=${{ matrix.shared_libs == 'shared' && 'ON' || 'OFF' }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DIGRAPH_PRINT_ARITH_HEADER=ON -DFLEX_KEEP_LINE_NUMBERS=ON -DFORCE_COLORED_OUTPUT=ON -DIGRAPH_OPENMP_SUPPORT=ON
 
       - name: Ccache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.CCACHE_DIR }}
           key: ccache-msys2-${{ matrix.arch }}-${{ matrix.shared_libs }}-${{ github.ref_name }}-${{ github.sha }}
@@ -69,7 +71,7 @@ jobs:
 
       # The glpk_error test is temporarily disabled, see https://github.com/igraph/igraph/issues/1850
       - name: Test
-        run: ctest -j $(nproc) --exclude-regex glpk_error --output-on-failure --timeout 180
+        run: ctest --exclude-regex glpk_error --output-on-failure --timeout 180
         working-directory: build-${{ matrix.arch }}
 
       - name: Ccache stats
@@ -79,7 +81,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: failure-${{ matrix.arch }}
+          name: failure-${{ matrix.arch }}-${{ matrix.shared_libs }}
           path: |
             build-${{ matrix.arch }}/tests/*
             !build-${{ matrix.arch }}/tests/*.exe

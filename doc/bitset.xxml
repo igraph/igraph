@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Bitsets">
+<title>Bitsets</title>
+
+<section id="igraph_bitset_t">
+<!-- doxrox-include about_igraph_bitset_t_objects -->
+</section>
+
+<section id="bitset-constructors-and-destructors">
+<!-- doxrox-include igraph_bitset_constructors_and_destructors -->
+<!-- doxrox-include igraph_bitset_init -->
+<!-- doxrox-include igraph_bitset_init_copy -->
+<!-- doxrox-include igraph_bitset_destroy -->
+</section>
+
+<section id="bitset-accessing-elements">
+<!-- doxrox-include igraph_bitset_accessing_elements -->
+<!-- doxrox-include IGRAPH_BIT_MASK -->
+<!-- doxrox-include IGRAPH_BIT_SLOT -->
+<!-- doxrox-include IGRAPH_BIT_SET -->
+<!-- doxrox-include IGRAPH_BIT_CLEAR -->
+<!-- doxrox-include IGRAPH_BIT_TEST -->
+<!-- doxrox-include IGRAPH_BIT_NSLOTS -->
+</section>
+
+<section id="bitset-operations"><title>Bitset operations</title>
+<!-- doxrox-include igraph_bitset_fill -->
+<!-- doxrox-include igraph_bitset_null -->
+<!-- doxrox-include igraph_bitset_or -->
+<!-- doxrox-include igraph_bitset_and -->
+<!-- doxrox-include igraph_bitset_xor -->
+<!-- doxrox-include igraph_bitset_not -->
+<!-- doxrox-include igraph_bitset_popcount -->
+<!-- doxrox-include igraph_bitset_countl_zero -->
+<!-- doxrox-include igraph_bitset_countl_one -->
+<!-- doxrox-include igraph_bitset_countr_zero -->
+<!-- doxrox-include igraph_bitset_countr_one -->
+<!-- doxrox-include igraph_bitset_is_all_zero -->
+<!-- doxrox-include igraph_bitset_is_all_one -->
+<!-- doxrox-include igraph_bitset_is_any_zero -->
+<!-- doxrox-include igraph_bitset_is_any_one -->
+</section>
+
+<section id="bitset-properties"><title>Bitset properties</title>
+<!-- doxrox-include igraph_bitset_size -->
+<!-- doxrox-include igraph_bitset_capacity -->
+</section>
+
+<section id="bitset-resizing-operations"><title>Resizing operations</title>
+<!-- doxrox-include igraph_bitset_reserve -->
+<!-- doxrox-include igraph_bitset_resize -->
+</section>
+
+<section id="bitset-copying"><title>Copying bitsets</title>
+<!-- doxrox-include igraph_bitset_update -->
+</section>
+
+</section>

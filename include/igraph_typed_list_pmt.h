@@ -103,8 +103,8 @@ IGRAPH_EXPORT void FUNCTION(remove_consecutive_duplicates)(TYPE *v, igraph_bool_
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t *index);
 IGRAPH_EXPORT igraph_error_t FUNCTION(reverse)(TYPE *v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2);
-IGRAPH_EXPORT igraph_error_t FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
+IGRAPH_EXPORT void FUNCTION(swap)(TYPE *v1, TYPE *v2);
+IGRAPH_EXPORT void FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
 
 /*-----------*/
 /* Sorting   */

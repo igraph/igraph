@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ typedef struct igraph_lazy_adjlist2_t {
     igraph_loops_t loops;
     igraph_multiple_t multiple;
 } igraph_lazy_adjlist2_t;
+
 igraph_error_t igraph_lazy_adjlist2_init(const igraph_t *graph,
                              igraph_lazy_adjlist2_t *al,
                              igraph_neimode_t mode,
@@ -67,8 +68,9 @@ void igraph_lazy_adjlist2_destroy(igraph_lazy_adjlist2_t *al) {
     IGRAPH_FREE(al->data);
 }
 
-igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(igraph_lazy_adjlist2_t *al,
-        igraph_integer_t pno) {
+igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(
+    igraph_lazy_adjlist2_t *al, igraph_integer_t pno
+) {
     igraph_integer_t no = pno;
     igraph_error_t ret;
 

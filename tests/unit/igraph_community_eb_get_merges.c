@@ -105,7 +105,7 @@ int main(void) {
         igraph_small(&g, 6, IGRAPH_UNDIRECTED, -1);
         igraph_integer_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
         igraph_vector_int_view(&edges, edge_array, 7);
-        CHECK_ERROR(igraph_community_eb_get_merges(&g, 1, &edges, NULL, NULL, NULL, NULL, NULL), IGRAPH_EINVAL);
+        CHECK_ERROR(igraph_community_eb_get_merges(&g, 1, &edges, NULL, NULL, NULL, NULL, NULL), IGRAPH_EINVEID);
         igraph_destroy(&g);
     }
     {

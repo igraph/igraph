@@ -4,25 +4,71 @@
 
 ### Breaking changes
 
+ - igraph now requires a C++ compiler that supports the C++14 standard.
  - Interruption handlers do not take a `void*` argument any more; this is relevant to maintainers of higher-level interfaces only.
  - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
+ - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
  - `igraph_delete_vertices_map()` (formerly called `igraph_delete_vertices_idx()`) and `igraph_induced_subgraph_map()` now use -1 to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. (Note that the inverse map always behaved this way, this change makes the two mappings consistent).
  - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
  - `igraph_vector_shuffle()` no longer returns an error code.
  - `igraph_vector_swap()` no longer returns an error code.
  - `igraph_matrix_swap()` no longer returns an error code.
- - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
+ - `igraph_vector_list_swap()` and `igraph_graph_list_swap()` no longer return an error code.
+ - `igraph_vector_swap_elements()` no longer returns an error code.
+ - `igraph_vector_reverse()` no longer returns an error code.
+ - `igraph_vector_list_swap_elements()` and `igraph_graph_list_swap_elements()` no longer return an error code.
  - `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices to create vertex pairs of, instead of one.
+ - `igraph_subisomorphic_lad()` does not have a CPU time limit parameter any more. If you wish to stop the calculation from another thread or a higher level interface, use igraph's interruption mechanism.
  - `igraph_read_graph_ncol()` and `igraph_read_graph_lgl()` now uses a default edge weight of 1 instead of 0 for files that do not contain edge weights for at least some of the edges.
+ - `igraph_count_automorphisms()` has been renamed to `igraph_count_automorphisms_bliss()` because it has a BLISS-specific interface. A new `igraph_count_automorphisms()` function was added with a simplified interface that does not depend on BLISS.
+ - `igraph_automorphism_group()` has been renamed to `igraph_automorphism_group_bliss()` because it has a BLISS-specific interface. A new `igraph_automorphism_group()` function was added with a simplified interface that does not depend on BLISS.
+ - `igraph_canonical_permutation()` has been renamed to `igraph_canonical_permutation_bliss()` because it has a BLISS-specific interface. A new `igraph_canonical_permutation()` function was added with a simplified interface that does not depend on BLISS.
+ - The `IGRAPH_EINVEVECTOR` error code was removed; `igraph_create()` and `igraph_add_edges()` that used to return this error code for invalid edge vectors will now return `IGRAPH_EINVAL` instead.
+ - The `IGRAPH_NONSQUARE` error code was removed; functions that used this error code now return `IGRAPH_EINVAL` instead when encountering a non-square matrix.
+ - The `IGRAPH_EGLP` error code and all other GLP-specific error codes (starting with `IGRAPH_GLP_`) were removed; functions that used this error code now return `IGRAPH_FAILURE` instead, providing more details in the message associated to the error code.
+ - The `IGRAPH_ELAPACK` error code was removed; functions that used this error code now return `IGRAPH_FAILURE` instead, providing more details in the message associated to the error code.
+ - The `IGRAPH_CPUTIME` error code was removed in favour of the interruption mechanism built into igraph.
+ - The unused `IGRAPH_EDIVZERO` and `IGRAPH_EATTRIBUTES` error codes were removed with no replacement.
+ - ARPACK-specific error codes (starting with `IGRAPH_ARPACK_...`) were replaced with a single `IGRAPH_EARPACK` error code. Details about the underlying ARPACK failure are provided in the error message.
+ - A new error code called `IGRAPH_EINVEID` was added for cases when an invalid edge ID was encountered in an edge ID vector.
+ - `igraph_progress()`, `igraph_progressf()` and `IGRAPH_PROGRESS()` do not convert error codes to `IGRAPH_INTERRUPTED` any more. Any error code returned from the progress handler function is forwarded intact to the caller. If you want to trigger the interruption of the current calculation from the progress handler without reporting an error, report `IGRAPH_INTERRUPTED` explicitly. It is the responsibility of higher-level interfaces to handle this error code appropriately.
+ - `igraph_status()`, `igraph_statusf()` and their macro versions (`IGRAPH_STATUS()` and `IGRAPH_STATUSF()`) do not convert error codes to `IGRAPH_INTERRUPTED` any more. Any error code returned from the status handler function is forwarded intact to the caller. If you want to trigger the interruption of the current calculation from the status handler without reporting an error, report `IGRAPH_INTERRUPTED` explicitly. It is the responsibility of higher-level interfaces to handle this error code appropriately.
+ - `igraph_community_edge_betweenness()` now takes both a `weights` and a `lengths` parameter. Egde weights (interpreted as connection strengths) are used to divide betweenness scores before selecting them for removal as well as for the modularity computation. Edge lengths are used for defining shortest path lengths during the betweenness computation. This fixes issues #2229 and #1040.
+ - `igraph_get_biadjacency()` now takes a `weights` parameter, and can optionally create weighted biadjacency matrices.
+ - `igraph_community_label_propagation()` changed signature to allow specification of LPA variants. A new fast label propagation variant was added.
+ - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` now use a `mode` parameter with possible values `IGRAPH_OUT`, `IGRAPH_IN` or `IGRAPH_ALL` to control how edge directions are considered. Previously they used a boolean `directed` parameter.
+ - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` no longer have a `scale` parameter. The result is now always scaled so that the largest centrality value is 1.
+ - `igraph_hub_and_authority_scores()` no longer has a `scale` parameter. The result is now always scaled so that the largest hub and authority scores are each 1.
+ - `igraph_minimum_spanning_tree()` takes a new `method` parameter that controls the algorithm used for finding the spanning tree. Kruskal's algorithm was added.
+ - `igraph_get_all_simple_paths()` returns its results in an integer vector list (`igraph_vector_int_list_t`) instead of a single integer vector.
+ - `igraph_get_all_simple_paths()` now has an additional parameter that allows restricting paths by minimum length as well.
+ - `igraph_strvector_print()` no longer takes a file parameter. Use `igraph_strvector_fprint()` to print to a file.
+ - `igraph_community_optimal_modularity()` now takes a `resolution` parameter and its `weight` parameter was moved to the second place.
 
 ### Added
 
- - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges
- - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges
+ - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
+ - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges.
+ - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges.
+ - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
+ - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
+ - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
+ - `igraph_strvector_fprint()` prints a string vector to a file.
 
 ### Changed
 
  - The Pajek format reader and writer now map vertex labels to the `name` vertex attribute in igraph. The `id` attribute is no longer used.
+ - `igraph_minimum_size_separators()` no longer returns any separating vertex sets for complete graphs. Prior to igraph 1.0, it would return all `n - 1` size vertex subsets where `n` is the vertex count.
+ - `igraph_community_edge_betweenness()` now treats edges with large weights as strong connections.
+ - `igraph_biadjacency()` now truncates non-integer matrix entries to their integer part instead of rounding them up. This brings consistency with related functions such as `igraph_adjacency()`.
+ - The order of edges in the graph returned by `igraph_(weighted_)adjacency()` and `igraph_biadjacency()` has changed. Note that these functions do not guarantee any specific edge order.
+ - `igraph_eigenvector_centrality()` now warns about eigenvector centralities equal to zero, as these indicate a disconnected graph, for which eigenvector centrality is not meaningful.
+ - `igraph_hub_and_authority_scores()` now warns when a large fraction of centrality scores are zero, as this indicates a non-unique solution, and thus the returned result may not be meaningful.
+ - `igraph_hub_and_authority_scores()` now warns when providing an undirected graph as input, and falls back to the equivalent eigenvector centrality computation.
+ - `igraph_get_stochastic_sparse()` no longer throws an error when some row or column sums are zero. This brings its behaviour in line with `igraph_get_stochastic()`.
+ - `igraph_vector_append()`, `igraph_strvector_append()` and `igraph_vector_ptr_append()` now use a different allocation strategy: if the `to` vector has insufficient capacity, they double its capacity. Previously they reserved precisely as much capacity as needed for appending the `from` vector.
+ - `igraph_degree_sequence_game()` no longer interprets an empty in-degree vector as a request for generating undirected graphs. To generate undirected graphs, pass `NULL` for in-degrees.
+ - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`, `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` no longer interprets an empty `outseq` vector as a missing out-degree sequence. Pass `NULL` if you don't wish to specify an out-degree sequence.
 
 ### Fixed
 
@@ -31,19 +77,250 @@
 ### Removed
 
  - Removed `igraph_Calloc()`, `igraph_Realloc()` and `igraph_Free()`. Use `IGRAPH_CALLOC()`, `IGRAPH_REALLOC()` and `IGRAPH_FREE()` instead.
+ - The deprecated `igraph_automorphisms()` was removed. Use `igraph_count_automorphisms()` or `igraph_count_automorphisms_bliss()` instead.
+ - The deprecated `igraph_decompose_destroy()` was removed.
+ - The deprecated `igraph_hub_score()` and `igraph_authority_score()` were removed.
+ - The deprecated `igraph_vector_copy()` and `igraph_matrix_copy()` were removed. Use `igraph_vector_init_copy()` and `igraph_matrix_init_copy()` instead.
+ - The deprecated `igraph_vector_e()`, `igraph_vector_e_ptr()`, `igraph_matrix_e()` and `igraph_matrix_e_ptr()` were removed. Use the alternatives ending in `_get()` and `_get_ptr()` instead.
+ - The deprecated `igraph_vs_seq()`, `igraph_vss_seq()`, `igraph_es_seq()`, `igraph_ess_range()`, and `igraph_vector_init_seq()` were removed. Use the `range` alternatives instead of the old `seq` ones.
+ - The deprecated `igraph_erdos_renyi_game()` and `igraph_bipartite_game()` were removed. Use the corresponding functions with `_gnm()` and `_gnp()` in the name instead.
+ - The deprecated `igraph_tree()` was removed. Use `igraph_kary_tree()` instead.
+ - The deprecated `igraph_lattice()` was removed. Use `igraph_square_lattice()` instead.
+ - The deprecated `igraph_minimum_spanning_tree_prim()` was removed. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+ - The deprecated `igraph_minimum_spanning_tree_unweighted()` was removed. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+ - The deprecated `igraph_get_sparsemat()` was removed. Use `igraph_get_adjacency_sparse()` instead.
+ - The deprecated `igraph_get_stochastic_sparsemat()` was removed. Use `igraph_get_stochastic_sparse()` instead.
+ - The deprecated `igraph_are_connected()` was removed. Use `igraph_are_adjacent()` instead.
+ - The deprecated `igraph_laplacian()` was removed. Use `igraph_get_laplacian()` or `igraph_get_laplacian_sparse()` instead.
+ - The deprecated `igraph_subgraph_edges()` was removed. Use `igraph_subgraph_from_edges()` instead.
+ - The deprecated `igraph_read_graph_dimacs()` and `igraph_write_graph_dimacs()` were removed. These names may be re-used in the future. Use `igraph_read_graph_dimacs_flow()` and `igraph_write_graph_dimacs_flow()` instead.
+ - The deprecated `igraph_isomorphic_function_vf2()` was removed. Use `igraph_get_isomorphisms_vf2_callback()` instead.
+ - The deprecated `igraph_subisomorphic_function_vf2()` was removed. Use `igraph_get_subisomorphisms_vf2_callback()` instead.
+ - The deprecated `igraph_isomorphic_34()` was removed. Its functionality is accessible through `igraph_isomorphic()`.
+ - The deprecated `igraph_transitive_closure_dag()` was removed. Use `igraph_transitive_closure()` instead, which works for all graphs, not just DAGs.
+ - The deprecated `igraph_vector_move_interval2()` was removed.
+ - The deprecated `igraph_sparsemat_copy()` was removed. Use `igraph_sparsemat_init_copy()` instead.
+ - The deprecated `igraph_sparsemat_eye()` was removed. Use `igraph_sparsemat_init_eye()` instead.
+ - The deprecated `igraph_sparsemat_diag()` was removed. Use `igraph_sparsemat_init_diag()` instead.
+ - The deprecated `igraph_zeroin()` was removed.
+ - The deprecated `igraph_random_edge_walk()` was removed. Its functionality is incorporated in `igraph_random_walk()`.
+ - The deprecated `igraph_vector_qsort_ind()` was removed. Use `igraph_vector_sort_ind()` instead.
+ - The deprecated `igraph_vector_binsearch2()` was removed. Use `igraph_vector_contains_sorted()` instead.
 
 ### Deprecated
 
 - `igraph_delete_vertices_idx()` is now deprecated in favour of `igraph_delete_vertices_map()`, which is functionally equivalent but has a name that is consistent with `igraph_induced_subgraph_map()`.
 
+### Other
+
+ - Improved performance when creating graphs from dense adjacency matrices (`igraph_adjacency()` and `igraph_weighted_adjacency()`).
+
 ## [master]
+
+### Deprecated
+
+ - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
+
+### Other
+
+ - Workaround for bug in CMake 3.31.0, see https://gitlab.kitware.com/cmake/cmake/-/issues/26449
+ - Updated the vendored `plfit` library to version 1.0.0. This works around a bug in some MSVC / Windows SDK versions that define a `NAN` macro that is not a compile-time constant.
+ - Updated vendored BLAS to 3.12.0 and vendored ARPACK to ARPACK-NG 3.7.0.
+ - Re-translated vendored BLAS/LAPACK/ARPACK sources with f2c version 20240504.
+ - Documentation improvements.
+
+## [0.10.15]
+
+### Added
+
+ - `igraph_bitset_update()` copies the contents of one bitset into another (experimental function).
+ - `igraph_vector_sort_ind()` (rename of `igraph_vector_qsort_ind()`).
+ - `igraph_vector_contains_sorted()` (rename of `igraph_vector_binsearch2()`).
+ - `igraph_vector_reverse_section()` reverses a contiguous section of a vector.
+ - `igraph_vector_rotate_left()` applies a cyclic permutation to a vector.
+ - `igraph_strvector_swap_elements()` swaps two strings in an `igraph_strvector_t`.
+ - `igraph_find_cycle()` finds a single cycle in a graph, if it exists (experimental function).
+ - `igraph_feedback_vertex_set()` finds a minimum feedback vertex set in a directed or undirected graph (experimental function).
+ - `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` find all simple cycles in a graph, optionally with an upper bound on the cycle length (experimental functions). Many thanks to Tim Bernhard @GenieTim for contributing this functionality in #2181.
+
+### Changed
+
+ - `igraph_feedback_arc_set()` uses a much faster method for solving the exact minimum feedback arc set problem. The new method (`IGRAPH_FAS_EXACT_IP_CG`) is used by default (i.e. with `IGRAPH_FAS_EXACT_IP`), but the previous method is also kept available (`IGRAPH_FAS_EXACT_IP_TI`).
+ - `igraph_motifs_randesu()`, `igraph_motifs_randesu_callback()`, `igraph_motifs_randesu_estimate()` and `igraph_motifs_randesu_no()` now accept `NULL` for their `cut_prob` parameter, signifying that a complete search should be performed.
+ - `igraph_centralization_eigenvector_centrality_tmax()` and `igraph_centralization_eigenvector_centrality()` cannot produce meaningful results without normalizing vertex-level eigenvector centrality in a well-defined way. This was not the case when using `scale=false`. These functions now ignore the value of the `scale` parameter and always scale vertex-level centrality scores to have a maximum of 1. If you require a different type of normalization for the vertex-level eigenvector centrality scores, perform this normalization manually, and call `igraph_centralization()` to compute the centralization.
+ - When `igraph_eigenvector_centrality()` receives a directed acyclic graph as input, it now produces an eigenvector which has 1s in sink vertices and 0s everywhere else. Previously, it would return an all-zero vector. Note that eigenvector centrality is not uniquely defined for graphs that are not (strongly) connected, and both of these results can be considered valid. This change is to ensure consistency with the definition of the theoretical maximum of eigenvector centralization, which assumes the in-star to be the most centralized directed network.
+
+### Fixed
+
+ - `igraph_layout_drl()` and `igraph_layout_drl_3d()` would crash with an assertion failure when interrupted. This is now fixed.
+ - Removed broken interruption support from `igraph_community_spinglass_single()`.
+ - In rare cases `igraph_community_multilevel()` could enter an infinite loop. This is now corrected.
+ - Fixed null-dereference in `igraph_community_voronoi()` when requesting `modularity` but not `membership`.
+ - Fixed null-dereference in `igraph_community_optimal_modularity()` when requesting `modularity` but not `membership` and passing a null graph or singleton graph.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash when passing `distances=NULL` and `distances_are_weights=true`. This is now fixed.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` would crash on interruption. This is now fixed.
+ - `igraph_read_graph_pajek()` now warns about duplicate vertex IDs in input files.
+ - The documented `igraph_strvector_resize_min()` was missing from headers.
+ - `igraph_feedback_arc_set()` now validates the edge weights.
+ - `igraph_layout_lgl()` was not working correctly since igraph 0.10.0 due to a poor choice of initial coordinates. This is now fixed.
+ - `igraph_centralization_degree_tmax()`, `igraph_centralization_betweenness_tmax()`, `igraph_centralization_closeness_tmax()`, and `igraph_centralization_eigenvector_centrality_tmax()` now validate their `nodes` parameter.
+ - `igraph_centralization_degree_tmax()`, `igraph_centralization_betweenness_tmax()`, `igraph_centralization_closeness_tmax()`, and `igraph_centralization_eigenvector_centrality_tmax()` now return NaN for zero-vertex graphs. Previously they would return invalid values.
+ - `igraph_centralization_eigenvector_centrality_tmax()` now returns 0 for the undirected singleton graph. Previous it would return an invalid value.
+ - `igraph_motifs_randesu_estimate()` now validates the sample size.
+ - `igraph_bipartite_projection_size()` now validates the bipartite `types` vector.
+
+### Deprecated
+
+ - `igraph_minimum_spanning_tree_prim()` and `igraph_minimum_spanning_tree_unweighted()` are deprecated. Use `igraph_minimum_spanning_tree()` in conjunction with `igraph_subgraph_from_edges()` instead.
+ - `igraph_array3_t` and all associated functions are deprecated and scheduled for removal in igraph 1.0.
+ - `igraph_vector_qsort_ind()` is deprecated in favour of `igraph_vector_sort_ind()`.
+ - `igraph_vector_binsearch2()` is deprecated in favour of `igraph_vector_contains_sorted()`.
+
+### Other
+
+ - Fixed multiple memory leaks in benchmark programs.
+ - Documentation improvements.
+
+## [0.10.13]
+
+### Added
+
+ - `igraph_bitset_fill()` sets all elements of a bitset to the same value (experimental function).
+ - `igraph_bitset_null()` clears all elements of a bitset (experimental function).
+ - `igraph_bitset_is_all_zero()`, `igraph_bitset_is_all_one()`, `igraph_bitset_is_any_zero()`, `igraph_bitset_is_any_one()` check if any/all elements of a bitset are zeros/ones (experimental functions).
+ - `igraph_chung_lu_game()` implements the classic Chung-Lu model, as well as a number of its variants (experimental function).
+ - `igraph_mean_degree()` computes the average of vertex degrees (experimental function).
+ - `igraph_count_loops()` counts self-loops in the graph (experimental function).
+ - `igraph_is_clique()` checks if all pairs within a set of vertices are connected (experimental function).
+ - `igraph_is_independent_vertex_set()` checks if no pairs within a set of vertices are connected (experimental function).
+ - `igraph_hypercube()` creates a hypercube graph (experimental function).
+ - `igraph_vector_intersection_size_sorted()` counts elements common to two sorted vectors (experimental function).
+ - `igraph_stack_capacity()` returns the allocated capacity of a stack.
+ - `igraph_vector_is_all_finite()` checks if all elements in a vector are finite (i.e. neither NaN nor Inf).
+
+### Fixed
+
+ - Fixed a bug that incorrectly cached that a graph has no multiple edges when `igraph_init_adjlist()` was called with `IGRAPH_NO_LOOPS` and `IGRAPH_NO_MULTIPLE` and all the multi-edges were loop edges.
+ - `igraph_is_forest()` would fail to set the result variable when testing for a directed forest, and it was already cached that the graph was not an undirected forest.
+ - `igraph_hub_and_authority_scores()` no longer clips negative results to zeros when negative weights are present.
+ - Fixed an assertion failure in `igraph_realize_bipartite_degree_sequence()` with some non-graphical degree sequences when requesting simple bipartite graphs.
+ - `igraph_static_fitness_game()` checks the input more carefully, and avoids an infinite loop in rare edge cases, such as when (almost) all fitness scores are zero.
+ - `igraph_arpack_rnsolve()` used the incorrect error message text for some errors. This is now corrected.
+ - Corrected the detection of some MSVC-specific bitset intrinsics during configuration.
+ - Corrected a bug in the fallback implementation of `igraph_bitset_countl_zero()` when `IGRAPH_INTEGER_SIZE` was set to 32. This fallback implementation was _not_ used with GCC, Clang, or MSVC.
+
+### Changed
+
+ - `igraph_is_graphical()` and `igraph_is_bigraphical()` are now linear-time in all cases, and generally several times faster than before (thanks to @gendelpiekel, contributed in #2605).
+ - `igraph_erdos_renyi_game_gnp()` can now generate graphs with more than a hundred million vertices.
+ - `igraph_hub_and_authority_scores()` now warns when negative edge weights are present.
+ - `igraph_layout_lgl()` now uses a BFS tree rooted in the vertex specified as `proot` to guide the layout. Previously it used an unspecified (arbitrary) spanning tree.
+ - Updated the internal heuristics used by igraph's ARPACK interface, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, to improve the robustness of calculations.
+ - Updated the initial vector construction in `igraph_hub_and_authority_scores()`, `igraph_eigenvector_centrality()` and `igraph_(personalized_)pagerank()` with `IGRAPH_PAGERANK_ALGO_ARPACK`. This improves the robustness and convergence of calculations.
+
+### Other
+
+ - Documentation improvements.
+ - Reduced the memory usage of several functions by using bitsets instead of boolean vectors.
+ - `igraph_vector_intersect_sorted()` has better performance when the input vector sizes are similar.
+
+## [0.10.12] - 2024-05-06
+
+### Added
+
+ - `igraph_transitive_closure()` computes the transitive closure of a graph (experimental function).
+ - `igraph_reachability()` determines which vertices are reachable from each other in a graph (experimental function).
+ - `igraph_count_reachable()` counts how many vertices are reachable from each vertex (experimental function).
+ - Added a bitset data structure, `igraph_bitset_t`, and a set of corresponding functions (experimental functionality).
+
+### Fixed
+
+ - `igraph_community_label_propagation()` is now interruptible.
+ - `igraph_is_bipartite()` would on rare occasions return invalid results when the cache was employed.
+ - `igraph_weighted_adjacency()` correctly passes through NaN values with `IGRAPH_ADJ_MAX`, and correctly recognizes symmetric adjacency matrices containing NaN values with `IGRAPH_ADJ_UNDIRECTED`.
+ - `igraph_read_graph_gml()` can now read GML files that use ids larger than what is representable on 32 bits, provided that igraph was configured with a 64-bit `igraph_integer_t` size.
+ - Fixed a performance issue in `igraph_read_graph_graphml()` with files containing a very large number of entities, such as `&gt;`.
+ - `igraph_read_graph_pajek()` has improved vertex ID validation that better matches that of Pajek's own behavior.
+
+### Changed
+
+ - `igraph_eigenvector_centrality()` no longer issues a warning when the input is directed and weighted. When using this function, keep in mind that eigenvector centrality is well-defined only for (strongly) connected graphs, and edges with zero weights are effectively treated as absent.
+
+### Deprecated
+
+ - `igraph_transitive_closure_dag()` is deprecated in favour of `igraph_transitive_closure()`
+
+### Other
+
+ - Documentation improvements.
+ - `igraph_strength()` and `igraph_degree(loops=false)` are now faster when calculating values for all vertices (contributed by @gendelpiekel in #2602)
+
+## [0.10.11] - 2024-04-02
+
+### Added
+
+ - `igraph_is_complete()` checks whether there is a connection between all pairs of vertices (experimental function, contributed by Aymeric Agon-Rambosson @aagon in #2510).
+ - `igraph_join()` creates the _join_ of two graphs (experimental function, contributed by Quinn Buratynski @GanzuraTheConsumer in #2508).
+
+### Fixed
+
+ - Fixed a corruption of the "finally" stack in `igraph_write_graph_gml()` for certain invalid GML files.
+ - Fixed a memory leak in `igraph_write_graph_lgl()` when vertex names were present but edge weights were not.
+ - Fixed the handling of duplicate edge IDs in `igraph_subgraph_from_edges()`.
+ - Fixed conversion of sparse matrices to dense with `igraph_sparsemat_as_matrix()` when sparse matrix object did not make use of its full allocated capacity.
+ - `igraph_write_graph_ncol()` and `igraph_write_graph_lgl()` now refuse to write vertex names which would result in an invalid file that cannot be read back in.
+ - `igraph_write_graph_gml()` now ignores graph attributes called `edge` or `node` with a warning. Writing these would create an invalid GML file that igraph couldn't read back.
+ - `igraph_disjoint_union()` and `igraph_disjoint_union_many()` now check for overflow.
+ - `igraph_read_graph_graphml()` now correctly compares attribute values with certain expected values, meaning that prefixes of valid values of `attr.type` are not accepted anymore.
+ - Empty IDs are not allowed any more in `<key>` tags of GraphML files as this is a violation of the GraphML specification.
+ - `igraph_is_separator()` and `igraph_is_minimal_separator()` now work correctly with disconnected graphs.
+ - `igraph_linegraph()` now considers self-loops to be self-adjacent in undirected graphs, bringing consistency with how directed graphs were already handled in previous versions.
+ - `igraph_all_st_mincuts()` now correctly returns all minimum cuts. This also fixes a problem with `igraph_minimum_size_separators()`.
+ - Corrected minor error in `igraph_community_label_propagation()` when adding labels to isolated nodes with some fixed labels present.
+ - `igraph_community_spinglass()` no longer crashes when passing an edgeless graph and an empty weight vector.
+ - `igraph_rewire()` no longer crashes on graphs with more than three vertices but fewer than two edges.
+
+### Changed
+
+ - `igraph_rewire()` on longer throws an error on graphs with fewer than four vertices. These graphs are now returned unchanged, just like other graphs which are the unique realization of their degree sequence.
+
+### Other
+
+ - Performance: `igraph_is_simple()` now makes more granular use of the cache.
+ - Performance: `igraph_degree()` now makes use of the cache when checking for self-loops.
+ - The performance of `igraph_is_minimal_separator()` was improved.
+ - `igraph_is_graphical()` now performs graphicality checks for degree sequences of simple directed graphs in linear time, an improvement from the previously used quadratic algorithm (contributed by Arnar Bjarni Arnarson @Tagl in #2537).
+ - Documentation improvements.
+
+## [0.10.10] - 2024-02-13
+
+### Fixed
+
+ - When `igraph_is_forest()` determined that a graph is not a directed forest, and the `roots` output parameter was set to `NULL`, it would incorrectly cache that the graph is also not an undirected forest.
+ - `igraph_spanner()` now correctly ignores edge directions, and no longer crashes on directed graphs.
+
+### Deprecated
+
+ - `igraph_are_connected()` is renamed to `igraph_are_adjacent()`; the old name is kept available until at least igraph 1.0.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.9] - 2024-02-02
+
+### Added
+
+ - `igraph_is_biconnected()` checks if a graph is biconnected.
+ - `igraph_realize_bipartite_degree_sequence()` constructs a bipartite graph that has the given bidegree sequence, optionally ensuring that it is connected (PR #2425 by Lára Margrét Hólmfríðardóttir @larah19).
 
 ### Fixed
 
  - More robust error handling in HRG code.
  - Fixed infinite loop in `igraph_hrg_sample_many()`.
  - `igraph_community_fastgreedy()` no longer crashes when providing a modularity vector only, but not a merges matrix of membership vector.
- - Compatibility with libxml2 version 2.12.
+ - The graph property cache was not initialized correctly on systems where the size of `bool` was not 1 byte (#2477).
+ - Compatibility with libxml2 version 2.12 (#2442).
 
 ### Deprecated
 
@@ -51,15 +328,16 @@
 
 ### Other
 
- - Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Performance: Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Performance: Improved cache use by `igraph_is_bipartite()`.
  - The documentation is now also generated in Texinfo format.
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.10.8] - 2023-11-17
 
 ### Added
 
- - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19).
  - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
  - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
  - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
@@ -315,7 +593,7 @@ Some of the highlights are:
  - The random number generator interface, `igraph_rng_type_t`, has been overhauled. Check the declaration of the type for details.
  - The default random number generator has been changed from Mersenne Twister to PCG32.
  - Functions related to spectral coarse graining (i.e. all functions starting with `igraph_scg_...`) were separated into a project of its own. If you wish to keep on using these functions, please refer to the repository hosting the spectral coarse graining code at https://github.com/igraph/igraph-scg . The spectral coarse graining code was updated to support igraph 0.10.
- - Since `igraph_integer_t` aims to be the largest integer size that is feasible on a particular platform, there is no need for generic data types based on `long int` any more. The `long` variants of generic data types (e.g., `igraph_vector_long_t`) are therefore removed; you should use the corresponding `int` variant instead, whose elements are of type `igraph_integer_t`.
+ - Since `igraph_integer_t` aims to be the largest integer size that is feasible on a particular platform, there is no need for generic data types based on `long int` anymore. The `long` variants of generic data types (e.g., `igraph_vector_long_t`) are therefore removed; you should use the corresponding `int` variant instead, whose elements are of type `igraph_integer_t`.
  - Generic data types based on `float` were removed as they were not used anywhere in the library.
  - Several igraph functions that used to take a `long int` or return a `long int` now takes or returns an `igraph_integer_t` instead to make the APIs more consistent. Similarly, igraph functions that used `igraph_vector_t` for arguments that take or return _integral_ vectors (e.g., vertex or edge indices) now take `igraph_vector_int_t` instead. Graph-related functions where the API was changed due to this reason are listed below, one by one.
  - Similarly, igraph functions that used to accept the `long` variant of a generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int` variant of the same data type.
@@ -1297,7 +1575,13 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.8..master
+[master]: https://github.com/igraph/igraph/compare/0.10.15..master
+[0.10.15]: https://github.com/igraph/igraph/compare/0.10.13..0.10.15
+[0.10.13]: https://github.com/igraph/igraph/compare/0.10.12..0.10.13
+[0.10.12]: https://github.com/igraph/igraph/compare/0.10.11..0.10.12
+[0.10.11]: https://github.com/igraph/igraph/compare/0.10.10..0.10.11
+[0.10.10]: https://github.com/igraph/igraph/compare/0.10.9..0.10.10
+[0.10.9]: https://github.com/igraph/igraph/compare/0.10.8..0.10.9
 [0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
 [0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
 [0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6

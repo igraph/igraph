@@ -26,7 +26,6 @@
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_random.h"
-#include "igraph_structural.h"
 #include "igraph_visitor.h"
 
 #include "core/grid.h"
@@ -97,7 +96,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_t mst;
     igraph_integer_t root;
     igraph_integer_t no_of_layers, actlayer = 0;
     igraph_vector_int_t vids;
@@ -138,17 +136,26 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (repulserad <= 0) {
-        IGRAPH_ERRORF("Repusion cutoff radius must be positive, got %g.", IGRAPH_EINVAL, repulserad);
+        IGRAPH_ERRORF("Repulsion cutoff radius must be positive, got %g.", IGRAPH_EINVAL, repulserad);
     }
 
     if (cellsize <= 0) {
         IGRAPH_ERRORF("Cell size must be positive, got %g.", IGRAPH_EINVAL, cellsize);
     }
 
-    IGRAPH_CHECK(igraph_minimum_spanning_tree_unweighted(graph, &mst));
-    IGRAPH_FINALLY(igraph_destroy, &mst);
-
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+
+    /* Note: The LGL paper describes an algorithm that uses weights, and
+     * determines the layers by traversing the minimum spanning tree (MST)
+     * of the weighted graph starting from a chosen root. This function
+     * does not currently use weights, so all spanning trees are of the
+     * same weight. Therefore, we currently use a BFS traversal of the
+     * original graph from the root.
+     *
+     * TODO: If this function is updated to handle weights, it should
+     * construct the MST and traverse that instead. */
+
+    RNG_BEGIN();
 
     /* Determine the root vertex, random pick right now */
     if (proot < 0) {
@@ -162,7 +169,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, 0);
     if (no_of_nodes > 0) {
-        IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
+        IGRAPH_CHECK(igraph_bfs_simple(graph, root, IGRAPH_ALL, &vids, &layers, &parents));
     }
     no_of_layers = igraph_vector_int_size(&layers) - 1;
 
@@ -172,10 +179,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         IGRAPH_WARNING("LGL layout does not support disconnected graphs yet.");
     }
 
-    /* We don't need the mst any more */
-    igraph_destroy(&mst);
-    igraph_empty(&mst, 0, IGRAPH_UNDIRECTED); /* to make finalization work */
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
@@ -184,7 +187,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     /* Place the vertices randomly */
     IGRAPH_CHECK(igraph_layout_random(graph, res));
-    igraph_matrix_scale(res, 1e6);
+    igraph_matrix_scale(res, sqrt(area / M_PI));
 
     /* This is the grid for calculating the vertices near to a given vertex */
     IGRAPH_CHECK(igraph_2dgrid_init(&grid, res,
@@ -220,8 +223,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         /* Step 1: place the next layer on spheres */
         /*-----------------------------------------*/
 
-        RNG_BEGIN();
-
         j = VECTOR(layers)[actlayer];
         for (i = VECTOR(layers)[actlayer - 1];
              i < VECTOR(layers)[actlayer]; i++) {
@@ -230,7 +231,13 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_integer_t par = VECTOR(parents)[vid];
 
             if (par < 0) {
-                /* this is either the root vertex or an unreachable node */
+                if (par == -1) {
+                    /* this is either the root vertex ... */
+                    MATRIX(*res, vid, 0) = 0;
+                    MATRIX(*res, vid, 1) = 0;
+                } else {
+                    /* ... or an unreachable node */
+                }
                 continue;
             }
 
@@ -261,8 +268,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 j++;
             }
         }
-
-        RNG_END();
 
         /*-----------------------------------------*/
         /* Step 2: add the edges of the next layer */
@@ -373,8 +378,9 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         }
     }
 
+    RNG_END();
+
     IGRAPH_PROGRESS("Large graph layout", 100.0, 0);
-    igraph_destroy(&mst);
     igraph_vector_int_destroy(&vids);
     igraph_vector_int_destroy(&layers);
     igraph_vector_int_destroy(&parents);
@@ -383,7 +389,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_int_destroy(&eids);
     igraph_vector_destroy(&forcex);
     igraph_vector_destroy(&forcey);
-    IGRAPH_FINALLY_CLEAN(9);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 
 }

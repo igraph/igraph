@@ -44,18 +44,17 @@ int main(void) {
 
     /* Null graph */
     igraph_vector_int_init(&membership, 0);
+
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
-
     igraph_destroy(&graph);
+
     igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
-
-    /* Should not crash if we omit 'modularity' */
-    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, /* modularity = */ NULL);
     igraph_destroy(&graph);
+
     igraph_vector_int_destroy(&membership);
 
     /* Simple unweighted graph */
@@ -95,7 +94,7 @@ int main(void) {
     igraph_contract_vertices(&graph, &membership, NULL);
     igraph_vector_int_destroy(&membership);
 
-    igraph_simplify(&graph, /* multiple */ true, /* loops */ false, &comb);
+    igraph_simplify(&graph, /* remove_multiple */ true, /* remove_loops */ false, &comb);
 
     igraph_vector_int_init_range(&membership, 0, igraph_vcount(&graph));
     EANV(&graph, "weight", &weights);

@@ -51,6 +51,7 @@
 #include "io/parsers/gml-lexer.h"
 #include "io/parse_utils.h"
 #include "internal/hacks.h" /* strcasecmp & strndup */
+#include "math/safe_intop.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -184,11 +185,14 @@ static igraph_error_t igraph_i_gml_make_numeric(const char *name,
   }
   IGRAPH_FINALLY(igraph_free, t);
 
-  /* The GML spec only requires support for 32-bit signed integers.
+  /* The GML spec only requires support for 32-bit signed integers,
+   * but igraph tries to support the same range as igraph_integer_t,
+   * so that it can read/write all graphs it can represent.
    * We treat anything out of that range as real. These values end
    * up as igraph_real_t anyway, as igraph does not currently support
    * integer-typed attributes. */
-  if (floor(value) == value && value >= INT32_MIN && value <= INT32_MAX) {
+  igraph_real_t trunc_value = trunc(value);
+  if (value == trunc_value && igraph_i_is_real_representable_as_integer(trunc_value)) {
     IGRAPH_CHECK(igraph_gml_tree_init_integer(t, name, line, value));
   } else {
     IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, value));

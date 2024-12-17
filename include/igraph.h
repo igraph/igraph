@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +16,6 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 #ifndef IGRAPH_H
@@ -35,7 +32,7 @@
 #include "igraph_complex.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
-#include "igraph_array.h"
+#include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
 #include "igraph_heap.h"
@@ -60,7 +57,7 @@
 #include "igraph_structural.h"
 #include "igraph_transitivity.h"
 #include "igraph_neighborhood.h"
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 #include "igraph_bipartite.h"
 #include "igraph_cliques.h"
 #include "igraph_layout.h"
@@ -95,5 +92,6 @@
 #include "igraph_eulerian.h"
 #include "igraph_graphicality.h"
 #include "igraph_cycles.h"
+#include "igraph_reachability.h"
 
 #endif

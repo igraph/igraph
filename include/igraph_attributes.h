@@ -24,7 +24,6 @@
 #ifndef IGRAPH_ATTRIBUTES_H
 #define IGRAPH_ATTRIBUTES_H
 
-#include "igraph_config.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_datatype.h"
@@ -70,7 +69,6 @@ __BEGIN_DECLS
  */
 typedef enum {
     IGRAPH_ATTRIBUTE_UNSPECIFIED = 0,
-    IGRAPH_ATTRIBUTE_DEFAULT IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ATTRIBUTE_UNSPECIFIED,
     IGRAPH_ATTRIBUTE_NUMERIC = 1,
     IGRAPH_ATTRIBUTE_BOOLEAN = 2,
     IGRAPH_ATTRIBUTE_STRING = 3,
@@ -418,7 +416,6 @@ typedef struct igraph_attribute_table_t {
                                          igraph_vector_bool_t *value);
 } igraph_attribute_table_t;
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
 IGRAPH_EXPORT igraph_attribute_table_t * igraph_set_attribute_table(const igraph_attribute_table_t * table);
 
 IGRAPH_EXPORT igraph_bool_t igraph_has_attribute_table(void);

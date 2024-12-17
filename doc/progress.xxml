@@ -19,6 +19,7 @@
 
 <section id="invoking-the-progress-handler"><title>Invoking the progress handler</title>
 <!-- doxrox-include IGRAPH_PROGRESS -->
+<!-- doxrox-include IGRAPH_PROGRESSF -->
 <!-- doxrox-include igraph_progress -->
 <!-- doxrox-include igraph_progressf -->
 </section>

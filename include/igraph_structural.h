@@ -40,7 +40,7 @@ __BEGIN_DECLS
 /* Basic query functions                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_are_adjacent(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res, igraph_integer_t eid);
 IGRAPH_EXPORT igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
@@ -51,6 +51,7 @@ IGRAPH_EXPORT igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *
                                igraph_vector_int_t *circle);
 IGRAPH_EXPORT igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_count_loops(const igraph_t *graph, igraph_integer_t *loop_count);
 IGRAPH_EXPORT igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                                  igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
@@ -65,6 +66,8 @@ IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
                                    igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
+                                                igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                      igraph_bool_t ignore_loops,
                                      igraph_reciprocity_t mode);
@@ -84,12 +87,14 @@ IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_boo
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
-                                               const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
-                                                          igraph_t *mst);
-IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
-                                                    const igraph_vector_t *weights);
+IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
+                                              igraph_bool_t directed, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,
+                                                       igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_minimum_spanning_tree(
+    const igraph_t *graph, igraph_vector_int_t *res,
+    const igraph_vector_t *weights, igraph_mst_algorithm_t method);
 IGRAPH_EXPORT igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_int_t *res,
                                               igraph_integer_t vid);
 
@@ -122,8 +127,13 @@ IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
-                                          const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
@@ -140,7 +150,7 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
  * are used according to the \p mode parameter.
  *
  * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian, <code>L = D - A</code>.
- * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
+ * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetrically normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
  * \enumval IGRAPH_LAPLACIAN_LEFT Left-stochastic normalized Laplacian, <code>L = I - D^-1 A</code>.
  * \enumval IGRAPH_LAPLACIAN_RIGHT Right-stochastic normalized Laplacian, <code>L = I - A D^-1</code>.
  */
@@ -160,10 +170,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_laplacian_sparse(
    const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
    igraph_laplacian_normalization_t normalization,
    const igraph_vector_t *weights
-);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_laplacian(
-   const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
-   igraph_bool_t normalized, const igraph_vector_t *weights
 );
 
 __END_DECLS

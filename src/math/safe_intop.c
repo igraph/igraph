@@ -104,11 +104,11 @@ igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
 }
 
 /**
- * Converts an igraph_real_t into an igraph_integer_t with range checks to
- * protect from undefined behaviour. The input value is assumed to have no
- * fractional part.
+ * Checks if an igraph_real_t with no fractional part is representable as an igraph_integer_t.
+ * Avoids invoking undefined behaviour.
+ * Must not be called with an input that has a non-zero fractional part.
  */
-static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_integer_t *result) {
+igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value) {
     /* IGRAPH_INTEGER_MAX is one less than a power of 2, and may not be representable as
      * a floating point number. Thus we cannot safely check that value <= IGRAPH_INTEGER_MAX,
      * as this would convert IGRAPH_INTEGER_MAX to floating point, potentially changing its value.
@@ -122,6 +122,19 @@ static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_inte
     const igraph_real_t int_max_plus_1 = 2.0 * (IGRAPH_INTEGER_MAX / 2 + 1);
     const igraph_real_t int_min = (igraph_real_t) IGRAPH_INTEGER_MIN;
     if (IGRAPH_LIKELY(int_min <= value && value < int_max_plus_1)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is assumed to have no
+ * fractional part.
+ */
+static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_integer_t *result) {
+    if (igraph_i_is_real_representable_as_integer(value)) {
         *result = (igraph_integer_t) value;
         return IGRAPH_SUCCESS;
     } else if (isnan(value)) {
@@ -169,5 +182,5 @@ igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result
 * This is typically the fastest of this set of functions.
  */
 igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result) {
-    return igraph_i_safe_real_to_int(round(value), result);
+    return igraph_i_safe_real_to_int(trunc(value), result);
 }

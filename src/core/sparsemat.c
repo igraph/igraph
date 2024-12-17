@@ -28,7 +28,6 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_types.h"
-#include "igraph_vector_ptr.h"
 
 #include "internal/hacks.h"    /* IGRAPH_STATIC_ASSERT */
 
@@ -170,19 +169,6 @@ igraph_error_t igraph_sparsemat_init_copy(
     memcpy(to->cs->x, from->cs->x, sizeof(CS_ENTRY) * (size_t) (from->cs->nzmax));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_sparsemat_copy
- * \brief Copies a sparse matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_copy 0.10
- */
-
-igraph_error_t igraph_sparsemat_copy(
-    igraph_sparsemat_t *to, const igraph_sparsemat_t *from
-) {
-    return igraph_sparsemat_init_copy(to, from);
 }
 
 /**
@@ -933,9 +919,9 @@ igraph_error_t igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
  *
  * \param A The first input matrix, in column-compressed format.
  * \param B The second input matrix, in column-compressed format.
- * \param alpha Real scalar, \p A is multiplied by \p alpha before the
+ * \param alpha Real value, \p A is multiplied by \p alpha before the
  *    addition.
- * \param beta Real scalar, \p B is multiplied by \p beta before the
+ * \param beta Real value, \p B is multiplied by \p beta before the
  *    addition.
  * \param res Pointer to an uninitialized sparse matrix, the result
  *    is stored here.
@@ -1010,7 +996,7 @@ igraph_error_t igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
                             igraph_vector_t *res) {
 
     if (L->cs->m != L->cs->n) {
-        IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot perform lower triangular solve on non-square matrix.", IGRAPH_EINVAL);
     }
 
     if (res != b) {
@@ -1018,7 +1004,7 @@ igraph_error_t igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
     }
 
     if (! cs_lsolve(L->cs, VECTOR(*res))) {
-        IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot perform lower triangular solve.", IGRAPH_FAILURE);
     }
 
     return IGRAPH_SUCCESS;
@@ -1044,8 +1030,10 @@ igraph_error_t igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
                              igraph_vector_t *res) {
 
     if (L->cs->m != L->cs->n) {
-        IGRAPH_ERROR("Cannot perform transposed lower triangular solve",
-                     IGRAPH_NONSQUARE);
+        IGRAPH_ERROR(
+            "Cannot perform transposed lower triangular solve on non-square matrix.",
+            IGRAPH_EINVAL
+        );
     }
 
     if (res != b) {
@@ -1053,7 +1041,7 @@ igraph_error_t igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
     }
 
     if (!cs_ltsolve(L->cs, VECTOR(*res))) {
-        IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot perform lower triangular solve.", IGRAPH_FAILURE);
     }
 
     return IGRAPH_SUCCESS;
@@ -1078,7 +1066,10 @@ igraph_error_t igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
                             igraph_vector_t *res) {
 
     if (U->cs->m != U->cs->n) {
-        IGRAPH_ERROR("Cannot perform upper triangular solve", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR(
+            "Cannot perform upper triangular solve on non-square matrix.",
+            IGRAPH_EINVAL
+        );
     }
 
     if (res != b) {
@@ -1086,7 +1077,7 @@ igraph_error_t igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
     }
 
     if (! cs_usolve(U->cs, VECTOR(*res))) {
-        IGRAPH_ERROR("Cannot perform upper triangular solve", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot perform upper triangular solve.", IGRAPH_FAILURE);
     }
 
     return IGRAPH_SUCCESS;
@@ -1112,8 +1103,10 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
                              igraph_vector_t *res) {
 
     if (U->cs->m != U->cs->n) {
-        IGRAPH_ERROR("Cannot perform transposed upper triangular solve",
-                     IGRAPH_NONSQUARE);
+        IGRAPH_ERROR(
+            "Cannot perform transposed upper triangular solve on non-square matrix.",
+            IGRAPH_EINVAL
+        );
     }
 
     if (res != b) {
@@ -1121,7 +1114,7 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
     }
 
     if (!cs_utsolve(U->cs, VECTOR(*res))) {
-        IGRAPH_ERROR("Cannot perform transposed upper triangular solve",
+        IGRAPH_ERROR("Cannot perform transposed upper triangular solve.",
                      IGRAPH_FAILURE);
     }
 
@@ -1151,8 +1144,10 @@ igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
                              igraph_integer_t order) {
 
     if (A->cs->m != A->cs->n) {
-        IGRAPH_ERROR("Cannot perform sparse symmetric solve",
-                     IGRAPH_NONSQUARE);
+        IGRAPH_ERROR(
+            "Cannot perform sparse symmetric solve on non-square matrix.",
+            IGRAPH_EINVAL
+        );
     }
 
     if (res != b) {
@@ -1160,7 +1155,7 @@ igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
     }
 
     if (! cs_cholsol(order, A->cs, VECTOR(*res))) {
-        IGRAPH_ERROR("Cannot perform sparse symmetric solve", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot perform sparse symmetric solve.", IGRAPH_FAILURE);
     }
 
     return IGRAPH_SUCCESS;
@@ -1193,8 +1188,7 @@ igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
                            igraph_real_t tol) {
 
     if (A->cs->m != A->cs->n) {
-        IGRAPH_ERROR("Cannot perform LU solve",
-                     IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot perform LU solve on non-square matrix.", IGRAPH_EINVAL);
     }
 
     if (res != b) {
@@ -1202,7 +1196,7 @@ igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
     }
 
     if (! cs_lusol(order, A->cs, VECTOR(*res), tol)) {
-        IGRAPH_ERROR("Cannot perform LU solve", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot perform LU solve.", IGRAPH_FAILURE);
     }
 
     return IGRAPH_SUCCESS;
@@ -1221,7 +1215,7 @@ static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparse
     igraph_integer_t e = 0;
 
     if (no_of_nodes != A->cs->n) {
-        IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot create graph object from non-square matrix.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
@@ -1258,7 +1252,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
     igraph_integer_t e;
 
     if (no_of_nodes != A->cs->n) {
-        IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot create graph object from non-square matrix.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
@@ -1291,8 +1285,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
  * \param graph Pointer to an uninitialized igraph_t object, the
  *    graphs is stored here.
  * \param A The input matrix, in triplet or column-compressed format.
- * \param directed Boolean scalar, whether to create a directed
- *    graph.
+ * \param directed Whether to create a directed graph.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -1375,7 +1368,7 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
     CS_INT no_of_nodes = A->cs->m;
 
     if (no_of_nodes != A->cs->n) {
-        IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Cannot create graph object from non-square matrix.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, pot_edges * 2);
@@ -1530,20 +1523,6 @@ igraph_error_t igraph_sparsemat_init_eye(
     }
 }
 
-/**
- * \function igraph_sparsemat_eye
- * \brief Creates a sparse identity matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_eye 0.10
- */
-
-igraph_error_t igraph_sparsemat_eye(
-    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
-    igraph_real_t value, igraph_bool_t compress
-) {
-    return igraph_sparsemat_init_eye(A, n, nzmax, value, compress);
-}
-
 static igraph_error_t igraph_i_sparsemat_init_diag_triplet(
     igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values
 ) {
@@ -1608,20 +1587,6 @@ igraph_error_t igraph_sparsemat_init_diag(
     } else {
         return (igraph_i_sparsemat_init_diag_triplet(A, nzmax, values));
     }
-}
-
-/**
- * \function igraph_sparsemat_diag
- * \brief Creates a sparse diagonal matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_diag 0.10
- */
-
-igraph_error_t igraph_sparsemat_diag(
-    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values,
-    igraph_bool_t compress
-) {
-    return igraph_sparsemat_init_diag(A, nzmax, values, compress);
 }
 
 static igraph_error_t igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
@@ -1708,11 +1673,11 @@ igraph_error_t igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
     igraph_integer_t n = igraph_sparsemat_nrow(A);
 
     if (n != igraph_sparsemat_ncol(A)) {
-        IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Non-square matrix for ARPACK.", IGRAPH_EINVAL);
     }
 
     if (n > INT_MAX) {
-        IGRAPH_ERROR("Matrix too large for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Matrix too large for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     if (options == 0) {
@@ -1812,11 +1777,11 @@ igraph_error_t igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
     igraph_integer_t n = igraph_sparsemat_nrow(A);
 
     if (n > INT_MAX) {
-        IGRAPH_ERROR("Matrix too large for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Matrix too large for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     if (n != igraph_sparsemat_ncol(A)) {
-        IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Non-square matrix for ARPACK.", IGRAPH_EINVAL);
     }
 
     if (options == 0) {
@@ -2109,10 +2074,12 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
  * \param res An uninitialized sparse matrix, the result is stored
  *    here.
  * \param mat The dense input matrix.
- * \param tol Real scalar, the tolerance. Values closer than \p tol to
- *    zero are considered as zero, and will not be included in the
- *    sparse matrix.
+ * \param tol The tolerance for zero comparisons. Values closer than
+ *    \p tol to zero are considered as zero, and will not be included
+ *    in the sparse matrix.
  * \return Error code.
+ *
+ * \sa \ref igraph_sparsemat_as_matrix() for the reverse conversion.
  *
  * Time complexity: O(mn), the number of elements in the dense
  * matrix.
@@ -2155,13 +2122,13 @@ static igraph_error_t igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
     CS_INT *p = spmat->cs->p;
     CS_INT *i = spmat->cs->i;
     CS_ENTRY *x = spmat->cs->x;
-    CS_INT nzmax = spmat->cs->nzmax;
+    CS_INT elem_count = spmat->cs->p[ spmat->cs->n ];
 
     IGRAPH_CHECK(igraph_matrix_resize(res, nrow, ncol));
     igraph_matrix_null(res);
 
-    while (*p < nzmax) {
-        while (to < * (p + 1)) {
+    while (*p < elem_count) {
+        while (to < *(p + 1)) {
             MATRIX(*res, *i, from) += *x;
             to++;
             i++;
@@ -2203,6 +2170,8 @@ static igraph_error_t igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
  * \param spmat The input sparse matrix, in triplet or
  *    column-compressed format.
  * \return Error code.
+ *
+ * \sa \ref igraph_matrix_as_sparsemat() for the reverse conversion.
  *
  * Time complexity: O(mn), the number of elements in the dense
  * matrix.
@@ -2359,10 +2328,10 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  * \function igraph_sparsemat_count_nonzerotol
  * \brief Counts nonzero elements of a sparse matrix, ignoring elements close to zero.
  *
- * Count the number of matrix entries that are closer to zero than \p
- * tol.
+ * Count the number of matrix entries that are closer to zero than \p tol.
+ *
  * \param The input matrix, column-compressed.
- * \param Real scalar, the tolerance.
+ * \param The tolerance for zero comparisons.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -2851,7 +2820,8 @@ igraph_error_t igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
  * \function igraph_sparsemat_scale
  * \brief Scales a sparse matrix.
  *
- * Multiplies all elements of a sparse matrix, by the given scalar.
+ * Multiplies all elements of a sparse matrix, by the given factor.
+ *
  * \param A The input matrix.
  * \param by The scaling factor.
  * \return Error code.

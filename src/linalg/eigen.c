@@ -1143,11 +1143,11 @@ static igraph_error_t igraph_i_eigen_checks(const igraph_matrix_t *A,
 
     if (A) {
         if (n != igraph_matrix_ncol(A) || n != igraph_matrix_nrow(A)) {
-            IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
+            IGRAPH_ERROR("Eigenvector calculations need a square matrix.", IGRAPH_EINVAL);
         }
     } else if (sA) {
         if (n != igraph_sparsemat_ncol(sA) || n != igraph_sparsemat_nrow(sA)) {
-            IGRAPH_ERROR("Invalid matrix", IGRAPH_NONSQUARE);
+            IGRAPH_ERROR("Eigenvector calculations need a square matrix.", IGRAPH_EINVAL);
         }
     }
 
@@ -1465,34 +1465,4 @@ igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
     }
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_eigen_laplacian
- *
- */
-
-igraph_error_t igraph_eigen_laplacian(const igraph_t *graph,
-                           igraph_eigen_algorithm_t algorithm,
-                           const igraph_eigen_which_t *which,
-                           igraph_arpack_options_t *options,
-                           igraph_arpack_storage_t *storage,
-                           igraph_vector_t *values,
-                           igraph_matrix_t *vectors,
-                           igraph_vector_complex_t *cmplxvalues,
-                           igraph_matrix_complex_t *cmplxvectors) {
-
-    IGRAPH_UNUSED(graph);
-    IGRAPH_UNUSED(algorithm);
-    IGRAPH_UNUSED(which);
-    IGRAPH_UNUSED(options);
-    IGRAPH_UNUSED(storage);
-    IGRAPH_UNUSED(values);
-    IGRAPH_UNUSED(vectors);
-    IGRAPH_UNUSED(cmplxvalues);
-    IGRAPH_UNUSED(cmplxvectors);
-
-    /* TODO */
-
-    IGRAPH_ERROR("'igraph_eigen_laplacian'", IGRAPH_UNIMPLEMENTED);
 }

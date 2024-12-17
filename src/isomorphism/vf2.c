@@ -21,7 +21,7 @@
 
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -460,7 +460,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                 if (VECTOR(*core_1)[node] >= 0) {
                     igraph_integer_t node2 = VECTOR(*core_1)[node];
                     /* check if there is a node2->cand2 edge */
-                    if (!igraph_vector_int_binsearch2(inneis_2, node2)) {
+                    if (!igraph_vector_int_contains_sorted(inneis_2, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
@@ -492,7 +492,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                 if (VECTOR(*core_1)[node] >= 0) {
                     igraph_integer_t node2 = VECTOR(*core_1)[node];
                     /* check if there is a cand2->node2 edge */
-                    if (!igraph_vector_int_binsearch2(outneis_2, node2)) {
+                    if (!igraph_vector_int_contains_sorted(outneis_2, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
@@ -524,7 +524,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                 if (VECTOR(*core_2)[node] >= 0) {
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a node2->cand1 edge */
-                    if (!igraph_vector_int_binsearch2(inneis_1, node2)) {
+                    if (!igraph_vector_int_contains_sorted(inneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
@@ -556,7 +556,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                 if (VECTOR(*core_2)[node] >= 0) {
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a cand1->node2 edge */
-                    if (!igraph_vector_int_binsearch2(outneis_1, node2)) {
+                    if (!igraph_vector_int_contains_sorted(outneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
@@ -695,26 +695,6 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     }
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_isomorphic_function_vf2
- * \brief The generic VF2 interface (deprecated alias).
- *
- * \deprecated-by igraph_get_isomorphisms_vf2_callback 0.10.0
- */
-igraph_error_t igraph_isomorphic_function_vf2(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-) {
-    return igraph_get_isomorphisms_vf2_callback(
-        graph1, graph2, vertex_color1, vertex_color2, edge_color1, edge_color2,
-        map12, map21, isohandler_fn, node_compat_fn, edge_compat_fn, arg
-    );
 }
 
 typedef struct {
@@ -885,7 +865,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
  *   \p edge_compat_fn.
  * \return Error code.
  *
- * \sa igraph_count_automorphisms()
+ * \sa igraph_count_automorphisms_bliss()
  *
  * Time complexity: exponential.
  */
@@ -1361,7 +1341,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                 if (VECTOR(*core_2)[node] >= 0) {
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a node2->cand1 edge */
-                    if (!igraph_vector_int_binsearch2(inneis_1, node2)) {
+                    if (!igraph_vector_int_contains_sorted(inneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
@@ -1393,7 +1373,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                 if (VECTOR(*core_2)[node] >= 0) {
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a cand1->node2 edge */
-                    if (!igraph_vector_int_binsearch2(outneis_1, node2)) {
+                    if (!igraph_vector_int_contains_sorted(outneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
@@ -1543,26 +1523,6 @@ static igraph_error_t igraph_i_subisomorphic_vf2_cb(
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *iso = true;
     return IGRAPH_STOP;
-}
-
-/**
- * \function igraph_subisomorphic_function_vf2
- * \brief Generic VF2 function for subgraph isomorphism problems (deprecated alias).
- *
- * \deprecated-by igraph_get_subisomorphisms_vf2_callback 0.10.0
- */
-igraph_error_t igraph_subisomorphic_function_vf2(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-) {
-    return igraph_get_subisomorphisms_vf2_callback(
-        graph1, graph2, vertex_color1, vertex_color2, edge_color1, edge_color2,
-        map12, map21, isohandler_fn, node_compat_fn, edge_compat_fn, arg
-    );
 }
 
 /**

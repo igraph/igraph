@@ -96,6 +96,9 @@ to convince the project's developers of the merits of this feature.
 <a name="pull-requests"></a>
 ## Pull requests
 
+_**Note:** The wiki has a lot of useful information for newcomers, as well as a
+[quick start guide](https://github.com/igraph/igraph/wiki/Quickstart-for-new-contributors)!_
+
 Good pull requests - patches, improvements, new features - are a fantastic help.
 They should remain focused in scope and avoid containing unrelated commits.
 Please also take a look at our [tips on writing igraph code](#tips) before

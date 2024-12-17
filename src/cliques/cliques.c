@@ -168,8 +168,8 @@ static igraph_error_t igraph_i_find_k_indsets(
  * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
  *
  * \param graph The input graph.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \param min_size Integer specifying the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the cliques to be
@@ -280,8 +280,8 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts. You may pass \c NULL
  *   here to make each vertex have a weight of 1.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \param min_weight Integer specifying the minimum weight of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_weight Integer specifying the maximum weight of the cliques to be
@@ -326,8 +326,8 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts. You may pass \c NULL
  *   here to make each vertex have a weight of 1.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
  * \sa \ref igraph_weighted_cliques(), \ref igraph_weighted_clique_number(), \ref igraph_largest_cliques()
@@ -413,8 +413,8 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  * 6:505--517, 1977.
  *
  * \param graph The input graph.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \param min_size Integer specifying the minimum size of the sets to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the sets to be
@@ -537,8 +537,8 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
  * 6:505--517, 1977.
  *
  * \param graph The input graph.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
  * \sa \ref igraph_independent_vertex_sets(), \ref
@@ -554,8 +554,8 @@ igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
 
 typedef struct igraph_i_max_ind_vsets_data_t {
     igraph_integer_t matrix_size;
-    igraph_adjlist_t adj_list;         /* Adjacency list of the graph */
-    igraph_vector_int_t deg;                 /* Degrees of individual nodes */
+    igraph_adjlist_t adj_list;           /* Adjacency list of the graph */
+    igraph_vector_int_t deg;             /* Degrees of individual nodes */
     igraph_set_t* buckets;               /* Bucket array */
     /* The IS value for each node. Still to be explained :) */
     igraph_integer_t* IS;
@@ -758,8 +758,8 @@ static void free_set_array(igraph_set_t *array, igraph_integer_t n) {
  * use \ref igraph_independence_number() instead.
  *
  * \param graph The input graph.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques(), \ref
@@ -948,8 +948,8 @@ static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* 
  * these two versions.
  *
  * \param graph The input graph.
- * \param res Pointer to a list of integer vectors, the result will be stored
- *   here. The pointer vector will be resized if needed.
+ * \param res Pointer to an initialized list of integer vectors. The cliques
+ *   will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
  * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()

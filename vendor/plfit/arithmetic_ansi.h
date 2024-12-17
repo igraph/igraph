@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-/* $Id: arithmetic_ansi.h 65 2010-01-29 12:19:16Z naoaki $ */
+/* $Id$ */
 
 #include <stdlib.h>
 #include <memory.h>
@@ -51,7 +51,7 @@ inline static void vecfree(void *memblock)
 inline static void vecset(lbfgsfloatval_t *x, const lbfgsfloatval_t c, const int n)
 {
     int i;
-
+    
     for (i = 0;i < n;++i) {
         x[i] = c;
     }

@@ -11,25 +11,11 @@
  * This file has been placed in the public domain.
  */
 
-#ifndef __PLFIT_MT_H__
-#define __PLFIT_MT_H__
+#ifndef PLFIT_MT_H
+#define PLFIT_MT_H
 
-/* VS 2010, i.e. _MSC_VER == 1600, already has stdint.h */
-#if defined(_MSC_VER) && _MSC_VER < 1600
-#  define uint32_t unsigned __int32
-#else
-#  include <stdint.h>
-#endif
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
+#include <stdint.h>
+#include "plfit_decls.h"
 
 __BEGIN_DECLS
 
@@ -60,7 +46,7 @@ typedef struct {
  *
  * \param  rng  the random number generator to initialize
  */
-void plfit_mt_init(plfit_mt_rng_t* rng);
+PLFIT_EXPORT void plfit_mt_init(plfit_mt_rng_t* rng);
 
 /**
  * \brief Initializes a Mersenne Twister random number generator, seeding it
@@ -75,7 +61,7 @@ void plfit_mt_init(plfit_mt_rng_t* rng);
  *                 be initialized from the built-in RNG as if \ref plfit_mt_init()
  *                 was called.
  */
-void plfit_mt_init_from_rng(plfit_mt_rng_t* rng, plfit_mt_rng_t* seeder);
+PLFIT_EXPORT void plfit_mt_init_from_rng(plfit_mt_rng_t* rng, plfit_mt_rng_t* seeder);
 
 /**
  * \brief Returns the next 32-bit random number from the given Mersenne Twister
@@ -84,7 +70,7 @@ void plfit_mt_init_from_rng(plfit_mt_rng_t* rng, plfit_mt_rng_t* seeder);
  * \param  rng  the random number generator to use
  * \return the next 32-bit random number from the generator
  */
-uint32_t plfit_mt_random(plfit_mt_rng_t* rng);
+PLFIT_EXPORT uint32_t plfit_mt_random(plfit_mt_rng_t* rng);
 
 /**
  * \brief Returns a uniformly distributed double from the interval [0;1)
@@ -94,8 +80,8 @@ uint32_t plfit_mt_random(plfit_mt_rng_t* rng);
  * \param  rng  the random number generator to use
  * \return a uniformly distributed random number from the interval [0;1)
  */
-double plfit_mt_uniform_01(plfit_mt_rng_t* rng);
+PLFIT_EXPORT double plfit_mt_uniform_01(plfit_mt_rng_t* rng);
 
 __END_DECLS
 
-#endif
+#endif /* PLFIT_MT_H */

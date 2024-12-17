@@ -55,14 +55,12 @@ IGRAPH_EXPORT igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, ig
                               igraph_integer_t center);
 IGRAPH_EXPORT igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
                               igraph_integer_t center);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
-                                 igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular);
+IGRAPH_EXPORT igraph_error_t igraph_hypercube(igraph_t *graph,
+                                              igraph_integer_t n, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_square_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
                                  igraph_bool_t directed, igraph_bool_t mutual, const igraph_vector_bool_t *circular);
 IGRAPH_EXPORT igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                               igraph_bool_t mutual, igraph_bool_t circular);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
-                              igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
                                               igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t *branches,
@@ -98,6 +96,7 @@ IGRAPH_EXPORT igraph_error_t igraph_realize_degree_sequence(igraph_t *graph,
                                                  igraph_realize_degseq_t method);
 IGRAPH_EXPORT igraph_error_t igraph_triangular_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual);
 IGRAPH_EXPORT igraph_error_t igraph_hexagonal_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual);
+IGRAPH_EXPORT igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, const igraph_edge_type_sw_t allowed_edge_types, const igraph_realize_degseq_t method);
 
 __END_DECLS
 

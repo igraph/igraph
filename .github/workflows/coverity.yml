@@ -3,15 +3,18 @@
 name: Coverity
 
 # Coverity only allows a few builds per day.
-# Build once at 3 AM UTC every day.
+# Build once at 2 AM UTC every day.
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
   coverity:
     runs-on: ubuntu-latest
+
+    # Do not run in forks
+    if: github.repository == 'igraph/igraph'
 
     steps:
     - name: Install dependencies
@@ -21,6 +24,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref_name }}
 
     - name: Create build environment
       run: cmake -E make_directory ${{github.workspace}}/build

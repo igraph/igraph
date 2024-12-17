@@ -154,7 +154,7 @@ const TYPE(igraph_matrix)* FUNCTION(igraph_matrix, view)(
  * Time complexity: O(1).
  */
 
-IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
+const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
     const TYPE(igraph_matrix) *m, const TYPE(igraph_vector) *v,
     igraph_integer_t nrow
 ) {
@@ -547,18 +547,6 @@ igraph_error_t FUNCTION(igraph_matrix, init_copy)(TYPE(igraph_matrix) *to, const
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \ingroup matrix
- * \function igraph_matrix_copy
- * \brief Copies a matrix (deprecated alias).
- *
- * \deprecated-by igraph_matrix_init_copy 0.10
- */
-
-igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
-    return FUNCTION(igraph_matrix, init_copy)(to, from);
-}
-
 #ifndef NOTORDERED
 
 /**
@@ -720,9 +708,9 @@ BASE FUNCTION(igraph_matrix, sum)(const TYPE(igraph_matrix) *m) {
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    equal to the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the dimensions of the matrices don't match.
+ * \return True if the elements in the \p lhs are all
+ *    equal to the corresponding elements in \p rhs. Returns false
+ *    if the dimensions of the matrices don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
  */
@@ -747,9 +735,9 @@ FUNCTION(igraph_matrix, is_equal)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    less than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the dimensions of the matrices don't match.
+ * \return True if the elements in the \p lhs are all
+ *    less than the corresponding elements in \p rhs. Returns false
+ *    if the dimensions of the matrices don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
  */
@@ -766,9 +754,9 @@ igraph_bool_t FUNCTION(igraph_matrix, all_l)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    greater than the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the dimensions of the matrices don't match.
+ * \return True if the elements in the \p lhs are all
+ *    greater than the corresponding elements in \p rhs. Returns false
+ *    if the dimensions of the matrices don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
  */
@@ -785,9 +773,9 @@ igraph_bool_t FUNCTION(igraph_matrix, all_g)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    less than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the dimensions of the matrices
+ *    rhs. Returns false if the dimensions of the matrices
  *    don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
@@ -806,9 +794,9 @@ FUNCTION(igraph_matrix, all_le)(const TYPE(igraph_matrix) *lhs,
  *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
- * \return Positive integer (=true) if the elements in the \p lhs are all
+ * \return True if the elements in the \p lhs are all
  *    greater than or equal to the corresponding elements in \p
- *    rhs. Returns \c 0 (=false) if the dimensions of the matrices
+ *    rhs. Returns false if the dimensions of the matrices
  *    don't match.
  *
  * Time complexity: O(nm), the size of the matrices.
@@ -945,30 +933,6 @@ BASE FUNCTION(igraph_matrix, get)(const TYPE(igraph_matrix) *m,
 BASE* FUNCTION(igraph_matrix, get_ptr)(const TYPE(igraph_matrix) *m,
                                        igraph_integer_t row, igraph_integer_t col) {
     return &MATRIX(*m, row, col);
-}
-
-/**
- * \function igraph_matrix_e
- * Extract an element from a matrix (deprecated alias).
- *
- * \deprecated-by igraph_matrix_get 0.10.0
- */
-
-BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
-                                igraph_integer_t row, igraph_integer_t col) {
-    return FUNCTION(igraph_matrix, get)(m, row, col);
-}
-
-/**
- * \function igraph_matrix_e_ptr
- * Pointer to an element of a matrix.
- *
- * \deprecated-by igraph_matrix_get_ptr 0.10.0
- */
-
-BASE* FUNCTION(igraph_matrix, e_ptr)(const TYPE(igraph_matrix) *m,
-                                     igraph_integer_t row, igraph_integer_t col) {
-    return FUNCTION(igraph_matrix, get_ptr)(m, row, col);
 }
 
 /**

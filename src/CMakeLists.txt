@@ -39,7 +39,8 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
-  core/array.c
+  core/bitset.c
+  core/bitset_list.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c
@@ -113,6 +114,7 @@ add_library(
 
   games/barabasi.c
   games/callaway_traits.c
+  games/chung_lu.c
   games/citations.c
   games/correlated.c
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
@@ -177,6 +179,9 @@ add_library(
   connectivity/cohesive_blocks.c
   connectivity/components.c
   connectivity/separators.c
+  connectivity/reachability.c
+
+  cycles/simple_cycles.c
 
   flow/flow.c
   flow/flow_conversion.c
@@ -232,6 +237,7 @@ add_library(
   operators/difference.c
   operators/disjoint_union.c
   operators/intersection.c
+  operators/join.c
   operators/misc_internal.c
   operators/permute.c
   operators/reverse.c
@@ -259,6 +265,7 @@ add_library(
   paths/widest_paths.c
 
   properties/basic_properties.c
+  properties/complete.c
   properties/constraint.c
   properties/convergence_degree.c
   properties/dag.c
@@ -307,7 +314,6 @@ add_library(
   internal/qsort_r.c
   internal/qsort.c
   internal/utils.c
-  internal/zeroin.c
 
   version.c
 
@@ -325,7 +331,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.3")
+set_target_properties(igraph PROPERTIES VERSION "3.1.9")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

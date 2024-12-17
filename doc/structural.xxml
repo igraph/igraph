@@ -10,7 +10,7 @@
 <!-- doxrox-include about_structural -->
 
 <section id="basic-properties"><title>Basic properties</title>
-<!-- doxrox-include igraph_are_connected -->
+<!-- doxrox-include igraph_are_adjacent -->
 </section>
 
 <section id="Sparsifiers"><title>Sparsifiers</title>
@@ -95,13 +95,15 @@
 <section id="graph-components"><title>Graph components</title>
 <!-- doxrox-include igraph_subcomponent -->
 <!-- doxrox-include igraph_connected_components -->
-<!-- doxrox-include igraph_clusters -->
 <!-- doxrox-include igraph_is_connected -->
 <!-- doxrox-include igraph_decompose -->
-<!-- doxrox-include igraph_decompose_destroy -->
+<!-- doxrox-include igraph_reachability -->
+<!-- doxrox-include igraph_count_reachable -->
+<!-- doxrox-include igraph_transitive_closure -->
 <!-- doxrox-include igraph_biconnected_components -->
 <!-- doxrox-include igraph_articulation_points -->
 <!-- doxrox-include igraph_bridges -->
+<!-- doxrox-include igraph_is_biconnected -->
 </section>
 
 <section id="degree-sequences"><title>Degree sequences</title>
@@ -134,8 +136,8 @@
 </section>
 
 <section id="subset-limited-centrality-measures"><title>Subset-limited centrality measures</title>
-<!-- doxrox-include igraph_betweenness_subset-->
-<!-- doxrox-include igraph_edge_betweenness_subset-->
+<!-- doxrox-include igraph_betweenness_subset -->
+<!-- doxrox-include igraph_edge_betweenness_subset -->
 </section>
 
 <section id="centralization"><title>Centralization</title>
@@ -164,8 +166,6 @@
 
 <section id="trees"><title>Trees and forests</title>
 <!-- doxrox-include igraph_minimum_spanning_tree -->
-<!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
-<!-- doxrox-include igraph_minimum_spanning_tree_prim -->
 <!-- doxrox-include igraph_random_spanning_tree -->
 <!-- doxrox-include igraph_is_tree -->
 <!-- doxrox-include igraph_is_forest -->
@@ -194,6 +194,8 @@
 <section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple graphs: Multiple and loop edges</title>
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
+<!-- doxrox-include igraph_has_loop -->
+<!-- doxrox-include igraph_count_loops -->
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
@@ -218,6 +220,7 @@
 <!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
 <!-- doxrox-include igraph_feedback_arc_set -->
+<!-- doxrox-include igraph_feedback_vertex_set -->
 </section>
 
 <section id="maximum-cardinality-search-chordal-graphs"><title>Maximum cardinality search and chordal graphs</title>
@@ -237,9 +240,11 @@
 
 <section id="other-operations"><title>Other operations</title>
 <!-- doxrox-include igraph_density -->
+<!-- doxrox-include igraph_mean_degree -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
+<!-- doxrox-include igraph_has_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
@@ -248,18 +253,6 @@
 <!-- doxrox-include igraph_get_stochastic_sparse -->
 <!-- doxrox-include igraph_get_edgelist -->
 <!-- doxrox-include igraph_is_acyclic -->
-</section>
-
-<section id="structural-properties-deprecated"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_shortest_paths -->
-<!-- doxrox-include igraph_shortest_paths_dijkstra -->
-<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
-<!-- doxrox-include igraph_shortest_paths_johnson -->
-<!-- doxrox-include igraph_get_stochastic_sparsemat -->
-<!-- doxrox-include igraph_get_sparsemat -->
-<!-- doxrox-include igraph_laplacian -->
-<!-- doxrox-include igraph_hub_score -->
-<!-- doxrox-include igraph_authority_score -->
 </section>
 
 </chapter>

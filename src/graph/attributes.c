@@ -594,6 +594,7 @@ igraph_error_t igraph_attribute_record_set_type(
 static igraph_error_t igraph_i_attribute_record_list_init_item(
     const igraph_attribute_record_list_t* list, igraph_attribute_record_t* item
 ) {
+    IGRAPH_UNUSED(list);
     return igraph_attribute_record_init(item, NULL, IGRAPH_ATTRIBUTE_UNSPECIFIED);
 }
 
@@ -886,12 +887,6 @@ igraph_set_attribute_table(const igraph_attribute_table_t * table) {
     igraph_attribute_table_t *old = igraph_i_attribute_table;
     igraph_i_attribute_table = (igraph_attribute_table_t*) table;
     return old;
-}
-
-igraph_attribute_table_t *
-igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
-    IGRAPH_WARNING("igraph_i_set_attribute_table is deprecated, use igraph_set_attribute_table.");
-    return igraph_set_attribute_table(table);
 }
 
 igraph_bool_t igraph_has_attribute_table(void) {

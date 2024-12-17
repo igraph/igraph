@@ -59,8 +59,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#include "core/indheap.h"
-
 /**
  * \ingroup vector
  * \function igraph_vector_floor
@@ -94,23 +92,6 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_in
         VECTOR(*to)[i] = round(VECTOR(*from)[i]);
     }
 
-    return IGRAPH_SUCCESS;
-}
-
-igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
-    igraph_indheap_t heap;
-
-    IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
-    IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
-
-    igraph_vector_clear(v);
-    while (!igraph_indheap_empty(&heap)) {
-        IGRAPH_CHECK(igraph_vector_push_back(v, igraph_indheap_max_index(&heap) - 1));
-        igraph_indheap_delete_max(&heap);
-    }
-
-    igraph_indheap_destroy(&heap);
-    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
@@ -200,23 +181,36 @@ igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
-                             igraph_vector_int_t* res,
-                             igraph_integer_t nodes) {
-    igraph_integer_t edges = igraph_vector_int_size(v);
+/**
+ * \function igraph_i_vector_int_order
+ *
+ * \param v Integer vector with non-negative entries.
+ * \param res The indices of the elements of \p v will be written here
+ *    in sorted order.
+ * \param maxval The largest value in \p v must be provided here.
+ * \return Error code.
+ *
+ * Time complexity: O(maxval).
+ */
+igraph_error_t igraph_i_vector_int_order(
+        const igraph_vector_int_t *v,
+        igraph_vector_int_t *res,
+        igraph_integer_t maxval) {
+
+    const igraph_integer_t size = igraph_vector_int_size(v);
     igraph_vector_int_t ptr;
     igraph_vector_int_t rad;
-    igraph_integer_t i, j;
+    igraph_integer_t j;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, nodes + 1);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, edges);
-    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, maxval + 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, size);
+    IGRAPH_CHECK(igraph_vector_int_resize(res, size));
 
-    for (i = 0; i < edges; i++) {
-        igraph_integer_t radix = v->stor_begin[i];
+    for (igraph_integer_t i = 0; i < size; i++) {
+        igraph_integer_t radix = VECTOR(*v)[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -224,13 +218,13 @@ igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
     }
 
     j = 0;
-    for (i = 0; i < nodes + 1; i++) {
+    for (igraph_integer_t i = 0; i < maxval + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
             igraph_integer_t next = VECTOR(ptr)[i] - 1;
-            res->stor_begin[j++] = next;
+            VECTOR(*res)[j++] = next;
             while (VECTOR(rad)[next] != 0) {
                 next = VECTOR(rad)[next] - 1;
-                res->stor_begin[j++] = next;
+                VECTOR(*res)[j++] = next;
             }
         }
     }
@@ -242,25 +236,38 @@ igraph_error_t igraph_vector_int_order1(const igraph_vector_int_t* v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_vector_rank(
-        const igraph_vector_t *v, igraph_vector_int_t *res, igraph_integer_t nodes) {
+/**
+ * \function igraph_i_vector_int_rank
+ *
+ * \param v Integer vector with non-negative entries.
+ * \param res The zero-based rank of the elements of \p v will be written here
+ *    from smallest to largest.
+ * \param maxval The largest value in \p v must be provided here.
+ * \return Error code.
+ *
+ * Time complexity: O(maxval).
+ */
+igraph_error_t igraph_i_vector_int_rank(
+    const igraph_vector_int_t *v,
+    igraph_vector_int_t *res,
+    igraph_integer_t maxval) {
 
+    const igraph_integer_t size = igraph_vector_int_size(v);
     igraph_vector_int_t rad;
     igraph_vector_int_t ptr;
-    igraph_integer_t edges = igraph_vector_size(v);
-    igraph_integer_t i, c = 0;
+    igraph_integer_t c = 0;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, edges);
-    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, maxval);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, size);
+    IGRAPH_CHECK(igraph_vector_int_resize(res, size));
 
-    for (i = 0; i < edges; i++) {
+    for (igraph_integer_t i = 0; i < size; i++) {
         igraph_integer_t elem = VECTOR(*v)[i];
         VECTOR(ptr)[i] = VECTOR(rad)[elem];
         VECTOR(rad)[elem] = i + 1;
     }
 
-    for (i = 0; i < nodes; i++) {
+    for (igraph_integer_t i = 0; i < maxval; i++) {
         igraph_integer_t p = VECTOR(rad)[i];
         while (p != 0) {
             VECTOR(*res)[p - 1] = c++;
@@ -271,38 +278,7 @@ igraph_error_t igraph_vector_rank(
     igraph_vector_int_destroy(&ptr);
     igraph_vector_int_destroy(&rad);
     IGRAPH_FINALLY_CLEAN(2);
-    return IGRAPH_SUCCESS;
-}
 
-igraph_error_t igraph_vector_int_rank(
-        const igraph_vector_int_t *v, igraph_vector_int_t *res, igraph_integer_t nodes) {
-
-    igraph_vector_int_t rad;
-    igraph_vector_int_t ptr;
-    igraph_integer_t edges = igraph_vector_int_size(v);
-    igraph_integer_t i, c = 0;
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rad, nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, edges);
-    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
-
-    for (i = 0; i < edges; i++) {
-        igraph_integer_t elem = VECTOR(*v)[i];
-        VECTOR(ptr)[i] = VECTOR(rad)[elem];
-        VECTOR(rad)[elem] = i + 1;
-    }
-
-    for (i = 0; i < nodes; i++) {
-        igraph_integer_t p = VECTOR(rad)[i];
-        while (p != 0) {
-            VECTOR(*res)[p - 1] = c++;
-            p = VECTOR(ptr)[p - 1];
-        }
-    }
-
-    igraph_vector_int_destroy(&ptr);
-    igraph_vector_int_destroy(&rad);
-    IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
 
@@ -476,38 +452,6 @@ igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *
     return true;
 }
 
-/**
- * Deprecated in favour of \ref igraph_vector_all_almost_e() which uses
- * relative tolerances. Will be removed in 0.11.
- *
- * Checks if two vectors are equal within an absolute tolerance.
- */
-igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
-                                  const igraph_vector_t *rhs,
-                                  igraph_real_t tol) {
-    igraph_integer_t i, s;
-    IGRAPH_ASSERT(lhs != 0);
-    IGRAPH_ASSERT(rhs != 0);
-    IGRAPH_ASSERT(lhs->stor_begin != 0);
-    IGRAPH_ASSERT(rhs->stor_begin != 0);
-
-    s = igraph_vector_size(lhs);
-    if (s != igraph_vector_size(rhs)) {
-        return false;
-    } else {
-        if (tol == 0) {
-            tol = DBL_EPSILON;
-        }
-        for (i = 0; i < s; i++) {
-            igraph_real_t l = VECTOR(*lhs)[i];
-            igraph_real_t r = VECTOR(*rhs)[i];
-            if (l < r - tol || l > r + tol) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
 
 /**
  * \function igraph_vector_all_almost_e
@@ -662,7 +606,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
  * \brief Check if any element is NaN.
  *
  * \param v The \type igraph_vector_t object to check.
- * \return 1 if any element is NaN, 0 otherwise.
+ * \return True if any element is NaN, false otherwise.
  *
  * Time complexity: O(n), the number of elements.
  */
@@ -679,4 +623,30 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
         ptr++;
     }
     return false;
+}
+
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_is_all_finite
+ * \brief Check if all elements are finite.
+ *
+ * \param v The \type igraph_vector_t object to check.
+ * \return True if none of the elements are infinite or NaN.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+igraph_bool_t igraph_vector_is_all_finite(const igraph_vector_t *v)
+{
+    igraph_real_t *ptr;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    ptr = v->stor_begin;
+    while (ptr < v->end) {
+        if (!isfinite(*ptr)) {
+            return false;
+        }
+        ptr++;
+    }
+    return true;
 }

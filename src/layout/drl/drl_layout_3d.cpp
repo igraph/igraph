@@ -44,21 +44,10 @@
 // S. Martin
 // 5/6/2005
 
-// C++ library routines
-#include <map>
-#include <vector>
-
-using namespace std;
-
 // layout routines and constants
 #include "drl_layout_3d.h"
 #include "drl_parse.h"
 #include "drl_graph_3d.h"
-
-// MPI
-#ifdef MUSE_MPI
-    #include <mpi.h>
-#endif
 
 using namespace drl3d;
 #include "igraph_layout.h"
@@ -79,7 +68,7 @@ using namespace drl3d;
  * </para><para> This function uses a modified DrL generator that does
  * the layout in three dimensions.
  * \param graph The input graph.
- * \param use_seed Logical scalar, if true, then the coordinates
+ * \param use_seed Boolean, if true, then the coordinates
  *    supplied in the \p res argument are used as starting points.
  * \param res Pointer to a matrix, the result layout is stored
  *    here. It will be resized as needed.
@@ -138,7 +127,7 @@ igraph_error_t igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 3));
             neighbors.read_real(res);
         }
-        neighbors.draw_graph(res);
+        IGRAPH_CHECK(neighbors.draw_graph(res));
 
         RNG_END();
     );

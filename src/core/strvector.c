@@ -277,18 +277,6 @@ igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \ingroup strvector
- * \function igraph_strvector_copy
- * \brief Initialization by copying (deprecated alias).
- *
- * \deprecated-by igraph_strvector_init_copy 0.10.0
- */
-
-igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
-                          const igraph_strvector_t *from) {
-    return igraph_strvector_init_copy(to, from);
-}
 
 /**
  * \function igraph_strvector_append
@@ -310,16 +298,25 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
  */
 
 igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
-                            const igraph_strvector_t *from) {
-    const igraph_integer_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
-    igraph_integer_t newlen;
+                                       const igraph_strvector_t *from) {
+    const igraph_integer_t to_size = igraph_strvector_size(to);
+    const igraph_integer_t from_size = igraph_strvector_size(from);
+    const igraph_integer_t to_capacity = igraph_strvector_capacity(to);
+    igraph_integer_t new_to_size;
     igraph_bool_t error = false;
     const char *tmp;
 
-    IGRAPH_SAFE_ADD(len1, len2, &newlen);
-    IGRAPH_CHECK(igraph_strvector_reserve(to, newlen));
+    IGRAPH_SAFE_ADD(to_size, from_size, &new_to_size);
 
-    for (igraph_integer_t i = 0; i < len2; i++) {
+    if (to_capacity < new_to_size) {
+        igraph_integer_t new_to_capacity = to_capacity < IGRAPH_INTEGER_MAX/2 ? to_capacity * 2 : IGRAPH_INTEGER_MAX;
+        if (new_to_capacity < new_to_size) {
+            new_to_capacity = new_to_size;
+        }
+        IGRAPH_CHECK(igraph_strvector_reserve(to, new_to_capacity));
+    }
+
+    for (igraph_integer_t i = 0; i < from_size; i++) {
         if (from->stor_begin[i] == NULL || from->stor_begin[i][0] == '\0') {
             /* Represent empty strings as NULL. */
             tmp = NULL;
@@ -335,7 +332,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     }
 
     if (error) {
-        igraph_strvector_resize(to, len1); /* always shrinks */
+        igraph_strvector_resize(to, to_size); /* always shrinks */
         IGRAPH_ERROR("Cannot append string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
@@ -620,46 +617,21 @@ igraph_error_t igraph_strvector_push_back_len(
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \ingroup strvector
- * \function igraph_strvector_add
- * \brief Adds an element to the back of a string vector (deprecated alias).
- *
- * \deprecated-by igraph_strvector_push_back 0.10.0
- */
-
-igraph_error_t igraph_strvector_add(igraph_strvector_t *sv, const char *value) {
-    return igraph_strvector_push_back(sv, value);
-}
-
-/**
- * \ingroup strvector
- * \function igraph_strvector_set2
- * \brief Sets an element of the string vector given a buffer and its size (deprecated alias).
- *
- * \deprecated-by igraph_strvector_set_len 0.10.0
- */
-
-igraph_error_t igraph_strvector_set2(
-    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
-) {
-    return igraph_strvector_set_len(sv, idx, value, len);
-}
 
 /**
  * \ingroup strvector
  * \function igraph_strvector_print
- * \brief Prints a string vector.
+ * \brief Prints a string vector to a file.
  *
  * \param sv The string vector.
  * \param file The file to write to.
  * \param sep The separator to print between strings.
  * \return Error code.
  */
-igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
-                           const char *sep) {
+igraph_error_t igraph_strvector_fprint(const igraph_strvector_t *sv, FILE *file,
+                                       const char *sep) {
 
-    igraph_integer_t n = igraph_strvector_size(sv);
+    const igraph_integer_t n = igraph_strvector_size(sv);
     if (n != 0) {
         fprintf(file, "%s", igraph_strvector_get(sv, 0));
     }
@@ -668,6 +640,22 @@ igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
     }
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_print
+ * \brief Prints a string vector.
+ *
+ * \param sv The string vector.
+ * \param sep The separator to print between strings.
+ * \return Error code.
+ */
+#ifndef USING_R
+igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv,
+                                      const char *sep) {
+    return igraph_strvector_fprint(sv, stdout, sep);
+}
+#endif
 
 /**
  * \ingroup strvector
@@ -732,4 +720,22 @@ void igraph_strvector_swap(igraph_strvector_t *v1, igraph_strvector_t *v2) {
     tmp = *v1;
     *v1 = *v2;
     *v2 = tmp;
+}
+
+/**
+ * \function igraph_strvector_swap_elements
+ * \brief Swap two elements in a string vector.
+ *
+ * Note that currently no range checking is performed.
+ *
+ * \param sv The string vector.
+ * \param i Index of the first element.
+ * \param j Index of the second element (may be the same as the first one).
+ *
+ * Time complexity: O(1).
+ */
+void igraph_strvector_swap_elements(igraph_strvector_t *sv, igraph_integer_t i, igraph_integer_t j) {
+    const char *tmp = sv->stor_begin[i];
+    sv->stor_begin[i] = sv->stor_begin[j];
+    sv->stor_begin[j] = tmp;
 }

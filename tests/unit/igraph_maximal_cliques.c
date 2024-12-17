@@ -95,7 +95,7 @@ int main(void) {
         igraph_destroy(&g);
         g = g2;
     }
-    igraph_simplify(&g, /*multiple=*/ true, /*loop=*/ false, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /*remove_multiple=*/ true, /*remove_loop=*/ false, /*edge_comb=*/ NULL);
 
     igraph_vector_int_destroy(&perm);
     igraph_destroy(&cli);

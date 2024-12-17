@@ -23,14 +23,14 @@
 
 #include "igraph_progress.h"
 
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 static IGRAPH_THREAD_LOCAL igraph_progress_handler_t *igraph_i_progress_handler = 0;
 static IGRAPH_THREAD_LOCAL char igraph_i_progressmsg_buffer[1000];
 
 /**
  * \function igraph_progress
- * Report progress
+ * \brief Report the progress of a calculation from an igraph function.
  *
  * Note that the usual way to report progress is the \ref IGRAPH_PROGRESS
  * macro, as that takes care of the return value of the progress
@@ -45,25 +45,22 @@ static IGRAPH_THREAD_LOCAL char igraph_i_progressmsg_buffer[1000];
  *     report progress pass a null pointer here. Users can
  *     write their own progress handlers and functions with progress
  *     reporting, and then pass some meaningfull context here.
- * \return If there is a progress handler installed and
- *     it does not return \c IGRAPH_SUCCESS, then \c IGRAPH_INTERRUPTED
- *     is returned.
+ * \return Error code from the progress handler function, or \c IGRAPH_SUCCESS
+ *         if no progress handler function was registered.
  *
  * Time complexity: O(1).
  */
 
 igraph_error_t igraph_progress(const char *message, igraph_real_t percent, void *data) {
     if (igraph_i_progress_handler) {
-        if (igraph_i_progress_handler(message, percent, data) != IGRAPH_SUCCESS) {
-            return IGRAPH_INTERRUPTED;
-        }
+        return igraph_i_progress_handler(message, percent, data);
     }
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_progressf
- * Report progress, printf-like version
+ * \brief Report the progress of a calculation from an igraph function, printf-like.
  *
  * This is a more flexible version of \ref igraph_progress(), with
  * a printf-like template string. First the template string
@@ -84,9 +81,8 @@ igraph_error_t igraph_progress(const char *message, igraph_real_t percent, void 
  *     reporting, and then pass some meaningfull context here.
  * \param ... Additional argument that were specified in the
  *     \p message argument.
- * \return If there is a progress handler installed and
- *     it does not return \c IGRAPH_SUCCESS, then \c IGRAPH_INTERRUPTED
- *     is returned.
+ * \return Error code from the progress handler function, or \c IGRAPH_SUCCESS
+ *         if no progress handler function was registered.
  * \return
  */
 
