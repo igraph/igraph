@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <style type="text/css">
+      .io > * {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      #arguments {
+        width: 100%;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@mapequation/infomap@latest/index.min.js"
+    ></script>
+  </head>
+  <body>
+    <div class="io">
+      <div class="input">
+        <form id="network-form">
+          <textarea id="network" rows="30" cols="20">
+#source target [weight]
+0 1
+0 2
+0 3
+1 0
+1 2
+2 1
+2 0
+3 0
+3 4
+3 5
+4 3
+4 5
+5 4
+5 3
+</textarea>
+        </form>
+      </div>
+
+      <div class="action">
+        <input type="text" id="arguments" value="" />
+        <button id="run">Run...</button>
+        <div class="console">
+          <textarea
+            id="console"
+            rows="30"
+            cols="100"
+            readonly="true"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="output">
+        <textarea id="output" rows="30" cols="20" readonly="true"></textarea>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      const Infomap = window.infomap.default;
+
+      const infomap = new Infomap()
+        .on("data", printLine)
+        .on("error", content => printLine("Error: " + content))
+        .on("finished", onFinished);
+
+      function run() {
+        clearOutput();
+        const network = document.getElementById("network").value;
+        const args = document.getElementById("arguments").value;
+
+        infomap.run({ network, args });
+      }
+
+      function printLine(line) {
+        document.getElementById("console").value += line + "\n";
+      }
+
+      function clearOutput() {
+        document.getElementById("console").value = "";
+        document.getElementById("output").value = "";
+      }
+
+      function onFinished(content) {
+        const { clu, tree, ftree } = content;
+        if (clu) document.getElementById("output").value += clu;
+        if (tree) document.getElementById("output").value += tree;
+        if (ftree) document.getElementById("output").value += ftree;
+      }
+
+      document.getElementById("run").addEventListener("click", run);
+    </script>
+  </body>
+</html>

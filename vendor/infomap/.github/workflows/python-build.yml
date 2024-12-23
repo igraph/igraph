@@ -1,0 +1,27 @@
+name: Build Python package
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: |
+          sudo apt update
+          sudo apt install swig
+          pip install -r requirements_dev.txt
+      - run: make python
+      - run: make py-local-install
+      - run: make py-test

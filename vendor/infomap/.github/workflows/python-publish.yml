@@ -1,0 +1,120 @@
+name: Publish Python Package
+
+on:
+  release:
+    types: [created]
+
+  workflow_dispatch:
+
+jobs:
+  swig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo apt update
+          sudo apt install swig
+      - run: make py-swig
+      - uses: actions/upload-artifact@v2
+        with:
+          retention-days: 1
+          name: swigfiles
+          path: build/py/
+
+  build:
+    needs: swig
+    name: build (${{ matrix.config.name }}, ${{ matrix.python-version }})
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - {
+              name: windows,
+              os: windows-2019,
+              cxxflags: -static,
+              ldflags: -static,
+              compiler: g++,
+            }
+          - {
+              name: ubuntu,
+              os: ubuntu-20.04,
+              cxxflags: "",
+              ldflags: "",
+              compiler: g++,
+            }
+          - {
+              name: macos,
+              os: macos-11,
+              cxxflags: "-I /usr/local/include -I/usr/local/opt/llvm/include",
+              ldflags: "-L /usr/local/lib -L/usr/local/opt/llvm/lib",
+              compiler: /usr/local/opt/llvm/bin/clang++,
+            }
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: swigfiles
+          path: build/py
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel
+          pip install -r requirements_dev.txt
+      - if: startsWith(matrix.config.os, 'macos')
+        run: |
+          brew install llvm libomp
+          export PATH="$(brew --prefix llvm)/bin:$PATH"
+      - run: make py-build
+        shell: bash
+        env:
+          CXX: ${{ matrix.config.compiler }}
+          CXXFLAGS: ${{ matrix.config.cxxflags }}
+          LDFLAGS: ${{ matrix.config.ldflags }}
+      - run: make py-local-install
+        shell: bash
+      - run: make py-test
+        shell: bash
+      - run: make pypi-dist
+        shell: bash
+      - uses: actions/upload-artifact@v2
+        with:
+          retention-days: 1
+          name: package-${{ matrix.config.name }}-${{ matrix.python-version }}
+          path: build/py/
+
+  publish:
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+      - run: |
+          mkdir -p build
+          mv package-macos-3.9 build/py
+          cp package-macos-*/dist/*.whl build/py/dist
+          cp package-windows-*/dist/*.whl build/py/dist
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      # npm ci to get prettier
+      - run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements_dev.txt
+          npm ci
+      - run: make pypi-publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - run: make py-doc
+      - uses: EndBug/add-and-commit@v7.4.0
+        with:
+          default_author: github_actions
+          add: "docs"
+          message: "docs(python): Update Python docs"

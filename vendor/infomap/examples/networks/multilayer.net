@@ -1,0 +1,29 @@
+# A multilayer network using explicit format
+# Figure 3
+*Vertices 5
+# node_id name
+1 "i"
+2 "j"
+3 "k"
+4 "l"
+5 "m"
+*Multilayer
+# layer_id node_id layer_id node_id weight
+# intra
+1 1 1 4 0.8
+1 4 1 1 1
+1 1 1 5 0.8
+1 5 1 1 1
+1 4 1 5 1
+1 5 1 4 1
+2 1 2 2 0.8
+2 2 2 1 1
+2 1 2 3 0.8
+2 3 2 1 1
+2 2 2 3 1
+2 3 2 2 1
+# inter
+1 1 2 2 0.2
+1 1 2 3 0.2
+2 1 1 4 0.2
+2 1 1 5 0.2

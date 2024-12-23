@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "target": "es6",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationDir": "../../",
+    "baseUrl": "src"
+  },
+  "files": ["src/index.ts"]
+}
