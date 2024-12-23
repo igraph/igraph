@@ -1,3 +1,0 @@
-[submodule "src/community/infomap"]
-	path = vendor/infomap
-	url = https://github.com/mapequation/infomap.git
