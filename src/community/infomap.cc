@@ -152,6 +152,8 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         // Re-index membership
         IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
 
+        *codelength = iw.codelength();
+
         return IGRAPH_SUCCESS;
 
 #endif
