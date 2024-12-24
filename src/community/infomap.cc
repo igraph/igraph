@@ -126,6 +126,8 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         igraph_integer_t n = igraph_vcount(graph);
         igraph_integer_t m = igraph_ecount(graph);
 
+        igraph_vector_int_resize(membership, n);
+
         for (igraph_integer_t v = 0; v < n; v++)
         {
             iw.addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1);
@@ -137,12 +139,12 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
             igraph_integer_t v2 = IGRAPH_TO(graph, e);
             iw.addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1);
         }
-        
+
         // Run main infomap algorithm
         iw.run();
 
         // Retrieve membership
-        for (auto it = iw.iterTree(); !it.isEnd(); ++it) 
+        for (auto it = iw.iterTree(); !it.isEnd(); ++it)
         {
             VECTOR(*membership)[it->physicalId] = it.moduleIndex();
         }
