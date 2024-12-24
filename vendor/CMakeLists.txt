@@ -8,18 +8,14 @@ add_subdirectory(plfit)
 
 # We add the infomap vendored target here, so that
 # we can keep infomap as a clean submodule.
+
+file(GLOB_RECURSE infomap_src CONFIGURE_DEPENDS "infomap/src/*.h" "infomap/src/*.cpp")
 add_library(infomap_vendored
 
   OBJECT
   EXCLUDE_FROM_ALL
 
-  infomap/src/core/BiasedMapEquation.cpp
-  infomap/src/core/InfoEdge.cpp
-  infomap/src/core/InfomapBase.cpp
-  infomap/src/core/InfoNode.cpp
-  infomap/src/core/MemMapEquation.cpp
-  infomap/src/core/MetaMapEquation.cpp
-  infomap/src/core/StateNetwork.cpp
+  ${infomap_src}
 
 )
 
