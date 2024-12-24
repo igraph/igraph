@@ -119,7 +119,6 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 #ifndef HAVE_INFOMAP
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
-    IGRAPH_HANDLE_EXCEPTIONS(
 
         // Create infomap wrapper
         infomap::InfomapWrapper iw("--two-level -N2");;
@@ -152,7 +151,6 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
 
         return IGRAPH_SUCCESS;
-    );
 
 #endif
 }
