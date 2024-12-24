@@ -128,14 +128,14 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 
         for (igraph_integer_t v = 0; v < n; v++)
         {
-            iw.addNode(v, VECTOR(*v_weights)[v]);
+            iw.addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1);
         }
 
         for (igraph_integer_t e = 0; e < m; e++)
         {
             igraph_integer_t v1 = IGRAPH_FROM(graph, e);
             igraph_integer_t v2 = IGRAPH_TO(graph, e);
-            iw.addLink(v1, v2, VECTOR(*e_weights)[e]);
+            iw.addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1);
         }
         
         // Run main infomap algorithm
