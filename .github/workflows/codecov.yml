@@ -32,10 +32,12 @@ jobs:
       shell: bash
       run: cmake --build . --parallel
 
+    # No need to run coverage target, check is sufficient.
+    # https://github.com/igraph/igraph/issues/2712#issuecomment-2567612369
     - name: Coverage
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: cmake --build . --target coverage --parallel
+      run: cmake --build . --target check --parallel
 
     - name: Codecov.io
       uses: codecov/codecov-action@v5

@@ -143,7 +143,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
     # directory that somehow gets into the coverage results. /Applications and
     # /Library/Developer are for macOS -- they exclude files from the macOS SDK.
-    EXCLUDE "io/*.l" "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
+    EXCLUDE "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
   )
 endif()
 
