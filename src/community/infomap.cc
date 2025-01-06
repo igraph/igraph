@@ -109,6 +109,25 @@ using std::isnan;
  *
  * Time complexity: TODO.
  */
+
+igraph_error_t infomap_get_membership(infomap::InfomapWrapper &im, igraph_vector_int_t *membership) {
+    igraph_integer_t n = im.numLeafNodes();
+
+    IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
+
+    for (auto it(im.iterTreePhysical(1)); !it.isEnd(); ++it) {
+        infomap::InfoNode& node = *it;
+        if (node.isLeaf()) {
+            VECTOR(*membership)[node.physicalId] = it.moduleId();
+        }
+    }
+
+    // Re-index membership
+    IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+
+    return IGRAPH_SUCCESS;
+}
+
 igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              const igraph_vector_t *e_weights,
                              const igraph_vector_t *v_weights,
@@ -126,8 +145,6 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         igraph_integer_t n = igraph_vcount(graph);
         igraph_integer_t m = igraph_ecount(graph);
 
-        igraph_vector_int_resize(membership, n);
-
         for (igraph_integer_t v = 0; v < n; v++)
         {
             iw.addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1);
@@ -143,14 +160,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         // Run main infomap algorithm
         iw.run();
 
-        // Retrieve membership
-        for (auto it = iw.iterTree(); !it.isEnd(); ++it)
-        {
-            VECTOR(*membership)[it->physicalId] = it.moduleIndex();
-        }
-
-        // Re-index membership
-        IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+        IGRAPH_CHECK(infomap_get_membership(iw, membership));
 
         *codelength = iw.codelength();
 
