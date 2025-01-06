@@ -82,9 +82,9 @@ typedef struct {
 /**
  * The implementation of procedure UNBLOCK from Johnson's paper
  */
-static igraph_error_t
-igraph_i_simple_cycles_unblock(igraph_i_simple_cycle_search_state_t *state,
-                               igraph_integer_t u) {
+static igraph_error_t igraph_i_simple_cycles_unblock(
+    igraph_i_simple_cycle_search_state_t *state,
+    igraph_integer_t u) {
 
     // TODO: introduce stack for w & neis in order to reduce the number of
     // iterations.
@@ -133,9 +133,12 @@ igraph_i_simple_cycles_unblock(igraph_i_simple_cycle_search_state_t *state,
  * \param arg: argument to pass to the callback function
  */
 static igraph_error_t igraph_i_simple_cycles_circuit(
-    igraph_i_simple_cycle_search_state_t *state, igraph_integer_t V,
-    igraph_integer_t max_cycle_length, igraph_integer_t min_cycle_length,
-    igraph_cycle_handler_t *callback, void *arg) {
+    igraph_i_simple_cycle_search_state_t *state,
+    igraph_integer_t V,
+    igraph_integer_t max_cycle_length,
+    igraph_integer_t min_cycle_length,
+    igraph_cycle_handler_t *callback,
+    void *arg) {
 
     const igraph_vector_int_t *neighbors;
     const igraph_vector_int_t *incident_edges;
@@ -319,7 +322,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  * \ref igraph_i_simple_cycle_search_state_destroy
  */
 static igraph_error_t igraph_i_simple_cycle_search_state_init(
-    igraph_i_simple_cycle_search_state_t *state, const igraph_t *graph,
+    igraph_i_simple_cycle_search_state_t *state,
+    const igraph_t *graph,
     igraph_neimode_t mode) {
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
@@ -381,9 +385,10 @@ static void igraph_i_simple_cycle_search_state_destroy(
  * Use by \ref igraph_simple_cycles()
  */
 static igraph_error_t
-igraph_i_append_simple_cycle_result(const igraph_vector_int_t *vertices,
-                                    const igraph_vector_int_t *edges,
-                                    void *arg) {
+igraph_i_append_simple_cycle_result(
+    const igraph_vector_int_t *vertices,
+    const igraph_vector_int_t *edges,
+    void *arg) {
 
     igraph_i_simple_cycle_results_t *res_list =
         (igraph_i_simple_cycle_results_t *)arg;
@@ -502,12 +507,13 @@ static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
  *
  * \return Error code.
  */
-igraph_error_t igraph_simple_cycles_callback(const igraph_t *graph,
-        igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length,
-        igraph_cycle_handler_t *callback,
-        void *arg) {
+igraph_error_t igraph_simple_cycles_callback(
+    const igraph_t *graph,
+    igraph_neimode_t mode,
+    igraph_integer_t min_cycle_length,
+    igraph_integer_t max_cycle_length,
+    igraph_cycle_handler_t *callback,
+    void *arg) {
 
     if (max_cycle_length == 0) {
         return IGRAPH_SUCCESS;
@@ -607,12 +613,13 @@ igraph_error_t igraph_simple_cycles_callback(const igraph_t *graph,
  *
  * \return Error code.
  */
-igraph_error_t igraph_simple_cycles(const igraph_t *graph,
-                                    igraph_vector_int_list_t *vertices,
-                                    igraph_vector_int_list_t *edges,
-                                    igraph_neimode_t mode,
-                                    igraph_integer_t min_cycle_length,
-                                    igraph_integer_t max_cycle_length) {
+igraph_error_t igraph_simple_cycles(
+    const igraph_t *graph,
+    igraph_vector_int_list_t *vertices,
+    igraph_vector_int_list_t *edges,
+    igraph_neimode_t mode,
+    igraph_integer_t min_cycle_length,
+    igraph_integer_t max_cycle_length) {
 
     igraph_i_simple_cycle_results_t result_list;
     result_list.vertices = vertices;
