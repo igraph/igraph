@@ -62,7 +62,7 @@ igraph_error_t igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
     int inc = 1;
 
     if (igraph_matrix_nrow(a) > INT_MAX || igraph_matrix_ncol(a) > INT_MAX) {
-        IGRAPH_ERROR("Matrix too large for BLAS", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Matrix too large for BLAS.", IGRAPH_EOVERFLOW);
     }
 
     m = (int) igraph_matrix_nrow(a);
@@ -193,7 +193,7 @@ igraph_error_t igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t al
     int inc = 1;
 
     if (igraph_matrix_nrow(a) > INT_MAX || igraph_matrix_ncol(a) > INT_MAX) {
-        IGRAPH_ERROR("Matrix too large for BLAS", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Matrix too large for BLAS.", IGRAPH_EOVERFLOW);
     }
 
     m = (int) igraph_matrix_nrow(a);
@@ -221,7 +221,7 @@ igraph_error_t igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t al
  */
 igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
     if (igraph_vector_size(v) > INT_MAX) {
-        IGRAPH_ERROR("Vector too large for BLAS", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Vector too large for BLAS.", IGRAPH_EOVERFLOW);
     }
 
     int n = (int) igraph_vector_size(v);
@@ -245,7 +245,7 @@ igraph_error_t igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t
                        igraph_real_t *res) {
 
     if (igraph_vector_size(v1) > INT_MAX) {
-        IGRAPH_ERROR("Vector too large for BLAS", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Vector too large for BLAS.", IGRAPH_EOVERFLOW);
     }
 
     int n = (int) igraph_vector_size(v1);

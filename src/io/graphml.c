@@ -41,7 +41,7 @@
 #include <libxml/globals.h>
 #include <libxml/parser.h>
 
-xmlEntity blankEntityStruct = {
+static xmlEntity blankEntity = {
 #ifndef XML_WITHOUT_CORBA
     NULL, /* _private */
 #endif
@@ -71,8 +71,6 @@ xmlEntity blankEntityStruct = {
     0     /* expandedSize */
 #endif
 };
-
-xmlEntityPtr blankEntity = &blankEntityStruct;
 
 #define toXmlChar(a)   (BAD_CAST(a))
 #define fromXmlChar(a) ((char *)(a)) /* not the most elegant way... */
@@ -384,7 +382,7 @@ static xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
     entityName = fromXmlChar(name);
     IGRAPH_WARNINGF("Unknown XML entity found: '%s'.", entityName);
 
-    return blankEntity;
+    return &blankEntity;
 }
 
 static igraph_error_t igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {

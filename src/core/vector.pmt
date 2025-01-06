@@ -1596,7 +1596,7 @@ igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
 
 BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v) {
     BASE res = ZERO;
-    BASE *p;
+    const BASE *p;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
@@ -1611,7 +1611,7 @@ BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v) {
 
 igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
     igraph_real_t res = 0.0;
-    BASE *p;
+    const BASE *p;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
@@ -1640,7 +1640,7 @@ igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
 
 BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
     BASE res = ONE;
-    BASE *p;
+    const BASE *p;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
@@ -1671,7 +1671,8 @@ BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
 igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     BASE res = ZERO;
-    BASE *p, *p2;
+    const BASE *p;
+    BASE *p2;
 
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(from->stor_begin != NULL);

@@ -982,7 +982,7 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
     /* Integer overflow is no longer a concern after the above check. */
 
     const igraph_integer_t vcount = (igraph_integer_t) 1 << n;
-    const igraph_integer_t ecount = ((igraph_integer_t) 1 << (n-1)) * n;
+    const igraph_integer_t ecount = n > 0 ? ((igraph_integer_t) 1 << (n-1)) * n : 0; /* avoid UBSan warning */
     igraph_vector_int_t edges;
     igraph_integer_t p;
     int iter = 0;

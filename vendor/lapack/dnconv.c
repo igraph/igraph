@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -16,69 +16,69 @@
 
 static doublereal c_b3 = .66666666666666663;
 
-/* -----------------------------------------------------------------------   
-   \BeginDoc   
+/* -----------------------------------------------------------------------
+   \BeginDoc
 
-   \Name: dnconv   
+   \Name: dnconv
 
-   \Description:   
-    Convergence testing for the nonsymmetric Arnoldi eigenvalue routine.   
+   \Description:
+    Convergence testing for the nonsymmetric Arnoldi eigenvalue routine.
 
-   \Usage:   
-    call dnconv   
-       ( N, RITZR, RITZI, BOUNDS, TOL, NCONV )   
+   \Usage:
+    call dnconv
+       ( N, RITZR, RITZI, BOUNDS, TOL, NCONV )
 
-   \Arguments   
-    N       Integer.  (INPUT)   
-            Number of Ritz values to check for convergence.   
+   \Arguments
+    N       Integer.  (INPUT)
+            Number of Ritz values to check for convergence.
 
-    RITZR,  Double precision arrays of length N.  (INPUT)   
-    RITZI   Real and imaginary parts of the Ritz values to be checked   
-            for convergence.   
-    BOUNDS  Double precision array of length N.  (INPUT)   
-            Ritz estimates for the Ritz values in RITZR and RITZI.   
+    RITZR,  Double precision arrays of length N.  (INPUT)
+    RITZI   Real and imaginary parts of the Ritz values to be checked
+            for convergence.
+    BOUNDS  Double precision array of length N.  (INPUT)
+            Ritz estimates for the Ritz values in RITZR and RITZI.
 
-    TOL     Double precision scalar.  (INPUT)   
-            Desired backward error for a Ritz value to be considered   
-            "converged".   
+    TOL     Double precision scalar.  (INPUT)
+            Desired backward error for a Ritz value to be considered
+            "converged".
 
-    NCONV   Integer scalar.  (OUTPUT)   
-            Number of "converged" Ritz values.   
+    NCONV   Integer scalar.  (OUTPUT)
+            Number of "converged" Ritz values.
 
-   \EndDoc   
+   \EndDoc
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
-   \BeginLib   
+   \BeginLib
 
-   \Local variables:   
-       xxxxxx  real   
+   \Local variables:
+       xxxxxx  real
 
-   \Routines called:   
-       second  ARPACK utility routine for timing.   
-       dlamch  LAPACK routine that determines machine constants.   
-       dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.   
+   \Routines called:
+       arscnd  ARPACK utility routine for timing.
+       dlamch  LAPACK routine that determines machine constants.
+       dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 
-   \Author   
-       Danny Sorensen               Phuong Vu   
-       Richard Lehoucq              CRPC / Rice University   
-       Dept. of Computational &     Houston, Texas   
-       Applied Mathematics   
-       Rice University   
-       Houston, Texas   
+   \Author
+       Danny Sorensen               Phuong Vu
+       Richard Lehoucq              CRPC / Rice University
+       Dept. of Computational &     Houston, Texas
+       Applied Mathematics
+       Rice University
+       Houston, Texas
 
-   \Revision history:   
-       xx/xx/92: Version ' 2.1'   
+   \Revision history:
+       xx/xx/92: Version ' 2.1'
 
-   \SCCS Information: @(#)   
-   FILE: nconv.F   SID: 2.3   DATE OF SID: 4/20/96   RELEASE: 2   
+   \SCCS Information: @(#)
+   FILE: nconv.F   SID: 2.3   DATE OF SID: 4/20/96   RELEASE: 2
 
-   \Remarks   
-       1. xxxx   
+   \Remarks
+       1. xxxx
 
-   \EndLib   
+   \EndLib
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
    Subroutine */ int igraphdnconv_(integer *n, doublereal *ritzr, doublereal *ritzi,
 	 doublereal *bounds, doublereal *tol, integer *nconv)
@@ -92,51 +92,51 @@ static doublereal c_b3 = .66666666666666663;
 
     /* Local variables */
     integer i__;
-    IGRAPH_F77_SAVE real t0, t1;
+    real t0, t1;
     doublereal eps23, temp;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphsecond_(real *);
-    real tnconv = 0.;
+    extern /* Subroutine */ int igrapharscnd_(real *);
+    real tnconv=0;
 
 
-/*     %----------------------------------------------------%   
-       | Include files for debugging and timing information |   
-       %----------------------------------------------------%   
+/*     %----------------------------------------------------%
+       | Include files for debugging and timing information |
+       %----------------------------------------------------%
 
 
-       %------------------%   
-       | Scalar Arguments |   
-       %------------------%   
+       %------------------%
+       | Scalar Arguments |
+       %------------------%
 
 
-       %-----------------%   
-       | Array Arguments |   
-       %-----------------%   
+       %-----------------%
+       | Array Arguments |
+       %-----------------%
 
-       %---------------%   
-       | Local Scalars |   
-       %---------------%   
+       %---------------%
+       | Local Scalars |
+       %---------------%
 
 
-       %--------------------%   
-       | External Functions |   
-       %--------------------%   
+       %--------------------%
+       | External Functions |
+       %--------------------%
 
-       %-----------------------%   
-       | Executable Statements |   
-       %-----------------------%   
+       %-----------------------%
+       | Executable Statements |
+       %-----------------------%
 
-       %-------------------------------------------------------------%   
-       | Convergence test: unlike in the symmetric code, I am not    |   
-       | using things like refined error bounds and gap condition    |   
-       | because I don't know the exact equivalent concept.          |   
-       |                                                             |   
-       | Instead the i-th Ritz value is considered "converged" when: |   
-       |                                                             |   
-       |     bounds(i) .le. ( TOL * | ritz | )                       |   
-       |                                                             |   
-       | for some appropriate choice of norm.                        |   
-       %-------------------------------------------------------------%   
+       %-------------------------------------------------------------%
+       | Convergence test: unlike in the symmetric code, I am not    |
+       | using things like refined error bounds and gap condition    |
+       | because I don't know the exact equivalent concept.          |
+       |                                                             |
+       | Instead the i-th Ritz value is considered "converged" when: |
+       |                                                             |
+       |     bounds(i) .le. ( TOL * | ritz | )                       |
+       |                                                             |
+       | for some appropriate choice of norm.                        |
+       %-------------------------------------------------------------%
 
        Parameter adjustments */
     --bounds;
@@ -144,10 +144,10 @@ static doublereal c_b3 = .66666666666666663;
     --ritzr;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
 
-/*     %---------------------------------%   
-       | Get machine dependent constant. |   
+/*     %---------------------------------%
+       | Get machine dependent constant. |
        %---------------------------------% */
 
     eps23 = igraphdlamch_("Epsilon-Machine");
@@ -165,13 +165,13 @@ static doublereal c_b3 = .66666666666666663;
 /* L20: */
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tnconv += t1 - t0;
 
     return 0;
 
-/*     %---------------%   
-       | End of dnconv |   
+/*     %---------------%
+       | End of dnconv |
        %---------------% */
 
 } /* igraphdnconv_ */

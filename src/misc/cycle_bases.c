@@ -199,6 +199,8 @@ igraph_i_fundamental_cycles_bfs(
  * \param weights Currently unused.
  * \return Error code.
  *
+ * \sa \ref igraph_minimum_cycle_basis()
+ *
  * Time complexity: O(|V| + |E|).
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
@@ -407,6 +409,8 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   performance tradeoffs.
  * \param weights Currently unused.
  * \return Error code.
+ *
+ * \sa \ref igraph_fundamental_cycles()
  *
  * Time complexity: TODO.
  */

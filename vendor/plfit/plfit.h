@@ -18,22 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef __PLFIT_H__
-#define __PLFIT_H__
+#ifndef PLFIT_H
+#define PLFIT_H
 
 #include <stdlib.h>
+#include "plfit_decls.h"
+#include "plfit_error.h"
 #include "plfit_mt.h"
+#include "plfit_sampling.h"
 #include "plfit_version.h"
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
 
 __BEGIN_DECLS
 
@@ -91,50 +84,50 @@ typedef struct _plfit_discrete_options_t {
     plfit_mt_rng_t* rng;
 } plfit_discrete_options_t;
 
-int plfit_continuous_options_init(plfit_continuous_options_t* options);
-int plfit_discrete_options_init(plfit_discrete_options_t* options);
+PLFIT_EXPORT int plfit_continuous_options_init(plfit_continuous_options_t* options);
+PLFIT_EXPORT int plfit_discrete_options_init(plfit_discrete_options_t* options);
 
-extern const plfit_continuous_options_t plfit_continuous_default_options;
-extern const plfit_discrete_options_t plfit_discrete_default_options;
+PLFIT_EXPORT extern const plfit_continuous_options_t plfit_continuous_default_options;
+PLFIT_EXPORT extern const plfit_discrete_options_t plfit_discrete_default_options;
 
 /********** continuous power law distribution fitting **********/
 
-int plfit_log_likelihood_continuous(const double* xs, size_t n, double alpha,
+PLFIT_EXPORT int plfit_log_likelihood_continuous(const double* xs, size_t n, double alpha,
         double xmin, double* l);
-int plfit_estimate_alpha_continuous(const double* xs, size_t n, double xmin,
+PLFIT_EXPORT int plfit_estimate_alpha_continuous(const double* xs, size_t n, double xmin,
         const plfit_continuous_options_t* options, plfit_result_t* result);
-int plfit_continuous(const double* xs, size_t n,
+PLFIT_EXPORT int plfit_continuous(const double* xs, size_t n,
         const plfit_continuous_options_t* options, plfit_result_t* result);
 
 /*********** discrete power law distribution fitting ***********/
 
-int plfit_estimate_alpha_discrete(const double* xs, size_t n, double xmin,
+PLFIT_EXPORT int plfit_estimate_alpha_discrete(const double* xs, size_t n, double xmin,
         const plfit_discrete_options_t* options, plfit_result_t *result);
-int plfit_log_likelihood_discrete(const double* xs, size_t n, double alpha, double xmin, double* l);
-int plfit_discrete(const double* xs, size_t n, const plfit_discrete_options_t* options,
+PLFIT_EXPORT int plfit_log_likelihood_discrete(const double* xs, size_t n, double alpha, double xmin, double* l);
+PLFIT_EXPORT int plfit_discrete(const double* xs, size_t n, const plfit_discrete_options_t* options,
         plfit_result_t* result);
 
 /***** resampling routines to generate synthetic replicates ****/
 
-int plfit_resample_continuous(const double* xs, size_t n, double alpha, double xmin,
+PLFIT_EXPORT int plfit_resample_continuous(const double* xs, size_t n, double alpha, double xmin,
         size_t num_samples, plfit_mt_rng_t* rng, double* result);
-int plfit_resample_discrete(const double* xs, size_t n, double alpha, double xmin,
+PLFIT_EXPORT int plfit_resample_discrete(const double* xs, size_t n, double alpha, double xmin,
         size_t num_samples, plfit_mt_rng_t* rng, double* result);
 
 /******** calculating the p-value of a fitted model only *******/
 
-int plfit_calculate_p_value_continuous(const double* xs, size_t n,
+PLFIT_EXPORT int plfit_calculate_p_value_continuous(const double* xs, size_t n,
         const plfit_continuous_options_t* options, plfit_bool_t xmin_fixed,
         plfit_result_t *result);
-int plfit_calculate_p_value_discrete(const double* xs, size_t n,
+PLFIT_EXPORT int plfit_calculate_p_value_discrete(const double* xs, size_t n,
         const plfit_discrete_options_t* options, plfit_bool_t xmin_fixed,
         plfit_result_t *result);
 
 /************* calculating descriptive statistics **************/
 
-int plfit_moments(const double* data, size_t n, double* mean, double* variance,
+PLFIT_EXPORT int plfit_moments(const double* data, size_t n, double* mean, double* variance,
         double* skewness, double* kurtosis);
 
 __END_DECLS
 
-#endif /* __PLFIT_H__ */
+#endif /* PLFIT_H */

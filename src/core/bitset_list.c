@@ -35,6 +35,7 @@
 static igraph_error_t igraph_i_bitset_list_init_item(
     const igraph_bitset_list_t* list, igraph_bitset_t* item
 ) {
+    IGRAPH_UNUSED(list);
     return igraph_bitset_init(item, 0);
 }
 

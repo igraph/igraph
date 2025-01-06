@@ -25,11 +25,11 @@
 #define RESTYPE igraph_vector_int_list_t *res
 #define RESNAME res
 #define SUFFIX
-#define RECORD do {                         \
-        IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R));     \
+#define RECORD do { \
+        IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R)); \
     } while (0)
-#define PREPARE do {                    \
-        igraph_vector_int_list_clear(res);           \
+#define PREPARE do { \
+        igraph_vector_int_list_clear(res); \
     } while (0)
 #define CLEANUP
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++)
@@ -59,32 +59,32 @@
 #endif
 
 #ifdef IGRAPH_MC_FULL
-#define RESTYPE                 \
-    const igraph_vector_int_t *subset,            \
-    igraph_vector_int_list_t *res,           \
-    igraph_integer_t *no,           \
+#define RESTYPE \
+    const igraph_vector_int_t *subset, \
+    igraph_vector_int_list_t *res, \
+    igraph_integer_t *no, \
     FILE *outfile
 #define RESNAME subset, res, no, outfile
 #define SUFFIX _subset
-#define RECORD do {                         \
-        if (res) {                                \
-            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R));      \
-        }                                 \
-        if (no) { (*no)++; }                              \
-        if (outfile) { igraph_vector_int_fprint(R, outfile); }        \
+#define RECORD do { \
+        if (res) { \
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, R)); \
+        } \
+        if (no) { (*no)++; } \
+        if (outfile) { igraph_vector_int_fprint(R, outfile); } \
     } while (0)
-#define PREPARE do {                        \
-        if (res) {                                 \
-            igraph_vector_int_list_clear(res);     \
-        }                             \
-        if (no) { *no=0; }                        \
+#define PREPARE do { \
+        if (res) { \
+            igraph_vector_int_list_clear(res); \
+        } \
+        if (no) { *no=0; } \
     } while (0)
 #define CLEANUP
-#define FOR_LOOP_OVER_VERTICES                  \
-    nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;    \
+#define FOR_LOOP_OVER_VERTICES \
+    nn = subset ? igraph_vector_int_size(subset) : no_of_nodes; \
     for (ii=0; ii<nn; ii++)
-#define FOR_LOOP_OVER_VERTICES_PREPARE do {  \
-        i= subset ? VECTOR(*subset)[ii] : ii;    \
+#define FOR_LOOP_OVER_VERTICES_PREPARE do { \
+        i = subset ? VECTOR(*subset)[ii] : ii; \
     } while (0)
 #endif
 
@@ -205,19 +205,20 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
     /* Implementation details. TODO */
 
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t PX, R, H, pos, nextv;
     igraph_vector_int_t coreness;
     igraph_vector_int_t order;
     igraph_vector_int_t rank; /* TODO: this is not needed */
-    igraph_integer_t i, ii, nn, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, ii, nn;
     igraph_adjlist_t adjlist, fulladjlist;
     igraph_real_t pgreset = round(no_of_nodes / 100.0), pg = pgreset, pgc = 0;
     igraph_error_t err;
-    IGRAPH_UNUSED(nn);
+
+    IGRAPH_UNUSED(nn); /* not used by all implementations */
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Edge directions are ignored for maximal clique "
-                       "calculation");
+        IGRAPH_WARNING("Edge directions are ignored for maximal clique calculations.");
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
