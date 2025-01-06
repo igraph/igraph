@@ -1,0 +1,23 @@
+Cycle, detect start:
+( 0 1 2 3 )
+( 0 1 2 3 0 )
+
+Cycle plus one vertex, start given:
+( 0 1 2 3 0 )
+( 0 1 2 3 0 1 )
+
+Single edge, detect start:
+( 2 )
+( 2 3 )
+
+Single edge, directed OUT, detect start:
+( 2 )
+( 2 3 )
+
+Single edge, directed IN, detect start:
+( 2 )
+( 3 2 )
+
+Zero edges, start given:
+( )
+( 2 )
