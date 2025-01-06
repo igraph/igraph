@@ -32,6 +32,7 @@
 #include "igraph_community.h"
 
 #include "igraph_interface.h"
+#include "igraph_random.h"
 
 #include "core/exceptions.h"
 #include "core/interruption.h"
@@ -139,9 +140,19 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
+        // Configure infomap
+        infomap::Config conf;
+        conf.twoLevel = true;
+        conf.numTrials = 1;
+        conf.silent = true;
+
+        RNG_BEGIN();
+        conf.seedToRandomNumberGenerator = RNG_INTEGER(0, IGRAPH_INTEGER_MAX);
+        RNG_END();
+
         // Create infomap wrapper
         infomap::InfomapWrapper iw("--two-level -N2 --silent");
-        
+
         igraph_integer_t n = igraph_vcount(graph);
         igraph_integer_t m = igraph_ecount(graph);
 
