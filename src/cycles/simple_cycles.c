@@ -61,11 +61,14 @@ typedef struct igraph_simple_cycle_search_state_t {
     /* Boolean vector indicating which vertices are blocked */
     igraph_vector_bool_t v_blocked;
 
+    /* Boolean vector indicating which vertices have ever been checked.
+    * The bigger picture here is that this allows a "lazy" community decomposition */
+    igraph_vector_bool_t v_visited;
+
     /* Whether the graph is directed */
     igraph_bool_t directed;
 
-    /* Boolean indicating whether the algorithm should stop searching for cycles
-     */
+    /* Boolean indicating whether the algorithm should stop searching for cycles */
     igraph_bool_t stop_search;
 } igraph_i_simple_cycle_search_state_t;
 
@@ -163,6 +166,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     while ((recurse_deeper ||
             igraph_stack_int_size(&neigh_iteration_progress) > 0) &&
             !state->stop_search) {
+        VECTOR(state->v_visited)[V] = true;
 
         IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) ==
                       igraph_stack_int_size(&e_stack));
@@ -340,7 +344,10 @@ static igraph_error_t igraph_i_simple_cycle_search_state_init(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&state->edge_stack, 8);
     igraph_vector_int_clear(&state->edge_stack);
 
+    // by default false
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&state->v_blocked, state->N);
+
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&state->v_visited, state->N);
 
     IGRAPH_CHECK(igraph_inclist_init(
                      graph, &state->IK, mode,
@@ -354,7 +361,7 @@ static igraph_error_t igraph_i_simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
@@ -375,6 +382,7 @@ static void igraph_i_simple_cycle_search_state_destroy(
     igraph_vector_int_destroy(&state->vertex_stack);
     igraph_vector_int_destroy(&state->edge_stack);
     igraph_vector_bool_destroy(&state->v_blocked);
+    igraph_vector_bool_destroy(&state->v_visited);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
     igraph_adjlist_destroy(&state->B);
@@ -434,10 +442,12 @@ igraph_i_append_simple_cycle_result(
  * https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
 static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
-    igraph_i_simple_cycle_search_state_t *state, igraph_integer_t s,
-    igraph_integer_t min_cycle_length, igraph_integer_t max_cycle_length,
-    igraph_cycle_handler_t *callback, void *arg) {
-
+    igraph_i_simple_cycle_search_state_t *state,
+    igraph_integer_t s,
+    igraph_integer_t min_cycle_length,
+    igraph_integer_t max_cycle_length,
+    igraph_cycle_handler_t *callback,
+    void *arg) {
     // L3:
     for (igraph_integer_t i = s; i < state->N; ++i) {
         VECTOR(state->v_blocked)[i] = false;
@@ -529,16 +539,7 @@ igraph_error_t igraph_simple_cycles_callback(
     // instead, we expect that each cycle must involve, either:
     // - a vertex with degree > 2
     // - or, if it's a free standing cycle, be any vertex of this community
-    igraph_vector_int_t membership;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, state.N);
-    igraph_integer_t no_of_communities = 0;
-    IGRAPH_CHECK(igraph_connected_components(graph, &membership, NULL,
-                 &no_of_communities, IGRAPH_WEAK));
-    igraph_vector_bool_t community_considered;
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&community_considered, no_of_communities);
-    for (igraph_integer_t i = 0; i < no_of_communities; i++) {
-        igraph_vector_bool_set(&community_considered, i, false);
-    }
+    // the community detection happens via the `state->v_visited`
 
     // then, iterate the vertices, and consider them if they are a considerable
     // starting point according to the rules laid out above
@@ -547,16 +548,13 @@ igraph_error_t igraph_simple_cycles_callback(
         igraph_integer_t degree;
         IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
         if (degree < 3 &&
-                igraph_vector_bool_get(&community_considered,
-                                       igraph_vector_int_get(&membership, i))) {
+                VECTOR(state.v_visited)[i]) {
             continue;
         }
         // check if we find a cycle starting from this vertex
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_i_simple_cycles_search_callback_from_one_vertex(
                              &state, i, min_cycle_length, max_cycle_length, callback, arg));
-            igraph_vector_bool_set(&community_considered,
-                                   igraph_vector_int_get(&membership, i), true);
             IGRAPH_ALLOW_INTERRUPTION();
         }
         if (state.stop_search) {
@@ -566,9 +564,7 @@ igraph_error_t igraph_simple_cycles_callback(
     }
 
     igraph_i_simple_cycle_search_state_destroy(&state);
-    igraph_vector_int_destroy(&membership);
-    igraph_vector_bool_destroy(&community_considered);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
