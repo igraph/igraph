@@ -19,7 +19,6 @@
 #include "igraph_cycles.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_components.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
