@@ -111,12 +111,12 @@ using std::isnan;
  * Time complexity: TODO.
  */
 
-igraph_error_t infomap_get_membership(infomap::InfomapWrapper &im, igraph_vector_int_t *membership) {
-    igraph_integer_t n = im.numLeafNodes();
+static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
+    igraph_integer_t n = infomap.numLeafNodes();
 
     IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
 
-    for (auto it(im.iterTreePhysical(1)); !it.isEnd(); ++it) {
+    for (auto it(infomap.iterTreePhysical(1)); !it.isEnd(); ++it) {
         infomap::InfoNode& node = *it;
         if (node.isLeaf()) {
             VECTOR(*membership)[node.physicalId] = it.moduleId();
@@ -125,6 +125,29 @@ igraph_error_t infomap_get_membership(infomap::InfomapWrapper &im, igraph_vector
 
     // Re-index membership
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_to_infomap(const igraph_t *graph,
+                                       const igraph_vector_t *e_weights,
+                                       const igraph_vector_t *v_weights,
+                                       infomap::Network* network) {
+
+    igraph_integer_t n = igraph_vcount(graph);
+    igraph_integer_t m = igraph_ecount(graph);
+
+    for (igraph_integer_t v = 0; v < n; v++)
+    {
+        network->addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1);
+    }
+
+    for (igraph_integer_t e = 0; e < m; e++)
+    {
+        igraph_integer_t v1 = IGRAPH_FROM(graph, e);
+        igraph_integer_t v2 = IGRAPH_TO(graph, e);
+        network->addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1);
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -152,30 +175,16 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         conf.seedToRandomNumberGenerator = RNG_INTEGER(0, IGRAPH_INTEGER_MAX);
         RNG_END();
 
-        // Create infomap wrapper
-        infomap::InfomapWrapper iw(conf);
+        infomap::InfomapBase infomap(conf);
+        infomap::Network network;
 
-        igraph_integer_t n = igraph_vcount(graph);
-        igraph_integer_t m = igraph_ecount(graph);
+        IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
 
-        for (igraph_integer_t v = 0; v < n; v++)
-        {
-            iw.addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1);
-        }
+        infomap.run(network);
 
-        for (igraph_integer_t e = 0; e < m; e++)
-        {
-            igraph_integer_t v1 = IGRAPH_FROM(graph, e);
-            igraph_integer_t v2 = IGRAPH_TO(graph, e);
-            iw.addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1);
-        }
+        IGRAPH_CHECK(infomap_get_membership(infomap, membership));
 
-        // Run main infomap algorithm
-        iw.run();
-
-        IGRAPH_CHECK(infomap_get_membership(iw, membership));
-
-        *codelength = iw.codelength();
+        *codelength = infomap.codelength();
 
         IGRAPH_HANDLE_EXCEPTIONS_END;
 
