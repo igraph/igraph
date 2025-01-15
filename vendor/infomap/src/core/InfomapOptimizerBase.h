@@ -102,7 +102,7 @@ protected:
 
 private:
 
-  interruptionHandlerFn *interruptionHandler;
+  interruptionHandlerFn *interruptionHandler = NULL;
 
 };
 
