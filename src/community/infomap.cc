@@ -194,11 +194,10 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     RNG_END();
 
     infomap::InfomapBase infomap(conf);
-    infomap::Network network(conf);
 
-    IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
+    IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network())));
 
-    infomap.run(network);
+    infomap.run();
 
     IGRAPH_CHECK(infomap_get_membership(infomap, membership));
 
