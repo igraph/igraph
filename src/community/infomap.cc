@@ -170,6 +170,15 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         IGRAPH_ERROR("Cannot run infomap if membership is missing.", IGRAPH_EINVAL);
     }
 
+    if (igraph_vcount(graph) == 0) {
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
+
+        if (codelength)
+            *codelength = IGRAPH_NAN;
+
+        return IGRAPH_SUCCESS;
+    }
+
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     // Configure infomap
@@ -187,20 +196,14 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     infomap::InfomapBase infomap(conf);
     infomap::Network network(conf);
 
-    if (igraph_vcount(graph) > 0) {
-        IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
+    IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
 
-        infomap.run(network);
+    infomap.run(network);
 
-        IGRAPH_CHECK(infomap_get_membership(infomap, membership));
+    IGRAPH_CHECK(infomap_get_membership(infomap, membership));
 
-        if (codelength) {
-            *codelength = infomap.codelength();
-        }
-    } else {
-        IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
-
-        *codelength = IGRAPH_NAN;
+    if (codelength) {
+        *codelength = infomap.codelength();
     }
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
