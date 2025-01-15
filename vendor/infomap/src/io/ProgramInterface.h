@@ -24,6 +24,13 @@
 
 namespace infomap {
 
+class InterruptException : public std::exception {
+public:
+    InterruptException() {};
+};
+
+typedef bool interruptionHandlerFn(void);
+
 struct ArgType {
   static const std::string integer;
   static const std::string number;

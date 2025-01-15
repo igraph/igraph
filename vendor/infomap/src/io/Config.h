@@ -157,6 +157,7 @@ struct Config {
   std::string version = INFOMAP_VERSION;
   std::string parsedString;
   std::vector<ParsedOption> parsedOptions;
+  infomap::interruptionHandlerFn *interruptionHandler;
 
   Config() = default;
 

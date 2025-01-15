@@ -32,6 +32,7 @@ public:
   {
     m_infomap = infomap;
     m_objective.init(infomap->getConfig());
+    this->setInterruptionHandler(infomap->getConfig().interruptionHandler);
   }
 
   // ===================================================
@@ -302,6 +303,8 @@ unsigned int InfomapOptimizer<Objective>::tryMoveEachNodeIntoBestModule()
 
   for (unsigned int i = 0; i < numNodes; ++i) {
     InfoNode& current = *network[nodeEnumeration[i]];
+
+    this->checkInterruption();
 
     if (!current.dirty)
       continue;

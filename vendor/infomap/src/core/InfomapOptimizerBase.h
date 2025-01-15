@@ -46,8 +46,20 @@ public:
 
   virtual double getMetaCodelength(bool /*unweighted*/ = false) const { return 0.0; }
 
+  void setInterruptionHandler(interruptionHandlerFn *interruptionHandler) {
+    this->interruptionHandler = interruptionHandler;
+  }
+
 protected:
   virtual unsigned int numActiveModules() const = 0;
+
+  void checkInterruption() {
+    if (interruptionHandler) {
+      if (interruptionHandler()) {
+        throw infomap::InterruptException();
+      }
+    }
+  }
 
   // ===================================================
   // Run: Init: *
@@ -87,6 +99,11 @@ protected:
   // ===================================================
 
   virtual void printDebug() = 0;
+
+private:
+
+  interruptionHandlerFn *interruptionHandler;
+
 };
 
 } /* namespace infomap */

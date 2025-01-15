@@ -139,12 +139,14 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 #ifndef HAVE_INFOMAP
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
+        IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
         // Configure infomap
         infomap::Config conf;
         conf.twoLevel = true;
         conf.numTrials = 1;
         conf.silent = true;
+        conf.interruptionHandler = &igraph_allow_interruption;
 
         RNG_BEGIN();
         conf.seedToRandomNumberGenerator = RNG_INTEGER(0, IGRAPH_INTEGER_MAX);
@@ -174,6 +176,8 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         IGRAPH_CHECK(infomap_get_membership(iw, membership));
 
         *codelength = iw.codelength();
+
+        IGRAPH_HANDLE_EXCEPTIONS_END;
 
         return IGRAPH_SUCCESS;
 
