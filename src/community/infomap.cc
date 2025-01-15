@@ -169,6 +169,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         conf.twoLevel = true;
         conf.numTrials = 1;
         conf.silent = true;
+        conf.directed = igraph_is_directed(graph);
         conf.interruptionHandler = &igraph_allow_interruption;
 
         RNG_BEGIN();
@@ -176,7 +177,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         RNG_END();
 
         infomap::InfomapBase infomap(conf);
-        infomap::Network network;
+        infomap::Network network(conf);
 
         IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
 
