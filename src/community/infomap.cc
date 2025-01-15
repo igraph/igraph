@@ -153,7 +153,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         RNG_END();
 
         // Create infomap wrapper
-        infomap::InfomapWrapper iw("--two-level -N2 --silent");
+        infomap::InfomapWrapper iw(conf);
 
         igraph_integer_t n = igraph_vcount(graph);
         igraph_integer_t m = igraph_ecount(graph);
