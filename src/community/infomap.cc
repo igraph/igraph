@@ -134,6 +134,8 @@ static igraph_error_t igraph_to_infomap(const igraph_t *graph,
                                        const igraph_vector_t *v_weights,
                                        infomap::Network* network) {
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+
     igraph_integer_t n = igraph_vcount(graph);
     igraph_integer_t m = igraph_ecount(graph);
 
@@ -148,6 +150,8 @@ static igraph_error_t igraph_to_infomap(const igraph_t *graph,
         igraph_integer_t v2 = IGRAPH_TO(graph, e);
         network->addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1);
     }
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     return IGRAPH_SUCCESS;
 }
