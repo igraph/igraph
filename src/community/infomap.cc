@@ -166,46 +166,46 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 #ifndef HAVE_INFOMAP
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
-        if (!membership) {
-            IGRAPH_ERROR("Cannot run infomap if membership is missing.", IGRAPH_EINVAL);
+    if (!membership) {
+        IGRAPH_ERROR("Cannot run infomap if membership is missing.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
+    // Configure infomap
+    infomap::Config conf;
+    conf.twoLevel = true;
+    conf.numTrials = 1;
+    conf.silent = true;
+    conf.directed = igraph_is_directed(graph);
+    conf.interruptionHandler = &igraph_allow_interruption;
+
+    RNG_BEGIN();
+    conf.seedToRandomNumberGenerator = RNG_INTEGER(0, IGRAPH_INTEGER_MAX);
+    RNG_END();
+
+    infomap::InfomapBase infomap(conf);
+    infomap::Network network(conf);
+
+    if (igraph_vcount(graph) > 0) {
+        IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
+
+        infomap.run(network);
+
+        IGRAPH_CHECK(infomap_get_membership(infomap, membership));
+
+        if (codelength) {
+            *codelength = infomap.codelength();
         }
+    } else {
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
 
-        IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+        *codelength = IGRAPH_NAN;
+    }
 
-        // Configure infomap
-        infomap::Config conf;
-        conf.twoLevel = true;
-        conf.numTrials = 1;
-        conf.silent = true;
-        conf.directed = igraph_is_directed(graph);
-        conf.interruptionHandler = &igraph_allow_interruption;
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
-        RNG_BEGIN();
-        conf.seedToRandomNumberGenerator = RNG_INTEGER(0, IGRAPH_INTEGER_MAX);
-        RNG_END();
-
-        infomap::InfomapBase infomap(conf);
-        infomap::Network network(conf);
-
-        if (igraph_vcount(graph) > 0) {
-            IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &network));
-
-            infomap.run(network);
-
-            IGRAPH_CHECK(infomap_get_membership(infomap, membership));
-
-            if (codelength) {
-                *codelength = infomap.codelength();
-            }
-        } else {
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
-
-            *codelength = IGRAPH_NAN;
-        }
-
-        IGRAPH_HANDLE_EXCEPTIONS_END;
-
-        return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 
 #endif
 }
