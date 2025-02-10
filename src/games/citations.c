@@ -50,8 +50,10 @@ static void igraph_i_citing_cited_type_game_free (
  * based on the last time they were cited. Time is measured by the
  * addition of vertices and it is binned into \p agebins bins.
  * So if the current time step is \c t and the last citation to a
- * given \c i vertex was made in time step \c t0, then \c
- * (t-t0)/binwidth is calculated where binwidth is \c nodes/agebins+1,
+ * given \c i vertex was made in time step \c t0, then
+ * <code>(t-t0) / binwidth</code>
+ * is calculated where binwidth is
+ * <code>nodes/agebins + 1</code>,
  * in the last expression '/' denotes integer division, so the
  * fraction part is omitted.
  *
@@ -74,7 +76,7 @@ static void igraph_i_citing_cited_type_game_free (
  *     step.
  * \param agebins The number of age bins to use.
  * \param preference Pointer to an initialized vector of length
- *     \c agebins+1. This contains the "attractivity" of the various
+ *     <code>agebins + 1</code>. This contains the "attractivity" of the various
  *     age bins, the last element is the attractivity of the vertices
  *     which were never cited, and it should be greater than zero.
  *     It is a good idea to have all positive values in this vector.
@@ -97,7 +99,6 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
     igraph_integer_t no_of_nodes = nodes;
     igraph_psumtree_t sumtree;
     igraph_vector_int_t edges;
-    igraph_integer_t i, j, k;
     igraph_integer_t *lastcit;
     igraph_integer_t *index;
     igraph_integer_t binwidth;
@@ -109,27 +110,27 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
                      agebins, igraph_vector_size(preference));
     }
     if (nodes < 0) {
-        IGRAPH_ERRORF("Number of nodes should be non-negative, received %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Number of nodes must not be negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      nodes);
     }
     if (edges_per_node < 0) {
-        IGRAPH_ERRORF("Number of edges per node should be non-negative, received %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Number of edges per node must not be negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      edges_per_node);
     }
     if (agebins < 1) {
-        IGRAPH_ERRORF("Number of age bins should be at least 1, received %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Number of age bins must be at least 1, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      agebins);
     }
     if (VECTOR(*preference)[agebins] <= 0) {
-        IGRAPH_ERRORF("The last element of the `preference' vector needs to be positive, but is %g.",
+        IGRAPH_ERRORF("The last element of the `preference' vector must be strictly positive, but is %g.",
                      IGRAPH_EINVAL,
                      VECTOR(*preference)[agebins]);
     }
     if (igraph_vector_min(preference) < 0) {
-        IGRAPH_ERRORF("The preference vector must contain only non-negative values, but found %g.",
+        IGRAPH_ERRORF("The preference vector must not contain negative values, but found %g.",
                      IGRAPH_EINVAL,
                      igraph_vector_min(preference));
     }
@@ -143,15 +144,11 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     lastcit = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (!lastcit) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(lastcit, "Insufficient memory for lastcit game.");
     IGRAPH_FINALLY(igraph_free, lastcit);
 
     index = IGRAPH_CALLOC(no_of_nodes + 1, igraph_integer_t);
-    if (!index) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(index, "Insufficient memory for lastcit game.");
     IGRAPH_FINALLY(igraph_free, index);
 
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, nodes));
@@ -165,12 +162,12 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
     RNG_BEGIN();
 
-    for (i = 1; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
 
         /* Add new edges */
-        for (j = 0; j < edges_per_node; j++) {
+        for (igraph_integer_t j = 0; j < edges_per_node; j++) {
             igraph_integer_t to;
-            igraph_real_t sum = igraph_psumtree_sum(&sumtree);
+            const igraph_real_t sum = igraph_psumtree_sum(&sumtree);
             if (sum == 0) {
                 /* If none of the so-far added nodes have positive weight,
                  * we choose one uniformly to connect to. */
@@ -190,11 +187,11 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
         /* Update the preference of some vertices if they got to another bin.
            We need to know the citations of some older vertices, this is in the index. */
-        for (k = 1; i - binwidth * k >= 1; k++) {
-            igraph_integer_t shnode = i - binwidth * k;
-            igraph_integer_t m = index[shnode], n = index[shnode + 1];
-            for (j = 2 * m; j < 2 * n; j += 2) {
-                igraph_integer_t cnode = VECTOR(edges)[j + 1];
+        for (igraph_integer_t k = 1; i - binwidth * k >= 1; k++) {
+            const igraph_integer_t shnode = i - binwidth * k;
+            const igraph_integer_t m = index[shnode], n = index[shnode + 1];
+            for (igraph_integer_t j = 2 * m; j < 2 * n; j += 2) {
+                const igraph_integer_t cnode = VECTOR(edges)[j + 1];
                 if (lastcit[cnode] == shnode + 1) {
                     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, cnode, VECTOR(*preference)[k]));
                 }
@@ -206,8 +203,8 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
     RNG_END();
 
     igraph_psumtree_destroy(&sumtree);
-    igraph_free(index);
-    igraph_free(lastcit);
+    IGRAPH_FREE(index);
+    IGRAPH_FREE(lastcit);
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
