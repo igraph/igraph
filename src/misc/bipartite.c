@@ -125,7 +125,7 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
         neilen1 = igraph_vector_int_size(neis1);
         for (igraph_integer_t j = 0; j < neilen1; j++) {
             igraph_integer_t neilen2, nei = VECTOR(*neis1)[j];
-            igraph_vector_int_t *neis2 = igraph_adjlist_get(&adjlist, nei);
+            const igraph_vector_int_t *neis2 = igraph_adjlist_get(&adjlist, nei);
             if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
                 IGRAPH_ERROR("Non-bipartite edge found in bipartite projection.",
                              IGRAPH_EINVAL);
@@ -179,7 +179,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     igraph_vector_int_t vertex_perm, vertex_index;
     igraph_vector_int_t edges;
     igraph_adjlist_t adjlist;
-    igraph_vector_int_t *neis1, *neis2;
+    const igraph_vector_int_t *neis1, *neis2;
     igraph_integer_t neilen1, neilen2;
     igraph_vector_int_t added;
     igraph_vector_int_t mult;
@@ -354,7 +354,7 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                 igraph_vector_int_t *multiplicity2,
                                 igraph_integer_t probe1) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     /* t1 is -1 if proj1 is omitted, it is 0 if it belongs to type zero,
        it is 1 if it belongs to type one. The same for t2 */
