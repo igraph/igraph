@@ -518,9 +518,8 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t triples = 0, triangles = 0;
-    igraph_integer_t node, nn;
     igraph_integer_t maxdegree;
     igraph_integer_t *neis;
     igraph_vector_int_t order;
@@ -529,7 +528,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
 
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis1, *neis2;
-    igraph_integer_t i, j, neilen1, neilen2;
+    igraph_integer_t neilen1, neilen2;
 
     if (no_of_nodes == 0) {
         *res = mode == IGRAPH_TRANSITIVITY_ZERO ? 0.0 : IGRAPH_NAN;
@@ -539,8 +538,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
-                               IGRAPH_LOOPS));
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
     maxdegree = igraph_vector_int_max(&degree) + 1;
     IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
 
@@ -548,7 +546,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
     }
 
@@ -556,31 +554,29 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (! neis) {
-        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(neis, "Insufficient memory for undirected global transitivity.");
     IGRAPH_FINALLY(igraph_free, neis);
 
-    for (nn = no_of_nodes - 1; nn >= 0; nn--) {
-        node = VECTOR(order)[nn];
+    for (igraph_integer_t nn = no_of_nodes - 1; nn >= 0; nn--) {
+        const igraph_integer_t node = VECTOR(order)[nn];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         neis1 = igraph_adjlist_get(&allneis, node);
         neilen1 = igraph_vector_int_size(neis1);
-        triples += (igraph_real_t)neilen1 * (neilen1 - 1);
+        triples += (igraph_real_t) neilen1 * (neilen1 - 1);
         /* Mark the neighbors of 'node' */
-        for (i = 0; i < neilen1; i++) {
+        for (igraph_integer_t i = 0; i < neilen1; i++) {
             igraph_integer_t nei = VECTOR(*neis1)[i];
             neis[nei] = node + 1;
         }
-        for (i = 0; i < neilen1; i++) {
+        for (igraph_integer_t i = 0; i < neilen1; i++) {
             igraph_integer_t nei = VECTOR(*neis1)[i];
             /* If 'nei' is not ready yet */
             if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
                 neis2 = igraph_adjlist_get(&allneis, nei);
                 neilen2 = igraph_vector_int_size(neis2);
-                for (j = 0; j < neilen2; j++) {
+                for (igraph_integer_t j = 0; j < neilen2; j++) {
                     igraph_integer_t nei2 = VECTOR(*neis2)[j];
                     if (neis[nei2] == node + 1) {
                         triangles += 1.0;
