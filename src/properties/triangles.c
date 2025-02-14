@@ -408,6 +408,78 @@ static igraph_error_t adjacent_triangles4(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_integer_t count_triangles_and_triples(
+        const igraph_t *graph, igraph_real_t *triangles, igraph_real_t *connected_triples)
+{
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_vector_int_t mark;
+    igraph_adjlist_t al;
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, vcount);
+
+    *triangles = 0;
+    if (connected_triples) *connected_triples = 0;
+
+    /* In a simple graph we could loop through all edges and count how many common
+     * neighbours their endpoints have. However, we only need to consider each
+     * connected vertex pair once, even if there are multiple edges between them.
+     * The nested for loop below uses an adjlist that already has multi-edges and
+     * self-loops filtered, and solves this problem.
+     *
+     * Performance trick:
+     *
+     * We only consider connected u-v pairs when v < u to avoid triple-counting
+     * and speed up the procedure. This effectively orients an undirected graph
+     * as directed acyclic. In an arbitrary orientation, an originally undirected
+     * triangle may appear as one of these two directed patterns:
+     *  - A -> B -> C -> A. This is NOT acyclic, so we don't encounter it.
+     *  - A -> B -> C, A -> C. This is the only one we need to count.
+     * This is implemented through the `if (v >= u) break;` lines below.
+     *
+     * Some other functions achieve the same via igraph_i_trans4_al_simplify().
+     */
+    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
+        const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
+        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
+        if (d1 > 1) {
+            if (connected_triples) {
+                *connected_triples += (igraph_real_t) d1 * (d1 - 1.0) / 2.0;
+            }
+
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 >= v1) break;
+
+                VECTOR(mark)[v2] = v1+1;
+            }
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 >= v1) break;
+
+                const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
+                const igraph_integer_t d2 = igraph_vector_int_size(nei2);
+                for (igraph_integer_t j=0; j < d2; j++) {
+                    const igraph_integer_t v3 = VECTOR(*nei2)[j];
+                    if (v3 >= v2) break;
+
+                    if (VECTOR(mark)[v3] == v1+1) {
+                        *triangles += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    igraph_vector_int_destroy(&mark);
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
 
 /**
  * \ingroup structural
@@ -432,68 +504,7 @@ static igraph_error_t adjacent_triangles4(const igraph_t *graph,
  */
 
 igraph_integer_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res) {
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_vector_int_t mark;
-    igraph_adjlist_t al;
-
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, vcount);
-
-    *res = 0;
-
-    /* In a simple graph we could loop through all edges and count how many common
-     * neighbours their endpoints have. However, we only need to consider each
-     * connected vertex pair once, even if there are multiple edges between them.
-     * The nested for loop below uses an adjlist that already has multi-edges and
-     * self-loops filtered, and solves this problem.
-     *
-     * Performance trick:
-     *
-     * We only consider connected u-v pairs when v < u to avoid triple-counting
-     * and speed up the procedure. This effectively orients an undirected graph
-     * as directed acyclic. In an arbitrary orientation, an originally undirected
-     * triangle may appear as one of these two directed patterns:
-     *  - A -> B -> C -> A. This is NOT acyclic, so we don't encounter it.
-     *  - A -> B -> C, A -> C. This is the only one we need to count.
-     * This is implemented through the `if (v >= u) break;` lines below.
-     *
-     * Some other functions achieve the same via igraph_i_trans4_al_simplify().
-     */
-    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
-        const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
-        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
-        if (d1 > 1) {
-            for (igraph_integer_t i=0; i < d1; i++) {
-                const igraph_integer_t v2 = VECTOR(*nei1)[i];
-                if (v2 >= v1) break;
-
-                VECTOR(mark)[v2] = v1+1;
-            }
-            for (igraph_integer_t i=0; i < d1; i++) {
-                const igraph_integer_t v2 = VECTOR(*nei1)[i];
-                if (v2 >= v1) break;
-
-                const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
-                const igraph_integer_t d2 = igraph_vector_int_size(nei2);
-                for (igraph_integer_t j=0; j < d2; j++) {
-                    const igraph_integer_t v3 = VECTOR(*nei2)[j];
-                    if (v3 >= v2) break;
-
-                    if (VECTOR(mark)[v3] == v1+1) {
-                        *res += 1;
-                    }
-                }
-            }
-        }
-    }
-
-    igraph_vector_int_destroy(&mark);
-    igraph_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
+    return count_triangles_and_triples(graph, res, NULL);
 }
 
 
@@ -632,62 +643,14 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_real_t triangles = 0, connected_triples = 0;
-    igraph_vector_int_t mark;
-    igraph_adjlist_t al;
+    igraph_real_t triangles, connected_triples;
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, vcount);
-
-    /* This implementation uses the same principles as igraph_count_triangles(),
-     * but it also calculates the number of connected triples.
-     * See the explanation there. */
-    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
-        const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
-        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
-
-        if (d1 > 1) {
-            /* We skip division by 2, therefore this double-counts.
-             * A correction is made later. */
-            connected_triples += (igraph_real_t) d1 * (d1 - 1);
-
-            for (igraph_integer_t i=0; i < d1; i++) {
-                const igraph_integer_t v2 = VECTOR(*nei1)[i];
-                if (v2 >= v1) break;
-
-                VECTOR(mark)[v2] = v1+1;
-            }
-            for (igraph_integer_t i=0; i < d1; i++) {
-                const igraph_integer_t v2 = VECTOR(*nei1)[i];
-                if (v2 >= v1) break;
-
-                const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
-                const igraph_integer_t d2 = igraph_vector_int_size(nei2);
-                for (igraph_integer_t j=0; j < d2; j++) {
-                    const igraph_integer_t v3 = VECTOR(*nei2)[j];
-                    if (v3 >= v2) break;
-
-                    if (VECTOR(mark)[v3] == v1+1) {
-                        triangles += 1;
-                    }
-                }
-            }
-        }
-    }
-
-    igraph_vector_int_destroy(&mark);
-    igraph_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_CHECK(count_triangles_and_triples(graph, &triangles, &connected_triples));
 
     if (connected_triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO) {
         *res = 0;
     } else {
-        /* Factor of 2: connected_triples was double-counted.
-         * Factor of 3: each triangle contains three connected triples. */
-        *res = triangles / connected_triples * (2.0 * 3.0);
+        *res = triangles / connected_triples * 3.0;
     }
 
     return IGRAPH_SUCCESS;
