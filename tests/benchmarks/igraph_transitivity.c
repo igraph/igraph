@@ -20,9 +20,6 @@
 
 #include "bench.h"
 
-#define N 6000
-#define M 2000000
-
 int main(void) {
 
     igraph_t g;
@@ -32,6 +29,9 @@ int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 42);
     BENCH_INIT();
+
+#define N 6000
+#define M 2000000
 
     igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_init(&trans, igraph_vcount(&g));
@@ -105,6 +105,51 @@ int main(void) {
           );
 
     BENCH(" 7 Count all triangles, Barabasi",
+          igraph_count_triangles(&g, &tri_count);
+          );
+
+    igraph_vs_destroy(&all_vertices);
+    igraph_destroy(&g);
+
+    printf("\n");
+
+#undef N
+#undef M
+
+#define N 1000000
+#define M 10000000
+
+    igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_vector_init(&trans, igraph_vcount(&g));
+    igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
+
+    BENCH(" 1 Local transitivity, all vertices method, large GNM",
+          igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
+                                               IGRAPH_TRANSITIVITY_NAN);
+          );
+
+    BENCH(" 2 Local transitivity, subset method, large GNM",
+          igraph_transitivity_local_undirected(&g, &trans, all_vertices,
+                                               IGRAPH_TRANSITIVITY_NAN);
+          );
+
+    BENCH(" 3 Average local transitivity, large GNM",
+          igraph_transitivity_avglocal_undirected(&g, &avg_trans, IGRAPH_TRANSITIVITY_NAN);
+          );
+
+    BENCH(" 4 Global transitivity, large GNM",
+          igraph_transitivity_undirected(&g, &global_trans, IGRAPH_TRANSITIVITY_NAN);
+          );
+
+    BENCH(" 5 Count triangles per vertex, all vertices method, large GNM",
+          igraph_count_adjacent_triangles(&g, &trans, igraph_vss_all());
+          );
+
+    BENCH(" 6 Count triangles per vertex, subset method, large GNM",
+          igraph_count_adjacent_triangles(&g, &trans, all_vertices);
+          );
+
+    BENCH(" 7 Count all triangles, large GNM",
           igraph_count_triangles(&g, &tri_count);
           );
 
