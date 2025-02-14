@@ -408,7 +408,7 @@ static igraph_error_t adjacent_triangles4(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_integer_t count_triangles_and_triples(
+static igraph_error_t count_triangles_and_triples(
         const igraph_t *graph, igraph_real_t *triangles, igraph_real_t *connected_triples)
 {
     const igraph_integer_t vcount = igraph_vcount(graph);
@@ -503,7 +503,7 @@ static igraph_integer_t count_triangles_and_triples(
  * the graph, d is the average node degree.
  */
 
-igraph_integer_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res) {
+igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res) {
     return count_triangles_and_triples(graph, res, NULL);
 }
 
