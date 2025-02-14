@@ -18,6 +18,7 @@ by Holland and Leinhardt, and named dyad census and triad census.
 
 <section id="finding-triangles"><title>Finding triangles</title>
 <!-- doxrox-include igraph_count_adjacent_triangles -->
+<!-- doxrox-include igraph_count_triangles -->
 <!-- doxrox-include igraph_list_triangles -->
 </section>
 

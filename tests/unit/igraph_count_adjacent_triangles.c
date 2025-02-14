@@ -21,13 +21,14 @@
 #include "test_utilities.h"
 
 int main(void) {
-    igraph_t g;
-    igraph_vector_t res;
+    igraph_t graph;
+    igraph_vector_t count_per_vertex;
+    igraph_real_t total_count;
     igraph_vs_t vertices;
 
-    igraph_vector_init(&res, 0);
+    igraph_vector_init(&count_per_vertex, 0);
 
-    igraph_small(&g, 20, IGRAPH_DIRECTED,
+    igraph_small(&graph, 20, IGRAPH_DIRECTED,
                  15, 12, 12, 10, 15, 0, 11, 10, 2, 8, 8, 6, 13, 17, 10, 10, 17, 2, 14,
                  0, 16, 13, 14, 14, 0, 5, 6, 4, 0, 9, 0, 6, 10, 9, 16, 4, 14, 5, 17,
                  15, 14, 9, 17, 17, 1, 4, 10, 16, 7, 0, 11, 12, 6, 13, 2, 17, 4, 0, 0,
@@ -41,33 +42,42 @@ int main(void) {
                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                  -1);
 
-    igraph_vs_range(&vertices, 0, igraph_vcount(&g));
+    igraph_vs_range(&vertices, 0, igraph_vcount(&graph));
 
     printf("\nDirected multi:\n");
-    igraph_count_adjacent_triangles(&g, &res, igraph_vss_all());
-    print_vector(&res);
-    igraph_count_adjacent_triangles(&g, &res, vertices);
-    print_vector(&res);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, igraph_vss_all());
+    print_vector(&count_per_vertex);
+    igraph_count_triangles(&graph, &total_count);
+    printf("Total count: %g\n", total_count);
+    IGRAPH_ASSERT(igraph_vector_sum(&count_per_vertex) == 3*total_count);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, vertices);
+    print_vector(&count_per_vertex);
 
     printf("\nUndirected multi:\n");
-    igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
-    igraph_count_adjacent_triangles(&g, &res, igraph_vss_all());
-    print_vector(&res);
-    igraph_count_adjacent_triangles(&g, &res, vertices);
-    print_vector(&res);
+    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, igraph_vss_all());
+    print_vector(&count_per_vertex);
+    igraph_count_triangles(&graph, &total_count);
+    printf("Total count: %g\n", total_count);
+    IGRAPH_ASSERT(igraph_vector_sum(&count_per_vertex) == 3*total_count);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, vertices);
+    print_vector(&count_per_vertex);
 
     printf("\nSimple:\n");
-    igraph_simplify(&g, true, true, NULL);
-    igraph_count_adjacent_triangles(&g, &res, igraph_vss_all());
-    print_vector(&res);
-    igraph_count_adjacent_triangles(&g, &res, vertices);
-    print_vector(&res);
+    igraph_simplify(&graph, true, true, NULL);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, igraph_vss_all());
+    print_vector(&count_per_vertex);
+    igraph_count_triangles(&graph, &total_count);
+    printf("Total count: %g\n", total_count);
+    IGRAPH_ASSERT(igraph_vector_sum(&count_per_vertex) == 3*total_count);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, vertices);
+    print_vector(&count_per_vertex);
 
     igraph_vs_destroy(&vertices);
 
-    igraph_destroy(&g);
+    igraph_destroy(&graph);
 
-    igraph_vector_destroy(&res);
+    igraph_vector_destroy(&count_per_vertex);
 
     VERIFY_FINALLY_STACK();
 

@@ -408,6 +408,67 @@ static igraph_error_t adjacent_triangles4(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \ingroup structural
+ * \function igraph_count_triangles
+ * \brief Counts triangles in a graph.
+ *
+ * This function computes the total number of triangles, i.e. fully connected
+ * vertex triples, in a graph. Edge directions, edge multiplicities, and self-loops
+ * are ignored.
+ *
+ * \param graph The graph object. Edge directions and multiplicites are ignored.
+ * \param res Pointer to a real variable, the result will be stored here.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory for
+ *         temporary data.
+ *
+ * \sa \ref igraph_list_triangles(), \ref igraph_count_adjacent_triangles(),
+ * \ref igraph_transitivity_undirected().
+ *
+ * Time complexity: O(|V|*d^2), |V| is the number of vertices in
+ * the graph, d is the average node degree.
+ */
+
+igraph_integer_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res) {
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_adjlist_t al;
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+    *res = 0;
+
+    /* In a simple graph we could loop through all edges and count how many common
+     * neighbours their endpoints have. However, we only need to consider each
+     * connected vertex pair once, even if there are multiple edges between them.
+     * The nested for loop below uses an adjlist that already has multi-edges and
+     * self-loops filtered, and solves this problem. */
+    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
+        const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
+        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
+        if (d1 > 1) {
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 > v1) {
+                    const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
+                    *res += igraph_vector_int_intersection_size_sorted(nei1, nei2);
+                }
+            }
+        }
+    }
+
+    /* Each triangle was counted thrice, once for each edge it contains. */
+    *res /= 3;
+
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+
 /**
  * \function igraph_count_adjacent_triangles
  * \brief Count the number of triangles a vertex is part of.
@@ -417,7 +478,8 @@ static igraph_error_t adjacent_triangles4(const igraph_t *graph,
  * \param vids The vertices to perform the calculation for.
  * \return Error mode.
  *
- * \sa \ref igraph_list_triangles() to list them.
+ * \sa \ref igraph_list_triangles() to list triangles,
+ * \ref igraph_count_triangles() to count all triangles at once.
  *
  * Time complexity: O(d^2 n), d is the average vertex degree of the
  * queried vertices, n is their number.
@@ -474,9 +536,10 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  *        listed exactly once.
  * \return Error code.
  *
- * \sa \ref igraph_transitivity_undirected() to count the triangles,
+ * \sa \ref igraph_count_triangles() to count the triangles,
  * \ref igraph_adjacent_triangles() to count the triangles a vertex
- * participates in.
+ * participates in, \ref igraph_transitivity_undirected() to compute
+ * the global clustering coefficient.
  *
  * Time complexity: O(d^2 n), d is the average degree, n is the number
  * of vertices.
