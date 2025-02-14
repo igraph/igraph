@@ -632,84 +632,62 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_real_t triples = 0, triangles = 0;
-    igraph_integer_t maxdegree;
-    igraph_integer_t *neis;
-    igraph_vector_int_t order;
-    igraph_vector_t rank;
-    igraph_vector_int_t degree;
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_real_t triangles = 0, connected_triples = 0;
+    igraph_vector_int_t mark;
+    igraph_adjlist_t al;
 
-    igraph_adjlist_t allneis;
-    igraph_vector_int_t *neis1, *neis2;
-    igraph_integer_t neilen1, neilen2;
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
-    if (no_of_nodes == 0) {
-        *res = mode == IGRAPH_TRANSITIVITY_ZERO ? 0.0 : IGRAPH_NAN;
-        return IGRAPH_SUCCESS;
-    }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, vcount);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
+    /* This implementation uses the same principles as igraph_count_triangles(),
+     * but it also calculates the number of connected triples.
+     * See the explanation there. */
+    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
+        const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
+        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
 
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
-    maxdegree = igraph_vector_int_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+        if (d1 > 1) {
+            /* We skip division by 2, therefore this double-counts.
+             * A correction is made later. */
+            connected_triples += (igraph_real_t) d1 * (d1 - 1);
 
-    igraph_vector_int_destroy(&degree);
-    IGRAPH_FINALLY_CLEAN(1);
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 >= v1) break;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
-    }
+                VECTOR(mark)[v2] = v1+1;
+            }
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 >= v1) break;
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
+                const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
+                const igraph_integer_t d2 = igraph_vector_int_size(nei2);
+                for (igraph_integer_t j=0; j < d2; j++) {
+                    const igraph_integer_t v3 = VECTOR(*nei2)[j];
+                    if (v3 >= v2) break;
 
-    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(neis, "Insufficient memory for undirected global transitivity.");
-    IGRAPH_FINALLY(igraph_free, neis);
-
-    for (igraph_integer_t nn = no_of_nodes - 1; nn >= 0; nn--) {
-        const igraph_integer_t node = VECTOR(order)[nn];
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        neis1 = igraph_adjlist_get(&allneis, node);
-        neilen1 = igraph_vector_int_size(neis1);
-        triples += (igraph_real_t) neilen1 * (neilen1 - 1);
-        /* Mark the neighbors of 'node' */
-        for (igraph_integer_t i = 0; i < neilen1; i++) {
-            igraph_integer_t nei = VECTOR(*neis1)[i];
-            neis[nei] = node + 1;
-        }
-        for (igraph_integer_t i = 0; i < neilen1; i++) {
-            igraph_integer_t nei = VECTOR(*neis1)[i];
-            /* If 'nei' is not ready yet */
-            if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
-                neis2 = igraph_adjlist_get(&allneis, nei);
-                neilen2 = igraph_vector_int_size(neis2);
-                for (igraph_integer_t j = 0; j < neilen2; j++) {
-                    igraph_integer_t nei2 = VECTOR(*neis2)[j];
-                    if (neis[nei2] == node + 1) {
-                        triangles += 1.0;
+                    if (VECTOR(mark)[v3] == v1+1) {
+                        triangles += 1;
                     }
                 }
             }
         }
     }
 
-    IGRAPH_FREE(neis);
-    igraph_adjlist_destroy(&allneis);
-    igraph_vector_destroy(&rank);
-    igraph_vector_int_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(4);
+    igraph_vector_int_destroy(&mark);
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(2);
 
-    if (triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO) {
+    if (connected_triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO) {
         *res = 0;
     } else {
-        *res = triangles / triples * 2.0;
+        /* Factor of 2: connected_triples was double-counted.
+         * Factor of 3: each triangle contains three connected triples. */
+        *res = triangles / connected_triples * (2.0 * 3.0);
     }
 
     return IGRAPH_SUCCESS;
