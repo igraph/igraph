@@ -44,23 +44,23 @@ int main(void) {
     igraph_vs_range(&vertices, 0, igraph_vcount(&g));
 
     printf("\nDirected multi:\n");
-    igraph_adjacent_triangles(&g, &res, igraph_vss_all());
+    igraph_count_adjacent_triangles(&g, &res, igraph_vss_all());
     print_vector(&res);
-    igraph_adjacent_triangles(&g, &res, vertices);
+    igraph_count_adjacent_triangles(&g, &res, vertices);
     print_vector(&res);
 
     printf("\nUndirected multi:\n");
     igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
-    igraph_adjacent_triangles(&g, &res, igraph_vss_all());
+    igraph_count_adjacent_triangles(&g, &res, igraph_vss_all());
     print_vector(&res);
-    igraph_adjacent_triangles(&g, &res, vertices);
+    igraph_count_adjacent_triangles(&g, &res, vertices);
     print_vector(&res);
 
     printf("\nSimple:\n");
     igraph_simplify(&g, true, true, NULL);
-    igraph_adjacent_triangles(&g, &res, igraph_vss_all());
+    igraph_count_adjacent_triangles(&g, &res, igraph_vss_all());
     print_vector(&res);
-    igraph_adjacent_triangles(&g, &res, vertices);
+    igraph_count_adjacent_triangles(&g, &res, vertices);
     print_vector(&res);
 
     igraph_vs_destroy(&vertices);

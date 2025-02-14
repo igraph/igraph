@@ -1972,7 +1972,7 @@ igraph_triad_census:
     PARAMS: GRAPH graph, OUT VECTOR res
     RETURN: ERROR
 
-igraph_adjacent_triangles:
+igraph_count_adjacent_triangles:
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL
     DEPS: vids ON graph
 
