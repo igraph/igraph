@@ -2,9 +2,15 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_count_triangles()` counts undirected triangles in a graph.
+ - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`)
+
 ### Deprecated
 
  - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
+ - `igraph_adjacent_triangles()` is deprecated and scheduled for removal in 1.0.
 
 ### Other
 
@@ -12,6 +18,7 @@
  - Updated the vendored `plfit` library to version 1.0.0. This works around a bug in some MSVC / Windows SDK versions that define a `NAN` macro that is not a compile-time constant.
  - Updated vendored BLAS to 3.12.0 and vendored ARPACK to ARPACK-NG 3.7.0.
  - Re-translated vendored BLAS/LAPACK/ARPACK sources with f2c version 20240504.
+ - The performance of `igraph_transitivity_undirected()` is improved by a factor of about 2.5.
  - Documentation improvements.
 
 ## [0.10.15]
