@@ -113,7 +113,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
+static igraph_error_t transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -125,7 +125,7 @@ static igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *grap
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
+static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -321,7 +321,7 @@ igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
+static igraph_error_t transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -378,7 +378,7 @@ igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_transitivity_mode_t mode) {
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_transitivity_local_undirected4(graph, res, mode);
+        return transitivity_local_undirected4(graph, res, mode);
     } else {
         igraph_vit_t vit;
         igraph_integer_t size;
@@ -388,21 +388,21 @@ igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vit_destroy(&vit);
         IGRAPH_FINALLY_CLEAN(1);
         if (size < 100) {
-            return igraph_transitivity_local_undirected1(graph, res, vids, mode);
+            return transitivity_local_undirected1(graph, res, vids, mode);
         } else {
-            return igraph_transitivity_local_undirected2(graph, res, vids, mode);
+            return transitivity_local_undirected2(graph, res, vids, mode);
         }
     }
 }
 
-static igraph_error_t igraph_adjacent_triangles1(const igraph_t *graph,
+static igraph_error_t adjacent_triangles1(const igraph_t *graph,
                                       igraph_vector_t *res,
                                       const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_adjacent_triangles4(const igraph_t *graph,
+static igraph_error_t adjacent_triangles4(const igraph_t *graph,
                                       igraph_vector_t *res) {
 # include "properties/triangles_template.h"
     return IGRAPH_SUCCESS;
@@ -427,9 +427,9 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
                               igraph_vector_t *res,
                               const igraph_vs_t vids) {
     if (igraph_vs_is_all(&vids)) {
-        return igraph_adjacent_triangles4(graph, res);
+        return adjacent_triangles4(graph, res);
     } else {
-        return igraph_adjacent_triangles1(graph, res, vids);
+        return adjacent_triangles1(graph, res, vids);
     }
 }
 
@@ -601,7 +601,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_transitivity_barrat1(
+static igraph_error_t transitivity_barrat1(
         const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
@@ -693,7 +693,7 @@ static igraph_error_t igraph_i_transitivity_barrat1(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_transitivity_barrat4(
+static igraph_error_t transitivity_barrat4(
         const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
@@ -885,8 +885,8 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     /* Preconditions validated, now we can call the real implementation */
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_i_transitivity_barrat4(graph, res, weights, mode);
+        return transitivity_barrat4(graph, res, weights, mode);
     } else {
-        return igraph_i_transitivity_barrat1(graph, res, vids, weights, mode);
+        return transitivity_barrat1(graph, res, vids, weights, mode);
     }
 }
