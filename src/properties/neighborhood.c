@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
+#include "igraph_reachability.h"
 
 /**
  * \function igraph_neighborhood_size
@@ -83,6 +84,10 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     if (order < 0) {
         order = no_of_nodes;
         inf_order = true;
+
+        if (mindist == 0 && igraph_vs_is_all(&vids)) {
+            return igraph_count_reachable(graph, res, mode);
+        }
     }
 
     if (mindist < 0) {
