@@ -62,7 +62,7 @@
  *   two, then its neighbors are not counted either, etc.
  * \return Error code.
  *
- * \sa \ref igraph_neighborhood() for calculating the actual neighborhood,
+ * \sa \ref igraph_neighborhood() for calculating the actual neighborhood;
  * \ref igraph_neighborhood_graphs() for creating separate graphs from
  * the neighborhoods.
  *
@@ -199,8 +199,9 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
  * \return Error code.
  *
  * \sa \ref igraph_neighborhood_size() to calculate the size of the
- * neighborhood, \ref igraph_neighborhood_graphs() for creating
- * graphs from the neighborhoods.
+ * neighborhood; \ref igraph_neighborhood_graphs() for creating
+ * graphs from the neighborhoods; \ref igraph_subcomponent() to find vertices
+ * reachable from a single vertex.
  *
  * Time complexity: O(n*d*o), n is the number of vertices for which
  * the calculation is performed, d is the average degree, o is the
@@ -343,7 +344,7 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
  * \return Error code.
  *
  * \sa \ref igraph_neighborhood_size() for calculating the neighborhood
- * sizes only, \ref igraph_neighborhood() for calculating the
+ * sizes only; \ref igraph_neighborhood() for calculating the
  * neighborhoods (but not creating graphs).
  *
  * Time complexity: O(n*(|V|+|E|)), where n is the number vertices for
