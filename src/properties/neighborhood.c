@@ -75,7 +75,6 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
-    igraph_integer_t i, j;
     igraph_integer_t *added;
     igraph_vector_int_t neis;
 
@@ -99,8 +98,8 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_vector_int_resize(res, IGRAPH_VIT_SIZE(vit)));
 
-    for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+    for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+        const igraph_integer_t node = IGRAPH_VIT_GET(vit);
         igraph_integer_t size = mindist == 0 ? 1 : 0;
         added[node] = i + 1;
         igraph_dqueue_int_clear(&q);
@@ -110,15 +109,15 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            igraph_integer_t n;
+            const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+            const igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
-            n = igraph_vector_int_size(&neis);
+            const igraph_integer_t n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
                 /* we add them to the q */
-                for (j = 0; j < n; j++) {
+                for (igraph_integer_t j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
@@ -131,8 +130,8 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
                 }
             } else {
                 /* we just count them, but don't add them */
-                for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
+                for (igraph_integer_t j = 0; j < n; j++) {
+                    const igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -200,10 +199,9 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
                         igraph_vs_t vids, igraph_integer_t order,
                         igraph_neimode_t mode, igraph_integer_t mindist) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
-    igraph_integer_t i, j;
     igraph_integer_t *added;
     igraph_vector_int_t neis;
     igraph_vector_int_t tmp;
@@ -229,8 +227,8 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
     IGRAPH_CHECK(igraph_vector_int_list_reserve(res, IGRAPH_VIT_SIZE(vit)));
     igraph_vector_int_list_clear(res);
 
-    for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+    for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+        const igraph_integer_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_int_clear(&tmp);
         if (mindist == 0) {
@@ -242,16 +240,16 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            igraph_integer_t n;
+            const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+            const igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
-            n = igraph_vector_int_size(&neis);
+            const igraph_integer_t n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
                 /* we add them to the q */
-                for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
+                for (igraph_integer_t j = 0; j < n; j++) {
+                    const igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
@@ -263,8 +261,8 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
                 }
             } else {
                 /* we just count them but don't add them to q */
-                for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
+                for (igraph_integer_t j = 0; j < n; j++) {
+                    const igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -307,9 +305,10 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
  * </para><para>
  * The first version of this function was written by
  * Vincent Matossian, thanks Vincent.
+ *
  * \param graph The input graph.
  * \param res Pointer to a list of graphs, the result will be stored
- *   here. Each item in the list is an \c igraph_t object. The list will be
+ *   here. Each item in the list is an \type igraph_t object. The list will be
  *   resized as needed.
  * \param vids The vertices for which the calculation is performed.
  * \param order Integer giving the order of the neighborhood.
@@ -338,10 +337,9 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
                                igraph_vs_t vids, igraph_integer_t order,
                                igraph_neimode_t mode,
                                igraph_integer_t mindist) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
-    igraph_integer_t i, j;
     igraph_integer_t *added;
     igraph_vector_int_t neis;
     igraph_vector_int_t tmp;
@@ -368,8 +366,8 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
 
     igraph_graph_list_clear(res);
 
-    for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+    for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+        const igraph_integer_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_int_clear(&tmp);
         if (mindist == 0) {
@@ -389,8 +387,8 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
 
             if (actdist < order - 1) {
                 /* we add them to the q */
-                for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
+                for (igraph_integer_t j = 0; j < n; j++) {
+                    const igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
@@ -402,8 +400,8 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
                 }
             } else {
                 /* we just count them but don't add them to q */
-                for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
+                for (igraph_integer_t j = 0; j < n; j++) {
+                    const igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
