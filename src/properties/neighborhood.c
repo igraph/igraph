@@ -89,7 +89,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(added, "Cannot calculate neighborhood size.");
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to calculate neighborhood sizes.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -207,16 +207,16 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
     igraph_vector_int_t tmp;
 
     if (order < 0) {
-        IGRAPH_ERROR("Negative order in neighborhood size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Negative order in neighborhood size.", IGRAPH_EINVAL);
     }
 
     if (mindist < 0 || mindist > order) {
-        IGRAPH_ERROR("Minimum distance should be between zero and order",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Minimum distance should be between 0 and the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, order, mindist);
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(added, "Cannot calculate neighborhood size.");
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to calculate neighborhood sizes.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -346,16 +346,16 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
     igraph_t newg;
 
     if (order < 0) {
-        IGRAPH_ERROR("Negative order in neighborhood size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Negative order in neighborhood size.", IGRAPH_EINVAL);
     }
 
     if (mindist < 0 || mindist > order) {
-        IGRAPH_ERROR("Minimum distance should be between zero and order",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Minimum distance should be between 0 and the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL, order, mindist);
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(added, "Cannot calculate neighborhood size");
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to calculate neighborhood graphs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
