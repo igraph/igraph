@@ -46,7 +46,8 @@
  * \param res Pointer to an initialized vector, the result will be
  *    stored here. It will be resized as needed.
  * \param vids The vertices for which the calculation is performed.
- * \param order Integer giving the order of the neighborhood.
+ * \param order Integer giving the order of the neighborhood. Negative values
+ *   are treated as infinity.
  * \param mode Specifies how to use the direction of the edges if a
  *   directed graph is analyzed. For \c IGRAPH_OUT only the outgoing
  *   edges are followed, so all vertices reachable from the source
@@ -77,14 +78,18 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     igraph_vit_t vit;
     igraph_integer_t *added;
     igraph_vector_int_t neis;
+    igraph_bool_t inf_order = false;
 
     if (order < 0) {
-        IGRAPH_ERRORF("Negative order in neighborhood size: %" IGRAPH_PRId ".",
-                      IGRAPH_EINVAL, order);
+        order = no_of_nodes;
+        inf_order = true;
     }
 
-    if (mindist < 0 || mindist > order) {
-        IGRAPH_ERRORF("Minimum distance should be between 0 and the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
+    if (mindist < 0) {
+        IGRAPH_ERRORF("Minium distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
+    }
+    if (!inf_order && mindist > order) {
+        IGRAPH_ERRORF("Minimum distance must not exceed the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, order, mindist);
     }
 
@@ -173,7 +178,8 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
  * \param res An initialized list of integer vectors. The result of the
  *    calculation will be stored here. The list will be resized as needed.
  * \param vids The vertices for which the calculation is performed.
- * \param order Integer giving the order of the neighborhood.
+ * \param order Integer giving the order of the neighborhood. Negative values
+ *   are treated as infinity.
  * \param mode Specifies how to use the direction of the edges if a
  *   directed graph is analyzed. For \c IGRAPH_OUT only the outgoing
  *   edges are followed, so all vertices reachable from the source
@@ -205,13 +211,18 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
     igraph_integer_t *added;
     igraph_vector_int_t neis;
     igraph_vector_int_t tmp;
+    igraph_bool_t inf_order = false;
 
     if (order < 0) {
-        IGRAPH_ERROR("Negative order in neighborhood size.", IGRAPH_EINVAL);
+        order = no_of_nodes;
+        inf_order = true;
     }
 
-    if (mindist < 0 || mindist > order) {
-        IGRAPH_ERRORF("Minimum distance should be between 0 and the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
+    if (mindist < 0) {
+        IGRAPH_ERRORF("Minium distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
+    }
+    if (!inf_order && mindist > order) {
+        IGRAPH_ERRORF("Minimum distance must not exceed the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, order, mindist);
     }
 
@@ -311,7 +322,8 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
  *   here. Each item in the list is an \type igraph_t object. The list will be
  *   resized as needed.
  * \param vids The vertices for which the calculation is performed.
- * \param order Integer giving the order of the neighborhood.
+ * \param order Integer giving the order of the neighborhood. Negative values
+ *   are treated as infinity.
  * \param mode Specifies how to use the direction of the edges if a
  *   directed graph is analyzed. For \c IGRAPH_OUT only the outgoing
  *   edges are followed, so all vertices reachable from the source
@@ -344,13 +356,18 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
     igraph_vector_int_t neis;
     igraph_vector_int_t tmp;
     igraph_t newg;
+    igraph_bool_t inf_order = false;
 
     if (order < 0) {
-        IGRAPH_ERROR("Negative order in neighborhood size.", IGRAPH_EINVAL);
+        order = no_of_nodes;
+        inf_order = true;
     }
 
-    if (mindist < 0 || mindist > order) {
-        IGRAPH_ERRORF("Minimum distance should be between 0 and the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
+    if (mindist < 0) {
+        IGRAPH_ERRORF("Minium distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
+    }
+    if (!inf_order && mindist > order) {
+        IGRAPH_ERRORF("Minimum distance must not exceed the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, order, mindist);
     }
 
