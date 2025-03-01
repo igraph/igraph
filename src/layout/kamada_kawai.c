@@ -78,8 +78,10 @@
  *        and then \p maxiter iterations are performed.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
- * \param weights Edge weights, larger values will result longer edges.
- *        Weights must be positive. Pass \c NULL to assume unit weights
+ * \param weights A vector of edge weights. Weights are interpreted as edge
+ *        \em lengths in the shortest path calculation used by the
+ *        Kamada-Kawai algorithm. Therefore, vertices connected by high-weight
+ *        edges will be placed further apart. Pass \c NULL to assume unit weights
  *        for all edges.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -383,8 +385,10 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  *        and then \p maxiter iterations are performed.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
- * \param weights Edge weights, larger values will result longer edges.
- *        Weights must be positive. Pass \c NULL to assume unit weights
+ * \param weights A vector of edge weights. Weights are interpreted as edge
+ *        \em lengths in the shortest path calculation used by the
+ *        Kamada-Kawai algorithm. Therefore, vertices connected by high-weight
+ *        edges will be placed further apart. Pass \c NULL to assume unit weights
  *        for all edges.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
