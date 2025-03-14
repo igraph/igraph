@@ -106,6 +106,7 @@
  - The deprecated `igraph_random_edge_walk()` was removed. Its functionality is incorporated in `igraph_random_walk()`.
  - The deprecated `igraph_vector_qsort_ind()` was removed. Use `igraph_vector_sort_ind()` instead.
  - The deprecated `igraph_vector_binsearch2()` was removed. Use `igraph_vector_contains_sorted()` instead.
+ - The unused enum type `igraph_fileformat_type_t` was removed.
 
 ### Deprecated
 
