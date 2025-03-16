@@ -1747,7 +1747,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  *
  * GraphML is an XML-based file format for representing various types of
  * graphs. See the GraphML Primer (http://graphml.graphdrawing.org/primer/graphml-primer.html)
- * for detailed format description.
+ * for the detailed format description.
  *
  * </para><para>
  * When a numerical attribute value is NaN, it will be omitted from the file.
@@ -1755,7 +1755,8 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  * </para><para>
  * This function assumes that non-ASCII characters in attribute names and string
  * attribute values are UTF-8 encoded. If this is not the case, the resulting
- * XML file will be invalid.
+ * XML file will be invalid. Control characters, i.e. character codes up to and
+ * including 31 (with the exception of tab, cr and lf), are not allowed.
  *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
