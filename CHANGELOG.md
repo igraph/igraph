@@ -5,7 +5,8 @@
 ### Added
 
  - `igraph_count_triangles()` counts undirected triangles in a graph.
- - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`)
+ - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`).
+ - `igraph_rng_get_bool()` and `RNG_BOOL()` produce a single random boolean.
 
 ### Changed
 
