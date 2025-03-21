@@ -793,7 +793,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
         /* we move all vertices on one end of the edges, then we come back for
          * the vertices on the other end. This way we don't move both ends at the
          * same time, which is almost a wasted move since they attract each other */
-        int swapflag = (int)(RNG_UNIF01() > 0.5);
+        int swapflag = (int)(RNG_BOOL());
         int swapflag_end = swapflag + 2;
         for (; swapflag < swapflag_end; swapflag++) {
 
