@@ -42,12 +42,11 @@
 igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
     const igraph_integer_t no_of_edges = igraph_ecount(graph);
     char message[256];
-    igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
-    igraph_vector_int_t eids;
-    igraph_vector_int_t edgevec, alledges;
+    igraph_integer_t a, b, c, d, dummy;
+    igraph_integer_t num_swaps = 0, num_successful_swaps = 0;
+    igraph_vector_int_t eids, edgevec, alledges;
     const igraph_bool_t directed = igraph_is_directed(graph);
-    const igraph_bool_t loops = (mode & IGRAPH_REWIRING_SIMPLE_LOOPS);
-    igraph_bool_t ok;
+    const igraph_bool_t allow_loops = (mode & IGRAPH_REWIRING_SIMPLE_LOOPS);
     igraph_es_t es;
     igraph_adjlist_t al;
 
@@ -76,7 +75,6 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
     /* We count both successful and unsuccessful rewiring trials.
      * This is necessary for uniform sampling. */
 
-    num_swaps = num_successful_swaps = 0;
     while (num_swaps < n) {
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -87,122 +85,76 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             IGRAPH_PROGRESS(message, (100.0 * num_swaps) / n, 0);
         }
 
-        switch (mode) {
-        case IGRAPH_REWIRING_SIMPLE:
-        case IGRAPH_REWIRING_SIMPLE_LOOPS:
-            ok = true;
 
-            /* Choose two edges randomly */
-            VECTOR(eids)[0] = RNG_INTEGER(0, no_of_edges - 1);
-            do {
-                VECTOR(eids)[1] = RNG_INTEGER(0, no_of_edges - 1);
-            } while (VECTOR(eids)[0] == VECTOR(eids)[1]);
+        /* Choose two edges randomly */
+        VECTOR(eids)[0] = RNG_INTEGER(0, no_of_edges - 1);
+        do {
+            VECTOR(eids)[1] = RNG_INTEGER(0, no_of_edges - 1);
+        } while (VECTOR(eids)[0] == VECTOR(eids)[1]);
+        
 
-            /* Get the endpoints */
-            if (use_adjlist) {
-                a = VECTOR(alledges)[VECTOR(eids)[0] * 2];
-                b = VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1];
-                c = VECTOR(alledges)[VECTOR(eids)[1] * 2];
-                d = VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1];
-            } else {
-                IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[0], &a, &b));
-                IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[1], &c, &d));
-            }
-
-            /* For an undirected graph, we have two "variants" of each edge, i.e.
-             * a -- b and b -- a. Since some rewirings can be performed only when we
-             * "swap" the endpoints, we do it now with probability 0.5 */
-            if (!directed && RNG_UNIF01() < 0.5) {
-                dummy = c; c = d; d = dummy;
-                if (use_adjlist) {
-                    /* Flip the edge in the unordered edge-list, so the update later on
-                     * hits the correct end. */
-                    VECTOR(alledges)[VECTOR(eids)[1] * 2] = c;
-                    VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = d;
-                }
-            }
-
-            /* If we do not touch loops, check whether a == b or c == d and disallow
-             * the swap if needed */
-            if (!loops && (a == b || c == d)) {
-                ok = false;
-            } else {
-                /* Check whether they are suitable for rewiring */
-                if (a == c || b == d) {
-                    /* Swapping would have no effect */
-                    ok = false;
-                } else {
-                    /* a != c && b != d */
-                    /* If a == d or b == c, the swap would generate at least one loop, so
-                     * we disallow them unless we want to have loops */
-                    ok = loops || (a != d && b != c);
-                    /* Also, if a == b and c == d and we allow loops, doing the swap
-                     * would result in a multiple edge if the graph is undirected */
-                    ok = ok && (directed || a != b || c != d);
-                }
-            }
-
-            /* All good so far. Now check for the existence of a --> d and c --> b to
-             * disallow the creation of multiple edges */
-            if (ok) {
-                if (use_adjlist) {
-                    if (igraph_adjlist_has_edge(&al, a, d, directed)) {
-                        ok = false;
-                    }
-                } else {
-                    IGRAPH_CHECK(igraph_are_adjacent(graph, a, d, &ok));
-                    ok = !ok;
-                }
-            }
-            if (ok) {
-                if (use_adjlist) {
-                    if (igraph_adjlist_has_edge(&al, c, b, directed)) {
-                        ok = false;
-                    }
-                } else {
-                    IGRAPH_CHECK(igraph_are_adjacent(graph, c, b, &ok));
-                    ok = !ok;
-                }
-            }
-
-            /* If we are still okay, we can perform the rewiring */
-            if (ok) {
-                /* printf("Deleting: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
-                              a, b, c, d); */
-                if (use_adjlist) {
-                    /* Replace entry in sorted adjlist: */
-                    IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
-                    IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, c, d, b, directed));
-                    /* Also replace in unsorted edgelist: */
-                    VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1] = d;
-                    VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = b;
-                } else {
-                    IGRAPH_CHECK(igraph_delete_edges(graph, es));
-                    VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
-                    VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
-                    /* printf("Adding: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
-                                a, d, c, b); */
-                    IGRAPH_CHECK(igraph_add_edges(graph, &edgevec, 0));
-                }
-                num_successful_swaps++;
-            }
-            break;
-        default:
-            RNG_END();
-            IGRAPH_ERROR("Invalid rewiring mode.", IGRAPH_EINVAL);
+        /* Get the endpoints */
+        if (use_adjlist) {
+            a = VECTOR(alledges)[VECTOR(eids)[0] * 2];
+            b = VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1];
+            c = VECTOR(alledges)[VECTOR(eids)[1] * 2];
+            d = VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1];
+        } else {
+            IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[0], &a, &b));
+            IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[1], &c, &d));
         }
+
+        /* For an undirected graph, we have two "variants" of each edge, i.e.
+            * a -- b and b -- a. Since some rewirings can be performed only when we
+            * "swap" the endpoints, we do it now with probability 0.5 */
+        if (!directed && RNG_UNIF01() < 0.5) {
+            dummy = c; c = d; d = dummy;
+            if (use_adjlist) {
+                /* Flip the edge in the unordered edge-list, so the update later on
+                    * hits the correct end. */
+                VECTOR(alledges)[VECTOR(eids)[1] * 2] = c;
+                VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = d;
+            }
+        }
+
+
+        /* Check loop constraints */
+        if (!allow_loops && (a == b || c == d)) continue;
+
+        /* Ensure swaps make sense */
+        if (a == c || b == d || (a == d && b == c)) continue;
+
+        /* Prevent self-loops unless allowed */
+        if (!allow_loops && (a == d || b == c)) continue;
+ 
+
+        /* If we are still okay, we can perform the rewiring */
+        /* printf("Deleting: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
+                            a, b, c, d); */
+        if (use_adjlist) {
+            /* Replace entry in sorted adjlist: */
+            IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
+            IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, c, d, b, directed));
+            /* Also replace in unsorted edgelist: */
+            VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1] = d;
+            VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = b;
+        } else {
+            IGRAPH_CHECK(igraph_delete_edges(graph, es));
+            VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
+            VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
+            /* printf("Adding: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
+                        a, d, c, b); */
+            IGRAPH_CHECK(igraph_add_edges(graph, &edgevec, 0));
+        }
+        num_successful_swaps++;
         num_swaps++;
     }
+
 
     if (use_adjlist) {
         /* Replace graph edges with the adjlist current state */
         IGRAPH_CHECK(igraph_delete_edges(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID)));
         IGRAPH_CHECK(igraph_add_edges(graph, &alledges, 0));
-    }
-
-    IGRAPH_PROGRESS("Random rewiring: ", 100.0, 0);
-
-    if (use_adjlist) {
         igraph_vector_int_destroy(&alledges);
         igraph_adjlist_destroy(&al);
     } else {
