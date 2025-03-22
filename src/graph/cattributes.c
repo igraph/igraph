@@ -1354,7 +1354,7 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
             VECTOR(*newv)[i] = (num_trues > n / 2);
         } else {
             if (num_trues == n / 2) {
-                VECTOR(*newv)[i] = (RNG_UNIF01() < 0.5);
+                VECTOR(*newv)[i] = RNG_BOOL();
             } else {
                 VECTOR(*newv)[i] = (num_trues > n / 2);
             }

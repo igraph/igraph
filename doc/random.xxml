@@ -24,6 +24,7 @@
 </section>
 
 <section id="generating-random-numbers"><title>Generating random numbers</title>
+<!-- doxrox-include igraph_rng_get_bool -->
 <!-- doxrox-include igraph_rng_get_integer -->
 <!-- doxrox-include igraph_rng_get_unif01 -->
 <!-- doxrox-include igraph_rng_get_unif -->
