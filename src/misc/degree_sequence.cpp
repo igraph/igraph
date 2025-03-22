@@ -71,120 +71,71 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 // Generate simple undirected realization as edge-list.
 // If largest=true, always choose the vertex with the largest remaining degree to connect up next.
 // Otherwise, always choose the one with the smallest remaining degree.
-static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool largest) {
-    igraph_integer_t n = igraph_vector_int_size(deg);
+#include <queue>
+#include <vector>
 
-    igraph_integer_t ec = 0; // number of edges added so far
-
-    std::vector<vd_pair> vertices;
-    vertices.reserve(n);
-    for (igraph_integer_t i = 0; i < n; ++i) {
-        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
-    }
-
-    while (! vertices.empty()) {
-        if (largest) {
-            std::stable_sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
-        } else {
-            std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
-        }
-
-        // take the next vertex to be connected up
-        vd_pair vd = vertices.back();
-        vertices.pop_back();
-
-        if (vd.degree == 0) {
-            continue;
-        }
-
-        if (vertices.size() < size_t(vd.degree)) {
-            goto fail;
-        }
-
-        if (largest) {
-            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
-                if (--(vertices[vertices.size() - 1 - i].degree) < 0) {
-                    goto fail;
-                }
-
-                VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
-                VECTOR(*edges)[2 * (ec + i) + 1] = vertices[vertices.size() - 1 - i].vertex;
-            }
-        } else {
-            // this loop can only be reached if all zero-degree nodes have already been removed
-            // therefore decrementing remaining degrees is safe
-            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
-                vertices[i].degree--;
-
-                VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
-                VECTOR(*edges)[2 * (ec + i) + 1] = vertices[i].vertex;
-            }
-        }
-
-        ec += vd.degree;
-    }
-
-    return IGRAPH_SUCCESS;
-
-fail:
-    IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
-}
-
-
-// Choose vertices in the order of their IDs.
+// Function to realize the degree sequence
 static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg, igraph_vector_int_t *edges) {
     igraph_integer_t n = igraph_vector_int_size(deg);
+    igraph_integer_t edgeCount = 0;  // Counter for edges added
 
-    igraph_integer_t ec = 0; // number of edges added so far
+    typedef std::pair<igraph_integer_t, igraph_integer_t> VertexDeg;  // (degree, vertex)
+    std::priority_queue<VertexDeg> maxHeap;  
 
-    typedef std::list<vd_pair> vlist;
-    vlist vertices;
+    // Insert vertices with non-zero degrees into the heap
     for (igraph_integer_t i = 0; i < n; ++i) {
-        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
+        if (VECTOR(*deg)[i] > 0) {
+            maxHeap.push(std::make_pair(VECTOR(*deg)[i], i));  // Use std::make_pair (older C++ style)
+        }
     }
 
-    std::vector<vlist::iterator> pointers;
-    pointers.reserve(n);
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-        pointers.push_back(it);
-    }
+    // Main loop: Process vertices and create edges
+    while (!maxHeap.empty()) {
+        VertexDeg top = maxHeap.top();
+        maxHeap.pop();
+        
+        igraph_integer_t degree = top.first;
+        igraph_integer_t vertex = top.second;
 
-    for (const auto &pt : pointers) {
-        vertices.sort(degree_greater<vd_pair>);
+        if (degree == 0) continue;
 
-        vd_pair vd = *pt;
-        vertices.erase(pt);
-
-        if (vd.degree == 0) {
-            continue;
+        if (degree > maxHeap.size()) {
+            return IGRAPH_EINVAL;  // Use error code, not exceptions
         }
 
-        igraph_integer_t k;
-        vlist::iterator it;
-        for (it = vertices.begin(), k = 0;
-             k != vd.degree && it != vertices.end();
-             ++it, ++k) {
-            if (--(it->degree) < 0) {
-                goto fail;
+        std::vector<VertexDeg> remainingNodes;  
+
+        // Connect the current vertex to its neighbors
+        for (igraph_integer_t i = 0; i < degree; ++i) {
+            if (maxHeap.empty()) {
+                return IGRAPH_EINVAL;  
             }
 
-            VECTOR(*edges)[2 * (ec + k)] = vd.vertex;
-            VECTOR(*edges)[2 * (ec + k) + 1] = it->vertex;
-        }
-        if (it == vertices.end() && k < vd.degree) {
-            goto fail;
+            VertexDeg neighbor = maxHeap.top();
+            maxHeap.pop();
+
+            igraph_integer_t neighborDeg = neighbor.first;
+            igraph_integer_t neighborVertex = neighbor.second;
+
+            // Add the edge
+            VECTOR(*edges)[2 * edgeCount] = vertex;
+            VECTOR(*edges)[2 * edgeCount + 1] = neighborVertex;
+            edgeCount++;
+
+            // Decrease the neighbor's degree
+            if (neighborDeg > 1) {
+                remainingNodes.push_back(std::make_pair(neighborDeg - 1, neighborVertex));
+            }
         }
 
-        ec += vd.degree;
+        // Push remaining vertices back into the heap
+        for (const auto& node : remainingNodes) {
+            maxHeap.push(node);
+        }
     }
 
     return IGRAPH_SUCCESS;
-
-fail:
-    IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
-
-
 /***********************************/
 /***** Undirected multigraphs ******/
 /***********************************/
