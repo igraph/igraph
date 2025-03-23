@@ -126,6 +126,17 @@ void stats(void) {
         printf("norm: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
         IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
     }
+
+    {
+        tm = 0.5; tsd = 0.5;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_BOOL();
+        }
+        m /= n;
+        printf("binary: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
 }
 
 /* These is merely a smoke test for various random samplers.
@@ -135,6 +146,7 @@ void stats(void) {
 void sample(void) {
     igraph_integer_t i;
     igraph_real_t x;
+    igraph_bool_t b;
 
     i = RNG_INTEGER(-100, 100);
     printf("integer: %" IGRAPH_PRId "\n", i);
@@ -238,6 +250,8 @@ void sample(void) {
     IGRAPH_ASSERT(0 <= x && isfinite(x));
 #endif
 
+    b = RNG_BOOL();
+    IGRAPH_ASSERT(b == true || b == false);
 }
 
 void test_and_destroy(igraph_rng_type_t *rng_type) {

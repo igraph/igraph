@@ -147,7 +147,9 @@ jobs:
 
   - job: documentation
     steps:
-      - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
         displayName: Install dependencies
 
       - task: CMake@1
