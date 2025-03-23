@@ -1030,8 +1030,9 @@ add_benchmarks(
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
-  lad
   intersection
+  lad
+  modularity
   spanning_tree
 )
 
