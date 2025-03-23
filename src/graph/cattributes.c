@@ -1564,7 +1564,7 @@ static igraph_bool_t igraph_i_cattribute_has_attr(const igraph_t *graph,
         break;
     }
 
-    return 0;
+    return false;
 }
 
 static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
