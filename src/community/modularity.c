@@ -307,7 +307,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_integer_t no_of_edges = igraph_ecount(graph);
     const igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
-    igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
+    igraph_vector_t deg, in_deg, out_deg;
     igraph_real_t scaling_factor;
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
@@ -323,6 +323,15 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_i_modularity_matrix_get_adjacency(graph, modmat, weights, directed));
 
+    /* Performance notes:
+     *  - Iterating in column-major order makes a large difference.
+     *  - Applying the scaling_factor to in_deg (or out_deg) first to reduce the
+     *    number of multiplications does not make an appreciable performance
+     *    difference. However, doing this in the undirected case causes the result
+     *    matrix to sometimes not be strictly symmetric due to the non-associativity
+     *    of floating point multiplication.
+     */
+
     if (directed) {
         IGRAPH_VECTOR_INIT_FINALLY(&in_deg, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&out_deg, no_of_nodes);
@@ -332,17 +341,11 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         IGRAPH_CHECK(igraph_strength(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
                                      IGRAPH_LOOPS, weights));
 
-        /* Scaling one degree factor so every element gets scaled. */
         scaling_factor = resolution / sw;
-        igraph_vector_scale(&out_deg, scaling_factor);
 
         for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
             for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-                /* The intermediate const variable prevents operation fusion,
-                 * reducing numerical inaccuracies.
-                 * See https://github.com/igraph/igraph/issues/2473 */
-                const igraph_real_t x = VECTOR(out_deg)[i] * VECTOR(in_deg)[j];
-                MATRIX(*modmat, i, j) -= x;
+                MATRIX(*modmat, i, j) -= VECTOR(out_deg)[i] * VECTOR(in_deg)[j] * scaling_factor;
             }
         }
         igraph_vector_destroy(&in_deg);
@@ -354,24 +357,15 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
                                      IGRAPH_LOOPS, weights));
 
-        /* Scaling one degree factor so every element gets scaled. */
-        IGRAPH_CHECK(igraph_vector_init_copy(&deg_unscaled, &deg));
-        IGRAPH_FINALLY(igraph_vector_destroy, &deg_unscaled);
         scaling_factor = resolution / 2.0 / sw;
-        igraph_vector_scale(&deg, scaling_factor);
 
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-                /* The intermediate const variable prevents operation fusion,
-                 * reducing numerical inaccuracies.
-                 * See https://github.com/igraph/igraph/issues/2473 */
-                const igraph_real_t x = VECTOR(deg)[i] * VECTOR(deg_unscaled)[j];
-                MATRIX(*modmat, i, j) -= x;
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+                MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] * scaling_factor;
             }
         }
         igraph_vector_destroy(&deg);
-        igraph_vector_destroy(&deg_unscaled);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     return IGRAPH_SUCCESS;
