@@ -622,8 +622,9 @@ igraph_error_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m
     igraph_integer_t i, j, ncols = FUNCTION(igraph_matrix, ncol)(m);
 
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(res, norows, ncols));
-    for (i = 0; i < norows; i++) {
-        for (j = 0; j < ncols; j++) {
+    /* Iterate in column-major order for better performance. */
+    for (j = 0; j < ncols; j++) {
+        for (i = 0; i < norows; i++) {
             MATRIX(*res, i, j) = MATRIX(*m, VECTOR(*rows)[i], j);
         }
     }
@@ -660,8 +661,9 @@ igraph_error_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matri
     igraph_integer_t i, j;
 
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(res, nrows, ncols));
-    for (i = 0; i < nrows; i++) {
-        for (j = 0; j < ncols; j++) {
+    /* Iterate in column-major order for better performance. */
+    for (j = 0; j < ncols; j++) {
+        for (i = 0; i < nrows; i++) {
             MATRIX(*res, i, j) = MATRIX(*m, VECTOR(*rows)[i], VECTOR(*cols)[j]);
         }
     }
@@ -1622,16 +1624,16 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     const igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, nrow));
-    for (igraph_integer_t r = 0; r < nrow; r++) {
-        BASE sum = ZERO;
-        for (igraph_integer_t c = 0; c < ncol; c++) {
+    FUNCTION(igraph_vector, null)(res);
+    /* Iterate in column-major order for better performance. */
+    for (igraph_integer_t c = 0; c < ncol; c++) {
+        for (igraph_integer_t r = 0; r < nrow; r++) {
 #ifdef SUM
-            SUM(sum, sum, MATRIX(*m, r, c));
+            SUM(VECTOR(*res)[r], VECTOR(*res)[r], MATRIX(*m, r, c));
 #else
-            sum += MATRIX(*m, r, c);
+            VECTOR(*res)[r] += MATRIX(*m, r, c);
 #endif
         }
-        VECTOR(*res)[r] = sum;
     }
     return IGRAPH_SUCCESS;
 }
@@ -1777,8 +1779,9 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
     igraph_integer_t i, j;
 
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(res, nrows, ncols));
-    for (i = 0; i < nrows; i++) {
-        for (j = 0; j < ncols; j++) {
+    /* Iterate in column-major order for better performance. */
+    for (j = 0; j < ncols; j++) {
+        for (i = 0; i < nrows; i++) {
             MATRIX(*res, i, j) = MATRIX(*m, i, VECTOR(*cols)[j]);
         }
     }
