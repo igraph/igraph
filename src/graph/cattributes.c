@@ -428,7 +428,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_for_numeric
 
     if (vec == NULL) {
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_init(vec, work_area->length));
         work_area->numeric = vec;
@@ -445,7 +445,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_for_boolean
 
     if (vec == NULL) {
         vec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_bool_init(vec, work_area->length));
         work_area->boolean = vec;
@@ -462,7 +462,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_for_strings
 
     if (vec == NULL) {
         vec = IGRAPH_CALLOC(1, igraph_vector_ptr_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_ptr_init(vec, 0));
         IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vec, igraph_strvector_destroy);
@@ -481,7 +481,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_permute_and_store
     igraph_strvector_t *new_vec;
 
     new_vec = IGRAPH_CALLOC(1, igraph_strvector_t);
-    IGRAPH_CHECK_OOM(new_vec, "Cannot permute attributes");
+    IGRAPH_CHECK_OOM(new_vec, "Cannot permute attributes.");
     IGRAPH_FINALLY(igraph_free, new_vec);
     IGRAPH_CHECK(igraph_strvector_init(new_vec, 0));
     IGRAPH_FINALLY(igraph_strvector_destroy, new_vec);
@@ -1187,7 +1187,7 @@ static igraph_error_t igraph_i_cattributes_cs_concat(const igraph_attribute_reco
             len += strlen(tmp);
         }
         tmp2 = IGRAPH_CALLOC(len + 1, char);
-        IGRAPH_CHECK_OOM(tmp2, "Cannot combine attributes");
+        IGRAPH_CHECK_OOM(tmp2, "Cannot combine attributes.");
         IGRAPH_FINALLY(igraph_free, tmp2);
         len = 0;
         for (igraph_integer_t j = 0; j < n; j++) {
@@ -1294,7 +1294,7 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
     IGRAPH_ASSERT(igraph_attribute_record_list_empty(new_attrs));
 
     todo_items = IGRAPH_CALLOC(no_attrs, igraph_attribute_combination_todo_item_t);
-    IGRAPH_CHECK_OOM(todo_items, "Cannot combine attributes");
+    IGRAPH_CHECK_OOM(todo_items, "Cannot combine attributes.");
     IGRAPH_FINALLY(igraph_free, todo_items);
 
     for (igraph_integer_t i = 0; i < no_attrs; i++) {
@@ -1357,15 +1357,15 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                 IGRAPH_CHECK(igraph_i_cattributes_cn_mean(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-                IGRAPH_ERROR("Median calculation not implemented",
+                IGRAPH_ERROR("Median calculation not implemented.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-                IGRAPH_ERROR("Cannot concatenate numeric attributes",
+                IGRAPH_ERROR("Cannot concatenate numeric attributes.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             default:
-                IGRAPH_ERROR("Unknown attribute combination",
+                IGRAPH_ERROR("Unknown attribute combination.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
@@ -1397,11 +1397,11 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                 IGRAPH_CHECK(igraph_i_cattributes_cb_last(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-                IGRAPH_ERROR("Cannot calculate concatenation of Booleans",
+                IGRAPH_ERROR("Cannot calculate concatenation of Booleans.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             default:
-                IGRAPH_ERROR("Unknown attribute combination",
+                IGRAPH_ERROR("Unknown attribute combination.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
@@ -1412,25 +1412,25 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                              todo_item.func.as_str));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
-                IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
+                IGRAPH_ERROR("Cannot sum strings.", IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_PROD:
-                IGRAPH_ERROR("Cannot multiply strings", IGRAPH_EATTRCOMBINE);
+                IGRAPH_ERROR("Cannot multiply strings.", IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MIN:
-                IGRAPH_ERROR("Cannot find minimum of strings",
+                IGRAPH_ERROR("Cannot find minimum of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MAX:
-                IGRAPH_ERROR("Cannot find maximum of strings",
+                IGRAPH_ERROR("Cannot find maximum of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
-                IGRAPH_ERROR("Cannot calculate mean of strings",
+                IGRAPH_ERROR("Cannot calculate mean of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-                IGRAPH_ERROR("Cannot calculate median of strings",
+                IGRAPH_ERROR("Cannot calculate median of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
@@ -1446,12 +1446,12 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                 IGRAPH_CHECK(igraph_i_cattributes_cs_concat(oldrec, &newrec, merges));
                 break;
             default:
-                IGRAPH_ERROR("Unknown attribute combination",
+                IGRAPH_ERROR("Unknown attribute combination.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
         } else {
-            IGRAPH_ERROR("Unknown attribute type, this should not happen",
+            IGRAPH_ERROR("Unknown attribute type, this should not happen.",
                          IGRAPH_UNIMPLEMENTED);
         }
 
@@ -1562,7 +1562,7 @@ static igraph_bool_t igraph_i_cattribute_has_attr(const igraph_t *graph,
     case IGRAPH_ATTRIBUTE_EDGE:
         return igraph_i_cattribute_find_index(&at->eal, name) >= 0;
     default:
-        IGRAPH_ERROR("Unknown attribute element type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown attribute element type.", IGRAPH_EINVAL);
         break;
     }
 
@@ -1588,7 +1588,7 @@ static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
         al = &at->eal;
         break;
     default:
-        IGRAPH_ERROR("Unknown attribute element type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown attribute element type.", IGRAPH_EINVAL);
         break;
     }
 
@@ -2666,7 +2666,7 @@ igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_size(v) != nv) {
-        IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->val, name, IGRAPH_ATTRIBUTE_NUMERIC, nv, &rec));
@@ -2699,7 +2699,7 @@ igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_bool_size(v) != nv) {
-        IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->val, name, IGRAPH_ATTRIBUTE_BOOLEAN, nv, &rec));
@@ -2732,7 +2732,7 @@ igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_strvector_size(sv) != nv) {
-        IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->val, name, IGRAPH_ATTRIBUTE_STRING, nv, &rec));
@@ -2764,7 +2764,7 @@ igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_size(v) != ne) {
-        IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->eal, name, IGRAPH_ATTRIBUTE_NUMERIC, ne, &rec));
@@ -2796,7 +2796,7 @@ igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_bool_size(v) != ne) {
-        IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->eal, name, IGRAPH_ATTRIBUTE_BOOLEAN, ne, &rec));
@@ -2829,7 +2829,7 @@ igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_strvector_size(sv) != ne) {
-        IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->eal, name, IGRAPH_ATTRIBUTE_STRING, ne, &rec));
