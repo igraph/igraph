@@ -175,7 +175,7 @@ igraph_integer_t igraph_i_clz64(igraph_uint_t x) {
 igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size) {
     igraph_integer_t alloc_size = IGRAPH_BIT_NSLOTS(size);
     bitset->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_uint_t);
-    IGRAPH_CHECK_OOM(bitset->stor_begin, "Cannot initialize bitset");
+    IGRAPH_CHECK_OOM(bitset->stor_begin, "Cannot initialize bitset.");
     bitset->size = size;
     bitset->stor_end = bitset->stor_begin + alloc_size;
     return IGRAPH_SUCCESS;

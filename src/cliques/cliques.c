@@ -138,7 +138,7 @@ static igraph_error_t igraph_i_find_k_indsets(
                 *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                                         (size_t) new_member_storage_size * 2,
                                                         igraph_integer_t);
-                IGRAPH_CHECK_OOM(*new_member_storage, "igraph_independent_vertex_sets failed");
+                IGRAPH_CHECK_OOM(*new_member_storage, "Insufficient memory to find independent vertex sets.");
                 new_member_storage_size *= 2;
                 IGRAPH_FINALLY(igraph_free, *new_member_storage);
             }
