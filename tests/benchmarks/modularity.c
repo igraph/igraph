@@ -31,7 +31,7 @@ void run_bench(int n) {
 
     igraph_matrix_init(&modmat, n, n);
 
-    igraph_erdos_renyi_game_gnm(&graph, n, 10*n, IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, n, 10*n, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "G(n,m),   directed, n = %5d, m = %7" IGRAPH_PRId ", %dx", n, igraph_ecount(&graph), rep);
