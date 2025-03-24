@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: ${{ matrix.config.os }}${{ matrix.target.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - {
+              name: windows,
+              os: windows-2019,
+              artifact: "infomap-win",
+              binary: Infomap.exe,
+              cxxflags: -static,
+              ldflags: -static,
+              compiler: g++,
+            }
+          - {
+              name: ubuntu,
+              os: ubuntu-20.04,
+              artifact: "infomap-ubuntu",
+              binary: Infomap,
+              cxxflags: "",
+              ldflags: "",
+              compiler: g++,
+            }
+          - {
+              name: macos,
+              os: macos-11,
+              artifact: "infomap-mac",
+              binary: Infomap,
+              cxxflags: "-I /usr/local/include -I/usr/local/opt/llvm/include",
+              ldflags: "-L /usr/local/lib -L/usr/local/opt/llvm/lib",
+              compiler: /usr/local/opt/llvm/bin/clang++,
+            }
+        target:
+          - { name: "", target: "" }
+          - { name: "-noomp", target: "noomp" }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      #- if: startsWith(matrix.config.os, 'ubuntu')
+      #  run: |
+      #    sudo apt update
+      #    sudo apt install libomp-dev
+
+      - if: startsWith(matrix.config.os, 'macos')
+        run: |
+          brew install p7zip llvm libomp
+          export PATH="$(brew --prefix llvm)/bin:$PATH"
+
+      - run: make -j ${{ matrix.target.target }}
+        shell: bash
+        env:
+          CXX: ${{ matrix.config.compiler }}
+          CXXFLAGS: ${{ matrix.config.cxxflags }}
+          LDFLAGS: ${{ matrix.config.ldflags }}
+
+      - run: ./Infomap --version
+        shell: bash
+
+      - run: 7z a ${{ matrix.config.artifact }}${{ matrix.target.name }}.zip ${{ matrix.config.binary }}
+        shell: bash
+
+      - uses: actions/upload-artifact@v2
+        with:
+          retention-days: 1
+          path: ./${{ matrix.config.binary }}
+          name: ${{ matrix.config.artifact }}${{ matrix.target.name }}
+
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ matrix.config.artifact }}${{ matrix.target.name }}.zip
