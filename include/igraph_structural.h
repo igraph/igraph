@@ -66,6 +66,9 @@ IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
                                    igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_maxdegree_arg(const igraph_t *graph, igraph_integer_t *res,
+                                    igraph_vs_t vids, igraph_neimode_t mode,
+                                    igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
                                                 igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,

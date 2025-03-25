@@ -31,6 +31,9 @@
 
 #include "core/interruption.h"
 #include "core/indheap.h"
+#include <limits.h>
+#include "core/set.h"
+
 
 /* When vid_ecc is not NULL, only one vertex ID should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
@@ -1047,5 +1050,117 @@ igraph_error_t igraph_graph_center_dijkstra(
     igraph_vector_destroy(&ecc);
     IGRAPH_FINALLY_CLEAN(1);
 
+    return IGRAPH_SUCCESS;
+}
+
+// helper functions for now
+// TODO: integrate somewhere?
+void update_to_min(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? b : *a;}
+void update_to_max(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? *a : b;}
+
+/**
+ * \function igraph_diameter_bound
+ * TODO: update
+ * Plan: return diameter
+ */
+igraph_error_t igraph_diameter_bound(
+    const igraph_t *graph,  // input graph
+    igraph_real_t *diameter,  // output diameter value
+    igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
+    igraph_integer_t *from,  // output start of longest shortest path
+    igraph_integer_t *to,  // output end of longest shortest path
+    igraph_bool_t directed,  // is this graph directed?
+    igraph_bool_t unconn  // is this graph connected
+) {
+    directed = 0; unconn = 0;  // TODO: remove
+    if (directed || unconn) {
+        // for now, don't allow these cases // TODO: fix
+        printf("%d %d\n", directed, unconn);
+        IGRAPH_ERROR("Don't support this yet", IGRAPH_EINVAL);
+    }
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    if (vid_start >= no_of_nodes) {
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
+    }
+
+    printf("start: %li\n", vid_start);
+    if (vid_start < 0) {
+        // no given start vertex, so we choose one ourselves
+        igraph_maxdegree_arg(graph, &vid_start, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+        // TODO: not sure about this vids selector
+        // TODO: something about loop being slower?
+        printf("start: %li\n", vid_start);
+    }
+
+    // initialise set W (line 3)
+    igraph_set_t W;
+    igraph_set_init(&W, no_of_nodes);
+    // TODO: fill W with nodes from V. Can this be done in a better way than loop?
+    // TODO: clean up set!!
+
+    // initialise upper/lower diameter bounds (line 3)
+    igraph_integer_t dia_lower = INT_MIN;
+    igraph_integer_t dia_upper = INT_MAX;
+
+    // initialise upper/lower eccentricity bounds (lines 4-7)
+    igraph_vector_t ecc_lower, ecc_upper;
+    igraph_vector_init_int(&ecc_lower, no_of_nodes);
+    igraph_vector_fill(&ecc_lower, dia_lower);
+    igraph_vector_init_int(&ecc_upper, no_of_nodes);
+    igraph_vector_fill(&ecc_upper, dia_lower);
+    // TODO: these need to be cleaned up!!!!
+
+    // TODO: these vectors are never resized or anything. So technically
+    // I could directly save VECTOR(ecc_lower) now and index it directly
+    // every time from now on..? But the maintainers won't like that.
+
+    // main loop (line 8)
+    while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
+        // line 9: choose vertex v
+        // TODO: currently takes arbitrary node. Implement choosing function
+        igraph_integer_t v; // = SelectFrom(W);
+        igraph_integer_t state = 0;
+        igraph_set_iterate(&W, &state, &v);
+
+        // line 10: DFS on v to get its eccentricity
+        // TODO: DFS and ecc
+        igraph_matrix_t distances;
+        igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
+        igraph_integer_t ecc_v = igraph_matrix_max(&distances);
+
+        // lines 11&12: update upper/lower bounds on diameter
+        update_to_max(&dia_lower, ecc_v);
+        update_to_min(&dia_lower, 2*ecc_v);
+
+        // TODO: possible improvement to alg
+        // we can directly set dia_lower[v] = dia_upper[v] = ecc_v and remove v from W.
+        // (technically this will already be done in the loop)
+
+        // TODO for w in W loop line 13
+        state = 0;
+        igraph_integer_t w;
+        while (igraph_set_iterate(&W, &state, &w)) {
+            // TODO calc d(v,w)
+            igraph_integer_t d = MATRIX(distances, v, w);
+            // lines 14-15: update upper/lower bounds on eccentricities
+            // TODO: correct vector access?
+            // TODO: igraph_vector_get_ptr
+            // TODO: why do I see reals/doubles here?
+            update_to_max(&VECTOR(ecc_lower)[w], ecc_v - d);
+            update_to_max(&VECTOR(ecc_lower)[w], d);
+            update_to_min(&VECTOR(ecc_upper)[w], ecc_v+d);
+
+            if (  // line 16
+                VECTOR(ecc_lower)[w] == VECTOR(ecc_lower)[w] ||  // ecc found, or
+                (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
+            )
+                ; // TODO: line 17: remove w from W
+                // I think igraph_set_t doesn't allow for element removals?
+        }
+    }
+
+    // return (line 21)
+    *diameter = dia_lower;
     return IGRAPH_SUCCESS;
 }
