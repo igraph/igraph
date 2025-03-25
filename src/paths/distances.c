@@ -1055,8 +1055,8 @@ igraph_error_t igraph_graph_center_dijkstra(
 
 // helper functions for now
 // TODO: integrate somewhere?
-void update_to_min(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? b : *a;}
-void update_to_max(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? *a : b;}
+static void update_to_min(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? b : *a;}
+static void update_to_max(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? *a : b;}
 
 /**
  * \function igraph_diameter_bound
@@ -1065,7 +1065,7 @@ void update_to_max(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? *a 
  */
 igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
-    igraph_real_t *diameter,  // output diameter value
+    igraph_integer_t *diameter,  // output diameter value
     igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
     igraph_integer_t *from,  // output start of longest shortest path
     igraph_integer_t *to,  // output end of longest shortest path
@@ -1095,7 +1095,13 @@ igraph_error_t igraph_diameter_bound(
 
     // initialise set W (line 3)
     igraph_set_t W;
+    igraph_vit_t vit;
     igraph_set_init(&W, no_of_nodes);
+    igraph_vit_create(graph, igraph_vss_all(), &vit);
+    while (!IGRAPH_VIT_END(vit)) {
+        igraph_set_add(&W, IGRAPH_VIT_GET(vit));
+        IGRAPH_VIT_NEXT(vit);
+    }
     // TODO: fill W with nodes from V. Can this be done in a better way than loop?
     // TODO: clean up set!!
 
@@ -1119,19 +1125,22 @@ igraph_error_t igraph_diameter_bound(
     while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
         // line 9: choose vertex v
         // TODO: currently takes arbitrary node. Implement choosing function
-        igraph_integer_t v; // = SelectFrom(W);
+        igraph_integer_t v = 123456789; // = SelectFrom(W);
         igraph_integer_t state = 0;
         igraph_set_iterate(&W, &state, &v);
+        printf("Choose vertex %ld with diameter bounds %ld:%ld\n", v, dia_lower, dia_upper);
 
         // line 10: DFS on v to get its eccentricity
         // TODO: DFS and ecc
         igraph_matrix_t distances;
+        igraph_matrix_init(&distances, 0, 0);
         igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
         igraph_integer_t ecc_v = igraph_matrix_max(&distances);
+        printf("  - found eccentricity %ld\n", ecc_v);
 
         // lines 11&12: update upper/lower bounds on diameter
         update_to_max(&dia_lower, ecc_v);
-        update_to_min(&dia_lower, 2*ecc_v);
+        update_to_min(&dia_upper, 2*ecc_v);
 
         // TODO: possible improvement to alg
         // we can directly set dia_lower[v] = dia_upper[v] = ecc_v and remove v from W.
@@ -1152,13 +1161,20 @@ igraph_error_t igraph_diameter_bound(
             update_to_min(&VECTOR(ecc_upper)[w], ecc_v+d);
 
             if (  // line 16
-                VECTOR(ecc_lower)[w] == VECTOR(ecc_lower)[w] ||  // ecc found, or
-                (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
-            )
-                ; // TODO: line 17: remove w from W
-                // I think igraph_set_t doesn't allow for element removals?
+                VECTOR(ecc_lower)[w] == VECTOR(ecc_lower)[w]  // ecc found, or
+                // ||
+                // (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
+            ) {
+                igraph_set_remove(&W, w);  // line 17: remove w from W
+                // TODO: removing while iterating doesn't work!!
+                // see https://github.com/igraph/igraph/issues/2287
+                // However, in this case this doesn't matter for soundness, only
+                // for runtime. This can cause us to skip some vertices.
+            }
         }
     }
+
+    printf("Finished, found result %ld\n", dia_lower);
 
     // return (line 21)
     *diameter = dia_lower;
