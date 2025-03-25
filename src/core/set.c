@@ -248,6 +248,72 @@ igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
 
 /**
  * \ingroup set
+ * \function igraph_set_remove
+ * \brief Adds an element to the set.
+ *
+ * If element not present, does nothing. Does not change capacity!
+ *
+ * \param set The set object.
+ * \param e The element to be removed.
+ *
+ * Time complexity: O(log(n)), n is the number of elements in \p set.
+ */
+igraph_error_t igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
+    igraph_integer_t left, right, middle;
+    igraph_integer_t size;
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
+
+    size = igraph_set_size(set);
+    if (size == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* find the element to remove */
+    // TODO: extract binsearch to own function for add and remove functions
+    // Also why is there an in-house binsearch implementation...
+    left = 0;
+    right = size - 1;
+    while (left < right - 1) {
+        middle = (left + right) / 2;
+        if (SET(*set)[middle] > e) {
+            right = middle;
+        } else if (SET(*set)[middle] < e) {
+            left = middle;
+        } else {
+            left = middle;
+            break;
+        }
+    }
+
+    // if element not found, there's nothing to do, return
+    if (SET(*set)[left] != e && SET(*set)[right] != e) {
+        return IGRAPH_SUCCESS;
+    }
+    
+    // make sure left points at e
+    if (SET(*set)[right] == e) {
+        left = right;
+    }
+    
+    // if the element we found is not the last one, shift all following elements
+    // to the left by one.
+    if (left + 1 < size) {
+        memmove(
+            set->stor_begin + left,
+            set->stor_begin + left + 1,
+            (size - left) * sizeof(set->stor_begin[0])
+        );
+    }
+
+    // delete the last element and return
+    set->end -= 1;
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup set
  * \function igraph_set_contains
  * \brief Checks whether a given element is in the set or not.
  *
