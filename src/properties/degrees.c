@@ -117,7 +117,7 @@ igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
     if (igraph_vector_int_size(&tmp) == 0) {
         *res = -1;
     } else {
-        *res = igraph_vector_which_max(&tmp);
+        *res = igraph_vector_int_which_max(&tmp);
     }
 
     igraph_vector_int_destroy(&tmp);

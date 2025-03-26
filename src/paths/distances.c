@@ -1121,6 +1121,11 @@ igraph_error_t igraph_diameter_bound(
     // I could directly save VECTOR(ecc_lower) now and index it directly
     // every time from now on..? But the maintainers won't like that.
 
+    igraph_matrix_t distances;
+    igraph_matrix_init(&distances, 0, 0);
+    igraph_vector_int_t to_remove;
+    igraph_vector_int_init(&to_remove, no_of_nodes);
+
     // main loop (line 8)
     while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
         // line 9: choose vertex v
@@ -1131,9 +1136,6 @@ igraph_error_t igraph_diameter_bound(
         printf("Choose vertex %ld with diameter bounds %.1f:%.1f\n", v, dia_lower, dia_upper);
 
         // line 10: DFS on v to get its eccentricity
-        // TODO: DFS and ecc
-        igraph_matrix_t distances;
-        igraph_matrix_init(&distances, 0, 0);
         igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
         igraph_real_t ecc_v = igraph_matrix_max(&distances);
         printf("  - found eccentricity %.1f\n", ecc_v);
@@ -1151,7 +1153,7 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t w;
         while (igraph_set_iterate(&W, &state, &w)) {
             // TODO calc d(v,w)
-            igraph_integer_t d = MATRIX(distances, v, w);
+            igraph_real_t d = MATRIX(distances, v, w);
             // lines 14-15: update upper/lower bounds on eccentricities
             // TODO: correct vector access?
             // TODO: igraph_vector_get_ptr
@@ -1178,5 +1180,13 @@ igraph_error_t igraph_diameter_bound(
 
     // return (line 21)
     *diameter = dia_lower;
+
+    // frees
+    igraph_set_destroy(&W);
+    igraph_matrix_destroy(&distances);
+    igraph_vector_destroy(&ecc_lower);
+    igraph_vector_destroy(&ecc_upper);
+    igraph_vector_int_destroy(&to_remove);
+
     return IGRAPH_SUCCESS;
 }
