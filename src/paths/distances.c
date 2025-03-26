@@ -1152,8 +1152,7 @@ igraph_error_t igraph_diameter_bound(
         state = 0;
         igraph_integer_t w;
         while (igraph_set_iterate(&W, &state, &w)) {
-            // TODO calc d(v,w)
-            igraph_real_t d = MATRIX(distances, v, w);
+            igraph_real_t d = MATRIX(distances, 0, w);
             // lines 14-15: update upper/lower bounds on eccentricities
             // TODO: correct vector access?
             // TODO: igraph_vector_get_ptr
