@@ -1055,8 +1055,8 @@ igraph_error_t igraph_graph_center_dijkstra(
 
 // helper functions for now
 // TODO: integrate somewhere?
-static void update_to_min(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? b : *a;}
-static void update_to_max(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b) ? *a : b;}
+static void update_to_min(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? b : *a;}
+static void update_to_max(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? *a : b;}
 
 /**
  * \function igraph_diameter_bound
@@ -1065,7 +1065,7 @@ static void update_to_max(igraph_integer_t *a, igraph_integer_t b) {*a = (*a > b
  */
 igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
-    igraph_integer_t *diameter,  // output diameter value
+    igraph_real_t *diameter,  // output diameter value
     igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
     igraph_integer_t *from,  // output start of longest shortest path
     igraph_integer_t *to,  // output end of longest shortest path
@@ -1106,15 +1106,15 @@ igraph_error_t igraph_diameter_bound(
     // TODO: clean up set!!
 
     // initialise upper/lower diameter bounds (line 3)
-    igraph_integer_t dia_lower = INT_MIN;
-    igraph_integer_t dia_upper = INT_MAX;
+    igraph_real_t dia_lower = 0;
+    igraph_real_t dia_upper = IGRAPH_INFINITY;
 
     // initialise upper/lower eccentricity bounds (lines 4-7)
     igraph_vector_t ecc_lower, ecc_upper;
-    igraph_vector_init_int(&ecc_lower, no_of_nodes);
+    igraph_vector_init(&ecc_lower, no_of_nodes);
     igraph_vector_fill(&ecc_lower, dia_lower);
-    igraph_vector_init_int(&ecc_upper, no_of_nodes);
-    igraph_vector_fill(&ecc_upper, dia_lower);
+    igraph_vector_init(&ecc_upper, no_of_nodes);
+    igraph_vector_fill(&ecc_upper, dia_upper);
     // TODO: these need to be cleaned up!!!!
 
     // TODO: these vectors are never resized or anything. So technically
@@ -1128,15 +1128,15 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t v = 123456789; // = SelectFrom(W);
         igraph_integer_t state = 0;
         igraph_set_iterate(&W, &state, &v);
-        printf("Choose vertex %ld with diameter bounds %ld:%ld\n", v, dia_lower, dia_upper);
+        printf("Choose vertex %ld with diameter bounds %.1f:%.1f\n", v, dia_lower, dia_upper);
 
         // line 10: DFS on v to get its eccentricity
         // TODO: DFS and ecc
         igraph_matrix_t distances;
         igraph_matrix_init(&distances, 0, 0);
         igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
-        igraph_integer_t ecc_v = igraph_matrix_max(&distances);
-        printf("  - found eccentricity %ld\n", ecc_v);
+        igraph_real_t ecc_v = igraph_matrix_max(&distances);
+        printf("  - found eccentricity %.1f\n", ecc_v);
 
         // lines 11&12: update upper/lower bounds on diameter
         update_to_max(&dia_lower, ecc_v);
@@ -1162,8 +1162,8 @@ igraph_error_t igraph_diameter_bound(
 
             if (  // line 16
                 VECTOR(ecc_lower)[w] == VECTOR(ecc_lower)[w]  // ecc found, or
-                // ||
-                // (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
+                ||
+                (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
             ) {
                 igraph_set_remove(&W, w);  // line 17: remove w from W
                 // TODO: removing while iterating doesn't work!!
@@ -1174,7 +1174,7 @@ igraph_error_t igraph_diameter_bound(
         }
     }
 
-    printf("Finished, found result %ld\n", dia_lower);
+    printf("\nFinished, found result %.1f\n", dia_lower);
 
     // return (line 21)
     *diameter = dia_lower;

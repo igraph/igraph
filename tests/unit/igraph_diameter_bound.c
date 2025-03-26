@@ -23,7 +23,7 @@
 
 int main(void) {
     igraph_t g;
-    igraph_integer_t result;
+    igraph_real_t result;
 
     // recreate example graph from paper. A=0, B=1, etc. Note that O is missing.
     // AC, BC, CD, CE, CF, DF, EF, EG, FG, FH, FJ, GI,
