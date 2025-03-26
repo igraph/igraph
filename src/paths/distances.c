@@ -1163,7 +1163,7 @@ igraph_error_t igraph_diameter_bound(
             update_to_min(&VECTOR(ecc_upper)[w], ecc_v+d);
 
             if (  // line 16
-                VECTOR(ecc_lower)[w] == VECTOR(ecc_lower)[w]  // ecc found, or
+                VECTOR(ecc_lower)[w] == VECTOR(ecc_upper)[w]  // ecc found, or
                 ||
                 (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
             ) {
