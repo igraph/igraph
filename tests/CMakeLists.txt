@@ -379,6 +379,11 @@ add_legacy_tests(
   bug_2517
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_rich_club
+)
+
 # components.at
 add_examples(
   FOLDER examples/simple NAMES
