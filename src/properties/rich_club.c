@@ -18,58 +18,82 @@
 
 #include "igraph_structural.h"
 #include "igraph_interface.h"
+#include "igraph_conversion.h"
 
-igraph_error_t igraph_i_rich_club_density_sequence(const igraph_t *graph,
-                                                  const igraph_vector_int_t *vertex_order,
-                                                  igraph_bool_t directed,
-                                                  igraph_bool_t loops,
-                                                  igraph_vector_t *res) {
+/* HELPER for igraph_i_rich_club_density_sequence()
+ *
+ * Given an ordered list of vertex IDs, returns a list where the index of each vertex ID
+ * corresponds to its position in this returned list.
+ *
+ * Index: ordering  -> Index: vertex ID
+ * Value: vertex ID    Value: ordering
+ *
+ * order[id] = placement of vertex ID in vertex_order
+ */
+static igraph_vector_int_t igraph_i_get_vertex_order_map(const igraph_vector_int_t *vertex_order) {
+    igraph_integer_t size = igraph_vector_int_size(vertex_order);
+    igraph_vector_int_t map;
+
+    igraph_vector_int_init(&map, size);
+
+    for (int i = 0; i < size; i++) {
+        VECTOR(map)[VECTOR(*vertex_order)[i]] = i;
+    }
+    return map;
+}
+
+igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
+                                                 const igraph_vector_int_t *vertex_order,
+                                                 igraph_bool_t directed,
+                                                 igraph_bool_t loops,
+                                                 igraph_vector_t *res) {
     /* TODO:
-
-     * should we check that the vertex_order given is a permutation of the
-       vertices of the graph? Or is it valid if vertex_order is only a subset of the vertices?
-
      * implement directed vs. undirected functionality
+     */
 
-    */
-    igraph_integer_t numVertices = igraph_vcount(graph);
-
-    /* Error: vertex_order wrong size */
+    /**
+    // Error: vertex_order wrong size
     if (igraph_vector_int_size(vertex_order) != numVertices) {
         IGRAPH_ERROR("Invalid vertex order length.", IGRAPH_EINVAL);
+    }*/
+    igraph_integer_t numVertices = igraph_vcount(graph);
+    igraph_integer_t numEdges = igraph_ecount(graph);
+    igraph_vector_int_t edges;
+    igraph_vector_int_t edgesRemainingAfter;
+
+    igraph_vector_int_init(&edges, 0);
+    igraph_vector_int_init(&edgesRemainingAfter, numVertices);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, numVertices)); // resize res
+
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0)); // get list of edges
+
+    // get map of vertex ordering -> orderOf[id] = index of vertexID in vertex_order
+    igraph_vector_int_t orderOf = igraph_i_get_vertex_order_map(vertex_order);
+
+    for (int i = 0; i < numEdges; i++) {
+        igraph_integer_t v1 = VECTOR(edges)[2 * i];     // endpoints
+        igraph_integer_t v2 = VECTOR(edges)[2 * i + 1];
+        igraph_integer_t orderV1 = VECTOR(orderOf)[v1]; // ordering of endpoints
+        igraph_integer_t orderV2 = VECTOR(orderOf)[v2];
+
+        igraph_integer_t edgeRemovalIndex = (orderV1 < orderV2 ? orderV1 : orderV2);
+
+        for (int j = 0; j <= edgeRemovalIndex; j++) {
+            VECTOR(edgesRemainingAfter)[j]++; // add to edge remaining count
+        }
     }
 
-    /* Make sure res is the right size (better way to do this?) */
-    IGRAPH_CHECK(igraph_vector_resize(res, numVertices));
+    igraph_integer_t totalPossibleVertices = numVertices * (numVertices - 1) / 2;
 
-    printf("Checkpoint 1\n");
-
-    /* create copy of the graph */
-    igraph_t graphCopy;
-    IGRAPH_CHECK(igraph_copy(&graphCopy, graph));
-
-    /* loop through the number of vertices in the graph */
+    // density calculation
     for (int i = 0; i < numVertices; i++) {
-        printf("Checkpoint 2a\n");
-
-        /* compute the density */
-        igraph_real_t density;
-        IGRAPH_CHECK(igraph_density(&graphCopy, &density, loops));
-        printf("Checkpoint 2b\n");
-
-        /* store density in result */
-        VECTOR(*res)[i] = density;
-        printf("Checkpoint 2c\n");
-
-        /* remove a vertex */
-        IGRAPH_CHECK(igraph_delete_vertices(&graphCopy, igraph_vss_1(VECTOR(*vertex_order)[i])));
-        printf("Checkpoint 2d\n");
+        VECTOR(*res)[i] = VECTOR(edgesRemainingAfter)[i] / (igraph_real_t) totalPossibleVertices;
     }
 
-    /* destroy */
-    igraph_destroy(&graphCopy);
-
-    // TODO: add static back in
+    igraph_vector_int_destroy(&edges);
+    igraph_vector_int_destroy(&orderOf);
+    igraph_vector_int_destroy(&edgesRemainingAfter);
 
     return IGRAPH_SUCCESS;
 }
