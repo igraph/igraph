@@ -1167,12 +1167,16 @@ igraph_error_t igraph_diameter_bound(
                 ||
                 (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
             ) {
-                igraph_set_remove(&W, w);  // line 17: remove w from W
+                // igraph_set_remove(&W, w);  // line 17: remove w from W
+                igraph_vector_int_push_back(&to_remove, w);
                 // TODO: removing while iterating doesn't work!!
                 // see https://github.com/igraph/igraph/issues/2287
                 // However, in this case this doesn't matter for soundness, only
                 // for runtime. This can cause us to skip some vertices.
             }
+        }
+        for (size_t i=0; i<igraph_vector_int_size(&to_remove); i++) {
+            igraph_set_remove(&W, igraph_vector_int_pop_back(&to_remove));
         }
     }
 
