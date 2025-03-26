@@ -49,7 +49,7 @@ int main(void) {
     printf("\n");
 
     /* EXPECTED OUTPUT
-       0.2667 0.2000 0.1333 0.0000 0.0000 0.0000
+       0.2667 0.3000 0.3333 0.0000 0.0000 nan
     */
     igraph_vector_int_destroy(&vertex_order);
     igraph_vector_destroy(&res);
