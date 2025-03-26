@@ -22,7 +22,7 @@
 
 /* HELPER for igraph_i_rich_club_density_sequence()
  *
- * Given an ordered list of vertex IDs, returns a list where the index of each vertex ID
+ * Given an ordered list of vertex IDs, builds a list where the index of each vertex ID
  * corresponds to its position in this returned list.
  *
  * Index: ordering  -> Index: vertex ID
@@ -30,16 +30,15 @@
  *
  * order[id] = placement of vertex ID in vertex_order
  */
-static igraph_vector_int_t igraph_i_get_vertex_order_map(const igraph_vector_int_t *vertex_order) {
+static igraph_error_t igraph_i_get_vertex_order_map(const igraph_vector_int_t *vertex_order,
+                                                    igraph_vector_int_t *map) {
     igraph_integer_t size = igraph_vector_int_size(vertex_order);
-    igraph_vector_int_t map;
+    IGRAPH_CHECK(igraph_vector_int_resize(map, size)); // resize map
 
-    igraph_vector_int_init(&map, size);
-
-    for (int i = 0; i < size; i++) {
-        VECTOR(map)[VECTOR(*vertex_order)[i]] = i;
+    for (igraph_integer_t i = 0; i < size; i++) {
+        VECTOR(*map)[VECTOR(*vertex_order)[i]] = i;
     }
-    return map;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
@@ -50,28 +49,30 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
     /* TODO:
      * implement directed vs. undirected functionality
      */
+    igraph_integer_t numVertices = igraph_vcount(graph);
 
-    /**
     // Error: vertex_order wrong size
     if (igraph_vector_int_size(vertex_order) != numVertices) {
         IGRAPH_ERROR("Invalid vertex order length.", IGRAPH_EINVAL);
-    }*/
-    igraph_integer_t numVertices = igraph_vcount(graph);
+    }
+
     igraph_integer_t numEdges = igraph_ecount(graph);
     igraph_vector_int_t edges;
     igraph_vector_int_t edgesRemainingAfter;
 
-    igraph_vector_int_init(&edges, 0);
-    igraph_vector_int_init(&edgesRemainingAfter, numVertices);
+    IGRAPH_CHECK(igraph_vector_int_init(&edges, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&edgesRemainingAfter, numVertices));
 
     IGRAPH_CHECK(igraph_vector_resize(res, numVertices)); // resize res
 
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0)); // get list of edges
 
     // get map of vertex ordering -> orderOf[id] = index of vertexID in vertex_order
-    igraph_vector_int_t orderOf = igraph_i_get_vertex_order_map(vertex_order);
+    igraph_vector_int_t orderOf;
+    IGRAPH_CHECK(igraph_vector_int_init(&orderOf, numVertices));
+    igraph_i_get_vertex_order_map(vertex_order, &orderOf);
 
-    for (int i = 0; i < numEdges; i++) {
+    for (igraph_integer_t i = 0; i < numEdges; i++) {   // O(E)
         igraph_integer_t v1 = VECTOR(edges)[2 * i];     // endpoints
         igraph_integer_t v2 = VECTOR(edges)[2 * i + 1];
         igraph_integer_t orderV1 = VECTOR(orderOf)[v1]; // ordering of endpoints
@@ -79,16 +80,21 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
 
         igraph_integer_t edgeRemovalIndex = (orderV1 < orderV2 ? orderV1 : orderV2);
 
-        for (int j = 0; j <= edgeRemovalIndex; j++) {
-            VECTOR(edgesRemainingAfter)[j]++; // add to edge remaining count
-        }
+        VECTOR(edgesRemainingAfter)[edgeRemovalIndex]++; // add to edge remaining count
     }
 
-    igraph_integer_t totalPossibleVertices = numVertices * (numVertices - 1) / 2;
+    // derive the final edgesRemainingAfter vector via accumulating from the end
+    igraph_integer_t total = 0;
+    for (igraph_integer_t i = numVertices - 1; i >= 0; i--) { // O(V)
+        total += VECTOR(edgesRemainingAfter)[i];
+        VECTOR(edgesRemainingAfter)[i] = total;
+    }
 
     // density calculation
-    for (int i = 0; i < numVertices; i++) {
-        VECTOR(*res)[i] = VECTOR(edgesRemainingAfter)[i] / (igraph_real_t) totalPossibleVertices;
+    for (igraph_integer_t i = 0; i < numVertices; i++) { // O(V)
+        // (numVertices - i) = the number of vertices left on this loop
+        igraph_real_t totalPossibleEdges = (numVertices - i) * ((numVertices - i) - 1) / 2;
+        VECTOR(*res)[i] = VECTOR(edgesRemainingAfter)[i] / totalPossibleEdges;
     }
 
     igraph_vector_int_destroy(&edges);
@@ -96,6 +102,8 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
     igraph_vector_int_destroy(&edgesRemainingAfter);
 
     return IGRAPH_SUCCESS;
+
+    // Complexity: O(E + V)
 }
 
 igraph_error_t igraph_rich_club_coefficient(const igraph_t *graph,
