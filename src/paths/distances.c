@@ -1129,7 +1129,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_int_reserve(&to_remove, no_of_nodes);
 
     printf("Start on graph with %ld nodes and %ld edges. Initial bounds %.0f:%.0f\n",
-        no_of_nodes, igraph_ecount(graph), dia_lower, dia_upper);
+        (long) no_of_nodes, (long) igraph_ecount(graph), dia_lower, dia_upper);
 
     // main loop (line 8)
     while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
@@ -1138,7 +1138,7 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t v = 123456789; // = SelectFrom(W);
         igraph_integer_t state = 0;
         igraph_set_iterate(&W, &state, &v);
-        printf("Choose vertex %ld\n", v);
+        printf("Choose vertex %ld\n", (long) v);
 
         // line 10: DFS on v to get its eccentricity
         igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
@@ -1160,7 +1160,7 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t w;
         while (igraph_set_iterate(&W, &state, &w)) {
             igraph_real_t d = MATRIX(distances, 0, w);
-            printf("\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
+            printf("\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
             // lines 14-15: update upper/lower bounds on eccentricities
             update_to_max(&VECTOR(ecc_lower)[w], ecc_v-d);
             update_to_max(&VECTOR(ecc_lower)[w], d);
@@ -1181,7 +1181,7 @@ igraph_error_t igraph_diameter_bound(
         while (!igraph_vector_int_empty(&to_remove)) {
             igraph_set_remove(&W, igraph_vector_int_pop_back(&to_remove));
         }
-        printf("\tRemaining |W|=%ld\n", igraph_set_size(&W));
+        printf("\tRemaining |W|=%ld\n", (long) igraph_set_size(&W));
     }
 
     printf("\nFinished, found result %.0f\n", dia_lower);
