@@ -32,7 +32,10 @@ int main(void) {
         0,2, 1,2, 2,3, 2,4, 2,5, 3,5, 4,5, 4,6, 5,6, 5,7, 5,9, 6,8, 6,9, 7,10,
         9,11, 11,12, 11,13, 11,14, 13,14, 14,15, 14,16, 15,17, 16,18, -1
     );
-    igraph_diameter_bound(&g, &result, 5, NULL, NULL, IGRAPH_UNDIRECTED, 1);
+
+    igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
