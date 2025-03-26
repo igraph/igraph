@@ -31,7 +31,6 @@
 
 #include "core/interruption.h"
 #include "core/indheap.h"
-#include <limits.h>
 #include "core/set.h"
 
 
@@ -1053,8 +1052,6 @@ igraph_error_t igraph_graph_center_dijkstra(
     return IGRAPH_SUCCESS;
 }
 
-// helper functions for now
-// TODO: integrate somewhere?
 static void update_to_min(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? b : *a;}
 static void update_to_max(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? *a : b;}
 
@@ -1069,29 +1066,34 @@ igraph_error_t igraph_diameter_bound(
     igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
     igraph_integer_t *from,  // output start of longest shortest path
     igraph_integer_t *to,  // output end of longest shortest path
-    igraph_bool_t directed,  // is this graph directed?
+    igraph_bool_t directed,  // treating this graph as undirected
     igraph_bool_t unconn  // is this graph connected
 ) {
-    directed = 0; unconn = 0;  // TODO: remove
-    if (directed || unconn) {
-        // for now, don't allow these cases // TODO: fix
-        printf("%d %d\n", directed, unconn);
-        IGRAPH_ERROR("Don't support this yet", IGRAPH_EINVAL);
+    // linux static_vendored is the important one
+    if (!igraph_is_directed(graph)) {
+        directed = false;
+    }
+
+    if (directed) {
+        IGRAPH_ERROR("Directed graphs not supported", IGRAPH_UNIMPLEMENTED);
+    }
+    if (unconn) {
+        IGRAPH_ERROR("Unconnected graphs not supported", IGRAPH_UNIMPLEMENTED);
     }
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
-    printf("start: %li\n", vid_start);
-    if (vid_start < 0) {
-        // no given start vertex, so we choose one ourselves
-        igraph_maxdegree_arg(graph, &vid_start, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
-        // TODO: not sure about this vids selector
-        // TODO: something about loop being slower?
-        printf("start: %li\n", vid_start);
-    }
+    // printf("start: %li\n", vid_start);
+    // if (vid_start < 0) {
+    //     // no given start vertex, so we choose one ourselves
+    //     igraph_maxdegree_arg(graph, &vid_start, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+    //     // TODO: not sure about this vids selector
+    //     // TODO: something about loop being slower?
+    //     printf("start: %li\n", vid_start);
+    // }
 
     // initialise set W (line 3)
     igraph_set_t W;
@@ -1102,11 +1104,10 @@ igraph_error_t igraph_diameter_bound(
         igraph_set_add(&W, IGRAPH_VIT_GET(vit));
         IGRAPH_VIT_NEXT(vit);
     }
-    // TODO: fill W with nodes from V. Can this be done in a better way than loop?
-    // TODO: clean up set!!
+    // TODO: Can this fill be done in a better way than loop?
 
     // initialise upper/lower diameter bounds (line 3)
-    igraph_real_t dia_lower = 0;
+    igraph_real_t dia_lower = -IGRAPH_INFINITY;
     igraph_real_t dia_upper = IGRAPH_INFINITY;
 
     // initialise upper/lower eccentricity bounds (lines 4-7)
@@ -1115,7 +1116,6 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_fill(&ecc_lower, dia_lower);
     igraph_vector_init(&ecc_upper, no_of_nodes);
     igraph_vector_fill(&ecc_upper, dia_upper);
-    // TODO: these need to be cleaned up!!!!
 
     // TODO: these vectors are never resized or anything. So technically
     // I could directly save VECTOR(ecc_lower) now and index it directly
@@ -1124,7 +1124,12 @@ igraph_error_t igraph_diameter_bound(
     igraph_matrix_t distances;
     igraph_matrix_init(&distances, 0, 0);
     igraph_vector_int_t to_remove;
-    igraph_vector_int_init(&to_remove, no_of_nodes);
+    // igraph_vector_int_init(&to_remove, no_of_nodes);  // TODO: causes size=19??
+    igraph_vector_int_init(&to_remove, 0);
+    igraph_vector_int_reserve(&to_remove, no_of_nodes);
+
+    printf("Start on graph with %ld nodes and %ld edges. Initial bounds %.0f:%.0f\n",
+        no_of_nodes, igraph_ecount(graph), dia_lower, dia_upper);
 
     // main loop (line 8)
     while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
@@ -1133,16 +1138,18 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t v = 123456789; // = SelectFrom(W);
         igraph_integer_t state = 0;
         igraph_set_iterate(&W, &state, &v);
-        printf("Choose vertex %ld with diameter bounds %.1f:%.1f\n", v, dia_lower, dia_upper);
+        printf("Choose vertex %ld\n", v);
 
         // line 10: DFS on v to get its eccentricity
         igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
         igraph_real_t ecc_v = igraph_matrix_max(&distances);
-        printf("  - found eccentricity %.1f\n", ecc_v);
+        printf("\tFound eccentricity %.0f\n", ecc_v);
 
         // lines 11&12: update upper/lower bounds on diameter
         update_to_max(&dia_lower, ecc_v);
         update_to_min(&dia_upper, 2*ecc_v);
+
+        printf("\tNew diameter bounds: %.0f:%.0f\n", dia_lower, dia_upper);
 
         // TODO: possible improvement to alg
         // we can directly set dia_lower[v] = dia_upper[v] = ecc_v and remove v from W.
@@ -1153,33 +1160,31 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t w;
         while (igraph_set_iterate(&W, &state, &w)) {
             igraph_real_t d = MATRIX(distances, 0, w);
+            printf("\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
             // lines 14-15: update upper/lower bounds on eccentricities
-            // TODO: correct vector access?
-            // TODO: igraph_vector_get_ptr
-            // TODO: why do I see reals/doubles here?
-            update_to_max(&VECTOR(ecc_lower)[w], ecc_v - d);
+            update_to_max(&VECTOR(ecc_lower)[w], ecc_v-d);
             update_to_max(&VECTOR(ecc_lower)[w], d);
             update_to_min(&VECTOR(ecc_upper)[w], ecc_v+d);
+            printf(" -> %.0f:%.0f", VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
 
             if (  // line 16
                 VECTOR(ecc_lower)[w] == VECTOR(ecc_upper)[w]  // ecc found, or
                 ||
                 (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
             ) {
-                // igraph_set_remove(&W, w);  // line 17: remove w from W
-                igraph_vector_int_push_back(&to_remove, w);
-                // TODO: removing while iterating doesn't work!!
-                // see https://github.com/igraph/igraph/issues/2287
-                // However, in this case this doesn't matter for soundness, only
-                // for runtime. This can cause us to skip some vertices.
+                printf(" (to be removed)");
+                igraph_vector_int_push_back(&to_remove, w);  // line 17: remove w from W
             }
+            printf("\n");
         }
-        for (size_t i=0; i<igraph_vector_int_size(&to_remove); i++) {
+        // remove the unneeded vertices
+        while (!igraph_vector_int_empty(&to_remove)) {
             igraph_set_remove(&W, igraph_vector_int_pop_back(&to_remove));
         }
+        printf("\tRemaining |W|=%ld\n", igraph_set_size(&W));
     }
 
-    printf("\nFinished, found result %.1f\n", dia_lower);
+    printf("\nFinished, found result %.0f\n", dia_lower);
 
     // return (line 21)
     *diameter = dia_lower;
