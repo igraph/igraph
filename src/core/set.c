@@ -286,23 +286,23 @@ igraph_error_t igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
         }
     }
 
-    // if element not found, there's nothing to do, return
-    if (SET(*set)[left] != e && SET(*set)[right] != e) {
-        return IGRAPH_SUCCESS;
-    }
-    
     // make sure left points at e
-    if (SET(*set)[right] == e) {
+    if (right >= 0 && SET(*set)[right] == e) {
         left = right;
     }
-    
+
+    // if it still doesn't then element not found, there's nothing to do, return
+    if (SET(*set)[left] != e) {
+        return IGRAPH_SUCCESS;
+    }
+
     // if the element we found is not the last one, shift all following elements
     // to the left by one.
     if (left + 1 < size) {
         memmove(
             set->stor_begin + left,
             set->stor_begin + left + 1,
-            (size - left) * sizeof(set->stor_begin[0])
+            (size - left - 1) * sizeof(set->stor_begin[0])
         );
     }
 
