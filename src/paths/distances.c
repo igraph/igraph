@@ -1082,6 +1082,10 @@ igraph_error_t igraph_diameter_bound(
     }
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    if (no_of_nodes == 0) {
+        *diameter = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
     if (vid_start >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
