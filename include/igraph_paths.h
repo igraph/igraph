@@ -76,8 +76,7 @@ IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_
                                   igraph_vector_int_t *vertex_path, igraph_vector_int_t *edge_path,
                                   igraph_bool_t directed, igraph_bool_t unconn);
 IGRAPH_EXPORT igraph_error_t igraph_diameter_bound(const igraph_t *graph, igraph_real_t *res,
-                                  igraph_integer_t start, igraph_integer_t *from,
-                                  igraph_integer_t *to, igraph_bool_t directed,
+                                  igraph_integer_t start, igraph_bool_t directed,
                                   igraph_bool_t unconn);
 IGRAPH_EXPORT igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                                            const igraph_vector_t *weights,

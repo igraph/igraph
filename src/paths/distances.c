@@ -1064,12 +1064,9 @@ igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
     igraph_real_t *diameter,  // output diameter value
     igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
-    igraph_integer_t *from,  // output start of longest shortest path
-    igraph_integer_t *to,  // output end of longest shortest path
     igraph_bool_t directed,  // treating this graph as undirected
     igraph_bool_t unconn  // is this graph connected
 ) {
-    // linux static_vendored is the important one
     if (!igraph_is_directed(graph)) {
         directed = false;
     }
