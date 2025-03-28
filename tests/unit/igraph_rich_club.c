@@ -20,40 +20,86 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main(void) {
+void null_graph(void) {
     igraph_t graph;
-    igraph_vector_t res;
-    igraph_vector_int_t vertex_order;
-    const igraph_integer_t N_VERTICES = 6;
+    igraph_vector_t result;
+    igraph_vector_int_t vertexOrder;
 
-    /* GRAPH FORMAT
-       1-4 0-3-2-5
-     */
-    IGRAPH_CHECK(igraph_small(&graph, N_VERTICES, IGRAPH_UNDIRECTED,
-                              1, 4, 2, 3, 0, 3, 2, 5, -1));
+    igraph_vector_init(&result, 0);
+    igraph_vector_int_init(&vertexOrder, 0);
+    igraph_empty(&graph, 0, IGRAPH_UNDIRECTED); // null graph
 
-    igraph_vector_init(&res, 0);
-    igraph_vector_int_init(&vertex_order, N_VERTICES);
+    /* output */
+    printf("Null graph\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
+    print_vector(&result);
 
-    // vertex removal order: 0, 1, 2, 3, 4, 5
-    for (int i = 0; i < N_VERTICES; i++){
-        VECTOR(vertex_order)[i] = i;
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_destroy(&graph);
+}
+
+void singleton_graph(void) {
+    igraph_t graph;
+    igraph_vector_t result;
+    igraph_vector_int_t vertexOrder;
+
+    igraph_vector_init(&result, 1);
+    igraph_vector_int_init(&vertexOrder, 1); // vertexOrder: [0]
+    VECTOR(vertexOrder)[0] = 0;
+    igraph_empty(&graph, 1, IGRAPH_UNDIRECTED); // singleton
+
+    /* output */
+    printf("Test 2: singleton graph\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
+    print_vector(&result);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_destroy(&graph);
+}
+
+void more_complex_graph(void) {
+    igraph_t graph;
+    igraph_vector_t result;
+    igraph_vector_int_t vertexOrder;
+    const igraph_integer_t numVertices = 7;
+
+    igraph_vector_init(&result, numVertices);
+    igraph_vector_int_init(&vertexOrder, numVertices);
+    for (int i = 0; i < numVertices; i++){
+        VECTOR(vertexOrder)[i] = i;
     }
+    igraph_small(&graph, numVertices, IGRAPH_UNDIRECTED,
+                 0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1);
 
-    IGRAPH_CHECK(igraph_rich_club_density_sequence(&graph, &vertex_order, 0, 0, &res));
-
-    printf("Test 3 (disjoint graph):\n");
-    for (int i = 0; i < igraph_vector_size(&res); i++){
-        printf("%.4f ", VECTOR(res)[i]);
-    }
+    /* output */
+    printf("Test 3a: more complex graph (in-order vertex removal)\n"); // vertexOrder: in order 0-6
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
+    print_vector(&result);
     printf("\n");
 
-    /* EXPECTED OUTPUT
-       0.2667 0.3000 0.3333 0.0000 0.0000 nan
-    */
-    igraph_vector_int_destroy(&vertex_order);
-    igraph_vector_destroy(&res);
+    igraph_vector_int_reverse(&vertexOrder);
+    printf("Test 3b: more complex graph (reverse vertex removal)\n"); // vertexOrder: reverse 6-0
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
+    print_vector(&result);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
     igraph_destroy(&graph);
+}
+
+int main(void) {
+    null_graph();      // (NaN)
+    printf("\n");
+
+    singleton_graph(); // (NaN)
+    printf("\n");
+
+    /* in-order: (0.380952 0.466667 0.5 0.5 0.333333 1 NaN)
+     * reverse: (0.380952 0.466667 0.5 0.666667 0.333333 1 NaN)
+     */
+    more_complex_graph();
 
     VERIFY_FINALLY_STACK();
     return 0;
