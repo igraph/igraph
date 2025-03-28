@@ -93,7 +93,7 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
     // density calculation
     for (igraph_integer_t i = 0; i < numVertices; i++) { // O(V)
         // (numVertices - i) = the number of vertices left on this loop
-        igraph_real_t totalPossibleEdges = (numVertices - i) * ((numVertices - i) - 1) / 2;
+        igraph_real_t totalPossibleEdges = (igraph_real_t) (numVertices - i) * ((numVertices - i) - 1.0) / 2.0;
         VECTOR(*res)[i] = VECTOR(edgesRemainingAfter)[i] / totalPossibleEdges;
     }
 
