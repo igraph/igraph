@@ -19,6 +19,7 @@
 #include "igraph_games.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset_list.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_graphicality.h"
@@ -33,9 +34,10 @@
 #include "games/degree_sequence_vl/degree_sequence_vl.h"
 #include "math/safe_intop.h"
 
-static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *graph,
-                                       const igraph_vector_int_t *out_seq,
-                                       const igraph_vector_int_t *in_seq) {
+static igraph_error_t configuration(
+        igraph_t *graph,
+        const igraph_vector_int_t *out_seq,
+        const igraph_vector_int_t *in_seq) {
 
     const igraph_bool_t directed = (in_seq != NULL && igraph_vector_int_size(in_seq) != 0);
     igraph_integer_t outsum = 0, insum = 0;
@@ -124,8 +126,9 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
-        igraph_t *graph, const igraph_vector_int_t *seq) {
+static igraph_error_t fast_heur_undirected(
+        igraph_t *graph,
+        const igraph_vector_int_t *seq) {
 
     igraph_vector_int_t stubs;
     igraph_vector_int_t *neis;
@@ -267,8 +270,10 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t *graph,
-        const igraph_vector_int_t *out_seq, const igraph_vector_int_t *in_seq) {
+static igraph_error_t fast_heur_directed(
+        igraph_t *graph,
+        const igraph_vector_int_t *out_seq,
+        const igraph_vector_int_t *in_seq) {
 
     igraph_adjlist_t al;
     igraph_bool_t deg_seq_ok, failed, finished;
@@ -421,43 +426,21 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
         VECTOR(vec)[j] = temp; \
     }
 
-static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirected(igraph_t *graph, const igraph_vector_int_t *degseq) {
-    igraph_vector_int_t stubs;
-    igraph_vector_int_t edges;
-    igraph_bool_t graphical;
+/* Uses a set to check for multi-edges. Efficient for larger graphs, frugal with memory. */
+static igraph_error_t configuration_simple_undirected_set(
+        const igraph_vector_int_t *degseq,
+        igraph_vector_int_t *stubs,
+        igraph_integer_t vcount, igraph_integer_t stub_count) {
+
+    const igraph_integer_t ecount = stub_count / 2;
     igraph_vector_ptr_t adjlist;
-    igraph_integer_t i, j;
-    igraph_integer_t vcount, ecount, stub_count;
     int iter = 0;
-
-    IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &graphical));
-    if (!graphical) {
-        IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence.", IGRAPH_EINVAL);
-    }
-
-    stub_count = igraph_vector_int_sum(degseq);
-    ecount = stub_count / 2;
-    vcount = igraph_vector_int_size(degseq);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&stubs, stub_count);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, stub_count);
-
-    /* Fill stubs vector. */
-    {
-        igraph_integer_t k = 0;
-        for (i = 0; i < vcount; ++i) {
-            igraph_integer_t deg = VECTOR(*degseq)[i];
-            for (j = 0; j < deg; ++j) {
-                VECTOR(stubs)[k++] = i;
-            }
-        }
-    }
 
     /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
-    for (i = 0; i < vcount; ++i) {
+    for (igraph_integer_t i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         IGRAPH_CHECK_OOM(set, "Insufficient memory for configuration model (simple graphs).");
         IGRAPH_CHECK(igraph_set_init(set, 0));
@@ -471,17 +454,17 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
         igraph_bool_t success = true;
 
         /* Shuffle stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
-        for (i = 0; i < ecount; ++i) {
+        for (igraph_integer_t i = 0; i < ecount; ++i) {
             igraph_integer_t k, from, to;
 
             k = RNG_INTEGER(2*i, stub_count-1);
-            SWAP_INT_ELEM(stubs, 2*i, k);
+            SWAP_INT_ELEM(*stubs, 2*i, k);
 
             k = RNG_INTEGER(2*i+1, stub_count-1);
-            SWAP_INT_ELEM(stubs, 2*i+1, k);
+            SWAP_INT_ELEM(*stubs, 2*i+1, k);
 
-            from = VECTOR(stubs)[2*i];
-            to   = VECTOR(stubs)[2*i+1];
+            from = VECTOR(*stubs)[2*i];
+            to   = VECTOR(*stubs)[2*i+1];
 
             /* self-loop, fail */
             if (from == to) {
@@ -498,10 +481,6 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
             /* sets are already reserved */
             igraph_set_add((igraph_set_t *) VECTOR(adjlist)[to], from);
             igraph_set_add((igraph_set_t *) VECTOR(adjlist)[from], to);
-
-            /* register edge */
-            VECTOR(edges)[2 * i]   = from;
-            VECTOR(edges)[2 * i + 1] = to;
         }
 
         if (success) {
@@ -509,7 +488,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
         }
 
         /* Clear adjacency list. */
-        for (j = 0; j < vcount; ++j) {
+        for (igraph_integer_t j = 0; j < vcount; ++j) {
             igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
         }
 
@@ -519,26 +498,135 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     RNG_END();
 
     igraph_vector_ptr_destroy_all(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/* Uses a bitset to check for multi-edges. Efficient for smaller graphs. */
+static igraph_error_t configuration_simple_undirected_bitset(
+        igraph_vector_int_t *stubs,
+        igraph_integer_t vcount, igraph_integer_t stub_count) {
+
+    const igraph_integer_t ecount = stub_count / 2;
+    igraph_bitset_list_t adjlist;
+    int iter = 0;
+
+    /* Build an adjacency list in terms of bitsets; used to check for multi-edges. */
+    IGRAPH_BITSET_LIST_INIT_FINALLY(&adjlist, vcount);
+    for (igraph_integer_t i = 0; i < vcount; ++i) {
+        IGRAPH_CHECK(igraph_bitset_resize(igraph_bitset_list_get_ptr(&adjlist, i), vcount));
+    }
+
+    RNG_BEGIN();
+
+    for (;;) {
+        igraph_bool_t success = true;
+
+        /* Shuffle stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
+        for (igraph_integer_t i = 0; i < ecount; ++i) {
+            igraph_integer_t k, from, to;
+
+            k = RNG_INTEGER(2*i, stub_count-1);
+            SWAP_INT_ELEM(*stubs, 2*i, k);
+
+            k = RNG_INTEGER(2*i+1, stub_count-1);
+            SWAP_INT_ELEM(*stubs, 2*i+1, k);
+
+            from = VECTOR(*stubs)[2*i];
+            to   = VECTOR(*stubs)[2*i+1];
+
+            /* self-loop, fail */
+            if (from == to) {
+                success = false;
+                break;
+            }
+
+            /* multi-edge, fail */
+            if (IGRAPH_BIT_TEST(*igraph_bitset_list_get_ptr(&adjlist, to), from)) {
+                success = false;
+                break;
+            }
+
+            /* sets are already reserved */
+            IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(&adjlist, to), from);
+            IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(&adjlist, from), to);
+        }
+
+        if (success) {
+            break;
+        }
+
+        /* Clear adjacency list. */
+        for (igraph_integer_t j = 0; j < vcount; ++j) {
+            igraph_bitset_null(igraph_bitset_list_get_ptr(&adjlist, j));
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
+    }
+
+    RNG_END();
+
+    igraph_bitset_list_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t configuration_simple_undirected(
+        igraph_t *graph,
+        const igraph_vector_int_t *degseq) {
+
+    igraph_vector_int_t stubs;
+    igraph_bool_t graphical;
+    igraph_integer_t vcount, stub_count;
+
+    IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &graphical));
+    if (!graphical) {
+        IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence.", IGRAPH_EINVAL);
+    }
+
+    stub_count = igraph_vector_int_sum(degseq);
+    vcount = igraph_vector_int_size(degseq);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&stubs, stub_count);
+
+    /* Fill stubs vector. */
+    {
+        igraph_integer_t k = 0;
+        for (igraph_integer_t i = 0; i < vcount; ++i) {
+            igraph_integer_t deg = VECTOR(*degseq)[i];
+            for (igraph_integer_t j = 0; j < deg; ++j) {
+                VECTOR(stubs)[k++] = i;
+            }
+        }
+    }
+
+    /* Tradeoff between speed and memory: Choose set vs bitset implementation. */
+    if (vcount > 1024) {
+        IGRAPH_CHECK(configuration_simple_undirected_set(degseq, &stubs, vcount, stub_count));
+    } else {
+        IGRAPH_CHECK(configuration_simple_undirected_bitset(&stubs, vcount, stub_count));
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &stubs, vcount, IGRAPH_UNDIRECTED));
+
     igraph_vector_int_destroy(&stubs);
-    IGRAPH_FINALLY_CLEAN(2);
-
-    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, IGRAPH_UNDIRECTED));
-
-    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
 
 
-static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directed(
-    igraph_t *graph, const igraph_vector_int_t *out_deg, const igraph_vector_int_t *in_deg) {
+static igraph_error_t configuration_simple_directed(
+        igraph_t *graph,
+        const igraph_vector_int_t *out_deg,
+        const igraph_vector_int_t *in_deg) {
 
     igraph_vector_int_t out_stubs, in_stubs;
     igraph_vector_int_t edges;
+    igraph_vector_int_t vertex_done;
     igraph_bool_t graphical;
-    igraph_vector_ptr_t adjlist;
-    igraph_integer_t i, j;
     igraph_integer_t vcount, ecount;
     int iter = 0;
 
@@ -550,49 +638,48 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
     ecount = igraph_vector_int_sum(out_deg);
     vcount = igraph_vector_int_size(out_deg);
 
+    /* In the directed case, checking for multi-edges can be done efficiently for as
+     * long as only one of the in-/out-stub vectors is shuffled. Here we shuffle
+     * the out-stub vector, keeping in the in-stubs in their original order, thus
+     * processing vertices to connect *to* in order. For each vertex v, we mark
+     * vertex_done[v] to indicate that it has already been connected *to* the
+     * current vertex. When moving on to the next vertex, instead of nulling the
+     * vertex_done vector, we simply change the mark we use. */
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * ecount);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out_stubs, ecount);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_stubs, ecount);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * ecount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_done, vcount);
 
     /* Fill in- and out-stubs vectors. */
     {
         igraph_integer_t k = 0, l = 0;
-        for (i = 0; i < vcount; ++i) {
+        for (igraph_integer_t i = 0; i < vcount; ++i) {
             igraph_integer_t dout, din;
 
             dout = VECTOR(*out_deg)[i];
-            for (j = 0; j < dout; ++j) {
+            for (igraph_integer_t j = 0; j < dout; ++j) {
                 VECTOR(out_stubs)[k++] = i;
             }
 
             din  = VECTOR(*in_deg)[i];
-            for (j = 0; j < din; ++j) {
+            for (igraph_integer_t j = 0; j < din; ++j) {
                 VECTOR(in_stubs)[l++] = i;
             }
         }
     }
 
-    /* Build an adjacency list in terms of sets; used to check for multi-edges. */
-    IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
-    for (i = 0; i < vcount; ++i) {
-        igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
-        IGRAPH_CHECK_OOM(set, "Insufficient memory for directed configuration model (simple graphs).");
-        IGRAPH_CHECK(igraph_set_init(set, 0));
-        VECTOR(adjlist)[i] = set;
-        IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));
-    }
+    igraph_integer_t vertex_done_mark = 1;
 
     RNG_BEGIN();
 
     for (;;) {
         igraph_bool_t success = true;
+        igraph_integer_t previous_to = -1;
 
         /* Shuffle out-stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
-        for (i = 0; i < ecount; ++i) {
+        for (igraph_integer_t i = 0; i < ecount; ++i) {
             igraph_integer_t k, from, to;
-            igraph_set_t *set;
 
             k = RNG_INTEGER(i, ecount-1);
             SWAP_INT_ELEM(out_stubs, i, k);
@@ -606,28 +693,23 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
                 break;
             }
 
+            /* have we moved on to the next vertex? */
+            if (to != previous_to) {
+                vertex_done_mark++;
+                previous_to = to;
+            }
+
             /* multi-edge, fail */
-            set = (igraph_set_t *) VECTOR(adjlist)[from];
-            if (igraph_set_contains(set, to)) {
+            if (VECTOR(vertex_done)[from] == vertex_done_mark) {
                 success = false;
                 break;
             }
 
-            /* sets are already reserved */
-            igraph_set_add(set, to);
-
-            /* register edge */
-            VECTOR(edges)[2 * i]   = from;
-            VECTOR(edges)[2 * i + 1] = to;
+            VECTOR(vertex_done)[from] = vertex_done_mark;
         }
 
         if (success) {
             break;
-        }
-
-        /* Clear adjacency list. */
-        for (j = 0; j < vcount; ++j) {
-            igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
         }
 
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
@@ -635,9 +717,14 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
 
     RNG_END();
 
-    igraph_vector_ptr_destroy_all(&adjlist);
-    igraph_vector_int_destroy(&out_stubs);
+    for (igraph_integer_t i=0; i < ecount; i++) {
+        VECTOR(edges)[2*i]   = VECTOR(out_stubs)[i];
+        VECTOR(edges)[2*i+1] = VECTOR(in_stubs)[i];
+    }
+
+    igraph_vector_int_destroy(&vertex_done);
     igraph_vector_int_destroy(&in_stubs);
+    igraph_vector_int_destroy(&out_stubs);
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, vcount, IGRAPH_DIRECTED));
@@ -650,9 +737,10 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
 
 #undef SWAP_INT_ELEM
 
-igraph_error_t igraph_i_degree_sequence_game_edge_switching(
+igraph_error_t edge_switching(
         igraph_t *graph,
-        const igraph_vector_int_t *out_seq, const igraph_vector_int_t *in_seq) {
+        const igraph_vector_int_t *out_seq,
+        const igraph_vector_int_t *in_seq) {
 
     IGRAPH_CHECK(igraph_realize_degree_sequence(graph, out_seq, in_seq, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX));
     IGRAPH_FINALLY(igraph_destroy, graph);
@@ -771,36 +859,39 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  * \example examples/simple/igraph_degree_sequence_game.c
  */
 
-igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_int_t *out_deg,
-                                const igraph_vector_int_t *in_deg,
-                                igraph_degseq_t method) {
+igraph_error_t igraph_degree_sequence_game(
+        igraph_t *graph,
+        const igraph_vector_int_t *out_deg,
+        const igraph_vector_int_t *in_deg,
+        igraph_degseq_t method) {
+
     if (in_deg && igraph_vector_int_empty(in_deg) && !igraph_vector_int_empty(out_deg)) {
         in_deg = NULL;
     }
 
     switch (method) {
     case IGRAPH_DEGSEQ_CONFIGURATION:
-        return igraph_i_degree_sequence_game_configuration(graph, out_deg, in_deg);
+        return configuration(graph, out_deg, in_deg);
 
     case IGRAPH_DEGSEQ_VL:
         return igraph_i_degree_sequence_game_vl(graph, out_deg, in_deg);
 
     case IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE:
         if (! in_deg) {
-            return igraph_i_degree_sequence_game_fast_heur_undirected(graph, out_deg);
+            return fast_heur_undirected(graph, out_deg);
         } else {
-            return igraph_i_degree_sequence_game_fast_heur_directed(graph, out_deg, in_deg);
+            return fast_heur_directed(graph, out_deg, in_deg);
         }
 
     case IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE:
         if (! in_deg) {
-            return igraph_i_degree_sequence_game_configuration_simple_undirected(graph, out_deg);
+            return configuration_simple_undirected(graph, out_deg);
         } else {
-            return igraph_i_degree_sequence_game_configuration_simple_directed(graph, out_deg, in_deg);
+            return configuration_simple_directed(graph, out_deg, in_deg);
         }
 
     case IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE:
-        return igraph_i_degree_sequence_game_edge_switching(graph, out_deg, in_deg);
+        return edge_switching(graph, out_deg, in_deg);
 
     default:
         IGRAPH_ERROR("Invalid degree sequence game method.", IGRAPH_EINVAL);
