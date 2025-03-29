@@ -147,12 +147,6 @@ IGRAPH_EXPORT igraph_error_t igraph_rich_club_density_sequence(
     igraph_vector_t *weights,
     igraph_vector_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_rich_club_coefficient(
-    const igraph_t *graph,
-    const igraph_vector_t *weights,
-    igraph_neimode_t mode,
-    igraph_vector_t *res);
-
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
