@@ -20,27 +20,30 @@
 #include "igraph_interface.h"
 #include "igraph_conversion.h"
 
-/* HELPER for igraph_i_rich_club_density_sequence()
- *
- * Given an ordered list of vertex IDs, builds a list where the index of each vertex ID
- * corresponds to its position in this returned list.
+/* Given a vertex order, computes a mapping such that for each index = vertex ID, the
+ * corresponding value is its position in the order.
  *
  * Index: ordering  -> Index: vertex ID
  * Value: vertex ID    Value: ordering
- *
- * order[id] = placement of vertex ID in vertex_order
  */
 static igraph_error_t igraph_i_get_vertex_order_map(const igraph_vector_int_t *vertex_order,
                                                     igraph_vector_int_t *map) {
     igraph_integer_t size = igraph_vector_int_size(vertex_order);
-    IGRAPH_CHECK(igraph_vector_int_resize(map, size)); // resize map
-
+    IGRAPH_CHECK(igraph_vector_int_resize(map, size));
     for (igraph_integer_t i = 0; i < size; i++) {
         VECTOR(*map)[VECTOR(*vertex_order)[i]] = i;
     }
     return IGRAPH_SUCCESS;
 }
 
+/* Returns the total number of possible edges given the number of vertices in a graph,
+ * whether it is directed, and whether loops should be assumed possible.
+ *
+ * No loops, undirected: n * (n-1) / 2
+ * No loops, directed:   n * (n-1)
+ * Loops, undirected:    n * (n+1) / 2
+ * Loops, directed:      n^2
+ */
 static igraph_real_t igraph_i_total_possible_edges(igraph_integer_t numVertices,
                                                    igraph_bool_t directed,
                                                    igraph_bool_t loops){
@@ -52,6 +55,41 @@ static igraph_real_t igraph_i_total_possible_edges(igraph_integer_t numVertices,
     }
 }
 
+/**
+ * \function igraph_rich_club_density_sequence
+ * \brief Density sequence of subgraphs formed by sequential vertex removal.
+ *
+ * This function takes a graph and a vertex ordering as input, sequentially removes the
+ * vertices in the given order, and calculates the density of the subgraph after each
+ * removal.
+ *
+ * Density is calculated as the ratio of the number of edges (or total edge weight, if
+ * weighted) to the number of total possible edges in the graph. The latter is dependent
+ * on whether the graph is directed and whether self-loops are assumed to be possible: for
+ * undirected graphs without self-loops, this total is given by n(n-1)/2, and for directed
+ * graphs by n(n-1). When self-loops are allowed, these are adjusted to n(n+1)/2 for
+ * undirected and n^2 for directed graphs.
+ *
+ * Vertex order can be sorted by degree so that the resulting density sequence helps
+ * reveal how interconnected a graph is across different degree levels, or the presence
+ * of a "rich-club" effect.
+ *
+ * \param graph The graph object to analyze.
+ * \param vertex_order Vector giving the order in which vertices are removed.
+ * \param directed Boolean, whether the graph is directed.
+ * \param loops Whether self-loops are assumed to be possible.
+ * \param weights Vector with weight of edges, if considered (if not, this should be NULL).
+ * \param res Integer vector containing the result. It should be initialized and will be
+ * resized to be the appropriate size.
+ *
+ * \return Error code: IGRAPH_EINVAL: invalid vertex_order vector and/or weight vector
+ * lengths
+ *
+ * Time complexity: O(V + E)
+ * where V is the number of vertices and E the number of edges in the graph given.
+ *
+ * \sa \ref igraph_density(), which uses the same calculation of total possible edges.
+ */
 igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
                                                  const igraph_vector_int_t *vertex_order,
                                                  igraph_bool_t directed,
@@ -59,19 +97,26 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
                                                  igraph_vector_t *weights,
                                                  igraph_vector_t *res) {
     igraph_integer_t numVertices = igraph_vcount(graph);
+    igraph_integer_t numEdges = igraph_ecount(graph);
 
-    // Error: vertex_order wrong size
+    // Error handling: invalid vertex_order and weights sizes
     if (igraph_vector_int_size(vertex_order) != numVertices) {
-        IGRAPH_ERROR("Invalid vertex order length.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Vertex order vector length (%" IGRAPH_PRId ") does not match "
+                      "number of vertices (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_int_size(vertex_order), numVertices);
+    }
+    if (weights && igraph_vector_size(weights) != numEdges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match "
+                      "number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), numEdges);
     }
 
-    igraph_integer_t numEdges = igraph_ecount(graph);
-    igraph_vector_int_t edges;
-    igraph_vector_int_t edgesRemainingAfter;
+    igraph_vector_t edgesRemainingAfter;
     igraph_vector_int_t orderOf;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edgesRemainingAfter, numVertices);
+    IGRAPH_VECTOR_INIT_FINALLY(&edgesRemainingAfter, numVertices);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&orderOf, numVertices);
 
     IGRAPH_CHECK(igraph_vector_resize(res, numVertices)); // resize res
@@ -79,10 +124,11 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
 
     igraph_bool_t warningIssued = 0;
 
+    // edgesRemainingAfter vector: number of edges (or total edge weight) removed by index
     for (igraph_integer_t eid = 0; eid < numEdges; eid++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
         igraph_integer_t v2 = IGRAPH_TO(graph, eid);
-        if (v1 == v2 && !loops && !warningIssued) { // if loops = false and there's a loop
+        if (v1 == v2 && !loops && !warningIssued) {
             IGRAPH_WARNING("Self-loop encountered while `loops = false`. "
                            "Proceeding as if loops were not possible (density computed accordingly)");
             warningIssued = 1;
@@ -91,12 +137,10 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
         igraph_integer_t orderV2 = VECTOR(orderOf)[v2];
 
         igraph_integer_t edgeRemovalIndex = (orderV1 < orderV2 ? orderV1 : orderV2);
-
-        // add to edge remaining count
         VECTOR(edgesRemainingAfter)[edgeRemovalIndex] += (weights ? VECTOR(*weights)[eid] : 1);
     }
 
-    // derive the final edgesRemainingAfter vector via accumulating from the end
+    // edgesRemainingAfter vector: edges (or total edge weight) remaining after i removals
     igraph_integer_t total = 0;
     for (igraph_integer_t i = numVertices - 1; i >= 0; i--) {
         total += VECTOR(edgesRemainingAfter)[i];
@@ -112,20 +156,8 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
     }
 
     igraph_vector_int_destroy(&orderOf);
-    igraph_vector_int_destroy(&edgesRemainingAfter);
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(3);
-
-    return IGRAPH_SUCCESS;
-
-    // Complexity: O(E + V)
-}
-
-igraph_error_t igraph_rich_club_coefficient(const igraph_t *graph,
-                                            const igraph_vector_t *weights,
-                                            igraph_neimode_t mode,
-                                            igraph_vector_t *res) {
-    /* Computes the rich-club coefficient as a function of degree. */
+    igraph_vector_destroy(&edgesRemainingAfter);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
