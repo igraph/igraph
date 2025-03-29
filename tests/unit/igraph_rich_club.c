@@ -30,7 +30,7 @@ void null_graph(void) {
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED); // null graph
 
     /* output */
-    printf("Null graph\n");
+    printf("Test 1: null graph\n");
     igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
     print_vector(&result);
 
@@ -74,13 +74,13 @@ void more_complex_graph(void) {
                  0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1);
 
     /* output */
-    printf("Test 3a: more complex graph (in-order vertex removal)\n"); // vertexOrder: in order 0-6
+    printf("Test 3a: more complex graph (in-order vertex removal)\n");
     igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
     print_vector(&result);
     printf("\n");
 
     igraph_vector_int_reverse(&vertexOrder);
-    printf("Test 3b: more complex graph (reverse vertex removal)\n"); // vertexOrder: reverse 6-0
+    printf("Test 3b: more complex graph (reverse vertex removal)\n");
     igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
     print_vector(&result);
 
@@ -90,15 +90,12 @@ void more_complex_graph(void) {
 }
 
 int main(void) {
-    null_graph();      // (NaN)
+    null_graph();
     printf("\n");
 
-    singleton_graph(); // (NaN)
+    singleton_graph();
     printf("\n");
 
-    /* in-order: (0.380952 0.466667 0.5 0.5 0.333333 1 NaN)
-     * reverse: (0.380952 0.466667 0.5 0.666667 0.333333 1 NaN)
-     */
     more_complex_graph();
 
     VERIFY_FINALLY_STACK();
