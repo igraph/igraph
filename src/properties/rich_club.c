@@ -63,13 +63,16 @@ static igraph_real_t total_possible_edges(igraph_integer_t numVertices,
  * vertices in the given order, and calculates the density of the subgraph after each
  * removal.
  *
+ * </para><para>
  * Density is calculated as the ratio of the number of edges (or total edge weight, if
  * weighted) to the number of total possible edges in the graph. The latter is dependent
  * on whether the graph is directed and whether self-loops are assumed to be possible: for
- * undirected graphs without self-loops, this total is given by n(n-1)/2, and for directed
- * graphs by n(n-1). When self-loops are allowed, these are adjusted to n(n+1)/2 for
- * undirected and n^2 for directed graphs.
+ * undirected graphs without self-loops, this total is given by <code>n(n-1)/2</code>,
+ * and for directed graphs by <code>n(n-1)</code>. When self-loops are allowed, these
+ * are adjusted to <code>n(n+1)/2</code> for undirected and <code>n^2</code> for directed
+ * graphs.
  *
+ * </para><para>
  * Vertex order can be sorted by degree so that the resulting density sequence helps
  * reveal how interconnected a graph is across different degree levels, or the presence
  * of a "rich-club" effect.
@@ -78,15 +81,15 @@ static igraph_real_t total_possible_edges(igraph_integer_t numVertices,
  * \param vertex_order Vector giving the order in which vertices are removed.
  * \param directed Boolean, whether the graph is directed.
  * \param loops Whether self-loops are assumed to be possible.
- * \param weights Vector with weight of edges, if considered (if not, this should be NULL).
+ * \param weights Vector with weight of edges, if considered (if not, this should be \c NULL).
  * \param res Integer vector containing the result. It should be initialized and will be
  * resized to be the appropriate size.
  *
- * \return Error code: IGRAPH_EINVAL: invalid vertex_order vector and/or weight vector
+ * \return Error code: \c IGRAPH_EINVAL: invalid vertex_order vector and/or weight vector
  * lengths
  *
- * Time complexity: O(V + E)
- * where V is the number of vertices and E the number of edges in the graph given.
+ * Time complexity: O(|V| + |E|)
+ * where |V| is the number of vertices and |E| the number of edges in the graph given.
  *
  * \sa \ref igraph_density(), which uses the same calculation of total possible edges.
  */
