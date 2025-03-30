@@ -95,7 +95,7 @@ static igraph_real_t total_possible_edges(igraph_integer_t numVertices,
  * \sa \ref igraph_density(), which uses the same calculation of total possible edges.
  */
 igraph_error_t igraph_rich_club_density_sequence(
-        const igraph_t *graph, igraph_vector_t *weights,
+        const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *res,
         const igraph_vector_int_t *vertex_order,
         igraph_bool_t loops, igraph_bool_t directed) {
