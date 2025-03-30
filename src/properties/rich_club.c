@@ -79,11 +79,12 @@ static igraph_real_t total_possible_edges(igraph_integer_t numVertices,
  *
  * \param graph The graph object to analyze.
  * \param vertex_order Vector giving the order in which vertices are removed.
- * \param directed Boolean, whether the graph is directed.
+ * \param directed If false, directed graphs will be treated as undirected.
+ *    Ignored in undirected graphs.
  * \param loops Whether self-loops are assumed to be possible.
  * \param weights Vector with weight of edges, if considered (if not, this should be \c NULL).
- * \param res Integer vector containing the result. It should be initialized and will be
- * resized to be the appropriate size.
+ * \param res Integer vector containing the result. It must be initialized and
+ *    will be resized to be the appropriate size.
  *
  * \return Error code: \c IGRAPH_EINVAL: invalid vertex_order vector and/or weight vector
  * lengths
@@ -115,6 +116,10 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
                       "number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_vector_size(weights), ecount);
+    }
+
+    if (! igraph_is_directed(graph)) {
+        directed = false;
     }
 
     igraph_vector_t edges_remaining_after;
