@@ -17,8 +17,8 @@
 */
 
 #include "igraph_structural.h"
+
 #include "igraph_interface.h"
-#include "igraph_conversion.h"
 
 /* Given a vertex order, computes a mapping such that for each index = vertex ID, the
  * corresponding value is its position in the order.
