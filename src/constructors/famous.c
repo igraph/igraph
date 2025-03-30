@@ -311,7 +311,7 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_integer_t *d
  *           The Frucht Graph is the smallest cubical graph
  *           whose automorphism group consists only of the identity
  *           element. It has 12 vertices and 18 edges.
- *   \cli Grotzsch
+ *   \cli Grotzsch, Groetzsch
  *           The Grötzsch graph is a triangle-free graph with
  *           11 vertices, 20 edges, and chromatic number 4. It is named after
  *           German mathematician Herbert Grötzsch, and its existence
@@ -444,7 +444,8 @@ igraph_error_t igraph_famous(igraph_t *graph, const char *name) {
         return igraph_i_famous(graph, igraph_i_famous_franklin);
     } else if (!strcasecmp(name, "frucht")) {
         return igraph_i_famous(graph, igraph_i_famous_frucht);
-    } else if (!strcasecmp(name, "grotzsch")) {
+    } else if (!strcasecmp(name, "grotzsch") ||
+               !strcasecmp(name, "groetzsch")) {
         return igraph_i_famous(graph, igraph_i_famous_grotzsch);
     } else if (!strcasecmp(name, "heawood")) {
         return igraph_i_famous(graph, igraph_i_famous_heawood);
