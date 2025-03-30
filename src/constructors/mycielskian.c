@@ -96,5 +96,27 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 }
 
 igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
+    igraph_t g;
+    // igraph_small(&g, 1, 0, -1);
+
+    if (k <= 0) {
+        IGRAPH_ERROR("Number of iterations (k) must be positive", IGRAPH_EINVAL);
+    }
+    if (graph == NULL) {
+        IGRAPH_ERROR("Invalid Output graph", IGRAPH_EINVAL);
+    }
+    if (igraph_is_directed(&g)) {
+        IGRAPH_ERROR("Mycielski's construction is not defined for directed graphs", IGRAPH_EINVAL);
+    }
+    if (k == 1) {
+        igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1); // single vertex
+        igraph_copy(graph, &g);
+        igraph_destroy(&g);
+        return IGRAPH_SUCCESS;
+    }
+    igraph_small(&g, 1, IGRAPH_UNDIRECTED, 0, 1, -1); // a path
+    igraph_mycielskian(graph, &g, k - 2);
+    igraph_destroy(&g);
+
     return IGRAPH_SUCCESS;
 }
