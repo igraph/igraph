@@ -39,7 +39,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     igraph_integer_t ecount = igraph_ecount(graph);
 
     if (k == 0) { // if k is 0, return the original graph
-        igraph_copy(res, graph);
+        IGRAPH_CHECK(igraph_copy(res, graph));
         return IGRAPH_SUCCESS;
     }
 
@@ -54,7 +54,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_t edges;
-    igraph_vector_int_init(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false)); // copy the edges from the original graph to the new vector
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, new_ecount * 2));
 
