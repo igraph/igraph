@@ -145,7 +145,7 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
     }
 
     // edgesRemainingAfter vector: edges (or total edge weight) remaining after i removals
-    igraph_integer_t total = 0;
+    igraph_real_t total = 0;
     for (igraph_integer_t i = numVertices - 1; i >= 0; i--) {
         total += VECTOR(edgesRemainingAfter)[i];
         VECTOR(edgesRemainingAfter)[i] = total;
