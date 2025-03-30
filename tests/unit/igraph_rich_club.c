@@ -202,7 +202,23 @@ void weighted_graph(void) {
     }
 
     /* output */
-    printf("Test 7: weighted graph\n");
+    printf("Test 7a: weighted graph\n");
+    igraph_rich_club_density_sequence(&graph, &weights, &result, &vertexOrder, 0, 0);
+    print_vector(&result);
+    printf("\n");
+
+    // change weights to include some non-integer weights
+    // for this specific graph, weights should now be the same as that of Test 3a
+    VECTOR(weights)[0] = 1;   // (0,3)
+    VECTOR(weights)[1] = 0.5; // (1,3)
+    VECTOR(weights)[2] = 0.5; // (2,3)
+    VECTOR(weights)[3] = 1;   // (4,3)
+    VECTOR(weights)[4] = 1;   // (5,3)
+    VECTOR(weights)[5] = 1;   // (5,6)
+    VECTOR(weights)[6] = 1.5; // (1,2)
+    VECTOR(weights)[7] = 1.5; // (2,5)
+
+    printf("Test 7b: weighted graph (non-integer weights)\n");
     igraph_rich_club_density_sequence(&graph, &weights, &result, &vertexOrder, 0, 0);
     print_vector(&result);
 

@@ -28,5 +28,8 @@ Test 6a: directed, loop graph (in-order vertex removal)
 Test 6b: directed, loop graph (reverse vertex removal)
 ( 0.183673 0.194444 0.24 0.25 0.222222 0 0 )
 
-Test 7: weighted graph
+Test 7a: weighted graph
 ( 0.761905 0.933333 1 1 0.666667 2 NaN )
+
+Test 7b: weighted graph (non-integer weights)
+( 0.380952 0.466667 0.5 0.5 0.333333 1 NaN )
