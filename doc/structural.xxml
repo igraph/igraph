@@ -221,6 +221,7 @@
 <!-- doxrox-include igraph_joint_type_distribution -->
 <!-- doxrox-include igraph_joint_degree_distribution -->
 <!-- doxrox-include igraph_joint_degree_matrix -->
+<!-- doxrox-include igraph_rich_club_density_sequence -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>
