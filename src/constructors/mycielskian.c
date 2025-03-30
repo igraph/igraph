@@ -24,5 +24,75 @@
 #include "math/safe_intop.h"
 
 igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_integer_t k) {
+    if (k < 0) {
+        IGRAPH_ERROR("Number of iterations (k) must be non-negative", IGRAPH_EINVAL);
+    }
+    if (graph == NULL || res == NULL) {
+        IGRAPH_ERROR("Invalid input/output graph", IGRAPH_EINVAL);
+    }
+    if (igraph_is_directed(graph)) {
+        IGRAPH_ERROR("Mycielski's construction is not defined for directed graphs", IGRAPH_EINVAL);
+    }
     
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
+
+    if (k == 0) { // if k is 0, return the original graph
+        igraph_copy(res, graph);
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_integer_t new_vcount = vcount;
+    igraph_integer_t new_ecount = ecount;
+
+    for (igraph_integer_t i = 0; i < k; i++) {
+        new_ecount = 3 * new_ecount + new_vcount; // the number of edges after each iteration
+        new_vcount = new_vcount * 2 + 1; // the new number of vertices after each iteration
+    }
+
+    IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_UNDIRECTED));
+
+    igraph_vector_t edges;
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false)); // copy the edges from the original graph to the new vector
+    IGRAPH_CHECK(igraph_vector_int_resize(res, new_ecount * 2));
+
+    igraph_integer_t edge_index = 2 * ecount;  // Current last edge index in edge vector
+    igraph_integer_t offset = vcount;          // Tracks where new vertices start
+
+    for (igraph_integer_t i = 0; i < k; i++) {
+        igraph_integer_t prev_vcount = offset;  // Number of vertices before this step
+        igraph_integer_t w = offset * 2;        // The new 'w' node index
+        igraph_integer_t last_edge_index = edge_index;  // Mark where edges before this step end
+
+        // For each edge before this step, add two new edges
+        for (igraph_integer_t j = 0; j < last_edge_index; j += 2) {
+            igraph_integer_t v1 = VECTOR(edges)[j];
+            igraph_integer_t v2 = VECTOR(edges)[j + 1];
+
+            VECTOR(edges)[edge_index++] = v1;
+            VECTOR(edges)[edge_index++] = offset + v2;
+
+            VECTOR(edges)[edge_index++] = v2;
+            VECTOR(edges)[edge_index++] = offset + v1;
+        }
+
+        // Add edges connecting each `ui` to `w` (forming a star)
+        for (igraph_integer_t j = prev_vcount; j < w; j++) {
+            VECTOR(edges)[edge_index++] = j;
+            VECTOR(edges)[edge_index++] = w;
+        }
+
+        // Update offset for next step
+        offset = offset * 2 + 1;
+    }
+
+    // Add all edges in one go
+    IGRAPH_CHECK(igraph_add_edges(res, &edges, 0));
+    igraph_vector_destroy(&edges);
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
+    return IGRAPH_SUCCESS;
 }
