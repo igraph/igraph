@@ -133,7 +133,7 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
 
     igraph_bool_t warning_issued = false;
 
-    // edgesRemainingAfter vector: number of edges (or total edge weight) removed by index
+    // edges_remaining_after vector: number of edges (or total edge weight) removed by index
     for (igraph_integer_t eid = 0; eid < ecount; eid++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
         igraph_integer_t v2 = IGRAPH_TO(graph, eid);
@@ -149,7 +149,7 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
         VECTOR(edges_remaining_after)[edge_removal_index] += (weights ? VECTOR(*weights)[eid] : 1);
     }
 
-    // edgesRemainingAfter vector: edges (or total edge weight) remaining after i removals
+    // edges_remaining_after vector: edges (or total edge weight) remaining after i removals
     igraph_real_t total = 0;
     for (igraph_integer_t i = vcount - 1; i >= 0; i--) {
         total += VECTOR(edges_remaining_after)[i];
