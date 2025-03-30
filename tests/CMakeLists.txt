@@ -602,6 +602,7 @@ add_legacy_tests(
   igraph_adjlist_simplify
   igraph_get_adjacency
   igraph_get_adjacency_sparse
+  igraph_get_adjacency_submatrix
   igraph_get_laplacian
   igraph_get_stochastic
   igraph_get_stochastic_sparse
