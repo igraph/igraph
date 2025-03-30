@@ -17,6 +17,7 @@
 */
 
 #include "igraph_constructors.h"
+#include "igraph_conversion.h"
 
 #include "igraph_interface.h"
 
@@ -52,9 +53,10 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
     IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_UNDIRECTED));
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
+    igraph_vector_int_init(&edges, 0);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false)); // copy the edges from the original graph to the new vector
-    IGRAPH_CHECK(igraph_vector_int_resize(res, new_ecount * 2));
+    IGRAPH_CHECK(igraph_vector_int_resize(&edges, new_ecount * 2));
 
     igraph_integer_t edge_index = 2 * ecount;  // Current last edge index in edge vector
     igraph_integer_t offset = vcount;          // Tracks where new vertices start
@@ -88,7 +90,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
     // Add all edges in one go
     IGRAPH_CHECK(igraph_add_edges(res, &edges, 0));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
 
     return IGRAPH_SUCCESS;
 }
