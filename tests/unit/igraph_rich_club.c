@@ -59,7 +59,7 @@ void singleton_graph(void) {
     igraph_destroy(&graph);
 }
 
-void more_complex_graph(void) {
+void undirected_no_loop_graph(void) {
     igraph_t graph;
     igraph_vector_t result;
     igraph_vector_int_t vertexOrder;
@@ -74,14 +74,136 @@ void more_complex_graph(void) {
                  0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1);
 
     /* output */
-    printf("Test 3a: more complex graph (in-order vertex removal)\n");
+    printf("Test 3a: undirected, no-loop graph (in-order vertex removal)\n");
     igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
     print_vector(&result);
     printf("\n");
 
     igraph_vector_int_reverse(&vertexOrder);
-    printf("Test 3b: more complex graph (reverse vertex removal)\n");
+    printf("Test 3b: undirected, no-loop graph (reverse vertex removal)\n");
     igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, 0, &result);
+    print_vector(&result);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_destroy(&graph);
+}
+
+void directed_no_loop_graph(void) {
+    igraph_t graph;
+    igraph_vector_t result;
+    igraph_vector_int_t vertexOrder;
+    const igraph_integer_t numVertices = 7;
+
+    igraph_vector_init(&result, numVertices);
+    igraph_vector_int_init(&vertexOrder, numVertices);
+    for (int i = 0; i < numVertices; i++){
+        VECTOR(vertexOrder)[i] = i;
+    }
+    igraph_small(&graph, numVertices, IGRAPH_DIRECTED,
+                 0,2, 1,2, 2,3, 1,3, 3,5, 3,4, 5,6, 6,5, -1);
+
+    /* output */
+    printf("Test 4a: directed, no-loop graph (in-order vertex removal)\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 1, 0, 0, &result);
+    print_vector(&result);
+    printf("\n");
+
+    igraph_vector_int_reverse(&vertexOrder);
+    printf("Test 4b: directed, no-loop graph (reverse vertex removal)\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 1, 0, 0, &result);
+    print_vector(&result);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_destroy(&graph);
+}
+
+void undirected_loop_graph(void) {
+    igraph_t graph;
+    igraph_vector_t result;
+    igraph_vector_int_t vertexOrder;
+    const igraph_integer_t numVertices = 7;
+
+    igraph_vector_init(&result, numVertices);
+    igraph_vector_int_init(&vertexOrder, numVertices);
+    for (int i = 0; i < numVertices; i++){
+        VECTOR(vertexOrder)[i] = i;
+    }
+    igraph_small(&graph, numVertices, IGRAPH_UNDIRECTED,
+                 0,3, 1,3, 2,3, 4,4, 5,3, 5,6, 1,2, 2,5, 6,4, -1);
+
+    /* output */
+    printf("Test 5a: undirected, loop graph (in-order vertex removal)\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 1, 0, &result);
+    print_vector(&result);
+    printf("\n");
+
+    igraph_vector_int_reverse(&vertexOrder);
+    printf("Test 5b: undirected, loop graph (reverse vertex removal)\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 1, 0, &result);
+    print_vector(&result);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_destroy(&graph);
+}
+
+void directed_loop_graph(void) {
+    igraph_t graph;
+    igraph_vector_t result;
+    igraph_vector_int_t vertexOrder;
+    const igraph_integer_t numVertices = 7;
+
+    igraph_vector_init(&result, numVertices);
+    igraph_vector_int_init(&vertexOrder, numVertices);
+    for (int i = 0; i < numVertices; i++){
+        VECTOR(vertexOrder)[i] = i;
+    }
+    igraph_small(&graph, numVertices, IGRAPH_DIRECTED,
+                 0,2, 1,2, 2,3, 1,3, 3,5, 3,4, 5,6, 6,5, 4,4, -1);
+
+    /* output */
+    printf("Test 6a: directed, loop graph (in-order vertex removal)\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 1, 1, 0, &result);
+    print_vector(&result);
+    printf("\n");
+
+    igraph_vector_int_reverse(&vertexOrder);
+    printf("Test 6b: directed, loop graph (reverse vertex removal)\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 1, 1, 0, &result);
+    print_vector(&result);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_destroy(&graph);
+}
+
+void weighted_graph(void) {
+    // same undirected, no-loop graph as Test 3
+    igraph_t graph;
+    igraph_vector_t result, weights;
+    igraph_vector_int_t vertexOrder;
+    const igraph_integer_t numVertices = 7;
+
+    igraph_small(&graph, numVertices, IGRAPH_UNDIRECTED,
+                 0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1);
+
+    igraph_vector_init(&result, numVertices);
+    igraph_vector_int_init(&vertexOrder, numVertices);
+    for (int i = 0; i < numVertices; i++){
+        VECTOR(vertexOrder)[i] = i;
+    }
+
+    igraph_vector_init(&weights, igraph_ecount(&graph));
+    for (int i = 0; i < igraph_ecount(&graph); i++) {
+        // all "edges" have weight 2, output should be double of Test 3a
+        VECTOR(weights)[i] = 2;
+    }
+
+    /* output */
+    printf("Test 7: weighted graph\n");
+    igraph_rich_club_density_sequence(&graph, &vertexOrder, 0, 0, &weights, &result);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertexOrder);
@@ -96,7 +218,19 @@ int main(void) {
     singleton_graph();
     printf("\n");
 
-    more_complex_graph();
+    undirected_no_loop_graph();
+    printf("\n");
+
+    directed_no_loop_graph();
+    printf("\n");
+
+    undirected_loop_graph();
+    printf("\n");
+
+    directed_loop_graph();
+    printf("\n");
+
+    weighted_graph();
 
     VERIFY_FINALLY_STACK();
     return 0;
