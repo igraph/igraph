@@ -961,6 +961,15 @@ igraph_degree_correlation_vector:
         BOOLEAN directed_neighbors=True
     DEPS: weights ON graph
 
+igraph_rich_club_density_sequence:
+  PARAMS: |-
+      GRAPH graph, EDGEWEIGHTS weights,
+      OUT VECTOR res,
+      INDEX_VECTOR vertex_order,
+      BOOLEAN loops=False,
+      BOOLEAN directed=True
+  DEPS: weights ON graph
+
 igraph_strength:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
