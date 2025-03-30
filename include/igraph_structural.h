@@ -141,7 +141,7 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
 
 IGRAPH_EXPORT igraph_error_t igraph_rich_club_density_sequence(
     const igraph_t *graph,
-    igraph_vector_t *weights,
+    const igraph_vector_t *weights,
     igraph_vector_t *res,
     const igraph_vector_int_t *vertex_order,
     igraph_bool_t loops,
