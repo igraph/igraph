@@ -12,6 +12,7 @@
 <!-- doxrox-include igraph_simple_cycles -->
 <!-- doxrox-include igraph_simple_cycles_callback -->
 <!-- doxrox-include igraph_cycle_handler_t -->
+<!-- doxrox-include igraph_is_acyclic -->
 </section>
 
 <section><title>Eulerian cycles and paths</title>

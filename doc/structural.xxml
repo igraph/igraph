@@ -206,10 +206,12 @@
 <!-- doxrox-include igraph_count_multiple_1 -->
 </section>
 
-<section id="mixing-patterns"><title>Mixing patterns</title>
+<section id="mixing-patterns"><title>Mixing patterns and degree correlations</title>
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_joint_type_distribution -->
 <!-- doxrox-include igraph_joint_degree_distribution -->
 <!-- doxrox-include igraph_joint_degree_matrix -->
@@ -249,14 +251,11 @@
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_has_mutual -->
-<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
-<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparse -->
 <!-- doxrox-include igraph_get_edgelist -->
-<!-- doxrox-include igraph_is_acyclic -->
 </section>
 
 <section id="structural-properties-deprecated"><title>Deprecated functions</title>
