@@ -100,67 +100,66 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
                                                  igraph_vector_t *weights,
                                                  igraph_vector_t *res) {
 
-    const igraph_integer_t numVertices = igraph_vcount(graph);
-    const igraph_integer_t numEdges = igraph_ecount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
 
     // Error handling: invalid vertex_order and weights sizes
-    if (igraph_vector_int_size(vertex_order) != numVertices) {
+    if (igraph_vector_int_size(vertex_order) != vcount) {
         IGRAPH_ERRORF("Vertex order vector length (%" IGRAPH_PRId ") does not match "
                       "number of vertices (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
-                      igraph_vector_int_size(vertex_order), numVertices);
+                      igraph_vector_int_size(vertex_order), vcount);
     }
-    if (weights && igraph_vector_size(weights) != numEdges) {
+    if (weights && igraph_vector_size(weights) != ecount) {
         IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match "
                       "number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
-                      igraph_vector_size(weights), numEdges);
+                      igraph_vector_size(weights), ecount);
     }
 
-    igraph_vector_t edgesRemainingAfter;
-    igraph_vector_int_t orderOf;
+    igraph_vector_t edges_remaining_after;
+    igraph_vector_int_t order_of;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edgesRemainingAfter, numVertices);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&orderOf, numVertices);
+    IGRAPH_VECTOR_INIT_FINALLY(&edges_remaining_after, vcount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order_of, vcount);
 
-    IGRAPH_CHECK(igraph_vector_resize(res, numVertices)); // resize res
-    IGRAPH_CHECK(get_vertex_order_map(vertex_order, &orderOf)); // get map of vertex order
+    IGRAPH_CHECK(igraph_vector_resize(res, vcount)); // resize res
+    IGRAPH_CHECK(get_vertex_order_map(vertex_order, &order_of)); // get map of vertex order
 
-    igraph_bool_t warningIssued = false;
+    igraph_bool_t warning_issued = false;
 
     // edgesRemainingAfter vector: number of edges (or total edge weight) removed by index
-    for (igraph_integer_t eid = 0; eid < numEdges; eid++) {
+    for (igraph_integer_t eid = 0; eid < ecount; eid++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
         igraph_integer_t v2 = IGRAPH_TO(graph, eid);
-        if (v1 == v2 && !loops && !warningIssued) {
+        if (!loops && !warning_issued && v1 == v2) {
             IGRAPH_WARNING("Self-loop encountered while `loops = false`. "
                            "Proceeding as if loops were not possible (density computed accordingly)");
-            warningIssued = true;
+            warning_issued = true;
         }
-        igraph_integer_t orderV1 = VECTOR(orderOf)[v1]; // order of endpoints
-        igraph_integer_t orderV2 = VECTOR(orderOf)[v2];
+        igraph_integer_t order_v1 = VECTOR(order_of)[v1]; // order of endpoints
+        igraph_integer_t order_v2 = VECTOR(order_of)[v2];
 
-        igraph_integer_t edgeRemovalIndex = (orderV1 < orderV2 ? orderV1 : orderV2);
-        VECTOR(edgesRemainingAfter)[edgeRemovalIndex] += (weights ? VECTOR(*weights)[eid] : 1);
+        igraph_integer_t edge_removal_index = (order_v1 < order_v2 ? order_v1 : order_v2);
+        VECTOR(edges_remaining_after)[edge_removal_index] += (weights ? VECTOR(*weights)[eid] : 1);
     }
 
     // edgesRemainingAfter vector: edges (or total edge weight) remaining after i removals
     igraph_real_t total = 0;
-    for (igraph_integer_t i = numVertices - 1; i >= 0; i--) {
-        total += VECTOR(edgesRemainingAfter)[i];
-        VECTOR(edgesRemainingAfter)[i] = total;
+    for (igraph_integer_t i = vcount - 1; i >= 0; i--) {
+        total += VECTOR(edges_remaining_after)[i];
+        VECTOR(edges_remaining_after)[i] = total;
     }
 
     // density calculation
-    for (igraph_integer_t i = 0; i < numVertices; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         // (numVertices - i) = the number of vertices left on this loop
-        igraph_real_t totalPossibleEdges =
-                      total_possible_edges(numVertices - i, directed, loops);
-        VECTOR(*res)[i] = VECTOR(edgesRemainingAfter)[i] / totalPossibleEdges;
+        VECTOR(*res)[i] =
+            VECTOR(edges_remaining_after)[i] / total_possible_edges(vcount - i, directed, loops);
     }
 
-    igraph_vector_int_destroy(&orderOf);
-    igraph_vector_destroy(&edgesRemainingAfter);
+    igraph_vector_int_destroy(&order_of);
+    igraph_vector_destroy(&edges_remaining_after);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
