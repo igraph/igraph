@@ -208,6 +208,7 @@ void weighted_graph(void) {
 
     igraph_vector_int_destroy(&vertexOrder);
     igraph_vector_destroy(&result);
+    igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 }
 
