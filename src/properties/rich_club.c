@@ -99,8 +99,9 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
                                                  igraph_bool_t loops,
                                                  igraph_vector_t *weights,
                                                  igraph_vector_t *res) {
-    igraph_integer_t numVertices = igraph_vcount(graph);
-    igraph_integer_t numEdges = igraph_ecount(graph);
+
+    const igraph_integer_t numVertices = igraph_vcount(graph);
+    const igraph_integer_t numEdges = igraph_ecount(graph);
 
     // Error handling: invalid vertex_order and weights sizes
     if (igraph_vector_int_size(vertex_order) != numVertices) {
@@ -125,7 +126,7 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(res, numVertices)); // resize res
     IGRAPH_CHECK(get_vertex_order_map(vertex_order, &orderOf)); // get map of vertex order
 
-    igraph_bool_t warningIssued = 0;
+    igraph_bool_t warningIssued = false;
 
     // edgesRemainingAfter vector: number of edges (or total edge weight) removed by index
     for (igraph_integer_t eid = 0; eid < numEdges; eid++) {
@@ -134,7 +135,7 @@ igraph_error_t igraph_rich_club_density_sequence(const igraph_t *graph,
         if (v1 == v2 && !loops && !warningIssued) {
             IGRAPH_WARNING("Self-loop encountered while `loops = false`. "
                            "Proceeding as if loops were not possible (density computed accordingly)");
-            warningIssued = 1;
+            warningIssued = true;
         }
         igraph_integer_t orderV1 = VECTOR(orderOf)[v1]; // order of endpoints
         igraph_integer_t orderV2 = VECTOR(orderOf)[v2];
