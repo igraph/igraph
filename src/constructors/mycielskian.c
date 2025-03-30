@@ -105,9 +105,6 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     if (graph == NULL) {
         IGRAPH_ERROR("Invalid Output graph", IGRAPH_EINVAL);
     }
-    if (igraph_is_directed(&g)) {
-        IGRAPH_ERROR("Mycielski's construction is not defined for directed graphs", IGRAPH_EINVAL);
-    }
     if (k == 1) {
         igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1); // single vertex
         igraph_copy(graph, &g);
