@@ -26,13 +26,10 @@
 
 igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_integer_t k) {
     if (k < 0) {
-        IGRAPH_ERROR("Number of iterations (k) must be non-negative", IGRAPH_EINVAL);
-    }
-    if (graph == NULL || res == NULL) {
-        IGRAPH_ERROR("Invalid input/output graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
     }
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Mycielski's construction is not defined for directed graphs", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Mycielski's construction is not defined for directed graphs.", IGRAPH_EINVAL);
     }
     
     igraph_integer_t vcount = igraph_vcount(graph);
@@ -97,22 +94,30 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
 igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     igraph_t g;
-    // igraph_small(&g, 1, 0, -1);
 
     if (k <= 0) {
-        IGRAPH_ERROR("Number of iterations (k) must be positive", IGRAPH_EINVAL);
-    }
-    if (graph == NULL) {
-        IGRAPH_ERROR("Invalid Output graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The Mycielski graph order must be a positive integer.", IGRAPH_EINVAL);
     }
     if (k == 1) {
-        igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1); // single vertex
+        IGRAPH_CHECK(igraph_empty(&g, 1, IGRAPH_UNDIRECTED));
+        IGRAPH_FINALLY(igraph_destroy, &g);
+
         igraph_copy(graph, &g);
         igraph_destroy(&g);
         return IGRAPH_SUCCESS;
     }
-    igraph_small(&g, 1, IGRAPH_UNDIRECTED, 0, 1, -1); // a path
+    // Make g as a path 0----1, then apply mycielski construction
+    igraph_vector_int_t edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2);
+    VECTOR(edges)[0] = 0;
+    VECTOR(edges)[1] = 1;
+
+    IGRAPH_CHECK(igraph_create(&g, &edges, 0, IGRAPH_UNDIRECTED));
+    IGRAPH_FINALLY(igraph_destroy, &g);
+
     igraph_mycielskian(graph, &g, k - 2);
+
+    igraph_vector_int_destroy(&edges);
     igraph_destroy(&g);
 
     return IGRAPH_SUCCESS;
