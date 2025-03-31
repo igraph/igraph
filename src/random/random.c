@@ -576,14 +576,16 @@ igraph_bool_t igraph_rng_get_bool(igraph_rng_t *rng) {
  * \function igraph_rng_get_integer
  * \brief Generate an integer random number from an interval.
  *
+ * Generate uniformly distributed integers from the interval <code>[l, h]</code>.
+ *
  * \param rng Pointer to the RNG to use for the generation. Use \ref
  *        igraph_rng_default() here to use the default igraph RNG.
  * \param l Lower limit, inclusive, it can be negative as well.
  * \param h Upper limit, inclusive, it can be negative as well, but it
- *        should be at least <code>l</code>.
+ *        must be at least <code>l</code>.
  * \return The generated random integer.
  *
- * Time complexity: O(log2(h-l) / bits) where bits is the value of
+ * Time complexity: O(log2(h-l+1) / bits) where bits is the value of
  * \ref igraph_rng_bits(rng).
  */
 

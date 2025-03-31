@@ -779,7 +779,7 @@ igraph_error_t igraph_degree_sequence_game(
         return igraph_i_degree_sequence_game_configuration(graph, out_degrees, in_degrees);
 
     case IGRAPH_DEGSEQ_VL:
-        return igraph_degree_sequence_game_vl(graph, out_degrees, in_degrees);
+        return igraph_i_degree_sequence_game_vl(graph, out_degrees, in_degrees);
 
     case IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE:
         if (! in_degrees) {
