@@ -143,6 +143,6 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     igraph_mycielskian(graph, &g, k - 2);
 
     igraph_destroy(&g);
-
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
