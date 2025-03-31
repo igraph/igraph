@@ -32,11 +32,6 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
 
-    if (k == 0) { // if k is 0, return the original graph
-        IGRAPH_CHECK(igraph_copy(res, graph));
-        return IGRAPH_SUCCESS;
-    }
-
     igraph_integer_t new_vcount = vcount;
     igraph_integer_t new_ecount = ecount;
 
