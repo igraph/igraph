@@ -28,9 +28,6 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     if (k < 0) {
         IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
     }
-    if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Mycielski's construction is not defined for directed graphs.", IGRAPH_EINVAL);
-    }
     
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
@@ -48,7 +45,10 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
         new_vcount = new_vcount * 2 + 1; // the new number of vertices after each iteration
     }
 
-    IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_UNDIRECTED));
+    if (igraph_is_directed(graph))
+        IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_DIRECTED));
+    else
+        IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
