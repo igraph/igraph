@@ -70,16 +70,19 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     }
 
     for (igraph_integer_t i = 0; i < k; i++) {
+        // new edges = 3 * old edges + old vertices
         IGRAPH_SAFE_MULT(new_ecount, 3, &new_ecount);
-        IGRAPH_SAFE_ADD(new_ecount, new_vcount, &new_ecount); // new edges = 3 * old edges + old vertices
+        IGRAPH_SAFE_ADD(new_ecount, new_vcount, &new_ecount);
 
+        // new vertices = 2 * old vertices + 1
         IGRAPH_SAFE_MULT(new_vcount, 2, &new_vcount);
-        IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount); // new vertices = 2 * old vertices + 1
+        IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount); 
     }
 
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false)); // copy the edges from the original graph to the new vector
+    // copy the edges from the original graph to the new vector
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false));
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, new_ecount * 2));
 
     igraph_integer_t edge_index = 2 * ecount;  // Current last edge index in edge vector
@@ -135,7 +138,7 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
     IGRAPH_FINALLY(igraph_destroy, &g);
 
-    igraph_mycielskian(graph, &g, k - 2);
+    IGRAPH_CHECK(igraph_mycielskian(graph, &g, k - 2));
 
     igraph_destroy(&g);
     IGRAPH_FINALLY_CLEAN(1);
