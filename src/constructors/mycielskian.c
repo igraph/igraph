@@ -77,11 +77,6 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
         IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount); // new vertices = 2 * old vertices + 1
     }
 
-    if (igraph_is_directed(graph))
-        IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_DIRECTED));
-    else
-        IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_UNDIRECTED));
-
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false)); // copy the edges from the original graph to the new vector
@@ -118,7 +113,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     }
 
     // Add all edges in one go
-    IGRAPH_CHECK(igraph_add_edges(res, &edges, 0));
+    IGRAPH_CHECK(igraph_create(res, &edges, 0, igraph_is_directed(graph)));
     IGRAPH_FINALLY_CLEAN(1); 
     igraph_vector_int_destroy(&edges);
 
