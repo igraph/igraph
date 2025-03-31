@@ -94,11 +94,7 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
         IGRAPH_ERROR("The Mycielski graph order must be a positive integer.", IGRAPH_EINVAL);
     }
     if (k == 1) {
-        IGRAPH_CHECK(igraph_empty(&g, 1, IGRAPH_UNDIRECTED));
-        IGRAPH_FINALLY(igraph_destroy, &g);
-
-        igraph_copy(graph, &g);
-        igraph_destroy(&g);
+        IGRAPH_CHECK(igraph_empty(graph, 1, IGRAPH_UNDIRECTED));
         return IGRAPH_SUCCESS;
     }
     // Make g as a path 0----1, then apply mycielski construction
