@@ -35,32 +35,45 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     igraph_integer_t new_vcount = vcount;
     igraph_integer_t new_ecount = ecount;
 
-    if (vcount == 0) {
-        igraph_mycielski_graph(res, k);
+    if (vcount == 0) { // empty graph
+        if (k <= 1) { // 0-> return null graph, 1-> return a single vertex
+            IGRAPH_CHECK(igraph_empty(res, k, IGRAPH_UNDIRECTED));
+            return IGRAPH_SUCCESS;
+        }
+        igraph_t g;
+        // create a path 0---1
+        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
+        IGRAPH_FINALLY(igraph_destroy, &g);
+
+        igraph_mycielskian(res, &g, k - 2);
+
+        igraph_destroy(&g);
         return IGRAPH_SUCCESS;
     }
 
-    if (vcount == 1) {
-        igraph_mycielski_graph(res, k+1);
+    if (vcount == 1) { // single vertex, assuming no self loop
+        if (k == 0) { // 0-> return single vertex
+            IGRAPH_CHECK(igraph_empty(res, 1, IGRAPH_UNDIRECTED));
+            return IGRAPH_SUCCESS;
+        }
+        igraph_t g;
+        // create a path 0---1
+        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
+        IGRAPH_FINALLY(igraph_destroy, &g);
+
+        igraph_mycielskian(res, &g, k - 1);
+
+        igraph_destroy(&g);
         return IGRAPH_SUCCESS;
     }
 
     for (igraph_integer_t i = 0; i < k; i++) {
-        new_ecount = 3 * new_ecount + new_vcount; // the number of edges after each iteration
-        new_vcount = new_vcount * 2 + 1; // the new number of vertices after each iteration
+        IGRAPH_SAFE_MULT(new_ecount, 3, &new_ecount);
+        IGRAPH_SAFE_ADD(new_ecount, new_vcount, &new_ecount); // new edges = 3 * old edges + old vertices
+
+        IGRAPH_SAFE_MULT(new_vcount, 2, &new_vcount);
+        IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount); // new vertices = 2 * old vertices + 1
     }
-
-    // igraph_integer_t two_to_k = igraph_i_safe_exp2(k, &new_vcount);
-    // IGRAPH_SAFE_MULT(vcount + 1, new_vcount, &new_vcount);
-    // IGRAPH_SAFE_ADD(new_vcount, -1, &new_vcount);
-
-    // igraph_integer_t n_k_plus_1 = new_vcount;
-    // IGRAPH_SAFE_MULT(new_vcount, 2, &n_k_plus_1);
-    // IGRAPH_SAFE_ADD(n_k_plus_1, 1, &n_k_plus_1);
-    ////// TODO for new_ecount //////
-
-    // n k = ( n + 1 ) 2^k − 1 
-    //  m k = 0.5( ( 2 m + 2 n + 1 ) 3^k − n_(k+1) ) 
 
     if (igraph_is_directed(graph))
         IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_DIRECTED));
