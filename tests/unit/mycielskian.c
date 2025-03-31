@@ -101,6 +101,20 @@ int main(void) {
     igraph_destroy(&g);
     igraph_destroy(&res);
 
+    // path graph gives k=2 a grotzsch graph
+    igraph_small(
+        &g, 2, /* directed = */ 0,
+        /* edge 0 */ 0, 1,
+        -1
+    );
+    igraph_mycielskian(&res, &g, 2);
+    igraph_famous(&grostzsch, "grotzsch");
+    igraph_isomorphic(&grostzsch, &res, &res_bool);
+    IGRAPH_ASSERT(res_bool);
+    igraph_destroy(&grostzsch);
+    igraph_destroy(&g);
+    igraph_destroy(&res);
+
     VERIFY_FINALLY_STACK();
 
     return 0;
