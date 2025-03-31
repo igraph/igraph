@@ -97,18 +97,13 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
         IGRAPH_CHECK(igraph_empty(graph, 1, IGRAPH_UNDIRECTED));
         return IGRAPH_SUCCESS;
     }
-    // Make g as a path 0----1, then apply mycielski construction
-    igraph_vector_int_t edges;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2);
-    VECTOR(edges)[0] = 0;
-    VECTOR(edges)[1] = 1;
 
-    IGRAPH_CHECK(igraph_create(&g, &edges, 0, IGRAPH_UNDIRECTED));
+    // create a path 0---1
+    IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
     IGRAPH_FINALLY(igraph_destroy, &g);
 
     igraph_mycielskian(graph, &g, k - 2);
 
-    igraph_vector_int_destroy(&edges);
     igraph_destroy(&g);
 
     return IGRAPH_SUCCESS;
