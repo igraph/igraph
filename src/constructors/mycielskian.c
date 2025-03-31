@@ -40,6 +40,18 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
         new_vcount = new_vcount * 2 + 1; // the new number of vertices after each iteration
     }
 
+    // igraph_integer_t two_to_k = igraph_i_safe_exp2(k, &new_vcount);
+    // IGRAPH_SAFE_MULT(vcount + 1, new_vcount, &new_vcount);
+    // IGRAPH_SAFE_ADD(new_vcount, -1, &new_vcount);
+
+    // igraph_integer_t n_k_plus_1 = new_vcount;
+    // IGRAPH_SAFE_MULT(new_vcount, 2, &n_k_plus_1);
+    // IGRAPH_SAFE_ADD(n_k_plus_1, 1, &n_k_plus_1);
+    ////// TODO for new_ecount //////
+
+    // n k = ( n + 1 ) 2^k − 1 
+    //  m k = 0.5( ( 2 m + 2 n + 1 ) 3^k − n_(k+1) ) 
+
     if (igraph_is_directed(graph))
         IGRAPH_CHECK(igraph_empty(res, new_vcount, IGRAPH_DIRECTED));
     else
