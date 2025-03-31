@@ -42,7 +42,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
         }
         igraph_t g;
         // create a path 0---1
-        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
+        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
         IGRAPH_FINALLY(igraph_destroy, &g);
 
         igraph_mycielskian(res, &g, k - 2);
@@ -59,7 +59,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
         }
         igraph_t g;
         // create a path 0---1
-        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
+        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
         IGRAPH_FINALLY(igraph_destroy, &g);
 
         igraph_mycielskian(res, &g, k - 1);
@@ -113,6 +113,8 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
         // Update offset for next step
         offset = offset * 2 + 1;
+
+        IGRAPH_ALLOW_INTERRUPTION();
     }
 
     // Add all edges in one go
@@ -126,16 +128,16 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     igraph_t g;
 
-    if (k <= 0) {
+    if (k < 0) {
         IGRAPH_ERROR("The Mycielski graph order must be a positive integer.", IGRAPH_EINVAL);
     }
-    if (k == 1) {
-        IGRAPH_CHECK(igraph_empty(graph, 1, IGRAPH_UNDIRECTED));
+    if (k <= 1) {
+        IGRAPH_CHECK(igraph_empty(graph, k, IGRAPH_UNDIRECTED));
         return IGRAPH_SUCCESS;
     }
 
     // create a path 0---1
-    IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, 0, 0));
+    IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
     IGRAPH_FINALLY(igraph_destroy, &g);
 
     IGRAPH_CHECK(igraph_mycielskian(graph, &g, k - 2));
