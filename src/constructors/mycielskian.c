@@ -35,6 +35,16 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     igraph_integer_t new_vcount = vcount;
     igraph_integer_t new_ecount = ecount;
 
+    if (vcount == 0) {
+        igraph_mycielski_graph(res, k);
+        return IGRAPH_SUCCESS;
+    }
+
+    if (vcount == 1) {
+        igraph_mycielski_graph(res, k+1);
+        return IGRAPH_SUCCESS;
+    }
+
     for (igraph_integer_t i = 0; i < k; i++) {
         new_ecount = 3 * new_ecount + new_vcount; // the number of edges after each iteration
         new_vcount = new_vcount * 2 + 1; // the new number of vertices after each iteration
