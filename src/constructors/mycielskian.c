@@ -47,6 +47,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
         igraph_mycielskian(res, &g, k - 2);
 
+        IGRAPH_FINALLY_CLEAN(1);
         igraph_destroy(&g);
         return IGRAPH_SUCCESS;
     }
@@ -63,6 +64,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
         igraph_mycielskian(res, &g, k - 1);
 
+        IGRAPH_FINALLY_CLEAN(1);
         igraph_destroy(&g);
         return IGRAPH_SUCCESS;
     }
@@ -117,6 +119,7 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
 
     // Add all edges in one go
     IGRAPH_CHECK(igraph_add_edges(res, &edges, 0));
+    IGRAPH_FINALLY_CLEAN(1); 
     igraph_vector_int_destroy(&edges);
 
     return IGRAPH_SUCCESS;
