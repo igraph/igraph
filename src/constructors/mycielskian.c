@@ -24,6 +24,69 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
+/**
+ * \function igraph_mycielskian
+ * \brief Generate the Mycielskian of a graph with k iterations.
+ *
+ * The Mycielskian construction is a method used to generate a triangle-free 
+ * graph with an increased chromatic number. Given an input graph, the 
+ * Mycielskian transformation produces a new graph where the chromatic number 
+ * increases by at most one in each iteration.
+ *
+ * </para><para>
+ * This transformation is useful in graph theory for constructing 
+ * graphs with large chromatic numbers while avoiding small cycles, 
+ * particularly triangles.
+ *
+ * \subsection mycielskian_structure Structure of Mycielskian Graph
+ *
+ * Let the \( n \) vertices of the given graph \( G \) be \( v_1, v_2, \dots, v_n \). 
+ * The Mycielski graph \( \mu(G) \) contains \( G \) itself as a subgraph, 
+ * together with \( n+1 \) additional vertices:
+ * - A vertex \( u_i \) corresponding to each vertex \( v_i \) of \( G \).
+ * - An extra vertex \( w \).
+ *
+ * The edges are added as follows:
+ * - Each vertex \( u_i \) is connected to \( w \), forming a star \( K_{1,n} \).
+ * - For each edge \( (v_i, v_j) \) in \( G \), two new edges are added:  
+ *   \( (u_i, v_j) \) and \( (v_i, u_j) \).
+ *
+ * Thus, if \( G \) has \( n \) vertices and \( m \) edges, the Mycielski graph \( \mu(G) \) has:
+ * \[
+ * 2n + 1 \text{ vertices, and } 3m + n \text{ edges.}
+ * \]
+ *
+ * \subsection mycielskian_growth Growth with k Iterations
+ * The k-th iterated Mycielskian has:
+ * \f[
+ * n_k = ( n + 1 ) \cdot 2^k - 1
+ * \f]
+ * vertices, where \( n \) is the number of vertices in the original graph.
+ *
+ * The edge count increases as:
+ * \f[
+ * m_k = \frac{(2m + 2n + 1) \cdot 3^k - n_{k+1}}{2}
+ * \f]
+ * where \( m \) is the original number of edges. The number of edges increases 
+ * from \( m \) to \( 3m + n \) in each iteration, as we add 2 edges for every 
+ * existing edge and 1 edge for every vertex.
+ * 
+ * </para><para>
+ * The Mycielskian is commonly used to demonstrate that graphs can have high 
+ * chromatic numbers without forming small cycles (i.e., triangle-free graphs).
+ * The Grötzsch graph, for example, is obtained as \( M_4 \) of a triangle-free graph.
+ *
+ * \param graph Pointer to the input graph.
+ * \param res Pointer to an uninitialized graph object where the Mycielskian 
+ *        of the input graph will be stored.
+ * \param k Integer, the number of Mycielskian iterations (must be ≥ 0).
+ * \return Error code.
+ *
+ * \sa \ref igraph_mycielski_graph().
+ *
+ * Time complexity: Exponential in k.
+ */
+
 igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
     if (k < 0) {
         IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
