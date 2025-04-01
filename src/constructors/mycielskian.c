@@ -208,15 +208,12 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * demonstrating properties of chromatic graphs.
  * 
  * The first few Mycielski graphs are:
- *
- * <table>
- * <tr><th>Order \( k \)</th><th>Graph</th></tr>
- * <tr><td>1</td><td>Singleton graph \( K_1 \)</td></tr>
- * <tr><td>2</td><td>Path graph \( P_2 \)</td></tr>
- * <tr><td>3</td><td>Cycle graph \( C_5 \)</td></tr>
- * <tr><td>4</td><td>Grötzsch graph</td></tr>
- * </table>
- *
+ * - \( M_0 \): Null graph
+ * - \( M_1 \): Single vertex
+ * - \( M_2 \): Path graph with 2 vertices
+ * - \( M_3 \): Cycle graph with 5 vertices
+ * - \( M_4 \): Grötzsch graph (triangle-free graph with chromatic number 4)
+ * 
  * </para><para>
  * The Mycielski graph has several important applications, particularly in 
  * demonstrating that there exist graphs with high chromatic numbers but no 
