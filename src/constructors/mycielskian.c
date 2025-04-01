@@ -86,7 +86,6 @@
  *
  * Time complexity: Exponential in k.
  */
-
 igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
     if (k < 0) {
         IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
