@@ -25,6 +25,14 @@ int main(void) {
     igraph_t expected_res;
     igraph_bool_t is_isomorph;
 
+    // k == 0 testing --> should be a null graph
+    igraph_mycielski_graph(&res, 0);
+    igraph_empty(&expected_res, 0, IGRAPH_UNDIRECTED);
+    igraph_isomorphic(&res, &expected_res, &is_isomorph);
+    IGRAPH_ASSERT(is_isomorph);
+    igraph_destroy(&res);
+    igraph_destroy(&expected_res);
+    
     //should be a vertex
     igraph_mycielski_graph(&res, 1);
     igraph_empty(&expected_res, 1, IGRAPH_UNDIRECTED);

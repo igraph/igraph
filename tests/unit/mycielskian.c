@@ -102,11 +102,7 @@ int main(void) {
     igraph_destroy(&res);
 
     // path graph gives k=2 a grotzsch graph
-    igraph_small(
-        &g, 2, /* directed = */ 0,
-        /* edge 0 */ 0, 1,
-        -1
-    );
+    igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false);
     igraph_mycielskian(&g, &res, 2);
     igraph_famous(&grostzsch, "grotzsch");
     igraph_isomorphic(&grostzsch, &res, &res_bool);
