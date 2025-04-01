@@ -234,7 +234,7 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     igraph_t g;
 
     if (k < 0) {
-        IGRAPH_ERROR("The Mycielski graph order must be a positive integer.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The Mycielski graph order must not be negative.", IGRAPH_EINVAL);
     }
     if (k <= 1) { // 0--> Null graph, 1--> single vertex
         IGRAPH_CHECK(igraph_empty(graph, k, IGRAPH_UNDIRECTED));
