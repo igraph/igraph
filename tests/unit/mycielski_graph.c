@@ -50,15 +50,7 @@ int main(void) {
 
     // should a 5-cycle
     igraph_mycielski_graph(&res, 3);
-    igraph_small(
-        &expected_res, 5, /* directed = */ 0,
-        /* edge 0 */ 0, 1,
-        /* edge 1 */ 1, 2,
-        /* edge 2 */ 2, 3,
-        /* edge 3 */ 3, 4,
-        /* edge 4 */ 4, 0,
-        -1
-    );
+    igraph_ring(&expected_res, 5, IGRAPH_UNDIRECTED, false, true);
     igraph_isomorphic(&res, &expected_res, &is_isomorph);
     IGRAPH_ASSERT(is_isomorph);
     igraph_destroy(&res);

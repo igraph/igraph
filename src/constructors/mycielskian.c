@@ -31,45 +31,46 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
     
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
-
-    igraph_integer_t new_vcount = vcount;
-    igraph_integer_t new_ecount = ecount;
+    igraph_integer_t init_iter = 0; // to track the init iteration number
+    igraph_vector_int_t edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (vcount == 0) { // empty graph
-        if (k <= 1) { // 0-> return null graph, 1-> return a single vertex
+        if (k <= 1) { // 0--> Null graph, 1--> single vertex
             IGRAPH_CHECK(igraph_empty(res, k, IGRAPH_UNDIRECTED));
+            IGRAPH_FINALLY_CLEAN(1); 
+            igraph_vector_int_destroy(&edges);
             return IGRAPH_SUCCESS;
         }
-        igraph_t g;
-        // create a path 0---1
-        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
-        IGRAPH_FINALLY(igraph_destroy, &g);
-
-        igraph_mycielskian(res, &g, k - 2);
-
-        IGRAPH_FINALLY_CLEAN(1);
-        igraph_destroy(&g);
-        return IGRAPH_SUCCESS;
+        /* else */
+        init_iter = 2; // start from 2nd iteration
+        // Make a 2-vertex graph
+        vcount = 2;
+        ecount = 1;
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 0));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 1));
     }
-
+    
     if (vcount == 1) { // single vertex, assuming no self loop
-        if (k == 0) { // 0-> return single vertex
+        if (k == 0) {
             IGRAPH_CHECK(igraph_empty(res, 1, IGRAPH_UNDIRECTED));
+            IGRAPH_FINALLY_CLEAN(1); 
+            igraph_vector_int_destroy(&edges);
             return IGRAPH_SUCCESS;
         }
-        igraph_t g;
-        // create a path 0---1
-        IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
-        IGRAPH_FINALLY(igraph_destroy, &g);
-
-        igraph_mycielskian(res, &g, k - 1);
-
-        IGRAPH_FINALLY_CLEAN(1);
-        igraph_destroy(&g);
-        return IGRAPH_SUCCESS;
+        /* else */
+        init_iter = 1; // start from 1st iteration
+        // Make a 2-vertex graph
+        vcount = 2;
+        ecount = 1;
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 0));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 1));
     }
-
-    for (igraph_integer_t i = 0; i < k; i++) {
+    
+    igraph_integer_t new_vcount = vcount;
+    igraph_integer_t new_ecount = ecount;
+    
+    for (igraph_integer_t i = init_iter; i < k; i++) {
         // new edges = 3 * old edges + old vertices
         IGRAPH_SAFE_MULT(new_ecount, 3, &new_ecount);
         IGRAPH_SAFE_ADD(new_ecount, new_vcount, &new_ecount);
@@ -79,16 +80,18 @@ igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_i
         IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount); 
     }
 
-    igraph_vector_int_t edges;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     // copy the edges from the original graph to the new vector
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false));
+    // excluding for the case of vcount==0 and vcount==1
+    // i.e, init_iter != 0, exclude it
+    if (init_iter == 0) {
+        IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false));
+    }
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, new_ecount * 2));
 
     igraph_integer_t edge_index = 2 * ecount;  // Current last edge index in edge vector
     igraph_integer_t offset = vcount;          // Tracks where new vertices start
 
-    for (igraph_integer_t i = 0; i < k; i++) {
+    for (igraph_integer_t i = init_iter; i < k; i++) {
         igraph_integer_t prev_vcount = offset;  // Number of vertices before this step
         igraph_integer_t w = offset * 2;        // The new 'w' node index
         igraph_integer_t last_edge_index = edge_index;  // Mark where edges before this step end
@@ -131,7 +134,7 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     if (k < 0) {
         IGRAPH_ERROR("The Mycielski graph order must be a positive integer.", IGRAPH_EINVAL);
     }
-    if (k <= 1) {
+    if (k <= 1) { // 0--> Null graph, 1--> single vertex
         IGRAPH_CHECK(igraph_empty(graph, k, IGRAPH_UNDIRECTED));
         return IGRAPH_SUCCESS;
     }
