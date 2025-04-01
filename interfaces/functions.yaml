@@ -185,6 +185,9 @@ igraph_famous:
 igraph_lcf_vector:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
 
+igraph_mycielski_graph:
+    PARAMS: OUT GRAPH graph, INTEGER k
+
 igraph_adjlist:
     PARAMS: |-
         OUT GRAPH graph, ADJLIST adjlist, NEIMODE mode=OUT,

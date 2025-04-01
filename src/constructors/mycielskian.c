@@ -128,6 +128,48 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_mycielski_graph
+ * \brief Generate the Mycielski graph of order k.
+ *
+ * The Mycielski graph construction is used to create a triangle-free graph 
+ * with an increased chromatic number. Given an input graph, the Mycielski 
+ * transformation produces a new graph with one additional chromatic number.
+ * This transformation is commonly used in graph theory to study chromatic 
+ * properties of graphs.
+ *
+ * </para><para>
+ * The Mycielski graph \( M_k \) of order \( k \) is a triangle-free graph 
+ * with chromatic number \( k \) and the smallest possible number of vertices.
+ *
+ * The number of edges also increases with each step, making it useful for 
+ * demonstrating properties of chromatic graphs.
+ * 
+ * The first few Mycielski graphs are:
+ *
+ * <table>
+ * <tr><th>Order \( k \)</th><th>Graph</th></tr>
+ * <tr><td>1</td><td>Singleton graph \( K_1 \)</td></tr>
+ * <tr><td>2</td><td>Path graph \( P_2 \)</td></tr>
+ * <tr><td>3</td><td>Cycle graph \( C_5 \)</td></tr>
+ * <tr><td>4</td><td>Grötzsch graph</td></tr>
+ * </table>
+ *
+ * </para><para>
+ * The Mycielski graph has several important applications, particularly in 
+ * demonstrating that there exist graphs with high chromatic numbers but no 
+ * short cycles (i.e., triangle-free). For example, the Grötzsch graph, 
+ * which is \( M_4 \), is a triangle-free graph with chromatic number 4.
+ *
+ * \param graph Pointer to an uninitialized graph object. The generated 
+ *        Mycielski graph will be stored here.
+ * \param k Integer, the order of the Mycielski graph (must be \( \geq 0 \)).
+ * \return Error code.
+ *
+ * \sa \ref igraph_mycielskian().
+ *
+ * Time complexity: Exponential in \( k \).
+ */
 igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     igraph_t g;
 
