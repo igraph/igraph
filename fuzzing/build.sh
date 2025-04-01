@@ -8,7 +8,7 @@ mkdir $DEPS_PATH
 # It may be necessary to leave CMAKE_BUILD_TYPE empty and specify LIBXML2_WITH_MODULES=OFF
 # in order for fuzz introspector builds to succeed (details unverified).
 cd $SRC
-wget https://download.gnome.org/sources/libxml2/2.13/libxml2-2.14.0.tar.xz
+wget https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.0.tar.xz
 tar xf libxml2-2.14.0.tar.xz
 cd libxml2-2.14.0
 mkdir build && cd build
