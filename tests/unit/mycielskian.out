@@ -1,3 +1,4 @@
+small graph, k=0
 directed: false
 vcount: 5
 edges: {
@@ -10,18 +11,21 @@ edges: {
 }
 
 
+null graph, k=0
 directed: false
 vcount: 0
 edges: {
 }
 
 
+null graph, k=1
 directed: false
 vcount: 1
 edges: {
 }
 
 
+null graph, k=3
 directed: false
 vcount: 5
 edges: {
@@ -33,12 +37,14 @@ edges: {
 }
 
 
+singleton graph, k=0
 directed: false
 vcount: 1
 edges: {
 }
 
 
+small directed graph, k=0
 directed: true
 vcount: 5
 edges: {
@@ -51,3 +57,55 @@ edges: {
 }
 
 
+singleton graph, k=3
+directed: false
+vcount: 11
+edges: {
+1 0
+3 0
+2 1
+4 2
+4 3
+6 0
+5 1
+8 0
+5 3
+7 1
+6 2
+9 2
+7 4
+9 3
+8 4
+10 5
+10 6
+10 7
+10 8
+10 9
+}
+
+
+P_2, k=2
+directed: false
+vcount: 11
+edges: {
+1 0
+3 0
+2 1
+4 2
+4 3
+6 0
+5 1
+8 0
+5 3
+7 1
+6 2
+9 2
+7 4
+9 3
+8 4
+10 5
+10 6
+10 7
+10 8
+10 9
+}

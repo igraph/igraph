@@ -22,8 +22,13 @@
 
 int main(void) {
     igraph_t g, res;
+    igraph_t groetzsch;
+    igraph_bool_t isomorphic;
+
+    igraph_famous(&groetzsch, "groetzsch");
 
     // k == 0 testing
+    printf("small graph, k=0\n");
     igraph_small(
         &g, 5, /* directed = */ false,
         /* edge 0 */ 0, 1,
@@ -36,43 +41,48 @@ int main(void) {
     );
     igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
-    printf("\n\n");
-    igraph_destroy(&g);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
     // vcount == 0, k==0 testing
+    printf("null graph, k=0\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
-    printf("\n\n");
-    igraph_destroy(&g);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
     // vcount == 0, k==1 testing
+    printf("null graph, k=1\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_mycielskian(&g, &res, 1);
     print_graph(&res);
-    printf("\n\n");
-    igraph_destroy(&g);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
     // vcount == 0, k==3 testing
+    printf("null graph, k=3\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_mycielskian(&g, &res, 3);
     print_graph(&res);
-    printf("\n\n");
-    igraph_destroy(&g);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
     // vcount == 1, k==0 testing
+    printf("singleton graph, k=0\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
-    printf("\n\n");
-    igraph_destroy(&g);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
     // checking for directed graphs for directed attribute
+    printf("small directed graph, k=0\n");
     igraph_small(
         &g, 5, /* directed = */ true,
         /* edge 0 */ 0, 1,
@@ -85,31 +95,32 @@ int main(void) {
     );
     igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
-    printf("\n\n");
-    igraph_destroy(&g);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
     // vcount == 1, k==3 testing --> should output a Grötzsch graph
+    printf("singleton graph, k=3\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     igraph_mycielskian(&g, &res, 3);
-    igraph_t grostzsch;
-    igraph_bool_t res_bool;
-    igraph_famous(&grostzsch, "grotzsch");
-    igraph_isomorphic(&grostzsch, &res, &res_bool);
-    IGRAPH_ASSERT(res_bool);
-    igraph_destroy(&grostzsch);
-    igraph_destroy(&g);
+    print_graph(&res);
+    igraph_isomorphic(&groetzsch, &res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+    printf("\n\n");
 
-    // path graph gives k=2 a grotzsch graph
+    // P_2 graph with k=2 gives the Grötzsch graph
+    printf("P_2, k=2\n");
     igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false);
     igraph_mycielskian(&g, &res, 2);
-    igraph_famous(&grostzsch, "grotzsch");
-    igraph_isomorphic(&grostzsch, &res, &res_bool);
-    IGRAPH_ASSERT(res_bool);
-    igraph_destroy(&grostzsch);
-    igraph_destroy(&g);
+    print_graph(&res);
+    igraph_isomorphic(&groetzsch, &res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
     igraph_destroy(&res);
+    igraph_destroy(&g);
+
+    igraph_destroy(&groetzsch);
 
     VERIFY_FINALLY_STACK();
 
