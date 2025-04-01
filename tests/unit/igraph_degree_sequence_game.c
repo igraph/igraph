@@ -21,31 +21,31 @@
 #include "test_utilities.h"
 
 igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_vector_int_t *observed) {
-    igraph_integer_t i, n = igraph_vector_int_size(expected);
+    const igraph_integer_t n = igraph_vector_int_size(expected);
 
     if (igraph_vector_int_size(observed) != n) {
-        return 0;
+        return false;
     }
 
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         if (VECTOR(*expected)[i] != VECTOR(*observed)[i]) {
-            return 0;
+            return false;
         }
     }
 
-    return 1;
+    return true;
 }
 
 int main(void) {
-    igraph_t g;
+    igraph_t g, rg;
     igraph_vector_int_t outdeg, indeg, empty;
-    igraph_vector_int_t degrees;
+    igraph_vector_int_t degrees, rg_degrees;
     igraph_bool_t is_simple, is_connected;
 
-    igraph_integer_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
-    igraph_integer_t inarr[]  = {3, 6, 2, 0, 2, 2, 4, 3, 3, 3};
+    const igraph_integer_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
+    const igraph_integer_t inarr[]  = {3, 6, 2, 0, 2, 2, 4, 3, 3, 3};
 
-    igraph_integer_t n = sizeof(outarr) / sizeof(outarr[0]);
+    const igraph_integer_t n = sizeof(outarr) / sizeof(outarr[0]);
 
     igraph_rng_seed(igraph_rng_default(), 333);
 
@@ -57,6 +57,8 @@ int main(void) {
     /* This vector is used to check that the degrees of the result
      * match the requested degrees. */
     igraph_vector_int_init(&degrees, 0);
+    igraph_vector_int_init(&rg_degrees, 0);
+
 
     /* Configuration model, undirected non-simple graphs */
 
@@ -113,6 +115,20 @@ int main(void) {
     igraph_degree_sequence_game(&g, &empty, NULL, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
+
+    igraph_erdos_renyi_game_gnm(&rg, 2000, 2000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_degree(&rg, &rg_degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+
+    igraph_degree_sequence_game(&g, &rg_degrees, NULL, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);
+
+    igraph_is_simple(&g, &is_simple);
+    IGRAPH_ASSERT(is_simple);
+
+    igraph_degree(&g, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+    IGRAPH_ASSERT(compare_degrees(&rg_degrees, &degrees));
+
+    igraph_destroy(&g);
+    igraph_destroy(&rg);
 
 
     /* Configuration model, directed simple graphs */
@@ -193,6 +209,7 @@ int main(void) {
 
     igraph_destroy(&g);
 
+
     /* Edge-swithching MCMC, directed, simple graphs */
 
     igraph_degree_sequence_game(&g, &outdeg, &indeg, IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE);
@@ -237,6 +254,7 @@ int main(void) {
     /* This degree sequence contains a zero degree, so it cannot be realized by a connected graph. */
     CHECK_ERROR(igraph_degree_sequence_game(&g, &indeg, NULL, IGRAPH_DEGSEQ_VL), IGRAPH_EINVAL);
 
+    igraph_vector_int_destroy(&rg_degrees);
     igraph_vector_int_destroy(&degrees);
     igraph_vector_int_destroy(&empty);
 

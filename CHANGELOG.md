@@ -11,6 +11,7 @@
 ### Changed
 
  - `igraph_neighborhood_size()`, `igraph_neighborhood()` and `igraph_neighborhood_graphs()` now accept a negative `order` value and interpret it as infinite order. Previously, a negative `order` value was disallowed.
+ - `igraph_famous()` now accepts `Groetzsch` as an alias of `Grotzsch`.
 
 ### Fixed
 
@@ -28,6 +29,7 @@
  - Updated vendored BLAS to 3.12.0 and vendored ARPACK to ARPACK-NG 3.7.0.
  - Re-translated vendored BLAS/LAPACK/ARPACK sources with f2c version 20240504.
  - The performance of `igraph_transitivity_undirected()` is improved by a factor of about 2.5.
+ - The performance of `igraph_degree_sequence_game()` is improved when using `IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE`.
  - Documentation improvements.
 
 ## [0.10.15]
