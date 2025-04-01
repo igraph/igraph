@@ -34,7 +34,7 @@ int main(void) {
         /* edge 5 */ 3, 4,
         -1
     );
-    igraph_mycielskian(&res, &g, 0);
+    igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
     printf("\n\n");
     igraph_destroy(&g);
@@ -42,7 +42,7 @@ int main(void) {
 
     // vcount == 0, k==0 testing
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_mycielskian(&res, &g, 0);
+    igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
     printf("\n\n");
     igraph_destroy(&g);
@@ -50,7 +50,7 @@ int main(void) {
 
     // vcount == 0, k==1 testing
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_mycielskian(&res, &g, 1);
+    igraph_mycielskian(&g, &res, 1);
     print_graph(&res);
     printf("\n\n");
     igraph_destroy(&g);
@@ -58,7 +58,7 @@ int main(void) {
 
     // vcount == 0, k==3 testing
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_mycielskian(&res, &g, 3);
+    igraph_mycielskian(&g, &res, 3);
     print_graph(&res);
     printf("\n\n");
     igraph_destroy(&g);
@@ -66,7 +66,7 @@ int main(void) {
 
     // vcount == 1, k==0 testing
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    igraph_mycielskian(&res, &g, 0);
+    igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
     printf("\n\n");
     igraph_destroy(&g);
@@ -83,7 +83,7 @@ int main(void) {
         /* edge 5 */ 3, 4,
         -1
     );
-    igraph_mycielskian(&res, &g, 0);
+    igraph_mycielskian(&g, &res, 0);
     print_graph(&res);
     printf("\n\n");
     igraph_destroy(&g);
@@ -91,7 +91,7 @@ int main(void) {
 
     // vcount == 1, k==3 testing --> should output a Grötzsch graph
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    igraph_mycielskian(&res, &g, 3);
+    igraph_mycielskian(&g, &res, 3);
     igraph_t grostzsch;
     igraph_bool_t res_bool;
     igraph_famous(&grostzsch, "grotzsch");
@@ -107,7 +107,7 @@ int main(void) {
         /* edge 0 */ 0, 1,
         -1
     );
-    igraph_mycielskian(&res, &g, 2);
+    igraph_mycielskian(&g, &res, 2);
     igraph_famous(&grostzsch, "grotzsch");
     igraph_isomorphic(&grostzsch, &res, &res_bool);
     IGRAPH_ASSERT(res_bool);

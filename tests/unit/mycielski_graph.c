@@ -27,10 +27,7 @@ int main(void) {
 
     //should be a vertex
     igraph_mycielski_graph(&res, 1);
-    igraph_small(
-        &expected_res, 1, /* directed = */ 0,
-        -1
-    );
+    igraph_empty(&expected_res, 1, IGRAPH_UNDIRECTED);
     igraph_isomorphic(&res, &expected_res, &is_isomorph);
     IGRAPH_ASSERT(is_isomorph);
     igraph_destroy(&res);
@@ -38,11 +35,7 @@ int main(void) {
 
     // should be a path
     igraph_mycielski_graph(&res, 2);
-    igraph_small(
-        &expected_res, 2, /* directed = */ 0,
-        /* edge 0 */ 0, 1,
-        -1
-    );
+    igraph_ring(&expected_res, 2, IGRAPH_UNDIRECTED, false, false);
     igraph_isomorphic(&res, &expected_res, &is_isomorph);
     IGRAPH_ASSERT(is_isomorph);
     igraph_destroy(&res);
