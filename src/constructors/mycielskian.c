@@ -88,52 +88,43 @@
  * Time complexity: Exponential in k.
  */
 igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_vector_int_t edges;
+
     if (k < 0) {
         IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
     }
 
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
-    igraph_integer_t init_iter = 0; // to track the init iteration number
-    igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol */ false));
 
-    if (vcount == 0) { // empty graph
-        if (k <= 1) { // 0--> Null graph, 1--> single vertex
-            IGRAPH_CHECK(igraph_empty(res, k, IGRAPH_UNDIRECTED));
-            IGRAPH_FINALLY_CLEAN(1);
-            igraph_vector_int_destroy(&edges);
-            return IGRAPH_SUCCESS;
-        }
-        /* else */
-        init_iter = 2; // start from 2nd iteration
-        // Make a 2-vertex graph
-        vcount = 2;
-        ecount = 1;
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 0));
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 1));
+    /* Special case: null graph.
+     * We add a single vertex. */
+    if (vcount == 0 && k > 0) {
+        vcount += 1;
+        k--;
     }
 
-    if (vcount == 1) { // single vertex, assuming no self loop
-        if (k == 0) {
-            IGRAPH_CHECK(igraph_empty(res, 1, IGRAPH_UNDIRECTED));
-            IGRAPH_FINALLY_CLEAN(1);
-            igraph_vector_int_destroy(&edges);
-            return IGRAPH_SUCCESS;
-        }
-        /* else */
-        init_iter = 1; // start from 1st iteration
-        // Make a 2-vertex graph
-        vcount = 2;
-        ecount = 1;
+    /* Special case: singleton graph.
+     * We add a new vertex and connect it to the existing vertex. */
+    if (vcount == 1 && k > 0) {
+        vcount += 1;
+        ecount += 1;
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 0));
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 1));
+        k--;
     }
+
+    /* No more special cases, we are ready for performing the remaining Mycielski iterations. */
+
+    /* Compute the number of vertices and edges. Since these are exponential in k,
+     * overflow checks are important. */
 
     igraph_integer_t new_vcount = vcount;
     igraph_integer_t new_ecount = ecount;
 
-    for (igraph_integer_t i = init_iter; i < k; i++) {
+    for (igraph_integer_t i = 0; i < k; i++) {
         // new edges = 3 * old edges + old vertices
         IGRAPH_SAFE_MULT(new_ecount, 3, &new_ecount);
         IGRAPH_SAFE_ADD(new_ecount, new_vcount, &new_ecount);
@@ -143,18 +134,12 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
         IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount);
     }
 
-    // copy the edges from the original graph to the new vector
-    // excluding for the case of vcount==0 and vcount==1
-    // i.e, init_iter != 0, exclude it
-    if (init_iter == 0) {
-        IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, false));
-    }
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, new_ecount * 2));
 
     igraph_integer_t edge_index = 2 * ecount;  // Current last edge index in edge vector
     igraph_integer_t offset = vcount;          // Tracks where new vertices start
 
-    for (igraph_integer_t i = init_iter; i < k; i++) {
+    for (igraph_integer_t i = 0; i < k; i++) {
         igraph_integer_t prev_vcount = offset;  // Number of vertices before this step
         igraph_integer_t w = offset * 2;        // The new 'w' node index
         igraph_integer_t last_edge_index = edge_index;  // Mark where edges before this step end
@@ -182,11 +167,11 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
+    
+    IGRAPH_CHECK(igraph_create(res, &edges, new_vcount, igraph_is_directed(graph)));
 
-    // Add all edges in one go
-    IGRAPH_CHECK(igraph_create(res, &edges, 0, igraph_is_directed(graph)));
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
