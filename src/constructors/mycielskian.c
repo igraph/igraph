@@ -28,27 +28,27 @@
  * \function igraph_mycielskian
  * \brief Generate the Mycielskian of a graph with k iterations.
  *
- * The Mycielskian construction is a method used to generate a triangle-free 
- * graph with an increased chromatic number. Given an input graph, the 
- * Mycielskian transformation produces a new graph where the chromatic number 
+ * The Mycielskian construction is a method used to generate a triangle-free
+ * graph with an increased chromatic number. Given an input graph, the
+ * Mycielskian transformation produces a new graph where the chromatic number
  * increases by at most one in each iteration.
  *
  * </para><para>
- * This transformation is useful in graph theory for constructing 
- * graphs with large chromatic numbers while avoiding small cycles, 
+ * This transformation is useful in graph theory for constructing
+ * graphs with large chromatic numbers while avoiding small cycles,
  * particularly triangles.
  *
  * \subsection mycielskian_structure Structure of Mycielskian Graph
  *
- * Let the \( n \) vertices of the given graph \( G \) be \( v_1, v_2, \dots, v_n \). 
- * The Mycielski graph \( \mu(G) \) contains \( G \) itself as a subgraph, 
+ * Let the \( n \) vertices of the given graph \( G \) be \( v_1, v_2, \dots, v_n \).
+ * The Mycielski graph \( \mu(G) \) contains \( G \) itself as a subgraph,
  * together with \( n+1 \) additional vertices:
  * - A vertex \( u_i \) corresponding to each vertex \( v_i \) of \( G \).
  * - An extra vertex \( w \).
  *
  * The edges are added as follows:
  * - Each vertex \( u_i \) is connected to \( w \), forming a star \( K_{1,n} \).
- * - For each edge \( (v_i, v_j) \) in \( G \), two new edges are added:  
+ * - For each edge \( (v_i, v_j) \) in \( G \), two new edges are added:
  *   \( (u_i, v_j) \) and \( (v_i, u_j) \).
  *
  * Thus, if \( G \) has \( n \) vertices and \( m \) edges, the Mycielski graph \( \mu(G) \) has:
@@ -67,17 +67,17 @@
  * \f[
  * m_k = \frac{(2m + 2n + 1) \cdot 3^k - n_{k+1}}{2}
  * \f]
- * where \( m \) is the original number of edges. The number of edges increases 
- * from \( m \) to \( 3m + n \) in each iteration, as we add 2 edges for every 
+ * where \( m \) is the original number of edges. The number of edges increases
+ * from \( m \) to \( 3m + n \) in each iteration, as we add 2 edges for every
  * existing edge and 1 edge for every vertex.
- * 
+ *
  * </para><para>
- * The Mycielskian is commonly used to demonstrate that graphs can have high 
+ * The Mycielskian is commonly used to demonstrate that graphs can have high
  * chromatic numbers without forming small cycles (i.e., triangle-free graphs).
  * The Grötzsch graph, for example, is obtained as \( M_4 \) of a triangle-free graph.
  *
  * \param graph Pointer to the input graph.
- * \param res Pointer to an uninitialized graph object where the Mycielskian 
+ * \param res Pointer to an uninitialized graph object where the Mycielskian
  *        of the input graph will be stored.
  * \param k Integer, the number of Mycielskian iterations (must be ≥ 0).
  * \return Error code.
@@ -90,7 +90,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
     if (k < 0) {
         IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
     }
-    
+
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t init_iter = 0; // to track the init iteration number
@@ -100,7 +100,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
     if (vcount == 0) { // empty graph
         if (k <= 1) { // 0--> Null graph, 1--> single vertex
             IGRAPH_CHECK(igraph_empty(res, k, IGRAPH_UNDIRECTED));
-            IGRAPH_FINALLY_CLEAN(1); 
+            IGRAPH_FINALLY_CLEAN(1);
             igraph_vector_int_destroy(&edges);
             return IGRAPH_SUCCESS;
         }
@@ -112,11 +112,11 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 0));
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 1));
     }
-    
+
     if (vcount == 1) { // single vertex, assuming no self loop
         if (k == 0) {
             IGRAPH_CHECK(igraph_empty(res, 1, IGRAPH_UNDIRECTED));
-            IGRAPH_FINALLY_CLEAN(1); 
+            IGRAPH_FINALLY_CLEAN(1);
             igraph_vector_int_destroy(&edges);
             return IGRAPH_SUCCESS;
         }
@@ -128,10 +128,10 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 0));
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, 1));
     }
-    
+
     igraph_integer_t new_vcount = vcount;
     igraph_integer_t new_ecount = ecount;
-    
+
     for (igraph_integer_t i = init_iter; i < k; i++) {
         // new edges = 3 * old edges + old vertices
         IGRAPH_SAFE_MULT(new_ecount, 3, &new_ecount);
@@ -139,7 +139,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 
         // new vertices = 2 * old vertices + 1
         IGRAPH_SAFE_MULT(new_vcount, 2, &new_vcount);
-        IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount); 
+        IGRAPH_SAFE_ADD(new_vcount, 1, &new_vcount);
     }
 
     // copy the edges from the original graph to the new vector
@@ -184,7 +184,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 
     // Add all edges in one go
     IGRAPH_CHECK(igraph_create(res, &edges, 0, igraph_is_directed(graph)));
-    IGRAPH_FINALLY_CLEAN(1); 
+    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&edges);
 
     return IGRAPH_SUCCESS;
@@ -194,33 +194,33 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * \function igraph_mycielski_graph
  * \brief Generate the Mycielski graph of order k.
  *
- * The Mycielski graph construction is used to create a triangle-free graph 
- * with an increased chromatic number. Given an input graph, the Mycielski 
+ * The Mycielski graph construction is used to create a triangle-free graph
+ * with an increased chromatic number. Given an input graph, the Mycielski
  * transformation produces a new graph with one additional chromatic number.
- * This transformation is commonly used in graph theory to study chromatic 
+ * This transformation is commonly used in graph theory to study chromatic
  * properties of graphs.
  *
  * </para><para>
- * The Mycielski graph \( M_k \) of order \( k \) is a triangle-free graph 
+ * The Mycielski graph \( M_k \) of order \( k \) is a triangle-free graph
  * with chromatic number \( k \) and the smallest possible number of vertices.
  *
- * The number of edges also increases with each step, making it useful for 
+ * The number of edges also increases with each step, making it useful for
  * demonstrating properties of chromatic graphs.
- * 
+ *
  * The first few Mycielski graphs are:
  * - \( M_0 \): Null graph
  * - \( M_1 \): Single vertex
  * - \( M_2 \): Path graph with 2 vertices
  * - \( M_3 \): Cycle graph with 5 vertices
  * - \( M_4 \): Grötzsch graph (triangle-free graph with chromatic number 4)
- * 
+ *
  * </para><para>
- * The Mycielski graph has several important applications, particularly in 
- * demonstrating that there exist graphs with high chromatic numbers but no 
- * short cycles (i.e., triangle-free). For example, the Grötzsch graph, 
+ * The Mycielski graph has several important applications, particularly in
+ * demonstrating that there exist graphs with high chromatic numbers but no
+ * short cycles (i.e., triangle-free). For example, the Grötzsch graph,
  * which is \( M_4 \), is a triangle-free graph with chromatic number 4.
  *
- * \param graph Pointer to an uninitialized graph object. The generated 
+ * \param graph Pointer to an uninitialized graph object. The generated
  *        Mycielski graph will be stored here.
  * \param k Integer, the order of the Mycielski graph (must be \( \geq 0 \)).
  * \return Error code.
