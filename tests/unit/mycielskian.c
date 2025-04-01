@@ -25,7 +25,7 @@ int main(void) {
 
     // k == 0 testing
     igraph_small(
-        &g, 5, /* directed = */ 0,
+        &g, 5, /* directed = */ false,
         /* edge 0 */ 0, 1,
         /* edge 1 */ 0, 3,
         /* edge 2 */ 1, 2,
@@ -74,7 +74,7 @@ int main(void) {
 
     // checking for directed graphs for directed attribute
     igraph_small(
-        &g, 5, /* directed = */ 1,
+        &g, 5, /* directed = */ true,
         /* edge 0 */ 0, 1,
         /* edge 1 */ 0, 3,
         /* edge 2 */ 1, 2,
