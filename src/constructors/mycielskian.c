@@ -24,7 +24,7 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
-igraph_error_t igraph_mycielskian(igraph_t *res, const igraph_t *graph, igraph_integer_t k) {
+igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
     if (k < 0) {
         IGRAPH_ERROR("The number of Mycielski iterations must not be negative.", IGRAPH_EINVAL);
     }
@@ -143,7 +143,7 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
     IGRAPH_FINALLY(igraph_destroy, &g);
 
-    IGRAPH_CHECK(igraph_mycielskian(graph, &g, k - 2));
+    IGRAPH_CHECK(igraph_mycielskian(&g, graph, k - 2));
 
     igraph_destroy(&g);
     IGRAPH_FINALLY_CLEAN(1);
