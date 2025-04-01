@@ -167,7 +167,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
-    
+
     IGRAPH_CHECK(igraph_create(res, &edges, new_vcount, igraph_is_directed(graph)));
 
     igraph_vector_int_destroy(&edges);
@@ -221,12 +221,14 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     if (k < 0) {
         IGRAPH_ERROR("The Mycielski graph order must not be negative.", IGRAPH_EINVAL);
     }
-    if (k <= 1) { // 0--> Null graph, 1--> single vertex
+
+    /* Special cases: M_0 and M_1 are the null graph and singleton graph, respectively. */
+    if (k <= 1) {
         IGRAPH_CHECK(igraph_empty(graph, k, IGRAPH_UNDIRECTED));
         return IGRAPH_SUCCESS;
     }
 
-    // create a path 0---1
+    /* For k >= 2, start construction from P_2. */
     IGRAPH_CHECK(igraph_ring(&g, 2, IGRAPH_UNDIRECTED, false, false));
     IGRAPH_FINALLY(igraph_destroy, &g);
 
@@ -234,5 +236,6 @@ igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
 
     igraph_destroy(&g);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
