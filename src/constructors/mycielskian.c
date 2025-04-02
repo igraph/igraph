@@ -91,7 +91,6 @@
  *
  * Time complexity: Exponential in \p k.
  */
-
 igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
