@@ -27,7 +27,7 @@
 
 /**
  * \function igraph_mycielskian
- * \brief Generate the Mycielskian of a graph with k iterations.
+ * \brief Generate the Mycielskian of a graph with \p k iterations.
  *
  * The Mycielskian construction is a method used to generate a triangle-free
  * graph with an increased chromatic number. Given an input graph, the
@@ -40,31 +40,31 @@
  * particularly triangles.
  *
  * </para><para>
- * Let the n vertices of the given graph G be v1, v2, ..., vn.
- * The Mycielski graph M(G) contains G itself as a subgraph,
- * together with n+1 additional vertices:
+ * Let the \c n vertices of the given graph G be \c v_1, ..., \c v_n.
+ * The Mycielski graph \c M(G) contains G itself as a subgraph,
+ * together with \c n+1 additional vertices:
  * 
  * \olist
- *  \oli A vertex ui corresponding to each vertex vi of G.
- *  \oli An extra vertex w.
+ *  \oli A vertex \c u_i corresponding to each vertex \c v_i of \c G.
+ *  \oli An extra vertex \c w.
  * \endolist
  * 
  * </para><para>
  * The edges are added as follows:
  * \olist
- *  \oli Each vertex ui is connected to w, forming a star.
- *  \oli For each edge (vi, vj) in G, two new edges are added:
- *   (ui, vj) and (vi, uj).
+ *  \oli Each vertex \c u_i is connected to \c w, forming a star.
+ *  \oli For each edge <code>(v_i, v_j)</code> in \c G, two new edges are added:
+ *   <code>(u_i, v_j)</code> and <code>(v_i, u_j)</code>.
  * \endolist
  * 
- * Thus, if G has n vertices and m edges, the Mycielski graph M(G) has 2n + 1 vertices, and 3m + n edges.
+ * Thus, if G has \c n vertices and \c m edges, the Mycielski graph \c M(G) has <code>2n + 1</code> vertices, and <code>3m + n</code> edges.
  *
  * </para><para>
  * The k-th iterated Mycielskian has:
  * <code>
  *   n_k = (n + 1) * 2^k - 1
  * </code>
- * vertices, where \em n is the number of vertices in the original graph.
+ * vertices, where \c n is the number of vertices in the original graph.
  *
  * The edge count increases as:
  *  
@@ -73,14 +73,15 @@
  * </code>
  * 
  * where m is the original number of edges. The number of edges increases
- * from \em m to 3 \em m + \em n in each iteration, as we add 2 edges for every
+ * from \c m to <code>3m + n</code> in each iteration, as we add 2 edges for every
  * existing edge and 1 edge for every vertex.
  *
  * </para><para>
  * The Mycielskian is commonly used to demonstrate that graphs can have high
  * chromatic numbers without forming small cycles (i.e., triangle-free graphs).
- * The Grotzsch graph, for example, is obtained as M_4 of a triangle-free graph.
- *
+ * The Grotzsch graph, for example, is obtained as \c M_4 of a triangle-free graph.
+ * </para><para>
+ * 
  * \param graph Pointer to the input graph.
  * \param res Pointer to an uninitialized graph object where the Mycielskian
  *        of the input graph will be stored.
@@ -191,32 +192,33 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * properties of graphs.
  *
  * </para><para>
- * The Mycielski graph M_k of order k is a triangle-free graph
- * with chromatic number k and the smallest possible number of vertices.
+ * The Mycielski graph \c M_k of order \p k is a triangle-free graph
+ * with chromatic number \p k and the smallest possible number of vertices.
  *
  * The number of edges also increases with each step, making it useful for
  * demonstrating properties of chromatic graphs.
- *
+ * </para><para>
+ * 
  * The first few Mycielski graphs are:
- * \clist
- *  \cli M_0:
+ * \olist
+ *  \oli M_0:
  *              Null graph
- *  \cli M_1:
+ *  \oli M_1:
  *              Single vertex
- *  \cli M_2:
+ *  \oli M_2:
  *              Path graph with 2 vertices
- *  \cli M_3:
+ *  \oli M_3:
  *              Cycle graph with 5 vertices
- *  \cli M_4:
+ *  \oli M_4:
  *              Grötzsch graph (triangle-free graph with chromatic number 4)
- * \endclist
+ * \endolist
  * 
  * </para><para>
  * The Mycielski graph has several important applications, particularly in
  * demonstrating that there exist graphs with high chromatic numbers but no
  * short cycles (i.e., triangle-free). For example, the Grötzsch graph,
- * which is M_4, is a triangle-free graph with chromatic number 4.
- *
+ * which is \c M_4, is a triangle-free graph with chromatic number 4.
+ * 
  * \param graph Pointer to an uninitialized graph object. The generated
  *        Mycielski graph will be stored here.
  * \param k Integer, the order of the Mycielski graph (must be &ge; 0).
