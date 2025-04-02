@@ -45,19 +45,20 @@
  * together with \c n+1 additional vertices:
  * 
  * \olist
- *  \oli A vertex \c u_i corresponding to each vertex \c v_i of \c G.
- *  \oli An extra vertex \c w.
+ * \oli A vertex \c u_i corresponding to each vertex \c v_i of \c G.
+ * \oli An extra vertex \c w.
  * \endolist
  * 
  * </para><para>
  * The edges are added as follows:
  * \olist
- *  \oli Each vertex \c u_i is connected to \c w, forming a star.
- *  \oli For each edge <code>(v_i, v_j)</code> in \c G, two new edges are added:
+ * \oli Each vertex \c u_i is connected to \c w, forming a star.
+ * \oli For each edge <code>(v_i, v_j)</code> in \c G, two new edges are added:
  *   <code>(u_i, v_j)</code> and <code>(v_i, u_j)</code>.
  * \endolist
  * 
- * Thus, if G has \c n vertices and \c m edges, the Mycielski graph \c M(G) has <code>2n + 1</code> vertices, and <code>3m + n</code> edges.
+ * Thus, if G has \c n vertices and \c m edges, the Mycielski graph \c M(G) 
+ * has <code>2n + 1</code> vertices, and <code>3m + n</code> edges.
  *
  * </para><para>
  * The k-th iterated Mycielskian has:
@@ -201,16 +202,11 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * 
  * The first few Mycielski graphs are:
  * \olist
- *  \oli M_0:
- *              Null graph
- *  \oli M_1:
- *              Single vertex
- *  \oli M_2:
- *              Path graph with 2 vertices
- *  \oli M_3:
- *              Cycle graph with 5 vertices
- *  \oli M_4:
- *              Grötzsch graph (triangle-free graph with chromatic number 4)
+ * \oli M_0: Null graph
+ * \oli M_1: Single vertex
+ * \oli M_2: Path graph with 2 vertices
+ * \oli M_3: Cycle graph with 5 vertices
+ * \oli M_4: Grötzsch graph (triangle-free graph with chromatic number 4)
  * \endolist
  * 
  * </para><para>
