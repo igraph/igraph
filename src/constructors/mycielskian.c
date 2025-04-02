@@ -62,16 +62,11 @@
  *
  * </para><para>
  * The k-th iterated Mycielskian has:
- * <code>
- *   n_k = (n + 1) * 2^k - 1
- * </code>
+ * <code> n_k = (n + 1) * 2^k - 1 </code>
  * vertices, where \c n is the number of vertices in the original graph.
  *
  * The edge count increases as:
- *  
- * <code>
- *   m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2
- * </code>
+ * <code> m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2 </code>
  * 
  * where m is the original number of edges. The number of edges increases
  * from \c m to <code>3m + n</code> in each iteration, as we add 2 edges for every
@@ -86,7 +81,7 @@
  * \param graph Pointer to the input graph.
  * \param res Pointer to an uninitialized graph object where the Mycielskian
  *        of the input graph will be stored.
- * \param k Integer, the number of Mycielskian iterations (must be &ge; 0).
+ * \param k Integer, the number of Mycielskian iterations (must be non-negative).
  * \return Error code.
  *
  * \sa \ref igraph_mycielski_graph().
@@ -217,7 +212,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * 
  * \param graph Pointer to an uninitialized graph object. The generated
  *        Mycielski graph will be stored here.
- * \param k Integer, the order of the Mycielski graph (must be &ge; 0).
+ * \param k Integer, the order of the Mycielski graph (must be non-negative).
  * \return Error code.
  *
  * \sa \ref igraph_mycielskian().
