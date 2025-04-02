@@ -221,7 +221,7 @@ igraph_turan:
         OUT GRAPH graph, OPTIONAL OUT INDEX_VECTOR types, INTEGER n, INTEGER r
 
 igraph_weighted_sparsemat:
-    PARAMS:
+    PARAMS: |-
         OUT GRAPH graph, SPARSEMAT A, BOOLEAN directed, CSTRING attr, BOOLEAN loops=False
 
 #######################################
