@@ -78,19 +78,19 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
-  - job: linux_clang_20
+  - job: linux_clang_21
     steps:
       - script: |
           sudo apt-get install ninja-build ccache -y
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 20
+          sudo ./llvm.sh 21
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-20  -DCMAKE_CXX_COMPILER=clang++-20'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-21  -DCMAKE_CXX_COMPILER=clang++-21'
 
   - job: linux_x87
     steps:
@@ -147,7 +147,9 @@ jobs:
 
   - job: documentation
     steps:
-      - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
         displayName: Install dependencies
 
       - task: CMake@1

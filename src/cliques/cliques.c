@@ -138,7 +138,7 @@ static igraph_error_t igraph_i_find_k_indsets(
                 *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                                         (size_t) new_member_storage_size * 2,
                                                         igraph_integer_t);
-                IGRAPH_CHECK_OOM(*new_member_storage, "igraph_independent_vertex_sets failed");
+                IGRAPH_CHECK_OOM(*new_member_storage, "Insufficient memory to find independent vertex sets.");
                 new_member_storage_size *= 2;
                 IGRAPH_FINALLY(igraph_free, *new_member_storage);
             }
@@ -549,7 +549,7 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
 igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
         igraph_vector_int_list_t *res) {
-    return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, 0, true, false);
+    return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, NULL, true, false);
 }
 
 typedef struct igraph_i_max_ind_vsets_data_t {
@@ -780,7 +780,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     clqdata.keep_only_largest = false;
 
     IGRAPH_CHECK(igraph_adjlist_init(
-        graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
+        graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
@@ -1008,7 +1008,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
         IGRAPH_CHECK(igraph_adjlist_init_complementer(graph, &clqdata.adj_list, IGRAPH_ALL, 0));
     } else {
         IGRAPH_CHECK(igraph_adjlist_init(
-            graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
+            graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
         ));
     }
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);

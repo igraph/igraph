@@ -719,7 +719,7 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
             VECTOR(*barycenters)[i] = MATRIX(*layout, i, 0);
         } else {
             for (j = 0; j < m; j++) {
-                VECTOR(*barycenters)[i] += MATRIX(*layout, (igraph_integer_t) VECTOR(neis)[j], 0);
+                VECTOR(*barycenters)[i] += MATRIX(*layout, VECTOR(neis)[j], 0);
             }
             VECTOR(*barycenters)[i] /= m;
         }
@@ -754,9 +754,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     /* Start with a first-seen ordering within each layer */
     {
         igraph_integer_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_integer_t);
-        if (xs == 0) {
-            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(xs, "Cannot order nodes horizontally during Sugiyama layout.");
         for (i = 0; i < no_of_vertices; i++) {
             MATRIX(*layout, i, 0) = xs[(igraph_integer_t)MATRIX(*layout, i, 1)]++;
         }

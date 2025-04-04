@@ -135,7 +135,7 @@ static const int  SHUFFLE_TYPE = FINAL_HEURISTICS;
 
 using namespace gengraph;
 
-igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
+igraph_error_t igraph_i_degree_sequence_game_vl(igraph_t *graph,
                                               const igraph_vector_int_t *out_seq,
                                               const igraph_vector_int_t *in_seq) {
     IGRAPH_HANDLE_EXCEPTIONS(
