@@ -1096,6 +1096,8 @@ igraph_error_t igraph_diameter_bound(
     //     printf("start: %li\n", vid_start);
     // }
 
+    igraph_uint_t bfs_count = 0;
+
     // initialise set W (line 3)
     igraph_set_t W;
     igraph_vit_t vit;
@@ -1129,6 +1131,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_int_init(&to_remove, 0);
     igraph_vector_int_reserve(&to_remove, no_of_nodes);
 
+    igraph_integer_t state;
     printf("Start on graph with %ld nodes and %ld edges. Initial bounds %.0f:%.0f\n",
         (long) no_of_nodes, (long) igraph_ecount(graph), dia_lower, dia_upper);
 
@@ -1137,11 +1140,12 @@ igraph_error_t igraph_diameter_bound(
         // line 9: choose vertex v
         // TODO: currently takes arbitrary node. Implement choosing function
         igraph_integer_t v = 123456789; // = SelectFrom(W);
-        igraph_integer_t state = 0;
+        state = 0;
         igraph_set_iterate(&W, &state, &v);
         printf("Choose vertex %ld\n", (long) v);
 
         // line 10: DFS on v to get its eccentricity
+        bfs_count++;
         igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
         igraph_real_t ecc_v = igraph_matrix_max(&distances);
         printf("\tFound eccentricity %.0f\n", ecc_v);
@@ -1185,7 +1189,7 @@ igraph_error_t igraph_diameter_bound(
         printf("\tRemaining |W|=%ld\n", (long) igraph_set_size(&W));
     }
 
-    printf("\nFinished, found result %.0f\n", dia_lower);
+    printf("\nFinished, found result %.0f; used %lu BFS instead of %lu\n", dia_lower, bfs_count, no_of_nodes);
 
     // return (line 21)
     *diameter = dia_lower;
