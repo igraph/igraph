@@ -269,7 +269,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
     directed = directed && igraph_is_directed(graph);
 
     if (!directed && values_in) {
-        IGRAPH_WARNING("Incoming vertex values ignored when calculating undirected assortativity.");
+        IGRAPH_WARNING(
+            "Incoming vertex values are ignored when calculating undirected assortativity.");
     }
 
     if (igraph_vector_size(values) != no_of_nodes) {
