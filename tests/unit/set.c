@@ -69,6 +69,36 @@ int main(void) {
     if (igraph_set_contains(&set, 42) || !igraph_set_contains(&set, 7)) {
         return 3;
     }
+    
+    /* igraph_set_remove */
+    // remove element in the middle
+    igraph_set_remove(&set, 10);
+    if (igraph_set_size(&set) != 20 || igraph_set_contains(&set, 10)) {
+        return 5;
+    }
+    // remove element not in the set - above, below, middle
+    igraph_set_remove(&set, 25);
+    igraph_set_remove(&set, 10);
+    igraph_set_remove(&set, -25);
+    if (igraph_set_size(&set) != 20) {
+        return 6;
+    }
+    // remove last element
+    igraph_set_remove(&set, 21);
+    if (igraph_set_size(&set) != 19 || igraph_set_contains(&set, 21)) {
+        return 7;
+    }
+    // remove first element
+    igraph_set_remove(&set, 1);
+    if (igraph_set_size(&set) != 18 || igraph_set_contains(&set, 1)) {
+        return 8;
+    }
+    // remove elements around gap
+    igraph_set_remove(&set, 9);
+    igraph_set_remove(&set, 11);
+    if (igraph_set_size(&set) != 16 || igraph_set_contains(&set, 9) || igraph_set_contains(&set, 11)) {
+        return 9;
+    }
 
     /* igraph_set_empty, igraph_set_clear */
     if (igraph_set_empty(&set)) {
@@ -78,6 +108,13 @@ int main(void) {
     if (!igraph_set_empty(&set)) {
         return 2;
     }
+
+    /* igraph_set_empty for small sets */
+    igraph_set_remove(&set, 10);
+    if (igraph_set_size(&set) != 0) { return 12; }
+    igraph_set_add(&set, 10);
+    igraph_set_remove(&set, 10);
+    if (igraph_set_size(&set) != 0) { return 13; }
     igraph_set_destroy(&set);
 
     VERIFY_FINALLY_STACK();
