@@ -435,6 +435,9 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  * \return Error code:
  *        \c IGRAPH_EINVAL: invalid mode argument.
  *
+ * \sa \ref igraph_connected_components() to find the connected components,
+ * \ref igraph_is_biconnected() to check if the graph is 2-vertex-connected.
+ *
  * Time complexity: O(|V|+|E|), the
  * number of vertices
  * plus the number of edges in the graph.
