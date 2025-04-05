@@ -1026,7 +1026,8 @@ igraph_assortativity_nominal:
 
 igraph_assortativity:
     PARAMS: |-
-        GRAPH graph, VECTOR values, OPTIONAL VECTOR values_in,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        VECTOR values, OPTIONAL VECTOR values_in,
         OUT REAL res, BOOLEAN directed=True, BOOLEAN normalized=True
 
 igraph_assortativity_degree:
