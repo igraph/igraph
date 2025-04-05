@@ -963,7 +963,7 @@ igraph_degree_correlation_vector:
 
 igraph_rich_club_density_sequence:
   PARAMS: |-
-      GRAPH graph, EDGEWEIGHTS weights,
+      GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
       OUT VECTOR res,
       INDEX_VECTOR vertex_order,
       BOOLEAN loops=False,
