@@ -772,7 +772,7 @@ static igraph_error_t mixing_matrix(
  * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
  *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
  *    Ignored in undirected graphs.
- * \param to_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ * \param to_mode How to compute the degree of targets? Can be \c IGRAPH_OUT
  *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
  *    Ignored in undirected graphs.
  * \param directed_neighbors Whether to consider <code>u -> v</code> connections
