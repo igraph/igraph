@@ -59,6 +59,8 @@ static igraph_real_t total_possible_edges(igraph_integer_t numVertices,
  * \function igraph_rich_club_density_sequence
  * \brief Density sequence of subgraphs formed by sequential vertex removal.
  *
+ * \experimental
+ *
  * This function takes a graph and a vertex ordering as input, sequentially removes the
  * vertices in the given order, and calculates the density of the subgraph after each
  * removal.
