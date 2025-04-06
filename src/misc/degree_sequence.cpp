@@ -129,61 +129,62 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igra
 fail:
     IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
-
-
 // Choose vertices in the order of their IDs.
+#include <queue>
+#include <vector>
 static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg, igraph_vector_int_t *edges) {
     igraph_integer_t n = igraph_vector_int_size(deg);
 
     igraph_integer_t ec = 0; // number of edges added so far
 
-    typedef std::list<vd_pair> vlist;
-    vlist vertices;
+    typedef std::pair<igraph_integer_t, igraph_integer_t> VertexDeg;  // (degree, vertex)
+    std::priority_queue<VertexDeg> maxHeap;  
     for (igraph_integer_t i = 0; i < n; ++i) {
-        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
-    }
+        if (VECTOR(*deg)[i] > 0) {
+            maxHeap.push(std::make_pair(VECTOR(*deg)[i], i)); } }
+//main loop
+while (!maxHeap.empty()) {
+        VertexDeg top = maxHeap.top();
+        maxHeap.pop();
 
-    std::vector<vlist::iterator> pointers;
-    pointers.reserve(n);
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-        pointers.push_back(it);
-    }
+        igraph_integer_t degree = top.first;
+        igraph_integer_t vertex = top.second;
 
-    for (const auto &pt : pointers) {
-        vertices.sort(degree_greater<vd_pair>);
+        if (degree == 0) continue;
 
-        vd_pair vd = *pt;
-        vertices.erase(pt);
-
-        if (vd.degree == 0) {
-            continue;
+        if (degree > maxHeap.size()) {
+            return IGRAPH_EINVAL;  // Return error code if the sequence is invalid
         }
 
-        igraph_integer_t k;
-        vlist::iterator it;
-        for (it = vertices.begin(), k = 0;
-             k != vd.degree && it != vertices.end();
-             ++it, ++k) {
-            if (--(it->degree) < 0) {
-                goto fail;
+        std::vector<VertexDeg> remainingNodes;  
+
+        // Connect the current vertex to its neighbors
+        for (igraph_integer_t i = 0; i < degree; ++i) {
+            if (maxHeap.empty()) {
+                return IGRAPH_EINVAL;  
             }
 
-            VECTOR(*edges)[2 * (ec + k)] = vd.vertex;
-            VECTOR(*edges)[2 * (ec + k) + 1] = it->vertex;
-        }
-        if (it == vertices.end() && k < vd.degree) {
-            goto fail;
-        }
+            VertexDeg neighbor = maxHeap.top();
+            maxHeap.pop();
 
-        ec += vd.degree;
+            igraph_integer_t neighborDeg = neighbor.first;
+            igraph_integer_t neighborVertex = neighbor.second;
+ // Add the edge
+            VECTOR(*edges)[2 * ec] = vertex;
+            VECTOR(*edges)[2 * ec + 1] = neighborVertex;
+            ec++;
+// Decrease the neighbor's degree
+            if (neighborDeg > 1) {
+                remainingNodes.push_back(std::make_pair(neighborDeg - 1, neighborVertex));
+            }
+        }
+// Push remaining vertices back into the heap
+        for (const auto& node : remainingNodes) {
+            maxHeap.push(node);
+        }
     }
-
     return IGRAPH_SUCCESS;
-
-fail:
-    IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
-
 
 /***********************************/
 /***** Undirected multigraphs ******/
