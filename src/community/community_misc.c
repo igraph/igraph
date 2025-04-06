@@ -36,7 +36,7 @@
  * S. Fortunato:
  * "Community Detection in Graphs".
  * Physics Reports 486, no. 3–5 (2010): 75–174.
- * https://doi.org/16/j.physrep.2009.11.002.
+ * https://doi.org/10.1016/j.physrep.2009.11.002.
  * </para>
  *
  * <para>
