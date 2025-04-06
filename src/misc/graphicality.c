@@ -70,9 +70,9 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * https://users.renyi.hu/~p_erdos/1961-05.pdf
  *
  * </para><para>
- * Z Király, Recognizing graphic degree sequences and generating all realizations.
+ * Z. Király, Recognizing graphic degree sequences and generating all realizations.
  * TR-2011-11, Egerváry Research Group, H-1117, Budapest, Hungary. ISSN 1587-4451 (2012).
- * http://bolyai.cs.elte.hu/egres/tr/egres-11-11.pdf
+ * https://egres.elte.hu/tr/egres-11-11.pdf
  *
  * </para><para>
  * B. Cloteaux, Is This for Real? Fast Graphicality Testing, Comput. Sci. Eng. 17, 91 (2015).

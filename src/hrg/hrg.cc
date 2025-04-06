@@ -72,7 +72,7 @@ using namespace fitHRG;
  *
  * <para>The igraph HRG implementation is heavily based on the code
  * published by Aaron Clauset, at his website,
- * http://tuvalu.santafe.edu/~aaronc/hierarchy/
+ * https://aaronclauset.github.io/hierarchy/
  * </para>
  */
 

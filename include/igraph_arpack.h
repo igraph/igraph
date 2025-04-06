@@ -42,8 +42,7 @@ __BEGIN_DECLS
  * most appropriate for large sparse or structured matrices \c A where
  * structured means that a matrix-vector product <code>w &lt;- Av</code> requires
  * order \c n rather than the usual order <code>n^2</code> floating point
- * operations. Please see
- * http://www.caam.rice.edu/software/ARPACK/ for details.
+ * operations. Please see https://github.com/opencollab/arpack-ng for details.
  * </para>
  *
  * <para>
