@@ -1,0 +1,52 @@
+{
+  "name": "@mapequation/infomap-react",
+  "version": "1.0.0",
+  "description": "Infomap React hooks",
+  "author": {
+    "name": "mapequation",
+    "email": "mapequation@gmail.com",
+    "url": "https://www.mapequation.org/about.html"
+  },
+  "homepage": "https://www.mapequation.org/infomap",
+  "license": "AGPL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mapequation/infomap.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "jsnext:main": "dist/index.es.js",
+  "engines": {
+    "node": ">=8",
+    "npm": ">=5"
+  },
+  "scripts": {
+    "build": "rollup -c && tsc -d --emitDeclarationOnly --noEmit false --declarationDir dist",
+    "start": "rollup -c -w",
+    "prepare": "npm run build"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "react": ">=16.9.0",
+    "@mapequation/infomap": ">=2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/runtime": "^7.3.1",
+    "@rollup/plugin-babel": "^5.2.0",
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-typescript": "^5.0.2",
+    "@rollup/plugin-url": "^5.0.1",
+    "@types/react": ">=16.9.0",
+    "cross-env": "^5.2.0",
+    "rollup": "^2.26.9",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "tslib": "^2.0.1",
+    "typescript": "^3.2.4"
+  }
+}
