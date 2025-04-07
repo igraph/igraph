@@ -1110,8 +1110,8 @@ igraph_error_t igraph_diameter_bound(
     // TODO: Can this fill be done in a better way than loop?
 
     // initialise upper/lower diameter bounds (line 3)
-    igraph_real_t dia_lower = -IGRAPH_INFINITY;
-    igraph_real_t dia_upper = IGRAPH_INFINITY;
+    igraph_real_t dia_lower = 0;
+    igraph_real_t dia_upper = IGRAPH_INFINITY;  // unbounded for weighted graphs
 
     // initialise upper/lower eccentricity bounds (lines 4-7)
     igraph_vector_t ecc_lower, ecc_upper;
