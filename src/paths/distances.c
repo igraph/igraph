@@ -1054,6 +1054,16 @@ igraph_error_t igraph_graph_center_dijkstra(
 
 static void update_to_min(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? b : *a;}
 static void update_to_max(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? *a : b;}
+static void max_non_inf(igraph_matrix_t *m, igraph_real_t *res) {
+    *res = -IGRAPH_INFINITY;
+    igraph_integer_t len = igraph_matrix_size(m);
+    for (size_t i = 0; i < len; i++) {
+        igraph_real_t val = VECTOR(m->data)[i];
+        if (*res < val && val < IGRAPH_INFINITY) {
+            *res = val;
+        }
+    }
+}
 
 /**
  * \function igraph_diameter_bound
@@ -1065,7 +1075,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_real_t *diameter,  // output diameter value
     igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
     igraph_bool_t directed,  // treating this graph as undirected
-    igraph_bool_t unconn  // is this graph connected
+    igraph_bool_t unconn  // false: disconnected returns INF; true: returns largest diameter
 ) {
     if (!igraph_is_directed(graph)) {
         directed = false;
@@ -1130,8 +1140,8 @@ igraph_error_t igraph_diameter_bound(
     printf("Start on graph with %ld nodes and %ld edges. Initial bounds %.0f:%.0f\n",
         (long) no_of_nodes, (long) igraph_ecount(graph), dia_lower, dia_upper);
 
-    // main loop (line 8)
-    while (dia_lower != dia_upper && !igraph_set_empty(&to_inspect)) {
+    // main loop (line 8); the dia_lower != dia_upper check happens in the loop
+    while (!igraph_set_empty(&to_inspect)) {
         // line 9: choose vertex v
         igraph_integer_t v = -1;
         searchHigh = !searchHigh;
@@ -1175,7 +1185,7 @@ igraph_error_t igraph_diameter_bound(
                 best_deg = temp_deg;
             }
             printf(
-                "Looking for %s vertex ecc, chose %ld with ecc_%s %f\n",
+                "Looking for %s vertex ecc, chose %ld with ecc_%s %.0f\n",
                 searchHigh ? "highest" : "lowest",
                 (long) v,
                 searchHigh ? "upper" : "lower",
@@ -1189,20 +1199,46 @@ igraph_error_t igraph_diameter_bound(
         igraph_real_t ecc_v = igraph_matrix_max(&distances);
         printf("\tFound eccentricity %.0f\n", ecc_v);
 
+        // non-paper adjustments: deal with ecc_v = inf, which happens in a
+        // disconnected graph
+        if (ecc_v == IGRAPH_INFINITY) {
+            // If unconn is false, we can stop now return an inf already
+            if (!unconn) {
+                dia_lower = IGRAPH_INFINITY;
+                break;
+            }
+            // Otherwise we are considering just this connected component, so
+            // all infinity values are not relevant. Reset ecc to largest non-inf
+            max_non_inf(&distances, &ecc_v);
+            printf("\tDon't want inf, new ecc = %.0f\n", ecc_v);
+        }
+
         // lines 11&12: update upper/lower bounds on diameter
         update_to_max(&dia_lower, ecc_v);
         update_to_min(&dia_upper, 2*ecc_v);
 
         printf("\tNew diameter bounds: %.0f:%.0f\n", dia_lower, dia_upper);
 
-        // TODO: possible improvement to alg
+        // line 8 check can happen here. If bounds equal, we're done, break
+        if (dia_lower == dia_upper) break;
+
+        // Non-paper improvement
         // we can directly set dia_lower[v] = dia_upper[v] = ecc_v and remove v from W.
         // (technically this will already be done in the loop)
+        VECTOR(ecc_lower)[v] = ecc_v;
+        VECTOR(ecc_upper)[v] = ecc_v;
+        igraph_set_remove(&to_inspect, v);
 
         state = 0;
         igraph_integer_t w;
         while (igraph_set_iterate(&to_inspect, &state, &w)) {
             igraph_real_t d = MATRIX(distances, 0, w);
+            if (d == IGRAPH_INFINITY) {
+              // if unconn is false, this is not reachable
+              // if unconn is true, don't update bounds or remove vertices based
+              // on non-existant pathes
+              continue;
+            }
             printf("\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
             // lines 14-15: update upper/lower bounds on eccentricities
             update_to_max(&VECTOR(ecc_lower)[w], ecc_v-d);
