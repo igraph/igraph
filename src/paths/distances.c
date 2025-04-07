@@ -1150,14 +1150,29 @@ igraph_error_t igraph_diameter_bound(
             // choose vertex based on distance measures (= SelectFrom(W))
             // interchangebly looking at lowest ecc_lower and highest ecc_upper
             igraph_integer_t temp_vert = 0;
-            igraph_real_t best_ecc = searchHigh ? 0 : IGRAPH_INFINITY;
+            igraph_real_t best_ecc = searchHigh ? -IGRAPH_INFINITY : IGRAPH_INFINITY;
+            igraph_integer_t best_deg = -1;
+            igraph_integer_t temp_deg;
             state = 0;
             while(igraph_set_iterate(&to_inspect, &state, &temp_vert)) {
                 igraph_real_t temp_ecc = searchHigh ? VECTOR(ecc_upper)[temp_vert] : VECTOR(ecc_lower)[temp_vert];
-                if (searchHigh ? temp_ecc > best_ecc : temp_ecc < best_ecc) {
-                    best_ecc = temp_ecc;
-                    v = temp_vert;
-                }
+
+                // if ecc worse than the current node, skip
+                if (searchHigh ? temp_ecc < best_ecc : temp_ecc > best_ecc)
+                    continue;
+
+                // if tie, break the tie by highest degree
+                igraph_degree_1(graph, &temp_deg, temp_vert, IGRAPH_ALL, IGRAPH_LOOPS);
+
+                // so skip if temp doesn't have a higher degree
+                if (temp_ecc == best_ecc && temp_deg <= best_deg)
+                    continue;
+
+                // now either we have better ecc or same ecc with better degree!
+                // choose this node for next inspection and update best values
+                v = temp_vert;
+                best_ecc = temp_ecc;
+                best_deg = temp_deg;
             }
             printf(
                 "Looking for %s vertex ecc, chose %ld with ecc_%s %f\n",
@@ -1166,7 +1181,6 @@ igraph_error_t igraph_diameter_bound(
                 searchHigh ? "upper" : "lower",
                 best_ecc
             );
-
         }
 
         // line 10: DFS on v to get its eccentricity
