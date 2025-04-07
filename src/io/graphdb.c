@@ -84,9 +84,9 @@ static igraph_error_t handle_input_error(FILE *instream) {
  * </para>
  *
  * <para>
- * De Santo, M., Foggia, P., Sansone, C., & Vento, M. (2003).
+ * M. De Santo, P. Foggia, C. Sansone, and M. Vento:
  * A large database of graphs and its use for benchmarking graph isomorphism algorithms.
- * Pattern Recognition Letters, 24(8), 1067-1079.
+ * Pattern Recognition Letters, 24(8), 1067-1079 (2003).
  * https://doi.org/10.1016/S0167-8655(02)00253-2
  * </para>
  *
@@ -94,7 +94,6 @@ static igraph_error_t handle_input_error(FILE *instream) {
  * MIVIA ARG Dataset,
  * https://zenodo.org/records/11204020,
  * https://mivia.unisa.it/datasets/graph-database/arg-database/
- * </para>
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read from. It should be opened
