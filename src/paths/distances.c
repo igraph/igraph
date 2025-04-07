@@ -1087,15 +1087,6 @@ igraph_error_t igraph_diameter_bound(
         IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
-    // printf("start: %li\n", vid_start);
-    // if (vid_start < 0) {
-    //     // no given start vertex, so we choose one ourselves
-    //     igraph_maxdegree_arg(graph, &vid_start, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
-    //     // TODO: not sure about this vids selector
-    //     // TODO: something about loop being slower?
-    //     printf("start: %li\n", vid_start);
-    // }
-
     igraph_uint_t bfs_count = 0;
 
     // initialise set W (line 3)
@@ -1124,6 +1115,10 @@ igraph_error_t igraph_diameter_bound(
     // I could directly save VECTOR(ecc_lower) now and index it directly
     // every time from now on..? But the maintainers won't like that.
 
+    // Use paper's 4.2: Interchanging Eccentricity Bounds strategy for ChooseFrom 
+    igraph_bool_t first_iteration = true;
+    igraph_bool_t searchHigh = true;  // flip every iteration
+
     igraph_matrix_t distances;
     igraph_matrix_init(&distances, 0, 0);
     igraph_vector_int_t to_remove;
@@ -1138,11 +1133,41 @@ igraph_error_t igraph_diameter_bound(
     // main loop (line 8)
     while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
         // line 9: choose vertex v
-        // TODO: currently takes arbitrary node. Implement choosing function
-        igraph_integer_t v = 123456789; // = SelectFrom(W);
-        state = 0;
-        igraph_set_iterate(&W, &state, &v);
-        printf("Choose vertex %ld\n", (long) v);
+        igraph_integer_t v = -1;
+        searchHigh = !searchHigh;
+        if (first_iteration) {
+            first_iteration = false;
+            if (vid_start >= 0) {
+                // if first vertex given, use it
+                v = vid_start;
+                printf("Use given starting vertex %ld\n", (long) v);
+            } else {
+                // otherwise, find the highest degree vertex
+                igraph_maxdegree_arg(graph, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+                printf("Choose starting vertex %ld\n", (long) v);
+            }
+        } else {
+            // choose vertex based on distance measures (= SelectFrom(W))
+            // interchangebly looking at lowest ecc_lower and highest ecc_upper
+            igraph_integer_t temp_vert = 0;
+            igraph_real_t best_ecc = searchHigh ? 0 : IGRAPH_INFINITY;
+            state = 0;
+            while(igraph_set_iterate(&W, &state, &temp_vert)) {
+                igraph_real_t temp_ecc = searchHigh ? VECTOR(ecc_upper)[temp_vert] : VECTOR(ecc_lower)[temp_vert];
+                if (searchHigh ? temp_ecc > best_ecc : temp_ecc < best_ecc) {
+                    best_ecc = temp_ecc;
+                    v = temp_vert;
+                }
+            }
+            printf(
+                "Looking for %s vertex ecc, chose %ld with ecc_%s %f\n",
+                searchHigh ? "highest" : "lowest",
+                (long) v,
+                searchHigh ? "upper" : "lower",
+                best_ecc
+            );
+
+        }
 
         // line 10: DFS on v to get its eccentricity
         bfs_count++;
