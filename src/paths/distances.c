@@ -1089,13 +1089,13 @@ igraph_error_t igraph_diameter_bound(
 
     igraph_uint_t bfs_count = 0;
 
-    // initialise set W (line 3)
-    igraph_set_t W;
+    // initialise set W (to_inspect) (line 3)
+    igraph_set_t to_inspect;  // set of remaining "useful" vertices
     igraph_vit_t vit;
-    igraph_set_init(&W, no_of_nodes);
+    igraph_set_init(&to_inspect, no_of_nodes);
     igraph_vit_create(graph, igraph_vss_all(), &vit);
     while (!IGRAPH_VIT_END(vit)) {
-        igraph_set_add(&W, IGRAPH_VIT_GET(vit));
+        igraph_set_add(&to_inspect, IGRAPH_VIT_GET(vit));
         IGRAPH_VIT_NEXT(vit);
     }
     // TODO: Can this fill be done in a better way than loop?
@@ -1131,7 +1131,7 @@ igraph_error_t igraph_diameter_bound(
         (long) no_of_nodes, (long) igraph_ecount(graph), dia_lower, dia_upper);
 
     // main loop (line 8)
-    while (dia_lower != dia_upper && !igraph_set_empty(&W)) {
+    while (dia_lower != dia_upper && !igraph_set_empty(&to_inspect)) {
         // line 9: choose vertex v
         igraph_integer_t v = -1;
         searchHigh = !searchHigh;
@@ -1152,7 +1152,7 @@ igraph_error_t igraph_diameter_bound(
             igraph_integer_t temp_vert = 0;
             igraph_real_t best_ecc = searchHigh ? 0 : IGRAPH_INFINITY;
             state = 0;
-            while(igraph_set_iterate(&W, &state, &temp_vert)) {
+            while(igraph_set_iterate(&to_inspect, &state, &temp_vert)) {
                 igraph_real_t temp_ecc = searchHigh ? VECTOR(ecc_upper)[temp_vert] : VECTOR(ecc_lower)[temp_vert];
                 if (searchHigh ? temp_ecc > best_ecc : temp_ecc < best_ecc) {
                     best_ecc = temp_ecc;
@@ -1185,10 +1185,9 @@ igraph_error_t igraph_diameter_bound(
         // we can directly set dia_lower[v] = dia_upper[v] = ecc_v and remove v from W.
         // (technically this will already be done in the loop)
 
-        // TODO for w in W loop line 13
         state = 0;
         igraph_integer_t w;
-        while (igraph_set_iterate(&W, &state, &w)) {
+        while (igraph_set_iterate(&to_inspect, &state, &w)) {
             igraph_real_t d = MATRIX(distances, 0, w);
             printf("\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
             // lines 14-15: update upper/lower bounds on eccentricities
@@ -1203,15 +1202,15 @@ igraph_error_t igraph_diameter_bound(
                 (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
             ) {
                 printf(" (to be removed)");
-                igraph_vector_int_push_back(&to_remove, w);  // line 17: remove w from W
+                igraph_vector_int_push_back(&to_remove, w);  // line 17: remove w from to_inspect
             }
             printf("\n");
         }
         // remove the unneeded vertices
         while (!igraph_vector_int_empty(&to_remove)) {
-            igraph_set_remove(&W, igraph_vector_int_pop_back(&to_remove));
+            igraph_set_remove(&to_inspect, igraph_vector_int_pop_back(&to_remove));
         }
-        printf("\tRemaining |W|=%ld\n", (long) igraph_set_size(&W));
+        printf("\tRemaining |W|=%ld\n", (long) igraph_set_size(&to_inspect));
     }
 
     printf("\nFinished, found result %.0f; used %lu BFS instead of %lu\n", dia_lower, bfs_count, no_of_nodes);
@@ -1220,7 +1219,7 @@ igraph_error_t igraph_diameter_bound(
     *diameter = dia_lower;
 
     // frees
-    igraph_set_destroy(&W);
+    igraph_set_destroy(&to_inspect);
     igraph_matrix_destroy(&distances);
     igraph_vector_destroy(&ecc_lower);
     igraph_vector_destroy(&ecc_upper);
