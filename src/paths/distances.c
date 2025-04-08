@@ -1068,8 +1068,36 @@ static void max_non_inf(igraph_vector_t *m, igraph_real_t *res) {
 
 /**
  * \function igraph_diameter_bound
- * TODO: update
- * Plan: return diameter
+ * \brief Calculate the diameter of a graph using successive bounds.
+ *
+ * The diameter of a graph is the length of the longest shortest path it has,
+ * i.e. the maximum eccentricity of the graph's vertices.
+ *
+ * This function implements https://doi.org/10.1145/2063576.2063748, a technique
+ * of computing diameter by tightening eccentricity bounds of all vertices and
+ * pruning ones with no valuable diameter-relevant information. This can
+ * significantly reduce the number of BFSes required to be done, especially
+ * in real-life networks with scale-free degree distribution.
+ *
+ * If the graph has no vertices, \c IGRAPH_NAN is returned.
+ *
+ * \param graph The graph object.
+ * \param diameter Pointer to a real number, if not \c NULL then it will contain
+ *        the diameter (the actual distance).
+ * \param directed Boolean, whether to consider directed paths. Currently, directed
+ *        pathes are not supported, so true will return an error.
+ * \param unconn What to do if the graph is not connected. If
+ *        \c true the longest geodesic within a component
+ *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
+ * \return Error code:
+ *         \c IGRAPH_UNIMPLEMENTED, for \c directed=true
+ *
+ * Time complexity (worst case) O(|V||E|)
+ * Time complexity (expected in real-world networks) O(|E|)
+ *
+ * \sa \ref igraph_diameter_dijkstra() for the weighted version,
+ *
+ * \example tests/unit/igraph_diameter_bound.c
  */
 igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
