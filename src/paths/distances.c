@@ -1127,6 +1127,10 @@ igraph_error_t igraph_diameter_bound(
 
     igraph_integer_t state; // for set iteration
 
+    // prepare adjacency list - calling BFS would otherwise recompute it every time
+    igraph_adjlist_t adjlist;
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+
     // non-paper change: support for disconnected graphs
     // General algorithm:
     // 1) Pick a node v from to_inspect
@@ -1165,7 +1169,7 @@ igraph_error_t igraph_diameter_bound(
 
         // BFS(v)
         bfs_count++;
-        igraph_distances_1(graph, &distances, v, IGRAPH_ALL);
+        igraph_distances_1(&adjlist, &distances, v);
 
         // populate current_component from distances
         igraph_set_clear(&current_component);
@@ -1244,7 +1248,7 @@ igraph_error_t igraph_diameter_bound(
 
                 // Run BFS (if first_iteration, we already did)
                 bfs_count++;
-                igraph_distances_1(graph, &distances, v, IGRAPH_ALL);
+                igraph_distances_1(&adjlist, &distances, v);
             }
 
             // don't do it again
@@ -1319,6 +1323,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_destroy(&ecc_upper);
     igraph_vector_int_destroy(&to_remove);
     igraph_vector_int_destroy(&degrees);
+    igraph_adjlist_destroy(&adjlist);
 
     return IGRAPH_SUCCESS;
 }
