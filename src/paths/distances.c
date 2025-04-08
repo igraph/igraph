@@ -28,6 +28,7 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 #include "igraph_vector.h"
+#include "igraph_structural.h"
 
 #include "core/interruption.h"
 #include "core/indheap.h"
@@ -1073,7 +1074,6 @@ static void max_non_inf(igraph_matrix_t *m, igraph_real_t *res) {
 igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
     igraph_real_t *diameter,  // output diameter value
-    igraph_integer_t vid_start,  // vertex to start search from, if negative we choose
     igraph_bool_t directed,  // treating this graph as undirected
     igraph_bool_t unconn  // false: disconnected returns INF; true: returns largest diameter
 ) {
@@ -1089,9 +1089,6 @@ igraph_error_t igraph_diameter_bound(
     if (no_of_nodes == 0) {
         *diameter = IGRAPH_NAN;
         return IGRAPH_SUCCESS;
-    }
-    if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
     igraph_uint_t bfs_count = 0;
@@ -1312,7 +1309,7 @@ igraph_error_t igraph_diameter_bound(
         printf("\tFound component diameter %.0f, global set to %.0f\n", dia_lower, *diameter);
     }
 
-    printf("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, bfs_count, no_of_nodes);
+    printf("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, (long) bfs_count, (long) no_of_nodes);
 
     // frees
     igraph_set_destroy(&to_inspect);
