@@ -1055,15 +1055,16 @@ igraph_error_t igraph_graph_center_dijkstra(
 
 static void update_to_min(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? b : *a;}
 static void update_to_max(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? *a : b;}
-static void max_non_inf(igraph_vector_t *m, igraph_real_t *res) {
-    *res = -IGRAPH_INFINITY;
+static igraph_real_t max_non_inf(igraph_vector_t *m) {
+    igraph_real_t res = -IGRAPH_INFINITY;
     igraph_integer_t len = igraph_vector_size(m);
     for (size_t i = 0; i < len; i++) {
         igraph_real_t val = VECTOR(*m)[i];
-        if (*res < val && val < IGRAPH_INFINITY) {
-            *res = val;
+        if (res < val && val < IGRAPH_INFINITY) {
+            res = val;
         }
     }
+    return res;
 }
 
 /**
@@ -1284,7 +1285,7 @@ igraph_error_t igraph_diameter_bound(
 
             // line 10: Get eccentricity
             igraph_real_t ecc_v = -1;
-            max_non_inf(&distances, &ecc_v);  // TODO: return
+            ecc_v = max_non_inf(&distances);
             printf("\t\tFound eccentricity %.0f\n", ecc_v);
 
             // lines 11&12: update upper/lower bounds on diameter
