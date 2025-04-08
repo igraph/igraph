@@ -603,3 +603,81 @@ igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+// Same as igraph_distances, but takes one input vertex for starting point
+// and returns a vector of distances to all vertices. Unreachable vertices
+// are inf. Instead of taking a graph, takes an adjlist; makes re-calling cheap.
+igraph_error_t igraph_distances_1(const igraph_t *graph, igraph_vector_t *res,
+                          const igraph_integer_t from_vert,
+                          igraph_neimode_t mode) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t *already_counted;
+    igraph_adjlist_t adjlist;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
+    igraph_vector_int_t *neis;
+
+    igraph_integer_t i, j;
+    igraph_vit_t fromvit, tovit;
+    igraph_vector_int_t indexv;
+    igraph_vs_t from = igraph_vss_1(from_vert);
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+        mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
+    }
+
+    IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+    already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    IGRAPH_CHECK_OOM(already_counted, "Insufficient memory for graph distance calculation.");
+    IGRAPH_FINALLY(igraph_free, already_counted);
+
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    igraph_vector_fill(res, IGRAPH_INFINITY);
+
+    for (IGRAPH_VIT_RESET(fromvit), i = 0;
+         !IGRAPH_VIT_END(fromvit);
+         IGRAPH_VIT_NEXT(fromvit), i++) {
+        igraph_integer_t reached = 0;
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, IGRAPH_VIT_GET(fromvit)));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
+        already_counted[ IGRAPH_VIT_GET(fromvit) ] = i + 1;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+
+            VECTOR(*res)[act] = actdist;
+
+            neis = igraph_adjlist_get(&adjlist, act);
+            igraph_integer_t nei_count = igraph_vector_int_size(neis);
+            for (j = 0; j < nei_count; j++) {
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
+                if (already_counted[neighbor] == i + 1) {
+                    continue;
+                }
+                already_counted[neighbor] = i + 1;
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
+            }
+        }
+    }
+
+    /* Clean */
+    IGRAPH_FREE(already_counted);
+    igraph_dqueue_int_destroy(&q);
+    igraph_vit_destroy(&fromvit);
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
+}

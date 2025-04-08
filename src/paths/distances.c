@@ -1055,11 +1055,11 @@ igraph_error_t igraph_graph_center_dijkstra(
 
 static void update_to_min(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? b : *a;}
 static void update_to_max(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? *a : b;}
-static void max_non_inf(igraph_matrix_t *m, igraph_real_t *res) {
+static void max_non_inf(igraph_vector_t *m, igraph_real_t *res) {
     *res = -IGRAPH_INFINITY;
-    igraph_integer_t len = igraph_matrix_size(m);
+    igraph_integer_t len = igraph_vector_size(m);
     for (size_t i = 0; i < len; i++) {
-        igraph_real_t val = VECTOR(m->data)[i];
+        igraph_real_t val = VECTOR(*m)[i];
         if (*res < val && val < IGRAPH_INFINITY) {
             *res = val;
         }
@@ -1098,7 +1098,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_set_t to_inspect;  // set of remaining "useful" vertices
     igraph_set_t current_component;  // set of nodes in current component
     igraph_vector_t ecc_lower, ecc_upper;  // lower/upper bounds for eccentricities
-    igraph_matrix_t distances;  // return value for vertex distances
+    igraph_vector_t distances;  // return value for vertex distances
     igraph_vector_int_t to_remove;  // stack of vertices to prune
     igraph_vector_int_t degrees;  // degrees of all nodes
 
@@ -1119,7 +1119,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_fill(&ecc_upper, IGRAPH_INFINITY);
 
     // initialise distances, toremove, calculate degrees
-    igraph_matrix_init(&distances, 1, no_of_nodes);
+    igraph_vector_init(&distances, no_of_nodes);
     igraph_vector_int_init(&to_remove, 0);
     igraph_vector_int_reserve(&to_remove, no_of_nodes);
     igraph_vector_int_init(&degrees, no_of_nodes);
@@ -1165,12 +1165,12 @@ igraph_error_t igraph_diameter_bound(
 
         // BFS(v)
         bfs_count++;
-        igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
+        igraph_distances_1(graph, &distances, v, IGRAPH_ALL);
 
         // populate current_component from distances
         igraph_set_clear(&current_component);
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            if (MATRIX(distances, 0, i) < IGRAPH_INFINITY) {
+            if (VECTOR(distances)[i] < IGRAPH_INFINITY) {
                 igraph_set_add(&current_component, i);
                 igraph_set_remove(&to_inspect, i);  // TODO: add igraph_set_minus
             }
@@ -1244,7 +1244,7 @@ igraph_error_t igraph_diameter_bound(
 
                 // Run BFS (if first_iteration, we already did)
                 bfs_count++;
-                igraph_distances(graph, &distances, igraph_vss_1(v), igraph_vss_all(), IGRAPH_ALL);
+                igraph_distances_1(graph, &distances, v, IGRAPH_ALL);
             }
 
             // don't do it again
@@ -1274,7 +1274,7 @@ igraph_error_t igraph_diameter_bound(
             state = 0;
             igraph_integer_t w;
             while (igraph_set_iterate(&current_component, &state, &w)) {
-                igraph_real_t d = MATRIX(distances, 0, w);
+                igraph_real_t d = VECTOR(distances)[w];
                 if (d == IGRAPH_INFINITY) continue;  // ignore non-CC
 
                 // printf("\t\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
@@ -1314,7 +1314,7 @@ igraph_error_t igraph_diameter_bound(
     // frees
     igraph_set_destroy(&to_inspect);
     igraph_set_destroy(&current_component);
-    igraph_matrix_destroy(&distances);
+    igraph_vector_destroy(&distances);
     igraph_vector_destroy(&ecc_lower);
     igraph_vector_destroy(&ecc_upper);
     igraph_vector_int_destroy(&to_remove);
