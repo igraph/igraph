@@ -22,6 +22,7 @@
 #ifndef IGRAPH_PATHS_H
 #define IGRAPH_PATHS_H
 
+#include "igraph_adjlist.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
@@ -93,8 +94,7 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igra
 IGRAPH_EXPORT igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
                                               const igraph_vs_t from, const igraph_vs_t to,
                                               igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_distances_1(const igraph_t *graph, igraph_vector_t *res,
-                                  const igraph_integer_t from_vert, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_distances_1(const igraph_adjlist_t *adjlist, igraph_vector_t *res, igraph_integer_t from_vert);
 IGRAPH_EXPORT igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                                                      igraph_matrix_t *res,
                                                      const igraph_vs_t from,
