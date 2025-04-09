@@ -115,8 +115,26 @@ int main(void) {
     igraph_set_add(&set, 10);
     igraph_set_remove(&set, 10);
     if (igraph_set_size(&set) != 0) { return 13; }
+    
+    /* igraph_set_difference 3n\5n*/
+    igraph_set_t small;
+    igraph_set_init(&small, 0);
+    for (i=0; i<=100/3; i++) {  // sets of multiples of 3 and 5
+        igraph_set_add(&set, 3*i);
+        igraph_set_add(&small, 5*i);
+    }
+    IGRAPH_ASSERT(igraph_set_size(&set) == 34);
+    igraph_set_difference(&set, &small);
+    print_set(&set, stdout);
+    IGRAPH_ASSERT(igraph_set_size(&set) == 27);
+    // Special memmove case - when B runs out before A
+    igraph_set_clear(&small);
+    igraph_set_add(&small, 9);
+    igraph_set_difference(&set, &small);
+    print_set(&set, stdout);
+    
     igraph_set_destroy(&set);
-
+    igraph_set_destroy(&small);
     VERIFY_FINALLY_STACK();
 
     return 0;

@@ -1205,9 +1205,9 @@ igraph_error_t igraph_diameter_bound(
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             if (VECTOR(distances)[i] < IGRAPH_INFINITY) {
                 igraph_set_add(&current_component, i);
-                igraph_set_remove(&to_inspect, i);  // TODO: add igraph_set_minus
             }
         }
+        igraph_set_difference(&to_inspect, &current_component);
 
         // if current component does NOT contains all nodes, and we don't expect
         // a disconnected graph, we can already return inf
