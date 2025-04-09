@@ -74,58 +74,6 @@ igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_maxdegree_arg
- * \brief The index of the maximum degree vertex in a graph (or set of vertices).
- *
- * The largest in-, out- or total degree of the specified vertices is
- * calculated. If the graph has no vertices, or \p vids is empty,
- * 0 is returned, as this is the smallest possible value for degrees.
- *
- * \param graph The input graph.
- * \param res Pointer to an integer (\c igraph_integer_t), the result
- *        will be stored here.
- * \param vids Vector giving the vertex IDs for which the maximum degree will
- *        be calculated.
- * \param mode Defines the type of the degree.
- *        \c IGRAPH_OUT, out-degree,
- *        \c IGRAPH_IN, in-degree,
- *        \c IGRAPH_ALL, total degree (sum of the
- *        in- and out-degree).
- *        This parameter is ignored for undirected graphs.
- * \param loops Boolean, gives whether the self-loops should be
- *        counted.
- * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex ID.
- *         \c IGRAPH_EINVMODE: invalid mode argument.
- *
- * Time complexity: O(v) if \p loops is \c true, and O(v*d) otherwise. v is the number
- * of vertices for which the degree will be calculated, and d is their
- * (average) degree.
- *
- * \sa \ref igraph_degree() to retrieve the degrees for several vertices.
- */
- igraph_error_t igraph_maxdegree_arg(const igraph_t *graph, igraph_integer_t *res,
-    igraph_vs_t vids, igraph_neimode_t mode,
-    igraph_bool_t loops) {
-
-    igraph_vector_int_t tmp;
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
-
-    IGRAPH_CHECK(igraph_degree(graph, &tmp, vids, mode, loops));
-    if (igraph_vector_int_size(&tmp) == 0) {
-        *res = -1;
-    } else {
-        *res = igraph_vector_int_which_max(&tmp);
-    }
-
-    igraph_vector_int_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
 static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vs_t vids,
         igraph_neimode_t mode,
