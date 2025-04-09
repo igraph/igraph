@@ -108,6 +108,7 @@ add_library(
   constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
+  constructors/mycielskian.c
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c
