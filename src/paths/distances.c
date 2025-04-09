@@ -28,7 +28,6 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 #include "igraph_vector.h"
-#include "igraph_structural.h"
 
 #include "core/interruption.h"
 #include "core/indheap.h"
@@ -1172,28 +1171,14 @@ igraph_error_t igraph_diameter_bound(
     while (!igraph_set_empty(&to_inspect)) {
         // Pick node from to_inspect
         // This will be the starting node for the paper algorithm
-        // So it should be a node with the highest degree
+        // So it should be a node with the highest degree within to_inspect
         // This will be a node not previously analysed, so it has no ecc bounds yet
-        igraph_integer_t v = -1;
-        igraph_vector_int_t vec_view = {.stor_begin = to_inspect.stor_begin,
-                                        .stor_end = to_inspect.stor_end,
-                                        .end = to_inspect.end};
-        igraph_maxdegree_arg(graph, &v, igraph_vss_vector(&vec_view),
-                             IGRAPH_ALL, IGRAPH_LOOPS);
-        // TODO: there is no `igraph_vss_set`. Adding one turned out to be annoying.
-        // For now, I create a vec that points to the same data;
-
-        // TODO: the maxdegree_arg doesn't work!
-        // The docs for the function are not clear to me. Perhaps the vids is not
-        // a set of vertices for which the degree should be calculated, but rather
-        // the vertices whose edges should be considered in the degree.
-        // For now, calculate maxdegree_arg manually
-        igraph_integer_t highest_degree = -1;
-        for (igraph_integer_t i=0; i<no_of_nodes; i++) {
-            if (!igraph_set_contains(&to_inspect, i)) continue;
-            if (VECTOR(degrees)[i] <= highest_degree) continue;
-            highest_degree = VECTOR(degrees)[i];
-            v = i;
+        igraph_integer_t v, temp, highest_degree = -1;
+        state = 0;
+        while (igraph_set_iterate(&to_inspect, &state, &temp)) {
+            if (VECTOR(degrees)[temp] <= highest_degree) {continue;}
+            highest_degree = VECTOR(degrees)[temp];
+            v = temp;
         }
 
         // BFS(v)
