@@ -23,6 +23,7 @@
 
 int main(void) {
     igraph_t g;
+    igraph_vector_t weights;
     igraph_real_t result;
     igraph_real_t reference;
 
@@ -33,7 +34,7 @@ int main(void) {
         0,2, 1,2, 2,3, 2,4, 2,5, 3,5, 4,5, 4,6, 5,6, 5,7, 5,9, 6,8, 6,9, 7,10,
         9,11, 11,12, 11,13, 11,14, 13,14, 14,15, 14,16, 15,17, 16,18, -1
     );
-    igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, 0);
+    igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, 0);
     igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
     IGRAPH_ASSERT(result == reference && result == 7);
     igraph_destroy(&g);
@@ -41,8 +42,17 @@ int main(void) {
     // ring graph - diameter should be half of the node count
     printf("\nRing graph with 24 nodes\n");
     igraph_ring(&g, 24, IGRAPH_UNDIRECTED, false, true);
-    igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, 0);
+    igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, 0);
     IGRAPH_ASSERT(result == 12);
+    igraph_destroy(&g);
+
+    // weighted ring graph
+    igraph_vector_init_real(&weights, 9, 1.0, 2.675, 3.0, 4.0, 5.5, 1.0, 1.0, 1.0, 1.0);
+    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 0);
+    igraph_diameter_bound(&g, &result, &weights, false, true);
+    igraph_diameter_dijkstra(&g, &weights, &reference, NULL, NULL, NULL, NULL, false, true);
+    IGRAPH_ASSERT(result == reference);  // direct float comparison, not great...
+    printf("weighted results: %f\n%f\n\n\n", result, reference);
     igraph_destroy(&g);
 
     // random barabasi - compare to default diameter. Do it a few times
@@ -50,7 +60,7 @@ int main(void) {
     for (igraph_integer_t i = 0; i < 10; i++) {
         igraph_rng_seed(igraph_rng_default(), 1234*i);
         igraph_barabasi_game(&g, 100, 1, 4, 0, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_BAG, NULL);
-        igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, 0);
+        igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, 0);
         igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
         IGRAPH_ASSERT(result == reference);  // no reference value to compare to
         igraph_destroy(&g);
@@ -61,7 +71,7 @@ int main(void) {
     for (igraph_integer_t i = 0; i < 10; i++) {
         igraph_rng_seed(igraph_rng_default(), 1234*i);
         igraph_watts_strogatz_game(&g, 1, 100, 5, 0.2, false, false);
-        igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, 0);
+        igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, 0);
         igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
         IGRAPH_ASSERT(result == reference);  // no reference value to compare to
         igraph_destroy(&g);
@@ -76,11 +86,11 @@ int main(void) {
     igraph_vector_int_view(&edge_vec, vec, sizeof(vec) / sizeof(vec[0]));
     igraph_es_vector(&edge_sele, &edge_vec);
     igraph_delete_edges(&g, edge_sele);
-    igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, false);
+    igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, false);
     igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 0);
     IGRAPH_ASSERT(result == reference);
     printf("\nDisconnected ring graph, unconn=true\n");
-    igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, true);
+    igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, true);
     igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
     IGRAPH_ASSERT(result == reference);
     igraph_es_destroy(&edge_sele);
@@ -89,18 +99,19 @@ int main(void) {
     // graph with zero nodes - result should be NaN
     printf("\nGraph with no vertices\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, 0);
+    igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, 0);
     IGRAPH_ASSERT(result != result);  // NaN test
     igraph_destroy(&g);
 
     // graph with one node - result should be 0
     printf("\nGraph with one vertex\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    igraph_diameter_bound(&g, &result, IGRAPH_UNDIRECTED, 0);
+    igraph_diameter_bound(&g, &result, NULL, IGRAPH_UNDIRECTED, 0);
     igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 0);
     IGRAPH_ASSERT(result == reference && result == 0);
     igraph_destroy(&g);
 
+    igraph_vector_destroy(&weights);
     VERIFY_FINALLY_STACK();
     return 0;
 }

@@ -1102,6 +1102,7 @@ static igraph_real_t max_non_inf(igraph_vector_t *m) {
 igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
     igraph_real_t *diameter,  // output diameter value
+    const igraph_vector_t *weights,  // optional weights
     igraph_bool_t directed,  // treating this graph as undirected
     igraph_bool_t unconn  // false: disconnected returns INF; true: returns largest diameter
 ) {
@@ -1155,9 +1156,15 @@ igraph_error_t igraph_diameter_bound(
 
     igraph_integer_t state; // for set iteration
 
-    // prepare adjacency list - calling BFS would otherwise recompute it every time
+    // prepare lists - calling BFS would otherwise recompute it every time
+    // unweighted uses adjlist, weighted uses inclist
     igraph_adjlist_t adjlist;
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+    igraph_lazy_inclist_t inclist;
+    if (weights) {
+        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS));
+    } else {
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+    }
 
     // non-paper change: support for disconnected graphs
     // General algorithm:
@@ -1183,7 +1190,8 @@ igraph_error_t igraph_diameter_bound(
 
         // BFS(v)
         bfs_count++;
-        igraph_distances_1(&adjlist, &distances, v);
+        weights ? igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights)
+                : igraph_distances_1(&adjlist, &distances, v);
 
         // populate current_component from distances
         igraph_set_clear(&current_component);
@@ -1262,7 +1270,8 @@ igraph_error_t igraph_diameter_bound(
 
                 // Run BFS (if first_iteration, we already did)
                 bfs_count++;
-                igraph_distances_1(&adjlist, &distances, v);
+                weights ? igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights)
+                : igraph_distances_1(&adjlist, &distances, v);
             }
 
             // don't do it again
@@ -1337,7 +1346,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_destroy(&ecc_upper);
     igraph_vector_int_destroy(&to_remove);
     igraph_vector_int_destroy(&degrees);
-    igraph_adjlist_destroy(&adjlist);
+    weights ? igraph_lazy_inclist_destroy(&inclist) : igraph_adjlist_destroy(&adjlist);
 
     return IGRAPH_SUCCESS;
 }
