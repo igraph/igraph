@@ -441,6 +441,12 @@ igraph_diameter_dijkstra:
         BOOLEAN directed=True, BOOLEAN unconnected=True
     DEPS: weights ON graph
 
+igraph_diameter_bound:
+    PARAMS: |-
+        GRAPH graph, OUT REAL res,
+        OPTIONAL EDGE_WEIGHTS weights,
+        BOOLEAN directed=True, BOOLEAN unconnected=True
+
 igraph_closeness:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res,
