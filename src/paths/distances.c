@@ -33,6 +33,12 @@
 #include "core/indheap.h"
 #include "core/set.h"
 
+// #define BOUNDING_DEBUG  // uncomment to enable
+#ifdef BOUNDING_DEBUG
+    #define debug(...) fprintf(stderr, __VA_ARGS__)
+#else
+    #define debug(...)
+#endif
 
 /* When vid_ecc is not NULL, only one vertex ID should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
@@ -1214,8 +1220,8 @@ igraph_error_t igraph_diameter_bound(
         // conclusion: it's safe to ignore all infs from now on.
 
         // run paper algorithm on `current_component` as W...
-        printf("Looking at component of size %ld\n", (long) igraph_set_size(&current_component));
-        printf("\tLooking at first vertex %ld\n", (long) v);
+        debug("Looking at component of size %ld\n", (long) igraph_set_size(&current_component));
+        debug("\tLooking at first vertex %ld\n", (long) v);
 
         // initialise upper/lower diameter bounds (line 3)
         igraph_real_t dia_lower = 0;
@@ -1260,7 +1266,7 @@ igraph_error_t igraph_diameter_bound(
                     best_ecc = temp_ecc;
                     best_deg = temp_deg;
                 }
-                printf(
+                debug(
                     "\tLooking for %s vertex ecc, chose %ld with ecc_%s %.0f\n",
                     searchHigh ? "highest" : "lowest",
                     (long) v,
@@ -1280,13 +1286,13 @@ igraph_error_t igraph_diameter_bound(
             // line 10: Get eccentricity
             igraph_real_t ecc_v = -1;
             ecc_v = max_non_inf(&distances);
-            printf("\t\tFound eccentricity %.0f\n", ecc_v);
+            debug("\t\tFound eccentricity %.0f\n", ecc_v);
 
             // lines 11&12: update upper/lower bounds on diameter
             update_to_max(&dia_lower, ecc_v);
             update_to_min(&dia_upper, 2*ecc_v);
 
-            printf("\t\tNew diameter bounds: %.0f:%.0f\n", dia_lower, dia_upper);
+            debug("\t\tNew diameter bounds: %.0f:%.0f\n", dia_lower, dia_upper);
 
             // line 8 check can happen here. If bounds equal, we're done, break
             if (dia_lower == dia_upper) break;
@@ -1304,39 +1310,38 @@ igraph_error_t igraph_diameter_bound(
                 igraph_real_t d = VECTOR(distances)[w];
                 if (d == IGRAPH_INFINITY) continue;  // ignore non-CC
 
-                // printf("\t\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
+                // debug("\t\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
                 // lines 14-15: update upper/lower bounds on eccentricities
                 update_to_max(&VECTOR(ecc_lower)[w], ecc_v-d);
                 update_to_max(&VECTOR(ecc_lower)[w], d);
                 update_to_min(&VECTOR(ecc_upper)[w], ecc_v+d);
-                // printf(" -> %.0f:%.0f", VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
+                // debug(" -> %.0f:%.0f", VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
 
                 if (  // line 16
                     VECTOR(ecc_lower)[w] == VECTOR(ecc_upper)[w] ||  // ecc found, or
                     (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
                 ) {
-                    // printf(" (to be removed)");
+                    // debug(" (to be removed)");
                     igraph_vector_int_push_back(&to_remove, w);  // line 17: remove w from current set
                 }
-                // printf("\n");
+                // debug("\n");
             }
 
             // remove the unneeded vertices
-            igraph_integer_t pruned = 1 + igraph_vector_int_size(&to_remove);
             while (!igraph_vector_int_empty(&to_remove)) {
                 igraph_integer_t pop = igraph_vector_int_pop_back(&to_remove);
                 igraph_set_remove(&current_component, pop);
             }
-            printf("\t\tRemaining |W|=%ld, pruned %ld\n", (long) igraph_set_size(&current_component), (long) pruned);
+            debug("\t\tRemaining |W|=%ld, pruned %ld\n", (long) igraph_set_size(&current_component));
         }
 
         // paper alg finished; dia_lower is the dia for the current component
         // if it's larger than estimates so far, update
         update_to_max(diameter, dia_lower);
-        printf("\tFound component diameter %.0f, global set to %.0f\n", dia_lower, *diameter);
+        debug("\tFound component diameter %.0f, global set to %.0f\n", dia_lower, *diameter);
     }
 
-    printf("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, (long) bfs_count, (long) no_of_nodes);
+    debug("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, (long) bfs_count, (long) no_of_nodes);
 
     // frees
     igraph_set_destroy(&to_inspect);
