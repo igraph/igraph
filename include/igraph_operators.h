@@ -40,10 +40,6 @@ __BEGIN_DECLS
 /* Graph operators                                    */
 /* -------------------------------------------------- */
 
-typedef enum {
-        IGRAPH_CARTESIAN_PRODUCT,
-} igraph_product_t;    
-
 IGRAPH_EXPORT igraph_error_t igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 IGRAPH_EXPORT igraph_error_t igraph_disjoint_union(igraph_t *res,
                                         const igraph_t *left, const igraph_t *right);
