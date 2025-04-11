@@ -253,9 +253,9 @@ void error_checks(void) {
                                                   &vertexOrder, false, false),
                                                   IGRAPH_EINVAL);
 
+    igraph_vector_destroy(&weights);
     igraph_vector_int_destroy(&vertexOrder);
     igraph_vector_destroy(&result);
-    igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 }
 
