@@ -230,6 +230,35 @@ void weighted_graph(void) {
     igraph_destroy(&graph);
 }
 
+void error_checks(void) {
+    igraph_t graph;
+    igraph_vector_t result, weights;
+    igraph_vector_int_t vertexOrder;
+    const igraph_integer_t numVertices = 7;
+
+    igraph_small(&graph, numVertices, IGRAPH_UNDIRECTED,
+                 0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1); // 8 edges
+
+    igraph_vector_init(&result, numVertices);
+
+    // wrong vertex order size (!= number of vertices)
+    igraph_vector_int_init(&vertexOrder, 1);
+    CHECK_ERROR(igraph_rich_club_density_sequence(&graph, NULL, &result,
+                                                  &vertexOrder, false, false),
+                                                  IGRAPH_EINVAL);
+
+    // wrong weights vector size (!= number of edges)
+    igraph_vector_init(&weights, 1);
+    CHECK_ERROR(igraph_rich_club_density_sequence(&graph, &weights, &result,
+                                                  &vertexOrder, false, false),
+                                                  IGRAPH_EINVAL);
+
+    igraph_vector_int_destroy(&vertexOrder);
+    igraph_vector_destroy(&result);
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&graph);
+}
+
 int main(void) {
     null_graph();
     printf("\n");
@@ -250,6 +279,8 @@ int main(void) {
     printf("\n");
 
     weighted_graph();
+
+    error_checks();
 
     VERIFY_FINALLY_STACK();
     return 0;
