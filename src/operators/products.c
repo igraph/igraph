@@ -101,14 +101,16 @@ static igraph_error_t cartesian_product(igraph_t *res,
  *    \cli IGRAPH_PRODUCT_CARTESIAN
  *       Computes the Cartesian product of two graphs \c g1 and \c g2.
  * The Cartesian product of two graphs \c g1 and \c g2 is a graph \c res such that:
- *  </para><para>
- * The vertex set of \c res is the Cartesian product: V(g1) X V(g2).
+ * \olist
+ *    \oli The vertex set of \c res is the Cartesian product of the vertex sets of g1 and g2: V(g1) x V(g2).
  * </para><para>
- * Two vertices <code>(u, v)</code> and <code>(u1, v1)</code> are adjacent in 
+ *    \oli Two vertices <code>(u, v)</code> and <code>(u1, v1)</code> are adjacent in 
  *    \c res if and only if either <code>u = u1</code> and \c v is adjacent 
  *    to \c v1 in \c g2, or <code>v = v1</code> and \c u is adjacent to 
  *    \c u1 in \c g1.
- * 
+ * \endolist
+ * Thus, the number of vertices in \c res is |V1| x |V2|, and the number of edges in
+ * \c res is |V1| × |E2| + |V2| × |E1|.
  * </para><para>
  * Both graphs must be either directed or undirected.
  * </para><para>
