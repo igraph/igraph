@@ -51,7 +51,7 @@ int main(void) {
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 0);
     igraph_diameter_bound(&g, &result, &weights, false, true);
     igraph_diameter_dijkstra(&g, &weights, &reference, NULL, NULL, NULL, NULL, false, true);
-    IGRAPH_ASSERT(result == reference);  // direct float comparison, not great...
+    IGRAPH_ASSERT(igraph_almost_equals(result, reference, 1e-10));
     printf("weighted results: %f\n%f\n\n\n", result, reference);
     igraph_destroy(&g);
 
