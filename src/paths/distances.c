@@ -1203,7 +1203,7 @@ igraph_error_t igraph_diameter_bound(
         igraph_integer_t v, temp, highest_degree = -1;
         state = 0;
         while (igraph_set_iterate(&to_inspect, &state, &temp)) {
-            if (VECTOR(degrees)[temp] <= highest_degree) {continue;}
+            if (VECTOR(degrees)[temp] <= highest_degree) continue;
             highest_degree = VECTOR(degrees)[temp];
             v = temp;
         }
