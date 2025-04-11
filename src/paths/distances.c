@@ -1176,10 +1176,10 @@ igraph_error_t igraph_diameter_bound(
     // prepare lists - calling BFS would otherwise recompute it every time
     // unweighted uses adjlist, weighted uses inclist
     igraph_adjlist_t adjlist;
-    igraph_lazy_inclist_t inclist;
+    igraph_inclist_t inclist;
     if (weights) {
-        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS));
-        IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS));
+        IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
     } else {
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -1379,7 +1379,7 @@ igraph_error_t igraph_diameter_bound(
     igraph_vector_int_destroy(&to_remove);
     igraph_vector_int_destroy(&degrees);
     if (weights) {
-        igraph_lazy_inclist_destroy(&inclist);
+        igraph_inclist_destroy(&inclist);
     } else {
         igraph_adjlist_destroy(&adjlist);
     }
