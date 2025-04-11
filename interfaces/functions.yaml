@@ -443,8 +443,8 @@ igraph_diameter_dijkstra:
 
 igraph_diameter_bound:
     PARAMS: |-
-        GRAPH graph, OUT REAL res,
-        OPTIONAL EDGE_WEIGHTS weights,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        OUT REAL res,
         BOOLEAN directed=True, BOOLEAN unconnected=True
 
 igraph_closeness:
