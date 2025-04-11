@@ -353,6 +353,7 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_rich_club
   igraph_simple_cycles
   igraph_similarity
   igraph_transitive_closure
@@ -381,11 +382,6 @@ add_legacy_tests(
   bug_2497
   bug_2506
   bug_2517
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  igraph_rich_club
 )
 
 # components.at
