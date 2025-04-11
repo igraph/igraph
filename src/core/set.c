@@ -258,16 +258,14 @@ igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-igraph_error_t igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
+void igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
     igraph_integer_t left, right, middle;
     igraph_integer_t size;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
 
     size = igraph_set_size(set);
-    if (size == 0) {
-        return IGRAPH_SUCCESS;
-    }
+    if (size == 0) return;
 
     /* find the element to remove */
     // TODO: extract binsearch to own function for add and remove functions
@@ -292,9 +290,7 @@ igraph_error_t igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
     }
 
     // if it still doesn't then element not found, there's nothing to do, return
-    if (SET(*set)[left] != e) {
-        return IGRAPH_SUCCESS;
-    }
+    if (SET(*set)[left] != e) return;
 
     // if the element we found is not the last one, shift all following elements
     // to the left by one.
@@ -308,7 +304,6 @@ igraph_error_t igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
 
     // delete the last element and return
     set->end -= 1;
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -324,9 +319,8 @@ igraph_error_t igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
  * Time complexity: O(n+m), n and m are the number of elements in \p set and
  * \p to_remove respectively.
  */
-igraph_error_t igraph_set_difference(igraph_set_t *set, igraph_set_t *to_remove) {
-    if (igraph_set_empty(set) || igraph_set_empty(to_remove))
-        return IGRAPH_SUCCESS;  // nothing to do
+void igraph_set_difference(igraph_set_t *set, igraph_set_t *to_remove) {
+    if (igraph_set_empty(set) || igraph_set_empty(to_remove)) return;  // nothing to do
 
     igraph_integer_t a_read = 0, a_write = 0;  // read and write indices into set
     igraph_integer_t b_read = 0;  // read index into to_remove
@@ -382,7 +376,6 @@ igraph_error_t igraph_set_difference(igraph_set_t *set, igraph_set_t *to_remove)
 
     // Now a_write points to just after the last element in the new set A\B
     set->end -= removed;
-    return IGRAPH_SUCCESS;
 }
 
 /**
