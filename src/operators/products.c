@@ -92,7 +92,43 @@ static igraph_error_t cartesian_product(igraph_t *res,
    return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_product(igraph_t *res,
+/**
+ * \function igraph_product
+ * \brief Computes the graph product of two graphs, based on the specified product type.
+ * </para><para>
+ * Supported graph product types are:
+ * \clist
+ *    \cli IGRAPH_PRODUCT_CARTESIAN
+ *       Computes the Cartesian product of two graphs \c g1 and \c g2.
+ * The Cartesian product of two graphs \c g1 and \c g2 is a graph \c res such that:
+ *  </para><para>
+ * The vertex set of \c res is the Cartesian product: V(g1) X V(g2).
+ * </para><para>
+ * Two vertices <code>(u, v)</code> and <code>(u1, v1)</code> are adjacent in 
+ *    \c res if and only if either <code>u = u1</code> and \c v is adjacent 
+ *    to \c v1 in \c g2, or <code>v = v1</code> and \c u is adjacent to 
+ *    \c u1 in \c g1.
+ * 
+ * </para><para>
+ * Both graphs must be either directed or undirected.
+ * </para><para>
+ * Time Complexity: O(|V1| × |V2| + |V1| × |E2| + |V2| × |E1|)
+ *       where |V1| and |V2| are the number of vertices, and
+ *       |E1| and |E2| are the number of edges in \c g1 and \c g2 respectively.
+ * 
+ * \endclist
+ *
+ * \param res Pointer to an uninitialized graph object. The result will be stored here.
+ * \param g1 The first operand graph.
+ * \param g2 The second operand graph.
+ * \param type The type of graph product to compute.
+ * 
+ * \return Error code:
+ *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input graphs
+ *         \p g1 and \p g2 are incompatible for the requested product.
+ */
+
+ igraph_error_t igraph_product(igraph_t *res,
                         const igraph_t *g1, const igraph_t *g2,
                         igraph_product_t type) {
 
