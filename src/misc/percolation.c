@@ -56,6 +56,11 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     IGRAPH_CHECK(igraph_vector_int_init(&links, v_count));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &links);
 
+    for (igraph_integer_t i = 0; i < upper; i++) {
+        VECTOR(sizes)[i] = 1;
+        VECTOR(links)[i] = i;
+    }
+
     int edge_count = igraph_vector_int_size(edges) / 2;
     IGRAPH_CHECK(igraph_vector_int_resize(output, edge_count));
 
