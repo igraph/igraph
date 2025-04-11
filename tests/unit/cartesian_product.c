@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void test_grid_vs_square_lattice() {
+void test_grid_vs_square_lattice(void) {
     // P4 X P3 should be a 4x3 grid (non-periodic)
     igraph_t p4, p3, product, lattice;
     igraph_bool_t is_iso;
@@ -44,7 +44,7 @@ void test_grid_vs_square_lattice() {
     igraph_vector_int_destroy(&dims);
 }
 
-void test_cylinder_vs_cartesian() {
+void test_cylinder_vs_cartesian(void) {
     // C4 X P3 should be a cylindrical lattice (periodic in one dimension)
     igraph_t c4, p3, product, cylinder;
     igraph_bool_t is_iso;
@@ -74,7 +74,7 @@ void test_cylinder_vs_cartesian() {
 }
 
 
-void test_cube_vs_cartesian() {
+void test_cube_vs_cartesian(void) {
     // K2 X K2 X K2 = Q3 (3-dimensional hypercube)
     igraph_t k2, temp, q3, cube;
     igraph_bool_t is_iso;
@@ -94,7 +94,7 @@ void test_cube_vs_cartesian() {
     igraph_destroy(&cube);
 }
 
-void test_torus_vs_cartesian() {
+void test_torus_vs_cartesian(void) {
     // C4 X C4 = Torus
     igraph_t c4a, c4b, product, torus;
     igraph_bool_t is_iso;
@@ -125,7 +125,7 @@ void test_torus_vs_cartesian() {
     igraph_vector_bool_destroy(&periodic);
 }
 
-void test_self_loop() {
+void test_self_loop(void) {
     // 1-vertex loop X K4 (circular=false) = K4(circular=true)
     igraph_t v1loop, k4a, k4b, product;
     igraph_bool_t is_iso;
@@ -145,7 +145,7 @@ void test_self_loop() {
     igraph_destroy(&product);
 }
 
-void test_multigraph() {
+void test_multigraph(void) {
     igraph_t g1, g2, product;
 
     // g1: a multigraph with 2 vertices and parallel edges + self-loop
@@ -180,7 +180,7 @@ void test_multigraph() {
     igraph_destroy(&product);
 }
 
-int main() {
+int main(void) {
     test_grid_vs_square_lattice();
     test_cylinder_vs_cartesian();
     test_cube_vs_cartesian();
