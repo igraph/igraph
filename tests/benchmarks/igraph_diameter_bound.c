@@ -105,7 +105,7 @@ int main(void) {
 #undef DENS
 #undef REP
 
-    printf("Barabasi-Albert G(n, p)\n");
+    printf("Barabasi-Albert\n");
 
 #define VCOUNT 250
 #define ECOUNT 15
@@ -120,17 +120,17 @@ int main(void) {
     }
     RNG_END();
 
-    BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Unweighted Bound, " TOSTR(REP) "x",
+    BENCH(" 9 vcount=" TOSTR(VCOUNT) ", m=" TOSTR(ECOUNT) ", Unweighted Bound, " TOSTR(REP) "x",
           REPEAT(igraph_diameter_bound(&g, NULL, &res, IGRAPH_UNDIRECTED, true), REP);
     );
-    BENCH("10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Unweighted Original, " TOSTR(REP) "x",
+    BENCH("10 vcount=" TOSTR(VCOUNT) ", m=" TOSTR(ECOUNT) ", Unweighted Original, " TOSTR(REP) "x",
           REPEAT(igraph_diameter(&g, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
     );
     IGRAPH_ASSERT(res == ref);
-    BENCH("11 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Weighted Bound, " TOSTR(REP) "x",
+    BENCH("11 vcount=" TOSTR(VCOUNT) ", m=" TOSTR(ECOUNT) ", Weighted Bound, " TOSTR(REP) "x",
         REPEAT(igraph_diameter_bound(&g, &weights, &res, IGRAPH_UNDIRECTED, true), REP);
     );
-    BENCH("12 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Weighted Original, " TOSTR(REP) "x",
+    BENCH("12 vcount=" TOSTR(VCOUNT) ", m=" TOSTR(ECOUNT) ", Weighted Original, " TOSTR(REP) "x",
         REPEAT(igraph_diameter_dijkstra(&g, &weights, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
     );
     IGRAPH_ASSERT(igraph_almost_equals(res, ref, 1e-10));
