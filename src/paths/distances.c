@@ -1076,6 +1076,8 @@ static igraph_real_t max_non_inf(igraph_vector_t *m) {
  * \function igraph_diameter_bound
  * \brief Calculate the diameter of a graph using successive bounds.
  *
+ * \experimental
+ *
  * The diameter of a graph is the length of the longest shortest path it has,
  * i.e. the maximum eccentricity of the graph's vertices.
  *
