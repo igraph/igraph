@@ -110,7 +110,7 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *gr
                                                               igraph_neimode_t mode,
                                                               igraph_real_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra_1(const igraph_t *graph,
-                                           igraph_lazy_inclist_t *inclist,
+                                           igraph_inclist_t *inclist,
                                            igraph_vector_t *res,
                                            igraph_integer_t from,
                                            const igraph_vector_t *weights);

@@ -254,7 +254,7 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
  * TODO
  */
 igraph_error_t igraph_distances_dijkstra_1(const igraph_t *graph,
-                                           igraph_lazy_inclist_t *inclist,
+                                           igraph_inclist_t *inclist,
                                            igraph_vector_t *res,
                                            igraph_integer_t from,
                                            const igraph_vector_t *weights) {
@@ -303,7 +303,7 @@ igraph_error_t igraph_distances_dijkstra_1(const igraph_t *graph,
         VECTOR(*res)[minnei] = mindist;
 
         /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_lazy_inclist_get(inclist, minnei);
+        neis = igraph_inclist_get(inclist, minnei);
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (j = 0; j < nlen; j++) {
