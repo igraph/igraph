@@ -1157,7 +1157,6 @@ igraph_error_t igraph_diameter_bound(
 
     // initialise upper/lower eccentricity bounds (lines 4-7)
     IGRAPH_VECTOR_INIT_FINALLY(&ecc_lower, no_of_nodes);
-
     IGRAPH_VECTOR_INIT_FINALLY(&ecc_upper, no_of_nodes);
     igraph_vector_fill(&ecc_upper, IGRAPH_INFINITY);
 
@@ -1212,9 +1211,11 @@ igraph_error_t igraph_diameter_bound(
 #ifdef BOUNDING_DEBUG
         bfs_count++;
 #endif
-
-        weights ? igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights)
-                : igraph_distances_1(&adjlist, &distances, v);
+        if (weights) {
+            IGRAPH_CHECK(igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights));
+        } else {
+            IGRAPH_CHECK(igraph_distances_1(&adjlist, &distances, v));
+        }
 
         // populate current_component from distances
         igraph_set_clear(&current_component);
@@ -1223,7 +1224,7 @@ igraph_error_t igraph_diameter_bound(
                 IGRAPH_CHECK(igraph_set_add(&current_component, i));
             }
         }
-        IGRAPH_CHECK(igraph_set_difference(&to_inspect, &current_component));
+        igraph_set_difference(&to_inspect, &current_component);
 
         // if current component does NOT contains all nodes, and we don't expect
         // a disconnected graph, we can already return inf
@@ -1267,14 +1268,13 @@ igraph_error_t igraph_diameter_bound(
                     igraph_real_t temp_ecc = searchHigh ? VECTOR(ecc_upper)[temp_vert] : VECTOR(ecc_lower)[temp_vert];
 
                     // if ecc worse than the current node, skip
-                    if (searchHigh ? temp_ecc < best_ecc : temp_ecc > best_ecc)
+                    if (searchHigh ? temp_ecc < best_ecc : temp_ecc > best_ecc) {
                         continue;
+                    }
 
                     // if tie, break the tie by highest degree
-                    IGRAPH_CHECK(igraph_degree_1(graph, &temp_deg, temp_vert, IGRAPH_ALL, IGRAPH_LOOPS));
-
                     // so skip if temp doesn't have a higher degree
-                    if (temp_ecc == best_ecc && temp_deg <= best_deg) {
+                    if (temp_ecc == best_ecc && VECTOR(degrees)[temp_vert] <= best_deg) {
                         continue;
                     }
 
@@ -1296,9 +1296,11 @@ igraph_error_t igraph_diameter_bound(
 #ifdef BOUNDING_DEBUG
                 bfs_count++;
 #endif
-
-                weights ? igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights)
-                : igraph_distances_1(&adjlist, &distances, v);
+                if (weights) {
+                    IGRAPH_CHECK(igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights));
+                } else {
+                    IGRAPH_CHECK(igraph_distances_1(&adjlist, &distances, v));
+                }
             }
 
             // don't do it again
@@ -1352,7 +1354,7 @@ igraph_error_t igraph_diameter_bound(
             // remove the unneeded vertices
             while (!igraph_vector_int_empty(&to_remove)) {
                 igraph_integer_t pop = igraph_vector_int_pop_back(&to_remove);
-                IGRAPH_CHECK(igraph_set_remove(&current_component, pop));
+                igraph_set_remove(&current_component, pop);
             }
             debug("\t\tRemaining |W|=%ld, pruned %ld\n", (long) igraph_set_size(&current_component));
         }
@@ -1364,16 +1366,23 @@ igraph_error_t igraph_diameter_bound(
     }
 
     debug("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, (long) bfs_count, (long) no_of_nodes);
+#ifdef BOUNDING_DEBUG
+    debug("Used %ld BFSes" (long) bfs_count);
+#endif
 
     // frees
     igraph_set_destroy(&to_inspect);
     igraph_set_destroy(&current_component);
-    igraph_vector_destroy(&distances);
     igraph_vector_destroy(&ecc_lower);
     igraph_vector_destroy(&ecc_upper);
+    igraph_vector_destroy(&distances);
     igraph_vector_int_destroy(&to_remove);
     igraph_vector_int_destroy(&degrees);
-    weights ? igraph_lazy_inclist_destroy(&inclist) : igraph_adjlist_destroy(&adjlist);
+    if (weights) {
+        igraph_lazy_inclist_destroy(&inclist);
+    } else {
+        igraph_adjlist_destroy(&adjlist);
+    }
     IGRAPH_FINALLY_CLEAN(8);
 
     return IGRAPH_SUCCESS;
