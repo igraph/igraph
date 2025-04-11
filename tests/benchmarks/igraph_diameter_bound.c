@@ -49,14 +49,14 @@ int main(void) {
     RNG_END();
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Bound, " TOSTR(REP) "x",
-          REPEAT(igraph_diameter_bound(&g, &res, NULL, IGRAPH_UNDIRECTED, true), REP);
+          REPEAT(igraph_diameter_bound(&g, NULL, &res, IGRAPH_UNDIRECTED, true), REP);
     );
     BENCH(" 2 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Original, " TOSTR(REP) "x",
           REPEAT(igraph_diameter(&g, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
     );
     IGRAPH_ASSERT(res == ref);
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Weighted Bound, " TOSTR(REP) "x",
-        REPEAT(igraph_diameter_bound(&g, &res, &weights, IGRAPH_UNDIRECTED, true), REP);
+        REPEAT(igraph_diameter_bound(&g, &weights, &res, IGRAPH_UNDIRECTED, true), REP);
     );
     BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Weighted Original, " TOSTR(REP) "x",
         REPEAT(igraph_diameter_dijkstra(&g, &weights, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
@@ -85,14 +85,14 @@ int main(void) {
     RNG_END();
 
     BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Bound, " TOSTR(REP) "x",
-          REPEAT(igraph_diameter_bound(&g, &res, NULL, IGRAPH_UNDIRECTED, true), REP);
+          REPEAT(igraph_diameter_bound(&g, NULL, &res, IGRAPH_UNDIRECTED, true), REP);
     );
     BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Original, " TOSTR(REP) "x",
           REPEAT(igraph_diameter(&g, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
     );
     IGRAPH_ASSERT(res == ref);
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Weighted Bound, " TOSTR(REP) "x",
-        REPEAT(igraph_diameter_bound(&g, &res, &weights, IGRAPH_UNDIRECTED, true), REP);
+        REPEAT(igraph_diameter_bound(&g, &weights, &res, IGRAPH_UNDIRECTED, true), REP);
     );
     BENCH(" 8 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Weighted Original, " TOSTR(REP) "x",
         REPEAT(igraph_diameter_dijkstra(&g, &weights, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
@@ -121,14 +121,14 @@ int main(void) {
     RNG_END();
 
     BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Unweighted Bound, " TOSTR(REP) "x",
-          REPEAT(igraph_diameter_bound(&g, &res, NULL, IGRAPH_UNDIRECTED, true), REP);
+          REPEAT(igraph_diameter_bound(&g, NULL, &res, IGRAPH_UNDIRECTED, true), REP);
     );
     BENCH("10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Unweighted Original, " TOSTR(REP) "x",
           REPEAT(igraph_diameter(&g, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
     );
     IGRAPH_ASSERT(res == ref);
     BENCH("11 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Weighted Bound, " TOSTR(REP) "x",
-        REPEAT(igraph_diameter_bound(&g, &res, &weights, IGRAPH_UNDIRECTED, true), REP);
+        REPEAT(igraph_diameter_bound(&g, &weights, &res, IGRAPH_UNDIRECTED, true), REP);
     );
     BENCH("12 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(ECOUNT) ", Weighted Original, " TOSTR(REP) "x",
         REPEAT(igraph_diameter_dijkstra(&g, &weights, &ref, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, true), REP);
