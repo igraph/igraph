@@ -1088,6 +1088,8 @@ static igraph_real_t max_non_inf(igraph_vector_t *m) {
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
  *
  * \param graph The graph object.
+ * \param weights The edge weights of the graph. Can be \c NULL for an
+ *        unweighted graph. All weights should be non-negative.
  * \param diameter Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param directed Boolean, whether to consider directed paths. Currently, directed
@@ -1107,8 +1109,8 @@ static igraph_real_t max_non_inf(igraph_vector_t *m) {
  */
 igraph_error_t igraph_diameter_bound(
     const igraph_t *graph,  // input graph
-    igraph_real_t *diameter,  // output diameter value
     const igraph_vector_t *weights,  // optional weights
+    igraph_real_t *diameter,  // output diameter value
     igraph_bool_t directed,  // treating this graph as undirected
     igraph_bool_t unconn  // false: disconnected returns INF; true: returns largest diameter
 ) {
