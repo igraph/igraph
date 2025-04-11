@@ -172,7 +172,7 @@ void test_multigraph(void) {
     // Check expected number of vertices: |V1| * |V2| = 2 * 3 = 6
     IGRAPH_ASSERT(igraph_vcount(&product) == 6);
 
-    // verified manually, assuming multiple self loops can be present
+    // verified by v1*e2 + v2*e1, see: https://en.wikipedia.org/wiki/Graph_product
     IGRAPH_ASSERT(igraph_ecount(&product) == 17); 
 
     igraph_destroy(&g1);

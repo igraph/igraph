@@ -40,36 +40,37 @@ static igraph_error_t cartesian_product(igraph_t *res,
 
    igraph_integer_t vg1 = igraph_vcount(g1);
    igraph_integer_t vg2 = igraph_vcount(g2);
-   igraph_integer_t vres;
-
-   IGRAPH_SAFE_MULT(vg1, vg2, &vres);
-
-   igraph_vector_int_t edges;
-   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-
-
    igraph_integer_t eg1 = igraph_ecount(g1);
    igraph_integer_t eg2 = igraph_ecount(g2);
+   igraph_integer_t vres;
+   igraph_integer_t eres;
+   igraph_integer_t temp;
+
+   IGRAPH_SAFE_MULT(vg1, vg2, &vres);
+   igraph_vector_int_t edges;
+
+   // new edge count = vg1*e2 + vg2*e1
+   IGRAPH_SAFE_MULT(vg1, eg2, &eres);
+   IGRAPH_SAFE_MULT(vg2, eg1, &temp);
+   IGRAPH_SAFE_ADD(eres, temp, &eres);
+   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*eres);
 
    igraph_integer_t from, to;
    igraph_integer_t i, j;
    
-   // edge (i, j) with i from g1, and j from g2
+   // Vertex ((i, j)) with i from g1, and j from g2
    //   will have new vertex id: i * vg2 + j
 
+   igraph_integer_t edge_index = 0;
    // Edges from g1
    for (i = 0; i < eg1; ++i) {
       igraph_edge(g1, i, &from, &to);
-      // for all edges (from, to) in g1, add edge from (from, j) to (to, j)
+      // for all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
       //    for all vertex j in g2
       for (j = 0; j < vg2; ++j) {
-
          // SAFE MULT and SAFE ADD not needed as < vres
-         igraph_integer_t v1 = from * vg2 + j;
-         igraph_integer_t v2 = to * vg2 + j;
-
-         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v1));
-         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v2));
+         VECTOR(edges)[edge_index++] = from * vg2 + j;   // ((from, j))
+         VECTOR(edges)[edge_index++] = to * vg2 + j;     // ((to, j))
       }
    }
 
@@ -79,11 +80,8 @@ static igraph_error_t cartesian_product(igraph_t *res,
       // for all edges (from, to) in g2, add edge from (j, from) to (j, to)
       //    for all vertex j in g1
       for (j = 0; j < vg1; ++j) {
-         igraph_integer_t v1 = j * vg2 + from;
-         igraph_integer_t v2 = j * vg2 + to;
-
-         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v1));
-         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v2));
+         VECTOR(edges)[edge_index++] = j * vg2 + from; // ((j, from))
+         VECTOR(edges)[edge_index++] = j * vg2 + to;   // ((j, to))
       }
    }
 
