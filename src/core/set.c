@@ -248,6 +248,50 @@ igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
 
 /**
  * \ingroup set
+ * \function igraph_set_push_back
+ * \brief Adds an element to the end of a set. Fail if it is smaller than some elements.
+ *
+ * \param set The set object.
+ * \param e The element to be added.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: input can't be inserted at the back.
+ *         \c IGRAPH_ENOMEM: not enough memory.
+ *
+ * Time complexity: O(1).
+ */
+igraph_error_t igraph_set_push_back(igraph_set_t *set, igraph_integer_t e) {
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
+
+    igraph_integer_t size = igraph_set_size(set);
+    if (size > 0) {
+        igraph_integer_t last = set->stor_begin[size - 1];
+        if (last == e) { return IGRAPH_SUCCESS; }  // element already in the set
+        if (last > e) { return IGRAPH_EINVAL; }  // element can't be last
+    }
+
+    // if we're here, the element is safe to push to end of the set.
+    // make sure we have enough capacity
+    if (set->stor_end == set->end) {
+        igraph_integer_t new_size = size < IGRAPH_INTEGER_MAX/2 ? size * 2 : IGRAPH_INTEGER_MAX;
+        if (size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot add to set, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
+        if (new_size == 0) {
+            new_size = 1;
+        }
+        IGRAPH_CHECK(igraph_set_reserve(set, new_size));
+    }
+
+    // push element
+    *(set->end) = e;
+    set->end++;
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup set
  * \function igraph_set_remove
  * \brief Adds an element to the set.
  *
