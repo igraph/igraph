@@ -1230,6 +1230,14 @@ igraph_error_t igraph_diameter_bound(
         }
         igraph_set_difference(&to_inspect, &current_component);
 
+        // if we're looking at unweighted diameter and the current component size
+        // is not greater than the current diameter lower bound, the current
+        // component cannot increase the lower bound. So we can safely skip it
+        // without exploring
+        if (!weights && igraph_set_size(&current_component) <= *diameter) {
+            break;
+        }
+
         // if current component does NOT contains all nodes, and we don't expect
         // a disconnected graph, we can already return inf
         if (!unconn && igraph_set_size(&current_component) < no_of_nodes) {
