@@ -1225,7 +1225,7 @@ igraph_error_t igraph_diameter_bound(
         igraph_set_clear(&current_component);
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             if (VECTOR(distances)[i] < IGRAPH_INFINITY) {
-                IGRAPH_CHECK(igraph_set_add(&current_component, i));
+                IGRAPH_CHECK(igraph_set_push_back(&current_component, i));
             }
         }
         igraph_set_difference(&to_inspect, &current_component);
