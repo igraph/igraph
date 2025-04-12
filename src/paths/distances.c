@@ -1266,7 +1266,6 @@ igraph_error_t igraph_diameter_bound(
                 igraph_integer_t temp_vert = 0;
                 igraph_real_t best_ecc = searchHigh ? -IGRAPH_INFINITY : IGRAPH_INFINITY;
                 igraph_integer_t best_deg = -1;
-                igraph_integer_t temp_deg;
                 state = 0;
                 while(igraph_set_iterate(&current_component, &state, &temp_vert)) {
                     igraph_real_t temp_ecc = searchHigh ? VECTOR(ecc_upper)[temp_vert] : VECTOR(ecc_lower)[temp_vert];
@@ -1286,7 +1285,7 @@ igraph_error_t igraph_diameter_bound(
                     // choose this node for next inspection and update best values
                     v = temp_vert;
                     best_ecc = temp_ecc;
-                    best_deg = temp_deg;
+                    best_deg = VECTOR(degrees)[temp_vert];
                 }
                 debug(
                     "\tLooking for %s vertex ecc, chose %ld with ecc_%s %.0f\n",
