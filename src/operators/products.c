@@ -112,14 +112,16 @@ static igraph_error_t cartesian_product(igraph_t *res,
  * Thus, the number of vertices in \c res is |V1| x |V2|, and the number of edges in
  * \c res is |V1| × |E2| + |V2| × |E1|.
  * </para><para>
- * Both graphs must be either directed or undirected.
- * </para><para>
  * Time Complexity: O(|V1| × |V2| + |V1| × |E2| + |V2| × |E1|)
  *       where |V1| and |V2| are the number of vertices, and
  *       |E1| and |E2| are the number of edges in \c g1 and \c g2 respectively.
  * 
  * \endclist
- *
+ * Both graphs must be of the same type, either directed or undirected. If a product of an undirected and a
+ * directed graph is required, the undirected graph can be converted to a directed graph using \ref 
+ * igraph_to_directed, or the directed graph can be converted to an undirected graph using \ref 
+ * igraph_to_undirected.
+ * </para><para>
  * \param res Pointer to an uninitialized graph object. The result will be stored here.
  * \param g1 The first operand graph.
  * \param g2 The second operand graph.
