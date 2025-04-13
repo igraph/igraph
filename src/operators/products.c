@@ -36,9 +36,8 @@ static igraph_error_t cartesian_product(igraph_t *res,
       IGRAPH_ERROR("Cartesian product of directed and undirected graphs is not supported. "
                    "You can convert an undirected graph to a directed one using igraph_to_directed, "
                    "or a directed graph to an undirected one using igraph_to_undirected.", IGRAPH_EINVAL);
-  }
+   }
   
-
    igraph_bool_t directed = directed1 && directed2;
 
    igraph_integer_t vg1 = igraph_vcount(g1);
@@ -85,6 +84,60 @@ static igraph_error_t cartesian_product(igraph_t *res,
       for (j = 0; j < vg1; ++j) {
          VECTOR(edges)[edge_index++] = j * vg2 + from; // ((j, from))
          VECTOR(edges)[edge_index++] = j * vg2 + to;   // ((j, to))
+      }
+   }
+
+   IGRAPH_CHECK(igraph_create(res, &edges, vres, directed));
+   igraph_vector_int_destroy(&edges);
+   IGRAPH_FINALLY_CLEAN(1);
+
+   return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t tensor_product(igraph_t *res,
+   const igraph_t *g1, const igraph_t *g2) {
+      
+   igraph_bool_t directed1 = igraph_is_directed(g1);
+   igraph_bool_t directed2 = igraph_is_directed(g2);
+
+   if (directed1 != directed2) {
+      IGRAPH_ERROR("Tensor product of directed and undirected graphs is not supported. "
+                   "You can convert an undirected graph to a directed one using igraph_to_directed, "
+                   "or a directed graph to an undirected one using igraph_to_undirected.", IGRAPH_EINVAL);
+   }
+
+   igraph_bool_t directed = directed1 && directed2;
+
+   igraph_integer_t vg1 = igraph_vcount(g1);
+   igraph_integer_t vg2 = igraph_vcount(g2);
+   igraph_integer_t eg1 = igraph_ecount(g1);
+   igraph_integer_t eg2 = igraph_ecount(g2);
+   igraph_integer_t vres;
+   igraph_integer_t eres;
+
+   IGRAPH_SAFE_MULT(vg1, vg2, &vres);
+   igraph_vector_int_t edges;
+
+   // new edge count = e1*e2
+   IGRAPH_SAFE_MULT(eg1, eg2, &eres);
+   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*eres);
+
+   igraph_integer_t from1, to1, from2, to2;
+   igraph_integer_t i, j;
+   
+   // Vertex ((i, j)) with i from g1, and j from g2
+   //   will have new vertex id: i * vg2 + j
+   igraph_integer_t edge_index = 0;
+
+   for (i = 0; i < eg1; ++i) {
+      igraph_edge(g1, i, &from1, &to1);
+
+      for (j = 0; j < eg2; ++j) {
+         igraph_edge(g2, j, &from2, &to2);
+
+         // create edge between ((from1, from2)) to ((to1, to2))
+         VECTOR(edges)[edge_index++] = from1 * vg2 + from2; // ((from1, from2))
+         VECTOR(edges)[edge_index++] = to1   * vg2 + to2;   // ((to1, to2))
       }
    }
 
@@ -144,6 +197,10 @@ igraph_error_t igraph_product(igraph_t *res,
          IGRAPH_CHECK(cartesian_product(res, g1, g2));
          return IGRAPH_SUCCESS;
       
+      case IGRAPH_PRODUCT_TENSOR:
+         IGRAPH_CHECK(tensor_product(res, g1, g2));
+         return IGRAPH_SUCCESS;
+
       default:
          IGRAPH_ERROR("Unknown graph product type.", IGRAPH_EINVAL);
    }
