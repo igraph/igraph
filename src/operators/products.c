@@ -130,7 +130,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
  *         \p g1 and \p g2 are incompatible for the requested product.
  */
 
- igraph_error_t igraph_product(igraph_t *res,
+igraph_error_t igraph_product(igraph_t *res,
                         const igraph_t *g1, const igraph_t *g2,
                         igraph_product_t type) {
 

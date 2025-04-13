@@ -2083,7 +2083,7 @@ igraph_induced_subgraph_map:
 # default product type=Cartesian
 igraph_product:
     PARAMS: |-
-        OUT GRAPH res, GRAPH g1, GRAPH g2, PRODUCT_TYPE type=CARTESIAN
+        OUT GRAPH res, GRAPH g1, GRAPH g2, GRAPH_PRODUCT_TYPE type=CARTESIAN
 
 #######################################
 # Maximum flows, minimum cuts
