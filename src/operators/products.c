@@ -33,8 +33,11 @@ static igraph_error_t cartesian_product(igraph_t *res,
    igraph_bool_t directed2 = igraph_is_directed(g2);
 
    if (directed1 != directed2) {
-      IGRAPH_ERROR("Cartesian product of directed and undirected graphs is not supported.", IGRAPH_EINVAL);
-   }
+      IGRAPH_ERROR("Cartesian product of directed and undirected graphs is not supported. "
+                   "You can convert an undirected graph to a directed one using igraph_to_directed, "
+                   "or a directed graph to an undirected one using igraph_to_undirected.", IGRAPH_EINVAL);
+  }
+  
 
    igraph_bool_t directed = directed1 && directed2;
 
