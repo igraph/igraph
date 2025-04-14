@@ -1,15 +1,10 @@
-name: MINGW
 
-# TODO: Check the BRANCHES element when merging the branch 'develop' to, say, 'master'.
-on:
-  push:
-    branches:
-      - '**'
-      - '!appveyor/**'
-      - '!travis/**'
-  pull_request:
+name: MinGW
+
+on: [push, pull_request]
 
 env:
+  CMAKE_GENERATOR: Ninja
   CMAKE_COLOR_DIAGNOSTICS: ON
   OMP_NUM_THREADS: 1
   CCACHE_DIR: ${{ github.workspace }}/ccache
@@ -53,7 +48,7 @@ jobs:
         run: |
           mkdir -p build-${{ matrix.arch }}
           cd build-${{ matrix.arch }}
-          cmake .. -GNinja -DBUILD_SHARED_LIBS=${{ matrix.shared_libs == 'shared' && 'ON' || 'OFF' }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DIGRAPH_PRINT_ARITH_HEADER=ON -DFLEX_KEEP_LINE_NUMBERS=ON -DFORCE_COLORED_OUTPUT=ON -DIGRAPH_OPENMP_SUPPORT=ON
+          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared_libs == 'shared' && 'ON' || 'OFF' }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DIGRAPH_PRINT_ARITH_HEADER=ON -DFLEX_KEEP_LINE_NUMBERS=ON -DFORCE_COLORED_OUTPUT=ON -DIGRAPH_OPENMP_SUPPORT=ON
 
       - name: Ccache
         uses: actions/cache@v4
@@ -71,7 +66,7 @@ jobs:
 
       # The glpk_error test is temporarily disabled, see https://github.com/igraph/igraph/issues/1850
       - name: Test
-        run: ctest --exclude-regex glpk_error --output-on-failure --timeout 180
+        run: ctest --output-on-failure --timeout 180
         working-directory: build-${{ matrix.arch }}
 
       - name: Ccache stats
