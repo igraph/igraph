@@ -1,0 +1,124 @@
+
+name: arm64 tests
+
+on: [push, pull_request]
+
+env:
+  CMAKE_GENERATOR: Ninja
+  CMAKE_COLOR_DIAGNOSTICS: ON
+  CCACHE_DIR: ${{ github.workspace }}/ccache
+  CCACHE_MAXSIZE: 128M
+  OMP_NUM_THREADS: 1
+  CTEST_PARALLEL_LEVEL: 4 # Since CMake 3.29, a setting of 0 will try to use all available resources
+
+jobs:
+  linux:
+    name: Linux arm64
+
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get install libxml2-dev libopenblas-dev bison flex ccache
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_SHARED_LIBS=ON \
+            -DIGRAPH_GLPK_SUPPORT=ON \
+            -DIGRAPH_GRAPHML_SUPPORT=ON \
+            -DIGRAPH_OPENMP_SUPPORT=ON \
+            -DIGRAPH_USE_INTERNAL_BLAS=OFF \
+            -DIGRAPH_USE_INTERNAL_LAPACK=OFF \
+            -DIGRAPH_USE_INTERNAL_ARPACK=ON \
+            -DIGRAPH_USE_INTERNAL_GLPK=ON \
+            -DIGRAPH_USE_INTERNAL_GMP=ON \
+            -DIGRAPH_USE_INTERNAL_PLFIT=ON \
+            -DIGRAPH_PRINT_ARITH_HEADER=ON \
+            -DFLEX_KEEP_LINE_NUMBERS=ON \
+            -DFORCE_COLORED_OUTPUT=ON \
+            -DUSE_SANITIZER=Address
+
+      - name: Ccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-linux-arm64-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ccache-linux-arm64-${{ github.ref_name }}-
+
+      - name: Build
+        working-directory: build
+        run: cmake --build . --target build_tests --parallel
+      
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure --timeout 240
+
+      - name: Ccache stats
+        run: ccache -s
+
+  windows:
+    name: Windows arm64
+
+    runs-on: windows-11-arm
+
+    steps:
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: arm64
+
+      - name: Install dependencies
+        run: choco install ccache ninja winflexbison3
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure
+        run: |
+          mkdir build
+          cd build
+          cmake .. `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_SHARED_LIBS=ON `
+            -DIGRAPH_GLPK_SUPPORT=ON `
+            -DIGRAPH_GRAPHML_SUPPORT=OFF `
+            -DIGRAPH_OPENMP_SUPPORT=ON `
+            -DIGRAPH_USE_INTERNAL_BLAS=ON `
+            -DIGRAPH_USE_INTERNAL_LAPACK=ON `
+            -DIGRAPH_USE_INTERNAL_ARPACK=ON `
+            -DIGRAPH_USE_INTERNAL_GLPK=ON `
+            -DIGRAPH_USE_INTERNAL_GMP=ON `
+            -DIGRAPH_USE_INTERNAL_PLFIT=ON `
+            -DIGRAPH_PRINT_ARITH_HEADER=ON `
+            -DFLEX_KEEP_LINE_NUMBERS=ON `
+            -DFORCE_COLORED_OUTPUT=ON
+
+      - name: Ccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-windows-arm64-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ccache-windows-arm64-${{ github.ref_name }}-
+
+      - name: Build
+        working-directory: build
+        run: cmake --build . --target build_tests --parallel
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure --timeout 240
+
+      - name: Ccache stats
+        run: ccache -sv
