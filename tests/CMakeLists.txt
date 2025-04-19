@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  cartesian_product
   components
   coreness
   efficiency
@@ -364,6 +365,7 @@ add_legacy_tests(
   random_spanning_tree
   reachability
   single_target_shortest_path
+  tensor_product
   topological_sorting
 )
 

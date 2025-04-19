@@ -412,6 +412,11 @@ PAGERANKALGO:
     CTYPE: igraph_pagerank_algo_t
     FLAGS: ENUM
 
+GRAPH_PRODUCT_TYPE:
+    # Enum that describes the various implementations of the graph products
+    CTYPE: igraph_product_t
+    FLAGS: ENUM
+
 RANDOM_TREE_METHOD:
     # Enum that describes the various implementation of the uniform random tree
     # sampling method
