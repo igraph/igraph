@@ -366,6 +366,7 @@ add_legacy_tests(
   random_spanning_tree
   reachability
   single_target_shortest_path
+  tensor_product
   topological_sorting
 )
 

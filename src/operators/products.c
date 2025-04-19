@@ -118,8 +118,11 @@ static igraph_error_t tensor_product(igraph_t *res,
    IGRAPH_SAFE_MULT(vg1, vg2, &vres);
    igraph_vector_int_t edges;
 
-   // new edge count = e1*e2
+   // new edge count = 2*e1*e2
    IGRAPH_SAFE_MULT(eg1, eg2, &eres);
+   if (!directed) {// directed tensor product has only e1*e2 edges, see below
+      IGRAPH_SAFE_MULT(eres, 2, &eres);
+   }
    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*eres);
 
    igraph_integer_t from1, to1, from2, to2;
@@ -138,6 +141,13 @@ static igraph_error_t tensor_product(igraph_t *res,
          // create edge between ((from1, from2)) to ((to1, to2))
          VECTOR(edges)[edge_index++] = from1 * vg2 + from2; // ((from1, from2))
          VECTOR(edges)[edge_index++] = to1   * vg2 + to2;   // ((to1, to2))
+
+         // this cross edge is not present in directed edge
+         // as to2 is not adjacent to from2, if directed is taken in account
+         if (!directed) {
+            VECTOR(edges)[edge_index++] = from1 * vg2 + to2;   // ((from1, to2))
+            VECTOR(edges)[edge_index++] = to1   * vg2 + from2; // ((to1, from2))
+         }
       }
    }
 
