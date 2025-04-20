@@ -88,6 +88,7 @@ jobs:
         run: |
           mkdir build
           cd build
+          cl /VERSION
           cmake .. `
             -DCMAKE_BUILD_TYPE=Release `
             -DBUILD_SHARED_LIBS=ON `
@@ -114,7 +115,7 @@ jobs:
 
       - name: Build
         working-directory: build
-        run: cmake --build . --target build_tests --parallel
+        run: ninja -v build_tests
 
       - name: Test
         working-directory: build
