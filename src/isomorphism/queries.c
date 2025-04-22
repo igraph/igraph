@@ -90,7 +90,7 @@ static igraph_error_t igraph_i_isomorphic_small(
  *
  * \param graph1 The first graph.
  * \param graph2 The second graph.
- * \param iso Pointer to a logical variable, will be set to \c true
+ * \param iso Pointer to a Boolean variable, will be set to \c true
  *        if the two graphs are isomorphic, and \c false otherwise.
  * \return Error code.
  * \sa \ref igraph_isoclass(), \ref igraph_isoclass_subgraph(),

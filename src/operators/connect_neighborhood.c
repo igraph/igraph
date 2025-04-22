@@ -193,7 +193,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * \param res The graph power of the given \p order.
  * \param order Non-negative integer, the power to raise the graph to.
  *    In other words, vertices within a distance \p order will be connected.
- * \param directed Logical, whether to take edge directions into account.
+ * \param directed Whether to take edge directions into account.
  * \return Error code.
  *
  * \sa \ref igraph_connect_neighborhood() to connect each vertex to its

@@ -2736,7 +2736,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vect
  * \param graph Pointer to an uninitialized graph object.
  * \param size The number of vertices to add to the graph.
  * \param number The isomorphism class.
- * \param directed Logical constant, whether to create a directed
+ * \param directed Boolean constant, whether to create a directed
  *        graph.
  * \return Error code.
  * \sa \ref igraph_isoclass(),

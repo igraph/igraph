@@ -226,7 +226,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * not to be connected, and therefore not a tree.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored
+ * \param res Pointer to a Boolean variable, the result will be stored
  *        here.
  * \param root If not \c NULL, the root node will be stored here. When \p mode
  *        is \c IGRAPH_ALL or the graph is undirected, any vertex can be the root
@@ -494,7 +494,7 @@ static igraph_error_t igraph_i_is_forest(
  * will return a cached value in O(1) time if the roots are not requested.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable. If not \c NULL, then the result will be stored
+ * \param res Pointer to a Boolean variable. If not \c NULL, then the result will be stored
  *        here.
  * \param roots If not \c NULL, the root nodes will be stored here. When \p mode
  *        is \c IGRAPH_ALL or the graph is undirected, any one vertex from each
