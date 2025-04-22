@@ -81,7 +81,7 @@ static void igraph_i_citing_cited_type_game_free (
  *     which were never cited, and it should be greater than zero.
  *     It is a good idea to have all positive values in this vector.
  *     Preferences cannot be negative.
- * \param directed Logical constant, whether to create directed
+ * \param directed Boolean constant, whether to create directed
  *      networks.
  * \return Error code.
  *
@@ -238,7 +238,7 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
  *     plus one (types are numbered from zero).
  * \param edges_per_step Integer constant, the number of edges to add
  *     in each time step.
- * \param directed Logical constant, whether to create a directed
+ * \param directed Boolean constant, whether to create a directed
  *     network.
  * \return Error code.
  *
@@ -386,7 +386,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  *     element in \p types plus one (types are numbered from zero).
  * \param edges_per_step Integer constant, the number of edges to add
  *     in each time step.
- * \param directed Logical constant, whether to create a directed
+ * \param directed Boolean constant, whether to create a directed
  *     network.
  * \return Error code.
  *

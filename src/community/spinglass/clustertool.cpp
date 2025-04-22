@@ -124,7 +124,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  * \param spins Integer giving the number of spins, i.e. the maximum
  *     number of clusters. Even if the number of spins is high the number of
  *     clusters in the result might be small.
- * \param parupdate A logical constant, whether to update all spins in
+ * \param parupdate A Boolean constant, whether to update all spins in
  *     parallel. It is not implemented in the \c IGRAPH_SPINCOMM_INP_NEG
  *     implementation.
  * \param starttemp Real number, the temperature at the start. A reasonable

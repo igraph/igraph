@@ -50,12 +50,12 @@
  * \param outseq The number of edges to add in each time step. This
  *        argument is ignored if it is a null pointer or a zero length
  *        vector. In this case the constant \p m parameter is used.
- * \param outpref Logical constant, if true the edges originated by a
+ * \param outpref Boolean constant, if true the edges originated by a
  *        vertex also count as recent incident edges.
  *        For most applications it is reasonable to set it to false.
  * \param zero_appeal Constant giving the attractiveness of the
  *        vertices which haven't gained any edge recently.
- * \param directed Logical constant, whether to generate a directed
+ * \param directed Boolean constant, whether to generate a directed
  *        graph.
  * \return Error code.
  *
@@ -213,7 +213,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
  * \param outseq Vector giving the number of edges to add in each time
  *        step. If it is a null pointer or a zero-length vector then
  *        it is ignored and the \p m argument is used.
- * \param outpref Logical constant, if true the edges initiated by a
+ * \param outpref Boolean constant, if true the edges initiated by a
  *        vertex are also counted. Normally it is false.
  * \param pa_exp The exponent for the preferential attachment.
  * \param aging_exp The exponent for the aging, normally it is
@@ -223,7 +223,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
  *        incident edges for the vertices.
  * \param zero_appeal The degree dependent part of the attractiveness
  *        for zero degree vertices.
- * \param directed Logical constant, whether to create a directed
+ * \param directed Boolean constant, whether to create a directed
  *        graph.
  * \return Error code.
  *

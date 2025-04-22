@@ -425,7 +425,7 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  * time.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored
+ * \param res Pointer to a Boolean variable, the result will be stored
  *        here.
  * \param mode For a directed graph this specifies whether to calculate
  *        weak or strong connectedness. Possible values:

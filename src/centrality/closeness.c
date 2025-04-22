@@ -89,11 +89,11 @@
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param weights An optional vector containing edge weights for
- *        weighted closeness. No edge weight may be NaN. Supply a null
+ * \param weights An optional vector containing edge weights for weighted
+ *        closeness. NaN values re not allowed as weights. Supply a null
  *        pointer here for traditional, unweighted closeness.
  * \param normalized If true, the inverse of the mean distance to reachable
- *        vetices is returned. If false, the inverse of the sum of distances
+ *        vertices is returned. If false, the inverse of the sum of distances
  *        is returned.
  * \return Error code:
  *        \clist

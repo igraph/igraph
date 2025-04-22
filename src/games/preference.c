@@ -67,10 +67,10 @@
  *   graph is undirected.
  * \param node_type_vec A vector where the individual generated vertex types
  *   will be stored. If \c NULL, the vertex types won't be saved.
- * \param directed Logical, whether to generate a directed graph. If undirected
+ * \param directed Whether to generate a directed graph. If undirected
  *   graphs are requested, only the lower left triangle of the preference
  *   matrix is considered.
- * \param loops Logical, whether loop edges are allowed.
+ * \param loops Whether loop edges are allowed.
  * \return Error code.
  *
  * Added in version 0.3.</para><para>
@@ -373,7 +373,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *   vertex types will be stored. If \c NULL, the vertex types won't be saved.
  * \param node_type_in_vec A vector where the individual generated "incoming"
  *   vertex types will be stored. If \c NULL, the vertex types won't be saved.
- * \param loops Logical, whether loop edges are allowed.
+ * \param loops Whether loop edges are allowed.
  * \return Error code.
  *
  * Added in version 0.3.</para><para>
