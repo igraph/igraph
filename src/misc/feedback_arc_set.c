@@ -208,7 +208,8 @@ finish:
  * vertices and edges in the original input graph.
  *
  * \sa \ref igraph_is_acyclic() to determine if a graph is acyclic,
- * without returning a specific cycle.
+ * without returning a specific cycle; \ref igraph_simple_cycles()
+ * to list all cycles in a graph.
  */
 igraph_error_t igraph_find_cycle(const igraph_t *graph,
                                  igraph_vector_int_t *vertices,
