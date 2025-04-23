@@ -241,6 +241,9 @@ igraph_erdos_renyi_game_gnp:
 igraph_erdos_renyi_game_gnm:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False, BOOLEAN multiple=False
 
+igraph_iea_game:
+    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False
+
 igraph_degree_sequence_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,

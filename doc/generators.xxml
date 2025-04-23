@@ -52,6 +52,7 @@
 <!-- doxrox-include igraph_barabasi_game -->
 <!-- doxrox-include igraph_erdos_renyi_game_gnm -->
 <!-- doxrox-include igraph_erdos_renyi_game_gnp -->
+<!-- doxrox-include igraph_iea_game -->
 <!-- doxrox-include igraph_watts_strogatz_game -->
 <!-- doxrox-include igraph_rewire_edges -->
 <!-- doxrox-include igraph_rewire_directed_edges -->

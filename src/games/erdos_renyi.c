@@ -263,14 +263,42 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
 /**
  * \ingroup generators
- * \function igraph_erdos_renyi_game_gnm_multi
- * \brief Generates a random (Erdős-Rényi) graph with multi-edges.
+ * \function igraph_iea_game
+ * \brief Generates a random multigraph through independent edge assignment.
+ *
+ * \experimental
+ *
+ * This model generates random multigraphs on \p n vertices with \p m edges
+ * through independent edge assignment (IEA). Each of the \p m edges is assigned
+ * uniformly at random to an \em ordered vertex pair, independently of each
+ * other.
+ *
+ * </para><para>
+ * This model does not sample multigraphs uniformly. Undirected graphs are
+ * generated with probability proportional to
+ *
+ * </para><para>
+ * <code>(prod_(i&lt;j) A_ij ! prod_i A_ii !!)^(-1)</code>,
+ *
+ * </para><para>
+ * where \c A denotes the adjacency matrix and <code>!!</code> denotes
+ * the double factorial. Here \c A is assumed to have twice the number of
+ * self-loops on its diagonal. The corresponding  expression for directed
+ * graphs is
+ *
+ * </para><para>
+ * <code>(prod_(i,j) A_ij !)^(-1)</code>.
+ *
+ * </para><para>
+ * Thus the probability of all simple graphs (which only have 0s and 1s
+ * in the adjacency matrix) is the same, while that of
+ * non-simple ones depends on their edge and self-loop multiplicities.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges in the graph.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate loops (self) edges.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough
@@ -278,17 +306,24 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_erdos_renyi_game_gnm() to uniformly sample graphs with
+ * a given number of vertices and edges.
  */
-static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
-    igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
-    igraph_bool_t directed, igraph_bool_t loops
-) {
+igraph_error_t igraph_iea_game(
+        igraph_t *graph,
+        igraph_integer_t n, igraph_integer_t m,
+        igraph_bool_t directed, igraph_bool_t loops) {
 
     igraph_vector_int_t edges;
     int iter = 0;
 
-    /* No need for checking n or m here; it has already been done in
-     * igraph_erdos_renyi_game_gnm() */
+    if (n < 0) {
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+    }
+    if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
@@ -374,7 +409,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     }
 
     if (multiple) {
-        return igraph_i_erdos_renyi_game_gnm_multi(graph, n, m, directed, loops);
+        return igraph_iea_game(graph, n, m, directed, loops);
     }
 
     if (m == 0.0 || no_of_nodes == 0) {
