@@ -165,7 +165,7 @@ Follow the following steps if you would like to make a new pull request:
    conflicts; however, if you already have many commits, merging the upstream
    development branch may be faster.
 
-7. WHen your topic branch is up-to-date with the upstream development branch, you can
+7. When your topic branch is up-to-date with the upstream development branch, you can
    push your topic branch up to your fork:
 
    ```bash
