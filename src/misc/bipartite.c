@@ -1351,6 +1351,112 @@ igraph_error_t igraph_bipartite_iea_game(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t bipartite_gnm_multi(
+        igraph_t *graph,
+        igraph_integer_t n1, igraph_integer_t n2, igraph_integer_t m,
+        igraph_bool_t directed, igraph_neimode_t mode) {
+
+    /* See igraph_erdos_renyi_game_gnm() for how the sampling works. */
+
+    igraph_vector_int_t edges;
+    igraph_integer_t n;
+    igraph_integer_t nrow, ncol;
+    igraph_integer_t last;
+    igraph_integer_t offset1 = 0, offset2 = n1;
+
+    IGRAPH_SAFE_ADD(n1, n2, &n);
+
+    /* The larger partition is associated with collumns, the smaller
+     * with rows. This setup helps avoid integer overflow. We swap
+     * n1 and n2 so that n1 is smaller. */
+    if (n1 > n2) {
+        igraph_integer_t tmp = n1;
+        n1 = n2;
+        n2 = tmp;
+
+        offset1 = n2; offset2 = 0;
+
+        mode = IGRAPH_REVERSE_MODE(mode);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*m);
+
+    if (!directed || mode != IGRAPH_ALL) {
+        nrow = n1;
+        ncol = n2;
+        last = ncol-1;
+        for (igraph_integer_t i=0; i < m; i++) {
+            while (true) {
+                igraph_integer_t r = RNG_INTEGER(0, nrow-1);
+                igraph_integer_t c = RNG_INTEGER(0, ncol-1);
+
+                if (r >= n1) {
+                    igraph_integer_t j = (r - n1) * ncol + c;
+                    if (j >= i) continue; /* rejection sampling */
+                    VECTOR(edges)[2*i]   = VECTOR(edges)[2*j];
+                    VECTOR(edges)[2*i+1] = VECTOR(edges)[2*j+1];
+                } else {
+                    if (directed && mode == IGRAPH_IN) {
+                        VECTOR(edges)[2*i]   = c + offset2;
+                        VECTOR(edges)[2*i+1] = r + offset1;
+                    } else {
+                        VECTOR(edges)[2*i]   = r + offset1;
+                        VECTOR(edges)[2*i+1] = c + offset2;
+                    }
+                }
+
+                last += 1;
+                if (last >= ncol) {
+                    last -= ncol;
+                    nrow++;
+                }
+
+                break;
+            }
+        }
+    } else /* directed, mutual allowed */ {
+        nrow = 2*n1;
+        ncol = n2;
+        last = ncol-1;
+        for (igraph_integer_t i=0; i < m; i++) {
+            while (true) {
+                igraph_integer_t r = RNG_INTEGER(0, nrow-1);
+                igraph_integer_t c = RNG_INTEGER(0, ncol-1);
+
+                if (r >= 2*n1) {
+                    igraph_integer_t j = (r - 2*n1) * ncol + c;
+                    if (j >= i) continue; /* rejection sampling */
+                    VECTOR(edges)[2*i]   = VECTOR(edges)[2*j];
+                    VECTOR(edges)[2*i+1] = VECTOR(edges)[2*j+1];
+                } else {
+                    if (r < n1) {
+                        VECTOR(edges)[2*i]   = r + offset1;
+                        VECTOR(edges)[2*i+1] = c + offset2;
+                    } else {
+                        VECTOR(edges)[2*i]   = c + offset2;
+                        VECTOR(edges)[2*i+1] = r - n1 + offset1;
+                    }
+                }
+
+                last += 1;
+                if (last >= ncol) {
+                    last -= ncol;
+                    nrow++;
+                }
+
+                break;
+            }
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_bipartite_game_gnm
  * \brief Generate a random bipartite graph with a fixed number of edges.
@@ -1398,15 +1504,14 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     igraph_integer_t n;
     igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
 
-    if (multiple) {
-        return igraph_bipartite_iea_game(graph, types,n1, n2, m, directed, mode);
-    }
-
     if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices for bipartite graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,m) model.", IGRAPH_EINVAL);
     }
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges for bipartite G(n,m) model.", IGRAPH_EINVAL);
+    }
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for bipartite G(n,m) model.", IGRAPH_EINVAL);
     }
 
     IGRAPH_SAFE_ADD(n1, n2, &n);
@@ -1425,6 +1530,8 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
             IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
         }
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
+    } else if (multiple) {
+        IGRAPH_CHECK(bipartite_gnm_multi(graph, n1, n2, m, directed, mode));
     } else {
 
         igraph_integer_t i;
@@ -1470,11 +1577,11 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                 }
 
                 if (mode != IGRAPH_IN) {
-                    igraph_vector_int_push_back(&edges, from);
-                    igraph_vector_int_push_back(&edges, to);
+                    igraph_vector_int_push_back(&edges, from); /* reserved */
+                    igraph_vector_int_push_back(&edges, to); /* reserved */
                 } else {
-                    igraph_vector_int_push_back(&edges, to);
-                    igraph_vector_int_push_back(&edges, from);
+                    igraph_vector_int_push_back(&edges, to); /* reserved */
+                    igraph_vector_int_push_back(&edges, from); /* reserved */
                 }
             }
 
