@@ -64,8 +64,8 @@ IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph
 IGRAPH_EXPORT igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
 
-IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_t * output);
-IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_t * output);
+IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_int_t * output);
+IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_int_t * output);
 
 /* Deprecated in igraph 0.10 when we switched to igraph_graph_list_t. Will be
  * removed in 0.11 */
