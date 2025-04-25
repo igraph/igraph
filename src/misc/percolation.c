@@ -117,10 +117,13 @@ IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igra
 
     igraph_i_edge_list_percolation(&edgelist, output, igraph_vcount(graph));
 
+    igraph_vector_int_destroy(&edgelist);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
 IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_int_t * output) {
     return IGRAPH_SUCCESS;
-}
 
+}
