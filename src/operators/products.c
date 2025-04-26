@@ -164,7 +164,9 @@ static igraph_error_t tensor_product(igraph_t *res,
  * \function igraph_product
  * \brief Computes the graph product of two graphs, based on the specified
  * product type.
- * </para><para>
+ *
+ * \experimental
+ *
  * Supported graph product types are:
  * \clist
  *    \cli IGRAPH_PRODUCT_CARTESIAN
@@ -172,12 +174,14 @@ static igraph_error_t tensor_product(igraph_t *res,
  * The Cartesian product of two graphs \c g1 and \c g2 is a graph \c res such
  * that: \olist \oli The vertex set of \c res is the Cartesian product of the
  * vertex sets of g1 and g2: V(g1) x V(g2).
+ *
  * </para><para>
  *    \oli Two vertices <code>(u, v)</code> and <code>(u1, v1)</code> are
  * adjacent in \c res if and only if either <code>u = u1</code> and \c v is
  * adjacent to \c v1 in \c g2, or <code>v = v1</code> and \c u is adjacent to \c
  * u1 in \c g1. \endolist Thus, the number of vertices in \c res is |V1| x |V2|,
  * and the number of edges in \c res is |V1| × |E2| + |V2| × |E1|.
+ *
  * </para><para>
  * Time Complexity: O(|V1| × |V2| + |V1| × |E2| + |V2| × |E1|)
  *       where |V1| and |V2| are the number of vertices, and
@@ -186,10 +190,19 @@ static igraph_error_t tensor_product(igraph_t *res,
  * \endclist
  * Both graphs must be of the same type, either directed or undirected. If a
  * product of an undirected and a directed graph is required, the undirected
- * graph can be converted to a directed graph using \ref igraph_to_directed, or
+ * graph can be converted to a directed graph using \ref igraph_to_directed(), or
  * the directed graph can be converted to an undirected graph using \ref
- * igraph_to_undirected.
+ * igraph_to_undirected().
+ * 
  * </para><para>
+ * In graph products, each vertex in the resulting graph corresponds to a pair (u, v),
+ * where u is a vertex from the first graph and v is a vertex from the second graph.
+ *
+ * The pair (u, v) is mapped to a unique vertex index in the product graph using:
+ * <code>index = u * |V2| + v</code>
+ *
+ * where |V2| is the number of vertices in the second graph.
+ *
  * \param res Pointer to an uninitialized graph object. The result will be
  * stored here. \param g1 The first operand graph. \param g2 The second operand
  * graph. \param type The type of graph product to compute.
