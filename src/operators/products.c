@@ -237,9 +237,9 @@ static igraph_error_t tensor_product(igraph_t *res,
  */
 
 igraph_error_t igraph_product(igraph_t *res,
-               const igraph_t *g1,
-               const igraph_t *g2,
-               igraph_product_t type) {
+                              const igraph_t *g1,
+                              const igraph_t *g2,
+                              igraph_product_t type) {
     switch (type) {
     case IGRAPH_PRODUCT_CARTESIAN:
         IGRAPH_CHECK(cartesian_product(res, g1, g2));
