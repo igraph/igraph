@@ -204,7 +204,8 @@ static igraph_error_t tensor_product(igraph_t *res,
  * \endolist
  *
  * Thus, the number of vertices in \c res is |V1| × |V2|, and the number of edges
- * in \c res is |E1| × |E2|.
+ * in \c res is |E1| × |E2| for product of two directed graphs, and 2*|E1| × |E2|
+ * for product of two undirected graphs.
  *
  * </para><para>
  * Time Complexity: O(|V1| × |V2| + |E1| × |E2|)
