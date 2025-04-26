@@ -19,6 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+/********************** Cartesian Product ************************/
 void test_grid_vs_square_lattice(void) {
     // P4 X P3 should be a 4x3 grid (non-periodic)
     igraph_t p4, p3, product, lattice;
@@ -180,7 +181,8 @@ void test_multigraph_cartesian(void) {
     igraph_destroy(&product);
 }
 
-// K2 petersen = G(10,3)
+/********************** Tensor Product ************************/
+// K2 X petersen = G(10,3)
 void test_petersen_tensor(void) {
     igraph_t k2, petersen, g_10_3, product;
     igraph_bool_t is_iso;
@@ -201,6 +203,27 @@ void test_petersen_tensor(void) {
     igraph_destroy(&product);
 }
 
+// C2 X C3 = C6
+void test_dir_cycle_tensor(void) {
+    igraph_t c2, c3, c6, product;
+    igraph_bool_t is_iso;
+
+    igraph_ring(&c2, 2, IGRAPH_DIRECTED, false, true);
+    igraph_ring(&c3, 3, IGRAPH_DIRECTED, false, true);
+    igraph_ring(&c6, 6, IGRAPH_DIRECTED, false, true);
+
+    igraph_product(&product, &c2, &c3, IGRAPH_PRODUCT_TENSOR);
+
+    igraph_isomorphic(&product, &c6, &is_iso);
+
+    IGRAPH_ASSERT(is_iso);
+
+    igraph_destroy(&c2);
+    igraph_destroy(&c3);
+    igraph_destroy(&c6);
+    igraph_destroy(&product);
+}
+
 int main(void) {
     // CARTESIAN PRODUCT TEST
     test_grid_vs_square_lattice();
@@ -212,6 +235,7 @@ int main(void) {
 
     // TENSOR PRODUCT TEST
     test_petersen_tensor();
+    test_dir_cycle_tensor();
 
     VERIFY_FINALLY_STACK();
 
