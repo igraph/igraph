@@ -33,61 +33,63 @@ static igraph_error_t cartesian_product(igraph_t *res,
    igraph_bool_t directed2 = igraph_is_directed(g2);
 
    if (directed1 != directed2) {
-      IGRAPH_ERROR("Cartesian product of directed and undirected graphs is not supported. "
-                   "You can convert an undirected graph to a directed one using igraph_to_directed, "
-                   "or a directed graph to an undirected one using igraph_to_undirected.", IGRAPH_EINVAL);
+      IGRAPH_ERROR("Cartesian product between a directed and an undirected graph is invalid. "
+         "Please ensure that both graphs have the same directionality.", IGRAPH_EINVAL);
    }
   
    igraph_bool_t directed = directed1 && directed2;
 
-   igraph_integer_t vg1 = igraph_vcount(g1);
-   igraph_integer_t vg2 = igraph_vcount(g2);
-   igraph_integer_t eg1 = igraph_ecount(g1);
-   igraph_integer_t eg2 = igraph_ecount(g2);
-   igraph_integer_t vres;
-   igraph_integer_t eres;
+   igraph_integer_t vcountg1 = igraph_vcount(g1);
+   igraph_integer_t vcountg2 = igraph_vcount(g2);
+   igraph_integer_t ecountg1 = igraph_ecount(g1);
+   igraph_integer_t ecountg2 = igraph_ecount(g2);
+   igraph_integer_t vcount;
+   igraph_integer_t ecount;
    igraph_integer_t temp;
 
-   IGRAPH_SAFE_MULT(vg1, vg2, &vres);
+   IGRAPH_SAFE_MULT(vcountg1, vcountg2, &vcount);
    igraph_vector_int_t edges;
 
-   // new edge count = vg1*e2 + vg2*e1
-   IGRAPH_SAFE_MULT(vg1, eg2, &eres);
-   IGRAPH_SAFE_MULT(vg2, eg1, &temp);
-   IGRAPH_SAFE_ADD(eres, temp, &eres);
-   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*eres);
+   // new edge count = vcountg1*e2 + vcountg2*e1
+   IGRAPH_SAFE_MULT(vcountg1, ecountg2, &ecount);
+   IGRAPH_SAFE_MULT(vcountg2, ecountg1, &temp);
+   IGRAPH_SAFE_ADD(ecount, temp, &ecount);
+   IGRAPH_SAFE_MULT(ecount, 2, &ecount);
+   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount);
 
    igraph_integer_t from, to;
    igraph_integer_t i, j;
    
    // Vertex ((i, j)) with i from g1, and j from g2
-   //   will have new vertex id: i * vg2 + j
+   //   will have new vertex id: i * vcountg2 + j
 
    igraph_integer_t edge_index = 0;
    // Edges from g1
-   for (i = 0; i < eg1; ++i) {
-      igraph_edge(g1, i, &from, &to);
+   for (i = 0; i < ecountg1; ++i) {
+      from = IGRAPH_FROM(g1, i);
+      to = IGRAPH_TO(g1, i);
       // for all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
       //    for all vertex j in g2
-      for (j = 0; j < vg2; ++j) {
-         // SAFE MULT and SAFE ADD not needed as < vres
-         VECTOR(edges)[edge_index++] = from * vg2 + j;   // ((from, j))
-         VECTOR(edges)[edge_index++] = to * vg2 + j;     // ((to, j))
+      for (j = 0; j < vcountg2; ++j) {
+         // SAFE MULT and SAFE ADD not needed as < vcount
+         VECTOR(edges)[edge_index++] = from * vcountg2 + j;   // ((from, j))
+         VECTOR(edges)[edge_index++] = to * vcountg2 + j;     // ((to, j))
       }
    }
 
    // Edges from g2
-   for (i = 0; i < eg2; ++i) {
-      igraph_edge(g2, i, &from, &to);
+   for (i = 0; i < ecountg2; ++i) {
+      from = IGRAPH_FROM(g2, i);
+      to = IGRAPH_TO(g2, i);
       // for all edges (from, to) in g2, add edge from (j, from) to (j, to)
       //    for all vertex j in g1
-      for (j = 0; j < vg1; ++j) {
-         VECTOR(edges)[edge_index++] = j * vg2 + from; // ((j, from))
-         VECTOR(edges)[edge_index++] = j * vg2 + to;   // ((j, to))
+      for (j = 0; j < vcountg1; ++j) {
+         VECTOR(edges)[edge_index++] = j * vcountg2 + from; // ((j, from))
+         VECTOR(edges)[edge_index++] = j * vcountg2 + to;   // ((j, to))
       }
    }
 
-   IGRAPH_CHECK(igraph_create(res, &edges, vres, directed));
+   IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
    igraph_vector_int_destroy(&edges);
    IGRAPH_FINALLY_CLEAN(1);
 
@@ -101,57 +103,59 @@ static igraph_error_t tensor_product(igraph_t *res,
    igraph_bool_t directed2 = igraph_is_directed(g2);
 
    if (directed1 != directed2) {
-      IGRAPH_ERROR("Tensor product of directed and undirected graphs is not supported. "
-                   "You can convert an undirected graph to a directed one using igraph_to_directed, "
-                   "or a directed graph to an undirected one using igraph_to_undirected.", IGRAPH_EINVAL);
+      IGRAPH_ERROR("Tensor product between a directed and an undirected graph is invalid. "
+         "Please ensure that both graphs have the same directionality.", IGRAPH_EINVAL);
    }
 
    igraph_bool_t directed = directed1 && directed2;
 
-   igraph_integer_t vg1 = igraph_vcount(g1);
-   igraph_integer_t vg2 = igraph_vcount(g2);
-   igraph_integer_t eg1 = igraph_ecount(g1);
-   igraph_integer_t eg2 = igraph_ecount(g2);
-   igraph_integer_t vres;
-   igraph_integer_t eres;
+   igraph_integer_t vcountg1 = igraph_vcount(g1);
+   igraph_integer_t vcountg2 = igraph_vcount(g2);
+   igraph_integer_t ecountg1 = igraph_ecount(g1);
+   igraph_integer_t ecountg2 = igraph_ecount(g2);
+   igraph_integer_t vcount;
+   igraph_integer_t ecount;
 
-   IGRAPH_SAFE_MULT(vg1, vg2, &vres);
+   IGRAPH_SAFE_MULT(vcountg1, vcountg2, &vcount);
    igraph_vector_int_t edges;
 
    // new edge count = 2*e1*e2 if undirected else e1*e2
-   IGRAPH_SAFE_MULT(eg1, eg2, &eres);
+   IGRAPH_SAFE_MULT(ecountg1, ecountg2, &ecount);
    if (!directed) { // directed tensor product has only e1*e2 edges, see below
-      IGRAPH_SAFE_MULT(eres, 2, &eres);
+      IGRAPH_SAFE_MULT(ecount, 2, &ecount);
    }
-   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*eres);
+   IGRAPH_SAFE_MULT(ecount, 2, &ecount);
+   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount);
 
    igraph_integer_t from1, to1, from2, to2;
    igraph_integer_t i, j;
    
    // Vertex ((i, j)) with i from g1, and j from g2
-   //   will have new vertex id: i * vg2 + j
+   //   will have new vertex id: i * vcountg2 + j
    igraph_integer_t edge_index = 0;
 
-   for (i = 0; i < eg1; ++i) {
-      igraph_edge(g1, i, &from1, &to1);
+   for (i = 0; i < ecountg1; ++i) {
+      from1 = IGRAPH_FROM(g1, i);
+      to1 = IGRAPH_TO(g1, i);
 
-      for (j = 0; j < eg2; ++j) {
-         igraph_edge(g2, j, &from2, &to2);
+      for (j = 0; j < ecountg2; ++j) {
+         from2 = IGRAPH_FROM(g2, j);
+         to2 = IGRAPH_TO(g2, j);
 
          // create edge between ((from1, from2)) to ((to1, to2))
-         VECTOR(edges)[edge_index++] = from1 * vg2 + from2; // ((from1, from2))
-         VECTOR(edges)[edge_index++] = to1   * vg2 + to2;   // ((to1, to2))
+         VECTOR(edges)[edge_index++] = from1 * vcountg2 + from2; // ((from1, from2))
+         VECTOR(edges)[edge_index++] = to1   * vcountg2 + to2;   // ((to1, to2))
 
          // this cross edge is not present in directed edge
-         // as to2 is not adjacent to from2, if directed is taken in account
+         // as to2 is not adjacent to from2, if direction is taken in account
          if (!directed) {
-            VECTOR(edges)[edge_index++] = from1 * vg2 + to2;   // ((from1, to2))
-            VECTOR(edges)[edge_index++] = to1   * vg2 + from2; // ((to1, from2))
+            VECTOR(edges)[edge_index++] = from1 * vcountg2 + to2;   // ((from1, to2))
+            VECTOR(edges)[edge_index++] = to1   * vcountg2 + from2; // ((to1, from2))
          }
       }
    }
 
-   IGRAPH_CHECK(igraph_create(res, &edges, vres, directed));
+   IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
    igraph_vector_int_destroy(&edges);
    IGRAPH_FINALLY_CLEAN(1);
 
