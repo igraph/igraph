@@ -180,23 +180,23 @@ void test_multigraph(void) {
     igraph_destroy(&product);
 }
 
-// K2 X G(5,2) = G(10,3)
+// K2 X petersen = G(10,3)
 void test_petersen(void) {
-    igraph_t k2, g_5_2, g_10_3, product;
+    igraph_t k2, petersen, g_10_3, product;
     igraph_bool_t is_iso;
 
     igraph_full(&k2, 2, IGRAPH_UNDIRECTED, false);
-    igraph_generalized_petersen(&g_5_2, 5, 2);
+    igraph_famous(&petersen, "petersen");
     igraph_generalized_petersen(&g_10_3, 10, 3);
 
-    igraph_product(&product, &k2, &g_5_2, IGRAPH_PRODUCT_TENSOR);
+    igraph_product(&product, &k2, &petersen, IGRAPH_PRODUCT_TENSOR);
 
     igraph_isomorphic(&product, &g_10_3, &is_iso);
 
     IGRAPH_ASSERT(is_iso);
 
     igraph_destroy(&k2);
-    igraph_destroy(&g_5_2);
+    igraph_destroy(&petersen);
     igraph_destroy(&g_10_3);
     igraph_destroy(&product);
 }
