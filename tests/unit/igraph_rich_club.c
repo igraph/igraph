@@ -246,6 +246,7 @@ void error_checks(void) {
     CHECK_ERROR(igraph_rich_club_density_sequence(&graph, NULL, &result,
                                                   &vertexOrder, false, false),
                                                   IGRAPH_EINVAL);
+    igraph_vector_int_resize(&vertexOrder, numVertices);
 
     // wrong weights vector size (!= number of edges)
     igraph_vector_init(&weights, 1);
