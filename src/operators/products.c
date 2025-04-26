@@ -118,9 +118,9 @@ static igraph_error_t tensor_product(igraph_t *res,
    IGRAPH_SAFE_MULT(vg1, vg2, &vres);
    igraph_vector_int_t edges;
 
-   // new edge count = 2*e1*e2
+   // new edge count = 2*e1*e2 if undirected else e1*e2
    IGRAPH_SAFE_MULT(eg1, eg2, &eres);
-   if (!directed) {// directed tensor product has only e1*e2 edges, see below
+   if (!directed) { // directed tensor product has only e1*e2 edges, see below
       IGRAPH_SAFE_MULT(eres, 2, &eres);
    }
    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*eres);
