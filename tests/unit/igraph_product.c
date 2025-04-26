@@ -59,8 +59,8 @@ void test_cylinder_vs_cartesian(void) {
     igraph_vector_bool_init(&periodic, 2);
     VECTOR(dims)[0] = 4;
     VECTOR(dims)[1] = 3;
-    VECTOR(periodic)[0] = 1;  // periodic in first dim (C4)
-    VECTOR(periodic)[1] = 0;  // non-periodic in second dim (P3)
+    VECTOR(periodic)[0] = true;  // periodic in first dim (C4)
+    VECTOR(periodic)[1] = false;  // non-periodic in second dim (P3)
 
     igraph_square_lattice(&cylinder, &dims, 1, IGRAPH_UNDIRECTED, false, &periodic);
     igraph_isomorphic(&product, &cylinder, &is_iso);
@@ -110,8 +110,8 @@ void test_torus_vs_cartesian(void) {
     igraph_vector_bool_init(&periodic, 2);
     VECTOR(dims)[0] = 4;
     VECTOR(dims)[1] = 4;
-    VECTOR(periodic)[0] = 1;
-    VECTOR(periodic)[1] = 1;
+    VECTOR(periodic)[0] = true;
+    VECTOR(periodic)[1] = true;
 
     igraph_square_lattice(&torus, &dims, 1, IGRAPH_UNDIRECTED, false, &periodic);
     igraph_isomorphic(&product, &torus, &is_iso);
