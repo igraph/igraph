@@ -172,7 +172,9 @@ static igraph_error_t tensor_product(igraph_t *res,
  *    \cli IGRAPH_PRODUCT_CARTESIAN
  *       Computes the Cartesian product of two graphs \c g1 and \c g2.
  * The Cartesian product of two graphs \c g1 and \c g2 is a graph \c res such
- * that: \olist \oli The vertex set of \c res is the Cartesian product of the
+ * that: 
+ * \olist 
+ *   \oli The vertex set of \c res is the Cartesian product of the
  * vertex sets of g1 and g2: V(g1) x V(g2).
  *
  * </para><para>
@@ -187,7 +189,29 @@ static igraph_error_t tensor_product(igraph_t *res,
  *       where |V1| and |V2| are the number of vertices, and
  *       |E1| and |E2| are the number of edges in \c g1 and \c g2 respectively.
  *
+ *    \cli IGRAPH_PRODUCT_TENSOR
+ *       Computes the Tensor (categorical) product of two graphs \c g1 and \c g2.
+ * The Tensor product of two graphs \c g1 and \c g2 is a graph \c res such that:
+ *
+ * \olist
+ *    \oli The vertex set of \c res is the Cartesian product of the 
+ * vertex sets of g1 and g2: V(g1) × V(g2).
+ *
+ * </para><para>
+ *    \oli Two vertices <code>(u, v)</code> and <code>(u1, v1)</code> are adjacent in \c res
+ *         if and only if \c u is adjacent to \c u1 in \c g1
+ *         and \c v is adjacent to \c v1 in \c g2.
+ * \endolist
+ *
+ * Thus, the number of vertices in \c res is |V1| × |V2|, and the number of edges
+ * in \c res is |E1| × |E2|.
+ *
+ * </para><para>
+ * Time Complexity: O(|V1| × |V2| + |E1| × |E2|)
+ *       where |V1| and |V2| are the number of vertices, and
+ *       |E1| and |E2| are the number of edges in \c g1 and \c g2 respectively.
  * \endclist
+ *
  * Both graphs must be of the same type, either directed or undirected. If a
  * product of an undirected and a directed graph is required, the undirected
  * graph can be converted to a directed graph using \ref igraph_to_directed(), or
