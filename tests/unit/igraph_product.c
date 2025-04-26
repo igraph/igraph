@@ -125,7 +125,7 @@ void test_torus_vs_cartesian(void) {
     igraph_vector_bool_destroy(&periodic);
 }
 
-void test_self_loop(void) {
+void test_self_loop_cartesian(void) {
     // 1-vertex loop X K4 (circular=false) = K4(circular=true)
     igraph_t v1loop, k4a, k4b, product;
     igraph_bool_t is_iso;
@@ -145,7 +145,7 @@ void test_self_loop(void) {
     igraph_destroy(&product);
 }
 
-void test_multigraph(void) {
+void test_multigraph_cartesian(void) {
     igraph_t g1, g2, product;
 
     // g1: a multigraph with 2 vertices and parallel edges + self-loop
@@ -180,8 +180,8 @@ void test_multigraph(void) {
     igraph_destroy(&product);
 }
 
-// K2 X petersen = G(10,3)
-void test_petersen(void) {
+// K2 petersen = G(10,3)
+void test_petersen_tensor(void) {
     igraph_t k2, petersen, g_10_3, product;
     igraph_bool_t is_iso;
 
@@ -207,11 +207,11 @@ int main(void) {
     test_cylinder_vs_cartesian();
     test_cube_vs_cartesian();
     test_torus_vs_cartesian();
-    test_self_loop();
-    test_multigraph();
+    test_self_loop_cartesian();
+    test_multigraph_cartesian();
 
     // TENSOR PRODUCT TEST
-    test_petersen();
+    test_petersen_tensor();
 
     VERIFY_FINALLY_STACK();
 
