@@ -102,7 +102,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_real_t no_of_edges_real = no_of_edges;   /* for divisions */
+    igraph_real_t no_of_edges_real = (igraph_real_t) no_of_edges;   /* for divisions */
     igraph_integer_t no_of_types;
     igraph_vector_int_t ai, bi, eii;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
