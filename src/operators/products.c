@@ -19,7 +19,6 @@
 #include "igraph_operators.h"
 
 #include "igraph_constructors.h"
-#include "igraph_conversion.h"
 #include "igraph_interface.h"
 
 #include "math/safe_intop.h"
@@ -49,7 +48,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
     IGRAPH_SAFE_MULT(vcountg1, vcountg2, &vcount);
     igraph_vector_int_t edges;
 
-    // new edge count = vcountg1*e2 + vcountg2*e1
+    // New edge count = vcountg1*e2 + vcountg2*e1
     IGRAPH_SAFE_MULT(vcountg1, ecountg2, &ecount);
     IGRAPH_SAFE_MULT(vcountg2, ecountg1, &temp);
     IGRAPH_SAFE_ADD(ecount, temp, &ecount);
@@ -60,12 +59,13 @@ static igraph_error_t cartesian_product(igraph_t *res,
     //   will have new vertex id: i * vcountg2 + j
 
     igraph_integer_t edge_index = 0;
+
     // Edges from g1
     for (igraph_integer_t i = 0; i < ecountg1; ++i) {
         igraph_integer_t from = IGRAPH_FROM(g1, i);
         igraph_integer_t to = IGRAPH_TO(g1, i);
 
-        // for all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
+        // For all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
         //    for all vertex j in g2
         for (igraph_integer_t j = 0; j < vcountg2; ++j) {
             // SAFE MULT and SAFE ADD not needed as < vcount
@@ -79,7 +79,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
         igraph_integer_t from = IGRAPH_FROM(g2, i);
         igraph_integer_t to = IGRAPH_TO(g2, i);
 
-        // for all edges (from, to) in g2, add edge from (j, from) to (j, to)
+        // For all edges (from, to) in g2, add edge from (j, from) to (j, to)
         //    for all vertex j in g1
         for (igraph_integer_t j = 0; j < vcountg1; ++j) {
             VECTOR(edges)[edge_index++] = j * vcountg2 + from; // ((j, from))
@@ -118,9 +118,9 @@ static igraph_error_t tensor_product(igraph_t *res,
     IGRAPH_SAFE_MULT(vcountg1, vcountg2, &vcount);
     igraph_vector_int_t edges;
 
-    // new edge count = 2*e1*e2 if undirected else e1*e2
+    // New edge count = 2*e1*e2 if undirected else e1*e2
     IGRAPH_SAFE_MULT(ecountg1, ecountg2, &ecount);
-    if (!directed) { // directed tensor product has only e1*e2 edges, see below
+    if (!directed) { // Directed tensor product has only e1*e2 edges, see below
         IGRAPH_SAFE_MULT(ecount, 2, &ecount);
     }
     IGRAPH_SAFE_MULT(ecount, 2, &ecount);
@@ -128,6 +128,7 @@ static igraph_error_t tensor_product(igraph_t *res,
 
     // Vertex ((i, j)) with i from g1, and j from g2
     //   will have new vertex id: i * vcountg2 + j
+
     igraph_integer_t edge_index = 0;
 
     for (igraph_integer_t i = 0; i < ecountg1; ++i) {
@@ -138,12 +139,13 @@ static igraph_error_t tensor_product(igraph_t *res,
             igraph_integer_t from2 = IGRAPH_FROM(g2, j);
             igraph_integer_t to2 = IGRAPH_TO(g2, j);
 
-            // create edge between ((from1, from2)) to ((to1, to2))
+            // Create edge between ((from1, from2)) to ((to1, to2))
             VECTOR(edges)[edge_index++] = from1 * vcountg2 + from2; // ((from1, from2))
             VECTOR(edges)[edge_index++] = to1 * vcountg2 + to2; // ((to1, to2))
 
-            // this cross edge is not present in directed edge
-            // as to2 is not adjacent to from2, if direction is taken in account
+            // In directed graphs, no edge is added because (from2, to2) are not adjacent 
+            // respecting direction.
+            // For undirected graphs, add cross edges between ((from1, to2)) and ((to1, from2)).
             if (!directed) {
                 VECTOR(edges)[edge_index++] = from1 * vcountg2 + to2; // ((from1, to2))
                 VECTOR(edges)[edge_index++] = to1 * vcountg2 + from2; // ((to1, from2))
