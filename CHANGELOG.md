@@ -12,10 +12,12 @@
 
  - `igraph_neighborhood_size()`, `igraph_neighborhood()` and `igraph_neighborhood_graphs()` now accept a negative `order` value and interpret it as infinite order. Previously, a negative `order` value was disallowed.
  - `igraph_famous()` now accepts `Groetzsch` as an alias of `Grotzsch`.
+ - `igraph_vertex_path_from_edge_path()` can now determine the start vertex automatically.
 
 ### Fixed
 
  - `igraph_largest_independent_vertex_sets()` and `igraph_maximal_independent_vertex_sets()` would sometimes return incorrect results for graphs with self-loops. This is now corrected.
+ - `igraph_vertex_path_from_edge_path()` now validates the start vertex.
 
 ### Deprecated
 
