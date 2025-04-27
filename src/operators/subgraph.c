@@ -338,7 +338,10 @@ static igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
         ratio = (igraph_real_t) num_vs / igraph_vcount(graph);
     }
 
-    if (ratio > log(graph->n) / log(10) / 10) {
+    /* The threshold of 0.5 is justified by the benchmarking done in
+     * https://github.com/igraph/igraph/pull/2708
+     * Small improvements may be possible by using better heuristics. */
+    if (ratio > 0.5) {
         *result = IGRAPH_SUBGRAPH_COPY_AND_DELETE;
     } else {
         *result = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;

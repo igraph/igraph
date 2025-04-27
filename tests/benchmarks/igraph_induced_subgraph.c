@@ -1,6 +1,6 @@
 /*
     IGraph library.
-    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "bench.h"
-#include "igraph_constants.h"
 #include <igraph.h>
-#include <stdio.h>
+
+#include "bench.h"
 
 // Function to generate random vertex indices for subgraph extraction
 void generate_random_vertices(igraph_vector_int_t *vertices,
