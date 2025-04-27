@@ -366,6 +366,7 @@ add_legacy_tests(
   igraph_spanner
   knn
   minimum_spanning_tree
+  paths
   random_spanning_tree
   reachability
   single_target_shortest_path
@@ -1014,6 +1015,7 @@ add_benchmarks(
   igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph
   igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
