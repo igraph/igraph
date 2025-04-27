@@ -29,7 +29,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
     igraph_bool_t directed1 = igraph_is_directed(g1);
     igraph_bool_t directed2 = igraph_is_directed(g2);
 
-   if (directed1 != directed2) {
+    if (directed1 != directed2) {
         IGRAPH_ERROR("Cartesian product between a directed and an undirected graph "
                      "is invalid.",
                      IGRAPH_EINVAL);
