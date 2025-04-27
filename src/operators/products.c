@@ -41,16 +41,19 @@ static igraph_error_t cartesian_product(igraph_t *res,
     igraph_integer_t vcount;
     igraph_integer_t ecount, ecount_double;
     igraph_vector_int_t edges;
-    igraph_integer_t temp;
 
+    // New vertex count = vcount1 * vcount2
     IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
 
-    // New edge count = vcount1*e2 + vcount2*e1
-    IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
-    IGRAPH_SAFE_MULT(vcount2, ecount1, &temp);
-    IGRAPH_SAFE_ADD(ecount, temp, &ecount);
-    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    {
+        // New edge count = vcount1*ecount2 + vcount2*ecount1
+        igraph_integer_t temp;
+        IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+        IGRAPH_SAFE_MULT(vcount2, ecount1, &temp);
+        IGRAPH_SAFE_ADD(ecount, temp, &ecount);
+    }
 
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
 
     // Vertex ((i, j)) with i from g1, and j from g2
@@ -113,10 +116,9 @@ static igraph_error_t tensor_product(igraph_t *res,
 
     IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
 
-    // New edge count = 2*e1*e2 if undirected else e1*e2
+    // New edge count = 2*ecount1*ecount2 if undirected else ecount1*ecount2
     IGRAPH_SAFE_MULT(ecount1, ecount2, &ecount);
     if (!directed) {
-        // Directed tensor product has only e1*e2 edges, see below
         IGRAPH_SAFE_MULT(ecount, 2, &ecount);
     }
     IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
