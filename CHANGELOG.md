@@ -48,8 +48,10 @@
 ### Added
 
  - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
- - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges.
- - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges.
+ - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to uniformly sample G(n,m) graphs with multi-edges.
+ - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to uniformly sample bipartite G(n,m) graphs with multi-edges.
+ - `igraph_iea_game()` samples random multigraphs through independent edge assignment.
+ - `igraph_bipartite_iea_game()` samples random bipartite multigraph through independent edge assignment.
  - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
  - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
