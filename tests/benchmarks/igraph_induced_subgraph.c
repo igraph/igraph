@@ -62,9 +62,10 @@ void bench_induced_subgraph(igraph_t *graph, igraph_vector_int_t *vertices,
     igraph_destroy(&subgraph);
 }
 
-void run_bench(int i, int n, int m, int subset_percentage) {
+void run_bench(int i, igraph_integer_t n, igraph_real_t k, double subset_percentage) {
     igraph_t graph;
     igraph_vector_int_t vertices;
+    igraph_integer_t m = round(k * n / 2);
 
     // Calculate subset size based on percentage
     igraph_integer_t subset_size = (n * subset_percentage) / 100;
@@ -78,7 +79,7 @@ void run_bench(int i, int n, int m, int subset_percentage) {
 
     // Benchmark method 1 (COPY_AND_DELETE)
     snprintf(msg, sizeof(msg),
-             "Method 1 (COPY_AND_DELETE):     n=%5d, subset=%3d%%, %dx", n,
+             "Method 1 (COPY_AND_DELETE):     n= %5lld, subset=%3g%%, %dx", n,
              subset_percentage, rep);
     BENCH(msg, REPEAT(bench_induced_subgraph(&graph, &vertices,
                                              IGRAPH_SUBGRAPH_COPY_AND_DELETE),
@@ -86,7 +87,42 @@ void run_bench(int i, int n, int m, int subset_percentage) {
 
     // Benchmark method 2 (CREATE_FROM_SCRATCH)
     snprintf(msg, sizeof(msg),
-             "Method 2 (CREATE_FROM_SCRATCH): n=%5d, subset=%3d%%, %dx", n,
+             "Method 2 (CREATE_FROM_SCRATCH): n= %5lld, subset=%3g%%, %dx", n,
+             subset_percentage, rep);
+    BENCH(msg, REPEAT(bench_induced_subgraph(&graph, &vertices,
+                                             IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH),
+                      rep));
+
+    // Cleanup
+    igraph_vector_int_destroy(&vertices);
+    igraph_destroy(&graph);
+}
+
+void run_bench2(int i, igraph_integer_t n, igraph_real_t k, double subset_percentage) {
+    igraph_t graph;
+    igraph_vector_int_t vertices;
+
+    // Calculate subset size based on percentage
+    igraph_integer_t subset_size = (n * subset_percentage) / 100;
+
+    // Prepare random graph and vertices
+    igraph_barabasi_game(&graph, n, 1, round(k/2), NULL, true, 0, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE, NULL);
+    generate_random_vertices(&vertices, n, subset_size);
+
+    char msg[255];
+    int rep = 300000000 / (n * subset_percentage);
+
+    // Benchmark method 1 (COPY_AND_DELETE)
+    snprintf(msg, sizeof(msg),
+             "Method 1 (COPY_AND_DELETE):     n= %5lld, subset=%3g%%, %dx", n,
+             subset_percentage, rep);
+    BENCH(msg, REPEAT(bench_induced_subgraph(&graph, &vertices,
+                                             IGRAPH_SUBGRAPH_COPY_AND_DELETE),
+                      rep));
+
+    // Benchmark method 2 (CREATE_FROM_SCRATCH)
+    snprintf(msg, sizeof(msg),
+             "Method 2 (CREATE_FROM_SCRATCH): n= %5lld, subset=%3g%%, %dx", n,
              subset_percentage, rep);
     BENCH(msg, REPEAT(bench_induced_subgraph(&graph, &vertices,
                                              IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH),
@@ -105,7 +141,10 @@ int main(void) {
     BENCH_INIT();
 
 // Macro to run benchmarks for different graph sizes and subset percentages
-#define BENCHSET(n, m)                                                           \
+#define BENCHSET(n, m) \
+    run_bench(++i, n, m,  5); /* 20% subset */                                   \
+    run_bench(++i, n, m, 10); /* 20% subset */                                   \
+    run_bench(++i, n, m, 15); /* 20% subset */                                   \
     run_bench(++i, n, m, 20); /* 20% subset */                                   \
     run_bench(++i, n, m, 25); /* 25% subset */                                   \
     run_bench(++i, n, m, 30); /* 30% subset */                                   \
@@ -114,13 +153,107 @@ int main(void) {
     run_bench(++i, n, m, 45); /* 45% subset */                                   \
     run_bench(++i, n, m, 50); /* 50% subset */                                   \
     run_bench(++i, n, m, 55); /* 55% subset */                                   \
+    run_bench(++i, n, m, 60); /* 55% subset */                                   \
+    run_bench(++i, n, m, 65); /* 55% subset */                                   \
+    run_bench(++i, n, m, 70); /* 55% subset */                                   \
+    printf("\n");
+
+#define BENCHSET2(n, m)                                                           \
+    run_bench2(++i, n, m,  5); /* 20% subset */                                   \
+    run_bench2(++i, n, m, 10); /* 20% subset */                                   \
+    run_bench2(++i, n, m, 15); /* 20% subset */                                   \
+    run_bench2(++i, n, m, 20); /* 20% subset */                                   \
+    run_bench2(++i, n, m, 25); /* 25% subset */                                   \
+    run_bench2(++i, n, m, 30); /* 30% subset */                                   \
+    run_bench2(++i, n, m, 35); /* 35% subset */                                   \
+    run_bench2(++i, n, m, 40); /* 40% subset */                                   \
+    run_bench2(++i, n, m, 45); /* 45% subset */                                   \
+    run_bench2(++i, n, m, 50); /* 50% subset */                                   \
+    run_bench2(++i, n, m, 55); /* 55% subset */                                   \
+    run_bench2(++i, n, m, 60); /* 55% subset */                                   \
+    run_bench2(++i, n, m, 65); /* 55% subset */                                   \
+    run_bench2(++i, n, m, 70); /* 55% subset */                                   \
     printf("\n");
 
     // Benchmark different graph sizes
-    BENCHSET(100, 500);
-    BENCHSET(1000, 5000);
-    BENCHSET(10000, 50000);
-    BENCHSET(100000, 500000);
+    BENCHSET(100, 2);
+    BENCHSET(1000, 2);
+    BENCHSET(10000, 2);
+    BENCHSET(100000, 2);
+    BENCHSET(1000000, 2);
+
+    // Benchmark different graph sizes
+    BENCHSET(100, 4);
+    BENCHSET(1000, 4);
+    BENCHSET(10000, 4);
+    BENCHSET(100000, 4);
+    BENCHSET(1000000, 4);
+
+    // Benchmark different graph sizes
+    BENCHSET(100, 8);
+    BENCHSET(1000, 8);
+    BENCHSET(10000, 8);
+    BENCHSET(100000, 8);
+    BENCHSET(1000000, 8);
+
+    // Benchmark different graph sizes
+    BENCHSET(100, 16);
+    BENCHSET(1000, 16);
+    BENCHSET(10000, 16);
+    BENCHSET(100000, 16);
+    BENCHSET(1000000, 16);
+
+    // Benchmark different graph sizes
+    BENCHSET(100, 32);
+    BENCHSET(1000, 32);
+    BENCHSET(10000, 32);
+    BENCHSET(100000, 32);
+    BENCHSET(1000000, 32);
+
+    BENCHSET(1000, 64);
+    BENCHSET(10000, 64);
+    BENCHSET(100000, 64);
+    BENCHSET(1000000, 64);
+
+    // Benchmark different graph sizes
+    BENCHSET2(100, 2);
+    BENCHSET2(1000, 2);
+    BENCHSET2(10000, 2);
+    BENCHSET2(100000, 2);
+    BENCHSET2(1000000, 2);
+
+    // Benchmark different graph sizes
+    BENCHSET2(100, 4);
+    BENCHSET2(1000, 4);
+    BENCHSET2(10000, 4);
+    BENCHSET2(100000, 4);
+    BENCHSET2(1000000, 4);
+
+    // Benchmark different graph sizes
+    BENCHSET2(100, 8);
+    BENCHSET2(1000, 8);
+    BENCHSET2(10000, 8);
+    BENCHSET2(100000, 8);
+    BENCHSET2(1000000, 8);
+
+    // Benchmark different graph sizes
+    BENCHSET2(100, 16);
+    BENCHSET2(1000, 16);
+    BENCHSET2(10000, 16);
+    BENCHSET2(100000, 16);
+    BENCHSET2(1000000, 16);
+
+    // Benchmark different graph sizes
+    BENCHSET2(100, 32);
+    BENCHSET2(1000, 32);
+    BENCHSET2(10000, 32);
+    BENCHSET2(100000, 32);
+    BENCHSET2(1000000, 32);
+
+    BENCHSET2(1000, 64);
+    BENCHSET2(10000, 64);
+    BENCHSET2(100000, 64);
+    BENCHSET2(1000000, 64);
 
     return 0;
 }
