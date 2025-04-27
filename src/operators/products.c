@@ -23,7 +23,7 @@
 
 #include "math/safe_intop.h"
 
-static igraph_error_t cartesian_product(igraph_t *res, 
+static igraph_error_t cartesian_product(igraph_t *res,
                                         const igraph_t *g1,
                                         const igraph_t *g2) {
     igraph_bool_t directed1 = igraph_is_directed(g1);
@@ -95,7 +95,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
 }
 
 static igraph_error_t tensor_product(igraph_t *res,
-                                     const igraph_t *g1, 
+                                     const igraph_t *g1,
                                      const igraph_t *g2) {
     igraph_bool_t directed1 = igraph_is_directed(g1);
     igraph_bool_t directed2 = igraph_is_directed(g2);
@@ -120,7 +120,8 @@ static igraph_error_t tensor_product(igraph_t *res,
 
     // New edge count = 2*e1*e2 if undirected else e1*e2
     IGRAPH_SAFE_MULT(ecountg1, ecountg2, &ecount);
-    if (!directed) { // Directed tensor product has only e1*e2 edges, see below
+    if (!directed) {
+        // Directed tensor product has only e1*e2 edges, see below
         IGRAPH_SAFE_MULT(ecount, 2, &ecount);
     }
     IGRAPH_SAFE_MULT(ecount, 2, &ecount);
@@ -143,7 +144,7 @@ static igraph_error_t tensor_product(igraph_t *res,
             VECTOR(edges)[edge_index++] = from1 * vcountg2 + from2; // ((from1, from2))
             VECTOR(edges)[edge_index++] = to1 * vcountg2 + to2; // ((to1, to2))
 
-            // In directed graphs, no edge is added because (from2, to2) are not adjacent 
+            // In directed graphs, no edge is added because (from2, to2) are not adjacent
             // respecting direction.
             // For undirected graphs, add cross edges between ((from1, to2)) and ((to1, from2)).
             if (!directed) {
@@ -172,8 +173,8 @@ static igraph_error_t tensor_product(igraph_t *res,
  *    \cli IGRAPH_PRODUCT_CARTESIAN
  *       Computes the Cartesian product of two graphs \c g1 and \c g2.
  * The Cartesian product of two graphs \c g1 and \c g2 is a graph \c res such
- * that: 
- * \olist 
+ * that:
+ * \olist
  *   \oli The vertex set of \c res is the Cartesian product of the
  * vertex sets of g1 and g2: V(g1) x V(g2).
  *
@@ -194,7 +195,7 @@ static igraph_error_t tensor_product(igraph_t *res,
  * The Tensor product of two graphs \c g1 and \c g2 is a graph \c res such that:
  *
  * \olist
- *    \oli The vertex set of \c res is the Cartesian product of the 
+ *    \oli The vertex set of \c res is the Cartesian product of the
  * vertex sets of g1 and g2: V(g1) × V(g2).
  *
  * </para><para>
@@ -218,7 +219,7 @@ static igraph_error_t tensor_product(igraph_t *res,
  * graph can be converted to a directed graph using \ref igraph_to_directed(), or
  * the directed graph can be converted to an undirected graph using \ref
  * igraph_to_undirected().
- * 
+ *
  * </para><para>
  * In graph products, each vertex in the resulting graph corresponds to a pair (u, v),
  * where u is a vertex from the first graph and v is a vertex from the second graph.
