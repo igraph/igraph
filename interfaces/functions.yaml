@@ -2080,6 +2080,10 @@ igraph_induced_subgraph_map:
         OPTIONAL OUT INDEX_VECTOR map, OPTIONAL OUT INDEX_VECTOR invmap
     DEPS: vids ON graph
 
+igraph_product:
+    PARAMS: |-
+        OUT GRAPH res, GRAPH g1, GRAPH g2, GRAPH_PRODUCT_TYPE type=CARTESIAN
+
 #######################################
 # Maximum flows, minimum cuts
 #######################################
