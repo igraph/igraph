@@ -393,7 +393,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *     take weights into account if \p weights is not null.
  * \param membership If not a null pointer, then the membership vector,
  *     corresponding to the highest modularity value, is stored here.
- * \param directed Logical constant. Controls whether to calculate directed
+ * \param directed Boolean constant. Controls whether to calculate directed
  *    betweenness (i.e. directed paths) for directed graphs, and whether
  *    to use the directed version of modularity. It is ignored for undirected
  *    graphs.

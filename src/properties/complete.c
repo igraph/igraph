@@ -36,7 +36,7 @@
  * The null graph and the singleton graph are considered complete.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored here.
+ * \param res Pointer to a Boolean variable, the result will be stored here.
  *
  * \return Error code.
  *

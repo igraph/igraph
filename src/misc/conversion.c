@@ -320,10 +320,11 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
  * \param graph Pointer to the graph object
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
- * \param bycol Logical, if true, the edges will be returned
+ * \param bycol Boolean constant. If true, the edges will be returned
  *        columnwise, e.g. the first edge is
  *        <code>res[0]->res[|E|]</code>, the second is
- *        <code>res[1]->res[|E|+1]</code>, etc.
+ *        <code>res[1]->res[|E|+1]</code>, etc. Supply false to get
+ *        the edge list in a format compatible with \ref igraph_add_edges().
  * \return Error code.
  *
  * \sa \ref igraph_edges() to return the result only for some edge IDs.

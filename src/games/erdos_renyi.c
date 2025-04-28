@@ -125,8 +125,8 @@ static igraph_error_t gnp_large(
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param p The probability of the existence of an edge in the graph.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate self-loops.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -272,8 +272,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges in the graph.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate self-loops.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -421,8 +421,8 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
  *        G(n,p) graphs and the
  *        m
  *        parameter for G(n,m) graphs.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate loops (self) edges.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate loops (self) edges.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid
  *         \p type, \p n,

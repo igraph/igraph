@@ -1093,7 +1093,7 @@ static igraph_error_t igraph_i_create_start_vectors(
  * \brief Is this a directed graph?
  *
  * \param graph The graph.
- * \return Logical value, \c true if the graph is directed,
+ * \return Boolean value, \c true if the graph is directed,
  * \c false otherwise.
  *
  * Time complexity: O(1)

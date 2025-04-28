@@ -38,8 +38,8 @@
  * may change the edge order, even if the input was already a simple graph.
  *
  * \param graph The graph object.
- * \param remove_multiple Logical, if true, multiple edges will be removed.
- * \param remove_loops Logical, if true, loops (self edges) will be removed.
+ * \param remove_multiple If true, multiple edges will be removed.
+ * \param remove_loops If true, loops (self edges) will be removed.
  * \param edge_comb What to do with the edge attributes. \c NULL means to
  *        discard the edge attributes after the operation, even for edges
  *        that were unaffected. See the igraph manual section about attributes

@@ -26,7 +26,7 @@
 #include "igraph_random.h"
 #include "igraph_error.h"
 
-/*
+/**
  * Internal use only.
  * Compute the cumulative proportionate values of a vector. The vector is
  * assumed to hold values associated with edges.
@@ -178,7 +178,7 @@ static igraph_error_t igraph_i_ecumulative_proportionate_values(const igraph_t *
     return IGRAPH_SUCCESS;
 }
 
-/*
+/**
  * Internal use only.
  * Compute the cumulative proportionate values of a vector. The vector is
  * assumed to hold values associated with vertices.
@@ -338,7 +338,7 @@ static igraph_error_t igraph_i_vcumulative_proportionate_values(const igraph_t *
     return IGRAPH_SUCCESS;
 }
 
-/*
+/**
  * Internal use only.
  * A set of standard tests to be performed prior to strategy updates. The
  * tests contained in this function are common to many strategy revision
@@ -518,7 +518,7 @@ static igraph_error_t igraph_i_microscopic_standard_tests(const igraph_t *graph,
  *        in-neighbours (respectively out-neighbours), but \p vid has zero
  *        in-neighbours (respectively out-neighbours). Loops are ignored in
  *        computing the degree (in, out, all) of \p vid.
- * \param optimality Logical; controls the type of optimality to be used.
+ * \param optimality Boolean; controls the type of optimality to be used.
  *        Supported values are:
  *        \clist
  *        \cli IGRAPH_MAXIMUM
