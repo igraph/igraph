@@ -1133,7 +1133,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
     }
 
     if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid connection probability.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid connection probability for bipartite G(n,p) model.", IGRAPH_EINVAL);
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {

@@ -159,10 +159,10 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     int iter = 0;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for G(n,p) model.", IGRAPH_EINVAL);
     }
     if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid probability given.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid probability given for G(n,p) model.", IGRAPH_EINVAL);
     }
 
     if (p == 0.0 || no_of_nodes == 0) {
@@ -319,10 +319,10 @@ igraph_error_t igraph_iea_game(
     int iter = 0;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for IEA model.", IGRAPH_EINVAL);
     }
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges for IEA model.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -600,10 +600,10 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 
     /* The multigraph implementation relies on the below checks to avoid overflow. */
     if (n < 0 || n > IGRAPH_VCOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for G(n,m) model.", IGRAPH_EINVAL);
     }
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges for G(n,m) model..", IGRAPH_EINVAL);
     }
 
     if (no_of_edges == 0 || no_of_nodes == 0) {
