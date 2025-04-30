@@ -144,11 +144,39 @@ int test_multiple(void) {
 
     igraph_rng_seed(igraph_rng_default(), 137); /* Makes test deterministic */
 
-    /* singleton with two loops */
+    /* null graph */
+
+    igraph_erdos_renyi_game_gnm(&graph1, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    IGRAPH_ASSERT(igraph_vcount(&graph1) == 0);
+    IGRAPH_ASSERT(igraph_ecount(&graph1) == 0);
+    print_graph(&graph1);
+    igraph_destroy(&graph1);
+
+    /* null graph with more than zero edges is invalid */
+
+    CHECK_ERROR(
+        igraph_erdos_renyi_game_gnm(&graph1, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE),
+        IGRAPH_EINVAL
+    );
+
+    /* singleton with no loops and more than zero edges is invalid */
+
+    CHECK_ERROR(
+        igraph_erdos_renyi_game_gnm(&graph1, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE),
+        IGRAPH_EINVAL
+    );
+
+    /* singleton with multiple loops */
 
     igraph_erdos_renyi_game_gnm(&graph1, 1, 2, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE); /* undirected with loops */
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 1);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 2);
+    print_graph(&graph1);
+    igraph_destroy(&graph1);
+
+    igraph_erdos_renyi_game_gnm(&graph1, 1, 3, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE); /* undirected with loops */
+    IGRAPH_ASSERT(igraph_vcount(&graph1) == 1);
+    IGRAPH_ASSERT(igraph_ecount(&graph1) == 3);
     print_graph(&graph1);
     igraph_destroy(&graph1);
 

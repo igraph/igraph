@@ -397,7 +397,7 @@ static igraph_error_t gnm_multi(
 
     if (!directed && !loops &&
         n == IGRAPH_VCOUNT_MAX && m == IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Too many edges or vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Too many edges or vertices for G(n,m) multigraph.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*m);
@@ -591,9 +591,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
      * IGRAPH_INTEGER_MAX and this will cause overflows when calculating `from` and `to`
      * for tests on large graphs. This is also why we need a 'real' version of random_sample.
     */
-    igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges = m;
-    igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes; /* for divisions below */
+    igraph_real_t n_real = (igraph_real_t) n; /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
     int iter = 0;
@@ -603,12 +601,22 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         IGRAPH_ERROR("Invalid number of vertices for G(n,m) model.", IGRAPH_EINVAL);
     }
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges for G(n,m) model..", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges for G(n,m) model.", IGRAPH_EINVAL);
     }
 
-    if (no_of_edges == 0 || no_of_nodes == 0) {
-        IGRAPH_CHECK(igraph_empty(graph, n, directed));
-        return IGRAPH_SUCCESS;
+    /* Special cases of "too many edges" that also apply to multigraphs:
+     *  - The null graph cannot have edges.
+     *  - The singleton graph canot have edges unless loops are allowed.
+     */
+
+    if (m > 0 && ((n == 0) || (!loops && n == 1))) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for G(n,m) model.",
+             IGRAPH_EINVAL);
+    }
+
+    if (m == 0) {
+        return igraph_empty(graph, n, directed);
     }
 
     if (multiple) {
@@ -626,17 +634,19 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         maxedges *= (n - 1) / 2.0;
     }
 
-    if (no_of_edges > maxedges) {
-        IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
+    if (m > maxedges) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for G(n,m) model.",
+            IGRAPH_EINVAL);
     }
 
-    if (maxedges == no_of_edges) {
+    if (maxedges == m) {
         IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
     } else {
         igraph_integer_t slen;
 
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_random_sample_real(&s, 0, maxedges - 1, no_of_edges));
+        IGRAPH_CHECK(igraph_random_sample_real(&s, 0, maxedges - 1, m));
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
@@ -644,18 +654,18 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         slen = igraph_vector_size(&s);
         if (directed && loops) {
             for (igraph_integer_t i = 0; i < slen; i++) {
-                igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
-                igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
+                igraph_integer_t to = floor(VECTOR(s)[i] / n_real);
+                igraph_integer_t from = VECTOR(s)[i] - to * n_real;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
                 IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else if (directed && !loops) {
             for (igraph_integer_t i = 0; i < slen; i++) {
-                igraph_integer_t from = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
-                igraph_integer_t to = VECTOR(s)[i] - from * (no_of_nodes_real - 1);
+                igraph_integer_t from = floor(VECTOR(s)[i] / (n_real - 1));
+                igraph_integer_t to = VECTOR(s)[i] - from * (n_real - 1);
                 if (from == to) {
-                    to = no_of_nodes - 1;
+                    to = n - 1;
                 }
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
