@@ -365,8 +365,8 @@ static igraph_error_t gnm_multi(
      *  - Consider a list containing all vertex pairs. Use unordered pairs for
      *    undirected graphs, ordered pairs for directed ones, and include
      *    self-pairs if desired.
-     *  - Pick a list element uniformly at random and append it to the list.
-     *    Add the corresponding edge to the graph.
+     *  - Pick a list element uniformly at random with replacement and append
+     *    it to the list. Add the corresponding edge to the graph.
      *  - Continue picking elements form the list uniformly at random and
      *    appending the pick to the list until we have sampled the desired
      *    number of edges.
