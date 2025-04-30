@@ -27,12 +27,16 @@
 #include "math/safe_intop.h"
 
 /**
- * \function igraph_lcf_vector
+ * \function igraph_lcf
  * \brief Creates a graph from LCF notation.
  *
- * This function is essentially the same as \ref igraph_lcf(), only
- * the way for giving the arguments is different. See \ref
- * igraph_lcf() for details.
+ * LCF notation (named after Lederberg, Coxeter and Frucht) is a concise notation
+ * for 3-regular Hamiltonian graphs. It consists of three parameters: the
+ * number of vertices in the graph, a list of shifts giving additional
+ * edges to a cycle backbone, and another integer giving how many times
+ * the shifts should be performed. See
+ * https://mathworld.wolfram.com/LCFNotation.html for details.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer constant giving the number of vertices.
  * \param shifts A vector giving the shifts.
@@ -40,14 +44,14 @@
  *        for the shifts.
  * \return Error code.
  *
- * \sa \ref igraph_lcf(), \ref igraph_extended_chordal_ring()
+ * \sa \ref igraph_lcf_small(), \ref igraph_extended_chordal_ring()
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
  */
-igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
-                      const igraph_vector_int_t *shifts,
-                      igraph_integer_t repeats) {
+igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
+                          const igraph_vector_int_t *shifts,
+                          igraph_integer_t repeats) {
 
     igraph_vector_int_t edges;
     igraph_integer_t no_of_shifts = igraph_vector_int_size(shifts);
@@ -95,16 +99,12 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 }
 
 /**
- * \function igraph_lcf
- * \brief Creates a graph from LCF notation.
+ * \function igraph_lcf_small
+ * \brief Shorthand to create a graph from LCF notation, giving shifts as the arguments.
  *
- * </para><para>
- * LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation for
- * 3-regular Hamiltonian graphs. It consists of three parameters: the
- * number of vertices in the graph, a list of shifts giving additional
- * edges to a cycle backbone, and another integer giving how many times
- * the shifts should be performed. See
- * https://mathworld.wolfram.com/LCFNotation.html for details.
+ * This function provides a shorthand to give the shifts of the LCF notation
+ * directly as function arguments. See \ref igraph_lcf() for an explanation
+ * of LCF notation.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.
@@ -112,7 +112,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  *        plus an additional 0 to mark the end of the arguments.
  * \return Error code.
  *
- * \sa See \ref igraph_lcf_vector() for a similar function using an
+ * \sa See \ref igraph_lcf() for a similar function using an
  * \ref igraph_vector_t instead of the variable length argument list;
  * \ref igraph_circulant() to create circulant graphs.
  *
@@ -121,7 +121,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  *
  * \example examples/simple/igraph_lcf.c
  */
-igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
+igraph_error_t igraph_lcf_small(igraph_t *graph, igraph_integer_t n, ...) {
     igraph_vector_int_t shifts;
     igraph_integer_t repeats;
     va_list ap;
@@ -148,7 +148,7 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
         repeats = igraph_vector_int_pop_back(&shifts);
     }
 
-    IGRAPH_CHECK(igraph_lcf_vector(graph, n, &shifts, repeats));
+    IGRAPH_CHECK(igraph_lcf(graph, n, &shifts, repeats));
     igraph_vector_int_destroy(&shifts);
     IGRAPH_FINALLY_CLEAN(1);
 

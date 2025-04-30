@@ -29,7 +29,7 @@ int main(void) {
     igraph_bool_t iso;
 
     // Franklin graph
-    igraph_lcf(&g, 12, 5, -5, 6, 0);
+    igraph_lcf_small(&g, 12, 5, -5, 6, 0);
     igraph_famous(&g2, "franklin");
 
     igraph_isomorphic_vf2(&g, &g2,
@@ -45,7 +45,7 @@ int main(void) {
     igraph_destroy(&g2);
 
     // [3, -2]^4, n=8
-    igraph_lcf(&g, 8, 3, -2, 4, 0);
+    igraph_lcf_small(&g, 8, 3, -2, 4, 0);
 
     if (igraph_ecount(&g) != 16) {
         printf("Failure: [3, -2]^4, n=8\n");
@@ -55,7 +55,7 @@ int main(void) {
     igraph_destroy(&g);
 
     // [2, -2]^2, n=2
-    igraph_lcf(&g, 2, 2, -2, 2, 0);
+    igraph_lcf_small(&g, 2, 2, -2, 2, 0);
 
     if (igraph_ecount(&g) != 1) {
         printf("Failure: [2, -2]^2, n=2\n");
@@ -65,7 +65,7 @@ int main(void) {
     igraph_destroy(&g);
 
     // [2]^2, n=2
-    igraph_lcf(&g, 2, 2, 2, 0);
+    igraph_lcf_small(&g, 2, 2, 2, 0);
 
     if (igraph_ecount(&g) != 1) {
         printf("Failure: [2]^2, n=2\n");
@@ -75,7 +75,7 @@ int main(void) {
     igraph_destroy(&g);
 
     // Regression test for bug #996
-    igraph_lcf(&g, 0, 0);
+    igraph_lcf_small(&g, 0, 0);
     if (igraph_vcount(&g) != 0 || igraph_ecount(&g) != 0) {
         printf("Failure: regression test for #996\n");
         return 1;
