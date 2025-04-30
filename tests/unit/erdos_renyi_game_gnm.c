@@ -264,6 +264,18 @@ int test_iea(void) {
     IGRAPH_ASSERT(!igraph_is_directed(&g));
     igraph_destroy(&g);
 
+    /* null graph with more than zero edges is invalid */
+    CHECK_ERROR(
+        igraph_iea_game(&g, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS),
+        IGRAPH_EINVAL
+    );
+
+    /* singleton with no loops and more than zero edges is invalid */
+    CHECK_ERROR(
+        igraph_iea_game(&g, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS),
+        IGRAPH_EINVAL
+    );
+
     /* singleton with loop */
     igraph_iea_game(&g, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     IGRAPH_ASSERT(igraph_vcount(&g) == 1);

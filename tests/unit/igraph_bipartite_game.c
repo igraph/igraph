@@ -186,6 +186,10 @@ int main(void) {
     check_gnm(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
     check_gnm(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE);
 
+    /* empty partition */
+    check_gnm(0, 2, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
+    check_gnm(3, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE);
+
     /* empty graph */
     check_gnm(5, 6, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
     check_gnm(6, 5, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE);
@@ -207,6 +211,10 @@ int main(void) {
         /* null graph */
         check_gnm(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE);
         check_gnm(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE);
+
+        /* empty partition */
+        check_gnm(3, 0, 0, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
+        check_gnm(0, 4, 0, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE);
 
         /* empty graph */
         check_gnm(2, 4, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE);
@@ -237,6 +245,9 @@ int main(void) {
     /* null graph */
     check_iea(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL);
 
+    /* empty partition */
+    check_iea(2, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+
     /* empty graph */
     check_iea(5, 6, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL);
 
@@ -249,6 +260,9 @@ int main(void) {
     for (size_t i=0; i < sizeof(modes) / sizeof(modes[0]); i++) {
         /* null graph */
         check_iea(0, 0, 0, IGRAPH_DIRECTED, modes[i]);
+
+        /* empty partition */
+        check_iea(0, 2, 0, IGRAPH_DIRECTED, modes[i]);
 
         /* empty graph */
         check_iea(2, 4, 0, IGRAPH_DIRECTED, modes[i]);
@@ -283,9 +297,15 @@ int main(void) {
     VERIFY_FINALLY_STACK();
 
     CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE), IGRAPH_EINVAL);
+
     CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 201, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+
     CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, -1, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+
+    CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, 10, 0, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
 
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, 10, -1, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);

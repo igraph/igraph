@@ -325,6 +325,16 @@ igraph_error_t igraph_iea_game(
         IGRAPH_ERROR("Invalid number of edges for IEA model.", IGRAPH_EINVAL);
     }
 
+    /* Special cases of "too many edges" that also apply to multigraphs:
+     *  - The null graph cannot have edges.
+     *  - The singleton graph canot have edges unless loops are allowed.
+     */
+    if (m > 0 && ((n == 0) || (!loops && n == 1))) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for IEA model.",
+            IGRAPH_EINVAL);
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
@@ -608,7 +618,6 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
      *  - The null graph cannot have edges.
      *  - The singleton graph canot have edges unless loops are allowed.
      */
-
     if (m > 0 && ((n == 0) || (!loops && n == 1))) {
         IGRAPH_ERROR(
             "Too many edges requested compared to the number of vertices for G(n,m) model.",
