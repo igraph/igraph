@@ -182,7 +182,7 @@ igraph_kautz:
 igraph_famous:
     PARAMS: OUT GRAPH graph, CSTRING name
 
-igraph_lcf_vector:
+igraph_lcf:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
 
 igraph_adjlist:
