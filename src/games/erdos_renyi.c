@@ -35,7 +35,8 @@
  * it is also slower than the default implementation. */
 static igraph_error_t gnp_large(
     igraph_t *graph, igraph_int_t n, igraph_real_t p,
-    igraph_bool_t directed, igraph_bool_t loops, igraph_int_t ecount_estimate
+    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple,
+    igraph_int_t ecount_estimate
 ) {
 
     igraph_vector_int_t edges;
@@ -74,7 +75,7 @@ static igraph_error_t gnp_large(
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             }
 
-            j++;
+            j += ! multiple; /* 1 for simple graph, 0 for multigraph */
 
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
@@ -96,22 +97,53 @@ static igraph_error_t gnp_large(
  * or Bernoulli random graph, a graph with \p n vertices is generated such that
  * every possible edge is included in the graph independently with probability
  * \p p. This is equivalent to a maximum entropy random graph model model with
- * a constraint on the \em expected edge count. Setting <code>p = 1/2</code>
- * generates all graphs on \p n vertices with the same probability.
+ * a constraint on the \em expected edge count. The maximum entropy view allows
+ * for extending the model to multigraphs, as discussed by Park and Newman (2004),
+ * section III.D. In this case, \p p is interpreted as the expected number of
+ * edges between any vertex pair.
  *
  * </para><para>
- * The expected mean degree of the graph is approximately <code>p n</code>;
- * set <code>p = k/n</code> when a mean degree of approximately \c k is
- * desired. More precisely, the expected mean degree is <code>p(n-1)</code>
- * in (undirected or directed) graphs without self-loops,
+ * Setting <code>p = 1/2</code> and <code>multiple = false</code> generates all
+ * graphs without multi-edges on \p n vertices with the same probability.
+ *
+ * </para><para>
+ * For both simple and multigraphs, the expected mean degree of the graph is
+ * approximately <code>p n</code>; set <code>p = k/n</code> when a mean degree
+ * of approximately \c k is desired. More precisely, the expected mean degree is
+ * <code>p(n-1)</code> in (undirected or directed) graphs without self-loops,
  * <code>p(n+1)</code> in undirected graphs with self-loops, and
  * <code>p n</code> in directed graphs with self-loops.
  *
+ * </para><para>
+ * When generating multigraphs, the distribution of the edge multiplicities is
+ * geometric, i.e. the probability of finding \c m edges between two vertices
+ * is <code>q (1-q)^m</code>, where <code>q = 1 / (1+p)</code>.
+ *
+ * </para><para>
+ * This function uses the sequential geometric sampling technique described in
+ * Batagelj and Brandes (2005), with a modification to handle multigraphs.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * J. Park and M. E. J. Newman: "Statistical Mechanics of Networks".
+ * Phys. Rev. E 70, 066117 (2004).
+ * https://doi.org/10.1103/PhysRevE.70.066117
+ *
+ * </para><para>
+ * V. Batagelj and U. Brandes: "Efficient Generation of Large Random Networks".
+ * Phys. Rev. E 71, 036113 (2005).
+ * https://doi.org/10.1103/PhysRevE.71.036113
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
- * \param p The probability of the existence of an edge in the graph.
+ * \param p The expected number of edges between any vertex pair.
+ *    When multi-edges are disallowed, this is equivalent to the probability
+ *    of having a connection between any two vertices.
  * \param directed Whether to generate a directed graph.
  * \param loops Whether to generate self-loops.
+ * \param multiple Whether to generate multi-edges.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -130,7 +162,7 @@ static igraph_error_t gnp_large(
  */
 igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_t *graph, igraph_int_t n, igraph_real_t p,
-    igraph_bool_t directed, igraph_bool_t loops
+    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple
 ) {
     /* This function uses doubles in its `s` vector, and for `maxedges` and `last`.
      * This is because on a system with 32-bit ints, maxedges will be larger than
@@ -146,13 +178,26 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices for G(n,p) model.", IGRAPH_EINVAL);
     }
-    if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid probability given for G(n,p) model.", IGRAPH_EINVAL);
+
+    if (multiple) {
+        if (p < 0.0) {
+            IGRAPH_ERROR("Invalid expected edge multiplicity given for G(n,p) multigraph model.", IGRAPH_EINVAL);
+        }
+
+        /* Convert the expected edge count to the appropriate probability parameter
+         * of the geometric distribution when sampling lengths of runs of 0s in the
+         * adjacency matrix. */
+        p = p / (1 + p);
+
+    } else {
+        if (p < 0.0 || p > 1.0) {
+            IGRAPH_ERROR("Invalid probability given for G(n,p) model.", IGRAPH_EINVAL);
+        }
     }
 
     if (p == 0.0 || no_of_nodes == 0) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
-    } else if (p == 1.0) {
+    } else if (! multiple && p == 1.0) {
         IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
     } else {
         igraph_real_t maxedges = n, last;
@@ -172,7 +217,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
         if (maxedges > IGRAPH_MAX_EXACT_REAL) {
             /* Use a slightly slower, but overflow-free implementation. */
-            return gnp_large(graph, n, p, directed, loops, ecount_estimate);
+            return gnp_large(graph, n, p, directed, loops, multiple, ecount_estimate);
         }
 
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
@@ -182,7 +227,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         while (last < maxedges) {
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
-            last += 1;
+            last += ! multiple; /* 1 for simple graph, 0 for multigraph */
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
 
