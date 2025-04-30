@@ -38,7 +38,7 @@ int main(void) {
 #define DENS 0.5
 #define REP 200
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
@@ -97,7 +97,7 @@ int main(void) {
 #define DENS 0.1
 #define REP 10
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
@@ -156,7 +156,7 @@ int main(void) {
 #define DENS 0.02
 #define REP 1
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
