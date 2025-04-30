@@ -225,6 +225,7 @@ add_legacy_tests(
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
+  igraph_lcf
   igraph_kautz
   igraph_preference_game
   igraph_perfect
