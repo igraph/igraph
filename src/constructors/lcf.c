@@ -38,10 +38,11 @@
  * https://mathworld.wolfram.com/LCFNotation.html for details.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param n Integer constant giving the number of vertices.
- * \param shifts A vector giving the shifts.
- * \param repeats An integer constant giving the number of repeats
- *        for the shifts.
+ * \param n Integer constant giving the number of vertices. This
+ *    is normally set to the number of shifts multiplied by the
+ *    number of repeats.
+ * \param shifts An integer vector giving the shifts.
+ * \param repeats The number of repeats for the shifts.
  * \return Error code.
  *
  * \sa \ref igraph_lcf_small(), \ref igraph_extended_chordal_ring()
@@ -55,9 +56,9 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
 
     igraph_vector_int_t edges;
     igraph_integer_t no_of_shifts = igraph_vector_int_size(shifts);
-    igraph_integer_t ptr = 0, i, sptr = 0;
+    igraph_integer_t ptr = 0, sptr = 0;
     igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges = n + no_of_shifts * repeats;
+    igraph_integer_t no_of_edges;
     igraph_integer_t no_of_edges2;
 
     if (repeats < 0) {
@@ -73,7 +74,7 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
 
     if (no_of_nodes > 0) {
         /* Create a ring first */
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             VECTOR(edges)[ptr++] = i;
             VECTOR(edges)[ptr++] = i + 1;
         }
@@ -129,7 +130,7 @@ igraph_error_t igraph_lcf_small(igraph_t *graph, igraph_integer_t n, ...) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&shifts, 0);
 
     va_start(ap, n);
-    while (1) {
+    while (true) {
         igraph_error_t err;
         int num = va_arg(ap, int);
         if (num == 0) {
