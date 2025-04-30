@@ -62,7 +62,7 @@ int main(void) {
     printf("---\n");
     /* ----------------------------------------------------------- */
 
-    igraph_erdos_renyi_game_gnp(&graph, 50, 0.5, /*directed=*/ 0, /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&graph, 50, 0.5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
     igraph_vector_int_list_init(&cliques, 0);
 

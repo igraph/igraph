@@ -43,7 +43,7 @@ void run_bench(int n) {
 
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnp(&graph, n, 0.1, IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnp(&graph, n, 0.1, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "G(n,p),   directed, n = %5d, m = %7" IGRAPH_PRId ", %dx", n, igraph_ecount(&graph), rep);

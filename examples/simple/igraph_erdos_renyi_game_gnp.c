@@ -31,7 +31,7 @@ int main(void) {
 
     igraph_erdos_renyi_game_gnp(
         &graph, /* n= */ 100, /* p= */ 0.01,
-        IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS
+        IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     );
 
     /* Compute the fraction of vertices contained within the largest connected component */

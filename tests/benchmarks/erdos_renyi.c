@@ -22,7 +22,7 @@
 
 void gnp(igraph_int_t n, igraph_real_t p, igraph_bool_t directed, igraph_bool_t loops) {
     igraph_t g;
-    igraph_erdos_renyi_game_gnp(&g, n, p, directed, loops);
+    igraph_erdos_renyi_game_gnp(&g, n, p, directed, loops, IGRAPH_NO_MULTIPLE);
     igraph_destroy(&g);
 }
 
@@ -51,7 +51,7 @@ void run_bench(igraph_int_t vcount, igraph_real_t meandeg, igraph_int_t rep) {
     igraph_vector_init(&outdeg, 0);
     igraph_vector_init(&indeg, 0);
 
-    igraph_erdos_renyi_game_gnp(&g, vcount, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, vcount, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_strength(&g, &outdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, NULL);
     igraph_destroy(&g);
 
@@ -83,7 +83,7 @@ void run_bench(igraph_int_t vcount, igraph_real_t meandeg, igraph_int_t rep) {
 
     printf("\n");
 
-    igraph_erdos_renyi_game_gnp(&g, vcount, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, vcount, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_strength(&g, &outdeg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, NULL);
     igraph_strength(&g, &indeg, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, NULL);
     igraph_destroy(&g);
