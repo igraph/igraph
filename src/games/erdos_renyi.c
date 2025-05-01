@@ -290,9 +290,14 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * <code>(prod_(i,j) A_ij !)^(-1)</code>.
  *
  * </para><para>
- * Thus the probability of all simple graphs (which only have 0s and 1s
- * in the adjacency matrix) is the same, while that of
- * non-simple ones depends on their edge and self-loop multiplicities.
+ * Thus the probability of all simple graphs (which only have 0s and 1s in
+ * the adjacency matrix) is the same, while that of non-simple ones depends
+ * on their edge and self-loop multiplicities.
+ *
+ * </para><para>
+ * An alternative way to think of this model is that it performs uniform
+ * sampling of \em edge-labeled graphs, i.e. graphs in which not only vertices,
+ * but also edges carry unique identities and are distinguishable.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
