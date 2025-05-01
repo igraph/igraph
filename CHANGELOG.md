@@ -66,7 +66,9 @@
 
  - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
  - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to uniformly sample G(n,m) graphs with multi-edges.
+ - `igraph_erdos_renyi_game_gnp()` gained a `multiple` Boolean argument, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ total edge count.
  - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to uniformly sample bipartite G(n,m) graphs with multi-edges.
+ - `igraph_bipartite_game_gnp()` gained a `multiple` Boolean argument, and can now sample bipartite multigraphs from a maximum entropy model with a prescribed _expected_ total edge count.
  - `igraph_iea_game()` samples random multigraphs through independent edge assignment.
  - `igraph_bipartite_iea_game()` samples random bipartite multigraph through independent edge assignment.
  - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
