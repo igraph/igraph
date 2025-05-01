@@ -149,7 +149,9 @@ This section gives detailed on breaking changes you need to consider when updati
 
  - `igraph_setup()` performs all initialization tasks that are recommended before using the igraph library. Right now this function only initializes igraph's internal random number generator with a practically random seed, but it may also perform other tasks in the future. It is recommended to call this function before using any other function from the library (although most of the functions will work fine now even if this function is not called).
  - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to uniformly sample G(n,m) graphs with multi-edges.
+ - `igraph_erdos_renyi_game_gnp()` gained a `multiple` Boolean argument, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity.
  - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to uniformly sample bipartite G(n,m) graphs with multi-edges.
+ - `igraph_bipartite_game_gnp()` gained a `multiple` Boolean argument, and can now sample bipartite multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity.
  - `igraph_iea_game()` samples random multigraphs through independent edge assignment.
  - `igraph_bipartite_iea_game()` samples random bipartite multigraph through independent edge assignment.
  - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
