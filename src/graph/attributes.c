@@ -756,7 +756,7 @@ igraph_error_t igraph_i_attribute_get_type(const igraph_t *graph,
                                igraph_attribute_elemtype_t elemtype,
                                const char *name) {
     if (igraph_i_attribute_table) {
-        return igraph_i_attribute_table->gettype(graph, type, elemtype, name);
+        return igraph_i_attribute_table->get_type(graph, type, elemtype, name);
     } else {
         return IGRAPH_SUCCESS;
     }

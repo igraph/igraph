@@ -1567,7 +1567,7 @@ static igraph_bool_t igraph_i_cattribute_has_attr(const igraph_t *graph,
     return false;
 }
 
-static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
+static igraph_error_t igraph_i_cattribute_get_type(const igraph_t *graph,
                                        igraph_attribute_type_t *type,
                                        igraph_attribute_elemtype_t elemtype,
                                        const char *name) {
@@ -1848,7 +1848,7 @@ const igraph_attribute_table_t igraph_cattribute_table = {
     &igraph_i_cattribute_combine_edges,
     &igraph_i_cattribute_get_info,
     &igraph_i_cattribute_has_attr,
-    &igraph_i_cattribute_gettype,
+    &igraph_i_cattribute_get_type,
     &igraph_i_cattribute_get_numeric_graph_attr,
     &igraph_i_cattribute_get_string_graph_attr,
     &igraph_i_cattribute_get_bool_graph_attr,
