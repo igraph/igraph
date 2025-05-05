@@ -44,6 +44,11 @@
  - `igraph_get_all_simple_paths()` now has an additional parameter that allows restricting paths by minimum length as well.
  - `igraph_strvector_print()` no longer takes a file parameter. Use `igraph_strvector_fprint()` to print to a file.
  - `igraph_community_optimal_modularity()` now takes a `resolution` parameter and its `weight` parameter was moved to the second place.
+ - `igraph_attribute_handler_t` members that formerly took an untyped `igraph_vector_ptr_t` argument are now taking a typed `igraph_attribute_record_list_t` argument instead.
+ - The deprecated `IGRAPH_ATTRIBUTE_DEFAULT` value of the `igraph_attribute_type_t` enum was removed.
+ - The `gettype` member of `igraph_attribute_table_t` was renamed to `get_type` for sake of consistency with the naming scheme of other struct members.
+ - Attribute table members that retrieve graph, vertex or edge attributes must not clear the incoming result vector any more; results must be appended to the end of the provided result vector instead.
+ - The `value` member of `igraph_attribute_record_t` is now a union that can be used to formally treat the associated pointer as an `igraph_vector_t*`, `igraph_strvector_t*` or `igraph_vector_bool_t*`.
 
 ### Added
 
