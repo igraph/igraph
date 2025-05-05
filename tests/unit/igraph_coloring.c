@@ -143,7 +143,7 @@ void test_graph_small_multi(void) {
 void test_graph_lcf(void) {
     igraph_t graph;
 
-    igraph_lcf(&graph, /* n= */ 8, /* shifts= */ 2, /* repeats= */ 8, 0);
+    igraph_lcf_small(&graph, /* n= */ 8, /* shifts= */ 2, /* repeats= */ 8, 0);
     printf("Testing small LCF graph\n");
     run_tests(&graph, true);
 

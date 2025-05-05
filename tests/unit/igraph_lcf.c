@@ -18,34 +18,52 @@
 
 #include <igraph.h>
 
+#include "test_utilities.h"
+
 int main(void) {
 
-    igraph_t g1, g2;
-    igraph_vector_int_t edges;
+    igraph_t g, g2;
     igraph_bool_t iso;
 
-    // Heawood graph through LCF notation: [5, -5]^7
-    // The number of vertices is normally the number of shifts
-    // multiplied by the number of repeats, in this case 2*7 = 14.
-    igraph_lcf_small(&g1,
-                     /* n */ 14,
-                     /* shifts */ 5, -5,
-                     /* repeats */7,
-                     0);
+    // Franklin graph: [5, -5]^6x
+    igraph_lcf_small(&g, 12, 5, -5, 6, 0);
+    igraph_famous(&g2, "franklin");
 
-    printf("edges:\n");
-    igraph_vector_int_init(&edges, 0);
-    igraph_get_edgelist(&g1, &edges, false);
-    igraph_vector_int_print(&edges);
-    igraph_vector_int_destroy(&edges);
+    igraph_isomorphic(&g, &g2, &iso);
+    IGRAPH_ASSERT(&iso);
 
-    // Built-in Heawood graph:
-    igraph_famous(&g2, "Heawood");
-    igraph_isomorphic(&g1, &g2, &iso);
-    printf("isomorphic: %s\n", iso ? "true" : "false");
+    igraph_destroy(&g);
     igraph_destroy(&g2);
 
-    igraph_destroy(&g1);
+    // [3, -2]^4, n=8
+    igraph_lcf_small(&g, 8, 3, -2, 4, 0);
+
+    IGRAPH_ASSERT(igraph_ecount(&g) == 16);
+
+    igraph_destroy(&g);
+
+    // [2, -2]^2, n=2
+    igraph_lcf_small(&g, 2, 2, -2, 2, 0);
+
+    IGRAPH_ASSERT(igraph_ecount(&g) == 1);
+
+    igraph_destroy(&g);
+
+    // [2]^2, n=2
+    igraph_lcf_small(&g, 2, 2, 2, 0);
+
+    IGRAPH_ASSERT(igraph_ecount(&g) == 1);
+
+    igraph_destroy(&g);
+
+    // Regression test for bug #996
+    igraph_lcf_small(&g, 0, 0);
+
+    IGRAPH_ASSERT(igraph_ecount(&g) == 0 && igraph_vcount(&g) == 0);
+
+    igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -842,8 +842,7 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_i
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector(),
- * \ref igraph_circulant()
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_circulant()
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
