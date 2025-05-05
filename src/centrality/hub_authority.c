@@ -77,8 +77,10 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
         if (-tol < x && x < tol) {
             if (++zero_cnt > max_zero_cnt) {
                 IGRAPH_WARNING(
-                    "More than a fraction %g of hub or authority scores is zero. The presence of zero values "
-                    "indicates that the solution is not unique, thus the returned result may not be meaningful.");
+                    "More than %d%% of hub or authority scores are zeros. The presence of zero values "
+                    "indicates that the solution is not unique, thus the returned result may not be meaningful.",
+                    (int) (frac * 100)
+                );
                 return;
             }
         }
@@ -325,7 +327,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
             igraph_vector_fill(authority_vector, 1.0);
         }
         if (no_of_nodes > 1) {
-            IGRAPH_WARNING("The graph has no edges. Hub and authortiy scores are not meaningful.");
+            IGRAPH_WARNING("The graph has no edges. Hub and authority scores are not meaningful.");
         }
         return IGRAPH_SUCCESS;
     }
@@ -368,7 +370,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
                 igraph_vector_fill(authority_vector, 1);
             }
-            IGRAPH_WARNING("All edge weights are zero. Hub and authortiy scores are not meaningful.");
+            IGRAPH_WARNING("All edge weights are zero. Hub and authority scores are not meaningful.");
             return IGRAPH_SUCCESS;
         }
     }
