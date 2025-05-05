@@ -416,7 +416,7 @@ igraph_error_t igraph_add_vertices(
 
     /* Add attributes if necessary. This section is protected with
      * FINALLY_ENTER/EXIT so that the graph would not be accidentally
-     * free upon error until it could be restored to a consistant state. */
+     * free upon error until it could be restored to a consistent state. */
 
     if (graph->attr) {
         igraph_error_t err;
