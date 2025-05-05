@@ -339,26 +339,47 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    graph/vertex/edge attribute.
  * \member get_type Query the type of a graph/vertex/edge attribute.
  * \member get_numeric_graph_attr Query a numeric graph attribute. The
- *    value should be placed as the first element of the \p value
- *    vector.
+ *    value should be appended to the provided \p value vector. No assumptions
+ *    should be made about the initial contents of the \p value vector and it is
+ *    not guaranteed to be empty.
  * \member get_string_graph_attr Query a string graph attribute. The
- *    value should be placed as the first element of the \p value
- *    string vector.
+ *    value should be appended to the provided \p value vector. No assumptions
+ *    should be made about the initial contents of the \p value vector and it is
+ *    not guaranteed to be empty.
  * \member get_bool_graph_attr Query a boolean graph attribute. The
- *    value should be placed as the first element of the \p value
- *    boolean vector.
+ *    value should be appended to the provided \p value vector. No assumptions
+ *    should be made about the initial contents of the \p value vector and it is
+ *    not guaranteed to be empty.
  * \member get_numeric_vertex_attr Query a numeric vertex attribute,
- *    for the vertices included in \p vs.
+ *    for the vertices included in \p vs. The attribute values should be
+ *    appended to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_string_vertex_attr Query a string vertex attribute,
- *    for the vertices included in \p vs.
+ *    for the vertices included in \p vs. The attribute values should be
+ *    appended to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_bool_vertex_attr Query a boolean vertex attribute,
- *    for the vertices included in \p vs.
+ *    for the vertices included in \p vs. The attribute values should be
+ *    appended to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_numeric_edge_attr Query a numeric edge attribute, for
- *    the edges included in \p es.
+ *    the edges included in \p es. The attribute values should be appended
+ *    to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_string_edge_attr Query a string edge attribute, for the
- *    edges included in \p es.
+ *    the edges included in \p es. The attribute values should be appended
+ *    to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_bool_edge_attr Query a boolean edge attribute, for the
- *    edges included in \p es.
+ *    the edges included in \p es. The attribute values should be appended
+ *    to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  */
 
 typedef struct igraph_attribute_table_t {
