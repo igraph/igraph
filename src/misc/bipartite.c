@@ -536,8 +536,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
  * vector. If there is an edge connecting two vertices of the same
  * kind, then an error is reported.
  *
- * \param graph Pointer to an uninitialized graph object, the result is
- *   created here.
+ * \param graph Pointer to an uninitialized graph object, the result
+ *   is created here.
  * \param types Boolean vector giving the vertex types. The length of
  *   the vector defines the number of vertices in the graph.
  * \param edges Vector giving the edges of the graph. The highest
@@ -1038,8 +1038,19 @@ static igraph_error_t gnp_bipartite_large(
 
             j += gap;
 
-            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
+            /* Handle edge creation based on directedness and mode */
+            if (!directed || mode == IGRAPH_OUT) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+            } else if (mode == IGRAPH_IN) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            } else { /* mode == IGRAPH_ALL */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            }
 
             j++;
 
@@ -1049,7 +1060,8 @@ static igraph_error_t gnp_bipartite_large(
     RNG_END();
 
     /* Create the graph */
-    igraph_integer_t n = n1 + n2;
+    igraph_integer_t n;
+    IGRAPH_SAFE_ADD(n1, n2, &n);
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 
     /* Set types if requested */
