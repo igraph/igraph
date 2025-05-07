@@ -1069,15 +1069,6 @@ static igraph_error_t gnp_bipartite_large(
     IGRAPH_SAFE_ADD(n1, n2, &n);
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 
-    /* Set types if requested */
-    if (types) {
-        IGRAPH_CHECK(igraph_vector_bool_resize(types, n));
-        igraph_vector_bool_null(types);
-        for (igraph_integer_t i = n1; i < n; i++) {
-            VECTOR(*types)[i] = true;
-        }
-    }
-
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
