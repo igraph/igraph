@@ -1022,10 +1022,13 @@ static igraph_error_t gnp_bipartite_large(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     /* Reserve space for the expected number of edges */
-    if (!directed || mode != IGRAPH_ALL) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * (igraph_integer_t) ceil(n1 * n2 * p)));
-    } else {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 4 * (igraph_integer_t) ceil(n1 * n2 * p)));
+    {
+        igraph_real_t exp_edges = n1 * n2 * p;
+        igraph_integer_t reserved = 2 * (igraph_integer_t) ceil(exp_edges);
+        if (directed && mode == IGRAPH_ALL) {
+            reserved *= 2;
+        }
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, reserved));
     }
 
     RNG_BEGIN();
