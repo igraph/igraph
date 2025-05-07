@@ -1065,9 +1065,8 @@ static igraph_error_t gnp_bipartite_large(
     RNG_END();
 
     /* Create the graph */
-    igraph_integer_t n;
-    IGRAPH_SAFE_ADD(n1, n2, &n);
-    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+    /* n1 + n2 has already been checked for overflow in the caller function. */
+    IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
