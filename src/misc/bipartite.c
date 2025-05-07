@@ -1058,7 +1058,8 @@ static igraph_error_t gnp_bipartite_large(
             }
 
             j++;
-            iter++;
+
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
     }
     RNG_END();
