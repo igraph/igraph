@@ -1179,8 +1179,8 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, slen * 2));
 
         for (igraph_integer_t i = 0; i < slen; i++) {
-            igraph_integer_t to = floor(VECTOR(s)[i] / n1);
-            igraph_integer_t from = (VECTOR(s)[i] - ((igraph_real_t)to) * n1);
+            igraph_integer_t to = floor(VECTOR(s)[i] / n1_real);
+            igraph_integer_t from = (VECTOR(s)[i] - ((igraph_real_t)to) * n1_real);
             if (mode != IGRAPH_IN) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to + n1));
