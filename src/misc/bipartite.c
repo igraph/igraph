@@ -1162,7 +1162,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges * p * 1.1));
+        IGRAPH_CHECK(igraph_vector_reserve(&s, (igraph_integer_t) floor(maxedges * p * 1.1)));
 
         RNG_BEGIN();
 
