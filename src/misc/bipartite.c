@@ -1037,21 +1037,20 @@ static igraph_error_t gnp_bipartite_large(
 
             j += gap;
 
-            /* Handle edge creation based on directedness and mode */
             if (!directed) {
-                /* For undirected graphs, always add a single edge */
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
-            } else if (mode == IGRAPH_OUT) {
-                /* For directed graphs with OUT mode, edges point from bottom to top */
+                /* Undirected graph */
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
             } else if (mode == IGRAPH_IN) {
-                /* For directed graphs with IN mode, edges point from top to bottom */
+                /* Incoming edges */
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-            } else { /* mode == IGRAPH_ALL */
-                /* For directed graphs with ALL mode, add both directions */
+            } else if (mode == IGRAPH_OUT) {
+                /* Outgoing edges */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+            } else {
+                /* Both directions for IGRAPH_ALL */
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
