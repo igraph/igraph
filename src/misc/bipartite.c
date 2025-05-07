@@ -1058,11 +1058,7 @@ static igraph_error_t gnp_bipartite_large(
             }
 
             j++;
-
-            /* Allow interruption of long-running loops */
-            if (++iter % (1 << 14) == 0) {
-                IGRAPH_ALLOW_INTERRUPTION();
-            }
+            iter++;
         }
     }
     RNG_END();
