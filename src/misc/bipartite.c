@@ -23,12 +23,13 @@
 
 #include "igraph_bipartite.h"
 
+#include "core/interruption.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_random.h"
-#include "core/interruption.h"
 
 #include "graph/attributes.h"
 #include "random/random_internal.h"
@@ -1024,7 +1025,7 @@ static igraph_error_t gnp_bipartite_large(
     /* Reserve space for the expected number of edges */
     {
         igraph_real_t exp_edges = n1 * n2 * p;
-        igraph_integer_t reserved = 2 * (igraph_integer_t) ceil(exp_edges);
+        igraph_integer_t reserved = 2 * (igraph_integer_t) floor(exp_edges);
         if (directed && mode == IGRAPH_ALL) {
             reserved *= 2;
         }
@@ -1070,6 +1071,7 @@ static igraph_error_t gnp_bipartite_large(
 
             j++;
 
+            iter++;
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
     }
@@ -1174,6 +1176,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
             last += 1;
+            iter++;
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
 
@@ -1193,6 +1196,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
                 igraph_vector_int_push_back(&edges, to + n1); /* reserved */
                 igraph_vector_int_push_back(&edges, from); /* reserved */
             }
+            iter++;
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
 
@@ -1325,6 +1329,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                     igraph_vector_int_push_back(&edges, to); /* reserved */
                     igraph_vector_int_push_back(&edges, from); /* reserved */
                 }
+                iter++;
                 IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
 
