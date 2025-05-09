@@ -50,7 +50,6 @@
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 #include "igraph_games.h"
-#include "igraph_microscopic_update.h"
 #include "igraph_centrality.h"
 #include "igraph_paths.h"
 #include "igraph_components.h"

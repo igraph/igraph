@@ -297,7 +297,6 @@ add_library(
   misc/feedback_arc_set.c
   misc/graphicality.c
   misc/matching.c
-  misc/microscopic_update.c
   misc/mixing.c
   misc/motifs.c
   misc/order_cycle.cpp
