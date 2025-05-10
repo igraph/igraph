@@ -37,7 +37,7 @@ jobs:
     - name: Coverage
       working-directory: ${{github.workspace}}/build
       shell: bash
-      run: cmake --build . --target check --parallel
+      run: cmake --build . --target coverage --parallel
 
     - name: Codecov.io
       uses: codecov/codecov-action@v5
