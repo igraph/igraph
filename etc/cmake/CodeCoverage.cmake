@@ -274,7 +274,7 @@ function(setup_target_for_coverage_lcov)
     # Setting up commands which will be run to generate coverage data.
     # Cleanup lcov
     set(LCOV_CLEAN_CMD
-        ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} -directory .
+        ${LCOV_PATH} ${Coverage_LCOV_ARGS} --gcov-tool ${GCOV_PATH} --directory .
         -b ${BASEDIR} --zerocounters
     )
     # Create baseline to make sure untouched files show up in the report
