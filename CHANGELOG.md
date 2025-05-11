@@ -7,6 +7,7 @@
  - `igraph_count_triangles()` counts undirected triangles in a graph.
  - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`).
  - `igraph_rng_get_bool()` and `RNG_BOOL()` produce a single random boolean.
+ - `igraph_product()` computes various kinds of graph products of two graphs. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2748!
 
 ### Changed
 
