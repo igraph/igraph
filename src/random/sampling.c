@@ -22,6 +22,7 @@
 
 #include "igraph_random.h"
 #include "igraph_matrix.h"
+#include "igraph_games.h"
 
 /**
  * \function igraph_sample_sphere_surface
