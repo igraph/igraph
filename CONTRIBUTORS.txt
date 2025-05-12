@@ -27,7 +27,7 @@ Hong Xu (@xuhdev)
 Hosseinazari (@Hosseinazari)
 Jean Monlong (@jmonlong)
 Keivin98 (@Keivin98)
-Leonardo de Araujo (@araujo88)
+Leonardo (@leo-aa88)
 Min Kim (@msk)
 Nikolay Khitrin (@khitrin)
 Peter Schmiedeskamp (@pschmied)
@@ -67,6 +67,8 @@ Kirill Müller (@krlmlr)
 Michael (@gendelpiekel)
 Tim Bernhard (@GenieTim)
 Maëlle Salmon (@maelle)
+Gulshan Kumar (@gulshan-123)
+Carlos Planelles (@carlos-planelles)
 
 This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
 
