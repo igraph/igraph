@@ -83,6 +83,7 @@ add_library(
   random/rng_mt19937.c
   random/rng_pcg32.c
   random/rng_pcg64.c
+  random/sampling.c
 
   graph/adjlist.c
   graph/attributes.c
@@ -110,7 +111,6 @@ add_library(
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c
-
 
   games/barabasi.c
   games/callaway_traits.c
