@@ -25,11 +25,12 @@
 #include "igraph_games.h"
 
 /**
- * \function igraph_sample_sphere_surface
+ * \function igraph_rng_sample_sphere_surface
  * \brief Sample points uniformly from the surface of a sphere.
  *
  * The center of the sphere is at the origin.
  *
+ * \param rng The random number generator to use.
  * \param dim The dimension of the random vectors.
  * \param n The number of vectors to sample.
  * \param radius Radius of the sphere, it must be positive.
@@ -43,11 +44,11 @@
  * Time complexity: O(n*dim*g), where g is the time complexity of
  * generating a standard normal random number.
  *
- * \sa \ref igraph_sample_sphere_volume(), \ref
- * igraph_sample_dirichlet() for other similar samplers.
+ * \sa \ref igraph_rng_sample_sphere_volume(), \ref
+ * igraph_rng_sample_dirichlet() for other similar samplers.
  */
-igraph_error_t igraph_sample_sphere_surface(
-    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+igraph_error_t igraph_rng_sample_sphere_surface(
+    igraph_rng_t* rng, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
     igraph_bool_t positive, igraph_matrix_t *res
 ) {
     igraph_integer_t i, j;
@@ -71,7 +72,7 @@ igraph_error_t igraph_sample_sphere_surface(
         igraph_real_t *col = &MATRIX(*res, 0, i);
         igraph_real_t sum = 0.0;
         for (j = 0; j < dim; j++) {
-            col[j] = RNG_NORMAL(0, 1);
+            col[j] = igraph_rng_get_normal(rng, 0, 1);
             sum += col[j] * col[j];
         }
         sum = sqrt(sum);
@@ -91,11 +92,12 @@ igraph_error_t igraph_sample_sphere_surface(
 }
 
 /**
- * \function igraph_sample_sphere_volume
+ * \function igraph_rng_sample_sphere_volume
  * \brief Sample points uniformly from the volume of a sphere.
  *
  * The center of the sphere is at the origin.
  *
+ * \param rng The random number generator to use.
  * \param dim The dimension of the random vectors.
  * \param n The number of vectors to sample.
  * \param radius Radius of the sphere, it must be positive.
@@ -109,11 +111,11 @@ igraph_error_t igraph_sample_sphere_surface(
  * Time complexity: O(n*dim*g), where g is the time complexity of
  * generating a standard normal random number.
  *
- * \sa \ref igraph_sample_sphere_surface(), \ref
- * igraph_sample_dirichlet() for other similar samplers.
+ * \sa \ref igraph_rng_sample_sphere_surface(), \ref
+ * igraph_rng_sample_dirichlet() for other similar samplers.
  */
-igraph_error_t igraph_sample_sphere_volume(
-    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+igraph_error_t igraph_rng_sample_sphere_volume(
+    igraph_rng_t* rng, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
     igraph_bool_t positive, igraph_matrix_t *res
 ) {
 
@@ -121,13 +123,13 @@ igraph_error_t igraph_sample_sphere_volume(
 
     /* Arguments are checked by the following call */
 
-    IGRAPH_CHECK(igraph_sample_sphere_surface(dim, n, radius, positive, res));
+    IGRAPH_CHECK(igraph_rng_sample_sphere_surface(rng, dim, n, radius, positive, res));
 
     RNG_BEGIN();
 
     for (i = 0; i < n; i++) {
         igraph_real_t *col = &MATRIX(*res, 0, i);
-        igraph_real_t U = pow(RNG_UNIF01(), 1.0 / dim);
+        igraph_real_t U = pow(igraph_rng_get_unif01(rng), 1.0 / dim);
         for (j = 0; j < dim; j++) {
             col[j] *= U;
         }
@@ -139,9 +141,10 @@ igraph_error_t igraph_sample_sphere_volume(
 }
 
 /**
- * \function igraph_sample_dirichlet
+ * \function igraph_rng_sample_dirichlet
  * \brief Sample points from a Dirichlet distribution.
  *
+ * \param rng The random number generator to use.
  * \param n The number of vectors to sample.
  * \param alpha The parameters of the Dirichlet distribution. They
  *    must be positive. The length of this vector gives the dimension
@@ -154,18 +157,18 @@ igraph_error_t igraph_sample_sphere_volume(
  * sample vectors, set by the length of alpha, and g is the time
  * complexity of sampling from a Gamma distribution.
  *
- * \sa \ref igraph_sample_sphere_surface() and
- * \ref igraph_sample_sphere_volume() for other methods to sample
+ * \sa \ref igraph_rng_sample_sphere_surface() and
+ * \ref igraph_rng_sample_sphere_volume() for other methods to sample
  * latent vectors.
  */
-igraph_error_t igraph_sample_dirichlet(
-    igraph_integer_t n, const igraph_vector_t *alpha, igraph_matrix_t *res
+igraph_error_t igraph_rng_sample_dirichlet(
+    igraph_rng_t* rng, igraph_integer_t n, const igraph_vector_t *alpha,
+    igraph_matrix_t *res
 ) {
 
     igraph_integer_t len = igraph_vector_size(alpha);
     igraph_integer_t i, j;
     igraph_real_t sum, num;
-    igraph_rng_t* rng = igraph_rng_default();
 
     if (n < 0) {
         IGRAPH_ERRORF("Number of samples should be non-negative, got %" IGRAPH_PRId ".",
@@ -201,4 +204,29 @@ igraph_error_t igraph_sample_dirichlet(
     RNG_END();
 
     return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_sample_sphere_surface(
+    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_bool_t positive, igraph_matrix_t *res
+) {
+    return igraph_rng_sample_sphere_surface(
+        igraph_rng_default(), dim, n, radius, positive, res
+    );
+}
+
+igraph_error_t igraph_sample_sphere_volume(
+    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_bool_t positive, igraph_matrix_t *res
+) {
+    return igraph_rng_sample_sphere_volume(
+        igraph_rng_default(), dim, n, radius, positive, res
+    );
+}
+
+igraph_error_t igraph_sample_dirichlet(
+    igraph_integer_t n, const igraph_vector_t *alpha,
+    igraph_matrix_t *res
+) {
+    return igraph_rng_sample_dirichlet(igraph_rng_default(), n, alpha, res);
 }

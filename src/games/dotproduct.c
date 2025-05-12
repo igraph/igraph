@@ -52,8 +52,8 @@
  * Time complexity: O(n*n*m), where n is the number of vertices,
  * and m is the length of the latent vectors.
  *
- * \sa \ref igraph_sample_dirichlet(), \ref
- * igraph_sample_sphere_volume(), \ref igraph_sample_sphere_surface()
+ * \sa \ref igraph_rng_sample_dirichlet(), \ref
+ * igraph_rng_sample_sphere_volume(), \ref igraph_rng_sample_sphere_surface()
  * for functions to generate the latent vectors.
  */
 

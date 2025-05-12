@@ -30,6 +30,7 @@
 #include "igraph_error.h"
 #include "igraph_matrix.h"
 #include "igraph_matrix_list.h"
+#include "igraph_random.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
@@ -213,18 +214,33 @@ IGRAPH_EXPORT igraph_error_t igraph_tree_game(igraph_t *graph, igraph_integer_t 
 IGRAPH_EXPORT igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                                           igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
-                                               igraph_real_t radius,
-                                               igraph_bool_t positive,
-                                               igraph_matrix_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_sample_sphere_surface(
+    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_bool_t positive, igraph_matrix_t *res
+);
 
-IGRAPH_EXPORT igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
-                                              igraph_real_t radius,
-                                              igraph_bool_t positive,
-                                              igraph_matrix_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_sample_sphere_volume(
+    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_bool_t positive, igraph_matrix_t *res
+);
 
-IGRAPH_EXPORT igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
-                                          igraph_matrix_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_sample_dirichlet(
+    igraph_integer_t n, const igraph_vector_t *alpha, igraph_matrix_t *res
+);
+
+IGRAPH_EXPORT igraph_error_t igraph_rng_sample_sphere_surface(
+    igraph_rng_t* rng, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_bool_t positive, igraph_matrix_t *res
+);
+
+IGRAPH_EXPORT igraph_error_t igraph_rng_sample_sphere_volume(
+    igraph_rng_t* rng, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_bool_t positive, igraph_matrix_t *res
+);
+
+IGRAPH_EXPORT igraph_error_t igraph_rng_sample_dirichlet(
+    igraph_rng_t* rng, igraph_integer_t n, const igraph_vector_t *alpha, igraph_matrix_t *res
+);
 
 __END_DECLS
 
