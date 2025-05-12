@@ -213,6 +213,10 @@ typedef enum { IGRAPH_MST_AUTOMATIC = 0,
                IGRAPH_MST_KRUSKAL
              } igraph_mst_algorithm_t;
 
+typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
+               IGRAPH_PRODUCT_TENSOR,
+             } igraph_product_t;
+
 /**
  * \typedef igraph_lpa_variant_t
  * \brief Label propagation algorithm variants of implementation

@@ -254,10 +254,10 @@
       ]
     },
     {
-      "login": "araujo88",
-      "name": "Leonardo de Araujo",
+      "login": "leo-aa88",
+      "name": "Leonardo",
       "avatar_url": "https://avatars.githubusercontent.com/u/46436462?v=4",
-      "profile": "https://araujo88.medium.com/",
+      "profile": "https://medium.com/@leo88",
       "contributions": [
         "code"
       ]
@@ -609,6 +609,24 @@
       "name": "Maëlle Salmon",
       "avatar_url": "https://avatars.githubusercontent.com/u/8360597?v=4",
       "profile": "https://masalmon.eu/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "gulshan-123",
+      "name": "Gulshan Kumar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72340125?v=4",
+      "profile": "https://github.com/gulshan-123",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "carlos-planelles",
+      "name": "Carlos Planelles",
+      "avatar_url": "https://avatars.githubusercontent.com/u/132953755?v=4",
+      "profile": "https://github.com/carlos-planelles",
       "contributions": [
         "code"
       ]

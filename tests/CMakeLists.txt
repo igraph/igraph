@@ -284,6 +284,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  igraph_product
   components
   coreness
   efficiency

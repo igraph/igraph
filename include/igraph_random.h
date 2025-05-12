@@ -141,9 +141,8 @@ IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(
     igraph_rng_t *rng, igraph_real_t shape, igraph_real_t scale
 );
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate);
-IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
-                                           const igraph_vector_t *alpha,
-                                           igraph_vector_t *result);
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(
+    igraph_rng_t *rng, const igraph_vector_t *alpha, igraph_vector_t *result);
 
 /* --------------------------------- */
 
