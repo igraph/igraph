@@ -144,7 +144,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (igraph_vcount(&graph) >= 1) {
             igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_OUT);
             igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_OUT, &iv1, &iv2);
-            igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
+            igraph_pseudo_diameter(&graph, NULL, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
             igraph_bfs(&graph, 0, NULL, IGRAPH_OUT, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
 
             igraph_reverse_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID));

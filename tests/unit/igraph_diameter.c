@@ -38,7 +38,7 @@ int main(void) {
     igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1,
                          IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,
                          /*start_from=*/ 0);
-    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
+    igraph_diameter(&g, NULL, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
 
     printf("Diameter: %" IGRAPH_PRId "\n", (igraph_integer_t) result);
 
@@ -50,7 +50,7 @@ int main(void) {
     igraph_vector_int_init(&path_vertex, 0);
     igraph_vector_int_init(&path_edge, 0);
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
-    igraph_diameter(&g, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, NULL, &result, &from, &to, &path_vertex, &path_edge, IGRAPH_DIRECTED, 1);
     printf("diameter: %g, from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n", result,
             from, to);
     print_vector_int(&path_vertex);
@@ -64,10 +64,10 @@ int main(void) {
     igraph_es_vector(&edge_sele, &edge_vec);
     igraph_delete_edges(&g, edge_sele);
     printf("The largest path in one connected component\n");
-    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, NULL, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
     printf("\nuconn = False \n");
-    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 0);
+    igraph_diameter(&g, NULL, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 0);
     print_real(stdout, result, "%g");
 
     igraph_es_destroy(&edge_sele);
@@ -76,7 +76,7 @@ int main(void) {
     // test graph with zero nodes
     printf("\ngraph with zero nodes\n");
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
-    igraph_diameter(&g, &result, &from, &to, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, NULL, &result, &from, &to, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
     printf("\nfrom = %" IGRAPH_PRId ", to = %" IGRAPH_PRId "\n", from, to);
     igraph_destroy(&g);
@@ -84,7 +84,7 @@ int main(void) {
     //test graph with one node
     printf("graph with one node\n");
     igraph_empty(&g, 1, IGRAPH_DIRECTED);
-    igraph_diameter(&g, &result, &from, &to, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, NULL, &result, &from, &to, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
     printf("\nfrom = %" IGRAPH_PRId ", to = %" IGRAPH_PRId "\n", from, to);
     igraph_destroy(&g);

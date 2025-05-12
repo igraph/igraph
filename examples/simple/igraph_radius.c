@@ -30,21 +30,21 @@ int main(void) {
     igraph_real_t radius;
 
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    igraph_radius(&g, &radius, IGRAPH_OUT);
+    igraph_radius(&g, NULL, &radius, IGRAPH_OUT);
     if (radius != 1) {
         return 1;
     }
     igraph_destroy(&g);
 
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    igraph_radius(&g, &radius, IGRAPH_ALL);
+    igraph_radius(&g, NULL, &radius, IGRAPH_ALL);
     if (radius != 1) {
         return 2;
     }
     igraph_destroy(&g);
 
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    igraph_radius(&g, &radius, IGRAPH_OUT);
+    igraph_radius(&g, NULL, &radius, IGRAPH_OUT);
     if (radius != 0) {
         return 3;
     }

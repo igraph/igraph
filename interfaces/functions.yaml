@@ -427,13 +427,6 @@ igraph_are_adjacent:
 
 igraph_diameter:
     PARAMS: |-
-        GRAPH graph, OUT REAL res, OUT INTEGER from,
-        OUT INTEGER to, OPTIONAL OUT VECTOR_INT vertex_path,
-        OPTIONAL OUT VECTOR_INT edge_path,
-        BOOLEAN directed=True, BOOLEAN unconnected=True
-
-igraph_diameter_dijkstra:
-    PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT REAL res, OUT INTEGER from, OUT INTEGER to,
         OPTIONAL OUT VECTOR_INT vertex_path,
@@ -747,12 +740,8 @@ igraph_reverse_edges:
     DEPS: eids ON graph
 
 igraph_average_path_length:
-    PARAMS: GRAPH graph, PRIMARY OUT REAL res, OPTIONAL OUT REAL unconn_pairs,
-        BOOLEAN directed=True, BOOLEAN unconn=True
-
-igraph_average_path_length_dijkstra:
-    PARAMS: GRAPH graph, PRIMARY OUT REAL res, OPTIONAL OUT REAL unconn_pairs,
-        OPTIONAL EDGE_WEIGHTS weights, BOOLEAN directed=True, BOOLEAN unconn=True
+    PARAMS: GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, PRIMARY OUT REAL res,
+        OPTIONAL OUT REAL unconn_pairs, BOOLEAN directed=True, BOOLEAN unconn=True
     DEPS: weights ON graph
 
 igraph_path_length_hist:
@@ -1045,12 +1034,6 @@ igraph_contract_vertices:
 
 igraph_eccentricity:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
-        NEIMODE mode=ALL
-    DEPS: vids ON graph, res ON graph vids
-
-igraph_eccentricity_dijkstra:
-    PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL
@@ -1058,28 +1041,14 @@ igraph_eccentricity_dijkstra:
 
 igraph_graph_center:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
-    DEPS: res ON graph
-
-igraph_graph_center_dijkstra:
-    PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VERTEX_INDICES res, NEIMODE mode=ALL
     DEPS: weights ON graph, res ON graph
 
 igraph_radius:
-    PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL
-
-igraph_radius_dijkstra:
     PARAMS: GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT REAL radius, NEIMODE mode=ALL
     DEPS: weights ON graph
 
 igraph_pseudo_diameter:
-    PARAMS: |-
-        GRAPH graph, OUT REAL diameter, VERTEX start_vid,
-        OPTIONAL OUT INTEGER from, OPTIONAL OUT INTEGER to,
-        BOOLEAN directed=True, BOOLEAN unconnected=True
-
-igraph_pseudo_diameter_dijkstra:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT REAL diameter, VERTEX start_vid,
@@ -1100,18 +1069,18 @@ igraph_random_walk:
     DEPS: start ON graph, weights ON graph, vertices ON graph, edges ON graph
 
 igraph_global_efficiency:
-    PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_WEIGHTS weights, BOOLEAN directed=True
+    PARAMS: GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT REAL res, BOOLEAN directed=True
     DEPS: weights ON graph
 
 igraph_local_efficiency:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
-        OPTIONAL EDGE_WEIGHTS weights, BOOLEAN directed=True, NEIMODE mode=ALL
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VERTEX_QTY res,
+        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_average_local_efficiency:
     PARAMS: |-
-        GRAPH graph, OUT REAL res, OPTIONAL EDGE_WEIGHTS weights,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT REAL res,
         BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: weights ON graph
 

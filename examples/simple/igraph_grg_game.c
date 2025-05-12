@@ -35,7 +35,7 @@ int main(void) {
 
     /* Compute average path length */
 
-    igraph_average_path_length_dijkstra(&graph, &avg_dist, NULL, &weights, IGRAPH_UNDIRECTED, /* unconn */ 1);
+    igraph_average_path_length(&graph, &weights, &avg_dist, NULL, IGRAPH_UNDIRECTED, /* unconn */ 1);
 
     printf("Average distance in the geometric graph: %g.\n", avg_dist);
 

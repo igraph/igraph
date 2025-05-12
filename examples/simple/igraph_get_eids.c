@@ -62,7 +62,7 @@ int main(void) {
             }
         }
 
-        igraph_diameter(&g, /*res=*/ NULL, /*from=*/ NULL, /*to=*/ NULL, &path, NULL,
+        igraph_diameter(&g, /*weights=*/ NULL, /*res=*/ NULL, /*from=*/ NULL, /*to=*/ NULL, &path, NULL,
                         IGRAPH_UNDIRECTED, /*unconn=*/ true);
         igraph_vector_int_update(&pairs, &path);
         igraph_expand_path_to_pairs(&pairs);

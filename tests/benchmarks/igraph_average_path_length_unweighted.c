@@ -34,13 +34,13 @@ int main(void) {
     igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
 
     BENCH(" 1 Kautz(4, 5) average_path_length directed",
-          igraph_average_path_length(&graph, &avglen, NULL, IGRAPH_DIRECTED, 1);
+          igraph_average_path_length(&graph, NULL, &avglen, NULL, IGRAPH_DIRECTED, 1);
     );
     BENCH(" 2 Kautz(4, 5) distances directed",
           igraph_distances(&graph, &mat, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT);
     );
     BENCH(" 3 Kautz(4, 5) average_path_length undirected",
-          igraph_average_path_length(&graph, &avglen, NULL, IGRAPH_UNDIRECTED, 1);
+          igraph_average_path_length(&graph, NULL, &avglen, NULL, IGRAPH_UNDIRECTED, 1);
     );
     BENCH(" 4 Kautz(4, 5) distances undirected",
           igraph_distances(&graph, &mat, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
@@ -61,7 +61,7 @@ int main(void) {
     }
 
     BENCH(" 5 Rewired 15x15x15 lattice average_path_length",
-          igraph_average_path_length(&graph, &avglen, NULL, IGRAPH_UNDIRECTED, 1);
+          igraph_average_path_length(&graph, NULL, &avglen, NULL, IGRAPH_UNDIRECTED, 1);
     );
     BENCH(" 6 Rewired 15x15x15 lattice distances undirected",
           igraph_distances(&graph, &mat, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
@@ -73,7 +73,7 @@ int main(void) {
     igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
 
     BENCH(" 7 Erdos-Renyi n=10000 m=12000 average_path_length directed",
-          igraph_average_path_length(&graph, &avglen, NULL, IGRAPH_DIRECTED, 1);
+          igraph_average_path_length(&graph, NULL, &avglen, NULL, IGRAPH_DIRECTED, 1);
     );
     BENCH(" 8 Erdos-Renyi n=10000 m=12000 distances directed",
           igraph_distances(&graph, &mat, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT);
@@ -82,7 +82,7 @@ int main(void) {
     /* The undirected computation will be much slower on this graph, as the largest weakly connected
      * component is much larger. */
     BENCH(" 9 Erdos-Renyi n=10000 m=12000 average_path_length undirected",
-          igraph_average_path_length(&graph, &avglen, NULL, IGRAPH_UNDIRECTED, 1);
+          igraph_average_path_length(&graph, NULL, &avglen, NULL, IGRAPH_UNDIRECTED, 1);
     );
     BENCH("10 Erdos-Renyi n=10000 m=12000 distances undirected",
           igraph_distances(&graph, &mat, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
