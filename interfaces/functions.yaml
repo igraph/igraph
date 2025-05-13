@@ -66,7 +66,7 @@ igraph_edge:
     PARAMS: GRAPH graph, INTEGER eid, OUT INTEGER from, OUT INTEGER to
 
 igraph_edges:
-    PARAMS: GRAPH graph, EDGE_SELECTOR eids, OUT VECTOR_INT edges
+    PARAMS: GRAPH graph, EDGE_SELECTOR eids, OUT VECTOR_INT edges, BOOLEAN bycol=False
     DEPS: eids ON graph
 
 igraph_get_eid:

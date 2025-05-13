@@ -71,7 +71,7 @@ IGRAPH_EXPORT igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_
 IGRAPH_EXPORT igraph_error_t igraph_edge(const igraph_t *graph, igraph_integer_t eid,
                               igraph_integer_t *from, igraph_integer_t *to);
 IGRAPH_EXPORT igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids,
-                               igraph_vector_int_t *edges);
+                               igraph_vector_int_t *edges, igraph_bool_t bycol);
 IGRAPH_EXPORT igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
                                  igraph_integer_t from, igraph_integer_t to,
                                  igraph_bool_t directed, igraph_bool_t error);

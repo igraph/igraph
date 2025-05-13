@@ -182,7 +182,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_get_all_eids_between(&graph, &iv2, 1, 0, IGRAPH_UNDIRECTED);
             igraph_get_all_eids_between(&graph, &iv2, 0, 0, IGRAPH_UNDIRECTED);
 
-            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1);
+            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1, 0);
             igraph_vector_int_push_back(&iv1, 0);
             igraph_vector_int_push_back(&iv1, 1);
             igraph_vector_int_push_back(&iv1, 1);
