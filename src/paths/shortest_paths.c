@@ -1254,7 +1254,7 @@ static igraph_error_t igraph_i_diameter_dijkstra(
  * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
  * |E| is the number of edges.
  *
- * \sa \ref igraph_radius_dijkstra() for the minimum eccentricity.
+ * \sa \ref igraph_radius() for the minimum eccentricity.
  *
  * \example examples/simple/igraph_diameter.c
  */
