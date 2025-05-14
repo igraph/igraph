@@ -1293,7 +1293,7 @@ static igraph_error_t igraph_i_semidelete_vertex(
     igraph_integer_t vid, igraph_vector_int_t *edges_removed,
     igraph_vector_int_t *eids
 ) {
-    IGRAPH_CHECK(igraph_incident(graph, eids, vid, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_incident(graph, eids, vid, IGRAPH_ALL, IGRAPH_LOOPS));
 
     const igraph_integer_t n = igraph_vector_int_size(eids);
     for (igraph_integer_t j = 0; j < n; j++) {

@@ -966,17 +966,25 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  *        \c IGRAPH_OUT, outgoing edges;
  *        \c IGRAPH_IN, incoming edges;
  *        \c IGRAPH_ALL, all edges.
+ * \param loops Whether to include loop edges in the result. If
+ *        \c IGRAPH_NO_LOOPS, loop edges are excluded. If \c IGRAPH_LOOPS_ONCE,
+ *        loop edges are included once. If \c IGRAPH_LOOPS_TWICE, loop edges
+ *        are included twice, but only if the graph is undirected or \p mode is
+ *        set to \c IGRAPH_ALL.
  * \return Error code.
  * \sa \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t igraph_es_incident(igraph_es_t *es,
-                       igraph_integer_t vid, igraph_neimode_t mode) {
+igraph_error_t igraph_es_incident(
+    igraph_es_t *es, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops
+) {
     es->type = IGRAPH_ES_INCIDENT;
     es->data.incident.vid = vid;
     es->data.incident.mode = mode;
+    es->data.incident.loops = loops;
     return IGRAPH_SUCCESS;
 }
 
@@ -1543,8 +1551,10 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
 
     case IGRAPH_ES_INCIDENT:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 0);
-        IGRAPH_CHECK(igraph_incident(graph, &v,
-                                     es->data.incident.vid, es->data.incident.mode));
+        IGRAPH_CHECK(igraph_incident(
+            graph, &v, es->data.incident.vid, es->data.incident.mode,
+            es->data.incident.loops
+        ));
         *result = igraph_vector_int_size(&v);
         igraph_vector_int_destroy(&v);
         IGRAPH_FINALLY_CLEAN(1);
@@ -1691,7 +1701,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         igraph_vector_int_t adj;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode, IGRAPH_LOOPS));
             igraph_vector_int_append(vec, &adj);  /* reserved */
         }
         igraph_vector_int_destroy(&adj);
@@ -1704,7 +1714,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         IGRAPH_CHECK_OOM(added, "Cannot create edge iterator.");
         IGRAPH_FINALLY(igraph_free, added);
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL, IGRAPH_LOOPS));
             const igraph_integer_t length = igraph_vector_int_size(&adj);
             for (igraph_integer_t j = 0; j < length; j++) {
                 if (!added[ VECTOR(adj)[j] ]) {
@@ -1735,7 +1745,10 @@ static igraph_error_t igraph_i_eit_create_incident(const igraph_t* graph,
     igraph_integer_t i, n;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-    IGRAPH_CHECK(igraph_incident(graph, &vec, es.data.incident.vid, es.data.incident.mode));
+    IGRAPH_CHECK(igraph_incident(
+        graph, &vec, es.data.incident.vid, es.data.incident.mode,
+        es.data.incident.loops
+    ));
 
     vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec_int, "Cannot create edge iterator.");

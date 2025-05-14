@@ -1433,8 +1433,6 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  * d2 is the minimum of the out-degree of \c to and the in-degree of \c from.
  *
  * \example examples/simple/igraph_get_eid.c
- *
- * Added in version 0.2.</para><para>
  */
 
 igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
@@ -1669,39 +1667,38 @@ igraph_error_t igraph_get_all_eids_between(
  * \brief Gives the incident edges of a vertex.
  *
  * \param graph The graph object.
- * \param eids An initialized vector. It will be resized
- * to hold the result.
+ * \param eids An initialized vector. It will be resized to hold the result.
  * \param pnode A vertex ID.
  * \param mode Specifies what kind of edges to include for directed
- * graphs. \c IGRAPH_OUT means only outgoing edges, \c IGRAPH_IN only
- * incoming edges, \c IGRAPH_ALL both. This parameter is ignored for
- * undirected graphs.
- * \return Error code. \c IGRAPH_EINVVID: invalid \p pnode argument,
- *   \c IGRAPH_EINVMODE: invalid \p mode argument.
- *
- * Added in version 0.2.</para><para>
+ *        graphs. \c IGRAPH_OUT means only outgoing edges, \c IGRAPH_IN means
+ *        only incoming edges, \c IGRAPH_ALL means both. This parameter is
+ *        ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *        removes loop edges from the result. \c IGRAPH_LOOPS_ONCE
+ *        makes each loop edge appear only once in the result.
+ *        \c IGRAPH_LOOPS_TWICE makes loop edges appear \em twice in the
+ *        result if the graph is undirected or \p mode is set to \c IGRAPH_ALL
+ *        (and once otherwise as returning them twice does not make sense for
+ *        directed graphs).
+ * \return Error code:
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
+ *         \c IGRAPH_ENOMEM: not enough memory.
  *
  * Time complexity: O(d), the number of incident edges to \p pnode.
  */
 
-igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-        igraph_neimode_t mode) {
-    if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE);
-    } else {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_ONCE);
-    }
-}
-
-igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-        igraph_neimode_t mode, igraph_loops_t loops) {
+igraph_error_t igraph_incident(
+    const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
+    igraph_neimode_t mode, igraph_loops_t loops
+) {
     igraph_integer_t length = 0, idx = 0;
     igraph_integer_t i, j;
     igraph_integer_t node = pnode;
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
+        IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVVID, node);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
@@ -1713,8 +1710,11 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
+        /*
         IGRAPH_ERROR("For a directed graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.", IGRAPH_EINVAL);
+        */
+        loops = IGRAPH_LOOPS_ONCE;
     }
 
     /* Calculate needed space first & allocate it */
@@ -1825,7 +1825,6 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
     }
     IGRAPH_CHECK(igraph_vector_int_resize(eids, length));
     return IGRAPH_SUCCESS;
-#undef DEDUPLICATE_IF_NEEDED
 }
 
 

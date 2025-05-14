@@ -389,7 +389,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
             /* Okay, this vertex is in the component we are considering.
              * Add the neighbors of this vertex, excluding loops */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT, IGRAPH_LOOPS));
             j = igraph_vector_int_size(&neis);
             for (k = 0; k < j; k++) {
                 igraph_integer_t eid = VECTOR(neis)[k];

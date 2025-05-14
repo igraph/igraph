@@ -399,7 +399,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
                     }
 
                     /* All other nodes from all of v's incident edges */
-                    IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_ALL));
+                    IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_ALL, IGRAPH_NO_LOOPS));
                     igraph_integer_t no = igraph_vector_int_size(&neis);
                     for (igraph_integer_t e = 0; e < no; e++) {
                         igraph_integer_t mye = VECTOR(neis)[e];

@@ -411,7 +411,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     while (!igraph_dqueue_int_empty(&q) && reached < to_reach) {
         igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode));
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode, IGRAPH_LOOPS));
         vsize = igraph_vector_int_size(&tmp);
         for (j = 0; j < vsize; j++) {
             igraph_integer_t edge = VECTOR(tmp)[j];

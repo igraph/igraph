@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
 
         for (v = 0; v < clsize; v++) {
             igraph_integer_t i, neilen, node = VECTOR(*clique)[v];
-            IGRAPH_CHECK(igraph_incident(graph, &neis, node, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, node, IGRAPH_ALL, IGRAPH_LOOPS));
             neilen = igraph_vector_int_size(&neis);
             VECTOR(mark)[node] = c + 1;
             for (i = 0; i < neilen; i++) {

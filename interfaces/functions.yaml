@@ -88,7 +88,7 @@ igraph_get_all_eids_between:
         BOOLEAN directed=True
 
 igraph_incident:
-    PARAMS: GRAPH graph, OUT EDGE_INDICES eids, VERTEX vid, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, OUT EDGE_INDICES eids, VERTEX vid, NEIMODE mode=ALL, LOOPS loops=TWICE
 
 igraph_is_same_graph:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN res

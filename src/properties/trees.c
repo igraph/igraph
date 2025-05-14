@@ -98,7 +98,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
 
-            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode, IGRAPH_LOOPS));
 
             igraph_integer_t n = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < n; i++) {

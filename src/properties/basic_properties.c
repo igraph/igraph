@@ -217,7 +217,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
         igraph_real_t d;
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
 
-        IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &incident, v, IGRAPH_ALL, IGRAPH_LOOPS));
         k = igraph_vector_int_size(&incident); /* degree */
 
         /*

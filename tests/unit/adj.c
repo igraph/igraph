@@ -77,7 +77,7 @@ void print_adj2(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
     igraph_adjlist_destroy(&al);
 }
 
-/* Print incidence list based on igraph_i_incident() */
+/* Print incidence list based on igraph_incident() */
 void print_inc1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_vector_int_t incs;
@@ -88,7 +88,7 @@ void print_inc1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
     igraph_vector_int_init(&incs, 0);
     for (igraph_integer_t v=0; v < vcount; v++) {
         printf("%3" IGRAPH_PRId ": ", v);
-        igraph_i_incident(graph, &incs, v, mode, loops);
+        igraph_incident(graph, &incs, v, mode, loops);
         print_vector_int(&incs);
     }
     igraph_vector_int_destroy(&incs);
@@ -110,7 +110,7 @@ void print_inc2(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
     igraph_inclist_destroy(&il);
 }
 
-/* Verifies that igraph_neighbors() and igraph_i_incident() produce results in the same order. */
+/* Verifies that igraph_neighbors() and igraph_incident() produce results in the same order. */
 void verify_ordering1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_vector_int_t neis, incs;
     igraph_integer_t vcount = igraph_vcount(graph);
@@ -124,7 +124,7 @@ void verify_ordering1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops
 
     for (igraph_integer_t v=0; v < vcount; v++) {
         igraph_neighbors(graph, &neis, v, mode, loops, IGRAPH_MULTIPLE);
-        igraph_i_incident(graph, &incs, v, mode, loops);
+        igraph_incident(graph, &incs, v, mode, loops);
 
         igraph_integer_t n = igraph_vector_int_size(&neis);
         IGRAPH_ASSERT(igraph_vector_int_size(&incs) == n);
@@ -219,7 +219,7 @@ int main(void) {
     print_adj2(&ug, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     print_adj2(&ug, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
-    printf("\nigraph_i_incident()\n");
+    printf("\nigraph_incident()\n");
     print_inc1(&ug, IGRAPH_ALL, IGRAPH_NO_LOOPS);
     print_inc1(&ug, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
     print_inc1(&ug, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
@@ -241,7 +241,7 @@ int main(void) {
     print_adj2(&dg, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     print_adj2(&dg, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
-    printf("\nigraph_i_incident()\n");
+    printf("\nigraph_incident()\n");
     print_inc1(&dg, IGRAPH_ALL, IGRAPH_NO_LOOPS);
     print_inc1(&dg, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
     print_inc1(&dg, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
@@ -261,7 +261,7 @@ int main(void) {
     print_adj2(&dg, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
     print_adj2(&dg, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 
-    printf("\nigraph_i_incident()\n");
+    printf("\nigraph_incident()\n");
     print_inc1(&dg, IGRAPH_OUT, IGRAPH_NO_LOOPS);
     print_inc1(&dg, IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
 

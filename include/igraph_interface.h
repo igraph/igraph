@@ -82,8 +82,10 @@ IGRAPH_EXPORT igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vecto
                                   igraph_bool_t directed, igraph_bool_t error);
 IGRAPH_EXPORT igraph_error_t igraph_get_all_eids_between(const igraph_t *graph, igraph_vector_int_t *eids,
                                   igraph_integer_t source, igraph_integer_t target, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t vid,
-                                  igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_incident(
+    const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
+    igraph_neimode_t mode, igraph_loops_t loops
+);
 IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res);
 
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);

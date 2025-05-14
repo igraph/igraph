@@ -144,7 +144,7 @@ add_legacy_tests(
   igraph_empty
   igraph_get_eid
   igraph_is_same_graph
-  igraph_i_incident
+  igraph_incident
   igraph_neighbors
 )
 

@@ -57,14 +57,6 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
 );
 
 /**
- * Helper function that removes loops from an incidence vector (either both
- * occurrences or only one of them).
- */
-static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
-    igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
-);
-
-/**
  * \section about_adjlists
  *
  * <para>Sometimes it is easier to work with a graph which is in
@@ -640,76 +632,6 @@ igraph_error_t igraph_adjlist_replace_edge(
 
 }
 
-static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
-    igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
-) {
-    igraph_integer_t i, length, eid, write_ptr;
-    igraph_vector_int_t *seen_loops = 0;
-
-    /* In this function we make use of the fact that we are dealing with
-     * _incidence_ lists, and the only way for an edge ID to appear twice
-     * within an incidence list is if the edge is a loop edge; otherwise each
-     * element will be unique.
-     *
-     * Note that incidence vectors are not sorted by edge ID, so we need to
-     * look up the edges in the graph to decide whether they are loops or not.
-     *
-     * Also, it may be tempting to introduce a boolean in case of IGRAPH_LOOPS_ONCE,
-     * and flip it every time we see a loop to get rid of half of the occurrences,
-     * but the problem is that even if the same loop edge ID appears twice in
-     * the input list, they are not guaranteed to be next to each other; it
-     * may be the case that there are multiple loop edges, each edge appears
-     * twice, and we want to keep exactly one of them for each ID. That's why
-     * we have a "seen_loops" vector.
-     */
-
-    if (loops == IGRAPH_LOOPS_TWICE) {
-        /* Loop edges appear twice by default, nothing to do. */
-        return IGRAPH_SUCCESS;
-    }
-
-    length = igraph_vector_int_size(v);
-    if (length == 0) {
-        return IGRAPH_SUCCESS;
-    }
-
-    if (loops == IGRAPH_LOOPS_ONCE) {
-        /* We need a helper vector */
-        seen_loops = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        IGRAPH_FINALLY(igraph_free, seen_loops);
-        IGRAPH_CHECK(igraph_vector_int_init(seen_loops, 0));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, seen_loops);
-    } else if (loops != IGRAPH_NO_LOOPS) {
-        IGRAPH_ERROR("Invalid value for 'loops' argument", IGRAPH_EINVAL);
-    }
-
-    for (i = 0, write_ptr = 0; i < length; i++) {
-        eid = VECTOR(*v)[i];
-        if (IGRAPH_FROM(graph, eid) == IGRAPH_TO(graph, eid)) {
-            /* Loop edge */
-            if (seen_loops && !igraph_vector_int_contains(seen_loops, eid)) {
-                VECTOR(*v)[write_ptr++] = eid;
-                IGRAPH_CHECK(igraph_vector_int_push_back(seen_loops, eid));
-            }
-        } else {
-            /* Not a loop edge */
-            VECTOR(*v)[write_ptr++] = eid;
-        }
-    }
-
-    /* Always succeeds since we never grow the vector */
-    igraph_vector_int_resize(v, write_ptr);
-
-    /* Destroy the helper vector */
-    if (seen_loops) {
-        igraph_vector_int_destroy(seen_loops);
-        IGRAPH_FREE(seen_loops);
-        IGRAPH_FINALLY_CLEAN(2);
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 #ifndef USING_R
 igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
     igraph_integer_t i;
@@ -804,13 +726,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1000);
 
         IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], VECTOR(degrees)[i]));
-        IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode));
-
-        if (loops != IGRAPH_LOOPS_TWICE) {
-            IGRAPH_CHECK(
-                igraph_i_remove_loops_from_incidence_vector_in_place(&il->incs[i], graph, loops)
-            );
-        }
+        IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode, loops));
     }
 
     igraph_vector_int_destroy(&degrees);
@@ -1341,20 +1257,11 @@ igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il, i
             return NULL;
         }
 
-        ret = igraph_incident(il->graph, il->incs[no], no, il->mode);
+        ret = igraph_incident(il->graph, il->incs[no], no, il->mode, il->loops);
         if (ret != IGRAPH_SUCCESS) {
             igraph_vector_int_destroy(il->incs[no]);
             IGRAPH_FREE(il->incs[no]);
             return NULL;
-        }
-
-        if (il->loops != IGRAPH_LOOPS_TWICE) {
-            ret = igraph_i_remove_loops_from_incidence_vector_in_place(il->incs[no], il->graph, il->loops);
-            if (ret != IGRAPH_SUCCESS) {
-                igraph_vector_int_destroy(il->incs[no]);
-                IGRAPH_FREE(il->incs[no]);
-                return NULL;
-            }
         }
     }
 

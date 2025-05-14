@@ -47,7 +47,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (from != prev) {
-            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL, IGRAPH_LOOPS));
         }
         n = igraph_vector_int_size(&adjedges);
         for (igraph_integer_t i = 0; i < n; i++) {
@@ -58,7 +58,7 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
             }
         }
 
-        IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL, IGRAPH_LOOPS));
         n = igraph_vector_int_size(&adjedges2);
         for (igraph_integer_t i = 0; i < n; i++) {
             igraph_integer_t e2 = VECTOR(adjedges2)[i];
@@ -105,7 +105,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (from != prev) {
-            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_IN, IGRAPH_LOOPS));
         }
         n = igraph_vector_int_size(&adjedges);
         for (j = 0; j < n; j++) {
