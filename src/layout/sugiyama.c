@@ -700,7 +700,10 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
     igraph_vector_null(barycenters);
 
     for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, VECTOR(*layer_members)[i], direction));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, VECTOR(*layer_members)[i], direction,
+            IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         m = igraph_vector_int_size(&neis);
         if (m == 0) {
             /* No neighbors in this direction. Just use the current X coordinate */
@@ -910,7 +913,10 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         /* Find all the edges from this layer to the next */
         igraph_vector_int_clear(&neis1);
         for (j = 0; j < n; j++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis2, VECTOR(*vertices)[j], IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis2, VECTOR(*vertices)[j], IGRAPH_OUT,
+                IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             IGRAPH_CHECK(igraph_vector_int_append(&neis1, &neis2));
         }
 
@@ -1106,7 +1112,9 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
             }
 
             /* Find the neighbors of vertex j in layer i */
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, vertex, neimode));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, vertex, neimode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
 
             n = igraph_vector_int_size(&neis);
             if (n == 0)

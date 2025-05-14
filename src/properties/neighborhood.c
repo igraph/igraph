@@ -122,7 +122,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
             const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             const igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
 
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
             const igraph_integer_t n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
@@ -260,7 +260,7 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
             const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             const igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
 
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
             const igraph_integer_t n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
@@ -405,7 +405,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {

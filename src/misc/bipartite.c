@@ -1037,7 +1037,9 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             char acttype = VECTOR(seen)[actnode];
 
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, actnode, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+            ));
             n = igraph_vector_int_size(&neis);
             for (j = 0; j < n; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];

@@ -158,6 +158,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_multiple_t multiple) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
+    int iter = 0;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
@@ -194,11 +195,18 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     igraph_bool_t has_loops = false;
     igraph_bool_t has_multiple = false;
+
+    /* In theory, we could just run igraph_neighbors() in a loop with 'loops'
+     * and 'multiple' set exactly how the caller wants it. However, we take the
+     * opportunity to also _cache_ whether the graph has multiple or loop edges
+     * if we are looping over all vertices anyway, and that requires us to query
+     * the neighbors in full */
+
     for (igraph_integer_t i = 0; i < al->length; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1000);
 
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], VECTOR(degrees)[i]));
-        IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
 
         /* Attention: This function will only set values for has_loops and has_multiple
          * if it finds loops/multi-edges. Otherwise they are left at their original value. */
@@ -296,6 +304,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
     igraph_bitset_t seen;
     igraph_vector_int_t neis;
+    int iter;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Invalid neighbor mode specified for complementer adjlist view.", IGRAPH_EINVMODE);
@@ -318,13 +327,13 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
          * Then we iterate over 'seen' and record non-marked vertices in
          * the adjacency list. */
 
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1000);
 
         /* Reset neighbor counter and 'seen' vector. */
         igraph_bitset_null(&seen);
         igraph_integer_t n = al->length;
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode, loops, IGRAPH_NO_MULTIPLE));
 
         if (!loops) {
             IGRAPH_BIT_SET(seen, i);
@@ -770,6 +779,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_loops_t loops) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
+    int iter;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_EINVMODE);
@@ -791,7 +801,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
     for (igraph_integer_t i = 0; i < il->length; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1000);
 
         IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], VECTOR(degrees)[i]));
         IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode));
@@ -1191,17 +1201,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
             return NULL;
         }
 
-        ret = igraph_neighbors(al->graph, al->adjs[no], no, al->mode);
-        if (ret != IGRAPH_SUCCESS) {
-            igraph_vector_int_destroy(al->adjs[no]);
-            IGRAPH_FREE(al->adjs[no]);
-            return NULL;
-        }
-
-        ret = igraph_i_simplify_sorted_int_adjacency_vector_in_place(
-            al->adjs[no], no, al->mode, al->loops, al->multiple, NULL,
-            NULL
-        );
+        ret = igraph_neighbors(al->graph, al->adjs[no], no, al->mode, al->loops, al->multiple);
         if (ret != IGRAPH_SUCCESS) {
             igraph_vector_int_destroy(al->adjs[no]);
             IGRAPH_FREE(al->adjs[no]);

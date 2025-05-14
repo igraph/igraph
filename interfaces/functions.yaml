@@ -50,7 +50,9 @@ igraph_ecount:
     RETURN: INTEGER
 
 igraph_neighbors:
-    PARAMS: GRAPH graph, OUT VERTEX_INDICES neis, VERTEX vid, NEIMODE mode=ALL
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_INDICES neis, VERTEX vid, NEIMODE mode=ALL,
+        LOOPS loops=TWICE, MULTIPLE multiple=True
 
 igraph_is_directed:
     PARAMS: GRAPH graph

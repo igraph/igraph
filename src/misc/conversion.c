@@ -926,7 +926,9 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
 
             VECTOR(degrees)[leaf] = 0; /* mark leaf v as deleted */
 
-            IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, leaf, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neighbors, leaf, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+            ));
 
             /* Find the unique remaining neighbor of the leaf */
             neighbor_count = igraph_vector_int_size(&neighbors);

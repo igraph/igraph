@@ -82,7 +82,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(
          * should never happen, because the stor_end is set to one past the
          * end of the latest integer.
          */
-        ret = igraph_neighbors(al->graph, &al->adjs[no], no, al->mode);
+        ret = igraph_neighbors(al->graph, &al->adjs[no], no, al->mode, al->loops, al->multiple);
         if (ret != IGRAPH_SUCCESS) {
             igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
             return NULL;
@@ -150,7 +150,6 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             neis = igraph_i_lazy_adjlist2_get_real(&adjlist2, actnode);
-            //IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
@@ -251,7 +250,6 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             neis = igraph_lazy_adjlist_get(&adjlist, actnode);
-            //IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
@@ -352,7 +350,6 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             neis = igraph_adjlist_get(&adjlist, actnode);
-            //IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {

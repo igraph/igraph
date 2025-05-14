@@ -145,17 +145,32 @@ igraph_vs_t igraph_vss_all(void) {
  *          from/to \c vid. That is, all the neighbors of \c vid considered
  *          as if the graph is undirected.
  *        \endclist
+ * \param loops Whether to include the vertex itself in the neighborhood if the
+ *        vertex has a loop edge. If \c IGRAPH_NO_LOOPS, loop edges are
+ *        excluded. If \c IGRAPH_LOOPS_ONCE, the vertex is included in its own
+ *        neighborhood once for every loop edge that it has. If
+ *        \c IGRAPH_LOOPS_TWICE, the vertex is included twice in its own
+ *        neighborhood for every loop edge that it has, but only if the graph is
+ *        undirected or \p mode is set to \c IGRAPH_ALL.
+ * \param multiple Whether to include multiple edges. If \c IGRAPH_NO_MULTIPLE,
+ *        multiple edges are not included in the neighborhood. If
+ *        \c IGRAPH_MULTIPLE, multiple edges are included in the neighborhood.
+ *
  * \return Error code.
  * \sa \ref igraph_vs_destroy()
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
-                  igraph_integer_t vid, igraph_neimode_t mode) {
+igraph_error_t igraph_vs_adj(
+    igraph_vs_t *vs, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_multiple_t multiple
+) {
     vs->type = IGRAPH_VS_ADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
+    vs->data.adj.loops = loops;
+    vs->data.adj.multiple = multiple;
     return IGRAPH_SUCCESS;
 }
 
@@ -201,6 +216,8 @@ igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
     vs->type = IGRAPH_VS_NONADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
+    vs->data.adj.loops = IGRAPH_LOOPS;
+    vs->data.adj.multiple = IGRAPH_MULTIPLE;
     return IGRAPH_SUCCESS;
 }
 
@@ -615,7 +632,10 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
 
     case IGRAPH_VS_ADJ:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs->data.adj.vid, vs->data.adj.mode,
+            vs->data.adj.loops, vs->data.adj.multiple
+        ));
         *result = igraph_vector_int_size(&vec);
         igraph_vector_int_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(1);
@@ -623,7 +643,10 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
 
     case IGRAPH_VS_NONADJ:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs->data.adj.vid, vs->data.adj.mode,
+            vs->data.adj.loops, vs->data.adj.multiple
+        ));
         vec_len = igraph_vector_int_size(&vec);
         *result = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(*result, igraph_bool_t);
@@ -704,7 +727,10 @@ igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_v
         IGRAPH_FINALLY(igraph_free, vec_int);
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs.data.adj.vid, vs.data.adj.mode,
+            vs.data.adj.loops, vs.data.adj.multiple
+        ));
         n = igraph_vector_int_size(&vec);
         IGRAPH_CHECK(igraph_vector_int_resize(vec_int, n));
         for (i = 0; i < n; i++) {
@@ -727,7 +753,10 @@ igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_v
         IGRAPH_FINALLY(igraph_free, vec_int);
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs.data.adj.vid, vs.data.adj.mode,
+            vs.data.adj.loops, vs.data.adj.multiple
+        ));
         vec_len = igraph_vector_int_size(&vec);
         n = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(n, igraph_bool_t);

@@ -119,7 +119,7 @@ static igraph_error_t igraph_i_find_k_indsets(
                 /* v1 and v2 are the two different vertices. Check for the
                     * absence of an edge since we are looking for independent
                     * vertex sets */
-                IGRAPH_CHECK(igraph_neighbors(graph, neis, v1, IGRAPH_ALL));
+                IGRAPH_CHECK(igraph_neighbors(graph, neis, v1, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
                 if (!igraph_vector_int_search(neis, 0, v2, 0)) {
                     /* Found a new independent vertex set, step forward in new_member_storage */
                     if (m == n || v2 > (*new_member_storage)[m - 1]) {

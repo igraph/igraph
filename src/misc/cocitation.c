@@ -234,7 +234,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
         const igraph_real_t weight = weights ? VECTOR(*weights)[from] : 1;
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (i = 0; i < nei_count - 1; i++) {

@@ -724,7 +724,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t from = VECTOR(ranks)[i];
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, from, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+            ));
             neis_size = igraph_vector_int_size(&neis);
             for (igraph_integer_t j = 0; j < neis_size; j++) {
                 igraph_integer_t to = VECTOR(neis)[j];

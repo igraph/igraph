@@ -215,7 +215,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
         if (edges) {
             IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
         } else {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         }
 
         n = igraph_vector_int_size(&neis);

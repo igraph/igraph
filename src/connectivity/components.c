@@ -160,7 +160,9 @@ static igraph_error_t igraph_i_connected_components_weak(
 
         while ( !igraph_dqueue_int_empty(&q) ) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, act_node, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
@@ -516,7 +518,9 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
 
         const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, actnode, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {
@@ -669,7 +673,9 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         while (!igraph_dqueue_int_empty(&q) ) {
             /* pop from the queue of this component */
             igraph_integer_t actvert = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvert, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, actvert, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             /* iterate over the neighbors */
             for (i = 0; i < nei_count; i++) {
@@ -1581,7 +1587,7 @@ igraph_error_t igraph_subcomponent(
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, mode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
         vsize = igraph_vector_int_size(&tmp);
         for (i = 0; i < vsize; i++) {
             igraph_integer_t neighbor = VECTOR(tmp)[i];

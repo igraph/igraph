@@ -24,25 +24,25 @@
 void print_params(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops) {
     printf(igraph_is_directed(graph) ? "directed;   " : "undirected; ");
     switch (mode) {
-    case IGRAPH_ALL: printf("ALL; "); break;
-    case IGRAPH_OUT: printf("OUT; "); break;
-    case IGRAPH_IN : printf("IN;  "); break;
+        case IGRAPH_ALL: printf("ALL; "); break;
+        case IGRAPH_OUT: printf("OUT; "); break;
+        case IGRAPH_IN : printf("IN;  "); break;
     }
     switch (loops) {
-    case IGRAPH_NO_LOOPS:    printf("NO_LOOPS;    "); break;
-    case IGRAPH_LOOPS_ONCE:  printf("LOOPS_ONCE;  "); break;
-    case IGRAPH_LOOPS_TWICE: printf("LOOPS_TWICE; "); break;
+        case IGRAPH_NO_LOOPS:    printf("NO_LOOPS;    "); break;
+        case IGRAPH_LOOPS_ONCE:  printf("LOOPS_ONCE;  "); break;
+        case IGRAPH_LOOPS_TWICE: printf("LOOPS_TWICE; "); break;
     }
 }
 
 void print_multiple(igraph_multiple_t multiple) {
     switch (multiple) {
-    case IGRAPH_MULTIPLE:    printf("MULTIPLE;    "); break;
-    case IGRAPH_NO_MULTIPLE: printf("NO_MULTIPLE; "); break;
+        case IGRAPH_MULTIPLE:    printf("MULTIPLE;    "); break;
+        case IGRAPH_NO_MULTIPLE: printf("NO_MULTIPLE; "); break;
     }
 }
 
-/* Print adjacency list based on igraph_i_neighbors() */
+/* Print adjacency list based on igraph_neighbors() */
 void print_adj1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_vector_int_t neis;
@@ -54,7 +54,7 @@ void print_adj1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
     igraph_vector_int_init(&neis, 0);
     for (igraph_integer_t v=0; v < vcount; v++) {
         printf("%3" IGRAPH_PRId ": ", v);
-        igraph_i_neighbors(graph, &neis, v, mode, loops, multiple);
+        igraph_neighbors(graph, &neis, v, mode, loops, multiple);
         print_vector_int(&neis);
     }
     igraph_vector_int_destroy(&neis);
@@ -110,7 +110,7 @@ void print_inc2(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
     igraph_inclist_destroy(&il);
 }
 
-/* Verifies that igraph_i_neighbors() and igraph_i_incident() produce results in the same order. */
+/* Verifies that igraph_neighbors() and igraph_i_incident() produce results in the same order. */
 void verify_ordering1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_vector_int_t neis, incs;
     igraph_integer_t vcount = igraph_vcount(graph);
@@ -123,7 +123,7 @@ void verify_ordering1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops
     igraph_vector_int_init(&incs, 0);
 
     for (igraph_integer_t v=0; v < vcount; v++) {
-        igraph_i_neighbors(graph, &neis, v, mode, loops, IGRAPH_MULTIPLE);
+        igraph_neighbors(graph, &neis, v, mode, loops, IGRAPH_MULTIPLE);
         igraph_i_incident(graph, &incs, v, mode, loops);
 
         igraph_integer_t n = igraph_vector_int_size(&neis);
@@ -209,7 +209,7 @@ int main(void) {
 
     printf("UNDIRECTED\n\n");
 
-    printf("igraph_i_neighbors()\n");
+    printf("igraph_neighbors()\n");
     print_adj1(&ug, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
     print_adj1(&ug, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     print_adj1(&ug, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
@@ -231,7 +231,7 @@ int main(void) {
 
     printf("\nDIRECTED ALL\n\n");
 
-    printf("igraph_i_neighbors()\n");
+    printf("igraph_neighbors()\n");
     print_adj1(&dg, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
     print_adj1(&dg, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     print_adj1(&dg, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
@@ -253,7 +253,7 @@ int main(void) {
 
     printf("\nDIRECTED OUT\n\n");
 
-    printf("igraph_i_neighbors()\n");
+    printf("igraph_neighbors()\n");
     print_adj1(&dg, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
     print_adj1(&dg, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 

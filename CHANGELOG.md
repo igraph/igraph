@@ -55,6 +55,7 @@
  - The weighted variants of `igraph_diameter()`, `igraph_pseudo_diameter()`, `igraph_radius()`, `igraph_graph_center()`, `igraph_eccentricity()` and `igraph_average_path_length()` were merged into the undirected ones by adding a new argument named `weights` in the second position.
  - The `weights` parameter of `igraph_average_path_length()`, `igraph_global_efficiency()`, `igraph_local_efficiency()` and `igraph_average_local_efficiency()` were moved to the second position, after the `graph` itself, for sake of consistency with other functions.
  - `igraph_edges()` gained a new `bycol` argument that determines the order in which the edges are returned. `bycol` = 0 reproduces the existing behaviour, while `bycol` = 1 returns the edges suitable for a matrix stored in column-wise order.
+ - `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()` and `igraph_inclist_init()`.
 
 ### Added
 

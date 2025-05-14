@@ -60,8 +60,10 @@ IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_map(
 );
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_vcount(const igraph_t *graph);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_ecount(const igraph_t *graph);
-IGRAPH_EXPORT igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t vid,
-                                   igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_neighbors(
+    const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t vid,
+    igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple
+);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_is_directed(const igraph_t *graph);
 IGRAPH_EXPORT igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
                                              igraph_integer_t vid, igraph_neimode_t mode, igraph_bool_t loops);

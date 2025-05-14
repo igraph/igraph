@@ -123,7 +123,9 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, maxdeg);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t v = vert[i];
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, omode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, v, omode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         for (igraph_integer_t j = 0; j < nei_count; j++) {
             igraph_integer_t u = VECTOR(neis)[j];

@@ -434,7 +434,7 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
      * from, plus 1 */
     memset(already_counted, 0, no_of_nodes * sizeof(already_counted[0]));
 
-    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
+    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     vertex_neis_size = igraph_vector_int_size(vertex_neis);
 
     igraph_vector_char_null(nei_mask);
@@ -537,7 +537,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
     igraph_integer_t vertex_neis_size;
     igraph_integer_t neighbor_count; /* unlike 'inc_edges_size', 'neighbor_count' does not count self-loops or multi-edges */
 
-    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
+    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     vertex_neis_size = igraph_vector_int_size(vertex_neis);
 
     igraph_vector_char_null(nei_mask);

@@ -133,8 +133,10 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res) {
     for (igraph_integer_t i = 0; i < vcount; ++i) {
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
-        IGRAPH_CHECK(igraph_i_neighbors(graph, &neighbours, i, IGRAPH_OUT,
-                                        IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neighbours, i, IGRAPH_OUT, IGRAPH_NO_LOOPS,
+            IGRAPH_NO_MULTIPLE
+        ));
 
         if ((igraph_vector_int_size(&neighbours) < vcount - 1)) {
             *res = false;

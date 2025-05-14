@@ -1,6 +1,6 @@
 UNDIRECTED
 
-igraph_i_neighbors()
+igraph_neighbors()
 undirected; ALL; NO_LOOPS;    MULTIPLE;    
   0: ( 3 3 )
   1: ( 4 )
@@ -106,7 +106,7 @@ undirected; ALL; LOOPS_TWICE;
 
 DIRECTED ALL
 
-igraph_i_neighbors()
+igraph_neighbors()
 directed;   ALL; NO_LOOPS;    MULTIPLE;    
   0: ( 3 3 )
   1: ( 4 )
@@ -212,7 +212,7 @@ directed;   ALL; LOOPS_TWICE;
 
 DIRECTED OUT
 
-igraph_i_neighbors()
+igraph_neighbors()
 directed;   OUT; NO_LOOPS;    MULTIPLE;    
   0: ( 3 3 )
   1: ( 4 )

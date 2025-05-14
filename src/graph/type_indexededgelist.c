@@ -865,46 +865,66 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  *        \c IGRAPH_ALL, both kinds of vertices are
  *        searched.
  *        This parameter is ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *        removes loop edges from the result. \c IGRAPH_LOOPS_ONCE
+ *        makes each loop edge appear only once in the result.
+ *        \c IGRAPH_LOOPS_TWICE makes loop edges appear \em twice in the
+ *        result if the graph is undirected or \p mode is set to \c IGRAPH_ALL
+ *        (and once otherwise as returning them twice does not make sense for
+ *        directed graphs).
+ * \param multiple Specifies how to treat multiple (parallel) edges.
+ *        \c IGRAPH_NO_MULTIPLE collapses parallel edges into a single one;
+ *        \c IGRAPH_MULTIPLE keeps the multiplicities of parallel edges
+ *        so the same neighbor will appear as many times in the result as the
+ *        number of parallel edges going between the two vertices.
  * \return Error code:
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *         \c IGRAPH_ENOMEM: not enough memory.
  *
- * Time complexity: O(d),
- * d is the number
- * of adjacent vertices to the queried vertex.
+ * Time complexity: O(d), d is the number of adjacent vertices to the queried
+ * vertex.
  *
  * \example examples/simple/igraph_neighbors.c
  */
-igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
-        igraph_neimode_t mode) {
-    if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
-        return igraph_i_neighbors(graph, neis, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
-    } else {
-        return igraph_i_neighbors(graph, neis, pnode, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+igraph_error_t igraph_neighbors(
+    const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
+    igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple
+) {
+#define DEDUPLICATE_IF_NEEDED(vertex, n)                                          \
+    if (should_filter_duplicates) {                                               \
+        if (vertex == pnode) {                                                    \
+            /* This is a loop edge */                                             \
+            if (loops == IGRAPH_NO_LOOPS) {                                       \
+                /* Filtering loop edges unconditionally */                        \
+                length -= n;                                                      \
+                continue;                                                         \
+            } else if (loops == IGRAPH_LOOPS_ONCE && vertex == last_added) {      \
+                /* Filtering every second endpoint of loop edges */               \
+                length -= n;                                                      \
+                last_added = -1;                                                  \
+                seen_loop = true;                                                 \
+                continue;                                                         \
+            } else if (multiple == IGRAPH_NO_MULTIPLE && seen_loop) {             \
+                /* Filtering multi-loop edges */                                  \
+                length -= n;                                                      \
+                continue;                                                         \
+            } else {                                                              \
+                seen_loop = (loops != IGRAPH_LOOPS_TWICE || last_added == vertex);\
+                last_added = vertex;                                              \
+            }                                                                     \
+        } else {                                                                  \
+            /* Not a loop edge */                                                 \
+            if (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added) {         \
+                /* Filtering multi-edges */                                       \
+                length -= n;                                                      \
+                continue;                                                         \
+            } else {                                                              \
+                last_added = vertex;                                              \
+            }                                                                     \
+        }                                                                         \
     }
-}
 
-igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
-        igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
-#define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
-    if (should_filter_duplicates) {                                                        \
-        if (                                                                               \
-            (loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
-            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)         \
-        ) {                                                                                \
-            length -= n;                                                                   \
-            if (loops == IGRAPH_LOOPS_ONCE) {                                              \
-                last_added = -1;                                                           \
-            }                                                                              \
-            continue;                                                                      \
-        } else if (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added) {               \
-            length -= n;                                                                   \
-            continue;                                                                      \
-        } else {                                                                           \
-            last_added = vertex;                                                           \
-        }                                                                                  \
-    }
 
     igraph_integer_t length = 0, idx = 0;
     igraph_integer_t i, j;
@@ -913,11 +933,17 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
     igraph_integer_t last_added = -1;
     igraph_bool_t should_filter_duplicates;
 
+    /* seen_loop stores whether we have already seen at least one full loop
+     * edge while iterating over the neighbor lists. This is needed to handle
+     * multi-loop edges properly. Since internally we always store loop edges
+     * twice, this flag should become true only if we processed both endpoints
+     * for a loop edge */
+    igraph_bool_t seen_loop = false;
+
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
+        IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVVID, node);
     }
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
-            mode != IGRAPH_ALL) {
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Mode should be either IGRAPH_OUT, IGRAPH_IN or IGRAPH_ALL.", IGRAPH_EINVMODE);
     }
 
@@ -926,9 +952,13 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
+        /*
         IGRAPH_ERROR("For a directed graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.", IGRAPH_EINVAL);
+        */
+        loops = IGRAPH_LOOPS_ONCE;
     }
+
     /* Calculate needed space first & allocate it */
     /* Note that 'mode' is treated as a bit field here; it's okay because
      * IGRAPH_ALL = IGRAPH_IN | IGRAPH_OUT, bit-wise */
@@ -941,9 +971,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
 
     IGRAPH_CHECK(igraph_vector_int_resize(neis, length));
 
-    /* The loops below produce an ordering what is consistent with the
-     * ordering returned by igraph_neighbors(), and this should be preserved.
-     * We are dealing with two sorted lists; one for the successors and one
+    /* We are dealing with two sorted lists; one for the successors and one
      * for the predecessors. If we have requested only one of them, we have
      * an easy job. If we have requested both, we need to merge the two lists
      * to ensure that the output is sorted by the vertex IDs of the "other"
@@ -1009,14 +1037,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
                 i2++;
                 DEDUPLICATE_IF_NEEDED(n1, 2);
                 VECTOR(*neis)[idx++] = n1;
-                if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE))) {
-                    length--;
-                    if (loops == IGRAPH_LOOPS_ONCE) {
-                        last_added = -1;
-                    }
-                    continue;
-                }
+                DEDUPLICATE_IF_NEEDED(n2, 1);
                 VECTOR(*neis)[idx++] = n2;
             }
         }

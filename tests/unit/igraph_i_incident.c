@@ -92,10 +92,10 @@ int main(void) {
     CHECK_ERROR(igraph_i_incident(&g_lm, &eids, 0, IGRAPH_OUT, IGRAPH_LOOPS_TWICE), IGRAPH_EINVAL);
 
     printf("Vertex not in graph:\n");
-    CHECK_ERROR(igraph_i_neighbors(&g_lm, &eids, 100, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_neighbors(&g_lm, &eids, 100, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVVID);
 
     printf("Non-existent mode:\n");
-    CHECK_ERROR(igraph_i_neighbors(&g_lm, &eids, 0, (igraph_neimode_t) 100, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_neighbors(&g_lm, &eids, 0, (igraph_neimode_t) 100, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_1);
     igraph_destroy(&g_lm);

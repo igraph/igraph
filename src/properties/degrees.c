@@ -137,7 +137,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
         igraph_integer_t nv;
         igraph_real_t str = VECTOR(strength)[v];
         /* Get neighbours and incident edges */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_CHECK(igraph_incident(graph, &edge_neis, v, mode));
         nv = igraph_vector_int_size(&neis);
         for (igraph_integer_t j = 0; j < nv; j++) {
@@ -310,7 +310,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
         igraph_real_t sum = 0.0;
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
         igraph_integer_t nv;
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         nv = igraph_vector_int_size(&neis);
         for (igraph_integer_t j = 0; j < nv; j++) {
             igraph_integer_t nei = VECTOR(neis)[j];
