@@ -144,8 +144,7 @@ add_legacy_tests(
   igraph_empty
   igraph_get_eid
   igraph_is_same_graph
-  igraph_i_incident
-  igraph_i_neighbors
+  igraph_incident
   igraph_neighbors
 )
 
@@ -225,6 +224,7 @@ add_legacy_tests(
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
+  igraph_lcf
   igraph_kautz
   igraph_preference_game
   igraph_perfect
@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  igraph_product
   components
   coreness
   efficiency

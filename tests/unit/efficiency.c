@@ -33,76 +33,76 @@ int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* wei
         printf("UNWEIGHTED CASE:\n\n");
     }
 
-    igraph_global_efficiency(graph, &eff, NULL, IGRAPH_UNDIRECTED);
+    igraph_global_efficiency(graph, NULL, &eff, IGRAPH_UNDIRECTED);
     printf("Global efficiency, undirected: %f\n", eff);
 
-    igraph_global_efficiency(graph, &eff, NULL, IGRAPH_DIRECTED);
+    igraph_global_efficiency(graph, NULL, &eff, IGRAPH_DIRECTED);
     printf("Global efficiency, directed: %f\n", eff);
 
-    igraph_average_local_efficiency(graph, &eff, NULL, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_average_local_efficiency(graph, NULL, &eff, IGRAPH_UNDIRECTED, IGRAPH_ALL);
     printf("Average local efficiency, undirected: %f\n", eff);
 
-    igraph_average_local_efficiency(graph, &eff, NULL, IGRAPH_DIRECTED, IGRAPH_ALL);
+    igraph_average_local_efficiency(graph, NULL, &eff, IGRAPH_DIRECTED, IGRAPH_ALL);
     printf("Average local efficiency, directed, all neighbors: %f\n", eff);
 
-    igraph_average_local_efficiency(graph, &eff, NULL, IGRAPH_DIRECTED, IGRAPH_IN);
+    igraph_average_local_efficiency(graph, NULL, &eff, IGRAPH_DIRECTED, IGRAPH_IN);
     printf("Average local efficiency, directed, in-neighbors: %f\n", eff);
 
-    igraph_average_local_efficiency(graph, &eff, NULL, IGRAPH_DIRECTED, IGRAPH_OUT);
+    igraph_average_local_efficiency(graph, NULL, &eff, IGRAPH_DIRECTED, IGRAPH_OUT);
     printf("Average local efficiency, directed, out-neighbors: %f\n", eff);
 
     printf("\nLocal efficiency, undirected:\n");
-    igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), NULL, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_local_efficiency(graph, NULL, &eff_vec, igraph_vss_all(), IGRAPH_UNDIRECTED, IGRAPH_ALL);
     print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, all neighbors:\n");
-    igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), NULL, IGRAPH_DIRECTED, IGRAPH_ALL);
+    igraph_local_efficiency(graph, NULL, &eff_vec, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_ALL);
     print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, in-neighbors:\n");
-    igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), NULL, IGRAPH_DIRECTED, IGRAPH_IN);
+    igraph_local_efficiency(graph, NULL, &eff_vec, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_IN);
     print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, out-neighbors:\n");
-    igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), NULL, IGRAPH_DIRECTED, IGRAPH_OUT);
+    igraph_local_efficiency(graph, NULL, &eff_vec, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_OUT);
     print_vector(&eff_vec);
 
     if (weights_array) {
         igraph_vector_view(&weights, weights_array, igraph_ecount(graph));
         printf("\nWEIGHTED CASE:\n\n");
 
-        igraph_global_efficiency(graph, &eff, &weights, IGRAPH_UNDIRECTED);
+        igraph_global_efficiency(graph, &weights, &eff, IGRAPH_UNDIRECTED);
         printf("Global efficiency, undirected: %f\n", eff);
 
-        igraph_global_efficiency(graph, &eff, &weights, IGRAPH_DIRECTED);
+        igraph_global_efficiency(graph, &weights, &eff, IGRAPH_DIRECTED);
         printf("Global efficiency, directed: %f\n", eff);
 
-        igraph_average_local_efficiency(graph, &eff, &weights, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+        igraph_average_local_efficiency(graph, &weights, &eff, IGRAPH_UNDIRECTED, IGRAPH_ALL);
         printf("Average local efficiency, undirected: %f\n", eff);
 
-        igraph_average_local_efficiency(graph, &eff, &weights, IGRAPH_DIRECTED, IGRAPH_ALL);
+        igraph_average_local_efficiency(graph, &weights, &eff, IGRAPH_DIRECTED, IGRAPH_ALL);
         printf("Average local efficiency, directed, all neighbors: %f\n", eff);
 
-        igraph_average_local_efficiency(graph, &eff, &weights, IGRAPH_DIRECTED, IGRAPH_IN);
+        igraph_average_local_efficiency(graph, &weights, &eff, IGRAPH_DIRECTED, IGRAPH_IN);
         printf("Average local efficiency, directed, in-neighbors: %f\n", eff);
 
-        igraph_average_local_efficiency(graph, &eff, &weights, IGRAPH_DIRECTED, IGRAPH_OUT);
+        igraph_average_local_efficiency(graph, &weights, &eff, IGRAPH_DIRECTED, IGRAPH_OUT);
         printf("Average local efficiency, directed, out-neighbors: %f\n", eff);
 
         printf("\nLocal efficiency, undirected:\n");
-        igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), &weights, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+        igraph_local_efficiency(graph, &weights, &eff_vec, igraph_vss_all(), IGRAPH_UNDIRECTED, IGRAPH_ALL);
         print_vector(&eff_vec);
 
         printf("\nLocal efficiency, directed, all neighbors:\n");
-        igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), &weights, IGRAPH_DIRECTED, IGRAPH_ALL);
+        igraph_local_efficiency(graph, &weights, &eff_vec, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_ALL);
         print_vector(&eff_vec);
 
         printf("\nLocal efficiency, directed, in-neighbors:\n");
-        igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), &weights, IGRAPH_DIRECTED, IGRAPH_IN);
+        igraph_local_efficiency(graph, &weights, &eff_vec, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_IN);
         print_vector(&eff_vec);
 
         printf("\nLocal efficiency, directed, out-neighbors:\n");
-        igraph_local_efficiency(graph, &eff_vec, igraph_vss_all(), &weights, IGRAPH_DIRECTED, IGRAPH_OUT);
+        igraph_local_efficiency(graph, &weights, &eff_vec, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_OUT);
         print_vector(&eff_vec);
     }
 

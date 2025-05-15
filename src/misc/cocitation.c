@@ -234,7 +234,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
         const igraph_real_t weight = weights ? VECTOR(*weights)[from] : 1;
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (i = 0; i < nei_count - 1; i++) {
@@ -565,7 +565,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
     igraph_vector_int_t pairs;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&pairs, 0);
-    IGRAPH_CHECK(igraph_edges(graph, es, &pairs));
+    IGRAPH_CHECK(igraph_edges(graph, es, &pairs, 0));
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, &pairs, mode, loops));
     igraph_vector_int_destroy(&pairs);
     IGRAPH_FINALLY_CLEAN(1);

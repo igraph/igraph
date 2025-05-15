@@ -56,6 +56,8 @@ typedef struct igraph_vs_t {
         struct {
             igraph_integer_t vid;
             igraph_neimode_t mode;
+            igraph_loops_t loops;
+            igraph_bool_t multiple;
         } adj;                              /* adjacent vertices  */
         struct {
             igraph_integer_t start;         /* first index (inclusive) */
@@ -67,8 +69,10 @@ typedef struct igraph_vs_t {
 IGRAPH_EXPORT igraph_error_t igraph_vs_all(igraph_vs_t *vs);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_vs_t igraph_vss_all(void);
 
-IGRAPH_EXPORT igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
-                                igraph_integer_t vid, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_vs_adj(
+    igraph_vs_t *vs, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_bool_t multiple
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
                                    igraph_neimode_t mode);
@@ -250,6 +254,7 @@ typedef struct igraph_es_t {
         struct {
             igraph_integer_t vid;
             igraph_neimode_t mode;
+            igraph_loops_t loops;
         } incident;
         struct {
             igraph_integer_t start; /* first index (inclusive) */
@@ -271,8 +276,10 @@ IGRAPH_EXPORT igraph_error_t igraph_es_all(igraph_es_t *es,
                                 igraph_edgeorder_type_t order);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_incident(igraph_es_t *es,
-                                     igraph_integer_t vid, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_es_incident(
+    igraph_es_t *es, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_es_none(igraph_es_t *es);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_es_t igraph_ess_none(void);

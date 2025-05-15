@@ -31,15 +31,15 @@ int main(void) {
     igraph_vector_int_init(&v, 0);
     igraph_small(&g, 4, IGRAPH_DIRECTED, 0,1, 1,2, 2,3, 2,2, -1);
 
-    igraph_neighbors(&g, &v, 2, IGRAPH_OUT);
+    igraph_neighbors(&g, &v, 2, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     igraph_vector_int_sort(&v);
     igraph_vector_int_print(&v);
 
-    igraph_neighbors(&g, &v, 2, IGRAPH_IN);
+    igraph_neighbors(&g, &v, 2, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     igraph_vector_int_sort(&v);
     igraph_vector_int_print(&v);
 
-    igraph_neighbors(&g, &v, 2, IGRAPH_ALL);
+    igraph_neighbors(&g, &v, 2, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
     igraph_vector_int_sort(&v);
     igraph_vector_int_print(&v);
 

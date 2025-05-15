@@ -1101,7 +1101,7 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
 
 /**
  * \ingroup nongraph
- * \function igraph_random_sample_real
+ * \function igraph_i_random_sample_real
  * \brief Generates an increasing random sequence of integers (igraph_real_t version).
  *
  * This function is the 'real' version of \ref igraph_random_sample(), and was added
@@ -1126,7 +1126,7 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
  *         size of the candidate pool.
  */
 
-igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
+igraph_error_t igraph_i_random_sample_real(igraph_vector_t *res, igraph_real_t l,
                     igraph_real_t h, igraph_integer_t length) {
     /* This function is the 'real' version of igraph_random_sample, and was added
      * so erdos_renyi_game_gnm can use a random sample of doubles instead of integers
@@ -2235,33 +2235,4 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double a, double scale) {
     } /* repeat .. until  `t' is accepted */
     x = s + 0.5 * t;
     return scale * x * x;
-}
-
-igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
-                             const igraph_vector_t *alpha,
-                             igraph_vector_t *result) {
-
-    igraph_integer_t len = igraph_vector_size(alpha);
-    igraph_real_t sum = 0.0;
-
-    if (len < 2) {
-        IGRAPH_ERROR("Dirichlet parameter vector too short, must have at least two entries.",
-                     IGRAPH_EINVAL);
-    }
-    if (igraph_vector_min(alpha) <= 0) {
-        IGRAPH_ERROR("Dirichlet concentration parameters must be positive.",
-                     IGRAPH_EINVAL);
-    }
-
-    IGRAPH_CHECK(igraph_vector_resize(result, len));
-
-    for (igraph_integer_t i = 0; i < len; i++) {
-        VECTOR(*result)[i] = igraph_rng_get_gamma(rng, VECTOR(*alpha)[i], 1.0);
-        sum += VECTOR(*result)[i];
-    }
-    for (igraph_integer_t i = 0; i < len; i++) {
-        VECTOR(*result)[i] /= sum;
-    }
-
-    return IGRAPH_SUCCESS;
 }

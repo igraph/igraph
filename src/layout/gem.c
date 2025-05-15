@@ -189,7 +189,9 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
             }
         }
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, v, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         nlen = igraph_vector_int_size(&neis);
         for (j = 0; j < nlen; j++) {
             igraph_integer_t u = VECTOR(neis)[j];

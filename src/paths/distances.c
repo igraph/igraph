@@ -44,12 +44,11 @@
  * vid_ecc will then return the id of the vertex farthest from the one in
  * vids. If unconn == false and not all other vertices were reachable from
  * the single given vertex, -1 is returned in vid_ecc. */
-static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
-                                 igraph_vector_t *res,
-                                 igraph_vs_t vids,
-                                 igraph_lazy_adjlist_t *adjlist,
-                                 igraph_integer_t *vid_ecc,
-                                 igraph_bool_t unconn) {
+static igraph_error_t igraph_i_eccentricity_unweighted(
+    const igraph_t *graph, igraph_vector_t *res, igraph_vs_t vids,
+    igraph_lazy_adjlist_t *adjlist, igraph_integer_t *vid_ecc,
+    igraph_bool_t unconn
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -130,7 +129,7 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
 
 /**
  * This function finds the weighted eccentricity and returns it via \p ecc.
- * It's used for igraph_pseudo_diameter_dijkstra() and igraph_eccentricity_dijkstra().
+ * It's used for igraph_pseudo_diameter() and igraph_eccentricity().
  * \p vid_ecc returns the vertex id of the ecc with the greatest
  * distance from \p vid_start. If two vertices have the same greatest distance,
  * the one with the lowest degree is chosen.
@@ -138,13 +137,10 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
  * wil be set to infinity, and \p vid_ecc to -1;
  */
 static igraph_error_t igraph_i_eccentricity_dijkstra(
-        const igraph_t *graph,
-        const igraph_vector_t *weights,
-        igraph_real_t *ecc,
-        igraph_integer_t vid_start,
-        igraph_integer_t *vid_ecc,
-        igraph_bool_t unconn,
-        igraph_lazy_inclist_t *inclist) {
+    const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc,
+    igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn,
+    igraph_lazy_inclist_t *inclist
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_2wheap_t Q;
@@ -247,61 +243,11 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
  * components. Isolated vertices have eccentricity zero.
  *
  * \param graph The input graph, it can be directed or undirected.
- * \param res Pointer to an initialized vector, the result is stored
- *    here.
- * \param vids The vertices for which the eccentricity is calculated.
- * \param mode What kind of paths to consider for the calculation:
- *    \c IGRAPH_OUT, paths that follow edge directions;
- *    \c IGRAPH_IN, paths that follow the opposite directions; and
- *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
- *    is ignored for undirected graphs.
- * \return Error code.
- *
- * Time complexity: O(|S| (|V|+|E|)), where |V| is the number of
- * vertices, |E| is the number of edges and |S| is the number of
- * vertices for which eccentricity is calculated.
- *
- * \sa \ref igraph_radius().
- *
- * \example examples/simple/igraph_eccentricity.c
- */
-
-igraph_error_t igraph_eccentricity(const igraph_t *graph,
-                        igraph_vector_t *res,
-                        igraph_vs_t vids,
-                        igraph_neimode_t mode) {
-    igraph_lazy_adjlist_t adjlist;
-
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
-                                          IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-
-    IGRAPH_CHECK(igraph_i_eccentricity(graph, res, vids, &adjlist,
-                                       /*vid_ecc*/ NULL, /*unconn*/ true));
-    igraph_lazy_adjlist_destroy(&adjlist);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_eccentricity_dijkstra
- * \brief Eccentricity of some vertices, using weighted edges.
- *
- * The eccentricity of a vertex is calculated by measuring the shortest
- * distance from (or to) the vertex, to (or from) all vertices in the
- * graph, and taking the maximum.
- *
- * </para><para>
- * This implementation ignores vertex pairs that are in different
- * components. Isolated vertices have eccentricity zero.
- *
- * \param graph The input graph, it can be directed or undirected.
  * \param weights The edge weights. All edge weights must be
  *    non-negative for Dijkstra's algorithm to work. Additionally, no
  *    edge weight may be NaN. If either case does not hold, an error
- *    is returned. If this is a null pointer, then the unweighted
- *    version, \ref igraph_eccentricity() is called. Edges with positive
- *    infinite weights are ignored.
+ *    is returned. Use a null pointer to calculate the unweighted
+ *    eccentricities. Edges with positive infinite weights are ignored.
  * \param res Pointer to an initialized vector, the result is stored
  *    here.
  * \param vids The vertices for which the eccentricity is calculated.
@@ -315,13 +261,13 @@ igraph_error_t igraph_eccentricity(const igraph_t *graph,
  * Time complexity: O(|V| |E| log|V| + |V|), where |V| is the number of
  * vertices, |E| the number of edges.
  *
+ * \example examples/simple/igraph_eccentricity.c
  */
 
-igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
-                        const igraph_vector_t *weights,
-                        igraph_vector_t *res,
-                        igraph_vs_t vids,
-                        igraph_neimode_t mode) {
+igraph_error_t igraph_eccentricity(
+    const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_t *res,
+    igraph_vs_t vids, igraph_neimode_t mode
+) {
     igraph_lazy_inclist_t inclist;
     igraph_vit_t vit;
     igraph_integer_t dump;
@@ -329,7 +275,17 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (weights == NULL) {
-        return igraph_eccentricity(graph, res, vids, mode);
+        igraph_lazy_adjlist_t adjlist;
+
+        IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
+                                            IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+        IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+        IGRAPH_CHECK(igraph_i_eccentricity_unweighted(graph, res, vids, &adjlist,
+            /*vid_ecc*/ NULL, /*unconn*/ true));
+        igraph_lazy_adjlist_destroy(&adjlist);
+        IGRAPH_FINALLY_CLEAN(1);
+        return IGRAPH_SUCCESS;
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -354,10 +310,11 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(res, 0));
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
 
-    for (IGRAPH_VIT_RESET(vit);
-            !IGRAPH_VIT_END(vit);
-            IGRAPH_VIT_NEXT(vit)) {
-        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc, IGRAPH_VIT_GET(vit), /*vid_ecc*/ &dump, /*unconn*/ true, &inclist));
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(
+            graph, weights, &ecc, IGRAPH_VIT_GET(vit),
+            /*vid_ecc*/ &dump, /*unconn*/ true, &inclist
+        ));
         IGRAPH_CHECK(igraph_vector_push_back(res, ecc));
     }
     igraph_lazy_inclist_destroy(&inclist);
@@ -367,53 +324,6 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
 
 /**
  * \function igraph_radius
- * \brief Radius of a graph.
- *
- * The radius of a graph is the defined as the minimum eccentricity of
- * its vertices, see \ref igraph_eccentricity().
- *
- * \param graph The input graph, it can be directed or undirected.
- * \param radius Pointer to a real variable, the result is stored
- *   here.
- * \param mode What kind of paths to consider for the calculation:
- *    \c IGRAPH_OUT, paths that follow edge directions;
- *    \c IGRAPH_IN, paths that follow the opposite directions; and
- *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
- *    is ignored for undirected graphs.
- * \return Error code.
- *
- * Time complexity: O(|V|(|V|+|E|)), where |V| is the number of
- * vertices and |E| is the number of edges.
- *
- * \sa \ref igraph_radius_dijkstra() for the weighted version,
- * \ref igraph_diameter() for the maximum eccentricity,
- * \ref igraph_eccentricity() for the eccentricities of all vertices.
- *
- * \example examples/simple/igraph_radius.c
- */
-
-igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
-                             igraph_neimode_t mode) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-
-    if (no_of_nodes == 0) {
-        *radius = IGRAPH_NAN;
-    } else {
-        igraph_vector_t ecc;
-        IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
-        IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(),
-                                         mode));
-        *radius = igraph_vector_min(&ecc);
-        igraph_vector_destroy(&ecc);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_radius_dijkstra
  * \brief Radius of a graph, using weighted edges.
  *
  * \experimental
@@ -440,27 +350,22 @@ igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * Time complexity: O(|V| |E| log|V| + |V|), where |V| is the number of
  * vertices, |E| the number of edges.
  *
- * \sa \ref igraph_radius() for the unweighted version,
- * \ref igraph_diameter_dijkstra() for the maximum weighted eccentricity,
- * \ref igraph_eccentricity_dijkstra() for weighted eccentricities of
- * all vertices.
+ * \sa \ref igraph_diameter() for the maximum eccentricity,
+ * \ref igraph_eccentricity() for eccentricities of all vertices.
  */
 
-igraph_error_t igraph_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights,
-                                      igraph_real_t *radius, igraph_neimode_t mode) {
-
+igraph_error_t igraph_radius(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_real_t *radius, igraph_neimode_t mode
+) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-
-    if (weights == NULL) {
-        return igraph_radius(graph, radius, mode);
-    }
 
     if (no_of_nodes == 0) {
         *radius = IGRAPH_NAN;
     } else {
         igraph_vector_t ecc;
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
-        IGRAPH_CHECK(igraph_eccentricity_dijkstra(graph, weights, &ecc, igraph_vss_all(), mode));
+        IGRAPH_CHECK(igraph_eccentricity(graph, weights, &ecc, igraph_vss_all(), mode));
         *radius = igraph_vector_min(&ecc);
         igraph_vector_destroy(&ecc);
         IGRAPH_FINALLY_CLEAN(1);
@@ -469,54 +374,11 @@ igraph_error_t igraph_radius_dijkstra(const igraph_t *graph, const igraph_vector
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \function igraph_pseudo_diameter
- * \brief Approximation and lower bound of diameter.
- *
- * This algorithm finds a pseudo-peripheral vertex and returns its
- * eccentricity. This value can be used as an approximation
- * and lower bound of the diameter of a graph.
- *
- * </para><para>
- * A pseudo-peripheral vertex is a vertex v, such that for every
- * vertex u which is as far away from v as possible, v is also as
- * far away from u as possible. The process of finding one depends
- * on where the search starts, and for a disconnected graph the
- * maximum diameter found will be that of the component \p vid_start
- * is in.
- *
- * \param graph The input graph, if it is directed, its edge directions
- *        are ignored.
- * \param diameter Pointer to a real variable, the result is stored
- *        here.
- * \param vid_start Id of the starting vertex. If this is negative, a
- *        random starting vertex is chosen.
- * \param from Pointer to an integer, if not \c NULL it will be set to the
- *        source vertex of the diameter path. If \p unconn is \c false, and
- *        a disconnected graph is detected, this is set to -1.
- * \param to Pointer to an integer, if not \c NULL it will be set to the
- *        target vertex of the diameter path. If \p unconn is \c false, and
- *        a disconnected graph is detected, this is set to -1.
- * \param directed Boolean, whether to consider directed
- *        paths. Ignored for undirected graphs.
- * \param unconn What to do if the graph is not connected. If
- *        \c true the longest geodesic within a component
- *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
- * \return Error code.
- *
- * Time complexity: O(|V| |E|)), where |V| is the number of
- * vertices and |E| is the number of edges.
- *
- * \sa \ref igraph_eccentricity(), \ref igraph_diameter().
- *
- */
-igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
-                           igraph_real_t *diameter,
-                           igraph_integer_t vid_start,
-                           igraph_integer_t *from,
-                           igraph_integer_t *to,
-                           igraph_bool_t directed,
-                           igraph_bool_t unconn) {
+static igraph_error_t igraph_i_pseudo_diameter_unweighted(
+    const igraph_t *graph, igraph_real_t *diameter, igraph_integer_t vid_start,
+    igraph_integer_t *from, igraph_integer_t *to,
+    igraph_bool_t directed, igraph_bool_t unconn
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t ecc_v;
@@ -559,8 +421,9 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
         ifrom = vid_start;
         IGRAPH_VECTOR_INIT_FINALLY(&ecc_vec, no_of_nodes);
 
-        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_start),
-                                           &adjlist, &vid_ecc, unconn));
+        IGRAPH_CHECK(igraph_i_eccentricity_unweighted(
+            graph, &ecc_vec, igraph_vss_1(vid_start), &adjlist, &vid_ecc, unconn
+        ));
         ecc_u = VECTOR(ecc_vec)[0];
 
         if (!unconn && vid_ecc == -1) {
@@ -571,8 +434,9 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
 
                 ito = vid_ecc;
 
-                IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_ecc),
-                                                   &adjlist, &vid_ecc, true));
+                IGRAPH_CHECK(igraph_i_eccentricity_unweighted(
+                    graph, &ecc_vec, igraph_vss_1(vid_ecc),  &adjlist, &vid_ecc, true
+                ));
 
                 ecc_v = VECTOR(ecc_vec)[0];
 
@@ -607,10 +471,14 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&ecc_in, igraph_vcount(graph));
         IGRAPH_VECTOR_INIT_FINALLY(&ecc_out, igraph_vcount(graph));
 
-        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_start),
-                                           &adjlist_out, &vid_ecc_out, unconn));
-        IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_start),
-                                           &adjlist_in, &vid_ecc_in, unconn));
+        IGRAPH_CHECK(igraph_i_eccentricity_unweighted(
+            graph, &ecc_out, igraph_vss_1(vid_start),  &adjlist_out,
+            &vid_ecc_out, unconn
+        ));
+        IGRAPH_CHECK(igraph_i_eccentricity_unweighted(
+            graph, &ecc_in, igraph_vss_1(vid_start), &adjlist_in,
+            &vid_ecc_in, unconn
+        ));
 
         /* A directed graph is strongly connected iff all vertices are reachable
          * from vid_start both when moving along or moving opposite the edge directions. */
@@ -633,10 +501,14 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                 /* TODO: In the undirected case, we break ties between vertices at the
                  * same distance based on their degree. In te directed case, should we
                  * use in-, out- or total degree? */
-                IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_ecc),
-                                                   &adjlist_out, &vid_ecc_out, true));
-                IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_ecc),
-                                                   &adjlist_in, &vid_ecc_in, true));
+                IGRAPH_CHECK(igraph_i_eccentricity_unweighted(
+                    graph, &ecc_out, igraph_vss_1(vid_ecc), &adjlist_out,
+                    &vid_ecc_out, true
+                ));
+                IGRAPH_CHECK(igraph_i_eccentricity_unweighted(
+                    graph, &ecc_in, igraph_vss_1(vid_ecc), &adjlist_in,
+                    &vid_ecc_in, true
+                ));
 
                 if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
                     vid_ecc = vid_ecc_out;
@@ -698,60 +570,12 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
 }
 
 
-/**
- * \function igraph_pseudo_diameter_dijkstra
- * \brief Approximation and lower bound of the diameter of a weighted graph.
- *
- * This algorithm finds a pseudo-peripheral vertex and returns its
- * weighted eccentricity. This value can be used as an approximation
- * and lower bound of the diameter of a graph.
- *
- * </para><para>
- * A pseudo-peripheral vertex is a vertex v, such that for every
- * vertex u which is as far away from v as possible, v is also as
- * far away from u as possible. The process of finding one depends
- * on where the search starts, and for a disconnected graph the
- * maximum diameter found will be that of the component \p vid_start
- * is in.
- *
- * </para><para>
- * If the graph has no vertices, \c IGRAPH_NAN is returned.
- *
- * \param graph The input graph, can be directed or undirected.
- * \param weights The edge weights of the graph. Can be \c NULL for an
- *        unweighted graph. All weights should be non-negative. Edges with
- *        positive infinite weights are ignored.
- * \param diameter This will contain the weighted pseudo-diameter.
- * \param vid_start Id of the starting vertex. If this is negative, a
- *        random starting vertex is chosen.
- * \param from If not \c NULL this will be set to the
- *        source vertex of the diameter path. If the graph has no diameter path,
- *        it will be set to -1.
- * \param to If not \c NULL this will be set to the
- *        target vertex of the diameter path. If the graph has no diameter path,
- *        it will be set to -1.
- * \param directed Boolean, whether to consider directed
- *        paths. Ignored for undirected graphs.
- * \param unconn What to do if the graph is not connected. If
- *        \c true the longest geodesic within a component
- *        will be returned, otherwise \c IGRAPH_INFINITY is
- *        returned.
- * \return Error code.
- *
- * Time complexity: O(|V| |E| log|E|), |V| is the number of vertices,
- * |E| is the number of edges.
- *
- * \sa \ref igraph_diameter_dijkstra()
- */
-igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
-                                    const igraph_vector_t *weights,
-                                    igraph_real_t *diameter,
-                                    igraph_integer_t vid_start,
-                                    igraph_integer_t *from,
-                                    igraph_integer_t *to,
-                                    igraph_bool_t directed,
-                                    igraph_bool_t unconn) {
-
+static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_real_t *diameter, igraph_integer_t vid_start,
+    igraph_integer_t *from, igraph_integer_t *to,
+    igraph_bool_t directed, igraph_bool_t unconn
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -765,9 +589,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
     }
 
-    if (!weights) {
-        return igraph_pseudo_diameter(graph, diameter, vid_start, from, to, directed, unconn);
-    }
+    IGRAPH_ASSERT(weights != 0);
 
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
@@ -932,81 +754,84 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 }
 
 /**
- * \function igraph_graph_center
- * \brief Central vertices of a graph.
+ * \function igraph_pseudo_diameter
+ * \brief Approximation and lower bound of the diameter of a graph.
  *
- * The central vertices of a graph are calculated by finding the vertices
- * with the minimum eccentricity. This concept is typically applied to
- * (strongly) connected graphs. In disconnected graphs, the smallest
- * eccentricity is taken across all components.
+ * This algorithm finds a pseudo-peripheral vertex and returns its
+ * eccentricity. This value can be used as an approximation
+ * and lower bound of the diameter of a graph.
  *
- * \param graph The input graph, it can be directed or undirected.
- * \param res Pointer to an initialized vector, the result is stored
- *    here.
- * \param mode What kind of paths to consider for the calculation:
- *    \c IGRAPH_OUT, paths that follow edge directions;
- *    \c IGRAPH_IN, paths that follow the opposite directions; and
- *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
- *    is ignored for undirected graphs.
+ * </para><para>
+ * A pseudo-peripheral vertex is a vertex v, such that for every
+ * vertex u which is as far away from v as possible, v is also as
+ * far away from u as possible. The process of finding one depends
+ * on where the search starts, and for a disconnected graph the
+ * maximum diameter found will be that of the component \p vid_start
+ * is in.
+ *
+ * </para><para>
+ * If the graph has no vertices, \c IGRAPH_NAN is returned.
+ *
+ * \param graph The input graph, can be directed or undirected.
+ * \param weights The edge weights of the graph. Can be \c NULL for an
+ *        unweighted graph. All weights should be non-negative. Edges with
+ *        positive infinite weights are ignored.
+ * \param diameter This will contain the pseudo-diameter.
+ * \param vid_start Id of the starting vertex. If this is negative, a
+ *        random starting vertex is chosen.
+ * \param from If not \c NULL this will be set to the
+ *        source vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
+ * \param to If not \c NULL this will be set to the
+ *        target vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
+ * \param directed Boolean, whether to consider directed
+ *        paths. Ignored for undirected graphs.
+ * \param unconn What to do if the graph is not connected. If
+ *        \c true the longest geodesic within a component
+ *        will be returned, otherwise \c IGRAPH_INFINITY is
+ *        returned.
  * \return Error code.
  *
- * Time complexity: O(|V| (|V|+|E|)), where |V| is the number of
- * vertices and |E| is the number of edges.
+ * Time complexity: O(|V| |E| log|E|), |V| is the number of vertices,
+ * |E| is the number of edges.
  *
- * \sa \ref igraph_graph_center_dijkstra(),
- * \ref igraph_eccentricity(), \ref igraph_radius()
- *
+ * \sa \ref igraph_diameter()
  */
-igraph_error_t igraph_graph_center(
-    const igraph_t *graph, igraph_vector_int_t *res, igraph_neimode_t mode
+igraph_error_t igraph_pseudo_diameter(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_real_t *diameter, igraph_integer_t vid_start,
+    igraph_integer_t *from, igraph_integer_t *to,
+    igraph_bool_t directed, igraph_bool_t unconn
 ) {
-
-    igraph_vector_t ecc;
-
-    igraph_vector_int_clear(res);
-    if (igraph_vcount(graph) == 0) {
-        return IGRAPH_SUCCESS;
+    if (weights) {
+        return igraph_i_pseudo_diameter_dijkstra(
+            graph, weights, diameter, vid_start, from, to, directed, unconn
+        );
+    } else {
+        return igraph_i_pseudo_diameter_unweighted(
+            graph, diameter, vid_start, from, to, directed, unconn
+        );
     }
-
-    IGRAPH_VECTOR_INIT_FINALLY(&ecc, 0);
-    IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(), mode));
-
-    /* igraph_eccentricity() does not return infinity or NaN, and the null graph
-     * case was handled above, therefore calling vector_min() is safe. */
-    igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
-    igraph_integer_t n = igraph_vector_size(&ecc);
-    for (igraph_integer_t i = 0; i < n; i++) {
-        if (VECTOR(ecc)[i] == min_eccentricity) {
-            IGRAPH_CHECK(igraph_vector_int_push_back(res, i));
-        }
-    }
-
-    igraph_vector_destroy(&ecc);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
- * \function igraph_graph_center_dijkstra
- * \brief Central vertices of a graph, using weighted edges.
+ * \function igraph_graph_center
+ * \brief Central vertices of a graph.
  *
  * \experimental
  *
  * The central vertices of a graph are calculated by finding the vertices
- * with the minimum eccentricity. This function takes edge weights into
- * account and uses Dijkstra's algorithm for the shortest path calculation.
- * The concept of the graph center is typically applied to
- * (strongly) connected graphs. In disconnected graphs, the smallest
+ * with the minimum eccentricity. The concept of the graph center is typically
+ * applied to (strongly) connected graphs. In disconnected graphs, the smallest
  * eccentricity is taken across all components.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param weights The edge weights. All edge weights must be
  *    non-negative for Dijkstra's algorithm to work. Additionally, no
  *    edge weight may be NaN. If either case does not hold, an error
- *    is returned. If this is a null pointer, then the unweighted
- *    version, \ref igraph_graph_center() is called. Edges with positive
- *    infinite weights are ignored.
+ *    is returned. Pass a null pointer here if all edges have equal weight.
+ *    Edges with positive infinite weights are ignored.
  * \param res Pointer to an initialized vector, the result is stored
  *    here.
  * \param mode What kind of paths to consider for the calculation:
@@ -1019,20 +844,16 @@ igraph_error_t igraph_graph_center(
  * Time complexity: O(|V| |E| log|V| + |V|), where |V| is the number of
  * vertices, |E| the number of edges.
  *
- * \sa \ref igraph_graph_center(),
- * \ref igraph_eccentricity_dijkstra(), \ref igraph_radius_dijkstra()
+ * \sa \ref igraph_graph_center(), \ref igraph_eccentricity(), \ref igraph_radius()
  *
  */
-igraph_error_t igraph_graph_center_dijkstra(
-    const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_int_t *res, igraph_neimode_t mode
+igraph_error_t igraph_graph_center(
+    const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_int_t *res,
+    igraph_neimode_t mode
 ) {
 
     igraph_vector_t ecc;
     const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
-
-    if (weights == NULL) {
-        return igraph_graph_center(graph, res, mode);
-    }
 
     igraph_vector_int_clear(res);
     if (igraph_vcount(graph) == 0) {
@@ -1040,9 +861,9 @@ igraph_error_t igraph_graph_center_dijkstra(
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&ecc, 0);
-    IGRAPH_CHECK(igraph_eccentricity_dijkstra(graph, weights, &ecc, igraph_vss_all(), mode));
+    IGRAPH_CHECK(igraph_eccentricity(graph, weights, &ecc, igraph_vss_all(), mode));
 
-    /* igraph_eccentricity_dijkstra() does not return infinity or NaN, and the null graph
+    /* igraph_eccentricity() does not return infinity or NaN, and the null graph
      * case was handled above, therefore calling vector_min() is safe. */
     igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
     igraph_integer_t n = igraph_vector_size(&ecc);

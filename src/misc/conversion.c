@@ -306,37 +306,7 @@ igraph_error_t igraph_get_adjacency_sparse(
  */
 
 igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol) {
-
-    igraph_eit_t edgeit;
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t vptr = 0;
-    igraph_integer_t from, to;
-
-    IGRAPH_CHECK(igraph_vector_int_resize(res, no_of_edges * 2));
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                                   &edgeit));
-    IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
-
-    if (bycol) {
-        while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
-            VECTOR(*res)[vptr] = from;
-            VECTOR(*res)[vptr + no_of_edges] = to;
-            vptr++;
-            IGRAPH_EIT_NEXT(edgeit);
-        }
-    } else {
-        while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
-            VECTOR(*res)[vptr++] = from;
-            VECTOR(*res)[vptr++] = to;
-            IGRAPH_EIT_NEXT(edgeit);
-        }
-    }
-
-    igraph_eit_destroy(&edgeit);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
+    return igraph_edges(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), res, bycol);
 }
 
 /**
@@ -578,8 +548,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
             igraph_integer_t n_out, n_in;
             igraph_integer_t p1 = -1, p2 = -1;
             igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0, last;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT, IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN, IGRAPH_LOOPS));
             n_out = igraph_vector_int_size(&outadj);
             n_in = igraph_vector_int_size(&inadj);
 
@@ -692,10 +662,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
             igraph_integer_t n_out, n_in;
             igraph_integer_t p1 = -1, p2 = -1;
             igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, i,
-                                         IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj,  i,
-                                         IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT, IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_incident(graph, &inadj,  i, IGRAPH_IN, IGRAPH_LOOPS));
             n_out = igraph_vector_int_size(&outadj);
             n_in = igraph_vector_int_size(&inadj);
 
@@ -956,7 +924,9 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
 
             VECTOR(degrees)[leaf] = 0; /* mark leaf v as deleted */
 
-            IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, leaf, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neighbors, leaf, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+            ));
 
             /* Find the unique remaining neighbor of the leaf */
             neighbor_count = igraph_vector_int_size(&neighbors);

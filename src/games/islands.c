@@ -145,7 +145,7 @@ igraph_error_t igraph_simple_interconnected_islands_game(
         island_ecount = islands_size * islands_size;
         number_of_inter_island_edges = n_inter;
         for (i = is + 1; i < islands_n; i++) { /* for each other island (not the previous ones) */
-            IGRAPH_CHECK(igraph_random_sample_real(&s, 0, island_ecount - 1, n_inter));
+            IGRAPH_CHECK(igraph_i_random_sample_real(&s, 0, island_ecount - 1, n_inter));
 
             start_index_of_other_island = i * islands_size;
             for (j = 0; j < n_inter; j++) { /* for each link between islands */

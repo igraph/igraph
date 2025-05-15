@@ -124,7 +124,7 @@ static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
             PATH_PUSH(va, ea);
 
             IGRAPH_CHECK(igraph_stack_int_push(&stack, -1));
-            IGRAPH_CHECK(igraph_incident(graph, &inc, va, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &inc, va, mode, IGRAPH_LOOPS));
             igraph_integer_t n = igraph_vector_int_size(&inc);
             for (igraph_integer_t i=0; i < n; i++) {
                 igraph_integer_t eb = VECTOR(inc)[i];
@@ -579,7 +579,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Exclude the node from further searches */
             VECTOR(indegrees)[u] = VECTOR(outdegrees)[u] = -1;
             /* Get the neighbors and decrease their degrees */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, u, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, u, IGRAPH_OUT, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < neis_size; i++) {
                 const igraph_integer_t eid = VECTOR(neis)[i];
@@ -610,7 +610,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Exclude the node from further searches */
             VECTOR(indegrees)[u] = VECTOR(outdegrees)[u] = -1;
             /* Get the neighbors and decrease their degrees */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, u, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, u, IGRAPH_IN, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < neis_size; i++) {
                 const igraph_integer_t eid = VECTOR(neis)[i];
@@ -646,7 +646,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Remove vertex v */
             VECTOR(ordering)[v] = order_next_pos++;
             /* Remove outgoing edges */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_OUT, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < neis_size; i++) {
                 const igraph_integer_t eid = VECTOR(neis)[i];
@@ -662,7 +662,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 }
             }
             /* Remove incoming edges */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_IN, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < neis_size; i++) {
                 const igraph_integer_t eid = VECTOR(neis)[i];
@@ -724,7 +724,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t from = VECTOR(ranks)[i];
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, from, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+            ));
             neis_size = igraph_vector_int_size(&neis);
             for (igraph_integer_t j = 0; j < neis_size; j++) {
                 igraph_integer_t to = VECTOR(neis)[j];
@@ -1272,7 +1274,7 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
         /* Add as many vertex-disjoint cycles at once as possible. */
         while (true) {
             for (int i=0; i < cycle_size; i++) {
-                IGRAPH_CHECK(igraph_incident(graph, &incident, VECTOR(cycle)[i], IGRAPH_ALL));
+                IGRAPH_CHECK(igraph_incident(graph, &incident, VECTOR(cycle)[i], IGRAPH_ALL, IGRAPH_LOOPS));
                 const igraph_integer_t incident_size = igraph_vector_int_size(&incident);
                 for (igraph_integer_t j = 0; j < incident_size; j++) {
                     igraph_integer_t eid = VECTOR(incident)[j];
@@ -1302,7 +1304,7 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
                 igraph_integer_t i = VAR_TO_ID(j);
                 IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
 
-                IGRAPH_CHECK(igraph_incident(graph, &incident, i, IGRAPH_ALL));
+                IGRAPH_CHECK(igraph_incident(graph, &incident, i, IGRAPH_ALL, IGRAPH_LOOPS));
 
                 const igraph_integer_t incident_size = igraph_vector_int_size(&incident);
                 for (igraph_integer_t k = 0; k < incident_size; k++) {

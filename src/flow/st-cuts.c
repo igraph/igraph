@@ -790,8 +790,9 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 igraph_vector_int_t neis;
                 igraph_integer_t j;
                 IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-                IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
-                                              IGRAPH_OUT));
+                IGRAPH_CHECK(igraph_neighbors(
+                    graph, &neis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+                ));
                 n = igraph_vector_int_size(&neis);
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
@@ -1169,7 +1170,9 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
      */
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t j, n;
-        IGRAPH_CHECK(igraph_neighbors(residual, &neis, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_neighbors(
+            residual, &neis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         n = igraph_vector_int_size(&neis);
 
         // Only consider nodes that are not in S.

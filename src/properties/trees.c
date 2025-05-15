@@ -98,7 +98,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
 
-            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode, IGRAPH_LOOPS));
 
             igraph_integer_t n = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < n; i++) {
@@ -189,7 +189,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
         }
 
         /* register all its yet-unvisited neighbours for future processing */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, u, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, u, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         ncount = igraph_vector_int_size(&neighbors);
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(neighbors)[i];
@@ -432,7 +432,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
         }
 
         /* Vertex discovery: Register all its neighbours for future processing */
-        IGRAPH_CHECK(igraph_neighbors(graph, neis, u, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, neis, u, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         ncount = igraph_vector_int_size(neis);
 
         for (i = 0; i < ncount; ++i) {

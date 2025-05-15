@@ -66,7 +66,7 @@ igraph_error_t igraph_incadjlist_inter_init(const igraph_t *graph,
     for (i = 0; i < il->length; i++) {
         //IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode, IGRAPH_LOOPS));
 
         n = igraph_vector_int_size(&tmp);
         IGRAPH_CHECK(igraph_vector_int_init(&il->incadjs[i], n * 2));
@@ -137,7 +137,7 @@ igraph_error_t igraph_incadjlist_sep_init(const igraph_t *graph,
     for (i = 0; i < il->length; i++) {
         //IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode, IGRAPH_LOOPS));
 
         n = igraph_vector_int_size(&tmp);
         IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], n));

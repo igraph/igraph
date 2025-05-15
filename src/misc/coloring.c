@@ -79,7 +79,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
      * At the beginning, all vertices are set as "uncolored", see the vector_int_fill() call above.
      * Colors will be decremented to start at 0 later. */
     while (true) {
-        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         igraph_integer_t nei_count = igraph_vector_int_size(&neighbors);
 
         /* Colour current vertex by finding the smallest available non-0 color.

@@ -1,9 +1,10 @@
+
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge MA, 02139 USA
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,38 +18,34 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
 
 #include <igraph.h>
 
+#include "../unit/test_utilities.h"
+
 int main(void) {
-
     igraph_t g;
-    igraph_real_t radius;
+    igraph_vector_int_t membership;
 
-    igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    igraph_radius(&g, NULL, &radius, IGRAPH_OUT);
-    if (radius != 1) {
-        return 1;
-    }
+    /* label propagation is a stochastic method */
+    igraph_rng_seed(igraph_rng_default(), 765);
+
+    igraph_small(&g, 0, /* directed = */ 1,
+        0, 1, 0, 2, 1, 0, 1, 0, 1, 1, 2, 0, 2, 1, 2, 1, 2, 1, -1);
+    igraph_vector_int_init(&membership, 0);
+
+    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_FAST);
+
+    print_vector_int(&membership);
+    igraph_vector_int_destroy(&membership);
+
     igraph_destroy(&g);
 
-    igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    igraph_radius(&g, NULL, &radius, IGRAPH_ALL);
-    if (radius != 1) {
-        return 2;
-    }
-    igraph_destroy(&g);
-
-    igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    igraph_radius(&g, NULL, &radius, IGRAPH_OUT);
-    if (radius != 0) {
-        return 3;
-    }
-    igraph_destroy(&g);
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

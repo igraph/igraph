@@ -144,7 +144,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (igraph_vcount(&graph) >= 1) {
             igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_OUT);
             igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_OUT, &iv1, &iv2);
-            igraph_pseudo_diameter(&graph, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
+            igraph_pseudo_diameter(&graph, NULL, &r, 0, &i, &i2, IGRAPH_DIRECTED, true);
             igraph_bfs(&graph, 0, NULL, IGRAPH_OUT, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
 
             igraph_reverse_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID));
@@ -182,7 +182,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_get_all_eids_between(&graph, &iv2, 1, 0, IGRAPH_UNDIRECTED);
             igraph_get_all_eids_between(&graph, &iv2, 0, 0, IGRAPH_UNDIRECTED);
 
-            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1);
+            igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &iv1, 0);
             igraph_vector_int_push_back(&iv1, 0);
             igraph_vector_int_push_back(&iv1, 1);
             igraph_vector_int_push_back(&iv1, 1);

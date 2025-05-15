@@ -49,6 +49,15 @@
  - The `gettype` member of `igraph_attribute_table_t` was renamed to `get_type` for sake of consistency with the naming scheme of other struct members.
  - Attribute table members that retrieve graph, vertex or edge attributes must not clear the incoming result vector any more; results must be appended to the end of the provided result vector instead.
  - The `value` member of `igraph_attribute_record_t` is now a union that can be used to formally treat the associated pointer as an `igraph_vector_t*`, `igraph_strvector_t*` or `igraph_vector_bool_t*`.
+ - `igraph_lcf()` was renamed to `igraph_lcf_small()` and `igraph_lcf_vector()` was renamed to `igraph_lcf()`. Now `igraph_lcf()` takes shifts as a vector input, while `igraph_lcf_small()` accepts a shorthand notation where shifts are given as a variable number of function arguments.
+ - The deprecated `igraph_rng_get_dirichlet()` function was removed.
+ - `igraph_motifs_randesu_no()` and `igraph_motifs_randesu_estimate()` now take an `igraph_real_t` as their `result` argument to prevent overflows when igraph is compiled with 32-bit integers.
+ - The weighted variants of `igraph_diameter()`, `igraph_pseudo_diameter()`, `igraph_radius()`, `igraph_graph_center()`, `igraph_eccentricity()` and `igraph_average_path_length()` were merged into the undirected ones by adding a new argument named `weights` in the second position.
+ - The `weights` parameter of `igraph_average_path_length()`, `igraph_global_efficiency()`, `igraph_local_efficiency()` and `igraph_average_local_efficiency()` were moved to the second position, after the `graph` itself, for sake of consistency with other functions.
+ - `igraph_edges()` gained a new `bycol` argument that determines the order in which the edges are returned. `bycol` = 0 reproduces the existing behaviour, while `bycol` = 1 returns the edges suitable for a matrix stored in column-wise order.
+ - `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()`.
+ - `igraph_incident()` and `igraph_es_incident()` gained an extra arguments to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`.
+ - `igraph_multiple_t` was removed from the public API as it is essentially a boolean. The symbolic constants `IGRAPH_MULTIPLE` and `IGRAPH_NO_MULTIPLE` were kept to improve readability of code written directly in C.
 
 ### Added
 
@@ -61,6 +70,7 @@
  - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
  - `igraph_strvector_fprint()` prints a string vector to a file.
+ - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
 
 ### Changed
 
@@ -131,6 +141,7 @@
  - `igraph_count_triangles()` counts undirected triangles in a graph.
  - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`).
  - `igraph_rng_get_bool()` and `RNG_BOOL()` produce a single random boolean.
+ - `igraph_product()` computes various kinds of graph products of two graphs. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2748!
 
 ### Changed
 
@@ -147,7 +158,8 @@
 
  - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
  - `igraph_adjacent_triangles()` is deprecated and scheduled for removal in 1.0.
- - `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` are now depreated and scheduled for removal in 1.0.
+ - `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` are now deprecated and scheduled for removal in 1.0.
+ - `igraph_rng_get_dirichlet()` is deprecated and scheduled for removal in 1.0. Its interface is inconsistent with the other `igraph_rng_get_...()` functions and we have a replacemenet for it in `igraph_sample_dirichlet()`. igraph 1.0 will gain an `igraph_rng_sample_dirichlet()` function that lets the caller pass in an `igraph_rng_t` instance as well.
 
 ### Other
 

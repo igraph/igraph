@@ -278,7 +278,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_integer_t vid = VECTOR(vids)[j];
             igraph_integer_t k;
             IGRAPH_ALLOW_INTERRUPTION();
-            IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL, IGRAPH_LOOPS));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
                 igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);

@@ -23,7 +23,7 @@
 void call_and_print(igraph_t *graph, igraph_integer_t pnode, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_vector_int_t eids;
     igraph_vector_int_init(&eids, 0);
-    IGRAPH_ASSERT(igraph_i_incident(graph, &eids, pnode, mode, loops) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_incident(graph, &eids, pnode, mode, loops) == IGRAPH_SUCCESS);
     print_vector_int(&eids);
     igraph_vector_int_destroy(&eids);
 }
@@ -74,6 +74,9 @@ int main(void) {
     printf("Vertex 1 with loop, undirected, IGRAPH_LOOPS_ONCE:\n");
     call_and_print(&g_lmu, 1, IGRAPH_IN, IGRAPH_LOOPS_ONCE);
 
+    printf("Vertex 1 with loop, IGRAPH_OUT, IGRAPH_LOOPS_TWICE:\n");
+    call_and_print(&g_lm, 1, IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
+
     printf("Vertex 1 with loop, IGRAPH_ALL, IGRAPH_LOOPS_TWICE:\n");
     call_and_print(&g_lm, 1, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
 
@@ -88,14 +91,11 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
-    printf("Trying IGRAPH_LOOPS_TWICE with IGRAPH_OUT:\n");
-    CHECK_ERROR(igraph_i_incident(&g_lm, &eids, 0, IGRAPH_OUT, IGRAPH_LOOPS_TWICE), IGRAPH_EINVAL);
-
     printf("Vertex not in graph:\n");
-    CHECK_ERROR(igraph_i_neighbors(&g_lm, &eids, 100, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_neighbors(&g_lm, &eids, 100, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVVID);
 
     printf("Non-existent mode:\n");
-    CHECK_ERROR(igraph_i_neighbors(&g_lm, &eids, 0, (igraph_neimode_t) 100, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_neighbors(&g_lm, &eids, 0, (igraph_neimode_t) 100, IGRAPH_LOOPS_ONCE, IGRAPH_NO_MULTIPLE), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_1);
     igraph_destroy(&g_lm);

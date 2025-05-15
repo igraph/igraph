@@ -99,8 +99,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
         while (! igraph_dqueue_int_empty(&q)) {
             igraph_integer_t eids_size;
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_incident(graph, &eids, act_node,
-                                         IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &eids, act_node, IGRAPH_ALL, IGRAPH_LOOPS));
             eids_size = igraph_vector_int_size(&eids);
             for (igraph_integer_t j = 0; j < eids_size; j++) {
                 igraph_integer_t edge = VECTOR(eids)[j];
@@ -218,7 +217,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
         IGRAPH_BIT_SET(already_added, i);
         /* add all edges of the first vertex */
-        IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL, IGRAPH_LOOPS));
         adj_size = igraph_vector_int_size(&adj);
         for (igraph_integer_t j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
@@ -246,7 +245,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
                     IGRAPH_BIT_SET(added_edges, edge);
                     igraph_vector_int_push_back(res, edge); /* reserved */
                     /* add all outgoing edges */
-                    IGRAPH_CHECK(igraph_incident(graph, &adj, to, IGRAPH_ALL));
+                    IGRAPH_CHECK(igraph_incident(graph, &adj, to, IGRAPH_ALL, IGRAPH_LOOPS));
                     adj_size = igraph_vector_int_size(&adj);
                     for (igraph_integer_t j = 0; j < adj_size; j++) {
                         const igraph_integer_t edgeno = VECTOR(adj)[j];

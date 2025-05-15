@@ -79,8 +79,8 @@ int check_flow(int errorinc,
         for (i = 0; i < n; i++) {
             igraph_integer_t n1, n2, j;
             igraph_real_t in_flow = 0.0, out_flow = 0.0;
-            igraph_incident(graph, &inedges,  i, IGRAPH_IN);
-            igraph_incident(graph, &outedges, i, IGRAPH_OUT);
+            igraph_incident(graph, &inedges,  i, IGRAPH_IN, IGRAPH_LOOPS_ONCE);
+            igraph_incident(graph, &outedges, i, IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
             n1 = igraph_vector_int_size(&inedges);
             n2 = igraph_vector_int_size(&outedges);
             for (j = 0; j < n1; j++) {
