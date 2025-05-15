@@ -44,7 +44,7 @@ typedef struct igraph_inclist_t {
 
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                       igraph_neimode_t mode, igraph_loops_t loops,
-                                      igraph_multiple_t multiple);
+                                      igraph_bool_t multiple);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
@@ -112,14 +112,14 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_vector_int_t **adjs;
     igraph_neimode_t mode;
     igraph_loops_t loops;
-    igraph_multiple_t multiple;
+    igraph_bool_t multiple;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                                            igraph_lazy_adjlist_t *al,
                                            igraph_neimode_t mode,
                                            igraph_loops_t loops,
-                                           igraph_multiple_t multiple);
+                                           igraph_bool_t multiple);
 IGRAPH_EXPORT void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);

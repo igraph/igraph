@@ -57,6 +57,7 @@
  - `igraph_edges()` gained a new `bycol` argument that determines the order in which the edges are returned. `bycol` = 0 reproduces the existing behaviour, while `bycol` = 1 returns the edges suitable for a matrix stored in column-wise order.
  - `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()`.
  - `igraph_incident()` and `igraph_es_incident()` gained an extra arguments to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`.
+ - `igraph_multiple_t` was removed from the public API as it is essentially a boolean. The symbolic constants `IGRAPH_MULTIPLE` and `IGRAPH_NO_MULTIPLE` were kept to improve readability of code written directly in C.
 
 ### Added
 

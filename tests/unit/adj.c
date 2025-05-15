@@ -35,7 +35,7 @@ void print_params(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t l
     }
 }
 
-void print_multiple(igraph_multiple_t multiple) {
+void print_multiple(igraph_bool_t multiple) {
     switch (multiple) {
         case IGRAPH_MULTIPLE:    printf("MULTIPLE;    "); break;
         case IGRAPH_NO_MULTIPLE: printf("NO_MULTIPLE; "); break;
@@ -43,7 +43,7 @@ void print_multiple(igraph_multiple_t multiple) {
 }
 
 /* Print adjacency list based on igraph_neighbors() */
-void print_adj1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
+void print_adj1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple) {
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_vector_int_t neis;
 
@@ -61,7 +61,7 @@ void print_adj1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
 }
 
 /* Print adjacency list based on igraph_adjlist_init() */
-void print_adj2(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
+void print_adj2(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple) {
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_adjlist_t al;
 

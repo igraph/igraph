@@ -29,14 +29,14 @@ typedef struct igraph_lazy_adjlist2_t {
     igraph_integer_t next_data;
     igraph_neimode_t mode;
     igraph_loops_t loops;
-    igraph_multiple_t multiple;
+    igraph_bool_t multiple;
 } igraph_lazy_adjlist2_t;
 
 igraph_error_t igraph_lazy_adjlist2_init(const igraph_t *graph,
                              igraph_lazy_adjlist2_t *al,
                              igraph_neimode_t mode,
                              igraph_loops_t loops,
-                             igraph_multiple_t multiple) {
+                             igraph_bool_t multiple) {
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannor create lazy adjacency list view", IGRAPH_EINVMODE);
     }

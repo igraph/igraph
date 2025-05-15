@@ -164,7 +164,7 @@ igraph_vs_t igraph_vss_all(void) {
 
 igraph_error_t igraph_vs_adj(
     igraph_vs_t *vs, igraph_integer_t vid, igraph_neimode_t mode,
-    igraph_loops_t loops, igraph_multiple_t multiple
+    igraph_loops_t loops, igraph_bool_t multiple
 ) {
     vs->type = IGRAPH_VS_ADJ;
     vs->data.adj.vid = vid;

@@ -385,12 +385,6 @@ MSTALGORITHM:
     CTYPE: igraph_mst_algorithm_t
     FLAGS: ENUM
 
-MULTIPLE:
-    # Enum that describes how multiple edges should be handled in functions that
-    # support it.
-    CTYPE: igraph_multiple_t
-    FLAGS: ENUM
-
 NEIMODE:
     # Enum that describes how a particular function should take into account
     # the neighbors of vertices

@@ -889,7 +889,7 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  */
 igraph_error_t igraph_neighbors(
     const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
-    igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple
+    igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple
 ) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                          \
     if (should_filter_duplicates) {                                               \

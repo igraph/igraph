@@ -32,15 +32,15 @@ __BEGIN_DECLS
 /* Constants                                          */
 /* -------------------------------------------------- */
 
-typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
+/* These constants are meant to be used for sake of readability */
+enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
+enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
 
 /* Note for the enum below: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
  * is 2. This is intentional, for the sake of backwards compatibility with
  * earlier versions where we only had IGRAPH_LOOPS and it meant
  * IGRAPH_LOOPS_TWICE */
 typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IGRAPH_LOOPS_ONCE = 2 } igraph_loops_t;
-
-typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_multiple_t;
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
