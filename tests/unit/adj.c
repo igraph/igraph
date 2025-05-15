@@ -36,10 +36,7 @@ void print_params(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t l
 }
 
 void print_multiple(igraph_bool_t multiple) {
-    switch (multiple) {
-        case IGRAPH_MULTIPLE:    printf("MULTIPLE;    "); break;
-        case IGRAPH_NO_MULTIPLE: printf("NO_MULTIPLE; "); break;
-    }
+    printf(multiple ? "MULTIPLE;    " : "NO_MULTIPLE; ");
 }
 
 /* Print adjacency list based on igraph_neighbors() */
