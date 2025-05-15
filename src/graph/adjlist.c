@@ -296,7 +296,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
     igraph_bitset_t seen;
     igraph_vector_int_t neis;
-    int iter;
+    int iter = 0;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Invalid neighbor mode specified for complementer adjlist view.", IGRAPH_EINVMODE);
@@ -701,7 +701,7 @@ igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_loops_t loops) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
-    int iter;
+    int iter = 0;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_EINVMODE);
