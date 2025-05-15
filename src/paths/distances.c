@@ -1378,7 +1378,7 @@ igraph_error_t igraph_diameter_bound(
 
     debug("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, (long) bfs_count, (long) no_of_nodes);
 #ifdef BOUNDING_DEBUG
-    debug("Used %ld BFSes" (long) bfs_count);
+    debug("Used %ld BFSes", (long) bfs_count);
 #endif
 
     // frees
