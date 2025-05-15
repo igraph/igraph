@@ -30,12 +30,12 @@ int main(void) {
     // recreate example graph from paper. A=0, B=1, etc. Note that O is missing.
     // result should be 7
     printf("Sample graph with diameter 7\n");
-    igraph_small(&g, 19, IGRAPH_UNDIRECTED, 
+    igraph_small(&g, 19, IGRAPH_UNDIRECTED,
         0,2, 1,2, 2,3, 2,4, 2,5, 3,5, 4,5, 4,6, 5,6, 5,7, 5,9, 6,8, 6,9, 7,10,
         9,11, 11,12, 11,13, 11,14, 13,14, 14,15, 14,16, 15,17, 16,18, -1
     );
     igraph_diameter_bound(&g, NULL, &result, IGRAPH_UNDIRECTED, 0);
-    igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
+    igraph_diameter(&g, NULL, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
     IGRAPH_ASSERT(result == reference && result == 7);
     igraph_destroy(&g);
 
@@ -50,7 +50,7 @@ int main(void) {
     igraph_vector_init_real(&weights, 9, 1.0, 2.675, 3.0, 4.0, 5.5, 1.0, 1.0, 1.0, 1.0);
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 0);
     igraph_diameter_bound(&g, &weights, &result, false, true);
-    igraph_diameter_dijkstra(&g, &weights, &reference, NULL, NULL, NULL, NULL, false, true);
+    igraph_diameter(&g, &weights, &reference, NULL, NULL, NULL, NULL, false, true);
     IGRAPH_ASSERT(igraph_almost_equals(result, reference, 1e-10));
     printf("weighted results: %f\n%f\n\n\n", result, reference);
     igraph_destroy(&g);
@@ -61,7 +61,7 @@ int main(void) {
         igraph_rng_seed(igraph_rng_default(), 1234*i);
         igraph_barabasi_game(&g, 100, 1, 4, 0, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_BAG, NULL);
         igraph_diameter_bound(&g, NULL, &result, IGRAPH_UNDIRECTED, 0);
-        igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
+        igraph_diameter(&g, NULL, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
         IGRAPH_ASSERT(result == reference);  // no reference value to compare to
         igraph_destroy(&g);
     }
@@ -72,7 +72,7 @@ int main(void) {
         igraph_rng_seed(igraph_rng_default(), 1234*i);
         igraph_watts_strogatz_game(&g, 1, 100, 5, 0.2, false, false);
         igraph_diameter_bound(&g, NULL, &result, IGRAPH_UNDIRECTED, 0);
-        igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
+        igraph_diameter(&g, NULL, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
         IGRAPH_ASSERT(result == reference);  // no reference value to compare to
         igraph_destroy(&g);
     }
@@ -87,11 +87,11 @@ int main(void) {
     igraph_es_vector(&edge_sele, &edge_vec);
     igraph_delete_edges(&g, edge_sele);
     igraph_diameter_bound(&g, NULL, &result, IGRAPH_UNDIRECTED, false);
-    igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 0);
+    igraph_diameter(&g, NULL, &reference, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 0);
     IGRAPH_ASSERT(result == reference);
     printf("\nDisconnected ring graph, unconn=true\n");
     igraph_diameter_bound(&g, NULL, &result, IGRAPH_UNDIRECTED, true);
-    igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, NULL, &reference, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
     IGRAPH_ASSERT(result == reference);
     igraph_es_destroy(&edge_sele);
     igraph_destroy(&g);
@@ -107,7 +107,7 @@ int main(void) {
     printf("\nGraph with one vertex\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     igraph_diameter_bound(&g, NULL, &result, IGRAPH_UNDIRECTED, 0);
-    igraph_diameter(&g, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 0);
+    igraph_diameter(&g, NULL, &reference, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 0);
     IGRAPH_ASSERT(result == reference && result == 0);
     igraph_destroy(&g);
 
