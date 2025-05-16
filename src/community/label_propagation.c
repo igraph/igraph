@@ -262,7 +262,8 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_vector_bool_t *fixed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_not_fixed_nodes = 0;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_not_fixed_nodes = 0;
     igraph_integer_t i, j, k;
     igraph_inclist_t il;
     igraph_adjlist_t al;
@@ -314,7 +315,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
 
     for (i = 0; i < no_of_not_fixed_nodes; i++) {
         IGRAPH_CHECK(igraph_dqueue_int_push(&queue, VECTOR(node_order)[i]));
-        VECTOR(in_queue)[VECTOR(node_order)[i]] = 1;
+        VECTOR(in_queue)[VECTOR(node_order)[i]] = true;
     }
     igraph_vector_int_destroy(&node_order);
     IGRAPH_FINALLY_CLEAN(1);
@@ -328,7 +329,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         v1 = igraph_dqueue_int_pop(&queue);
-        VECTOR(in_queue)[v1] = 0;
+        VECTOR(in_queue)[v1] = false;
 
         /* Count the weights corresponding to different labels */
         igraph_vector_int_clear(&dominant_labels);
@@ -391,7 +392,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
                         if (neigh_label != new_label && /* not in new community */
                             (fixed == NULL || !VECTOR(*fixed)[v2]) ) { /* not fixed */
                             IGRAPH_CHECK(igraph_dqueue_int_push(&queue, v2));
-                            VECTOR(in_queue)[v2] = 1;
+                            VECTOR(in_queue)[v2] = true;
                         }
                     }
                 }
@@ -617,10 +618,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                          * modify 'fixed_copy' instead */
                         if (fixed_copy == fixed) {
                             fixed_copy = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-                            if (fixed_copy == 0) {
-                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                            }
-
+                            IGRAPH_CHECK_OOM(fixed_copy, "Insufficient memory for label propagation.");
                             IGRAPH_FINALLY(igraph_free, fixed_copy);
                             IGRAPH_CHECK(igraph_vector_bool_init_copy(fixed_copy, fixed));
                             IGRAPH_FINALLY(igraph_vector_bool_destroy, fixed_copy);
