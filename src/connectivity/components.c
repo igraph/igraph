@@ -27,7 +27,6 @@
 #include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -700,7 +699,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
             graph, &newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
-            /* invmap = */ 0, /* map_is_prepared = */ 1
+            /* invmap = */ NULL, /* map_is_prepared = */ true
         ));
         IGRAPH_FINALLY(igraph_destroy, &newg);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));

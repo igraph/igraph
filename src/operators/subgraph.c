@@ -195,7 +195,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
             /* undirected graph. We need to be careful with loop edges as each
              * loop edge will appear twice. We use a boolean flag to skip every
              * second loop edge */
-            skip_loop_edge = 0;
+            skip_loop_edge = false;
             for (igraph_integer_t j = 0; j < n; j++) {
                 eid = VECTOR(nei_edges)[j];
 

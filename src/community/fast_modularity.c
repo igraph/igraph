@@ -1059,7 +1059,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                      no_of_nodes,
                      /*steps=*/ best_no_of_joins,
                      membership,
-                     /*csize=*/ 0));
+                     /*csize=*/ NULL));
     }
 
     if (merges == &merges_local) {
