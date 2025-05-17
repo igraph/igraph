@@ -158,6 +158,44 @@ static igraph_error_t tensor_product(igraph_t *res,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t lexicographic_product(igraph_t *res,
+                                        const igraph_t *g1,
+                                        const igraph_t *g2) {
+
+    igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Lexicographic product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    // New vertex count = vcount1 * vcount2
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+
+    {
+        // New edge count = vcount1*ecount2 + (vcount2^2)*ecount2
+        igraph_integer_t temp;
+        IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+        IGRAPH_SAFE_MULT(vcount2, vcount2, &temp);
+        IGRAPH_SAFE_MULT(temp, ecount1, &temp);
+
+        IGRAPH_SAFE_ADD(ecount, temp, &ecount);
+    }
+
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_product
  * \brief The graph product of two graphs, according to the chosen product type.
@@ -235,6 +273,9 @@ igraph_error_t igraph_product(igraph_t *res,
 
     case IGRAPH_PRODUCT_TENSOR:
         return tensor_product(res, g1, g2);
+
+    case IGRAPH_PRODUCT_LEXICOGRAPHIC:
+        return lexicographic_product(res, g1, g2);
 
     default:
         IGRAPH_ERROR("Unknown graph product type.", IGRAPH_EINVAL);
