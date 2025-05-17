@@ -193,6 +193,21 @@ static igraph_error_t lexicographic_product(igraph_t *res,
     IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
 
+    igraph_integer_t edge_index = 0;
+
+    // edges of form a1=b1 and a2~b2
+    for (igraph_integer_t i = 0; i < ecount2; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g2, i);
+        igraph_integer_t to = IGRAPH_TO(g2, i);
+
+        // For all edges (from, to) in g2, add edge from (j, from) to (j, to)
+        //    for all vertex j in g1
+        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+            VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
+            VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
+        }
+    }
+
     return IGRAPH_SUCCESS;
 }
 
