@@ -193,6 +193,8 @@ static igraph_error_t lexicographic_product(igraph_t *res,
     IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
 
+    // Vertex ((i, j)) with i from g1, and j from g2
+    //   will have new vertex id: i * vcount2 + j
     igraph_integer_t edge_index = 0;
 
     // edges of form a1=b1 and a2~b2
@@ -207,6 +209,25 @@ static igraph_error_t lexicographic_product(igraph_t *res,
             VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
         }
     }
+
+    // edges of form a1~b1
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from1 = IGRAPH_FROM(g1, i);
+        igraph_integer_t to1 = IGRAPH_TO(g1, i);
+
+        // each vertex pair irrespective of their connectivity
+        for (igraph_integer_t from2 = 0; from2 < vcount2; ++from2) {
+            for (igraph_integer_t to2 = 0; to2 < vcount2; ++to2) {
+                // ((from1, from2)) to ((to1, to2))
+                VECTOR(edges)[edge_index++] = from1 * vcount2 + from2; // ((from1, from2))
+                VECTOR(edges)[edge_index++] = to1 * vcount2 + to2; // ((to1, to2))
+            }
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
