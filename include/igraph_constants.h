@@ -222,6 +222,7 @@ typedef enum { IGRAPH_ROW_MAJOR = 0,
 
 typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
                IGRAPH_PRODUCT_TENSOR,
+               IGRAPH_PRODUCT_LEXICOGRAPHIC,
              } igraph_product_t;
 
 __END_DECLS
