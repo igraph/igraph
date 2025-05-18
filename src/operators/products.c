@@ -261,6 +261,9 @@ static igraph_error_t strong_product(igraph_t *res,
             }
         }
     }
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
