@@ -117,7 +117,7 @@ static igraph_error_t lexicographic_product(igraph_t *res,
     IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
 
     {
-        // New edge count = vcount1*ecount2 + (vcount2^2)*ecount2
+        // New edge count = vcount1*ecount2 + (vcount2^2)*ecount1
         igraph_integer_t temp;
         IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
         IGRAPH_SAFE_MULT(vcount2, vcount2, &temp);
@@ -133,7 +133,7 @@ static igraph_error_t lexicographic_product(igraph_t *res,
     //   will have new vertex id: i * vcount2 + j
     igraph_integer_t edge_index = 0;
 
-    // edges of form a1=b1 and a2~b2
+    // edges of form u1=u2 and v1~v2
     for (igraph_integer_t i = 0; i < ecount2; ++i) {
         igraph_integer_t from = IGRAPH_FROM(g2, i);
         igraph_integer_t to = IGRAPH_TO(g2, i);
@@ -146,7 +146,7 @@ static igraph_error_t lexicographic_product(igraph_t *res,
         }
     }
 
-    // edges of form a1~b1
+    // edges of form u1~u2
     for (igraph_integer_t i = 0; i < ecount1; ++i) {
         igraph_integer_t from1 = IGRAPH_FROM(g1, i);
         igraph_integer_t to1 = IGRAPH_TO(g1, i);
