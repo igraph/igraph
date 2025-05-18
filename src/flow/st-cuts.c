@@ -1430,7 +1430,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* Permute vertices and replace residual with tmpgraph that is topologically
      * sorted.
      */
-    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &inv_order));
+    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &order));
 
     igraph_destroy(&residual); // We first free memory from original residual graph
     residual = tmpgraph;       // Then we replace it by allocated memory from tmpgraph
