@@ -168,6 +168,31 @@ static igraph_error_t lexicographic_product(igraph_t *res,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t strong_product(igraph_t *res,
+                                            const igraph_t *g1,
+                                            const igraph_t *g2) {
+    igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Lexicographic product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    // New vertex count = vcount1 * vcount2
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+
+
+    return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t tensor_product(igraph_t *res,
                                      const igraph_t *g1,
                                      const igraph_t *g2) {
@@ -322,6 +347,9 @@ igraph_error_t igraph_product(igraph_t *res,
 
     case IGRAPH_PRODUCT_LEXICOGRAPHIC:
         return lexicographic_product(res, g1, g2);
+
+    case IGRAPH_PRODUCT_STRONG:
+        return strong_product(res, g1, g2);
 
     case IGRAPH_PRODUCT_TENSOR:
         return tensor_product(res, g1, g2);
