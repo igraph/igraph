@@ -76,7 +76,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         /* Graphicality and graph realization based on the degrees of 'graph'. */
         igraph_has_loop(&graph, &loop);
         igraph_has_multiple(&graph, &multi);
-        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, true);
+        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
         igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &b);
         if (!loop && !multi) {
             IGRAPH_ASSERT(b);
@@ -114,7 +114,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         /* Graphicality and graph realization based on the degrees of 'graph'. */
         igraph_has_loop(&graph, &loop);
         igraph_has_multiple(&graph, &multi);
-        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, true);
+        igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
         igraph_is_graphical(&iv1, NULL, IGRAPH_SIMPLE_SW, &graphical);
         if (!loop && !multi) {
             IGRAPH_ASSERT(graphical);

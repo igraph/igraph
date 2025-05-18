@@ -165,7 +165,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&sources, 0);
 
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_IN, /* loops */ true));
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
 
     igraph_integer_t vertices_left = no_of_nodes;
 

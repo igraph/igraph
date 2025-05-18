@@ -65,22 +65,21 @@ IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool
                                     igraph_vector_int_t *roots, igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
-                                   igraph_bool_t loops);
+                                   igraph_loops_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
                                                 igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                      igraph_bool_t ignore_loops,
                                      igraph_reciprocity_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
-                                  const igraph_vs_t vids, igraph_neimode_t mode,
-                                  igraph_bool_t loops, const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
-                                                   igraph_vector_int_t *outvids,
-                                                   igraph_vs_t vids,
-                                                   igraph_neimode_t mode,
-                                                   igraph_bool_t loops,
-                                                   igraph_order_t order,
-                                                   igraph_bool_t only_indices);
+IGRAPH_EXPORT igraph_error_t igraph_strength(
+    const igraph_t *graph, igraph_vector_t *res, const igraph_vs_t vids,
+    igraph_neimode_t mode, igraph_loops_t loops, const igraph_vector_t *weights
+);
+IGRAPH_EXPORT igraph_error_t igraph_sort_vertex_ids_by_degree(
+    const igraph_t *graph, igraph_vector_int_t *outvids, igraph_vs_t vids,
+    igraph_neimode_t mode, igraph_loops_t loops, igraph_order_t order,
+    igraph_bool_t only_indices
+);
 IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect);
 
 /* -------------------------------------------------- */

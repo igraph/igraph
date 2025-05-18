@@ -65,8 +65,7 @@
 igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                         const igraph_vector_t *weights,
                         igraph_neimode_t mode) {
-    return igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
-                    weights);
+    return igraph_strength(graph, res, igraph_vss_all(), mode, IGRAPH_LOOPS, weights);
 }
 
 /* This removes loop, multiple edges and edges that point

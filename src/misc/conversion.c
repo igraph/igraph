@@ -790,7 +790,7 @@ igraph_error_t igraph_get_stochastic(
         IGRAPH_CHECK(igraph_strength(
             graph, &sums, igraph_vss_all(),
             column_wise ? IGRAPH_IN : IGRAPH_OUT,
-            /* loops = */ true, weights
+            IGRAPH_LOOPS, weights
         ));
 
         for (igraph_integer_t i = 0; i < no_of_edges; i++) {
@@ -804,7 +804,7 @@ igraph_error_t igraph_get_stochastic(
 
         IGRAPH_CHECK(igraph_strength(
             graph, &sums, igraph_vss_all(), IGRAPH_ALL,
-            /* loops = */ true, weights
+            IGRAPH_LOOPS, weights
         ));
 
         for (igraph_integer_t i = 0; i < no_of_edges; i++) {

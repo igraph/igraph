@@ -598,9 +598,9 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
 
         /* Calculate in- and out-strengths for the remaining edges */
         IGRAPH_CHECK(igraph_strength(graph, &indegs, igraph_vss_all(),
-                                     IGRAPH_IN, 1, weights));
+                                     IGRAPH_IN, IGRAPH_LOOPS, weights));
         IGRAPH_CHECK(igraph_strength(graph, &outdegs, igraph_vss_all(),
-                                     IGRAPH_IN, 1, weights));
+                                     IGRAPH_IN, IGRAPH_LOOPS, weights));
         j = igraph_vector_int_size(&feedback_edges);
         for (i = 0; i < j; i++) {
             igraph_integer_t eid = VECTOR(feedback_edges)[i];

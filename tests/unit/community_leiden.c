@@ -54,7 +54,7 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     igraph_real_t m;
 
     igraph_vector_init(&strength, igraph_vcount(graph));
-    igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL, 1, edge_weights);
+    igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, edge_weights);
     m = edge_weights ? igraph_vector_sum(edge_weights) : igraph_ecount(graph);
 
     /* Initialize with singleton partition. */
