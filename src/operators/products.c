@@ -189,6 +189,78 @@ static igraph_error_t strong_product(igraph_t *res,
     // New vertex count = vcount1 * vcount2
     IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
 
+    {
+        // New edge count = vcount1*ecount2 + vcount2*ecount1 + 2*e1*e2 for undirected graph
+        //                = vcount1*ecount2 + vcount2*ecount1 + e1*e2 for directed graph
+        igraph_integer_t temp;
+        IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+        IGRAPH_SAFE_MULT(vcount2, ecount1, &temp);
+        IGRAPH_SAFE_ADD(ecount, temp, &ecount);
+
+        IGRAPH_SAFE_MULT(ecount1, ecount2, &temp);
+        if (!directed) {
+            IGRAPH_SAFE_MULT(temp, 2, &temp);
+        }
+        IGRAPH_SAFE_ADD(ecount, temp, &ecount);
+    }
+
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
+
+    igraph_integer_t edge_index = 0;
+    // Strong graph product contains all the edges from both cartesian and tensor product
+
+    // Edges of type cartesian products: v1=v2 and u1~u2; v1~v2 and u1=u2
+    // v1=v2 and u1~u2
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g1, i);
+        igraph_integer_t to = IGRAPH_TO(g1, i);
+
+        // For all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
+        //    for all vertex j in g2
+        for (igraph_integer_t j = 0; j < vcount2; ++j) {
+            // SAFE MULT and SAFE ADD not needed as < vcount
+            VECTOR(edges)[edge_index++] = from * vcount2 + j; // ((from, j))
+            VECTOR(edges)[edge_index++] = to * vcount2 + j; // ((to, j))
+        }
+    }
+
+    // v1~v2 and u1=u2
+    for (igraph_integer_t i = 0; i < ecount2; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g2, i);
+        igraph_integer_t to = IGRAPH_TO(g2, i);
+
+        // For all edges (from, to) in g2, add edge from (j, from) to (j, to)
+        //    for all vertex j in g1
+        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+            VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
+            VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
+        }
+    }
+
+    // Edges of type tensor product
+    // u1 ~ u2 and v1 ~ v2
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from1 = IGRAPH_FROM(g1, i);
+        igraph_integer_t to1 = IGRAPH_TO(g1, i);
+
+        for (igraph_integer_t j = 0; j < ecount2; ++j) {
+            igraph_integer_t from2 = IGRAPH_FROM(g2, j);
+            igraph_integer_t to2 = IGRAPH_TO(g2, j);
+
+            // Create edge between ((from1, from2)) to ((to1, to2))
+            VECTOR(edges)[edge_index++] = from1 * vcount2 + from2; // ((from1, from2))
+            VECTOR(edges)[edge_index++] = to1 * vcount2 + to2; // ((to1, to2))
+
+            // In directed graphs, no edge is added because (from2, to2) are not adjacent
+            // respecting direction.
+            // For undirected graphs, add cross edges between ((from1, to2)) and ((to1, from2)).
+            if (!directed) {
+                VECTOR(edges)[edge_index++] = from1 * vcount2 + to2; // ((from1, to2))
+                VECTOR(edges)[edge_index++] = to1 * vcount2 + from2; // ((to1, from2))
+            }
+        }
+    }
 
     return IGRAPH_SUCCESS;
 }
