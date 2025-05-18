@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   aigraph_integer_t with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
@@ -243,6 +243,49 @@ void test_k2_k4_lex(void) {
     igraph_destroy(&product);
 }
 
+/********************** Strong Product ************************/
+// P8 X P8 = King Graph
+void test_p8_p8_strong(void) {
+    igraph_t p8, king_graph, product;
+    igraph_bool_t is_iso;
+
+    igraph_vector_int_t edges;
+    igraph_vector_int_init(&edges, 0);
+
+    igraph_integer_t n = 8;  // n x n chessboard
+
+    for (igraph_integer_t i = 0; i < n; i++) {
+        for (igraph_integer_t j = 0; j < n; j++) {
+            igraph_integer_t u = i * n + j;
+            for (igraph_integer_t dx = -1; dx <= 1; dx++) {
+                for (igraph_integer_t dy = -1; dy <= 1; dy++) {
+                    if (dx == 0 && dy == 0) continue;
+                    igraph_integer_t ni = i + dx, nj = j + dy;
+                    if (ni >= 0 && ni < n && nj >= 0 && nj < n) {
+                        igraph_integer_t v = ni * n + nj;
+                        // To avoid duplicate edges, only add u < v
+                        if (u < v) {
+                            igraph_vector_int_push_back(&edges, u);
+                            igraph_vector_int_push_back(&edges, v);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    igraph_create(&king_graph, &edges, n * n, IGRAPH_UNDIRECTED);
+    igraph_ring(&p8, 8, IGRAPH_UNDIRECTED, false, false);
+
+    igraph_product(&product, &p8, &p8, IGRAPH_PRODUCT_STRONG);
+    igraph_isomorphic(&product, &king_graph, &is_iso);
+    IGRAPH_ASSERT(is_iso);
+
+    igraph_destroy(&king_graph);
+    igraph_destroy(&product);
+    igraph_destroy(&p8);
+    igraph_vector_int_destroy(&edges);
+}
+
 int main(void) {
     // CARTESIAN PRODUCT TEST
     test_grid_vs_square_lattice();
@@ -258,6 +301,9 @@ int main(void) {
 
     //LEXICOGRAPHIC PRODUCT TEST
     test_k2_k4_lex();
+
+    // STRONG PRODUCT TEST
+    test_p8_p8_strong();
 
     VERIFY_FINALLY_STACK();
 
