@@ -224,6 +224,25 @@ void test_dir_cycle_tensor(void) {
     igraph_destroy(&product);
 }
 
+/********************** Lexicographic Product ************************/
+// K2 X K4 = K8
+void test_k2_k4_lex(void) {
+    igraph_t k2, k4, k8, product;
+    igraph_bool_t is_iso;
+
+    igraph_full(&k2, 2, IGRAPH_UNDIRECTED, false);
+    igraph_full(&k4, 4, IGRAPH_UNDIRECTED, false);
+    igraph_full(&k8, 8, IGRAPH_UNDIRECTED, false);
+
+    igraph_product(&product, &k2, &k4, IGRAPH_PRODUCT_LEXICOGRAPHIC);
+    igraph_isomorphic(&product, &k8, &is_iso);
+    IGRAPH_ASSERT(is_iso);
+    igraph_destroy(&k2);
+    igraph_destroy(&k4);
+    igraph_destroy(&k8);
+    igraph_destroy(&product);
+}
+
 int main(void) {
     // CARTESIAN PRODUCT TEST
     test_grid_vs_square_lattice();
@@ -236,6 +255,9 @@ int main(void) {
     // TENSOR PRODUCT TEST
     test_petersen_tensor();
     test_dir_cycle_tensor();
+
+    //LEXICOGRAPHIC PRODUCT TEST
+    test_k2_k4_lex();
 
     VERIFY_FINALLY_STACK();
 
