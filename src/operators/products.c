@@ -272,6 +272,20 @@ static igraph_error_t tensor_product(igraph_t *res,
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
  *
+ *     \cli IGRAPH_PRODUCT_LEXICOGRAPHIC
+ *     Computes the Lexicographic product of two graphs. In the product graph,
+ *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ *     if and only if
+ *     <code>u1 = u2</code> and <code>v1 ~ v2</code> or
+ *     <code>u1 ~ u2</code>
+ *     Thus the number of edges in the product is
+ *     <code>|V1| |E2| + |V2|^2 |E1|</code>
+ *
+ *     </para><para>
+ *     Time Complexity: O(|V1| |V2| + |V1| |E2| + |V2|^2 |E1|)
+ *     where |V1| and |V2| are the number of vertices, and
+ *     |E1| and |E2| are the number of edges of the operands.
+ *
  *     \cli IGRAPH_PRODUCT_TENSOR
  *     Computes the tensor (categorical) product of two graphs. In the product graph,
  *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
