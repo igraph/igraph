@@ -79,9 +79,9 @@ int main(void) {
         matrix_init_int_row_major(&adjmatrix, 1, 1, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_ONCE);
     }
-    printf("\n1x1 matrix, loops twice:\n");
+    printf("\n1x1 matrix, loops twice (treated as loops once):\n");
     {
-        int e[] = {2};
+        int e[] = {1};
         matrix_init_int_row_major(&adjmatrix, 1, 1, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE);
     }
@@ -98,7 +98,7 @@ int main(void) {
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_ONCE);
     }
-    printf("\n3x3 matrix, IGRAPH_ADJ_DIRECTED, loops twice:\n");
+    printf("\n3x3 matrix, IGRAPH_ADJ_DIRECTED, loops twice (treated as loops once):\n");
     {
         int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
@@ -188,7 +188,7 @@ int main(void) {
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UPPER, IGRAPH_LOOPS_ONCE);
     }
-    printf("\n3x3 matrix, IGRAPH_ADJ_UPPER, loops twice:\n");
+    printf("\n3x3 matrix, IGRAPH_ADJ_UPPER, loops twice (treated as loops once):\n");
     {
         int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
@@ -206,7 +206,7 @@ int main(void) {
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_LOWER, IGRAPH_LOOPS_ONCE);
     }
-    printf("\n3x3 matrix, IGRAPH_ADJ_LOWER, loops twice:\n");
+    printf("\n3x3 matrix, IGRAPH_ADJ_LOWER, loops twice (treated as loops once):\n");
     {
         int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
@@ -233,7 +233,7 @@ int main(void) {
     {
         int e[] = {1, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
-        check_error(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
+        check_error(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
     printf("\nCheck handling of invalid adjacency mode.\n");
