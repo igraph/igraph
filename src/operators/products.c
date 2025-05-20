@@ -174,7 +174,7 @@ static igraph_error_t strong_product(igraph_t *res,
     igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
-        IGRAPH_ERROR("Lexicographic product between a directed and an undirected graph is invalid.",
+        IGRAPH_ERROR("Strong product between a directed and an undirected graph is invalid.",
                      IGRAPH_EINVAL);
     }
 
