@@ -674,13 +674,9 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
         IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
     } while (0)
 
-#if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
-    #define GCC_VERSION_MAJOR  __GNUC__
-#endif
-
-#if defined(GCC_VERSION_MAJOR) && (GCC_VERSION_MAJOR >= 3)
-    #define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
-    #define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
+#if defined(__GNUC__)
+    #define IGRAPH_UNLIKELY(a) __builtin_expect(!!(a), 0)
+    #define IGRAPH_LIKELY(a)   __builtin_expect(!!(a), 1)
 #else
     #define IGRAPH_UNLIKELY(a) a
     #define IGRAPH_LIKELY(a)   a

@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  igraph_product
   components
   coreness
   efficiency
@@ -843,22 +844,6 @@ add_legacy_tests(
   igraph_hrg2
   igraph_hrg3
   igraph_hrg_create
-)
-
-# microscopic.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_deterministic_optimal_imitation
-  igraph_roulette_wheel_imitation
-  igraph_stochastic_imitation
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  igraph_deterministic_optimal_imitation
-  igraph_moran_process
-  igraph_roulette_wheel_imitation
-  igraph_stochastic_imitation
 )
 
 # mt.at -- only if we have pthreads

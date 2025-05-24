@@ -7,6 +7,7 @@
  - `igraph_count_triangles()` counts undirected triangles in a graph.
  - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`).
  - `igraph_rng_get_bool()` and `RNG_BOOL()` produce a single random boolean.
+ - `igraph_product()` computes various kinds of graph products of two graphs. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2748!
 
 ### Changed
 
@@ -23,6 +24,8 @@
 
  - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
  - `igraph_adjacent_triangles()` is deprecated and scheduled for removal in 1.0.
+ - `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` are now deprecated and scheduled for removal in 1.0.
+ - `igraph_rng_get_dirichlet()` is deprecated and scheduled for removal in 1.0. Its interface is inconsistent with the other `igraph_rng_get_...()` functions and we have a replacemenet for it in `igraph_sample_dirichlet()`. igraph 1.0 will gain an `igraph_rng_sample_dirichlet()` function that lets the caller pass in an `igraph_rng_t` instance as well.
 
 ### Other
 
