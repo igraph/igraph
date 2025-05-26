@@ -66,15 +66,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_RETENTION);
             igraph_community_label_propagation(&graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_DOMINANCE);
 
-            // Temporary check to see if issue #2608 is related to the presence of self-loops.
-            {
-                igraph_t loopless_graph;
-                igraph_copy(&loopless_graph, &graph);
-                igraph_simplify(&loopless_graph, false, true, NULL);
-                igraph_community_label_propagation(&loopless_graph, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_FAST);
-                igraph_destroy(&loopless_graph);
-            }
-
             igraph_community_walktrap(&graph, NULL, 3, &merges, &mv, &membership);
             igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, NULL, NULL);
 
