@@ -73,6 +73,7 @@ int main(void) {
     RUN_TEST("invalid3.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid4.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid5.graphml", /* should_parse = */ 0);
+    RUN_TEST("invalid6.graphml", /* should_parse = */ 0);
 
     VERIFY_FINALLY_STACK();
 

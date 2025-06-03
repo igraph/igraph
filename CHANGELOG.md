@@ -19,6 +19,7 @@
 
  - `igraph_largest_independent_vertex_sets()` and `igraph_maximal_independent_vertex_sets()` would sometimes return incorrect results for graphs with self-loops. This is now corrected.
  - `igraph_vertex_path_from_edge_path()` now validates the start vertex.
+ - Fixed a memory leak in the GraphML parser for cases when the `id` attribute was specified multiple times within the same XML tag.
 
 ### Deprecated
 
