@@ -70,7 +70,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_count_multiple(&graph, &iv1, igraph_ess_all(IGRAPH_EDGEORDER_FROM));
         igraph_is_loop(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_TO));
         igraph_is_multiple(&graph, &bv, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-        igraph_maxdegree(&graph, &i, igraph_vss_all(), IGRAPH_ALL, true);
+        igraph_maxdegree(&graph, &i, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
         igraph_mean_degree(&graph, &r, IGRAPH_NO_LOOPS);
 
         /* Graphicality and graph realization based on the degrees of 'graph'. */
@@ -183,8 +183,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_dfs(&graph, 0, IGRAPH_ALL, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
             igraph_bfs_simple(&graph, 0, IGRAPH_ALL, &iv1, &iv2, &iv3);
             igraph_subcomponent(&graph, &iv1, 0, IGRAPH_ALL);
-            igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, true);
-            igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, false);
+            igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, IGRAPH_LOOPS);
+            igraph_degree_1(&graph, &i, 0, IGRAPH_OUT, IGRAPH_NO_LOOPS);
         }
 
         if (igraph_vcount(&graph) >= 2) {
