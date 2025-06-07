@@ -41,6 +41,7 @@
 #include <assert.h>
 #include <math.h>
 #include <float.h> /* DBL_MANT_DIG */
+#include <stdbool.h>
 
 /**
  * \section about_rngs
@@ -1402,7 +1403,7 @@ igraph_error_t igraph_i_random_sample_real(igraph_vector_t *res, igraph_real_t l
 #define R_DT_log(p) (lower_tail? R_D_log(p) : R_D_LExp(p))/* log(p) in qF */
 #define R_DT_Clog(p)    (lower_tail? R_D_LExp(p): R_D_log(p))/* log(1-p) in qF*/
 #define R_DT_Log(p) (lower_tail? (p) : R_Log1_Exp(p))
-/* ==   R_DT_log when we already "know" log_p == TRUE :*/
+/* ==   R_DT_log when we already "know" log_p == true :*/
 
 #define R_Q_P01_check(p)            \
     if ((log_p  && p > 0) ||            \
@@ -1613,8 +1614,6 @@ static double igraph_i_exp_rand(igraph_rng_t *rng) {
 
 #define repeat for(;;)
 
-#define FALSE 0
-#define TRUE  1
 #define M_1_SQRT_2PI    0.398942280401432677939946059934     /* 1/sqrt(2pi) */
 
 static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
@@ -1635,7 +1634,9 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
     /* Local Vars  [initialize some for -Wall]: */
     double del, difmuk = 0., E = 0., fk = 0., fx, fy, g, px, py, t, u = 0., v, x;
     double pois = -1.;
-    int k, kflag, big_mu, new_big_mu = FALSE;
+    int k, big_mu;
+    bool new_big_mu = false;
+    bool kflag;
 
     if (!isfinite(mu) || mu < 0) {
         ML_ERR_return_NAN;
@@ -1647,13 +1648,13 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
 
     big_mu = mu >= 10.;
     if (big_mu) {
-        new_big_mu = FALSE;
+        new_big_mu = false;
     }
 
     if (!(big_mu && mu == muprev)) {/* maybe compute new persistent par.s */
 
         if (big_mu) {
-            new_big_mu = TRUE;
+            new_big_mu = true;
             /* Case A. (recalculation of s,d,l  because mu has changed):
              * The Poisson probabilities pk exceed the discrete normal
              * probabilities fk whenever k >= m(mu).
@@ -1755,7 +1756,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
 
     if (g >= 0.) {
         /* 'Subroutine' F is called (kflag=0 for correct return) */
-        kflag = 0;
+        kflag = false;
         goto Step_F;
     }
 
@@ -1775,7 +1776,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
             difmuk = mu - fk;
 
             /* 'subroutine' F is called (kflag=1 for correct return) */
-            kflag = 1;
+            kflag = true;
 
 Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 
@@ -1801,7 +1802,7 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
             x *= x;/* x^2 */
             fx = -0.5 * x;
             fy = omega * (((c3 * x + c2) * x + c1) * x + c0);
-            if (kflag > 0) {
+            if (kflag) {
                 /* Step H. Hat acceptance (E is repeated on rejection) */
                 if (c * fabs(u) <= py * exp(px + E) - fy * exp(fx + E)) {
                     break;
