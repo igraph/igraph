@@ -1,4 +1,3 @@
-/* vim:set ts=4 sw=4 sts=4 et: */
 /* plfit.h
  *
  * Copyright (C) 2010-2011 Tamas Nepusz
