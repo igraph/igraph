@@ -25,7 +25,6 @@
 #include "core/interruption.h"
 #include "core/set.h"
 #include "graph/attributes.h"
-#include "graph/internal.h"
 #include "operators/subgraph.h"
 
 /**

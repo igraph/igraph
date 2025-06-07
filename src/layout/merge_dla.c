@@ -27,7 +27,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 #include "layout/merge_grid.h"
 #include "layout/layout_internal.h"
 

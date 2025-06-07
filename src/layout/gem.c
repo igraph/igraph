@@ -28,7 +28,7 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 /**
  * \ingroup layout

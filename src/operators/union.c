@@ -20,8 +20,6 @@
 
 */
 
-#include <limits.h>
-
 #include "igraph_operators.h"
 
 #include "igraph_constructors.h"

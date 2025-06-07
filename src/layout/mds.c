@@ -28,7 +28,6 @@
 #include "igraph_components.h"
 #include "igraph_eigen.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_paths.h"
 #include "igraph_random.h"

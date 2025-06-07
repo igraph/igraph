@@ -30,7 +30,6 @@
 #include "igraph_vector.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
 #include "math/safe_intop.h"
 #include "random/random_internal.h"
 

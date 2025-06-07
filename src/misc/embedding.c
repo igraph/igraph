@@ -29,8 +29,6 @@
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
-#include "core/math.h"
-
 #include <limits.h>
 
 typedef struct {
