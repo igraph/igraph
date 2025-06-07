@@ -20,9 +20,7 @@
 
 */
 
-#include "igraph.h"
-
-#include <math.h>
+#include <igraph.h>
 
 int main(void) {
 
