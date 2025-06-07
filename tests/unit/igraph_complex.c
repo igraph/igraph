@@ -23,7 +23,7 @@
 #include <igraph.h>
 
 /* Ensure that math constants are available. */
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 #include "test_utilities.h"
 

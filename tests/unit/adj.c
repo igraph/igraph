@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include "graph/internal.h"
 
 #include "test_utilities.h"
 
