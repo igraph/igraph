@@ -139,6 +139,8 @@
 
 ## [master]
 
+## [0.10.16] - 2025-06-10
+
 ### Added
 
  - `igraph_count_triangles()` counts undirected triangles in a graph.
@@ -1621,7 +1623,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.15..master
+[master]: https://github.com/igraph/igraph/compare/0.10.16..master
+[0.10.16]: https://github.com/igraph/igraph/compare/0.10.15..0.10.16
 [0.10.15]: https://github.com/igraph/igraph/compare/0.10.13..0.10.15
 [0.10.13]: https://github.com/igraph/igraph/compare/0.10.12..0.10.13
 [0.10.12]: https://github.com/igraph/igraph/compare/0.10.11..0.10.12
