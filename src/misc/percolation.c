@@ -40,14 +40,10 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph
 static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *edges, igraph_vector_int_t* output) {
     igraph_integer_t biggest = 0;
     igraph_integer_t vert_count = igraph_vector_int_max(edges);
-
     igraph_vector_int_t sizes;
     IGRAPH_CHECK(igraph_vector_int_init(&sizes, vert_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sizes);
-
     igraph_vector_int_t links;
     IGRAPH_CHECK(igraph_vector_int_init(&links, vert_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &links);
 
     int edge_count = igraph_vector_int_size(edges) / 2;
     IGRAPH_CHECK(igraph_vector_int_resize(output, edge_count));
@@ -58,7 +54,6 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     }
     igraph_vector_int_destroy(&sizes);
     igraph_vector_int_destroy(&links);
-    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
