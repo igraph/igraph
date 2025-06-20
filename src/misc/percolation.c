@@ -46,8 +46,7 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
 
     if (v_count < 0) v_count = upper;
 
-    if (v_count < upper) IGRAPH_ERROR("Vertex count given is lower than highest referenced.",IGRAPH_EINVVID);
-    if (lower < 0) IGRAPH_ERROR("Negative number in edge list.", IGRAPH_EINVVID);
+    if (lower < 0 || v_count < upper) IGRAPH_ERROR("Vertex count given is lower than highest referenced.",IGRAPH_EINVVID);
 
     igraph_vector_int_t sizes;
     IGRAPH_CHECK(igraph_vector_int_init(&sizes, v_count));
@@ -62,9 +61,7 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
         VECTOR(links)[i] = i;
     }
 
-    int edge_count = igraph_vector_int_size(edges);
-    if (edge_count % 2 == 1) IGRAPH_ERROR("Invalid edge list, odd number of elements", IGRAPH_EINVAL);
-
+    int edge_count = igraph_vector_int_size(edges) / 2;
     IGRAPH_CHECK(igraph_vector_int_resize(output, edge_count));
 
     for (igraph_integer_t i = 0; i < edge_count; i++) {
