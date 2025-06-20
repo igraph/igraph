@@ -17,7 +17,7 @@
 */
 
 
-#include "igraph_epidemics.h"
+#include "igraph_epidemic.h"
 
 IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_t * output);
 IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_t * output);
