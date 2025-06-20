@@ -23,6 +23,12 @@
 #include "igraph_random.h"
 #include "igraph_interface.h"
 
+
+/**
+ * \function igraph_i_edge_shuffle
+ * \brief In-place Fisher-Yates shuffle for edge lists.
+ * \param edges List of edges, will be permuted.
+ */
 static igraph_error_t igraph_i_edge_shuffle(igraph_vector_int_t *edges) {
     igraph_integer_t k;
     igraph_integer_t edge_count = igraph_vector_int_size(edges);
@@ -31,7 +37,7 @@ static igraph_error_t igraph_i_edge_shuffle(igraph_vector_int_t *edges) {
     edge_count >>= 1;
 
     RNG_BEGIN();
-
+    if(true) {}
     while (edge_count > 1) {
         edge_count --;
         k = RNG_INTEGER(0, edge_count);
@@ -47,9 +53,18 @@ static igraph_error_t igraph_i_edge_shuffle(igraph_vector_int_t *edges) {
     RNG_END();
     return IGRAPH_SUCCESS;
 }
+/**
+ * \function igraph_i_percolate_edge
+ * \brief Percolates a single edge.
+ * \param links Vector representing parents.
+ * \param sizes sizes[i] is the number of children of links[i]
+ * \param biggest The biggest value in sizes, is updated if a bigger cluster is created.
+ * \param a A vertex incident to the edge.
+ * \param b The other vertex incident to the edge.
+ */
 
 static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph_vector_int_t *sizes, igraph_integer_t* biggest, igraph_integer_t a, igraph_integer_t b) {
-    // find head of each
+    // find head of each tree
     // TODO: Path compression
     while (VECTOR(*links)[a] != a) {
         a = VECTOR(*links)[a];
@@ -57,13 +72,25 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph
     while (VECTOR(*links)[b] != b) {
         b = VECTOR(*links)[b];
     }
+    // if they are already connected, exit early.
+    if (a == b) {
+      return IGRAPH_SUCCESS;
+    }
     // make a child of b
     VECTOR(*links)[a] = b;
     VECTOR(*sizes)[b] += VECTOR(*sizes)[a];
-    // if made new biggest component, update size
+    // if made new biggest component, update biggest.
     if (VECTOR(*sizes)[b] >= *biggest) *biggest = VECTOR(*sizes)[b];
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_i_edge_list_percolation
+ * \brief Gives the size of the largest connected component as edges are added.
+ * \param edges Vector of edges, will be added in order.
+ * \param output output[i] is the size of the largest connected component after edges[i] is added
+ * \param v_count Number of vertices, if negative it will be inferred from the edges.
+ */
 
 static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *edges, igraph_vector_int_t* output, igraph_integer_t v_count) {
     igraph_integer_t biggest = 0;
@@ -106,6 +133,13 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_bond_percolation
+ * \brief calculates the bond-percolation curve of a graph.
+ * \param graph The input graph
+ * \param output output[i] is the size of the largest component after adding i+1 edges, will be created.
+ */
+
 IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_int_t * output) {
     igraph_vector_int_t edgelist;
     IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 0));
@@ -125,5 +159,5 @@ IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igra
 
 IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_int_t * output) {
     return IGRAPH_SUCCESS;
-
+    
 }
