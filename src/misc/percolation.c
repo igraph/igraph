@@ -20,7 +20,7 @@
 #include "igraph_error.h"
 #include "igraph_structural.h"
 
-static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph_vector_int_t *sizes, igraph_integer_t* biggest, igraph_integer_t a, igraph_integer_t b) {
+static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph_vector_int_t *sizes, int* biggest,int a, int b) {
     // find head of each
     // TODO: Path compression
     while (VECTOR(*links)[a] != a) {
@@ -32,14 +32,14 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph
     // make a child of b
     VECTOR(*links)[a] = b;
     VECTOR(*sizes)[b] += VECTOR(*sizes)[a];
-    // if made new biggest component, update size
+    // update if made new biggest component, update size
     if (VECTOR(*sizes)[b] >= *biggest) *biggest = VECTOR(*sizes)[b];
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *edges, igraph_vector_int_t* output) {
-    igraph_integer_t biggest = 0;
-    igraph_integer_t vert_count = igraph_vector_int_max(edges);
+    int biggest = 0;
+    int vert_count = igraph_vector_int_max(edges);
     igraph_vector_int_t sizes;
     IGRAPH_CHECK(igraph_vector_int_init(&sizes, vert_count));
     igraph_vector_int_t links;
@@ -48,7 +48,7 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     int edge_count = igraph_vector_int_size(edges) / 2;
     IGRAPH_CHECK(igraph_vector_int_resize(output, edge_count));
 
-    for (igraph_integer_t i = 0; i < edge_count; i++) {
+    for (int i = 0; i < edge_count; i++) {
         igraph_i_percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1]);
         VECTOR(*output)[i] = biggest;
     }
