@@ -16,53 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 #include "igraph_epidemics.h"
-#include "igraph_error.h"
-#include "igraph_structural.h"
 
-static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph_vector_int_t *sizes, int* biggest,int a, int b) {
-    // find head of each
-    // TODO: Path compression
-    while (VECTOR(*links)[a] != a) {
-        a = VECTOR(*links)[a];
-    }
-    while (VECTOR(*links)[b] != b) {
-        b = VECTOR(*links)[b];
-    }
-    // make a child of b
-    VECTOR(*links)[a] = b;
-    VECTOR(*sizes)[b] += VECTOR(*sizes)[a];
-    // update if made new biggest component, update size
-    if (VECTOR(*sizes)[b] >= *biggest) *biggest = VECTOR(*sizes)[b];
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *edges, igraph_vector_int_t* output) {
-    int biggest = 0;
-    int vert_count = igraph_vector_int_max(edges);
-    igraph_vector_int_t sizes;
-    IGRAPH_CHECK(igraph_vector_int_init(&sizes, vert_count));
-    igraph_vector_int_t links;
-    IGRAPH_CHECK(igraph_vector_int_init(&links, vert_count));
-
-    int edge_count = igraph_vector_int_size(edges) / 2;
-    IGRAPH_CHECK(igraph_vector_int_resize(output, edge_count));
-
-    for (int i = 0; i < edge_count; i++) {
-        igraph_i_percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1]);
-        VECTOR(*output)[i] = biggest;
-    }
-    igraph_vector_int_destroy(&sizes);
-    igraph_vector_int_destroy(&links);
-
-    return IGRAPH_SUCCESS;
-}
-
-IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_t * output) {
-    return IGRAPH_SUCCESS;
-}
-
-IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_t * output) {
-    return IGRAPH_SUCCESS;
-}
-
+IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_t * output);
+IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_t * output);
