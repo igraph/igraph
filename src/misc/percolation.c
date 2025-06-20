@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_components.h"
+#include "igraph_epidemics.h"
 #include "igraph_error.h"
 #include "igraph_structural.h"
 
