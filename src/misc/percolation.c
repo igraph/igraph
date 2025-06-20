@@ -17,11 +17,14 @@
 */
 
 #include "igraph_components.h"
+#include "igraph_constants.h"
 #include "igraph_conversion.h"
 #include "igraph_error.h"
+#include "igraph_iterators.h"
 #include "igraph_structural.h"
 #include "igraph_random.h"
 #include "igraph_interface.h"
+#include "igraph_types.h"
 
 
 /**
@@ -37,7 +40,6 @@ static igraph_error_t igraph_i_edge_shuffle(igraph_vector_int_t *edges) {
     edge_count >>= 1;
 
     RNG_BEGIN();
-    if(true) {}
     while (edge_count > 1) {
         edge_count --;
         k = RNG_INTEGER(0, edge_count);
@@ -49,7 +51,6 @@ static igraph_error_t igraph_i_edge_shuffle(igraph_vector_int_t *edges) {
         VECTOR(*edges)[edge_count*2] = VECTOR(*edges)[k*2+1];
         VECTOR(*edges)[k*2+1] = dummy;
     }
-
     RNG_END();
     return IGRAPH_SUCCESS;
 }
@@ -63,7 +64,11 @@ static igraph_error_t igraph_i_edge_shuffle(igraph_vector_int_t *edges) {
  * \param b The other vertex incident to the edge.
  */
 
-static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph_vector_int_t *sizes, igraph_integer_t* biggest, igraph_integer_t a, igraph_integer_t b) {
+static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links,
+					      igraph_vector_int_t *sizes,
+					      igraph_integer_t* biggest,
+					      igraph_integer_t a,
+					      igraph_integer_t b) {
     // find head of each tree
     // TODO: Path compression
     while (VECTOR(*links)[a] != a) {
@@ -89,27 +94,24 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links, igraph
  * \brief Gives the size of the largest connected component as edges are added.
  * \param edges Vector of edges, will be added in order.
  * \param output output[i] is the size of the largest connected component after edges[i] is added
- * \param v_count Number of vertices, if negative it will be inferred from the edges.
  */
 
-static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *edges, igraph_vector_int_t* output, igraph_integer_t v_count) {
+static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *edges,
+						     igraph_vector_int_t* output) {
     igraph_integer_t biggest = 0;
 
     igraph_integer_t lower, upper;
 
     igraph_vector_int_minmax(edges, &lower, &upper);
 
-    if (v_count < 0) v_count = upper;
-
-    if (v_count < upper) IGRAPH_ERROR("Vertex count given is lower than highest referenced.",IGRAPH_EINVVID);
     if (lower < 0) IGRAPH_ERROR("Negative number in edge list.", IGRAPH_EINVVID);
 
     igraph_vector_int_t sizes;
-    IGRAPH_CHECK(igraph_vector_int_init(&sizes, v_count));
+    IGRAPH_CHECK(igraph_vector_int_init(&sizes, upper));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sizes);
 
     igraph_vector_int_t links;
-    IGRAPH_CHECK(igraph_vector_int_init(&links, v_count));
+    IGRAPH_CHECK(igraph_vector_int_init(&links, upper));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &links);
 
     for (igraph_integer_t i = 0; i < upper; i++) {
@@ -140,24 +142,129 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
  * \param output output[i] is the size of the largest component after adding i+1 edges, will be created.
  */
 
-IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_int_t * output) {
-    igraph_vector_int_t edgelist;
-    IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 0));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
+IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph,
+						     igraph_vector_int_t * output,
+						     igraph_vector_int_t * edge_indices) {
+  if (edge_indices == NULL) {
+    // generate random vertex list
+    igraph_integer_t size = igraph_ecount(graph);
+    igraph_vector_int_t new_edges;
+    IGRAPH_CHECK(igraph_vector_int_init(&new_edges, size));
 
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, false));
+    
+    for (igraph_integer_t i = 0; i< size; i++) {
+      VECTOR(new_edges)[i] = 0;
+    }
+    RNG_BEGIN();
+    IGRAPH_CHECK(igraph_vector_int_shuffle(&new_edges));
+    RNG_END();
 
-    IGRAPH_CHECK(igraph_i_edge_shuffle(&edgelist));
-
-    igraph_i_edge_list_percolation(&edgelist, output, igraph_vcount(graph));
-
-    igraph_vector_int_destroy(&edgelist);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &new_edges);
+    igraph_bond_percolation(graph, output, &new_edges);
+    
+    igraph_vector_int_destroy(&new_edges);
     IGRAPH_FINALLY_CLEAN(1);
-
     return IGRAPH_SUCCESS;
+  }
+
+  igraph_vector_int_t edgelist;
+  IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 2*igraph_vector_int_size(edge_indices)));
+
+  for (igraph_integer_t i = 0; i < igraph_vector_int_size(edge_indices); i++) {
+    IGRAPH_CHECK(igraph_edge(graph,
+			      VECTOR(*edge_indices)[i],
+			     &VECTOR(edgelist)[2*i],
+			     &VECTOR(edgelist)[2*i+1]));
+  }
+  
+  igraph_i_edge_list_percolation(&edgelist, output);
+    
+  igraph_vector_int_destroy(&edgelist);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return IGRAPH_SUCCESS;
 }
 
-IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_int_t * output) {
-    return IGRAPH_SUCCESS;
+static igraph_error_t igraph_i_percolate_site(const igraph_t *graph,
+                                              igraph_vector_int_t *links,
+                                              igraph_vector_int_t *sizes,
+					      igraph_integer_t *biggest,
+                                              igraph_integer_t vertex) {
+  if (VECTOR(*sizes)[vertex] != 0) IGRAPH_ERROR("Vertex already added.", IGRAPH_EINVAL);
+  VECTOR(*sizes)[vertex] = 1;
+  
+  igraph_vector_int_t neighbors;
+  IGRAPH_CHECK(igraph_vector_int_init(&neighbors, 0));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &neighbors);
+  
+  IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_IN));
+  
+  for (igraph_integer_t i = 0; i < igraph_vector_int_size(&neighbors); i++) {
+    if (VECTOR(*sizes)[VECTOR(neighbors)[i]] == 0) continue;
+    IGRAPH_CHECK(igraph_i_percolate_edge(links, sizes, biggest, vertex, VECTOR(neighbors)[i]));
+  }
+  
+  igraph_vector_int_destroy(&neighbors);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return IGRAPH_SUCCESS;
+}
+
+IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
+						     igraph_vector_int_t *output,
+						     igraph_vector_int_t *vertices
+						     ) {
+  // if vertex list is null, generate a random one.
+  if (vertices == NULL) {
+    // generate random vertex list
+    igraph_integer_t size = igraph_vcount(graph);
+    igraph_vector_int_t new_vertices;
+    IGRAPH_CHECK(igraph_vector_int_init(&new_vertices, size));
+
     
+    for (igraph_integer_t i = 0; i< size; i++) {
+      VECTOR(new_vertices)[i] = 0;
+    }
+    RNG_BEGIN();
+    IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
+    RNG_END();
+
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &new_vertices);
+    igraph_site_percolation(graph, output, &new_vertices);
+    
+    igraph_vector_int_destroy(&new_vertices);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+  }
+
+  // Initialize variables
+  igraph_integer_t size = igraph_vcount(graph);
+  igraph_integer_t biggest = 0;
+  
+  igraph_vector_int_t sizes;
+  IGRAPH_CHECK(igraph_vector_int_init(&sizes, size));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &sizes);
+
+  igraph_vector_int_t links;
+  IGRAPH_CHECK(igraph_vector_int_init(&links, size));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &links);
+
+  IGRAPH_CHECK(igraph_vector_int_resize(output, size));
+  
+  for (igraph_integer_t i = 0; i < size; i++) {
+    VECTOR(sizes)[i] = 0;
+    VECTOR(links)[i] = i;
+  }
+  
+  for (igraph_integer_t i = 0; i < size; i++) {
+    igraph_i_percolate_site(graph, &links, &sizes, &biggest, VECTOR(*vertices)[i]);
+    VECTOR(*output)[i] = biggest;
+  }
+  
+  // cleanup
+  igraph_vector_int_destroy(&links);
+  igraph_vector_int_destroy(&sizes);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  return IGRAPH_SUCCESS;
 }
