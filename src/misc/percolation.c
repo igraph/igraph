@@ -25,7 +25,9 @@
 #include "igraph_random.h"
 #include "igraph_interface.h"
 #include "igraph_types.h"
-
+#include "igraph_vector.h"
+#include "igraph_vector_list.h"
+#include <stdio.h>
 
 /**
  * \function igraph_i_edge_shuffle
@@ -71,12 +73,19 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links,
 					      igraph_integer_t b) {
     // find head of each tree
     // TODO: Path compression
+    printf("start: a=%li, b=%li ", a, b);
     while (VECTOR(*links)[a] != a) {
         a = VECTOR(*links)[a];
     }
     while (VECTOR(*links)[b] != b) {
         b = VECTOR(*links)[b];
     }
+    
+    printf("and end as a=%li, b=%li\n", a, b);
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(links); i++) {
+      printf("%li = %li, ", i,VECTOR(*sizes)[i]);
+    }
+
     // if they are already connected, exit early.
     if (a == b) {
       return IGRAPH_SUCCESS;
@@ -107,15 +116,14 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     if (lower < 0) IGRAPH_ERROR("Negative number in edge list.", IGRAPH_EINVVID);
 
     igraph_vector_int_t sizes;
-    IGRAPH_CHECK(igraph_vector_int_init(&sizes, upper));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sizes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, upper+1);
 
     igraph_vector_int_t links;
-    IGRAPH_CHECK(igraph_vector_int_init(&links, upper));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &links);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&links, upper+1);
 
-    for (igraph_integer_t i = 0; i < upper; i++) {
+    for (igraph_integer_t i = 0; i < upper+1; i++) {
         VECTOR(sizes)[i] = 1;
+	printf("%li", i);
         VECTOR(links)[i] = i;
     }
 
@@ -127,6 +135,7 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     for (igraph_integer_t i = 0; i < edge_count; i++) {
         igraph_i_percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1]);
         VECTOR(*output)[i] = biggest;
+	printf("biggest is: %li\n", biggest);
     }
     igraph_vector_int_destroy(&sizes);
     igraph_vector_int_destroy(&links);
@@ -149,12 +158,8 @@ IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph,
     // generate random vertex list
     igraph_integer_t size = igraph_ecount(graph);
     igraph_vector_int_t new_edges;
-    IGRAPH_CHECK(igraph_vector_int_init(&new_edges, size));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&new_edges, 0, size));
 
-    
-    for (igraph_integer_t i = 0; i< size; i++) {
-      VECTOR(new_edges)[i] = 0;
-    }
     RNG_BEGIN();
     IGRAPH_CHECK(igraph_vector_int_shuffle(&new_edges));
     RNG_END();
@@ -169,7 +174,8 @@ IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph,
 
   igraph_vector_int_t edgelist;
   IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 2*igraph_vector_int_size(edge_indices)));
-
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
+  
   for (igraph_integer_t i = 0; i < igraph_vector_int_size(edge_indices); i++) {
     IGRAPH_CHECK(igraph_edge(graph,
 			      VECTOR(*edge_indices)[i],
