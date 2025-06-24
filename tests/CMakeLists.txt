@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  igraph_product
   components
   coreness
   efficiency
@@ -361,6 +362,7 @@ add_legacy_tests(
   igraph_widest_paths
   igraph_spanner
   knn
+  paths
   random_spanning_tree
   reachability
   single_target_shortest_path
@@ -844,22 +846,6 @@ add_legacy_tests(
   igraph_hrg_create
 )
 
-# microscopic.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_deterministic_optimal_imitation
-  igraph_roulette_wheel_imitation
-  igraph_stochastic_imitation
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  igraph_deterministic_optimal_imitation
-  igraph_moran_process
-  igraph_roulette_wheel_imitation
-  igraph_stochastic_imitation
-)
-
 # mt.at -- only if we have pthreads
 if(CMAKE_USE_PTHREADS_INIT)
   add_legacy_tests(
@@ -1006,6 +992,7 @@ add_benchmarks(
   igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph
   igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose

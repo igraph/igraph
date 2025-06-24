@@ -42,7 +42,7 @@
  * \param graph Pointer to an uninitialized graph object.
  * \param nodes The number of vertices in the graph.
  * \param radius The radius within which the vertices will be connected.
- * \param torus Logical constant. If true, periodic boundary conditions
+ * \param torus Boolean constant. If true, periodic boundary conditions
  *        will be used, i.e. the vertices are assumed to be on a torus
  *        instead of a square.
  * \param x An initialized vector or \c NULL. If not \c NULL, the points'

@@ -317,7 +317,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param use_seed Logical, if true the supplied values in the
+ * \param use_seed If true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
  * \param niter The number of iterations to do. A reasonable
@@ -433,7 +433,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param use_seed Logical, if true the supplied values in the
+ * \param use_seed If true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
  * \param niter The number of iterations to do. A reasonable

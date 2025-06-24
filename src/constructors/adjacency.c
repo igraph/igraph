@@ -822,7 +822,7 @@ igraph_error_t igraph_weighted_adjacency(
  *             list contains the successors of the corresponding
  *             vertices), \c IGRAPH_IN means a directed graph from an
  *             in-adjacency list
- * \param duplicate Logical, for undirected graphs this specified
+ * \param duplicate Boolean constant. For undirected graphs this specifies
  *        whether each edge is included twice, in the vectors of
  *        both adjacent vertices. If this is \c false, then it is
  *        assumed that every edge is included only once. This argument

@@ -70,7 +70,7 @@
     </listitem>
     <listitem>
       <para>
-        <ulink url="https://www.caam.rice.edu/software/ARPACK/">ARPACK</ulink>
+        <ulink url="https://github.com/opencollab/arpack-ng">ARPACK</ulink>
       </para>
     </listitem>
     <listitem>
@@ -83,7 +83,7 @@
         A library providing a
         <ulink url="https://www.netlib.org/blas/">BLAS</ulink> API
         (available by default on macOS;
-        <ulink url="https://www.openblas.net">OpenBLAS</ulink> is one
+        <ulink url="http://www.openmathlib.org/OpenBLAS/">OpenBLAS</ulink> is one
         option on other systems)
       </para>
     </listitem>
@@ -92,7 +92,7 @@
         A library providing a
         <ulink url="https://www.netlib.org/lapack/">LAPACK</ulink>
         API (available by default on macOS;
-        <ulink url="https://openblas.net">OpenBLAS</ulink> is one
+        <ulink url="http://www.openmathlib.org/OpenBLAS/">OpenBLAS</ulink> is one
         option on other systems)
       </para>
     </listitem>

@@ -1215,7 +1215,7 @@ static igraph_error_t igraph_i_layout_umap(
  *   typically a sparse graph with only edges for the shortest distances stored, e.g.
  *   a k-nearest neighbors graph.
  * \param res Pointer to the n by 2 matrix where the layout coordinates will be stored.
- * \param use_seed Logical, if \c true the supplied values in the \p res argument are
+ * \param use_seed If \c true the supplied values in the \p res argument are
  *   used as an initial layout, if \c false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all weights will be set to 1.
@@ -1259,7 +1259,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   vertex to its neighbors. However, it can also be an undirected graph. If the
  *   \p distances_are_weights is \c true, this is treated as an undirected graph.
  * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
- * \param use_seed Logical, if true the supplied values in the \p res argument are used
+ * \param use_seed If true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all edges are assumed to have the same distance.

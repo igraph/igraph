@@ -240,6 +240,7 @@ add_library(
   operators/join.c
   operators/misc_internal.c
   operators/permute.c
+  operators/products.c
   operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
@@ -333,7 +334,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.9")
+set_target_properties(igraph PROPERTIES VERSION "3.1.10")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
