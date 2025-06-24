@@ -226,7 +226,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * not to be connected, and therefore not a tree.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored
+ * \param res Pointer to a Boolean variable, the result will be stored
  *        here.
  * \param root If not \c NULL, the root node will be stored here. When \p mode
  *        is \c IGRAPH_ALL or the graph is undirected, any vertex can be the root
@@ -244,7 +244,9 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * Time complexity: At most O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_is_connected()
+ * \sa \ref igraph_is_forest() to check if all components are trees,
+ * which is equivalent to the graph lacking undirected cycles;
+ * \ref igraph_is_connected(), \ref igraph_is_acyclic()
  *
  * \example examples/simple/igraph_kary_tree.c
  */
@@ -485,7 +487,8 @@ static igraph_error_t igraph_i_is_forest(
  * This test can be controlled using the \p mode parameter.
  *
  * </para><para>
- * By convention, the null graph (i.e. the graph with no vertices) is considered to be a forest.
+ * By convention, the null graph (i.e. the graph with no vertices) is considered
+ * to be a forest.
  *
  * </para><para>
  * The \p res return value of this function is cached in the graph itself if
@@ -494,8 +497,8 @@ static igraph_error_t igraph_i_is_forest(
  * will return a cached value in O(1) time if the roots are not requested.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable. If not \c NULL, then the result will be stored
- *        here.
+ * \param res Pointer to a Boolean variable. If not \c NULL, then the result will
+ *        be stored here.
  * \param roots If not \c NULL, the root nodes will be stored here. When \p mode
  *        is \c IGRAPH_ALL or the graph is undirected, any one vertex from each
  *        component can be the root. When \p mode is \c IGRAPH_OUT
@@ -511,6 +514,9 @@ static igraph_error_t igraph_i_is_forest(
  *
  * Time complexity: At most O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_is_tree() to check if a graph is a tree, i.e. a forest with
+ * a single component.
  */
 igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool_t *res,
                                 igraph_vector_int_t *roots, igraph_neimode_t mode) {
@@ -724,7 +730,8 @@ static igraph_error_t igraph_i_is_forest(
  * \function igraph_is_acyclic
  * \brief Checks whether a graph is acyclic or not.
  *
- * This function checks whether a graph is acyclic or not.
+ * This function checks whether a graph has any cycles. Edge directions are
+ * considered, i.e. in directed graphs, only directed cycles are searched for.
  *
  * \param graph The input graph.
  * \param res Pointer to a boolean constant, the result
@@ -732,7 +739,8 @@ static igraph_error_t igraph_i_is_forest(
  * \return Error code.
  *
  * \sa \ref igraph_find_cycle() to find a cycle that demonstrates
- * that the graph is not acyclic.
+ * that the graph is not acyclic; \ref igraph_is_forest() to look
+ * for undirected cycles even in directed graphs.
  *
  * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
  * vertices and edges in the original input graph.

@@ -51,7 +51,7 @@
  *
  * \param graph The input graph object. It must not have parallel edges.
  * \param res Pointer to a real number, the result will be stored here.
- * \param loops Logical constant, whether to include self-loops in the
+ * \param loops Boolean constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
  *   necessarily mean that the graph really contains any loops). If

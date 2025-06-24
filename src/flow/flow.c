@@ -2143,7 +2143,7 @@ static igraph_error_t igraph_i_connectivity_checks(
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
- * \param checks Logical constant. Whether to check if the graph is
+ * \param checks Boolean constant. Whether to check if the graph is
  *    connected or complete and also the degree of the vertices. If the graph is
  *    not (strongly) connected then the connectivity is obviously zero. Otherwise
  *    if the minimum degree is 1 then the vertex connectivity is also
@@ -2254,7 +2254,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph,
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
- * \param checks Logical constant. Whether to check that the graph is
+ * \param checks Boolean constant. Whether to check that the graph is
  *    connected and also the degree of the vertices. If the graph is
  *    not (strongly) connected then the connectivity is obviously zero. Otherwise
  *    if the minimum degree is one then the edge connectivity is also
@@ -2420,7 +2420,7 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph,
  *
  * \param graph The input graph, either directed or undirected.
  * \param res Pointer to an integer, the result will be stored here.
- * \param checks Logical constant. Whether to check that the graph is
+ * \param checks Boolean constant. Whether to check that the graph is
  *    connected and also the degree of the vertices. If the graph is
  *    not (strongly) connected then the adhesion is obviously zero. Otherwise
  *    if the minimum degree is one then the adhesion is also
@@ -2455,7 +2455,7 @@ igraph_error_t igraph_adhesion(const igraph_t *graph,
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.
- * \param checks Logical constant. Whether to check that the graph is
+ * \param checks Boolean constant. Whether to check that the graph is
  *    connected and also the degree of the vertices. If the graph is
  *    not (strongly) connected then the cohesion is obviously zero. Otherwise
  *    if the minimum degree is one then the cohesion is also

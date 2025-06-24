@@ -497,12 +497,12 @@ igraph_error_t igraph_square_lattice(
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
- * \param directed Logical, whether to create a directed graph.
+ * \param directed Whether to create a directed graph.
  *        All edges will be oriented in the same direction along
  *        the cycle or path.
- * \param mutual Logical, whether to create mutual edges in directed
+ * \param mutual Whether to create mutual edges in directed
  *        graphs. It is ignored for undirected graphs.
- * \param circular Logical, whether to create a closed ring (a cycle)
+ * \param circular Whether to create a closed ring (a cycle)
  *        or an open path.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.

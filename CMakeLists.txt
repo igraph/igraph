@@ -139,11 +139,14 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
   setup_target_for_coverage_lcov(
     NAME coverage
     EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
-    # Generated files are excluded; apparently the CodeCoverage script has some
-    # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
-    # directory that somehow gets into the coverage results. /Applications and
-    # /Library/Developer are for macOS -- they exclude files from the macOS SDK.
-    EXCLUDE "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
+    # The base directory is changed to allow finding the generated parser sources.
+    # The following works with 'Ninja'. For 'Unix Makefiles', this requires ${PROJECT_BINARY_DIR}/src.
+    BASE_DIRECTORY "${PROJECT_BINARY_DIR}"
+    # /Applications and /Library/Developer are for macOS -- they exclude files from the macOS SDK.
+    EXCLUDE "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
+    # These errors, present with lcov 2.x, are likely due to incompatibility with llvm-cov on macOS.
+    LCOV_ARGS --ignore-errors inconsistent,format,unused
+    GENHTML_ARGS --ignore-errors inconsistent,corrupt,category,unmapped
   )
 endif()
 

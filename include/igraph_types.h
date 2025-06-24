@@ -102,7 +102,9 @@ typedef IGRAPH_BOOL_TYPE igraph_bool_t;
  */
 #define IGRAPH_VCOUNT_MAX (IGRAPH_INTEGER_MAX-1)
 /* The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
- * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1
+ * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1.
+ * Several functions rely on this value not exceeding IGRAPH_INTEGER_MAX-1
+ * to avoid overflow.
  */
 
 /**

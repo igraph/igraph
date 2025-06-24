@@ -660,7 +660,7 @@ static igraph_real_t attraction_aging(
  * \param outseq The number of edges to add in each time step. If it
  *        is \c NULL or a zero-length vector then it is ignored
  *        and the \p m argument is used instead.
- * \param outpref Logical constant, whether the edges
+ * \param outpref Boolean constant, whether the edges
  *        initiated by a vertex contribute to the probability to gain
  *        a new edge.
  * \param pa_exp The exponent of the preferential attachment, a small
@@ -675,7 +675,7 @@ static igraph_real_t attraction_aging(
  *        of the vertices of age zero. This parameter is usually zero.
  * \param deg_coef The coefficient for the degree.
  * \param age_coef The coefficient for the age.
- * \param directed Logical constant, whether to generate a directed
+ * \param directed Boolean constant, whether to generate a directed
  *        graph.
  * \return Error code.
  *
