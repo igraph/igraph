@@ -73,7 +73,6 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links,
 					      igraph_integer_t b) {
     // find head of each tree
     // TODO: Path compression
-    printf("start: a=%li, b=%li ", a, b);
     while (VECTOR(*links)[a] != a) {
         a = VECTOR(*links)[a];
     }
@@ -81,11 +80,6 @@ static igraph_error_t igraph_i_percolate_edge(igraph_vector_int_t *links,
         b = VECTOR(*links)[b];
     }
     
-    printf("and end as a=%li, b=%li\n", a, b);
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(links); i++) {
-      printf("%li = %li, ", i,VECTOR(*sizes)[i]);
-    }
-
     // if they are already connected, exit early.
     if (a == b) {
       return IGRAPH_SUCCESS;
@@ -135,7 +129,6 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
     for (igraph_integer_t i = 0; i < edge_count; i++) {
         igraph_i_percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1]);
         VECTOR(*output)[i] = biggest;
-	printf("biggest is: %li\n", biggest);
     }
     igraph_vector_int_destroy(&sizes);
     igraph_vector_int_destroy(&links);
