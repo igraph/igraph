@@ -188,7 +188,11 @@ static igraph_error_t igraph_i_percolate_site(const igraph_t *graph,
                                               igraph_vector_int_t *sizes,
 					      igraph_integer_t *biggest,
                                               igraph_integer_t vertex) {
-  if (VECTOR(*sizes)[vertex] != 0) IGRAPH_ERROR("Vertex already added.", IGRAPH_EINVAL);
+  if (VECTOR(*sizes)[vertex] != 0) {
+    IGRAPH_ERROR("Vertex already added.", IGRAPH_EINVAL);
+
+  }
+  
   VECTOR(*sizes)[vertex] = 1;
   
   igraph_vector_int_t neighbors;
@@ -233,6 +237,7 @@ IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
 
   // Initialize variables
   igraph_integer_t size = igraph_vcount(graph);
+  if (size != igraph_vector_int_size(vertices)) IGRAPH_ERROR("Graph size and vertex size do not match", IGRAPH_EINVAL);
   igraph_integer_t biggest = 1;
   
   igraph_vector_int_t sizes;
@@ -251,10 +256,13 @@ IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
   }
   
   for (igraph_integer_t i = 0; i < size; i++) {
-    igraph_i_percolate_site(graph, &links, &sizes, &biggest, VECTOR(*vertices)[i]);
+    IGRAPH_CHECK(igraph_i_percolate_site(graph, &links, &sizes, &biggest, VECTOR(*vertices)[i]));
     VECTOR(*output)[i] = biggest;
   }
-  
+
+  for (igraph_integer_t i = 0; i < size; i++) {
+    if (VECTOR(sizes)[i] == 0) IGRAPH_ERROR("Vertex list is missing vertices from graph", IGRAPH_EINVAL);
+  }
   // cleanup
   igraph_vector_int_destroy(&links);
   igraph_vector_int_destroy(&sizes);

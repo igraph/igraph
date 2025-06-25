@@ -76,7 +76,7 @@ int main(void) {
   IGRAPH_CHECK(percolate(&c_4, &edge_ids));
 
   igraph_vector_int_destroy(&edge_ids);
-  igraph_destroy(&k_5);
+
   igraph_destroy(&c_4);
 
   igraph_famous(&karate, "Zachary");
@@ -102,7 +102,24 @@ int main(void) {
   igraph_vector_int_destroy(&components);
   IGRAPH_FINALLY_CLEAN(1);
 
+  igraph_vector_int_t bad_vert_list_repeat, bad_vert_list_too_big, bad_vert_list_missing;
+  igraph_vector_int_init_int(&bad_vert_list_too_big, 6, 0, 1, 2, 3, 4, 5);
+  igraph_vector_int_init_int(&bad_vert_list_missing, 3, 0, 1, 2);
+  igraph_vector_int_init_int(&bad_vert_list_repeat,  5, 0, 0, 0, 0, 0);
+  // should error due to being too big
+  CHECK_ERROR(percolate(&k_5, &bad_vert_list_too_big), IGRAPH_EINVAL);
+  // should error due to being too small
+  CHECK_ERROR(percolate(&k_5, &bad_vert_list_missing), IGRAPH_EINVAL);
+  //should error due to repeated vertices
+  CHECK_ERROR(percolate(&k_5, &bad_vert_list_repeat),  IGRAPH_EINVAL);
+  
+  
+  igraph_destroy(&k_5);
   igraph_destroy(&random);
+  igraph_vector_int_destroy(&bad_vert_list_missing);
+  igraph_vector_int_destroy(&bad_vert_list_repeat);
+  igraph_vector_int_destroy(&bad_vert_list_too_big);
+  
   VERIFY_FINALLY_STACK();
   return 0;
 }
