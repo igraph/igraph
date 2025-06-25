@@ -1,0 +1,7 @@
+K_5 graph percolation curve, no provided vertex sequence:
+( 1 2 3 4 5 )
+C_4 graph with vertex sequece 0, 2
+( 1 1 3 4 )
+Karate graph biggest component size, no edge list given: 34
+Generated disconnected graph, 100 vertices, p=0.01
+Sizes match :)
