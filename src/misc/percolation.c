@@ -117,7 +117,6 @@ static igraph_error_t igraph_i_edge_list_percolation(const igraph_vector_int_t *
 
     for (igraph_integer_t i = 0; i < upper+1; i++) {
         VECTOR(sizes)[i] = 1;
-	printf("%li", i);
         VECTOR(links)[i] = i;
     }
 
@@ -218,12 +217,8 @@ IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
     // generate random vertex list
     igraph_integer_t size = igraph_vcount(graph);
     igraph_vector_int_t new_vertices;
-    IGRAPH_CHECK(igraph_vector_int_init(&new_vertices, size));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&new_vertices, 0, size));
 
-    
-    for (igraph_integer_t i = 0; i< size; i++) {
-      VECTOR(new_vertices)[i] = 0;
-    }
     RNG_BEGIN();
     IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
     RNG_END();
@@ -238,7 +233,7 @@ IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
 
   // Initialize variables
   igraph_integer_t size = igraph_vcount(graph);
-  igraph_integer_t biggest = 0;
+  igraph_integer_t biggest = 1;
   
   igraph_vector_int_t sizes;
   IGRAPH_CHECK(igraph_vector_int_init(&sizes, size));
