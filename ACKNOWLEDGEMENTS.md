@@ -127,7 +127,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#### [Hierarchical Random Graphs](http://tuvalu.santafe.edu/~aaronc/hierarchy/)
+#### [Hierarchical Random Graphs](https://aaronclauset.github.io/hierarchy/)
 
 Copyright (C) 2006-2008 Aaron Clauset.
 

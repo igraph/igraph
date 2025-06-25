@@ -638,10 +638,27 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * \brief Registers an object for deallocation.
  *
  * This macro places the address of an object, together with the
- * address of its destructor in a stack. This stack is used if an
+ * address of its destructor on a stack. This stack is used if an
  * error happens to deallocate temporarily allocated objects to
  * prevent memory leaks. After manual deallocation, objects are removed
  * from the stack using \ref IGRAPH_FINALLY_CLEAN().
+ *
+ * </para><para>
+ * The typical usage is just after an initialization:
+ *
+ * <programlisting>
+ * IGRAPH_CHECK(igraph_vector_init(&amp;vector, 0));
+ * IGRAPH_FINALLY(igraph_vector_destroy, &amp;vector);
+ * </programlisting>
+ *
+ * The most commonly used data structures, such as \ref igraph_vector_t,
+ * have associated convenience macros that initialize the object and register
+ * it on this stack in one step. Thus the pattern above can be replaced with a
+ * single line:
+ *
+ * <programlisting>
+ * IGRAPH_VECTOR_INIT_FINALLY(&amp;vector, 0);
+ * </programlisting>
  *
  * \param func The function which is normally called to
  *   destroy the object.
@@ -657,13 +674,9 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
         IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
     } while (0)
 
-#if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
-    #define GCC_VERSION_MAJOR  __GNUC__
-#endif
-
-#if defined(GCC_VERSION_MAJOR) && (GCC_VERSION_MAJOR >= 3)
-    #define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
-    #define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
+#if defined(__GNUC__)
+    #define IGRAPH_UNLIKELY(a) __builtin_expect(!!(a), 0)
+    #define IGRAPH_LIKELY(a)   __builtin_expect(!!(a), 1)
 #else
     #define IGRAPH_UNLIKELY(a) a
     #define IGRAPH_LIKELY(a)   a

@@ -656,11 +656,21 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         if (xmlStrEqual(localname, toXmlChar("id"))) {
             xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
             IGRAPH_CHECK_OOM(xmlStr, "Cannot duplicate value of 'id' attribute.");
+            if (rec->id) {
+                /* may happen if the 'id' attribute is provided multiple times */
+                xmlFree((void *) rec->id);
+                rec->id = NULL;
+            }
             rec->id = fromXmlChar(xmlStr);
             xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
             xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
             IGRAPH_CHECK_OOM(xmlStr, "Cannot duplicate value of 'attr.name' attribute.");
+            if (rec->record.name) {
+                /* may happen if the 'attr.name' attribute is provided multiple times */
+                xmlFree((void *) rec->record.name);
+                rec->record.name = NULL;
+            }
             rec->record.name = fromXmlChar(xmlStr);
             xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
@@ -1761,7 +1771,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
- * \param prefixattr Logical value, whether to put a prefix in front of the
+ * \param prefixattr Boolean value. Whether to put a prefix in front of the
  *        attribute names to ensure uniqueness if the graph has vertex and
  *        edge (or graph) attributes with the same name.
  * \return Error code:

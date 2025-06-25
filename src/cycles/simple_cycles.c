@@ -578,7 +578,8 @@ igraph_error_t igraph_simple_cycles_callback(
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
  *
- * \sa \ref igraph_simple_cycles() to call a function for each found cycle;
+ * \sa \ref igraph_simple_cycles_callback() to call a function for each found
+ * cycle;
  * \ref igraph_find_cycle() to find a single cycle;
  * \ref igraph_fundamental_cycles() and \ref igraph_minimum_cycle_basis()
  * to find a cycle basis, a compact representation of the cycle structure

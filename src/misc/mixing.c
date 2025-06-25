@@ -269,7 +269,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
     directed = directed && igraph_is_directed(graph);
 
     if (!directed && values_in) {
-        IGRAPH_WARNING("Incoming vertex values ignored when calculating undirected assortativity.");
+        IGRAPH_WARNING(
+            "Incoming vertex values are ignored when calculating undirected assortativity.");
     }
 
     if (igraph_vector_size(values) != no_of_nodes) {
@@ -771,7 +772,7 @@ static igraph_error_t mixing_matrix(
  * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
  *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
  *    Ignored in undirected graphs.
- * \param to_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ * \param to_mode How to compute the degree of targets? Can be \c IGRAPH_OUT
  *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
  *    Ignored in undirected graphs.
  * \param directed_neighbors Whether to consider <code>u -> v</code> connections

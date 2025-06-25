@@ -70,7 +70,7 @@ vertex3name [optionalWeight] \endverbatim
  * in \a igraph it is not an error to have multiple and loop edges.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
- * \param names Logical value, if \c true the symbolic names of the
+ * \param names Boolean value, if \c true the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
  * \param weights Whether to add the weights of the edges to the
@@ -247,8 +247,8 @@ static igraph_error_t check_name(const char *name) {
  * \param weights The name of a numerical edge attribute, which will be
  *        written as weights to the file. Supply \c NULL to skip writing
  *        edge weights.
- * \param isolates Logical, if \c true isolated vertices are also written
- *        to the file. If \c false they will be omitted.
+ * \param isolates If \c true, isolated vertices are also written
+ *        to the file. If \c false, they will be omitted.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error
  *         writing the file.

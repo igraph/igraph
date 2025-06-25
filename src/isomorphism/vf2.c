@@ -779,7 +779,7 @@ static igraph_error_t igraph_i_isomorphic_vf2_cb(
  *   colors as well. Supply a null pointer here if your graphs are not
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
- * \param iso Pointer to a logical constant, the result of the
+ * \param iso Pointer to a Boolean constant, the result of the
  *    algorithm will be placed here.
  * \param map12 Pointer to an initialized vector or a NULL pointer. If not
  *    a NULL pointer then the mapping from \p graph1 to \p graph2 is

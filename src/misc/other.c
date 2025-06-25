@@ -304,15 +304,23 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
  * representation that describes the path in terms of vertex IDs instead.
  *
  * </para><para>
+ * The result will always contain one more vertex than the number of provided
+ * edges. If no edges are given, the output will contain only the start vertex.
+ *
+ * </para><para>
  * The walk is allowed to traverse the same vertex more than once. It is
  * suitable for use on paths, cycles, or arbitrary walks.
  *
  * \param  graph The graph that the edge IDs refer to.
- * \param  start The start vertex of the path.
+ * \param  start The start vertex of the path. If negative, it is determined
+ *         automatically. This is only possible if the walk contains at least
+ *         one edge. If only one edge is present in an undirected walk,
+ *         one of its endpoints will be selected arbitrarily.
  * \param  edge_path The sequence of edge IDs that describe the path.
  * \param  vertex_path The sequence of vertex IDs traversed will be returned here.
  * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory,
- *         \c IGRAPH_EINVAL if the edge path does not start at the given vertex
+ *         \c IGRAPH_EINVVID if the start vertex is invalid,
+ *         \c IGRAPH_EINVAL if the edge walk does not start at the given vertex
  *         or if there is at least one edge whose start vertex does not match
  *         the end vertex of the previous edge.
  *
@@ -330,6 +338,43 @@ igraph_error_t igraph_vertex_path_from_edge_path(
 
     if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    /* Detect start vertex automatically if necessary. */
+    if (start < 0) {
+        if (no_of_edges == 0) {
+            IGRAPH_ERROR("The path must contain at least one edge in order to "
+                         "determine its starting vertex automatically.", IGRAPH_EINVAL);
+        }
+        const igraph_integer_t edge = VECTOR(*edge_path)[0];
+        switch (mode) {
+        case IGRAPH_OUT:
+            start = IGRAPH_FROM(graph, edge);
+            break;
+        case IGRAPH_IN:
+            start = IGRAPH_TO(graph, edge);
+            break;
+        case IGRAPH_ALL:
+            if (no_of_edges > 1) {
+                const igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                const igraph_integer_t to = IGRAPH_TO(graph, edge);
+                const igraph_integer_t next_edge = VECTOR(*edge_path)[1];
+                if (to == IGRAPH_FROM(graph, next_edge) || to == IGRAPH_TO(graph, next_edge)) {
+                    start = from;
+                } else {
+                    start = to;
+                    /* If the walk is not continuous, this will be detected in the next stage. */
+                }
+            } else {
+                /* There is a single undirected edge.
+                 * Choose an arbitrary endpoint the start vertex. */
+                start = IGRAPH_FROM(graph, edge);
+            }
+        }
+    }
+
+    if (start >= igraph_vcount(graph)) {
+        IGRAPH_ERROR("Invalid start vertex.", IGRAPH_EINVVID);
     }
 
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {

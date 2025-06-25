@@ -72,7 +72,7 @@ using namespace fitHRG;
  *
  * <para>The igraph HRG implementation is heavily based on the code
  * published by Aaron Clauset, at his website,
- * http://tuvalu.santafe.edu/~aaronc/hierarchy/
+ * https://aaronclauset.github.io/hierarchy/
  * </para>
  */
 
@@ -394,7 +394,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
  *   is stored here. It can also be used to pass a HRG to the
  *   function, that can be used as the starting point of the Markov
  *   Chain Monte Carlo fitting, if the \p start argument is true.
- * \param start Logical, whether to start the fitting from the given
+ * \param start Whether to start the fitting from the given
  *   HRG model.
  * \param steps Integer, the number of MCMC steps to take in the
  *   fitting procedure. If this is zero, then the fitting stops if a
@@ -699,7 +699,7 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
  * \param hrg A hierarchical random graph. It is used as a starting
  *   point for the sampling, if the \p start argument is true. It is
  *   modified along the MCMC.
- * \param start Logical, whether to use the supplied HRG (in \p hrg)
+ * \param start Whether to use the supplied HRG (in \p hrg)
  *   as a starting point for the MCMC.
  * \param num_samples The number of samples to generate for creating
  *   the consensus tree.
@@ -853,7 +853,7 @@ static igraph_error_t recordPredictions(const pblock *br_list, igraph_vector_int
  *   edges, in the order corresponding to \c edges.
  * \param hrg A HRG, it is used as a starting point if \c start is
  *   true. It is also modified during the MCMC sampling.
- * \param start Logical, whether to start the MCMC from the given HRG.
+ * \param start Whether to start the MCMC from the given HRG.
  * \param num_samples The number of samples to generate.
  * \param num_bins Controls the resolution of the edge
  *   probabilities. Higher numbers result higher resolution.

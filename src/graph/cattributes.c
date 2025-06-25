@@ -3427,7 +3427,7 @@ igraph_error_t igraph_cattribute_list(const igraph_t *graph,
  * \param type The type of the attribute, \c IGRAPH_ATTRIBUTE_GRAPH,
  *        \c IGRAPH_ATTRIBUTE_VERTEX or \c IGRAPH_ATTRIBUTE_EDGE.
  * \param name Character constant, the name of the attribute.
- * \return Logical value, \c true if the attribute exists, \c false otherwise.
+ * \return Boolean value, \c true if the attribute exists, \c false otherwise.
  *
  * Time complexity: O(A), the number of (graph, vertex or edge)
  * attributes, assuming attribute names are not too long.
