@@ -127,32 +127,32 @@ static igraph_error_t edge_list_percolation(const igraph_vector_int_t *edges,
  * \param output output[i] is the size of the largest component after adding i+1 edges, will be created.
  */
 
-IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph,
-        igraph_vector_int_t * output,
-        igraph_vector_int_t * edge_indices) {
+igraph_error_t igraph_bond_percolation(const igraph_t *graph,
+                                       igraph_vector_int_t * output,
+                                       igraph_vector_int_t * edge_indices) {
+    igraph_vector_int_t* internal_edge_indices = edge_indices;
+    igraph_vector_int_t new_edges;
+    igraph_bool_t generated_edges = false;
     if (edge_indices == NULL) {
+        generated_edges = true;
         // generate random vertex list
         igraph_integer_t size = igraph_ecount(graph);
-        igraph_vector_int_t new_edges;
+
         IGRAPH_CHECK(igraph_vector_int_init_range(&new_edges, 0, size));
 
         IGRAPH_CHECK(igraph_vector_int_shuffle(&new_edges));
 
         IGRAPH_FINALLY(igraph_vector_int_destroy, &new_edges);
-        igraph_bond_percolation(graph, output, &new_edges);
-
-        igraph_vector_int_destroy(&new_edges);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
+        internal_edge_indices = &new_edges;
     }
 
     igraph_vector_int_t edgelist;
-    IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 2 * igraph_vector_int_size(edge_indices)));
+    IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 2 * igraph_vector_int_size(internal_edge_indices)));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
 
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(edge_indices); i++) {
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(internal_edge_indices); i++) {
         IGRAPH_CHECK(igraph_edge(graph,
-                                 VECTOR(*edge_indices)[i],
+                                 VECTOR(*internal_edge_indices)[i],
                                  &VECTOR(edgelist)[2 * i],
                                  &VECTOR(edgelist)[2 * i + 1]));
     }
@@ -162,6 +162,11 @@ IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph,
 
     igraph_vector_int_destroy(&edgelist);
     IGRAPH_FINALLY_CLEAN(1);
+
+    if (generated_edges) {
+        igraph_vector_int_destroy(&new_edges);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -197,31 +202,33 @@ static igraph_error_t percolate_site(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
-        igraph_vector_int_t *output,
-        igraph_vector_int_t *vertices
-                                                    ) {
+igraph_error_t igraph_site_percolation(const igraph_t *graph,
+                                       igraph_vector_int_t *output,
+                                       igraph_vector_int_t *vertices
+                                      ) {
     // if vertex list is null, generate a random one.
+    igraph_vector_int_t* internal_vertices;
+    igraph_bool_t generated_vertices = false;
+    igraph_vector_int_t new_vertices;
     if (vertices == NULL) {
+        generated_vertices = true;
         // generate random vertex list
         igraph_integer_t size = igraph_vcount(graph);
-        igraph_vector_int_t new_vertices;
+
         IGRAPH_CHECK(igraph_vector_int_init_range(&new_vertices, 0, size));
 
         IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
 
         IGRAPH_FINALLY(igraph_vector_int_destroy, &new_vertices);
-        igraph_site_percolation(graph, output, &new_vertices);
-
-        igraph_vector_int_destroy(&new_vertices);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
+        internal_vertices = & new_vertices;
+    } else {
+        internal_vertices = vertices;
     }
 
     // Initialize variables
     igraph_integer_t size = igraph_vcount(graph);
-    if (size != igraph_vector_int_size(vertices)) {
-        IGRAPH_ERROR("Graph size and vertex size do not match", IGRAPH_EINVAL);
+    if (size != igraph_vector_int_size(internal_vertices)) {
+        IGRAPH_ERROR("Graph size and vertex size do not match.", IGRAPH_EINVAL);
     }
     igraph_integer_t biggest = 1;
 
@@ -241,7 +248,7 @@ IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
     }
 
     for (igraph_integer_t i = 0; i < size; i++) {
-        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*vertices)[i]));
+        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*internal_vertices)[i]));
         VECTOR(*output)[i] = biggest;
     }
 
@@ -254,6 +261,12 @@ IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph,
     igraph_vector_int_destroy(&links);
     igraph_vector_int_destroy(&sizes);
     IGRAPH_FINALLY_CLEAN(2);
+
+    if (generated_vertices) {
+        igraph_vector_int_destroy(internal_vertices);
+        IGRAPH_FINALLY_CLEAN(1);
+        return IGRAPH_SUCCESS;
+    }
 
     return IGRAPH_SUCCESS;
 }
