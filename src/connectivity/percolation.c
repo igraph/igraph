@@ -36,7 +36,7 @@
 
 static void percolate_edge(igraph_vector_int_t *links,
                            igraph_vector_int_t *sizes,
-                           igraph_integer_t* biggest,
+                           igraph_integer_t *biggest,
                            igraph_integer_t a,
                            igraph_integer_t b) {
     // find head of each tree

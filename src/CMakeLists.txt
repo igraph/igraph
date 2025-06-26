@@ -179,6 +179,7 @@ add_library(
 
   connectivity/cohesive_blocks.c
   connectivity/components.c
+  connectivity/percolation.c
   connectivity/separators.c
   connectivity/reachability.c
 
@@ -308,7 +309,7 @@ add_library(
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
-  misc/percolation.c
+
 
   internal/glpk_support.c
   internal/hacks.c
