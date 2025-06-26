@@ -108,6 +108,10 @@
 <!-- doxrox-include igraph_is_biconnected -->
 </section>
 
+<section id="percolation"><title>Percolation</title>
+<!-- doxrox-include igraph_bond_percolation -->
+</section>
+
 <section id="degree-sequences"><title>Degree sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
