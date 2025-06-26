@@ -1,5 +1,4 @@
 /*
-/*
     IGraph library.
     Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
