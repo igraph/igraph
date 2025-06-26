@@ -1305,6 +1305,16 @@ igraph_count_reachable:
     PARAMS: GRAPH graph, OUT VECTOR_INT counts, NEIMODE mode
 
 #######################################
+# Percolation
+#######################################
+
+igraph_bond_percolation:
+    PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL VERTEX_INDICES vertex_order
+
+igraph_site_percolation:
+    PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL EDGE_INDICES edge_order
+
+#######################################
 # Cliques
 #######################################
 
