@@ -1041,6 +1041,5 @@ add_legacy_tests(
 # percolation
 add_legacy_tests(
 	FOLDER tests/unit NAMES
-	igraph_bond_percolation
-	igraph_site_percolation
+	igraph_percolation
 )
