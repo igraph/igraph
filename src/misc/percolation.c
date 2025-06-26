@@ -40,11 +40,12 @@ static void percolate_edge(igraph_vector_int_t *links,
                            igraph_integer_t a,
                            igraph_integer_t b) {
     // find head of each tree
-    // TODO: Path compression
     while (VECTOR(*links)[a] != a) {
+        VECTOR(*links)[a] = VECTOR(*links)[VECTOR(*links)[a]];
         a = VECTOR(*links)[a];
     }
     while (VECTOR(*links)[b] != b) {
+        VECTOR(*links)[b] = VECTOR(*links)[VECTOR(*links)[b]];
         b = VECTOR(*links)[b];
     }
 
@@ -52,12 +53,22 @@ static void percolate_edge(igraph_vector_int_t *links,
     if (a == b) {
         return;
     }
+
+    // make smaller child of larger
+    igraph_integer_t parent, child;
+    if (VECTOR(*sizes)[a] < VECTOR(*sizes)[b]) {
+        parent = b;
+        child = a;
+    } else {
+        parent = a;
+        child = b;
+    }
     // make a child of b
-    VECTOR(*links)[a] = b;
-    VECTOR(*sizes)[b] += VECTOR(*sizes)[a];
+    VECTOR(*links)[child] = parent;
+    VECTOR(*sizes)[parent] += VECTOR(*sizes)[child];
     // if made new biggest component, update biggest.
-    if (VECTOR(*sizes)[b] >= *biggest) {
-        *biggest = VECTOR(*sizes)[b];
+    if (VECTOR(*sizes)[parent] >= *biggest) {
+        *biggest = VECTOR(*sizes)[parent];
     }
 }
 
