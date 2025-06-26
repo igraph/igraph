@@ -16,17 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_constants.h"
-#include "igraph_constructors.h"
-#include "igraph_error.h"
-#include "igraph_games.h"
-#include "igraph_interface.h"
-#include "igraph_sparsemat.h"
-#include "igraph_vector.h"
-#include "test_utilities.h"
 #include <igraph.h>
-#include <string.h>
-#include "igraph_components.h"
+#include "test_utilities.h"
 
 igraph_error_t percolate(igraph_t *graph, igraph_vector_int_t *edge_indices) {
   igraph_vector_int_t outputs;
@@ -82,7 +73,7 @@ int main(void) {
   // TODO: verify that it counts the vertices correctly.
   printf("Karate graph biggest component size, no edge list given: ");
   largest_component(&karate, &size);
-  printf("%li\n",size);
+  printf("%" IGRAPH_PRId "\n",size);
   // TODO: generate decently sized disconnected graph, verify that it doesn't still create one single component.
   printf("Generated disconnected graph, 100 vertices, p=0.01\n");
 
@@ -97,9 +88,7 @@ int main(void) {
 
 
   largest_component(&random, &size);
-  if (size == igraph_vector_int_max(&components)) {
-    printf("Sizes match :)\n");
-  } else printf("Sizes do not match :(\n");
+  IGRAPH_ASSERT(size == igraph_vector_int_max(&components));
   igraph_vector_int_destroy(&components);
   IGRAPH_FINALLY_CLEAN(1);
 
