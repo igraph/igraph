@@ -60,8 +60,8 @@ IGRAPH_EXPORT igraph_error_t igraph_sir_init(igraph_sir_t *sir);
 IGRAPH_EXPORT void igraph_sir_destroy(igraph_sir_t *sir);
 
 IGRAPH_EXPORT igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
-                                        igraph_real_t gamma, igraph_integer_t no_sim,
-                                        igraph_vector_ptr_t *result);
+                             igraph_real_t gamma, igraph_integer_t no_sim,
+                             igraph_vector_ptr_t *result);
 
 __END_DECLS
 
