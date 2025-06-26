@@ -194,5 +194,5 @@ int test_site(void) {
 int main(void) {
     test_bond();
     test_site();
-    return 1;
+    return 0;
 }
