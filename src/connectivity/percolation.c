@@ -125,9 +125,11 @@ static igraph_error_t edge_list_percolation(
 
 /**
  * \function igraph_bond_percolation
- * \brief calculates the bond-percolation curve of a graph.
+ * \brief Calculates the bond-percolation curve of a graph.
+ *
  * \param graph The input graph
- * \param output output[i] is the size of the largest component after adding i+1 edges, will be created.
+ * \param output output[i] is the size of the largest component after adding
+ *    <code>i+1</code> edges, will be created.
  */
 
 igraph_error_t igraph_bond_percolation(
@@ -210,25 +212,21 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
 /**
  * \function igraph_site_percolation
- *
- * \brief returns the size of the largest component as vertices are added to graph.
+ * \brief The size of the largest component as vertices are added to graph.
  *
  * \param graph The graph that vertices are assumed to be in
- *
- * \param output output[i] will contain the size of the largest component
- *        after adding vertex_order[i]. Will be resised.
- *
+ * \param output <code>output[i]</code> will contain the size of the largest component
+ *        after adding <code>vertex_order[i]</code>. Will be resised.
  * \param vertex_order The order the vertices will be added in.
  *        Will raise error if there are duplicates, or a vertex is missing.
  *        If null, a random order will be used.
- *
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_EINVAL
  *             The vertex list is invalid, see above.
  *        \endclist
  *
- * */
+ */
 
 igraph_error_t igraph_site_percolation(
         const igraph_t *graph,
