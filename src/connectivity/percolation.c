@@ -91,7 +91,7 @@ static igraph_error_t edge_list_percolation(
     igraph_vector_int_minmax(edges, &lower, &upper);
 
     if (lower < 0) {
-        IGRAPH_ERROR("Negative number in edge list.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative) vertex index.", IGRAPH_EINVVID);
     }
 
     igraph_vector_int_t sizes;
@@ -113,9 +113,10 @@ static igraph_error_t edge_list_percolation(
     IGRAPH_CHECK(igraph_vector_int_resize(output, edge_count));
 
     for (igraph_integer_t i = 0; i < edge_count; i++) {
-        percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1]);
+        percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i + 1]);
         VECTOR(*output)[i] = biggest;
     }
+
     igraph_vector_int_destroy(&sizes);
     igraph_vector_int_destroy(&links);
     IGRAPH_FINALLY_CLEAN(2);
@@ -134,43 +135,36 @@ static igraph_error_t edge_list_percolation(
 
 igraph_error_t igraph_bond_percolation(
         const igraph_t *graph,
-        igraph_vector_int_t * output,
-        const igraph_vector_int_t * edge_order) {
+        igraph_vector_int_t *output,
+        const igraph_vector_int_t *edge_order) {
 
-    const igraph_vector_int_t* internal_edge_indices = edge_order;
-    igraph_vector_int_t new_edges;
-    igraph_bool_t generated_edges = false;
+    const igraph_vector_int_t *p_edge_order;
+    igraph_vector_int_t i_edge_order;
+    igraph_vector_int_t edges;
 
     if (edge_order == NULL) {
         // Use random edge order
-        generated_edges = true;
-        igraph_integer_t size = igraph_ecount(graph);
 
-        IGRAPH_CHECK(igraph_vector_int_init_range(&new_edges, 0, size));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &new_edges);
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&new_edges));
-        internal_edge_indices = &new_edges;
+        IGRAPH_CHECK(igraph_vector_int_init_range(&i_edge_order, 0, igraph_ecount(graph)));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &i_edge_order);
+        IGRAPH_CHECK(igraph_vector_int_shuffle(&i_edge_order));
+
+        p_edge_order = &i_edge_order;
+    } else {
+        p_edge_order = edge_order;
     }
 
-    igraph_vector_int_t edgelist;
-    IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 2 * igraph_vector_int_size(internal_edge_indices)));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
+    IGRAPH_CHECK(igraph_vector_int_init(&edges, 2 * igraph_vector_int_size(p_edge_order)));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
 
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(internal_edge_indices); i++) {
-        IGRAPH_CHECK(igraph_edge(graph,
-                                 VECTOR(*internal_edge_indices)[i],
-                                 &VECTOR(edgelist)[2 * i],
-                                 &VECTOR(edgelist)[2 * i + 1]));
-    }
+    IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges));
+    IGRAPH_CHECK(edge_list_percolation(&edges, output));
 
-
-    IGRAPH_CHECK(edge_list_percolation(&edgelist, output));
-
-    igraph_vector_int_destroy(&edgelist);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    if (generated_edges) {
-        igraph_vector_int_destroy(&new_edges);
+    if (edge_order == NULL) {
+        igraph_vector_int_destroy(&i_edge_order);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -184,7 +178,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
                                      igraph_integer_t vertex) {
 
     if (VECTOR(*sizes)[vertex] != 0) {
-        IGRAPH_ERROR("Vertex already added.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Duplicate vertex in vertex order vector.", IGRAPH_EINVAL);
     }
 
     VECTOR(*sizes)[vertex] = 1;
@@ -233,52 +227,52 @@ igraph_error_t igraph_site_percolation(
         igraph_vector_int_t *output,
         const igraph_vector_int_t *vertex_order) {
 
-    // If vertex list is null, generate a random one.
-    const igraph_vector_int_t* internal_vertices;
-    igraph_bool_t generated_vertices = false;
-    igraph_vector_int_t new_vertices;
+    const igraph_vector_int_t *p_vertex_order;
+    igraph_vector_int_t i_vertex_order;
+    const igraph_integer_t vcount = igraph_vcount(graph);
 
     if (vertex_order == NULL) {
         // Use random vertex order
-        generated_vertices = true;
-        igraph_integer_t size = igraph_vcount(graph);
 
-        IGRAPH_CHECK(igraph_vector_int_init_range(&new_vertices, 0, size));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &new_vertices);
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
-        internal_vertices = & new_vertices;
+        IGRAPH_CHECK(igraph_vector_int_init_range(&i_vertex_order, 0, vcount));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &i_vertex_order);
+        IGRAPH_CHECK(igraph_vector_int_shuffle(&i_vertex_order));
+
+        p_vertex_order = & i_vertex_order;
     } else {
-        internal_vertices = vertex_order;
+        p_vertex_order = vertex_order;
     }
 
     // Initialize variables
-    igraph_integer_t size = igraph_vcount(graph);
-    if (size != igraph_vector_int_size(internal_vertices)) {
-        IGRAPH_ERROR("Graph size and vertex size do not match.", IGRAPH_EINVAL);
+    if (igraph_vector_int_size(p_vertex_order) != vcount) {
+        IGRAPH_ERRORF("Vertex order vector length (%" IGRAPH_PRId") "
+                      "does not match the vertex count (%" IGRAPH_PRId ")",
+                      IGRAPH_EINVAL,
+                      igraph_vector_int_size(p_vertex_order), vcount);
     }
     igraph_integer_t biggest = 1;
 
     igraph_vector_int_t sizes;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, size);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, vcount);
 
     igraph_vector_int_t links;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&links, size);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&links, vcount);
 
-    IGRAPH_CHECK(igraph_vector_int_resize(output, size));
+    IGRAPH_CHECK(igraph_vector_int_resize(output, vcount));
 
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         VECTOR(sizes)[i] = 0;
         VECTOR(links)[i] = i;
     }
 
-    for (igraph_integer_t i = 0; i < size; i++) {
-        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*internal_vertices)[i]));
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*p_vertex_order)[i]));
         VECTOR(*output)[i] = biggest;
     }
 
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         if (VECTOR(sizes)[i] == 0) {
-            IGRAPH_ERROR("Vertex list is missing vertices from graph.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Vertex order vector is missing vertices from graph.", IGRAPH_EINVAL);
         }
     }
 
@@ -287,10 +281,9 @@ igraph_error_t igraph_site_percolation(
     igraph_vector_int_destroy(&sizes);
     IGRAPH_FINALLY_CLEAN(2);
 
-    if (generated_vertices) {
-        igraph_vector_int_destroy(&new_vertices);
+    if (vertex_order == NULL) {
+        igraph_vector_int_destroy(&i_vertex_order);
         IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
     }
 
     return IGRAPH_SUCCESS;
