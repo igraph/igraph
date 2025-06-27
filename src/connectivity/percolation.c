@@ -188,8 +188,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
     VECTOR(*sizes)[vertex] = 1;
 
     igraph_vector_int_t neighbors;
-    IGRAPH_CHECK(igraph_vector_int_init(&neighbors, 0));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neighbors);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(igraph_vector_int_init(&neighbors, 0));
 
     IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_IN));
 
