@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
+
 ## [0.10.16] - 2025-06-10
 
 ### Added
