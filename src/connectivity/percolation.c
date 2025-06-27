@@ -145,10 +145,8 @@ igraph_error_t igraph_bond_percolation(
         igraph_integer_t size = igraph_ecount(graph);
 
         IGRAPH_CHECK(igraph_vector_int_init_range(&new_edges, 0, size));
-
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&new_edges));
-
         IGRAPH_FINALLY(igraph_vector_int_destroy, &new_edges);
+        IGRAPH_CHECK(igraph_vector_int_shuffle(&new_edges));
         internal_edge_indices = &new_edges;
     }
 
