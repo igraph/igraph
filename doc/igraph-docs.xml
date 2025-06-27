@@ -2,7 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
-<!ENTITY version "@IGRAPH_VERSION@">
+<!ENTITY version "">
 <!ENTITY mdash "&#8212;">
 <!ENTITY aacute "&#xe1;">
 <!ENTITY ccaron "&#269;">

@@ -207,6 +207,22 @@ static igraph_error_t percolate_site(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \function igraph_site_percolation
+ * \brief returns the size of the largest component as vertices are added to graph.
+ * \param graph The graph that vertices are assumed to be in
+ * \param output output[i] will contain the size of the largest component
+ *        after adding vertex_order[i]. Will be resised.
+ * \param vertex_order The order the vertices will be added in.
+ *        Will raise error if there are duplicates, or a vertex is missing.
+ *        If null, a random order will be used.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_EINVAL
+ *             The vertex list is invalid, see above.
+ * */
+
 igraph_error_t igraph_site_percolation(
         const igraph_t *graph,
         igraph_vector_int_t *output,
