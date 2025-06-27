@@ -133,13 +133,13 @@ static igraph_error_t edge_list_percolation(
 igraph_error_t igraph_bond_percolation(
         const igraph_t *graph,
         igraph_vector_int_t * output,
-        igraph_vector_int_t * edge_indices) {
+        const igraph_vector_int_t * edge_order) {
 
-    igraph_vector_int_t* internal_edge_indices = edge_indices;
+    const igraph_vector_int_t* internal_edge_indices = edge_order;
     igraph_vector_int_t new_edges;
     igraph_bool_t generated_edges = false;
 
-    if (edge_indices == NULL) {
+    if (edge_order == NULL) {
         // Use random edge order
         generated_edges = true;
         igraph_integer_t size = igraph_ecount(graph);
@@ -188,11 +188,13 @@ static igraph_error_t percolate_site(const igraph_t *graph,
     VECTOR(*sizes)[vertex] = 1;
 
     igraph_vector_int_t neighbors;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(igraph_vector_int_init(&neighbors, 0));
+    igraph_integer_t neighbor_count;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
 
     IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_IN));
 
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&neighbors); i++) {
+    neighbor_count = igraph_vector_int_size(&neighbors);
+    for (igraph_integer_t i = 0; i < neighbor_count; i++) {
         if (VECTOR(*sizes)[VECTOR(neighbors)[i]] == 0) {
             continue;
         }
@@ -208,14 +210,14 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 igraph_error_t igraph_site_percolation(
         const igraph_t *graph,
         igraph_vector_int_t *output,
-        igraph_vector_int_t *vertices) {
+        const igraph_vector_int_t *vertex_order) {
 
     // If vertex list is null, generate a random one.
-    igraph_vector_int_t* internal_vertices;
+    const igraph_vector_int_t* internal_vertices;
     igraph_bool_t generated_vertices = false;
     igraph_vector_int_t new_vertices;
 
-    if (vertices == NULL) {
+    if (vertex_order == NULL) {
         // Use random vertex order
         generated_vertices = true;
         igraph_integer_t size = igraph_vcount(graph);
@@ -225,7 +227,7 @@ igraph_error_t igraph_site_percolation(
         IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
         internal_vertices = & new_vertices;
     } else {
-        internal_vertices = vertices;
+        internal_vertices = vertex_order;
     }
 
     // Initialize variables
@@ -236,12 +238,10 @@ igraph_error_t igraph_site_percolation(
     igraph_integer_t biggest = 1;
 
     igraph_vector_int_t sizes;
-    IGRAPH_CHECK(igraph_vector_int_init(&sizes, size));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sizes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, size);
 
     igraph_vector_int_t links;
-    IGRAPH_CHECK(igraph_vector_int_init(&links, size));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &links);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&links, size);
 
     IGRAPH_CHECK(igraph_vector_int_resize(output, size));
 
@@ -267,7 +267,7 @@ igraph_error_t igraph_site_percolation(
     IGRAPH_FINALLY_CLEAN(2);
 
     if (generated_vertices) {
-        igraph_vector_int_destroy(internal_vertices);
+        igraph_vector_int_destroy(&new_vertices);
         IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
     }
