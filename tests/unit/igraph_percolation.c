@@ -60,7 +60,6 @@ int test_bond(void) {
 
     igraph_vector_int_t edge_ids;
     IGRAPH_CHECK(igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3));
-    VECTOR(edge_ids);
 
     printf("C_4 graph with edge sequence 0, 2\n");
     IGRAPH_CHECK(percolate_b(&c_4, &edge_ids));
