@@ -221,10 +221,8 @@ igraph_error_t igraph_site_percolation(
         igraph_integer_t size = igraph_vcount(graph);
 
         IGRAPH_CHECK(igraph_vector_int_init_range(&new_vertices, 0, size));
-
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
-
         IGRAPH_FINALLY(igraph_vector_int_destroy, &new_vertices);
+        IGRAPH_CHECK(igraph_vector_int_shuffle(&new_vertices));
         internal_vertices = & new_vertices;
     } else {
         internal_vertices = vertices;
