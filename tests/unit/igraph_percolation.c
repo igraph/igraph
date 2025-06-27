@@ -47,7 +47,7 @@ igraph_error_t largest_component_b(igraph_t *graph, igraph_integer_t *size) {
 }
 
 int test_bond(void) {
-    // test with normal graph and provided edge list
+    // Test with normal graph and provided edge list
 
     igraph_t k_3, c_4, karate, random;
     igraph_integer_t size = 0;
@@ -83,7 +83,6 @@ int test_bond(void) {
 
     IGRAPH_CHECK(igraph_connected_components(&random, NULL, &components, NULL, IGRAPH_WEAK));
 
-
     largest_component_b(&random, &size);
     IGRAPH_ASSERT(size == igraph_vector_int_max(&components));
     igraph_vector_int_destroy(&components);
@@ -91,8 +90,10 @@ int test_bond(void) {
 
     igraph_destroy(&random);
     VERIFY_FINALLY_STACK();
+
     return 0;
 }
+
 igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
@@ -103,6 +104,7 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices) {
 
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -116,8 +118,8 @@ igraph_error_t largest_component_s(igraph_t *graph, igraph_integer_t *size) {
 
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
 
+    return IGRAPH_SUCCESS;
 }
 
 int test_site(void) {
@@ -171,11 +173,12 @@ int test_site(void) {
     igraph_vector_int_init_int(&bad_vert_list_too_big, 6, 0, 1, 2, 3, 4, 5);
     igraph_vector_int_init_int(&bad_vert_list_missing, 3, 0, 1, 2);
     igraph_vector_int_init_int(&bad_vert_list_repeat,  5, 0, 0, 0, 0, 0);
+
     // should error due to being too big
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_too_big), IGRAPH_EINVAL);
     // should error due to being too small
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_missing), IGRAPH_EINVAL);
-    //should error due to repeated vertices
+    // should error due to repeated vertices
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat),  IGRAPH_EINVAL);
 
 
