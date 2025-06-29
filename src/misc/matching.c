@@ -1074,7 +1074,7 @@ igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *
     if (weights != NULL) {
         return IGRAPH_UNIMPLEMENTED;
     } else {
-        igraph_maximum_matching_unweighted(graph, matching_size, matching);
+        IGRAPH_CHECK(igraph_maximum_matching_unweighted(graph, matching_size, matching));
     }
     return IGRAPH_SUCCESS;
 }
