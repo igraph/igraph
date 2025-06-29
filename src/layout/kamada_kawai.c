@@ -426,52 +426,52 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     igraph_integer_t m;
 
     if (maxiter < 0) {
-        IGRAPH_ERROR("Number of iterations must be non-negatice in "
-                     "Kamada-Kawai layout", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of iterations must be non-negative in "
+                     "3D Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
     if (kkconst <= 0) {
-        IGRAPH_ERROR("`K' constant must be positive in Kamada-Kawai layout",
+        IGRAPH_ERROR("`K' constant must be positive in Kamada-Kawai layout.",
                      IGRAPH_EINVAL);
     }
 
     if (use_seed && (igraph_matrix_nrow(res) != vcount ||
                      igraph_matrix_ncol(res) != 3)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
-                     "3d Kamada-Kawai layout", IGRAPH_EINVAL);
+                     "3D Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
     if (weights && igraph_vector_size(weights) != ecount) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
     if (weights && ecount > 0 && igraph_vector_min(weights) <= 0) {
-        IGRAPH_ERROR("Weights must be positive for Kamada-Kawai layout.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must be positive for 3D Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != vcount) {
-        IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
     if (maxx && igraph_vector_size(maxx) != vcount) {
-        IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
-        IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
     if (miny && igraph_vector_size(miny) != vcount) {
-        IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
     if (maxy && igraph_vector_size(maxy) != vcount) {
-        IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
-        IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+        IGRAPH_ERROR("miny must not be greater than maxy.", IGRAPH_EINVAL);
     }
     if (minz && igraph_vector_size(minz) != vcount) {
-        IGRAPH_ERROR("Invalid minz vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid minz vector length.", IGRAPH_EINVAL);
     }
     if (maxz && igraph_vector_size(maxz) != vcount) {
-        IGRAPH_ERROR("Invalid maxz vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxz vector length.", IGRAPH_EINVAL);
     }
     if (minz && maxz && !igraph_vector_all_le(minz, maxz)) {
-        IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minz must not be greater than maxz.", IGRAPH_EINVAL);
     }
 
     if (!use_seed) {
