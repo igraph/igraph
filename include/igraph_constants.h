@@ -39,8 +39,6 @@ typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IG
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
-typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
-
 /* Do not renumber the following values! Some internal code treats them as bitmasks
  * and assumes that IGRAPH_ALL == IGRAPH_IN | IGRAPH_OUT and IGRAPH_IN & IGRAPH_OUT == 0. */
 typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
@@ -75,10 +73,6 @@ typedef enum { IGRAPH_WHEEL_OUT = 0, IGRAPH_WHEEL_IN,
 typedef enum { IGRAPH_TREE_OUT = 0, IGRAPH_TREE_IN,
                IGRAPH_TREE_UNDIRECTED
              } igraph_tree_mode_t;
-
-typedef enum { IGRAPH_ERDOS_RENYI_GNP = 0,
-               IGRAPH_ERDOS_RENYI_GNM
-             } igraph_erdos_renyi_t;
 
 typedef enum { IGRAPH_GET_ADJACENCY_UPPER = 0,
                IGRAPH_GET_ADJACENCY_LOWER,
@@ -131,10 +125,6 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE = 0,
                IGRAPH_SPINCOMM_UPDATE_CONFIG
              } igraph_spincomm_update_t;
 
-typedef enum { IGRAPH_DONT_SIMPLIFY = 0,
-               IGRAPH_SIMPLIFY
-             } igraph_lazy_adlist_simplify_t;
-
 typedef enum { IGRAPH_TRANSITIVITY_NAN = 0,
                IGRAPH_TRANSITIVITY_ZERO
              } igraph_transitivity_mode_t;
@@ -173,11 +163,6 @@ typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
                IGRAPH_SUBGRAPH_COPY_AND_DELETE,
                IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
              } igraph_subgraph_implementation_t;
-
-typedef enum { IGRAPH_IMITATE_AUGMENTED = 0,
-               IGRAPH_IMITATE_BLIND,
-               IGRAPH_IMITATE_CONTRACTED
-             } igraph_imitate_algorithm_t;
 
 typedef enum { IGRAPH_LAYOUT_GRID = 0,
                IGRAPH_LAYOUT_NOGRID,
