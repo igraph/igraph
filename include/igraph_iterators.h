@@ -236,7 +236,6 @@ typedef enum {
     IGRAPH_ES_RANGE,
     IGRAPH_ES_PAIRS,
     IGRAPH_ES_PATH,
-    IGRAPH_ES_UNUSED_WAS_MULTIPAIRS,  /* placeholder for deprecated IGRAPH_ES_MULTIPAIRS from igraph 0.10 */
     IGRAPH_ES_ALL_BETWEEN,
 } igraph_es_type_t;
 
