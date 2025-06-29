@@ -145,7 +145,6 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
  * \function igraph_layout_mds
  * \brief Place the vertices on a plane using multidimensional scaling.
  *
- * </para><para>
  * This layout requires a distance matrix, where the intersection of
  * row i and column j specifies the desired distance between vertex i
  * and vertex j. The algorithm will try to place the vertices in a
@@ -159,8 +158,8 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
  * If the input graph is disconnected, igraph will decompose it
  * first into its subgraphs, lay out the subgraphs one by one
  * using the appropriate submatrices of the distance matrix, and
- * then merge the layouts using \ref igraph_layout_merge_dla.
- * Since \ref igraph_layout_merge_dla works for 2D layouts only,
+ * then merge the layouts using \ref igraph_layout_merge_dla().
+ * Since \ref igraph_layout_merge_dla() works for 2D layouts only,
  * you cannot run the MDS layout on disconnected graphs for
  * more than two dimensions.
  *
@@ -191,6 +190,7 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
 
 igraph_error_t igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_matrix_t *dist, igraph_integer_t dim) {
+
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;
     igraph_bool_t conn;
@@ -205,10 +205,11 @@ igraph_error_t igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
 
     /* Check the number of dimensions */
     if (dim <= 1) {
-        IGRAPH_ERROR("dim must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The dimension must be positive.", IGRAPH_EINVAL);
     }
     if (no_of_nodes > 0 && dim > no_of_nodes) {
-        IGRAPH_ERROR("dim must be less than the number of nodes", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of nodes must be at least as large as the dimension.",
+                     IGRAPH_EINVAL);
     }
 
     /* Copy or obtain the distance matrix */

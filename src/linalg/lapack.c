@@ -381,7 +381,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  * \brief Selected eigenvalues and optionally eigenvectors of a symmetric matrix.
  *
  * Calls the DSYEVR LAPACK function to compute selected eigenvalues
- * and, optionally, eigenvectors of a real symmetric matrix A.
+ * and, optionally, eigenvectors of a real symmetric matrix \c A.
  * Eigenvalues and eigenvectors can be selected by specifying either
  * a range of values or a range of indices for the desired eigenvalues.
  *
@@ -395,7 +395,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        the corresponding eigenvectors) to calculate. Possible
  *        values are \c IGRAPH_LAPACK_DSYEV_ALL, all eigenvalues;
  *        \c IGRAPH_LAPACK_DSYEV_INTERVAL, all eigenvalues in the
- *        half-open interval (vl,vu];
+ *        half-open interval <code>(vl, vu]</code>;
  *        \c IGRAPH_LAPACK_DSYEV_SELECT, the il-th through iu-th
  *        eigenvalues.
  * \param vl If \p which is \c IGRAPH_LAPACK_DSYEV_INTERVAL, then
@@ -405,7 +405,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        this is the upper bound of the interval to be searched for
  *        eigenvalues. See also the \p vestimate argument.
  * \param vestimate An upper bound for the number of eigenvalues in
- *        the (vl,vu] interval, if \p which is \c
+ *        the <code>(vl, vu]</code> interval, if \p which is \c
  *        IGRAPH_LAPACK_DSYEV_INTERVAL. Memory is allocated only for
  *        the given number of eigenvalues (and eigenvectors), so this
  *        upper bound must be correct.
@@ -415,14 +415,14 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        which is \c IGRAPH_LAPACK_DSYEV_SELECT.
  * \param abstol The absolute error tolerance for the eigevalues. An
  *        approximate eigenvalue is accepted as converged when it is
- *        determined to lie in an interval [a,b] of width less than or
- *        equal to abstol + EPS * max(|a|,|b|), where EPS is the
- *        machine precision.
+ *        determined to lie in an interval <code>[a,b]</code> of width
+ *        less than or equal to <code>abstol + EPS * max(|a|,|b|)</code>,
+ *        where \c EPS is the machine precision.
  * \param values An initialized vector, the eigenvalues are stored
  *        here, unless it is a null pointer. It will be resized as
  *        needed.
- * \param vectors An initialized matrix, the eigenvectors are stored
- *        in its columns, unless it is a null pointer. It will be
+ * \param vectors An initialized matrix. A set of orthonormal eigenvectors
+ *        are stored in its columns, unless it is a null pointer. It will be
  *        resized as needed.
  * \param support An integer vector. If not a null pointer, then it
  *        will be resized to (2*max(1,M)) (M is a the total number of
