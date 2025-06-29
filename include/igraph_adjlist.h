@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,20 +13,17 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ADJLIST_H
 #define IGRAPH_ADJLIST_H
 
 #include "igraph_decls.h"
+#include "igraph_datatype.h"
 #include "igraph_constants.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
@@ -44,7 +39,7 @@ typedef struct igraph_inclist_t {
 
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                       igraph_neimode_t mode, igraph_loops_t loops,
-                                      igraph_multiple_t multiple);
+                                      igraph_bool_t multiple);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
@@ -66,11 +61,12 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, i
  * \define igraph_adjlist_get
  * \brief Query a vector in an adjacency list.
  *
- * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
+ * Returns a pointer to an \ref igraph_vector_int_t object from an
  * adjacency list. The vector can be modified as desired.
+ *
  * \param al The adjacency list object.
  * \param no The vertex whose adjacent vertices will be returned.
- * \return Pointer to the <type>igraph_vector_int_t</type> object.
+ * \return Pointer to the \ref igraph_vector_int_t object.
  *
  * Time complexity: O(1).
  */
@@ -111,14 +107,14 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_vector_int_t **adjs;
     igraph_neimode_t mode;
     igraph_loops_t loops;
-    igraph_multiple_t multiple;
+    igraph_bool_t multiple;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                                            igraph_lazy_adjlist_t *al,
                                            igraph_neimode_t mode,
                                            igraph_loops_t loops,
-                                           igraph_multiple_t multiple);
+                                           igraph_bool_t multiple);
 IGRAPH_EXPORT void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);

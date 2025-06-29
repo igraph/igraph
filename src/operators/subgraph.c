@@ -25,7 +25,6 @@
 #include "core/interruption.h"
 #include "core/set.h"
 #include "graph/attributes.h"
-#include "graph/internal.h"
 #include "operators/subgraph.h"
 
 /**
@@ -174,7 +173,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
         igraph_integer_t new_vid = i;
         igraph_bool_t skip_loop_edge;
 
-        IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT, IGRAPH_LOOPS));
         n = igraph_vector_int_size(&nei_edges);
 
         if (directed) {
@@ -195,7 +194,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
             /* undirected graph. We need to be careful with loop edges as each
              * loop edge will appear twice. We use a boolean flag to skip every
              * second loop edge */
-            skip_loop_edge = 0;
+            skip_loop_edge = false;
             for (igraph_integer_t j = 0; j < n; j++) {
                 eid = VECTOR(nei_edges)[j];
 
@@ -336,7 +335,9 @@ static igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
         ratio = (igraph_real_t) num_vs / igraph_vcount(graph);
     }
 
-    /* TODO: needs benchmarking; threshold was chosen totally arbitrarily */
+    /* The threshold of 0.5 is justified by the benchmarking done in
+     * https://github.com/igraph/igraph/pull/2708
+     * Small improvements may be possible by using better heuristics. */
     if (ratio > 0.5) {
         *result = IGRAPH_SUBGRAPH_COPY_AND_DELETE;
     } else {
@@ -476,7 +477,7 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
-        IGRAPH_CHECK(igraph_i_incident(graph, &incedges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_incident(graph, &incedges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
 
         igraph_integer_t d = igraph_vector_int_size(&incedges);
         for (igraph_integer_t i=0; i < d; i++) {
@@ -484,7 +485,7 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
             igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
             /* The v <= u check avoids adding non-loop edges twice.
              * Loop edges only appear once due to the use of
-             * IGRAPH_LOOPS_ONCE in igraph_i_incident() */
+             * IGRAPH_LOOPS_ONCE in igraph_incident() */
             if (v <= u && igraph_set_contains(&vids_set, u)) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, e));
             }

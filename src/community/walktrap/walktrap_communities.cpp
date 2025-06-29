@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -54,7 +53,7 @@
 // see readme.txt for more details
 
 #include "walktrap_communities.h"
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 #include <algorithm>
 #include <cmath>
 

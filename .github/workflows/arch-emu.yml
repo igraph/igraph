@@ -1,0 +1,130 @@
+# This workflow is modified from a similar one used by SuiteSparse
+# https://github.com/DrTimothyAldenDavis/SuiteSparse/blob/dev/.github/workflows/build-arch-emu.yaml
+
+name: Emulated
+
+on:
+  workflow_dispatch:
+
+concurrency: ci-arch-emu-${{ github.ref }}
+
+env:
+  CMAKE_GENERATOR: Ninja
+  CMAKE_COLOR_DIAGNOSTICS: ON
+  CCACHE_MAXSIZE: 64M
+  OMP_NUM_THREADS: 1
+  CTEST_PARALLEL_LEVEL: 0 # Since CMake 3.29, a setting of 0 will try to use all available resources
+
+jobs:
+
+  alpine:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        # Use emulated shell as default
+        shell: alpine.sh {0}
+
+    strategy:
+      # Allow other runners in the matrix to continue if some fail
+      fail-fast: false
+
+      matrix:
+        # For available CPU architectures, see:
+        # https://github.com/marketplace/actions/setup-alpine-linux-environment
+        arch: [x86, aarch64, armhf, armv7, ppc64le, s390x, riscv64]
+
+    name: alpine (${{ matrix.arch }})
+
+    steps:
+      - name: CPU information (host)
+        shell: bash
+        run: lscpu
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        uses: jirutka/setup-alpine@v1
+        with:
+          arch: ${{ matrix.arch }}
+          packages: >
+            build-base
+            git
+            ninja
+            bison
+            flex
+            ccache
+            cmake
+            glpk-dev
+            gmp-dev
+            arpack-dev
+            libxml2-dev
+            util-linux-misc
+
+      - name: CPU information (emulated)
+        run: lscpu
+
+      - name: Prepare cache
+        # create key with human readable timestamp
+        # used in action/cache/restore and action/cache/save steps
+        id: ccache-prepare
+        run: |
+          echo "key=ccache:alpine:${{ matrix.arch }}:${{ github.ref }}:$(date +"%Y-%m-%d_%H-%M-%S"):${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Configure ccache
+        run: |
+          test -d ~/.ccache || mkdir ~/.ccache
+          echo "compression = true" >> ~/.ccache/ccache.conf
+          ccache -s
+          which ccache
+
+      - name: Restore cache
+        # setup the GitHub cache used to maintain the ccache from one job to the next
+        uses: actions/cache/restore@v4
+        with:
+          # location of the ccache of the chroot in the root file system
+          path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
+          key: ${{ steps.ccache-prepare.outputs.key }}
+          # Prefer caches from the same branch. Fall back to caches from the dev branch.
+          restore-keys: |
+            ccache:alpine:${{ matrix.arch }}:${{ github.ref }}
+            ccache:alpine:${{ matrix.arch }}
+
+      - name: Configure
+        run: |
+          echo "gcc --version"
+          gcc --version
+          echo "gcc -dumpmachine"
+          gcc -dumpmachine
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release \
+                -DBUILD_SHARED_LIBS=ON \
+                -DIGRAPH_ENABLE_TLS=ON \
+                -DIGRAPH_USE_INTERNAL_BLAS=OFF \
+                -DIGRAPH_USE_INTERNAL_LAPACK=OFF \
+                -DIGRAPH_USE_INTERNAL_ARPACK=OFF \
+                -DIGRAPH_USE_INTERNAL_GLPK=OFF \
+                -DIGRAPH_USE_INTERNAL_GMP=OFF \
+                -DIGRAPH_USE_INTERNAL_PLFIT=ON \
+                ..
+
+      - name: Build
+        run: cd build && cmake --build . --target build_tests --parallel
+
+      - name: Test
+        run: cd build && ctest --output-on-failure
+
+      - name: Ccache statistics
+        continue-on-error: true
+        run: ccache -s
+
+      - name: Cache
+        # Save the cache after we are done (successfully) building
+        # This helps to retain the ccache even if the subsequent steps are failing.
+        uses: actions/cache/save@v4
+        with:
+          path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
+          key: ${{ steps.ccache-prepare.outputs.key }}

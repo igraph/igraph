@@ -49,12 +49,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_real_t r;
         igraph_vector_int_list_t ivl1;
-        igraph_vector_t v1;
+        igraph_vector_t v1, v2;
         igraph_vector_int_t iv1, iv2;
         igraph_matrix_t m;
 
         igraph_vector_int_list_init(&ivl1, 0);
         igraph_vector_init(&v1, 0);
+        igraph_vector_init(&v2, 0);
         igraph_vector_int_init(&iv1, 0);
         igraph_vector_int_init(&iv2, 0);
         igraph_matrix_init(&m, 0, 0);
@@ -67,11 +68,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_joint_degree_matrix(&graph, &weights, &m, -1, -1);
         igraph_joint_degree_distribution(&graph, &weights, &m, IGRAPH_IN, IGRAPH_OUT, true, true, -1, -1);
         igraph_degree_correlation_vector(&graph, &weights, &v1, IGRAPH_OUT, IGRAPH_IN, true);
+        igraph_avg_nearest_neighbor_degree(&graph, igraph_vss_all(), IGRAPH_OUT, IGRAPH_IN, &v1, &v2, &weights);
 
-        igraph_pseudo_diameter_dijkstra(&graph, &weights, &r, -1, NULL, NULL, true, true);
-        igraph_diameter_dijkstra(&graph, &weights, &r, NULL, NULL, NULL, NULL, true, false);
-        igraph_average_path_length_dijkstra(&graph, &r, &r, &weights, true, true);
-        igraph_radius_dijkstra(&graph, &weights, &r, IGRAPH_OUT);
+        igraph_pseudo_diameter(&graph, &weights, &r, -1, NULL, NULL, true, true);
+        igraph_diameter(&graph, &weights, &r, NULL, NULL, NULL, NULL, true, false);
+        igraph_average_path_length(&graph, &weights, &r, &r, true, true);
+        igraph_radius(&graph, &weights, &r, IGRAPH_OUT);
 
         igraph_feedback_arc_set(&graph, &iv1, &weights, IGRAPH_FAS_APPROX_EADES);
 
@@ -106,11 +108,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_joint_degree_matrix(&graph, &weights, &m, -1, -1);
         igraph_joint_degree_distribution(&graph, &weights, &m, IGRAPH_ALL, IGRAPH_ALL, false, true, -1, -1);
         igraph_degree_correlation_vector(&graph, &weights, &v1, IGRAPH_ALL, IGRAPH_ALL, false);
+        igraph_avg_nearest_neighbor_degree(&graph, igraph_vss_all(), IGRAPH_ALL, IGRAPH_ALL, &v1, &v2, &weights);
 
-        igraph_pseudo_diameter_dijkstra(&graph, &weights, &r, -1, NULL, NULL, false, false);
-        igraph_diameter_dijkstra(&graph, &weights, &r, NULL, NULL, NULL, NULL, false, true);
-        igraph_average_path_length_dijkstra(&graph, &r, &r, &weights, true, true);
-        igraph_radius_dijkstra(&graph, &weights, &r, IGRAPH_OUT);
+        igraph_pseudo_diameter(&graph, &weights, &r, -1, NULL, NULL, false, false);
+        igraph_diameter(&graph, &weights, &r, NULL, NULL, NULL, NULL, false, true);
+        igraph_average_path_length(&graph, &weights, &r, &r, true, true);
+        igraph_radius(&graph, &weights, &r, IGRAPH_OUT);
 
         if (igraph_vcount(&graph) >= 1) {
             igraph_random_walk(&graph, &weights, &iv1, &iv2, 0, IGRAPH_ALL, igraph_ecount(&graph), IGRAPH_RANDOM_WALK_STUCK_RETURN);
@@ -127,6 +130,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_matrix_destroy(&m);
         igraph_vector_int_destroy(&iv2);
         igraph_vector_int_destroy(&iv1);
+        igraph_vector_destroy(&v2);
         igraph_vector_destroy(&v1);
         igraph_vector_int_list_destroy(&ivl1);
 

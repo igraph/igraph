@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -482,7 +480,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * \param m The number of outgoing edges generated for each
  *        vertex. Only used when \p outseq is \c NULL.
  * \param outseq Gives the (out-)degrees of the vertices. If this is
- *        constant, this can be a \c NULL pointer or an empty vector.
+ *        constant, this can be a \c NULL pointer.
  *        In this case \p m contains the constant out-degree.
  *        The very first vertex has by definition no outgoing edges,
  *        so the first number in this vector is ignored.
@@ -547,10 +545,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t start_nodes = start_from ? igraph_vcount(start_from) : 0;
     igraph_integer_t newn = start_from ? n - start_nodes : n;
 
-    /* Fix obscure parameterizations */
-    if (outseq && igraph_vector_int_empty(outseq)) {
-        outseq = NULL;
-    }
+    /* In undirected graphs, always consider the total degree. */
     if (!directed) {
         outpref = true;
     }
@@ -570,7 +565,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     if (!outseq && m < 0) {
         IGRAPH_ERROR("Number of edges added per step must not be negative.", IGRAPH_EINVAL);
     }
-    if (outseq && igraph_vector_int_min(outseq) < 0) {
+    if (outseq && newn > 0 && igraph_vector_int_min(outseq) < 0) {
         IGRAPH_ERROR("Negative out-degree in sequence.", IGRAPH_EINVAL);
     }
     if (!outpref && A <= 0) {
@@ -660,7 +655,7 @@ static igraph_real_t attraction_aging(
  * \param outseq The number of edges to add in each time step. If it
  *        is \c NULL or a zero-length vector then it is ignored
  *        and the \p m argument is used instead.
- * \param outpref Logical constant, whether the edges
+ * \param outpref Boolean constant, whether the edges
  *        initiated by a vertex contribute to the probability to gain
  *        a new edge.
  * \param pa_exp The exponent of the preferential attachment, a small
@@ -675,7 +670,7 @@ static igraph_real_t attraction_aging(
  *        of the vertices of age zero. This parameter is usually zero.
  * \param deg_coef The coefficient for the degree.
  * \param age_coef The coefficient for the age.
- * \param directed Logical constant, whether to generate a directed
+ * \param directed Boolean constant, whether to generate a directed
  *        graph.
  * \return Error code.
  *
@@ -708,12 +703,12 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of nodes must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (outseq != 0 && igraph_vector_int_size(outseq) != 0 && igraph_vector_int_size(outseq) != no_of_nodes) {
+    if (outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("The length of the out-degree sequence (%" IGRAPH_PRId ") does not agree with the number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_vector_int_size(outseq), no_of_nodes);
     }
-    if ( (outseq == 0 || igraph_vector_int_size(outseq) == 0) && m < 0) {
+    if (!outseq && m < 0) {
         IGRAPH_ERRORF("The number of edges per time step must not be negative, got %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL,
                       m);
@@ -745,13 +740,16 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
                       zero_age_appeal);
     }
 
+    /* This effectively also hanbdles an outseq size of 0.
+     * From here on we assume that outseq has a size of at least 1. */
     if (no_of_nodes == 0) {
-         return igraph_empty(graph, 0, directed);
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+        return IGRAPH_SUCCESS;
     }
 
     binwidth = no_of_nodes / aging_bins + 1;
 
-    if (outseq == 0 || igraph_vector_int_size(outseq) == 0) {
+    if (!outseq) {
         no_of_neighbors = m;
         IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
@@ -782,7 +780,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (outseq != 0 && igraph_vector_int_size(outseq) != 0) {
+        if (outseq) {
             no_of_neighbors = VECTOR(*outseq)[i];
         }
         sum = igraph_psumtree_sum(&sumtree);

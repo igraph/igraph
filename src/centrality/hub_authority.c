@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
@@ -76,9 +74,11 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
         igraph_real_t x = VECTOR(*cent)[i];
         if (-tol < x && x < tol) {
             if (++zero_cnt > max_zero_cnt) {
-                IGRAPH_WARNING(
-                    "More than a fraction %g of hub or authority scores is zero. The presence of zero values "
-                    "indicates that the solution is not unique, thus the returned result may not be meaningful.");
+                IGRAPH_WARNINGF(
+                    "More than %d%% of hub or authority scores are zeros. The presence of zero values "
+                    "indicates that the solution is not unique, thus the returned result may not be meaningful.",
+                    (int) (frac * 100)
+                );
                 return;
             }
         }
@@ -325,7 +325,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
             igraph_vector_fill(authority_vector, 1.0);
         }
         if (no_of_nodes > 1) {
-            IGRAPH_WARNING("The graph has no edges. Hub and authortiy scores are not meaningful.");
+            IGRAPH_WARNING("The graph has no edges. Hub and authority scores are not meaningful.");
         }
         return IGRAPH_SUCCESS;
     }
@@ -368,7 +368,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
                 igraph_vector_fill(authority_vector, 1);
             }
-            IGRAPH_WARNING("All edge weights are zero. Hub and authortiy scores are not meaningful.");
+            IGRAPH_WARNING("All edge weights are zero. Hub and authority scores are not meaningful.");
             return IGRAPH_SUCCESS;
         }
     }
@@ -402,7 +402,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     /* We calculate hub scores, which correlate with out-degrees / out-strengths.
      * Thus we use out-strengths as starting values. */
-    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, true, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
     RNG_BEGIN();
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {

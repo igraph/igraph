@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,16 +13,12 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_CONSTANTS_H
 #define IGRAPH_CONSTANTS_H
 
-#include "igraph_config.h"
 #include "igraph_decls.h"
 
 __BEGIN_DECLS
@@ -33,15 +27,15 @@ __BEGIN_DECLS
 /* Constants                                          */
 /* -------------------------------------------------- */
 
-typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
+/* These constants are meant to be used for sake of readability */
+enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
+enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
 
 /* Note for the enum below: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
  * is 2. This is intentional, for the sake of backwards compatibility with
  * earlier versions where we only had IGRAPH_LOOPS and it meant
  * IGRAPH_LOOPS_TWICE */
 typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IGRAPH_LOOPS_ONCE = 2 } igraph_loops_t;
-
-typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_multiple_t;
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
@@ -107,13 +101,6 @@ typedef enum { IGRAPH_RANDOM_TREE_PRUFER = 0,
                IGRAPH_RANDOM_TREE_LERW
              } igraph_random_tree_t;
 
-typedef enum { IGRAPH_FILEFORMAT_EDGELIST = 0,
-               IGRAPH_FILEFORMAT_NCOL,
-               IGRAPH_FILEFORMAT_PAJEK,
-               IGRAPH_FILEFORMAT_LGL,
-               IGRAPH_FILEFORMAT_GRAPHML
-             } igraph_fileformat_type_t;
-
 typedef enum { IGRAPH_REWIRING_SIMPLE = 0,
                IGRAPH_REWIRING_SIMPLE_LOOPS
              } igraph_rewiring_t;
@@ -174,8 +161,13 @@ typedef enum { IGRAPH_BARABASI_BAG = 0,
              } igraph_barabasi_algorithm_t;
 
 typedef enum { IGRAPH_FAS_EXACT_IP = 0,
-               IGRAPH_FAS_APPROX_EADES
+               IGRAPH_FAS_APPROX_EADES,
+               IGRAPH_FAS_EXACT_IP_CG,
+               IGRAPH_FAS_EXACT_IP_TI
              } igraph_fas_algorithm_t;
+
+typedef enum { IGRAPH_FVS_EXACT_IP = 0
+             } igraph_fvs_algorithm_t;
 
 typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
                IGRAPH_SUBGRAPH_COPY_AND_DELETE,
@@ -215,6 +207,10 @@ typedef enum { IGRAPH_MST_AUTOMATIC = 0,
                IGRAPH_MST_PRIM,
                IGRAPH_MST_KRUSKAL
              } igraph_mst_algorithm_t;
+
+typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
+               IGRAPH_PRODUCT_TENSOR,
+             } igraph_product_t;
 
 /**
  * \typedef igraph_lpa_variant_t

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -66,7 +65,7 @@
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_square_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
+ * \sa \ref igraph_wheel(), \ref igraph_square_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_star.c
@@ -323,6 +322,11 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
  *         \c IGRAPH_EINVAL: invalid (negative) dimension vector or mismatch
  *         between the length of the dimension vector and the periodicity vector.
  *
+ * \sa \ref igraph_hypercube() to create a hypercube graph; \ref igraph_ring()
+ * to create a cycle graph or path graph; \ref igraph_triangular_lattice()
+ * and \ref igraph_hexagonal_lattice() to create other types of lattices;
+ * \ref igraph_regular_tree() to create a Bethe lattice.
+ *
  * Time complexity: If \p nei is less than two then it is O(|V|+|E|) (as
  * far as I remember), |V| and |E| are the number of vertices
  * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
@@ -469,19 +473,20 @@ igraph_error_t igraph_square_lattice(
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
- * \param directed Logical, whether to create a directed graph.
+ * \param directed Whether to create a directed graph.
  *        All edges will be oriented in the same direction along
  *        the cycle or path.
- * \param mutual Logical, whether to create mutual edges in directed
+ * \param mutual Whether to create mutual edges in directed
  *        graphs. It is ignored for undirected graphs.
- * \param circular Logical, whether to create a closed ring (a cycle)
+ * \param circular Whether to create a closed ring (a cycle)
  *        or an open path.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  *
- * \sa \ref igraph_square_lattice() for generating more general lattices.
+ * \sa \ref igraph_square_lattice() for generating more general
+ * (periodic or non-periodic) lattices.
  *
  * \example examples/simple/igraph_ring.c
  */
@@ -582,7 +587,9 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * \sa \ref igraph_regular_tree(), \ref igraph_symmetric_tree() and \ref igraph_star()
  * for creating other regular structures; \ref igraph_from_prufer() and
  * \ref igraph_tree_from_parent_vector() for creating arbitrary trees;
- * \ref igraph_tree_game() for uniform random sampling of trees.
+ * \ref igraph_tree_game() for uniform random sampling of trees;
+ * \ref igraph_realize_degree_sequence() with \c IGRAPH_REALIZE_DEGSEQ_SMALLEST
+ * to create a tree with given degrees.
  *
  * \example examples/simple/igraph_kary_tree.c
  */
@@ -834,7 +841,7 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_i
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector().
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_circulant()
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
@@ -936,7 +943,7 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
     /* Integer overflow is no longer a concern after the above check. */
 
     const igraph_integer_t vcount = (igraph_integer_t) 1 << n;
-    const igraph_integer_t ecount = ((igraph_integer_t) 1 << (n-1)) * n;
+    const igraph_integer_t ecount = n > 0 ? ((igraph_integer_t) 1 << (n-1)) * n : 0; /* avoid UBSan warning */
     igraph_vector_int_t edges;
     igraph_integer_t p;
     int iter = 0;

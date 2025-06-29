@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,41 +13,42 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_memory.h"
 
 /**
- * \section about-alloc-funcs About allocation functions
+ * \section about_alloc_funcs About allocation functions
  *
- * Some igraph functions return a pointer vector (igraph_vector_ptr_t)
+ * <para>
+ * Some igraph functions return a pointer vector (\type igraph_vector_ptr_t)
  * containing pointers to other igraph or other data types. These data
  * types are dynamically allocated and have to be deallocated
- * manually when the user does not need them any more. \c igraph_vector_ptr_t
+ * manually when the user does not need them any more. \type igraph_vector_ptr_t
  * has functions to deallocate the contained pointers on its own, but in this
  * case it has to be ensured that these pointers are allocated by a function
- * that corresponding to the deallocator function that igraph uses.
+ * that corresponds to the deallocator function that igraph uses.
+ * </para>
  *
- * </para><para>
+ * <para>
  * To this end, igraph exports the memory allocation functions that are used
  * internally so the user of the library can ensure that the proper functions
  * are used when pointers are moved between the code written by the user and
  * the code of the igraph library.
+ * </para>
  *
- * </para><para>
+ * <para>
  * Additionally, the memory allocator functions used by igraph work around the
- * quirk of classical \c malloc(), \c realloc() and \c calloc() implementations
+ * quirks of classical \c malloc(), \c realloc() and \c calloc() implementations
  * where the behaviour of allocating zero bytes is undefined. igraph allocator
  * functions will always allocate at least one byte.
+ * </para>
  */
 
 /**
  * \function igraph_free
- * \brief Deallocate memory that was allocated by igraph functions.
+ * \brief Deallocates memory that was allocated by igraph functions.
  *
  * This function exposes the \c free() function used internally by igraph.
  *
@@ -67,7 +66,7 @@ void igraph_free(void *ptr) {
 
 /**
  * \function igraph_calloc
- * \brief Allocate memory that can be safely deallocated by igraph functions.
+ * \brief Allocates memory that can be safely deallocated by igraph functions.
  *
  * This function behaves like \c calloc(), but it ensures that at least one
  * byte is allocated even when the caller asks for zero bytes.
@@ -87,7 +86,7 @@ void *igraph_calloc(size_t count, size_t size) {
 
 /**
  * \function igraph_malloc
- * \brief Allocate memory that can be safely deallocated by igraph functions.
+ * \brief Allocates memory that can be safely deallocated by igraph functions.
  *
  * This function behaves like \c malloc(), but it ensures that at least one
  * byte is allocated even when the caller asks for zero bytes.
@@ -119,6 +118,6 @@ void *igraph_malloc(size_t size) {
  * \sa \ref igraph_free(), \ref igraph_malloc()
  */
 
-void *igraph_realloc(void* ptr, size_t size) {
-    return (void*) IGRAPH_REALLOC(ptr, size, char);
+void *igraph_realloc(void *ptr, size_t size) {
+    return (void *) IGRAPH_REALLOC(ptr, size, char);
 }

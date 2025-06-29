@@ -1,10 +1,5 @@
 #ifndef SYSDEP_H_INCLUDED
 #define SYSDEP_H_INCLUDED
-
-#ifdef _MSC_VER
-#define FTRUNCATE chsize
-#endif
-
 #undef USE_LARGEFILE
 #ifndef NO_LONG_LONG
 
@@ -15,13 +10,12 @@
 
 #ifdef __linux__
 #define USE_LARGEFILE
-
 #ifdef __GLIBC__
 #define OFF_T __off64_t
 #else
-#define OFF_T off64_t
-#endif /* __GLIBC__ */
-#endif /* __linux__ */
+#define OFF_T off_t
+#endif
+#endif
 
 #ifdef _AIX43
 #define _LARGE_FILES
@@ -49,12 +43,8 @@
 #ifndef OFF_T
 #define OFF_T off64_t
 #endif
-#ifndef _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE
-#endif
-#ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
-#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #define FOPEN fopen64

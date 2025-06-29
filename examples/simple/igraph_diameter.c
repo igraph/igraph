@@ -28,7 +28,7 @@ int main(void) {
     igraph_barabasi_game(&graph, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1,
                          IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,
                          /*start_from=*/ NULL);
-    igraph_diameter(&graph, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
+    igraph_diameter(&graph, NULL, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
 
     /* printf("diameter: %g\n", result); */
 
@@ -37,7 +37,7 @@ int main(void) {
     igraph_ring(&graph, 10, IGRAPH_DIRECTED, 0, 0);
     igraph_vector_int_init(&path, 0);
     igraph_vector_int_init(&path_edge, 0);
-    igraph_diameter(&graph, &result, &from, &to, &path, &path_edge, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&graph, NULL, &result, &from, &to, &path, &path_edge, IGRAPH_DIRECTED, 1);
     printf(
         "diameter: %g, from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n",
         result, from, to

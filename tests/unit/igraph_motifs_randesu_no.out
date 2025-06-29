@@ -8,7 +8,7 @@ Full graph of 50 vertices, motif size 3 (50 choose 3 = 19600):
 Result: 19600
 
 Full graph of 50 vertices, motif size 3, cut_prob 0.1 at each level:
-Result: 15990
+Result: 16034
 
 Full graph of 50 vertices, motif size 4 (50 choose 4 = 230300:
 Result: 230300

@@ -23,8 +23,6 @@
 
 #include "pcg/pcg_variants.h"
 
-#include "config.h" /* IGRAPH_THREAD_LOCAL */
-
 /* The original implementation of the 32-bit PCG random number generator in this
  * file was obtained from https://github.com/imneme/pcg-c
  *

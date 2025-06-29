@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team
+   Copyright (C) 2021-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #if defined(VECTOR_LIST)
@@ -103,8 +99,8 @@ IGRAPH_EXPORT void FUNCTION(remove_consecutive_duplicates)(TYPE *v, igraph_bool_
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(permute)(TYPE *v, const igraph_vector_int_t *index);
 IGRAPH_EXPORT igraph_error_t FUNCTION(reverse)(TYPE *v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(swap)(TYPE *v1, TYPE *v2);
-IGRAPH_EXPORT igraph_error_t FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
+IGRAPH_EXPORT void FUNCTION(swap)(TYPE *v1, TYPE *v2);
+IGRAPH_EXPORT void FUNCTION(swap_elements)(TYPE* v, igraph_integer_t i, igraph_integer_t j);
 
 /*-----------*/
 /* Sorting   */

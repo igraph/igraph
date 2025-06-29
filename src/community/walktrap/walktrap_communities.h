@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -59,7 +58,7 @@
 
 #include "walktrap_graph.h"
 #include "walktrap_heap.h"
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 namespace igraph {
 

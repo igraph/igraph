@@ -25,8 +25,15 @@ void print_and_destroy(igraph_t *g) {
 
     igraph_es_all(&eids, IGRAPH_EDGEORDER_ID);
     igraph_vector_int_init(&edges, 0);
-    igraph_edges(g, eids, &edges);
-    igraph_vector_int_print(&edges);
+
+    printf("  row-wise order: ");
+    igraph_edges(g, eids, &edges, 0);
+    print_vector_int(&edges);
+
+    printf("  column-wise order: ");
+    igraph_edges(g, eids, &edges, 1);
+    print_vector_int(&edges);
+
     igraph_destroy(g);
     igraph_vector_int_destroy(&edges);
 }

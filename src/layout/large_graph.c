@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2020  The igraph development team
@@ -30,7 +28,7 @@
 
 #include "core/grid.h"
 #include "core/interruption.h"
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
     igraph_real_t len = sqrt(*x * *x + *y * *y);
@@ -187,7 +185,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     /* Place the vertices randomly */
     IGRAPH_CHECK(igraph_layout_random(graph, res));
-    igraph_matrix_scale(res, 1e6);
+    igraph_matrix_scale(res, sqrt(area / M_PI));
 
     /* This is the grid for calculating the vertices near to a given vertex */
     IGRAPH_CHECK(igraph_2dgrid_init(&grid, res,
@@ -231,7 +229,13 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_integer_t par = VECTOR(parents)[vid];
 
             if (par < 0) {
-                /* this is either the root vertex or an unreachable node */
+                if (par == -1) {
+                    /* this is either the root vertex ... */
+                    MATRIX(*res, vid, 0) = 0;
+                    MATRIX(*res, vid, 1) = 0;
+                } else {
+                    /* ... or an unreachable node */
+                }
                 continue;
             }
 
@@ -272,7 +276,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             igraph_integer_t vid = VECTOR(vids)[j];
             igraph_integer_t k;
             IGRAPH_ALLOW_INTERRUPTION();
-            IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL, IGRAPH_LOOPS));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
                 igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);

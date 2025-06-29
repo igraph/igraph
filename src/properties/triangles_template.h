@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -62,7 +60,7 @@ for (i = 0; i < no_of_nodes; i++) {
 }
 
 maxdegree = igraph_vector_int_max(&degree) + 1;
-IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+IGRAPH_CHECK(igraph_i_vector_int_order(&degree, &order, maxdegree));
 IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
 for (i = 0; i < no_of_nodes; i++) {
     VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
@@ -71,9 +69,7 @@ for (i = 0; i < no_of_nodes; i++) {
 IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
 
 neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-if (neis == 0) {
-    IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-}
+IGRAPH_CHECK_OOM(neis, "Insufficient memory to count triangles.");
 IGRAPH_FINALLY(igraph_free, neis);
 
 #ifndef TRIANGLES

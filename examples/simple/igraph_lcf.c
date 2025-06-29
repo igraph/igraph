@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2007-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,73 +13,39 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 
 int main(void) {
 
-    igraph_t g, g2;
+    igraph_t g1, g2;
+    igraph_vector_int_t edges;
     igraph_bool_t iso;
 
-    // Franklin graph
-    igraph_lcf(&g, 12, 5, -5, 6, 0);
-    igraph_famous(&g2, "franklin");
+    // Heawood graph through LCF notation: [5, -5]^7
+    // The number of vertices is normally the number of shifts
+    // multiplied by the number of repeats, in this case 2*7 = 14.
+    igraph_lcf_small(&g1,
+                     /* n */ 14,
+                     /* shifts */ 5, -5,
+                     /* repeats */7,
+                     0);
 
-    igraph_isomorphic_vf2(&g, &g2,
-                          /*vertex.color1=*/ 0, /*vertex.color2=*/ 0,
-                          /*edge.color1=*/ 0, /*edge.color2=*/ 0,
-                          &iso, 0, 0, 0, 0, 0);
-    if (!iso) {
-        printf("Failure: Franklin\n");
-        return 1;
-    }
+    printf("edges:\n");
+    igraph_vector_int_init(&edges, 0);
+    igraph_get_edgelist(&g1, &edges, false);
+    igraph_vector_int_print(&edges);
+    igraph_vector_int_destroy(&edges);
 
-    igraph_destroy(&g);
+    // Built-in Heawood graph:
+    igraph_famous(&g2, "Heawood");
+    igraph_isomorphic(&g1, &g2, &iso);
+    printf("isomorphic: %s\n", iso ? "true" : "false");
     igraph_destroy(&g2);
 
-    // [3, -2]^4, n=8
-    igraph_lcf(&g, 8, 3, -2, 4, 0);
-
-    if (igraph_ecount(&g) != 16) {
-        printf("Failure: [3, -2]^4, n=8\n");
-        return 1;
-    }
-
-    igraph_destroy(&g);
-
-    // [2, -2]^2, n=2
-    igraph_lcf(&g, 2, 2, -2, 2, 0);
-
-    if (igraph_ecount(&g) != 1) {
-        printf("Failure: [2, -2]^2, n=2\n");
-        return 1;
-    }
-
-    igraph_destroy(&g);
-
-    // [2]^2, n=2
-    igraph_lcf(&g, 2, 2, 2, 0);
-
-    if (igraph_ecount(&g) != 1) {
-        printf("Failure: [2]^2, n=2\n");
-        return 1;
-    }
-
-    igraph_destroy(&g);
-
-    // Regression test for bug #996
-    igraph_lcf(&g, 0, 0);
-    if (igraph_vcount(&g) != 0 || igraph_ecount(&g) != 0) {
-        printf("Failure: regression test for #996\n");
-        return 1;
-    }
-
-    igraph_destroy(&g);
+    igraph_destroy(&g1);
 
     return 0;
 }

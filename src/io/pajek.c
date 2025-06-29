@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2020  The igraph development team
@@ -150,6 +149,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_attribute_record_list_t eattrs;
     igraph_integer_t i;
     igraph_i_pajek_parsedata_t context;
+    igraph_bitset_t seen; /* used to mark already seen vertex IDs */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
@@ -161,8 +161,11 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_CHECK(igraph_attribute_record_list_init(&eattrs, 0));
     IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &eattrs);
 
+    IGRAPH_BITSET_INIT_FINALLY(&seen, 0);
+
     context.directed = false; /* assume undirected until an element implying directedness is encountered */
     context.vector = &edges;
+    context.seen = &seen;
     context.vcount = -1;
     context.vertexid = 0;
     context.vertex_attribute_names = &vattrnames;
@@ -207,6 +210,10 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading Pajek file.", err);
     }
 
+    igraph_pajek_yylex_destroy(context.scanner);
+    igraph_bitset_destroy(&seen);
+    IGRAPH_FINALLY_CLEAN(2);
+
     /* Prepare attributes */
     const igraph_integer_t eattr_count = igraph_attribute_record_list_size(&eattrs);
     for (i = 0; i < eattr_count; i++) {
@@ -225,8 +232,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_trie_destroy(&eattrnames);
     igraph_attribute_record_list_destroy(&vattrs);
     igraph_trie_destroy(&vattrnames);
-    igraph_pajek_yylex_destroy(context.scanner);
-    IGRAPH_FINALLY_CLEAN(7); /* +1 for 'graph' */
+    IGRAPH_FINALLY_CLEAN(6); /* +1 for 'graph' */
 
     return IGRAPH_SUCCESS;
 }

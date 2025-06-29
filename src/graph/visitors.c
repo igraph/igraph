@@ -56,7 +56,7 @@
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param unreachable Logical scalar, whether the search should visit
+ * \param unreachable Boolean, whether the search should visit
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
@@ -384,8 +384,9 @@ igraph_error_t igraph_bfs_simple(
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
         igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvect,
-                                      mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, actvect, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         for (igraph_integer_t i = 0; i < nei_count; i++) {
             const igraph_integer_t neighbor = VECTOR(neis)[i];
@@ -442,7 +443,7 @@ igraph_error_t igraph_bfs_simple(
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param unreachable Logical scalar, whether the search should visit
+ * \param unreachable Boolean, whether the search should visit
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.

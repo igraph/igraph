@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -44,9 +42,7 @@ if (nodes_to_calc == 0) {
 }
 
 neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-if (neis == 0) {
-    IGRAPH_ERROR("local undirected transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-}
+IGRAPH_CHECK_OOM(neis, "Insufficient memory to count triangles.");
 IGRAPH_FINALLY(igraph_free, neis);
 
 IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));

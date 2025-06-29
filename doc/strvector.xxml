@@ -17,6 +17,7 @@
 <!-- doxrox-include igraph_strvector_set_len -->
 <!-- doxrox-include igraph_strvector_push_back -->
 <!-- doxrox-include igraph_strvector_push_back_len -->
+<!-- doxrox-include igraph_strvector_swap_elements -->
 <!-- doxrox-include igraph_strvector_remove -->
 <!-- doxrox-include igraph_strvector_remove_section -->
 <!-- doxrox-include igraph_strvector_append -->

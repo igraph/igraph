@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ARPACK_H
@@ -42,8 +37,7 @@ __BEGIN_DECLS
  * most appropriate for large sparse or structured matrices \c A where
  * structured means that a matrix-vector product <code>w &lt;- Av</code> requires
  * order \c n rather than the usual order <code>n^2</code> floating point
- * operations. Please see
- * http://www.caam.rice.edu/software/ARPACK/ for details.
+ * operations. Please see https://github.com/opencollab/arpack-ng for details.
  * </para>
  *
  * <para>

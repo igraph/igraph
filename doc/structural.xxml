@@ -38,19 +38,13 @@
 <!-- doxrox-include igraph_get_k_shortest_paths -->
 <!-- doxrox-include igraph_get_all_simple_paths -->
 <!-- doxrox-include igraph_average_path_length -->
-<!-- doxrox-include igraph_average_path_length_dijkstra -->
 <!-- doxrox-include igraph_path_length_hist -->
 <!-- doxrox-include igraph_diameter -->
-<!-- doxrox-include igraph_diameter_dijkstra -->
 <!-- doxrox-include igraph_girth -->
 <!-- doxrox-include igraph_eccentricity -->
-<!-- doxrox-include igraph_eccentricity_dijkstra -->
 <!-- doxrox-include igraph_radius -->
-<!-- doxrox-include igraph_radius_dijkstra -->
 <!-- doxrox-include igraph_graph_center -->
-<!-- doxrox-include igraph_graph_center_dijkstra -->
 <!-- doxrox-include igraph_pseudo_diameter -->
-<!-- doxrox-include igraph_pseudo_diameter_dijkstra -->
 <!-- doxrox-include igraph_voronoi -->
 <!-- doxrox-include igraph_vertex_path_from_edge_path -->
 </section>
@@ -202,10 +196,12 @@
 <!-- doxrox-include igraph_count_multiple_1 -->
 </section>
 
-<section id="mixing-patterns"><title>Mixing patterns</title>
+<section id="mixing-patterns"><title>Mixing patterns and degree correlations</title>
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_joint_type_distribution -->
 <!-- doxrox-include igraph_joint_degree_distribution -->
 <!-- doxrox-include igraph_joint_degree_matrix -->
@@ -220,6 +216,7 @@
 <!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
 <!-- doxrox-include igraph_feedback_arc_set -->
+<!-- doxrox-include igraph_feedback_vertex_set -->
 </section>
 
 <section id="maximum-cardinality-search-chordal-graphs"><title>Maximum cardinality search and chordal graphs</title>
@@ -244,14 +241,11 @@
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_has_mutual -->
-<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
-<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparse -->
 <!-- doxrox-include igraph_get_edgelist -->
-<!-- doxrox-include igraph_is_acyclic -->
 </section>
 
 </chapter>

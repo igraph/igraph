@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2020 The igraph development team
@@ -68,7 +67,7 @@ igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         if (loops) {
             for (j = no_of_nodes - 1; j >= *limit; j--) {
                 if (igraph_vector_int_empty(&neis) || j > igraph_vector_int_tail(&neis)) {

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2021  The igraph development team
@@ -416,7 +415,7 @@ igraph_error_t igraph_add_vertices(
 
     /* Add attributes if necessary. This section is protected with
      * FINALLY_ENTER/EXIT so that the graph would not be accidentally
-     * free upon error until it could be restored to a consistant state. */
+     * free upon error until it could be restored to a consistent state. */
 
     if (graph->attr) {
         igraph_error_t err;
@@ -865,46 +864,66 @@ igraph_integer_t igraph_ecount(const igraph_t *graph) {
  *        \c IGRAPH_ALL, both kinds of vertices are
  *        searched.
  *        This parameter is ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *        removes loop edges from the result. \c IGRAPH_LOOPS_ONCE
+ *        makes each loop edge appear only once in the result.
+ *        \c IGRAPH_LOOPS_TWICE makes loop edges appear \em twice in the
+ *        result if the graph is undirected or \p mode is set to \c IGRAPH_ALL
+ *        (and once otherwise as returning them twice does not make sense for
+ *        directed graphs).
+ * \param multiple Specifies how to treat multiple (parallel) edges.
+ *        \c IGRAPH_NO_MULTIPLE collapses parallel edges into a single one;
+ *        \c IGRAPH_MULTIPLE keeps the multiplicities of parallel edges
+ *        so the same neighbor will appear as many times in the result as the
+ *        number of parallel edges going between the two vertices.
  * \return Error code:
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *         \c IGRAPH_ENOMEM: not enough memory.
  *
- * Time complexity: O(d),
- * d is the number
- * of adjacent vertices to the queried vertex.
+ * Time complexity: O(d), d is the number of adjacent vertices to the queried
+ * vertex.
  *
  * \example examples/simple/igraph_neighbors.c
  */
-igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
-        igraph_neimode_t mode) {
-    if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
-        return igraph_i_neighbors(graph, neis, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
-    } else {
-        return igraph_i_neighbors(graph, neis, pnode, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+igraph_error_t igraph_neighbors(
+    const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
+    igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple
+) {
+#define DEDUPLICATE_IF_NEEDED(vertex, n)                                          \
+    if (should_filter_duplicates) {                                               \
+        if (vertex == pnode) {                                                    \
+            /* This is a loop edge */                                             \
+            if (loops == IGRAPH_NO_LOOPS) {                                       \
+                /* Filtering loop edges unconditionally */                        \
+                length -= n;                                                      \
+                continue;                                                         \
+            } else if (loops == IGRAPH_LOOPS_ONCE && vertex == last_added) {      \
+                /* Filtering every second endpoint of loop edges */               \
+                length -= n;                                                      \
+                last_added = -1;                                                  \
+                seen_loop = true;                                                 \
+                continue;                                                         \
+            } else if (multiple == IGRAPH_NO_MULTIPLE && seen_loop) {             \
+                /* Filtering multi-loop edges */                                  \
+                length -= n;                                                      \
+                continue;                                                         \
+            } else {                                                              \
+                seen_loop = (loops != IGRAPH_LOOPS_TWICE || last_added == vertex);\
+                last_added = vertex;                                              \
+            }                                                                     \
+        } else {                                                                  \
+            /* Not a loop edge */                                                 \
+            if (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added) {         \
+                /* Filtering multi-edges */                                       \
+                length -= n;                                                      \
+                continue;                                                         \
+            } else {                                                              \
+                last_added = vertex;                                              \
+            }                                                                     \
+        }                                                                         \
     }
-}
 
-igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
-        igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
-#define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
-    if (should_filter_duplicates) {                                                        \
-        if (                                                                               \
-            (loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
-            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)         \
-        ) {                                                                                \
-            length -= n;                                                                   \
-            if (loops == IGRAPH_LOOPS_ONCE) {                                              \
-                last_added = -1;                                                           \
-            }                                                                              \
-            continue;                                                                      \
-        } else if (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added) {               \
-            length -= n;                                                                   \
-            continue;                                                                      \
-        } else {                                                                           \
-            last_added = vertex;                                                           \
-        }                                                                                  \
-    }
 
     igraph_integer_t length = 0, idx = 0;
     igraph_integer_t i, j;
@@ -913,11 +932,17 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
     igraph_integer_t last_added = -1;
     igraph_bool_t should_filter_duplicates;
 
+    /* seen_loop stores whether we have already seen at least one full loop
+     * edge while iterating over the neighbor lists. This is needed to handle
+     * multi-loop edges properly. Since internally we always store loop edges
+     * twice, this flag should become true only if we processed both endpoints
+     * for a loop edge */
+    igraph_bool_t seen_loop = false;
+
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
+        IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVVID, node);
     }
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
-            mode != IGRAPH_ALL) {
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Mode should be either IGRAPH_OUT, IGRAPH_IN or IGRAPH_ALL.", IGRAPH_EINVMODE);
     }
 
@@ -926,9 +951,13 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
+        /*
         IGRAPH_ERROR("For a directed graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.", IGRAPH_EINVAL);
+        */
+        loops = IGRAPH_LOOPS_ONCE;
     }
+
     /* Calculate needed space first & allocate it */
     /* Note that 'mode' is treated as a bit field here; it's okay because
      * IGRAPH_ALL = IGRAPH_IN | IGRAPH_OUT, bit-wise */
@@ -941,9 +970,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
 
     IGRAPH_CHECK(igraph_vector_int_resize(neis, length));
 
-    /* The loops below produce an ordering what is consistent with the
-     * ordering returned by igraph_neighbors(), and this should be preserved.
-     * We are dealing with two sorted lists; one for the successors and one
+    /* We are dealing with two sorted lists; one for the successors and one
      * for the predecessors. If we have requested only one of them, we have
      * an easy job. If we have requested both, we need to merge the two lists
      * to ensure that the output is sorted by the vertex IDs of the "other"
@@ -1009,14 +1036,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
                 i2++;
                 DEDUPLICATE_IF_NEEDED(n1, 2);
                 VECTOR(*neis)[idx++] = n1;
-                if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE))) {
-                    length--;
-                    if (loops == IGRAPH_LOOPS_ONCE) {
-                        last_added = -1;
-                    }
-                    continue;
-                }
+                DEDUPLICATE_IF_NEEDED(n2, 1);
                 VECTOR(*neis)[idx++] = n2;
             }
         }
@@ -1097,7 +1117,7 @@ static igraph_error_t igraph_i_create_start_vectors(
  * \brief Is this a directed graph?
  *
  * \param graph The graph.
- * \return Logical value, \c true if the graph is directed,
+ * \return Boolean value, \c true if the graph is directed,
  * \c false otherwise.
  *
  * Time complexity: O(1)
@@ -1134,11 +1154,23 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * Time complexity: O(1) if \p loops is \c true, and
  * O(d) otherwise, where d is the degree.
  */
-igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
-                               igraph_integer_t vid, igraph_neimode_t mode, igraph_bool_t loops) {
+igraph_error_t igraph_degree_1(
+    const igraph_t *graph, igraph_integer_t *deg, igraph_integer_t vid,
+    igraph_neimode_t mode, igraph_loops_t loops
+) {
+    igraph_integer_t loop_counter;
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    if (loops != IGRAPH_NO_LOOPS && loops != IGRAPH_LOOPS_ONCE &&
+        loops != IGRAPH_LOOPS_TWICE) {
+        IGRAPH_ERROR("Invalid loops argument.", IGRAPH_EINVAL);
+    }
+
+    if (loops == IGRAPH_LOOPS_ONCE && (mode & IGRAPH_ALL) != IGRAPH_ALL) {
+        loops = IGRAPH_LOOPS_TWICE;
     }
 
     *deg = 0;
@@ -1148,22 +1180,31 @@ igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
     if (mode & IGRAPH_IN) {
         *deg += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
     }
-    if (! loops) {
+
+    if (loops != IGRAPH_LOOPS_TWICE) {
         /* When loops should not be counted, we remove their contribution from the
          * previously computed degree. */
+        loop_counter = 0;
         if (mode & IGRAPH_OUT) {
             for (igraph_integer_t i = VECTOR(graph->os)[vid]; i < VECTOR(graph->os)[vid + 1]; i++) {
                 if (VECTOR(graph->to)[ VECTOR(graph->oi)[i] ] == vid) {
-                    *deg -= 1;
+                    loop_counter++;
                 }
             }
         }
         if (mode & IGRAPH_IN) {
             for (igraph_integer_t i = VECTOR(graph->is)[vid]; i < VECTOR(graph->is)[vid + 1]; i++) {
                 if (VECTOR(graph->from)[ VECTOR(graph->ii)[i] ] == vid) {
-                    *deg -= 1;
+                    loop_counter++;
                 }
             }
+        }
+
+        if (loops == IGRAPH_NO_LOOPS || mode != IGRAPH_ALL) {
+            *deg -= loop_counter;
+        } else {
+            /* loops == IGRAPH_LOOPS_ONCE && mode == IGRAPH_ALL */
+            *deg -= loop_counter / 2;
         }
     }
 
@@ -1195,8 +1236,10 @@ igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
  *        \c IGRAPH_ALL, total degree (sum of the
  *        in- and out-degree).
  *        This parameter is ignored for undirected graphs.
- * \param loops Boolean, gives whether the self-loops should be
- *        counted.
+ * \param loops Specifies how to treat loop edges when calculating the
+ *        degree. \c IGRAPH_NO_LOOPS ignores loop edges; \c IGRAPH_LOOPS_ONCE
+ *        counts each loop edge only once; \c IGRAPH_LOOPS_TWICE counts each
+ *        loop edge twice in undirected graphs and once in directed graphs.
  * \return Error code:
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
@@ -1213,9 +1256,10 @@ igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
  *
  * \example examples/simple/igraph_degree.c
  */
-igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
-                  const igraph_vs_t vids,
-                  igraph_neimode_t mode, igraph_bool_t loops) {
+igraph_error_t igraph_degree(
+    const igraph_t *graph, igraph_vector_int_t *res, const igraph_vs_t vids,
+    igraph_neimode_t mode, igraph_loops_t loops
+) {
 
     igraph_integer_t nodes_to_calc;
     igraph_integer_t i, j;
@@ -1228,13 +1272,19 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
         IGRAPH_ERROR("Invalid mode for degree calculation.", IGRAPH_EINVMODE);
     }
 
-    if (! loops) {
+    if (loops == IGRAPH_NO_LOOPS || loops == IGRAPH_LOOPS_ONCE) {
         /* If the graph is known not to have loops, we can use the faster
-         * loops == true code path, which has O(1) complexity instead of of O(d). */
+         * loops == IGRAPH_LOOPS_TWICE code path, which has O(1) complexity
+         * instead of of O(d). */
         if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
             !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
-            loops = true;
+            loops = IGRAPH_LOOPS_TWICE;
         }
+    }
+
+    if (loops == IGRAPH_LOOPS_ONCE && mode != IGRAPH_ALL) {
+        /* We can use the faster loops == IGRAPH_LOOPS_TWICE path again */
+        loops = IGRAPH_LOOPS_TWICE;
     }
 
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
@@ -1245,7 +1295,7 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
     IGRAPH_CHECK(igraph_vector_int_resize(res, nodes_to_calc));
     igraph_vector_int_null(res);
 
-    if (loops) {
+    if (loops == IGRAPH_LOOPS_TWICE) {
         if (mode & IGRAPH_OUT) {
             for (IGRAPH_VIT_RESET(vit), i = 0;
                  !IGRAPH_VIT_END(vit);
@@ -1262,56 +1312,105 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                 VECTOR(*res)[i] += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
             }
         }
-    } else if (igraph_vs_is_all(&vids)) { /* no loops, calculating degree for all vertices */
-        // When calculating degree for all vertices, iterating over edges is faster
-        igraph_integer_t no_of_edges = igraph_ecount(graph);
+    } else if (loops == IGRAPH_LOOPS_ONCE) {
+        IGRAPH_ASSERT((mode & IGRAPH_ALL) == IGRAPH_ALL);
 
-        if (mode & IGRAPH_OUT) {
+        /* We arbitrarily count loop edges in the (mode & IGRAPH_OUT) branch but
+         * not in the (mode & IGRAPH_IN) branch */
+
+        if (igraph_vs_is_all(&vids)) {
+            // When calculating degree for all vertices, iterating over edges is faster
+            igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+            /* mode & IGRAPH_OUT branch */
             for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
                 igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                if (from != IGRAPH_TO(graph, edge)) {
-                    VECTOR(*res)[from]++;
-                }
+                VECTOR(*res)[from]++;
             }
-        }
-        if (mode & IGRAPH_IN) {
+
+            /* mode & IGRAPH_IN branch */
             for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
                 igraph_integer_t to = IGRAPH_TO(graph, edge);
                 if (IGRAPH_FROM(graph, edge) != to) {
                     VECTOR(*res)[to]++;
                 }
             }
-        }
-    } else { /* no loops */
-        if (mode & IGRAPH_OUT) {
+        } else {
+            /* mode & IGRAPH_OUT branch */
             for (IGRAPH_VIT_RESET(vit), i = 0;
-                 !IGRAPH_VIT_END(vit);
-                 IGRAPH_VIT_NEXT(vit), i++) {
+                !IGRAPH_VIT_END(vit);
+                IGRAPH_VIT_NEXT(vit), i++) {
                 igraph_integer_t vid = IGRAPH_VIT_GET(vit);
                 VECTOR(*res)[i] += (VECTOR(graph->os)[vid + 1] - VECTOR(graph->os)[vid]);
-                for (j = VECTOR(graph->os)[vid];
-                     j < VECTOR(graph->os)[vid + 1]; j++) {
-                    if (VECTOR(graph->to)[ VECTOR(graph->oi)[j] ] == vid) {
-                        VECTOR(*res)[i] -= 1;
-                    }
-                }
             }
-        }
-        if (mode & IGRAPH_IN) {
+
+            /* mode & IGRAPH_IN branch */
             for (IGRAPH_VIT_RESET(vit), i = 0;
-                 !IGRAPH_VIT_END(vit);
-                 IGRAPH_VIT_NEXT(vit), i++) {
+                !IGRAPH_VIT_END(vit);
+                IGRAPH_VIT_NEXT(vit), i++) {
                 igraph_integer_t vid = IGRAPH_VIT_GET(vit);
                 VECTOR(*res)[i] += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
                 for (j = VECTOR(graph->is)[vid];
-                     j < VECTOR(graph->is)[vid + 1]; j++) {
+                    j < VECTOR(graph->is)[vid + 1]; j++) {
                     if (VECTOR(graph->from)[ VECTOR(graph->ii)[j] ] == vid) {
                         VECTOR(*res)[i] -= 1;
                     }
                 }
             }
         }
-    }  /* loops */
+    } else {
+        /* no loops should be counted */
+        if (igraph_vs_is_all(&vids)) {
+            // When calculating degree for all vertices, iterating over edges is faster
+            igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+            if (mode & IGRAPH_OUT) {
+                for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                    igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                    if (from != IGRAPH_TO(graph, edge)) {
+                        VECTOR(*res)[from]++;
+                    }
+                }
+            }
+            if (mode & IGRAPH_IN) {
+                for (igraph_integer_t edge = 0; edge < no_of_edges; ++edge) {
+                    igraph_integer_t to = IGRAPH_TO(graph, edge);
+                    if (IGRAPH_FROM(graph, edge) != to) {
+                        VECTOR(*res)[to]++;
+                    }
+                }
+            }
+        } else {
+            if (mode & IGRAPH_OUT) {
+                for (IGRAPH_VIT_RESET(vit), i = 0;
+                    !IGRAPH_VIT_END(vit);
+                    IGRAPH_VIT_NEXT(vit), i++) {
+                    igraph_integer_t vid = IGRAPH_VIT_GET(vit);
+                    VECTOR(*res)[i] += (VECTOR(graph->os)[vid + 1] - VECTOR(graph->os)[vid]);
+                    for (j = VECTOR(graph->os)[vid];
+                        j < VECTOR(graph->os)[vid + 1]; j++) {
+                        if (VECTOR(graph->to)[ VECTOR(graph->oi)[j] ] == vid) {
+                            VECTOR(*res)[i] -= 1;
+                        }
+                    }
+                }
+            }
+            if (mode & IGRAPH_IN) {
+                for (IGRAPH_VIT_RESET(vit), i = 0;
+                    !IGRAPH_VIT_END(vit);
+                    IGRAPH_VIT_NEXT(vit), i++) {
+                    igraph_integer_t vid = IGRAPH_VIT_GET(vit);
+                    VECTOR(*res)[i] += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
+                    for (j = VECTOR(graph->is)[vid];
+                        j < VECTOR(graph->is)[vid + 1]; j++) {
+                        if (VECTOR(graph->from)[ VECTOR(graph->ii)[j] ] == vid) {
+                            VECTOR(*res)[i] -= 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1395,9 +1494,9 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  *        will be returned.
  * \param from The starting point of the edge.
  * \param to The end point of the edge.
- * \param directed Logical constant, whether to search for directed
+ * \param directed Boolean, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
- * \param error Logical scalar, whether to report an error if the edge
+ * \param error Boolean, whether to report an error if the edge
  *        was not found. If it is false, then <code>-1</code> will be
  *        assigned to \p eid. Note that invalid vertex IDs in input
  *        arguments (\p from or \p to) always trigger an error,
@@ -1412,8 +1511,6 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  * d2 is the minimum of the out-degree of \c to and the in-degree of \c from.
  *
  * \example examples/simple/igraph_get_eid.c
- *
- * Added in version 0.2.</para><para>
  */
 
 igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
@@ -1480,9 +1577,9 @@ igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
  * \param eids Pointer to an initialized vector, the result is stored
  *        here. It will be resized as needed.
  * \param pairs Vector giving pairs of vertices to fetch the edges for.
- * \param directed Logical scalar, whether to consider edge directions
+ * \param directed Boolean, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
- * \param error Logical scalar, whether it is an error to supply
+ * \param error Boolean, whether it is an error to supply
  *        non-connected vertices. If false, then -1 is
  *        returned for non-connected pairs.
  * \return Error code.
@@ -1601,7 +1698,7 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
  *        here. It will be resized as needed.
  * \param source The ID of the source vertex
  * \param target The ID of the target vertex
- * \param directed Logical scalar, whether to consider edge directions
+ * \param directed Boolean, whether to consider edge directions
  *        in directed graphs. This is ignored for undirected graphs.
  * \return Error code.
  *
@@ -1648,39 +1745,38 @@ igraph_error_t igraph_get_all_eids_between(
  * \brief Gives the incident edges of a vertex.
  *
  * \param graph The graph object.
- * \param eids An initialized vector. It will be resized
- * to hold the result.
+ * \param eids An initialized vector. It will be resized to hold the result.
  * \param pnode A vertex ID.
  * \param mode Specifies what kind of edges to include for directed
- * graphs. \c IGRAPH_OUT means only outgoing edges, \c IGRAPH_IN only
- * incoming edges, \c IGRAPH_ALL both. This parameter is ignored for
- * undirected graphs.
- * \return Error code. \c IGRAPH_EINVVID: invalid \p pnode argument,
- *   \c IGRAPH_EINVMODE: invalid \p mode argument.
- *
- * Added in version 0.2.</para><para>
+ *        graphs. \c IGRAPH_OUT means only outgoing edges, \c IGRAPH_IN means
+ *        only incoming edges, \c IGRAPH_ALL means both. This parameter is
+ *        ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *        removes loop edges from the result. \c IGRAPH_LOOPS_ONCE
+ *        makes each loop edge appear only once in the result.
+ *        \c IGRAPH_LOOPS_TWICE makes loop edges appear \em twice in the
+ *        result if the graph is undirected or \p mode is set to \c IGRAPH_ALL
+ *        (and once otherwise as returning them twice does not make sense for
+ *        directed graphs).
+ * \return Error code:
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
+ *         \c IGRAPH_ENOMEM: not enough memory.
  *
  * Time complexity: O(d), the number of incident edges to \p pnode.
  */
 
-igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-        igraph_neimode_t mode) {
-    if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE);
-    } else {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_ONCE);
-    }
-}
-
-igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-        igraph_neimode_t mode, igraph_loops_t loops) {
+igraph_error_t igraph_incident(
+    const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
+    igraph_neimode_t mode, igraph_loops_t loops
+) {
     igraph_integer_t length = 0, idx = 0;
     igraph_integer_t i, j;
     igraph_integer_t node = pnode;
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
-        IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
+        IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVVID, node);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
@@ -1692,8 +1788,11 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
     }
 
     if (mode != IGRAPH_ALL && loops == IGRAPH_LOOPS_TWICE) {
+        /*
         IGRAPH_ERROR("For a directed graph (with directions not ignored), "
                      "IGRAPH_LOOPS_TWICE does not make sense.", IGRAPH_EINVAL);
+        */
+        loops = IGRAPH_LOOPS_ONCE;
     }
 
     /* Calculate needed space first & allocate it */
@@ -1804,7 +1903,6 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
     }
     IGRAPH_CHECK(igraph_vector_int_resize(eids, length));
     return IGRAPH_SUCCESS;
-#undef DEDUPLICATE_IF_NEEDED
 }
 
 

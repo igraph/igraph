@@ -1,9 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
-   IGraph R package.
-   Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2014-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
@@ -31,7 +25,7 @@
 
 int intersect(void) {
 
-    float negative[][8] = {
+    igraph_real_t negative[][8] = {
         { 1, 2, 2, 2, 1, 1, 2, 1 }, /* 1 */
         { 1, 2, 1, 1, 2, 2, 2, 1 }, /* 2 */
         { 1, 0, 0, 1, 2, 0, 3, 1 }, /* 3 */
@@ -43,7 +37,7 @@ int intersect(void) {
         { 0, 0, 5, 5, 3, 2, 3, 2 }  /* 9 */
     };
 
-    float positive[][8] = {
+    igraph_real_t positive[][8] = {
         { 0, 1, 2, 1, 1, 0, 1, 2 }, /* 10 */
         { 0, 2, 5, 2, 1, 1, 4, 3 }, /* 11 */
         { 0, 0, 0, 3, 0, 1, 5, 1 }, /* 12 */
@@ -53,22 +47,23 @@ int intersect(void) {
     /* { 0,0,1,1, 1,1,1,1 }, /\* 15 *\/ */
     /* { 0,0,2,2, 1,1,1,1 }}; /\* 16 *\/ */
 
-    int no_neg = sizeof(negative) / sizeof(float) / 8;
-    int no_pos = sizeof(positive) / sizeof(float) / 8;
-    int i;
+    int no_neg = sizeof(negative) / sizeof(igraph_real_t) / 8;
+    int no_pos = sizeof(positive) / sizeof(igraph_real_t) / 8;
 
-    for (i = 0; i < no_neg; i++) {
-        float *co = negative[i];
-        if (igraph_i_layout_segments_intersect(co[0], co[1], co[2], co[3],
-                                        co[4], co[5], co[6], co[7])) {
+    for (int i = 0; i < no_neg; i++) {
+        igraph_real_t *co = negative[i];
+        if (igraph_i_layout_segments_intersect(
+                co[0], co[1], co[2], co[3],
+                co[4], co[5], co[6], co[7])) {
             return i + 1;
         }
     }
 
-    for (i = 0; i < no_pos; i++) {
-        float *co = positive[i];
-        if (!igraph_i_layout_segments_intersect(co[0], co[1], co[2], co[3],
-                                         co[4], co[5], co[6], co[7])) {
+    for (int i = 0; i < no_pos; i++) {
+        igraph_real_t *co = positive[i];
+        if (!igraph_i_layout_segments_intersect(
+                co[0], co[1], co[2], co[3],
+                co[4], co[5], co[6], co[7])) {
             return no_neg + i + 1;
         }
     }
@@ -89,11 +84,11 @@ int distance(void) {
     };
 
     int no = sizeof(configs) / sizeof(igraph_real_t) / 8;
-    int i;
 
-    for (i = 0; i < no; i++) {
+    for (int i = 0; i < no; i++) {
         igraph_real_t *co = configs[i];
-        igraph_real_t res = igraph_i_layout_point_segment_dist2(co[0], co[1], co[2], co[3], co[4], co[5]);
+        igraph_real_t res = igraph_i_layout_point_segment_dist2(
+            co[0], co[1], co[2], co[3], co[4], co[5]);
         if (fabs(res - co[6]) > 1e-12) {
             printf("%g\n", (double) res);
             return i + 1;
@@ -108,7 +103,8 @@ void check_layout_davidson_harel(void) {
     igraph_matrix_t res;
     igraph_bool_t use_seed;
     igraph_integer_t maxiter, fineiter;
-    igraph_real_t  cool_fact, weight_node_dist, weight_border, weight_edge_lengths, weight_edge_crossings, weight_node_edge_dist;
+    igraph_real_t cool_fact, weight_node_dist, weight_border;
+    igraph_real_t weight_edge_lengths, weight_edge_crossings, weight_node_edge_dist;
 
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_matrix_init(&res, 0, 0);

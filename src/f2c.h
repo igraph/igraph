@@ -46,6 +46,9 @@ typedef char integer1;
     typedef short ftnlen;
     typedef short ftnint;
 #else
+    /* Note by @szhorvat: 'ftnint' must be kept the same size as 'integer',
+     * as some of the f2c-generated code passes `integer *` where 'ftnint *'
+     * is expected. */
     typedef int flag;
     typedef int ftnlen;
     typedef int ftnint;

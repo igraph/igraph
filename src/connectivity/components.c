@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -27,7 +26,6 @@
 #include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -70,7 +68,7 @@ static igraph_error_t igraph_i_connected_components_strong(
  *    \cli IGRAPH_WEAK
  *       Compute weakly connected components, i.e. ignore edge directions.
  *    \cli IGRAPH_STRONG
- *       Compute strongly connnected components, i.e. considr edge directions.
+ *       Compute strongly connnected components, i.e. consider edge directions.
  *    \endclist
  *    This parameter is ignored for undirected graphs.
  * \return Error code.
@@ -160,7 +158,9 @@ static igraph_error_t igraph_i_connected_components_weak(
 
         while ( !igraph_dqueue_int_empty(&q) ) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, act_node, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
@@ -411,7 +411,7 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  * time.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored
+ * \param res Pointer to a Boolean variable, the result will be stored
  *        here.
  * \param mode For a directed graph this specifies whether to calculate
  *        weak or strong connectedness. Possible values:
@@ -420,6 +420,9 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  *        ignored for undirected graphs.
  * \return Error code:
  *        \c IGRAPH_EINVAL: invalid mode argument.
+ *
+ * \sa \ref igraph_connected_components() to find the connected components,
+ * \ref igraph_is_biconnected() to check if the graph is 2-vertex-connected.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices
@@ -513,7 +516,9 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
 
         const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, actnode, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {
@@ -583,7 +588,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  *    want to limit the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. For example, supplying 2 here ignored isolated vertices.
+ *    vector. For example, supplying 2 here ignores isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *
@@ -598,13 +603,18 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                      igraph_connectedness_t mode,
                      igraph_integer_t maxcompno, igraph_integer_t minelements) {
-    if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
-    } else if (mode == IGRAPH_STRONG) {
-        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_WEAK;
     }
 
-    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
+    switch (mode) {
+    case IGRAPH_WEAK:
+        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
+    case IGRAPH_STRONG:
+        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    default:
+        IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
@@ -661,7 +671,9 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         while (!igraph_dqueue_int_empty(&q) ) {
             /* pop from the queue of this component */
             igraph_integer_t actvert = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvert, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, actvert, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             /* iterate over the neighbors */
             for (i = 0; i < nei_count; i++) {
@@ -686,7 +698,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
             graph, &newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
-            /* invmap = */ 0, /* map_is_prepared = */ 1
+            /* invmap = */ NULL, /* map_is_prepared = */ true
         ));
         IGRAPH_FINALLY(igraph_destroy, &newg);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
@@ -1537,7 +1549,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
  * a given set of vertices and the edges between them;
  * \ref igraph_reachability() to efficiently compute the reachable set from \em all
- * vertices.
+ * vertices; \ref igraph_neighborhood() to find vertices within a given distance.
  */
 igraph_error_t igraph_subcomponent(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vertex,
@@ -1573,7 +1585,7 @@ igraph_error_t igraph_subcomponent(
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, mode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
         vsize = igraph_vector_int_size(&tmp);
         for (i = 0; i < vsize; i++) {
             igraph_integer_t neighbor = VECTOR(tmp)[i];

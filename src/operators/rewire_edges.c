@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -88,7 +86,7 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
         ADD_STUB(from, idx1);
         ADD_STUB(to, idx2);
     }
-    IGRAPH_CHECK(igraph_vector_int_order1(&tmp, &eorder, no_verts));
+    IGRAPH_CHECK(igraph_i_vector_int_order(&tmp, &eorder, no_verts));
     igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -135,7 +133,7 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
     for (i = 0; i < no_edges; i++) {
         VECTOR(tmp)[i] = VECTOR(*edges)[2 * i + 1];
     }
-    IGRAPH_CHECK(igraph_vector_int_order1(&tmp, &eorder, no_verts));
+    IGRAPH_CHECK(igraph_i_vector_int_order(&tmp, &eorder, no_verts));
     igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 

@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -13,28 +13,28 @@
 #include "f2c.h"
 
 
-/* \SCCS Information: @(#)   
-   FILE: stats.F   SID: 2.1   DATE OF SID: 4/19/96   RELEASE: 2   
-       %---------------------------------------------%   
-       | Initialize statistic and timing information |   
-       | for symmetric Arnoldi code.                 |   
-       %---------------------------------------------%   
+/* \SCCS Information: @(#)
+   FILE: stats.F   SID: 2.1   DATE OF SID: 4/19/96   RELEASE: 2
+       %---------------------------------------------%
+       | Initialize statistic and timing information |
+       | for symmetric Arnoldi code.                 |
+       %---------------------------------------------%
    Subroutine */ int igraphdstats_(void)
 {
-    integer nbx, nopx;
-    real trvec, tmvbx, tgetv0, tsaup2;
-    integer nitref;
-    real titref, tseigt, tsaupd, tsaitr, tsgets, tsapps;
-    integer nrorth;
-    real tsconv;
-    integer nrstrt;
-    real tmvopx;
+    integer nbx=0, nopx=0;
+    real trvec=0, tmvbx=0, tgetv0=0, tsaup2=0;
+    integer nitref=0;
+    real titref=0, tseigt=0, tsaupd=0, tsaitr=0, tsgets=0, tsapps=0;
+    integer nrorth=0;
+    real tsconv=0;
+    integer nrstrt=0;
+    real tmvopx=0;
 
-/*     %--------------------------------%   
-       | See stat.doc for documentation |   
-       %--------------------------------%   
-       %-----------------------%   
-       | Executable Statements |   
+/*     %--------------------------------%
+       | See stat.doc for documentation |
+       %--------------------------------%
+       %-----------------------%
+       | Executable Statements |
        %-----------------------% */
     nopx = 0;
     nbx = 0;
@@ -51,8 +51,8 @@
     titref = 0.f;
     tgetv0 = 0.f;
     trvec = 0.f;
-/*     %----------------------------------------------------%   
-       | User time including reverse communication overhead |   
+/*     %----------------------------------------------------%
+       | User time including reverse communication overhead |
        %----------------------------------------------------% */
     tmvopx = 0.f;
     tmvbx = 0.f;

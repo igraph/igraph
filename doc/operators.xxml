@@ -27,6 +27,7 @@
 <!-- doxrox-include igraph_connect_neighborhood -->
 <!-- doxrox-include igraph_contract_vertices -->
 <!-- doxrox-include igraph_graph_power -->
+<!-- doxrox-include igraph_product -->
 <!-- doxrox-include igraph_induced_subgraph -->
 <!-- doxrox-include igraph_induced_subgraph_map -->
 <!-- doxrox-include igraph_induced_subgraph_edges -->

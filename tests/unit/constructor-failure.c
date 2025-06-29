@@ -84,7 +84,7 @@ int main(void) {
     igraph_vector_bool_t bvalues;
     igraph_vector_bool_init(&bvalues, 0);
 
-    const igraph_vector_int_t edges; /* 2 edges */
+    const igraph_vector_int_t edges = IGRAPH_VECTOR_NULL; /* 2 edges */
     igraph_vector_int_init_int((igraph_vector_int_t *) &edges, 4, 0,1, 1,2);
 
     /* attr1, numeric, 3 values */

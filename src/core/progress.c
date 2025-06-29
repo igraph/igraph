@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -23,7 +22,7 @@
 
 #include "igraph_progress.h"
 
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 static IGRAPH_THREAD_LOCAL igraph_progress_handler_t *igraph_i_progress_handler = 0;
 static IGRAPH_THREAD_LOCAL char igraph_i_progressmsg_buffer[1000];

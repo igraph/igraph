@@ -4,7 +4,7 @@
 #include "igraph_foreign.h"
 #include "igraph_memory.h"
 
-#include "config.h"
+#include "config.h" /* HAVE_XLOCALE */
 
 #include <ctype.h>
 #include <errno.h>

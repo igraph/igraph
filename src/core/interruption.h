@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -26,7 +25,8 @@
 
 #include "igraph_decls.h"
 #include "igraph_interrupt.h"
-#include "config.h"
+
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 __BEGIN_DECLS
 

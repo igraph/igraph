@@ -175,7 +175,7 @@ igraph_integer_t igraph_i_clz64(igraph_uint_t x) {
 igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size) {
     igraph_integer_t alloc_size = IGRAPH_BIT_NSLOTS(size);
     bitset->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_uint_t);
-    IGRAPH_CHECK_OOM(bitset->stor_begin, "Cannot initialize bitset");
+    IGRAPH_CHECK_OOM(bitset->stor_begin, "Cannot initialize bitset.");
     bitset->size = size;
     bitset->stor_end = bitset->stor_begin + alloc_size;
     return IGRAPH_SUCCESS;
@@ -230,6 +230,37 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
     IGRAPH_ASSERT(src != NULL);
     IGRAPH_ASSERT(src->stor_begin != NULL);
     IGRAPH_CHECK(igraph_bitset_init(dest, src->size));
+    for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
+        VECTOR(*dest)[i] = VECTOR(*src)[i];
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup bitset
+ * \function igraph_bitset_update
+ * \brief Update a bitset from another one.
+ *
+ * \experimental
+ *
+ * The size and contents of \p dest will be identical to that of \p src.
+ *
+ * \param dest Pointer to an initialized bitset object. This will be updated.
+ * \param src The bitset to update from.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, usually
+ * O(n/w),
+ * n is the size of the bitset,
+ * w is the word size of the machine (32 or 64).
+ */
+
+igraph_error_t igraph_bitset_update(igraph_bitset_t *dest, const igraph_bitset_t *src) {
+    IGRAPH_ASSERT(src != NULL);
+    IGRAPH_ASSERT(src->stor_begin != NULL);
+    IGRAPH_CHECK(igraph_bitset_reserve(dest, src->size));
+    dest->size = src->size;
     for (igraph_integer_t i = 0; i < IGRAPH_BIT_NSLOTS(dest->size); ++i) {
         VECTOR(*dest)[i] = VECTOR(*src)[i];
     }

@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2005-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,16 +13,12 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ATTRIBUTES_H
 #define IGRAPH_ATTRIBUTES_H
 
-#include "igraph_config.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_datatype.h"
@@ -270,49 +264,61 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    member of the \c igraph_t object properly. The caller will set the
  *    \c attr member to a null pointer after this function returns.
  * \member copy This function is called when the C core wants to populate the
- *    attributes of a graph from another graph. The struvture of the target
+ *    attributes of a graph from another graph. The structure of the target
  *    graph is already initialized by the time this function is called, and the
- *    \c attr member of the graph is set to null pointer. The function is
+ *    \c attr member of the graph is set to a null pointer. The function is
  *    supposed to populate the \c attr member of the target \c igraph_t object
  *    to a non-null value \em or return an error code. Leaving the \c attr
  *    member at a null value while returning success is invalid and will trigger
  *    an error in the C core of igraph itself.
- * \member add_vertices Called when vertices are added to a
- *    graph, before adding the vertices themselves.
- *    The number of vertices to add is supplied as an
- *    argument. Expected to return an error code.
+ * \member add_vertices Called when vertices are added to a graph, after the
+ *    base data structure was modified. The number of vertices that were added is
+ *    supplied as an argument. The function is supposed to set up default values
+ *    for each vertex attribute that is currently registered on the graph, for
+ *    all the newly added vertices. Expected to return an error code.
  * \member permute_vertices Called when a new graph is created based on an
  *    existing one such that there is a mapping from the vertices of the new
  *    graph back to the vertices of the old graph (e.g. if vertices are removed
  *    from a graph). The supplied index vector defines which old vertex
- *    a new vertex corresponds to. Its length must be the same as the
- *    number of vertices in the new graph. Note that the old and the new graph
- *    may be the same. If the two graph instances are \em not the same, implementors
- *    may safely assume that the new graph has no vertex attributes yet (but it
- *    may already have graph or edge attributes by the time this function is
- *    called).
+ *    a new vertex corresponds to. Its length is the same as the number of
+ *    vertices in the new graph, and for each new vertex it provides the ID
+ *    of the corresponding vertex in the old graph. The function is supposed to
+ *    set up the values of the vertex attributes of the new graph based on the
+ *    attributes of the old graph and the provided index vector. Note that the
+ *    old and the new graph \em may be the same, in which case it is the
+ *    responsibility of the function to ensure that the operation can safely be
+ *    performed in-place. If the two graph instances are \em not the same,
+ *    implementors may safely assume that the new graph has no vertex attributes
+ *    yet (but it may already have graph or edge attributes by the time this
+ *    function is called).
  * \member combine_vertices This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of vertices
- *    from another graph. The function is after the new graph was created.
+ *    from another graph. The function is called after the new graph was created.
  *    An argument specifies how several vertices from the old graph map to a
  *    single vertex in the new graph. It is guaranteed that the old and the
  *    new graph instances are different when this callback is called.
  *    Implementors may safely assume that the new graph has no vertex attributes
  *    yet (but it may already have graph or edge attributes by the time this
  *    function is called).
- * \member add_edges Called when new edges have been added. The number
- *    of new edges are supplied as well. It is expected to return an
- *    error code.
- * \member permute_edges Called when a new graph is created and
- *    some of the new edges should carry the attributes of some of the
- *    old edges. The idx vector shows the mapping between the old edges and
- *    the new ones. Its length is the same as the number of edges in the new
- *    graph, and for each edge it gives the ID of the old edge (the edge in
- *    the old graph). Note that the old and the new graph instances \em may
- *    be the same. If the two graph instances are \em not the same, implementors
- *    may safely assume that the new graph has no edge attributes yet (but it
- *    may already have graph or vertex attributes by the time this function is
- *    called).
+ * \member add_edges Called when new edges are added to a graph, after the
+ *    base data structure was modified. A vector containing the endpoints of the
+ *    new edges are supplied as an argument. The function is supposd to set up
+ *    default values for each edge attribute that is currently registered on the
+ *    graph, for all the newly added edges. Expected to return an error code.
+ * \member permute_edges Called when a new graph is created based on an
+ *    existing one such that some of the edges in the new graph should copy the
+ *    attributes of some edges from the old graph (this also includes the
+ *    deletion of edges). The supplied index vector defines which old edge a new
+ *    edge corresponds to. Its length is the same as the number of edges in the
+ *    new graph, and for each edge it provides the ID of the correspnding edge
+ *    in the old graph. The function is supposed to set up the values of the
+ *    edge attributes of the new graph based on the attributes of the old graph
+ *    and the provided index vector. Note that the old and the new graph \em may
+ *    be the same, in which case it is the responsibility of the function to
+ *    ensure that the operation can safely be performed in-place. If the two
+ *    graph instances are \em not the same, implementors may safely assume that
+ *    the new graph has no edge attributes yet (but it may already have graph or
+ *    vertex attributes by the time this function is called).
  * \member combine_edges This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of edges
  *    from another graph. The function is after the new graph was created.
@@ -326,35 +332,49 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    types should be returned.
  * \member has_attr Check whether a graph has the named
  *    graph/vertex/edge attribute.
- * \member gettype Query the type of a graph/vertex/edge attribute.
+ * \member get_type Query the type of a graph/vertex/edge attribute.
  * \member get_numeric_graph_attr Query a numeric graph attribute. The
- *    value should be placed as the first element of the \p value
- *    vector.
+ *    value should be appended to the provided \p value vector. No assumptions
+ *    should be made about the initial contents of the \p value vector and it is
+ *    not guaranteed to be empty.
  * \member get_string_graph_attr Query a string graph attribute. The
- *    value should be placed as the first element of the \p value
- *    string vector.
+ *    value should be appended to the provided \p value vector. No assumptions
+ *    should be made about the initial contents of the \p value vector and it is
+ *    not guaranteed to be empty.
  * \member get_bool_graph_attr Query a boolean graph attribute. The
- *    value should be placed as the first element of the \p value
- *    boolean vector.
+ *    value should be appended to the provided \p value vector. No assumptions
+ *    should be made about the initial contents of the \p value vector and it is
+ *    not guaranteed to be empty.
  * \member get_numeric_vertex_attr Query a numeric vertex attribute,
- *    for the vertices included in \p vs.
+ *    for the vertices included in \p vs. The attribute values should be
+ *    appended to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_string_vertex_attr Query a string vertex attribute,
- *    for the vertices included in \p vs.
+ *    for the vertices included in \p vs. The attribute values should be
+ *    appended to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_bool_vertex_attr Query a boolean vertex attribute,
- *    for the vertices included in \p vs.
+ *    for the vertices included in \p vs. The attribute values should be
+ *    appended to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_numeric_edge_attr Query a numeric edge attribute, for
- *    the edges included in \p es.
+ *    the edges included in \p es. The attribute values should be appended
+ *    to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_string_edge_attr Query a string edge attribute, for the
- *    edges included in \p es.
+ *    the edges included in \p es. The attribute values should be appended
+ *    to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  * \member get_bool_edge_attr Query a boolean edge attribute, for the
- *    edges included in \p es.
- *
- * Note that the <function>get_*_*_attr</function> are allowed to
- * convert the attributes to numeric or string. E.g. if a vertex attribute
- * is a GNU R complex data type, then
- * <function>get_string_vertex_attribute</function> may serialize it
- * into a string, but this probably makes sense only if
- * <function>add_vertices</function> is able to deserialize it.
+ *    the edges included in \p es. The attribute values should be appended
+ *    to the provided \p value vector. No assumptions should be made
+ *    about the initial contents of the \p value vector and it is not guaranteed
+ *    to be empty.
  */
 
 typedef struct igraph_attribute_table_t {
@@ -389,7 +409,7 @@ typedef struct igraph_attribute_table_t {
                                igraph_strvector_t *enames, igraph_vector_int_t *etypes);
     igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
                               const char *name);
-    igraph_error_t (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
+    igraph_error_t (*get_type)(const igraph_t *graph, igraph_attribute_type_t *type,
                               igraph_attribute_elemtype_t elemtype, const char *name);
     igraph_error_t (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
                                              igraph_vector_t *value);

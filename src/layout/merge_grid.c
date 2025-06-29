@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
-   IGraph package.
-   Copyright (C) 2006-2021 The igraph development team
+   IGraph library.
+   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "layout/merge_grid.h"
@@ -205,14 +201,3 @@ igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_
 
     return ret;
 }
-
-/* int print_grid(igraph_i_layout_mergegrid_t *grid) { */
-/*   igraph_integer_t i,j; */
-
-/*   for (i=0; i<grid->stepsx; i++) { */
-/*     for (j=0; j<grid->stepsy; j++) { */
-/*       printf("%li ", MAT(i,j)-1); */
-/*     } */
-/*     printf("\n"); */
-/*   } */
-/* } */

@@ -2,7 +2,9 @@
 #define IGRAPH_OPERATORS_REWIRE_INTERNAL_H
 
 #include "igraph_decls.h"
-#include "igraph_interface.h"
+#include "igraph_constants.h"
+#include "igraph_datatype.h"
+#include "igraph_error.h"
 
 __BEGIN_DECLS
 

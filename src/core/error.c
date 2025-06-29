@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -21,9 +20,10 @@
 
 */
 
-#include "config.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
+
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 #include <stdio.h>
 #include <stdlib.h>

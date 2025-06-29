@@ -11,7 +11,7 @@ int main(void) {
                          /*start_from=*/ 0);
 
     /* Compute the average shortest path length. */
-    igraph_average_path_length(&graph, &result, NULL, IGRAPH_UNDIRECTED, 1);
+    igraph_average_path_length(&graph, NULL, &result, NULL, IGRAPH_UNDIRECTED, 1);
     printf("Average length of all-pairs shortest paths: %g\n", result);
 
     /* Destroy no-longer-needed objects. */

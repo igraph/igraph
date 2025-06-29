@@ -103,7 +103,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
 
         for (int i = 0; i < num_vs; i++) {
-            IGRAPH_CHECK(igraph_incident(g, &neis, i, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(g, &neis, i, IGRAPH_ALL, IGRAPH_LOOPS));
 
             int temp = igraph_vector_int_size(&neis);
 

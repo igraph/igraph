@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2020  The igraph development team
@@ -32,7 +30,7 @@
 #include "igraph_progress.h"
 #include "igraph_structural.h"
 
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     const igraph_t *graph,
@@ -572,8 +570,8 @@ igraph_error_t igraph_roots_for_tree_layout(
         igraph_vector_t ecc;
 
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, no_of_nodes);
-        IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(), mode));
-        IGRAPH_CHECK(igraph_vector_qsort_ind(&ecc, &order, IGRAPH_ASCENDING));
+        IGRAPH_CHECK(igraph_eccentricity(graph, NULL, &ecc, igraph_vss_all(), mode));
+        IGRAPH_CHECK(igraph_vector_sort_ind(&ecc, &order, IGRAPH_ASCENDING));
 
         igraph_vector_destroy(&ecc);
         IGRAPH_FINALLY_CLEAN(1);

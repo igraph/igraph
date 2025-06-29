@@ -61,12 +61,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_closeness_cutoff(&graph, &v, &iv, &b, igraph_vss_all(), IGRAPH_OUT, NULL, true, 4);
             igraph_harmonic_centrality_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_ALL, NULL, true, 3);
             igraph_harmonic_centrality_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_IN, NULL, true, 4);
-            igraph_global_efficiency(&graph, &r, NULL, IGRAPH_DIRECTED);
-            igraph_local_efficiency(&graph, &v, igraph_vss_all(), NULL, IGRAPH_DIRECTED, IGRAPH_OUT);
+            igraph_global_efficiency(&graph, NULL, &r, IGRAPH_DIRECTED);
+            igraph_local_efficiency(&graph, NULL, &v, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_OUT);
             igraph_transitivity_undirected(&graph, &r, IGRAPH_TRANSITIVITY_NAN);
             igraph_transitivity_local_undirected(&graph, &v, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
             igraph_transitivity_avglocal_undirected(&graph, &r, IGRAPH_TRANSITIVITY_ZERO);
-            igraph_adjacent_triangles(&graph, &v, igraph_vss_all());
+            igraph_count_adjacent_triangles(&graph, &v, igraph_vss_all());
             igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &v, &r, igraph_vss_all(), IGRAPH_DIRECTED, 0.6, NULL, NULL);
             igraph_constraint(&graph, &v, igraph_vss_all(), NULL);
             igraph_spanner(&graph, &iv, 2.34, NULL);

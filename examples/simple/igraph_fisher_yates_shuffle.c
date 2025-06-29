@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
   Test suite for the Fisher-Yates shuffle.
   Copyright (C) 2011 Minh Van Nguyen <nguyenminh2@gmail.com>

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2010-2021  The igraph development team
@@ -790,8 +789,9 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 igraph_vector_int_t neis;
                 igraph_integer_t j;
                 IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-                IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
-                                              IGRAPH_OUT));
+                IGRAPH_CHECK(igraph_neighbors(
+                    graph, &neis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+                ));
                 n = igraph_vector_int_size(&neis);
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
@@ -1169,7 +1169,9 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
      */
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t j, n;
-        IGRAPH_CHECK(igraph_neighbors(residual, &neis, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_neighbors(
+            residual, &neis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         n = igraph_vector_int_size(&neis);
 
         // Only consider nodes that are not in S.
@@ -1427,7 +1429,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* Permute vertices and replace residual with tmpgraph that is topologically
      * sorted.
      */
-    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &inv_order));
+    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &order));
 
     igraph_destroy(&residual); // We first free memory from original residual graph
     residual = tmpgraph;       // Then we replace it by allocated memory from tmpgraph

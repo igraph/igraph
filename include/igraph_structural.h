@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_STRUCTURAL_H
@@ -65,22 +60,21 @@ IGRAPH_EXPORT igraph_error_t igraph_is_forest(const igraph_t *graph, igraph_bool
                                     igraph_vector_int_t *roots, igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                                    igraph_vs_t vids, igraph_neimode_t mode,
-                                   igraph_bool_t loops);
+                                   igraph_loops_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
                                                 igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                      igraph_bool_t ignore_loops,
                                      igraph_reciprocity_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
-                                  const igraph_vs_t vids, igraph_neimode_t mode,
-                                  igraph_bool_t loops, const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
-                                                   igraph_vector_int_t *outvids,
-                                                   igraph_vs_t vids,
-                                                   igraph_neimode_t mode,
-                                                   igraph_bool_t loops,
-                                                   igraph_order_t order,
-                                                   igraph_bool_t only_indices);
+IGRAPH_EXPORT igraph_error_t igraph_strength(
+    const igraph_t *graph, igraph_vector_t *res, const igraph_vs_t vids,
+    igraph_neimode_t mode, igraph_loops_t loops, const igraph_vector_t *weights
+);
+IGRAPH_EXPORT igraph_error_t igraph_sort_vertex_ids_by_degree(
+    const igraph_t *graph, igraph_vector_int_t *outvids, igraph_vs_t vids,
+    igraph_neimode_t mode, igraph_loops_t loops, igraph_order_t order,
+    igraph_bool_t only_indices
+);
 IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect);
 
 /* -------------------------------------------------- */
@@ -127,8 +121,13 @@ IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_t *result,
-                                          const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+    const igraph_t *graph, igraph_vector_int_t *result,
+    const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */

@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_STRVECTOR_H
@@ -92,12 +87,15 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_update(
     igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_resize(
     igraph_strvector_t* v, igraph_integer_t newsize);
+IGRAPH_EXPORT void igraph_strvector_resize_min(igraph_strvector_t *sv);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v,
         const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *v,
         const char *value, igraph_integer_t len);
-IGRAPH_EXPORT igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
-                                         const char *sep);
+IGRAPH_EXPORT igraph_error_t igraph_strvector_fprint(const igraph_strvector_t *v, FILE *file,
+                                                     const char *sep);
+IGRAPH_EXPORT igraph_error_t igraph_strvector_print(const igraph_strvector_t *v,
+                                                    const char *sep);
 
 IGRAPH_EXPORT igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
                                          igraph_strvector_t *newv,
@@ -105,6 +103,9 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
 
 IGRAPH_EXPORT igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv,
                                                       igraph_integer_t capacity);
+
+IGRAPH_EXPORT void igraph_strvector_swap_elements(igraph_strvector_t *sv,
+                                                  igraph_integer_t i, igraph_integer_t j);
 
 __END_DECLS
 

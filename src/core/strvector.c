@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -266,7 +265,7 @@ igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
                 IGRAPH_FREE(to->stor_begin[j]);
             }
             IGRAPH_FREE(to->stor_begin);
-            IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM);
             /* LCOV_EXCL_STOP */
         }
     }
@@ -621,17 +620,17 @@ igraph_error_t igraph_strvector_push_back_len(
 /**
  * \ingroup strvector
  * \function igraph_strvector_print
- * \brief Prints a string vector.
+ * \brief Prints a string vector to a file.
  *
  * \param sv The string vector.
  * \param file The file to write to.
  * \param sep The separator to print between strings.
  * \return Error code.
  */
-igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
-                           const char *sep) {
+igraph_error_t igraph_strvector_fprint(const igraph_strvector_t *sv, FILE *file,
+                                       const char *sep) {
 
-    igraph_integer_t n = igraph_strvector_size(sv);
+    const igraph_integer_t n = igraph_strvector_size(sv);
     if (n != 0) {
         fprintf(file, "%s", igraph_strvector_get(sv, 0));
     }
@@ -640,6 +639,22 @@ igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
     }
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_print
+ * \brief Prints a string vector.
+ *
+ * \param sv The string vector.
+ * \param sep The separator to print between strings.
+ * \return Error code.
+ */
+#ifndef USING_R
+igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv,
+                                      const char *sep) {
+    return igraph_strvector_fprint(sv, stdout, sep);
+}
+#endif
 
 /**
  * \ingroup strvector
@@ -704,4 +719,22 @@ void igraph_strvector_swap(igraph_strvector_t *v1, igraph_strvector_t *v2) {
     tmp = *v1;
     *v1 = *v2;
     *v2 = tmp;
+}
+
+/**
+ * \function igraph_strvector_swap_elements
+ * \brief Swap two elements in a string vector.
+ *
+ * Note that currently no range checking is performed.
+ *
+ * \param sv The string vector.
+ * \param i Index of the first element.
+ * \param j Index of the second element (may be the same as the first one).
+ *
+ * Time complexity: O(1).
+ */
+void igraph_strvector_swap_elements(igraph_strvector_t *sv, igraph_integer_t i, igraph_integer_t j) {
+    const char *tmp = sv->stor_begin[i];
+    sv->stor_begin[i] = sv->stor_begin[j];
+    sv->stor_begin[j] = tmp;
 }
