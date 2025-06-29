@@ -74,7 +74,7 @@
  *        default value is at least ten (or more) times the number of
  *        vertices.
  * \param epsilon Stop the iteration, if the maximum delta value of the
- *        algorithm is smaller than still. It is safe to leave it at zero,
+ *        algorithm is smaller than this. It is safe to leave it at zero,
  *        and then \p maxiter iterations are performed.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
@@ -378,7 +378,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  *        default value is at least ten (or more) times the number of
  *        vertices.
  * \param epsilon Stop the iteration, if the maximum delta value of the
- *        algorithm is smaller than still. It is safe to leave it at zero,
+ *        algorithm is smaller than this. It is safe to leave it at zero,
  *        and then \p maxiter iterations are performed.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
