@@ -1,0 +1,35 @@
+Test 1: null graph
+( )
+
+Test 2: singleton graph
+( NaN )
+
+Test 3a: undirected, no-loop graph (in-order vertex removal)
+( 0.380952 0.466667 0.5 0.5 0.333333 1 NaN )
+
+Test 3b: undirected, no-loop graph (reverse vertex removal)
+( 0.380952 0.466667 0.5 0.666667 0.333333 0 NaN )
+
+Test 4a: directed, no-loop graph (in-order vertex removal)
+( 0.190476 0.233333 0.25 0.333333 0.333333 1 NaN )
+
+Test 4b: directed, no-loop graph (reverse vertex removal)
+( 0.190476 0.2 0.25 0.333333 0.333333 0 NaN )
+
+Test 5a: undirected, loop graph (in-order vertex removal)
+( 0.321429 0.380952 0.4 0.4 0.5 0.333333 0 )
+
+Test 5b: undirected, loop graph (reverse vertex removal)
+( 0.321429 0.333333 0.333333 0.4 0.166667 0 0 )
+
+Test 6a: directed, loop graph (in-order vertex removal)
+( 0.183673 0.222222 0.24 0.3125 0.333333 0.5 0 )
+
+Test 6b: directed, loop graph (reverse vertex removal)
+( 0.183673 0.194444 0.24 0.25 0.222222 0 0 )
+
+Test 7a: weighted graph
+( 0.761905 0.933333 1 1 0.666667 2 NaN )
+
+Test 7b: weighted graph (non-integer weights)
+( 0.380952 0.466667 0.5 0.5 0.333333 1 NaN )
