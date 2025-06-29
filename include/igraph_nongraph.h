@@ -35,13 +35,6 @@ __BEGIN_DECLS
  */
 #define IGRAPH_SHORTEST_PATH_EPSILON 1e-10
 
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
-        const igraph_vector_t *par,
-        void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t *var,
-                                      const igraph_vector_t *par,
-                                      igraph_vector_t* res, void* extra);
-
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
