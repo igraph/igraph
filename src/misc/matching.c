@@ -1255,7 +1255,7 @@ igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, ig
 
             // while there exists an unmarked edge e = {v, w} and we haven't contracted and have't found path
             // that is, test all unmarked edges from v
-            igraph_neighbors(graph, &neighbors, v, IGRAPH_ALL);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, v, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
 
             // if there are no such edges
             while (igraph_vector_int_size(&neighbors) != 0 && !contracted && !path_found) {
