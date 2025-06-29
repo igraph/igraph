@@ -1037,3 +1037,9 @@ add_legacy_tests(
         FOLDER tests/unit NAMES
         igraph_realize_bipartite_degree_sequence
 )
+
+# percolation
+add_legacy_tests(
+	FOLDER tests/unit NAMES
+	igraph_percolation
+)
