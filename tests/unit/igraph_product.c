@@ -299,7 +299,7 @@ int main(void) {
     test_petersen_tensor();
     test_dir_cycle_tensor();
 
-    //LEXICOGRAPHIC PRODUCT TEST
+    // LEXICOGRAPHIC PRODUCT TEST
     test_k2_k4_lex();
 
     // STRONG PRODUCT TEST
