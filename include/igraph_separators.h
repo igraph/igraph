@@ -30,14 +30,14 @@
 __BEGIN_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_is_separator(const igraph_t *graph,
-                                      const igraph_vs_t candidate,
+                                      igraph_vs_t candidate,
                                       igraph_bool_t *res);
 
 IGRAPH_EXPORT igraph_error_t igraph_all_minimal_st_separators(const igraph_t *graph,
                                                    igraph_vector_int_list_t *separators);
 
 IGRAPH_EXPORT igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
-                                              const igraph_vs_t candidate,
+                                              igraph_vs_t candidate,
                                               igraph_bool_t *res);
 
 IGRAPH_EXPORT igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
