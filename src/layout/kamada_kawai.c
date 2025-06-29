@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2003-2024  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@
 #include "core/interruption.h"
 #include "layout/layout_internal.h"
 
-/* Energy gradient values below this threshold are considered to be zero. */
+/* Energy gradient values below this threshold are considered to be zero,
+ * for the 2D and 3D cases, respectively. */
 #define KK_EPS 1e-13
+#define KK3D_EPS 1e-8
 
 /**
  * \ingroup layout
@@ -605,8 +607,10 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         /* Need to solve some linear equations, we just use Cramer's rule */
 #define DET(a,b,c,d,e,f,g,h,i) ((a*e*i+b*f*g+c*d*h)-(c*e*g+b*d*i+a*f*h))
 
-        /* See comments in 2D version for the reason for this check */
-        if (Ax*Ax + Ay*Ay + Az*Az < KK_EPS*KK_EPS) {
+        /* See comments in 2D version for the reason for this check.
+         * In the 3D case, a different threshold is needed (KK3D_EPS vs KK_EPS).
+         * See https://github.com/igraph/igraph/issues/2782 */
+        if (Ax*Ax + Ay*Ay + Az*Az < KK3D_EPS*KK3D_EPS) {
             delta_x = delta_y = delta_z = 0;
         } else {
             igraph_real_t detnum;
