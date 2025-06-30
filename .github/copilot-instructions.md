@@ -20,6 +20,8 @@ When performing a code review, keep in mind the following.
 
  - Public igraph functions that are written in C++ (i.e. defined in `.cpp` files) must catch all exceptions before returning. This can be done using the `IGRAPH_HANDLE_EXCEPTIONS_BEGIN;` and `IGRAPH_HANDLE_EXCEPTIONS_END;` macros.
 
+ - Check that `for` loops that iterate through vectors do not repeatedly call the `igraph_vector_size()` (or equivalent) function, unless the vector size changes during the iteration. Instead, the vector size should be saved into a variable before entering the `for` loop.
+
  - Check that the formatting of the code is consistent with the rest of the igraph codebase. If the formatting is considerably different, suggest reformatting using `astyle` and the `.astylerc` file at the root of the repository.
 
 ## Memory management and error handling
@@ -63,7 +65,7 @@ When performing a code review, keep in mind the following.
 
  - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments.
 
- - Check that the documentation of newly added or updated functions describes all function parameters, as well as the return value. Suggest adding a "see also" section (example `\sa \ref igraph_some_function()`) when appropriate. If the time complexity of a newly added function was not included in the documentation, point this out.
+ - Check that the documentation of newly added or updated functions describes all function parameters, as well as the return value. The parameters must be documented in the same order as they appear in the function signature. If the time complexity of a newly added function was not included in the documentation, point this out.
 
  - Check that within the main description of the function each paragraph, except the first, is preceded by `</para><para>` on a separate line.
 

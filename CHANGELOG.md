@@ -139,6 +139,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
+
 ### Fixed
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.

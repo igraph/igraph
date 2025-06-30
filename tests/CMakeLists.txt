@@ -410,6 +410,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_align
   igraph_layout_drl
   igraph_layout_drl_3d
   igraph_layout_bipartite

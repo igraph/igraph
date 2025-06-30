@@ -205,6 +205,7 @@ add_library(
   io/parse_utils.c
   ${PARSER_SOURCES}
 
+  layout/align.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
