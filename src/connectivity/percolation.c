@@ -190,7 +190,9 @@ static igraph_error_t percolate_site(const igraph_t *graph,
                                      igraph_vector_int_t *links,
                                      igraph_vector_int_t *sizes,
                                      igraph_integer_t *biggest,
-                                     igraph_integer_t vertex) {
+                                     igraph_integer_t vertex,
+                                     igraph_vector_int_t *neighbors
+) {
 
     if (VECTOR(*sizes)[vertex] != 0) {
         IGRAPH_ERROR("Duplicate vertex in vertex order vector.", IGRAPH_EINVAL);
@@ -198,22 +200,17 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
     VECTOR(*sizes)[vertex] = 1;
 
-    igraph_vector_int_t neighbors;
     igraph_integer_t neighbor_count;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
 
-    IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_neighbors(graph, neighbors, vertex, IGRAPH_IN));
 
-    neighbor_count = igraph_vector_int_size(&neighbors);
+    neighbor_count = igraph_vector_int_size(neighbors);
     for (igraph_integer_t i = 0; i < neighbor_count; i++) {
-        if (VECTOR(*sizes)[VECTOR(neighbors)[i]] == 0) {
+        if (VECTOR(*sizes)[VECTOR(*neighbors)[i]] == 0) {
             continue;
         }
-        percolate_edge(links, sizes, biggest, vertex, VECTOR(neighbors)[i]);
+        percolate_edge(links, sizes, biggest, vertex, VECTOR(*neighbors)[i]);
     }
-
-    igraph_vector_int_destroy(&neighbors);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -283,10 +280,14 @@ igraph_error_t igraph_site_percolation(
         VECTOR(links)[i] = i;
     }
 
+    igraph_vector_int_t neighbors;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
     for (igraph_integer_t i = 0; i < vcount; i++) {
-        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*p_vertex_order)[i]));
+        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*p_vertex_order)[i], &neighbors));
         VECTOR(*output)[i] = biggest;
     }
+    igraph_vector_int_destroy(&neighbors);
+    IGRAPH_FINALLY_CLEAN(1);
 
     for (igraph_integer_t i = 0; i < vcount; i++) {
         if (VECTOR(sizes)[i] == 0) {
