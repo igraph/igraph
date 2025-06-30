@@ -18,6 +18,7 @@
 
 #include <igraph.h>
 #include "igraph_error.h"
+#include "igraph_vector.h"
 #include "test_utilities.h"
 
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
@@ -224,13 +225,13 @@ void test_site(void) {
 
 igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
-    igraph_vector_int_init(&outputs, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
     IGRAPH_CHECK(igraph_edge_list_percolation(edge_list, &outputs));
 
     if (printing) print_vector_int(&outputs);
 
     igraph_vector_int_t components;
-    igraph_vector_int_init(&components, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
 
     igraph_t graph;
 
@@ -256,7 +257,7 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
     }
 
     igraph_vector_int_destroy(&outputs);
-
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
@@ -271,7 +272,6 @@ void test_edge_list_percolation(void) {
     printf("Percolation with ( 0 1 1 2 1 ), odd number of entries\n");
     CHECK_ERROR(el_percolate(&odd, false), IGRAPH_EINVAL);
     printf("Percolation with ( -1 1 0 0 1 -1 ), negative numbers\n");
-    print_vector_int(&negative);
     CHECK_ERROR(el_percolate(&negative, false), IGRAPH_EINVVID);
 
     igraph_vector_int_destroy(&odd);

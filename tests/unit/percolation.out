@@ -25,3 +25,6 @@ Zachary karate graph, vertices in storage order.
 K_5 with too big vertex list
 K_5 with too small vertex list
 K_5 with repeated vertices
+# Edge list percolation
+Percolation with ( 0 1 1 2 1 ), odd number of entries
+Percolation with ( -1 1 0 0 1 -1 ), negative numbers
