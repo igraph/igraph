@@ -26,6 +26,7 @@
 #include <list>
 #include <algorithm>
 #include <utility>
+#include <set>
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
@@ -39,7 +40,13 @@ struct vd_pair {
     igraph_integer_t vertex;
     igraph_integer_t degree;
 
+    vd_pair() = default;
     vd_pair(igraph_integer_t vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
+
+    bool operator<(const vd_pair& other) const {
+        if (degree == other.degree) return vertex < other.vertex;
+        return degree < other.degree;
+    }
 };
 
 // (indegree, outdegree)
@@ -68,66 +75,72 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 /***** Undirected simple graphs ******/
 /*************************************/
 
+// helper function for igraph_i_havel_hakimi()
+vd_pair decrement_degree(std::set<vd_pair>& nodes, std::set<vd_pair>::iterator it) {
+    vd_pair node = *it;
+    nodes.erase(it);
+
+    node.degree -= 1;
+    return node;
+}
+
 // Generate simple undirected realization as edge-list.
 // If largest=true, always choose the vertex with the largest remaining degree to connect up next.
 // Otherwise, always choose the one with the smallest remaining degree.
-static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool largest) {
-    igraph_integer_t n = igraph_vector_int_size(deg);
 
-    igraph_integer_t ec = 0; // number of edges added so far
+// O(E log V)
+static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
+                                            igraph_vector_int_t *edges,
+                                            bool largest) {
+    // put everything in a set O(V log V)
+    std::set<vd_pair> nodes;
+    for (igraph_integer_t n = 0; n < igraph_vector_int_size(degseq); n++) {
+        igraph_integer_t degree = VECTOR(*degseq)[n];
 
-    std::vector<vd_pair> vertices;
-    vertices.reserve(n);
-    for (igraph_integer_t i = 0; i < n; ++i) {
-        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
+        if (degree < 0) { // INVALID DEGSEQ
+            IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
+        } else if (degree != 0) { // only insert non-zero degrees
+            nodes.insert(vd_pair{n, degree});
+        }
     }
 
-    while (! vertices.empty()) {
-        if (largest) {
-            std::stable_sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
+    igraph_integer_t n_edges_added = 0;
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(degseq); i++) {
+        // CHECK FOR COMPLETE
+        if (nodes.empty()) return IGRAPH_SUCCESS;
+
+        // CHOOSE VERTEX HUB
+        vd_pair hub;
+        if (!largest) {
+            auto smallest = nodes.begin(); // O(log V)
+            hub = *smallest;
+            nodes.erase(smallest);
         } else {
-            std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+            auto largest = prev(nodes.end()); // O(log V)
+            hub = *largest;
+            nodes.erase(largest);
         }
 
-        // take the next vertex to be connected up
-        vd_pair vd = vertices.back();
-        vertices.pop_back();
-
-        if (vd.degree == 0) {
-            continue;
+        if (hub.degree > nodes.size()) { // NOT ENOUGH NODES TO CONNECT
+            IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
+        }
+        // CHOOSE NODES TO CONNECT TO
+        std::vector<vd_pair> visited;
+        for (igraph_integer_t e = 0; e < hub.degree; e++) { // sum of degrees = O(E) total
+            auto largest = prev(nodes.end());
+            visited.push_back(decrement_degree(nodes, largest)); // O(log V)
         }
 
-        if (vertices.size() < size_t(vd.degree)) {
-            goto fail;
+        // CONNECT THEM
+        for (const auto node : visited) { // O(E)
+            VECTOR(*edges)[2*n_edges_added] = hub.vertex;
+            VECTOR(*edges)[2*n_edges_added + 1] = node.vertex;
+            n_edges_added++;
+
+            nodes.insert(node); // O(log V)
         }
-
-        if (largest) {
-            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
-                if (--(vertices[vertices.size() - 1 - i].degree) < 0) {
-                    goto fail;
-                }
-
-                VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
-                VECTOR(*edges)[2 * (ec + i) + 1] = vertices[vertices.size() - 1 - i].vertex;
-            }
-        } else {
-            // this loop can only be reached if all zero-degree nodes have already been removed
-            // therefore decrementing remaining degrees is safe
-            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
-                vertices[i].degree--;
-
-                VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
-                VECTOR(*edges)[2 * (ec + i) + 1] = vertices[i].vertex;
-            }
-        }
-
-        ec += vd.degree;
     }
-
     return IGRAPH_SUCCESS;
-
-fail:
-    IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
 
 
