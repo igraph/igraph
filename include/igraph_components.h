@@ -66,6 +66,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector
 
 IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(const igraph_t *graph, igraph_vector_int_t *output, const igraph_vector_int_t *edge_order);
 IGRAPH_EXPORT igraph_error_t igraph_site_percolation(const igraph_t *graph, igraph_vector_int_t *output, const igraph_vector_int_t *vertex_order);
+IGRAPH_EXPORT igraph_error_t igraph_edge_list_percolation(const igraph_vector_int_t *edge_list, igraph_vector_int_t *output);
 
 /* Deprecated in igraph 0.10 when we switched to igraph_graph_list_t. Will be
  * removed in 0.11 */

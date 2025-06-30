@@ -81,7 +81,7 @@ static void percolate_edge(igraph_vector_int_t *links,
  * \param output output[i] is the size of the largest connected component after edges[i] is added
  */
 
-static igraph_error_t edge_list_percolation(
+igraph_error_t igraph_edge_list_percolation(
         const igraph_vector_int_t *edges,
         igraph_vector_int_t* output) {
 
@@ -163,7 +163,7 @@ igraph_error_t igraph_bond_percolation(
     IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
 
     IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges));
-    IGRAPH_CHECK(edge_list_percolation(&edges, output));
+    IGRAPH_CHECK(igraph_edge_list_percolation(&edges, output));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
