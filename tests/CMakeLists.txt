@@ -362,6 +362,8 @@ add_legacy_tests(
   igraph_widest_paths
   igraph_spanner
   knn
+  mycielskian
+  mycielski_graph
   paths
   random_spanning_tree
   reachability
