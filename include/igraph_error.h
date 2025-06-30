@@ -477,7 +477,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
                                             int line, igraph_error_t igraph_errno,
                                             va_list ap);
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))

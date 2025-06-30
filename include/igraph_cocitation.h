@@ -33,28 +33,28 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
-                                    const igraph_vs_t vids);
+                                    igraph_vs_t vids);
 IGRAPH_EXPORT igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
-                                     const igraph_vs_t vids);
+                                     igraph_vs_t vids);
 
 IGRAPH_EXPORT igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
-                                            const igraph_vs_t vit_from, const igraph_vs_t vit_to,
+                                            igraph_vs_t vit_from, igraph_vs_t vit_to,
                                             igraph_neimode_t mode, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                                   const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
-                                               const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
+                                               igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
 
 IGRAPH_EXPORT igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
-                                         const igraph_vs_t vit_from, const igraph_vs_t vit_to,
+                                         igraph_vs_t vit_from, igraph_vs_t vit_to,
                                          igraph_neimode_t mode, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
                                                const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
+                                            igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
 
 IGRAPH_EXPORT igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
-                                                         igraph_matrix_t *res, const igraph_vs_t vids,
+                                                         igraph_matrix_t *res, igraph_vs_t vids,
                                                          igraph_neimode_t mode);
 
 __END_DECLS

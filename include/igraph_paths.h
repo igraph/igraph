@@ -76,34 +76,34 @@ IGRAPH_EXPORT igraph_error_t igraph_diameter(
 );
 
 IGRAPH_EXPORT igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *res,
-                                                     const igraph_vs_t from, const igraph_vs_t to,
+                                                     igraph_vs_t from, igraph_vs_t to,
                                                      igraph_neimode_t mode, igraph_real_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
-                                              const igraph_vs_t from, const igraph_vs_t to,
+                                              igraph_vs_t from, igraph_vs_t to,
                                               igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                                                      igraph_matrix_t *res,
-                                                     const igraph_vs_t from,
-                                                     const igraph_vs_t to,
+                                                     igraph_vs_t from,
+                                                     igraph_vs_t to,
                                                      const igraph_vector_t *weights,
                                                      igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
                                                               igraph_matrix_t *res,
-                                                              const igraph_vs_t from,
-                                                              const igraph_vs_t to,
+                                                              igraph_vs_t from,
+                                                              igraph_vs_t to,
                                                               const igraph_vector_t *weights,
                                                               igraph_neimode_t mode,
                                                               igraph_real_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                                                        igraph_matrix_t *res,
-                                                       const igraph_vs_t from,
-                                                       const igraph_vs_t to,
+                                                       igraph_vs_t from,
+                                                       igraph_vs_t to,
                                                        const igraph_vector_t *weights,
                                                        igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_distances_johnson(const igraph_t *graph,
                                                 igraph_matrix_t *res,
-                                                const igraph_vs_t from,
-                                                const igraph_vs_t to,
+                                                igraph_vs_t from,
+                                                igraph_vs_t to,
                                                 const igraph_vector_t *weights,
                                                 igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_distances_floyd_warshall(const igraph_t *graph,
@@ -117,7 +117,7 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_floyd_warshall(const igraph_t *gra
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                                             igraph_vector_int_list_t *vertices,
                                             igraph_vector_int_list_t *edges,
-                                            igraph_integer_t from, const igraph_vs_t to,
+                                            igraph_integer_t from, igraph_vs_t to,
                                             igraph_neimode_t mode,
                                             igraph_vector_int_t *parents,
                                             igraph_vector_int_t *inbound_edges);
@@ -175,7 +175,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph
                                                 igraph_vector_int_list_t *vertices,
                                                 igraph_vector_int_list_t *edges,
                                                 igraph_vector_int_t *nrgeo,
-                                                igraph_integer_t from, const igraph_vs_t to,
+                                                igraph_integer_t from, igraph_vs_t to,
                                                 igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                                                          igraph_vector_int_list_t *vertices,
@@ -198,7 +198,7 @@ IGRAPH_EXPORT igraph_error_t igraph_global_efficiency(
 );
 IGRAPH_EXPORT igraph_error_t igraph_local_efficiency(
     const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_t *res,
-    const igraph_vs_t vids, igraph_bool_t directed, igraph_neimode_t mode
+    igraph_vs_t vids, igraph_bool_t directed, igraph_neimode_t mode
 );
 IGRAPH_EXPORT igraph_error_t igraph_average_local_efficiency(
     const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *res,
@@ -230,7 +230,7 @@ IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(
 IGRAPH_EXPORT igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                                          igraph_vector_int_list_t *res,
                                                          igraph_integer_t from,
-                                                         const igraph_vs_t to,
+                                                         igraph_vs_t to,
                                                          igraph_integer_t minlen,
                                                          igraph_integer_t maxlen,
                                                          igraph_neimode_t mode);
@@ -276,14 +276,14 @@ IGRAPH_EXPORT igraph_error_t igraph_get_widest_path(const igraph_t *graph,
                                              igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
                                                    igraph_matrix_t *res,
-                                                   const igraph_vs_t from,
-                                                   const igraph_vs_t to,
+                                                   igraph_vs_t from,
+                                                   igraph_vs_t to,
                                                    const igraph_vector_t *weights,
                                                    igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                                              igraph_matrix_t *res,
-                                             const igraph_vs_t from,
-                                             const igraph_vs_t to,
+                                             igraph_vs_t from,
+                                             igraph_vs_t to,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_voronoi(const igraph_t *graph,
