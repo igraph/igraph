@@ -24,6 +24,7 @@
 #include "igraph_vector.h"
 
 /**
+ * \experimental
  * \function igraph_i_percolate_edge
  * \brief Percolates a single edge.
  * \param links Vector representing parents.
@@ -75,10 +76,16 @@ static void percolate_edge(igraph_vector_int_t *links,
 }
 
 /**
+ * \experimental
  * \function igraph_i_edge_list_percolation
  * \brief Gives the size of the largest connected component as edges are added.
- * \param edges Vector of edges, will be added in order.
- * \param output output[i] is the size of the largest connected component after edges[i] is added
+ * Calculates the size of the largest component as edges are added to a graph in the order given.
+ * If the edge-sequence and output are reversed, they are the size of the largest component as
+ * edges are removed.
+ *
+ * \param edges Vector of edges, where the n-th edge has endpoints edges[2n] and edges [2n+1].
+ * \param output output[n] is the size of the largest connected component after edge n is added.
+ *        Will be resized.
  */
 
 igraph_error_t igraph_edge_list_percolation(
@@ -132,11 +139,14 @@ igraph_error_t igraph_edge_list_percolation(
 /**
  * \function igraph_bond_percolation
  * \brief Calculates the bond-percolation curve of a graph.
- *
+ * Calculates the bond-percolation curve, or the size of the largest component as
+ * edges are added to the graph in the order given. If both the output and the input
+ * are reversed is the size of the largest component as edges are removed.
  * \param graph The input graph
  * \param output output[i] is the size of the largest component after adding
  *    <code>i+1</code> edges, will be created.
- */
+ * \param edges The order of the edges, will be generated at random if null.
+ * */
 
 igraph_error_t igraph_bond_percolation(
         const igraph_t *graph,
@@ -210,9 +220,13 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
 
 /**
+ * \experimental
  * \function igraph_site_percolation
  * \brief The size of the largest component as vertices are added to graph.
- *
+ * Calculates the percolation curve, or the size of the largest connected component as
+ * vertices are added in the order given. If the output is reversed, it is the size of
+ * the largest component as vertices are removed in the reverse of the order given.
+ * If there is no vertex order given, it will generate one.
  * \param graph The graph that vertices are assumed to be in
  * \param output <code>output[i]</code> will contain the size of the largest component
  *        after adding <code>vertex_order[i]</code>. Will be resised.
@@ -224,7 +238,6 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  *        \cli IGRAPH_EINVAL
  *             The vertex list is invalid, see above.
  *        \endclist
- *
  */
 
 igraph_error_t igraph_site_percolation(
