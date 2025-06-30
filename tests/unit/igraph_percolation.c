@@ -17,97 +17,95 @@
 */
 
 #include <igraph.h>
+#include <stdbool.h>
+#include "igraph_interface.h"
+#include "igraph_vector.h"
 #include "test_utilities.h"
 
-igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices) {
+igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
+    igraph_integer_t size = igraph_ecount(graph);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
 
     IGRAPH_CHECK(igraph_bond_percolation(graph, &outputs, edge_indices));
 
-    print_vector_int(&outputs);
-
-    igraph_vector_int_destroy(&outputs);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-}
-
-igraph_error_t largest_component_b(igraph_t *graph, igraph_integer_t *size) {
-    igraph_vector_int_t outputs;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
-
-    IGRAPH_CHECK(igraph_bond_percolation(graph, &outputs, NULL));
-
-    *size = VECTOR(outputs)[igraph_vector_int_size(&outputs) -1];
-
-    igraph_vector_int_destroy(&outputs);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-
-}
-
-int test_bond(void) {
-<<<<<<< HEAD
-    // test with normal graph and provided edge list
-=======
-    // Test with normal graph and provided edge list
->>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
-
-    igraph_t k_3, c_4, karate, random;
-    igraph_integer_t size = 0;
-    igraph_full(&k_3, 3, false, false);
-
-    igraph_small(&c_4, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 0, -1);
-
-    printf("K_3 graph percolation curve, no provided edge sequence:\n");
-    IGRAPH_CHECK(percolate_b(&k_3, NULL));
-
-    igraph_vector_int_t edge_ids;
-    IGRAPH_CHECK(igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3));
-
-    printf("C_4 graph with edge sequence 0, 2\n");
-    IGRAPH_CHECK(percolate_b(&c_4, &edge_ids));
-
-    igraph_vector_int_destroy(&edge_ids);
-    igraph_destroy(&k_3);
-    igraph_destroy(&c_4);
-
-    igraph_famous(&karate, "Zachary");
-    // Karate graph biggest component size, no edge list given
-    largest_component_b(&karate, &size);
-    IGRAPH_ASSERT(size == 34);
-    // Generated disconnected graph, 100 vertices, p=0.01
-
-    igraph_destroy(&karate);
-
-    IGRAPH_CHECK(igraph_erdos_renyi_game_gnp(&random, 100, 0.01, false, false));
+    if (printing) print_vector_int(&outputs);
 
     igraph_vector_int_t components;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
 
-    IGRAPH_CHECK(igraph_connected_components(&random, NULL, &components, NULL, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, NULL, &components, NULL, IGRAPH_WEAK));
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
-    largest_component_b(&random, &size);
-    IGRAPH_ASSERT(size == igraph_vector_int_max(&components));
+    IGRAPH_ASSERT(igraph_vector_int_size(&outputs) == size);
+    if (size > 1) {
+        IGRAPH_ASSERT(igraph_vector_int_max(&outputs) == igraph_vector_int_max(&components));
+    }
     igraph_vector_int_destroy(&components);
     IGRAPH_FINALLY_CLEAN(1);
+    igraph_integer_t prev = 0;
+    for (igraph_integer_t i = 0; i < size; i++) {
+        IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
+        IGRAPH_ASSERT(VECTOR(outputs)[i] >= prev);   // Size of largest component must be nondecreasing.
+        IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
+        prev = VECTOR(outputs)[i];
+    }
 
+    igraph_vector_int_destroy(&outputs);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+int test_bond(void) {
+    // Test with normal graph and provided edge list
+    igraph_t k_3, c_4, karate, random, null_graph, singleton;
+
+    igraph_empty(&null_graph, 0, false);
+    igraph_empty(&singleton, 1, false);
+    igraph_full(&k_3, 3, false, false);
+    igraph_small(&c_4, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 0, -1);
+    igraph_famous(&karate, "Zachary");
+    igraph_erdos_renyi_game_gnp(&random, 100, 0.01, false, false);
+    printf("# Bond percolation test suite\n");
+    printf("Null graph, no provided edge order.\n");
+    percolate_b(&null_graph, NULL, true);
+
+    printf("Singleton graph, no provided edge order.\n");
+    percolate_b(&singleton, NULL, true);
+
+    printf("K_3 graph percolation curve, no provided edge sequence.\n");
+    IGRAPH_CHECK(percolate_b(&k_3, NULL, true)); // sequence is random, but since it should be consistent it doesn't matter
+
+    igraph_vector_int_t edge_ids;
+    IGRAPH_CHECK(igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3));
+
+    printf("C_4 graph with edge sequence ( 0 2 1 3 ).\n");
+    IGRAPH_CHECK(percolate_b(&c_4, &edge_ids, true));
+
+    igraph_vector_int_destroy(&edge_ids);
+    printf("Zachary karate graph, no edge list given.\n");
+    // Karate graph, no edge list given
+    percolate_b(&karate, NULL, false);
+    // Generated disconnected graph, 100 vertices, p=0.01
+
+    igraph_vector_int_t storage_order;
+    igraph_vector_int_init_range(&storage_order, 0, igraph_ecount(&karate));
+    printf("Zachary karate graph, edges in storage order.\n");
+    percolate_b(&karate, &storage_order, true);
+    igraph_vector_int_destroy(&storage_order);
+
+    percolate_b(&random, NULL, false);
+    igraph_destroy(&singleton);
+    igraph_destroy(&null_graph);
+    igraph_destroy(&k_3);
+    igraph_destroy(&c_4);
+    igraph_destroy(&karate);
     igraph_destroy(&random);
     VERIFY_FINALLY_STACK();
-<<<<<<< HEAD
     return 0;
 }
-=======
-
-    return 0;
-}
-
->>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
-igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices) {
+igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
 
@@ -117,10 +115,6 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices) {
 
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
-<<<<<<< HEAD
-=======
-
->>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
     return IGRAPH_SUCCESS;
 }
 
@@ -138,65 +132,68 @@ igraph_error_t largest_component_s(igraph_t *graph, igraph_integer_t *size) {
 }
 
 int test_site(void) {
-    // test with normal graph and provided edge list
 
-    igraph_t k_5, c_4, karate, random;
-    igraph_integer_t size = 0;
+    // Test with normal graph and provided edge list
+    igraph_t k_5, c_4, karate, random, null_graph, singleton;
+
+    igraph_empty(&null_graph, 0, false);
+    igraph_empty(&singleton, 1, false);
     igraph_full(&k_5, 5, false, false);
-
     igraph_small(&c_4, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 0, -1);
-
-    printf("K_5 graph percolation curve, no provided vertex sequence:\n");
-    IGRAPH_CHECK(percolate_s(&k_5, NULL));
-
-    igraph_vector_int_t edge_ids;
-    IGRAPH_CHECK(igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3));
-
-    printf("C_4 graph with vertex sequence 0, 2\n");
-    IGRAPH_CHECK(percolate_s(&c_4, &edge_ids));
-
-    igraph_vector_int_destroy(&edge_ids);
-
-    igraph_destroy(&c_4);
-
     igraph_famous(&karate, "Zachary");
+    igraph_erdos_renyi_game_gnp(&random, 100, 0.01, false, false);
+    printf("# Site percolation test suite\n");
+    printf("Null graph, no provided vertex order.\n");
+    percolate_s(&null_graph, NULL, true);
 
-    //Karate graph biggest component size, no vertex list given: ");
-    largest_component_s(&karate, &size);
-    IGRAPH_ASSERT(size == 34);
+    printf("Singleton graph, no provided vertex order.\n");
+    percolate_s(&singleton, NULL, true);
 
+    printf("K_5 graph percolation curve, no provided vertex sequence.\n");
+    IGRAPH_CHECK(percolate_s(&k_5, NULL, true)); // sequence is random, but since it should be consistent it doesn't matter
+
+    igraph_vector_int_t vertex_ids;
+    IGRAPH_CHECK(igraph_vector_int_init_int(&vertex_ids, 4, 0, 2, 1, 3));
+
+    printf("C_4 graph with vertex sequence ( 0 2 1 3 ).\n");
+    IGRAPH_CHECK(percolate_s(&c_4, &vertex_ids, true));
+
+    igraph_vector_int_destroy(&vertex_ids);
+    printf("Zachary karate graph, no vertex list given.\n");
+    // Karate graph, no edge list given
+    percolate_b(&karate, NULL, false);
     // Generated disconnected graph, 100 vertices, p=0.01
 
-    igraph_destroy(&karate);
+    igraph_vector_int_t storage_order;
+    igraph_vector_int_init_range(&storage_order, 0, igraph_vcount(&karate));
+    printf("Zachary karate graph, vertices in storage order.\n");
+    percolate_s(&karate, &storage_order, true);
+    igraph_vector_int_destroy(&storage_order);
 
-    IGRAPH_CHECK(igraph_erdos_renyi_game_gnp(&random, 100, 0.01, false, false));
-
-    igraph_vector_int_t components;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
-
-    IGRAPH_CHECK(igraph_connected_components(&random, NULL, &components, NULL, IGRAPH_WEAK));
-
-
-    largest_component_s(&random, &size);
-    IGRAPH_ASSERT(size == igraph_vector_int_max(&components));
-
-    igraph_vector_int_destroy(&components);
-    IGRAPH_FINALLY_CLEAN(1);
+    percolate_b(&random, NULL, false);
 
     igraph_vector_int_t bad_vert_list_repeat, bad_vert_list_too_big, bad_vert_list_missing;
     igraph_vector_int_init_int(&bad_vert_list_too_big, 6, 0, 1, 2, 3, 4, 5);
     igraph_vector_int_init_int(&bad_vert_list_missing, 3, 0, 1, 2);
     igraph_vector_int_init_int(&bad_vert_list_repeat,  5, 0, 0, 0, 0, 0);
     // should error due to being too big
-    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_too_big), IGRAPH_EINVAL);
+    printf("K_5 with too big vertex list\n");
+    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_too_big, false), IGRAPH_EINVAL);
     // should error due to being too small
-    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_missing), IGRAPH_EINVAL);
+    printf("K_5 with too small vertex list\n");
+    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_missing, false), IGRAPH_EINVAL);
     // should error due to repeated vertices
-    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat),  IGRAPH_EINVAL);
+    printf("K_5 with repeated vertices\n");
+    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat, false),  IGRAPH_EINVAL);
 
 
+    igraph_destroy(&singleton);
+    igraph_destroy(&null_graph);
     igraph_destroy(&k_5);
+    igraph_destroy(&c_4);
+    igraph_destroy(&karate);
     igraph_destroy(&random);
+
     igraph_vector_int_destroy(&bad_vert_list_missing);
     igraph_vector_int_destroy(&bad_vert_list_repeat);
     igraph_vector_int_destroy(&bad_vert_list_too_big);
@@ -207,6 +204,7 @@ int test_site(void) {
 
 
 int main(void) {
+    igraph_rng_seed(igraph_rng_default(), 30062025);
     test_bond();
     test_site();
     return 0;

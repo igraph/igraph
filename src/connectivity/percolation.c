@@ -88,6 +88,11 @@ static igraph_error_t edge_list_percolation(
     igraph_integer_t biggest = 0;
     igraph_integer_t lower, upper;
 
+    // Handle edge case of no edges.
+    if (igraph_vector_int_size(edges) == 0) {
+        IGRAPH_CHECK(igraph_vector_int_resize(output, 0));
+        return IGRAPH_SUCCESS;
+    }
     igraph_vector_int_minmax(edges, &lower, &upper);
 
     if (lower < 0) {
