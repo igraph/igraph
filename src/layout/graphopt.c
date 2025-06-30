@@ -302,7 +302,11 @@ static void igraph_i_move_nodes(
  * anything like that, so a stable fixed point is not guaranteed.)
  *
  * </para><para>
- * See also http://www.schmuhl.org/graphopt/ for the original graphopt.
+ * See also
+ * https://web.archive.org/web/20220611030748/http://www.schmuhl.org/graphopt/
+ * and
+ * https://sourceforge.net/projects/graphopt/
+ * for the original graphopt.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result will be stored here

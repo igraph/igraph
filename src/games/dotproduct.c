@@ -249,18 +249,21 @@ igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t
                             igraph_matrix_t *res) {
 
     igraph_integer_t len = igraph_vector_size(alpha);
-    igraph_integer_t i;
-    igraph_vector_t vec;
+    igraph_integer_t i, j;
+    igraph_real_t sum, num;
+    igraph_rng_t* rng = igraph_rng_default();
 
     if (n < 0) {
         IGRAPH_ERRORF("Number of samples should be non-negative, got %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL, n);
     }
+
     if (len < 2) {
         IGRAPH_ERRORF("Dirichlet parameter vector too short, must "
                      "have at least two entries, got %" IGRAPH_PRId
                      ".", IGRAPH_EINVAL, len);
     }
+
     if (igraph_vector_min(alpha) <= 0) {
         IGRAPH_ERRORF("Dirichlet concentration parameters must be positive, got %g.",
                      IGRAPH_EINVAL, igraph_vector_min(alpha));
@@ -271,8 +274,14 @@ igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t
     RNG_BEGIN();
 
     for (i = 0; i < n; i++) {
-        igraph_vector_view(&vec, &MATRIX(*res, 0, i), len);
-        igraph_rng_get_dirichlet(igraph_rng_default(), alpha, &vec);
+        for (j = 0, sum = 0.0; j < len; j++) {
+            num = igraph_rng_get_gamma(rng, VECTOR(*alpha)[j], 1.0);
+            sum += num;
+            MATRIX(*res, j, i) = num;
+        }
+        for (j = 0; j < len; j++) {
+            MATRIX(*res, j, i) /= sum;
+        }
     }
 
     RNG_END();

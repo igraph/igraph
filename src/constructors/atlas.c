@@ -61,7 +61,7 @@
  */
 igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number) {
 
-    const igraph_vector_int_t v;
+    igraph_vector_int_t v;
 
     if (number < 0 ||
         number >= sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_i_atlas_edges_pos[0])) {

@@ -1761,7 +1761,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
- * \param prefixattr Logical value, whether to put a prefix in front of the
+ * \param prefixattr Boolean value. Whether to put a prefix in front of the
  *        attribute names to ensure uniqueness if the graph has vertex and
  *        edge (or graph) attributes with the same name.
  * \return Error code:
