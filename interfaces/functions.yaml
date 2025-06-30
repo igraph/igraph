@@ -1309,10 +1309,10 @@ igraph_count_reachable:
 #######################################
 
 igraph_bond_percolation:
-    PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL VERTEX_INDICES vertex_order
+    PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL EDGE_INDICES edge_order
 
 igraph_site_percolation:
-    PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL EDGE_INDICES edge_order
+    PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL VERTEX_INDICES vertex_order
 
 #######################################
 # Cliques

@@ -47,7 +47,11 @@ igraph_error_t largest_component_b(igraph_t *graph, igraph_integer_t *size) {
 }
 
 int test_bond(void) {
+<<<<<<< HEAD
     // test with normal graph and provided edge list
+=======
+    // Test with normal graph and provided edge list
+>>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
 
     igraph_t k_3, c_4, karate, random;
     igraph_integer_t size = 0;
@@ -83,7 +87,10 @@ int test_bond(void) {
 
     IGRAPH_CHECK(igraph_connected_components(&random, NULL, &components, NULL, IGRAPH_WEAK));
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
     largest_component_b(&random, &size);
     IGRAPH_ASSERT(size == igraph_vector_int_max(&components));
     igraph_vector_int_destroy(&components);
@@ -91,8 +98,15 @@ int test_bond(void) {
 
     igraph_destroy(&random);
     VERIFY_FINALLY_STACK();
+<<<<<<< HEAD
     return 0;
 }
+=======
+
+    return 0;
+}
+
+>>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
 igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
@@ -103,6 +117,10 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices) {
 
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
+<<<<<<< HEAD
+=======
+
+>>>>>>> dff3c4c5e749f6cdf5b02b3ae5200717d6d3b5c7
     return IGRAPH_SUCCESS;
 }
 
@@ -117,7 +135,6 @@ igraph_error_t largest_component_s(igraph_t *graph, igraph_integer_t *size) {
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
-
 }
 
 int test_site(void) {
@@ -134,7 +151,6 @@ int test_site(void) {
 
     igraph_vector_int_t edge_ids;
     IGRAPH_CHECK(igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3));
-    VECTOR(edge_ids);
 
     printf("C_4 graph with vertex sequence 0, 2\n");
     IGRAPH_CHECK(percolate_s(&c_4, &edge_ids));
@@ -175,7 +191,7 @@ int test_site(void) {
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_too_big), IGRAPH_EINVAL);
     // should error due to being too small
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_missing), IGRAPH_EINVAL);
-    //should error due to repeated vertices
+    // should error due to repeated vertices
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat),  IGRAPH_EINVAL);
 
 
