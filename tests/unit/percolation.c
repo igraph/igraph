@@ -182,7 +182,7 @@ void test_site(void) {
     igraph_vector_int_destroy(&vertex_ids);
     printf("Zachary karate graph, no vertex list given.\n");
     // Karate graph, no vertex list given
-    percolate_b(&karate, NULL, false);
+    percolate_s(&karate, NULL, false);
     // Generated disconnected graph, 100 vertices, p=0.01
 
     igraph_vector_int_t storage_order;
