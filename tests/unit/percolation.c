@@ -17,9 +17,6 @@
 */
 
 #include <igraph.h>
-#include <stdbool.h>
-#include "igraph_interface.h"
-#include "igraph_vector.h"
 #include "test_utilities.h"
 
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
@@ -75,13 +72,13 @@ int test_bond(void) {
     percolate_b(&singleton, NULL, true);
 
     printf("K_3 graph percolation curve, no provided edge sequence.\n");
-    IGRAPH_CHECK(percolate_b(&k_3, NULL, true)); // sequence is random, but since it should be consistent it doesn't matter
+    percolate_b(&k_3, NULL, true); // sequence is random, but since it should be consistent it doesn't matter
 
     igraph_vector_int_t edge_ids;
-    IGRAPH_CHECK(igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3));
+    igraph_vector_int_init_int(&edge_ids, 4, 0, 2, 1, 3);
 
     printf("C_4 graph with edge sequence ( 0 2 1 3 ).\n");
-    IGRAPH_CHECK(percolate_b(&c_4, &edge_ids, true));
+    percolate_b(&c_4, &edge_ids, true);
 
     igraph_vector_int_destroy(&edge_ids);
     printf("Zachary karate graph, no edge list given.\n");
@@ -151,7 +148,7 @@ igraph_error_t largest_component_s(igraph_t *graph, igraph_integer_t *size) {
     return IGRAPH_SUCCESS;
 }
 
-int test_site(void) {
+void test_site(void) {
 
     // Test with normal graph and provided edge list
     igraph_t k_5, c_4, karate, random, null_graph, singleton;
@@ -166,21 +163,23 @@ int test_site(void) {
     printf("Null graph, no provided vertex order.\n");
     percolate_s(&null_graph, NULL, true);
 
+    IGRAPH_ASSERT(true);
+
     printf("Singleton graph, no provided vertex order.\n");
     percolate_s(&singleton, NULL, true);
 
     printf("K_5 graph percolation curve, no provided vertex sequence.\n");
-    IGRAPH_CHECK(percolate_s(&k_5, NULL, true)); // sequence is random, but since it should be consistent it doesn't matter
+    percolate_s(&k_5, NULL, true); // sequence is random, but since it should be consistent it doesn't matter
 
     igraph_vector_int_t vertex_ids;
-    IGRAPH_CHECK(igraph_vector_int_init_int(&vertex_ids, 4, 0, 2, 1, 3));
+    igraph_vector_int_init_int(&vertex_ids, 4, 0, 2, 1, 3);
 
     printf("C_4 graph with vertex sequence ( 0 2 1 3 ).\n");
-    IGRAPH_CHECK(percolate_s(&c_4, &vertex_ids, true));
+    percolate_s(&c_4, &vertex_ids, true);
 
     igraph_vector_int_destroy(&vertex_ids);
     printf("Zachary karate graph, no vertex list given.\n");
-    // Karate graph, no edge list given
+    // Karate graph, no vertex list given
     percolate_b(&karate, NULL, false);
     // Generated disconnected graph, 100 vertices, p=0.01
 
@@ -219,13 +218,27 @@ int test_site(void) {
     igraph_vector_int_destroy(&bad_vert_list_too_big);
 
     VERIFY_FINALLY_STACK();
-    return 0;
 }
 
+
+void el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
+    igraph_vector_int_t output;
+    igraph_vector_int_init(&output, 0);
+    igraph_edge_list_percolation(edge_list, &output);
+
+    if (printing) {
+
+    }
+}
+
+int test_edge_list_percolation(void) {
+    return 1;
+}
 
 int main(void) {
     igraph_rng_seed(igraph_rng_default(), 30062025);
     test_bond();
     test_site();
+    test_edge_list_percolation();
     return 0;
 }
