@@ -17,6 +17,7 @@
 */
 
 #include <igraph.h>
+#include "igraph_error.h"
 #include "test_utilities.h"
 
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
@@ -221,18 +222,62 @@ void test_site(void) {
 }
 
 
-void el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
-    igraph_vector_int_t output;
-    igraph_vector_int_init(&output, 0);
-    igraph_edge_list_percolation(edge_list, &output);
+igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
+    igraph_vector_int_t outputs;
+    igraph_vector_int_init(&outputs, 0);
+    IGRAPH_CHECK(igraph_edge_list_percolation(edge_list, &outputs));
 
-    if (printing) {
+    if (printing) print_vector_int(&outputs);
 
+    igraph_vector_int_t components;
+    igraph_vector_int_init(&components, 0);
+
+    igraph_t graph;
+
+
+    IGRAPH_CHECK(igraph_create(&graph, edge_list, 0, false));
+
+    igraph_integer_t size = igraph_ecount(&graph);
+
+    IGRAPH_CHECK(igraph_connected_components(&graph, NULL, &components, NULL, IGRAPH_WEAK));
+    igraph_destroy(&graph);
+    IGRAPH_ASSERT(igraph_vector_int_size(&outputs) == size);
+    if (size > 1) {
+        IGRAPH_ASSERT(igraph_vector_int_max(&outputs) == igraph_vector_int_max(&components));
     }
+    igraph_vector_int_destroy(&components);
+    IGRAPH_FINALLY_CLEAN(1);
+    igraph_integer_t prev = 0;
+    for (igraph_integer_t i = 0; i < size; i++) {
+        IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
+        IGRAPH_ASSERT(VECTOR(outputs)[i] >= prev);   // Size of largest component must be nondecreasing.
+        IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
+        prev = VECTOR(outputs)[i];
+    }
+
+    igraph_vector_int_destroy(&outputs);
+
+    return IGRAPH_SUCCESS;
 }
 
-int test_edge_list_percolation(void) {
-    return 1;
+void test_edge_list_percolation(void) {
+    // Edge list percolation is already called from bond percolation,
+    // so this mostly tests for expected errors that cannot occur from generated edge lists.
+    igraph_vector_int_t odd, negative;
+    igraph_vector_int_init_int(&odd, 5, 0,1,1,2,1);
+    igraph_vector_int_init_int(&negative, 6, -1,1,0,0,1,-1);
+
+    printf("# Edge list percolation\n");
+    printf("Percolation with ( 0 1 1 2 1 ), odd number of entries\n");
+    CHECK_ERROR(el_percolate(&odd, false), IGRAPH_EINVAL);
+    printf("Percolation with ( -1 1 0 0 1 -1 ), negative numbers\n");
+    print_vector_int(&negative);
+    CHECK_ERROR(el_percolate(&negative, false), IGRAPH_EINVVID);
+
+    igraph_vector_int_destroy(&odd);
+    igraph_vector_int_destroy(&negative);
+    VERIFY_FINALLY_STACK();
+
 }
 
 int main(void) {
