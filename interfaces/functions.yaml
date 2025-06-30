@@ -1315,7 +1315,7 @@ igraph_site_percolation:
     PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL VERTEX_INDICES vertex_order
 
 igraph_edge_list_percolation:
-    PARAMS: IN VECTOR_INT edge_list, OUT VECTOR_INT output
+    PARAMS: IN VECTOR_INT edges, OUT VECTOR_INT output
 
 #######################################
 # Cliques
