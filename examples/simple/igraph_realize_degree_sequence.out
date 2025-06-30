@@ -3,6 +3,6 @@ Demonstration of difference in assortativities of graphs with the same degree se
 Initial graph based on the Barabasi-Albert model with 500 nodes.
 Assortativity of initial graph = -0.171365
 
-Assortativity after choosing vertices with the smallest degrees first = -0.262756
+Assortativity after choosing vertices with the smallest degrees first = -0.286806
 
-Assortativity after choosing vertices with the largest degrees first = 0.366441
+Assortativity after choosing vertices with the largest degrees first = 0.348683
