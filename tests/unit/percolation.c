@@ -108,10 +108,30 @@ int test_bond(void) {
 igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
-
+    igraph_integer_t size = igraph_vcount(graph);
     IGRAPH_CHECK(igraph_site_percolation(graph, &outputs, vert_indices));
 
-    print_vector_int(&outputs);
+    if (printing) print_vector_int(&outputs);
+
+    igraph_vector_int_t components;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
+
+    IGRAPH_CHECK(igraph_connected_components(graph, NULL, &components, NULL, IGRAPH_WEAK));
+
+    IGRAPH_ASSERT(igraph_vector_int_size(&outputs) == size);
+    if (size > 1) {
+        IGRAPH_ASSERT(igraph_vector_int_max(&outputs) == igraph_vector_int_max(&components));
+    }
+    igraph_vector_int_destroy(&components);
+    IGRAPH_FINALLY_CLEAN(1);
+    igraph_integer_t prev = 0;
+    for (igraph_integer_t i = 0; i < size; i++) {
+        IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
+        IGRAPH_ASSERT(VECTOR(outputs)[i] >= prev);   // Size of largest component must be nondecreasing.
+        IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 1); // Largest component cannot be bigger than a tree with the same number of vertices.
+        prev = VECTOR(outputs)[i];
+    }
+
 
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
