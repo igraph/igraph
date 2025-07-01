@@ -164,8 +164,6 @@ void test_site(void) {
     printf("Null graph, no provided vertex order.\n");
     percolate_s(&null_graph, NULL, true);
 
-    IGRAPH_ASSERT(true);
-
     printf("Singleton graph, no provided vertex order.\n");
     percolate_s(&singleton, NULL, true);
 
