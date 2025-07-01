@@ -130,7 +130,7 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, i
         IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 1); // Largest component cannot be bigger than a tree with the same number of vertices.
         prev = VECTOR(outputs)[i];
     }
-    
+
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
