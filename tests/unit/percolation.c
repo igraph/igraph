@@ -55,7 +55,7 @@ igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, i
 }
 
 
-int test_bond(void) {
+void test_bond(void) {
     // Test with normal graph and provided edge list
     igraph_t k_3, c_4, karate, random, null_graph, singleton;
 
