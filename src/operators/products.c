@@ -425,7 +425,7 @@ static igraph_error_t tensor_product(igraph_t *res,
  * Reference:
  *
   * </para><para>
- * Hammack, R., Imrich, W., & Klavžar, S. (2011).
+ * Richar Hammack, Wilfried Imrich, and Sandi Klavžar (2011).
  * Handbook of Product Graphs (2nd ed.). CRC Press.
  * https://doi.org/10.1201/b10959
  *
