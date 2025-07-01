@@ -27,7 +27,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
                                         const igraph_t *g1,
                                         const igraph_t *g2) {
 
-    igraph_bool_t directed = igraph_is_directed(g1);
+    const igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
         IGRAPH_ERROR("Cartesian product between a directed and an undirected graph is invalid.",
@@ -358,14 +358,14 @@ static igraph_error_t tensor_product(igraph_t *res,
  * is used to indicate that vertices \c u and \c v are adjacent, i.e. there is
  * a connection from \c u to \c v.
  * \clist
- *    \cli IGRAPH_PRODUCT_CARTESIAN
- *    Computes the Cartesian product of two graphs. In the product graph,
- *    there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
- *    if and only if
- *    <code>u1 = u2</code> and <code>v1 ~ v2</code> or
- *    <code>u1 ~ u2</code> and <code>v1 = v2</code>.
- *    Thus, the number of edges in the product is
- *    <code>|V1| |E2| + |V2| |E1|</code>.
+ *     \cli IGRAPH_PRODUCT_CARTESIAN
+ *     Computes the Cartesian product of two graphs. In the product graph,
+ *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ *     if and only if
+ *     <code>u1 = u2</code> and <code>v1 ~ v2</code> or
+ *     <code>u1 ~ u2</code> and <code>v1 = v2</code>.
+ *     Thus, the number of edges in the product is
+ *     <code>|V1| |E2| + |V2| |E1|</code>.
  *
  *     </para><para>
  *     Time Complexity: O(|V1| |V2| + |V1| |E2| + |V2| |E1|)
@@ -420,7 +420,7 @@ static igraph_error_t tensor_product(igraph_t *res,
  * \param res Pointer to an uninitialized graph object. The product graph will
  *   be stored here.
  * \param g1 The first operand graph.
- * \param g2 The second operand graph.
+ * \param g2 The second operand graph. It must have the same directedness as \p g1.
  * \param type The type of graph product to compute.
  *
  * \return Error code:
