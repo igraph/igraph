@@ -191,7 +191,7 @@ void test_site(void) {
     percolate_s(&karate, &storage_order, true);
     igraph_vector_int_destroy(&storage_order);
 
-    percolate_b(&random, NULL, false);
+    percolate_s(&random, NULL, false);
 
     igraph_vector_int_t bad_vert_list_repeat, bad_vert_list_too_big, bad_vert_list_missing;
     igraph_vector_int_init_int(&bad_vert_list_too_big, 6, 0, 1, 2, 3, 4, 5);
