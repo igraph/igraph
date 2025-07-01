@@ -100,8 +100,8 @@ void test_bond(void) {
     igraph_destroy(&c_4);
     igraph_destroy(&karate);
     igraph_destroy(&random);
-    VERIFY_FINALLY_STACK();
 
+    VERIFY_FINALLY_STACK();
 }
 
 igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, igraph_bool_t printing) {
@@ -130,8 +130,7 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, i
         IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 1); // Largest component cannot be bigger than a tree with the same number of vertices.
         prev = VECTOR(outputs)[i];
     }
-
-
+    
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
@@ -205,7 +204,6 @@ void test_site(void) {
     printf("K_5 with repeated vertices\n");
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat, false),  IGRAPH_EINVAL);
 
-
     igraph_destroy(&singleton);
     igraph_destroy(&null_graph);
     igraph_destroy(&k_5);
@@ -220,7 +218,6 @@ void test_site(void) {
     VERIFY_FINALLY_STACK();
 }
 
-
 igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
@@ -232,7 +229,6 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
     IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
 
     igraph_t graph;
-
 
     IGRAPH_CHECK(igraph_create(&graph, edge_list, 0, false));
 
@@ -259,7 +255,7 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
     return IGRAPH_SUCCESS;
 }
 
-void test_edge_list_percolation(void) {
+void test_edgelist_percolation(void) {
     // Edge list percolation is already called from bond percolation,
     // so this mostly tests for expected errors that cannot occur from generated edge lists.
     igraph_vector_int_t odd, negative;
@@ -275,13 +271,14 @@ void test_edge_list_percolation(void) {
     igraph_vector_int_destroy(&odd);
     igraph_vector_int_destroy(&negative);
     VERIFY_FINALLY_STACK();
-
 }
 
 int main(void) {
     igraph_rng_seed(igraph_rng_default(), 30062025);
+
     test_bond();
     test_site();
-    test_edge_list_percolation();
+    test_edgelist_percolation();
+
     return 0;
 }
