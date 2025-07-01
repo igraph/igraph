@@ -17,8 +17,7 @@
 */
 
 #include <igraph.h>
-#include "igraph_error.h"
-#include "igraph_vector.h"
+
 #include "test_utilities.h"
 
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
