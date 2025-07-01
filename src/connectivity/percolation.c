@@ -217,19 +217,22 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
 
 /**
- * \experimental
  * \function igraph_site_percolation
- * \brief The size of the largest component as vertices are added to graph.
+ * \brief The size of the largest component as vertices are added to a graph.
+ *
+ * \experimental
+ *
  * Calculates the percolation curve, or the size of the largest connected component as
  * vertices are added in the order given. If the output is reversed, it is the size of
  * the largest component as vertices are removed in the reverse of the order given.
  * If there is no vertex order given, it will generate one.
- * \param graph The graph that vertices are assumed to be in
+ *
+ * \param graph The graph that vertices are assumed to be in.
  * \param output <code>output[i]</code> will contain the size of the largest component
- *        after adding <code>vertex_order[i]</code>. Will be resised.
+ *        after adding <code>vertex_order[i]</code>. Will be resized.
  * \param vertex_order The order the vertices will be added in.
  *        Will raise error if there are duplicates, or a vertex is missing.
- *        If null, a random order will be used.
+ *        If \c NULL, a random order will be used.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_EINVAL
