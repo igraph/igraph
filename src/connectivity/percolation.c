@@ -276,7 +276,7 @@ igraph_error_t igraph_site_percolation(
         IGRAPH_FINALLY(igraph_vector_int_destroy, &i_vertex_order);
         IGRAPH_CHECK(igraph_vector_int_shuffle(&i_vertex_order));
 
-        p_vertex_order = & i_vertex_order;
+        p_vertex_order = &i_vertex_order;
     } else {
         p_vertex_order = vertex_order;
     }
