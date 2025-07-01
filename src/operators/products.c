@@ -353,6 +353,9 @@ static igraph_error_t tensor_product(igraph_t *res,
  * index in the product graph using <code>index = u |V2| + v</code>.
  *
  * </para><para>
+ * All implemented graph products are associative, but not all are commutative.
+ *
+ * </para><para>
  * The supported graph product types are detailed below. The notation
  * <code>u ~ v</code>
  * is used to indicate that vertices \c u and \c v are adjacent, i.e. there is
@@ -379,7 +382,8 @@ static igraph_error_t tensor_product(igraph_t *res,
  *     <code>u1 = u2</code> and <code>v1 ~ v2</code> or
  *     <code>u1 ~ u2</code>.
  *     Thus, the number of edges in the product is
- *     <code>|V1| |E2| + |V2|^2 |E1|</code>.
+ *     <code>|V1| |E2| + |V2|^2 |E1|</code>. Unlike most other graph products,
+ *     the lexicographic product is not commutative.
  *
  *     </para><para>
  *     Time Complexity: O(|V1| |V2| + |V1| |E2| + |V2|^2 |E1|)
@@ -416,6 +420,14 @@ static igraph_error_t tensor_product(igraph_t *res,
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
  * \endclist
+ *
+ * </para><para>
+ * Reference:
+ *
+  * </para><para>
+ * Hammack, R., Imrich, W., & Klavžar, S. (2011).
+ * Handbook of Product Graphs (2nd ed.). CRC Press.
+ * https://doi.org/10.1201/b10959
  *
  * \param res Pointer to an uninitialized graph object. The product graph will
  *   be stored here.
