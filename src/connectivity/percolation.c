@@ -17,6 +17,7 @@
 */
 
 #include "igraph_components.h"
+
 #include "igraph_constants.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
