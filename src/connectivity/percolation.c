@@ -24,7 +24,6 @@
 #include "igraph_vector.h"
 
 /**
- * \experimental
  * \function igraph_i_percolate_edge
  * \brief Percolates a single edge.
  * \param links Vector representing parents.
