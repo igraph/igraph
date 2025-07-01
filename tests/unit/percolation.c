@@ -101,8 +101,9 @@ void test_bond(void) {
     igraph_destroy(&karate);
     igraph_destroy(&random);
     VERIFY_FINALLY_STACK();
-    return 0;
+
 }
+
 igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
