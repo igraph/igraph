@@ -1566,6 +1566,9 @@ igraph_layout_umap_compute_weights:
     PARAMS: |-
         GRAPH graph, VECTOR distances, INOUT VECTOR weights
 
+igraph_layout_align:
+    PARAMS: GRAPH graph, INOUT MATRIX layout
+
 #######################################
 # Cocitation and other similarity measures
 #######################################
