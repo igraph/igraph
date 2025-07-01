@@ -110,6 +110,7 @@
 
 <section id="percolation"><title>Percolation</title>
 <!-- doxrox-include igraph_bond_percolation -->
+<!-- doxrox-include igraph_edge_list_percolation -->
 <!-- doxrox-include igraph_site_percolation -->
 </section>
 
