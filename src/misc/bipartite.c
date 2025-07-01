@@ -1200,8 +1200,9 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         iter = 0;
         for (igraph_integer_t i = 0; i < slen; i++) {
-            igraph_integer_t from = (igraph_integer_t)fmod(VECTOR(s)[i], n1);
-            igraph_integer_t to = (igraph_integer_t)(VECTOR(s)[i] / n1) + n1;
+            igraph_integer_t edge_index = (igraph_integer_t)VECTOR(s)[i];
+            igraph_integer_t from = edge_index % n1;
+            igraph_integer_t to = (edge_index / n1) + n1;
             if (mode != IGRAPH_IN) {
                 igraph_vector_int_push_back(&edges, from); /* reserved */
                 igraph_vector_int_push_back(&edges, to); /* reserved */
