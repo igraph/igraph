@@ -65,19 +65,23 @@ When performing a code review, keep in mind the following.
 
  - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments.
 
- - Check that the documentation of newly added or updated functions describes all function parameters, as well as the return value. The parameters must be documented in the same order as they appear in the function signature. If the time complexity of a newly added function was not included in the documentation, point this out.
+ - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature. 
+ 
+ - Check that the documentation of newly added public functions has a note on their time complexity.
 
  - Check that within the main description of the function each paragraph, except the first, is preceded by `</para><para>` on a separate line.
 
  - Check that any scientific articles referenced in the documentation are accompanied by a weblink, ideally a DOI link of the form `https://www.doi.org/...`. References to books do not need a weblink.
 
- - Check that newly added functions are marked as experimental by including `\experimental` on a separate line at the beginning of the documentation text.
+ - Check that newly added public functions are marked as experimental by including `\experimental` in their documentation. `\experimental` must appear on a separate line, directly following the `\brief` line.
 
  - Check that the documentation of newly added public functions is referenced in the appropriate `.xxml` file in the `/doc` subdirectory of the repo.
 
  - Check that the documentation of public functions conforms to the guidelines in our wiki at https://github.com/igraph/igraph/wiki/Documentation-guidelines. If they do not, include a link in your response to these guidelines.
 
- - When performing a code review, check that error and warning messages use sentence case and end in a fullstop. Messages should not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing. Refer to https://github.com/igraph/igraph/wiki/Error-reporting-guidelines for more details, and link this page when commenting on error or warning messages.
+ - Check that error and warning messages use sentence case and end in a fullstop. Refer to https://github.com/igraph/igraph/wiki/Error-reporting-guidelines for more details, and link this page when commenting on error or warning messages.
+
+ - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing. 
 
 ## Review hints
 
@@ -96,4 +100,3 @@ When performing a code review, keep in mind the following.
  - If `CHANGELOG.md` was updated, check that the description of changes is complete and accurate. If `CHANGELOG.md` was not updated, do not suggest doing so.
 
  - When performing a code review on a pull request that adds new features, you may comment on adherence to the general design principles of igraph explained at https://github.com/igraph/igraph/wiki/Design-principles-for-functions
-
