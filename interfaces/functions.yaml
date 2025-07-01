@@ -1314,7 +1314,7 @@ igraph_bond_percolation:
 igraph_site_percolation:
     PARAMS: GRAPH graph, OUT VECTOR_INT output, OPTIONAL VERTEX_INDICES vertex_order
 
-igraph_edge_list_percolation:
+igraph_edgelist_percolation:
     PARAMS: VERTEX_INDEX_PAIRS edges, OUT VECTOR_INT output
 
 #######################################

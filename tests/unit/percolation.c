@@ -224,7 +224,7 @@ void test_site(void) {
 igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
     igraph_vector_int_t outputs;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
-    IGRAPH_CHECK(igraph_edge_list_percolation(edge_list, &outputs));
+    IGRAPH_CHECK(igraph_edgelist_percolation(edge_list, &outputs));
 
     if (printing) print_vector_int(&outputs);
 

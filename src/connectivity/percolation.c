@@ -76,29 +76,28 @@ static void percolate_edge(igraph_vector_int_t *links,
 }
 
 /**
- * \function igraph_edge_list_percolation
+ * \function igraph_edgelist_percolation
+ * \brief Gives the size of the largest connected component as edges are added.
  *
  * \experimental
- *
- * \brief Gives the size of the largest connected component as edges are added.
  *
  * Calculates the size of the largest component as edges are added to a graph in the order given.
  * If the edge-sequence and output are reversed, they are the size of the largest component as
  * edges are removed.
- *
- * Time Complexity: O(|E| * a(|E|)) where a is the inverse ackerman function,
- *                  for all practical purposes it is not above 5.
  *
  * \param edges Vector of edges, where the n-th edge has endpoints edges[2n] and edges [2n+1].
  * \param output output[n] is the size of the largest connected component after edge n is added.
  *        Will be resized.
  *
  * \return Error code
+ *
+ * Time complexity: O(|E| * a(|E|)) where a is the inverse Ackermann function,
+ *                  for all practical purposes it is not above 5.
  */
 
-igraph_error_t igraph_edge_list_percolation(
-    const igraph_vector_int_t *edges,
-    igraph_vector_int_t* output) {
+igraph_error_t igraph_edgelist_percolation(
+        const igraph_vector_int_t *edges,
+        igraph_vector_int_t* output) {
 
     igraph_integer_t biggest = 0;
     igraph_integer_t lower, upper;
@@ -154,21 +153,20 @@ igraph_error_t igraph_edge_list_percolation(
  * edges are added to the graph in the order given. If both the output and the input
  * are reversed, it is the size of the largest component as edges are removed.
  *
- * Time Complexity: O(|V| + |E| * a(|E|)) where a is the inverse ackerman function,
- *                  for all practical purposes it is not above 5.
- *
- *
  * \param graph The input graph
  * \param output output[i] is the size of the largest component after adding
  *    <code>i+1</code> edges, will be created.
  * \param edge_order The order of the edges, will be generated at random if \c NULL.
  * \return Error code.
+ *
+ * Time complexity: O(|V| + |E| * a(|E|)) where a is the inverse Ackermann function,
+ *                  for all practical purposes it is not above 5.
  */
 
 igraph_error_t igraph_bond_percolation(
-    const igraph_t *graph,
-    igraph_vector_int_t *output,
-    const igraph_vector_int_t *edge_order) {
+        const igraph_t *graph,
+        igraph_vector_int_t *output,
+        const igraph_vector_int_t *edge_order) {
 
     const igraph_vector_int_t *p_edge_order;
     igraph_vector_int_t i_edge_order;
@@ -190,7 +188,7 @@ igraph_error_t igraph_bond_percolation(
     IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
 
     IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges));
-    IGRAPH_CHECK(igraph_edge_list_percolation(&edges, output));
+    IGRAPH_CHECK(igraph_edgelist_percolation(&edges, output));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -208,8 +206,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
                                      igraph_vector_int_t *sizes,
                                      igraph_integer_t *biggest,
                                      igraph_integer_t vertex,
-                                     igraph_vector_int_t *neighbors
-                                    ) {
+                                     igraph_vector_int_t *neighbors) {
 
     if (VECTOR(*sizes)[vertex] != 0) {
         IGRAPH_ERROR("Duplicate vertex in vertex order vector.", IGRAPH_EINVAL);
@@ -244,9 +241,6 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  * the largest component as vertices are removed in the reverse of the order given.
  * If there is no vertex order given, it will generate one.
  *
- * Time Complexity: O(|V| + |E| * a(|E|)) where a is the inverse ackerman function,
- *                  for all practical purposes it is not above 5.
- *
  * \param graph The graph that vertices are assumed to be in.
  * \param output <code>output[i]</code> will contain the size of the largest component
  *        after adding <code>vertex_order[i]</code>. Will be resized.
@@ -258,12 +252,15 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  *        \cli IGRAPH_EINVAL
  *             The vertex list is invalid, see above.
  *        \endclist
+ *
+ * Time Complexity: O(|V| + |E| * a(|E|)) where a is the inverse Ackermann function,
+ *                  for all practical purposes it is not above 5.
  */
 
 igraph_error_t igraph_site_percolation(
-    const igraph_t *graph,
-    igraph_vector_int_t *output,
-    const igraph_vector_int_t *vertex_order) {
+        const igraph_t *graph,
+        igraph_vector_int_t *output,
+        const igraph_vector_int_t *vertex_order) {
 
     const igraph_vector_int_t *p_vertex_order;
     igraph_vector_int_t i_vertex_order;
@@ -284,7 +281,7 @@ igraph_error_t igraph_site_percolation(
     // Initialize variables
     if (igraph_vector_int_size(p_vertex_order) != vcount) {
         IGRAPH_ERRORF("Vertex order vector length (%" IGRAPH_PRId") "
-                      "does not match the vertex count (%" IGRAPH_PRId ")",
+                      "does not match the vertex count (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_vector_int_size(p_vertex_order), vcount);
     }
