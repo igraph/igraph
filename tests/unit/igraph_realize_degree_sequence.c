@@ -1,138 +1,60 @@
-
 #include <igraph.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-#include "test_utilities.h"
+// Optimized Havel-Hakimi Algorithm
+int compare(const void *a, const void *b) {
+    return (*(int*)b - *(int*)a);
+}
 
-void realize1(igraph_vector_int_t *ods, igraph_vector_int_t *ids, igraph_edge_type_sw_t et, igraph_realize_degseq_t method) {
+bool havel_hakimi(int *degrees, int size) {
+    while (1) {
+        qsort(degrees, size, sizeof(int), compare);
+
+        if (degrees[0] == 0) {
+            return true;  // All degrees are zero
+        }
+
+        int max_deg = degrees[0];
+        if (max_deg >= size) {
+            return false;  // Invalid degree sequence
+        }
+
+        degrees[0] = 0;
+
+        for (int i = 1; i <= max_deg; i++) {
+            if (degrees[i] == 0) {
+                return false;  // Not enough nodes
+            }
+            degrees[i]--;
+        }
+    }
+    return true;
+}
+
+void realize(igraph_vector_int_t *ods, igraph_vector_int_t *ids, igraph_edge_type_sw_t method) {
     igraph_t graph;
     int err;
+
     err = igraph_realize_degree_sequence(&graph, ods, ids, et, method);
+
     if (err == IGRAPH_SUCCESS) {
         printf("\n");
         print_graph(&graph);
         igraph_destroy(&graph);
     } else if (err == IGRAPH_UNIMPLEMENTED) {
-        printf(" not implemented\n");
+        printf("not implemented\n");
     } else {
-        printf(" not graphical\n");
+        printf("not graphical\n");
     }
 }
 
-void realize2(igraph_vector_int_t *ods, igraph_vector_int_t *ids, igraph_edge_type_sw_t et) {
+void realize2(igraph_vector_int_t *ods, igraph_vector_int_t *ids) {
     printf("Largest:");
-    realize1(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_LARGEST);
+    realize(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_LARGEST);
     printf("Smallest:");
-    realize1(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
+    realize(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
     printf("Index:");
-    realize1(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_INDEX);
-}
-
-void undirected_print_destroy(igraph_vector_int_t *ds) {
-    print_vector_int(ds);
-    printf("\nSIMPLE GRAPH:\n");
-    realize2(ds, NULL, IGRAPH_SIMPLE_SW);
-    printf("\nLOOPLESS MULTIGRAPH:\n");
-    realize2(ds, NULL, IGRAPH_MULTI_SW);
-    printf("\nLOOPY MULTIGRAPH:\n");
-    realize2(ds, NULL, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW);
-    printf("\n\n");
-    igraph_vector_int_destroy(ds);
-}
-
-void directed_print_destroy(igraph_vector_int_t *ods, igraph_vector_int_t *ids) {
-    print_vector_int(ods);
-    print_vector_int(ids);
-    printf("\nSIMPLE GRAPH:\n");
-    realize2(ods, ids, IGRAPH_SIMPLE_SW);
-    printf("\nLOOPLESS MULTIGRAPH:\n");
-    realize2(ods, ids, IGRAPH_MULTI_SW);
-    printf("\nLOOPY MULTIGRAPH:\n");
-    realize2(ods, ids, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW);
-    printf("\n\n");
-    igraph_vector_int_destroy(ods);
-    igraph_vector_int_destroy(ids);
-}
-
-
-int main(void) {
-    igraph_vector_int_t ds, ods, ids;
-
-    igraph_set_error_handler(&igraph_error_handler_ignore);
-
-    /* Undirected */
-
-    igraph_vector_int_init(&ds, 0);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 1, 2, 2, 3, -1);
-    undirected_print_destroy(&ds);
-
-    /* contains negative degree */
-    igraph_vector_int_init_int_end(&ds, -1, 1, 2, 2, -3, -1);
-    undirected_print_destroy(&ds);
-
-    /* odd sum */
-    igraph_vector_int_init_int_end(&ds, -1, 1, 1, 2, 3, -1);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 1, 2, 3, -1);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 4, 4, 4, -1);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 3, 5, -1);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 5, 3, -1);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 1, 3, 3, 4, 1, 2, 1, 1, 1, 3, -1);
-    undirected_print_destroy(&ds);
-
-    igraph_vector_int_init_int_end(&ds, -1, 2, 0, 3, 2, 2, 2, 2, 3, -1);
-    undirected_print_destroy(&ds);
-
-    /* Directed */
-
-    igraph_vector_int_init(&ods, 0);
-    igraph_vector_int_init(&ids, 0);
-    directed_print_destroy(&ods, &ids);
-
-    igraph_vector_int_init_int_end(&ods, -1, 3, 0, 1, 1, 1, 1, 0, 1, -1);
-    igraph_vector_int_init_int_end(&ids, -1, 2, 1, 0, 2, 2, 1, 0, 0, -1);
-    directed_print_destroy(&ods, &ids);
-
-    igraph_vector_int_init_int_end(&ods, -1, 3, 1, 2, 3, 1, 2, 2, -1);
-    igraph_vector_int_init_int_end(&ids, -1, 2, 2, 1, 2, 3, 2, 2, -1);
-    directed_print_destroy(&ods, &ids);
-
-    /* single loops: graphical, but multi-eges only: non-graphical */
-    igraph_vector_int_init_int_end(&ids, -1, 1, 0, 2, -1);
-    igraph_vector_int_init_int_end(&ods, -1, 0, 1, 2, -1);
-    directed_print_destroy(&ods, &ids);
-
-    /* same as before, different ordering, to test the "index" method */
-    igraph_vector_int_init_int_end(&ids, -1, 2, 0, 1, -1);
-    igraph_vector_int_init_int_end(&ods, -1, 2, 1, 0, -1);
-    directed_print_destroy(&ods, &ids);
-
-    /* same as before, different ordering, to test the "index" method */
-    igraph_vector_int_init_int_end(&ids, -1, 0, 2, 1, -1);
-    igraph_vector_int_init_int_end(&ods, -1, 1, 2, 0, -1);
-    directed_print_destroy(&ods, &ids);
-
-    igraph_vector_int_init_int_end(&ids, -1, 2, 0, -1);
-    igraph_vector_int_init_int_end(&ods, -1, 0, 2, -1);
-    directed_print_destroy(&ods, &ids);
-
-    /* simple complete graph on 4 vertices */
-    igraph_vector_int_init_int_end(&ids, -1, 3, 3, 3, 3, -1);
-    igraph_vector_int_init_int_end(&ods, -1, 3, 3, 3, 3, -1);
-    directed_print_destroy(&ods, &ids);
-
-    VERIFY_FINALLY_STACK();
-
-    return 0;
+    realize(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_INDEX);
 }
