@@ -2,9 +2,14 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
+
 ### Fixed
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
+ - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
 
 ## [0.10.16] - 2025-06-10
 
