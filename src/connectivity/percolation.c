@@ -139,14 +139,19 @@ igraph_error_t igraph_edge_list_percolation(
 /**
  * \function igraph_bond_percolation
  * \brief Calculates the bond-percolation curve of a graph.
+ *
+ * \experimental
+ *
  * Calculates the bond-percolation curve, or the size of the largest component as
  * edges are added to the graph in the order given. If both the output and the input
- * are reversed is the size of the largest component as edges are removed.
+ * are reversed, it is the size of the largest component as edges are removed.
+ *
  * \param graph The input graph
  * \param output output[i] is the size of the largest component after adding
  *    <code>i+1</code> edges, will be created.
- * \param edges The order of the edges, will be generated at random if null.
- * */
+ * \param edges The order of the edges, will be generated at random if \c NULL.
+ * \return Error code.
+ */
 
 igraph_error_t igraph_bond_percolation(
         const igraph_t *graph,
