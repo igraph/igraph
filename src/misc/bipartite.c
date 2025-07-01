@@ -1081,6 +1081,15 @@ static igraph_error_t gnp_bipartite_large(
     /* n1 + n2 has already been checked for overflow in the caller function. */
     IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
 
+    // Assign types vector: first n1 are 0 (bottom), next n2 are 1 (top)
+    if (types) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
+        igraph_vector_bool_null(types);
+        for (igraph_integer_t i = n1; i < n1 + n2; i++) {
+            VECTOR(*types)[i] = true;
+        }
+    }
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
