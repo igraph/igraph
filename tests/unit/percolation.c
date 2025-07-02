@@ -136,18 +136,6 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, i
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t largest_component_s(igraph_t *graph, igraph_integer_t *size) {
-    igraph_vector_int_t outputs;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
-
-    IGRAPH_CHECK(igraph_site_percolation(graph, &outputs, NULL));
-
-    *size = VECTOR(outputs)[igraph_vector_int_size(&outputs) -1];
-
-    igraph_vector_int_destroy(&outputs);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-}
 
 void test_site(void) {
 
