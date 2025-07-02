@@ -154,7 +154,7 @@ int main(void) {
     igraph_destroy(&g);
 
     printf("\nIn-star S_10:\n");
-    igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
+    igraph_star(&g, 10, IGRAPH_STAR_IN, 0);
     IGRAPH_ASSERT(igraph_graph_center(&g, NULL, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
