@@ -49,7 +49,7 @@ int main(void) {
     igraph_destroy(&res);
     igraph_destroy(&expected_res);
 
-    // should a 5-cycle
+    // should be a 5-cycle
     igraph_mycielski_graph(&res, 3);
     igraph_ring(&expected_res, 5, IGRAPH_UNDIRECTED, false, true);
     igraph_isomorphic(&res, &expected_res, &is_isomorph);
