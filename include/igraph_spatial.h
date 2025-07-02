@@ -20,8 +20,8 @@
    02110-1301 USA
 
 */
-#ifndef IGRAPH_SPATIAL
-#define IGRAPH_SPATIAL
+#ifndef IGRAPH_SPATIAL_H
+#define IGRAPH_SPATIAL_H
 
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
