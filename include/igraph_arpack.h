@@ -387,8 +387,8 @@ IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun
 IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
                                                igraph_integer_t nev);
 
-const char* igraph_arpack_error_to_string(igraph_arpack_error_t error);
-igraph_arpack_error_t igraph_arpack_get_last_error(void);
+IGRAPH_EXPORT const char* igraph_arpack_error_to_string(igraph_arpack_error_t error);
+IGRAPH_EXPORT igraph_arpack_error_t igraph_arpack_get_last_error(void);
 
 __END_DECLS
 
