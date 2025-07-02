@@ -1,11 +1,9 @@
 
-#include "igraph_operators.h"
 #include "igraph_spatial.h"
 #include "igraph_datatype.h"
 #include "igraph_matrix.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_vector.h"
 #include "nanoflann/nanoflann.hpp"
 #include <cstdint>
 
@@ -16,7 +14,7 @@ class igraph_point_adaptor {
         return igraph_matrix_nrow(points);
     }
     igraph_real_t kdtree_get_pt(const size_t idx, const size_t dim) const {
-        return 0;
+        return igraph_matrix_get(points, idx, dim);
     }
 
     // indicates that it should use default
@@ -38,11 +36,11 @@ public:
 
 } ;
 
-igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
+extern "C" igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
         igraph_metric_t metric,
-        igraph_real_t cutoff,
-        igraph_integer_t number) {
+        igraph_integer_t neighbors,
+        igraph_real_t cutoff) {
 
     igraph_integer_t dimensionality = igraph_matrix_ncol(points);
 

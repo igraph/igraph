@@ -919,6 +919,13 @@ add_legacy_tests(
   igraph_is_bigraphical
 )
 
+# spatial
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_nearest_neighbor_graph
+)
+
+
 # cycle bases
 add_legacy_tests(
   FOLDER tests/unit NAMES
