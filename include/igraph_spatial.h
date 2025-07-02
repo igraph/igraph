@@ -30,7 +30,7 @@
 #include "igraph_matrix.h"
 
 typedef enum {
-    IGRAPH_L2_METRIC
+    IGRAPH_METRIC_L2
 } igraph_metric_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
