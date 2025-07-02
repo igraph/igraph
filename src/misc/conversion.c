@@ -744,7 +744,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise (or column-wise), such that
  * the sum of each row (or column) is one. The row-wise normalized matrix
- * is also called a \em right-stochastic and containt the transition
+ * is also called a \em right-stochastic and contains the transition
  * probabilities of a random walk that follows edge directions in a directed
  * graph. The column-wise normalized matrix is called \em left-stochastic and
  * is related to random walks moving against edge directions.
