@@ -361,6 +361,7 @@ add_legacy_tests(
   igraph_voronoi
   igraph_widest_paths
   igraph_spanner
+  jdm
   knn
   paths
   random_spanning_tree
@@ -405,6 +406,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_align
   igraph_layout_drl
   igraph_layout_drl_3d
   igraph_layout_bipartite
@@ -910,6 +912,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_graphical
   igraph_is_bigraphical
+  igraph_realize_bipartite_degree_sequence
 )
 
 # cycle bases
@@ -1028,18 +1031,9 @@ add_legacy_tests(
   igraph_hexagonal_lattice
 )
 
-add_legacy_tests(
-        FOLDER tests/unit NAMES
-        jdm
-)
-
-add_legacy_tests(
-        FOLDER tests/unit NAMES
-        igraph_realize_bipartite_degree_sequence
-)
-
 # percolation
 add_legacy_tests(
-	FOLDER tests/unit NAMES
-	percolation
+  FOLDER tests/unit NAMES
+  percolation
 )
+
