@@ -6,7 +6,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "nanoflann.hpp"
+#include "nanoflann/nanoflann.hpp"
 #include <cstdint>
 
 class igraph_point_adaptor {
