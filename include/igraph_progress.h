@@ -174,7 +174,7 @@ IGRAPH_EXPORT igraph_error_t igraph_progressf(const char *message, igraph_real_t
  * \define IGRAPH_PROGRESSF
  * \brief Report the progress of a calculation from an igraph function, printf-like (macro variant).
  *
- * This is the more flexible version of \ref IGRAPH_PROGRESSF(),
+ * This is the more flexible version of \ref IGRAPH_PROGRESS(),
  * having a printf-like syntax. As this macro takes variable
  * number of arguments, they must be all supplied as a single
  * argument, enclosed in parentheses. \ref igraph_progressf() is then
