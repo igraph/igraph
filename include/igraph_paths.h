@@ -29,7 +29,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \typedef igraph_astar_heuristic_func_t
@@ -301,6 +301,6 @@ IGRAPH_EXPORT igraph_error_t igraph_vertex_path_from_edge_path(
         const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
         igraph_neimode_t mode);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

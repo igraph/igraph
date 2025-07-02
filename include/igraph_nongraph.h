@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \def IGRAPH_SHORTEST_PATH_EPSILON
@@ -93,6 +93,6 @@ IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
     const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

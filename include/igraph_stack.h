@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */
@@ -61,6 +61,6 @@ __BEGIN_DECLS
     do { IGRAPH_CHECK(igraph_stack_int_init(s, capacity)); \
         IGRAPH_FINALLY(igraph_stack_int_destroy, s); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -6,12 +6,12 @@
 #include "igraph_datatype.h"
 #include "igraph_error.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_rewire(
     igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
     igraph_bool_t use_adjlist);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

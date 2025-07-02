@@ -25,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                                  igraph_real_t *res,
@@ -49,6 +49,6 @@ IGRAPH_EXPORT igraph_error_t igraph_ecc(const igraph_t *graph,
                                         igraph_bool_t offset,
                                         igraph_bool_t normalize);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

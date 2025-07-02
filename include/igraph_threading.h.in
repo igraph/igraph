@@ -21,7 +21,7 @@
 
 #include "igraph_decls.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \define IGRAPH_THREAD_SAFE
@@ -37,6 +37,6 @@ __BEGIN_DECLS
 
 #cmakedefine01 IGRAPH_THREAD_SAFE
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

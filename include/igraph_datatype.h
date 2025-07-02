@@ -23,7 +23,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 struct igraph_i_property_cache_t;
 typedef struct igraph_i_property_cache_t igraph_i_property_cache_t;
@@ -117,6 +117,6 @@ typedef struct {
 
 IGRAPH_EXPORT void igraph_invalidate_cache(const igraph_t* graph);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

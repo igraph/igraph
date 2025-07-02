@@ -25,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_reachability(
             const igraph_t *graph,
@@ -44,6 +44,6 @@ IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
 IGRAPH_EXPORT igraph_error_t igraph_transitive_closure(const igraph_t *graph,
                                                        igraph_t* closure);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif // IGRAPH_REACHABILITY_H

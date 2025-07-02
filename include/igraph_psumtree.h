@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef struct {
     igraph_vector_t v;
@@ -42,6 +42,6 @@ IGRAPH_EXPORT igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph
                                          igraph_real_t new_value);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

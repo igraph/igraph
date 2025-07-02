@@ -26,7 +26,7 @@
 #include "igraph_datatype.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Maximum flows, minimum cuts & such                 */
@@ -148,6 +148,6 @@ IGRAPH_EXPORT igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph,
                                         igraph_vector_t *flows,
                                         const igraph_vector_t *capacity);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

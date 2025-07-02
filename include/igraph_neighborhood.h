@@ -26,7 +26,7 @@
 #include "igraph_iterators.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int_t *res,
                                            igraph_vs_t vids, igraph_integer_t order,
@@ -39,6 +39,6 @@ IGRAPH_EXPORT igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, i
                                              igraph_neimode_t mode,
                                              igraph_integer_t mindist);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

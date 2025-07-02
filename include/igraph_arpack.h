@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \section about_arpack ARPACK interface in igraph
@@ -390,6 +390,6 @@ IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vecto
 IGRAPH_EXPORT const char* igraph_arpack_error_to_string(igraph_arpack_error_t error);
 IGRAPH_EXPORT igraph_arpack_error_t igraph_arpack_get_last_error(void);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

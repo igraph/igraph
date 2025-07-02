@@ -28,7 +28,7 @@
 
 #include <string.h> /* memset */
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 struct igraph_i_property_cache_t {
     igraph_bool_t value[IGRAPH_PROP_I_SIZE];
@@ -47,6 +47,6 @@ void igraph_i_property_cache_invalidate_conditionally(
     const igraph_t *graph, uint32_t keep_always, uint32_t keep_when_false, uint32_t keep_when_true
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_CACHING_H */

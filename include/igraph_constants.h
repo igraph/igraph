@@ -21,7 +21,7 @@
 
 #include "igraph_decls.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Constants                                          */
@@ -212,6 +212,6 @@ typedef enum {
     IGRAPH_LPA_FAST           // Sample from dominant labels, only check neighbors
 } igraph_lpa_variant_t;
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

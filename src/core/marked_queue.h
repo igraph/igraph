@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* This is essentially a double ended queue, with some extra features:
    (1) The is-element? operation is fast, O(1). This requires that we
@@ -69,6 +69,6 @@ IGRAPH_PRIVATE_EXPORT void igraph_marked_queue_int_pop_back_batch(igraph_marked_
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_marked_queue_int_as_vector(const igraph_marked_queue_int_t *q,
                                                                    igraph_vector_int_t *vec);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

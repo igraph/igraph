@@ -22,7 +22,7 @@
 #include "igraph_decls.h"
 #include "igraph_cliques.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int_list_t *res,
                              igraph_integer_t min_size, igraph_integer_t max_size);
@@ -44,6 +44,6 @@ igraph_error_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
 igraph_error_t igraph_i_weighted_clique_number(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_real_t *res);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif // IGRAPH_CLIQUER_H

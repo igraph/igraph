@@ -25,7 +25,7 @@
 
 #include "igraph_decls.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 extern const unsigned int igraph_i_isoclass2_3[];
 extern const unsigned int igraph_i_isoclass2_4[];
@@ -40,6 +40,6 @@ extern const unsigned int igraph_i_isoclass_4u_idx[];
 extern const unsigned int igraph_i_isoclass_5u_idx[];
 extern const unsigned int igraph_i_isoclass_6u_idx[];
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

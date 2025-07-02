@@ -26,7 +26,7 @@
 #include "igraph_graph_list.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \struct igraph_hrg_t
@@ -122,6 +122,6 @@ IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(
     igraph_t *graph, const igraph_hrg_t *hrg
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif  /* IGRAPH_HRG_H */

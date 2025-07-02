@@ -23,10 +23,10 @@
 #include "igraph_decls.h"
 #include "igraph_error.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_reverse(igraph_t *graph);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_GRAPH_INTERNAL_H */

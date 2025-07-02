@@ -26,7 +26,7 @@
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */
@@ -57,6 +57,6 @@ IGRAPH_EXPORT igraph_error_t igraph_similarity_inverse_log_weighted(const igraph
                                                          igraph_matrix_t *res, igraph_vs_t vids,
                                                          igraph_neimode_t mode);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif
