@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2020  The igraph development team
@@ -32,7 +30,7 @@
 #include "igraph_progress.h"
 #include "igraph_structural.h"
 
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     const igraph_t *graph,

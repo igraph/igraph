@@ -18,7 +18,7 @@
 #include <igraph.h>
 
 void prepare_weights_vector(igraph_vector_t *weights, const igraph_t *graph) {
-    const igraph_integer_t m =igraph_ecount(graph);
+    const igraph_integer_t m = igraph_ecount(graph);
     igraph_edge_betweenness(graph, weights, true, NULL);
     for (igraph_integer_t i=0; i < m; i++) {
         VECTOR(*weights)[i] = 1 / VECTOR(*weights)[i];
@@ -37,7 +37,7 @@ void verify_with_leiden(const igraph_t *graph, const igraph_vector_t *weights,
     igraph_vector_init(&vertex_weights, 0);
     igraph_vector_int_init(&leiden_membership, 0);
 
-    igraph_strength(graph, &vertex_weights, igraph_vss_all(), IGRAPH_ALL, /*loops*/ true, weights);
+    igraph_strength(graph, &vertex_weights, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, weights);
 
     for (int i=0; i < 10; i++) {
         igraph_community_leiden(graph, weights, &vertex_weights,
@@ -49,7 +49,7 @@ void verify_with_leiden(const igraph_t *graph, const igraph_vector_t *weights,
     }
 
     if (igraph_cmp_epsilon(modularity, maxQ, 1e-15) < 0) {
-        printf("Partitioning doesn't achieve maximum modulairty. "
+        printf("Partitioning doesn't achieve maximum modularity. "
                "With Leiden: Q=%g; with optimal modularity: Q=%g\n",
                maxQ, modularity);
         IGRAPH_ASSERT(igraph_cmp_epsilon(modularity, maxQ, 1e-15) >= 0);

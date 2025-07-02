@@ -29,7 +29,7 @@ int main(void) {
     igraph_vector_int_t edges;
     igraph_integer_t n;
 
-    /* C arryas use row-major storage, while igraph's matrix uses column-major.
+    /* C arrays use row-major storage, while igraph's matrix uses column-major.
      * The matrix 'mat' will be the transpose of 'data'. */
     igraph_matrix_view(&mat, *data, sizeof(data[0]) / sizeof(data[0][0]), sizeof(data) / sizeof(data[0]));
 

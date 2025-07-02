@@ -30,7 +30,7 @@ int main(void) {
     igraph_famous(&g2, "franklin");
 
     igraph_isomorphic(&g, &g2, &iso);
-    IGRAPH_ASSERT(&iso);
+    IGRAPH_ASSERT(iso);
 
     igraph_destroy(&g);
     igraph_destroy(&g2);

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -332,7 +330,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
         IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
 
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, IGRAPH_LOOPS));
+        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode), IGRAPH_LOOPS));
 
         for (i = 0; i < vcount; ++i) {
             if (VECTOR(degree)[i] == 0) {
@@ -674,7 +672,7 @@ static igraph_error_t igraph_i_is_forest(
 
             IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
             IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                            IGRAPH_REVERSE_MODE(mode), /* loops = */ 1));
+                            IGRAPH_REVERSE_MODE(mode), IGRAPH_LOOPS));
 
             for (v = 0; v < vcount; ++v) {
                 /* In an out-tree, roots have in-degree 0,

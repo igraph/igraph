@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -32,7 +31,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_operators.h"
 #include "igraph_structural.h"
@@ -464,14 +462,14 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  *        contains the target vertex.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
- * \param capacity Vector containing the capacity of the edges. If NULL, then
+ * \param capacity Vector containing the capacity of the edges. If \c NULL, then
  *        every edge is considered to have capacity 1.0.
  * \param stats Counts of the number of different operations
- *        preformed by the algorithm are stored here.
+ *        performed by the algorithm are stored here.
  * \return Error code.
  *
- * Time complexity: O(|V|^3). In practice it is much faster, but i
- * cannot prove a better lower bound for the data structure i've
+ * Time complexity: O(|V|^3). In practice it is much faster, but I
+ * cannot prove a better lower bound for the data structure I've
  * used. In fact, this implementation runs much faster than the
  * \c hi_pr implementation discussed in
  * B. V. Cherkassky and A. V. Goldberg: On implementing the
@@ -1134,7 +1132,7 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
         IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity, 0));
+    IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity, NULL));
 
     return IGRAPH_SUCCESS;
 }
@@ -1396,18 +1394,16 @@ static igraph_error_t igraph_i_mincut_undirected(
         igraph_integer_t bignode = VECTOR(mergehist)[2 * mincut_step + 1];
         igraph_integer_t i, idx;
         igraph_integer_t size = 1;
-        bool *mark;
+        igraph_bitset_t mark;
 
-        mark = IGRAPH_CALLOC(no_of_nodes, bool);
-        IGRAPH_CHECK_OOM(mark, "Not enough memory for minimum cut.");
-        IGRAPH_FINALLY(igraph_free, mark);
+        IGRAPH_BITSET_INIT_FINALLY(&mark, no_of_nodes);
 
         /* first count the vertices in the partition */
-        mark[bignode] = true;
+        IGRAPH_BIT_SET(mark, bignode);
         for (i = mincut_step - 1; i >= 0; i--) {
-            if ( mark[ VECTOR(mergehist)[2 * i] ] ) {
+            if ( IGRAPH_BIT_TEST(mark, VECTOR(mergehist)[2 * i]) ) {
                 size++;
-                mark [ VECTOR(mergehist)[2 * i + 1] ] = true;
+                IGRAPH_BIT_SET(mark, VECTOR(mergehist)[2 * i + 1]);
             }
         }
 
@@ -1417,7 +1413,7 @@ static igraph_error_t igraph_i_mincut_undirected(
             idx = 0;
             VECTOR(*partition)[idx++] = bignode;
             for (i = mincut_step - 1; i >= 0; i--) {
-                if (mark[ VECTOR(mergehist)[2 * i] ]) {
+                if (IGRAPH_BIT_TEST(mark, VECTOR(mergehist)[2 * i])) {
                     VECTOR(*partition)[idx++] = VECTOR(mergehist)[2 * i + 1];
                 }
             }
@@ -1428,7 +1424,7 @@ static igraph_error_t igraph_i_mincut_undirected(
             IGRAPH_CHECK(igraph_vector_int_resize(partition2, no_of_nodes - size));
             idx = 0;
             for (i = 0; i < no_of_nodes; i++) {
-                if (!mark[i]) {
+                if (!IGRAPH_BIT_TEST(mark, i)) {
                     VECTOR(*partition2)[idx++] = i;
                 }
             }
@@ -1443,8 +1439,8 @@ static igraph_error_t igraph_i_mincut_undirected(
             igraph_vector_int_clear(&mergehist);
             for (i = 0; i < no_of_edges; i++) {
                 igraph_edge(graph, i, &from, &to);
-                if ((mark[from] && !mark[to]) ||
-                    (mark[to] && !mark[from])) {
+                if ((IGRAPH_BIT_TEST(mark, from) && !IGRAPH_BIT_TEST(mark, to)) ||
+                    (IGRAPH_BIT_TEST(mark, to) && !IGRAPH_BIT_TEST(mark, from))) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&mergehist, i));
                 }
             }
@@ -1452,7 +1448,7 @@ static igraph_error_t igraph_i_mincut_undirected(
             IGRAPH_CHECK(igraph_vector_int_append(cut, &mergehist));
         }
 
-        IGRAPH_FREE(mark);
+        igraph_bitset_destroy(&mark);
         igraph_vector_int_destroy(&mergehist);
         IGRAPH_FINALLY_CLEAN(2);
     }
@@ -1473,7 +1469,7 @@ static igraph_error_t igraph_i_mincut_directed(
     igraph_real_t flow;
     igraph_real_t minmaxflow = IGRAPH_INFINITY;
     igraph_vector_int_t mypartition, mypartition2, mycut;
-    igraph_vector_int_t *ppartition = 0, *ppartition2 = 0, *pcut = 0;
+    igraph_vector_int_t *ppartition = NULL, *ppartition2 = NULL, *pcut = NULL;
     igraph_vector_int_t bestpartition, bestpartition2, bestcut;
 
     if (partition) {
@@ -1708,7 +1704,7 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
 
     for (i = 1; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, 0, i,
-                                          capacity, 0));
+                                          capacity, NULL));
         if (flow < minmaxflow) {
             minmaxflow = flow;
             if (flow == 0) {
@@ -1716,7 +1712,7 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
             }
         }
         IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, i, 0,
-                                          capacity, 0));
+                                          capacity, NULL));
         if (flow < minmaxflow) {
             minmaxflow = flow;
             if (flow == 0) {
@@ -1839,7 +1835,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(
 
     /* Do the maximum flow */
     IGRAPH_CHECK(igraph_maxflow_value(&newgraph, &real_res,
-                                      source, target + no_of_nodes, &capacity, 0));
+                                      source, target + no_of_nodes, &capacity, NULL));
     *res = (igraph_integer_t) real_res;
 
     *res -= no_conn;
@@ -2008,7 +2004,7 @@ static igraph_error_t igraph_i_vertex_connectivity_directed(
 
                 /* Do the maximum flow */
                 IGRAPH_CHECK(igraph_maxflow_value(
-                                 &split_graph, &real_res, i, j + no_of_nodes, &capacity, 0
+                                 &split_graph, &real_res, i, j + no_of_nodes, &capacity, NULL
                              ));
 
                 /* Restore the capacities */
@@ -2230,7 +2226,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph,
         IGRAPH_ERROR("The source and target vertices must be different.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
+    IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, NULL, NULL));
     *res = (igraph_integer_t) flow;
 
     return IGRAPH_SUCCESS;
@@ -2338,7 +2334,7 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph,
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
+    IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, NULL, NULL));
 
     *res = (igraph_integer_t) flow;
 

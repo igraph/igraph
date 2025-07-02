@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -683,7 +682,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     } else {
         debug("Calculating degrees\n");
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
         for (i = 0; i < no_of_nodes; i++) {
             VECTOR(a)[i] = VECTOR(degrees)[i];
         }
@@ -1059,7 +1058,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                      no_of_nodes,
                      /*steps=*/ best_no_of_joins,
                      membership,
-                     /*csize=*/ 0));
+                     /*csize=*/ NULL));
     }
 
     if (merges == &merges_local) {

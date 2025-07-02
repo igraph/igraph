@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -537,18 +535,18 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     } else {
         if (igraph_vector_size(lengths) != no_of_edges) {
-            IGRAPH_ERROR("Egde length vector size must agree with number of edges.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Edge length vector size must agree with number of edges.", IGRAPH_EINVAL);
         }
 
         if (no_of_edges > 0) {
             /* Must not call vector_min on empty vector */
             igraph_real_t minlength = igraph_vector_min(lengths);
             if (minlength <= 0) {
-                IGRAPH_ERROR("Egde lengths must be strictly positive.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge lengths must be strictly positive.", IGRAPH_EINVAL);
             }
 
             if (isnan(minlength)) {
-                IGRAPH_ERROR("Egde lengths must not be NaN.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge lengths must not be NaN.", IGRAPH_EINVAL);
             }
         }
 

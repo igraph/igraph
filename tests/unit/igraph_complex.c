@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -24,7 +23,7 @@
 #include <igraph.h>
 
 /* Ensure that math constants are available. */
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 #include "test_utilities.h"
 

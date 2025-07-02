@@ -21,7 +21,7 @@
 
 void print_and_destroy(const igraph_t *graph, igraph_vector_int_list_t *list) {
     const igraph_integer_t n = igraph_vector_int_list_size(list);
-    for (igraph_integer_t i =0; i < n; i++) {
+    for (igraph_integer_t i=0; i < n; i++) {
         igraph_bool_t sep;
         igraph_is_minimal_separator(
             graph,

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2009-2023  The igraph development team <igraph@igraph.org>
@@ -498,8 +497,8 @@ igraph_error_t igraph_joint_degree_matrix(
         // Compute max degrees
         IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degrees, no_of_nodes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degrees, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, true));
-        IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, true));
+        IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
+        IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
 
         if (max_out_degree < 0) {
             max_out_degree = no_of_nodes > 0 ? igraph_vector_int_max(&out_degrees) : 0;
@@ -535,7 +534,7 @@ igraph_error_t igraph_joint_degree_matrix(
         igraph_integer_t maxdeg;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
         // Compute max degree of the graph only if needed
         if (max_out_degree < 0 || max_in_degree < 0) {
@@ -820,17 +819,17 @@ igraph_error_t igraph_joint_degree_distribution(
 
     if (have_out) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_out, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /* loops */ true));
+        IGRAPH_CHECK(igraph_degree(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
     }
 
     if (have_in) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_in, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /* loops */ true));
+        IGRAPH_CHECK(igraph_degree(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
     }
 
     if (have_all) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_all, no_of_nodes);
-        IGRAPH_CHECK(igraph_degree(graph, &deg_all, igraph_vss_all(), IGRAPH_ALL, /* loops */ true));
+        IGRAPH_CHECK(igraph_degree(graph, &deg_all, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
     }
 
     switch (from_mode) {

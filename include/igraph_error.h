@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ERROR_H
@@ -305,7 +300,7 @@ typedef enum {
     /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
-    /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* removed in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
     /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */

@@ -591,6 +591,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         localname = XML_ATTR_LOCALNAME(it);
 
         if (xmlStrEqual(localname, toXmlChar("id"))) {
+            safely_free_optional_string(&rec->id);
             IGRAPH_CHECK(safely_convert_xml_attribute_to_string(it, &rec->id));
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
             safely_free_optional_string(&attr_name);

@@ -205,6 +205,7 @@ add_library(
   io/parse_utils.c
   ${PARSER_SOURCES}
 
+  layout/align.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -330,7 +331,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.9")
+set_target_properties(igraph PROPERTIES VERSION "3.1.10")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

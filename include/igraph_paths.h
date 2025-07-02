@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2021  The igraph development team
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,9 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_PATHS_H
@@ -41,7 +38,7 @@ __BEGIN_DECLS
  *
  * \ref igraph_get_shortest_path_astar() uses a heuristic based on a distance
  * estimate to the target vertex to guide its search, and determine
- * which vertex to try next. The heurstic function is expected to compute
+ * which vertex to try next. The heuristic function is expected to compute
  * an estimate of the distance between \p from and \p to. In order for
  * \ref igraph_get_shortest_path_astar() to find an exact shortest path,
  * the distance must not be overestimated, i.e. the heuristic function

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
@@ -85,7 +84,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, pos);
 
     /* maximum degree + degree of vertices */
-    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode, /* loops= */ true));
+    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode, IGRAPH_LOOPS));
 
     /* null graph was already handled earlier, 'cores' is not empty */
     maxdeg = igraph_vector_int_max(cores);

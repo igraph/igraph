@@ -178,7 +178,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, true));
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, IGRAPH_LOOPS));
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         VECTOR(weights)[i] = VECTOR(degrees)[i];
         if (VECTOR(weights)[i] > 1) {

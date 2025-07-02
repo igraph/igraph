@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -21,8 +20,8 @@
 
 */
 
-#ifndef IGRAPH_CONSTRUCTURS_ATLAS_EDGES_H
-#define IGRAPH_CONSTRUCTURS_ATLAS_EDGES_H
+#ifndef IGRAPH_CONSTRUCTORS_ATLAS_EDGES_H
+#define IGRAPH_CONSTRUCTORS_ATLAS_EDGES_H
 
 #include "igraph_decls.h"
 #include "igraph_types.h"
@@ -1289,4 +1288,4 @@ const igraph_integer_t igraph_i_atlas_edges_pos[] = {0, 2, 4, 6, 10, 12, 16, 22,
 
 __END_DECLS
 
-#endif /* IGRAPH_CONSTRUCTURS_ATLAS_EDGES_H */
+#endif /* IGRAPH_CONSTRUCTORS_ATLAS_EDGES_H */

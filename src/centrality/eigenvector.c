@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
@@ -380,7 +378,10 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                 *value = 0;
             }
             if (vector) {
-                IGRAPH_CHECK(igraph_strength(graph, vector, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode), true, weights));
+                IGRAPH_CHECK(igraph_strength(
+                    graph, vector, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode),
+                    IGRAPH_LOOPS, weights
+                ));
                 for (igraph_integer_t i=0; i < no_of_nodes; i++) {
                     if (VECTOR(*vector)[i] == 0) {
                         VECTOR(*vector)[i] = 1;

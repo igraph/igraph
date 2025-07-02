@@ -20,7 +20,6 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
-#include "graph/internal.h"
 
 /**
  * \ingroup structural

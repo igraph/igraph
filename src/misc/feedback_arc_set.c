@@ -480,7 +480,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
         IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&roots, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
-                                     IGRAPH_ALL, /* loops */ false, weights));
+                                     IGRAPH_ALL, IGRAPH_NO_LOOPS, weights));
         IGRAPH_CHECK(igraph_vector_sort_ind(&degrees, &roots, IGRAPH_DESCENDING));
 
         IGRAPH_CHECK(igraph_bfs(graph,
@@ -536,12 +536,12 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     IGRAPH_VECTOR_INIT_FINALLY(&instrengths, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&outstrengths, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_degree(graph, &indegrees, igraph_vss_all(), IGRAPH_IN, false));
-    IGRAPH_CHECK(igraph_degree(graph, &outdegrees, igraph_vss_all(), IGRAPH_OUT, false));
+    IGRAPH_CHECK(igraph_degree(graph, &indegrees, igraph_vss_all(), IGRAPH_IN, IGRAPH_NO_LOOPS));
+    IGRAPH_CHECK(igraph_degree(graph, &outdegrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS));
 
     if (weights) {
-        IGRAPH_CHECK(igraph_strength(graph, &instrengths, igraph_vss_all(), IGRAPH_IN, false, weights));
-        IGRAPH_CHECK(igraph_strength(graph, &outstrengths, igraph_vss_all(), IGRAPH_OUT, false, weights));
+        IGRAPH_CHECK(igraph_strength(graph, &instrengths, igraph_vss_all(), IGRAPH_IN, IGRAPH_NO_LOOPS, weights));
+        IGRAPH_CHECK(igraph_strength(graph, &outstrengths, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, weights));
     } else {
         for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
             VECTOR(instrengths)[u] = VECTOR(indegrees)[u];
