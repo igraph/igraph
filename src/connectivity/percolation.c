@@ -77,22 +77,24 @@ static void percolate_edge(igraph_vector_int_t *links,
 
 /**
  * \function igraph_edgelist_percolation
- * \brief Gives the size of the largest connected component as edges are added.
+ * \brief The size of the largest connected component as vertex pairs are connected.
  *
  * \experimental
  *
- * Calculates the size of the largest component as edges are added to a graph in the order given.
- * If the edge-sequence and output are reversed, they are the size of the largest component as
- * edges are removed.
+ * Calculates the size of the largest component as edges are added to a graph in
+ * the order given. This function differs from \ref igraph_bond_percolation() in that
+ * it take a list of vertex pairs as input.
  *
- * \param edges Vector of edges, where the n-th edge has endpoints edges[2n] and edges [2n+1].
- * \param output output[n] is the size of the largest connected component after edge n is added.
- *        Will be resized.
+ * \param edges Vector of edges, where the i-th edge has endpoints <code>edges[2i]</code>
+ *    and <code>edges[2i+1]</code>.
+ * \param output <code>output[i]</code> will contain the size of the largest connected
+ *    component after edge \c i is added.
+ * \return Error code.
  *
- * \return Error code
+ * \sa \ref igraph_bond_percolation() to specify edges by their ID in a graph object.
  *
- * Time complexity: O(|E| * a(|E|)) where a is the inverse Ackermann function,
- *                  for all practical purposes it is not above 5.
+ * Time complexity: O(|E| a(|E|)) where a is the inverse Ackermann function,
+ * for all practical purposes it is not above 5.
  */
 
 igraph_error_t igraph_edgelist_percolation(
@@ -145,22 +147,29 @@ igraph_error_t igraph_edgelist_percolation(
 
 /**
  * \function igraph_bond_percolation
- * \brief Calculates the bond-percolation curve of a graph.
+ * \brief The size of the largest component as edges are added to a graph.
  *
  * \experimental
  *
- * Calculates the bond-percolation curve, or the size of the largest component as
+ * Calculates the bond percolation curve, or the size of the largest component as
  * edges are added to the graph in the order given. If both the output and the input
  * are reversed, it is the size of the largest component as edges are removed.
  *
- * \param graph The input graph
- * \param output output[i] is the size of the largest component after adding
- *    <code>i+1</code> edges, will be created.
- * \param edge_order The order of the edges, will be generated at random if \c NULL.
+ * \param graph The graph that edges are assumed to be in. Edge directions
+ *    are ignored.
+ * \param output <code>output[i]</code> will contain the size of the largest
+ *    component after having added the edge with index
+ *    <code>edge_order[i]</code>.
+ * \param edge_order The order the edges are added in. Must not contain duplicates.
+ *    If \c NULL, a random order will be used.
  * \return Error code.
  *
- * Time complexity: O(|V| + |E| * a(|E|)) where a is the inverse Ackermann function,
- *                  for all practical purposes it is not above 5.
+ * \sa \ref igraph_edgelist_percolation() to specify the edges to be added by
+ * their endpoints; \ref igraph_site_percolation() to compute the vertex percolation
+ * curve; \ref igraph_connected_components() to find the size of connected components.
+ *
+ * Time complexity: O(|V| + |E| a(|E|)) where a is the inverse Ackermann function,
+ * for all practical purposes it is not above 5.
  */
 
 igraph_error_t igraph_bond_percolation(
@@ -236,25 +245,26 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  *
  * \experimental
  *
- * Calculates the percolation curve, or the size of the largest connected component as
- * vertices are added in the order given. If the output is reversed, it is the size of
- * the largest component as vertices are removed in the reverse of the order given.
- * If there is no vertex order given, it will generate one.
+ * Calculates the site percolation curve, or the size of the largest connected
+ * component as vertices are added in the order given. If the output is
+ * reversed, it is the size of the largest component as vertices are removed
+ * in the reverse of the order given. If no vertex order is given, a random
+ * one will be used.
  *
- * \param graph The graph that vertices are assumed to be in.
- * \param output <code>output[i]</code> will contain the size of the largest component
- *        after adding <code>vertex_order[i]</code>. Will be resized.
- * \param vertex_order The order the vertices will be added in.
- *        Will raise error if there are duplicates, or a vertex is missing.
- *        If \c NULL, a random order will be used.
- * \return Error code:
- *        \clist
- *        \cli IGRAPH_EINVAL
- *             The vertex list is invalid, see above.
- *        \endclist
+ * \param graph The graph that vertices are assumed to be in. Edge directions
+ *    are ignored.
+ * \param output <code>output[i]</code> will contain the size of the largest
+ *    component after having added the vertex with index
+ *    <code>vertex_order[i]</code>.
+ * \param vertex_order The order the vertices are added in. Must not contain
+ *    duplicates. If \c NULL, a random order will be used.
+ * \return Error code.
  *
- * Time Complexity: O(|V| + |E| * a(|E|)) where a is the inverse Ackermann function,
- *                  for all practical purposes it is not above 5.
+ * \sa \ref igraph_bond_percolation() to compute the edge percolation curve;
+ * \ref igraph_connected_components() to find the size of connected components.
+ *
+ * Time complexity: O(|V| + |E| a(|E|)) where a is the inverse Ackermann function,
+ * for all practical purposes it is not above 5.
  */
 
 igraph_error_t igraph_site_percolation(
