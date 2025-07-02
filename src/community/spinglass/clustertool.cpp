@@ -386,10 +386,10 @@ static igraph_error_t igraph_i_community_spinglass_orig(
  *     cohesion index of the community will be stored here.
  * \param adhesion Pointer to a real variable, if not \c NULL the
  *     adhesion index of the community will be stored here.
- * \param inner_links Pointer to an integer, if not \c NULL the
+ * \param inner_links Pointer to a real, if not \c NULL the
  *     number of edges within the community (or the sum of their weights)
  *     is stored here.
- * \param outer_links Pointer to an integer, if not \c NULL the
+ * \param outer_links Pointer to a real, if not \c NULL the
  *     number of edges between the community and the rest of the graph
  *     (or the sum of their weights) will be stored here.
  * \param spins The number of spins to use, this can be higher than

@@ -300,7 +300,7 @@ typedef enum {
     /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
-    /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* removed in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
     /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */

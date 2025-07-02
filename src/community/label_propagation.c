@@ -499,7 +499,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * https://doi.org/10.1038/s41598-023-29610-z
  * https://arxiv.org/abs/2209.13338
  *
- * \param graph The input graph. Note that the algorithm wsa originally
+ * \param graph The input graph. Note that the algorithm was originally
  *    defined for undirected graphs. You are advised to set \p mode to
  *    \c IGRAPH_ALL if you pass a directed graph here to treat it as
  *    undirected.

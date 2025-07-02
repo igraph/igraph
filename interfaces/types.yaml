@@ -503,7 +503,7 @@ VORONOI_TIEBREAKER:
     FLAGS: ENUM
 
 WHEEL_MODE:
-    # Enum that describes how a star graph should be constructed
+    # Enum that describes how a wheel graph should be constructed
     CTYPE: igraph_wheel_mode_t
     FLAGS: ENUM
 

@@ -30,7 +30,7 @@ int main(void) {
     igraph_lcf_small(&g1,
                      /* n */ 14,
                      /* shifts */ 5, -5,
-                     /* repeats */7,
+                     /* repeats */ 7,
                      0);
 
     printf("edges:\n");
