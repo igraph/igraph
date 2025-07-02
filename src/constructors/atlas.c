@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2006-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  * \function igraph_atlas
  * \brief Create a small graph from the \quote Graph Atlas \endquote.
  *
- * </para><para>
  * The graph atlas contains all simple undirected unlabeled graphs on between
  * 0 and 7 vertices. The number of the graph is given as a parameter.
  * The graphs are listed:
@@ -32,7 +31,7 @@
  *      \oli in increasing order of number of vertices;
  *      \oli for a fixed number of vertices, in increasing order of the
  *           number of edges;
- *      \oli for fixed numbers of vertices and edges, in laxicographically
+ *      \oli for fixed numbers of vertices and edges, in lexicographically
  *           increasing order of the degree sequence, for example
  *           111223 &lt; 112222;
  *      \oli for fixed degree sequence, in increasing number of
@@ -52,8 +51,9 @@
  *    1252 (inclusive). Graphs on 0-7 vertices start at numbers 0, 1, 2, 4,
  *    8, 19, 53, and 209, respectively.
  *
- * Added in version 0.2.</para><para>
+ * Added in version 0.2.
  *
+ * </para><para>
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of
  * edges.
  *
@@ -62,10 +62,15 @@
 igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number) {
 
     igraph_vector_int_t v;
+    const igraph_integer_t atlas_size =
+        sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_i_atlas_edges_pos[0]);
 
     if (number < 0 ||
-        number >= sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_i_atlas_edges_pos[0])) {
-        IGRAPH_ERROR("No such graph in atlas", IGRAPH_EINVAL);
+        number >= atlas_size) {
+        IGRAPH_ERRORF("No such graph in atlas. "
+                      "The graph index must be less than %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL,
+                      atlas_size);
     }
 
     igraph_integer_t pos = igraph_i_atlas_edges_pos[number];
@@ -74,7 +79,8 @@ igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number) {
 
     IGRAPH_CHECK(igraph_create(graph,
                                igraph_vector_int_view(&v, igraph_i_atlas_edges + pos + 2, e * 2),
-                               n, IGRAPH_UNDIRECTED));
+                               n,
+                               IGRAPH_UNDIRECTED));
 
     return IGRAPH_SUCCESS;
 }
