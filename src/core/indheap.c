@@ -121,14 +121,12 @@ igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, const igraph_real_
  */
 
 void igraph_indheap_destroy(igraph_indheap_t* h) {
-    IGRAPH_ASSERT(h != 0);
-	if (h->stor_begin != 0) {
+    IGRAPH_ASSERT(h != NULL);
+    if (h->stor_begin != NULL) {
 		IGRAPH_FREE(h->stor_begin);
-		h->stor_begin = 0;
 	}
-	if (h->index_begin != 0) {
+    if (h->index_begin != NULL) {
 		IGRAPH_FREE(h->index_begin);
-		h->index_begin = 0;
 	}
 }
 
@@ -138,8 +136,8 @@ void igraph_indheap_destroy(igraph_indheap_t* h) {
  */
 
 igraph_bool_t igraph_indheap_empty(const igraph_indheap_t *h) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->stor_begin == h->end;
 }
 
@@ -149,8 +147,8 @@ igraph_bool_t igraph_indheap_empty(const igraph_indheap_t *h) {
  */
 
 igraph_error_t igraph_indheap_push(igraph_indheap_t* h, igraph_real_t elem) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -181,8 +179,8 @@ igraph_error_t igraph_indheap_push(igraph_indheap_t* h, igraph_real_t elem) {
  */
 
 igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -215,8 +213,8 @@ igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_intege
 void igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem) {
     igraph_integer_t i, n;
 
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     n = igraph_indheap_size(h);
     for (i = 0; i < n; i++)
@@ -271,8 +269,8 @@ igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
  */
 
 igraph_integer_t igraph_indheap_size(const igraph_indheap_t* h) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->end - h->stor_begin;
 }
 
@@ -288,8 +286,8 @@ igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_integer_t size
     igraph_integer_t actual_size = igraph_indheap_size(h);
     igraph_real_t *tmp1;
     igraph_integer_t *tmp2;
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     if (size <= actual_size) {
         return IGRAPH_SUCCESS;
@@ -325,8 +323,8 @@ igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_integer_t size
  */
 
 igraph_integer_t igraph_indheap_max_index(const igraph_indheap_t *h) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->index_begin[0];
 }
 
@@ -439,26 +437,26 @@ igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t all
         alloc_size = 1;
     }
     h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
-    if (h->stor_begin == 0) {
-        h->index_begin = 0;
-        h->index2_begin = 0;
+    if (h->stor_begin == NULL) {
+        h->index_begin = NULL;
+        h->index2_begin = NULL;
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_end = h->stor_begin + alloc_size;
     h->end = h->stor_begin;
     h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
-    if (h->index_begin == 0) {
+    if (h->index_begin == NULL) {
         IGRAPH_FREE(h->stor_begin);
-        h->stor_begin = 0;
-        h->index2_begin = 0;
+        h->stor_begin = NULL;
+        h->index2_begin = NULL;
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->index2_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
-    if (h->index2_begin == 0) {
+    if (h->index2_begin == NULL) {
         IGRAPH_FREE(h->stor_begin);
         IGRAPH_FREE(h->index_begin);
-        h->stor_begin = 0;
-        h->index_begin = 0;
+        h->stor_begin = NULL;
+        h->index_begin = NULL;
         IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
@@ -471,19 +469,16 @@ igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t all
  */
 
 void igraph_d_indheap_destroy(igraph_d_indheap_t* h) {
-    IGRAPH_ASSERT(h != 0);
-	if (h->stor_begin != 0) {
-		IGRAPH_FREE(h->stor_begin);
-		h->stor_begin = 0;
-	}
-	if (h->index_begin != 0) {
-		IGRAPH_FREE(h->index_begin);
-		h->index_begin = 0;
-	}
-	if (h->index2_begin != 0) {
-		IGRAPH_FREE(h->index2_begin);
-		h->index2_begin = 0;
-	}
+    IGRAPH_ASSERT(h != NULL);
+    if (h->stor_begin != NULL) {
+        IGRAPH_FREE(h->stor_begin);
+    }
+    if (h->index_begin != NULL) {
+        IGRAPH_FREE(h->index_begin);
+    }
+    if (h->index2_begin != NULL) {
+        IGRAPH_FREE(h->index2_begin);
+    }
 }
 
 /**
@@ -492,8 +487,8 @@ void igraph_d_indheap_destroy(igraph_d_indheap_t* h) {
  */
 
 igraph_bool_t igraph_d_indheap_empty(const igraph_d_indheap_t *h) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->stor_begin == h->end;
 }
 
@@ -504,8 +499,8 @@ igraph_bool_t igraph_d_indheap_empty(const igraph_d_indheap_t *h) {
 
 igraph_error_t igraph_d_indheap_push(igraph_d_indheap_t* h, igraph_real_t elem,
                                      igraph_integer_t idx, igraph_integer_t idx2) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -569,8 +564,8 @@ igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
  */
 
 igraph_integer_t igraph_d_indheap_size(const igraph_d_indheap_t* h) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->end - h->stor_begin;
 }
 
@@ -586,8 +581,8 @@ igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, igraph_integer_t 
     igraph_integer_t actual_size = igraph_d_indheap_size(h);
     igraph_real_t *tmp1;
     igraph_integer_t *tmp2, *tmp3;
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     if (size <= actual_size) {
         return IGRAPH_SUCCESS;
@@ -632,8 +627,8 @@ igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, igraph_integer_t 
  */
 
 void igraph_d_indheap_max_index(igraph_d_indheap_t *h, igraph_integer_t *idx, igraph_integer_t *idx2) {
-    IGRAPH_ASSERT(h != 0);
-    IGRAPH_ASSERT(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     (*idx) = h->index_begin[0];
     (*idx2) = h->index2_begin[0];
 }
@@ -902,7 +897,7 @@ igraph_integer_t igraph_2wheap_max_index(const igraph_2wheap_t *h) {
  * it was deactivated earlier.
  */
 igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, igraph_integer_t idx) {
-    return VECTOR(h->index2)[idx] != 0;
+    return (VECTOR(h->index2)[idx] != 0);
 }
 
 /**
