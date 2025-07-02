@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* The new RNG interface is (somewhat) modelled on the GSL */
 
@@ -179,6 +179,6 @@ void PutRNGstate(void);
 #define RNG_GAMMA(shape, scale) \
                          (igraph_rng_get_gamma(igraph_rng_default(), (shape), (scale)))
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

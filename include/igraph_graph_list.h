@@ -24,7 +24,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* List of graphs                                     */
@@ -50,6 +50,6 @@ void igraph_graph_list_set_directed(igraph_graph_list_t* list, igraph_bool_t dir
     do { IGRAPH_CHECK(igraph_graph_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_graph_list_destroy, v); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

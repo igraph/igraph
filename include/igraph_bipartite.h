@@ -27,7 +27,7 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Bipartite networks                                 */
@@ -100,6 +100,6 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_iea_game(
     igraph_integer_t n1, igraph_integer_t n2, igraph_integer_t m,
     igraph_bool_t directed, igraph_neimode_t mode);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

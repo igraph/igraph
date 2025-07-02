@@ -25,7 +25,7 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \section about_blas BLAS interface in igraph
@@ -62,6 +62,6 @@ IGRAPH_EXPORT igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                    igraph_real_t *res);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

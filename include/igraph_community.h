@@ -28,7 +28,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* K-Cores and K-Truss                                */
@@ -253,6 +253,6 @@ IGRAPH_EXPORT igraph_error_t igraph_split_join_distance(const igraph_vector_int_
                                              igraph_integer_t* distance12,
                                              igraph_integer_t* distance21);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

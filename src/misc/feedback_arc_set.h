@@ -23,7 +23,7 @@
 #include "igraph_datatype.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_feedback_arc_set_eades(
         const igraph_t *graph, igraph_vector_int_t *result,
@@ -47,6 +47,6 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

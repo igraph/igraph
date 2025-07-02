@@ -27,7 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_is_separator(const igraph_t *graph,
                                       const igraph_vs_t candidate,
@@ -43,6 +43,6 @@ IGRAPH_EXPORT igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_minimum_size_separators(const igraph_t *graph,
                                                  igraph_vector_int_list_t *separators);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

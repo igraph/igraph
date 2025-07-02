@@ -26,7 +26,7 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
                                                const igraph_vector_int_t *types,
@@ -63,6 +63,6 @@ IGRAPH_EXPORT igraph_error_t igraph_joint_type_distribution(
         const igraph_vector_int_t *from_types, const igraph_vector_int_t *to_types,
         igraph_bool_t directed, igraph_bool_t normalized);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

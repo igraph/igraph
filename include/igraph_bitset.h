@@ -31,7 +31,7 @@
     #include "intrin.h"
 #endif
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \ingroup bitset
@@ -262,6 +262,6 @@ IGRAPH_EXPORT igraph_error_t igraph_bitset_print(const igraph_bitset_t *bitset);
 do { IGRAPH_CHECK(igraph_bitset_init(bitset, size)); \
      IGRAPH_FINALLY(igraph_bitset_destroy, bitset); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_BITSET_H */

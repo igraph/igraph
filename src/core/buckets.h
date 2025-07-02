@@ -26,7 +26,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* Buckets, needed for the maximum flow algorithm */
 
@@ -66,6 +66,6 @@ void igraph_dbuckets_add(igraph_dbuckets_t *b, igraph_integer_t bucket,
 void igraph_dbuckets_delete(igraph_dbuckets_t *b, igraph_integer_t bucket,
                             igraph_integer_t elem);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

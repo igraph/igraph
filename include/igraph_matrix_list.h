@@ -24,7 +24,7 @@
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Flexible list of matrices                          */
@@ -50,6 +50,6 @@ __BEGIN_DECLS
     do { IGRAPH_CHECK(igraph_matrix_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_matrix_list_destroy, v); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

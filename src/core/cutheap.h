@@ -26,7 +26,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* Special maximum heap, needed for the minimum cut algorithm */
 
@@ -47,6 +47,6 @@ IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_
 IGRAPH_PRIVATE_EXPORT void igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index, igraph_real_t add);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_integer_t vertex);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

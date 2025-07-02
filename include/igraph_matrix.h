@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Matrix, very similar to vector                     */
@@ -90,6 +90,6 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_matrix_all_almost_e(cons
 IGRAPH_EXPORT igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_zapsmall(igraph_matrix_complex_t *m, igraph_real_t tol);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

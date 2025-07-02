@@ -27,7 +27,7 @@
 #include "igraph_error.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_induced_subgraph_map(
     const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
@@ -35,6 +35,6 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_induced_subgraph_map(
     igraph_vector_int_t *invmap, igraph_bool_t map_is_prepared
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -23,12 +23,12 @@
 #include <stdlib.h>
 #include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 double plfit_kolmogorov(double z);
 double plfit_ks_test_one_sample_p(double d, size_t n);
 double plfit_ks_test_two_sample_p(double d, size_t n1, size_t n2);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif

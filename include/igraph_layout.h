@@ -31,7 +31,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_matrix.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \section about_layouts
@@ -289,6 +289,6 @@ IGRAPH_EXPORT igraph_error_t igraph_roots_for_tree_layout(
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layout);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

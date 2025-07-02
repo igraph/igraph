@@ -25,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                                       const igraph_vector_t *weights, igraph_neimode_t mode);
@@ -62,6 +62,6 @@ IGRAPH_EXPORT igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *gra
                                                         igraph_vector_t *res,
                                                         const igraph_vector_t *weights,
                                                         const igraph_vector_int_list_t *neighborhoods);
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

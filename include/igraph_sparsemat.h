@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /*
  * These types are private to igraph, and customized to use igraph_integer_t.
@@ -293,6 +293,6 @@ IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_idx(const igraph_sparse
 IGRAPH_EXPORT igraph_real_t igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

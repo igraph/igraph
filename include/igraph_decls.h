@@ -18,14 +18,14 @@
    02110-1301 USA
 */
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
+#undef IGRAPH_BEGIN_C_DECLS
+#undef IGRAPH_END_C_DECLS
 #ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
+    #define IGRAPH_BEGIN_C_DECLS extern "C" {
+    #define IGRAPH_END_C_DECLS }
 #else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
+    #define IGRAPH_BEGIN_C_DECLS /* empty */
+    #define IGRAPH_END_C_DECLS /* empty */
 #endif
 
 /* This is to eliminate gcc warnings about unused parameters */

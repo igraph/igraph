@@ -28,7 +28,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * Trie data type
@@ -66,6 +66,6 @@ IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_trie_size(igr
 
 const igraph_strvector_t* igraph_i_trie_borrow_keys(igraph_trie_t *t);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -25,7 +25,7 @@
 #include "igraph_decls.h"
 #include "igraph_error.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* List of graphs                                     */
@@ -43,6 +43,6 @@ __BEGIN_DECLS
     do { IGRAPH_CHECK(igraph_bitset_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_bitset_list_destroy, v); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

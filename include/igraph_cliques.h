@@ -25,7 +25,7 @@
 #include "igraph_datatype.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Cliques, maximal independent vertex sets           */
@@ -106,6 +106,6 @@ IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_callback(const igraph_t *gra
                                                   igraph_integer_t min_size, igraph_integer_t max_size);
 
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

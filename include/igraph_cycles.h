@@ -28,7 +28,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Directed acyclic graphs                            */
@@ -97,6 +97,6 @@ IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
         igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

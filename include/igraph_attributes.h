@@ -29,7 +29,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Attributes                                         */
@@ -926,6 +926,6 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define DELALL(graph) (igraph_cattribute_remove_all((graph),1,1,1))
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

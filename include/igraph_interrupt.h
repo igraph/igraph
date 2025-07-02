@@ -22,7 +22,7 @@
 #include "igraph_decls.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* This file contains the igraph interruption handling. */
 
@@ -118,6 +118,6 @@ IGRAPH_EXPORT igraph_bool_t igraph_allow_interruption(void);
 
 IGRAPH_EXPORT igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -29,7 +29,7 @@
 #include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Graph operators                                    */
@@ -89,6 +89,6 @@ IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
                                             const igraph_t *g2,
                                             igraph_product_t type);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

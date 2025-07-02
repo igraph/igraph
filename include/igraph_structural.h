@@ -29,7 +29,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */
@@ -166,6 +166,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_laplacian_sparse(
    const igraph_vector_t *weights
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

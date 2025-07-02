@@ -22,7 +22,7 @@
 #include "igraph_decls.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef struct igraph_complex_t {
     igraph_real_t dat[2];
@@ -99,6 +99,6 @@ IGRAPH_EXPORT int igraph_complex_printf_aligned(int width, igraph_complex_t val)
 IGRAPH_EXPORT int igraph_complex_fprintf_aligned(FILE *file, int width, igraph_complex_t val);
 IGRAPH_EXPORT int igraph_complex_snprintf(char *str, size_t size, igraph_complex_t val);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

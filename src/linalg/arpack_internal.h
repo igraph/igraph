@@ -30,7 +30,7 @@
 #include "igraph_decls.h"
 #include "config.h" /* INTERNAL_ARPACK */
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 #ifndef INTERNAL_ARPACK
     #define igraphdsaupd_   dsaupd_
@@ -227,6 +227,6 @@ int igraphdsortc_(char *which, int *apply, int* n, double *xreal,
 
 #endif
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif  /* ARPACK_INTERNAL_H */

@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Heap                                               */
@@ -75,6 +75,6 @@ __BEGIN_DECLS
 
 #define IGRAPH_HEAP_NULL { 0,0,0 }
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

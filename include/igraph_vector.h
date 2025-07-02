@@ -25,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Flexible vector                                    */
@@ -153,6 +153,6 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_vector_int_rank(
     igraph_vector_int_t *res,
     igraph_integer_t maxval);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -25,7 +25,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                                          igraph_vector_int_list_t *blocks,
@@ -33,6 +33,6 @@ IGRAPH_EXPORT igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                                          igraph_vector_int_t *parent,
                                          igraph_t *block_tree);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

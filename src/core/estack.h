@@ -27,7 +27,7 @@
 #include "igraph_bitset.h"
 #include "igraph_stack.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef struct igraph_estack_t {
     igraph_stack_int_t stack;
@@ -46,6 +46,6 @@ IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_estack_size(c
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_print(const igraph_estack_t *s);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

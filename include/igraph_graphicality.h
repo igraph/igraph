@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef unsigned int igraph_edge_type_sw_t;
 
@@ -48,6 +48,6 @@ IGRAPH_EXPORT igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *de
                                         const igraph_edge_type_sw_t allowed_edge_types,
                                         igraph_bool_t *res);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif // IGRAPH_GRAPHICALITY_H

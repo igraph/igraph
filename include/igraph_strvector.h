@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * Vector of strings
@@ -107,6 +107,6 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv,
 IGRAPH_EXPORT void igraph_strvector_swap_elements(igraph_strvector_t *sv,
                                                   igraph_integer_t i, igraph_integer_t j);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

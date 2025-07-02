@@ -23,7 +23,7 @@
 #include "igraph_datatype.h"
 #include "igraph_error.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \typedef igraph_coloring_greedy_t
@@ -48,6 +48,6 @@ typedef enum {
 
 IGRAPH_EXPORT igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_COLORING_H */
