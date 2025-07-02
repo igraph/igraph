@@ -194,7 +194,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
     }
 
     if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     igraph_vector_int_clear(res);
@@ -354,7 +354,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
     }
 
     if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no_of_edges);
