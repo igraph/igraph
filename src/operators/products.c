@@ -98,7 +98,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
 static igraph_error_t lexicographic_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2) {
-    igraph_bool_t directed = igraph_is_directed(g1);
+    const igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
         IGRAPH_ERROR("Lexicographic product between a directed and an undirected graph is invalid.",
