@@ -14,7 +14,7 @@
 class igraph_point_adaptor {
     igraph_integer_t dimension;
     const igraph_matrix_t *points;
-    public:
+public:
     size_t kdtree_get_point_count() const {
         return igraph_matrix_nrow(points);
     }
@@ -46,31 +46,47 @@ public:
 */
 
 class GraphBuildingResultSet {
-    private:
-        igraph_integer_t current_vertex = 0;
-        igraph_t *graph;
-    public:
-        using DistanceType = igraph_real_t;
-        GraphBuildingResultSet(igraph_t * graph, igraph_integer_t neighbors, igraph_real_t distance) {
-           this->graph = graph;
-        }
-        bool addPoint(igraph_real_t distance, igraph_integer_t index) {
-            printf("Adding index");
-            igraph_add_edge(graph, current_vertex, index);
-            return false;
-        }
-        void select_vertex(igraph_integer_t i) {
-            current_vertex = i;
-        }
-        void sort () {
-
-        }
-        bool full () {
+private:
+    igraph_integer_t current_vertex = 0;
+    igraph_integer_t current_added = 0;
+    igraph_integer_t max_neighbors;
+    igraph_real_t max_distance;
+    igraph_t *graph;
+public:
+    using DistanceType = igraph_real_t;
+    GraphBuildingResultSet(igraph_t * graph, igraph_integer_t neighbors, igraph_real_t distance) : max_distance(distance), max_neighbors(neighbors) {
+        this->graph = graph;
+    }
+    bool addPoint(igraph_real_t distance, igraph_integer_t index) {
+        if (index == current_vertex) {
             return true;
         }
-        igraph_real_t worstDist() {
-            return 100;
+        printf("Processing %li -> %li ", current_vertex, index);
+        //if (distance > max_distance) {
+        //    printf("Stopping due to distane\n");
+        //    return false;
+        // }
+        igraph_add_edge(graph, current_vertex, index);
+        if (++current_added == max_neighbors) {
+            printf("Stopping due to neighbor count\n");
+            return false;
         }
+        printf("continuing.");
+        return true;
+    }
+    void select_vertex(igraph_integer_t i) {
+        current_vertex = i;
+        current_added = 0;
+    }
+    void sort () {
+
+    }
+    bool full () {
+        return false;
+    }
+    igraph_real_t worstDist() {
+        return max_distance;
+    }
 };
 
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
@@ -92,7 +108,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
 
     igraph_point_adaptor adaptor(points);
 
-    kdTree tree(dimensionality, adaptor);
+    kdTree tree(dimensionality, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
 
     tree.buildIndex();
 
@@ -103,6 +119,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
 
 
     for (igraph_integer_t i = 0; i < point_count; i++) {
+        printf("Nearest neighbor search at %li\n", i);
         IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
         results.select_vertex(i);
         tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
