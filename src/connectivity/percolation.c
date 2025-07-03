@@ -98,8 +98,8 @@ static void percolate_edge(igraph_vector_int_t *links,
  */
 
 igraph_error_t igraph_edgelist_percolation(
-        const igraph_vector_int_t *edges,
-        igraph_vector_int_t* output) {
+    const igraph_vector_int_t *edges,
+    igraph_vector_int_t* output) {
 
     igraph_integer_t biggest = 0;
     igraph_integer_t lower, upper;
@@ -173,9 +173,9 @@ igraph_error_t igraph_edgelist_percolation(
  */
 
 igraph_error_t igraph_bond_percolation(
-        const igraph_t *graph,
-        igraph_vector_int_t *output,
-        const igraph_vector_int_t *edge_order) {
+    const igraph_t *graph,
+    igraph_vector_int_t *output,
+    const igraph_vector_int_t *edge_order) {
 
     const igraph_vector_int_t *p_edge_order;
     igraph_vector_int_t i_edge_order;
@@ -214,6 +214,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
                                      igraph_vector_int_t *links,
                                      igraph_vector_int_t *sizes,
                                      igraph_integer_t *biggest,
+                                     igraph_integer_t *added,
                                      igraph_integer_t vertex,
                                      igraph_vector_int_t *neighbors) {
 
@@ -229,9 +230,11 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
     neighbor_count = igraph_vector_int_size(neighbors);
     for (igraph_integer_t i = 0; i < neighbor_count; i++) {
+        // do not add edges to vertices that have not been added.
         if (VECTOR(*sizes)[VECTOR(*neighbors)[i]] == 0) {
             continue;
         }
+        *added += 1;
         percolate_edge(links, sizes, biggest, vertex, VECTOR(*neighbors)[i]);
     }
 
@@ -253,8 +256,11 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  *
  * \param graph The graph that vertices are assumed to be in. Edge directions
  *    are ignored.
- * \param output <code>output[i]</code> will contain the size of the largest
+ * \param giant_size <code>giant_size[i]</code> will contain the size of the largest
  *    component after having added the vertex with index
+ *    <code>vertex_order[i]</code>.
+ * \param edge_count <code>edge_count[i]</code> will contain the numer of edges
+ *    in the graph having added the vertex with index
  *    <code>vertex_order[i]</code>.
  * \param vertex_order The order the vertices are added in. Must not contain
  *    duplicates. If \c NULL, a random order will be used.
@@ -268,9 +274,10 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  */
 
 igraph_error_t igraph_site_percolation(
-        const igraph_t *graph,
-        igraph_vector_int_t *output,
-        const igraph_vector_int_t *vertex_order) {
+    const igraph_t *graph,
+    igraph_vector_int_t *giant_size,
+    igraph_vector_int_t *edge_count,
+    const igraph_vector_int_t *vertex_order) {
 
     const igraph_vector_int_t *p_vertex_order;
     igraph_vector_int_t i_vertex_order;
@@ -302,19 +309,29 @@ igraph_error_t igraph_site_percolation(
 
     igraph_vector_int_t links;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&links, vcount);
-
-    IGRAPH_CHECK(igraph_vector_int_resize(output, vcount));
+    if (giant_size != NULL) {
+        IGRAPH_CHECK(igraph_vector_int_resize(giant_size, vcount));
+    }
+    if (edge_count != NULL) {
+        IGRAPH_CHECK(igraph_vector_int_resize(edge_count, vcount));
+    }
 
     for (igraph_integer_t i = 0; i < vcount; i++) {
         VECTOR(sizes)[i] = 0;
         VECTOR(links)[i] = i;
     }
 
+    igraph_integer_t added = 0;
     igraph_vector_int_t neighbors;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
     for (igraph_integer_t i = 0; i < vcount; i++) {
-        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, VECTOR(*p_vertex_order)[i], &neighbors));
-        VECTOR(*output)[i] = biggest;
+        IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, &added, VECTOR(*p_vertex_order)[i], &neighbors));
+        if (giant_size != NULL) {
+            VECTOR(*giant_size)[i] = biggest;
+        }
+        if (edge_count != NULL) {
+            VECTOR(*edge_count)[i] = added;
+        }
     }
     igraph_vector_int_destroy(&neighbors);
     IGRAPH_FINALLY_CLEAN(1);
