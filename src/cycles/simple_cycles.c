@@ -544,6 +544,8 @@ igraph_error_t igraph_simple_cycles_callback(
     // starting point according to the rules laid out above
     for (igraph_integer_t i = 0; i < state.N; i++) {
         // check if the vertex is a candidate for a cycle
+        // note that we call `igraph_degree_1` here instead of e.g. `igraph_adjlist_size(&state.AK, i)`,
+        // because (1.) we need to the undirected degree in all cases, and (2.) our algorithm modifies the state.AK
         igraph_integer_t degree;
         IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
         if (degree < 3 &&
