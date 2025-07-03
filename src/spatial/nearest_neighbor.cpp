@@ -1,8 +1,8 @@
 
-#include "cliques/cliquer/graph.h"
+#include "igraph_constructors.h"
+#include "igraph_interface.h"
 #include "igraph_operators.h"
 #include "igraph_spatial.h"
-#include "igraph_datatype.h"
 #include "igraph_matrix.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
@@ -14,6 +14,7 @@
 class igraph_point_adaptor {
     igraph_integer_t dimension;
     const igraph_matrix_t *points;
+    public:
     size_t kdtree_get_point_count() const {
         return igraph_matrix_nrow(points);
     }
@@ -22,7 +23,8 @@ class igraph_point_adaptor {
     }
 
     // indicates that it should use default
-    bool kdtree_get_bbox(void* bb) {
+    template <typename BoundingBox>
+    bool kdtree_get_bbox(BoundingBox &bb) const {
         return false;
     }
 
@@ -32,13 +34,16 @@ public:
         this -> points = points;
     }
 };
-
+/*
 class L2_igraph_adaptor {
 public:
     using ElementType = igraph_real_t;
     using DistanceType = nanoflann::metric_L2;
+    L2_igraph_adaptor(const igraph_point_adaptor& point) {
 
+    }
 } ;
+*/
 
 class GraphBuildingResultSet {
     private:
@@ -50,15 +55,25 @@ class GraphBuildingResultSet {
            this->graph = graph;
         }
         bool addPoint(igraph_real_t distance, igraph_integer_t index) {
+            printf("Adding index");
             igraph_add_edge(graph, current_vertex, index);
-            return true;
+            return false;
         }
         void select_vertex(igraph_integer_t i) {
             current_vertex = i;
         }
+        void sort () {
+
+        }
+        bool full () {
+            return true;
+        }
+        igraph_real_t worstDist() {
+            return 100;
+        }
 };
 
-extern "C" igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
+igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
         igraph_metric_t metric,
         igraph_integer_t neighbors,
@@ -66,20 +81,25 @@ extern "C" igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
 
     igraph_integer_t dimensionality = igraph_matrix_ncol(points);
 
-    igraph_point_adaptor adaptor(points);
 
     igraph_integer_t point_count = igraph_matrix_nrow(points);
 
-    using my_tree = nanoflann::KDTreeSingleIndexAdaptor<L2_igraph_adaptor, igraph_point_adaptor, 0, uint32_t>;
+    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor>, igraph_point_adaptor>;
 
-    my_tree tree(dimensionality, adaptor, 10);
+    //using my_tree = nanoflann::KDTreeSingleIndexAdaptor<, nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor<typename Inner>>, 0, uint32_t>;
+
+    igraph_empty(graph, point_count, false);
+
+    igraph_point_adaptor adaptor(points);
+
+    kdTree tree(dimensionality, adaptor);
 
     tree.buildIndex();
 
     igraph_vector_t current_point;
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, 0);
 
-    GraphBuildingResultSet results(graph, 2, 100);
+    GraphBuildingResultSet results(graph, neighbors, cutoff);
 
 
     for (igraph_integer_t i = 0; i < point_count; i++) {
