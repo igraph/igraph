@@ -378,13 +378,13 @@ static igraph_error_t igraph_i_simple_cycle_search_state_init(
  */
 static void igraph_i_simple_cycle_search_state_destroy(
     igraph_i_simple_cycle_search_state_t *state) {
-    igraph_vector_int_destroy(&state->vertex_stack);
-    igraph_vector_int_destroy(&state->edge_stack);
-    igraph_vector_bool_destroy(&state->v_blocked);
-    igraph_vector_bool_destroy(&state->v_visited);
+    igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
-    igraph_adjlist_destroy(&state->B);
+    igraph_vector_bool_destroy(&state->v_visited);
+    igraph_vector_bool_destroy(&state->v_blocked);
+    igraph_vector_int_destroy(&state->edge_stack);
+    igraph_vector_int_destroy(&state->vertex_stack);
 }
 
 /**
