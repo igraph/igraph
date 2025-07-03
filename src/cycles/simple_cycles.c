@@ -611,12 +611,12 @@ igraph_error_t igraph_simple_cycles_callback(
  * \return Error code.
  */
 igraph_error_t igraph_simple_cycles(
-    const igraph_t *graph,
-    igraph_vector_int_list_t *vertices,
-    igraph_vector_int_list_t *edges,
-    igraph_neimode_t mode,
-    igraph_integer_t min_cycle_length,
-    igraph_integer_t max_cycle_length) {
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_neimode_t mode,
+        igraph_integer_t min_cycle_length,
+        igraph_integer_t max_cycle_length) {
 
     simple_cycle_results_t result_list;
     result_list.vertices = vertices;
