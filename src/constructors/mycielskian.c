@@ -204,7 +204,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * The vertex count of \c M_k is
  * <code>n_k = 3 * 2^(k-2) - 1</code> for <code>k > 1</code> and \c k otherwise.
  * The edge count is
- * <code>m_k = (7 * 2^(k-2) + 1) / 2 - 3 * 2^(k - 2)</code> for <code>k > 1</code>
+ * <code>m_k = (7 * 3^(k-2) + 1) / 2 - 3 * 2^(k - 2)</code> for <code>k > 1</code>
  * and 0 otherwise.
  * 
  * \param graph Pointer to an uninitialized graph object. The generated
