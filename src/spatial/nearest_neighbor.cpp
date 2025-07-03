@@ -4,6 +4,7 @@
 #include "igraph_matrix.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
+#include "igraph_vector.h"
 #include "nanoflann/nanoflann.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -49,11 +50,16 @@ private:
     igraph_integer_t current_added = 0;
     igraph_integer_t max_neighbors;
     igraph_real_t max_distance;
+    igraph_vector_int_t edges;
     igraph_t *graph;
 public:
     using DistanceType = igraph_real_t;
     GraphBuildingResultSet(igraph_t * graph, igraph_integer_t neighbors, igraph_real_t distance) : max_distance(distance), max_neighbors(neighbors) {
         this->graph = graph;
+    }
+    igraph_error_t initialize() {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        return IGRAPH_SUCCESS;
     }
     bool addPoint(igraph_real_t distance, igraph_integer_t index) {
         if (index == current_vertex) {
@@ -64,13 +70,18 @@ public:
         //    printf("Stopping due to distane\n");
         //    return false;
         // }
-        igraph_add_edge(graph, current_vertex, index);
+        igraph_vector_int_push_back(&edges, current_vertex);
+        igraph_vector_int_push_back(&edges, index);
         if (++current_added == max_neighbors) {
             printf("Stopping due to neighbor count\n");
             return false;
         }
         printf("continuing.");
         return true;
+    }
+    ~GraphBuildingResultSet() {
+        igraph_vector_int_destroy(&edges);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     void select_vertex(igraph_integer_t i) {
         current_vertex = i;
@@ -84,6 +95,10 @@ public:
     }
     igraph_real_t worstDist() {
         return max_distance;
+    }
+    igraph_error_t dumpGraph() {
+        IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
+        return IGRAPH_SUCCESS;
     }
 };
 
@@ -114,7 +129,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, 0);
 
     GraphBuildingResultSet results(graph, neighbors, cutoff);
-
+    IGRAPH_CHECK(results.initialize());
 
     for (igraph_integer_t i = 0; i < point_count; i++) {
         printf("Nearest neighbor search at %li\n", i);
@@ -122,6 +137,8 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         results.select_vertex(i);
         tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
     }
+
+    IGRAPH_CHECK(results.dumpGraph());
 
     igraph_vector_destroy(&current_point);
     IGRAPH_FINALLY_CLEAN(1);
