@@ -209,8 +209,7 @@ static igraph_error_t simple_cycles_circuit(
                 if ((!state->directed &&
                         igraph_vector_int_size(&state->edge_stack) == 1 &&
                         VECTOR(state->edge_stack)[0] == WE)) {
-                    // printf("Skipping cycle to %" IGRAPH_PRId " via %" IGRAPH_PRId " to
-                    // prevent self-loop.\n", W, WE);
+                    // printf("Skipping cycle to %" IGRAPH_PRId " via %" IGRAPH_PRId " to prevent self-loop.\n", W, WE);
                     continue;
                 }
 
