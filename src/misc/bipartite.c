@@ -1044,31 +1044,36 @@ static igraph_error_t gnp_bipartite_large(
              * but also protects against overflow when 'p' is very small
              * and 'gap' becomes very large, perhaps larger than representable
              * in an igraph_integer_t. */
-            if (gap >= n2 - j) {
-                break;
+            igraph_integer_t j_new;
+            if (IGRAPH_SAFE_ADD(j, gap, &j_new)) {
+                break; // If addition would overflow, stop the loop
+            }
+            j = j_new;
+
+            igraph_integer_t target;
+            if (IGRAPH_SAFE_ADD(j, n1, &target)) {
+                break; // If addition would overflow, stop the loop
             }
 
-            j += gap;
-
             // Ensure edges are only between partitions
-            if (i < n1 && (j + n1) >= n1 && (j + n1) < n1 + n2) {
+            if (i < n1 && target >= n1 && target < n1 + n2) {
                 if (!directed) {
                     /* Undirected graph */
                     igraph_vector_int_push_back(&edges, i); /* reserved */
-                    igraph_vector_int_push_back(&edges, j + n1); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
                 } else if (mode == IGRAPH_IN) {
                     /* Incoming edges */
-                    igraph_vector_int_push_back(&edges, j + n1); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
                     igraph_vector_int_push_back(&edges, i); /* reserved */
                 } else if (mode == IGRAPH_OUT) {
                     /* Outgoing edges */
                     igraph_vector_int_push_back(&edges, i); /* reserved */
-                    igraph_vector_int_push_back(&edges, j + n1); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
                 } else {
                     /* Both directions for IGRAPH_ALL */
                     igraph_vector_int_push_back(&edges, i); /* reserved */
-                    igraph_vector_int_push_back(&edges, j + n1); /* reserved */
-                    igraph_vector_int_push_back(&edges, j + n1); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
                     igraph_vector_int_push_back(&edges, i); /* reserved */
                 }
             }
