@@ -69,8 +69,12 @@
  * are the Mycielski graphs that \ref igraph_mycielski_graph() produces.
  *
  * </para><para>
+ * igraph extends the construction to directed graphs, as well as to non-simple
+ * graphs, by following the above constructions rules literally.
+ *
+ * </para><para>
  * This function can apply the Mycielski transformation an arbitrary number of
- * times, controlled by the \p k parameter. The k-th iterated Mycielskian has
+ * times, controlled by the parameter \p k. The k-th iterated Mycielskian has
  * <code>n_k = (n + 1) * 2^k - 1</code>
  * vertices and
  * <code>m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2</code>
@@ -85,7 +89,8 @@
  *
  * \sa \ref igraph_mycielski_graph().
  *
- * Time complexity: Exponential in \p k.
+ * Time complexity: O(|V| 2^k + |E| 3^k) where |V| and |E| are the vertex and
+ * edge counts, respectively.
  */
 igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
     igraph_integer_t vcount = igraph_vcount(graph);
@@ -209,7 +214,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  *
  * \sa \ref igraph_mycielskian().
  *
- * Time complexity: Exponential in \p k.
+ * Time complexity: O(3^k), i.e. exponential in \p k.
  */
 igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
     igraph_t g;
