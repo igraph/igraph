@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2024-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ typedef struct igraph_simple_cycle_search_state_t {
     igraph_vector_bool_t v_blocked;
 
     /* Boolean vector indicating which vertices have ever been checked.
-    * The bigger picture here is that this allows a "lazy" community decomposition */
+     * The bigger picture here is that this allows a "lazy" community decomposition */
     igraph_vector_bool_t v_visited;
 
     /* Whether the graph is directed */
@@ -125,14 +125,12 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
 /**
  * The implementation of procedure CIRCUIT from Johnson's paper
  *
- * Arguments:
- *
- * \param state: local state object of the search
- * \param V: vertex to start the search from
- * \param callback: callback function to handle the found cycles
+ * \param state Local state object of the search.
+ * \param V Vertex to start the search from.
+ * \param callback Callback function to handle the found cycles.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value for no limit
- * \param arg: argument to pass to the callback function
+ * \param arg Argument to pass to the callback function.
  */
 static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_i_simple_cycle_search_state_t *state,
@@ -533,26 +531,28 @@ igraph_error_t igraph_simple_cycles_callback(
     IGRAPH_CHECK(igraph_i_simple_cycle_search_state_init(&state, graph, mode));
     IGRAPH_FINALLY(igraph_i_simple_cycle_search_state_destroy, &state);
 
-    // depending on the graph, it is rather unreasonable to search cycles
-    // from each and every node
-    // instead, we expect that each cycle must involve, either:
+    // Depending on the graph, it is rather unreasonable to search cycles
+    // from each and every node. Instead, we expect that each cycle must involve
+    // either:
     // - a vertex with degree > 2
-    // - or, if it's a free standing cycle, be any vertex of this community
-    // the community detection happens via the `state->v_visited`
-
-    // then, iterate the vertices, and consider them if they are a considerable
-    // starting point according to the rules laid out above
+    // - or, if it's a free standing cycle, be any vertex of this connected component;
+    //   components are identified via the `state->v_visited` boolean mask.
+    //
+    // Thus we iterate over the vertices, and check if they can be skipped as
+    // a starting point according to the rules laid out above.
     for (igraph_integer_t i = 0; i < state.N; i++) {
-        // check if the vertex is a candidate for a cycle
-        // note that we call `igraph_degree_1` here instead of e.g. `igraph_adjlist_size(&state.AK, i)`,
-        // because (1.) we need to the undirected degree in all cases, and (2.) our algorithm modifies the state.AK
+        // Check if the vertex is a candidate for a cycle.
+        // Note that we call igraph_degree_1() here instead of retrieving the
+        // neighbor count from igraph_adjlist_get(&state.AK, i) because:
+        //  - we need to the undirected degree in all cases, and
+        //  - our algorithm modifies the adjlist state.AK
         igraph_integer_t degree;
         IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
         if (degree < 3 &&
                 VECTOR(state.v_visited)[i]) {
             continue;
         }
-        // check if we find a cycle starting from this vertex
+        // Check if we find a cycle starting from this vertex.
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
             IGRAPH_CHECK(igraph_i_simple_cycles_search_callback_from_one_vertex(
                              &state, i, min_cycle_length, max_cycle_length, callback, arg));
