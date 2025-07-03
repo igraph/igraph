@@ -61,7 +61,7 @@
  *
  * \ilist
  * \ili The Mycielskian of the null graph is the singleton graph.
- * \ili The Mycielskian of the singleton graph is is the two-path.
+ * \ili The Mycielskian of the singleton graph is the two-path.
  * \endilist
  *
  * This ensures that iterative applications of the construction, starting from
