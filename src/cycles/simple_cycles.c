@@ -630,9 +630,9 @@ igraph_error_t igraph_simple_cycles(
         igraph_vector_int_list_clear(edges);
     }
 
-    igraph_simple_cycles_callback(graph, mode, min_cycle_length, max_cycle_length,
+    IGRAPH_CHECK(igraph_simple_cycles_callback(graph, mode, min_cycle_length, max_cycle_length,
                                   &igraph_i_append_simple_cycle_result,
-                                  &result_list);
+                                  &result_list));
 
     return IGRAPH_SUCCESS;
 }
