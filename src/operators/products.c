@@ -69,7 +69,6 @@ static igraph_error_t cartesian_product(igraph_t *res,
         // For all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
         //    for all vertex j in g2
         for (igraph_integer_t j = 0; j < vcount2; ++j) {
-            // SAFE MULT and SAFE ADD not needed as < vcount
             VECTOR(edges)[edge_index++] = from * vcount2 + j; // ((from, j))
             VECTOR(edges)[edge_index++] = to * vcount2 + j; // ((to, j))
         }
@@ -98,6 +97,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
 static igraph_error_t lexicographic_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2) {
+
     const igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
@@ -169,8 +169,9 @@ static igraph_error_t lexicographic_product(igraph_t *res,
 }
 
 static igraph_error_t strong_product(igraph_t *res,
-                                            const igraph_t *g1,
-                                            const igraph_t *g2) {
+                                     const igraph_t *g1,
+                                     const igraph_t *g2) {
+
     const igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
@@ -272,7 +273,7 @@ static igraph_error_t tensor_product(igraph_t *res,
                                      const igraph_t *g1,
                                      const igraph_t *g2) {
 
-    igraph_bool_t directed = igraph_is_directed(g1);
+    const igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
         IGRAPH_ERROR("Tensor product between a directed and an undirected graph is invalid.",
@@ -362,53 +363,55 @@ static igraph_error_t tensor_product(igraph_t *res,
  * a connection from \c u to \c v.
  * \clist
  *     \cli IGRAPH_PRODUCT_CARTESIAN
- *     Computes the Cartesian product of two graphs. In the product graph,
+ *     Computes the cartesian product of two graphs. In the product graph,
  *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
  *     if and only if
  *     <code>u1 = u2</code> and <code>v1 ~ v2</code> or
  *     <code>u1 ~ u2</code> and <code>v1 = v2</code>.
- *     Thus, the number of edges in the product is
+ *     Thus, the number of edges in the product graph is
  *     <code>|V1| |E2| + |V2| |E1|</code>.
  *
  *     </para><para>
- *     Time Complexity: O(|V1| |V2| + |V1| |E2| + |V2| |E1|)
+ *     Time complexity: O(|V1| |V2| + |V1| |E2| + |V2| |E1|)
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
  *
  *     \cli IGRAPH_PRODUCT_LEXICOGRAPHIC
- *     Computes the Lexicographic product of two graphs. In the product graph,
+ *     Computes the lexicographic product of two graphs. In the product graph,
  *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
  *     if and only if
  *     <code>u1 = u2</code> and <code>v1 ~ v2</code> or
  *     <code>u1 ~ u2</code>.
- *     Thus, the number of edges in the product is
+ *     Thus, the number of edges in the product graph is
  *     <code>|V1| |E2| + |V2|^2 |E1|</code>. Unlike most other graph products,
  *     the lexicographic product is not commutative.
  *
  *     </para><para>
- *     Time Complexity: O(|V1| |V2| + |V1| |E2| + |V2|^2 |E1|)
+ *     Time complexity: O(|V1| |V2| + |V1| |E2| + |V2|^2 |E1|)
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
  *
  *     \cli IGRAPH_PRODUCT_STRONG
- *     Computes the Strong product of two graphs. In the product graph,
- *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ *     Computes the strong product (also known as normal product) of two graphs.
+ *     In the product graph, there is a connection from <code>(u1, v1)</code> to
+ *     <code>(u2, v2)</code>
  *     if and only if
  *     <code>u1 = u2</code> and <code>v1 ~ v2</code> or
  *     <code>u1 ~ u2</code> and <code>v1 = v2</code> or
  *     <code>u1 ~ u2</code> and <code>v1 ~ v2</code>.
- *     Thus, the number of edges in the product is
+ *     Thus, the number of edges in the product graph is
  *     <code>|V1| |E2| + |V2| |E1| + |E1| |E2|</code> in the directed case and
  *     <code>|V1| |E2| + |V2| |E1| + 2 |E1| |E2|</code> in the undirected case.
  *
  *     </para><para>
- *     Time Complexity: O(|V1| |V2| + |V1| |E2| + |V2| |E1| + |E1| |E2|)
+ *     Time complexity: O(|V1| |V2| + |V1| |E2| + |V2| |E1| + |E1| |E2|)
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
  *
  *     \cli IGRAPH_PRODUCT_TENSOR
- *     Computes the tensor (categorical) product of two graphs. In the product graph,
- *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ *     Computes the tensor product (also known as categorial product) of two graphs.
+ *     In the product graph, there is a connection from <code>(u1, v1)</code> to
+ *     <code>(u2, v2)</code>
  *     if and only if
  *     <code>u1 ~ u2</code> and <code>v1 ~ v2</code>.
  *     Thus, the number of edges in the product is
