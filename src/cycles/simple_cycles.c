@@ -69,7 +69,7 @@ typedef struct igraph_simple_cycle_search_state_t {
 
     /* Boolean indicating whether the algorithm should stop searching for cycles */
     igraph_bool_t stop_search;
-} igraph_i_simple_cycle_search_state_t;
+} simple_cycle_search_state_t;
 
 /**
  * A struct to store one cycle found by the algorithm.
@@ -79,13 +79,13 @@ typedef struct {
     igraph_vector_int_list_t *vertices;
     /* the edges in the cycle */
     igraph_vector_int_list_t *edges;
-} igraph_i_simple_cycle_results_t;
+} simple_cycle_results_t;
 
 /**
  * The implementation of procedure UNBLOCK from Johnson's paper
  */
-static igraph_error_t igraph_i_simple_cycles_unblock(
-        igraph_i_simple_cycle_search_state_t *state,
+static igraph_error_t simple_cycles_unblock(
+        simple_cycle_search_state_t *state,
         igraph_integer_t u) {
 
     // TODO: introduce stack for w & neis in order to reduce the number of
@@ -132,8 +132,8 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
  *   Pass a negative value for no limit
  * \param arg Argument to pass to the callback function.
  */
-static igraph_error_t igraph_i_simple_cycles_circuit(
-        igraph_i_simple_cycle_search_state_t *state,
+static igraph_error_t simple_cycles_circuit(
+        simple_cycle_search_state_t *state,
         igraph_integer_t V,
         igraph_integer_t max_cycle_length,
         igraph_integer_t min_cycle_length,
@@ -265,7 +265,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         if (!recurse_deeper) {
             // L2
             if (local_found || loop_length_stop) {
-                IGRAPH_CHECK(igraph_i_simple_cycles_unblock(state, V));
+                IGRAPH_CHECK(simple_cycles_unblock(state, V));
             } else {
                 for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
                     const igraph_integer_t W = VECTOR(*neighbors)[i];
@@ -304,7 +304,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 }
 
 /**
- * \function igraph_i_simple_cycle_search_state_init
+ * \function simple_cycle_search_state_init
  * \brief Initializes the cycle search state.
  *
  * \param state The state structure to initialize.
@@ -319,10 +319,10 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  *
  * Time complexity: O(|V|*|E|*log(|V|*|E|))
  *
- * \ref igraph_i_simple_cycle_search_state_destroy
+ * \ref simple_cycle_search_state_destroy()
  */
-static igraph_error_t igraph_i_simple_cycle_search_state_init(
-        igraph_i_simple_cycle_search_state_t *state,
+static igraph_error_t simple_cycle_search_state_init(
+        simple_cycle_search_state_t *state,
         const igraph_t *graph,
         igraph_neimode_t mode) {
 
@@ -363,7 +363,7 @@ static igraph_error_t igraph_i_simple_cycle_search_state_init(
 }
 
 /**
- * \function igraph_i_simple_cycle_search_state_destroy
+ * \function simple_cycle_search_state_destroy
  * \brief Destroys the cycle search state.
  *
  * \param state The state structure to destroy
@@ -371,10 +371,9 @@ static igraph_error_t igraph_i_simple_cycle_search_state_init(
  *
  * Time complexity: O(1).
  *
- * \ref igraph_i_simple_cycle_search_state_init
+ * \ref simple_cycle_search_state_init()
  */
-static void igraph_i_simple_cycle_search_state_destroy(
-        igraph_i_simple_cycle_search_state_t *state) {
+static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state) {
 
     igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK);
@@ -389,13 +388,13 @@ static void igraph_i_simple_cycle_search_state_destroy(
  * A cycle handler that simply appends cycles to a vector list.
  * Use by \ref igraph_simple_cycles()
  */
-static igraph_error_t igraph_i_append_simple_cycle_result(
+static igraph_error_t append_simple_cycle_result(
         const igraph_vector_int_t *vertices,
         const igraph_vector_int_t *edges,
         void *arg) {
 
-    igraph_i_simple_cycle_results_t *res_list =
-        (igraph_i_simple_cycle_results_t *)arg;
+    simple_cycle_results_t *res_list =
+        (simple_cycle_results_t *)arg;
     if (res_list->vertices != NULL) {
         // copy output: from stack to vector. No need to reverse because
         // we were putting vertices in the stack in reverse order anyway.
@@ -420,7 +419,7 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
 }
 
 /**
- * \function igraph_i_simple_cycles_search_callback_from_one_vertex
+ * \function simple_cycles_search_callback_from_one_vertex
  * \brief Search simple cycles starting from one vertex.
  *
  * \param state The state structure to search on.
@@ -437,8 +436,8 @@ static igraph_error_t igraph_i_append_simple_cycle_result(
  * https://stackoverflow.com/a/35922906/3909202
  * https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
-static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
-        igraph_i_simple_cycle_search_state_t *state,
+static igraph_error_t simple_cycles_search_callback_from_one_vertex(
+        simple_cycle_search_state_t *state,
         igraph_integer_t s,
         igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length,
@@ -451,7 +450,7 @@ static igraph_error_t igraph_i_simple_cycles_search_callback_from_one_vertex(
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
 
-    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, max_cycle_length,
+    IGRAPH_CHECK(simple_cycles_circuit(state, s, max_cycle_length,
                  min_cycle_length, callback, arg));
 
     for (igraph_integer_t i = 0; i < state->N; ++i) {
@@ -526,10 +525,10 @@ igraph_error_t igraph_simple_cycles_callback(
         return IGRAPH_SUCCESS;
     }
 
-    igraph_i_simple_cycle_search_state_t state;
+    simple_cycle_search_state_t state;
 
-    IGRAPH_CHECK(igraph_i_simple_cycle_search_state_init(&state, graph, mode));
-    IGRAPH_FINALLY(igraph_i_simple_cycle_search_state_destroy, &state);
+    IGRAPH_CHECK(simple_cycle_search_state_init(&state, graph, mode));
+    IGRAPH_FINALLY(simple_cycle_search_state_destroy, &state);
 
     // Depending on the graph, it is rather unreasonable to search cycles
     // from each and every node. Instead, we expect that each cycle must involve
@@ -554,7 +553,7 @@ igraph_error_t igraph_simple_cycles_callback(
         }
         // Check if we find a cycle starting from this vertex.
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
-            IGRAPH_CHECK(igraph_i_simple_cycles_search_callback_from_one_vertex(
+            IGRAPH_CHECK(simple_cycles_search_callback_from_one_vertex(
                              &state, i, min_cycle_length, max_cycle_length, callback, arg));
             IGRAPH_ALLOW_INTERRUPTION();
         }
@@ -564,7 +563,7 @@ igraph_error_t igraph_simple_cycles_callback(
         }
     }
 
-    igraph_i_simple_cycle_search_state_destroy(&state);
+    simple_cycle_search_state_destroy(&state);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -619,7 +618,7 @@ igraph_error_t igraph_simple_cycles(
     igraph_integer_t min_cycle_length,
     igraph_integer_t max_cycle_length) {
 
-    igraph_i_simple_cycle_results_t result_list;
+    simple_cycle_results_t result_list;
     result_list.vertices = vertices;
     result_list.edges = edges;
 
@@ -631,7 +630,7 @@ igraph_error_t igraph_simple_cycles(
     }
 
     IGRAPH_CHECK(igraph_simple_cycles_callback(graph, mode, min_cycle_length, max_cycle_length,
-                                  &igraph_i_append_simple_cycle_result,
+                                  &append_simple_cycle_result,
                                   &result_list));
 
     return IGRAPH_SUCCESS;
