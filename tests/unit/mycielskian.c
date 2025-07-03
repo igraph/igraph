@@ -20,12 +20,12 @@
 
 #include "test_utilities.h"
 
-int main(void) {
+void test_mycielskian(void) {
     igraph_t g, res;
     igraph_t groetzsch;
     igraph_bool_t isomorphic;
 
-    igraph_famous(&groetzsch, "groetzsch");
+    igraph_famous(&groetzsch, "Groetzsch");
 
     // k == 0 testing
     printf("small graph, k=0\n");
@@ -123,6 +123,57 @@ int main(void) {
     igraph_destroy(&groetzsch);
 
     VERIFY_FINALLY_STACK();
+}
 
-    return 0;
+void test_mycielski_graph(void) {
+    igraph_t res;
+    igraph_t expected_res;
+    igraph_bool_t isomorphic;
+
+    // k == 0 testing --> should be a null graph
+    igraph_mycielski_graph(&res, 0);
+    igraph_empty(&expected_res, 0, IGRAPH_UNDIRECTED);
+    igraph_isomorphic(&res, &expected_res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
+    igraph_destroy(&res);
+    igraph_destroy(&expected_res);
+
+    //should be a vertex
+    igraph_mycielski_graph(&res, 1);
+    igraph_empty(&expected_res, 1, IGRAPH_UNDIRECTED);
+    igraph_isomorphic(&res, &expected_res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
+    igraph_destroy(&res);
+    igraph_destroy(&expected_res);
+
+    // should be a path
+    igraph_mycielski_graph(&res, 2);
+    igraph_ring(&expected_res, 2, IGRAPH_UNDIRECTED, false, false);
+    igraph_isomorphic(&res, &expected_res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
+    igraph_destroy(&res);
+    igraph_destroy(&expected_res);
+
+    // should be a 5-cycle
+    igraph_mycielski_graph(&res, 3);
+    igraph_ring(&expected_res, 5, IGRAPH_UNDIRECTED, false, true);
+    igraph_isomorphic(&res, &expected_res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
+    igraph_destroy(&res);
+    igraph_destroy(&expected_res);
+
+    // should be the Groetzsch graph
+    igraph_mycielski_graph(&res, 4);
+    igraph_famous(&expected_res, "Groetzsch");
+    igraph_isomorphic(&res, &expected_res, &isomorphic);
+    IGRAPH_ASSERT(isomorphic);
+    igraph_destroy(&res);
+    igraph_destroy(&expected_res);
+
+    VERIFY_FINALLY_STACK();
+}
+
+int main(void) {
+    test_mycielskian();
+    test_mycielski_graph();
 }
