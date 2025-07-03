@@ -29,54 +29,53 @@
  * \function igraph_mycielskian
  * \brief Generate the Mycielskian of a graph with \p k iterations.
  *
- * The Mycielskian construction is a method used to generate a triangle-free
- * graph with an increased chromatic number. Given an input graph, the
- * Mycielskian transformation produces a new graph where the chromatic number
- * increases by at most one in each iteration.
+ * The Mycielskian of a graph is a larger graph formed using a construction due
+ * to Jan Mycielski that increases the chromatic number by one while preserving
+ * the triangle-free property. The Mycielski construction can be used to create
+ * triangle-free graphs with an arbitrarily large chromatic number.
  *
  * </para><para>
- * This transformation is useful in graph theory for constructing
- * graphs with large chromatic numbers while avoiding small cycles,
- * particularly triangles.
+ * Let the \c n vertices of the given graph \c G be \c v_1, ..., \c v_n.
+ * The Mycielskian of \c G, denoted <code>M(G)</code>, contains \c G itself as
+ * a subgraph, together with \c n+1 additional vertices:
  *
- * </para><para>
- * Let the \c n vertices of the given graph G be \c v_1, ..., \c v_n.
- * The Mycielski graph \c M(G) contains G itself as a subgraph,
- * together with \c n+1 additional vertices:
- * 
- * \olist
- * \oli A vertex \c u_i corresponding to each vertex \c v_i of \c G.
- * \oli An extra vertex \c w.
- * \endolist
+ * \ilist
+ * \ili A vertex \c u_i corresponding to each vertex \c v_i of \c G.
+ * \ili An extra vertex \c w.
+ * \endilist
  * 
  * </para><para>
  * The edges are added as follows:
- * \olist
- * \oli Each vertex \c u_i is connected to \c w, forming a star.
- * \oli For each edge <code>(v_i, v_j)</code> in \c G, two new edges are added:
+ *
+ * \ilist
+ * \ili Each vertex \c u_i is connected to \c w, forming a star.
+ * \ili For each edge <code>(v_i, v_j)</code> in \c G, two new edges are added:
  *   <code>(u_i, v_j)</code> and <code>(v_i, u_j)</code>.
- * \endolist
+ * \endilist
  * 
- * Thus, if G has \c n vertices and \c m edges, the Mycielski graph \c M(G) 
+ * Thus, if \c G has \c n vertices and \c m edges, the Mycielskian <code>M(G)</code>
  * has <code>2n + 1</code> vertices, and <code>3m + n</code> edges.
  *
  * </para><para>
- * The k-th iterated Mycielskian has:
- * <code> n_k = (n + 1) * 2^k - 1 </code>
- * vertices, where \c n is the number of vertices in the original graph.
+ * igraph uses an alternative construction in two special cases:
  *
- * The edge count increases as:
- * <code> m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2 </code>
- * 
- * where m is the original number of edges. The number of edges increases
- * from \c m to <code>3m + n</code> in each iteration, as we add 2 edges for every
- * existing edge and 1 edge for every vertex.
+ * \ilist
+ * \ili The Mycielskian of the null graph is the singleton graph.
+ * \ili The Mycielskian of the singleton graph is is the two-path.
+ * \endilist
+ *
+ * This ensures that iterative applications of the construction, starting from
+ * the null or singleton graph, always yields connected graphs. In fact these
+ * are the Mycielski graphs that \ref igraph_mycielski_graph() produces.
  *
  * </para><para>
- * The Mycielskian is commonly used to demonstrate that graphs can have high
- * chromatic numbers without forming small cycles (i.e., triangle-free graphs).
- * The Grotzsch graph, for example, is obtained as \c M_4 of a triangle-free graph.
- * </para><para>
+ * This function can apply the Mycielski transformation an arbitrary number of
+ * times, controlled by the \p k parameter. The k-th iterated Mycielskian has
+ * <code>n_k = (n + 1) * 2^k - 1</code>
+ * vertices and
+ * <code>m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2</code>
+ * edges, where \c n and \c m are the vertex and edge count of the original
+ * graph, respectively.
  * 
  * \param graph Pointer to the input graph.
  * \param res Pointer to an uninitialized graph object where the Mycielskian
@@ -179,36 +178,28 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 
 /**
  * \function igraph_mycielski_graph
- * \brief Generate the Mycielski graph of order k.
+ * \brief The Mycielski graph of order \p k.
  *
- * The Mycielski graph construction is used to create a triangle-free graph
- * with an increased chromatic number. Given an input graph, the Mycielski
- * transformation produces a new graph with one additional chromatic number.
- * This transformation is commonly used in graph theory to study chromatic
- * properties of graphs.
- *
- * </para><para>
- * The Mycielski graph \c M_k of order \p k is a triangle-free graph
- * with chromatic number \p k and the smallest possible number of vertices.
- *
- * The number of edges also increases with each step, making it useful for
- * demonstrating properties of chromatic graphs.
- * </para><para>
+ * The Mycielski graph \c M_k of order \p k is a triangle-free graph on
+ * \p vertices with chromatic number \p k. It is defined through the Mycielski
+ * construction described in the documentation of \ref igraph_mycielskian().
  * 
+ * Some authors define Mycielski graphs only for <code>k > 1</code>.
+ * igraph extends this to all <code>k >= 0</code>.
  * The first few Mycielski graphs are:
  * \olist
  * \oli M_0: Null graph
  * \oli M_1: Single vertex
  * \oli M_2: Path graph with 2 vertices
  * \oli M_3: Cycle graph with 5 vertices
- * \oli M_4: Grötzsch graph (triangle-free graph with chromatic number 4)
+ * \oli M_4: Grötzsch graph (a triangle-free graph with chromatic number 4)
  * \endolist
- * 
- * </para><para>
- * The Mycielski graph has several important applications, particularly in
- * demonstrating that there exist graphs with high chromatic numbers but no
- * short cycles (i.e., triangle-free). For example, the Grötzsch graph,
- * which is \c M_4, is a triangle-free graph with chromatic number 4.
+ *
+ * The vertex count of \M_k is
+ * <code>3 * 2^(k-2) - 1</code> for <code>k > 1</code> and \c k otherwise.
+ * The edge count is
+ * <code>(7 * 2^(k-2) + 1) / 2 - 3 * 2^(k - 2)</code> for <code>k > 1</code>
+ * and 0 otherwise.
  * 
  * \param graph Pointer to an uninitialized graph object. The generated
  *        Mycielski graph will be stored here.
