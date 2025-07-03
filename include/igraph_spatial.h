@@ -25,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_matrix.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef enum {
     IGRAPH_METRIC_L2
@@ -39,6 +39,6 @@ IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_real_t cutoff
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif
