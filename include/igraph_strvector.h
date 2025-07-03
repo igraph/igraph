@@ -46,7 +46,7 @@ typedef struct s_igraph_strvector {
  * element. Use \ref igraph_strvector_set() to set an element instead.
  *
  * \param sv The string vector
- * \param i The the index of the element.
+ * \param i The index of the element.
  * \return The element at position \p i.
  *
  * Time complexity: O(1).

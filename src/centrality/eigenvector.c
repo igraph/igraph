@@ -523,7 +523,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * vertex is proportional to the sum of eigenvector centralities of its
  * neighbors. In practice, the centralities are determined by calculating the
  * eigenvector corresponding to the largest positive eigenvalue of the
- * adjacency matrix. This is motivated by the the fact that the principal
+ * adjacency matrix. This is motivated by the fact that the principal
  * eigenvector is guaranteed to be non-negative, assuming that edge weights
  * are also non-negative. In fact, in connected undirected graphs, this is
  * the \em only non-negative eigenvector.

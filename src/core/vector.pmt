@@ -2094,7 +2094,7 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
  *   vector if it is present. If \p v does not
  *   contain \p what then
  *   \p pos is set to the position to which it
- *   should be inserted (to keep the the vector sorted of course).
+ *   should be inserted (to keep the vector sorted of course).
  * \return True if \p what is found in the vector, false otherwise.
  *
  * Time complexity: O(log(n)),
@@ -2128,7 +2128,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  * \param pos Pointer to an \type igraph_integer_t. This is set to the position of an
  *        instance of \p what in the slice of the vector if it is present. If \p
  *        v does not contain \p what then \p pos is set to the position to which
- *        it should be inserted (to keep the the vector sorted).
+ *        it should be inserted (to keep the vector sorted).
  * \param start The start position of the slice to search (inclusive).
  * \param end The end position of the slice to search (exclusive).
  * \return True if \p what is found in the vector, false otherwise.
