@@ -33,7 +33,7 @@ typedef enum {
 
 IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_t *graph,
-    igraph_matrix_t *points,
+    const igraph_matrix_t *points,
     igraph_metric_t metric,
     igraph_integer_t neighbors,
     igraph_real_t cutoff
