@@ -88,7 +88,7 @@ do { \
               ); \
         \
         BENCH("Directed multi, loops, PA,     n = " TOSTR(N) ", " TOSTR(REP) "x", \
-              REPEAT(igraph_is_graphical(&outdeg, &indeg, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW, &graphical), 100); \
+              REPEAT(igraph_is_graphical(&outdeg, &indeg, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW, &graphical), REP); \
               ); \
         \
         igraph_erdos_renyi_game_gnp(&graph, N, 12.0/N, IGRAPH_DIRECTED, IGRAPH_LOOPS); \
@@ -109,7 +109,7 @@ do { \
               ); \
             \
         BENCH("Directed multi, loops, G(n,p), n = " TOSTR(N) ", " TOSTR(REP) "x", \
-              REPEAT(igraph_is_graphical(&outdeg, &indeg, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW, &graphical), 100); \
+              REPEAT(igraph_is_graphical(&outdeg, &indeg, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW, &graphical), REP); \
               ); \
         \
 } while (0)

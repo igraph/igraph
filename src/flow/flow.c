@@ -464,14 +464,14 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  *        contains the target vertex.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
- * \param capacity Vector containing the capacity of the edges. If NULL, then
+ * \param capacity Vector containing the capacity of the edges. If \c NULL, then
  *        every edge is considered to have capacity 1.0.
  * \param stats Counts of the number of different operations
- *        preformed by the algorithm are stored here.
+ *        performed by the algorithm are stored here.
  * \return Error code.
  *
- * Time complexity: O(|V|^3). In practice it is much faster, but i
- * cannot prove a better lower bound for the data structure i've
+ * Time complexity: O(|V|^3). In practice it is much faster, but I
+ * cannot prove a better lower bound for the data structure I've
  * used. In fact, this implementation runs much faster than the
  * \c hi_pr implementation discussed in
  * B. V. Cherkassky and A. V. Goldberg: On implementing the

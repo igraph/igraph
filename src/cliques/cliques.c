@@ -29,16 +29,16 @@
 #include "core/set.h"
 
 static igraph_error_t igraph_i_find_k_indsets(
-        const igraph_t *graph,
         igraph_integer_t size,
         const igraph_integer_t *member_storage,
         igraph_integer_t **new_member_storage,
         igraph_integer_t old_count,
         igraph_integer_t *new_count,
-        igraph_vector_int_t *neis) {
+        igraph_lazy_adjlist_t *al) {
 
     igraph_integer_t l, m, n, new_member_storage_size;
     const igraph_integer_t *c1, *c2;
+    const igraph_vector_int_t *neis;
     igraph_integer_t v1, v2;
     igraph_bool_t ok;
 
@@ -119,7 +119,8 @@ static igraph_error_t igraph_i_find_k_indsets(
                 /* v1 and v2 are the two different vertices. Check for the
                     * absence of an edge since we are looking for independent
                     * vertex sets */
-                IGRAPH_CHECK(igraph_neighbors(graph, neis, v1, IGRAPH_ALL));
+                neis = igraph_lazy_adjlist_get(al, v1);
+                IGRAPH_CHECK_OOM(neis, "Insufficient memory for independent sets.");
                 if (!igraph_vector_int_search(neis, 0, v2, 0)) {
                     /* Found a new independent vertex set, step forward in new_member_storage */
                     if (m == n || v2 > (*new_member_storage)[m - 1]) {
@@ -433,10 +434,11 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
                                    igraph_integer_t min_size,
                                    igraph_integer_t max_size) {
     igraph_integer_t no_of_nodes;
-    igraph_vector_int_t neis, *indset;
+    igraph_vector_int_t *indset;
     igraph_integer_t *member_storage, *new_member_storage, *c1;
     igraph_vector_int_t new_member_storage_view;
     igraph_integer_t indset_count, old_indset_count;
+    igraph_lazy_adjlist_t al;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_WARNING("Edge directions are ignored during independent vertex set calculations.");
@@ -453,7 +455,8 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
     igraph_vector_int_list_clear(res);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
 
     /* Will be resized later, if needed. */
     member_storage = IGRAPH_CALLOC(1, igraph_integer_t);
@@ -495,11 +498,11 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
         /* Calculate the independent vertex sets */
 
         IGRAPH_FINALLY_CLEAN(2);
-        IGRAPH_CHECK(igraph_i_find_k_indsets(graph, i, member_storage,
+        IGRAPH_CHECK(igraph_i_find_k_indsets(i, member_storage,
                                              &new_member_storage,
                                              old_indset_count,
                                              &indset_count,
-                                             &neis));
+                                             &al));
         IGRAPH_FINALLY(igraph_free, member_storage);
         IGRAPH_FINALLY(igraph_free, new_member_storage);
 
@@ -515,7 +518,7 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
     IGRAPH_FREE(new_member_storage);
     IGRAPH_FREE(member_storage);
-    igraph_vector_int_destroy(&neis);
+    igraph_lazy_adjlist_destroy(&al);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
