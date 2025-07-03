@@ -194,6 +194,8 @@ typedef enum { IGRAPH_MST_AUTOMATIC = 0,
              } igraph_mst_algorithm_t;
 
 typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
+               IGRAPH_PRODUCT_LEXICOGRAPHIC,
+               IGRAPH_PRODUCT_STRONG,
                IGRAPH_PRODUCT_TENSOR,
              } igraph_product_t;
 
