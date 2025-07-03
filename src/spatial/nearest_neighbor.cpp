@@ -65,18 +65,11 @@ public:
         if (index == current_vertex) {
             return true;
         }
-        printf("Processing %li -> %li ", current_vertex, index);
-        //if (distance > max_distance) {
-        //    printf("Stopping due to distane\n");
-        //    return false;
-        // }
         igraph_vector_int_push_back(&edges, current_vertex);
         igraph_vector_int_push_back(&edges, index);
         if (++current_added == max_neighbors) {
-            printf("Stopping due to neighbor count\n");
             return false;
         }
-        printf("continuing.");
         return true;
     }
     ~GraphBuildingResultSet() {
@@ -110,12 +103,9 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
 
     igraph_integer_t dimensionality = igraph_matrix_ncol(points);
 
-
     igraph_integer_t point_count = igraph_matrix_nrow(points);
 
     using kdTree = nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor>, igraph_point_adaptor>;
-
-    //using my_tree = nanoflann::KDTreeSingleIndexAdaptor<, nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor<typename Inner>>, 0, uint32_t>;
 
     igraph_empty(graph, point_count, false);
 
@@ -132,7 +122,6 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
     IGRAPH_CHECK(results.initialize());
 
     for (igraph_integer_t i = 0; i < point_count; i++) {
-        printf("Nearest neighbor search at %li\n", i);
         IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
         results.select_vertex(i);
         tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
