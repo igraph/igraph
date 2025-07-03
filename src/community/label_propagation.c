@@ -26,13 +26,15 @@
 
 #include "core/interruption.h"
 
-igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
+static igraph_error_t community_label_propagation(
+        const igraph_t *graph,
         igraph_vector_int_t *membership,
         igraph_neimode_t mode,
         const igraph_vector_t *weights,
-        igraph_vector_bool_t *fixed,
+        const igraph_vector_bool_t *fixed,
         igraph_bool_t retention) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_not_fixed_nodes = 0;
     igraph_integer_t i, j, k;
     igraph_adjlist_t al;
@@ -254,11 +256,12 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
+static igraph_error_t community_fast_label_propagation(
+        const igraph_t *graph,
         igraph_vector_int_t *membership,
         igraph_neimode_t mode,
         const igraph_vector_t *weights,
-        igraph_vector_bool_t *fixed) {
+        const igraph_vector_bool_t *fixed) {
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_not_fixed_nodes = 0;
@@ -556,8 +559,9 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         const igraph_vector_int_t *initial,
         const igraph_vector_bool_t *fixed,
         igraph_lpa_variant_t lpa_variant) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_not_fixed_nodes = no_of_nodes;
     igraph_integer_t i, j, k;
     igraph_bool_t unlabelled_left;
@@ -643,15 +647,15 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
     switch (lpa_variant) {
     case IGRAPH_LPA_FAST:
-        IGRAPH_CHECK(igraph_i_community_fast_label_propagation(graph, membership, mode, weights, fixed_copy));
+        IGRAPH_CHECK(community_fast_label_propagation(graph, membership, mode, weights, fixed_copy));
         break;
 
     case IGRAPH_LPA_RETENTION:
-        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ true ));
+        IGRAPH_CHECK(community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ true ));
         break;
 
     case IGRAPH_LPA_DOMINANCE:
-        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ false));
+        IGRAPH_CHECK(community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ false));
         break;
 
     default:
