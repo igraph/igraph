@@ -19,6 +19,7 @@
 #include "igraph_cycles.h"
 
 #include "igraph_adjlist.h"
+#include "igraph_bitset.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
@@ -30,7 +31,7 @@
  * Based on the original implementation in:
  * Johnson DB: Finding all the elementary circuits of a directed graph.
  * SIAM J Comput 4(1):77-84.
- * https://epubs.siam.org/doi/10.1137/0204007
+ * https://doi.org/10.1137/0204007
  */
 
 /**
@@ -38,7 +39,7 @@
  * single struct allows us to resume the algorithm from any point and yield the
  * cycles one by one in an iterator-like manner.
  */
-typedef struct igraph_simple_cycle_search_state_t {
+typedef struct {
     /* Number of vertices in the graph */
     igraph_integer_t N;
 
@@ -58,11 +59,11 @@ typedef struct igraph_simple_cycle_search_state_t {
     igraph_vector_int_t edge_stack;
 
     /* Boolean vector indicating which vertices are blocked */
-    igraph_vector_bool_t v_blocked;
+    igraph_bitset_t v_blocked;
 
     /* Boolean vector indicating which vertices have ever been checked.
      * The bigger picture here is that this allows a "lazy" community decomposition */
-    igraph_vector_bool_t v_visited;
+    igraph_bitset_t v_visited;
 
     /* Whether the graph is directed */
     igraph_bool_t directed;
@@ -100,12 +101,12 @@ static igraph_error_t simple_cycles_unblock(
         igraph_bool_t recurse_deeper = false;
         const igraph_integer_t current_u = igraph_stack_int_top(&u_stack);
 
-        VECTOR(state->v_blocked)[current_u] = false;
+        IGRAPH_BIT_CLEAR(state->v_blocked, current_u);
 
         neis = igraph_adjlist_get(&state->B, current_u);
         while (!igraph_vector_int_empty(neis) && !recurse_deeper) {
             const igraph_integer_t w = igraph_vector_int_pop_back(neis);
-            if (VECTOR(state->v_blocked)[w]) {
+            if (IGRAPH_BIT_TEST(state->v_blocked, w)) {
                 IGRAPH_CHECK(igraph_stack_int_push(&u_stack, w));
                 recurse_deeper = true;
             }
@@ -163,7 +164,7 @@ static igraph_error_t simple_cycles_circuit(
     while ((recurse_deeper ||
             igraph_stack_int_size(&neigh_iteration_progress) > 0) &&
             !state->stop_search) {
-        VECTOR(state->v_visited)[V] = true;
+        IGRAPH_BIT_SET(state->v_visited, V);
 
         IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) ==
                       igraph_stack_int_size(&e_stack));
@@ -181,7 +182,7 @@ static igraph_error_t simple_cycles_circuit(
             //        ", result size is %" IGRAPH_PRId "\n",
             //        V, igraph_vector_int_size(&state->vertex_stack),
             //        igraph_stack_int_size(&v_stack));
-            VECTOR(state->v_blocked)[V] = true;
+            IGRAPH_BIT_SET(state->v_blocked, V);
         } else {
             // back to what we were doing before
             i0 = igraph_stack_int_pop(&neigh_iteration_progress);
@@ -238,7 +239,7 @@ static igraph_error_t simple_cycles_circuit(
                     }
                 }
                 igraph_vector_int_pop_back(&state->edge_stack);
-            } else if (!(VECTOR(state->v_blocked)[W])) {
+            } else if (! IGRAPH_BIT_TEST(state->v_blocked, W)) {
                 // printf("Recursing deeper from %" IGRAPH_PRId " to  %" IGRAPH_PRId
                 // "\n", V, W);
                 recurse_deeper = ((max_cycle_length < 0) ||
@@ -340,9 +341,9 @@ static igraph_error_t simple_cycle_search_state_init(
     igraph_vector_int_clear(&state->edge_stack);
 
     // by default false
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&state->v_blocked, state->N);
+    IGRAPH_BITSET_INIT_FINALLY(&state->v_blocked, state->N);
 
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&state->v_visited, state->N);
+    IGRAPH_BITSET_INIT_FINALLY(&state->v_visited, state->N);
 
     IGRAPH_CHECK(igraph_inclist_init(
                      graph, &state->IK, mode,
@@ -377,8 +378,8 @@ static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state
     igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
-    igraph_vector_bool_destroy(&state->v_visited);
-    igraph_vector_bool_destroy(&state->v_blocked);
+    igraph_bitset_destroy(&state->v_visited);
+    igraph_bitset_destroy(&state->v_blocked);
     igraph_vector_int_destroy(&state->edge_stack);
     igraph_vector_int_destroy(&state->vertex_stack);
 }
@@ -445,7 +446,7 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
 
     // L3:
     for (igraph_integer_t i = s; i < state->N; ++i) {
-        VECTOR(state->v_blocked)[i] = false;
+        IGRAPH_BIT_CLEAR(state->v_blocked, i);
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
 
@@ -487,8 +488,6 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
  * SIAM J. Comput. 4(1):77-84.
  * https://doi.org/10.1137/0204007
  *
- * See also: \ref igraph_simple_cycles_callback()
- *
  * \param graph The graph to search for
  * \param mode A constant specifying how edge directions are
  *   considered in directed graphs. Valid modes are:
@@ -503,14 +502,13 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
  * \param callback A function to call for each cycle that is found.
  *   See also \ref igraph_cycle_handler_t
  * \param arg This parameter will be passed to \p callback.
+ * \return Error code.
  *
  * \sa \ref igraph_simple_cycles() to store the found cycles;
  * \ref igraph_find_cycle() to find a single cycle;
  * \ref igraph_fundamental_cycles() and igraph_minimum_cycle_basis()
  * to find a cycle basis, a compact representation of the cycle structure
  * of the graph.
- *
- * \return Error code.
  */
 igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
@@ -533,10 +531,10 @@ igraph_error_t igraph_simple_cycles_callback(
     // from each and every node. Instead, we expect that each cycle must involve
     // either:
     // - a vertex with degree > 2
-    // - or, if it's a free standing cycle, be any vertex of this connected component;
+    // - or, if it's a freestanding cycle, be any vertex of this connected component;
     //   components are identified via the `state->v_visited` boolean mask.
     //
-    // Thus we iterate over the vertices, and check if they can be skipped as
+    // Thus, we iterate over the vertices, and check if they can be skipped as
     // a starting point according to the rules laid out above.
     for (igraph_integer_t i = 0; i < state.N; i++) {
         // Check if the vertex is a candidate for a cycle.
@@ -546,8 +544,7 @@ igraph_error_t igraph_simple_cycles_callback(
         //  - our algorithm modifies the adjlist state.AK
         igraph_integer_t degree;
         IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
-        if (degree < 3 &&
-                VECTOR(state.v_visited)[i]) {
+        if (degree < 3 && IGRAPH_BIT_TEST(state.v_visited, i)) {
             continue;
         }
         // Check if we find a cycle starting from this vertex.
@@ -599,6 +596,7 @@ igraph_error_t igraph_simple_cycles_callback(
  *   Pass a negative value to search for all cycles.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
+ * \return Error code.
  *
  * \sa \ref igraph_simple_cycles_callback() to call a function for each found
  * cycle;
@@ -606,8 +604,6 @@ igraph_error_t igraph_simple_cycles_callback(
  * \ref igraph_fundamental_cycles() and \ref igraph_minimum_cycle_basis()
  * to find a cycle basis, a compact representation of the cycle structure
  * of the graph.
- *
- * \return Error code.
  */
 igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
