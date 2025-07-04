@@ -21,14 +21,16 @@
 #include "test_utilities.h"
 
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
-    igraph_vector_int_t outputs;
+    igraph_vector_int_t giant_size, vertex_count;
     igraph_integer_t size = igraph_ecount(graph);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&giant_size, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_count, 0);
 
-    IGRAPH_CHECK(igraph_bond_percolation(graph, &outputs, edge_indices));
+    IGRAPH_CHECK(igraph_bond_percolation(graph, &giant_size, &vertex_count, edge_indices));
 
     if (printing) {
-        print_vector_int(&outputs);
+        print_vector_int(&giant_size);
+        print_vector_int(&vertex_count);
     }
 
     igraph_vector_int_t components;
@@ -36,22 +38,30 @@ igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, i
 
     IGRAPH_CHECK(igraph_connected_components(graph, NULL, &components, NULL, IGRAPH_WEAK));
 
-    IGRAPH_ASSERT(igraph_vector_int_size(&outputs) == size);
+    IGRAPH_ASSERT(igraph_vector_int_size(&giant_size) == size);
+    IGRAPH_ASSERT(igraph_vector_int_size(&vertex_count) == size);
     if (size > 1) {
-        IGRAPH_ASSERT(igraph_vector_int_max(&outputs) == igraph_vector_int_max(&components));
+        IGRAPH_ASSERT(igraph_vector_int_max(&giant_size) == igraph_vector_int_max(&components));
     }
     igraph_vector_int_destroy(&components);
     IGRAPH_FINALLY_CLEAN(1);
     igraph_integer_t prev = 0;
     for (igraph_integer_t i = 0; i < size; i++) {
-        IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
-        IGRAPH_ASSERT(VECTOR(outputs)[i] >= prev);   // Size of largest component must be nondecreasing.
-        IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
-        prev = VECTOR(outputs)[i];
+        IGRAPH_ASSERT(VECTOR(giant_size)[i] > 0);      // Sizes cannot be negative.
+        IGRAPH_ASSERT(VECTOR(giant_size)[i] >= prev);   // Size of largest component must be nondecreasing.
+        IGRAPH_ASSERT(VECTOR(giant_size)[i] <= i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
+        prev = VECTOR(giant_size)[i];
     }
-
-    igraph_vector_int_destroy(&outputs);
-    IGRAPH_FINALLY_CLEAN(1);
+    prev = 0;
+    for (igraph_integer_t i = 0; i < size; i++) {
+        IGRAPH_ASSERT(VECTOR(vertex_count)[i] > 0);      // Sizes cannot be negative.
+        IGRAPH_ASSERT(VECTOR(vertex_count)[i] >= prev);   // Size of largest component must be nondecreasing.
+        IGRAPH_ASSERT(VECTOR(vertex_count)[i] <= 2*i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
+        prev = VECTOR(vertex_count)[i];
+    }
+    igraph_vector_int_destroy(&giant_size);
+    igraph_vector_int_destroy(&vertex_count);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -221,9 +231,10 @@ void test_site(void) {
 }
 
 igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t printing) {
-    igraph_vector_int_t outputs;
+    igraph_vector_int_t outputs, vertex_count;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
-    IGRAPH_CHECK(igraph_edgelist_percolation(edge_list, &outputs));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_count, 0);
+    IGRAPH_CHECK(igraph_edgelist_percolation(edge_list, &outputs, &vertex_count));
 
     if (printing) {
         print_vector_int(&outputs);
@@ -254,6 +265,13 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
         prev = VECTOR(outputs)[i];
     }
 
+    prev = 0;
+    for (igraph_integer_t i = 0; i < size; i++) {
+        IGRAPH_ASSERT(VECTOR(vertex_count)[i] > 0);      // Sizes cannot be negative.
+        IGRAPH_ASSERT(VECTOR(vertex_count)[i] >= prev);   // Size of largest component must be nondecreasing.
+        IGRAPH_ASSERT(VECTOR(vertex_count)[i] <= 2*i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
+        prev = VECTOR(vertex_count)[i];
+    }
     igraph_vector_int_destroy(&outputs);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
