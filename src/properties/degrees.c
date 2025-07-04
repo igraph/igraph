@@ -74,7 +74,7 @@ igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+static igraph_error_t avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vs_t vids,
         igraph_neimode_t mode,
         igraph_neimode_t neighbor_degree_mode,
@@ -278,7 +278,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     igraph_vector_int_t deghist;
 
     if (weights) {
-        return igraph_i_avg_nearest_neighbor_degree_weighted(graph, vids,
+        return avg_nearest_neighbor_degree_weighted(graph, vids,
                 mode, neighbor_degree_mode, knn, knnk, weights);
     }
 
@@ -536,7 +536,7 @@ igraph_error_t igraph_degree_correlation_vector(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_strength_all(
+static igraph_error_t strength_all(
         const igraph_t *graph, igraph_vector_t *res,
         igraph_neimode_t mode, igraph_bool_t loops,
         const igraph_vector_t *weights) {
@@ -642,7 +642,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     }
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_i_strength_all(graph, res, mode, loops, weights);
+        return strength_all(graph, res, mode, loops, weights);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));

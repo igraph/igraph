@@ -48,7 +48,7 @@ void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
     (void) igraph_pajek_yylex_destroy(scanner);
 }
 
-void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
+static void pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
     const igraph_integer_t attr_count = igraph_vector_ptr_size(attrs);
     for (igraph_integer_t i = 0; i < attr_count; i++) {
         igraph_attribute_record_t *rec = VECTOR(*attrs)[i];
@@ -183,11 +183,11 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     IGRAPH_TRIE_INIT_FINALLY(&vattrnames, 1);
     IGRAPH_CHECK(igraph_vector_ptr_init(&vattrs, 0));
-    IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &vattrs);
+    IGRAPH_FINALLY(pajek_destroy_attr_vector, &vattrs);
 
     IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 1);
     IGRAPH_CHECK(igraph_vector_ptr_init(&eattrs, 0));
-    IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &eattrs);
+    IGRAPH_FINALLY(pajek_destroy_attr_vector, &eattrs);
 
     IGRAPH_BITSET_INIT_FINALLY(&seen, 0);
 
@@ -279,9 +279,9 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
     igraph_vector_int_destroy(&edges);
-    igraph_i_pajek_destroy_attr_vector(&eattrs);
+    pajek_destroy_attr_vector(&eattrs);
     igraph_trie_destroy(&eattrnames);
-    igraph_i_pajek_destroy_attr_vector(&vattrs);
+    pajek_destroy_attr_vector(&vattrs);
     igraph_trie_destroy(&vattrnames);
     IGRAPH_FINALLY_CLEAN(6); /* +1 for 'graph' */
 
@@ -318,7 +318,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
 /* Pajek encodes newlines as \n, and any unicode character can be encoded
  * in the form &#hhhh;. Therefore we encode quotation marks as &#34; */
-static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
+static igraph_error_t pajek_escape(const char* src, char** dest) {
     igraph_integer_t destlen = 0;
     igraph_bool_t need_escape = false;
 
@@ -630,7 +630,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
                                  graph, vnames[V_ID], igraph_vss_1(id), &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+                IGRAPH_CHECK(pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
             } else {
@@ -661,7 +661,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
                                  graph, vnames[V_SHAPE], igraph_vss_1(id), &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+                IGRAPH_CHECK(pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
             }
@@ -681,7 +681,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
                                  graph, vstrnames[idx], igraph_vss_1(id), &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+                IGRAPH_CHECK(pajek_escape(s, &escaped));
                 fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
                 IGRAPH_FREE(escaped);
             }
@@ -767,7 +767,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(
                              graph, estrnames[idx], igraph_ess_1(edge), &strv));
             s = igraph_strvector_get(&strv, 0);
-            IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+            IGRAPH_CHECK(pajek_escape(s, &escaped));
             fprintf(outstream, " %s %s", estrnames2[idx], escaped);
             IGRAPH_FREE(escaped);
         }
