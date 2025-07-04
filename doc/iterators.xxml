@@ -93,13 +93,6 @@
 <!-- doxrox-include IGRAPH_EIT_GET -->
 </section>
 
-<section id="deprecated-vertex-edge-selectors"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_es_seq -->
-<!-- doxrox-include igraph_ess_seq -->
-<!-- doxrox-include igraph_vs_seq -->
-<!-- doxrox-include igraph_vss_seq -->
-</section>
-
 <!--
     <section id="examples"><title>Examples</title>
     </section>

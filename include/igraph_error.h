@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ERROR_H
@@ -29,7 +24,7 @@
 
 #include <stdarg.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* This file contains the igraph error handling.
  * Most bits are taken literally from the GSL library (with the GSL_
@@ -254,61 +249,22 @@ __BEGIN_DECLS
  *    number was specified as the number of vertices.
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
- * \enumval IGRAPH_EINVEVECTOR Invalid vector of vertex IDs. A vertex ID
- *    is either negative or bigger than the number of vertices minus one.
  * \enumval IGRAPH_EINVVID Invalid vertex ID, negative or too big.
- * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
- *    square matrix was expected.
+ * \enumval IGRAPH_EINVEID Invalid edge ID, negative or too big.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
  * \enumval IGRAPH_EFILE A file operation failed. E.g. a file doesn't exist,
  *   or the user has no rights to open it.
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
- * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed (not used any more).
- * \enumval IGRAPH_ARPACK_NPOS N must be positive.
- * \enumval IGRAPH_ARPACK_NEVNPOS NEV must be positive.
- * \enumval IGRAPH_ARPACK_NCVSMALL NCV must be bigger.
- * \enumval IGRAPH_ARPACK_NONPOSI Maximum number of iterations should be positive.
- * \enumval IGRAPH_ARPACK_WHICHINV Invalid WHICH parameter.
- * \enumval IGRAPH_ARPACK_BMATINV Invalid BMAT parameter.
- * \enumval IGRAPH_ARPACK_WORKLSMALL WORKL is too small.
- * \enumval IGRAPH_ARPACK_TRIDERR LAPACK error in tridiagonal eigenvalue calculation.
- * \enumval IGRAPH_ARPACK_ZEROSTART Starting vector is zero.
- * \enumval IGRAPH_ARPACK_MODEINV MODE is invalid.
- * \enumval IGRAPH_ARPACK_MODEBMAT MODE and BMAT are not compatible.
- * \enumval IGRAPH_ARPACK_ISHIFT ISHIFT must be 0 or 1.
- * \enumval IGRAPH_ARPACK_NEVBE NEV and WHICH='BE' are incompatible.
- * \enumval IGRAPH_ARPACK_NOFACT Could not build an Arnoldi factorization.
- * \enumval IGRAPH_ARPACK_FAILED No eigenvalues to sufficient accuracy.
- * \enumval IGRAPH_ARPACK_HOWMNY HOWMNY is invalid.
- * \enumval IGRAPH_ARPACK_HOWMNYS HOWMNY='S' is not implemented.
- * \enumval IGRAPH_ARPACK_EVDIFF Different number of converged Ritz values.
- * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
- * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
- * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
+ * \enumval IGRAPH_ARPACK An error happened inside a calculation implemented
+ *   in ARPACK. The calculation involved is most likely an eigenvector-related
+ *   calculation.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
- * \enumval IGRAPH_EDIVZERO Big integer division by zero.
- * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
- * \enumval IGRAPH_GLP_EROOT GLPK error (GLP_EROOT).
- * \enumval IGRAPH_GLP_ENOPFS GLPK error (GLP_ENOPFS).
- * \enumval IGRAPH_GLP_ENODFS GLPK error (GLP_ENODFS).
- * \enumval IGRAPH_GLP_EFAIL GLPK error (GLP_EFAIL).
- * \enumval IGRAPH_GLP_EMIPGAP GLPK error (GLP_EMIPGAP).
- * \enumval IGRAPH_GLP_ETMLIM GLPK error (GLP_ETMLIM).
- * \enumval IGRAPH_GLP_ESTOP GLPK error (GLP_ESTOP).
- * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not
- *   expected to find this; it is signalled if some igraph function is
- *   not using the attribute handler interface properly.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
- * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
- * \enumval IGRAPH_EDRL Internal error in the DrL layout generator; not used
- *   any more (replaced by IGRAPH_EINTERNAL).
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
- * \enumval IGRAPH_EGLP Internal GLPK error.
- * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
  * \enumval IGRAPH_ERANGE Maximum vertex or edge count exceeded.
@@ -322,57 +278,35 @@ typedef enum {
     IGRAPH_PARSEERROR        = 3,
     IGRAPH_EINVAL            = 4,
     IGRAPH_EXISTS            = 5,
-    IGRAPH_EINVEVECTOR       = 6,
+    /* IGRAPH_EINVEVECTOR       = 6, */   /* removed in 1.0 */
     IGRAPH_EINVVID           = 7,
-    IGRAPH_NONSQUARE         = 8,
+    IGRAPH_EINVEID           = 8,         /* used to be IGRAPH_NONSQUARE before 1.0 */
     IGRAPH_EINVMODE          = 9,
     IGRAPH_EFILE             = 10,
     IGRAPH_UNIMPLEMENTED     = 12,
     IGRAPH_INTERRUPTED       = 13,
     IGRAPH_DIVERGED          = 14,
-    IGRAPH_ARPACK_PROD       = 15,   /* unused, reserved */
-    IGRAPH_ARPACK_NPOS       = 16,
-    IGRAPH_ARPACK_NEVNPOS    = 17,
-    IGRAPH_ARPACK_NCVSMALL   = 18,
-    IGRAPH_ARPACK_NONPOSI    = 19,
-    IGRAPH_ARPACK_WHICHINV   = 20,
-    IGRAPH_ARPACK_BMATINV    = 21,
-    IGRAPH_ARPACK_WORKLSMALL = 22,
-    IGRAPH_ARPACK_TRIDERR    = 23,
-    IGRAPH_ARPACK_ZEROSTART  = 24,
-    IGRAPH_ARPACK_MODEINV    = 25,
-    IGRAPH_ARPACK_MODEBMAT   = 26,
-    IGRAPH_ARPACK_ISHIFT     = 27,
-    IGRAPH_ARPACK_NEVBE      = 28,
-    IGRAPH_ARPACK_NOFACT     = 29,
-    IGRAPH_ARPACK_FAILED     = 30,
-    IGRAPH_ARPACK_HOWMNY     = 31,
-    IGRAPH_ARPACK_HOWMNYS    = 32,
-    IGRAPH_ARPACK_EVDIFF     = 33,
-    IGRAPH_ARPACK_SHUR       = 34,
-    IGRAPH_ARPACK_LAPACK     = 35,
-    IGRAPH_ARPACK_UNKNOWN    = 36,
+    IGRAPH_EARPACK           = 15,
+    /* ARPACK error codes from 15 to 36 were moved to igraph_arpack_error_t in 1.0 */
     IGRAPH_ENEGLOOP          = 37,
     IGRAPH_EINTERNAL         = 38,
-    IGRAPH_ARPACK_MAXIT      = 39,
-    IGRAPH_ARPACK_NOSHIFT    = 40,
-    IGRAPH_ARPACK_REORDER    = 41,
-    IGRAPH_EDIVZERO          = 42,
-    IGRAPH_GLP_EBOUND        = 43,
-    IGRAPH_GLP_EROOT         = 44,
-    IGRAPH_GLP_ENOPFS        = 45,
-    IGRAPH_GLP_ENODFS        = 46,
-    IGRAPH_GLP_EFAIL         = 47,
-    IGRAPH_GLP_EMIPGAP       = 48,
-    IGRAPH_GLP_ETMLIM        = 49,
-    IGRAPH_GLP_ESTOP         = 50,
-    IGRAPH_EATTRIBUTES       = 51,
+    /* ARPACK error codes from 39 to 41 were moved to igraph_arpack_error_t in 1.0 */
+    /* IGRAPH_EDIVZERO          = 42, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EBOUND        = 43, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EROOT         = 44, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ENOPFS        = 45, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ENODFS        = 46, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EFAIL         = 47, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
+    /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* removed in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
-    IGRAPH_ELAPACK           = 53,
-    IGRAPH_EDRL IGRAPH_DEPRECATED_ENUMVAL = 54,
+    /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
+    /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */
     IGRAPH_EOVERFLOW         = 55,
-    IGRAPH_EGLP              = 56,
-    IGRAPH_CPUTIME           = 57,
+    /* IGRAPH_EGLP              = 56, */   /* removed in 1.0 */
+    /* IGRAPH_CPUTIME           = 57, */   /* removed in 1.0 */
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
     IGRAPH_STOP              = 60,
@@ -543,7 +477,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
                                             int line, igraph_error_t igraph_errno,
                                             va_list ap);
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -993,6 +927,6 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason,
         } \
     } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

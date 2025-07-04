@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 #define PLFIT_MT_LEN       624
 
@@ -82,6 +82,6 @@ PLFIT_EXPORT uint32_t plfit_mt_random(plfit_mt_rng_t* rng);
  */
 PLFIT_EXPORT double plfit_mt_uniform_01(plfit_mt_rng_t* rng);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif /* PLFIT_MT_H */

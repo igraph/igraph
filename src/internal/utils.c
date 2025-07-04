@@ -84,7 +84,7 @@ igraph_error_t igraph_i_matrix_subset_vertices(
     }
 
     /* This is O(1) time */
-    IGRAPH_CHECK(igraph_matrix_swap(m, &tmp));
+    igraph_matrix_swap(m, &tmp);
 
     igraph_matrix_destroy(&tmp);
     igraph_vit_destroy(&tovit);

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -113,10 +111,8 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         i = IGRAPH_VIT_GET(vit);
 
         /* get neighbors of i */
-        IGRAPH_CHECK(igraph_incident(graph, &ineis_in, i,
-                                     IGRAPH_IN));
-        IGRAPH_CHECK(igraph_incident(graph, &ineis_out, i,
-                                     IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_incident(graph, &ineis_in, i, IGRAPH_IN, IGRAPH_LOOPS));
+        IGRAPH_CHECK(igraph_incident(graph, &ineis_out, i, IGRAPH_OUT, IGRAPH_LOOPS));
 
         /* NaN for isolates */
         if (igraph_vector_int_size(&ineis_in) == 0 &&
@@ -176,10 +172,8 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             if (i == j) {
                 continue;
             }
-            IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j,
-                                         IGRAPH_IN));
-            IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j,
-                                         IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j, IGRAPH_IN, IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j, IGRAPH_OUT, IGRAPH_LOOPS));
             vsize2 = igraph_vector_int_size(&jneis_in);
             for (c = 0; c < vsize2; c++) {
                 edge2 = VECTOR(jneis_in)[c];
@@ -221,10 +215,8 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                 if (i == j) {
                     continue;
                 }
-                IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j,
-                                             IGRAPH_IN));
-                IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j,
-                                             IGRAPH_OUT));
+                IGRAPH_CHECK(igraph_incident(graph, &jneis_in, j, IGRAPH_IN, IGRAPH_LOOPS));
+                IGRAPH_CHECK(igraph_incident(graph, &jneis_out, j, IGRAPH_OUT, IGRAPH_LOOPS));
                 vsize2 = igraph_vector_int_size(&jneis_in);
                 for (c = 0; c < vsize2; c++) {
                     edge2 = VECTOR(jneis_in)[c];

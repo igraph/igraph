@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -60,7 +59,7 @@ int main(void) {
         return 5;
     }
     igraph_vector_int_init(&v2, 0);
-    igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, 1);
+    igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
     for (igraph_integer_t i = 0; i < igraph_vcount(&g); i++) {
         if (VECTOR(v3)[i] != VECTOR(v2)[i]) {
             igraph_vector_int_print(&v3);

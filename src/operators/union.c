@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2020 The igraph development team
@@ -19,8 +18,6 @@
    02110-1301 USA
 
 */
-
-#include <limits.h>
 
 #include "igraph_operators.h"
 

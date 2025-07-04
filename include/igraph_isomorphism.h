@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,33 +13,20 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef IGRAPH_TOPOLOGY_H
-#define IGRAPH_TOPOLOGY_H
+#ifndef IGRAPH_ISOMORPHISM_H
+#define IGRAPH_ISOMORPHISM_H
 
 #include "igraph_decls.h"
-#include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
-/* -------------------------------------------------- */
-/* Directed acyclic graphs                            */
-/* -------------------------------------------------- */
-
-IGRAPH_EXPORT igraph_error_t igraph_topological_sorting(
-    const igraph_t *graph, igraph_vector_int_t *res, igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph,
-                                                igraph_t *closure);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */
@@ -57,12 +42,23 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igr
                                     igraph_bool_t *iso);
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                                        igraph_bool_t *iso);
+IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms(
+        const igraph_t *graph, const igraph_vector_int_t *colors,
+        igraph_real_t *result);
+IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_list_t *generators
+);
+IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(
+    const igraph_t *graph, const igraph_vector_int_t *colors,
+    igraph_vector_int_t *labeling
+);
 
 /* LAD */
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_lad(
     const igraph_t *pattern, const igraph_t *target, const igraph_vector_int_list_t *domains,
     igraph_bool_t *iso, igraph_vector_int_t *map, igraph_vector_int_list_t *maps,
-    igraph_bool_t induced, igraph_integer_t time_limit
+    igraph_bool_t induced
 );
 
 /* VF2 family*/
@@ -155,17 +151,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_isomorphisms_vf2_callback(
     igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
     igraph_isocompat_t *edge_compat_fn, void *arg
 );
-
-/* Deprecated alias to igraph_get_isomorphisms_vf2_callback(), will be removed in 0.11 */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_isomorphic_function_vf2(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-);
-
 IGRAPH_EXPORT igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
                                            const igraph_vector_int_t *vertex_color1,
                                            const igraph_vector_int_t *vertex_color2,
@@ -197,16 +182,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *grap
                                                  igraph_isocompat_t *edge_compat_fn,
                                                  void *arg);
 IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2_callback(
-    const igraph_t *graph1, const igraph_t *graph2,
-    const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
-    const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
-    igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
-);
-
-/* Deprecated alias to igraph_get_subisomorphisms_vf2_callback(), will be removed in 0.11 */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subisomorphic_function_vf2(
     const igraph_t *graph1, const igraph_t *graph2,
     const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
     const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
@@ -264,7 +239,7 @@ typedef struct igraph_bliss_info_t {
  * \enumval IGRAPH_BLISS_FLM Largest maximally non-trivially connected
  *      non-singleton cell.
  * \enumval IGRAPH_BLISS_FSM Smallest maximally non-trivially
- *      connected non-singletion cell.
+ *      connected non-singleton cell.
  */
 
 typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
@@ -272,7 +247,7 @@ typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
                IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM
              } igraph_bliss_sh_t;
 
-IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_t *labeling,
+IGRAPH_EXPORT igraph_error_t igraph_canonical_permutation_bliss(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_int_t *labeling,
                                                igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 IGRAPH_EXPORT igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
                                           const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
@@ -281,15 +256,10 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, con
                                           igraph_bliss_sh_t sh,
                                           igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
 
-IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms(
+IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms_bliss(
         const igraph_t *graph, const igraph_vector_int_t *colors,
         igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
-
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_automorphisms(
-        const igraph_t *graph, const igraph_vector_int_t *colors,
-        igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
-
-IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(
+IGRAPH_EXPORT igraph_error_t igraph_automorphism_group_bliss(
     const igraph_t *graph, const igraph_vector_int_t *colors,
     igraph_vector_int_list_t *generators, igraph_bliss_sh_t sh,
     igraph_bliss_info_t *info
@@ -304,12 +274,6 @@ IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_inte
 
 IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count);
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_isomorphic_34(
-    const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
-);
-
-
-
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

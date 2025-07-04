@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -47,7 +46,7 @@ int main(void) {
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 2;
-    CHECK_ERROR(igraph_add_edges(&g, &v, 0), IGRAPH_EINVEVECTOR);
+    CHECK_ERROR(igraph_add_edges(&g, &v, 0), IGRAPH_EINVAL);
 
     /* Check result */
     igraph_get_edgelist(&g, &v, 0);

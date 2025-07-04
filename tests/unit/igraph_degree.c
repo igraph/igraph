@@ -18,10 +18,10 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void all_degs(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_bool_t loops) {
+void all_degs(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_integer_t n = igraph_vcount(g);
     igraph_vector_int_resize(res, n);
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < n; i++) {
         igraph_degree_1(g, &VECTOR(*res)[i], i, mode, loops);
     }
 }
@@ -41,31 +41,55 @@ int main(void) {
 
     igraph_vector_int_clear(&v);
     igraph_vector_int_clear(&v2);
-    printf("out,    loops: ");
-    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
+    printf("out, loops twice: ");
+    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
     print_vector_int(&v);
-    all_degs(&g, &v2, IGRAPH_OUT, IGRAPH_LOOPS);
+    all_degs(&g, &v2, IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
     IGRAPH_ASSERT(igraph_vector_int_all_e(&v, &v2));
 
     igraph_vector_int_clear(&v);
     igraph_vector_int_clear(&v2);
-    printf(" in,    loops: ");
-    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
+    printf(" in, loops twice: ");
+    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS_TWICE);
     print_vector_int(&v);
-    all_degs(&g, &v2, IGRAPH_IN, IGRAPH_LOOPS);
+    all_degs(&g, &v2, IGRAPH_IN, IGRAPH_LOOPS_TWICE);
     IGRAPH_ASSERT(igraph_vector_int_all_e(&v, &v2));
 
     igraph_vector_int_clear(&v);
     igraph_vector_int_clear(&v2);
-    printf("all,    loops: ");
-    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+    printf("all, loops twice: ");
+    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
     print_vector_int(&v);
-    all_degs(&g, &v2, IGRAPH_ALL, IGRAPH_LOOPS);
+    all_degs(&g, &v2, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
     IGRAPH_ASSERT(igraph_vector_int_all_e(&v, &v2));
 
     igraph_vector_int_clear(&v);
     igraph_vector_int_clear(&v2);
-    printf("out, no loops: ");
+    printf("out, loops once:  ");
+    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
+    print_vector_int(&v);
+    all_degs(&g, &v2, IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
+    IGRAPH_ASSERT(igraph_vector_int_all_e(&v, &v2));
+
+    igraph_vector_int_clear(&v);
+    igraph_vector_int_clear(&v2);
+    printf(" in, loops once:  ");
+    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS_ONCE);
+    print_vector_int(&v);
+    all_degs(&g, &v2, IGRAPH_IN, IGRAPH_LOOPS_ONCE);
+    IGRAPH_ASSERT(igraph_vector_int_all_e(&v, &v2));
+
+    igraph_vector_int_clear(&v);
+    igraph_vector_int_clear(&v2);
+    printf("all, loops once:  ");
+    igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    print_vector_int(&v);
+    all_degs(&g, &v2, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    IGRAPH_ASSERT(igraph_vector_int_all_e(&v, &v2));
+
+    igraph_vector_int_clear(&v);
+    igraph_vector_int_clear(&v2);
+    printf("out, no loops:    ");
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS);
     print_vector_int(&v);
     all_degs(&g, &v2, IGRAPH_OUT, IGRAPH_NO_LOOPS);
@@ -73,7 +97,7 @@ int main(void) {
 
     igraph_vector_int_clear(&v);
     igraph_vector_int_clear(&v2);
-    printf(" in, no loops: ");
+    printf(" in, no loops:    ");
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_IN, IGRAPH_NO_LOOPS);
     print_vector_int(&v);
     all_degs(&g, &v2, IGRAPH_IN, IGRAPH_NO_LOOPS);
@@ -81,7 +105,7 @@ int main(void) {
 
     igraph_vector_int_clear(&v);
     igraph_vector_int_clear(&v2);
-    printf("all, no loops: ");
+    printf("all, no loops:    ");
     igraph_degree(&g, &v, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS);
     print_vector_int(&v);
     all_degs(&g, &v2, IGRAPH_ALL, IGRAPH_NO_LOOPS);

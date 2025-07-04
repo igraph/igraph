@@ -22,7 +22,7 @@
 
 int main(void) {
     igraph_t graph;
-    igraph_bool_t is_tree = 0, are_connected = 0;
+    igraph_bool_t is_tree = false, are_adjacent = false;
 
     igraph_rng_seed(igraph_rng_default(), 74088);
 
@@ -72,15 +72,15 @@ int main(void) {
     IGRAPH_ASSERT(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_LERW) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&graph) == 2);
     IGRAPH_ASSERT(igraph_ecount(&graph) == 1);
-    IGRAPH_ASSERT(igraph_are_adjacent(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(are_connected);
+    IGRAPH_ASSERT(igraph_are_adjacent(&graph, 0, 1, &are_adjacent) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(are_adjacent);
     igraph_destroy(&graph);
 
     IGRAPH_ASSERT(igraph_tree_game(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_RANDOM_TREE_PRUFER) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&graph) == 2);
     IGRAPH_ASSERT(igraph_ecount(&graph) == 1);
-    IGRAPH_ASSERT(igraph_are_adjacent(&graph, 0, 1, &are_connected) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(are_connected);
+    IGRAPH_ASSERT(igraph_are_adjacent(&graph, 0, 1, &are_adjacent) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(are_adjacent);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

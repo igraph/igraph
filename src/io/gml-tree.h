@@ -26,7 +26,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef enum { IGRAPH_I_GML_TREE_TREE = 0,
                IGRAPH_I_GML_TREE_INTEGER,
@@ -82,6 +82,6 @@ IGRAPH_FUNCATTR_PURE const char *igraph_gml_tree_get_string(const igraph_gml_tre
 IGRAPH_FUNCATTR_PURE igraph_gml_tree_t *igraph_gml_tree_get_tree(const igraph_gml_tree_t *t,
         igraph_integer_t pos);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

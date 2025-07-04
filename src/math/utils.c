@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -27,26 +26,6 @@
 
 #include <math.h>
 #include <float.h>
-
-int igraph_finite(double x) {
-    return isfinite(x);
-}
-
-int igraph_is_nan(double x) {
-    return isnan(x);
-}
-
-int igraph_is_inf(double x) {
-    return isinf(x) != 0;
-}
-
-int igraph_is_posinf(double x) {
-    return isinf(x) && x > 0;
-}
-
-int igraph_is_neginf(double x) {
-    return isinf(x) && x < 0;
-}
 
 /**
  * \function igraph_almost_equals

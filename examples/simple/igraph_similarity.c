@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -49,7 +47,7 @@ int main(void) {
     }
 
     printf("Jaccard similarity:\n");
-    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
+    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_range(1, 3), IGRAPH_ALL, IGRAPH_NO_LOOPS);
     igraph_matrix_printf(&m, "%.2f");
 
     printf("\nJaccard similarity, pairs:\n");
@@ -61,7 +59,7 @@ int main(void) {
     igraph_vector_print(&res);
 
     printf("\nDice similarity:\n");
-    igraph_similarity_dice(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
+    igraph_similarity_dice(&g, &m, igraph_vss_range(1, 3), igraph_vss_range(1, 3), IGRAPH_ALL, IGRAPH_NO_LOOPS);
     igraph_matrix_printf(&m, "%.2f");
 
     printf("\nDice similarity, pairs:\n");

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2010-2021  The igraph development team
@@ -27,12 +26,12 @@
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
 #include "igraph_components.h"
+#include "igraph_cycles.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_operators.h"
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
-#include "igraph_topology.h"
 
 #include "core/estack.h"
 #include "core/marked_queue.h"
@@ -598,9 +597,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
 
-        IGRAPH_I_ATTRIBUTE_DESTROY(domtree);
-        IGRAPH_I_ATTRIBUTE_COPY(domtree, graph,
-                                /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
+        IGRAPH_CHECK(igraph_i_attribute_copy(domtree, graph, true, true, /*edges=*/ false));
     }
 
     if (!dom) {
@@ -766,7 +763,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, &Sbar);
 
-    root = VECTOR(Sbar_map)[target] - 1;
+    root = VECTOR(Sbar_map)[target];
 
     /* -------------------------------------------------------------*/
     /* Construct the dominator tree of Sbar */
@@ -785,15 +782,16 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     /* TODO: use the adjacency list, instead of neighbors() */
     IGRAPH_BITSET_INIT_FINALLY(&GammaS, no_of_nodes);
     if (igraph_marked_queue_int_size(S) == 0) {
-        IGRAPH_BIT_SET(GammaS, VECTOR(Sbar_map)[source] - 1);
+        IGRAPH_BIT_SET(GammaS, VECTOR(Sbar_map)[source]);
     } else {
         for (i = 0; i < no_of_nodes; i++) {
             if (igraph_marked_queue_int_iselement(S, i)) {
                 igraph_vector_int_t neis;
                 igraph_integer_t j;
                 IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-                IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
-                                              IGRAPH_OUT));
+                IGRAPH_CHECK(igraph_neighbors(
+                    graph, &neis, i, IGRAPH_OUT, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+                ));
                 n = igraph_vector_int_size(&neis);
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
@@ -840,7 +838,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
            Nu(v) contains all vertices that are dominated by v, for every
            v, this is a subtree of the dominator tree, rooted at v. The
            different subtrees are disjoint. */
-        igraph_integer_t min = VECTOR(Sbar_map)[ VECTOR(M)[i] ] - 1;
+        igraph_integer_t min = VECTOR(Sbar_map)[ VECTOR(M)[i] ];
         igraph_integer_t nuvsize, isvlen, j;
         IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
                                 /*unreachable=*/ false, /*order=*/ &Nuv,
@@ -1171,7 +1169,9 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
      */
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t j, n;
-        IGRAPH_CHECK(igraph_neighbors(residual, &neis, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_neighbors(
+            residual, &neis, i, IGRAPH_IN, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         n = igraph_vector_int_size(&neis);
 
         // Only consider nodes that are not in S.
@@ -1429,7 +1429,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* Permute vertices and replace residual with tmpgraph that is topologically
      * sorted.
      */
-    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &inv_order));
+    IGRAPH_CHECK(igraph_permute_vertices(&residual, &tmpgraph, &order));
 
     igraph_destroy(&residual); // We first free memory from original residual graph
     residual = tmpgraph;       // Then we replace it by allocated memory from tmpgraph

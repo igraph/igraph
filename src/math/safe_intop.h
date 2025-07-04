@@ -29,7 +29,7 @@
 
 #include <float.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* Largest positive value for igraph_real_t that can safely represent integers. */
 #define IGRAPH_MAX_EXACT_REAL ((double)(1LL << DBL_MANT_DIG))
@@ -134,6 +134,6 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igra
 igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_integer_t *res);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_MATH_SAFE_INTOP_H */

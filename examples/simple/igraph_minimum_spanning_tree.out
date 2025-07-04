@@ -2,6 +2,6 @@ Minimum spanning tree edges:
 2 17 6 12 0 3 8 7 13 14 16
 
 Maximum spanning tree edges:
-0 1 4 13 15 11 2 10 9 7 17
+11 10 0 9 1 13 17 7 15 4 2
 
 Total maximum spanning tree weight: 102.5

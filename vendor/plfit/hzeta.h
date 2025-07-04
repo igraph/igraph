@@ -34,7 +34,7 @@
 
 #include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 
 /* Hurwitz Zeta Function
@@ -83,6 +83,6 @@ double hsl_sf_lnhzeta_deriv(const double s, const double q);
 double hsl_sf_lnhzeta_deriv_tuple(const double s, const double q, double * deriv0, double * deriv1);
 
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif // __HZETA_H__

@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,18 +19,20 @@
 #include <igraph.h>
 
 int main(void) {
-    igraph_t g;
+    igraph_t graph;
     igraph_vector_t weights;
-    igraph_matrix_t m;
+    igraph_matrix_t L;
 
-    igraph_matrix_init(&m, 1, 1);
+    igraph_matrix_init(&L, 1, 1);
     igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);
 
-    igraph_ring(&g, 5, IGRAPH_DIRECTED, 0, 1);
-    igraph_get_laplacian(&g, &m, IGRAPH_OUT, IGRAPH_LAPLACIAN_SYMMETRIC, &weights);
-    igraph_matrix_print(&m);
+    igraph_ring(&graph, 5, IGRAPH_DIRECTED, 0, 1);
+    igraph_get_laplacian(&graph, &L, IGRAPH_OUT, IGRAPH_LAPLACIAN_SYMMETRIC, &weights);
+    igraph_matrix_print(&L);
 
     igraph_vector_destroy(&weights);
-    igraph_matrix_destroy(&m);
-    igraph_destroy(&g);
+    igraph_matrix_destroy(&L);
+    igraph_destroy(&graph);
+
+    return 0;
 }

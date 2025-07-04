@@ -41,7 +41,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
         igraph_isoclass_create(&pattern, k, i, directed);
         igraph_vector_int_list_init(&maps, 0);
 
-        igraph_subisomorphic_lad(&pattern, graph, NULL, NULL, NULL, &maps, /* induced = */ true, 0);
+        igraph_subisomorphic_lad(&pattern, graph, NULL, NULL, NULL, &maps, /* induced = */ true);
 
         igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
 
@@ -93,7 +93,7 @@ void test_motifs(void) {
 
     /* The graph is chosen to have approximately 50% density
      * so that most motifs have a high chance of appearing. */
-    igraph_erdos_renyi_game_gnm(&graph, 30, 400, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 30, 400, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
     igraph_graph_count(3, IGRAPH_DIRECTED, &count);
     test_k_motifs(&graph, 3, count, IGRAPH_DIRECTED);
@@ -112,7 +112,7 @@ void test_motifs_undirected(void) {
 
     /* The graph is chosen to have slightly higher than 50% density
      * so that most connected motifs have a high chance of appearing. */
-    igraph_erdos_renyi_game_gnm(&graph, 18, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 18, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
     igraph_graph_count(3, IGRAPH_UNDIRECTED, &count);
     test_k_motifs(&graph, 3, count, IGRAPH_UNDIRECTED);
@@ -125,7 +125,7 @@ void test_motifs_undirected(void) {
     /* Use a smaller graph so that the test would not take too long.
      * The graph is chosen to have slightly higher than 50% density
      * so that most connected motifs have a high chance of appearing. */
-    igraph_erdos_renyi_game_gnm(&graph, 12, 36, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 12, 36, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
     igraph_graph_count(5, IGRAPH_UNDIRECTED, &count);
     test_k_motifs(&graph, 5, count, IGRAPH_UNDIRECTED);
@@ -158,7 +158,7 @@ int main(void) {
 
     igraph_small(&pattern, 0, IGRAPH_UNDIRECTED, -1);
     igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ NULL, &iso, &map, &maps,
-                             /*induced=*/ false, /*time_limit=*/ 0);
+                             /*induced=*/ false);
 
     IGRAPH_ASSERT(iso);
     IGRAPH_ASSERT(igraph_vector_int_size(&map) == 0);
@@ -176,9 +176,11 @@ int main(void) {
     igraph_vector_int_init(&map, 0);
     igraph_vector_int_list_init(&maps, 0);
     igraph_small(&pattern, 0, IGRAPH_DIRECTED, -1);
-    CHECK_ERROR(igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0,
-                                      &iso, &map, &maps, /*induced=*/ 0,
-                                      /*time_limit=*/ 0), IGRAPH_EINVAL);
+    CHECK_ERROR(
+        igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0,
+        &iso, &map, &maps, /*induced=*/ 0),
+        IGRAPH_EINVAL
+    );
     igraph_vector_int_destroy(&map);
     igraph_vector_int_list_destroy(&maps);
     igraph_destroy(&pattern);

@@ -22,7 +22,7 @@
 
 #include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 /**
  * Enum specifying what the search should do when the function is not U-shaped.
@@ -133,6 +133,6 @@ unsigned short int gss_get_warning_flag(void);
  */
 void gss_parameter_init(gss_parameter_t *param);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif /* __GSS_H__ */

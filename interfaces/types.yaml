@@ -38,10 +38,6 @@ INT:
     # A C integer
     CTYPE: int
 
-LONGINT:
-    # A C long integer
-    CTYPE: long int
-
 CSTRING:
     # A null-terminated immutable C string
     CTYPE: const char*
@@ -177,12 +173,12 @@ BIPARTITE_TYPES:
     CTYPE: igraph_vector_bool_t
     FLAGS: BY_REF
 
-EDGE_CAPACITY:
+EDGE_CAPACITIES:
     # A vector containing edge capacities (typically for max-flow algorithms)
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-EDGE_COLOR:
+EDGE_COLORS:
     # A vector containing edge colors
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
@@ -192,12 +188,12 @@ EDGE_LENGTHS:
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-EDGEWEIGHTS:
+EDGE_WEIGHTS:
     # A vector containing edge weights
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-EDGESET_LIST:
+EDGE_INDICES_LIST:
     # A list containing vectors of igraph integers where each such
     # vector represents a sequence of edge indices.
     CTYPE: igraph_vector_int_list_t
@@ -233,18 +229,18 @@ SIR_LIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEXSET_LIST:
+VERTEX_INDICES_LIST:
     # A list containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
-VERTEX_COLOR:
+VERTEX_COLORS:
     # A vector containing vertex colors
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
-VERTEXWEIGHTS:
+VERTEX_WEIGHTS:
     # A vector containing vertex weights
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
@@ -327,13 +323,6 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
-ERDOS_RENYI_TYPE:
-    # Enum that says wheter a GNM (n vertices, m edges) or
-    # GNP (n vertices, every edge exists with probability p)
-    # graph is created
-    CTYPE: igraph_erdos_renyi_t
-    FLAGS: ENUM
-
 FAS_ALGORITHM:
     # Enum representing feedback arc set algorithms
     CTYPE: igraph_fas_algorithm_t
@@ -358,11 +347,6 @@ GETADJACENCY:
 GREEDY_COLORING_HEURISTIC:
     # Enum representing different heuristics for a greedy vertex coloring
     CTYPE: igraph_coloring_greedy_t
-    FLAGS: ENUM
-
-IMITATE_ALGORITHM:
-    # This enum controls which algorithm to use in stochastic imitation
-    CTYPE: igraph_imitate_algorithm_t
     FLAGS: ENUM
 
 LAPLACIAN_NORMALIZATION:
@@ -391,15 +375,15 @@ LSETYPE:
     CTYPE: igraph_laplacian_spectral_embedding_type_t
     FLAGS: ENUM
 
+MSTALGORITHM:
+    # Enum that describes the algorithm for computing a minimum spanning tree
+    CTYPE: igraph_mst_algorithm_t
+    FLAGS: ENUM
+
 NEIMODE:
     # Enum that describes how a particular function should take into account
     # the neighbors of vertices
     CTYPE: igraph_neimode_t
-    FLAGS: ENUM
-
-OPTIMALITY:
-    # This enum controls which algorithm to use in deterministic optimal imitation
-    CTYPE: igraph_optimal_t
     FLAGS: ENUM
 
 ORDER:
@@ -509,8 +493,13 @@ VORONOI_TIEBREAKER:
     FLAGS: ENUM
 
 WHEEL_MODE:
-    # Enum that describes how a star graph should be constructed
+    # Enum that describes how a wheel graph should be constructed
     CTYPE: igraph_wheel_mode_t
+    FLAGS: ENUM
+
+LPA_VARIANT:
+    # Enum that describes the label propagation algorithm variant
+    CTYPE: igraph_lpa_variant_t
     FLAGS: ENUM
 
 ###############################################################################
@@ -532,7 +521,7 @@ WRITE_GML_SW:
 # Callbacks
 ###############################################################################
 
-ARPACKFUNC:
+ARPACK_FUNC:
     # ARPACK matrix multiplication function.
     CTYPE: igraph_arpack_function_t
 
@@ -566,7 +555,7 @@ ISOMORPHISM_FUNC:
     # isomorphism is found
     CTYPE: igraph_isohandler_t
 
-LEVCFUNC:
+LEVC_FUNC:
     # Callback function for igraph_leading_eigenvector_community(). Called
     # after each eigenvalue / eigenvector calculation.
     CTYPE: igraph_community_leading_eigenvector_callback_t
@@ -575,12 +564,12 @@ LEVCFUNC:
 # Miscellaneous
 ###############################################################################
 
-ARPACKOPT:
+ARPACK_OPTIONS:
     # Structure that contains the options of the ARPACK eigensolver.
     CTYPE: igraph_arpack_options_t
     FLAGS: BY_REF
 
-ARPACKSTORAGE:
+ARPACK_STORAGE:
     # Pointer to a general-purpose memory block that ARPACK-based algorithms
     # may use as a working area.
     CTYPE: igraph_arpack_storage_t
@@ -591,10 +580,9 @@ ASTAR_HEURISTIC_FUNC:
     CTYPE: igraph_astar_heuristic_func_t
 
 ATTRIBUTES:
-    # An opaque data structure that a high-level interface may use to pass
-    # information about graph/vertex/edge attributes to a low-level igraph
-    # C function
-    CTYPE: void
+    # A data structure specifying graph/vertex/edge attributes to add to a
+    # graph in a low-level igraph C function
+    CTYPE: igraph_attribute_record_list_t
     FLAGS: BY_REF
 
 BLISSINFO:

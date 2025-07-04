@@ -24,26 +24,20 @@
 #include "igraph_strvector.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
-#define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
-    do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
-#define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
-        igraph_error_t igraph_i_ret2=IGRAPH_SUCCESS; \
-        (to)->attr = NULL; \
-        if ((from)->attr) { \
-            IGRAPH_CHECK(igraph_i_ret2=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
-        } \
-        if (igraph_i_ret2 != IGRAPH_SUCCESS) { \
-            IGRAPH_ERROR("", igraph_i_ret2); \
-        } \
-    } while(0)
-
-igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr);
+igraph_error_t igraph_i_attribute_init(
+   igraph_t *graph, const igraph_attribute_record_list_t *attr
+);
 void igraph_i_attribute_destroy(igraph_t *graph);
-igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from,
-                            igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea);
-igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr);
+igraph_error_t igraph_i_attribute_copy(
+   igraph_t *to, const igraph_t *from,
+   igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea
+);
+igraph_error_t igraph_i_attribute_add_vertices(
+   igraph_t *graph, igraph_integer_t nv,
+   const igraph_attribute_record_list_t *attr
+);
 igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_t *idx);
@@ -51,8 +45,10 @@ igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb);
-igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
-                                 const igraph_vector_int_t *edges, void *attr);
+igraph_error_t igraph_i_attribute_add_edges(
+   igraph_t *graph, const igraph_vector_int_t *edges,
+   const igraph_attribute_record_list_t *attr
+);
 igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_int_t *idx);
@@ -71,7 +67,7 @@ igraph_error_t igraph_i_attribute_get_info(const igraph_t *graph,
 igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph,
                                           igraph_attribute_elemtype_t type,
                                           const char *name);
-igraph_error_t igraph_i_attribute_gettype(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_type(const igraph_t *graph,
                                igraph_attribute_type_t *type,
                                igraph_attribute_elemtype_t elemtype,
                                const char *name);
@@ -110,6 +106,6 @@ igraph_error_t igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
                                           igraph_es_t es,
                                           igraph_vector_bool_t *value);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_GRAPH_ATTRIBUTES_H */

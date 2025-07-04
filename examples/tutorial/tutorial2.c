@@ -15,7 +15,7 @@ int main(void) {
   igraph_vector_bool_fill(&periodic, true);
   igraph_square_lattice(&graph, &dimvector, 0, IGRAPH_UNDIRECTED, /* mutual= */ false, &periodic);
 
-  igraph_average_path_length(&graph, &avg_path_len, NULL, IGRAPH_UNDIRECTED, /* unconn= */ true);
+  igraph_average_path_length(&graph, NULL, &avg_path_len, NULL, IGRAPH_UNDIRECTED, /* unconn= */ true);
   printf("Average path length (lattice):            %g\n", (double) avg_path_len);
 
   igraph_rng_seed(igraph_rng_default(), 42); /* seed RNG before first use */
@@ -25,7 +25,7 @@ int main(void) {
   }
 
   igraph_add_edges(&graph, &edges, NULL);
-  igraph_average_path_length(&graph, &avg_path_len, NULL, IGRAPH_UNDIRECTED, /* unconn= */ true);
+  igraph_average_path_length(&graph, NULL, &avg_path_len, NULL, IGRAPH_UNDIRECTED, /* unconn= */ true);
   printf("Average path length (randomized lattice): %g\n", (double) avg_path_len);
 
   igraph_vector_bool_destroy(&periodic);

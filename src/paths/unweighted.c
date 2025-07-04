@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team <igraph@igraph.org>
@@ -256,20 +254,6 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
 }
 
 /**
- * \function igraph_shortest_paths
- * \brief Length of the shortest paths between vertices.
- *
- * \deprecated-by igraph_distances 0.10.0
- */
-igraph_error_t igraph_shortest_paths(const igraph_t *graph,
-                                     igraph_matrix_t *res,
-                                     const igraph_vs_t from,
-                                     const igraph_vs_t to,
-                                     igraph_neimode_t mode) {
-    return igraph_distances(graph, res, from, to, mode);
-}
-
-/**
  * \ingroup structural
  * \function igraph_get_shortest_paths
  * \brief Shortest paths from a vertex.
@@ -425,7 +409,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     while (!igraph_dqueue_int_empty(&q) && reached < to_reach) {
         igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode));
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode, IGRAPH_LOOPS));
         vsize = igraph_vector_int_size(&tmp);
         for (j = 0; j < vsize; j++) {
             igraph_integer_t edge = VECTOR(tmp)[j];
@@ -605,12 +589,12 @@ igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
     /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
        result to the output parameter. */
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }

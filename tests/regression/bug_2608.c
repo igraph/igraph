@@ -1,7 +1,7 @@
-/* -*- mode: C -*-  */
+
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
    This program is free software; you can redistribute it and/or modify
@@ -21,30 +21,29 @@
 
 */
 
-#include "igraph_types.h"
-#include "igraph_vector.h"
-#include "igraph_array.h"
+#include <igraph.h>
 
-#define BASE_IGRAPH_REAL
-#include "igraph_pmt.h"
-#include "array.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_IGRAPH_REAL
+#include "../unit/test_utilities.h"
 
-#define BASE_INT
-#include "igraph_pmt.h"
-#include "array.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_INT
+int main(void) {
+    igraph_t g;
+    igraph_vector_int_t membership;
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "array.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
+    /* label propagation is a stochastic method */
+    igraph_rng_seed(igraph_rng_default(), 765);
 
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "array.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
+    igraph_small(&g, 0, /* directed = */ 1,
+        0, 1, 0, 2, 1, 0, 1, 0, 1, 1, 2, 0, 2, 1, 2, 1, 2, 1, -1);
+    igraph_vector_int_init(&membership, 0);
+
+    igraph_community_label_propagation(&g, &membership, IGRAPH_OUT, NULL, NULL, NULL, IGRAPH_LPA_FAST);
+
+    print_vector_int(&membership);
+    igraph_vector_int_destroy(&membership);
+
+    igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
+}

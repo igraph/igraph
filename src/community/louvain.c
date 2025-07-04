@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -191,7 +189,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
     igraph_vector_clear(links_weight);
 
     /* Get the list of incident edges */
-    IGRAPH_CHECK(igraph_incident(graph, edges, vertex, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_incident(graph, edges, vertex, IGRAPH_ALL, IGRAPH_LOOPS));
 
     n = igraph_vector_int_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);

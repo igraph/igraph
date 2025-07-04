@@ -84,8 +84,8 @@ int main(void) {
     {
         igraph_t g1, g2;
 
-        igraph_erdos_renyi_game_gnm(&g1, 10, 30, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-        igraph_erdos_renyi_game_gnm(&g2, 10, 30, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+        igraph_erdos_renyi_game_gnm(&g1, 10, 30, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+        igraph_erdos_renyi_game_gnm(&g2, 10, 30, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
         igraph_disjoint_union(&graph, &g1, &g2);
         igraph_add_edge(&graph, 9, 10);

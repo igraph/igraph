@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 typedef struct TYPE(igraph_matrix) {
@@ -39,18 +34,11 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_copy)(
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_matrix, copy)(
-    TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
-
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/
 
 /* MATRIX */
-IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_matrix, e)(
-    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
-IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_matrix, e_ptr)(
-    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_matrix, get)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE* FUNCTION(igraph_matrix, get_ptr)(
@@ -88,7 +76,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) 
                                                  const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
                                                  const TYPE(igraph_matrix) *from);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2);
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2);
 
 /*--------------------------*/
 /* Copying rows and columns */

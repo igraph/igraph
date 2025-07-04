@@ -60,8 +60,7 @@ int main(void) {
                 &g,
                 /*vector=*/ NULL,
                 /*value=*/ NULL,
-                IGRAPH_DIRECTED,
-                /*scale=*/ false,
+                /*mode=*/ IGRAPH_OUT,
                 &arpack_options, &cent,
                 /*theoretical_max=*/ NULL,
                 /*normalized=*/ true);

@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_PROGRESS_H
@@ -28,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \section about_progress_handlers About progress handlers
@@ -138,9 +133,8 @@ __BEGIN_DECLS
  *     reporting, and then pass some meaningfull context here.
  * \return If the return value of the progress handler is not
  *     \c IGRAPH_SUCCESS, then \ref igraph_progress() returns the
- *     error code \c IGRAPH_INTERRUPTED. The \ref IGRAPH_PROGRESS()
- *     macro frees all memory and finishes the igraph function with
- *     error code \c IGRAPH_INTERRUPTED in this case.
+ *     error code from the progress handler intact. The \ref IGRAPH_PROGRESS()
+ *     macro also frees all allocated memory.
  */
 
 typedef igraph_error_t igraph_progress_handler_t(const char *message, igraph_real_t percent,
@@ -157,7 +151,7 @@ IGRAPH_EXPORT igraph_error_t igraph_progressf(const char *message, igraph_real_t
 
 /**
  * \define IGRAPH_PROGRESS
- * \brief Report progress.
+ * \brief Report the progress of a calculation from an igraph function (macro variant).
  *
  * The standard way to report progress from an igraph function
  * \param message A string, a textual message that references the
@@ -165,20 +159,39 @@ IGRAPH_EXPORT igraph_error_t igraph_progressf(const char *message, igraph_real_t
  * \param percent Numeric scalar, the percentage that is complete.
  * \param data User-defined data, this can be used in user-defined
  *    progress handler functions, from user-written igraph functions.
- * \return If the progress handler returns with \c IGRAPH_INTERRUPTED,
- *    then this macro frees up the igraph allocated memory for
- *    temporary data and returns to the caller with \c
- *    IGRAPH_INTERRUPTED.
+ * \return If the return value of the progress handler is not
+ *     \c IGRAPH_SUCCESS, then \ref igraph_progress() returns the
+ *     error code from the progress handler intact. The \ref IGRAPH_PROGRESS()
+ *     macro also frees all allocated memory.
  */
 
 #define IGRAPH_PROGRESS(message, percent, data) \
     do { \
-        if (igraph_progress((message), (percent), (data)) != IGRAPH_SUCCESS) { \
-            IGRAPH_FINALLY_FREE(); \
-            return IGRAPH_INTERRUPTED; \
-        } \
+        IGRAPH_CHECK(igraph_progress((message), (percent), (data))); \
     } while (0)
 
-__END_DECLS
+/**
+ * \define IGRAPH_PROGRESSF
+ * \brief Report the progress of a calculation from an igraph function, printf-like (macro variant).
+ *
+ * This is the more flexible version of \ref IGRAPH_PROGRESS(),
+ * having a printf-like syntax. As this macro takes variable
+ * number of arguments, they must be all supplied as a single
+ * argument, enclosed in parentheses. \ref igraph_progressf() is then
+ * called with the given arguments.
+ *
+ * \param args The arguments to pass to \ref igraph_progressf().
+ * \return If the progress handler returns with a value other than
+ *        \c IGRAPH_SUCCESS, then the function that called this
+ *        macro returns as well, with the same error code, after
+ *        cleaning up all allocated memory as needed.
+ */
+
+#define IGRAPH_PROGRESSF(args) \
+    do { \
+        IGRAPH_CHECK(igraph_progressf args); \
+    } while (0)
+
+IGRAPH_END_C_DECLS
 
 #endif

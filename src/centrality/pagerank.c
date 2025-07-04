@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -608,8 +606,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
                                  directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS, weights));
 
-    /* Set up an appropriate starting vector. We start from the (possibly weight) in-degrees
-     * plus some small random noise to avoid convergence problems. */
+    /* Set up an appropriate starting vector. We start from the (possibly weighted)
+     * in-degrees plus some small random noise to avoid convergence problems. */
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i] > 0) {
             /* Note: Keep random perturbation non-negative. */

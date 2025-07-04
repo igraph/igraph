@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
@@ -32,15 +31,15 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
 
     igraph_vector_int_init(&indegree_before, 0);
     igraph_vector_int_init(&outdegree_before, 0);
-    igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 1);
-    igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 1);
+    igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
+    igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
 
     igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_REWIRING_SIMPLE_LOOPS : IGRAPH_REWIRING_SIMPLE, use_adjlist);
 
     igraph_vector_int_init(&indegree_after, 0);
     igraph_vector_int_init(&outdegree_after, 0);
-    igraph_degree(&g, &indegree_after, igraph_vss_all(), IGRAPH_IN, 1);
-    igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, 1);
+    igraph_degree(&g, &indegree_after, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
+    igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
 
     if ((!igraph_vector_int_all_e(&indegree_before, &indegree_after)) ||
         (!igraph_vector_int_all_e(&outdegree_before, &outdegree_after))) {

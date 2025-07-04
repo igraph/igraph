@@ -99,7 +99,7 @@ void test_graph_large(void) {
     igraph_t graph;
 
     /* simple large undirected graph */
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     printf("Testing large simple graph\n");
     run_tests(&graph, false);
 
@@ -143,7 +143,7 @@ void test_graph_small_multi(void) {
 void test_graph_lcf(void) {
     igraph_t graph;
 
-    igraph_lcf(&graph, /* n= */ 8, /* shifts= */ 2, /* repeats= */ 8, 0);
+    igraph_lcf_small(&graph, /* n= */ 8, /* shifts= */ 2, /* repeats= */ 8, 0);
     printf("Testing small LCF graph\n");
     run_tests(&graph, true);
 
@@ -196,11 +196,11 @@ void test_wheel_graph(void) {
 void test_bipartite_graph(void) {
     igraph_t graph_1, graph_2;
 
-    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
     printf("Testing complete bipartite graph\n");
     run_tests(&graph_1, false);
 
-    igraph_bipartite_game_gnm(&graph_2, 0, 100, 100, 10000 - 100, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_bipartite_game_gnm(&graph_2, 0, 100, 100, 10000 - 100, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
     printf("Testing large bipartite graph\n");
     run_tests(&graph_2, false);
 

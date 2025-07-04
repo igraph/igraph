@@ -24,7 +24,7 @@
 #define TOSTR(x) TOSTR1(x)
 
 /* Calls igraph_degree_1() separately for each vertex. */
-void deg1(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_bool_t loops) {
+void deg1(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_integer_t n = igraph_vcount(g);
     igraph_vector_int_resize(res, n);
     for (igraph_integer_t i=0; i < n; i++) {
@@ -33,7 +33,7 @@ void deg1(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, ig
 }
 
 /* Calls igraph_degree() separately for each vertex, pre-allocates work vector. */
-void degv(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_bool_t loops) {
+void degv(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_integer_t n = igraph_vcount(g);
     igraph_vector_int_t work;
 
@@ -46,7 +46,7 @@ void degv(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, ig
 }
 
 /* Calls igraph_degree() separately for each vertex, allocates a new work vector each time. */
-void degv2(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_bool_t loops) {
+void degv2(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_integer_t n = igraph_vcount(g);
 
     for (igraph_integer_t i=0; i < n; i++) {
@@ -69,7 +69,7 @@ int main(void) {
 
 #define REP 1000
 
-    printf("Count loops, O(1) per degree, fast methods only.\n");
+    printf("Count loops twice, O(1) per degree, fast methods only.\n");
 
     BENCH(" 1 igraph_degree(), preferential attachment n=100000, m=10, " TOSTR(REP) "x",
           REPEAT(igraph_degree(&g, &degs, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS), REP);
@@ -82,7 +82,26 @@ int main(void) {
 
 #define REP 100
 
-    printf("\nCount loops, O(1) per degree.\n");
+    printf("\nCount loops twice, O(1) per degree.\n");
+
+    BENCH(" 1 igraph_degree(), preferential attachment n=100000, m=10, " TOSTR(REP) "x",
+          REPEAT(igraph_degree(&g, &degs, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS), REP);
+    );
+    BENCH(" 2 deg1(), preferential attachment n=100000, m=10, " TOSTR(REP) "x",
+          REPEAT(deg1(&g, &degs, IGRAPH_ALL, IGRAPH_LOOPS), REP);
+    );
+    BENCH(" 3 degv(), preferential attachment n=100000, m=10, " TOSTR(REP) "x",
+          REPEAT(degv(&g, &degs, IGRAPH_ALL, IGRAPH_LOOPS), REP);
+    );
+    BENCH(" 4 degv2(), preferential attachment n=100000, m=10, " TOSTR(REP) "x",
+          REPEAT(degv2(&g, &degs, IGRAPH_ALL, IGRAPH_LOOPS), REP);
+    );
+
+#undef REP
+
+#define REP 100
+
+    printf("\nCount loops twice, O(1) per degree.\n");
 
     BENCH(" 1 igraph_degree(), preferential attachment n=100000, m=10, " TOSTR(REP) "x",
           REPEAT(igraph_degree(&g, &degs, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS), REP);

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2020  The igraph development team
@@ -81,10 +80,11 @@ void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
  *        graph as an edge attribute called \quote weight\endquote.
  *        \c IGRAPH_ADD_WEIGHTS_YES adds the weights (even if they
  *        are not present in the file, in this case they are assumed
- *        to be zero). \c IGRAPH_ADD_WEIGHTS_NO does not add any
+ *        to be 1). \c IGRAPH_ADD_WEIGHTS_NO does not add any
  *        edge attribute. \c IGRAPH_ADD_WEIGHTS_IF_PRESENT adds the
  *        attribute if and only if there is at least one explicit
- *        edge weight in the input file.
+ *        edge weight in the input file, and edges without an explicit
+ *        weight are assumed to have a weight of 1.
  * \param directed Whether to create a directed graph. As this format
  *        was originally used only for undirected graphs there is no
  *        information in the file about the directedness of the graph.
@@ -114,9 +114,9 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
     igraph_integer_t no_of_nodes;
     igraph_integer_t no_predefined = 0;
-    igraph_vector_ptr_t name, weight;
-    igraph_vector_ptr_t *pname = NULL, *pweight = NULL;
-    igraph_attribute_record_t namerec, weightrec;
+    igraph_attribute_record_list_t name, weight;
+    igraph_attribute_record_list_t *pname = NULL, *pweight = NULL;
+    igraph_attribute_record_t *namerec, *weightrec;
     const char *namestr = "name", *weightstr = "weight";
     igraph_i_ncol_parsedata_t context;
 
@@ -185,28 +185,32 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         IGRAPH_WARNING("Unknown vertex/vertices found in NCOL file, predefined names extended.");
     }
 
-    /* Prepare attributes, if needed */
-
+    /* Prepare attributes if needed */
     if (names) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+        IGRAPH_CHECK(igraph_attribute_record_list_init(&name, 1));
+        IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &name);
+
+        namerec = igraph_attribute_record_list_get_ptr(&name, 0);
+        IGRAPH_CHECK(igraph_attribute_record_set_name(namerec, namestr));
+        IGRAPH_CHECK(igraph_attribute_record_set_type(namerec, IGRAPH_ATTRIBUTE_STRING));
+        IGRAPH_CHECK(igraph_strvector_update(
+            namerec->value.as_strvector, igraph_i_trie_borrow_keys(context.trie))
+        );
+
         pname = &name;
-        namerec.name = namestr;
-        namerec.type = IGRAPH_ATTRIBUTE_STRING;
-        namerec.value = igraph_i_trie_borrow_keys(&trie);
-        VECTOR(name)[0] = &namerec;
     }
 
     if (weights == IGRAPH_ADD_WEIGHTS_YES ||
         (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && context.has_weights)) {
+        IGRAPH_CHECK(igraph_attribute_record_list_init(&weight, 1));
+        IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &weight);
 
-        IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
+        weightrec = igraph_attribute_record_list_get_ptr(&weight, 0);
+        IGRAPH_CHECK(igraph_attribute_record_set_name(weightrec, weightstr));
+        IGRAPH_CHECK(igraph_attribute_record_set_type(weightrec, IGRAPH_ATTRIBUTE_NUMERIC));
+        igraph_vector_swap(weightrec->value.as_vector, context.weights);
+
         pweight = &weight;
-        weightrec.name = weightstr;
-        weightrec.type = IGRAPH_ATTRIBUTE_NUMERIC;
-        weightrec.value = &ws;
-        VECTOR(weight)[0] = &weightrec;
     }
 
     if (igraph_vector_int_empty(&edges)) {
@@ -222,11 +226,11 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
 
     if (pname) {
-        igraph_vector_ptr_destroy(pname);
+        igraph_attribute_record_list_destroy(pname);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (pweight) {
-        igraph_vector_ptr_destroy(pweight);
+        igraph_attribute_record_list_destroy(pweight);
         IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_vector_destroy(&ws);
@@ -309,7 +313,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         names = NULL;
     }
     if (names) {
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
         if (nametype != IGRAPH_ATTRIBUTE_STRING) {
             IGRAPH_WARNINGF("Ignoring names attribute '%s', "
@@ -324,7 +328,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         weights = NULL;
     }
     if (weights) {
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
         if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
             IGRAPH_WARNINGF("Ignoring weights attribute '%s', "

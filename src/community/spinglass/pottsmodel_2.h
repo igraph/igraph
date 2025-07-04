@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -110,8 +109,8 @@ public:
                                   igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
-                                  igraph_integer_t *inner_links,
-                                  igraph_integer_t *outer_links) const;
+                                  igraph_real_t *inner_links,
+                                  igraph_real_t *outer_links) const;
 };
 
 

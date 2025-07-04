@@ -23,7 +23,7 @@ void compute_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_bool_t 
     igraph_real_t result;
     igraph_real_t unconn_pairs;
 
-    IGRAPH_ASSERT(igraph_average_path_length_dijkstra(graph, &result, &unconn_pairs, weights,
+    IGRAPH_ASSERT(igraph_average_path_length(graph, weights, &result, &unconn_pairs,
                   directed, unconn) == IGRAPH_SUCCESS);
 
     printf("Result: ");
@@ -77,11 +77,11 @@ int main(void) {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Checking incorrect weight length error handling.\n");
-    IGRAPH_ASSERT(igraph_average_path_length_dijkstra(&g_lm, &result, NULL, &weights_0,
+    IGRAPH_ASSERT(igraph_average_path_length(&g_lm, &weights_0, &result, NULL,
                   1, 1) == IGRAPH_EINVAL);
 
     printf("Checking negative weight error handling.\n");
-    IGRAPH_ASSERT(igraph_average_path_length_dijkstra(&g_lm, &result, NULL, &weights_lm_neg,
+    IGRAPH_ASSERT(igraph_average_path_length(&g_lm, &weights_lm_neg, &result, NULL,
                   1, 1) == IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2021 The igraph development team
@@ -30,7 +29,7 @@
 #include "core/estack.h"
 #include "core/marked_queue.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_all_st_cuts_pivot(
    const igraph_t *graph, const igraph_marked_queue_int_t *S,
@@ -39,6 +38,6 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_all_st_cuts_pivot(
 
 igraph_error_t igraph_i_split_vertices(const igraph_t* graph, igraph_t* result);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

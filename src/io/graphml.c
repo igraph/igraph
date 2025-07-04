@@ -88,17 +88,13 @@ static xmlEntity blankEntity = {
     } while (0)
 
 typedef struct igraph_i_graphml_attribute_record_t {
-    const char *id;           /* GraphML id */
+    char *id;           /* GraphML id */
     enum { I_GRAPHML_BOOLEAN, I_GRAPHML_INTEGER, I_GRAPHML_LONG,
            I_GRAPHML_FLOAT, I_GRAPHML_DOUBLE, I_GRAPHML_STRING,
            I_GRAPHML_UNKNOWN_TYPE
          } type; /* GraphML type */
-    union {
-        igraph_real_t as_numeric;
-        igraph_bool_t as_boolean;
-        char *as_string;
-    } default_value;   /* Default value of the attribute, if any */
     igraph_attribute_record_t record;
+    igraph_bool_t record_disowned;  /* true if ownership of the record was taken over */
 } igraph_i_graphml_attribute_record_t;
 
 typedef enum {
@@ -210,34 +206,16 @@ static igraph_error_t igraph_i_graphml_parse_boolean(
 }
 
 static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute_record_t* rec) {
-    if (rec->record.type == IGRAPH_ATTRIBUTE_NUMERIC) {
-        if (rec->record.value != 0) {
-            igraph_vector_destroy((igraph_vector_t*)rec->record.value);
-            IGRAPH_FREE(rec->record.value);
-        }
-    } else if (rec->record.type == IGRAPH_ATTRIBUTE_STRING) {
-        if (rec->record.value != 0) {
-            igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
-            IGRAPH_FREE(rec->record.value);
-        }
-        if (rec->default_value.as_string != 0) {
-            IGRAPH_FREE(rec->default_value.as_string);
-        }
-    } else if (rec->record.type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-        if (rec->record.value != 0) {
-            igraph_vector_bool_destroy((igraph_vector_bool_t*)rec->record.value);
-            IGRAPH_FREE(rec->record.value);
-        }
-    } else if (rec->record.type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
-        /* no value was set */
+    if (!rec->record_disowned) {
+        igraph_attribute_record_destroy(&rec->record);
     }
+
     if (rec->id != NULL) {
-        xmlFree((void *) rec->id);
+        igraph_free(rec->id);
         rec->id = NULL;
     }
-    if (rec->record.name != 0) {
-        IGRAPH_FREE(rec->record.name);
-    }
+
+    memset(rec, 0, sizeof(igraph_i_graphml_attribute_record_t));
 }
 
 static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, igraph_integer_t index) {
@@ -409,34 +387,25 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
 }
 
 static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph_i_graphml_parser_state *state) {
-    igraph_integer_t i, l;
-    igraph_attribute_record_t idrec, eidrec;
+    igraph_integer_t i;
     const char *idstr = "id";
     igraph_bool_t already_has_vertex_id = false, already_has_edge_id = false;
-    igraph_vector_ptr_t vattr, eattr, gattr;
-    igraph_integer_t esize;
+    igraph_attribute_record_list_t vattr, eattr, gattr;
+    igraph_attribute_record_t *idrec;
 
     IGRAPH_ASSERT(state->successful);
 
     /* check that we have found and parsed the graph the user is interested in */
     IGRAPH_ASSERT(state->index < 0);
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&vattr, igraph_vector_ptr_size(&state->v_attrs) + 1)); /* +1 for 'id' */
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vattr);
-    igraph_vector_ptr_resize(&vattr, 0); /* will be filled with push_back() */
+    IGRAPH_CHECK(igraph_attribute_record_list_init(&vattr, 0));
+    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &vattr);
+    IGRAPH_CHECK(igraph_attribute_record_list_init(&eattr, 0));
+    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &eattr);
+    IGRAPH_CHECK(igraph_attribute_record_list_init(&gattr, 0));
+    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &gattr);
 
-    esize = igraph_vector_ptr_size(&state->e_attrs);
-    if (igraph_strvector_size(&state->edgeids) != 0) {
-        esize++;
-    }
-    IGRAPH_CHECK(igraph_vector_ptr_init(&eattr, esize));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &eattr);
-    igraph_vector_ptr_resize(&eattr, 0); /* will be filled with push_back() */
-
-    IGRAPH_CHECK(igraph_vector_ptr_init(&gattr, igraph_vector_ptr_size(&state->g_attrs)));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &gattr);
-    igraph_vector_ptr_resize(&gattr, 0); /* will be filled with push_back() */
-
+    /* Add default attribute values for vertices where needed */
     for (i = 0; i < igraph_vector_ptr_size(&state->v_attrs); i++) {
         igraph_i_graphml_attribute_record_t *graphmlrec =
             VECTOR(state->v_attrs)[i];
@@ -444,131 +413,68 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 
         /* Check that the name of the vertex attribute is not 'id'.
          * If it is then we cannot add the complementary 'id' attribute. */
-        if (! strcmp(rec->name, idstr)) {
+        if (!strcmp(rec->name, idstr)) {
             already_has_vertex_id = 1;
         }
 
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_size(vec);
-            igraph_integer_t nodes = igraph_trie_size(&state->node_trie);
-            IGRAPH_CHECK(igraph_vector_resize(vec, nodes));
-            for (l = origsize; l < nodes; l++) {
-                VECTOR(*vec)[l] = graphmlrec->default_value.as_numeric;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            igraph_integer_t origsize = igraph_strvector_size(strvec);
-            igraph_integer_t nodes = igraph_trie_size(&state->node_trie);
-            IGRAPH_CHECK(igraph_strvector_resize(strvec, nodes));
-            for (l = origsize; l < nodes; l++) {
-                IGRAPH_CHECK(igraph_strvector_set(strvec, l, graphmlrec->default_value.as_string));
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            igraph_vector_bool_t *boolvec = (igraph_vector_bool_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_bool_size(boolvec);
-            igraph_integer_t nodes = igraph_trie_size(&state->node_trie);
-            IGRAPH_CHECK(igraph_vector_bool_resize(boolvec, nodes));
-            for (l = origsize; l < nodes; l++) {
-                VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
-            continue; /* skipped attribute */
+        if (rec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            IGRAPH_CHECK(igraph_attribute_record_resize(rec, igraph_trie_size(&state->node_trie)));
+            IGRAPH_CHECK(igraph_attribute_record_list_push_back(&vattr, rec));
+            graphmlrec->record_disowned = true;
         }
-        igraph_vector_ptr_push_back(&vattr, rec); /* reserved */
     }
+
+    /* Add vertex ID attribute if needed */
     if (!already_has_vertex_id) {
-        idrec.name = idstr;
-        idrec.type = IGRAPH_ATTRIBUTE_STRING;
-        idrec.value = igraph_i_trie_borrow_keys(&state->node_trie);
-        igraph_vector_ptr_push_back(&vattr, &idrec); /* reserved */
+        IGRAPH_CHECK(igraph_attribute_record_list_push_back_new(&vattr, &idrec));
+        IGRAPH_CHECK(igraph_attribute_record_set_name(idrec, idstr));
+        IGRAPH_CHECK(igraph_attribute_record_set_type(idrec, IGRAPH_ATTRIBUTE_STRING));
+        IGRAPH_CHECK(igraph_strvector_update(idrec->value.as_strvector, igraph_i_trie_borrow_keys(&state->node_trie)));
     } else {
         IGRAPH_WARNING("Could not add vertex ids, there is already an 'id' vertex attribute.");
     }
 
+    /* Add default attribute values for edges where needed */
     for (i = 0; i < igraph_vector_ptr_size(&state->e_attrs); i++) {
         igraph_i_graphml_attribute_record_t *graphmlrec =
             VECTOR(state->e_attrs)[i];
         igraph_attribute_record_t *rec = &graphmlrec->record;
 
-        if (! strcmp(rec->name, idstr)) {
+        if (!strcmp(rec->name, idstr)) {
             already_has_edge_id = 1;
         }
 
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_size(vec);
-            igraph_integer_t edges = igraph_vector_int_size(&state->edgelist) / 2;
-            IGRAPH_CHECK(igraph_vector_resize(vec, edges));
-            for (l = origsize; l < edges; l++) {
-                VECTOR(*vec)[l] = graphmlrec->default_value.as_numeric;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            igraph_integer_t origsize = igraph_strvector_size(strvec);
-            igraph_integer_t edges = igraph_vector_int_size(&state->edgelist) / 2;
-            IGRAPH_CHECK(igraph_strvector_resize(strvec, edges));
-            for (l = origsize; l < edges; l++) {
-                IGRAPH_CHECK(igraph_strvector_set(strvec, l, graphmlrec->default_value.as_string));
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            igraph_vector_bool_t *boolvec = (igraph_vector_bool_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_bool_size(boolvec);
-            igraph_integer_t edges = igraph_vector_int_size(&state->edgelist) / 2;
-            IGRAPH_CHECK(igraph_vector_bool_resize(boolvec, edges));
-            for (l = origsize; l < edges; l++) {
-                VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
-            continue; /* skipped attribute */
+        if (rec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            IGRAPH_CHECK(igraph_attribute_record_resize(rec, igraph_vector_int_size(&state->edgelist) / 2));
+            IGRAPH_CHECK(igraph_attribute_record_list_push_back(&eattr, rec));
+            graphmlrec->record_disowned = true;
         }
-        igraph_vector_ptr_push_back(&eattr, rec); /* reserved */
     }
+
+    /* Add edge ID attribute if needed */
     if (igraph_strvector_size(&state->edgeids) != 0) {
         if (!already_has_edge_id) {
-            igraph_integer_t origsize = igraph_strvector_size(&state->edgeids);
-            eidrec.name = idstr;
-            eidrec.type = IGRAPH_ATTRIBUTE_STRING;
-            IGRAPH_CHECK(igraph_strvector_resize(&state->edgeids, igraph_vector_int_size(&state->edgelist) / 2));
-            for (; origsize < igraph_strvector_size(&state->edgeids); origsize++) {
-                IGRAPH_CHECK(igraph_strvector_set(&state->edgeids, origsize, ""));
-            }
-            eidrec.value = &state->edgeids;
-            igraph_vector_ptr_push_back(&eattr, &eidrec); /* reserved */
+            IGRAPH_CHECK(igraph_attribute_record_list_push_back_new(&eattr, &idrec));
+            IGRAPH_CHECK(igraph_attribute_record_set_name(idrec, idstr));
+            IGRAPH_CHECK(igraph_attribute_record_set_type(idrec, IGRAPH_ATTRIBUTE_STRING));
+            IGRAPH_CHECK(igraph_strvector_update(idrec->value.as_strvector, igraph_i_trie_borrow_keys(&state->node_trie)));
+            IGRAPH_CHECK(igraph_attribute_record_resize(idrec, igraph_vector_int_size(&state->edgelist) / 2));
         } else {
             IGRAPH_WARNING("Could not add edge ids, there is already an 'id' edge attribute.");
         }
     }
 
+    /* Add default graph attribute values where needed */
     for (i = 0; i < igraph_vector_ptr_size(&state->g_attrs); i++) {
         igraph_i_graphml_attribute_record_t *graphmlrec =
             VECTOR(state->g_attrs)[i];
         igraph_attribute_record_t *rec = &graphmlrec->record;
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_size(vec);
-            IGRAPH_CHECK(igraph_vector_resize(vec, 1));
-            for (l = origsize; l < 1; l++) {
-                VECTOR(*vec)[l] = graphmlrec->default_value.as_numeric;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            igraph_integer_t origsize = igraph_strvector_size(strvec);
-            IGRAPH_CHECK(igraph_strvector_resize(strvec, 1));
-            for (l = origsize; l < 1; l++) {
-                IGRAPH_CHECK(igraph_strvector_set(strvec, l, graphmlrec->default_value.as_string));
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            igraph_vector_bool_t *boolvec = (igraph_vector_bool_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_bool_size(boolvec);
-            IGRAPH_CHECK(igraph_vector_bool_resize(boolvec, 1));
-            for (l = origsize; l < 1; l++) {
-                VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
-            continue; /* skipped attribute */
+
+        if (rec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            IGRAPH_CHECK(igraph_attribute_record_resize(rec, 1));
+            IGRAPH_CHECK(igraph_attribute_record_list_push_back(&gattr, rec));
+            graphmlrec->record_disowned = true;
         }
-        igraph_vector_ptr_push_back(&gattr, rec); /* reserved */
     }
 
     IGRAPH_CHECK(igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr));
@@ -577,9 +483,9 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     IGRAPH_CHECK(igraph_add_edges(state->g, &state->edgelist, &eattr));
     IGRAPH_FINALLY_CLEAN(1); /* graph construction completed successfully */
 
-    igraph_vector_ptr_destroy(&vattr);
-    igraph_vector_ptr_destroy(&eattr);
-    igraph_vector_ptr_destroy(&gattr);
+    igraph_attribute_record_list_destroy(&vattr);
+    igraph_attribute_record_list_destroy(&eattr);
+    igraph_attribute_record_list_destroy(&gattr);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -594,6 +500,34 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 #define XML_ATTR_VALUE_LENGTH(it) (size_t)(it[4] - it[3])
 #define XML_ATTR_VALUE(it) it[3], (int)(it[4] - it[3]) /* for use in strnxxx()-style functions that take a char * and a length */
 #define XML_ATTR_VALUE_PF(it) (int)(it[4] - it[3]), it[3] /* for use in printf-style function with "%.*s" */
+
+static igraph_error_t safely_convert_xml_attribute_to_string(xmlChar** it, char** str) {
+    /* This is quite convoluted but we need to go safely from xmlChar*-world
+     * to char*-world */
+    xmlChar *xml_str;
+    char *c_str;
+
+    xml_str = xmlStrndup(XML_ATTR_VALUE(it));
+    IGRAPH_CHECK_OOM(xml_str, "Insufficient memory to duplicate attribute value.");
+    IGRAPH_FINALLY(xmlFree, xml_str);
+
+    c_str = strdup(fromXmlChar(xml_str));
+    IGRAPH_CHECK_OOM(c_str, "Insufficient memory to duplicate attribute value.");
+
+    *str = c_str;
+
+    xmlFree(xml_str);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+static void safely_free_optional_string(char** str) {
+    if (*str != NULL) {
+        igraph_free(*str);
+        *str = NULL;
+    }
+}
 
 static igraph_bool_t xmlAttrValueEqual(xmlChar** attr, const char* expected) {
     size_t expected_length = strlen(expected);
@@ -623,13 +557,17 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
     xmlChar **it;
     xmlChar *localname;
-    xmlChar *xmlStr;
     igraph_trie_t *trie = NULL;
     igraph_vector_ptr_t *ptrvector = NULL;
     igraph_integer_t i, n;
     igraph_integer_t id;
     igraph_i_graphml_attribute_record_t *rec = NULL;
+    char *attr_name;
+    igraph_attribute_type_t igraph_attr_type;
     igraph_bool_t skip = false;
+
+    attr_name = NULL;
+    IGRAPH_FINALLY(safely_free_optional_string, &attr_name);
 
     if (!state->successful) {
         /* Parser is already in an error state */
@@ -637,13 +575,12 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     rec = IGRAPH_CALLOC(1, igraph_i_graphml_attribute_record_t);
-    if (rec == NULL) {
-        IGRAPH_ERROR("Cannot allocate attribute record.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(rec, "Insufficient memory to allocate attribute record.");
     IGRAPH_FINALLY(igraph_free, rec);
     IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
+    memset(rec, 0, sizeof(igraph_i_graphml_attribute_record_t));
 
-    rec->type = I_GRAPHML_UNKNOWN_TYPE;
+    igraph_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
 
     for (i = 0, it = (xmlChar**)attrs; i < nb_attrs; i++, it += 5) {
         if (XML_ATTR_URI(it) != 0 &&
@@ -654,52 +591,30 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         localname = XML_ATTR_LOCALNAME(it);
 
         if (xmlStrEqual(localname, toXmlChar("id"))) {
-            xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
-            IGRAPH_CHECK_OOM(xmlStr, "Cannot duplicate value of 'id' attribute.");
-            if (rec->id) {
-                /* may happen if the 'id' attribute is provided multiple times */
-                xmlFree((void *) rec->id);
-                rec->id = NULL;
-            }
-            rec->id = fromXmlChar(xmlStr);
-            xmlStr = NULL;
+            safely_free_optional_string(&rec->id);
+            IGRAPH_CHECK(safely_convert_xml_attribute_to_string(it, &rec->id));
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
-            xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
-            IGRAPH_CHECK_OOM(xmlStr, "Cannot duplicate value of 'attr.name' attribute.");
-            if (rec->record.name) {
-                /* may happen if the 'attr.name' attribute is provided multiple times */
-                xmlFree((void *) rec->record.name);
-                rec->record.name = NULL;
-            }
-            rec->record.name = fromXmlChar(xmlStr);
-            xmlStr = NULL;
+            safely_free_optional_string(&attr_name);
+            IGRAPH_CHECK(safely_convert_xml_attribute_to_string(it, &attr_name));
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
             if (xmlAttrValueEqual(it, "boolean")) {
+                igraph_attr_type = IGRAPH_ATTRIBUTE_BOOLEAN;
                 rec->type = I_GRAPHML_BOOLEAN;
-                rec->record.type = IGRAPH_ATTRIBUTE_BOOLEAN;
-                rec->default_value.as_boolean = 0;
             } else if (xmlAttrValueEqual(it, "string")) {
-                char *str = strdup("");
-                IGRAPH_CHECK_OOM(str, "Cannot allocate new empty string.");
+                igraph_attr_type = IGRAPH_ATTRIBUTE_STRING;
                 rec->type = I_GRAPHML_STRING;
-                rec->record.type = IGRAPH_ATTRIBUTE_STRING;
-                rec->default_value.as_string = str;
             } else if (xmlAttrValueEqual(it, "float")) {
+                igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_FLOAT;
-                rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
-                rec->default_value.as_numeric = IGRAPH_NAN;
             } else if (xmlAttrValueEqual(it, "double")) {
+                igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_DOUBLE;
-                rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
-                rec->default_value.as_numeric = IGRAPH_NAN;
             } else if (xmlAttrValueEqual(it, "int")) {
+                igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_INTEGER;
-                rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
-                rec->default_value.as_numeric = IGRAPH_NAN;
             } else if (xmlAttrValueEqual(it, "long")) {
+                igraph_attr_type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->type = I_GRAPHML_LONG;
-                rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
-                rec->default_value.as_numeric = IGRAPH_NAN;
             } else {
                 IGRAPH_ERRORF("Unknown attribute type '%.*s'.", IGRAPH_PARSEERROR,
                               XML_ATTR_VALUE_PF(it));
@@ -749,9 +664,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     /* in case of a missing attr.name attribute, use the id as the attribute name */
-    if (rec->record.name == NULL) {
-        rec->record.name = strdup(rec->id);
-        IGRAPH_CHECK_OOM(rec->record.name, "Cannot duplicate attribute ID as name.");
+    if (attr_name == NULL) {
+        /* Allocation here is protected by safely_free_optional_string(&attr_name),
+         * which is already in the finally stack */
+        attr_name = strdup(rec->id);
+        IGRAPH_CHECK_OOM(attr_name, "Cannot duplicate attribute ID as name.");
     }
 
     /* if the attribute type is missing, ignore the attribute with a warning */
@@ -760,9 +677,10 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         skip = 1;
     }
 
-    /* if the value of the 'for' attribute was unknown, throw an error */
+    /* if the value of the 'for' attribute was missing, ignore the attribute with a warning */
     if (!skip && trie == 0) {
-        IGRAPH_ERROR("Missing 'for' attribute in a <key> tag.", IGRAPH_PARSEERROR);
+        IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing 'for' attribute.", rec->id);
+        skip = 1;
     }
 
     /* If attribute is skipped, proceed according to the type of the associated graph element. */
@@ -780,7 +698,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
             /* If the skipped attribute was for a supported graph element, we add it
              * as "UNSPECIFIED" so that we can avoid reporting "unknown attribute" warnings
              * later. */
-            rec->record.type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
+            igraph_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
         }
     }
 
@@ -794,12 +712,12 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     n = igraph_vector_ptr_size(ptrvector);
     for (i = 0; i < n; i++) {
         if (!strcmp(
-            rec->record.name,
+            attr_name,
             ((igraph_i_graphml_attribute_record_t*) igraph_vector_ptr_get(ptrvector, i))->record.name
         )) {
             IGRAPH_ERRORF(
                 "Duplicate attribute name found: '%s' (for <key id='%s'>).",
-                IGRAPH_PARSEERROR, rec->record.name, rec->id
+                IGRAPH_PARSEERROR, attr_name, rec->id
             );
         }
     }
@@ -813,42 +731,12 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     IGRAPH_FINALLY_CLEAN(2);
 
     /* create the attribute values */
-    switch (rec->record.type) {
-        igraph_vector_t *vec;
-        igraph_vector_bool_t *boolvec;
-        igraph_strvector_t *strvec;
-    case IGRAPH_ATTRIBUTE_BOOLEAN:
-        boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-        IGRAPH_CHECK_OOM(boolvec, "Cannot allocate value vector for Boolean attribute.");
-        IGRAPH_FINALLY(igraph_free, boolvec);
-        IGRAPH_CHECK(igraph_vector_bool_init(boolvec, 0));
-        rec->record.value = boolvec;
-        IGRAPH_FINALLY_CLEAN(1);
-        break;
-    case IGRAPH_ATTRIBUTE_NUMERIC:
-        vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot allocate value vector for numeric attribute.");
-        IGRAPH_FINALLY(igraph_free, vec);
-        IGRAPH_CHECK(igraph_vector_init(vec, 0));
-        rec->record.value = vec;
-        IGRAPH_FINALLY_CLEAN(1);
-        break;
-    case IGRAPH_ATTRIBUTE_STRING:
-        strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
-        IGRAPH_CHECK_OOM(strvec, "Cannot allocate value vector for string attribute.");
-        IGRAPH_FINALLY(igraph_free, strvec);
-        IGRAPH_CHECK(igraph_strvector_init(strvec, 0));
-        rec->record.value = strvec;
-        IGRAPH_FINALLY_CLEAN(1);
-        break;
-    case IGRAPH_ATTRIBUTE_UNSPECIFIED:
-        rec->record.value = NULL;
-        break;
-    default:
-        IGRAPH_FATAL("Unexpected attribute type.");
-    }
+    IGRAPH_CHECK(igraph_attribute_record_init(&rec->record, attr_name, igraph_attr_type));
 
 exit:
+    safely_free_optional_string(&attr_name);
+    IGRAPH_FINALLY_CLEAN(1);
+
     *record = rec;
     return IGRAPH_SUCCESS;
 }
@@ -876,9 +764,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
                 state->data_key = NULL;
             }
             state->data_key = xmlStrndup(XML_ATTR_VALUE(it));
-            if (state->data_key == 0) {
-                return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(state->data_key, "Insufficient memory to read GraphML file.");
             igraph_vector_char_clear(&state->data_char);
             state->data_type = type;
         } else {
@@ -892,16 +778,17 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
 static igraph_error_t igraph_i_graphml_append_to_data_char(
     struct igraph_i_graphml_parser_state *state, const xmlChar *data, int len
 ) {
+    igraph_vector_char_t data_vec;
+
     if (!state->successful) {
         return IGRAPH_SUCCESS;
     }
 
-    /* vector_push_back() minimizes reallocations by doubling the size of the buffer,
-     * while vector_append() would only allocate as much additional memory as needed. */
     IGRAPH_STATIC_ASSERT(sizeof(char) == sizeof(xmlChar));
-    for (int i=0; i < len; i++) {
-        IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, data[i]));
-    }
+    IGRAPH_CHECK(igraph_vector_char_append(
+        &state->data_char,
+        igraph_vector_char_view(&data_vec, (char *) data, len)
+    ));
 
     return IGRAPH_SUCCESS;
 }
@@ -955,66 +842,44 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
     graphmlrec = VECTOR(*ptrvector)[recid];
     rec = &graphmlrec->record;
 
+    if (id >= igraph_attribute_record_size(rec) && rec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+        IGRAPH_CHECK(igraph_attribute_record_resize(rec, id + 1));
+    }
+
     switch (rec->type) {
         igraph_vector_bool_t *boolvec;
         igraph_vector_t *vec;
         igraph_strvector_t *strvec;
-        igraph_integer_t s, i;
         const char* strvalue;
 
     case IGRAPH_ATTRIBUTE_BOOLEAN:
-        boolvec = (igraph_vector_bool_t *)rec->value;
-        s = igraph_vector_bool_size(boolvec);
-        if (id >= s) {
-            IGRAPH_CHECK(igraph_vector_bool_resize(boolvec, id + 1));
-            for (i = s; i < id; i++) {
-                VECTOR(*boolvec)[i] = graphmlrec->default_value.as_boolean;
-            }
-        }
-
         /* Add null terminator */
         IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
+        boolvec = rec->value.as_vector_bool;
         IGRAPH_CHECK(igraph_i_graphml_parse_boolean(
-            VECTOR(state->data_char), VECTOR(*boolvec) + id,  graphmlrec->default_value.as_boolean
+            VECTOR(state->data_char), VECTOR(*boolvec) + id, rec->default_value.boolean
         ));
         break;
 
     case IGRAPH_ATTRIBUTE_NUMERIC:
-        vec = (igraph_vector_t *)rec->value;
-        s = igraph_vector_size(vec);
-        if (id >= s) {
-            IGRAPH_CHECK(igraph_vector_resize(vec, id + 1));
-            for (i = s; i < id; i++) {
-                VECTOR(*vec)[i] = graphmlrec->default_value.as_numeric;
-            }
-        }
-
         /* Add null terminator */
         IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
+        vec = rec->value.as_vector;
         IGRAPH_CHECK(igraph_i_graphml_parse_numeric(
-            VECTOR(state->data_char), VECTOR(*vec) + id,
-            graphmlrec->default_value.as_numeric
+            VECTOR(state->data_char), VECTOR(*vec) + id, rec->default_value.numeric
         ));
         break;
 
     case IGRAPH_ATTRIBUTE_STRING:
-        strvec = (igraph_strvector_t *)rec->value;
-        s = igraph_strvector_size(strvec);
-        if (id >= s) {
-            IGRAPH_CHECK(igraph_strvector_resize(strvec, id + 1));
-            strvalue = graphmlrec->default_value.as_string;
-            for (i = s; i < id; i++) {
-                IGRAPH_CHECK(igraph_strvector_set(strvec, i, strvalue));
-            }
-        }
+        /* Ensure that the vector ends with a null terminator */
+        strvec = rec->value.as_strvector;
         if (igraph_vector_char_size(&state->data_char) > 0) {
-            /* Ensure that the vector ends with a null terminator */
             IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
             strvalue = VECTOR(state->data_char);
         } else {
-            strvalue = graphmlrec->default_value.as_string;
+            strvalue = rec->default_value.string;
         }
-        IGRAPH_CHECK(igraph_strvector_set(strvec, id, strvalue));
+        IGRAPH_CHECK(igraph_strvector_set(strvec, id, strvalue ? strvalue : ""));
         break;
 
     case IGRAPH_ATTRIBUTE_UNSPECIFIED:
@@ -1032,8 +897,10 @@ exit:
 
 static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igraph_i_graphml_parser_state *state) {
     igraph_i_graphml_attribute_record_t *graphmlrec = state->current_attr_record;
+    igraph_attribute_record_t *rec;
     igraph_error_t result = IGRAPH_SUCCESS;
-    char* str = 0;
+    igraph_real_t default_num;
+    igraph_bool_t default_bool;
 
     IGRAPH_ASSERT(state->current_attr_record != NULL);
 
@@ -1041,32 +908,25 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         return IGRAPH_SUCCESS;
     }
 
-    switch (graphmlrec->record.type) {
+    rec = &graphmlrec->record;
+
+    switch (rec->type) {
     case IGRAPH_ATTRIBUTE_BOOLEAN:
         /* Add null terminator */
         IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
-        IGRAPH_CHECK(igraph_i_graphml_parse_boolean(
-            VECTOR(state->data_char), &graphmlrec->default_value.as_boolean, 0
-        ));
+        IGRAPH_CHECK(igraph_i_graphml_parse_boolean(VECTOR(state->data_char), &default_bool, false));
+        IGRAPH_CHECK(igraph_attribute_record_set_default_boolean(rec, default_bool));
         break;
     case IGRAPH_ATTRIBUTE_NUMERIC:
         /* Add null terminator */
         IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
-        IGRAPH_CHECK(igraph_i_graphml_parse_numeric(
-            VECTOR(state->data_char), &graphmlrec->default_value.as_numeric, IGRAPH_NAN
-        ));
+        IGRAPH_CHECK(igraph_i_graphml_parse_numeric(VECTOR(state->data_char), &default_num, IGRAPH_NAN));
+        IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, default_num));
         break;
     case IGRAPH_ATTRIBUTE_STRING:
         /* Add null terminator */
         IGRAPH_CHECK(igraph_vector_char_push_back(&state->data_char, '\x00'));
-        str = strdup(VECTOR(state->data_char));
-        IGRAPH_CHECK_OOM(str, "Cannot allocate memory for string attribute.");
-
-        if (graphmlrec->default_value.as_string != 0) {
-            IGRAPH_FREE(graphmlrec->default_value.as_string);
-        }
-        graphmlrec->default_value.as_string = str;
-        str = NULL;
+        IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, VECTOR(state->data_char)));
         break;
     case IGRAPH_ATTRIBUTE_UNSPECIFIED:
         break;

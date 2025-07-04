@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -281,29 +280,6 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 
     /* 2 instead of 1 because the star graph is registered before. */
     IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup generators
- * \function igraph_lattice
- * \brief Arbitrary dimensional square lattices (deprecated).
- *
- * \deprecated-by igraph_square_lattice 0.10.0
- */
-igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector,
-                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
-                   igraph_bool_t circular) {
-    igraph_vector_bool_t periodic;
-
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&periodic, igraph_vector_int_size(dimvector));
-    igraph_vector_bool_fill(&periodic, circular);
-
-    IGRAPH_CHECK(igraph_square_lattice(graph, dimvector, nei, directed, mutual, &periodic));
-
-    igraph_vector_bool_destroy(&periodic);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -674,18 +650,6 @@ igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_integer_t n, igraph_inte
 
 /**
  * \ingroup generators
- * \function igraph_tree
- * \brief Creates a k-ary tree in which almost all vertices have k children (deprecated alias).
- *
- * \deprecated-by igraph_kary_tree 0.10.0
- */
-igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
-                igraph_tree_mode_t type) {
-    return igraph_kary_tree(graph, n, children, type);
-}
-
-/**
- * \ingroup generators
  * \function igraph_symmetric_tree
  * \brief Creates a symmetric tree with the specified number of branches at each level.
  *
@@ -877,8 +841,7 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_i
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector(),
- * \ref igraph_circulant()
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_circulant()
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
@@ -945,8 +908,6 @@ igraph_error_t igraph_extended_chordal_ring(
 /**
  * \function igraph_hypercube
  * \brief The n-dimensional hypercube graph.
- *
- * \experimental
  *
  * The hypercube graph \c Q_n has <code>2^n</code> vertices and
  * <code>2^(n-1) n</code> edges. Two vertices are connected when the binary

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -282,33 +281,6 @@ igraph_error_t igraph_get_adjacency_sparse(
 
 #undef WEIGHT_OF
 
-/**
- * \function igraph_get_sparsemat
- * \brief Converts an igraph graph to a sparse matrix (deprecated).
- *
- * If the graph is undirected, then a symmetric matrix is created.
- *
- * </para><para>
- * This function is deprecated in favour of \ref igraph_get_adjacency_sparse(),
- * but does not work in an identical way. This function takes an \em uninitialized
- * \c igraph_sparsemat_t while \ref igraph_get_adjacency_sparse() takes
- * an already initialized one.
- *
- * \param graph The input graph.
- * \param res Pointer to an \em uninitialized sparse matrix. The result
- *    will be stored here.
- * \return Error code.
- *
- * \deprecated-by igraph_get_adjacency_sparse 0.10.0
- */
-
-igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
-}
 
 /**
  * \ingroup conversion
@@ -333,37 +305,7 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
  */
 
 igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol) {
-
-    igraph_eit_t edgeit;
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t vptr = 0;
-    igraph_integer_t from, to;
-
-    IGRAPH_CHECK(igraph_vector_int_resize(res, no_of_edges * 2));
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                                   &edgeit));
-    IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
-
-    if (bycol) {
-        while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
-            VECTOR(*res)[vptr] = from;
-            VECTOR(*res)[vptr + no_of_edges] = to;
-            vptr++;
-            IGRAPH_EIT_NEXT(edgeit);
-        }
-    } else {
-        while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
-            VECTOR(*res)[vptr++] = from;
-            VECTOR(*res)[vptr++] = to;
-            IGRAPH_EIT_NEXT(edgeit);
-        }
-    }
-
-    igraph_eit_destroy(&edgeit);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
+    return igraph_edges(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), res, bycol);
 }
 
 /**
@@ -451,8 +393,7 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
                                    no_of_nodes,
                                    IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
-        IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-        IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, true, true, true);
+        IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, true));
         igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(2);
 
@@ -484,8 +425,7 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
                                    no_of_nodes,
                                    IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
-        IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-        IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, true, true, /*edges=*/false);
+        IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, /* edges= */ false));
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &index));
 
         igraph_vector_int_destroy(&index);
@@ -585,8 +525,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
                                    IGRAPH_UNDIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         igraph_vector_int_destroy(&edges);
-        IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-        IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, true, true, true);
+        IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, true));
         IGRAPH_FINALLY_CLEAN(2);
         igraph_destroy(graph);
         *graph = newgraph;
@@ -608,8 +547,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
             igraph_integer_t n_out, n_in;
             igraph_integer_t p1 = -1, p2 = -1;
             igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0, last;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT, IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN, IGRAPH_LOOPS));
             n_out = igraph_vector_int_size(&outadj);
             n_in = igraph_vector_int_size(&inadj);
 
@@ -683,8 +622,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
                                    IGRAPH_UNDIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         igraph_vector_int_destroy(&edges);
-        IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-        IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, true, true, /*edges*/ false); /* no edge attributes */
+        IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, /* edges= */ false));
 
         if (attr) {
             igraph_fixed_vectorlist_t vl;
@@ -723,10 +661,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
             igraph_integer_t n_out, n_in;
             igraph_integer_t p1 = -1, p2 = -1;
             igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, i,
-                                         IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj,  i,
-                                         IGRAPH_IN));
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT, IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_incident(graph, &inadj,  i, IGRAPH_IN, IGRAPH_LOOPS));
             n_out = igraph_vector_int_size(&outadj);
             n_in = igraph_vector_int_size(&inadj);
 
@@ -773,8 +709,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
                                    IGRAPH_UNDIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         igraph_vector_int_destroy(&edges);
-        IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-        IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, true, true, /*edges*/ false); /* no edge attributes */
+        IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, /* edges= */ false));
 
         if (attr) {
             igraph_fixed_vectorlist_t vl;
@@ -807,16 +742,26 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * \brief Stochastic adjacency matrix of a graph.
  *
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
- * its adjacency matrix, normalized row-wise or column-wise, such that
- * the sum of each row (or column) is one.
+ * its adjacency matrix, normalized row-wise (or column-wise), such that
+ * the sum of each row (or column) is one. The row-wise normalized matrix
+ * is also called a \em right-stochastic and contains the transition
+ * probabilities of a random walk that follows edge directions in a directed
+ * graph. The column-wise normalized matrix is called \em left-stochastic and
+ * is related to random walks moving against edge directions.
+ *
+ * </para><para>
+ * When the out-degree (or in-degree) of a vertex is zero, the corresponding
+ * row (or column) of the row-wise (or column-wise) normalized stochastic
+ * matrix will be zero.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result is stored here.
  *   It will be resized as needed.
- * \param column_wise Whether to normalize column-wise.
+ * \param column_wise If \c false, row-wise normalization is used.
+ *                    If \c true, column-wise normalization is used.
  * \return Error code.
  *
- * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
+ * Time complexity: O(|V|^2), |V| is the number of vertices in the graph.
  *
  * \sa \ref igraph_get_stochastic_sparse(), the sparse version of this
  * function.
@@ -829,7 +774,7 @@ igraph_error_t igraph_get_stochastic(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t i, from, to;
+    igraph_integer_t from, to;
     igraph_vector_t sums;
     igraph_real_t sum;
 
@@ -839,25 +784,29 @@ igraph_error_t igraph_get_stochastic(
     IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_nodes);
 
     if (directed) {
+        /* Directed */
+
         IGRAPH_CHECK(igraph_strength(
             graph, &sums, igraph_vss_all(),
             column_wise ? IGRAPH_IN : IGRAPH_OUT,
-            /* loops = */ true, weights
+            IGRAPH_LOOPS, weights
         ));
 
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             sum = VECTOR(sums)[column_wise ? to : from];
             MATRIX(*res, from, to) += WEIGHT_OF(i) / sum;
         }
     } else {
+        /* Undirected */
+
         IGRAPH_CHECK(igraph_strength(
             graph, &sums, igraph_vss_all(), IGRAPH_ALL,
-            /* loops = */ true, weights
+            IGRAPH_LOOPS, weights
         ));
 
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             MATRIX(*res, from, to) += WEIGHT_OF(i) / VECTOR(sums)[column_wise ? to : from];
@@ -877,14 +826,14 @@ igraph_error_t igraph_get_stochastic(
  * \function igraph_get_stochastic_sparse
  * \brief The stochastic adjacency matrix of a graph.
  *
- * Stochastic matrix of a graph. The stochastic matrix of a graph is
- * its adjacency matrix, normalized row-wise or column-wise, such that
- * the sum of each row (or column) is one.
+ * Stochastic matrix of a graph in sparse format. See \ref igraph_get_stochastic()
+ * for the information on stochastic matrices.
  *
  * \param graph The input graph.
  * \param res Pointer to an \em initialized sparse matrix, the
  *    result is stored here. The matrix will be resized as needed.
- * \param column_wise Whether to normalize column-wise.
+ * \param column_wise If \c false, row-wise normalization is used.
+ *                    If \c true, column-wise normalization is used.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -900,43 +849,12 @@ igraph_error_t igraph_get_stochastic_sparse(
     IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, weights, IGRAPH_LOOPS_TWICE));
 
     if (column_wise) {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ false));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ true));
     } else {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ false));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ true));
     }
 
     return IGRAPH_SUCCESS;
-}
-
-
-/**
- * \function igraph_get_stochastic_sparsemat
- * \brief Stochastic adjacency matrix of a graph (deprecated).
- *
- * This function is deprecated in favour of \ref igraph_get_stochastic_sparse(),
- * but does not work in an identical way. This function takes an \em uninitialized
- * \c igraph_sparsemat_t while \ref igraph_get_stochastic_sparse() takes
- * an already initialized one.
- *
- * \param graph The input graph.
- * \param res Pointer to an \em uninitialized sparse matrix, the
- *    result is stored here. The matrix will be resized as needed.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
- * \return Error code.
- *
- * \deprecated-by igraph_get_stochastic_sparse 0.10.0
- */
-
-igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
-                                               igraph_sparsemat_t *res,
-                                               igraph_bool_t column_wise) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
-    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_stochastic_sparse(graph, res, column_wise, NULL);
 }
 
 
@@ -1005,7 +923,9 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
 
             VECTOR(degrees)[leaf] = 0; /* mark leaf v as deleted */
 
-            IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, leaf, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neighbors, leaf, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+            ));
 
             /* Find the unique remaining neighbor of the leaf */
             neighbor_count = igraph_vector_int_size(&neighbors);

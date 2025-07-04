@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2020  The igraph development team
@@ -30,7 +29,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef enum {
    IGRAPH_MERGE_MODE_UNION = 1,
@@ -42,6 +41,6 @@ igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

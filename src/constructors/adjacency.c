@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -26,9 +25,9 @@
 #include "igraph_interface.h"
 #include "igraph_sparsemat.h"
 
-static igraph_error_t igraph_i_adjacency_directed(
+static igraph_error_t igraph_i_adjacency_directed_or_plus(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
-    igraph_loops_t loops
+    igraph_adjacency_t mode, igraph_loops_t loops
 );
 static igraph_error_t igraph_i_adjacency_max(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
@@ -74,21 +73,25 @@ static igraph_error_t igraph_i_adjust_loop_edge_count(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_directed(
+static igraph_error_t igraph_i_adjacency_directed_or_plus(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
-    igraph_loops_t loops
+    igraph_adjacency_t mode, igraph_loops_t loops
 ) {
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
+     * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
+    if (mode == IGRAPH_ADJ_DIRECTED && loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t M = MATRIX(*adjmatrix, i, j);
             if (i == j) {
                 IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
             }
-            for (k = 0; k < M; k++) {
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -152,25 +155,35 @@ static igraph_error_t igraph_i_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_integer_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        /* do the loops first */
-        M = MATRIX(*adjmatrix, i, i);
-        if (M) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (k = 0; k < M; k++) {
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < j; i++) {
+            M = MATRIX(*adjmatrix, i, j);
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        /* then the rest */
-        for (j = i + 1; j < no_of_nodes; j++) {
-            M = MATRIX(*adjmatrix, i, j);
-            for (k = 0; k < M; k++) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+        /* do the loops as well */
+        M = MATRIX(*adjmatrix, j, j);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (igraph_integer_t k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
@@ -183,25 +196,36 @@ static igraph_error_t igraph_i_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_integer_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < i; j++) {
-            M = MATRIX(*adjmatrix, i, j);
-            for (k = 0; k < M; k++) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        /* do the loops first */
+        M = MATRIX(*adjmatrix, j, j);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (igraph_integer_t k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        /* do the loops as well */
-        M = MATRIX(*adjmatrix, i, i);
-        if (M) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (k = 0; k < M; k++) {
+        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+            M = MATRIX(*adjmatrix, i, j);
+            for (igraph_integer_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
     }
@@ -253,7 +277,9 @@ static igraph_error_t igraph_i_adjacency_min(
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
- * next row is for vertex 1, etc.
+ * next row is for vertex 1, etc. No guarantees are given about the ordering
+ * of edges.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The adjacency matrix. How it is interpreted
  *        depends on the \p mode argument.
@@ -262,35 +288,31 @@ static igraph_error_t igraph_i_adjacency_min(
  *        row i and column j in the adjacency matrix \p adjmatrix):
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
- *          The graph will be directed and
- *          an element gives the number of edges between two vertices.
+ *          The graph will be directed and an element gives the number of edges
+ *           between two vertices.
  *        \cli IGRAPH_ADJ_UNDIRECTED
- *          The graph will be undirected and
- *          an element gives the number of edges between two vertices.
- *          If the input matrix is not symmetric, an error is thrown.
+ *          The graph will be undirected and an element gives the number of
+ *          edges between two vertices. If the input matrix is not symmetric,
+ *          an error is thrown.
  *        \cli IGRAPH_ADJ_MAX
- *          An undirected graph will be created
- *          and the number of edges between vertices
- *          i and j is max(A(i,j), A(j,i)).
+ *          An undirected graph will be created and the number of edges between
+ *          vertices i and j is max(A(i,j), A(j,i)).
  *        \cli IGRAPH_ADJ_MIN
- *          An undirected graph will be created
- *          with min(A(i,j), A(j,i))
- *          edges between vertices i and j.
+ *          An undirected graph will be created with min(A(i,j), A(j,i)) edges
+ *          between vertices i and j.
  *        \cli IGRAPH_ADJ_PLUS
- *          An undirected graph will be created
- *          with A(i,j)+A(j,i) edges
+ *          An undirected graph will be created with A(i,j)+A(j,i) edges
  *          between vertices i and j.
  *        \cli IGRAPH_ADJ_UPPER
- *          An undirected graph will be created.
- *          Only the upper right triangle (including the diagonal) is
- *          used for the number of edges.
+ *          An undirected graph will be created. Only the upper right triangle
+ *          (including the diagonal) is used for the number of edges.
  *        \cli IGRAPH_ADJ_LOWER
- *          An undirected graph will be created.
- *          Only the lower left triangle (including the diagonal) is
- *          used for the number of edges.
+ *          An undirected graph will be created. Only the lower left triangle
+ *          (including the diagonal) is used for the number of edges.
  *       \endclist
  * \param loops Constant to specify how the diagonal of the matrix should be
- *        treated when creating loop edges.
+ *        treated when creating loop edges. Ignored for modes
+ *        \c IGRAPH_ADJ_DIRECTED, \c IGRAPH_ADJ_UPPER and \c IGRAPH_ADJ_LOWER.
  *        \clist
  *        \cli IGRAPH_NO_LOOPS
  *          Ignore the diagonal of the input matrix and do not create loops.
@@ -303,9 +325,9 @@ static igraph_error_t igraph_i_adjacency_min(
  *          will return an error code.
  *        \endclist
  * \return Error code,
- *         \c IGRAPH_NONSQUARE: non-square matrix.
- *         \c IGRAPH_EINVAL: Negative entry was found in adjacency matrix, or an
- *         odd number was found in the diagonal with \c IGRAPH_LOOPS_TWICE
+ *         \c IGRAPH_EINVAL: Non-square adjacency matrix, negative entry in
+ *         adjacency matrix, or an odd number was found in the diagonal with
+ *         \c IGRAPH_LOOPS_TWICE
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
@@ -322,7 +344,7 @@ igraph_error_t igraph_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_EINVAL);
     }
 
     if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
@@ -336,7 +358,8 @@ igraph_error_t igraph_adjacency(
     no_of_nodes = igraph_matrix_nrow(adjmatrix);
     switch (mode) {
     case IGRAPH_ADJ_DIRECTED:
-        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges, loops));
+    case IGRAPH_ADJ_PLUS:
+        IGRAPH_CHECK(igraph_i_adjacency_directed_or_plus(adjmatrix, &edges, mode, loops));
         break;
     case IGRAPH_ADJ_MAX:
         IGRAPH_CHECK(igraph_i_adjacency_max(adjmatrix, &edges, loops));
@@ -352,9 +375,6 @@ igraph_error_t igraph_adjacency(
         break;
     case IGRAPH_ADJ_MIN:
         IGRAPH_CHECK(igraph_i_adjacency_min(adjmatrix, &edges, loops));
-        break;
-    case IGRAPH_ADJ_PLUS:
-        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges, loops));
         break;
     default:
         IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
@@ -427,11 +447,16 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+    /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
+     * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
                 if (i == j) {
@@ -534,20 +559,35 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
      * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
      * returns false for these as NaN != NaN. */
-    igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
+    const igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
     for (igraph_integer_t i=0; i < n; i++) {
+        /* do the loops first */
+        if (loops) {
+            igraph_real_t M = MATRIX(*adjmatrix, i, i);
+            if (M != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
+            }
+        }
+
         for (igraph_integer_t j=0; j < i; j++) {
-            igraph_real_t a1 = MATRIX(*adjmatrix, i, j);
-            igraph_real_t a2 = MATRIX(*adjmatrix, j, i);
-            if (a1 != a2 && ! (isnan(a1) && isnan(a2))) {
+            igraph_real_t M1 = MATRIX(*adjmatrix, i, j);
+            igraph_real_t M2 = MATRIX(*adjmatrix, j, i);
+            if (IGRAPH_UNLIKELY(M1 != M2 && ! (isnan(M1) && isnan(M2)))) {
                 IGRAPH_ERROR(
                     "Adjacency matrix should be symmetric to produce an undirected graph.",
                     IGRAPH_EINVAL
-                    );
+                );
+            } else if (M1 != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
             }
         }
     }
-    return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -558,27 +598,36 @@ static igraph_error_t igraph_i_weighted_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        /* do the loops first */
-        if (loops) {
-            M = MATRIX(*adjmatrix, i, i);
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_integer_t i = 0; i < j; i++) {
+            igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
-                igraph_i_adjust_loop_edge_weight(&M, loops);
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
 
-        /* then the rest */
-        for (j = i + 1; j < no_of_nodes; j++) {
-            igraph_real_t M = MATRIX(*adjmatrix, i, j);
+        /* do the loops as well */
+        if (loops) {
+            M = MATRIX(*adjmatrix, j, j);
             if (M != 0.0) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
@@ -594,27 +643,37 @@ static igraph_error_t igraph_i_weighted_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < i; j++) {
-            M = MATRIX(*adjmatrix, i, j);
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        /* do the loops first */
+        if (loops) {
+            M = MATRIX(*adjmatrix, j, j);
             if (M != 0.0) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
 
-        /* do the loops as well */
-        if (loops) {
-            M = MATRIX(*adjmatrix, i, i);
+        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+            M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
-                igraph_i_adjust_loop_edge_weight(&M, loops);
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
         }
@@ -670,55 +729,43 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
  * corresponding to the first row/column will be vertex with id 0, the
- * next row is for vertex 1, etc.
+ * next row is for vertex 1, etc. No guarantees are given for the ordering
+ * of edges.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The weighted adjacency matrix. How it is interpreted
  *        depends on the \p mode argument. The common feature is that
  *        edges with zero weights are considered nonexistent (however,
  *        negative weights are permitted).
  * \param mode Constant to specify how the given matrix is interpreted
- *        as an adjacency matrix. Possible values
- *        (A(i,j)
- *        is the element in row i and column
- *        j in the adjacency matrix
- *        \p adjmatrix):
+ *        as an adjacency matrix. Possible values (A(i,j) is the element in row
+ *        i and column j in the adjacency matrix \p adjmatrix):
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
- *          the graph will be directed and
- *          an element gives the weight of the edge between two vertices.
+ *          The graph will be directed and an element specifies the weight of the
+ *           edge between two vertices.
  *        \cli IGRAPH_ADJ_UNDIRECTED
- *          this is the same as \c IGRAPH_ADJ_MAX,
- *          for convenience.
+ *          This is the same as \c IGRAPH_ADJ_MAX, for convenience.
  *        \cli IGRAPH_ADJ_MAX
- *          undirected graph will be created
- *          and the weight of the edge between vertices
- *          i and
- *          j is
- *          max(A(i,j), A(j,i)).
+ *          An undirected graph will be created and the weight of the edge between
+ *          vertices i and j is max(A(i,j), A(j,i)).
  *        \cli IGRAPH_ADJ_MIN
- *          undirected graph will be created
- *          with edge weight min(A(i,j), A(j,i))
- *          between vertices
- *          i and
- *          j.
+ *          An undirected graph will be created and the weight of the edge between
+ *          vertices i and j is min(A(i,j), A(j,i)).
  *        \cli IGRAPH_ADJ_PLUS
- *          undirected graph will be created
- *          with edge weight A(i,j)+A(j,i)
- *          between vertices
- *          i and
- *          j.
+ *          An undirected graph will be created and the weight of the edge between
+ *          vertices i and j is A(i,j)+A(j,i).
  *        \cli IGRAPH_ADJ_UPPER
- *          undirected graph will be created,
- *          only the upper right triangle (including the diagonal) is
- *          used for the edge weights.
+ *          An undirected graph will be created. Only the upper right triangle
+ *          (including the diagonal) is used for the edge weights.
  *        \cli IGRAPH_ADJ_LOWER
- *          undirected graph will be created,
- *          only the lower left triangle (including the diagonal) is
- *          used for the edge weights.
+ *          An undirected graph will be created. Only the lower left triangle
+ *          (including the diagonal) is used for the edge weights.
  *       \endclist
  * \param weights Pointer to an initialized vector, the weights will be stored here.
  * \param loops Constant to specify how the diagonal of the matrix should be
- *        treated when creating loop edges.
+ *        treated when creating loop edges. Ignored for modes
+ *        \c IGRAPH_ADJ_DIRECTED, \c IGRAPH_ADJ_UPPER and \c IGRAPH_ADJ_LOWER.
  *        \clist
  *        \cli IGRAPH_NO_LOOPS
  *          Ignore the diagonal of the input matrix and do not create loops.
@@ -730,7 +777,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *          incident on the corresponding vertex.
  *        \endclist
  * \return Error code,
- *         \c IGRAPH_NONSQUARE: non-square matrix.
+ *         \c IGRAPH_EINVAL: non-square matrix.
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
@@ -747,7 +794,7 @@ igraph_error_t igraph_weighted_adjacency(
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrices must be square.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -906,12 +953,18 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_sparse_adjacency_directed(
+static igraph_error_t igraph_i_sparse_adjacency_directed_or_plus(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
-    igraph_loops_t loops
+    igraph_adjacency_t mode, igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
+
+    /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
+     * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
+    if (mode == IGRAPH_ADJ_DIRECTED && loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
         igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
@@ -994,6 +1047,17 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
 ) {
     igraph_sparsemat_iterator_t it;
 
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
         igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
@@ -1019,6 +1083,17 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
     igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
+
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
@@ -1052,7 +1127,7 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
             IGRAPH_EINVAL
         );
     }
-    return igraph_i_sparse_adjacency_upper(adjmatrix, edges, loops);
+    return igraph_i_sparse_adjacency_max(adjmatrix, edges, loops);
 }
 
 /**
@@ -1080,7 +1155,7 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
                "form.", IGRAPH_EINVAL);
     }
     if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_EINVAL);
     }
 
     if (no_of_nodes != 0 && igraph_sparsemat_min(adjmatrix) < 0) {
@@ -1114,7 +1189,8 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
     /* Collect the edges */
     switch (mode) {
     case IGRAPH_ADJ_DIRECTED:
-        IGRAPH_CHECK(igraph_i_sparse_adjacency_directed(adjmatrix, &edges, loops));
+    case IGRAPH_ADJ_PLUS:
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_directed_or_plus(adjmatrix, &edges, mode, loops));
         break;
     case IGRAPH_ADJ_MAX:
         IGRAPH_CHECK(igraph_i_sparse_adjacency_max(adjmatrix, &edges, loops));
@@ -1130,9 +1206,6 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
         break;
     case IGRAPH_ADJ_MIN:
         IGRAPH_CHECK(igraph_i_sparse_adjacency_min(adjmatrix, &edges, loops));
-        break;
-    case IGRAPH_ADJ_PLUS:
-        IGRAPH_CHECK(igraph_i_sparse_adjacency_directed(adjmatrix, &edges, loops));
         break;
     default:
         IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
@@ -1255,6 +1328,17 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
 
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
+
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
         igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
         igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
@@ -1284,6 +1368,17 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
+
+    /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
+     * for loops to appear twice in the adjacency matrix when the lower triangle
+     * is empty; double-counting of loops in undirected graphs happens because
+     * the upper and the lower triangle are added on top of each other on the
+     * diagonal. See discussion in #2501:
+     *
+     * https://github.com/igraph/igraph/issues/2501#issuecomment-1949345675 */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
         igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
@@ -1320,7 +1415,7 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_undirected (
             IGRAPH_EINVAL
         );
     }
-    return igraph_i_sparse_weighted_adjacency_upper(adjmatrix, edges, weights, loops);
+    return igraph_i_sparse_weighted_adjacency_max(adjmatrix, edges, weights, loops);
 }
 
 
@@ -1331,6 +1426,12 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
+
+    /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
+     * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
+    if (loops == IGRAPH_LOOPS_TWICE) {
+        loops = IGRAPH_LOOPS_ONCE;
+    }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
         igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
@@ -1376,7 +1477,7 @@ igraph_error_t igraph_sparse_weighted_adjacency(
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed form.", IGRAPH_EINVAL);
     }
     if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);

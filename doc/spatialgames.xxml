@@ -13,11 +13,4 @@
 <!-- doxrox-include igraph_sir_destroy -->
 </section>
 
-<section id="spatial-games-deprecated"><title>Deprecated-functions</title>
-<!-- doxrox-include igraph_deterministic_optimal_imitation -->
-<!-- doxrox-include igraph_moran_process -->
-<!-- doxrox-include igraph_roulette_wheel_imitation -->
-<!-- doxrox-include igraph_stochastic_imitation -->
-</section>
-
 </chapter>

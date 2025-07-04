@@ -144,8 +144,7 @@ add_legacy_tests(
   igraph_empty
   igraph_get_eid
   igraph_is_same_graph
-  igraph_i_incident
-  igraph_i_neighbors
+  igraph_incident
   igraph_neighbors
 )
 
@@ -225,6 +224,7 @@ add_legacy_tests(
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
+  igraph_lcf
   igraph_kautz
   igraph_preference_game
   igraph_perfect
@@ -287,11 +287,15 @@ add_legacy_tests(
   components
   coreness
   efficiency
+# The eigen_stress test is disabled by default. The chance of failure on at
+# least some platforms, or with some BLAS/LAPACK/ARPACK versions is high
+# due to ARPACK's fickleness. The test is still useful for local testing.
+  # eigen_stress
   global_transitivity
   harmonic_centrality
   hub_and_authority
   igraph_count_adjacent_triangles
-  igraph_are_connected
+  igraph_are_adjacent
   igraph_average_path_length
   igraph_average_path_length_dijkstra
   igraph_betweenness
@@ -363,6 +367,7 @@ add_legacy_tests(
   igraph_spanner
   jdm
   knn
+  minimum_spanning_tree
   mycielskian
   paths
   random_spanning_tree
@@ -680,6 +685,7 @@ add_legacy_tests(
   igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_community_optimal_modularity
   igraph_community_voronoi
   igraph_compare_communities
   igraph_le_community_to_membership
@@ -792,6 +798,7 @@ add_legacy_tests(
   igraph_bipartite_projection
   igraph_biadjacency
   igraph_get_biadjacency
+  igraph_weighted_biadjacency
 )
 
 # centralization.at
@@ -985,6 +992,7 @@ add_benchmarks(
   connectivity
   erdos_renyi
   graphicality
+  igraph_adjacency
   igraph_average_path_length_unweighted
   igraph_betweenness
   igraph_betweenness_weighted
@@ -1016,6 +1024,7 @@ add_benchmarks(
   intersection
   lad
   modularity
+  spanning_tree
 )
 
 # dot product

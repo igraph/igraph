@@ -48,20 +48,17 @@ Test igraph_vector_init_real
 ( 1 2 3 4 5 6 7 8 9 10 )
 Test igraph_vector_init_int
 ( 1 2 3 4 5 6 7 8 9 10 )
-Test order2
-( 0 8 1 7 6 2 3 5 4 )
-Test order2 on empty vector
-( )
 Test filter_smaller, quite special....
 ( 4 4 5 6 7 8 )
 ( 1 2 3 4 4 4 4 5 6 7 8 )
 ( 0 1 2 3 4 4 4 4 5 6 7 8 )
-Test rank
+Test igraph_i_vector_int_rank and igraph_i_vector_int_order
 ( 0 1 2 6 5 2 1 0 )
 ( 1 3 5 7 6 4 2 0 )
+( 7 0 6 1 5 2 4 3 )
 Test pair order
 ( 0 1 2 3 )
 Test fill
 Test range
-Test igraph_vector_int_init_range, igraph_vector_int_order1
-( 0 1 2 3 4 5 6 7 8 9 )
+Test igraph_vector_int_init_range, igraph_i_vector_int_order
+( 9 8 7 6 5 4 3 2 1 0 )

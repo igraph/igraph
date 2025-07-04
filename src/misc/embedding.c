@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
@@ -28,8 +27,6 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_structural.h"
-
-#include "core/math.h"
 
 #include <limits.h>
 
@@ -940,7 +937,7 @@ static igraph_error_t igraph_i_lse_und(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
-    IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, weights));
 
     switch (type) {
     case IGRAPH_EMBEDDING_D_A:
@@ -993,8 +990,8 @@ static igraph_error_t igraph_i_lse_dir(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&deg_in, n);
     IGRAPH_VECTOR_INIT_FINALLY(&deg_out, n);
-    IGRAPH_CHECK(igraph_strength(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1, weights));
-    IGRAPH_CHECK(igraph_strength(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
 
     for (i = 0; i < n; i++) {
         VECTOR(deg_in)[i] = 1.0 / sqrt(VECTOR(deg_in)[i]);

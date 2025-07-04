@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -27,7 +26,6 @@
 #include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -44,20 +42,6 @@ static igraph_error_t igraph_i_connected_components_strong(
     const igraph_t *graph, igraph_vector_int_t *membership,
     igraph_vector_int_t *csize, igraph_integer_t *no
 );
-
-/**
- * \ingroup structural
- * \function igraph_clusters
- * \brief Calculates the (weakly or strongly) connected components in a graph (deprecated alias).
- *
- * \deprecated-by igraph_connected_components 0.10
- */
-
-igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
-                    igraph_vector_int_t *csize, igraph_integer_t *no,
-                    igraph_connectedness_t mode) {
-    return igraph_connected_components(graph, membership, csize, no, mode);
-}
 
 /**
  * \ingroup structural
@@ -174,7 +158,9 @@ static igraph_error_t igraph_i_connected_components_weak(
 
         while ( !igraph_dqueue_int_empty(&q) ) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, act_node, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
@@ -530,7 +516,9 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
 
         const igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, actnode, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {
@@ -569,34 +557,6 @@ exit:
     }
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_decompose_destroy
- * \brief Frees the contents of a pointer vector holding graphs.
- *
- * This function destroys and frees all <type>igraph_t</type>
- * objects held in \p complist. However, it does not destroy
- * \p complist itself. Use \ref igraph_vector_ptr_destroy() to destroy
- * \p complist.
- *
- * \param complist The list of graphs to destroy.
- *
- * Time complexity: O(n), n is the number of items.
- *
- * \deprecated 0.10.0
- */
-
-void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
-    igraph_integer_t i, n;
-
-    n = igraph_vector_ptr_size(complist);
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*complist)[i] != 0) {
-            igraph_destroy(VECTOR(*complist)[i]);
-            IGRAPH_FREE(VECTOR(*complist)[i]);
-        }
-    }
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
@@ -685,6 +645,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
+    igraph_vector_int_fill(&vids_old2new, -1);
 
     /* vids_old2new would have been created internally in igraph_induced_subgraph(),
        but it is slow if the graph is large and consists of many small components,
@@ -710,7 +671,9 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         while (!igraph_dqueue_int_empty(&q) ) {
             /* pop from the queue of this component */
             igraph_integer_t actvert = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvert, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, actvert, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             /* iterate over the neighbors */
             for (i = 0; i < nei_count; i++) {
@@ -735,7 +698,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_induced_subgraph_map(
             graph, &newg, igraph_vss_vector(&verts),
             IGRAPH_SUBGRAPH_AUTO, &vids_old2new,
-            /* invmap = */ 0, /* map_is_prepared = */ 1
+            /* invmap = */ NULL, /* map_is_prepared = */ true
         ));
         IGRAPH_FINALLY(igraph_destroy, &newg);
         IGRAPH_CHECK(igraph_graph_list_push_back(components, &newg));
@@ -792,6 +755,8 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     /* The result */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
+    igraph_vector_int_fill(&vids_old2new, -1);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&next_nei, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out, 0);
@@ -1265,8 +1230,6 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * \function igraph_is_biconnected
  * \brief Checks whether a graph is biconnected.
  *
- * \experimental
- *
  * A graph is biconnected if the removal of any single vertex (and
  * its incident edges) does not disconnect it.
  *
@@ -1622,7 +1585,7 @@ igraph_error_t igraph_subcomponent(
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, mode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
         vsize = igraph_vector_int_size(&tmp);
         for (i = 0; i < vsize; i++) {
             igraph_integer_t neighbor = VECTOR(tmp)[i];

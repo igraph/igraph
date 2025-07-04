@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -381,7 +379,7 @@ igraph_error_t igraph_community_leading_eigenvector(
 
     if (start && membership &&
         igraph_vector_int_size(membership) != no_of_nodes) {
-        IGRAPH_ERROR("Supplied memberhsip vector length does not match number of vertices.",
+        IGRAPH_ERROR("Supplied membership vector length does not match number of vertices.",
                      IGRAPH_EINVAL);
     }
 
@@ -415,7 +413,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     if (!start) {
         /* Calculate the weakly connected components in the graph and use them as
          * an initial split */
-        IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, 0, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, NULL, IGRAPH_WEAK));
         communities = igraph_vector_int_size(&idx);
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history,
@@ -547,21 +545,27 @@ igraph_error_t igraph_community_leading_eigenvector(
         }
         RNG_END();
         igraph_vector_view(&start_vec, storage.resid, options->n);
-        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
+        igraph_vector_shuffle(&start_vec);
 
         {
             igraph_error_t retval;
             igraph_error_handler_t *errh =
                     igraph_set_error_handler(igraph_i_error_handler_none);
-            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
+            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ NULL, /*vectors=*/ NULL);
             igraph_set_error_handler(errh);
-            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
-                IGRAPH_ERROR("ARPACK call failed", retval);
+            if (retval == IGRAPH_EARPACK) {
+                /* TODO(ntamas): get last ARPACK error code. Some errors are OK. */
+                igraph_arpack_error_t arpack_error = igraph_arpack_get_last_error();
+                if (arpack_error != IGRAPH_ARPACK_MAXIT && arpack_error != IGRAPH_ARPACK_NOSHIFT) {
+                    IGRAPH_ERROR(igraph_arpack_error_to_string(arpack_error), IGRAPH_EARPACK);
+                }
+            } else if (retval != IGRAPH_SUCCESS) {
+                IGRAPH_ERROR("Leading eigenvector calculation failed.", retval);
             }
         }
 
         if (options->nconv < 1) {
-            IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
+            IGRAPH_ERROR(igraph_arpack_error_to_string(IGRAPH_ARPACK_FAILED), IGRAPH_EARPACK);
         }
 
         /* Ok, we have the leading eigenvector of the modularity matrix */
@@ -817,7 +821,7 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merg
         }
     }
 
-    IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, &fake_memb, 0));
+    IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, &fake_memb, NULL));
 
     /* Ok, now we have the membership of the initial components,
        rewrite the original membership vector. */

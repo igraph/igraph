@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -445,7 +443,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         for (igraph_integer_t i = 0; i < no_of_nodes; i++, j--) {
             VECTOR(fitness_in)[i] = pow(j, alpha_in);
         }
-        IGRAPH_CHECK(igraph_vector_shuffle(&fitness_in));
+        igraph_vector_shuffle(&fitness_in);
 
         IGRAPH_CHECK(igraph_static_fitness_game(graph, no_of_edges,
                                                 &fitness_out, &fitness_in, loops, multiple));

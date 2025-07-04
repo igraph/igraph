@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
@@ -23,7 +22,7 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_operators.h"
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "core/interruption.h"
 
@@ -156,7 +155,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
         IGRAPH_FINALLY(igraph_destroy, &cycle);
 
         if (cycle_len > girth) {
-            IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
+            IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1));
             if (iso) {
                 *perfect = false;
                 goto clean2;
@@ -164,7 +163,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
         }
 
         if (cycle_len > comp_girth) {
-            IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
+            IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1));
             if (iso) {
                 *perfect = false;
                 goto clean2;

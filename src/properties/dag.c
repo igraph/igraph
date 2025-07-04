@@ -1,32 +1,24 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
-   IGraph library.
-   Copyright (C) 2005-2021 The igraph development team
+  IGraph library.
+  Copyright (C) 2005-2024 The igraph development team <igraph@igraph.org>
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation; either version 2 of the License, or (at your option) any later
+  version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+  You should have received a copy of the GNU General Public License along with
+  this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_topology.h"
+#include "igraph_cycles.h"
 
-#include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_stack.h"
 
 /**
  * \function igraph_topological_sorting
@@ -87,7 +79,7 @@ igraph_error_t igraph_topological_sorting(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&sources, 0));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &sources);
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), deg_mode, 0));
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), deg_mode, IGRAPH_NO_LOOPS));
 
     igraph_vector_int_clear(res);
 
@@ -106,7 +98,7 @@ igraph_error_t igraph_topological_sorting(
         /* Exclude the node from further source searches */
         VECTOR(degrees)[node] = -1;
         /* Get the neighbors and decrease their degrees by one */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, mode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
         j = igraph_vector_int_size(&neis);
         for (i = 0; i < j; i++) {
             VECTOR(degrees)[ VECTOR(neis)[i] ]--;
@@ -173,7 +165,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&sources, 0);
 
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_IN, /* loops */ true));
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
 
     igraph_integer_t vertices_left = no_of_nodes;
 
@@ -191,7 +183,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         VECTOR(degrees)[node] = -1;
         vertices_left--;
         /* Get the neighbors and decrease their degrees by one */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         igraph_integer_t n = igraph_vector_int_size(&neis);
         for (igraph_integer_t i = 0; i < n; i++) {
             igraph_integer_t nei = VECTOR(neis)[i];
@@ -217,99 +209,6 @@ finalize:
     IGRAPH_FINALLY_CLEAN(3);
 
     igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_DAG, *res);
-
-    return IGRAPH_SUCCESS;
-}
-
-/* Create the transitive closure of a tree graph.
-   This is fairly simple, we just collect all ancestors of a vertex
-   using a depth-first search.
- */
-igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *closure) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_int_t deg;
-    igraph_vector_int_t new_edges;
-    igraph_vector_int_t ancestors;
-    igraph_integer_t root;
-    igraph_vector_int_t neighbors;
-    igraph_stack_int_t path;
-    igraph_vector_bool_t done;
-
-    if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Tree transitive closure of a directed graph",
-                     IGRAPH_EINVAL);
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&new_edges, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&ancestors, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
-    IGRAPH_CHECK(igraph_stack_int_init(&path, 0));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
-    IGRAPH_CHECK(igraph_vector_bool_init(&done, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &done);
-
-    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(),
-                               IGRAPH_OUT, IGRAPH_LOOPS));
-
-#define STAR (-1)
-
-    for (root = 0; root < no_of_nodes; root++) {
-        if (VECTOR(deg)[root] != 0) {
-            continue;
-        }
-        IGRAPH_CHECK(igraph_stack_int_push(&path, root));
-
-        while (!igraph_stack_int_empty(&path)) {
-            igraph_integer_t node = igraph_stack_int_top(&path);
-            if (node == STAR) {
-                /* Leaving a node */
-                igraph_integer_t j, n;
-                igraph_stack_int_pop(&path);
-                node = igraph_stack_int_pop(&path);
-                if (!VECTOR(done)[node]) {
-                    igraph_vector_int_pop_back(&ancestors);
-                    VECTOR(done)[node] = true;
-                }
-                n = igraph_vector_int_size(&ancestors);
-                for (j = 0; j < n; j++) {
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, node));
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges,
-                                                         VECTOR(ancestors)[j]));
-                }
-            } else {
-                /* Getting into a node */
-                igraph_integer_t n, j;
-                if (!VECTOR(done)[node]) {
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&ancestors, node));
-                }
-                IGRAPH_CHECK(igraph_neighbors(graph, &neighbors,
-                                              node, IGRAPH_IN));
-                n = igraph_vector_int_size(&neighbors);
-                IGRAPH_CHECK(igraph_stack_int_push(&path, STAR));
-                for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neighbors)[j];
-                    IGRAPH_CHECK(igraph_stack_int_push(&path, nei));
-                }
-            }
-        }
-    }
-
-#undef STAR
-
-    igraph_vector_bool_destroy(&done);
-    igraph_stack_int_destroy(&path);
-    igraph_vector_int_destroy(&neighbors);
-    igraph_vector_int_destroy(&ancestors);
-    igraph_vector_int_destroy(&deg);
-    IGRAPH_FINALLY_CLEAN(5);
-
-    IGRAPH_CHECK(igraph_create(closure, &new_edges, no_of_nodes,
-                               IGRAPH_DIRECTED));
-
-    igraph_vector_int_destroy(&new_edges);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

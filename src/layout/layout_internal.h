@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2021 The igraph development team
@@ -31,7 +30,7 @@
 
 #include "layout/merge_grid.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                                                     igraph_integer_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
@@ -71,6 +70,6 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         const igraph_vector_t *miny, const igraph_vector_t *maxy,
         const igraph_vector_t *minz, const igraph_vector_t *maxz);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

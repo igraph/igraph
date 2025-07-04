@@ -18,7 +18,7 @@ edges: {
 0 0
 }
 
-1x1 matrix, loops twice:
+1x1 matrix, loops twice (treated as loops once):
 directed: true
 vcount: 1
 edges: {
@@ -75,12 +75,14 @@ edges: {
 2 2
 }
 
-3x3 matrix, IGRAPH_ADJ_DIRECTED, loops twice:
+3x3 matrix, IGRAPH_ADJ_DIRECTED, loops twice (treated as loops once):
 directed: true
 vcount: 3
 edges: {
 0 0
 0 0
+0 0
+0 0
 0 1
 0 1
 1 0
@@ -95,6 +97,9 @@ edges: {
 2 1
 2 1
 2 1
+2 2
+2 2
+2 2
 2 2
 2 2
 2 2
@@ -368,18 +373,23 @@ edges: {
 2 2
 }
 
-3x3 matrix, IGRAPH_ADJ_UPPER, loops twice:
+3x3 matrix, IGRAPH_ADJ_UPPER, loops twice (treated as loops once):
 directed: false
 vcount: 3
 edges: {
 0 0
 0 0
+0 0
+0 0
 0 1
 0 1
 1 2
 1 2
 1 2
 1 2
+2 2
+2 2
+2 2
 2 2
 2 2
 2 2
@@ -423,12 +433,14 @@ edges: {
 2 2
 }
 
-3x3 matrix, IGRAPH_ADJ_LOWER, loops twice:
+3x3 matrix, IGRAPH_ADJ_LOWER, loops twice (treated as loops once):
 directed: false
 vcount: 3
 edges: {
 0 0
 0 0
+0 0
+0 0
 0 1
 0 1
 0 1
@@ -437,6 +449,9 @@ edges: {
 1 2
 1 2
 1 2
+2 2
+2 2
+2 2
 2 2
 2 2
 2 2

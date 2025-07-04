@@ -95,7 +95,7 @@ input :    /* empty */
 ;
 
 edge :   endpoints NEWLINE {
-           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 0.0));
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 1.0));
        }
        | endpoints weight NEWLINE {
            IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, $2));

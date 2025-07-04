@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ARPACK_H
@@ -30,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \section about_arpack ARPACK interface in igraph
@@ -291,6 +286,67 @@ typedef struct igraph_arpack_storage_t {
     igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
+/**
+ * \typedef igraph_arpack_error_t
+ * \brief Error codes from ARPACK.
+ *
+ * These error codes represent error conditions returned from ARPACK.
+ * They are used internally to format error messages when igraph itself
+ * returns an \c IGRAPH_EARPACK error code from an ARPACK-related function.
+ *
+ * \enumval IGRAPH_ARPACK_NO_ERROR No error was encountered in ARPACK.
+ * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed (not used any more).
+ * \enumval IGRAPH_ARPACK_NPOS N must be positive.
+ * \enumval IGRAPH_ARPACK_NEVNPOS NEV must be positive.
+ * \enumval IGRAPH_ARPACK_NCVSMALL NCV must be bigger.
+ * \enumval IGRAPH_ARPACK_NONPOSI Maximum number of iterations should be positive.
+ * \enumval IGRAPH_ARPACK_WHICHINV Invalid WHICH parameter.
+ * \enumval IGRAPH_ARPACK_BMATINV Invalid BMAT parameter.
+ * \enumval IGRAPH_ARPACK_WORKLSMALL WORKL is too small.
+ * \enumval IGRAPH_ARPACK_TRIDERR LAPACK error in tridiagonal eigenvalue calculation.
+ * \enumval IGRAPH_ARPACK_ZEROSTART Starting vector is zero.
+ * \enumval IGRAPH_ARPACK_MODEINV MODE is invalid.
+ * \enumval IGRAPH_ARPACK_MODEBMAT MODE and BMAT are not compatible.
+ * \enumval IGRAPH_ARPACK_ISHIFT ISHIFT must be 0 or 1.
+ * \enumval IGRAPH_ARPACK_NEVBE NEV and WHICH='BE' are incompatible.
+ * \enumval IGRAPH_ARPACK_NOFACT Could not build an Arnoldi factorization.
+ * \enumval IGRAPH_ARPACK_FAILED No eigenvalues to sufficient accuracy.
+ * \enumval IGRAPH_ARPACK_HOWMNY HOWMNY is invalid.
+ * \enumval IGRAPH_ARPACK_HOWMNYS HOWMNY='S' is not implemented.
+ * \enumval IGRAPH_ARPACK_EVDIFF Different number of converged Ritz values.
+ * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
+ * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
+ * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
+ */
+typedef enum {
+    IGRAPH_ARPACK_NO_ERROR   = 0,
+    IGRAPH_ARPACK_PROD       = 15,
+    IGRAPH_ARPACK_NPOS       = 16,
+    IGRAPH_ARPACK_NEVNPOS    = 17,
+    IGRAPH_ARPACK_NCVSMALL   = 18,
+    IGRAPH_ARPACK_NONPOSI    = 19,
+    IGRAPH_ARPACK_WHICHINV   = 20,
+    IGRAPH_ARPACK_BMATINV    = 21,
+    IGRAPH_ARPACK_WORKLSMALL = 22,
+    IGRAPH_ARPACK_TRIDERR    = 23,
+    IGRAPH_ARPACK_ZEROSTART  = 24,
+    IGRAPH_ARPACK_MODEINV    = 25,
+    IGRAPH_ARPACK_MODEBMAT   = 26,
+    IGRAPH_ARPACK_ISHIFT     = 27,
+    IGRAPH_ARPACK_NEVBE      = 28,
+    IGRAPH_ARPACK_NOFACT     = 29,
+    IGRAPH_ARPACK_FAILED     = 30,
+    IGRAPH_ARPACK_HOWMNY     = 31,
+    IGRAPH_ARPACK_HOWMNYS    = 32,
+    IGRAPH_ARPACK_EVDIFF     = 33,
+    IGRAPH_ARPACK_SHUR       = 34,
+    IGRAPH_ARPACK_LAPACK     = 35,
+    IGRAPH_ARPACK_UNKNOWN    = 36,
+    IGRAPH_ARPACK_MAXIT      = 39,
+    IGRAPH_ARPACK_NOSHIFT    = 40,
+    IGRAPH_ARPACK_REORDER    = 41,
+} igraph_arpack_error_t;
+
 IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
 IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default(void);
 
@@ -331,6 +387,9 @@ IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun
 IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
                                                igraph_integer_t nev);
 
-__END_DECLS
+IGRAPH_EXPORT const char* igraph_arpack_error_to_string(igraph_arpack_error_t error);
+IGRAPH_EXPORT igraph_arpack_error_t igraph_arpack_get_last_error(void);
+
+IGRAPH_END_C_DECLS
 
 #endif

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -40,9 +38,9 @@
 #include <setjmp.h>
 #include <stdbool.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
-typedef struct igraph_i_glpk_error_info_s {
+typedef struct {
     jmp_buf jmp;            /* used for bailing when there is a GLPK error */
     bool    is_interrupted; /* Boolean; true if there was an interruption */
     bool    is_error;       /* Boolean; true if the error hook was called */
@@ -131,18 +129,18 @@ void igraph_i_glp_delete_prob(glp_prob *p);
                         igraph_i_glpk_error_info.msg_ptr--; \
                     } \
                     *igraph_i_glpk_error_info.msg_ptr = '\0'; \
-                    igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                    igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FAILURE); \
                 } else if (igraph_i_glpk_error_info.is_error) { \
                     /* This branch can never be reached unless compiled with USING_R and using */ \
                     /* the hack to support pre-4.57 GLPK versions. See comments in glpk_support.c. */ \
-                    igraph_error("Error while running GLPK solver.", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                    igraph_error("Error while running GLPK solver.", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FAILURE); \
                 } \
-                return IGRAPH_EGLP; \
+                return IGRAPH_FAILURE; \
             } \
         } \
     } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* HAVE_GLPK */
 

@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Flexible set                                       */
@@ -58,6 +58,6 @@ IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set,
                                                        igraph_integer_t *state,
                                                        igraph_integer_t *element);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

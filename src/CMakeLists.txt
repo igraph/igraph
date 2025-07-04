@@ -39,7 +39,6 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
-  core/array.c
   core/bitset.c
   core/bitset_list.c
   core/buckets.c
@@ -84,6 +83,7 @@ add_library(
   random/rng_mt19937.c
   random/rng_pcg32.c
   random/rng_pcg64.c
+  random/sampling.c
 
   graph/adjlist.c
   graph/attributes.c
@@ -112,7 +112,6 @@ add_library(
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c
-
 
   games/barabasi.c
   games/callaway_traits.c
@@ -301,7 +300,6 @@ add_library(
   misc/feedback_arc_set.c
   misc/graphicality.c
   misc/matching.c
-  misc/microscopic_update.c
   misc/mixing.c
   misc/motifs.c
   misc/order_cycle.cpp
@@ -317,7 +315,6 @@ add_library(
   internal/qsort_r.c
   internal/qsort.c
   internal/utils.c
-  internal/zeroin.c
 
   version.c
 

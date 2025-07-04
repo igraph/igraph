@@ -24,7 +24,7 @@
 void print_and_destroy_weighted(igraph_t *graph, igraph_neimode_t mode, igraph_vector_t *weights) {
     igraph_vector_t ecc;
     igraph_vector_init(&ecc, 0);
-    igraph_eccentricity_dijkstra(graph, weights, &ecc, igraph_vss_all(), mode);
+    igraph_eccentricity(graph, weights, &ecc, igraph_vss_all(), mode);
     print_vector(&ecc);
     igraph_destroy(graph);
     igraph_vector_destroy(&ecc);
@@ -96,17 +96,17 @@ int main(void) {
     printf("\nCheck wrong number of weights error.\n");
     igraph_vector_init(&weights, 1);
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_eccentricity(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
 
     printf("Check NaN weight error.\n");
     igraph_destroy(&g);
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
     VECTOR(weights)[0] = IGRAPH_NAN;
-    CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_eccentricity(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
 
     printf("Check negative weight error.\n");
     VECTOR(weights)[0] = -1;
-    CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_eccentricity(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
 
     igraph_vector_destroy(&ecc);
     igraph_vector_destroy(&weights);

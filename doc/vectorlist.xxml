@@ -14,6 +14,7 @@
 <section id="vector-list-constructors-and-destructors">
 <!-- doxrox-include igraph_vector_list_constructors_and_destructors -->
 <!-- doxrox-include igraph_vector_list_init -->
+<!-- doxrox-include igraph_vector_list_init_copy -->
 <!-- doxrox-include igraph_vector_list_destroy -->
 </section>
 

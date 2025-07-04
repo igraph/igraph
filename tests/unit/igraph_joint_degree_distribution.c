@@ -121,8 +121,8 @@ void check_assort_i(const igraph_t *g, igraph_neimode_t from_mode, igraph_neimod
     igraph_vector_init(&a, 0);
     igraph_vector_init(&b, 0);
 
-    igraph_strength(g, &dfrom, igraph_vss_all(), from_mode, true, NULL);
-    igraph_strength(g, &dto, igraph_vss_all(), to_mode, true, NULL);
+    igraph_strength(g, &dfrom, igraph_vss_all(), from_mode, IGRAPH_LOOPS, NULL);
+    igraph_strength(g, &dto, igraph_vss_all(), to_mode, IGRAPH_LOOPS, NULL);
 
     igraph_matrix_init(&p, 0, 0);
     igraph_joint_degree_distribution(g, NULL, &p, from_mode, to_mode, true, /*normalized*/ true, -1, -1);
@@ -252,7 +252,7 @@ int main(void) {
     check_knnk(&dg, NULL);
     igraph_destroy(&dg);
 
-    igraph_erdos_renyi_game_gnm(&dg, 10, 30, IGRAPH_DIRECTED, /*loops*/ true);
+    igraph_erdos_renyi_game_gnm(&dg, 10, 30, IGRAPH_DIRECTED, /*loops*/ true, /* multiple */ false);
     check_jdm(&dg, NULL);
     check_assort(&dg);
     check_knnk(&dg, NULL);
@@ -286,7 +286,7 @@ int main(void) {
     check_knnk(&ug, NULL);
     igraph_destroy(&ug);
 
-    igraph_erdos_renyi_game_gnm(&ug, 10, 30, IGRAPH_UNDIRECTED, /*loops*/ true);
+    igraph_erdos_renyi_game_gnm(&ug, 10, 30, IGRAPH_UNDIRECTED, /*loops*/ true, /* multiple */ false);
     check_jdm(&ug, NULL);
     check_assort(&ug);
     check_knnk(&ug, NULL);

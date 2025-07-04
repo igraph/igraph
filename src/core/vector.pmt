@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -679,36 +678,6 @@ BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector) *v, igraph_inte
 
 /**
  * \ingroup vector
- * \function igraph_vector_e
- * \brief Access an element of a vector (deprecated alias).
- *
- * \deprecated-by igraph_vector_get 0.10.0
- */
-
-BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector) *v, igraph_integer_t pos) {
-    return FUNCTION(igraph_vector, get)(v, pos);
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_e_ptr
- * \brief Get the address of an element of a vector.
- *
- * \param v The \type igraph_vector_t object.
- * \param pos The position of the element, the position of the first
- *   element is zero.
- * \return Pointer to the desired element.
- * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
- *
- * Time complexity: O(1).
- */
-
-BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector) *v, igraph_integer_t pos) {
-    return FUNCTION(igraph_vector, get_ptr)(v, pos);
-}
-
-/**
- * \ingroup vector
  * \function igraph_vector_set
  * \brief Assignment to an element of a vector.
  *
@@ -1073,17 +1042,6 @@ igraph_error_t FUNCTION(igraph_vector, sort_ind)(
     }
     IGRAPH_FREE(vind);
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_vector_qsort_ind
- * \brief Returns a permutation of indices that sorts a vector (deprecated alias).
- *
- * \deprecated-by igraph_vector_sort_ind 0.10.14
- */
-igraph_error_t FUNCTION(igraph_vector, qsort_ind)(const TYPE(igraph_vector) *v,
-                                                 igraph_vector_int_t *inds, igraph_order_t order) {
-    return FUNCTION(igraph_vector, sort_ind)(v, inds, order);
 }
 
 /**
@@ -1569,19 +1527,6 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(
 
 /**
  * \ingroup vector
- * \function igraph_vector_copy
- * \brief Initializes a vector from another vector object (deprecated alias).
- *
- * \deprecated-by igraph_vector_init_copy 0.10
- */
-
-igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                  const TYPE(igraph_vector) *from) {
-    return FUNCTION(igraph_vector, init_copy)(to, from);
-}
-
-/**
- * \ingroup vector
  * \function igraph_vector_sum
  * \brief Calculates the sum of the elements in the vector.
  *
@@ -1694,38 +1639,6 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 }
 
 #ifndef NOTORDERED
-
-/**
- * \ingroup vector
- * \function igraph_vector_init_seq
- * \brief Initializes a vector with a sequence, inclusive endpoints (deprecated).
- *
- * </para><para>
- * The vector will contain the numbers \p from, \p from+1, ..., \p to. Note that
- * both endpoints are \em inclusive, contrary to typical usage of ranges in C.
- *
- * \deprecated-by igraph_vector_init_range 0.10.0
- *
- * \param v Pointer to an uninitialized vector object.
- * \param from The lower limit in the sequence (inclusive).
- * \param to The upper limit in the sequence (inclusive).
- * \return Error code:
- *         \c IGRAPH_ENOMEM: out of memory.
- *
- * Time complexity: O(n), the number
- * of elements in the vector.
- */
-
-igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v, BASE from, BASE to) {
-    BASE *p;
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
-
-    for (p = v->stor_begin; p < v->end; p++) {
-        *p = from++;
-    }
-
-    return IGRAPH_SUCCESS;
-}
 
 /**
  * \ingroup vector
@@ -1871,14 +1784,6 @@ igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
            sizeof(BASE) * (end - begin));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \deprecated-by igraph_vector_move_interval 0.10.0
- */
-igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
-        igraph_integer_t begin, igraph_integer_t end, igraph_integer_t to) {
-    return FUNCTION(igraph_vector, move_interval)(v, begin, end, to);
 }
 
 #ifndef NOTORDERED
@@ -2189,7 +2094,7 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
  *   vector if it is present. If \p v does not
  *   contain \p what then
  *   \p pos is set to the position to which it
- *   should be inserted (to keep the the vector sorted of course).
+ *   should be inserted (to keep the vector sorted of course).
  * \return True if \p what is found in the vector, false otherwise.
  *
  * Time complexity: O(log(n)),
@@ -2223,7 +2128,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  * \param pos Pointer to an \type igraph_integer_t. This is set to the position of an
  *        instance of \p what in the slice of the vector if it is present. If \p
  *        v does not contain \p what then \p pos is set to the position to which
- *        it should be inserted (to keep the the vector sorted).
+ *        it should be inserted (to keep the vector sorted).
  * \param start The start position of the slice to search (inclusive).
  * \param end The end position of the slice to search (exclusive).
  * \return True if \p what is found in the vector, false otherwise.
@@ -2309,18 +2214,6 @@ igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector)
     }
 
     return false;
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_binsearch2
- * \brief Binary search, without returning the index.
- *
- * \deprecated-by igraph_vector_contains_sorted 0.10.14
- */
-igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
-                                                  BASE what) {
-    return FUNCTION(igraph_vector, contains_sorted)(v, what);
 }
 
 #endif
@@ -2487,17 +2380,28 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
  */
 
 igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
-                                    const TYPE(igraph_vector) *from) {
-    igraph_integer_t tosize, fromsize;
-    igraph_integer_t newsize;
+                                               const TYPE(igraph_vector) *from) {
+    IGRAPH_ASSERT(to != NULL);
+    IGRAPH_ASSERT(to->stor_begin != NULL);
 
-    tosize = FUNCTION(igraph_vector, size)(to);
-    fromsize = FUNCTION(igraph_vector, size)(from);
-    IGRAPH_SAFE_ADD(tosize, fromsize, &newsize);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, newsize));
-    memcpy(to->stor_begin + tosize, from->stor_begin,
-           sizeof(BASE) * fromsize);
-    to->end = to->stor_begin + tosize + fromsize;
+    const igraph_integer_t to_size = FUNCTION(igraph_vector, size)(to);
+    const igraph_integer_t from_size = FUNCTION(igraph_vector, size)(from);
+    const igraph_integer_t to_capacity = FUNCTION(igraph_vector, capacity)(to);
+    igraph_integer_t new_to_size;
+
+    IGRAPH_SAFE_ADD(to_size, from_size, &new_to_size);
+
+    if (to_capacity < new_to_size) {
+        igraph_integer_t new_to_capacity = to_capacity < IGRAPH_INTEGER_MAX/2 ? to_capacity * 2 : IGRAPH_INTEGER_MAX;
+        if (new_to_capacity < new_to_size) {
+            new_to_capacity = new_to_size;
+        }
+        IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(to, new_to_capacity));
+    }
+
+    memcpy(to->stor_begin + to_size, from->stor_begin,
+           sizeof(BASE) * from_size);
+    to->end = to->stor_begin + new_to_size;
 
     return IGRAPH_SUCCESS;
 }
@@ -2586,20 +2490,17 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
  *
  * \param v1 The first vector.
  * \param v2 The second vector.
- * \return Error code.
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
+void FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
 
     TYPE(igraph_vector) tmp;
 
     tmp = *v1;
     *v1 = *v2;
     *v2 = tmp;
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2607,22 +2508,19 @@ igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igrap
  * \brief Swap two elements in a vector.
  *
  * Note that currently no range checking is performed.
+ *
  * \param v The input vector.
  * \param i Index of the first element.
- * \param j Index of the second element (may be the same as the
- * first one).
- * \return Error code, currently always \c IGRAPH_SUCCESS.
+ * \param j Index of the second element (may be the same as the first one).
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
-        igraph_integer_t i, igraph_integer_t j) {
+void FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
+                                    igraph_integer_t i, igraph_integer_t j) {
     BASE tmp = VECTOR(*v)[i];
     VECTOR(*v)[i] = VECTOR(*v)[j];
     VECTOR(*v)[j] = tmp;
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2655,16 +2553,14 @@ void FUNCTION(igraph_vector, reverse_section)(TYPE(igraph_vector) *v, igraph_int
  * first, etc.
  *
  * \param v The input vector.
- * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * \sa igraph_vector_reverse_section() to reverse only a section of a vector.
  *
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
+void FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
     FUNCTION(igraph_vector, reverse_section)(v, 0, FUNCTION(igraph_vector, size)(v));
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2705,7 +2601,6 @@ void FUNCTION(igraph_vector, rotate_left)(TYPE(igraph_vector) *v, igraph_integer
  * these generators is less than the number of possible permutations
  * of the vector if the vector is long enough.
  * \param v The vector object.
- * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * Time complexity: O(n),
  * n is the number of elements in the
@@ -2726,7 +2621,7 @@ void FUNCTION(igraph_vector, rotate_left)(TYPE(igraph_vector) *v, igraph_integer
  * \example examples/simple/igraph_fisher_yates_shuffle.c
  */
 
-igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
+void FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
     igraph_integer_t n = FUNCTION(igraph_vector, size)(v);
     igraph_integer_t k;
     BASE dummy;
@@ -2740,8 +2635,6 @@ igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
         VECTOR(*v)[k] = dummy;
     }
     RNG_END();
-
-    return IGRAPH_SUCCESS;
 }
 
 /**

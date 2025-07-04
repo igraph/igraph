@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -41,20 +40,6 @@ igraph_complex_t igraph_complex_polar(igraph_real_t r, igraph_real_t theta) {
     IGRAPH_REAL(res) = r * cos(theta);
     IGRAPH_IMAG(res) = r * sin(theta);
     return res;
-}
-
-/**
- * Deprecated in favour of igraph_complex_almost_equals(), which uses relative
- * tolerances. Will be removed in 0.11.
- */
-igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
-                                    igraph_complex_t z2,
-                                    igraph_real_t tol) {
-    if (fabs(IGRAPH_REAL(z1) - IGRAPH_REAL(z2)) > tol ||
-        fabs(IGRAPH_IMAG(z1) - IGRAPH_IMAG(z2)) > tol) {
-        return false;
-    }
-    return true;
 }
 
 igraph_real_t igraph_complex_arg(igraph_complex_t z) {

@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2010-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_COMPLEX_H
@@ -27,7 +22,7 @@
 #include "igraph_decls.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef struct igraph_complex_t {
     igraph_real_t dat[2];
@@ -40,13 +35,9 @@ typedef struct igraph_complex_t {
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_complex_t igraph_complex(igraph_real_t x, igraph_real_t y);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_complex_t igraph_complex_polar(igraph_real_t r, igraph_real_t theta);
 
-IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
-                                                                    igraph_complex_t z2,
-                                                                    igraph_real_t tol);
-
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_bool_t igraph_complex_almost_equals(igraph_complex_t z1,
-                                                                               igraph_complex_t z2,
-                                                                               igraph_real_t eps);
+                                                         igraph_complex_t z2,
+                                                         igraph_real_t eps);
 
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_real_t igraph_complex_arg(igraph_complex_t z);
 
@@ -108,6 +99,6 @@ IGRAPH_EXPORT int igraph_complex_printf_aligned(int width, igraph_complex_t val)
 IGRAPH_EXPORT int igraph_complex_fprintf_aligned(FILE *file, int width, igraph_complex_t val);
 IGRAPH_EXPORT int igraph_complex_snprintf(char *str, size_t size, igraph_complex_t val);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

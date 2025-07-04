@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -95,8 +93,6 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 /**
  * \function igraph_mean_degree
  * \brief The mean degree of a graph.
- *
- * \experimental
  *
  * This is a convenience function that computes the average of all vertex
  * degrees. In directed graphs, the average of out-degrees and in-degrees is
@@ -219,7 +215,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
         igraph_real_t d;
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
 
-        IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &incident, v, IGRAPH_ALL, IGRAPH_LOOPS));
         k = igraph_vector_int_size(&incident); /* degree */
 
         /*
@@ -328,8 +324,12 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ip, op, indeg, outdeg;
-        IGRAPH_CHECK(igraph_neighbors(graph, &inneis, i, IGRAPH_IN));
-        IGRAPH_CHECK(igraph_neighbors(graph, &outneis, i, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &inneis, i, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE
+        ));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &outneis, i, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE
+        ));
 
         indeg = igraph_vector_int_size(&inneis);
         outdeg = igraph_vector_int_size(&outneis);

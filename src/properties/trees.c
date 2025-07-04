@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -22,10 +20,10 @@
 */
 
 #include "igraph_structural.h"
-#include "igraph_topology.h"
 
 #include "igraph_bitset.h"
 #include "igraph_constructors.h"
+#include "igraph_cycles.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
@@ -98,7 +96,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
 
-            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode, IGRAPH_LOOPS));
 
             igraph_integer_t n = igraph_vector_int_size(&neis);
             for (igraph_integer_t i = 0; i < n; i++) {
@@ -189,7 +187,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
         }
 
         /* register all its yet-unvisited neighbours for future processing */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, u, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, u, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         ncount = igraph_vector_int_size(&neighbors);
         for (i = 0; i < ncount; ++i) {
             igraph_integer_t v = VECTOR(neighbors)[i];
@@ -332,7 +330,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
         IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
 
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, IGRAPH_LOOPS));
+        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode), IGRAPH_LOOPS));
 
         for (i = 0; i < vcount; ++i) {
             if (VECTOR(degree)[i] == 0) {
@@ -432,7 +430,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
         }
 
         /* Vertex discovery: Register all its neighbours for future processing */
-        IGRAPH_CHECK(igraph_neighbors(graph, neis, u, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, neis, u, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         ncount = igraph_vector_int_size(neis);
 
         for (i = 0; i < ncount; ++i) {
@@ -674,7 +672,7 @@ static igraph_error_t igraph_i_is_forest(
 
             IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
             IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                            IGRAPH_REVERSE_MODE(mode), /* loops = */ 1));
+                            IGRAPH_REVERSE_MODE(mode), IGRAPH_LOOPS));
 
             for (v = 0; v < vcount; ++v) {
                 /* In an out-tree, roots have in-degree 0,

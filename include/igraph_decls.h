@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2016-2024  The igraph development team
+   Copyright (C) 2016-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,19 +13,17 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
+#undef IGRAPH_BEGIN_C_DECLS
+#undef IGRAPH_END_C_DECLS
 #ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
+    #define IGRAPH_BEGIN_C_DECLS extern "C" {
+    #define IGRAPH_END_C_DECLS }
 #else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
+    #define IGRAPH_BEGIN_C_DECLS /* empty */
+    #define IGRAPH_END_C_DECLS /* empty */
 #endif
 
 /* This is to eliminate gcc warnings about unused parameters */

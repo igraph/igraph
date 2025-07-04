@@ -20,9 +20,9 @@
 </section>
 
 <section id="random-sampling-of-spatial-points"><title>Random sampling of spatial points</title>
-<!-- doxrox-include igraph_sample_sphere_surface -->
-<!-- doxrox-include igraph_sample_sphere_volume -->
-<!-- doxrox-include igraph_sample_dirichlet -->
+<!-- doxrox-include igraph_rng_sample_sphere_surface -->
+<!-- doxrox-include igraph_rng_sample_sphere_volume -->
+<!-- doxrox-include igraph_rng_sample_dirichlet -->
 </section>
 
 <section id="convex-hull-of-a-set-of-points-on-a-plane"><title>Convex hull of a set of points on a plane</title>

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -46,7 +45,7 @@
    -- Tamas Nepusz, 11 July 2013
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_bitset.h"
@@ -1332,7 +1331,7 @@ static igraph_error_t igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, 
 
 
 
-static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstSol, bool induced,
+static igraph_error_t igraph_i_lad_solve(bool firstSol, bool induced,
                        Tdomain* D, Tgraph* Gp, Tgraph* Gt,
                        igraph_bool_t *invalid, igraph_bool_t *iso,
                        igraph_vector_int_t *vec, igraph_vector_int_t *map, igraph_vector_int_list_t *maps,
@@ -1347,16 +1346,10 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
     igraph_integer_t u, v, minDom, i;
     igraph_integer_t* nbVal;
     igraph_integer_t* globalMatching;
-    clock_t end = clock();
     igraph_integer_t* val;
     bool result;
 
     (*nbNodes)++;
-
-    if ( (double)(end - *begin) / CLOCKS_PER_SEC >= timeLimit) {
-        /* CPU time limit exceeded */
-        IGRAPH_ERROR("LAD CPU time exceeded", IGRAPH_CPUTIME);
-    }
 
     /* Allocate memory */
     ALLOC_ARRAY_IN_HISTORY(nbVal, Gp->nbVertices, igraph_integer_t, alloc_history);
@@ -1423,7 +1416,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
             (*nbNodes)++;
             igraph_i_lad_resetToFilter(D);
         } else {
-            IGRAPH_CHECK(igraph_i_lad_solve(timeLimit, firstSol, induced,
+            IGRAPH_CHECK(igraph_i_lad_solve(firstSol, induced,
                                             D, Gp, Gt, invalid, iso, vec, map, maps,
                                             nbNodes, nbFail, nbSol, begin,
                                             alloc_history));
@@ -1522,7 +1515,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
                              const igraph_vector_int_list_t *domains,
                              igraph_bool_t *iso, igraph_vector_int_t *map,
                              igraph_vector_int_list_t *maps,
-                             igraph_bool_t induced, igraph_integer_t time_limit) {
+                             igraph_bool_t induced) {
 
     bool firstSol = maps == NULL;
     bool initialDomains = domains != NULL;
@@ -1552,9 +1545,6 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     if (igraph_is_directed(pattern) != igraph_is_directed(target)) {
         IGRAPH_ERROR("Cannot search for a directed pattern in an undirected target "
                      "or vice versa", IGRAPH_EINVAL);
-    }
-    if (time_limit <= 0) {
-        time_limit = IGRAPH_INTEGER_MAX;
     }
 
     if (iso)  {
@@ -1631,7 +1621,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     IGRAPH_CHECK(igraph_vector_ptr_init(&alloc_history, 0));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &alloc_history);
 
-    IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (bool) induced, &D,
+    IGRAPH_CHECK(igraph_i_lad_solve(firstSol, (bool) induced, &D,
                                     &Gp, &Gt, &invalidDomain, iso, &vec, map, maps,
                                     &nbNodes, &nbFail, &nbSol, &begin,
                                     &alloc_history));

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "centrality/centrality_internal.h"
@@ -49,4 +47,26 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
 
     /* is the most negative value larger in magnitude than the most positive? */
     return (-mi/ma > 1);
+}
+
+/* Normalizes a vector of real numbers such that the largest value, as well as
+ * the largest value by magnitude, are 1.0. This is used by functions that
+ * produce eigenvector-like centrality values, scaling the largest centrality
+ * to 1.0. */
+void igraph_i_vector_scale_by_max_abs(igraph_vector_t *vec) {
+    const igraph_integer_t n = igraph_vector_size(vec);
+    igraph_real_t amax = 0;
+    igraph_integer_t which = 0;
+
+    for (igraph_integer_t i = 0; i < n; i++) {
+        igraph_real_t tmp;
+        tmp = fabs(VECTOR(*vec)[i]);
+        if (tmp > amax) {
+            amax = tmp;
+            which = i;
+        }
+    }
+    if (amax != 0) {
+        igraph_vector_scale(vec, 1 / VECTOR(*vec)[which]);
+    }
 }

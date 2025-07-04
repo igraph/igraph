@@ -35,7 +35,7 @@ int main(void) {
 
     /* Use Prim's algorithm to compute the edges that belong to the minimum weight
      * spanning tree, using edge betweenness values as edge weights. */
-    igraph_minimum_spanning_tree(&graph, &edges, &eb);
+    igraph_minimum_spanning_tree(&graph, &edges, &eb, IGRAPH_MST_PRIM);
     printf("Minimum spanning tree edges:\n");
     igraph_vector_int_print(&edges);
 
@@ -44,7 +44,7 @@ int main(void) {
 
     /* Compute and output the edges that belong to the maximum weight spanning tree,
      * letting igraph automatically select the most suitable algorithm. */
-    igraph_minimum_spanning_tree(&graph, &edges, &eb);
+    igraph_minimum_spanning_tree(&graph, &edges, &eb, IGRAPH_MST_AUTOMATIC);
     printf("\nMaximum spanning tree edges:\n");
     igraph_vector_int_print(&edges);
 

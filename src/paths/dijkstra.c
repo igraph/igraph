@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -300,20 +298,6 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     return igraph_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, -1);
 }
 
-/**
- * \function igraph_shortest_paths_dijkstra
- * \brief Weighted shortest path lengths between vertices (deprecated).
- *
- * \deprecated-by igraph_distances_dijkstra 0.10.0
- */
-igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
-                                       igraph_matrix_t *res,
-                                       const igraph_vs_t from,
-                                       const igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode) {
-    return igraph_distances_dijkstra(graph, res, from, to, weights, mode);
-}
 
 /**
  * \ingroup structural
@@ -696,12 +680,12 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
     /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
        result to the output parameter. */
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }

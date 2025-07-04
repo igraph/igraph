@@ -25,7 +25,8 @@ This example illustrates a couple of points:
 First, programs
 using the <command>igraph</command> library should include the
 <filename>igraph.h</filename> header
-file.
+file. Note that while igraph installs several sub-headers, the organization of these may change
+without notice. Only use <filename>igraph.h</filename> in your projects, not any of the sub-headers.
 </para></listitem>
 <listitem><para>
 Second, <command>igraph</command> uses the

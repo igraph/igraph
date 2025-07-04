@@ -19,21 +19,22 @@
 #include <igraph.h>
 
 int main(void) {
-    igraph_t g;
+    igraph_t graph;
     igraph_vector_t weights;
     igraph_matrix_int_t merges;
 
     igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_init_int(&weights, 8, 10, 10, 1, 1, 1, 1, 1, 1);
 
-    igraph_small(&g, 6, IGRAPH_UNDIRECTED,
+    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
                  0,1, 1,2, 2,3, 2,4, 2,5, 3,4, 3,5, 4,5, -1);
-    igraph_community_fastgreedy(&g, &weights, &merges,
+    igraph_community_fastgreedy(&graph, &weights, &merges,
                                 /*modularity*/ NULL,
                                 /*membership=*/ NULL);
     igraph_matrix_int_print(&merges);
-    igraph_destroy(&g);
+    igraph_destroy(&graph);
     igraph_vector_destroy(&weights);
     igraph_matrix_int_destroy(&merges);
+
     return 0;
 }

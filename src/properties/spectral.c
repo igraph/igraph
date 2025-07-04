@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -370,62 +368,6 @@ igraph_error_t igraph_get_laplacian_sparse(
 
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_laplacian
- * \brief Returns the Laplacian matrix of a graph (deprecated).
- *
- * This function produces the Laplacian matrix of a graph in either dense or
- * sparse format. When \p normalized is set to true, the type of normalization
- * used depends on the directnedness of the graph: symmetric normalization
- * is used for undirected graphs and left stochastic normalization for
- * directed graphs.
- *
- * \param graph Pointer to the graph to convert.
- * \param res Pointer to an initialized matrix object or \c NULL. The dense matrix
- *        result will be stored here.
- * \param sparseres Pointer to an initialized sparse matrix object or \c NULL.
- *        The sparse matrix result will be stored here.
- * \param mode Controls whether to use out- or in-degrees in directed graphs.
- *        If set to \c IGRAPH_ALL, edge directions will be ignored.
- * \param normalized Boolean, whether to normalize the result.
- * \param weights An optional vector containing non-negative edge weights,
- *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
- *        calculate the unweighted Laplacian.
- * \return Error code.
- *
- * \deprecated-by igraph_get_laplacian 0.10.0
- */
-
-igraph_error_t igraph_laplacian(
-    const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
-    igraph_bool_t normalized, const igraph_vector_t *weights
-) {
-    igraph_laplacian_normalization_t norm_method = IGRAPH_LAPLACIAN_UNNORMALIZED;
-
-    if (!res && !sparseres) {
-        IGRAPH_ERROR("Laplacian: specify at least one of 'res' or 'sparseres'",
-                     IGRAPH_EINVAL);
-    }
-
-    if (normalized) {
-        if (igraph_is_directed(graph)) {
-            norm_method = IGRAPH_LAPLACIAN_LEFT;
-        } else {
-            norm_method = IGRAPH_LAPLACIAN_SYMMETRIC;
-        }
-    }
-
-    if (res) {
-        IGRAPH_CHECK(igraph_get_laplacian(graph, res, IGRAPH_OUT, norm_method, weights));
-    }
-
-    if (sparseres) {
-        IGRAPH_CHECK(igraph_get_laplacian_sparse(graph, sparseres, IGRAPH_OUT, norm_method, weights));
-    }
 
     return IGRAPH_SUCCESS;
 }
