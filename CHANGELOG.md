@@ -6,6 +6,7 @@
 
  - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
  - `igraph_product()` supports the lexicographic and strong graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772!
+ - Simple cycle search (`igraph_simple_cycles()` and `igraph_simple_cycles_callback()`) is sped up by skipping cycle search from some redundant start vertices. Thanks to Tim Bernhard @GenieTim for contributing this improvement in #2714!
 
 ### Fixed
 
