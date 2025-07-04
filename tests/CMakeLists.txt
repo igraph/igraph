@@ -368,6 +368,7 @@ add_legacy_tests(
   jdm
   knn
   minimum_spanning_tree
+  mycielskian
   paths
   random_spanning_tree
   reachability
