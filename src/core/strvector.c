@@ -607,9 +607,7 @@ igraph_error_t igraph_strvector_push_back_len(
 
     IGRAPH_CHECK(strvector_expand_if_full(sv));
     const char *tmp = strndup(value, len);
-    if (! tmp) {
-        IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Insufficient memory to push to string vector.");
     *sv->end = tmp;
     sv->end++;
 
