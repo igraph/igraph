@@ -545,7 +545,7 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
  * Ensures that the vector has at least one extra slot at the end of its
  * allocated storage area.
  */
-static igraph_error_t igraph_i_strvector_expand_if_full(igraph_strvector_t *sv) {
+static igraph_error_t strvector_expand_if_full(igraph_strvector_t *sv) {
     IGRAPH_ASSERT(sv != NULL);
     IGRAPH_ASSERT(sv->stor_begin != NULL);
 
@@ -578,7 +578,7 @@ static igraph_error_t igraph_i_strvector_expand_if_full(igraph_strvector_t *sv) 
  */
 
 igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *value) {
-    IGRAPH_CHECK(igraph_i_strvector_expand_if_full(sv));
+    IGRAPH_CHECK(strvector_expand_if_full(sv));
     const char *tmp = strdup(value);
     IGRAPH_CHECK_OOM(tmp, "Cannot push new string to string vector.");
     *sv->end = tmp;
@@ -605,7 +605,7 @@ igraph_error_t igraph_strvector_push_back_len(
         igraph_strvector_t *sv,
         const char *value, igraph_integer_t len) {
 
-    IGRAPH_CHECK(igraph_i_strvector_expand_if_full(sv));
+    IGRAPH_CHECK(strvector_expand_if_full(sv));
     const char *tmp = strndup(value, len);
     if (! tmp) {
         IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
