@@ -1309,7 +1309,7 @@ igraph_count_reachable:
 #######################################
 
 igraph_bond_percolation:
-    PARAMS: GRAPH graph, OUT VECTOR_INT giant_size, OUT VECTOR_INT connected_vertices OPTIONAL EDGE_INDICES edge_order
+    PARAMS: GRAPH graph, OUT VECTOR_INT giant_size, OUT VECTOR_INT, connected_vertices OPTIONAL EDGE_INDICES edge_order
 
 igraph_site_percolation:
     PARAMS: GRAPH graph, OUT VECTOR_INT giant_size, OUT VECTOR_INT edge_count, OPTIONAL VERTEX_INDICES vertex_order
