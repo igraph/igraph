@@ -363,6 +363,7 @@ add_legacy_tests(
   igraph_spanner
   jdm
   knn
+  mycielskian
   paths
   random_spanning_tree
   reachability

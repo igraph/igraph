@@ -185,6 +185,9 @@ igraph_famous:
 igraph_lcf_vector:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
 
+igraph_mycielski_graph:
+    PARAMS: OUT GRAPH graph, INTEGER k
+
 igraph_adjlist:
     PARAMS: |-
         OUT GRAPH graph, ADJLIST adjlist, NEIMODE mode=OUT,
@@ -2082,6 +2085,10 @@ igraph_induced_subgraph_map:
         GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl,
         OPTIONAL OUT INDEX_VECTOR map, OPTIONAL OUT INDEX_VECTOR invmap
     DEPS: vids ON graph
+
+igraph_mycielskian:
+    PARAMS: |-
+        IN GRAPH graph, OUT GRAPH res, INTEGER k=1
 
 igraph_product:
     PARAMS: |-
