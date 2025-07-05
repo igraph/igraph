@@ -1089,7 +1089,11 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
  *
  * In the <code>G(n1, n2, p)</code> model, every possible edge between the \p n1
  * bottom vertices and \p n2 top vertices is realized independently with
- * probability \p p.
+ * probability \p p. This is equivalent to a maximum entropy model with
+ * a constraint on the \em expected total edge count. This view allows
+ * a multigraph extension, in which case \p is interpreted as the expected
+ * number of edges between any vertex pair. See \ref igraph_erdos_renyi_game_gnp()
+ * for more details.
  *
  * \param graph Pointer to an uninitialized igraph graph, the result
  *    is stored here.
@@ -1099,9 +1103,11 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
  *    vertices.
  * \param n1 The number of bottom vertices.
  * \param n2 The number of top vertices.
- * \param p The connection probability.
- * \param directed Boolean, whether to generate a directed graph. See
- *     also the \p mode argument.
+ * \param p The expected number of edges between any vertex pair.
+ *    When multi-edges are disallowed, this is equivalent to the probability
+ *    of having a connection between any two vertices.
+ * \param directed Whether to generate a directed graph. See also
+ *     the \p mode argument.
  * \param mode Specifies how to direct the edges in directed
  *     graphs. If it is \c IGRAPH_OUT, then directed edges point from
  *     bottom vertices to top vertices. If it is \c IGRAPH_IN, edges
@@ -1110,6 +1116,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
  *     \c IGRAPH_ALL, then each edge direction is considered
  *     independently and mutual edges might be generated. This
  *     argument is ignored for undirected graphs.
+ * \param multiple Whether to generate multi-edges.
  * \return Error code.
  *
  * \sa \ref igraph_erdos_renyi_game_gnp() for the unipartite version,
@@ -1122,7 +1129,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
 igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_integer_t n1, igraph_integer_t n2,
                               igraph_real_t p, igraph_bool_t directed,
-                              igraph_neimode_t mode) {
+                              igraph_neimode_t mode, igraph_bool_t multiple) {
 
     igraph_vector_int_t edges;
     igraph_vector_t s;
@@ -1133,8 +1140,25 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,p) model.", IGRAPH_EINVAL);
     }
 
-    if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid connection probability for bipartite G(n,p) model.", IGRAPH_EINVAL);
+    if (multiple) {
+        if (p < 0.0) {
+            IGRAPH_ERROR(
+                "Invalid expected edge multiplicity given for "
+                "bipartite G(n,p) multigraph model.",
+                IGRAPH_EINVAL);
+        }
+
+        /* Convert the expected edge count to the appropriate probability parameter
+         * of the geometric distribution when sampling lengths of runs of 0s in the
+         * adjacency matrix. */
+        p = p / (1 + p);
+
+    } else {
+        if (p < 0.0 || p > 1.0) {
+            IGRAPH_ERROR(
+                "Invalid connection probability given for bipartite G(n,p) model.",
+                IGRAPH_EINVAL);
+        }
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
@@ -1181,7 +1205,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
         while (last < maxedges) {
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
-            last += 1;
+            last += ! multiple; /* 1 for simple graph, 0 for multigraph */
         }
 
         RNG_END();

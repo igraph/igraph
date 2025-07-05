@@ -46,7 +46,7 @@ IGRAPH_EXPORT igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_intege
                                        igraph_barabasi_algorithm_t algo,
                                        const igraph_t *start_from);
 IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real_t p,
-                                              igraph_bool_t directed, igraph_bool_t loops);
+                                                         igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple);
 IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
                                               igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple);
 IGRAPH_EXPORT igraph_error_t igraph_iea_game(igraph_t *graph,
