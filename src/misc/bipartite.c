@@ -23,6 +23,8 @@
 
 #include "igraph_bipartite.h"
 
+#include "core/interruption.h"
+
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
@@ -32,6 +34,7 @@
 #include "graph/attributes.h"
 #include "random/random_internal.h"
 #include "math/safe_intop.h"
+#include <math.h>
 
 /**
  * \section about_bipartite Bipartite networks in igraph
@@ -482,8 +485,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                VECTOR(edges)[ptr++] = i;
-                VECTOR(edges)[ptr++] = n1 + j;
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
             }
         }
 
@@ -491,8 +494,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                VECTOR(edges)[ptr++] = n1 + j;
-                VECTOR(edges)[ptr++] = i;
+                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
             }
         }
 
@@ -500,10 +503,10 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                VECTOR(edges)[ptr++] = i;
-                VECTOR(edges)[ptr++] = n1 + j;
-                VECTOR(edges)[ptr++] = n1 + j;
-                VECTOR(edges)[ptr++] = i;
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
+                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
             }
         }
     }
@@ -536,8 +539,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
  * vector. If there is an edge connecting two vertices of the same
  * kind, then an error is reported.
  *
- * \param graph Pointer to an uninitialized graph object, the result is
- *   created here.
+ * \param graph Pointer to an uninitialized graph object, the result
+ *   is created here.
  * \param types Boolean vector giving the vertex types. The length of
  *   the vector defines the number of vertices in the graph.
  * \param edges Vector giving the edges of the graph. The highest
@@ -1005,6 +1008,103 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t gnp_bipartite_large(
+    igraph_t *graph, igraph_vector_bool_t *types,
+    igraph_integer_t n1, igraph_integer_t n2,
+    igraph_real_t p, igraph_bool_t directed,
+    igraph_neimode_t mode) {
+
+    igraph_vector_int_t edges;
+    int iter = 0;
+
+    /* Necessitated by floating point arithmetic used in the implementation. */
+    if (n1 >= IGRAPH_MAX_EXACT_REAL || n2 >= IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Number of vertices is too large.", IGRAPH_EOVERFLOW);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    /* Reserve space for the expected number of edges */
+    {
+        igraph_real_t exp_edges = n1 * n2 * p;
+        igraph_integer_t reserved = 2 * (igraph_integer_t) floor(exp_edges);
+        if (directed && mode == IGRAPH_ALL) {
+            reserved *= 2;
+        }
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, reserved));
+    }
+
+    RNG_BEGIN();
+    for (igraph_integer_t i = 0; i < n1; i++) {
+        igraph_integer_t j = 0;
+
+        while (true) {
+            igraph_real_t gap = RNG_GEOM(p);
+
+            /* This formulation not only terminates the loop when necessary,
+             * but also protects against overflow when 'p' is very small
+             * and 'gap' becomes very large, perhaps larger than representable
+             * in an igraph_integer_t. */
+            igraph_integer_t j_new;
+            if (IGRAPH_SAFE_ADD(j, gap, &j_new)) {
+                break; // If addition would overflow, stop the loop
+            }
+            j = j_new;
+
+            igraph_integer_t target;
+            if (IGRAPH_SAFE_ADD(j, n1, &target)) {
+                break; // If addition would overflow, stop the loop
+            }
+
+            // Ensure edges are only between partitions
+            if (i < n1 && target >= n1 && target < n1 + n2) {
+                if (!directed) {
+                    /* Undirected graph */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
+                } else if (mode == IGRAPH_IN) {
+                    /* Incoming edges */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                } else if (mode == IGRAPH_OUT) {
+                    /* Outgoing edges */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
+                } else {
+                    /* Both directions for IGRAPH_ALL */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
+                    igraph_vector_int_push_back(&edges, target); /* reserved */
+                    igraph_vector_int_push_back(&edges, i); /* reserved */
+                }
+            }
+
+            j++;
+
+            iter++;
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    }
+    RNG_END();
+
+    /* Create the graph */
+    /* n1 + n2 has already been checked for overflow in the caller function. */
+    IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
+
+    // Assign types vector: first n1 are 0 (bottom), next n2 are 1 (top)
+    if (types) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
+        igraph_vector_bool_null(types);
+        for (igraph_integer_t i = n1; i < n1 + n2; i++) {
+            VECTOR(*types)[i] = true;
+        }
+    }
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_bipartite_game_gnp
  * \brief Generates a random bipartite graph with a fixed connection probability.
@@ -1049,7 +1149,9 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_integer_t n;
-    igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
+    igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2;
+    igraph_real_t maxedges;
+    int iter = 0;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices for bipartite graph.", IGRAPH_EINVAL);
@@ -1074,64 +1176,47 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
     } else if (p == 1.0) {
         IGRAPH_CHECK(igraph_full_bipartite(graph, types, n1, n2, directed, mode));
     } else {
-
-        igraph_integer_t to, from, slen;
-        igraph_real_t maxedges, last;
-        igraph_integer_t maxedges_int;
-
-        if (!directed || mode != IGRAPH_ALL) {
-            maxedges = n1_real * n2_real;
-        } else {
-            maxedges = 2.0 * n1_real * n2_real;
-        }
+        maxedges = n1_real * n2_real;
 
         if (maxedges > IGRAPH_MAX_EXACT_REAL) {
-            IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+            /* Use a slightly slower, but overflow-free implementation */
+            return gnp_bipartite_large(graph, types, n1, n2, p, directed, mode);
         }
+
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &maxedges_int));
-        IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges_int));
+        IGRAPH_CHECK(igraph_vector_reserve(&s, (igraph_integer_t) floor(maxedges * p * 1.1)));
 
         RNG_BEGIN();
 
-        last = RNG_GEOM(p);
+        igraph_real_t last = RNG_GEOM(p);
         while (last < maxedges) {
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
             last += 1;
+            iter++;
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
 
         RNG_END();
 
-        slen = igraph_vector_size(&s);
+        igraph_integer_t slen = igraph_vector_size(&s);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, slen * 2));
 
+        iter = 0;
         for (igraph_integer_t i = 0; i < slen; i++) {
-            if (!directed || mode != IGRAPH_ALL) {
-                to = floor(VECTOR(s)[i] / n1_real);
-                from = VECTOR(s)[i] - to * n1_real;
-                to += n1;
-            } else {
-                igraph_real_t n1n2 = n1_real * n2_real;
-                if (VECTOR(s)[i] < n1n2) {
-                    to = floor(VECTOR(s)[i] / n1_real);
-                    from = VECTOR(s)[i] - to * n1_real;
-                    to += n1;
-                } else {
-                    to = floor((VECTOR(s)[i] - n1n2) / n2_real);
-                    from = VECTOR(s)[i] - n1n2 - to * n2_real;
-                    from += n1;
-                }
-            }
-
+            igraph_integer_t edge_index = (igraph_integer_t)VECTOR(s)[i];
+            igraph_integer_t from = edge_index % n1;
+            igraph_integer_t to = (edge_index / n1) + n1;
             if (mode != IGRAPH_IN) {
-                igraph_vector_int_push_back(&edges, from);
-                igraph_vector_int_push_back(&edges, to);
+                igraph_vector_int_push_back(&edges, from); /* reserved */
+                igraph_vector_int_push_back(&edges, to); /* reserved */
             } else {
-                igraph_vector_int_push_back(&edges, to);
-                igraph_vector_int_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to); /* reserved */
+                igraph_vector_int_push_back(&edges, from); /* reserved */
             }
+            iter++;
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
 
         igraph_vector_destroy(&s);
@@ -1188,6 +1273,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     igraph_vector_t s;
     igraph_integer_t n;
     igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
+    int iter = 0;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices for bipartite graph.", IGRAPH_EINVAL);
@@ -1235,7 +1321,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
             IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
             IGRAPH_CHECK(igraph_random_sample_real(&s, 0, maxedges - 1, m));
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
             for (i = 0; i < m; i++) {
                 if (!directed || mode != IGRAPH_ALL) {
@@ -1256,12 +1342,14 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                 }
 
                 if (mode != IGRAPH_IN) {
-                    igraph_vector_int_push_back(&edges, from);
-                    igraph_vector_int_push_back(&edges, to);
+                    igraph_vector_int_push_back(&edges, from); /* reserved */
+                    igraph_vector_int_push_back(&edges, to); /* reserved */
                 } else {
-                    igraph_vector_int_push_back(&edges, to);
-                    igraph_vector_int_push_back(&edges, from);
+                    igraph_vector_int_push_back(&edges, to); /* reserved */
+                    igraph_vector_int_push_back(&edges, from); /* reserved */
                 }
+                iter++;
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
 
             igraph_vector_destroy(&s);
