@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \def IGRAPH_SHORTEST_PATH_EPSILON
@@ -34,13 +34,6 @@ __BEGIN_DECLS
  * to decide whether two shortest paths are of equal length.
  */
 #define IGRAPH_SHORTEST_PATH_EPSILON 1e-10
-
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
-        const igraph_vector_t *par,
-        void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t *var,
-                                      const igraph_vector_t *par,
-                                      igraph_vector_t* res, void* extra);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
@@ -100,6 +93,6 @@ IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
     const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

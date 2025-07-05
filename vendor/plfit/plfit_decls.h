@@ -20,14 +20,14 @@
 #ifndef PLFIT_DECLS_H
 #define PLFIT_DECLS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
+#undef PLFIT_BEGIN_C_DECLS
+#undef PLFIT_END_C_DECLS
 #ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
+    #define PLFIT_BEGIN_C_DECLS extern "C" {
+    #define PLFIT_END_C_DECLS }
 #else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
+    #define PLFIT_BEGIN_C_DECLS /* empty */
+    #define PLFIT_END_C_DECLS /* empty */
 #endif
 
 #define PLFIT_EXPORT /* empty */

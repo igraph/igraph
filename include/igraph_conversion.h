@@ -28,7 +28,7 @@
 #include "igraph_sparsemat.h"
 #include "igraph_attributes.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Conversion                                         */
@@ -62,6 +62,6 @@ IGRAPH_EXPORT igraph_error_t igraph_to_undirected(igraph_t *graph,
                                        const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -63,7 +63,7 @@ int main(void) {
     }
 
     {
-        printf("\nBipartite adjacencymatrix for five vertices:\n");
+        printf("\nBipartite adjacency matrix for five vertices:\n");
         igraph_real_t elem[] = {0.0, -4.5, 2.3,
                                 -0.1, 0.0, 0.0};
         matrix_init_real_row_major(&biadjmat, 2, 3, elem);

@@ -18,7 +18,7 @@ int main(void) {
     igraph_vector_init(&x, 0);
     igraph_vector_init(&y, 0);
 
-    igraph_grg_game(&graph, 200, 0.1, /* torus */ 0, &x, &y);
+    igraph_grg_game(&graph, 200, 0.1, /* torus */ false, &x, &y);
 
     /* Compute edge weights as geometric distance */
 
@@ -35,7 +35,7 @@ int main(void) {
 
     /* Compute average path length */
 
-    igraph_average_path_length(&graph, &weights, &avg_dist, NULL, IGRAPH_UNDIRECTED, /* unconn */ 1);
+    igraph_average_path_length(&graph, &weights, &avg_dist, NULL, IGRAPH_UNDIRECTED, /* unconn */ true);
 
     printf("Average distance in the geometric graph: %g.\n", avg_dist);
 

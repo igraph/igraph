@@ -29,7 +29,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Components                                         */
@@ -54,6 +54,6 @@ IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph
 IGRAPH_EXPORT igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

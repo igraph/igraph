@@ -23,13 +23,13 @@
 
 #include <stddef.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT void igraph_qsort(void *base, size_t nel, size_t width,
                                 int (*compar)(const void *, const void *));
 IGRAPH_EXPORT void igraph_qsort_r(void *base, size_t nel, size_t width, void *thunk,
                                   int (*compar)(void *, const void *, const void *));
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

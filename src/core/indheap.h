@@ -26,7 +26,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Indexed heap                                       */
@@ -149,6 +149,6 @@ IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap
 IGRAPH_PRIVATE_EXPORT void igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_2wheap_check(const igraph_2wheap_t *h);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -108,6 +108,7 @@ add_library(
   constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
+  constructors/mycielskian.c
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c
@@ -205,6 +206,7 @@ add_library(
   io/parse_utils.c
   ${PARSER_SOURCES}
 
+  layout/align.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp

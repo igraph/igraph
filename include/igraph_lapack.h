@@ -24,7 +24,7 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * \section about_lapack LAPACK interface in igraph
@@ -102,6 +102,6 @@ IGRAPH_EXPORT igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
                                        int ilo, int ihi,
                                        igraph_matrix_t *result);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -27,7 +27,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Centrality                                         */
@@ -35,30 +35,30 @@ __BEGIN_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                                    igraph_vector_int_t *reachable_count, igraph_bool_t *all_reachable,
-                                   const igraph_vs_t vids, igraph_neimode_t mode,
+                                   igraph_vs_t vids, igraph_neimode_t mode,
                                    const igraph_vector_t *weights, igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                                           igraph_vector_int_t *reachable_count, igraph_bool_t *all_reachable,
-                                          const igraph_vs_t vids, igraph_neimode_t mode,
+                                          igraph_vs_t vids, igraph_neimode_t mode,
                                           const igraph_vector_t *weights,
                                           igraph_bool_t normalized,
                                           igraph_real_t cutoff);
 
 IGRAPH_EXPORT igraph_error_t igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
-                                             const igraph_vs_t vids, igraph_neimode_t mode,
+                                             igraph_vs_t vids, igraph_neimode_t mode,
                                              const igraph_vector_t *weights,
                                              igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
-                                                    const igraph_vs_t vids, igraph_neimode_t mode,
+                                                    igraph_vs_t vids, igraph_neimode_t mode,
                                                     const igraph_vector_t *weights,
                                                     igraph_bool_t normalized,
                                                     igraph_real_t cutoff);
 
 IGRAPH_EXPORT igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
-                                     const igraph_vs_t vids, igraph_bool_t directed,
+                                     igraph_vs_t vids, igraph_bool_t directed,
                                      const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_vs_t vids, igraph_bool_t directed,
+                                            igraph_vs_t vids, igraph_bool_t directed,
                                             const igraph_vector_t *weights, igraph_real_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                                           igraph_bool_t directed,
@@ -67,12 +67,12 @@ IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *grap
                                                  igraph_bool_t directed,
                                                  const igraph_vector_t *weights, igraph_real_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_vs_t vids, igraph_bool_t directed,
-                                            const igraph_vs_t sources, const igraph_vs_t targets,
+                                            igraph_vs_t vids, igraph_bool_t directed,
+                                            igraph_vs_t sources, igraph_vs_t targets,
                                             const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
-                                            const igraph_es_t eids, igraph_bool_t directed,
-                                            const igraph_vs_t sources, const igraph_vs_t targets,
+                                            igraph_es_t eids, igraph_bool_t directed,
+                                            igraph_vs_t sources, igraph_vs_t targets,
                                             const igraph_vector_t *weights);
 
 /**
@@ -94,19 +94,19 @@ typedef enum {
 
 IGRAPH_EXPORT igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
                                   igraph_vector_t *vector,
-                                  igraph_real_t *value, const igraph_vs_t vids,
+                                  igraph_real_t *value, igraph_vs_t vids,
                                   igraph_bool_t directed, igraph_real_t damping,
                                   const igraph_vector_t *weights, igraph_arpack_options_t *options);
 IGRAPH_EXPORT igraph_error_t igraph_personalized_pagerank(const igraph_t *graph,
                                                igraph_pagerank_algo_t algo, igraph_vector_t *vector,
-                                               igraph_real_t *value, const igraph_vs_t vids,
+                                               igraph_real_t *value, igraph_vs_t vids,
                                                igraph_bool_t directed, igraph_real_t damping,
                                                const igraph_vector_t *reset,
                                                const igraph_vector_t *weights, igraph_arpack_options_t *options);
 IGRAPH_EXPORT igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
                                                   igraph_pagerank_algo_t algo,
                                                   igraph_vector_t *vector,
-                                                  igraph_real_t *value, const igraph_vs_t vids,
+                                                  igraph_real_t *value, igraph_vs_t vids,
                                                   igraph_bool_t directed, igraph_real_t damping,
                                                   igraph_vs_t reset_vids,
                                                   const igraph_vector_t *weights, igraph_arpack_options_t *options);
@@ -179,6 +179,6 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality_tmax(c
                                                                                igraph_neimode_t mode,
                                                                                igraph_real_t *res);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

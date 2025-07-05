@@ -67,7 +67,7 @@ static igraph_integer_t max_tree_edges(igraph_integer_t no_of_nodes, igraph_inte
  * minimum spanning tree algorithms.
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
+static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
         const igraph_t* graph,
         igraph_vector_int_t* res) {
 
@@ -173,7 +173,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_prim(
+static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         const igraph_t* graph,
         igraph_vector_int_t* res,
         const igraph_vector_t *weights) {
@@ -194,7 +194,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
     }
 
     if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     igraph_vector_int_clear(res);
@@ -334,7 +334,7 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
+static igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
         const igraph_t *graph,
         igraph_vector_int_t *res,
         const igraph_vector_t *weights) {
@@ -354,7 +354,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
     }
 
     if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no_of_edges);

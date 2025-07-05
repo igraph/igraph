@@ -30,7 +30,7 @@
 #include "igraph_decls.h"
 #include "config.h" /* INTERNAL_BLAS */
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 #ifndef INTERNAL_BLAS
     #define igraphdaxpy_    daxpy_
@@ -87,6 +87,6 @@ double igraphdnrm2_(int *n, double *x, int *incx);
 
 double igraphddot_(int *n, double *dx, int *incx, double *dy, int *incy);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

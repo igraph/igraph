@@ -26,7 +26,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
@@ -236,7 +236,6 @@ typedef enum {
     IGRAPH_ES_RANGE,
     IGRAPH_ES_PAIRS,
     IGRAPH_ES_PATH,
-    IGRAPH_ES_UNUSED_WAS_MULTIPAIRS,  /* placeholder for deprecated IGRAPH_ES_MULTIPAIRS from igraph 0.10 */
     IGRAPH_ES_ALL_BETWEEN,
 } igraph_es_type_t;
 
@@ -412,6 +411,6 @@ IGRAPH_EXPORT void igraph_eit_destroy(const igraph_eit_t *eit);
 
 IGRAPH_EXPORT igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_int_t *v);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

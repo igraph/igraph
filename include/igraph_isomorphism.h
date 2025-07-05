@@ -25,7 +25,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 
 /* -------------------------------------------------- */
@@ -274,6 +274,6 @@ IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_inte
 
 IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

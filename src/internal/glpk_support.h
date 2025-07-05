@@ -38,7 +38,7 @@
 #include <setjmp.h>
 #include <stdbool.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef struct {
     jmp_buf jmp;            /* used for bailing when there is a GLPK error */
@@ -140,7 +140,7 @@ void igraph_i_glp_delete_prob(glp_prob *p);
         } \
     } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* HAVE_GLPK */
 

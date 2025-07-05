@@ -47,7 +47,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
-        igraph_real_t r;
+        igraph_real_t r, r2;
         igraph_vector_int_list_t ivl1;
         igraph_vector_t v1, v2;
         igraph_vector_int_t iv1, iv2;
@@ -72,7 +72,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_pseudo_diameter(&graph, &weights, &r, -1, NULL, NULL, true, true);
         igraph_diameter(&graph, &weights, &r, NULL, NULL, NULL, NULL, true, false);
-        igraph_average_path_length(&graph, &weights, &r, &r, true, true);
+        igraph_average_path_length(&graph, &weights, &r, &r2, true, true);
         igraph_radius(&graph, &weights, &r, IGRAPH_OUT);
 
         igraph_feedback_arc_set(&graph, &iv1, &weights, IGRAPH_FAS_APPROX_EADES);

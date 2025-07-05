@@ -30,7 +30,7 @@
 
 #include "igraph_interface.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
                                           igraph_real_t *value, const igraph_vs_t vids,
@@ -38,6 +38,6 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
                                           const igraph_vector_t *reset,
                                           const igraph_vector_t *weights);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

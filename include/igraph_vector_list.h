@@ -23,7 +23,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Flexible list of vectors                           */
@@ -58,6 +58,6 @@ __BEGIN_DECLS
     do { IGRAPH_CHECK(igraph_vector_int_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_vector_int_list_destroy, v); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

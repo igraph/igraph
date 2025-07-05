@@ -29,7 +29,7 @@
 #include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Graph operators                                    */
@@ -73,22 +73,23 @@ IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
                                              igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
                                              const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
-                                              const igraph_vs_t vids,
+                                              igraph_vs_t vids,
                                               igraph_subgraph_implementation_t impl,
                                               igraph_vector_int_t *map,
                                               igraph_vector_int_t *invmap);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
-                                          const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
+                                          igraph_vs_t vids, igraph_subgraph_implementation_t impl);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_edges(
         const igraph_t *graph, igraph_vs_t vids, igraph_vector_int_t *edges);
 IGRAPH_EXPORT igraph_error_t igraph_subgraph_from_edges(const igraph_t *graph, igraph_t *res,
-                                        const igraph_es_t eids, igraph_bool_t delete_vertices);
-IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids);
+                                        igraph_es_t eids, igraph_bool_t delete_vertices);
+IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, igraph_es_t eids);
 IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2,
                                             igraph_product_t type);
+IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

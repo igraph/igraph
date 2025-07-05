@@ -30,7 +30,7 @@
 #include "igraph_decls.h"
 #include "config.h" /* INTERNAL_LAPACK */
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 #ifndef INTERNAL_LAPACK
     #define igraphdgeevx_   dgeevx_
@@ -179,6 +179,6 @@ int igraphdgehrd_(int *n, int *ilo, int *ihi, double *A, int *lda,
 
 double igraphddot_(int *n, double *dx, int *incx, double *dy, int *incy);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

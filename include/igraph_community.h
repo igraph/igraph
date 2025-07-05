@@ -28,7 +28,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* K-Cores and K-Truss                                */
@@ -49,7 +49,7 @@ IGRAPH_EXPORT igraph_error_t igraph_trussness(
 
 IGRAPH_EXPORT igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
                                                                  const igraph_vector_t *weights,
-                                                                 const igraph_real_t resolution,
+                                                                 igraph_real_t resolution,
                                                                  igraph_real_t *modularity,
                                                                  igraph_vector_int_t *membership);
 
@@ -106,7 +106,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_edge_betweenness(const igraph_t *g
                                                     const igraph_vector_t *weights,
                                                     const igraph_vector_t *lengths);
 IGRAPH_EXPORT igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
-                                                 const igraph_bool_t directed,
+                                                 igraph_bool_t directed,
                                                  const igraph_vector_int_t *edges,
                                                  const igraph_vector_t *weights,
                                                  igraph_matrix_int_t *merges,
@@ -139,13 +139,13 @@ IGRAPH_EXPORT igraph_error_t igraph_community_voronoi(
 IGRAPH_EXPORT igraph_error_t igraph_modularity(const igraph_t *graph,
                                     const igraph_vector_int_t *membership,
                                     const igraph_vector_t *weights,
-                                    const igraph_real_t resolution,
-                                    const igraph_bool_t directed,
+                                    igraph_real_t resolution,
+                                    igraph_bool_t directed,
                                     igraph_real_t *modularity);
 
 IGRAPH_EXPORT igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                                            const igraph_vector_t *weights,
-                                           const igraph_real_t resolution,
+                                           igraph_real_t resolution,
                                            igraph_matrix_t *modmat,
                                            igraph_bool_t directed);
 
@@ -225,7 +225,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_label_propagation(const igraph_t *
 
 IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               const igraph_vector_t *weights,
-                                              const igraph_real_t resolution,
+                                              igraph_real_t resolution,
                                               igraph_vector_int_t *membership,
                                               igraph_matrix_int_t *memberships,
                                               igraph_vector_t *modularity);
@@ -233,10 +233,10 @@ IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
                                           const igraph_vector_t *edge_weights,
                                           const igraph_vector_t *node_weights,
-                                          const igraph_real_t resolution_parameter,
-                                          const igraph_real_t beta,
-                                          const igraph_bool_t start,
-                                          const igraph_integer_t n_iterations,
+                                          igraph_real_t resolution_parameter,
+                                          igraph_real_t beta,
+                                          igraph_bool_t start,
+                                          igraph_integer_t n_iterations,
                                           igraph_vector_int_t *membership,
                                           igraph_integer_t *nb_clusters,
                                           igraph_real_t *quality);
@@ -253,6 +253,6 @@ IGRAPH_EXPORT igraph_error_t igraph_split_join_distance(const igraph_vector_int_
                                              igraph_integer_t* distance12,
                                              igraph_integer_t* distance21);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* A type of grid used for merging layouts; each cell is owned by exactly one graph */
 
@@ -50,6 +50,6 @@ igraph_integer_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid
 igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
                                               igraph_real_t x, igraph_real_t y, igraph_real_t r);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

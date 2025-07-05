@@ -24,7 +24,7 @@
 #include "plfit_decls.h"
 #include "plfit_mt.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 /**
  * Draws a sample from a binomial distribution with the given count and
@@ -163,6 +163,6 @@ PLFIT_EXPORT void plfit_walker_alias_sampler_destroy(plfit_walker_alias_sampler_
 PLFIT_EXPORT int plfit_walker_alias_sampler_sample(const plfit_walker_alias_sampler_t* sampler,
         long int* xs, size_t n, plfit_mt_rng_t* rng);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif /* PLFIT_SAMPLING_H */

@@ -24,7 +24,7 @@
 
 #include <stdarg.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* This file contains the igraph error handling.
  * Most bits are taken literally from the GSL library (with the GSL_
@@ -300,7 +300,7 @@ typedef enum {
     /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
-    /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* removed in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
     /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */
@@ -477,7 +477,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
                                             int line, igraph_error_t igraph_errno,
                                             va_list ap);
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -927,6 +927,6 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason,
         } \
     } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

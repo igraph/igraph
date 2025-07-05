@@ -23,13 +23,13 @@
 #include "igraph_datatype.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_order_cycle(
         const igraph_t *graph,
         const igraph_vector_int_t *cycle,
         igraph_vector_int_t *res);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_ORDER_CYCLE_H */

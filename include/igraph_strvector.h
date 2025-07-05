@@ -23,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /**
  * Vector of strings
@@ -46,7 +46,7 @@ typedef struct s_igraph_strvector {
  * element. Use \ref igraph_strvector_set() to set an element instead.
  *
  * \param sv The string vector
- * \param i The the index of the element.
+ * \param i The index of the element.
  * \return The element at position \p i.
  *
  * Time complexity: O(1).
@@ -91,7 +91,7 @@ IGRAPH_EXPORT void igraph_strvector_resize_min(igraph_strvector_t *sv);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v,
         const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *v,
-        const char *value, igraph_integer_t len);
+        const char *value, size_t len);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_fprint(const igraph_strvector_t *v, FILE *file,
                                                      const char *sep);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_print(const igraph_strvector_t *v,
@@ -107,6 +107,6 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv,
 IGRAPH_EXPORT void igraph_strvector_swap_elements(igraph_strvector_t *sv,
                                                   igraph_integer_t i, igraph_integer_t j);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

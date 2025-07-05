@@ -25,23 +25,23 @@
 #include "igraph_error.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                                  igraph_real_t *res,
                                                  igraph_transitivity_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
                                                        igraph_vector_t *res,
-                                                       const igraph_vs_t vids,
+                                                       igraph_vs_t vids,
                                                        igraph_transitivity_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
                                                           igraph_real_t *res,
                                                           igraph_transitivity_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
                                              igraph_vector_t *res,
-                                             const igraph_vs_t vids,
+                                             igraph_vs_t vids,
                                              const igraph_vector_t *weights,
-                                             const igraph_transitivity_mode_t mode);
+                                             igraph_transitivity_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_ecc(const igraph_t *graph,
                                         igraph_vector_t *res,
                                         igraph_es_t eids,
@@ -49,6 +49,6 @@ IGRAPH_EXPORT igraph_error_t igraph_ecc(const igraph_t *graph,
                                         igraph_bool_t offset,
                                         igraph_bool_t normalize);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

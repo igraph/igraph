@@ -764,9 +764,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
                 state->data_key = NULL;
             }
             state->data_key = xmlStrndup(XML_ATTR_VALUE(it));
-            if (state->data_key == 0) {
-                return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(state->data_key, "Insufficient memory to read GraphML file.");
             igraph_vector_char_clear(&state->data_char);
             state->data_type = type;
         } else {

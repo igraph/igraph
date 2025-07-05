@@ -21,7 +21,7 @@
 
 #include "igraph_decls.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 #ifdef __cplusplus
     #define __STDC_FORMAT_MACROS   /* needed for PRId32 and PRId64 from inttypes.h on Linux */
@@ -139,6 +139,6 @@ IGRAPH_EXPORT int igraph_real_snprintf_precise(char *str, size_t size, igraph_re
 #define IGRAPH_NEGINFINITY (-IGRAPH_INFINITY)
 #define IGRAPH_NAN ((double)NAN)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

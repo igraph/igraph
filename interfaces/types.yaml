@@ -349,11 +349,6 @@ GREEDY_COLORING_HEURISTIC:
     CTYPE: igraph_coloring_greedy_t
     FLAGS: ENUM
 
-IMITATE_ALGORITHM:
-    # This enum controls which algorithm to use in stochastic imitation
-    CTYPE: igraph_imitate_algorithm_t
-    FLAGS: ENUM
-
 LAPLACIAN_NORMALIZATION:
     # Enum representing the possible normalization methods of a Laplacian
     # matrix
@@ -389,11 +384,6 @@ NEIMODE:
     # Enum that describes how a particular function should take into account
     # the neighbors of vertices
     CTYPE: igraph_neimode_t
-    FLAGS: ENUM
-
-OPTIMALITY:
-    # This enum controls which algorithm to use in deterministic optimal imitation
-    CTYPE: igraph_optimal_t
     FLAGS: ENUM
 
 ORDER:
@@ -503,7 +493,7 @@ VORONOI_TIEBREAKER:
     FLAGS: ENUM
 
 WHEEL_MODE:
-    # Enum that describes how a star graph should be constructed
+    # Enum that describes how a wheel graph should be constructed
     CTYPE: igraph_wheel_mode_t
     FLAGS: ENUM
 

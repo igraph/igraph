@@ -30,7 +30,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */
@@ -237,6 +237,6 @@ IGRAPH_EXPORT igraph_error_t igraph_rng_sample_dirichlet(
     igraph_rng_t* rng, igraph_integer_t n, const igraph_vector_t *alpha, igraph_matrix_t *res
 );
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

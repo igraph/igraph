@@ -23,11 +23,11 @@
 #include "igraph_decls.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                            const igraph_vector_int_t *rank);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -20,7 +20,7 @@ edges: {
 }
 types: 0 1
 
-Bipartite adjacencymatrix for two vertices, multiple = true:
+Bipartite adjacency matrix for two vertices, multiple = true:
 directed: true
 vcount: 2
 edges: {
@@ -37,7 +37,7 @@ edges: {
 }
 types: 0 1
 
-Bipartite adjacencymatrix for five vertices:
+Bipartite adjacency matrix for five vertices:
 directed: true
 vcount: 5
 edges: {

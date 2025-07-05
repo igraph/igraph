@@ -25,11 +25,11 @@
 #include "igraph_vector.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
                       igraph_vector_int_t *p);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

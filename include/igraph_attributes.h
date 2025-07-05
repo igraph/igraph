@@ -29,7 +29,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Attributes                                         */
@@ -302,7 +302,7 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    function is called).
  * \member add_edges Called when new edges are added to a graph, after the
  *    base data structure was modified. A vector containing the endpoints of the
- *    new edges are supplied as an argument. The function is supposd to set up
+ *    new edges are supplied as an argument. The function is supposed to set up
  *    default values for each edge attribute that is currently registered on the
  *    graph, for all the newly added edges. Expected to return an error code.
  * \member permute_edges Called when a new graph is created based on an
@@ -310,7 +310,7 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    attributes of some edges from the old graph (this also includes the
  *    deletion of edges). The supplied index vector defines which old edge a new
  *    edge corresponds to. Its length is the same as the number of edges in the
- *    new graph, and for each edge it provides the ID of the correspnding edge
+ *    new graph, and for each edge it provides the ID of the corresponding edge
  *    in the old graph. The function is supposed to set up the values of the
  *    edge attributes of the new graph based on the attributes of the old graph
  *    and the provided index vector. Note that the old and the new graph \em may
@@ -926,6 +926,6 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define DELALL(graph) (igraph_cattribute_remove_all((graph),1,1,1))
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

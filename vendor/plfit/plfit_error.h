@@ -22,7 +22,7 @@
 
 #include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 enum {
 	PLFIT_SUCCESS  = 0,
@@ -67,6 +67,6 @@ PLFIT_EXPORT plfit_error_handler_t* plfit_set_error_handler(plfit_error_handler_
 PLFIT_EXPORT void plfit_error(const char *reason, const char *file, int line, int plfit_errno);
 PLFIT_EXPORT const char* plfit_strerror(const int plfit_errno);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif /* PLFIT_ERROR_H */
