@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -114,6 +114,33 @@ int main(void) {
     igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
                     igraph_ess_all(IGRAPH_EDGEORDER_ID), 0, 0.85, 0, 0);
     printf("PRPACK star: "); print_vector(&res);
+
+    /* Test null graph (empty graph with 0 vertices) */
+    printf("\nLinkRank Test 7 - Null graph\n");
+    igraph_destroy(&g);
+    igraph_empty(&g, 0, IGRAPH_DIRECTED);
+
+    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+                    igraph_ess_all(IGRAPH_EDGEORDER_ID), 1, 0.85, 0, 0);
+    printf("PRPACK null graph: "); print_vector(&res);
+
+    /* Test singleton graph (1 vertex, no edges) */
+    printf("\nLinkRank Test 8 - Singleton graph\n");
+    igraph_destroy(&g);
+    igraph_empty(&g, 1, IGRAPH_DIRECTED);
+
+    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+                    igraph_ess_all(IGRAPH_EDGEORDER_ID), 1, 0.85, 0, 0);
+    printf("PRPACK singleton: "); print_vector(&res);
+
+    /* Test singleton graph with self-loop */
+    printf("\nLinkRank Test 9 - Singleton graph with self-loop\n");
+    igraph_destroy(&g);
+    igraph_small(&g, 1, IGRAPH_DIRECTED, 0, 0, -1);
+
+    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+                    igraph_ess_all(IGRAPH_EDGEORDER_ID), 1, 0.85, 0, 0);
+    printf("PRPACK singleton with self-loop: "); print_vector(&res);
 
     /* Cleanup */
     igraph_vector_destroy(&res);
