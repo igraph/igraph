@@ -18,10 +18,10 @@ LinkRank Test 6 - Undirected star
 PRPACK star: ( 0.131081 0.131081 0.131081 0.131081 )
 
 LinkRank Test 7 - Null graph
-PRPACK null graph: (  )
+PRPACK null graph: ( )
 
 LinkRank Test 8 - Singleton graph
-PRPACK singleton: (  )
+PRPACK singleton: ( )
 
 LinkRank Test 9 - Singleton graph with self-loop
 PRPACK singleton with self-loop: ( 1 )
