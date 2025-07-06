@@ -20,7 +20,6 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
-#include "graph/internal.h"
 
 /**
  * \ingroup structural
@@ -36,7 +35,7 @@
  * The null graph and the singleton graph are considered complete.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored here.
+ * \param res Pointer to a Boolean variable, the result will be stored here.
  *
  * \return Error code.
  *
@@ -133,8 +132,10 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res) {
     for (igraph_integer_t i = 0; i < vcount; ++i) {
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
-        IGRAPH_CHECK(igraph_i_neighbors(graph, &neighbours, i, IGRAPH_OUT,
-                                        IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neighbours, i, IGRAPH_OUT, IGRAPH_NO_LOOPS,
+            IGRAPH_NO_MULTIPLE
+        ));
 
         if ((igraph_vector_int_size(&neighbours) < vcount - 1)) {
             *res = false;

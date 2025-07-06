@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -89,11 +87,11 @@
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param weights An optional vector containing edge weights for
- *        weighted closeness. No edge weight may be NaN. Supply a null
+ * \param weights An optional vector containing edge weights for weighted
+ *        closeness. NaN values re not allowed as weights. Supply a null
  *        pointer here for traditional, unweighted closeness.
  * \param normalized If true, the inverse of the mean distance to reachable
- *        vetices is returned. If false, the inverse of the sum of distances
+ *        vertices is returned. If false, the inverse of the sum of distances
  *        is returned.
  * \return Error code:
  *        \clist

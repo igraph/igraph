@@ -62,7 +62,7 @@ int main(void) {
                   == IGRAPH_SUCCESS);
     igraph_vector_int_init(&degrees, 0);
     igraph_vs_1(&vertices, 0);
-    igraph_degree(&g, &degrees, vertices, IGRAPH_ALL, 0);
+    igraph_degree(&g, &degrees, vertices, IGRAPH_ALL, IGRAPH_NO_LOOPS);
     IGRAPH_ASSERT(VECTOR(degrees)[0] == 9);
     igraph_vector_int_destroy(&degrees);
     igraph_vs_destroy(&vertices);

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -110,7 +109,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  * \param graph Pointer to an uninitialized graph object. The result
  *        will be stored here.
  * \param n The number of vertices in the graph; a non-negative integer.
- * \param directed Logical constant; gives whether the graph should be
+ * \param directed Boolean constant; gives whether the graph should be
  *        directed. Supported values are:
  *        \clist
  *        \cli IGRAPH_DIRECTED

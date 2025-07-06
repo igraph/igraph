@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -29,7 +28,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Vectorlist, fixed length                           */
@@ -45,6 +44,6 @@ igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_int_t *from,
                                     igraph_integer_t size);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

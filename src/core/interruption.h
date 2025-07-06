@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -29,7 +28,7 @@
 
 #include "config.h" /* IGRAPH_THREAD_LOCAL */
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_handler;
 
@@ -76,6 +75,6 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_
         } \
     } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

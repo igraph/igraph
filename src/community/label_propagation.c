@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2022  The igraph development team <igraph@igraph.org>
@@ -28,13 +26,15 @@
 
 #include "core/interruption.h"
 
-igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
+static igraph_error_t community_label_propagation(
+        const igraph_t *graph,
         igraph_vector_int_t *membership,
         igraph_neimode_t mode,
         const igraph_vector_t *weights,
-        igraph_vector_bool_t *fixed,
+        const igraph_vector_bool_t *fixed,
         igraph_bool_t retention) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_not_fixed_nodes = 0;
     igraph_integer_t i, j, k;
     igraph_adjlist_t al;
@@ -256,13 +256,15 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
+static igraph_error_t community_fast_label_propagation(
+        const igraph_t *graph,
         igraph_vector_int_t *membership,
         igraph_neimode_t mode,
         const igraph_vector_t *weights,
-        igraph_vector_bool_t *fixed) {
+        const igraph_vector_bool_t *fixed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_not_fixed_nodes = 0;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_not_fixed_nodes = 0;
     igraph_integer_t i, j, k;
     igraph_inclist_t il;
     igraph_adjlist_t al;
@@ -314,7 +316,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
 
     for (i = 0; i < no_of_not_fixed_nodes; i++) {
         IGRAPH_CHECK(igraph_dqueue_int_push(&queue, VECTOR(node_order)[i]));
-        VECTOR(in_queue)[VECTOR(node_order)[i]] = 1;
+        VECTOR(in_queue)[VECTOR(node_order)[i]] = true;
     }
     igraph_vector_int_destroy(&node_order);
     IGRAPH_FINALLY_CLEAN(1);
@@ -328,7 +330,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         v1 = igraph_dqueue_int_pop(&queue);
-        VECTOR(in_queue)[v1] = 0;
+        VECTOR(in_queue)[v1] = false;
 
         /* Count the weights corresponding to different labels */
         igraph_vector_int_clear(&dominant_labels);
@@ -391,7 +393,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
                         if (neigh_label != new_label && /* not in new community */
                             (fixed == NULL || !VECTOR(*fixed)[v2]) ) { /* not fixed */
                             IGRAPH_CHECK(igraph_dqueue_int_push(&queue, v2));
-                            VECTOR(in_queue)[v2] = 1;
+                            VECTOR(in_queue)[v2] = true;
                         }
                     }
                 }
@@ -500,7 +502,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * https://doi.org/10.1038/s41598-023-29610-z
  * https://arxiv.org/abs/2209.13338
  *
- * \param graph The input graph. Note that the algorithm wsa originally
+ * \param graph The input graph. Note that the algorithm was originally
  *    defined for undirected graphs. You are advised to set \p mode to
  *    \c IGRAPH_ALL if you pass a directed graph here to treat it as
  *    undirected.
@@ -557,8 +559,9 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         const igraph_vector_int_t *initial,
         const igraph_vector_bool_t *fixed,
         igraph_lpa_variant_t lpa_variant) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_not_fixed_nodes = no_of_nodes;
     igraph_integer_t i, j, k;
     igraph_bool_t unlabelled_left;
@@ -617,10 +620,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                          * modify 'fixed_copy' instead */
                         if (fixed_copy == fixed) {
                             fixed_copy = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-                            if (fixed_copy == 0) {
-                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                            }
-
+                            IGRAPH_CHECK_OOM(fixed_copy, "Insufficient memory for label propagation.");
                             IGRAPH_FINALLY(igraph_free, fixed_copy);
                             IGRAPH_CHECK(igraph_vector_bool_init_copy(fixed_copy, fixed));
                             IGRAPH_FINALLY(igraph_vector_bool_destroy, fixed_copy);
@@ -647,15 +647,15 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     /* From this point onwards we use 'fixed_copy' instead of 'fixed' */
     switch (lpa_variant) {
     case IGRAPH_LPA_FAST:
-        IGRAPH_CHECK(igraph_i_community_fast_label_propagation(graph, membership, mode, weights, fixed_copy));
+        IGRAPH_CHECK(community_fast_label_propagation(graph, membership, mode, weights, fixed_copy));
         break;
 
     case IGRAPH_LPA_RETENTION:
-        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ true ));
+        IGRAPH_CHECK(community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ true ));
         break;
 
     case IGRAPH_LPA_DOMINANCE:
-        IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ false));
+        IGRAPH_CHECK(community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ false));
         break;
 
     default:
@@ -738,7 +738,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                     igraph_integer_t ni, num_neis;
                     igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
                     num_neis = igraph_vector_int_size(&neis);
 
                     for (ni = 0; ni < num_neis; ++ni) {

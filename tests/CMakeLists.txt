@@ -144,8 +144,7 @@ add_legacy_tests(
   igraph_empty
   igraph_get_eid
   igraph_is_same_graph
-  igraph_i_incident
-  igraph_i_neighbors
+  igraph_incident
   igraph_neighbors
 )
 
@@ -225,6 +224,7 @@ add_legacy_tests(
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
+  igraph_lcf
   igraph_kautz
   igraph_preference_game
   igraph_perfect
@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  igraph_product
   components
   coreness
   efficiency
@@ -293,7 +294,7 @@ add_legacy_tests(
   global_transitivity
   harmonic_centrality
   hub_and_authority
-  igraph_adjacent_triangles
+  igraph_count_adjacent_triangles
   igraph_are_adjacent
   igraph_average_path_length
   igraph_average_path_length_dijkstra
@@ -364,8 +365,11 @@ add_legacy_tests(
   igraph_voronoi
   igraph_widest_paths
   igraph_spanner
+  jdm
   knn
   minimum_spanning_tree
+  mycielskian
+  paths
   random_spanning_tree
   reachability
   single_target_shortest_path
@@ -408,6 +412,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_layout_align
   igraph_layout_drl
   igraph_layout_drl_3d
   igraph_layout_bipartite
@@ -851,22 +856,6 @@ add_legacy_tests(
   igraph_hrg_create
 )
 
-# microscopic.at
-add_examples(
-  FOLDER examples/simple NAMES
-  igraph_deterministic_optimal_imitation
-  igraph_roulette_wheel_imitation
-  igraph_stochastic_imitation
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  igraph_deterministic_optimal_imitation
-  igraph_moran_process
-  igraph_roulette_wheel_imitation
-  igraph_stochastic_imitation
-)
-
 # mt.at -- only if we have pthreads
 if(CMAKE_USE_PTHREADS_INIT)
   add_legacy_tests(
@@ -931,6 +920,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_graphical
   igraph_is_bigraphical
+  igraph_realize_bipartite_degree_sequence
 )
 
 # cycle bases
@@ -1014,6 +1004,7 @@ add_benchmarks(
   igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph
   igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
@@ -1030,16 +1021,17 @@ add_benchmarks(
   igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
-  lad
   intersection
+  lad
+  modularity
   spanning_tree
 )
 
-# dot product
+# sampling
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_sample_dirichlet
-  igraph_sample_sphere
+  igraph_rng_sample_dirichlet
+  igraph_rng_sample_sphere
 )
 
 # lattices
@@ -1047,14 +1039,4 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
-)
-
-add_legacy_tests(
-        FOLDER tests/unit NAMES
-        jdm
-)
-
-add_legacy_tests(
-        FOLDER tests/unit NAMES
-        igraph_realize_bipartite_degree_sequence
 )

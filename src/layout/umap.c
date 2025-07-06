@@ -255,7 +255,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
     /* Iterate over vertices x, like in the paper */
     for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
         /* Edges out of this vertex, e.g. to its k-nearest neighbors */
-        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_OUT, IGRAPH_LOOPS));
         no_of_neis = igraph_vector_int_size(&eids);
 
         /* Vertex has no neighbors */
@@ -793,7 +793,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
         /* we move all vertices on one end of the edges, then we come back for
          * the vertices on the other end. This way we don't move both ends at the
          * same time, which is almost a wasted move since they attract each other */
-        int swapflag = (int)(RNG_UNIF01() > 0.5);
+        int swapflag = (int)(RNG_BOOL());
         int swapflag_end = swapflag + 2;
         for (; swapflag < swapflag_end; swapflag++) {
 
@@ -854,7 +854,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                     /* NOTE: the efficiency of this step could be improved but it
                      * should be only used for small graphs anyway, so it's fine */
                     igraph_bool_t skip = false;
-                    IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL));
+                    IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL, IGRAPH_LOOPS));
                     const igraph_integer_t nneis = igraph_vector_int_size(&neis);
                     for (igraph_integer_t k = 0; k < nneis; k++) {
                         igraph_integer_t eid2 = VECTOR(neis)[k];
@@ -1215,7 +1215,7 @@ static igraph_error_t igraph_i_layout_umap(
  *   typically a sparse graph with only edges for the shortest distances stored, e.g.
  *   a k-nearest neighbors graph.
  * \param res Pointer to the n by 2 matrix where the layout coordinates will be stored.
- * \param use_seed Logical, if \c true the supplied values in the \p res argument are
+ * \param use_seed If \c true the supplied values in the \p res argument are
  *   used as an initial layout, if \c false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all weights will be set to 1.
@@ -1259,7 +1259,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   vertex to its neighbors. However, it can also be an undirected graph. If the
  *   \p distances_are_weights is \c true, this is treated as an undirected graph.
  * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
- * \param use_seed Logical, if true the supplied values in the \p res argument are used
+ * \param use_seed If true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all edges are assumed to have the same distance.

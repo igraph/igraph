@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ERROR_H
@@ -29,7 +24,7 @@
 
 #include <stdarg.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* This file contains the igraph error handling.
  * Most bits are taken literally from the GSL library (with the GSL_
@@ -305,7 +300,7 @@ typedef enum {
     /* IGRAPH_GLP_EMIPGAP       = 48, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ETMLIM        = 49, */   /* removed in 1.0 */
     /* IGRAPH_GLP_ESTOP         = 50, */   /* removed in 1.0 */
-    /* IGRAPH_EATTRIBUTES       = 51, */   /* rempved in 1.0 */
+    /* IGRAPH_EATTRIBUTES       = 51, */   /* removed in 1.0 */
     IGRAPH_EATTRCOMBINE      = 52,
     /* IGRAPH_ELAPACK           = 53, */   /* removed in 1.0 */
     /* IGRAPH_EDRL              = 54, */   /* deprecated in 0.10.2, removed in 1.0 */
@@ -482,7 +477,7 @@ IGRAPH_EXPORT igraph_error_t igraph_errorvf(const char *reason, const char *file
                                             int line, igraph_error_t igraph_errno,
                                             va_list ap);
 
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(const igraph_error_t igraph_errno);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strerror(igraph_error_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -577,10 +572,27 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * \brief Registers an object for deallocation.
  *
  * This macro places the address of an object, together with the
- * address of its destructor in a stack. This stack is used if an
+ * address of its destructor on a stack. This stack is used if an
  * error happens to deallocate temporarily allocated objects to
  * prevent memory leaks. After manual deallocation, objects are removed
  * from the stack using \ref IGRAPH_FINALLY_CLEAN().
+ *
+ * </para><para>
+ * The typical usage is just after an initialization:
+ *
+ * <programlisting>
+ * IGRAPH_CHECK(igraph_vector_init(&amp;vector, 0));
+ * IGRAPH_FINALLY(igraph_vector_destroy, &amp;vector);
+ * </programlisting>
+ *
+ * The most commonly used data structures, such as \ref igraph_vector_t,
+ * have associated convenience macros that initialize the object and register
+ * it on this stack in one step. Thus the pattern above can be replaced with a
+ * single line:
+ *
+ * <programlisting>
+ * IGRAPH_VECTOR_INIT_FINALLY(&amp;vector, 0);
+ * </programlisting>
  *
  * \param func The function which is normally called to
  *   destroy the object.
@@ -596,13 +608,9 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
         IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
     } while (0)
 
-#if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
-    #define GCC_VERSION_MAJOR  __GNUC__
-#endif
-
-#if defined(GCC_VERSION_MAJOR) && (GCC_VERSION_MAJOR >= 3)
-    #define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
-    #define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
+#if defined(__GNUC__)
+    #define IGRAPH_UNLIKELY(a) __builtin_expect(!!(a), 0)
+    #define IGRAPH_LIKELY(a)   __builtin_expect(!!(a), 1)
 #else
     #define IGRAPH_UNLIKELY(a) a
     #define IGRAPH_LIKELY(a)   a
@@ -919,6 +927,6 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason,
         } \
     } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

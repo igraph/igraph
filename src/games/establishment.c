@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -46,7 +44,7 @@
  * If \c NULL, the distribution is assumed to be uniform.
  * \param pref_matrix Matrix giving the connection probabilities for
  * different vertex types.
- * \param directed Logical, whether to generate a directed graph.
+ * \param directed Whether to generate a directed graph.
  * \param node_type_vec An initialized vector or \c NULL.
  * If not \c NULL, the type of each node will be stored here.
  * \return Error code.

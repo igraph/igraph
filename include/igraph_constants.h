@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_CONSTANTS_H
@@ -26,13 +21,15 @@
 
 #include "igraph_decls.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Constants                                          */
 /* -------------------------------------------------- */
 
-typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
+/* These constants are meant to be used for sake of readability */
+enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
+enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
 
 /* Note for the enum below: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
  * is 2. This is intentional, for the sake of backwards compatibility with
@@ -40,11 +37,7 @@ typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
  * IGRAPH_LOOPS_TWICE */
 typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IGRAPH_LOOPS_ONCE = 2 } igraph_loops_t;
 
-typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_multiple_t;
-
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
-
-typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
 
 /* Do not renumber the following values! Some internal code treats them as bitmasks
  * and assumes that IGRAPH_ALL == IGRAPH_IN | IGRAPH_OUT and IGRAPH_IN & IGRAPH_OUT == 0. */
@@ -81,10 +74,6 @@ typedef enum { IGRAPH_TREE_OUT = 0, IGRAPH_TREE_IN,
                IGRAPH_TREE_UNDIRECTED
              } igraph_tree_mode_t;
 
-typedef enum { IGRAPH_ERDOS_RENYI_GNP = 0,
-               IGRAPH_ERDOS_RENYI_GNM
-             } igraph_erdos_renyi_t;
-
 typedef enum { IGRAPH_GET_ADJACENCY_UPPER = 0,
                IGRAPH_GET_ADJACENCY_LOWER,
                IGRAPH_GET_ADJACENCY_BOTH
@@ -105,13 +94,6 @@ typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,
 typedef enum { IGRAPH_RANDOM_TREE_PRUFER = 0,
                IGRAPH_RANDOM_TREE_LERW
              } igraph_random_tree_t;
-
-typedef enum { IGRAPH_FILEFORMAT_EDGELIST = 0,
-               IGRAPH_FILEFORMAT_NCOL,
-               IGRAPH_FILEFORMAT_PAJEK,
-               IGRAPH_FILEFORMAT_LGL,
-               IGRAPH_FILEFORMAT_GRAPHML
-             } igraph_fileformat_type_t;
 
 typedef enum { IGRAPH_REWIRING_SIMPLE = 0,
                IGRAPH_REWIRING_SIMPLE_LOOPS
@@ -142,10 +124,6 @@ typedef enum { IGRAPH_VCONN_NEI_ERROR = 0,
 typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE = 0,
                IGRAPH_SPINCOMM_UPDATE_CONFIG
              } igraph_spincomm_update_t;
-
-typedef enum { IGRAPH_DONT_SIMPLIFY = 0,
-               IGRAPH_SIMPLIFY
-             } igraph_lazy_adlist_simplify_t;
 
 typedef enum { IGRAPH_TRANSITIVITY_NAN = 0,
                IGRAPH_TRANSITIVITY_ZERO
@@ -186,11 +164,6 @@ typedef enum { IGRAPH_SUBGRAPH_AUTO = 0,
                IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
              } igraph_subgraph_implementation_t;
 
-typedef enum { IGRAPH_IMITATE_AUGMENTED = 0,
-               IGRAPH_IMITATE_BLIND,
-               IGRAPH_IMITATE_CONTRACTED
-             } igraph_imitate_algorithm_t;
-
 typedef enum { IGRAPH_LAYOUT_GRID = 0,
                IGRAPH_LAYOUT_NOGRID,
                IGRAPH_LAYOUT_AUTOGRID
@@ -220,6 +193,12 @@ typedef enum { IGRAPH_MST_AUTOMATIC = 0,
                IGRAPH_MST_KRUSKAL
              } igraph_mst_algorithm_t;
 
+typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
+               IGRAPH_PRODUCT_LEXICOGRAPHIC,
+               IGRAPH_PRODUCT_STRONG,
+               IGRAPH_PRODUCT_TENSOR,
+             } igraph_product_t;
+
 /**
  * \typedef igraph_lpa_variant_t
  * \brief Label propagation algorithm variants of implementation
@@ -235,6 +214,6 @@ typedef enum {
     IGRAPH_LPA_FAST           // Sample from dominant labels, only check neighbors
 } igraph_lpa_variant_t;
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

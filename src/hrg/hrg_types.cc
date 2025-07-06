@@ -1594,7 +1594,7 @@ void dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
     t        = tempPair->t;
 
     if (t == LEFT) {
-        if (RNG_UNIF01() < 0.5) { // ## LEFT ALPHA move: ((i,j),k) -> ((i,k),j)
+        if (RNG_BOOL()) { // ## LEFT ALPHA move: ((i,j),k) -> ((i,k),j)
             // We need to calculate the change in the likelihood (dLogL)
             // that would result from this move. Most of the information
             // needed to do this is already available, the exception being
@@ -1726,7 +1726,7 @@ void dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
 
         // right-edge: t == RIGHT
 
-        if (RNG_UNIF01() < 0.5) {
+        if (RNG_BOOL()) {
 
             // alpha move: (i,(j,k)) -> ((i,k),j)
 

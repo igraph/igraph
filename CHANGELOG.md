@@ -44,16 +44,38 @@
  - `igraph_get_all_simple_paths()` now has an additional parameter that allows restricting paths by minimum length as well.
  - `igraph_strvector_print()` no longer takes a file parameter. Use `igraph_strvector_fprint()` to print to a file.
  - `igraph_community_optimal_modularity()` now takes a `resolution` parameter and its `weight` parameter was moved to the second place.
+ - `igraph_attribute_handler_t` members that formerly took an untyped `igraph_vector_ptr_t` argument are now taking a typed `igraph_attribute_record_list_t` argument instead.
+ - The deprecated `IGRAPH_ATTRIBUTE_DEFAULT` value of the `igraph_attribute_type_t` enum was removed.
+ - The `gettype` member of `igraph_attribute_table_t` was renamed to `get_type` for sake of consistency with the naming scheme of other struct members.
+ - Attribute table members that retrieve graph, vertex or edge attributes must not clear the incoming result vector any more; results must be appended to the end of the provided result vector instead.
+ - The `value` member of `igraph_attribute_record_t` is now a union that can be used to formally treat the associated pointer as an `igraph_vector_t*`, `igraph_strvector_t*` or `igraph_vector_bool_t*`.
+ - `igraph_lcf()` was renamed to `igraph_lcf_small()` and `igraph_lcf_vector()` was renamed to `igraph_lcf()`. Now `igraph_lcf()` takes shifts as a vector input, while `igraph_lcf_small()` accepts a shorthand notation where shifts are given as a variable number of function arguments.
+ - The deprecated `igraph_rng_get_dirichlet()` function was removed.
+ - `igraph_motifs_randesu_no()` and `igraph_motifs_randesu_estimate()` now take an `igraph_real_t` as their `result` argument to prevent overflows when igraph is compiled with 32-bit integers.
+ - The weighted variants of `igraph_diameter()`, `igraph_pseudo_diameter()`, `igraph_radius()`, `igraph_graph_center()`, `igraph_eccentricity()` and `igraph_average_path_length()` were merged into the undirected ones by adding a new argument named `weights` in the second position.
+ - The `weights` parameter of `igraph_average_path_length()`, `igraph_global_efficiency()`, `igraph_local_efficiency()` and `igraph_average_local_efficiency()` were moved to the second position, after the `graph` itself, for sake of consistency with other functions.
+ - `igraph_edges()` gained a new `bycol` argument that determines the order in which the edges are returned. `bycol` = 0 reproduces the existing behaviour, while `bycol` = 1 returns the edges suitable for a matrix stored in column-wise order.
+ - `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()`.
+ - `igraph_incident()` and `igraph_es_incident()` gained an extra arguments to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`.
+ - `igraph_multiple_t` was removed from the public API as it is essentially a boolean. The symbolic constants `IGRAPH_MULTIPLE` and `IGRAPH_NO_MULTIPLE` were kept to improve readability of code written directly in C.
+ - The semantics of the `igraph_permute_vertices()` permutation argument has changed: the i-th element of the vector now contains the index of the _original_ vertex that will be mapped to the i-th vertex in the new graph. This is now consistent with how other igraph functions treat permutations and vertex index vectors; for instance, you can now pass the result of `igraph_topological_sorting()` directly to `igraph_permute_vertices()` to obtain a new graph where the vertices are sorted topologically.
+ - The type of the `loops` argument of `igraph_centralization_degree()`, `igraph_centralization_degree_tmax()`, `igraph_degree()`, `igraph_maxdegree()`, `igrapH_sort_vertex_ids_by_degree()` and `igraph_strength()` was changed to `igraph_loops_t` from `igraph_bool_t`, allowing finer-grained control about how loop edges are treated.
+ - `igraph_adjacency()` now treats `IGRAPH_LOOPS_TWICE` as `IGRAPH_LOOPS_ONCE` when the mode is `IGRAPH_ADJ_DIRECTED`, `IGRAPH_ADJ_UPPER` or `IGRAPH_ADJ_LOWER`. For directed graphs, this is for the sake of consistency with the rest of the library where `IGRAPH_LOOPS_TWICE` is considered for undirected graphs only. For the "upper" and "lower" modes, double-counting the diagonal makes no sense because the double-counting artifact appears when you add the _transpose_ of an upper (or lower) diagonal matrix on top of the matrix itself. See Github issue #2501 for more context.
+ - `igraph_strvector_push_back_len()` now takes a length parameter of `size_t` instead of `igraph_integer_t`.
+ - `igraph_sample_dirichlet()`, `igraph_sample_sphere_surface()` and `igraph_sample_sphere_volume()` were removed in favour of `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_surface()` and `igraph_rng_sample_sphere_volume()`, which allow the user to specify the random number generator to use.
 
 ### Added
 
  - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
- - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdős-Rényi graphs with multi-edges.
- - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to generate random bipartite graphs with multi-edges.
+ - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to uniformly sample G(n,m) graphs with multi-edges.
+ - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to uniformly sample bipartite G(n,m) graphs with multi-edges.
+ - `igraph_iea_game()` samples random multigraphs through independent edge assignment.
+ - `igraph_bipartite_iea_game()` samples random bipartite multigraph through independent edge assignment.
  - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
  - `igraph_vector_ptr_capacity()` returns the allocated capacity of a pointer vector.
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
  - `igraph_strvector_fprint()` prints a string vector to a file.
+ - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
 
 ### Changed
 
@@ -106,6 +128,8 @@
  - The deprecated `igraph_random_edge_walk()` was removed. Its functionality is incorporated in `igraph_random_walk()`.
  - The deprecated `igraph_vector_qsort_ind()` was removed. Use `igraph_vector_sort_ind()` instead.
  - The deprecated `igraph_vector_binsearch2()` was removed. Use `igraph_vector_contains_sorted()` instead.
+ - The deprecated `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` functions were removed.
+ - The unused enum type `igraph_fileformat_type_t` was removed.
 
 ### Deprecated
 
@@ -117,9 +141,49 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
+ - `igraph_product()` supports the lexicographic and strong graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772!
+ - `igraph_mycielskian()` and `igraph_mycielski_graph()` compute a Mycielski transformation of a graph, and a Mycielski graph, respectively. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2741!
+
+### Fixed
+
+ - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
+ - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
+
+### Other
+
+ - Documentation improvements.
+ - Simple cycle search (`igraph_simple_cycles()` and `igraph_simple_cycles_callback()`) is sped up by skipping cycle search from some redundant start vertices. Thanks to Tim Bernhard @GenieTim for contributing this improvement in #2714!
+
+## [0.10.16] - 2025-06-10
+
+### Added
+
+ - `igraph_count_triangles()` counts undirected triangles in a graph.
+ - `igraph_count_adjacent_triangles()` (rename of `igraph_adjacent_triangles()`).
+ - `igraph_rng_get_bool()` and `RNG_BOOL()` produce a single random boolean.
+ - `igraph_product()` computes various kinds of graph products of two graphs. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2748!
+
+### Changed
+
+ - `igraph_neighborhood_size()`, `igraph_neighborhood()` and `igraph_neighborhood_graphs()` now accept a negative `order` value and interpret it as infinite order. Previously, a negative `order` value was disallowed.
+ - `igraph_famous()` now accepts `Groetzsch` as an alias of `Grotzsch`.
+ - `igraph_vertex_path_from_edge_path()` can now determine the start vertex automatically.
+
+### Fixed
+
+ - `igraph_largest_independent_vertex_sets()` and `igraph_maximal_independent_vertex_sets()` would sometimes return incorrect results for graphs with self-loops. This is now corrected.
+ - `igraph_vertex_path_from_edge_path()` now validates the start vertex.
+ - Fixed a memory leak in the GraphML parser for cases when the `id` attribute was specified multiple times within the same XML tag.
+
 ### Deprecated
 
  - The undocumented function `igraph_vector_sumsq()` is deprecated. Use `igraph_blas_dnrm2()` to compute the Euclidean norm of real vectors.
+ - `igraph_adjacent_triangles()` is deprecated and scheduled for removal in 1.0.
+ - `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` are now deprecated and scheduled for removal in 1.0.
+ - `igraph_rng_get_dirichlet()` is deprecated and scheduled for removal in 1.0. Its interface is inconsistent with the other `igraph_rng_get_...()` functions and we have a replacemenet for it in `igraph_sample_dirichlet()`. igraph 1.0 will gain an `igraph_rng_sample_dirichlet()` function that lets the caller pass in an `igraph_rng_t` instance as well.
 
 ### Other
 
@@ -127,7 +191,9 @@
  - Updated the vendored `plfit` library to version 1.0.0. This works around a bug in some MSVC / Windows SDK versions that define a `NAN` macro that is not a compile-time constant.
  - Updated vendored BLAS to 3.12.0 and vendored ARPACK to ARPACK-NG 3.7.0.
  - Re-translated vendored BLAS/LAPACK/ARPACK sources with f2c version 20240504.
- - Documentation improvements.
+ - The performance of `igraph_transitivity_undirected()` is improved by a factor of about 2.5.
+ - The performance of `igraph_degree_sequence_game()` is improved when using `IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE`.
+ - Documentation improvements and fixes.
 
 ## [0.10.15]
 
@@ -1575,7 +1641,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.15..master
+[master]: https://github.com/igraph/igraph/compare/0.10.16..master
+[0.10.16]: https://github.com/igraph/igraph/compare/0.10.15..0.10.16
 [0.10.15]: https://github.com/igraph/igraph/compare/0.10.13..0.10.15
 [0.10.13]: https://github.com/igraph/igraph/compare/0.10.12..0.10.13
 [0.10.12]: https://github.com/igraph/igraph/compare/0.10.11..0.10.12

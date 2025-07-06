@@ -54,7 +54,7 @@ int main(void) {
 
     /* Use degrees as vertex weights for optimizing modularity */
     igraph_vector_init(&weights, igraph_vcount(&graph));
-    igraph_strength(&graph, &weights, igraph_vss_all(), IGRAPH_ALL, /*loops*/ true, NULL);
+    igraph_strength(&graph, &weights, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, NULL);
 
     /* Perform Leiden algorithm using modularity until stable iteration */
     igraph_community_leiden(&graph, NULL, &weights, 1.0 / (2 * igraph_ecount(&graph)), 0.01, 0, -1, &membership, &nb_clusters, &quality);

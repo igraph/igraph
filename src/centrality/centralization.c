@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -114,8 +112,11 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  * \param mode Constant the specifies the type of degree for directed
  *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
  *     IGRAPH_ALL. This argument is ignored for undirected graphs.
- * \param loops Boolean, whether to consider loop edges when
- *     calculating the degree (and the centralization).
+ * \param loops Specifies how to treat loop edges when calculating the
+ *     degree (and the centralization). \c IGRAPH_NO_LOOPS ignores loop
+ *     edges; \c IGRAPH_LOOPS_ONCE counts each loop edge only once;
+ *     \c IGRAPH_LOOPS_TWICE counts each loop edge twice in undirected
+ *     graphs and once in directed graphs.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
  * \param theoretical_max Pointer to real number or a null pointer. If
@@ -134,11 +135,11 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  * score.
  */
 
-igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
-                                 igraph_neimode_t mode, igraph_bool_t loops,
-                                 igraph_real_t *centralization,
-                                 igraph_real_t *theoretical_max,
-                                 igraph_bool_t normalized) {
+igraph_error_t igraph_centralization_degree(
+    const igraph_t *graph, igraph_vector_t *res, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_real_t *centralization,
+    igraph_real_t *theoretical_max, igraph_bool_t normalized
+) {
 
     igraph_vector_t myscores;
     igraph_vector_t *scores = res;
@@ -200,8 +201,11 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  *     or total degree (\c IGRAPH_ALL). This is ignored if
  *     the \p graph argument is not a null pointer and the
  *     given graph is undirected.
- * \param loops Boolean, whether to consider loop edges in the
- *     calculation.
+ * \param loops Specifies how to treat loop edges when calculating the
+ *     degree (and the centralization). \c IGRAPH_NO_LOOPS ignores loop
+ *     edges; \c IGRAPH_LOOPS_ONCE counts each loop edge only once;
+ *     \c IGRAPH_LOOPS_TWICE counts each loop edge twice in undirected
+ *     graphs and once in directed graphs.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
  *
@@ -211,11 +215,10 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  * igraph_centralization().
  */
 
-igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
-                                      igraph_integer_t nodes,
-                                      igraph_neimode_t mode,
-                                      igraph_bool_t loops,
-                                      igraph_real_t *res) {
+igraph_error_t igraph_centralization_degree_tmax(
+    const igraph_t *graph, igraph_integer_t nodes, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_real_t *res
+) {
 
     igraph_bool_t directed = (mode != IGRAPH_ALL);
     igraph_real_t real_nodes;
@@ -240,14 +243,14 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
         switch (mode) {
         case IGRAPH_IN:
         case IGRAPH_OUT:
-            if (!loops) {
+            if (loops == IGRAPH_NO_LOOPS) {
                 *res = (real_nodes - 1) * (real_nodes - 1);
             } else {
                 *res = (real_nodes - 1) * real_nodes;
             }
             break;
         case IGRAPH_ALL:
-            if (!loops) {
+            if (loops == IGRAPH_NO_LOOPS) {
                 *res = 2 * (real_nodes - 1) * (real_nodes - 2);
             } else {
                 *res = 2 * (real_nodes - 1) * (real_nodes - 1);
@@ -255,8 +258,10 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
             break;
         }
     } else {
-        if (!loops) {
+        if (loops == IGRAPH_NO_LOOPS) {
             *res = (real_nodes - 1) * (real_nodes - 2);
+        } else if (loops == IGRAPH_LOOPS_ONCE) {
+            *res = (real_nodes - 1) * (real_nodes - 1);
         } else {
             *res = (real_nodes - 1) * real_nodes;
         }

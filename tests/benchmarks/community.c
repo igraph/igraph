@@ -31,7 +31,7 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights,
     igraph_vector_int_init(&membership, vcount);
     igraph_vector_init(&vertex_weight, vcount);
 
-    igraph_strength(graph, &vertex_weight, igraph_vss_all(), IGRAPH_ALL, true, weights);
+    igraph_strength(graph, &vertex_weight, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, weights);
 
     snprintf(msg2, sizeof(msg2) / sizeof(msg2[0]),
              "%s, vcount=%" IGRAPH_PRId ", ecount=%" IGRAPH_PRId ", %s, %dx",

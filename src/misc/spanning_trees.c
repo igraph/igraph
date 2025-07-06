@@ -67,7 +67,7 @@ static igraph_integer_t max_tree_edges(igraph_integer_t no_of_nodes, igraph_inte
  * minimum spanning tree algorithms.
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
+static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
         const igraph_t* graph,
         igraph_vector_int_t* res) {
 
@@ -99,8 +99,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
         while (! igraph_dqueue_int_empty(&q)) {
             igraph_integer_t eids_size;
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
-            IGRAPH_CHECK(igraph_incident(graph, &eids, act_node,
-                                         IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &eids, act_node, IGRAPH_ALL, IGRAPH_LOOPS));
             eids_size = igraph_vector_int_size(&eids);
             for (igraph_integer_t j = 0; j < eids_size; j++) {
                 igraph_integer_t edge = VECTOR(eids)[j];
@@ -174,7 +173,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_prim(
+static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         const igraph_t* graph,
         igraph_vector_int_t* res,
         const igraph_vector_t *weights) {
@@ -195,7 +194,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
     }
 
     if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     igraph_vector_int_clear(res);
@@ -218,7 +217,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
         IGRAPH_BIT_SET(already_added, i);
         /* add all edges of the first vertex */
-        IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL, IGRAPH_LOOPS));
         adj_size = igraph_vector_int_size(&adj);
         for (igraph_integer_t j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
@@ -246,7 +245,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_prim(
                     IGRAPH_BIT_SET(added_edges, edge);
                     igraph_vector_int_push_back(res, edge); /* reserved */
                     /* add all outgoing edges */
-                    IGRAPH_CHECK(igraph_incident(graph, &adj, to, IGRAPH_ALL));
+                    IGRAPH_CHECK(igraph_incident(graph, &adj, to, IGRAPH_ALL, IGRAPH_LOOPS));
                     adj_size = igraph_vector_int_size(&adj);
                     for (igraph_integer_t j = 0; j < adj_size; j++) {
                         const igraph_integer_t edgeno = VECTOR(adj)[j];
@@ -335,7 +334,7 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
+static igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
         const igraph_t *graph,
         igraph_vector_int_t *res,
         const igraph_vector_t *weights) {
@@ -355,7 +354,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
     }
 
     if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no_of_edges);

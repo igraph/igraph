@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_FOREIGN_H
@@ -33,7 +28,7 @@
 
 #include <stdio.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Read and write foreign formats                     */
@@ -98,6 +93,6 @@ typedef struct igraph_safelocale_s *igraph_safelocale_t;
 IGRAPH_EXPORT igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc);
 IGRAPH_EXPORT void  igraph_exit_safelocale(igraph_safelocale_t *loc);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

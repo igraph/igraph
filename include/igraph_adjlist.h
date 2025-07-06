@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ADJLIST_H
@@ -30,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 typedef struct igraph_adjlist_t {
     igraph_integer_t length;
@@ -44,7 +39,7 @@ typedef struct igraph_inclist_t {
 
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                       igraph_neimode_t mode, igraph_loops_t loops,
-                                      igraph_multiple_t multiple);
+                                      igraph_bool_t multiple);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
@@ -112,14 +107,14 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_vector_int_t **adjs;
     igraph_neimode_t mode;
     igraph_loops_t loops;
-    igraph_multiple_t multiple;
+    igraph_bool_t multiple;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                                            igraph_lazy_adjlist_t *al,
                                            igraph_neimode_t mode,
                                            igraph_loops_t loops,
-                                           igraph_multiple_t multiple);
+                                           igraph_bool_t multiple);
 IGRAPH_EXPORT void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);
@@ -220,6 +215,6 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_lazy_inclist_size(con
                                     : (igraph_i_lazy_inclist_get_real(il,no)))
 IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il, igraph_integer_t no);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

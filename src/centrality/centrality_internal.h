@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -28,11 +27,11 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector);
 void igraph_i_vector_scale_by_max_abs(igraph_vector_t *vec);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -380,7 +378,10 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                 *value = 0;
             }
             if (vector) {
-                IGRAPH_CHECK(igraph_strength(graph, vector, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode), true, weights));
+                IGRAPH_CHECK(igraph_strength(
+                    graph, vector, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode),
+                    IGRAPH_LOOPS, weights
+                ));
                 for (igraph_integer_t i=0; i < no_of_nodes; i++) {
                     if (VECTOR(*vector)[i] == 0) {
                         VECTOR(*vector)[i] = 1;
@@ -522,7 +523,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * vertex is proportional to the sum of eigenvector centralities of its
  * neighbors. In practice, the centralities are determined by calculating the
  * eigenvector corresponding to the largest positive eigenvalue of the
- * adjacency matrix. This is motivated by the the fact that the principal
+ * adjacency matrix. This is motivated by the fact that the principal
  * eigenvector is guaranteed to be non-negative, assuming that edge weights
  * are also non-negative. In fact, in connected undirected graphs, this is
  * the \em only non-negative eigenvector.

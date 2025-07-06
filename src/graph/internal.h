@@ -21,22 +21,12 @@
 
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
-#include "igraph_constants.h"
 #include "igraph_error.h"
-#include "igraph_vector.h"
 
-__BEGIN_DECLS
-
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_neighbors(
-   const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t pnode,
-   igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple);
-
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_incident(
-   const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-   igraph_neimode_t mode, igraph_loops_t loops);
+IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_reverse(igraph_t *graph);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_GRAPH_INTERNAL_H */

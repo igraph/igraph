@@ -20,15 +20,15 @@
 #include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob) {
-    igraph_integer_t result;
+    igraph_real_t result;
     IGRAPH_ASSERT(igraph_motifs_randesu_no(graph, &result, size, cut_prob) == IGRAPH_SUCCESS);
-    printf("Result: %" IGRAPH_PRId "\n\n", result);
+    printf("Result: %g\n\n", result);
 }
 
 int main(void) {
     igraph_t g_0, g_1, g_50_full, g_4_3_1;
     igraph_vector_t cut_prob_01;
-    igraph_integer_t result;
+    igraph_real_t result;
 
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
 

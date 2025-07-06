@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_TYPES_H
@@ -26,7 +21,7 @@
 
 #include "igraph_decls.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 #ifdef __cplusplus
     #define __STDC_FORMAT_MACROS   /* needed for PRId32 and PRId64 from inttypes.h on Linux */
@@ -104,7 +99,9 @@ typedef IGRAPH_BOOL_TYPE igraph_bool_t;
  */
 #define IGRAPH_VCOUNT_MAX (IGRAPH_INTEGER_MAX-1)
 /* The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
- * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1
+ * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1.
+ * Several functions rely on this value not exceeding IGRAPH_INTEGER_MAX-1
+ * to avoid overflow.
  */
 
 /**
@@ -142,6 +139,6 @@ IGRAPH_EXPORT int igraph_real_snprintf_precise(char *str, size_t size, igraph_re
 #define IGRAPH_NEGINFINITY (-IGRAPH_INFINITY)
 #define IGRAPH_NAN ((double)NAN)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

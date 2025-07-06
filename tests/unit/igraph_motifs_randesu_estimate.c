@@ -21,9 +21,9 @@
 
 void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
                     igraph_integer_t sample_size, igraph_vector_int_t *parsample) {
-    igraph_integer_t estimate;
+    igraph_real_t estimate;
     IGRAPH_ASSERT(igraph_motifs_randesu_estimate(graph, &estimate, size, cut_prob, sample_size, parsample) == IGRAPH_SUCCESS);
-    printf("Estimate: %" IGRAPH_PRId "\n\n", estimate);
+    printf("Estimate: %g\n\n", estimate);
 }
 
 
@@ -31,7 +31,7 @@ int main(void) {
     igraph_t g_0, g_1, g_50_full, g_4_3_1;
     igraph_vector_t cut_prob_01;
     igraph_vector_int_t parsample;
-    igraph_integer_t estimate;
+    igraph_real_t estimate;
 
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
     igraph_vector_int_init_range(&parsample, 0, 41);

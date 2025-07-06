@@ -27,7 +27,7 @@ void check_radius(const igraph_t *graph, const igraph_vector_int_t *center, igra
     igraph_real_t radius;
     igraph_integer_t n = igraph_vector_int_size(center);
 
-    igraph_radius(graph, &radius, mode);
+    igraph_radius(graph, NULL, &radius, mode);
     printf("Radius: %g\n", radius);
 
     if (n == 0) {
@@ -35,7 +35,7 @@ void check_radius(const igraph_t *graph, const igraph_vector_int_t *center, igra
         IGRAPH_ASSERT(isnan(radius));
     } else {
         igraph_vector_init(&ecc, 0);
-        igraph_eccentricity(graph, &ecc, igraph_vss_vector(center), mode);
+        igraph_eccentricity(graph, NULL, &ecc, igraph_vss_vector(center), mode);
         for (igraph_integer_t i=0; i < n; i++) {
             IGRAPH_ASSERT(VECTOR(ecc)[i] == radius);
         }
@@ -50,7 +50,7 @@ void check_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights
     igraph_integer_t n = igraph_vector_int_size(center);
     const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
-    igraph_radius_dijkstra(graph, weights, &radius, mode);
+    igraph_radius(graph, weights, &radius, mode);
     printf("Radius: %g\n", radius);
 
     if (n == 0) {
@@ -58,7 +58,7 @@ void check_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights
         IGRAPH_ASSERT(isnan(radius));
     } else {
         igraph_vector_init(&ecc, 0);
-        igraph_eccentricity_dijkstra(graph, weights, &ecc, igraph_vss_vector(center), mode);
+        igraph_eccentricity(graph, weights, &ecc, igraph_vss_vector(center), mode);
         for (igraph_integer_t i=0; i < n; i++) {
             IGRAPH_ASSERT(igraph_cmp_epsilon(VECTOR(ecc)[i], radius, eps) == 0);
         }
@@ -83,14 +83,14 @@ int main(void) {
 
     printf("Null graph:\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nSingleton graph:\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -99,63 +99,63 @@ int main(void) {
     igraph_small(&g, 3, IGRAPH_UNDIRECTED,
                  0,2,
                  -1);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nFour isolated vertices:\n");
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, -1);
-    igraph_graph_center(&g, &center, IGRAPH_OUT);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nUndirected path graph P_5:\n");
-    igraph_ring(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_ring(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ false, /* circular */ false);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nUndirected graph\n");
     igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 0, 2, 3, 0, 4, 1, 2, 5, -1);
-    igraph_graph_center(&g, &center, IGRAPH_OUT);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nDirected path graph P_5:\n");
-    igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ 0, /* circular */ 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ false, /* circular */ false);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nUndirected star S_10:\n");
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nOut-star S_10:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nOut-star S_10, undirected mode:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_ALL) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_ALL);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_ALL);
     igraph_destroy(&g);
 
     printf("\nIn-star S_10:\n");
-    igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_star(&g, 10, IGRAPH_STAR_IN, 0);
+    igraph_graph_center(&g, NULL, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -168,14 +168,14 @@ int main(void) {
     printf("Null graph:\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     igraph_destroy(&g);
 
     printf("\nSingleton graph:\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -185,7 +185,7 @@ int main(void) {
                  0,2,
                  -1);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -193,15 +193,15 @@ int main(void) {
     printf("\nFour isolated vertices:\n");
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, -1);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nUndirected path graph P_5:\n");
-    igraph_ring(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 0);
+    igraph_ring(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ false, /* circular */ false);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -209,15 +209,15 @@ int main(void) {
     printf("\nUndirected graph\n");
     igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 0, 2, 3, 0, 4, 1, 2, 5, -1);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nDirected path graph P_5:\n");
-    igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ 0, /* circular */ 0);
+    igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ false, /* circular */ false);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -225,7 +225,7 @@ int main(void) {
     printf("\nUndirected star S_10:\n");
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -233,7 +233,7 @@ int main(void) {
     printf("\nOut-star S_10:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -241,7 +241,7 @@ int main(void) {
     printf("\nOut-star S_10, undirected mode:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_ALL) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_ALL);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_ALL);
     igraph_destroy(&g);
@@ -249,7 +249,7 @@ int main(void) {
     printf("\nIn-star S_10:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
     igraph_destroy(&g);
@@ -257,12 +257,12 @@ int main(void) {
     printf("\nDirected cycle C_5\n");
     igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ false, /* circular */ true);
     igraph_vector_view(&w, VECTOR(weights), igraph_ecount(&g));
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_OUT);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_OUT);
 
     printf("\nDirected cycle C_5, mode=IN\n");
-    IGRAPH_ASSERT(igraph_graph_center_dijkstra(&g, &w, &center, IGRAPH_IN) == IGRAPH_SUCCESS);
+    igraph_graph_center(&g, &w, &center, IGRAPH_IN);
     print_vector_int(&center);
     check_radius_dijkstra(&g, &w, &center, IGRAPH_IN);
     igraph_destroy(&g);

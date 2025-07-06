@@ -317,7 +317,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param use_seed Logical, if true the supplied values in the
+ * \param use_seed If true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
  * \param niter The number of iterations to do. A reasonable
@@ -332,10 +332,11 @@ static igraph_error_t igraph_layout_i_grid_fr(
  *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid based
  *        version only for large graphs, currently the ones with
  *        more than 1000 vertices.
- * \param weights Pointer to a vector containing edge weights,
- *        the attraction along the edges will be multiplied by these.
- *        Weights must be positive.
- *        It will be ignored if it is a null-pointer.
+ * \param weights Pointer to a vector containing edge weights. Weights must
+ *        be positive. If \c NULL, all edges are assumed to have weight 1.
+ *        The attraction along the edges will be multiplied by the weights,
+ *        resulting in vertices connected by a high-weight edge being placed
+ *        closer together.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
  *        \quote x \endquote coordinate for every vertex.
@@ -432,7 +433,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param use_seed Logical, if true the supplied values in the
+ * \param use_seed If true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
  * \param niter The number of iterations to do. A reasonable
@@ -441,10 +442,11 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *        of movement alloved along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
- * \param weights Pointer to a vector containing edge weights,
- *        the attraction along the edges will be multiplied by these.
- *        Weights must be positive.
- *        It will be ignored if it is a null-pointer.
+ * \param weights Pointer to a vector containing edge weights. Weights must
+ *        be positive. If \c NULL, all edges are assumed to have weight 1.
+ *        The attraction along the edges will be multiplied by the weights,
+ *        resulting in vertices connected by a high-weight edge being placed
+ *        closer together.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
  *        \quote x \endquote coordinate for every vertex.

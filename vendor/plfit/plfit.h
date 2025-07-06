@@ -1,4 +1,3 @@
-/* vim:set ts=4 sw=4 sts=4 et: */
 /* plfit.h
  *
  * Copyright (C) 2010-2011 Tamas Nepusz
@@ -28,7 +27,7 @@
 #include "plfit_sampling.h"
 #include "plfit_version.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 typedef unsigned short int plfit_bool_t;
 
@@ -128,6 +127,6 @@ PLFIT_EXPORT int plfit_calculate_p_value_discrete(const double* xs, size_t n,
 PLFIT_EXPORT int plfit_moments(const double* data, size_t n, double* mean, double* variance,
         double* skewness, double* kurtosis);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif /* PLFIT_H */

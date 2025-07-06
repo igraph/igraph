@@ -232,7 +232,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, 0);
 
-    igraph_vector_sort_ind(in_weights, &idx, IGRAPH_DESCENDING);
+    IGRAPH_CHECK(igraph_vector_sort_ind(in_weights, &idx, IGRAPH_DESCENDING));
 
     RNG_BEGIN();
     for (igraph_integer_t i=0; i < no_of_nodes; i++) {

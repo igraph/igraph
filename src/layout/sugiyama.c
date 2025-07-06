@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -41,23 +39,11 @@
 
 /* #define SUGIYAMA_DEBUG */
 
-#ifdef _MSC_VER
-/* MSVC does not support variadic macros */
-#include <stdarg.h>
-static void debug(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-#ifdef SUGIYAMA_DEBUG
-    vfprintf(stderr, fmt, args);
-#endif
-    va_end(args);
-}
-#else
+
 #ifdef SUGIYAMA_DEBUG
     #define debug(...) fprintf(stderr, __VA_ARGS__)
 #else
     #define debug(...)
-#endif
 #endif
 
 /* MSVC uses __forceinline instead of inline */
@@ -401,7 +387,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
 
             /* Okay, this vertex is in the component we are considering.
              * Add the neighbors of this vertex, excluding loops */
-            IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT, IGRAPH_LOOPS));
             j = igraph_vector_int_size(&neis);
             for (k = 0; k < j; k++) {
                 igraph_integer_t eid = VECTOR(neis)[k];
@@ -610,9 +596,9 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
 
         /* Calculate in- and out-strengths for the remaining edges */
         IGRAPH_CHECK(igraph_strength(graph, &indegs, igraph_vss_all(),
-                                     IGRAPH_IN, 1, weights));
+                                     IGRAPH_IN, IGRAPH_LOOPS, weights));
         IGRAPH_CHECK(igraph_strength(graph, &outdegs, igraph_vss_all(),
-                                     IGRAPH_IN, 1, weights));
+                                     IGRAPH_IN, IGRAPH_LOOPS, weights));
         j = igraph_vector_int_size(&feedback_edges);
         for (i = 0; i < j; i++) {
             igraph_integer_t eid = VECTOR(feedback_edges)[i];
@@ -712,14 +698,17 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
     igraph_vector_null(barycenters);
 
     for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, VECTOR(*layer_members)[i], direction));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, VECTOR(*layer_members)[i], direction,
+            IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         m = igraph_vector_int_size(&neis);
         if (m == 0) {
             /* No neighbors in this direction. Just use the current X coordinate */
             VECTOR(*barycenters)[i] = MATRIX(*layout, i, 0);
         } else {
             for (j = 0; j < m; j++) {
-                VECTOR(*barycenters)[i] += MATRIX(*layout, (igraph_integer_t) VECTOR(neis)[j], 0);
+                VECTOR(*barycenters)[i] += MATRIX(*layout, VECTOR(neis)[j], 0);
             }
             VECTOR(*barycenters)[i] /= m;
         }
@@ -754,9 +743,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     /* Start with a first-seen ordering within each layer */
     {
         igraph_integer_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_integer_t);
-        if (xs == 0) {
-            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(xs, "Cannot order nodes horizontally during Sugiyama layout.");
         for (i = 0; i < no_of_vertices; i++) {
             MATRIX(*layout, i, 0) = xs[(igraph_integer_t)MATRIX(*layout, i, 1)]++;
         }
@@ -924,7 +911,10 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         /* Find all the edges from this layer to the next */
         igraph_vector_int_clear(&neis1);
         for (j = 0; j < n; j++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis2, VECTOR(*vertices)[j], IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis2, VECTOR(*vertices)[j], IGRAPH_OUT,
+                IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
             IGRAPH_CHECK(igraph_vector_int_append(&neis1, &neis2));
         }
 
@@ -1120,7 +1110,9 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
             }
 
             /* Find the neighbors of vertex j in layer i */
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, vertex, neimode));
+            IGRAPH_CHECK(igraph_neighbors(
+                graph, &neis, vertex, neimode, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+            ));
 
             n = igraph_vector_int_size(&neis);
             if (n == 0)
