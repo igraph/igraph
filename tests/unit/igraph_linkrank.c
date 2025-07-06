@@ -32,7 +32,6 @@ bool is_almost_one(igraph_real_t x) {
 }
 
 int main(void) {
-
     igraph_t g;
     igraph_vector_t res, reset, weights;
     igraph_arpack_options_t arpack_options;
@@ -49,12 +48,12 @@ int main(void) {
 
     /* Test unweighted LinkRank for all edges */
     igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, 0, 0);
+                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, NULL);
     printf("PRPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
     igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, 0, &arpack_options);
+                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, &arpack_options);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -69,7 +68,7 @@ int main(void) {
     VECTOR(weights)[5] = 1.0;
 
     igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, &weights, 0);
+                    IGRAPH_DIRECTED, 0.85, &weights, NULL);
     printf("PRPACK weighted: "); print_vector(&res);
 
     /* Test personalized LinkRank */
