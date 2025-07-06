@@ -171,6 +171,5 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
-    printf("All tests passed!\n");
     return 0;
 }
