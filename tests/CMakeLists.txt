@@ -338,6 +338,7 @@ add_legacy_tests(
   igraph_joint_degree_distribution
   igraph_joint_type_distribution
   igraph_is_acyclic
+  igraph_linkrank
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
@@ -1004,7 +1005,6 @@ add_benchmarks(
   igraph_induced_subgraph
   igraph_induced_subgraph_edges
   igraph_layout_umap
-  igraph_linkrank
   igraph_matrix_transpose
   igraph_maximal_cliques
   igraph_neighborhood
