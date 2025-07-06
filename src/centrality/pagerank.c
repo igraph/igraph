@@ -922,7 +922,7 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
 /**
  * \function igraph_personalized_linkrank_vs
  * \brief Calculates the personalized LinkRank for the specified edges.
- * 
+ *
  * \experimental
  *
  * This simplified interface takes a vertex sequence and resets the random walk to

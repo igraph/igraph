@@ -43,7 +43,7 @@ int main(void) {
     igraph_arpack_options_init(&arpack_options);
 
     /* Test graph taken from PageRank tests - simple directed graph */
-    printf("LinkRank Test 1 - Simple directed graph\n");
+    printf("Simple directed graph\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 0, 1, 3, 2, 3, 3, 2, -1);
 
     igraph_vector_init(&res, 0);
@@ -60,7 +60,7 @@ int main(void) {
     IGRAPH_ASSERT(is_almost_one(value));
 
     /* Test weighted LinkRank */
-    printf("\nLinkRank Test 2 - Weighted edges\n");
+    printf("\nWeighted edges\n");
     igraph_vector_init(&weights, 6);
     VECTOR(weights)[0] = 2.0;
     VECTOR(weights)[1] = 1.0;
@@ -74,7 +74,7 @@ int main(void) {
     printf("PRPACK weighted: "); print_vector(&res);
 
     /* Test personalized LinkRank */
-    printf("\nLinkRank Test 3 - Personalized LinkRank\n");
+    printf("\nPersonalized LinkRank\n");
     igraph_vector_init(&reset, 4);
     VECTOR(reset)[0] = 1.0;
     VECTOR(reset)[1] = 0.0;
@@ -86,14 +86,14 @@ int main(void) {
     printf("PRPACK personalized: "); print_vector(&res);
 
     /* Test personalized LinkRank with vertex selector */
-    printf("\nLinkRank Test 4 - Personalized LinkRank with vertex selector\n");
+    printf("\nPersonalized LinkRank with vertex selector\n");
     igraph_personalized_linkrank_vs(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                                    igraph_ess_all(IGRAPH_EDGEORDER_ID), 1, 0.85, 
+                                    igraph_ess_all(IGRAPH_EDGEORDER_ID), 1, 0.85,
                                     igraph_vss_1(0), 0, 0);
     printf("PRPACK personalized vs: "); print_vector(&res);
 
     /* Test edge subset */
-    printf("\nLinkRank Test 5 - Edge subset\n");
+    printf("\nEdge subset\n");
     igraph_es_t es;
     igraph_vector_int_t edge_vec;
     igraph_vector_int_init(&edge_vec, 2);
@@ -107,7 +107,7 @@ int main(void) {
     igraph_vector_int_destroy(&edge_vec);
 
     /* Test star graph (undirected) */
-    printf("\nLinkRank Test 6 - Undirected star\n");
+    printf("\nUndirected star\n");
     igraph_destroy(&g);
     igraph_star(&g, 5, IGRAPH_STAR_UNDIRECTED, 0);
 
@@ -116,7 +116,7 @@ int main(void) {
     printf("PRPACK star: "); print_vector(&res);
 
     /* Test null graph (empty graph with 0 vertices) */
-    printf("\nLinkRank Test 7 - Null graph\n");
+    printf("\nNull graph\n");
     igraph_destroy(&g);
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
 
@@ -125,7 +125,7 @@ int main(void) {
     printf("PRPACK null graph: "); print_vector(&res);
 
     /* Test singleton graph (1 vertex, no edges) */
-    printf("\nLinkRank Test 8 - Singleton graph\n");
+    printf("\nSingleton graph\n");
     igraph_destroy(&g);
     igraph_empty(&g, 1, IGRAPH_DIRECTED);
 
@@ -134,7 +134,7 @@ int main(void) {
     printf("PRPACK singleton: "); print_vector(&res);
 
     /* Test singleton graph with self-loop */
-    printf("\nLinkRank Test 9 - Singleton graph with self-loop\n");
+    printf("\nSingleton graph with self-loop\n");
     igraph_destroy(&g);
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0, 0, -1);
 
