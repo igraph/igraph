@@ -47,13 +47,13 @@ int main(void) {
     igraph_vector_init(&res, 0);
 
     /* Test unweighted LinkRank for all edges */
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, NULL);
+    igraph_linkrank(&g, /* weights= */ NULL, &res, &value,
+                    IGRAPH_DIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, &arpack_options);
+    igraph_linkrank(&g, /* weights= */ NULL, &res, &value,
+                    IGRAPH_DIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_ARPACK, &arpack_options);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -67,8 +67,8 @@ int main(void) {
     VECTOR(weights)[4] = 2.0;
     VECTOR(weights)[5] = 1.0;
 
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, &weights, NULL);
+    igraph_linkrank(&g, &weights, &res, &value,
+                    IGRAPH_DIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK weighted: "); print_vector(&res);
 
     /* Test personalized LinkRank */
@@ -79,15 +79,15 @@ int main(void) {
     VECTOR(reset)[2] = 0.0;
     VECTOR(reset)[3] = 0.0;
 
-    igraph_personalized_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                                 IGRAPH_DIRECTED, 0.85, &reset, /* weights= */ NULL, NULL);
+    igraph_personalized_linkrank(&g, /* weights= */ NULL, &res, &value,
+                                 IGRAPH_DIRECTED, 0.85, &reset, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK personalized: "); print_vector(&res);
 
     /* Test personalized LinkRank with vertex selector */
     printf("\nPersonalized LinkRank with vertex selector\n");
-    igraph_personalized_linkrank_vs(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+    igraph_personalized_linkrank_vs(&g, /* weights= */ NULL, &res, &value,
                                     IGRAPH_DIRECTED, 0.85,
-                                    igraph_vss_1(0), /* weights= */ NULL, NULL);
+                                    igraph_vss_1(0), IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK personalized vs: "); print_vector(&res);
 
     /* Test star graph (undirected) */
@@ -95,8 +95,8 @@ int main(void) {
     igraph_destroy(&g);
     igraph_star(&g, 5, IGRAPH_STAR_UNDIRECTED, 0);
 
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_UNDIRECTED, 0.85, /* weights= */ NULL, NULL);
+    igraph_linkrank(&g, /* weights= */ NULL, &res, &value,
+                    IGRAPH_UNDIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK star: "); print_vector(&res);
 
     /* Test null graph (empty graph with 0 vertices) */
@@ -104,8 +104,8 @@ int main(void) {
     igraph_destroy(&g);
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
 
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, NULL);
+    igraph_linkrank(&g, /* weights= */ NULL, &res, &value,
+                    IGRAPH_DIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK null graph: "); print_vector(&res);
 
     /* Test singleton graph (1 vertex, no edges) */
@@ -113,8 +113,8 @@ int main(void) {
     igraph_destroy(&g);
     igraph_empty(&g, 1, IGRAPH_DIRECTED);
 
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, NULL);
+    igraph_linkrank(&g, /* weights= */ NULL, &res, &value,
+                    IGRAPH_DIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK singleton: "); print_vector(&res);
 
     /* Test singleton graph with self-loop */
@@ -122,8 +122,8 @@ int main(void) {
     igraph_destroy(&g);
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0, 0, -1);
 
-    igraph_linkrank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
-                    IGRAPH_DIRECTED, 0.85, /* weights= */ NULL, NULL);
+    igraph_linkrank(&g, /* weights= */ NULL, &res, &value,
+                    IGRAPH_DIRECTED, 0.85, IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
     printf("PRPACK singleton with self-loop: "); print_vector(&res);
 
     /* Cleanup */
