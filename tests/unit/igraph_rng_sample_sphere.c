@@ -24,9 +24,9 @@ void check(igraph_bool_t volume, igraph_integer_t dim, igraph_integer_t n, igrap
 
     igraph_matrix_init(&samples, 0, 0);
     if (volume) {
-        igraph_sample_sphere_volume(dim, n, radius, positive, &samples);
+        igraph_rng_sample_sphere_volume(igraph_rng_default(), dim, n, radius, positive, &samples);
     } else {
-        igraph_sample_sphere_surface(dim, n, radius, positive, &samples);
+        igraph_rng_sample_sphere_surface(igraph_rng_default(), dim, n, radius, positive, &samples);
     }
     IGRAPH_ASSERT(igraph_matrix_ncol(&samples) == n);
     IGRAPH_ASSERT(igraph_matrix_nrow(&samples) == dim);

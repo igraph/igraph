@@ -19,9 +19,7 @@
 
 */
 
-#include "igraph_random.h"
-#include "igraph_matrix.h"
-#include "igraph_games.h"
+#include "igraph_sampling.h"
 
 /**
  * \function igraph_rng_sample_sphere_surface
@@ -203,29 +201,4 @@ igraph_error_t igraph_rng_sample_dirichlet(
     RNG_END();
 
     return IGRAPH_SUCCESS;
-}
-
-igraph_error_t igraph_sample_sphere_surface(
-    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
-    igraph_bool_t positive, igraph_matrix_t *res
-) {
-    return igraph_rng_sample_sphere_surface(
-        igraph_rng_default(), dim, n, radius, positive, res
-    );
-}
-
-igraph_error_t igraph_sample_sphere_volume(
-    igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
-    igraph_bool_t positive, igraph_matrix_t *res
-) {
-    return igraph_rng_sample_sphere_volume(
-        igraph_rng_default(), dim, n, radius, positive, res
-    );
-}
-
-igraph_error_t igraph_sample_dirichlet(
-    igraph_integer_t n, const igraph_vector_t *alpha,
-    igraph_matrix_t *res
-) {
-    return igraph_rng_sample_dirichlet(igraph_rng_default(), n, alpha, res);
 }

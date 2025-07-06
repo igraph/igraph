@@ -43,19 +43,19 @@ int main(void) {
 
     printf("Zero vectors to sample should return empty matrix:\n");
     igraph_vector_init_int(&alpha, 2, 1, 1);
-    igraph_sample_dirichlet(0, &alpha, &res);
+    igraph_rng_sample_dirichlet(igraph_rng_default(), 0, &alpha, &res);
     igraph_matrix_print(&res);
     igraph_vector_destroy(&alpha);
 
     printf("Check if result vectors add up to one.\n");
     igraph_vector_init_int(&alpha, 5, 1, 2, 3, 4, 5);
-    igraph_sample_dirichlet(100, &alpha, &res);
+    igraph_rng_sample_dirichlet(igraph_rng_default(), 100, &alpha, &res);
     check_result(&res, 100);
     igraph_vector_destroy(&alpha);
 
     printf("Distribution localized at 0.5, 0.5:\n");
     igraph_vector_init_real(&alpha, 2, 1e30, 1e30);
-    igraph_sample_dirichlet(2, &alpha, &res);
+    igraph_rng_sample_dirichlet(igraph_rng_default(), 2, &alpha, &res);
     igraph_matrix_print(&res);
     igraph_vector_destroy(&alpha);
 
@@ -63,17 +63,17 @@ int main(void) {
 
     printf("Check if too short parameter vector is handled correctly.\n");
     igraph_vector_init(&alpha, 0);
-    CHECK_ERROR(igraph_sample_dirichlet(0, &alpha, &res), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_rng_sample_dirichlet(igraph_rng_default(), 0, &alpha, &res), IGRAPH_EINVAL);
     igraph_vector_destroy(&alpha);
 
     printf("Check if negative number of samples is handled correctly.\n");
     igraph_vector_init_int(&alpha, 2, 1, 1);
-    CHECK_ERROR(igraph_sample_dirichlet(-1, &alpha, &res), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_rng_sample_dirichlet(igraph_rng_default(), -1, &alpha, &res), IGRAPH_EINVAL);
     igraph_vector_destroy(&alpha);
 
     printf("Check if negative alpha is handled correctly.\n");
     igraph_vector_init_int(&alpha, 2, -1, 1);
-    CHECK_ERROR(igraph_sample_dirichlet(0, &alpha, &res), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_rng_sample_dirichlet(igraph_rng_default(), 0, &alpha, &res), IGRAPH_EINVAL);
     igraph_vector_destroy(&alpha);
 
     igraph_matrix_destroy(&res);

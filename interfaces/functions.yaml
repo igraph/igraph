@@ -405,19 +405,6 @@ igraph_correlated_pair_game:
 igraph_dot_product_game:
     PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
 
-igraph_sample_sphere_surface:
-    PARAMS: |-
-        INTEGER dim, INTEGER n=1, REAL radius=1,
-        BOOLEAN positive=True, OUT MATRIX res
-
-igraph_sample_sphere_volume:
-    PARAMS: |-
-        INTEGER dim, INTEGER n=1, REAL radius=1,
-        BOOLEAN positive=True, OUT MATRIX res
-
-igraph_sample_dirichlet:
-    PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
-
 #######################################
 # Basic query functions
 #######################################
