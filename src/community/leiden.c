@@ -915,7 +915,8 @@ static igraph_error_t igraph_i_community_leiden(
  * The objective function being optimized is
  *
  * </para><para>
- * <code>1 / 2m sum_ij (A_ij - γ n_i n_j) δ(s_i, s_j)</code>
+ * <code>1 / 2m sum_ij (A_ij - γ n_i n_j) δ(s_i, s_j)</code> for undirected graphs, or
+ * <code>1 / m sum_ij (A_ij - γ n_i n_j) δ(s_i, s_j)</code> for directed graphs
  *
  * </para><para>
  * where m is the total edge weight, <code>A_ij</code> is the weight of edge
@@ -943,7 +944,7 @@ static igraph_error_t igraph_i_community_leiden(
  * Phys. Rev. E 84, 016114 (2011).
  * https://doi.org/10.1103/PhysRevE.84.016114
  *
- * \param graph The input graph. It must be an undirected graph.
+ * \param graph The input graph. Both directed and undirected graphs are supported.
  * \param edge_weights Numeric vector containing edge weights. If \c NULL, every edge
  *    has equal weight of 1. The weights need not be non-negative.
  * \param node_weights Numeric vector containing node weights. If \c NULL, every node
