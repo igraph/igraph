@@ -783,6 +783,7 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
 /**
  * \function igraph_linkrank
  * \brief Calculates the LinkRank for the specified edges.
+ *
  * \experimental
  *
  * LinkRank is the edge-based equivalent of PageRank. It represents the fraction
@@ -841,6 +842,7 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
 /**
  * \function igraph_personalized_linkrank
  * \brief Calculates the personalized LinkRank for the specified edges.
+ *
  * \experimental
  *
  * The personalized LinkRank is based on personalized PageRank, where the random
@@ -899,24 +901,19 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
                                             const igraph_vector_t *reset,
                                             const igraph_vector_t *weights,
                                             igraph_arpack_options_t *options) {
-    igraph_vector_t pagerank_scores;
-    igraph_real_t pagerank_eigenvalue; /* Expected to be 1.0 */
+    igraph_vector_t pagerank;
 
     /* Calculate PageRank for all vertices first */
-    IGRAPH_VECTOR_INIT_FINALLY(&pagerank_scores, igraph_vcount(graph));
-    IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, &pagerank_scores, &pagerank_eigenvalue,
+    IGRAPH_VECTOR_INIT_FINALLY(&pagerank, igraph_vcount(graph));
+    IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, &pagerank, value,
                                               igraph_vss_all(), directed, damping,
                                               reset, weights, options));
 
     /* Convert PageRank to LinkRank */
-    IGRAPH_CHECK(pagerank_to_linkrank(graph, &pagerank_scores, vector,
-                                               eids, weights, directed));
+    IGRAPH_CHECK(pagerank_to_linkrank(graph, &pagerank, vector,
+                                      eids, weights, directed));
 
-    if (value) {
-        *value = pagerank_eigenvalue;
-    }
-
-    igraph_vector_destroy(&pagerank_scores);
+    igraph_vector_destroy(&pagerank);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -925,6 +922,7 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
 /**
  * \function igraph_personalized_linkrank_vs
  * \brief Calculates the personalized LinkRank for the specified edges.
+ * 
  * \experimental
  *
  * This simplified interface takes a vertex sequence and resets the random walk to
@@ -983,7 +981,8 @@ igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     while (!IGRAPH_VIT_END(vit)) {
-        VECTOR(reset)[IGRAPH_VIT_GET(vit)]++;
+        /* Increment by 1 instead of setting to 1 to handle duplicate vertices. */
+        VECTOR(reset)[IGRAPH_VIT_GET(vit)] += 1.0;
         IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
