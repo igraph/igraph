@@ -717,3 +717,286 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_i_pagerank_to_linkrank
+ * \brief Helper function to convert PageRank results to LinkRank.
+ *
+ * This function takes PageRank scores for vertices and converts them to LinkRank
+ * scores for edges using the formula: linkrank(e) = pagerank(source(e)) * weight(e) / strength_out(source(e))
+ *
+ * \param graph The input graph.
+ * \param pagerank_scores Vector containing PageRank scores for all vertices.
+ * \param linkrank_result Vector to store the LinkRank scores (will be resized).
+ * \param eids Edge selector specifying which edges to compute LinkRank for.
+ * \param weights Edge weights vector, or NULL for unweighted edges.
+ * \param directed Whether to treat the graph as directed.
+ * \return Error code.
+ */
+static igraph_error_t igraph_i_pagerank_to_linkrank(const igraph_t *graph,
+                                                     const igraph_vector_t *pagerank_scores,
+                                                     igraph_vector_t *linkrank_result,
+                                                     const igraph_es_t eids,
+                                                     const igraph_vector_t *weights,
+                                                     igraph_bool_t directed) {
+    igraph_eit_t eit;
+    igraph_vector_t strength;
+    igraph_integer_t no_of_edges_to_calc;
+    igraph_integer_t i;
+
+    /* Get the edges to calculate LinkRank for */
+    IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+    no_of_edges_to_calc = IGRAPH_EIT_SIZE(eit);
+
+    /* Calculate vertex strengths (sum of outgoing edge weights) */
+    IGRAPH_VECTOR_INIT_FINALLY(&strength, igraph_vcount(graph));
+    IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(),
+                                 directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS, weights));
+
+    /* Resize result vector */
+    IGRAPH_CHECK(igraph_vector_resize(linkrank_result, no_of_edges_to_calc));
+
+    /* Calculate LinkRank for each edge */
+    for (IGRAPH_EIT_RESET(eit), i = 0; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
+        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_real_t edge_weight = weights ? VECTOR(*weights)[edge] : 1.0;
+        igraph_real_t vertex_strength = VECTOR(strength)[from];
+        igraph_real_t vertex_pagerank = VECTOR(*pagerank_scores)[from];
+
+        if (vertex_strength > 0) {
+            VECTOR(*linkrank_result)[i] = vertex_pagerank * edge_weight / vertex_strength;
+        } else {
+            /* If vertex has no outgoing edges, LinkRank is 0 */
+            VECTOR(*linkrank_result)[i] = 0.0;
+        }
+    }
+
+    igraph_vector_destroy(&strength);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    igraph_eit_destroy(&eit);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_linkrank
+ * \brief Calculates the LinkRank for the specified edges.
+ *
+ * LinkRank is the edge-based equivalent of PageRank. It represents the fraction 
+ * of time a random walker traversing the graph would spend on each edge.
+ * For each edge, LinkRank is calculated as:
+ * linkrank(e) = pagerank(source(e)) * weight(e) / strength_out(source(e))
+ *
+ * </para><para>
+ * This function first computes PageRank for all vertices, then transforms
+ * the results to LinkRank scores for the specified edges.
+ *
+ * </para><para>
+ * Note that the LinkRank of a given edge depends on the PageRank of its
+ * source vertex, so PageRank must be calculated for all vertices even if
+ * LinkRank is requested for only some edges.
+ *
+ * \param graph The graph object.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param vector Pointer to an initialized vector, the result is
+ *    stored here. It is resized as needed.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the largest eigenvalue is stored here. It should be very close to one.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, it is set to 1.0.
+ *    This parameter can be a null pointer if not needed.
+ * \param eids Edge selector specifying which edges to compute LinkRank for.
+ * \param directed Boolean, whether to consider the directedness of the graph.
+ *    This is ignored for undirected graphs.
+ * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
+ * \param weights Optional weights for edges. If this is a NULL pointer then 
+ *    every edge has the same weight. The weights are expected to be non-negative.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the <code>n</code> (number
+ *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
+ *    (LM) parameters and it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code:
+ *    \c IGRAPH_EINVAL invalid damping factor, or invalid edge weights.
+ *    \c IGRAPH_ENOMEM not enough memory for temporary data.
+ * 
+ * Time complexity: depends on the input graph, usually it is O(|E|),
+ * the number of edges.
+ *
+ * \sa \ref igraph_pagerank() for the vertex-based PageRank implementation.
+ *
+ * \example examples/simple/igraph_linkrank.c
+ */
+igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+                               igraph_vector_t *vector,
+                               igraph_real_t *value, const igraph_es_t eids,
+                               igraph_bool_t directed, igraph_real_t damping,
+                               const igraph_vector_t *weights, igraph_arpack_options_t *options) {
+    return igraph_personalized_linkrank(graph, algo, vector, value, eids,
+                                        directed, damping, NULL, weights,
+                                        options);
+}
+
+/**
+ * \function igraph_personalized_linkrank
+ * \brief Calculates the personalized LinkRank for the specified edges.
+ *
+ * The personalized LinkRank is based on personalized PageRank, where the random 
+ * walk restart distribution is specified by the reset vector rather than being uniform.
+ * LinkRank is then calculated as:
+ * linkrank(e) = personalized_pagerank(source(e)) * weight(e) / strength_out(source(e))
+ *
+ * </para><para>
+ * This function first computes personalized PageRank for all vertices using the
+ * specified reset distribution, then transforms the results to LinkRank scores 
+ * for the specified edges.
+ *
+ * </para><para>
+ * Note that the personalized LinkRank of a given edge depends on the personalized
+ * PageRank of its source vertex, so personalized PageRank must be calculated for 
+ * all vertices even if LinkRank is requested for only some edges.
+ *
+ * \param graph The graph object.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param vector Pointer to an initialized vector, the result is
+ *    stored here. It is resized as needed.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the largest eigenvalue is stored here. It should be very close to one.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, it is set to 1.0.
+ *    This parameter can be a null pointer if not needed.
+ * \param eids Edge selector specifying which edges to compute LinkRank for.
+ * \param directed Boolean, whether to consider the directedness of the graph.
+ *    This is ignored for undirected graphs.
+ * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
+ * \param reset The reset vector for personalized PageRank. This vector should
+ *    contain non-negative numbers; if it does not sum to 1, it will be normalized.
+ *    Supply a NULL pointer here to get the non-personalized LinkRank.
+ * \param weights Optional weights for edges. If this is a NULL pointer then 
+ *    every edge has the same weight. The weights are expected to be non-negative.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the <code>n</code> (number
+ *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
+ *    (LM) parameters and it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code:
+ *    \c IGRAPH_EINVAL invalid damping factor, invalid edge weights,
+ *         \p eids or an invalid reset vector in \p reset.
+ *    \c IGRAPH_ENOMEM not enough memory for temporary data.
+ *
+ * Time complexity: depends on the input graph, usually it is O(|E|),
+ * the number of edges.
+ *
+ * \sa \ref igraph_linkrank() for the non-personalized implementation,
+ * \ref igraph_personalized_pagerank() for the vertex-based personalized PageRank implementation.
+ */
+igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
+                                            igraph_pagerank_algo_t algo, igraph_vector_t *vector,
+                                            igraph_real_t *value, const igraph_es_t eids,
+                                            igraph_bool_t directed, igraph_real_t damping,
+                                            const igraph_vector_t *reset,
+                                            const igraph_vector_t *weights,
+                                            igraph_arpack_options_t *options) {
+    igraph_vector_t pagerank_scores;
+    igraph_real_t pagerank_value;
+
+    /* Calculate PageRank for all vertices first */
+    IGRAPH_VECTOR_INIT_FINALLY(&pagerank_scores, igraph_vcount(graph));
+    IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, &pagerank_scores, &pagerank_value,
+                                              igraph_vss_all(), directed, damping,
+                                              reset, weights, options));
+
+    /* Convert PageRank to LinkRank */
+    IGRAPH_CHECK(igraph_i_pagerank_to_linkrank(graph, &pagerank_scores, vector,
+                                               eids, weights, directed));
+
+    if (value) {
+        *value = pagerank_value;
+    }
+
+    igraph_vector_destroy(&pagerank_scores);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_personalized_linkrank_vs
+ * \brief Calculates the personalized LinkRank for the specified edges.
+ *
+ * This simplified interface takes a vertex sequence and resets the random walk to
+ * one of the vertices in the specified vertex sequence, chosen uniformly. The
+ * LinkRank is then calculated as:
+ * linkrank(e) = personalized_pagerank(source(e)) * weight(e) / strength_out(source(e))
+ *
+ * \param graph The graph object.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param vector Pointer to an initialized vector, the result is
+ *    stored here. It is resized as needed.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the largest eigenvalue is stored here. It should be very close to one.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, it is set to 1.0.
+ *    This parameter can be a null pointer if not needed.
+ * \param eids Edge selector specifying which edges to compute LinkRank for.
+ * \param directed Boolean, whether to consider the directedness of the graph.
+ *    This is ignored for undirected graphs.
+ * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
+ * \param reset_vids Vertex sequence specifying the vertices used in the reset
+ *    distribution. All vertices in this sequence get equal probability in the
+ *    reset distribution.
+ * \param weights Optional weights for edges. If this is a NULL pointer then 
+ *    every edge has the same weight. The weights are expected to be non-negative.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the <code>n</code> (number
+ *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
+ *    (LM) parameters and it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code:
+ *    \c IGRAPH_EINVAL invalid damping factor, invalid edge weights,
+ *         \p eids or invalid vertex sequence in \p reset_vids.
+ *    \c IGRAPH_ENOMEM not enough memory for temporary data.
+ *
+ * Time complexity: depends on the input graph, usually it is O(|E|),
+ * the number of edges.
+ *
+ * \sa \ref igraph_linkrank() for the non-personalized implementation,
+ * \ref igraph_personalized_linkrank() for the personalized implementation
+ * with an explicit reset vector.
+ */
+igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
+                                               igraph_pagerank_algo_t algo,
+                                               igraph_vector_t *vector,
+                                               igraph_real_t *value, const igraph_es_t eids,
+                                               igraph_bool_t directed, igraph_real_t damping,
+                                               igraph_vs_t reset_vids,
+                                               const igraph_vector_t *weights,
+                                               igraph_arpack_options_t *options) {
+    igraph_vector_t reset;
+    igraph_vit_t vit;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&reset, igraph_vcount(graph));
+    IGRAPH_CHECK(igraph_vit_create(graph, reset_vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    while (!IGRAPH_VIT_END(vit)) {
+        VECTOR(reset)[IGRAPH_VIT_GET(vit)]++;
+        IGRAPH_VIT_NEXT(vit);
+    }
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_CHECK(igraph_personalized_linkrank(graph, algo, vector,
+                 value, eids, directed,
+                 damping, &reset, weights,
+                 options));
+
+    igraph_vector_destroy(&reset);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
