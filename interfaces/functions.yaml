@@ -746,7 +746,7 @@ igraph_personalized_pagerank_vs:
 igraph_linkrank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
-        OUT EDGE_QTY vector, OUT REAL value,
+        OUT VECTOR vector, OUT REAL value,
         EDGE_SELECTOR eids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL INOUT PAGERANKOPT options
@@ -757,7 +757,7 @@ igraph_linkrank:
 igraph_personalized_linkrank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
-        OUT EDGE_QTY vector, OUT REAL value,
+        OUT VECTOR vector, OUT REAL value,
         EDGE_SELECTOR eids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, OPTIONAL VECTOR personalized,
         OPTIONAL EDGEWEIGHTS weights,
@@ -769,7 +769,7 @@ igraph_personalized_linkrank:
 igraph_personalized_linkrank_vs:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
-        PRIMARY OUT EDGE_QTY vector, OUT REAL value,
+        PRIMARY OUT VECTOR vector, OUT REAL value,
         EDGE_SELECTOR eids=ALL, BOOLEAN directed=True,
         REAL damping=0.85,
         VERTEX_SELECTOR reset_vids,
