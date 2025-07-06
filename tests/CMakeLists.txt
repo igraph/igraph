@@ -1004,6 +1004,7 @@ add_benchmarks(
   igraph_induced_subgraph
   igraph_induced_subgraph_edges
   igraph_layout_umap
+  igraph_linkrank
   igraph_matrix_transpose
   igraph_maximal_cliques
   igraph_neighborhood
