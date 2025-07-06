@@ -464,3 +464,65 @@ igraph_error_t igraph_product(igraph_t *res,
         IGRAPH_ERROR("Unknown graph product type.", IGRAPH_EINVAL);
     }
 }
+
+igraph_error_t igraph_rooted_product(igraph_t *res,
+                                     const igraph_t *g1,
+                                     const igraph_t *g2,
+                                     const igraph_integer_t root) {
+    const igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Rooted product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    // New vertex count = vcount1 * vcount2
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+
+    // New edge count = vcount1 * ecount2 + ecount1
+    IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+    IGRAPH_SAFE_ADD(ecount, ecount1, &ecount);
+
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
+
+    // Vertex ((i, j)) with i from g1, and j from g2
+    //   will have new vertex id: i * vcount2 + j
+
+    igraph_integer_t edge_index = 0;
+
+    // Edges of form ((u, root)) - ((v, root))
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g1, i);
+        igraph_integer_t to = IGRAPH_TO(g1, i);
+
+        VECTOR(edges)[edge_index++] = from * vcount2 + root; // ((from, root))
+        VECTOR(edges)[edge_index++] = to * vcount2 + root; // ((to, root))
+    }
+
+    // For all edges (from, to) in g2, add edge from ((j, from)) to ((j, to))
+    //    for all vertex j in g1
+    for (igraph_integer_t i = 0; i < ecount2; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g2, i);
+        igraph_integer_t to = IGRAPH_TO(g2, i);
+
+        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+            VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
+            VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}

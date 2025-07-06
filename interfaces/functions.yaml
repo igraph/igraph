@@ -2094,6 +2094,10 @@ igraph_product:
     PARAMS: |-
         OUT GRAPH res, GRAPH g1, GRAPH g2, GRAPH_PRODUCT_TYPE type=CARTESIAN
 
+igraph_rooted_product:
+    PARAMS: |-
+        OUT GRAPH res, GRAPH g1, GRAPH g2, INTEGER root
+
 #######################################
 # Maximum flows, minimum cuts
 #######################################
