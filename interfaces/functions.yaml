@@ -143,6 +143,14 @@ igraph_ring:
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
         BOOLEAN circular=True
 
+igraph_path_graph:
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False
+
+igraph_cycle_graph:
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False
+
 igraph_kary_tree:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREE_MODE type=OUT
 
