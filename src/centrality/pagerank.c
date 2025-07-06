@@ -719,7 +719,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 }
 
 /**
- * \function igraph_i_pagerank_to_linkrank
+ * \function pagerank_to_linkrank
  * \brief Helper function to convert PageRank results to LinkRank.
  *
  * This function takes PageRank scores for vertices and converts them to LinkRank
@@ -733,7 +733,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
  * \param directed Whether to treat the graph as directed.
  * \return Error code.
  */
-static igraph_error_t igraph_i_pagerank_to_linkrank(const igraph_t *graph,
+static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
                                                      const igraph_vector_t *pagerank_scores,
                                                      igraph_vector_t *linkrank_result,
                                                      const igraph_es_t eids,
@@ -768,16 +768,14 @@ static igraph_error_t igraph_i_pagerank_to_linkrank(const igraph_t *graph,
         if (vertex_strength > 0) {
             VECTOR(*linkrank_result)[i] = vertex_pagerank * edge_weight / vertex_strength;
         } else {
-            /* If vertex has no outgoing edges, LinkRank is 0 */
+            /* If vertex has no outgoing edges with positive weight, LinkRank is 0 */
             VECTOR(*linkrank_result)[i] = 0.0;
         }
     }
 
     igraph_vector_destroy(&strength);
-    IGRAPH_FINALLY_CLEAN(1);
-
     igraph_eit_destroy(&eit);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -785,6 +783,7 @@ static igraph_error_t igraph_i_pagerank_to_linkrank(const igraph_t *graph,
 /**
  * \function igraph_linkrank
  * \brief Calculates the LinkRank for the specified edges.
+ * \experimental
  *
  * LinkRank is the edge-based equivalent of PageRank. It represents the fraction 
  * of time a random walker traversing the graph would spend on each edge.
@@ -844,6 +843,7 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
 /**
  * \function igraph_personalized_linkrank
  * \brief Calculates the personalized LinkRank for the specified edges.
+ * \experimental
  *
  * The personalized LinkRank is based on personalized PageRank, where the random 
  * walk restart distribution is specified by the reset vector rather than being uniform.
@@ -902,20 +902,20 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
                                             const igraph_vector_t *weights,
                                             igraph_arpack_options_t *options) {
     igraph_vector_t pagerank_scores;
-    igraph_real_t pagerank_value;
+    igraph_real_t pagerank_eigenvalue; /* Expected to be 1.0 */
 
     /* Calculate PageRank for all vertices first */
     IGRAPH_VECTOR_INIT_FINALLY(&pagerank_scores, igraph_vcount(graph));
-    IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, &pagerank_scores, &pagerank_value,
+    IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, &pagerank_scores, &pagerank_eigenvalue,
                                               igraph_vss_all(), directed, damping,
                                               reset, weights, options));
 
     /* Convert PageRank to LinkRank */
-    IGRAPH_CHECK(igraph_i_pagerank_to_linkrank(graph, &pagerank_scores, vector,
+    IGRAPH_CHECK(pagerank_to_linkrank(graph, &pagerank_scores, vector,
                                                eids, weights, directed));
 
     if (value) {
-        *value = pagerank_value;
+        *value = pagerank_eigenvalue;
     }
 
     igraph_vector_destroy(&pagerank_scores);
@@ -927,6 +927,7 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
 /**
  * \function igraph_personalized_linkrank_vs
  * \brief Calculates the personalized LinkRank for the specified edges.
+ * \experimental
  *
  * This simplified interface takes a vertex sequence and resets the random walk to
  * one of the vertices in the specified vertex sequence, chosen uniformly. The
