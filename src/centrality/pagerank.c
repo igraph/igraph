@@ -785,7 +785,7 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  * \brief Calculates the LinkRank for the specified edges.
  * \experimental
  *
- * LinkRank is the edge-based equivalent of PageRank. It represents the fraction 
+ * LinkRank is the edge-based equivalent of PageRank. It represents the fraction
  * of time a random walker traversing the graph would spend on each edge.
  * For each edge, LinkRank is calculated as:
  * linkrank(e) = pagerank(source(e)) * weight(e) / strength_out(source(e))
@@ -812,7 +812,7 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  * \param directed Boolean, whether to consider the directedness of the graph.
  *    This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
- * \param weights Optional weights for edges. If this is a NULL pointer then 
+ * \param weights Optional weights for edges. If this is a NULL pointer then
  *    every edge has the same weight. The weights are expected to be non-negative.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
@@ -822,13 +822,11 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  * \return Error code:
  *    \c IGRAPH_EINVAL invalid damping factor, or invalid edge weights.
  *    \c IGRAPH_ENOMEM not enough memory for temporary data.
- * 
+ *
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
  * \sa \ref igraph_pagerank() for the vertex-based PageRank implementation.
- *
- * \example examples/simple/igraph_linkrank.c
  */
 igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t algo,
                                igraph_vector_t *vector,
@@ -845,19 +843,19 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \brief Calculates the personalized LinkRank for the specified edges.
  * \experimental
  *
- * The personalized LinkRank is based on personalized PageRank, where the random 
+ * The personalized LinkRank is based on personalized PageRank, where the random
  * walk restart distribution is specified by the reset vector rather than being uniform.
  * LinkRank is then calculated as:
  * linkrank(e) = personalized_pagerank(source(e)) * weight(e) / strength_out(source(e))
  *
  * </para><para>
  * This function first computes personalized PageRank for all vertices using the
- * specified reset distribution, then transforms the results to LinkRank scores 
+ * specified reset distribution, then transforms the results to LinkRank scores
  * for the specified edges.
  *
  * </para><para>
  * Note that the personalized LinkRank of a given edge depends on the personalized
- * PageRank of its source vertex, so personalized PageRank must be calculated for 
+ * PageRank of its source vertex, so personalized PageRank must be calculated for
  * all vertices even if LinkRank is requested for only some edges.
  *
  * \param graph The graph object.
@@ -876,7 +874,7 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \param reset The reset vector for personalized PageRank. This vector should
  *    contain non-negative numbers; if it does not sum to 1, it will be normalized.
  *    Supply a NULL pointer here to get the non-personalized LinkRank.
- * \param weights Optional weights for edges. If this is a NULL pointer then 
+ * \param weights Optional weights for edges. If this is a NULL pointer then
  *    every edge has the same weight. The weights are expected to be non-negative.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
@@ -950,7 +948,7 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
  * \param reset_vids Vertex sequence specifying the vertices used in the reset
  *    distribution. All vertices in this sequence get equal probability in the
  *    reset distribution.
- * \param weights Optional weights for edges. If this is a NULL pointer then 
+ * \param weights Optional weights for edges. If this is a NULL pointer then
  *    every edge has the same weight. The weights are expected to be non-negative.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the <code>n</code> (number
