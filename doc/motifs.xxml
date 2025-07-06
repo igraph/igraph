@@ -30,8 +30,4 @@ by Holland and Leinhardt, and named dyad census and triad census.
 <!-- doxrox-include igraph_motifs_handler_t -->
 </section>
 
-<section id="deprecated-motifs"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_adjacent_triangles -->
-</section>
-
 </chapter>
