@@ -192,6 +192,24 @@ int main(void) {
     run_leiden_modularity(&graph, &weights);
     igraph_destroy(&graph);
 
+    /* Simple directed graph test */
+    printf("\nTesting directed graph:\n");
+    igraph_small(&graph, 4, IGRAPH_DIRECTED, 
+                 0, 1, 1, 2, 2, 0, 3, 3, -1);
+    run_leiden_modularity(&graph, NULL);
+    igraph_destroy(&graph);
+
+    /* Larger directed graph test - two well-connected components */
+    printf("\nTesting larger directed graph with clear community structure:\n");
+    igraph_small(&graph, 8, IGRAPH_DIRECTED, 
+                 0, 1, 1, 0, 0, 2, 2, 0, 1, 2, 2, 1,  /* Component 1: 0,1,2 strongly connected */
+                 4, 5, 5, 4, 4, 6, 6, 4, 5, 6, 6, 5,  /* Component 2: 4,5,6 strongly connected */
+                 7, 7,  /* Self loop for node 7 */
+                 0, 4,  /* Single edge connecting the components */
+                 -1);
+    run_leiden_modularity(&graph, NULL);
+    igraph_destroy(&graph);
+
     igraph_vector_destroy(&weights);
 
     VERIFY_FINALLY_STACK();

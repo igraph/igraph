@@ -631,6 +631,7 @@ static igraph_error_t igraph_i_community_leiden_quality(
     igraph_real_t total_edge_weight = 0.0;
     igraph_eit_t eit;
     igraph_integer_t i, c, n = igraph_vcount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
 
     *quality = 0.0;
 
@@ -644,7 +645,11 @@ static igraph_error_t igraph_i_community_leiden_quality(
         total_edge_weight += VECTOR(*edge_weights)[e];
         /* We add the internal edge weights */
         if (VECTOR(*membership)[from] == VECTOR(*membership)[to]) {
-            *quality += 2 * VECTOR(*edge_weights)[e];
+            if (directed) {
+                *quality += VECTOR(*edge_weights)[e];
+            } else {
+                *quality += 2 * VECTOR(*edge_weights)[e];
+            }
         }
         IGRAPH_EIT_NEXT(eit);
     }
@@ -666,8 +671,12 @@ static igraph_error_t igraph_i_community_leiden_quality(
     igraph_vector_destroy(&cluster_weights);
     IGRAPH_FINALLY_CLEAN(1);
 
-    /* We normalise by 2m */
-    *quality /= (2.0 * total_edge_weight);
+    /* We normalise by 2m for undirected graphs, by m for directed graphs */
+    if (directed) {
+        *quality /= total_edge_weight;
+    } else {
+        *quality /= (2.0 * total_edge_weight);
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -996,9 +1005,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     }
 
 
-    if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Leiden algorithm is only implemented for undirected graphs.", IGRAPH_EINVAL);
-    }
+
 
     /* Check edge weights to possibly use default */
     if (!edge_weights) {
