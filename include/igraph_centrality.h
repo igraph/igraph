@@ -116,23 +116,19 @@ IGRAPH_EXPORT igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *gra
                                                   igraph_vs_t reset_vids,
                                                   const igraph_vector_t *weights, igraph_arpack_options_t *options);
 
-IGRAPH_EXPORT igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t algo,
-                                  igraph_vector_t *vector, igraph_real_t *value,
-                                  igraph_bool_t directed, igraph_real_t damping,
-                                  const igraph_vector_t *weights, igraph_arpack_options_t *options);
-IGRAPH_EXPORT igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
-                                               igraph_pagerank_algo_t algo,
-                                               igraph_vector_t *vector, igraph_real_t *value,
-                                               igraph_bool_t directed, igraph_real_t damping,
-                                               const igraph_vector_t *reset,
-                                               const igraph_vector_t *weights, igraph_arpack_options_t *options);
-IGRAPH_EXPORT igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
-                                                  igraph_pagerank_algo_t algo,
-                                                  igraph_vector_t *vector,
-                                                  igraph_real_t *value,
-                                                  igraph_bool_t directed, igraph_real_t damping,
-                                                  igraph_vs_t reset_vids,
-                                                  const igraph_vector_t *weights, igraph_arpack_options_t *options);
+IGRAPH_EXPORT igraph_error_t
+igraph_linkrank(const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_t *vector, igraph_real_t *value,
+                igraph_bool_t directed, igraph_real_t damping, igraph_pagerank_algo_t algo,
+                igraph_arpack_options_t *options);
+IGRAPH_EXPORT igraph_error_t
+igraph_personalized_linkrank(const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_t *vector,
+                             igraph_real_t *value, igraph_bool_t directed, igraph_real_t damping,
+                             const igraph_vector_t *reset, igraph_pagerank_algo_t algo,
+                             igraph_arpack_options_t *options);
+IGRAPH_EXPORT igraph_error_t
+igraph_personalized_linkrank_vs(const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_t *vector,
+                                igraph_real_t *value, igraph_bool_t directed, igraph_real_t damping,
+                                igraph_vs_t reset_vids, igraph_pagerank_algo_t algo, igraph_arpack_options_t *options);
 
 IGRAPH_EXPORT igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
                                                 igraph_real_t *value,

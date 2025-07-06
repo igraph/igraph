@@ -797,8 +797,8 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  * https://doi.org/10.1103/PhysRevE.81.016103.
  *
  * \param graph The graph object.
- * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param weights Optional weights for edges. If this is a \c NULL pointer then
+ *    every edge has the same weight. The weights are expected to be non-negative.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
@@ -808,8 +808,8 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  * \param directed Boolean, whether to consider the directedness of the graph.
  *    This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
- * \param weights Optional weights for edges. If this is a \c NULL pointer then
- *    every edge has the same weight. The weights are expected to be non-negative.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param options Options to ARPACK. See \ref igraph_pagerank() for how it is handled.
  * \return Error code:
  *    \c IGRAPH_EINVAL invalid damping factor, or invalid edge weights.
@@ -820,12 +820,14 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  *
  * \sa \ref igraph_pagerank() for the vertex-based PageRank implementation.
  */
-igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t algo,
-                               igraph_vector_t *vector,igraph_real_t *value,
-                               igraph_bool_t directed, igraph_real_t damping,
-                               const igraph_vector_t *weights, igraph_arpack_options_t *options) {
-    return igraph_personalized_linkrank(graph, algo, vector, value,
-                                        directed, damping, NULL, weights,
+igraph_error_t igraph_linkrank(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *vector, igraph_real_t *value,
+        igraph_bool_t directed, igraph_real_t damping,
+        igraph_pagerank_algo_t algo, igraph_arpack_options_t *options) {
+
+    return igraph_personalized_linkrank(graph, weights, vector, value,
+                                        directed, damping, NULL, algo,
                                         options);
 }
 
@@ -856,8 +858,8 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * https://doi.org/10.1103/PhysRevE.81.016103.
  *
  * \param graph The graph object.
- * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param weights Optional weights for edges. If this is a \c NULL pointer then
+ *    every edge has the same weight. The weights are expected to be non-negative.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
@@ -870,8 +872,8 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \param reset The reset vector for personalized PageRank. This vector should
  *    contain non-negative numbers; if it does not sum to 1, it will be normalized.
  *    Supply a \c NULL pointer here to get the non-personalized LinkRank.
- * \param weights Optional weights for edges. If this is a \c NULL pointer then
- *    every edge has the same weight. The weights are expected to be non-negative.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param options Options to ARPACK. See \ref igraph_pagerank() for how it is handled.
  * \return Error code:
  *    \c IGRAPH_EINVAL invalid damping factor, invalid edge weights,
@@ -884,13 +886,12 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \sa \ref igraph_linkrank() for the non-personalized implementation,
  * \ref igraph_personalized_pagerank() for the vertex-based personalized PageRank score.
  */
-igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
-                                            igraph_pagerank_algo_t algo, igraph_vector_t *vector,
-                                            igraph_real_t *value,
-                                            igraph_bool_t directed, igraph_real_t damping,
-                                            const igraph_vector_t *reset,
-                                            const igraph_vector_t *weights,
-                                            igraph_arpack_options_t *options) {
+igraph_error_t igraph_personalized_linkrank(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *vector, igraph_real_t *value,
+        igraph_bool_t directed, igraph_real_t damping,
+        const igraph_vector_t *reset,
+        igraph_pagerank_algo_t algo, igraph_arpack_options_t *options) {
     igraph_vector_t pagerank;
 
     /* Calculate PageRank for all vertices first */
@@ -921,8 +922,8 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
  * starting point.
  *
  * \param graph The graph object.
- * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param weights Optional weights for edges. If this is a \c NULL pointer then
+ *    every edge has the same weight. The weights are expected to be non-negative.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
@@ -935,8 +936,8 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
  * \param reset_vids Vertex sequence specifying the vertices used in the reset
  *    distribution. All vertices in this sequence get equal probability in the
  *    reset distribution.
- * \param weights Optional weights for edges. If this is a \c NULL pointer then
- *    every edge has the same weight. The weights are expected to be non-negative.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param options Options to ARPACK. See \ref igraph_pagerank() for how it is handled.
  * \return Error code.
  *
@@ -947,14 +948,13 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
  * \ref igraph_personalized_linkrank() for the personalized implementation
  * with an explicit reset vector.
  */
-igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
-                                               igraph_pagerank_algo_t algo,
-                                               igraph_vector_t *vector,
-                                               igraph_real_t *value,
-                                               igraph_bool_t directed, igraph_real_t damping,
-                                               igraph_vs_t reset_vids,
-                                               const igraph_vector_t *weights,
-                                               igraph_arpack_options_t *options) {
+igraph_error_t igraph_personalized_linkrank_vs(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *vector, igraph_real_t *value,
+        igraph_bool_t directed, igraph_real_t damping,
+        igraph_vs_t reset_vids,
+        igraph_pagerank_algo_t algo, igraph_arpack_options_t *options) {
+
     igraph_vector_t reset;
     igraph_vit_t vit;
 
@@ -970,10 +970,10 @@ igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_personalized_linkrank(graph, algo, vector,
-                 value, directed,
-                 damping, &reset, weights,
-                 options));
+    IGRAPH_CHECK(igraph_personalized_linkrank(graph, weights, vector,
+                                              value, directed,
+                                              damping, &reset, algo,
+                                              options));
 
     igraph_vector_destroy(&reset);
     IGRAPH_FINALLY_CLEAN(1);
