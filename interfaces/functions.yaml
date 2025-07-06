@@ -747,36 +747,36 @@ igraph_linkrank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         OUT VECTOR vector, OUT REAL value,
-        EDGE_SELECTOR eids=ALL, BOOLEAN directed=True,
+        BOOLEAN directed=True,
         REAL damping=0.85, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
-        eids ON graph, weights ON graph, vector ON graph eids,
+        weights ON graph, vector ON graph,
         options ON algo
 
 igraph_personalized_linkrank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         OUT VECTOR vector, OUT REAL value,
-        EDGE_SELECTOR eids=ALL, BOOLEAN directed=True,
+        BOOLEAN directed=True,
         REAL damping=0.85, OPTIONAL VECTOR personalized,
         OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
-        eids ON graph, weights ON graph, vector ON graph eids,
+        weights ON graph, vector ON graph,
         options ON algo
 
 igraph_personalized_linkrank_vs:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         PRIMARY OUT VECTOR vector, OUT REAL value,
-        EDGE_SELECTOR eids=ALL, BOOLEAN directed=True,
+        BOOLEAN directed=True,
         REAL damping=0.85,
         VERTEX_SELECTOR reset_vids,
         OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
-        eids ON graph, weights ON graph, vector ON graph eids,
+        weights ON graph, vector ON graph,
         options ON algo
 
 igraph_rewire:
