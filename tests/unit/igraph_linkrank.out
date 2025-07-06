@@ -1,0 +1,18 @@
+LinkRank Test 1 - Simple directed graph
+PRPACK: ( 0.0326087 0.0326087 0.0326087 0.0326087 0.434783 0.434783 )
+ARPACK: ( 0.0326087 0.0326087 0.0326087 0.0326087 0.434783 0.434783 )
+
+LinkRank Test 2 - Weighted edges
+PRPACK weighted: ( 0.06409 0.032045 0.0689824 0.0229941 0.408023 0.403865 )
+
+LinkRank Test 3 - Personalized LinkRank
+PRPACK personalized: ( 0.0915332 0.0915332 0.0389016 0.0389016 0.381656 0.357474 )
+
+LinkRank Test 4 - Personalized LinkRank with vertex selector
+PRPACK personalized vs: ( 0.0915332 0.0915332 0.0389016 0.0389016 0.381656 0.357474 )
+
+LinkRank Test 5 - Edge subset
+PRPACK subset (edges 0,3): ( 0.0326087 0.0326087 )
+
+LinkRank Test 6 - Undirected star
+PRPACK star: ( 0.131081 0.131081 0.131081 0.131081 )
