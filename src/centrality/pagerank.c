@@ -728,26 +728,18 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
  * \param graph The input graph.
  * \param pagerank_scores Vector containing PageRank scores for all vertices.
  * \param linkrank_result Vector to store the LinkRank scores (will be resized).
- * \param eids Edge selector specifying which edges to compute LinkRank for.
  * \param weights Edge weights vector, or NULL for unweighted edges.
  * \param directed Whether to treat the graph as directed.
  * \return Error code.
  */
 static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
-                                                     const igraph_vector_t *pagerank_scores,
-                                                     igraph_vector_t *linkrank_result,
-                                                     const igraph_es_t eids,
-                                                     const igraph_vector_t *weights,
-                                                     igraph_bool_t directed) {
-    igraph_eit_t eit;
-    igraph_vector_t strength;
-    igraph_integer_t no_of_edges_to_calc;
-    igraph_integer_t i;
+                                           const igraph_vector_t *pagerank_scores,
+                                           igraph_vector_t *linkrank_result,
+                                           const igraph_vector_t *weights,
+                                           igraph_bool_t directed) {
 
-    /* Get the edges to calculate LinkRank for */
-    IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
-    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    no_of_edges_to_calc = IGRAPH_EIT_SIZE(eit);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_vector_t strength;
 
     /* Calculate vertex strengths (sum of outgoing edge weights) */
     IGRAPH_VECTOR_INIT_FINALLY(&strength, igraph_vcount(graph));
@@ -755,27 +747,25 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
                                  directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS, weights));
 
     /* Resize result vector */
-    IGRAPH_CHECK(igraph_vector_resize(linkrank_result, no_of_edges_to_calc));
+    IGRAPH_CHECK(igraph_vector_resize(linkrank_result, ecount));
 
     /* Calculate LinkRank for each edge */
-    for (IGRAPH_EIT_RESET(eit), i = 0; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from = IGRAPH_FROM(graph, edge);
-        igraph_real_t edge_weight = weights ? VECTOR(*weights)[edge] : 1.0;
+    for (igraph_integer_t eid = 0; eid < ecount; eid++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, eid);
+        igraph_real_t edge_weight = weights ? VECTOR(*weights)[eid] : 1.0;
         igraph_real_t vertex_strength = VECTOR(strength)[from];
         igraph_real_t vertex_pagerank = VECTOR(*pagerank_scores)[from];
 
         if (vertex_strength > 0) {
-            VECTOR(*linkrank_result)[i] = vertex_pagerank * edge_weight / vertex_strength;
+            VECTOR(*linkrank_result)[eid] = vertex_pagerank * edge_weight / vertex_strength;
         } else {
-            /* If vertex has no outgoing edges with positive weight, LinkRank is 0 */
-            VECTOR(*linkrank_result)[i] = 0.0;
+            /* If vertex has no outgoing edges with positive weight, LinkRank is 0. */
+            VECTOR(*linkrank_result)[eid] = 0.0;
         }
     }
 
     igraph_vector_destroy(&strength);
-    igraph_eit_destroy(&eit);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -809,7 +799,6 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  *    the largest eigenvalue is stored here. It should be very close to one.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, it is set to 1.0.
  *    This parameter can be a null pointer if not needed.
- * \param eids Edge selector specifying which edges to compute LinkRank for.
  * \param directed Boolean, whether to consider the directedness of the graph.
  *    This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
@@ -830,11 +819,10 @@ static igraph_error_t pagerank_to_linkrank(const igraph_t *graph,
  * \sa \ref igraph_pagerank() for the vertex-based PageRank implementation.
  */
 igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t algo,
-                               igraph_vector_t *vector,
-                               igraph_real_t *value, const igraph_es_t eids,
+                               igraph_vector_t *vector,igraph_real_t *value,
                                igraph_bool_t directed, igraph_real_t damping,
                                const igraph_vector_t *weights, igraph_arpack_options_t *options) {
-    return igraph_personalized_linkrank(graph, algo, vector, value, eids,
+    return igraph_personalized_linkrank(graph, algo, vector, value,
                                         directed, damping, NULL, weights,
                                         options);
 }
@@ -869,7 +857,6 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  *    the largest eigenvalue is stored here. It should be very close to one.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, it is set to 1.0.
  *    This parameter can be a null pointer if not needed.
- * \param eids Edge selector specifying which edges to compute LinkRank for.
  * \param directed Boolean, whether to consider the directedness of the graph.
  *    This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
@@ -896,7 +883,7 @@ igraph_error_t igraph_linkrank(const igraph_t *graph, igraph_pagerank_algo_t alg
  */
 igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
                                             igraph_pagerank_algo_t algo, igraph_vector_t *vector,
-                                            igraph_real_t *value, const igraph_es_t eids,
+                                            igraph_real_t *value,
                                             igraph_bool_t directed, igraph_real_t damping,
                                             const igraph_vector_t *reset,
                                             const igraph_vector_t *weights,
@@ -911,7 +898,7 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
 
     /* Convert PageRank to LinkRank */
     IGRAPH_CHECK(pagerank_to_linkrank(graph, &pagerank, vector,
-                                      eids, weights, directed));
+                                      weights, directed));
 
     igraph_vector_destroy(&pagerank);
     IGRAPH_FINALLY_CLEAN(1);
@@ -939,7 +926,6 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
  *    the largest eigenvalue is stored here. It should be very close to one.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, it is set to 1.0.
  *    This parameter can be a null pointer if not needed.
- * \param eids Edge selector specifying which edges to compute LinkRank for.
  * \param directed Boolean, whether to consider the directedness of the graph.
  *    This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper). Must be in [0,1].
@@ -968,7 +954,7 @@ igraph_error_t igraph_personalized_linkrank(const igraph_t *graph,
 igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
                                                igraph_pagerank_algo_t algo,
                                                igraph_vector_t *vector,
-                                               igraph_real_t *value, const igraph_es_t eids,
+                                               igraph_real_t *value,
                                                igraph_bool_t directed, igraph_real_t damping,
                                                igraph_vs_t reset_vids,
                                                const igraph_vector_t *weights,
@@ -989,7 +975,7 @@ igraph_error_t igraph_personalized_linkrank_vs(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_personalized_linkrank(graph, algo, vector,
-                 value, eids, directed,
+                 value, directed,
                  damping, &reset, weights,
                  options));
 
