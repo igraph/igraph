@@ -11,9 +11,6 @@ PRPACK personalized: ( 0.0915332 0.0915332 0.0389016 0.0389016 0.381656 0.357474
 Personalized LinkRank with vertex selector
 PRPACK personalized vs: ( 0.0915332 0.0915332 0.0389016 0.0389016 0.381656 0.357474 )
 
-Edge subset
-PRPACK subset (edges 0,3): ( 0.0326087 0.0326087 )
-
 Undirected star
 PRPACK star: ( 0.131081 0.131081 0.131081 0.131081 )
 
