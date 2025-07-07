@@ -39,8 +39,53 @@ void test_p2_p4(void) {
     igraph_destroy(&p8);
 }
 
+void test_multigraph(void) {
+    igraph_t g1, g2, exp_prod, product;
+    igraph_bool_t is_iso;
+
+    igraph_small(&g1, 2, IGRAPH_UNDIRECTED, 0, 1,    0, 1, -1);
+    igraph_small(&g2, 2, IGRAPH_UNDIRECTED, 0, 1,    0, 1,    0, 1, -1);
+    igraph_small(&exp_prod, 4, IGRAPH_UNDIRECTED, 0, 1,    0, 1,    0,1,
+                                            2, 3,   2, 3,   2,3,
+                                            0,2,    0, 2, -1, IGRAPH_UNDIRECTED);
+
+    igraph_rooted_product(&product, &g1, &g2, 0);
+    igraph_isomorphic(&product, &exp_prod, &is_iso);
+    IGRAPH_ASSERT(is_iso);
+
+    igraph_destroy(&product);
+    igraph_destroy(&g1);
+    igraph_destroy(&g2);
+    igraph_destroy(&exp_prod);
+}
+
+void test_directed(void) {
+    igraph_t p3, c3, exp_prod, product;
+    igraph_bool_t is_iso;
+
+    igraph_ring(&p3, 3, IGRAPH_DIRECTED, false, false);
+    igraph_ring(&c3, 3, IGRAPH_DIRECTED, false, true);
+
+    // calculated by hand
+    igraph_small(&exp_prod, 9, IGRAPH_DIRECTED, 0,1,  1,2,
+                                          3,0,  0,4,  4,3,
+                                          5,1,  1,6,  6,5,
+                                          7,2,  2,8,  8,7, -1);
+
+    igraph_rooted_product(&product, &p3, &c3, 0);
+    igraph_isomorphic(&exp_prod, &product, &is_iso);
+    IGRAPH_ASSERT(is_iso);
+
+    igraph_destroy(&product);
+    igraph_destroy(&p3);
+    igraph_destroy(&c3);
+    igraph_destroy(&exp_prod);
+}
+
 int main(void) {
     test_p2_p4();
+    test_multigraph();
+    test_directed();
 
     VERIFY_FINALLY_STACK();
 
