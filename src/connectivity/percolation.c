@@ -97,7 +97,7 @@ static bool is_connected(igraph_vector_int_t *links, igraph_vector_int_t *sizes,
  *    and <code>edges[2i+1]</code>.
  * \param giant_size <code>giant_size[i]</code> will contain the size of the largest connected
  *    component after edge \c i is added.
- * \param connected_vertices <code>giant_size[i]</code> will contain the number of vertices
+ * \param vertex_count <code>vertex_count[i]</code> will contain the number of vertices
  * with at least one edge after edge \c i is added.
  * \return Error code.
  *
@@ -108,9 +108,9 @@ static bool is_connected(igraph_vector_int_t *links, igraph_vector_int_t *sizes,
  */
 
 igraph_error_t igraph_edgelist_percolation(
-    const igraph_vector_int_t *edges,
-    igraph_vector_int_t *giant_size,
-    igraph_vector_int_t *connected_vertices) {
+        const igraph_vector_int_t *edges,
+        igraph_vector_int_t *giant_size,
+        igraph_vector_int_t *vertex_count) {
 
     igraph_integer_t biggest = 0;
     igraph_integer_t connected = 0;
@@ -121,8 +121,8 @@ igraph_error_t igraph_edgelist_percolation(
         if (giant_size != NULL) {
             IGRAPH_CHECK(igraph_vector_int_resize(giant_size, 0));
         }
-        if (connected_vertices != NULL) {
-            IGRAPH_CHECK(igraph_vector_int_resize(connected_vertices, 0));
+        if (vertex_count != NULL) {
+            IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, 0));
         }
         return IGRAPH_SUCCESS;
     }
@@ -150,14 +150,14 @@ igraph_error_t igraph_edgelist_percolation(
     }
     edge_count >>= 1;
     IGRAPH_CHECK(igraph_vector_int_resize(giant_size, edge_count));
-    IGRAPH_CHECK(igraph_vector_int_resize(connected_vertices, edge_count));
+    IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, edge_count));
 
     for (igraph_integer_t i = 0; i < edge_count; i++) {
         if (!is_connected(&links, &sizes, VECTOR(*edges)[2 * i]))     {connected++;}
         if (!is_connected(&links, &sizes, VECTOR(*edges)[2 * i+ 1 ])) {connected++;}
         percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1]);
         if (giant_size != NULL) {VECTOR(*giant_size)[i] = biggest;}
-        if (connected_vertices != NULL) {VECTOR(*connected_vertices)[i] = connected;}
+        if (vertex_count != NULL) { VECTOR(*vertex_count)[i] = connected;}
     }
 
     igraph_vector_int_destroy(&sizes);
@@ -180,11 +180,10 @@ igraph_error_t igraph_edgelist_percolation(
  * \param graph The graph that edges are assumed to be in. Edge directions
  *    are ignored.
  * \param giant_size <code>giant_size[i]</code> will contain the size of the largest
- *    component after having added the edge with index
- *    <code>edge_order[i]</code>.
- * \param connected_vertices <code>connected_vertices[i]</code> will contain the number
- *    of vertices that have at least one edge after adding the edge with index
- *    <code>edge_order[i]</code>.
+ *    component after having added the edge with index <code>edge_order[i]</code>.
+ * \param vertex_count <code>vertex_count[i]</code> will contain the number
+ *    of vertices that have at least one incident edge after adding the edge with
+ *    index <code>edge_order[i]</code>.
  * \param edge_order The order the edges are added in. Must not contain duplicates.
  *    If \c NULL, a random order will be used.
  * \return Error code.
@@ -198,10 +197,10 @@ igraph_error_t igraph_edgelist_percolation(
  */
 
 igraph_error_t igraph_bond_percolation(
-    const igraph_t *graph,
-    igraph_vector_int_t *output,
-    igraph_vector_int_t *connected_vertices,
-    const igraph_vector_int_t *edge_order) {
+        const igraph_t *graph,
+        igraph_vector_int_t *output,
+        igraph_vector_int_t *vertex_count,
+        const igraph_vector_int_t *edge_order) {
 
     const igraph_vector_int_t *p_edge_order;
     igraph_vector_int_t i_edge_order;
@@ -221,7 +220,7 @@ igraph_error_t igraph_bond_percolation(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * igraph_vector_int_size(p_edge_order));
 
     IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges));
-    IGRAPH_CHECK(igraph_edgelist_percolation(&edges, output, connected_vertices));
+    IGRAPH_CHECK(igraph_edgelist_percolation(&edges, output, vertex_count));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -298,10 +297,10 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  */
 
 igraph_error_t igraph_site_percolation(
-    const igraph_t *graph,
-    igraph_vector_int_t *giant_size,
-    igraph_vector_int_t *edge_count,
-    const igraph_vector_int_t *vertex_order) {
+        const igraph_t *graph,
+        igraph_vector_int_t *giant_size,
+        igraph_vector_int_t *edge_count,
+        const igraph_vector_int_t *vertex_order) {
 
     const igraph_vector_int_t *p_vertex_order;
     igraph_vector_int_t i_vertex_order;
