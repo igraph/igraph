@@ -441,6 +441,8 @@ static igraph_error_t tensor_product(igraph_t *res,
  * \return Error code:
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
  *         graphs \p g1 and \p g2 are incompatible for the requested product.
+ * 
+ * \sa \ref igraph_rooted_product
  */
 
 igraph_error_t igraph_product(igraph_t *res,
@@ -464,6 +466,43 @@ igraph_error_t igraph_product(igraph_t *res,
         IGRAPH_ERROR("Unknown graph product type.", IGRAPH_EINVAL);
     }
 }
+
+/**
+ * \function igraph_rooted_product
+ * \brief The rooted graph product of two graphs.
+ *
+ * \experimental
+ *
+ * This function computes the rooted product of two graphs. The two graphs
+ * must be of the same type, either directed or undirected. If a product of
+ * an undirected and a directed graph is required, convert one of them to the
+ * appropriate type using \ref igraph_to_directed() or \ref igraph_to_undirected().
+ *
+ * </para><para>
+ * The new vertex ID of the product graph is mapped similar to the mapping
+ * done in \ref igraph_product.
+ * 
+ * </para><para>
+ * The rooted product of two graphs G and H, with a root in H, duplicates
+ * H for each nodes in G with the root of H corresponding to the node in G.
+ *
+ * \param res Pointer to an uninitialized graph object. The product graph will
+ *   be stored here.
+ * \param g1 The first operand graph.
+ * \param g2 The second operand graph. It must have the same directedness as \p g1.
+ * \param root The root vertex id of the second graph.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
+ *         graphs \p g1 and \p g2 are incompatible for the requested product.
+ *         \c IGRAPH_EINVVID if invalid vertex ID passed as \p root.
+ * 
+ * \sa \ref igraph_product
+ * 
+ * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
+ * where |V1| and |V2| are the number of vertices, and
+ * |E1| and |E2| are the number of edges of the operands.
+ */
 
 igraph_error_t igraph_rooted_product(igraph_t *res,
                                      const igraph_t *g1,
