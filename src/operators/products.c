@@ -332,6 +332,34 @@ static igraph_error_t tensor_product(igraph_t *res,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t modular_product(igraph_t *res,
+                                     const igraph_t *g1,
+                                     const igraph_t *g2) {
+
+    const igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Modular product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_product
  * \brief The graph product of two graphs, according to the chosen product type.
@@ -461,6 +489,9 @@ igraph_error_t igraph_product(igraph_t *res,
 
     case IGRAPH_PRODUCT_TENSOR:
         return tensor_product(res, g1, g2);
+    
+    case IGRAPH_PRODUCT_MODULAR:
+        return modular_product(res, g1, g2);
 
     default:
         IGRAPH_ERROR("Unknown graph product type.", IGRAPH_EINVAL);
