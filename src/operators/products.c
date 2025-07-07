@@ -514,8 +514,13 @@ igraph_error_t igraph_product(igraph_t *res,
  * done in \ref igraph_product.
  * 
  * </para><para>
- * The rooted product of two graphs G and H, with a root in H, duplicates
- * H for each nodes in G with the root of H corresponding to the node in G.
+ * In the rooted product graph of G and H, with root vertex ID \c root in H,
+ * there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ * if and only if
+ * <code>u1 = u2</code> and <code>v1 ~ v2</code> or
+ * <code>u1 ~ u2</code> and <code>v1 = v2 = root</code>.
+ * Thus, the number of edges in the product graph is
+ * <code>|V1| |E2| + |E1|</code>.
  *
  * \param res Pointer to an uninitialized graph object. The product graph will
  *   be stored here.
