@@ -478,6 +478,11 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
 
     const igraph_integer_t vcount1 = igraph_vcount(g1);
     const igraph_integer_t vcount2 = igraph_vcount(g2);
+
+    if (root < 0 || root >= vcount2) { // root must be in range [0, vcount2-1]
+        IGRAPH_ERROR("Root vertex id out of range.", IGRAPH_EINVVID);
+    }
+
     const igraph_integer_t ecount1 = igraph_ecount(g1);
     const igraph_integer_t ecount2 = igraph_ecount(g2);
     igraph_integer_t vcount;
