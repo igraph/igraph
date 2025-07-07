@@ -552,7 +552,7 @@ igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
  * \return Error code.
  *
  * \sa \ref igraph_count_triangles() to count the triangles,
- * \ref igraph_adjacent_triangles() to count the triangles a vertex
+ * \ref igraph_count_adjacent_triangles() to count the triangles a vertex
  * participates in, \ref igraph_transitivity_undirected() to compute
  * the global clustering coefficient.
  *
