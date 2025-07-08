@@ -129,8 +129,6 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 10);
 
-    RNG_BEGIN();
-
     /* Initialization */
     IGRAPH_CHECK(igraph_strength(graph, &phi, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, /* weights = */ 0));
 
@@ -237,9 +235,6 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
         maxiter--;
 
     } /* while temp && iter */
-
-
-    RNG_END();
 
     igraph_vector_int_destroy(&neis);
     igraph_vector_destroy(&phi);

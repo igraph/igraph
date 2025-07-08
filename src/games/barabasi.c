@@ -144,8 +144,6 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
         igraph_vector_int_resize(&edges, no_of_edges * 2);
     }
 
-    RNG_BEGIN();
-
     /* and the others */
 
     for (i = (start_from ? start_nodes : 1), k = (start_from ? 0 : 1);
@@ -171,8 +169,6 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
             }
         }
     }
-
-    RNG_END();
 
     IGRAPH_FREE(bag);
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
@@ -251,8 +247,6 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
         igraph_vector_int_resize(&edges, no_of_edges * 2);
     }
 
-    RNG_BEGIN();
-
     /* And the rest: */
     for (i = (start_from ? start_nodes : 1), k = (start_from ? 0 : 1);
          i < no_of_nodes; i++, k++) {
@@ -288,8 +282,6 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
             IGRAPH_CHECK(igraph_psumtree_update(&sumtree, i, attraction(0, power, A)));
         }
     }
-
-    RNG_END();
 
     igraph_psumtree_destroy(&sumtree);
     igraph_vector_int_destroy(&degree);
@@ -349,8 +341,6 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
     IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
-
-    RNG_BEGIN();
 
     /* First node(s): */
     if (start_from) {
@@ -422,8 +412,6 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
             IGRAPH_CHECK(igraph_psumtree_update(&sumtree, i, attraction(0, power, A)));
         }
     }
-
-    RNG_END();
 
     igraph_psumtree_destroy(&sumtree);
     igraph_vector_int_destroy(&degree);
@@ -766,8 +754,6 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
-    RNG_BEGIN();
-
     /* First node: */
     /* Any weight may be used for the first node. In the first step, it will be connected to
      * with certainty, after which its weight will be set appropriately. */
@@ -842,8 +828,6 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
                 ));
         }
     }
-
-    RNG_END();
 
     igraph_vector_int_destroy(&degree);
     igraph_psumtree_destroy(&sumtree);

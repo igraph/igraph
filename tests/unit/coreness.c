@@ -110,8 +110,6 @@ void add_loop_and_multiple_edges(igraph_t* graph, igraph_real_t loop_prob, igrap
 
     igraph_vector_int_init(&extra_edges, 0);
 
-    RNG_BEGIN();
-
     n = igraph_vcount(graph);
     for (i = 0; i < n; i++) {
         if (RNG_UNIF01() < loop_prob) {
@@ -129,8 +127,6 @@ void add_loop_and_multiple_edges(igraph_t* graph, igraph_real_t loop_prob, igrap
         }
     }
 
-    RNG_END();
-
     igraph_add_edges(graph, &extra_edges, 0);
 
     igraph_vector_int_destroy(&extra_edges);
@@ -142,16 +138,12 @@ void remove_some_edges(igraph_t* graph, igraph_real_t prob) {
 
     igraph_vector_int_init(&to_remove, 0);
 
-    RNG_BEGIN();
-
     n = igraph_ecount(graph);
     for (i = 0; i < n; i++) {
         if (igraph_rng_get_unif01(igraph_rng_default()) < prob) {
             igraph_vector_int_push_back(&to_remove, i);
         }
     }
-
-    RNG_END();
 
     igraph_delete_edges(graph, igraph_ess_vector(&to_remove));
 

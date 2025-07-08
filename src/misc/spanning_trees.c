@@ -502,8 +502,6 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
     VECTOR(*visited)[start] = true;
     visited_count = 1;
 
-    RNG_BEGIN();
-
     while (visited_count < comp_size) {
         igraph_integer_t degree, edge;
         igraph_vector_int_t *edges;
@@ -526,8 +524,6 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

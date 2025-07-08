@@ -57,7 +57,6 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, vcount);
     IGRAPH_VECTOR_INIT_FINALLY(&dispy, vcount);
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < niter; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -155,7 +154,6 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
 
         temp -= difftemp;
     }
-    RNG_END();
 
     igraph_vector_destroy(&dispx);
     igraph_vector_destroy(&dispy);
@@ -199,7 +197,6 @@ static igraph_error_t igraph_layout_i_grid_fr(
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, vcount);
     IGRAPH_VECTOR_INIT_FINALLY(&dispy, vcount);
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < niter; i++) {
         igraph_integer_t v, u;
 
@@ -274,7 +271,6 @@ static igraph_error_t igraph_layout_i_grid_fr(
 
         temp -= difftemp;
     }
-    RNG_END();
 
     igraph_vector_destroy(&dispx);
     igraph_vector_destroy(&dispy);
@@ -552,7 +548,6 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dispy, vcount);
     IGRAPH_VECTOR_INIT_FINALLY(&dispz, vcount);
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < niter; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -671,7 +666,6 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
         temp -= difftemp;
     }
-    RNG_END();
 
     igraph_vector_destroy(&dispx);
     igraph_vector_destroy(&dispy);

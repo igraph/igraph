@@ -149,24 +149,6 @@ IGRAPH_EXPORT igraph_rng_t *igraph_rng_set_default(igraph_rng_t *rng);
 
 /* --------------------------------- */
 
-#ifdef USING_R
-
-void GetRNGstate(void);
-void PutRNGstate(void);
-#define RNG_BEGIN()    GetRNGstate()
-#define RNG_END()      PutRNGstate()
-
-#else
-
-#define RNG_BEGIN() \
-    do { if (!igraph_rng_default()->is_seeded) { \
-        igraph_rng_seed(igraph_rng_default(), time(0)); \
-        igraph_rng_default()->is_seeded = true; \
-    } } while (0)
-#define RNG_END() \
-    do { /* nothing */ } while (0)
-#endif
-
 #define RNG_BOOL()       (igraph_rng_get_bool(igraph_rng_default()))
 #define RNG_INTEGER(l,h) (igraph_rng_get_integer(igraph_rng_default(),(l),(h)))
 #define RNG_NORMAL(m,s)  (igraph_rng_get_normal(igraph_rng_default(),(m),(s)))

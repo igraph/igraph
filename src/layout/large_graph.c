@@ -153,8 +153,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
      * TODO: If this function is updated to handle weights, it should
      * construct the MST and traverse that instead. */
 
-    RNG_BEGIN();
-
     /* Determine the root vertex, random pick right now */
     if (proot < 0) {
         root = RNG_INTEGER(0, no_of_nodes - 1);
@@ -375,8 +373,6 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             /*       printf("%li iterations, maxchange: %f\n", it, (double)maxchange); */
         }
     }
-
-    RNG_END();
 
     IGRAPH_PROGRESS("Large graph layout", 100.0, 0);
     igraph_vector_int_destroy(&vids);

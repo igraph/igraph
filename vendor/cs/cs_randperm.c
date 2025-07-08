@@ -14,7 +14,6 @@ CS_INT *cs_randperm (CS_INT n, CS_INT seed)
     for (k = 0 ; k < n ; k++) p [k] = n-k-1 ;
     if (seed == -1) return (p) ;        /* return reverse permutation */
     /* srand (seed) ;                      /\* get new random number seed *\/ */
-    RNG_BEGIN();
     for (k = 0 ; k < n ; k++)
     {
         /* j = k + (rand ( ) % (n-k)) ;    /\* j = rand CS_INT in range k to n-1 *\/ */
@@ -23,6 +22,5 @@ CS_INT *cs_randperm (CS_INT n, CS_INT seed)
         p [j] = p [k] ;
         p [k] = t ;
     }
-    RNG_END();
     return (p) ;
 }

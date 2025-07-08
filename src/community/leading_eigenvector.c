@@ -539,11 +539,11 @@ igraph_error_t igraph_community_leading_eigenvector(
          * convergence in most cases. */
         options->start = 1;
         options->mxiter = options->mxiter > 10000 ? options->mxiter : 10000;  /* use more iterations, we've had convergence problems with 3000 */
-        RNG_BEGIN();
+
         for (i = 0; i < options->n; i++) {
             storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
         }
-        RNG_END();
+
         igraph_vector_view(&start_vec, storage.resid, options->n);
         igraph_vector_shuffle(&start_vec);
 

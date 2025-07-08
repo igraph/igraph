@@ -158,8 +158,6 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &visited);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&neiq, 10);
 
-    RNG_BEGIN();
-
 #define ADD_EDGE_TO(nei) \
     if (VECTOR(visited)[(nei)] != actnode+1) { \
         VECTOR(visited)[(nei)] = actnode+1; \
@@ -241,8 +239,6 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     } /* actnode < no_of_nodes */
 
 #undef ADD_EDGE_TO
-
-    RNG_END();
 
     IGRAPH_PROGRESS("Forest fire: ", 100.0, NULL);
 

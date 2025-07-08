@@ -89,14 +89,10 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
         IGRAPH_VECTOR_INIT_FINALLY(yy, nodes);
     }
 
-    RNG_BEGIN();
-
     for (i = 0; i < nodes; i++) {
         VECTOR(*xx)[i] = RNG_UNIF01();
         VECTOR(*yy)[i] = RNG_UNIF01();
     }
-
-    RNG_END();
 
     igraph_vector_sort(xx);
 

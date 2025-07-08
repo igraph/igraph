@@ -36,8 +36,6 @@ int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
-    RNG_BEGIN();
-
     igraph_vector_init(&elems, 100);
     for (i = 0; i < igraph_vector_size(&elems); i++) {
         VECTOR(elems)[i] = RNG_UNIF01();
@@ -164,8 +162,6 @@ int main(void) {
     igraph_2wheap_destroy(&Q);
 
     VERIFY_FINALLY_STACK();
-
-    RNG_END();
 
     return 0;
 }

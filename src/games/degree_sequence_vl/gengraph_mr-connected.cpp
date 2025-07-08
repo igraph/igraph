@@ -151,8 +151,6 @@ igraph_error_t igraph_i_degree_sequence_game_vl(igraph_t *graph,
                          IGRAPH_EINVAL);
         }
 
-        RNG_BEGIN();
-
         degree_sequence *dd = new degree_sequence(out_seq);
 
         graph_molloy_opt *g = new graph_molloy_opt(*dd);
@@ -160,13 +158,11 @@ igraph_error_t igraph_i_degree_sequence_game_vl(igraph_t *graph,
 
         if (!g->havelhakimi()) {
             delete g;
-            RNG_END();
             IGRAPH_FATAL("g->havelhakimi() failed; please report as a bug.");
         }
 
         if (!g->make_connected()) {
             delete g;
-            RNG_END();
             IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence.",
                          IGRAPH_EINVAL);
         }
@@ -180,8 +176,6 @@ igraph_error_t igraph_i_degree_sequence_game_vl(igraph_t *graph,
 
         IGRAPH_CHECK(gh->print(graph));
         delete gh;
-
-        RNG_END();
     );
 
     return IGRAPH_SUCCESS;

@@ -160,8 +160,6 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
      */
     sort_edges(&edges, old_graph);
 
-    RNG_BEGIN();
-
     if (p_del > 0) {
         last = RNG_GEOM(p_del);
         while (last < no_of_edges) {
@@ -181,8 +179,6 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         }
     }
     no_add = igraph_vector_size(&add);
-
-    RNG_END();
 
     /* Now we are merging the original edges, the edges that are removed,
        and the new edges. We have the following pointers:

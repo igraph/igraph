@@ -64,7 +64,6 @@ static igraph_error_t gnp_large(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount_estimate));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < n; i++) {
         igraph_integer_t j = directed ? 0 : i;
 
@@ -91,7 +90,6 @@ static igraph_error_t gnp_large(
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);
@@ -191,8 +189,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&s, ecount_estimate));
 
-        RNG_BEGIN();
-
         last = RNG_GEOM(p);
         while (last < maxedges) {
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
@@ -200,8 +196,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             last += 1;
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
-
-        RNG_END();
 
         ecount = igraph_vector_size(&s);
         if (ecount > IGRAPH_ECOUNT_MAX) {
@@ -341,7 +335,6 @@ igraph_error_t igraph_iea_game(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < m; i++) {
         igraph_integer_t from, to;
         from = RNG_INTEGER(0, n - 1);
@@ -357,7 +350,6 @@ igraph_error_t igraph_iea_game(
         igraph_vector_int_push_back(&edges, to); /* reserved */
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);
@@ -415,7 +407,6 @@ static igraph_error_t gnm_multi(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*m);
 
-    RNG_BEGIN();
     if (directed && loops) {
         nrow = ncol = n;
         last = ncol-1;
@@ -551,7 +542,6 @@ static igraph_error_t gnm_multi(
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 

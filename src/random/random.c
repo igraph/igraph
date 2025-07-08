@@ -994,8 +994,6 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
     igraph_vector_int_clear(res);
     IGRAPH_CHECK(igraph_vector_int_reserve(res, length));
 
-    RNG_BEGIN();
-
     Vprime = exp(log(RNG_UNIF01()) * ninv);
     l = l - 1;
 
@@ -1059,8 +1057,6 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
         l += S + 1;
         igraph_vector_int_push_back(res, l);    /* allocated */
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1180,8 +1176,6 @@ igraph_error_t igraph_i_random_sample_real(igraph_vector_t *res, igraph_real_t l
     igraph_vector_clear(res);
     IGRAPH_CHECK(igraph_vector_reserve(res, length));
 
-    RNG_BEGIN();
-
     Vprime = exp(log(RNG_UNIF01()) * ninv);
     l = l - 1;
 
@@ -1250,8 +1244,6 @@ igraph_error_t igraph_i_random_sample_real(igraph_vector_t *res, igraph_real_t l
         l += S + 1;
         igraph_vector_push_back(res, l);    /* allocated */
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

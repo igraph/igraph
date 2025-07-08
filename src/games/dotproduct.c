@@ -67,8 +67,6 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    RNG_BEGIN();
-
     for (i = 0; i < ncol; i++) {
         igraph_integer_t from = directed ? 0 : i + 1;
         igraph_vector_t v1;
@@ -95,8 +93,6 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
             }
         }
     }
-
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, ncol, directed));
 

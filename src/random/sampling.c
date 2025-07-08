@@ -63,8 +63,6 @@ igraph_error_t igraph_rng_sample_sphere_surface(
 
     IGRAPH_CHECK(igraph_matrix_resize(res, dim, n));
 
-    RNG_BEGIN();
-
     for (i = 0; i < n; i++) {
         igraph_real_t *col = &MATRIX(*res, 0, i);
         igraph_real_t sum = 0.0;
@@ -82,8 +80,6 @@ igraph_error_t igraph_rng_sample_sphere_surface(
             }
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -122,8 +118,6 @@ igraph_error_t igraph_rng_sample_sphere_volume(
 
     IGRAPH_CHECK(igraph_rng_sample_sphere_surface(rng, dim, n, radius, positive, res));
 
-    RNG_BEGIN();
-
     for (i = 0; i < n; i++) {
         igraph_real_t *col = &MATRIX(*res, 0, i);
         igraph_real_t U = pow(igraph_rng_get_unif01(rng), 1.0 / dim);
@@ -131,8 +125,6 @@ igraph_error_t igraph_rng_sample_sphere_volume(
             col[j] *= U;
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -185,8 +177,6 @@ igraph_error_t igraph_rng_sample_dirichlet(
 
     IGRAPH_CHECK(igraph_matrix_resize(res, len, n));
 
-    RNG_BEGIN();
-
     for (i = 0; i < n; i++) {
         for (j = 0, sum = 0.0; j < len; j++) {
             num = igraph_rng_get_gamma(rng, VECTOR(*alpha)[j], 1.0);
@@ -197,8 +187,6 @@ igraph_error_t igraph_rng_sample_dirichlet(
             MATRIX(*res, j, i) /= sum;
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
