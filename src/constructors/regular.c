@@ -572,6 +572,61 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 
 /**
  * \ingroup generators
+ * \function igraph_path_graph
+ * \brief A path graph \c P_n.
+ *
+ * Creates the path graph \c P_n on \p n vertices.
+ *
+ * </para><para>
+ * This is a convenience wrapper to \ref igraph_ring().
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param directed Whether to create a directed graph.
+ * \param mutual Whether to create mutual edges in directed
+ *        graphs. It is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|), the number of vertices in the graph.
+ */
+igraph_error_t igraph_path_graph(
+        igraph_t *graph, igraph_integer_t n,
+        igraph_bool_t directed, igraph_bool_t mutual) {
+    return igraph_ring(graph, n, directed, mutual, /* circular= */ false);
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_cycle_graph
+ * \brief A cycle graph \c C_n.
+ *
+ * Creates the cycle graph \c C_n on \p n vertices.
+ *
+ * </para><para>
+ * When \p n is 1 or 2, the result may not be a simple graph:
+ * the one-cycle contains a self-loop and the undirected or reciprocally
+ * connected directed two-cycle contains parallel edges.
+ *
+ * </para><para>
+ * This is a convenience wrapper to \ref igraph_ring().
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param directed Whether to create a directed graph.
+ * \param mutual Whether to create mutual edges in directed
+ *        graphs. It is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|), the number of vertices in the graph.
+ */
+igraph_error_t igraph_cycle_graph(
+        igraph_t *graph, igraph_integer_t n,
+        igraph_bool_t directed, igraph_bool_t mutual) {
+    return igraph_ring(graph, n, directed, mutual, /* circular= */ true);
+}
+
+/**
+ * \ingroup generators
  * \function igraph_kary_tree
  * \brief Creates a k-ary tree in which almost all vertices have k children.
  *

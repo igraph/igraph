@@ -12,7 +12,7 @@ Empty and singleton graphs:
 {
 }
 
-Two rings:
+Two cycles:
 {
   0: ( 0 1 2 3 4 )
   1: ( 0 4 3 2 1 )
@@ -26,7 +26,7 @@ Two rings:
   9: ( 4 3 2 1 0 )
 }
 
-Two directed rings:
+Two directed cycles:
 {
   0: ( 0 1 2 3 4 )
   1: ( 1 2 3 4 0 )
@@ -35,19 +35,19 @@ Two directed rings:
   4: ( 4 0 1 2 3 )
 }
 
-Two rings where node parity should be equal:
+Two cycles where node parity should be equal:
 {
   0: ( 0 1 2 3 4 )
   1: ( 4 3 2 1 0 )
 }
 
-Two rings where edge parity should be equal:
+Two cycles where edge parity should be equal:
 {
   0: ( 0 1 2 3 4 )
   1: ( 0 4 3 2 1 )
 }
 
-Two rings with only one vertex coloring:
+Two cycles with only one vertex coloring:
 {
   0: ( 0 1 2 3 4 )
   1: ( 0 4 3 2 1 )
@@ -61,19 +61,19 @@ Two rings with only one vertex coloring:
   9: ( 4 3 2 1 0 )
 }
 
-Two rings with vertex coloring:
+Two cycles with vertex coloring:
 {
   0: ( 0 1 2 3 4 )
   1: ( 4 3 2 1 0 )
 }
 
-Two rings with edge coloring:
+Two cycles with edge coloring:
 {
   0: ( 0 1 2 3 4 )
   1: ( 0 4 3 2 1 )
 }
 
-Two rings where node of graph 1 should not be 3 higher than node of graph 2:
+Two cycles where node of graph 1 should not be 3 higher than node of graph 2:
 {
   0: ( 0 1 2 3 4 )
   1: ( 1 0 4 3 2 )
@@ -84,11 +84,11 @@ Two rings where node of graph 1 should not be 3 higher than node of graph 2:
   6: ( 4 3 2 1 0 )
 }
 
-Two rings with different directedness.
+Two cycles with different directedness:
 {
 }
 
-Graph with loop edges.
+Graph with loop edges:
 {
 }
 

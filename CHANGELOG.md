@@ -7,6 +7,8 @@
  - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
  - `igraph_product()` supports the lexicographic and strong graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772!
  - `igraph_mycielskian()` and `igraph_mycielski_graph()` compute a Mycielski transformation of a graph, and a Mycielski graph, respectively. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2741!
+ - `igraph_path_graph()` is a convenience wrapper for `igraph_ring()` with `circular=false`.
+ - `igraph_cycle_graph()` is a convenience wrapper for `igraph_ring()` with `circular=true`.
 
 ### Fixed
 
