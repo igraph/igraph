@@ -10,30 +10,22 @@
 #ifndef RANDOM_H_
 #define RANDOM_H_
 
+#include <igraph_random.h>
+
 #include <vector>
-#include <random>
 #include <utility>
 
 namespace infomap {
-using RandGen = std::mt19937;
-using uniform_uint_dist = std::uniform_int_distribution<unsigned int>;
-using uniform_param_t = uniform_uint_dist::param_type;
 
 class Random {
-  RandGen m_randGen;
-  uniform_uint_dist uniform;
+  igraph_rng_t* m_randGen;
 
 public:
-  Random(unsigned int seed = 123) : m_randGen(seed) { }
-
-  void seed(unsigned int seedValue)
-  {
-    m_randGen.seed(seedValue);
-  }
+  Random() : m_randGen(igraph_rng_default()) { }
 
   unsigned int randInt(unsigned int min, unsigned int max)
   {
-    return uniform(m_randGen, uniform_param_t(min, max));
+    return igraph_rng_get_integer(m_randGen, min, max);
   }
 
   /**

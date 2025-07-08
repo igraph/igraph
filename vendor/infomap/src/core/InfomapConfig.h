@@ -24,7 +24,7 @@ public:
 
   InfomapConfig(const std::string& flags, bool isCli = false) : InfomapConfig(Config(flags, isCli)) { }
 
-  InfomapConfig(const Config& conf) : Config(conf), m_rand(conf.seedToRandomNumberGenerator)
+  InfomapConfig(const Config& conf) : Config(conf), m_rand(/* conf.seedToRandomNumberGenerator */)
   {
     Log::precision(conf.verboseNumberPrecision);
   }
@@ -59,7 +59,7 @@ public:
   Infomap& setConfig(const Config& conf)
   {
     *this = conf;
-    m_rand.seed(conf.seedToRandomNumberGenerator);
+    /* m_rand.seed(conf.seedToRandomNumberGenerator); */
     Log::precision(conf.verboseNumberPrecision);
     return get();
   }
@@ -128,12 +128,6 @@ public:
   {
     directed = value;
     flowModel = directed ? FlowModel::directed : FlowModel::undirected;
-    return get();
-  }
-
-  Infomap& reseed(unsigned int seed)
-  {
-    m_rand.seed(seed);
     return get();
   }
 };

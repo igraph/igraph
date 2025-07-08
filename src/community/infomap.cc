@@ -190,14 +190,14 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
     conf.interruptionHandler = &igraph_allow_interruption;
 
     RNG_BEGIN();
-    conf.seedToRandomNumberGenerator = RNG_INTEGER(0, IGRAPH_INTEGER_MAX);
-    RNG_END();
 
     infomap::InfomapBase infomap(conf);
 
     IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network())));
 
     infomap.run();
+
+    RNG_END();
 
     IGRAPH_CHECK(infomap_get_membership(infomap, membership));
 

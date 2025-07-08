@@ -134,7 +134,7 @@ Config::Config(const std::string& flags, bool isCLI) : isCLI(isCLI)
   api.addOptionArgument(multilayerRelaxByJensenShannonDivergence, "multilayer-relax-by-jsd", "Relax proportional to the out-link similarity measured by the Jensen-Shannon divergence.", "Algorithm", true);
 
   // --------------------- Performance and accuracy options ---------------------
-  api.addOptionArgument(seedToRandomNumberGenerator, 's', "seed", "A seed (integer) to the random number generator for reproducible results.", ArgType::integer, "Accuracy", 1ul);
+  // api.addOptionArgument(seedToRandomNumberGenerator, 's', "seed", "A seed (integer) to the random number generator for reproducible results.", ArgType::integer, "Accuracy", 1ul);
 
   api.addOptionArgument(numTrials, 'N', "num-trials", "Number of outer-most loops to run before picking the best solution.", ArgType::integer, "Accuracy", 1u);
 
