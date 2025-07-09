@@ -185,6 +185,7 @@ igraph_regular_tree:
 
 igraph_full:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
+    FLAGS: no_rng
 
 igraph_full_citation:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
@@ -206,12 +207,15 @@ igraph_linegraph:
 
 igraph_de_bruijn:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
+    FLAGS: no_rng
 
 igraph_kautz:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
+    FLAGS: no_rng
 
 igraph_famous:
     PARAMS: OUT GRAPH graph, CSTRING name
+    FLAGS: no_rng
 
 igraph_lcf:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
