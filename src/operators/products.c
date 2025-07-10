@@ -332,6 +332,34 @@ static igraph_error_t tensor_product(igraph_t *res,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t modular_product(igraph_t *res,
+                                     const igraph_t *g1,
+                                     const igraph_t *g2) {
+
+    const igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Modular product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_product
  * \brief The graph product of two graphs, according to the chosen product type.
@@ -441,6 +469,8 @@ static igraph_error_t tensor_product(igraph_t *res,
  * \return Error code:
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
  *         graphs \p g1 and \p g2 are incompatible for the requested product.
+ * 
+ * \sa \ref igraph_rooted_product
  */
 
 igraph_error_t igraph_product(igraph_t *res,
@@ -459,8 +489,120 @@ igraph_error_t igraph_product(igraph_t *res,
 
     case IGRAPH_PRODUCT_TENSOR:
         return tensor_product(res, g1, g2);
+    
+    case IGRAPH_PRODUCT_MODULAR:
+        return modular_product(res, g1, g2);
 
     default:
         IGRAPH_ERROR("Unknown graph product type.", IGRAPH_EINVAL);
     }
+}
+
+/**
+ * \function igraph_rooted_product
+ * \brief The rooted graph product of two graphs.
+ *
+ * \experimental
+ *
+ * This function computes the rooted product of two graphs. The two graphs
+ * must be of the same type, either directed or undirected. If a product of
+ * an undirected and a directed graph is required, convert one of them to the
+ * appropriate type using \ref igraph_to_directed() or \ref igraph_to_undirected().
+ *
+ * </para><para>
+ * The new vertex ID of the product graph is mapped similar to the mapping
+ * done in \ref igraph_product.
+ * 
+ * </para><para>
+ * In the rooted product graph of G and H, with root vertex ID \c root in H,
+ * there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ * if and only if
+ * <code>u1 = u2</code> and <code>v1 ~ v2</code> or
+ * <code>u1 ~ u2</code> and <code>v1 = v2 = root</code>.
+ * Thus, the number of edges in the product graph is
+ * <code>|V1| |E2| + |E1|</code>.
+ *
+ * \param res Pointer to an uninitialized graph object. The product graph will
+ *   be stored here.
+ * \param g1 The first operand graph.
+ * \param g2 The second operand graph. It must have the same directedness as \p g1.
+ * \param root The root vertex id of the second graph.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
+ *         graphs \p g1 and \p g2 are incompatible for the requested product.
+ *         \c IGRAPH_EINVVID if invalid vertex ID passed as \p root.
+ * 
+ * \sa \ref igraph_product
+ * 
+ * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
+ * where |V1| and |V2| are the number of vertices, and
+ * |E1| and |E2| are the number of edges of the operands.
+ */
+
+igraph_error_t igraph_rooted_product(igraph_t *res,
+                                     const igraph_t *g1,
+                                     const igraph_t *g2,
+                                     const igraph_integer_t root) {
+    const igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Rooted product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+
+    if (root < 0 || root >= vcount2) { // root must be in range [0, vcount2-1]
+        IGRAPH_ERROR("Root vertex id out of range.", IGRAPH_EINVVID);
+    }
+
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    // New vertex count = vcount1 * vcount2
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+
+    // New edge count = vcount1 * ecount2 + ecount1
+    IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+    IGRAPH_SAFE_ADD(ecount, ecount1, &ecount);
+
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
+
+    // Vertex ((i, j)) with i from g1, and j from g2
+    //   will have new vertex id: i * vcount2 + j
+
+    igraph_integer_t edge_index = 0;
+
+    // Edges of form ((u, root)) - ((v, root))
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g1, i);
+        igraph_integer_t to = IGRAPH_TO(g1, i);
+
+        VECTOR(edges)[edge_index++] = from * vcount2 + root; // ((from, root))
+        VECTOR(edges)[edge_index++] = to * vcount2 + root; // ((to, root))
+    }
+
+    // For all edges (from, to) in g2, add edge from ((j, from)) to ((j, to))
+    //    for all vertex j in g1
+    for (igraph_integer_t i = 0; i < ecount2; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g2, i);
+        igraph_integer_t to = IGRAPH_TO(g2, i);
+
+        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+            VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
+            VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
