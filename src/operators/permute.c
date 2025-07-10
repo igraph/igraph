@@ -27,6 +27,7 @@
 #include "graph/attributes.h"
 
 /**
+ * \function igraph_invert_permutation
  * \brief Inverts a permutation.
  *
  * Produces the inverse of \p permutation into \p inverse and at the same time it checks
@@ -37,7 +38,7 @@
  * \param inverse An initialized vector. The inverse of \p permutation will be stored here.
  * \return Error code.
  */
-static igraph_error_t igraph_i_invert_permutation(const igraph_vector_int_t *permutation, igraph_vector_int_t *inverse) {
+igraph_error_t igraph_invert_permutation(const igraph_vector_int_t *permutation, igraph_vector_int_t *inverse) {
     const igraph_integer_t n = igraph_vector_int_size(permutation);
 
     IGRAPH_CHECK(igraph_vector_int_resize(inverse, n));
@@ -94,7 +95,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_nodes);
 
     /* Also checks that 'permutation' is valid: */
-    IGRAPH_CHECK(igraph_i_invert_permutation(permutation, &index));
+    IGRAPH_CHECK(igraph_invert_permutation(permutation, &index));
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
