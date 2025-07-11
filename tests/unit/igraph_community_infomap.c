@@ -254,7 +254,7 @@ int main(void) {
     fclose(wikt);
     gsummary(&g);
     codelength = infomap_test(&g, /* smoke_test = */ 1);
-    printf("Codelength %0.3f", codelength);
+    printf("Codelength %0.2f", codelength);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
