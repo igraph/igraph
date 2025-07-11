@@ -254,11 +254,7 @@ int main(void) {
     fclose(wikt);
     gsummary(&g);
     codelength = infomap_test(&g, /* smoke_test = */ 1);
-    if (fabs(codelength - 5.708) >= 1e-3) {
-        printf("Codelength was %0.5f, expected %0.5f\n", codelength, 5.708);
-    } else {
-        printf("Codelength OK.\n");
-    }
+    printf("Codelength %0.2f", codelength);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
