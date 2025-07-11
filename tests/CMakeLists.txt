@@ -214,6 +214,7 @@ add_legacy_tests(
   igraph_extended_chordal_ring
   igraph_forest_fire_game
   igraph_from_prufer
+  igraph_full_bipartite
   igraph_full_citation
   igraph_full_multipartite
   igraph_generalized_petersen

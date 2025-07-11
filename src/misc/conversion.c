@@ -361,8 +361,6 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
 
         if (mode == IGRAPH_TO_DIRECTED_RANDOM) {
-            RNG_BEGIN();
-
             for (igraph_integer_t i=0; i < no_of_edges; ++i) {
                 if (RNG_INTEGER(0,1)) {
                     igraph_integer_t temp = VECTOR(edges)[2*i];
@@ -370,8 +368,6 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
                     VECTOR(edges)[2*i+1] = temp;
                 }
             }
-
-            RNG_END();
         } else if (mode == IGRAPH_TO_DIRECTED_ACYCLIC) {
             /* Currently, the endpoints of undirected edges are ordered in the
                internal graph datastructure, i.e. it is always true that from < to.

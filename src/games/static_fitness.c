@@ -200,7 +200,6 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         p_cum_fitness_in = &cum_fitness_out;
     }
 
-    RNG_BEGIN();
     num_steps = no_of_edges;
     if (multiple) {
         /* Generating when multiple edges are allowed */
@@ -290,7 +289,6 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
         igraph_adjlist_destroy(&al);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    RNG_END();
 
     IGRAPH_PROGRESS("Static fitness game", 100.0, NULL);
 

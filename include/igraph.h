@@ -24,6 +24,7 @@
 #include "igraph_error.h"
 #include "igraph_random.h"
 #include "igraph_progress.h"
+#include "igraph_setup.h"
 #include "igraph_statusbar.h"
 
 #include "igraph_types.h"

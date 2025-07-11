@@ -396,9 +396,7 @@ static igraph_error_t igraph_i_pseudo_diameter_unweighted(
     }
 
     if (vid_start < 0) {
-        RNG_BEGIN();
         vid_start = RNG_INTEGER(0, no_of_nodes - 1);
-        RNG_END();
     }
 
     if (!igraph_is_directed(graph) || !directed) {
@@ -611,9 +609,7 @@ static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
     }
 
     if (vid_start < 0) {
-        RNG_BEGIN();
         vid_start = RNG_INTEGER(0, no_of_nodes - 1);
-        RNG_END();
     }
 
     if (!igraph_is_directed(graph) || !directed) {

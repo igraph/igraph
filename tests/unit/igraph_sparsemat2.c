@@ -52,8 +52,6 @@ int main(void) {
     igraph_matrix_t M, N, O;
     igraph_integer_t i;
 
-    RNG_BEGIN();
-
     /* Matrix-vector product */
 #define NROW 10
 #define NCOL 5
@@ -144,8 +142,6 @@ int main(void) {
     igraph_matrix_destroy(&O);
 
     VERIFY_FINALLY_STACK();
-
-    RNG_END();
 
     return 0;
 }

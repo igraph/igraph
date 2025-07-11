@@ -43,11 +43,9 @@ static igraph_error_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&prufer, n - 2);
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < n - 2; ++i) {
         VECTOR(prufer)[i] = RNG_INTEGER(0, n - 1);
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_from_prufer(graph, &prufer));
 
@@ -89,8 +87,6 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
     IGRAPH_CHECK(igraph_vector_int_init_range(&vertices, 0, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &vertices);
 
-    RNG_BEGIN();
-
     /* A simple implementation could be as below. This is for illustration only.
      * The actually implemented algorithm avoids unnecessary walking on the already visited
      * portion of the vertex set.
@@ -131,8 +127,6 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
         i = VECTOR(vertices)[k];
         VECTOR(edges)[2 * k - 1] = i;
     }
-
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 

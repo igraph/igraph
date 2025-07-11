@@ -47,11 +47,9 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     igraph_random_sample(&generators, 0, igraph_vcount(&g)-1, 20);
 
@@ -79,11 +77,9 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     igraph_random_sample(&generators, 0, igraph_vcount(&g)-1, 20);
 
@@ -111,11 +107,9 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     igraph_random_sample(&generators, 0, igraph_vcount(&g)-1, 20);
 
@@ -143,11 +137,9 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     igraph_random_sample(&generators, 0, igraph_vcount(&g)-1, 100);
 

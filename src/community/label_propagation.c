@@ -81,8 +81,6 @@ static igraph_error_t community_label_propagation(
         no_of_not_fixed_nodes = no_of_nodes;
     }
 
-    RNG_BEGIN();
-
     /* There are two modes of operation in this implementation: retention or
      * dominance. When using retention, we prefer to keep the current label of a node.
      * Only if the current label is not among the dominant labels will we
@@ -238,8 +236,6 @@ static igraph_error_t community_label_propagation(
         }
     }
 
-    RNG_END();
-
     if (weights) {
         igraph_inclist_destroy(&il);
     } else {
@@ -291,8 +287,6 @@ static igraph_error_t community_fast_label_propagation(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dominant_labels, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&dominant_labels, 2));
-
-    RNG_BEGIN();
 
     /* Initialize node ordering vector with only the not fixed nodes */
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&queue, no_of_nodes);
@@ -407,8 +401,6 @@ static igraph_error_t community_fast_label_propagation(
             VECTOR(label_weights)[VECTOR(nonzero_labels)[j]] = 0;
         }
     }
-
-    RNG_END();
 
     if (weights) {
         igraph_inclist_destroy(&il);

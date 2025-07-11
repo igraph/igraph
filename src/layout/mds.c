@@ -192,8 +192,6 @@ igraph_error_t igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
     igraph_matrix_t m;
     igraph_bool_t conn;
 
-    RNG_BEGIN();
-
     /* Check the distance matrix */
     if (dist && (igraph_matrix_nrow(dist) != no_of_nodes ||
                  igraph_matrix_ncol(dist) != no_of_nodes)) {
@@ -289,8 +287,6 @@ igraph_error_t igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
         igraph_vector_int_destroy(&comp);
         IGRAPH_FINALLY_CLEAN(6);
     }
-
-    RNG_END();
 
     igraph_matrix_destroy(&m);
     IGRAPH_FINALLY_CLEAN(1);

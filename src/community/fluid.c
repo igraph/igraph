@@ -149,8 +149,6 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_init(&label_counters, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
 
-    RNG_BEGIN();
-
     /* running is the convergence boolean variable */
     running = true;
     while (running) {
@@ -236,8 +234,6 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
             }
         }
     }
-
-    RNG_END();
 
     /* Shift back the membership vector */
     /* There must be no 0 labels in membership vector at this point */

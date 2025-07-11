@@ -70,18 +70,18 @@ void check_print_destroy_simple(igraph_t *g1, igraph_t *g2) {
 }
 
 int main(void) {
-    igraph_t ring, ring_dir, ring_loop;
+    igraph_t cycle, cycle_dir, cycle_loop;
     igraph_t g_0, g_1;
     igraph_vector_int_t coloring;
     int three = 3;
 
     igraph_vector_int_init_int(&coloring, 5, 0, 1, 0, 1, 0);
-    igraph_small(&g_0, 0, 0, -1);
-    igraph_small(&g_1, 1, 0, -1);
-    igraph_ring(&ring, 5, /*directed*/ 0, /*mutual*/ 0, /*circular*/ 1);
-    igraph_ring(&ring_dir, 5, /*directed*/ 1, /*mutual*/ 0, /*circular*/ 1);
-    igraph_ring(&ring_loop, 5, /*directed*/ 0, /*mutual*/ 0, /*circular*/ 1);
-    igraph_add_edge(&ring_loop, 2, 2);
+    igraph_small(&g_0, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&g_1, 1, IGRAPH_UNDIRECTED, -1);
+    igraph_cycle_graph(&cycle, 5, /*directed*/ false, /*mutual*/ false);
+    igraph_cycle_graph(&cycle_dir, 5, /*directed*/ true, /*mutual*/ false);
+    igraph_cycle_graph(&cycle_loop, 5, /*directed*/ false, /*mutual*/ false);
+    igraph_add_edge(&cycle_loop, 2, 2);
 
     printf("Two empty graphs:\n");
     check_print_destroy_simple(&g_0, &g_0);
@@ -92,44 +92,44 @@ int main(void) {
     printf("Empty and singleton graphs:\n");
     check_print_destroy_simple(&g_0, &g_1);
 
-    printf("Two rings:\n");
-    check_print_destroy_simple(&ring, &ring);
+    printf("Two cycles:\n");
+    check_print_destroy_simple(&cycle, &cycle);
 
-    printf("Two directed rings:\n");
-    check_print_destroy_simple(&ring_dir, &ring_dir);
+    printf("Two directed cycles:\n");
+    check_print_destroy_simple(&cycle_dir, &cycle_dir);
 
-    printf("Two rings where node parity should be equal:\n");
-    check_print_destroy(&ring, &ring, NULL, NULL, NULL, NULL, &compat_parity, NULL, NULL, IGRAPH_SUCCESS);
+    printf("Two cycles where node parity should be equal:\n");
+    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, &compat_parity, NULL, NULL, IGRAPH_SUCCESS);
 
-    printf("Two rings where edge parity should be equal:\n");
-    check_print_destroy(&ring, &ring, NULL, NULL, NULL, NULL, NULL, &compat_parity, NULL, IGRAPH_SUCCESS);
+    printf("Two cycles where edge parity should be equal:\n");
+    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, NULL, &compat_parity, NULL, IGRAPH_SUCCESS);
 
-    printf("Two rings with only one vertex coloring:\n");
-    check_print_destroy(&ring, &ring, &coloring, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    printf("Two cycles with only one vertex coloring:\n");
+    check_print_destroy(&cycle, &cycle, &coloring, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
-    printf("Two rings with vertex coloring:\n");
-    check_print_destroy(&ring, &ring, &coloring, &coloring, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    printf("Two cycles with vertex coloring:\n");
+    check_print_destroy(&cycle, &cycle, &coloring, &coloring, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
-    printf("Two rings with edge coloring:\n");
-    check_print_destroy(&ring, &ring, NULL, NULL, &coloring, &coloring, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    printf("Two cycles with edge coloring:\n");
+    check_print_destroy(&cycle, &cycle, NULL, NULL, &coloring, &coloring, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
-    printf("Two rings where node of graph 1 should not be 3 higher than node of graph 2:\n");
-    check_print_destroy(&ring, &ring, NULL, NULL, NULL, NULL, &compat_not_arg, NULL, &three, IGRAPH_SUCCESS);
+    printf("Two cycles where node of graph 1 should not be 3 higher than node of graph 2:\n");
+    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, &compat_not_arg, NULL, &three, IGRAPH_SUCCESS);
 
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    printf("Two rings with different directedness.\n");
-    check_print_destroy(&ring, &ring_dir, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
+    printf("Two cycles with different directedness:\n");
+    check_print_destroy(&cycle, &cycle_dir, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
 
-    printf("Graph with loop edges.\n");
-    check_print_destroy(&ring, &ring_loop, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
+    printf("Graph with loop edges:\n");
+    check_print_destroy(&cycle, &cycle_loop, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
-    igraph_destroy(&ring);
-    igraph_destroy(&ring_dir);
-    igraph_destroy(&ring_loop);
+    igraph_destroy(&cycle);
+    igraph_destroy(&cycle_dir);
+    igraph_destroy(&cycle_loop);
     igraph_vector_int_destroy(&coloring);
 
     VERIFY_FINALLY_STACK();

@@ -82,8 +82,6 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
         for (igraph_integer_t j = 0; j < no_of_neighbors; j++) {
             if (citation) {
@@ -98,8 +96,6 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
             }
         }
     }
-
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);

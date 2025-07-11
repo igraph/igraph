@@ -90,11 +90,9 @@ double rzeta(igraph_integer_t xmin, double alpha) {
 int generate_continuous(double xmin, double alpha, size_t num_samples) {
     IGRAPH_CHECK(igraph_vector_resize(&data, num_samples));
 
-    RNG_BEGIN();
     for (size_t i = 0; i < num_samples; i++) {
         VECTOR(data)[i] = rpareto(xmin, alpha);
     }
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -102,11 +100,9 @@ int generate_continuous(double xmin, double alpha, size_t num_samples) {
 int generate_discrete(double xmin, double alpha, size_t num_samples) {
     IGRAPH_CHECK(igraph_vector_resize(&data, num_samples));
 
-    RNG_BEGIN();
     for (size_t i = 0; i < num_samples; i++) {
         VECTOR(data)[i] = rzeta(xmin, alpha);
     }
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
