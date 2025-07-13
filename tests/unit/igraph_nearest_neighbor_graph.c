@@ -19,12 +19,10 @@ int main(void) {
 
     igraph_matrix_t points;
 
-
-
     igraph_matrix_init_array(&points, &pointArray[0], 4, 2, IGRAPH_ROW_MAJOR);
 
-    igraph_integer_t neighbor_count = 2;
-    igraph_real_t max_distance = 10;
+    igraph_integer_t neighbor_count = 0;
+    igraph_real_t max_distance = 1000;
 
     igraph_nearest_neighbor_graph(&graph, &points, IGRAPH_METRIC_L2, neighbor_count, max_distance);
 

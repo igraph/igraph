@@ -1,3 +1,4 @@
+#include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_operators.h"
 #include "igraph_spatial.h"
@@ -8,7 +9,9 @@
 #include "nanoflann/nanoflann.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <string.h>
+#include <vector>
 
 class igraph_point_adaptor {
     igraph_integer_t dimension;
@@ -43,6 +46,7 @@ public:
     }
 } ;
 */
+
 
 class GraphBuildingResultSet {
 private:
@@ -95,42 +99,91 @@ public:
     }
 };
 
-igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
-        const igraph_matrix_t *points,
-        igraph_metric_t metric,
-        igraph_integer_t neighbors,
-        igraph_real_t cutoff) {
 
-    igraph_integer_t dimensionality = igraph_matrix_ncol(points);
+template <typename Metric, uint32_t Dimension>
+static igraph_error_t neighbor_helper(
+    igraph_t *graph,
+    const igraph_matrix_t *points,
+    igraph_integer_t neighbors,
+    igraph_real_t cutoff,
+    igraph_integer_t dimension) {
 
     igraph_integer_t point_count = igraph_matrix_nrow(points);
 
-    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor>, igraph_point_adaptor>;
-
-    igraph_empty(graph, point_count, false);
+    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, igraph_point_adaptor, Dimension>;
 
     igraph_point_adaptor adaptor(points);
 
-    kdTree tree(dimensionality, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
+    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
 
     tree.buildIndex();
 
     igraph_vector_t current_point;
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, 0);
 
-    GraphBuildingResultSet results(graph, neighbors, cutoff);
-    IGRAPH_CHECK(results.initialize());
+    igraph_integer_t neighbor_count = neighbors > 0 ? neighbors : point_count;
 
+    using resultClass = nanoflann::RKNNResultSet<igraph_real_t, igraph_integer_t, igraph_integer_t>;
+    resultClass results(neighbor_count, cutoff);
+    std::vector<igraph_integer_t> neighbor_set(neighbor_count);
+    std::vector<igraph_real_t>    distances(neighbor_count);
+    std::vector<igraph_integer_t> edges;
     for (igraph_integer_t i = 0; i < point_count; i++) {
-        IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
-        results.select_vertex(i);
-        tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
-    }
 
-    IGRAPH_CHECK(results.dumpGraph());
+        std::fill(neighbor_set.begin(), neighbor_set.end(), 0);
+        std::fill(distances.begin(), distances.end(), 0);
+
+        results.init(neighbor_set.data(), distances.data());
+        IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
+
+        tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
+        printf("beep %li, %li\n", results.size(), neighbor_set.size());
+        for (igraph_integer_t j = 0; j < results.size(); j++) {
+            printf("adding %li->%li\n", i, j);
+            edges.push_back(i);
+            edges.push_back(j);
+        }
+    }
+    igraph_vector_int_t edge_view;
+    igraph_vector_int_view(&edge_view, edges.data(), edges.size());
+    igraph_create(graph, &edge_view, point_count, true);
+
+    //igraph_vector_int_destroy(&edge_view);
 
     igraph_vector_destroy(&current_point);
     IGRAPH_FINALLY_CLEAN(1);
-
     return IGRAPH_SUCCESS;
+}
+
+
+template <typename Metric>
+static igraph_error_t dimension_dispatcher(
+    igraph_t *graph,
+    const igraph_matrix_t *points,
+    igraph_integer_t neighbors,
+    igraph_real_t cutoff,
+    igraph_integer_t dimension) {
+    switch (dimension) {
+    case 2:  return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension);
+    case 3:  return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension);
+    default: return neighbor_helper<Metric, 0>(graph, points, neighbors, cutoff, dimension);
+    }
+}
+
+igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
+        const igraph_matrix_t *points,
+        igraph_metric_t metric,
+        igraph_integer_t neighbors,
+        igraph_real_t cutoff) {
+    igraph_integer_t dimension = igraph_matrix_ncol(points);
+    switch (metric) {
+    case IGRAPH_METRIC_L2 :
+        return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor> > (
+                   graph,
+                   points,
+                   neighbors,
+                   cutoff * cutoff, // L2 uses square distances, so adjust for that here.
+                   dimension);
+    default : IGRAPH_ERROR("Metic type not implemented.", IGRAPH_UNIMPLEMENTED);
+    }
 }
