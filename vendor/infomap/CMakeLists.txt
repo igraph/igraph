@@ -1,27 +1,28 @@
-cmake_minimum_required(VERSION 3.21)
-project(infomap)
+file(GLOB_RECURSE infomap_src CONFIGURE_DEPENDS "src/*.cpp")
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_EXTENSIONS OFF)
+add_library(infomap_vendored
+  OBJECT
+  EXCLUDE_FROM_ALL
+  ${infomap_src}
+)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -Wshadow")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+target_include_directories(
+  infomap_vendored
 
-find_package(OpenMP)
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/
 
-find_program(CCACHE ccache)
-if(CCACHE)
-    message("-- Found Ccache: TRUE")
-    set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
-else()
-    message("-- Found Ccache: FALSE")
+  PRIVATE
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
+  ${PROJECT_BINARY_DIR}/src # config.h
+)
+
+if(BUILD_SHARED_LIBS)
+  set_property(TARGET infomap_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-file(GLOB_RECURSE infomap_src CONFIGURE_DEPENDS "src/*.h" "src/*.cpp")
+# Since these are included as object files, they should call the
+# function as is (without visibility specification)
+target_compile_definitions(infomap_vendored PRIVATE IGRAPH_STATIC)
 
-add_executable(infomap ${infomap_src})
-
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(infomap PUBLIC OpenMP::OpenMP_CXX)
-endif()
