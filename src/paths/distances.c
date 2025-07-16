@@ -29,6 +29,14 @@
 
 #include "core/interruption.h"
 #include "core/indheap.h"
+#include "core/set.h"
+
+// #define BOUNDING_DEBUG  // uncomment to enable
+#ifdef BOUNDING_DEBUG
+    #define debug(...) fprintf(stderr, __VA_ARGS__)
+#else
+    #define debug(...)
+#endif
 
 /* When vid_ecc is not NULL, only one vertex ID should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
@@ -861,6 +869,347 @@ igraph_error_t igraph_graph_center(
 
     igraph_vector_destroy(&ecc);
     IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+static void update_to_min(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? b : *a;}
+static void update_to_max(igraph_real_t *a, igraph_real_t b) {*a = (*a > b) ? *a : b;}
+static igraph_real_t max_non_inf(igraph_vector_t *m) {
+    igraph_real_t res = -IGRAPH_INFINITY;
+    igraph_integer_t len = igraph_vector_size(m);
+    for (igraph_integer_t i = 0; i < len; i++) {
+        igraph_real_t val = VECTOR(*m)[i];
+        if (res < val && val < IGRAPH_INFINITY) {
+            res = val;
+        }
+    }
+    return res;
+}
+
+/**
+ * \function igraph_diameter_bound
+ * \brief Calculate the diameter of a graph using successive bounds.
+ *
+ * \experimental
+ *
+ * The diameter of a graph is the length of the longest shortest path it has,
+ * i.e. the maximum eccentricity of the graph's vertices.
+ *
+ * This function implements https://doi.org/10.1145/2063576.2063748, a technique
+ * of computing diameter by tightening eccentricity bounds of all vertices and
+ * pruning ones with no valuable diameter-relevant information. This can
+ * significantly reduce the number of BFSes required to be done, especially
+ * in real-life networks with scale-free degree distribution.
+ *
+ * If the graph has no vertices, \c IGRAPH_NAN is returned.
+ *
+ * \param graph The graph object.
+ * \param weights The edge weights of the graph. Can be \c NULL for an
+ *        unweighted graph. All weights should be non-negative.
+ * \param diameter Pointer to a real number, if not \c NULL then it will contain
+ *        the diameter (the actual distance).
+ * \param directed Boolean, whether to consider directed paths. Currently, directed
+ *        pathes are not supported, so true will return an error.
+ * \param unconn What to do if the graph is not connected. If
+ *        \c true the longest geodesic within a component
+ *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
+ * \return Error code:
+ *         \c IGRAPH_UNIMPLEMENTED, for \c directed=true
+ *
+ * Time complexity (worst case) O(|V||E|)
+ * Time complexity (expected in real-world networks) O(|E|)
+ *
+ * \sa \ref igraph_diameter_dijkstra() for the weighted version,
+ *
+ * \example examples/simple/igraph_diameter_bound.c
+ */
+igraph_error_t igraph_diameter_bound(
+    const igraph_t *graph,  // input graph
+    const igraph_vector_t *weights,  // optional weights
+    igraph_real_t *diameter,  // output diameter value
+    igraph_bool_t directed,  // treating this graph as undirected
+    igraph_bool_t unconn  // false: disconnected returns INF; true: returns largest diameter
+) {
+    if (!igraph_is_directed(graph)) {
+        directed = false;
+    }
+
+    if (directed) {
+        IGRAPH_ERROR("Directed graphs not supported", IGRAPH_UNIMPLEMENTED);
+    }
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    if (no_of_nodes == 0) {
+        *diameter = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+#ifdef BOUNDING_DEBUG
+    igraph_uint_t bfs_count = 0;
+#endif
+
+    *diameter = 0;  // set to minimum; increase as higher is found per component
+
+    // collections to be used
+    igraph_set_t to_inspect;  // set of remaining "useful" vertices
+    igraph_set_t current_component;  // set of nodes in current component
+    igraph_vector_t ecc_lower, ecc_upper;  // lower/upper bounds for eccentricities
+    igraph_vector_t distances;  // return value for vertex distances
+    igraph_vector_int_t to_remove;  // stack of vertices to prune
+    igraph_vector_int_t degrees;  // degrees of all nodes
+
+    // initialise set W (to_inspect) (line 3)
+    igraph_vit_t vit;
+    IGRAPH_CHECK(igraph_set_init(&to_inspect, no_of_nodes));
+    IGRAPH_FINALLY(igraph_set_destroy, &to_inspect);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, igraph_vss_all(), &vit));
+
+    while (!IGRAPH_VIT_END(vit)) {
+        IGRAPH_CHECK(igraph_set_add(&to_inspect, IGRAPH_VIT_GET(vit)));
+        IGRAPH_VIT_NEXT(vit);
+    }
+
+    IGRAPH_CHECK(igraph_set_init(&current_component, no_of_nodes));
+    IGRAPH_FINALLY(igraph_set_destroy, &current_component);
+
+    // initialise upper/lower eccentricity bounds (lines 4-7)
+    IGRAPH_VECTOR_INIT_FINALLY(&ecc_lower, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&ecc_upper, no_of_nodes);
+    igraph_vector_fill(&ecc_upper, IGRAPH_INFINITY);
+
+    // initialise distances, toremove, calculate degrees
+    IGRAPH_VECTOR_INIT_FINALLY(&distances, no_of_nodes);
+
+    // IGRAPH_CHECK(igraph_vector_int_init(&to_remove, 0));
+    // IGRAPH_FINALLY(igraph_vector_int_destroy, &to_remove);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&to_remove, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&to_remove, no_of_nodes));
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
+
+    igraph_integer_t state; // for set iteration
+
+    // prepare lists - calling BFS would otherwise recompute it every time
+    // unweighted uses adjlist, weighted uses inclist
+    igraph_adjlist_t adjlist;
+    igraph_inclist_t inclist;
+    if (weights) {
+        IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS));
+        IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+    } else {
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+        IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    }
+
+    // non-paper change: support for disconnected graphs
+    // General algorithm:
+    // 1) Pick a node v from to_inspect
+    // 2) BFS(v) finds connected component. Populate current_component
+    // 3) to_inspect = to_inspect \ current_component
+    //      3.1) if component size <= largest diameter found, skip it
+    // 4) run paper algorithm with W = current_component
+    // 5) if a larget diameter is found, store it
+    // 6) repeat from step 1 until to_inspect is empty
+    while (!igraph_set_empty(&to_inspect)) {
+        // Pick node from to_inspect
+        // This will be the starting node for the paper algorithm
+        // So it should be a node with the highest degree within to_inspect
+        // This will be a node not previously analysed, so it has no ecc bounds yet
+        igraph_integer_t v, temp, highest_degree = -1;
+        state = 0;
+        while (igraph_set_iterate(&to_inspect, &state, &temp)) {
+            if (VECTOR(degrees)[temp] <= highest_degree) continue;
+            highest_degree = VECTOR(degrees)[temp];
+            v = temp;
+        }
+
+        // BFS(v)
+#ifdef BOUNDING_DEBUG
+        bfs_count++;
+#endif
+        if (weights) {
+            IGRAPH_CHECK(igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights));
+        } else {
+            IGRAPH_CHECK(igraph_distances_1(&adjlist, &distances, v));
+        }
+
+        // populate current_component from distances
+        igraph_set_clear(&current_component);
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            if (VECTOR(distances)[i] < IGRAPH_INFINITY) {
+                IGRAPH_CHECK(igraph_set_push_back(&current_component, i));
+            }
+        }
+        igraph_set_difference(&to_inspect, &current_component);
+
+        // if we're looking at unweighted diameter and the current component size
+        // is not greater than the current diameter lower bound, the current
+        // component cannot increase the lower bound. So we can safely skip it
+        // without exploring
+        if (!weights && igraph_set_size(&current_component) <= *diameter) {
+            break;
+        }
+
+        // if current component does NOT contains all nodes, and we don't expect
+        // a disconnected graph, we can already return inf
+        if (!unconn && igraph_set_size(&current_component) < no_of_nodes) {
+            *diameter = IGRAPH_INFINITY;
+            break;
+        }
+        // after this, we can always assume that EITHER the graph is connected
+        // and so we never see any infs, OR the graph is disconnected, in which
+        // case we ignore all infs because we only search within our own component
+        // conclusion: it's safe to ignore all infs from now on.
+
+        // run paper algorithm on `current_component` as W...
+        debug("Looking at component of size %ld\n", (long) igraph_set_size(&current_component));
+        debug("\tLooking at first vertex %ld\n", (long) v);
+
+        // initialise upper/lower diameter bounds (line 3)
+        igraph_real_t dia_lower = 0;
+        igraph_real_t dia_upper = IGRAPH_INFINITY;  // unbounded for weighted graphs
+
+        igraph_bool_t first_iteration = true;  // don't recompute v first time around
+        igraph_bool_t searchHigh = true;  // flip every iteration
+
+        // main loop (line 8); the dia_lower != dia_upper check happens in the loop
+        while (!igraph_set_empty(&current_component)) {
+            // line 9: choose vertex v
+            searchHigh = !searchHigh;
+
+            // if not first iteration, we need to select a vertex and BFS it
+            if (!first_iteration) {
+                // choose vertex based on distance measures (= SelectFrom(W))
+                v = -1;
+
+                // interchangebly looking at lowest ecc_lower and highest ecc_upper
+                igraph_integer_t temp_vert = 0;
+                igraph_real_t best_ecc = searchHigh ? -IGRAPH_INFINITY : IGRAPH_INFINITY;
+                igraph_integer_t best_deg = -1;
+                state = 0;
+                while(igraph_set_iterate(&current_component, &state, &temp_vert)) {
+                    igraph_real_t temp_ecc = searchHigh ? VECTOR(ecc_upper)[temp_vert] : VECTOR(ecc_lower)[temp_vert];
+
+                    // if ecc worse than the current node, skip
+                    if (searchHigh ? temp_ecc < best_ecc : temp_ecc > best_ecc) {
+                        continue;
+                    }
+
+                    // if tie, break the tie by highest degree
+                    // so skip if temp doesn't have a higher degree
+                    if (temp_ecc == best_ecc && VECTOR(degrees)[temp_vert] <= best_deg) {
+                        continue;
+                    }
+
+                    // now either we have better ecc or same ecc with better degree!
+                    // choose this node for next inspection and update best values
+                    v = temp_vert;
+                    best_ecc = temp_ecc;
+                    best_deg = VECTOR(degrees)[temp_vert];
+                }
+                debug(
+                    "\tLooking for %s vertex ecc, chose %ld with ecc_%s %.0f\n",
+                    searchHigh ? "highest" : "lowest",
+                    (long) v,
+                    searchHigh ? "upper" : "lower",
+                    best_ecc
+                );
+
+                // Run BFS (if first_iteration, we already did)
+#ifdef BOUNDING_DEBUG
+                bfs_count++;
+#endif
+                if (weights) {
+                    IGRAPH_CHECK(igraph_distances_dijkstra_1(graph, &inclist, &distances, v, weights));
+                } else {
+                    IGRAPH_CHECK(igraph_distances_1(&adjlist, &distances, v));
+                }
+            }
+
+            // don't do it again
+            first_iteration = false;
+
+            // line 10: Get eccentricity
+            igraph_real_t ecc_v = -1;
+            ecc_v = max_non_inf(&distances);
+            debug("\t\tFound eccentricity %.0f\n", ecc_v);
+
+            // lines 11&12: update upper/lower bounds on diameter
+            update_to_max(&dia_lower, ecc_v);
+            update_to_min(&dia_upper, 2*ecc_v);
+
+            debug("\t\tNew diameter bounds: %.0f:%.0f\n", dia_lower, dia_upper);
+
+            // line 8 check can happen here. If bounds equal, we're done, break
+            if (dia_lower == dia_upper) break;
+
+            // Non-paper improvement
+            // we can directly set dia_lower[v] = dia_upper[v] = ecc_v and remove v from W.
+            // (technically this will already be done in the loop)
+            VECTOR(ecc_lower)[v] = ecc_v;
+            VECTOR(ecc_upper)[v] = ecc_v;
+            igraph_set_remove(&current_component, v);
+
+            state = 0;
+            igraph_integer_t w;
+            while (igraph_set_iterate(&current_component, &state, &w)) {
+                igraph_real_t d = VECTOR(distances)[w];
+                if (d == IGRAPH_INFINITY) continue;  // ignore non-CC
+
+                // debug("\t\tUpdating %ld; distance %.0f; bounds %.0f:%.0f", (long) w, d, VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
+                // lines 14-15: update upper/lower bounds on eccentricities
+                update_to_max(&VECTOR(ecc_lower)[w], ecc_v-d);
+                update_to_max(&VECTOR(ecc_lower)[w], d);
+                update_to_min(&VECTOR(ecc_upper)[w], ecc_v+d);
+                // debug(" -> %.0f:%.0f", VECTOR(ecc_lower)[w], VECTOR(ecc_upper)[w]);
+
+                if (  // line 16
+                    VECTOR(ecc_lower)[w] == VECTOR(ecc_upper)[w] ||  // ecc found, or
+                    (VECTOR(ecc_upper)[w] <= dia_lower && VECTOR(ecc_lower)[w] >= dia_upper/2)  // not useful
+                ) {
+                    // debug(" (to be removed)");
+                    /* already reserved */
+                    igraph_vector_int_push_back(&to_remove, w);  // line 17: remove w from current set
+                }
+                // debug("\n");
+            }
+
+            // remove the unneeded vertices
+            while (!igraph_vector_int_empty(&to_remove)) {
+                igraph_integer_t pop = igraph_vector_int_pop_back(&to_remove);
+                igraph_set_remove(&current_component, pop);
+            }
+            debug("\t\tRemaining |W|=%ld, pruned %ld\n", (long) igraph_set_size(&current_component));
+        }
+
+        // paper alg finished; dia_lower is the dia for the current component
+        // if it's larger than estimates so far, update
+        update_to_max(diameter, dia_lower);
+        debug("\tFound component diameter %.0f, global set to %.0f\n", dia_lower, *diameter);
+    }
+
+    debug("Finished, found result %.0f; used %lu BFS instead of %lu\n", *diameter, (long) bfs_count, (long) no_of_nodes);
+#ifdef BOUNDING_DEBUG
+    debug("Used %ld BFSes", (long) bfs_count);
+#endif
+
+    // frees
+    igraph_set_destroy(&to_inspect);
+    igraph_set_destroy(&current_component);
+    igraph_vector_destroy(&ecc_lower);
+    igraph_vector_destroy(&ecc_upper);
+    igraph_vector_destroy(&distances);
+    igraph_vector_int_destroy(&to_remove);
+    igraph_vector_int_destroy(&degrees);
+    if (weights) {
+        igraph_inclist_destroy(&inclist);
+    } else {
+        igraph_adjlist_destroy(&adjlist);
+    }
+    IGRAPH_FINALLY_CLEAN(8);
 
     return IGRAPH_SUCCESS;
 }
