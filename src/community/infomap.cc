@@ -145,8 +145,9 @@ static igraph_error_t igraph_to_infomap(const igraph_t *graph,
  * \param nb_trials The number of attempts to partition the network
  *     (can be any integer value equal or larger than 1).
  * \param membership Pointer to a vector. The membership vector is
- *    stored here.
- * \param codelength Pointer to a real. If not NULL the code length of the
+ *     stored here. \c NULL means that the caller is not interested in the
+ *     membership vector.
+ * \param codelength Pointer to a real. If not \c NULL the code length of the
  *     partition is stored here.
  * \return Error code.
  *
@@ -166,15 +167,14 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 #ifndef HAVE_INFOMAP
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
-    if (!membership) {
-        IGRAPH_ERROR("Cannot run infomap if membership is missing.", IGRAPH_EINVAL);
-    }
-
     if (igraph_vcount(graph) == 0) {
-        IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
+        if (membership) {
+            IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
+        }
 
-        if (codelength)
+        if (codelength) {
             *codelength = IGRAPH_NAN;
+        }
 
         return IGRAPH_SUCCESS;
     }
@@ -195,7 +195,9 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 
     infomap.run();
 
-    IGRAPH_CHECK(infomap_get_membership(infomap, membership));
+    if (membership) {
+        IGRAPH_CHECK(infomap_get_membership(infomap, membership));
+    }
 
     if (codelength) {
         *codelength = infomap.codelength();
