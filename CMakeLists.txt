@@ -143,7 +143,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     # The following works with 'Ninja'. For 'Unix Makefiles', this requires ${PROJECT_BINARY_DIR}/src.
     BASE_DIRECTORY "${PROJECT_BINARY_DIR}"
     # /Applications and /Library/Developer are for macOS -- they exclude files from the macOS SDK.
-    EXCLUDE "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
+    EXCLUDE "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/infomap/*" "vendor/pcg/*"
     # These errors, present with lcov 2.x, are likely due to incompatibility with llvm-cov on macOS.
     LCOV_ARGS --ignore-errors inconsistent,format,unused
     GENHTML_ARGS --ignore-errors inconsistent,corrupt,category,unmapped
