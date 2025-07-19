@@ -28,4 +28,5 @@ comment:
 ignore:
   - "tests"
   - "examples"
+  - "vendor/infomap"
   - "vendor/pcg"
