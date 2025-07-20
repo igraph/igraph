@@ -1241,7 +1241,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * two connected vertices as biconnected, however, igraph does.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param result If not a \c NULL pointer, the result will be returned here.
+ * \param res If not a \c NULL pointer, the result will be returned here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
@@ -1387,7 +1387,7 @@ exit2:
  * connected components in the graph.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param res Pointer to an initialized vector, the
+ * \param bridges Pointer to an initialized vector, the
  *    bridges will be stored here as edge indices.
  * \return Error code.
  *
