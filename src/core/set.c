@@ -85,6 +85,7 @@ void igraph_set_destroy(igraph_set_t *set) {
  * if you used the \c IGRAPH_SET_NULL constant to initialize the set.
  *
  * \param set The set object.
+ * \return Boolean, whether the set is initialized.
  *
  * Time complexity: O(1)
  */
@@ -99,6 +100,7 @@ igraph_bool_t igraph_set_inited(igraph_set_t *set) {
  *
  * \param set The set object.
  * \param capacity the new \em allocated capacity of the set.
+ * \return Error code.
  *
  * Time complexity: operating system dependent, should be around
  * O(n), n is the new allocated size of the set.

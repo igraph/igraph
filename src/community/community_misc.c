@@ -87,6 +87,7 @@
  * \param csize Pointer to an initialized vector, or NULL. If not NULL
  *    then the sizes of the components will be stored here, the vector
  *    will be resized as needed.
+ * \return Error code.
  *
  * \sa \ref igraph_community_walktrap(), \ref
  * igraph_community_edge_betweenness(), \ref
@@ -243,6 +244,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
  *                     distinct clusters. If not \c NULL, this will be
  *                     updated to reflect the number of distinct
  *                     clusters found in membership.
+ * \return Error code.
  *
  * Time complexity: should be O(n) for n elements.
  */

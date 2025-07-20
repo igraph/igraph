@@ -295,6 +295,7 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * \param weights Weights of the edges. These are used only if the graph contains
  *                cycles; igraph will tend to reverse edges with smaller
  *                weights when breaking the cycles.
+ * \return Error code.
  */
 igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_t *extd_graph, igraph_vector_int_t *extd_to_orig_eids,

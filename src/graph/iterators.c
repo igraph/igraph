@@ -594,6 +594,7 @@ igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
  *
  * \param dest An uninitialized selector that will contain the copy.
  * \param src The selector being copied.
+ * \return Error code.
  */
 igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     igraph_vector_int_t *vec;
@@ -1546,6 +1547,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
  * \param graph Pointer to a graph to check if the edges in the selector exist.
  * \param es An edge selector object.
  * \param v Pointer to initialized vector. The result will be stored here.
+ * \return Error code.
  *
  * Time complexity: O(n), the number of edges in the selector.
  */

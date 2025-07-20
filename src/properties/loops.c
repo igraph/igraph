@@ -39,6 +39,7 @@
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result.
+ * \return Error code.
  *
  * \sa \ref igraph_simplify() to get rid of loop edges.
  *
