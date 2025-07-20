@@ -141,6 +141,7 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
  *                 or -1 if vertex i is unmatched.
  * \param result Pointer to a boolean variable, the result will be returned
  *               here.
+ * \return Error code.
  *
  * \sa \ref igraph_is_matching() if you are only interested in whether a
  *     matching vector is valid for a given graph.

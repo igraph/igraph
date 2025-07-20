@@ -234,6 +234,7 @@ igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
  * \param v1 The first vector.
  * \param v2 The second vector.
  * \param res Pointer to a real, the result will be stored here.
+ * \return Error code.
  *
  * Time complexity: O(n) where n is the length of the vectors.
  *

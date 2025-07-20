@@ -2329,8 +2329,8 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  *
  * Count the number of matrix entries that are closer to zero than \p tol.
  *
- * \param The input matrix, column-compressed.
- * \param The tolerance for zero comparisons.
+ * \param A The input matrix, column-compressed.
+ * \param tol The tolerance for zero comparisons.
  * \return Error code.
  *
  * Time complexity: TODO.

@@ -771,7 +771,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
  * \function igraph_inclist_destroy
  * \brief Frees all memory allocated for an incidence list.
  *
- * \param eal The incidence list to destroy.
+ * \param il The incidence list to destroy.
  *
  * Time complexity: O(n), where n is the size of the incidence list.
  */
@@ -1199,7 +1199,8 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
  * \brief Deallocates a lazy incidence list.
  *
  * Frees all allocated memory for a lazy incidence list.
- * \param al The incidence list to deallocate.
+ *
+ * \param il The incidence list to deallocate.
  *
  * Time complexity: depends on memory management.
  */
