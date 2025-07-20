@@ -105,11 +105,6 @@
  *   and igraph may renumber labels. However, co-membership constraints
  *   will be respected: two vertices can be fixed to be in the same or in
  *   different communities.
- * \param modularity If not a null pointer, then it must be a pointer
- *   to a real number. The modularity score of the detected community
- *   structure is stored here. Note that igraph will calculate the
- *   \em directed modularity if the input graph is directed, even if
- *   you set \p mode to \c IGRAPH_ALL
  * \return Error code.
  *
  * Time complexity: O(m+n)

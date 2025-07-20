@@ -241,8 +241,8 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * are \em constructing a graph using an adjacency list representation as
  * it does not require your graph to exist yet.
  *
- * \param no_of_nodes The number of vertices
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \param no_of_nodes The number of vertices
  * \return Error code.
  *
  * Time complexity: O(|V|), linear in the number of vertices.
@@ -1231,7 +1231,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
  * to a different value than \c IGRAPH_LOOPS_TWICE.
  *
  * \param graph The input graph.
- * \param al Pointer to an uninitialized incidence list.
+ * \param il Pointer to an uninitialized incidence list.
  * \param mode Constant, it gives whether incoming edges
  *   (<code>IGRAPH_IN</code>), outgoing edges
  *   (<code>IGRAPH_OUT</code>) or both types of edges

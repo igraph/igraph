@@ -318,6 +318,11 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
  *         one of its endpoints will be selected arbitrarily.
  * \param  edge_path The sequence of edge IDs that describe the path.
  * \param  vertex_path The sequence of vertex IDs traversed will be returned here.
+ * \param  mode A constant specifying how edge directions are
+ *         considered in directed graphs. \c IGRAPH_OUT follows edge
+ *         directions, \c IGRAPH_IN follows the opposite directions,
+ *         and \c IGRAPH_ALL ignores edge directions. This argument is
+ *         ignored for undirected graphs.
  * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory,
  *         \c IGRAPH_EINVVID if the start vertex is invalid,
  *         \c IGRAPH_EINVAL if the edge walk does not start at the given vertex

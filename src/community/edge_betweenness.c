@@ -178,11 +178,11 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * connected.
  *
  * \param graph The input graph.
+ * \param directed Whether to use the directed or undirected version
+ *    of modularity. Will be ignored for undirected graphs.
  * \param edges Vector containing the edges to be removed from the
  *    network, all edges are expected to appear exactly once in the
  *    vector.
- * \param directed Whether to use the directed or undirected version
- *    of modularity. Will be ignored for undirected graphs.
  * \param weights An optional vector containing edge weights. If null,
  *     the unweighted modularity scores will be calculated. If not null,
  *     the weighted modularity scores will be calculated. Ignored if both

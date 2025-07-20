@@ -52,7 +52,7 @@
  *        to an initialized vector, and a mapping from the edges of
  *        the result graph to the edges of the first graph is stored
  *        here.
- * \param edge_map1 If not a null pointer, then it must be a pointer
+ * \param edge_map2 If not a null pointer, then it must be a pointer
  *        to an initialized vector, and a mapping from the edges of
  *        the result graph to the edges of the second graph is stored
  *        here.
