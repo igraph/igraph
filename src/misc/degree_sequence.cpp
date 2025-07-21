@@ -85,8 +85,8 @@ struct HavelHakimiList {
     // O(N)                                       // sentinel BNode [0] and [N] as bookends
     HavelHakimiList(igraph_vector_int_t degseq) : buckets(igraph_vector_int_size(&degseq)+1) {
         igraph_integer_t n_nodes = igraph_vector_int_size(&degseq);
-        for (igraph_integer_t i = 0; i <= n_nodes; i++) { 
-            if (i == 0) buckets[i].prev = nullptr; 
+        for (igraph_integer_t i = 0; i <= n_nodes; i++) {
+            if (i == 0) buckets[i].prev = nullptr;
             else buckets[i].prev = &buckets[i-1];
 
             if (i == n_nodes) buckets[i].next = nullptr;
@@ -120,7 +120,7 @@ struct HavelHakimiList {
 
         if (prev_ptr == nullptr && next_ptr == nullptr) {
             next_ptr = &buckets[degree+1];
-            prev_ptr = next_ptr->prev;  
+            prev_ptr = next_ptr->prev;
 
             next_ptr->prev = &buckets[degree];
             prev_ptr->next = &buckets[degree];
@@ -230,10 +230,10 @@ enum class Method {
     CUSTOM
 };
 
-static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq, 
+static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
                                             igraph_vector_int_t *edges,
                                             Method method,
-                                            const igraph_vector_int_t *hub_order = nullptr) { 
+                                            const igraph_vector_int_t *hub_order = nullptr) {
     igraph_integer_t n_nodes = igraph_vector_int_size(degseq);
 
     // ----- upfront error/graphicality checks ----- //
@@ -243,37 +243,34 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
         return IGRAPH_SUCCESS;
     }
 
-    igraph_integer_t sum = 0;
     for (igraph_integer_t i = 0; i < n_nodes; i++) {
         igraph_integer_t deg = VECTOR(*degseq)[i];
-        if (deg < 0 || deg >= n_nodes) {
+        if (deg >= n_nodes) {
             IGRAPH_ERROR("Invalid degree sequence.", IGRAPH_EINVAL);
         }
-        sum += deg;
     }
-    if (sum % 2 != 0) IGRAPH_ERROR("Degree sequence is not graphical.", IGRAPH_EINVAL);
-    
+
     // ----- main Havel-Hakimi loop ----- //
     // O(V + alpha(V) * E)
     // O(V + E) for the LARGEST_FIRST method
     igraph_vector_int_t seq;
     IGRAPH_CHECK(igraph_vector_int_init_copy(&seq, degseq));
 
-    HavelHakimiList vault(seq); 
+    HavelHakimiList vault(seq);
 
     igraph_integer_t n_edges_added = 0;
-    for (igraph_integer_t i = 0; i < n_nodes; i++) {   
-        // hub node selection                    
-        vd_pair hub;                          
+    for (igraph_integer_t i = 0; i < n_nodes; i++) {
+        // hub node selection
+        vd_pair hub;
         if (method == Method::SMALLEST_FIRST) {
-            if (!vault.get_min_node(/* out param */hub)) break; 
+            if (!vault.get_min_node(/* out param */hub)) break;
             vault.remove_min_node();
-        } 
+        }
         else if (method == Method::LARGEST_FIRST) {
             if (!vault.get_max_node(/* out param */hub)) break;
             vault.remove_max_node();
-        } 
-        else if (method == Method::CUSTOM) {   
+        }
+        else if (method == Method::CUSTOM) {
             igraph_integer_t index = VECTOR(*hub_order)[i];
             igraph_integer_t degree = VECTOR(seq)[index];
             hub = vd_pair{index, degree};
@@ -288,7 +285,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
         igraph_vector_int_t spokes;
         IGRAPH_CHECK(igraph_vector_int_init(&spokes, 0));        // init with size hub.degree instead?
         IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, hub.degree));
-        vault.get_spokes(hub.degree, seq, spokes); 
+        vault.get_spokes(hub.degree, seq, spokes);
 
         igraph_integer_t n_spokes = igraph_vector_int_size(&spokes);
         for (igraph_integer_t i = 0; i < n_spokes; i++) {
