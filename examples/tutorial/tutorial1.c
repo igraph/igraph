@@ -6,6 +6,10 @@ int main(void) {
   igraph_real_t diameter;
   igraph_t graph;
 
+  /* Initialize the library. */
+  igraph_setup();
+
+  /* Ensure identical results across runs. */
   igraph_rng_seed(igraph_rng_default(), 42);
 
   igraph_erdos_renyi_game_gnm(
