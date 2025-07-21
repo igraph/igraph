@@ -19,7 +19,7 @@
 #include "igraph_setup.h"
 #include "igraph_random.h"
 
-#include <time.h>
+#include "random/random_internal.h"
 
 /**
  * \ingroup setup
@@ -62,7 +62,7 @@ igraph_error_t igraph_setup_rng(void) {
     igraph_rng_t *rng = igraph_rng_default();
 
     if (!rng->is_seeded) {
-        igraph_rng_seed(rng, time(0));
+        igraph_rng_seed(rng, igraph_i_get_random_seed());
         rng->is_seeded = true;
     };
 
