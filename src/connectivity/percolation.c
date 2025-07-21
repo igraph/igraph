@@ -112,7 +112,7 @@ igraph_error_t igraph_edgelist_percolation(
         igraph_vector_int_t *giant_size,
         igraph_vector_int_t *vertex_count) {
 
-    igraph_integer_t biggest = 0;
+    igraph_integer_t biggest = 1;
     igraph_integer_t connected = 0;
     igraph_integer_t lower, upper;
 
@@ -140,8 +140,8 @@ igraph_error_t igraph_edgelist_percolation(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&links, upper + 1);
 
     for (igraph_integer_t i = 0; i < upper + 1; i++) {
-        VECTOR(sizes)[i] = 1;
-        VECTOR(links)[i] = i;
+        VECTOR(sizes)[i] = -1;
+        VECTOR(links)[i] =  i;
     }
 
     igraph_integer_t edge_count = igraph_vector_int_size(edges);
@@ -153,8 +153,14 @@ igraph_error_t igraph_edgelist_percolation(
     IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, edge_count));
 
     for (igraph_integer_t i = 0; i < edge_count; i++) {
-        if (!is_connected(&links, &sizes, VECTOR(*edges)[2 * i]))     {connected++;}
-        if (!is_connected(&links, &sizes, VECTOR(*edges)[2 * i+ 1 ])) {connected++;}
+        if (VECTOR(sizes)[VECTOR(*edges)[2 * i]] == -1) {
+            connected++;
+            VECTOR(sizes)[VECTOR(*edges)[2 * i]] = 1;
+        }
+        if (VECTOR(sizes)[VECTOR(*edges)[2 * i + 1]] == -1) {
+            connected++;
+            VECTOR(sizes)[VECTOR(*edges)[2 * i + 1]] = 1;
+        }
         percolate_edge(&links, &sizes, &biggest, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1]);
         if (giant_size != NULL) {VECTOR(*giant_size)[i] = biggest;}
         if (vertex_count != NULL) { VECTOR(*vertex_count)[i] = connected;}
