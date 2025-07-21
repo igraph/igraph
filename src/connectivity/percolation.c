@@ -249,7 +249,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
     igraph_integer_t neighbor_count;
 
-    IGRAPH_CHECK(igraph_neighbors(graph, neighbors, vertex, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_neighbors(graph, neighbors, vertex, IGRAPH_ALL));
 
     neighbor_count = igraph_vector_int_size(neighbors);
     for (igraph_integer_t i = 0; i < neighbor_count; i++) {
