@@ -166,8 +166,8 @@ igraph_error_t igraph_edgelist_percolation(
         if (vertex_count != NULL) { VECTOR(*vertex_count)[i] = connected;}
     }
 
-    igraph_vector_int_destroy(&sizes);
     igraph_vector_int_destroy(&links);
+    igraph_vector_int_destroy(&sizes);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;

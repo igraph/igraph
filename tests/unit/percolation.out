@@ -38,3 +38,6 @@ K_5 with repeated vertices
 # Edge list percolation
 Percolation with ( 0 1 1 2 1 ), odd number of entries
 Percolation with ( -1 1 0 0 1 -1 ), negative numbers
+Percolation with ( 0 0 0 1 1 2 2 0 ), k_3 with loop
+( 1 2 3 3 )
+( 1 2 3 3 )

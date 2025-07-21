@@ -18,6 +18,7 @@
 
 #include <igraph.h>
 
+#include "igraph_vector.h"
 #include "test_utilities.h"
 
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
@@ -238,6 +239,7 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
 
     if (printing) {
         print_vector_int(&outputs);
+        print_vector_int(&vertex_count);
     }
 
     igraph_vector_int_t components;
@@ -255,8 +257,6 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
     if (size > 1) {
         IGRAPH_ASSERT(igraph_vector_int_max(&outputs) == igraph_vector_int_max(&components));
     }
-    igraph_vector_int_destroy(&components);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_integer_t prev = 0;
     for (igraph_integer_t i = 0; i < size; i++) {
         IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
@@ -273,16 +273,19 @@ igraph_error_t el_percolate(igraph_vector_int_t * edge_list, igraph_bool_t print
         prev = VECTOR(vertex_count)[i];
     }
     igraph_vector_int_destroy(&outputs);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_destroy(&components);
+    igraph_vector_int_destroy(&vertex_count);
+    IGRAPH_FINALLY_CLEAN(3);
     return IGRAPH_SUCCESS;
 }
 
 void test_edgelist_percolation(void) {
     // Edge list percolation is already called from bond percolation,
     // so this mostly tests for expected errors that cannot occur from generated edge lists.
-    igraph_vector_int_t odd, negative;
+    igraph_vector_int_t odd, negative, loopy;
     igraph_vector_int_init_int(&odd, 5, 0, 1, 1, 2, 1);
     igraph_vector_int_init_int(&negative, 6, -1, 1, 0, 0, 1, -1);
+    igraph_vector_int_init_int(&loopy, 8, 0, 0, 0, 1, 1, 2, 2, 0);
 
     printf("# Edge list percolation\n");
     printf("Percolation with ( 0 1 1 2 1 ), odd number of entries\n");
@@ -290,8 +293,13 @@ void test_edgelist_percolation(void) {
     printf("Percolation with ( -1 1 0 0 1 -1 ), negative numbers\n");
     CHECK_ERROR(el_percolate(&negative, false), IGRAPH_EINVVID);
 
+    printf("Percolation with ( 0 0 0 1 1 2 2 0 ), k_3 with loop\n");
+    el_percolate(&loopy, true);
+
+
     igraph_vector_int_destroy(&odd);
     igraph_vector_int_destroy(&negative);
+    igraph_vector_int_destroy(&loopy);
     VERIFY_FINALLY_STACK();
 }
 
