@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <time.h>
-
 #include "igraph_setup.h"
 #include "igraph_random.h"
+
+#include <time.h>
 
 /**
  * \ingroup setup
@@ -29,6 +29,7 @@
  * This function is a convenience function to call all setup functions that are
  * provided by the igraph library.
  *
+ * </para><para>
  * Most of the library functions will work even if this function is not called,
  * but it is recommended to call it before using any igraph functions that may
  * use random numbers, such as graph generators or random sampling functions.
@@ -52,10 +53,13 @@ igraph_error_t igraph_setup(void) {
  * for its internal random number generator. It should be called before
  * using any igraph functions that may use random numbers.
  *
+ * </para><para>
+ * This function is called by \ref igraph_setup().
+ *
  * \return Error code; currently always \c IGRAPH_SUCCESS.
  */
 igraph_error_t igraph_setup_rng(void) {
-    igraph_rng_t* rng = igraph_rng_default();
+    igraph_rng_t *rng = igraph_rng_default();
 
     if (!rng->is_seeded) {
         igraph_rng_seed(rng, time(0));
