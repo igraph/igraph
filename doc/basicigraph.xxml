@@ -187,7 +187,6 @@ initialization steps.
 </para>
 
 <!-- doxrox-include igraph_setup -->
-<!-- doxrox-include igraph_setup_rng -->
 </section>
 
 <section id="basic-interface"><title>The basic interface</title>

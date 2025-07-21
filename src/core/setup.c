@@ -23,6 +23,28 @@
 
 /**
  * \ingroup setup
+ * \function setup_rng
+ * \brief Initializes the random number generator.
+ *
+ * This function initializes the igraph library by setting up a random seed
+ * for its internal random number generator. It should be called before
+ * using any igraph functions that may use random numbers.
+ *
+ * \return Error code; currently always \c IGRAPH_SUCCESS.
+ */
+static igraph_error_t setup_rng(void) {
+    igraph_rng_t *rng = igraph_rng_default();
+
+    if (!rng->is_seeded) {
+        igraph_rng_seed(rng, igraph_i_get_random_seed());
+        rng->is_seeded = true;
+    };
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup setup
  * \function igraph_setup
  * \brief Initializes the igraph library.
  *
@@ -40,31 +62,7 @@
  * \return Error code; currently always \c IGRAPH_SUCCESS.
  */
 igraph_error_t igraph_setup(void) {
-    IGRAPH_CHECK(igraph_setup_rng());
+    IGRAPH_CHECK(setup_rng());
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \ingroup setup
- * \function igraph_setup_rng
- * \brief Initializes the random number generator.
- *
- * This function initializes the igraph library by setting up a random seed
- * for its internal random number generator. It should be called before
- * using any igraph functions that may use random numbers.
- *
- * </para><para>
- * This function is called by \ref igraph_setup().
- *
- * \return Error code; currently always \c IGRAPH_SUCCESS.
- */
-igraph_error_t igraph_setup_rng(void) {
-    igraph_rng_t *rng = igraph_rng_default();
-
-    if (!rng->is_seeded) {
-        igraph_rng_seed(rng, igraph_i_get_random_seed());
-        rng->is_seeded = true;
-    };
-
-    return IGRAPH_SUCCESS;
-}

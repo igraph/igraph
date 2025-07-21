@@ -25,7 +25,6 @@
 IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_setup(void);
-IGRAPH_EXPORT igraph_error_t igraph_setup_rng(void);
 
 IGRAPH_END_C_DECLS
 
