@@ -17,7 +17,9 @@
 */
 
 #include <igraph.h>
+#include <string.h>
 
+#include "igraph_components.h"
 #include "igraph_vector.h"
 #include "test_utilities.h"
 
@@ -106,7 +108,12 @@ void test_bond(void) {
     percolate_b(&karate, &storage_order, true);
     igraph_vector_int_destroy(&storage_order);
 
-    percolate_b(&random, NULL, false);
+    percolate_b(&random, NULL, false); // sanity check
+
+
+    printf("Null outputs\n");
+    igraph_bond_percolation(&karate, NULL, NULL, NULL);
+
     igraph_destroy(&singleton);
     igraph_destroy(&null_graph);
     igraph_destroy(&k_3);
@@ -217,6 +224,9 @@ void test_site(void) {
     printf("K_5 with repeated vertices\n");
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat, false),  IGRAPH_EINVAL);
 
+    printf("Null outputs\n");
+    igraph_bond_percolation(&karate, NULL, NULL, NULL);
+
     igraph_destroy(&singleton);
     igraph_destroy(&null_graph);
     igraph_destroy(&k_5);
@@ -296,6 +306,8 @@ void test_edgelist_percolation(void) {
     printf("Percolation with ( 0 0 0 1 1 2 2 0 ), k_3 with loop\n");
     el_percolate(&loopy, true);
 
+    printf("Null outputs\n");
+    igraph_edgelist_percolation(&loopy, NULL, NULL);
 
     igraph_vector_int_destroy(&odd);
     igraph_vector_int_destroy(&negative);

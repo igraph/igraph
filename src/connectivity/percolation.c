@@ -116,15 +116,22 @@ igraph_error_t igraph_edgelist_percolation(
     igraph_integer_t connected = 0;
     igraph_integer_t lower, upper;
 
-    // Handle edge case of no edges.
+    igraph_integer_t edge_count = igraph_vector_int_size(edges);
+
+    if (edge_count % 2 == 1) {
+        IGRAPH_ERROR("Invalid edge list, odd number of elements.", IGRAPH_EINVAL);
+    }
+    edge_count >>= 1;
+
+    if (giant_size != NULL) {
+        IGRAPH_CHECK(igraph_vector_int_resize(giant_size, edge_count));
+    }
+    if (vertex_count != NULL) {
+        IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, edge_count));
+    }
+   // Handle edge case of no edges.
     if (igraph_vector_int_size(edges) == 0) {
-        if (giant_size != NULL) {
-            IGRAPH_CHECK(igraph_vector_int_resize(giant_size, 0));
-        }
-        if (vertex_count != NULL) {
-            IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, 0));
-        }
-        return IGRAPH_SUCCESS;
+         return IGRAPH_SUCCESS;
     }
 
     igraph_vector_int_minmax(edges, &lower, &upper);
@@ -143,14 +150,6 @@ igraph_error_t igraph_edgelist_percolation(
         VECTOR(sizes)[i] = -1;
         VECTOR(links)[i] =  i;
     }
-
-    igraph_integer_t edge_count = igraph_vector_int_size(edges);
-    if (edge_count % 2 == 1) {
-        IGRAPH_ERROR("Invalid edge list, odd number of elements.", IGRAPH_EINVAL);
-    }
-    edge_count >>= 1;
-    IGRAPH_CHECK(igraph_vector_int_resize(giant_size, edge_count));
-    IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, edge_count));
 
     for (igraph_integer_t i = 0; i < edge_count; i++) {
         if (VECTOR(sizes)[VECTOR(*edges)[2 * i]] == -1) {
