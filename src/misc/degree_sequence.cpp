@@ -26,7 +26,7 @@
 #include <list>
 #include <algorithm>
 #include <utility>
-#include <set>
+#include <stack>
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
@@ -42,11 +42,6 @@ struct vd_pair {
 
     vd_pair() = default;
     vd_pair(igraph_integer_t vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
-
-    bool operator<(const vd_pair& other) const {
-        if (degree == other.degree) return vertex < other.vertex;
-        return degree < other.degree;
-    }
 };
 
 // (indegree, outdegree)
@@ -75,71 +70,238 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 /***** Undirected simple graphs ******/
 /*************************************/
 
-// helper function for igraph_i_havel_hakimi()
-vd_pair decrement_degree(std::set<vd_pair>& nodes, std::set<vd_pair>::iterator it) {
-    vd_pair node = *it;
-    nodes.erase(it);
+// "Bucket Node" for nodes of the same degree
+struct BNode {
+    igraph_integer_t count = 0;                // TODO: correct use of uint?
+    std::stack<vd_pair> nodes;
+    BNode* next;       // next bucket (higher degree)
+    BNode* prev;       // prev bucket (lower degree)
+};
 
-    node.degree -= 1;
-    return node;
-}
+struct HavelHakimiList {
+    std::vector<BNode> buckets;
 
-// Generate simple undirected realization as edge-list.
-// If largest=true, always choose the vertex with the largest remaining degree to connect up next.
-// Otherwise, always choose the one with the smallest remaining degree.
+    // Given degree sequence, sets up linked list of BNodes (degree buckets)
+    // O(N)                                       // sentinel BNode [0] and [N] as bookends
+    HavelHakimiList(igraph_vector_int_t degseq) : buckets(igraph_vector_int_size(&degseq)+1) {
+        igraph_integer_t n_nodes = igraph_vector_int_size(&degseq);
+        for (igraph_integer_t i = 0; i <= n_nodes; i++) { 
+            if (i == 0) buckets[i].prev = nullptr; 
+            else buckets[i].prev = &buckets[i-1];
 
-// O(E log V)
-static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
-                                            igraph_vector_int_t *edges,
-                                            bool largest) {
-    // put everything in a set O(V log V)
-    std::set<vd_pair> nodes;
-    for (igraph_integer_t n = 0; n < igraph_vector_int_size(degseq); n++) {
-        igraph_integer_t degree = VECTOR(*degseq)[n];
+            if (i == n_nodes) buckets[i].next = nullptr;
+            else buckets[i].next = &buckets[i+1];
+        }
 
-        if (degree < 0) { // INVALID DEGSEQ
-            IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
-        } else if (degree != 0) { // only insert non-zero degrees
-            nodes.insert(vd_pair{n, degree});
+        for (igraph_integer_t i = 0; i < n_nodes; i++) {
+            igraph_integer_t degree = VECTOR(degseq)[i];
+            buckets[degree].nodes.push(vd_pair{i, degree});
+            buckets[degree].count++;
         }
     }
+
+    // ----- O(1) convenience functions ----- //
+    BNode* head() {return &buckets.front();}
+    BNode* tail() {return &buckets.back();}
+
+    void remove_bucket(igraph_integer_t degree) {            // assuming sentinel nodes
+        BNode*& prev_ptr = buckets[degree].prev;
+        BNode*& next_ptr = buckets[degree].next;
+        if (prev_ptr) prev_ptr->next = next_ptr;
+        if (next_ptr) next_ptr->prev = prev_ptr;
+
+        next_ptr = nullptr;
+        prev_ptr = nullptr;
+    }
+
+    void insert_bucket(igraph_integer_t degree) {            // assuming sentinel nodes
+        BNode*& prev_ptr = buckets[degree].prev;
+        BNode*& next_ptr = buckets[degree].next;
+
+        if (prev_ptr == nullptr && next_ptr == nullptr) {
+            next_ptr = &buckets[degree+1];
+            prev_ptr = next_ptr->prev;  
+
+            next_ptr->prev = &buckets[degree];
+            prev_ptr->next = &buckets[degree];
+        }
+    }
+
+    void insert_node(vd_pair node) {
+        insert_bucket(node.degree);      // does nothing if already exists
+        buckets[node.degree].nodes.push(vd_pair{node.vertex, node.degree});
+        buckets[node.degree].count++;
+    }
+
+    igraph_integer_t get_degree(BNode* bucket) {
+        return bucket - head();          // head always points to '0' bucket
+    }
+
+    // ----- amortized ??? ----- //
+    bool get_max_node(vd_pair& max_node) {
+        BNode*& max_bucket = tail()->prev;
+        while (max_bucket->nodes.empty()) {
+            remove_bucket(get_degree(max_bucket));
+            max_bucket = tail()->prev;
+            if (!max_bucket) return false;
+        }
+        max_node = max_bucket->nodes.top();
+        return true;
+    }
+
+    void remove_max_node() {
+        BNode* max_bucket = tail()->prev;
+        while (max_bucket->nodes.empty()) {
+            remove_bucket(get_degree(max_bucket));
+            max_bucket = tail()->prev;
+        }
+        vd_pair max_node = max_bucket->nodes.top();
+        max_bucket->nodes.pop();
+        buckets[max_node.degree].count--;
+    }
+
+    bool get_min_node(vd_pair& min_node) {
+        BNode*& min_bucket = head()->next;
+        while (min_bucket->nodes.empty()) {
+            remove_bucket(get_degree(min_bucket));
+            min_bucket = head()->next;
+            if (!min_bucket) return false;
+        }
+        min_node = min_bucket->nodes.top();
+        return true;
+    }
+
+    void remove_min_node() {
+        BNode*& min_bucket = head()->next;
+        while (min_bucket->nodes.empty()) {
+            remove_bucket(get_degree(min_bucket));
+            min_bucket = head()->next;
+        }
+        vd_pair min_node = min_bucket->nodes.top();
+        min_bucket->nodes.pop();
+        buckets[min_node.degree].count--;
+    }
+
+    // Given degree of selected "hub" node, returns degree many "spoke" nodes to connect to
+    // amortized O(alpha(n))
+    igraph_error_t get_spokes(igraph_integer_t degree, const igraph_vector_int_t& seq,
+                              igraph_vector_int_t& spokes) {
+        std::stack<BNode*> buckets_req;    // stack of needed degree buckets
+        igraph_integer_t num_nodes = 0;
+        BNode* curr = tail()->prev;        // starts with max_bucket
+
+        while (num_nodes < degree && get_degree(curr) > 0) {
+            num_nodes += curr->count;
+            buckets_req.push(curr);
+            curr = curr->prev;            // gets next smallest NON-EMPTY bucket
+        }
+        if (num_nodes < degree) {         // not enough spokes for hub degree
+            IGRAPH_ERROR("Degree sequence is not graphical.", IGRAPH_EINVAL);
+        }
+
+        igraph_integer_t num_skip = num_nodes - degree;
+        while (!buckets_req.empty()) {               // starting from smallest degree
+            BNode* bucket = buckets_req.top();
+            buckets_req.pop();
+
+            igraph_integer_t to_get = bucket->count - num_skip;
+            while (to_get > 0) {
+                vd_pair node = bucket->nodes.top();
+                if (VECTOR(seq)[node.vertex] != 0) {                   // if "not marked for removal"
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&spokes, node.vertex)); // add as spoke
+
+                    node.degree--;
+                    insert_node(node);                // first, insert into bucket below
+
+                    bucket->count--;
+                    to_get--;
+                }
+                bucket->nodes.pop();                  // then pop from original bucket
+            }
+            num_skip = 0;
+        }
+        return IGRAPH_SUCCESS;
+    }
+};
+
+enum class Method {
+    LARGEST_FIRST,
+    SMALLEST_FIRST,
+    CUSTOM
+};
+
+static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq, 
+                                            igraph_vector_int_t *edges,
+                                            Method method,
+                                            const igraph_vector_int_t *hub_order = nullptr) { 
+    igraph_integer_t n_nodes = igraph_vector_int_size(degseq);
+
+    // ----- upfront error/graphicality checks ----- //
+    if (method == Method::CUSTOM && hub_order == nullptr) {
+        IGRAPH_ERROR("Custom ordering specified but no order given", IGRAPH_EINVAL);
+    } else if (n_nodes == 0 || (n_nodes == 1 && VECTOR(*degseq)[0] == 0)) {
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_integer_t sum = 0;
+    for (igraph_integer_t i = 0; i < n_nodes; i++) {
+        igraph_integer_t deg = VECTOR(*degseq)[i];
+        if (deg < 0 || deg >= n_nodes) {
+            IGRAPH_ERROR("Invalid degree sequence.", IGRAPH_EINVAL);
+        }
+        sum += deg;
+    }
+    if (sum % 2 != 0) IGRAPH_ERROR("Degree sequence is not graphical.", IGRAPH_EINVAL);
+    
+    // ----- main Havel-Hakimi loop ----- //
+    // O(V + alpha(V) * E)
+    // O(V + E) for the LARGEST_FIRST method
+    igraph_vector_int_t seq;
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&seq, degseq));
+
+    HavelHakimiList vault(seq); 
 
     igraph_integer_t n_edges_added = 0;
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(degseq); i++) {
-        // CHECK FOR COMPLETE
-        if (nodes.empty()) return IGRAPH_SUCCESS;
-
-        // CHOOSE VERTEX HUB
-        vd_pair hub;
-        if (!largest) {
-            auto smallest = nodes.begin(); // O(log V)
-            hub = *smallest;
-            nodes.erase(smallest);
-        } else {
-            auto largest = prev(nodes.end()); // O(log V)
-            hub = *largest;
-            nodes.erase(largest);
+    for (igraph_integer_t i = 0; i < n_nodes; i++) {   
+        // hub node selection                    
+        vd_pair hub;                          
+        if (method == Method::SMALLEST_FIRST) {
+            if (!vault.get_min_node(/* out param */hub)) break; 
+            vault.remove_min_node();
+        } 
+        else if (method == Method::LARGEST_FIRST) {
+            if (!vault.get_max_node(/* out param */hub)) break;
+            vault.remove_max_node();
+        } 
+        else if (method == Method::CUSTOM) {   
+            igraph_integer_t index = VECTOR(*hub_order)[i];
+            igraph_integer_t degree = VECTOR(seq)[index];
+            hub = vd_pair{index, degree};
+            vault.buckets[degree].count--;
         }
-
-        if (hub.degree > nodes.size()) { // NOT ENOUGH NODES TO CONNECT
-            IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
+        else {
+            IGRAPH_ERROR("Invalid method.", IGRAPH_EINVMODE);
         }
-        // CHOOSE NODES TO CONNECT TO
-        std::vector<vd_pair> visited;
-        for (igraph_integer_t e = 0; e < hub.degree; e++) { // sum of degrees = O(E) total
-            auto largest = prev(nodes.end());
-            visited.push_back(decrement_degree(nodes, largest)); // O(log V)
-        }
+        VECTOR(seq)[hub.vertex] = 0;
 
-        // CONNECT THEM
-        for (const auto node : visited) { // O(E)
+        // spoke nodes selection
+        igraph_vector_int_t spokes;
+        IGRAPH_CHECK(igraph_vector_int_init(&spokes, 0));        // init with size hub.degree instead?
+        IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, hub.degree));
+        vault.get_spokes(hub.degree, seq, spokes); 
+
+        igraph_integer_t n_spokes = igraph_vector_int_size(&spokes);
+        for (igraph_integer_t i = 0; i < n_spokes; i++) {
+            igraph_integer_t spoke_idx = VECTOR(spokes)[i];
             VECTOR(*edges)[2*n_edges_added] = hub.vertex;
-            VECTOR(*edges)[2*n_edges_added + 1] = node.vertex;
+            VECTOR(*edges)[2*n_edges_added + 1] = spoke_idx;
             n_edges_added++;
 
-            nodes.insert(node); // O(log V)
+            VECTOR(seq)[spoke_idx]--;
         }
+        igraph_vector_int_destroy(&spokes);
     }
+    igraph_vector_int_destroy(&seq);
     return IGRAPH_SUCCESS;
 }
 
@@ -586,10 +748,10 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
     {
         switch (method) {
         case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-            IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, false));
+            IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, Method::SMALLEST_FIRST));
             break;
         case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-            IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, true));
+            IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, Method::LARGEST_FIRST));
             break;
         case IGRAPH_REALIZE_DEGSEQ_INDEX:
             IGRAPH_CHECK(igraph_i_havel_hakimi_index(deg, &edges));
