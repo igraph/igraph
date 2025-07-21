@@ -238,7 +238,6 @@ static igraph_error_t avg_nearest_neighbor_degree_weighted(const igraph_t *graph
  * \param neighbor_degree_mode The type of degree to average in directed graphs.
  *   \c IGRAPH_OUT averages out-degrees, \c IGRAPH_IN averages in-degrees
  *   and \c IGRAPH_ALL ignores edge directions for the degree calculation.
- * \param vids The vertices for which the calculation is performed.
  * \param knn Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed. Supply a \c NULL pointer
  *   here if you only want to calculate \c knnk.

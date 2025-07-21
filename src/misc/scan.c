@@ -536,6 +536,7 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
  * \param them The input graph to perform the counting.
  * \param k The size of the neighborhood, non-negative integer.
  *        The k=0 case is special, see \ref igraph_local_scan_0_them().
+ * \param res An initialized vector, the results are stored here.
  * \param weights_them Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
  * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,

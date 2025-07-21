@@ -2275,7 +2275,7 @@ igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param vids The edges to query.
+ * \param eids The edges to query.
  * \param result Pointer to an initialized string vector, the result
  *     is stored here. It will be resized, if needed.
  * \return Error code.

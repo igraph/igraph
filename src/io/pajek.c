@@ -127,7 +127,7 @@ void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
  * http://mrvar.fdv.uni-lj.si/pajek/history.htm
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param file An already opened file handler.
+ * \param instream An already opened file handler.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|

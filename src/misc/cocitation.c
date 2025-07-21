@@ -288,9 +288,9 @@ static igraph_error_t igraph_i_neisets_intersect(
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
  *        as the number of vertex IDs in \p vit_from and \p vit_to, respectively.
- * \param vit_from The vertex IDs of the first set of vertices of the
+ * \param from The vertex IDs of the first set of vertices of the
  *        pairs for which the calculation will be done.
- * \param vit_to The vertex IDs of the second set of vertices of the
+ * \param to The vertex IDs of the second set of vertices of the
  *        pairs for which the calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:

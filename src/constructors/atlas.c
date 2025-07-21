@@ -50,6 +50,7 @@
  * \param number The number of the graph to generate. Must be between 0 and
  *    1252 (inclusive). Graphs on 0-7 vertices start at numbers 0, 1, 2, 4,
  *    8, 19, 53, and 209, respectively.
+ * \return Error code.
  *
  * Added in version 0.2.
  *

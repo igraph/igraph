@@ -37,6 +37,7 @@
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result.
+ * \return Error code.
  *
  * \sa \ref igraph_simplify() to get rid of loop edges.
  *
@@ -126,7 +127,7 @@ done:
  * Counts loop edges, i.e. edges whose two endpoints coincide.
  *
  * \param graph The input graph.
- * \param res Pointer to an integer, the number of self-loops will be stored here.
+ * \param loop_count Pointer to an integer, the number of self-loops will be stored here.
  * \return Error code.
  *
  * Time complexity: O(|E|), linear in the number of edges.

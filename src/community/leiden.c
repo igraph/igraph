@@ -1025,9 +1025,9 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
      * iteration may still find some improvement. This is because
      * each iteration explores different subsets of nodes.
      */
-    igraph_bool_t changed = false;
+    igraph_bool_t changed = true;
     for (igraph_integer_t itr = 0;
-         n_iterations >= 0 ? itr < n_iterations : !changed;
+         n_iterations < 0 ? changed : itr < n_iterations;
          itr++) {
         IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
                                                resolution_parameter, beta,

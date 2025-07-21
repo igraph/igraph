@@ -298,15 +298,15 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
  * All distinct ordered vertex pairs are taken into account.
  *
  * \param graph The graph object.
- * \param res Pointer to a real number, this will contain the result.
- * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
- *    ordered vertex pairs where the second vertex is unreachable from the first one
- *    will be stored here.
  * \param weights The edge weights. All edge weights must be
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
  *       is returned. Passa a null pointer here if the graph is unweighted.
  *       Edges with positive infinite weight are ignored.
+ * \param res Pointer to a real number, this will contain the result.
+ * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
+ *    ordered vertex pairs where the second vertex is unreachable from the first one
+ *    will be stored here.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param unconn If \c true, only those pairs are considered for the calculation

@@ -62,7 +62,7 @@
  * All elements of the string vector are set to the empty string.
  *
  * \param sv Pointer to an initialized string vector.
- * \param len The (initial) length of the string vector.
+ * \param size The (initial) length of the string vector.
  * \return Error code.
  *
  * Time complexity: O(\p len).
