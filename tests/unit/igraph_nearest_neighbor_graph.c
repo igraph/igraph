@@ -1,34 +1,94 @@
 #include <igraph.h>
 #include <math.h>
+#include <string.h>
+#include "igraph_constants.h"
+#include "igraph_conversion.h"
+#include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_matrix.h"
+#include "igraph_matrix_list.h"
 #include "igraph_spatial.h"
-#include "igraph_types.h"
 #include "test_utilities.h"
+
+igraph_error_t RKNN_neighbors(igraph_real_t* arr, igraph_integer_t num_points, igraph_integer_t dims, igraph_integer_t neighbors, igraph_real_t cutoff) {
+
+    igraph_t graph;
+    igraph_matrix_t points;
+    igraph_matrix_t adj_mat;
+    igraph_metric_t metric = IGRAPH_METRIC_L2;
+    igraph_matrix_t dist_mat;
+
+    IGRAPH_MATRIX_INIT_FINALLY(&dist_mat, num_points, num_points);
+
+    IGRAPH_FINALLY(igraph_matrix_destroy, &points);
+    igraph_matrix_init_array(&points, &arr[0], num_points, dims, IGRAPH_ROW_MAJOR);
+
+    for (igraph_integer_t start = 0; start < num_points-1; start++ ) {
+        for (igraph_integer_t end = start + 1; end < num_points; end++) {
+            igraph_real_t distance = 0;
+            switch (metric) {
+                case IGRAPH_METRIC_L2:
+                    for (igraph_integer_t i = 0; i < dims; i++) {
+                        distance += pow(MATRIX(points, start, i) - MATRIX(points, end, i), 2);
+                    }
+            }
+            MATRIX(dist_mat, start,end) = distance;
+            MATRIX(dist_mat, end,start) = distance;
+        }
+    } 
+
+
+    igraph_nearest_neighbor_graph(&graph, &points, metric, neighbors, cutoff);
+    print_matrix(&points);
+    print_graph_canon(&graph);
+    igraph_matrix_init(&adj_mat, 0, 0);
+    IGRAPH_FINALLY(igraph_matrix_destroy, &adj_mat);
+    IGRAPH_CHECK(igraph_get_adjacency(&graph, &adj_mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS));
+    IGRAPH_FINALLY(igraph_destroy, &graph);
+
+    for (igraph_integer_t start = 0; start < num_points; start ++) {
+
+        for (igraph_integer_t end = 0; end < num_points; end ++) {
+            if (start == end) continue;
+            igraph_real_t min_missing=INFINITY;
+            igraph_real_t max_present=0;
+            if (MATRIX(adj_mat, start, end) == 1) {
+                if (max_present < MATRIX(dist_mat, start, end)) max_present = MATRIX(dist_mat, start, end);
+            } else {
+                if (max_present < MATRIX(dist_mat, start, end)) max_present = MATRIX(dist_mat, start, end);
+            }
+        IGRAPH_ASSERT(min_missing > max_present);
+        }
+    }
+
+    igraph_destroy(&graph);
+    igraph_matrix_destroy(&adj_mat);
+    igraph_matrix_destroy(&points);
+    igraph_matrix_destroy(&dist_mat);
+    IGRAPH_FINALLY_CLEAN(4);
+
+
+    return IGRAPH_SUCCESS;
+}
 
 int main(void) {
 
-    igraph_t graph;
 
-    igraph_real_t pointArray[8] = {
-        0, 0,
-        100, 100,
-        0, 1,
-        1, 0
+    igraph_real_t pointArray[10] = {
+        12  , 8,
+        8  , 6,
+        5  , 12,
+        10  , 1,
+        12  , 2
     };
-
-    igraph_matrix_t points;
-
-    igraph_matrix_init_array(&points, &pointArray[0], 4, 2, IGRAPH_ROW_MAJOR);
-
-    igraph_integer_t neighbor_count = 0;
-    igraph_real_t max_distance = 1000;
-
-    igraph_nearest_neighbor_graph(&graph, &points, IGRAPH_METRIC_L2, neighbor_count, max_distance);
-
-    print_graph_canon(&graph);
-    igraph_destroy(&graph);
-    igraph_matrix_destroy(&points);
+    printf("2 neighbors, cutoff 5\n");
+    RKNN_neighbors(&pointArray[0], 5, 2, 2, 5);
+    printf("2 neighbors, cutoff INFINITY\n");
+    RKNN_neighbors(&pointArray[0], 5, 2, 1, INFINITY);
+    printf("unlimited neighbors, cutoff INFINITY\n");
+    RKNN_neighbors(&pointArray[0], 5, 2, 0, INFINITY);
+    printf("2 neighbors, cutoff 1\n");
+    RKNN_neighbors(&pointArray[0], 5, 2, 0, 7);
     VERIFY_FINALLY_STACK();
     return 1;
 }

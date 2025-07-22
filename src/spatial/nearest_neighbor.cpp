@@ -16,6 +16,7 @@ u
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "igraph_constructors.h"
 #include "igraph_spatial.h"
 
 #include "igraph_interface.h"
@@ -66,64 +67,69 @@ public:
 } ;
 */
 
-
 class GraphBuildingResultSet {
 private:
     igraph_integer_t current_vertex = 0;
     igraph_integer_t current_added = 0;
     igraph_real_t max_distance;
     igraph_integer_t max_neighbors;
-    igraph_vector_int_t edges;
-    igraph_t *graph;
+    igraph_integer_t *edges;
+    igraph_real_t *dists;
 public:
     using DistanceType = igraph_real_t;
-    GraphBuildingResultSet(igraph_t * graph, igraph_integer_t neighbors, igraph_real_t distance) : max_distance(distance), max_neighbors(neighbors) {
-        this->graph = graph;
-    }
-
-    igraph_error_t initialize() {
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-        return IGRAPH_SUCCESS;
-    }
+    GraphBuildingResultSet(igraph_integer_t neighbors, igraph_real_t distance) :
+        max_distance(distance),
+        max_neighbors(neighbors) {}
 
     bool addPoint(igraph_real_t distance, igraph_integer_t index) {
         if (index == current_vertex) {
             return true;
         }
-        igraph_vector_int_push_back(&edges, current_vertex);
-        igraph_vector_int_push_back(&edges, index);
-        if (++current_added == max_neighbors) {
-            return false;
+        igraph_integer_t i;
+        for (i = current_added; i > 0; i--) {
+            if ((dists[i-1] < distance || dists[i-1] == distance && index < edges[i-1] ) && i < max_neighbors) {
+                dists[i] = dists[i-1];
+                edges[i] = edges[i-1];
+            } else { break; }
+        }
+        if (i < max_neighbors) {
+            edges[i] = index;
+            dists[i] = distance;
+        }
+        if (current_added != max_neighbors) {
+            current_added++;
         }
         return true;
     }
 
-    ~GraphBuildingResultSet() {
-        igraph_vector_int_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
+        void init(igraph_real_t *_dists, igraph_integer_t* _edges, igraph_integer_t current_vertex) {
+            edges = _edges;
+            dists = _dists;
+            current_added = 0;
+            this-> current_vertex = current_vertex;
+        }
 
-    void select_vertex(igraph_integer_t i) {
-        current_vertex = i;
-        current_added = 0;
-    }
+        void sort () {}
 
-    void sort () { }
+        igraph_integer_t size() {
+            return current_added;
+        }
 
-    bool full () {
-        return false;
+    bool full () const {
+        return current_added == max_neighbors;
     }
+        bool empty() const {
+            return current_added == 0;
+        }
 
     igraph_real_t worstDist() {
-        return max_distance;
+        if (current_added < max_neighbors || current_added == 0) {
+            return  max_distance;
+        }
+        return dists[current_added-1];
     }
 
-    igraph_error_t dumpGraph() {
-        IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
-        return IGRAPH_SUCCESS;
-    }
 };
-
 
 template <typename Metric, uint32_t Dimension>
 static igraph_error_t neighbor_helper(
@@ -139,7 +145,7 @@ static igraph_error_t neighbor_helper(
 
     igraph_point_adaptor adaptor(points);
 
-    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
+    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(4));
 
     tree.buildIndex();
 
@@ -148,7 +154,8 @@ static igraph_error_t neighbor_helper(
 
     igraph_integer_t neighbor_count = neighbors > 0 ? neighbors : point_count;
 
-    using resultClass = nanoflann::RKNNResultSet<igraph_real_t, igraph_integer_t, igraph_integer_t>;
+    //using resultClass = nanoflann::RKNNResultSet<igraph_real_t, igraph_integer_t, igraph_integer_t>;
+    using resultClass = GraphBuildingResultSet;
     resultClass results(neighbor_count, cutoff);
     std::vector<igraph_integer_t> neighbor_set(neighbor_count);
     std::vector<igraph_real_t>    distances(neighbor_count);
@@ -158,15 +165,13 @@ static igraph_error_t neighbor_helper(
         std::fill(neighbor_set.begin(), neighbor_set.end(), 0);
         std::fill(distances.begin(), distances.end(), 0);
 
-        results.init(neighbor_set.data(), distances.data());
+        results.init(distances.data(), neighbor_set.data(), i);
         IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
 
         tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
-        printf("beep %li, %li\n", results.size(), neighbor_set.size());
         for (igraph_integer_t j = 0; j < results.size(); j++) {
-            printf("adding %li->%li\n", i, j);
             edges.push_back(i);
-            edges.push_back(j);
+            edges.push_back(neighbor_set[j]);
         }
     }
     igraph_vector_int_t edge_view;
