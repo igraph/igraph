@@ -1090,14 +1090,6 @@ static igraph_error_t gnp_bipartite_large(
     /* n1 + n2 has already been checked for overflow in the caller function. */
     IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
 
-    // Assign types vector: first n1 are 0 (bottom), next n2 are 1 (top)
-    if (types) {
-        IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
-        igraph_vector_bool_null(types);
-        for (igraph_integer_t i = n1; i < n1 + n2; i++) {
-            VECTOR(*types)[i] = true;
-        }
-    }
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1205,9 +1197,10 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         iter = 0;
         for (igraph_integer_t i = 0; i < slen; i++) {
-            igraph_integer_t edge_index = (igraph_integer_t)VECTOR(s)[i];
-            igraph_integer_t from = edge_index % n1;
-            igraph_integer_t to = (edge_index / n1) + n1;
+            igraph_real_t edge_val = VECTOR(s)[i];
+            igraph_integer_t to = (igraph_integer_t) floor(edge_val / n1_real);
+            igraph_integer_t from = (igraph_integer_t) (edge_val - ((igraph_real_t) to) * n1_real);
+            to += n1;
             if (mode != IGRAPH_IN) {
                 igraph_vector_int_push_back(&edges, from); /* reserved */
                 igraph_vector_int_push_back(&edges, to); /* reserved */
