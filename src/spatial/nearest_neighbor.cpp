@@ -19,17 +19,12 @@ u
 #include "igraph_constructors.h"
 #include "igraph_spatial.h"
 
-#include "igraph_interface.h"
 #include "igraph_matrix.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
 #include "nanoflann/nanoflann.hpp"
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <string.h>
 #include <vector>
 
 class igraph_point_adaptor {
@@ -87,10 +82,14 @@ public:
         }
         igraph_integer_t i;
         for (i = current_added; i > 0; i--) {
-            if ((dists[i-1] < distance || dists[i-1] == distance && index < edges[i-1] ) && i < max_neighbors) {
+            if ((dists[i-1] > distance /*|| dists[i-1] == distance && index < edges[i-1]*/ )) {
+                if (i < max_neighbors) {
                 dists[i] = dists[i-1];
                 edges[i] = edges[i-1];
-            } else { break; }
+                }
+            } else {
+                break;
+            }
         }
         if (i < max_neighbors) {
             edges[i] = index;
@@ -116,6 +115,7 @@ public:
         }
 
     bool full () const {
+        return false;
         return current_added == max_neighbors;
     }
         bool empty() const {
@@ -145,7 +145,7 @@ static igraph_error_t neighbor_helper(
 
     igraph_point_adaptor adaptor(points);
 
-    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(4));
+    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
 
     tree.buildIndex();
 

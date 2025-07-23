@@ -48,17 +48,18 @@ igraph_error_t RKNN_neighbors(igraph_real_t* arr, igraph_integer_t num_points, i
 
     for (igraph_integer_t start = 0; start < num_points; start ++) {
 
-        for (igraph_integer_t end = 0; end < num_points; end ++) {
-            if (start == end) continue;
             igraph_real_t min_missing=INFINITY;
             igraph_real_t max_present=0;
+        for (igraph_integer_t end = 0; end < num_points; end ++) {
+            if (start == end) continue;
             if (MATRIX(adj_mat, start, end) == 1) {
                 if (max_present < MATRIX(dist_mat, start, end)) max_present = MATRIX(dist_mat, start, end);
             } else {
-                if (max_present < MATRIX(dist_mat, start, end)) max_present = MATRIX(dist_mat, start, end);
+                if (min_missing > MATRIX(dist_mat, start, end)) min_missing = MATRIX(dist_mat, start, end);
             }
-        IGRAPH_ASSERT(min_missing > max_present);
         }
+        IGRAPH_ASSERT(min_missing > max_present);
+        IGRAPH_ASSERT(max_present <= cutoff*cutoff);
     }
 
     igraph_destroy(&graph);
@@ -83,11 +84,11 @@ int main(void) {
     };
     printf("2 neighbors, cutoff 5\n");
     RKNN_neighbors(&pointArray[0], 5, 2, 2, 5);
-    printf("2 neighbors, cutoff INFINITY\n");
+    printf("1 neighbors, cutoff INFINITY\n");
     RKNN_neighbors(&pointArray[0], 5, 2, 1, INFINITY);
     printf("unlimited neighbors, cutoff INFINITY\n");
     RKNN_neighbors(&pointArray[0], 5, 2, 0, INFINITY);
-    printf("2 neighbors, cutoff 1\n");
+    printf("unlimited neighbors, cutoff 7\n");
     RKNN_neighbors(&pointArray[0], 5, 2, 0, 7);
     VERIFY_FINALLY_STACK();
     return 1;
