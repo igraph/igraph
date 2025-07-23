@@ -75,21 +75,38 @@ igraph_error_t RKNN_neighbors(igraph_real_t* arr, igraph_integer_t num_points, i
 int main(void) {
 
 
-    igraph_real_t pointArray[10] = {
+    igraph_real_t points2d[10] = {
         12  , 8,
         8  , 6,
         5  , 12,
         10  , 1,
         12  , 2
     };
-    printf("2 neighbors, cutoff 5\n");
-    RKNN_neighbors(&pointArray[0], 5, 2, 2, 5);
-    printf("1 neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&pointArray[0], 5, 2, 1, INFINITY);
-    printf("unlimited neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&pointArray[0], 5, 2, 0, INFINITY);
-    printf("unlimited neighbors, cutoff 7\n");
-    RKNN_neighbors(&pointArray[0], 5, 2, 0, 7);
+    igraph_real_t points3d[15] = {
+        1,6,4,
+        6,2,3,
+        3,6,6,
+        3,2,2,
+        2,3,3
+    };
+    printf("2d 2 neighbors, cutoff 5\n");
+    RKNN_neighbors(&points2d[0], 5, 2, 2, 5);
+    printf("2d 1 neighbors, cutoff INFINITY\n");
+    RKNN_neighbors(&points2d[0], 5, 2, 1, INFINITY);
+    printf("2d unlimited neighbors, cutoff INFINITY\n");
+    RKNN_neighbors(&points2d[0], 5, 2, 0, INFINITY);
+    printf("2d unlimited neighbors, cutoff 7\n");
+    RKNN_neighbors(&points2d[0], 5, 2, 0, 7);
+
+    printf("3d, 2 neighbors, cutoff 4\n");
+    RKNN_neighbors(&points3d[0], 5, 3, 2, 4);
+    printf("3d, unlimited neighbors, cutoff 4\n");
+    RKNN_neighbors(&points3d[0], 5, 3, 0, 4);
+    printf("3d, 2 neighbors, cutoff INFINITY\n");
+    RKNN_neighbors(&points3d[0], 5, 3, 2, INFINITY);
+    printf("3d, unlimited neighbors, cutoff INFINITY\n");
+    RKNN_neighbors(&points3d[0], 5, 3, 0, INFINITY);
+
     VERIFY_FINALLY_STACK();
-    return 1;
+    return 0;
 }

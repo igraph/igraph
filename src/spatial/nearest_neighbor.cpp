@@ -24,6 +24,8 @@ u
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "core/exceptions.h"
+
 #include "nanoflann/nanoflann.hpp"
 #include <vector>
 
@@ -196,15 +198,29 @@ static igraph_error_t dimension_dispatcher(
     switch (dimension) {
     case 2:  return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension);
     case 3:  return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension);
-    default: return neighbor_helper<Metric, 0>(graph, points, neighbors, cutoff, dimension);
+    default:
+        IGRAPH_ERROR("Only 2 and 3 dimensional points are supported", IGRAPH_UNIMPLEMENTED);
+        //return neighbor_helper<Metric, 0>(graph, points, neighbors, cutoff, dimension);
     }
 }
 
+
+
+/**
+ * \function igraph_nearest_neighbor_graph
+ * \param graph A pointer to the graph that will be created.
+ * \param points A matrix containing the points that will be used to create the graph.
+ *         Each row is a point, dimensionality is inferred from the column count
+ * \param metric An enum for the metric that will be used.
+ * \param neighbors How many neighbors will be added for each vertex, set to 0 to ignore.
+ * \param cutoff Maximum distance at which connections will be made.
+ */
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
         igraph_metric_t metric,
         igraph_integer_t neighbors,
         igraph_real_t cutoff) {
+    //IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     igraph_integer_t dimension = igraph_matrix_ncol(points);
     switch (metric) {
     case IGRAPH_METRIC_L2 :
@@ -216,4 +232,5 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
                    dimension);
     default : IGRAPH_ERROR("Metic type not implemented.", IGRAPH_UNIMPLEMENTED);
     }
+    //IGRAPH_HANDLE_EXCEPTIONS_END;
 }
