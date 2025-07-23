@@ -215,6 +215,7 @@ add_legacy_tests(
   igraph_extended_chordal_ring
   igraph_forest_fire_game
   igraph_from_prufer
+  igraph_full_bipartite
   igraph_full_citation
   igraph_full_multipartite
   igraph_generalized_petersen
@@ -361,7 +362,9 @@ add_legacy_tests(
   igraph_voronoi
   igraph_widest_paths
   igraph_spanner
+  jdm
   knn
+  mycielskian
   paths
   random_spanning_tree
   reachability
@@ -911,6 +914,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_graphical
   igraph_is_bigraphical
+  igraph_realize_bipartite_degree_sequence
 )
 
 # cycle bases
@@ -1027,14 +1031,4 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
-)
-
-add_legacy_tests(
-        FOLDER tests/unit NAMES
-        jdm
-)
-
-add_legacy_tests(
-        FOLDER tests/unit NAMES
-        igraph_realize_bipartite_degree_sequence
 )

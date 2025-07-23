@@ -1135,7 +1135,7 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
  * Solve Ax=b, where A is a symmetric positive definite matrix.
  *
  * \param A The input matrix, in column-compressed format.
- * \param v The right hand side.
+ * \param b The right hand side.
  * \param res An initialized vector, the result is stored here.
  * \param order An integer giving the ordering method to use for the
  *    factorization. Zero is the natural ordering; if it is one, then
@@ -1665,7 +1665,7 @@ static igraph_error_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
  * \function igraph_sparsemat_arpack_rssolve
  * \brief Eigenvalues and eigenvectors of a symmetric sparse matrix via ARPACK.
  *
- * \param The input matrix, must be column-compressed.
+ * \param A The input matrix, must be column-compressed.
  * \param options It is passed to \ref igraph_arpack_rssolve(). Supply
  *    \c NULL here to use the defaults. See \ref igraph_arpack_options_t for the
  *    details. If \c mode is 1, then ARPACK uses regular mode, if \c mode is 3,
@@ -2359,8 +2359,8 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  *
  * Count the number of matrix entries that are closer to zero than \p tol.
  *
- * \param The input matrix, column-compressed.
- * \param The tolerance for zero comparisons.
+ * \param A The input matrix, column-compressed.
+ * \param tol The tolerance for zero comparisons.
  * \return Error code.
  *
  * Time complexity: TODO.

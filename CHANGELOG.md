@@ -5,11 +5,21 @@
 ### Added
 
  - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
+ - `igraph_product()` supports the lexicographic and strong graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772!
+ - `igraph_mycielskian()` and `igraph_mycielski_graph()` compute a Mycielski transformation of a graph, and a Mycielski graph, respectively. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2741!
+ - `igraph_path_graph()` is a convenience wrapper for `igraph_ring()` with `circular=false`.
+ - `igraph_cycle_graph()` is a convenience wrapper for `igraph_ring()` with `circular=true`.
 
 ### Fixed
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
  - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
+ - `igraph_community_leiden()` did iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
+
+### Other
+
+ - Documentation improvements, including a new glossary.
+ - Simple cycle search (`igraph_simple_cycles()` and `igraph_simple_cycles_callback()`) is sped up by skipping cycle search from some redundant start vertices. Thanks to Tim Bernhard @GenieTim for contributing this improvement in #2714!
 
 ## [0.10.16] - 2025-06-10
 

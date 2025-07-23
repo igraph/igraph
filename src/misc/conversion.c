@@ -179,6 +179,26 @@ igraph_error_t igraph_get_adjacency(
  *          the whole matrix is used, a symmetric matrix is returned
  *          if the graph is undirected.
  *        \endclist
+ * \param weights An optional vector containing the weight of each edge
+ *        in the graph. Supply a null pointer here to make all edges have
+ *        the same weight of 1.
+ * \param loops Constant specifying how loop edges should be handled.
+ *        Possible values:
+ *        \clist
+ *        \cli IGRAPH_NO_LOOPS
+ *          loop edges are ignored and the diagonal of the matrix will contain
+ *          zeros only
+ *        \cli IGRAPH_LOOPS_ONCE
+ *          loop edges are counted once, i.e. a vertex with a single unweighted
+ *          loop edge will have 1 in the corresponding diagonal entry
+ *        \cli IGRAPH_LOOPS_TWICE
+ *          loop edges are counted twice in \em undirected graphs, i.e. a vertex
+ *          with a single unweighted loop edge in an undirected graph will have
+ *          2 in the corresponding diagonal entry. Loop edges in directed graphs
+ *          are still counted as 1. Essentially, this means that the function is
+ *          counting the incident edge \em stems , which makes more sense when
+ *          using the adjacency matrix in linear algebra.
+ *        \endclist
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
@@ -814,6 +834,9 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * \param res Pointer to an initialized matrix, the result is stored here.
  *   It will be resized as needed.
  * \param column_wise Whether to normalize column-wise.
+ * \param weights An optional vector containing the weight of each edge
+ *        in the graph. Supply a null pointer here to make all edges have
+ *        the same weight of 1.
  * \return Error code.
  *
  * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
@@ -885,6 +908,9 @@ igraph_error_t igraph_get_stochastic(
  * \param res Pointer to an \em initialized sparse matrix, the
  *    result is stored here. The matrix will be resized as needed.
  * \param column_wise Whether to normalize column-wise.
+ * \param weights An optional vector containing the weight of each edge
+ *        in the graph. Supply a null pointer here to make all edges have
+ *        the same weight of 1.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and

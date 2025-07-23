@@ -570,6 +570,8 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  *      centrality scores, or a null pointer otherwise.
  * \param value If not a null pointer, then the leading eigenvalue is
  *      stored here.
+ * \param directed Boolean scalar, whether to consider edge directions
+ *     in a directed graph. It is ignored for undirected graphs.
  * \param scale This parameter is deprecated and ignored since igraph 0.10.14.
  *     Vertex-level centrality scores are always scaled to have a maximum of one.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
