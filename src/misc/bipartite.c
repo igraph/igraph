@@ -485,8 +485,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                igraph_vector_int_push_back(&edges, i); /* reserved */
-                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
+                VECTOR(edges)[ptr++] = i;
+                VECTOR(edges)[ptr++] = n1 + j;
             }
         }
 
@@ -494,8 +494,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
-                igraph_vector_int_push_back(&edges, i); /* reserved */
+                VECTOR(edges)[ptr++] = n1 + j;
+                VECTOR(edges)[ptr++] = i;
             }
         }
 
@@ -503,10 +503,10 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
         for (igraph_integer_t i = 0; i < n1; i++) {
             for (igraph_integer_t j = 0; j < n2; j++) {
-                igraph_vector_int_push_back(&edges, i); /* reserved */
-                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
-                igraph_vector_int_push_back(&edges, n1 + j); /* reserved */
-                igraph_vector_int_push_back(&edges, i); /* reserved */
+                VECTOR(edges)[ptr++] = i;
+                VECTOR(edges)[ptr++] = n1 + j;
+                VECTOR(edges)[ptr++] = n1 + j;
+                VECTOR(edges)[ptr++] = i;
             }
         }
     }
