@@ -1040,20 +1040,15 @@ static igraph_error_t gnp_bipartite_large(
         while (true) {
             igraph_real_t gap = RNG_GEOM(p);
 
-            /* This formulation not only terminates the loop when necessary,
-             * but also protects against overflow when 'p' is very small
-             * and 'gap' becomes very large, perhaps larger than representable
-             * in an igraph_integer_t. */
-            igraph_integer_t j_new;
-            if (IGRAPH_SAFE_ADD(j, gap, &j_new)) {
-                break; // If addition would overflow, stop the loop
+            /* Terminate if the gap would take us beyond the second partition
+             * or if it would overflow.  This mirrors the approach used in
+             * gnp_large() for Erdős–Rényi graphs. */
+            if (gap >= n2 - j) {
+                break;
             }
-            j = j_new;
 
-            igraph_integer_t target;
-            if (IGRAPH_SAFE_ADD(j, n1, &target)) {
-                break; // If addition would overflow, stop the loop
-            }
+            j += (igraph_integer_t) gap;
+            igraph_integer_t target = j + n1;
 
             // Ensure edges are only between partitions
             if (i < n1 && target >= n1 && target < n1 + n2) {
