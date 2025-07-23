@@ -388,6 +388,7 @@ static void bubble_up(It first, It last, Compare comp) {
 // by adding loops on the last vertex.
 // If largest=false, and the degree sequence was potentially connected, the resulting
 // graph will be connected.
+// O(V * E + V log V)
 static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool loops, bool largest) {
     igraph_integer_t vcount = igraph_vector_int_size(deg);
 
@@ -403,6 +404,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
     }
 
     // Initial sort in non-increasing order.
+    // O (V log V)
     std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
 
     igraph_integer_t ec = 0;
@@ -462,7 +464,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
     return IGRAPH_SUCCESS;
 }
 
-
+// O(V * E + V log V)
 static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool loops) {
     igraph_integer_t vcount = igraph_vector_int_size(deg);
 
@@ -546,6 +548,7 @@ inline bool is_nonzero_outdeg(const vbd_pair &vd) {
 // Realize bi-degree sequence as edge list
 // If smallest=true, always choose the vertex with "smallest" bi-degree for connecting up next,
 // otherwise choose the "largest" (based on lexicographic bi-degree ordering).
+// O(E + V^2 log V)
 static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, const igraph_vector_int_t *indeg, igraph_vector_int_t *edges, bool smallest) {
     igraph_integer_t n = igraph_vector_int_size(indeg); // number of vertices
 
@@ -559,6 +562,7 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
 
     while (true) {
         // sort vertices by (in, out) degree pairs in decreasing order
+        // O(V log V)
         std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vbd_pair>);
 
         // remove (0,0)-degree vertices
@@ -576,6 +580,7 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
         // because there are _some_ non-zero degrees and the sum of in- and out-degrees
         // is the same
         vbd_pair *vdp;
+        // O(V)
         if (smallest) {
             vdp = &*std::find_if(vertices.rbegin(), vertices.rend(), is_nonzero_outdeg);
         } else {
@@ -617,6 +622,7 @@ fail:
 
 
 // Choose vertices in the order of their IDs.
+// O(E + V^2 log V)
 static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *outdeg, const igraph_vector_int_t *indeg, igraph_vector_int_t *edges) {
     igraph_integer_t n = igraph_vector_int_size(indeg); // number of vertices
 
@@ -759,7 +765,7 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
     }
     else
     {
-        /* Remainig cases:
+        /* Remaining cases:
          *  - At most one self-loop per vertex but multi-edges between distinct vertices allowed.
          *  - At most one edge between distinct vertices but multi-self-loops allowed.
          * These cases cannot currently be requested through the documented API,
@@ -865,6 +871,11 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * connected are chosen. In the undirected case, \c IGRAPH_REALIZE_DEGSEQ_SMALLEST
  * produces a connected graph when one exists. This makes this method suitable
  * for constructing trees with a given degree sequence.
+ * 
+ * </para><para>
+ * For a undirected simple graph, the time complexity is O(V + alpha(V) * E).
+ * For an undirected multi graph, the time complexity is O(V * E + V log V).
+ * For a directed graph, the time complexity is O(E + V^2 log V).
  *
  * </para><para>
  * References:
