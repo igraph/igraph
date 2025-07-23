@@ -150,6 +150,8 @@
 
   <xi:include href="bipartite.xml"/>
 
+  <xi:include href="spatial.xml"/>
+
   <chapter id="igraph-Advanced">
     <title>Advanced igraph programming</title>
     <xi:include href="threading.xml" />

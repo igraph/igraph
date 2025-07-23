@@ -208,6 +208,9 @@ static igraph_error_t dimension_dispatcher(
 
 /**
  * \function igraph_nearest_neighbor_graph
+ *
+ * \brief Computes the nearest neighbor graph for some given points.
+ *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the graph.
  *         Each row is a point, dimensionality is inferred from the column count
