@@ -27,8 +27,14 @@
 
 IGRAPH_BEGIN_C_DECLS
 
+/**
+ * \typedef igraph_metric_t
+ * \brief Metric functions for use with spatial computation.
+ *
+ * \enumval IGRAPH_METRIC_L2 The Euclidean distance, i.e. L2 distance.
+ */
 typedef enum {
-    IGRAPH_METRIC_L2
+    IGRAPH_METRIC_L2 = 0
 } igraph_metric_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(

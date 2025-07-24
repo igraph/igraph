@@ -7,6 +7,10 @@
 <chapter id="igraph-Spatial">
 <title>Spatial operations</title>
 
+<section id="spatial-helpers"><title>Convenience functions</title>
+<!-- doxrox-include igraph_metric_t -->
+</section>
+
 <section id="spatial-constructors"><title>Spatial constructors</title>
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
 </section>

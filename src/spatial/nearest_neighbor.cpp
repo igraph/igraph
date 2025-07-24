@@ -31,14 +31,11 @@
 #include <vector>
 
 class ig_point_adaptor {
-    igraph_integer_t dimension;
     const igraph_matrix_t *points;
 
 public:
-    ig_point_adaptor(const igraph_matrix_t *points) {
-        this->dimension = igraph_matrix_ncol(points);
-        this->points = points;
-    }
+    explicit ig_point_adaptor(const igraph_matrix_t *points) :
+        points(points) { }
 
     size_t kdtree_get_point_count() const {
         return igraph_matrix_nrow(points);
@@ -99,16 +96,16 @@ public:
         return true;
     }
 
-    void init(igraph_real_t *_dists, igraph_integer_t* _edges, igraph_integer_t current_vertex) {
-        edges = _edges;
-        dists = _dists;
+    void init(igraph_real_t *dists_, igraph_integer_t *edges_, igraph_integer_t current_vertex_) {
+        edges = edges_;
+        dists = dists_;
         current_added = 0;
-        this-> current_vertex = current_vertex;
+        current_vertex = current_vertex_;
     }
 
     void sort() { }
 
-    igraph_integer_t size() {
+    igraph_integer_t size() const {
         return current_added;
     }
 
@@ -204,19 +201,25 @@ static igraph_error_t dimension_dispatcher(
 
 /**
  * \function igraph_nearest_neighbor_graph
- * \brief Computes the nearest neighbor graph for some given points.
+ * \brief Computes the nearest neighbor graph for a spatial point set.
+ *
+ * This function constructs the \p k nearest neighbor graph of a given point
+ * set. Each point is connected to at most \p k spatial neighbors within a
+ * radius of \p cutoff.
  *
  * \param graph A pointer to the graph that will be created.
- * \param points A matrix containing the points that will be used to create the graph.
- *         Each row is a point, dimensionality is inferred from the column count
- * \param metric An enum for the metric that will be used.
- * \param neighbors How many neighbors will be added for each vertex, set to 0 to ignore.
+ * \param points A matrix containing the points that will be used to create
+ *    the graph. Each row is a point, dimensionality is inferred from the
+ *    column count.
+ * \param metric The distance metric to use. See \ref igraph_metric_t.
+ * \param neighbors How many neighbors will be added for each vertex, set to
+ *    0 to ignore.
  * \param cutoff Maximum distance at which connections will be made.
  */
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
         igraph_metric_t metric,
-        igraph_integer_t neighbors,
+        igraph_integer_t k,
         igraph_real_t cutoff) {
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
@@ -227,7 +230,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor> > (
                    graph,
                    points,
-                   neighbors,
+                   k,
                    cutoff * cutoff, // L2 uses square distances, so adjust for that here.
                    dimension);
     default : IGRAPH_ERROR("Metic type not implemented.", IGRAPH_UNIMPLEMENTED);
