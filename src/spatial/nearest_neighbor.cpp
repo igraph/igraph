@@ -27,6 +27,7 @@ u
 #include "core/exceptions.h"
 
 #include "nanoflann/nanoflann.hpp"
+
 #include <vector>
 
 class igraph_point_adaptor {
@@ -44,6 +45,7 @@ public:
     // indicates that it should use default
     template <typename BoundingBox>
     bool kdtree_get_bbox(BoundingBox &bb) const {
+        IGRAPH_UNUSED(bb);
         return false;
     }
 
@@ -133,7 +135,7 @@ public:
 
 };
 
-template <typename Metric, uint32_t Dimension>
+template <typename Metric, igraph_integer_t Dimension>
 static igraph_error_t neighbor_helper(
     igraph_t *graph,
     const igraph_matrix_t *points,
@@ -223,7 +225,8 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         igraph_metric_t metric,
         igraph_integer_t neighbors,
         igraph_real_t cutoff) {
-    //IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     igraph_integer_t dimension = igraph_matrix_ncol(points);
     switch (metric) {
     case IGRAPH_METRIC_L2 :
@@ -235,5 +238,5 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
                    dimension);
     default : IGRAPH_ERROR("Metic type not implemented.", IGRAPH_UNIMPLEMENTED);
     }
-    //IGRAPH_HANDLE_EXCEPTIONS_END;
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 }
