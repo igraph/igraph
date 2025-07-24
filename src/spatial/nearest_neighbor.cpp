@@ -198,11 +198,12 @@ static igraph_error_t dimension_dispatcher(
     igraph_real_t cutoff,
     igraph_integer_t dimension) {
     switch (dimension) {
-    case 2:  return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension);
-    case 3:  return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension);
+    case 2:
+        return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension);
+    case 3:
+        return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension);
     default:
-        IGRAPH_ERROR("Only 2 and 3 dimensional points are supported", IGRAPH_UNIMPLEMENTED);
-        //return neighbor_helper<Metric, 0>(graph, points, neighbors, cutoff, dimension);
+        return neighbor_helper<Metric, -1>(graph, points, neighbors, cutoff, dimension);
     }
 }
 
