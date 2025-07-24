@@ -65,11 +65,11 @@ class GraphBuildingResultSet {
 public:
     using DistanceType = igraph_real_t;
 
-    GraphBuildingResultSet(igraph_integer_t neighbors, igraph_real_t distance) :
+    GraphBuildingResultSet(const igraph_integer_t neighbors, const igraph_real_t distance) :
         max_distance(distance),
         max_neighbors(neighbors) {}
 
-    bool addPoint(igraph_real_t distance, igraph_integer_t index) {
+    bool addPoint(const igraph_real_t distance, const igraph_integer_t index) {
         igraph_integer_t i;
 
         if (index == current_vertex) {
@@ -110,7 +110,6 @@ public:
     }
 
     bool full() const {
-        return false;
         return current_added == max_neighbors;
     }
 
@@ -118,7 +117,7 @@ public:
         return current_added == 0;
     }
 
-    igraph_real_t worstDist() {
+    igraph_real_t worstDist() const {
         if (current_added < max_neighbors || current_added == 0) {
             return  max_distance;
         }
@@ -148,7 +147,8 @@ static igraph_error_t neighbor_helper(
     igraph_vector_t current_point;
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, dimension);
 
-    igraph_integer_t neighbor_count = neighbors > 0 ? neighbors : point_count;
+    igraph_integer_t neighbor_count = neighbors >= 0 ? neighbors : point_count;
+    cutoff = cutoff >= 0 ? cutoff : INFINITY;
 
     using resultClass = GraphBuildingResultSet;
     resultClass results(neighbor_count, cutoff);
@@ -189,6 +189,10 @@ static igraph_error_t dimension_dispatcher(
     igraph_real_t cutoff,
     igraph_integer_t dimension) {
     switch (dimension) {
+    case 0:
+        IGRAPH_ERROR("0-dimensional points are not supported", IGRAPH_EINVAL);
+    case 1:
+        return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension);
     case 2:
         return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension);
     case 3:
@@ -213,8 +217,9 @@ static igraph_error_t dimension_dispatcher(
  *    column count.
  * \param metric The distance metric to use. See \ref igraph_metric_t.
  * \param neighbors How many neighbors will be added for each vertex, set to
- *    0 to ignore.
- * \param cutoff Maximum distance at which connections will be made.
+ *    a negative value to ignore.
+ * \param cutoff Maximum distance at which connections will be made, set to a
+ *    negative value or INFINITY to ignore.
  */
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
@@ -233,7 +238,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
                    k,
                    cutoff * cutoff, // L2 uses square distances, so adjust for that here.
                    dimension);
-    default : IGRAPH_ERROR("Metic type not implemented.", IGRAPH_UNIMPLEMENTED);
+    default : IGRAPH_ERROR("Metric type not implemented.", IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
