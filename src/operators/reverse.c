@@ -44,7 +44,7 @@
  * effectively treat edges as reversed.
  *
  * \param graph The graph whose edges will be reversed.
- * \param es    The edges to be reversed.
+ * \param eids  The edges to be reversed.
  *              Pass <code>igraph_ess_all(IGRAPH_EDGEORDER_ID)</code> to reverse all edges.
  * \return Error code.
  *

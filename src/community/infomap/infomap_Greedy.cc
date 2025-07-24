@@ -72,8 +72,6 @@ bool Greedy::optimize() {
     bool moved = false;
     const std::vector<Node> &node = graph->node;
 
-    RNG_BEGIN();
-
     // Generate random enumeration of nodes
     vector<igraph_integer_t> randomOrder(Nnode);
     for (igraph_integer_t i = 0; i < Nnode; i++) {
@@ -300,8 +298,6 @@ bool Greedy::optimize() {
         }
         offset += Nnode;
     }
-
-    RNG_END();
 
     return moved;
 }

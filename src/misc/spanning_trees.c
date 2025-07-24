@@ -67,7 +67,7 @@ static igraph_integer_t max_tree_edges(igraph_integer_t no_of_nodes, igraph_inte
  * minimum spanning tree algorithms.
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
+static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
         const igraph_t* graph,
         igraph_vector_int_t* res) {
 
@@ -173,7 +173,7 @@ igraph_error_t igraph_i_minimum_spanning_tree_unweighted(
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_prim(
+static igraph_error_t igraph_i_minimum_spanning_tree_prim(
         const igraph_t* graph,
         igraph_vector_int_t* res,
         const igraph_vector_t *weights) {
@@ -334,7 +334,7 @@ static void merge_comp(igraph_vector_int_t *comp, igraph_integer_t i, igraph_int
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 
-igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
+static igraph_error_t igraph_i_minimum_spanning_tree_kruskal(
         const igraph_t *graph,
         igraph_vector_int_t *res,
         const igraph_vector_t *weights) {
@@ -502,8 +502,6 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
     VECTOR(*visited)[start] = true;
     visited_count = 1;
 
-    RNG_BEGIN();
-
     while (visited_count < comp_size) {
         igraph_integer_t degree, edge;
         igraph_vector_int_t *edges;
@@ -526,8 +524,6 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

@@ -349,8 +349,6 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
     /* Initialize cumulative transformed difference */
     IGRAPH_VECTOR_INIT_FINALLY(&cum_trans_diff, n);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < n; i++) {
         igraph_integer_t v = VECTOR(node_order)[i];
         igraph_integer_t chosen_cluster, best_cluster, current_cluster = VECTOR(*refined_membership)[v];
@@ -446,8 +444,6 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
             }
         } /* end if singleton and may be merged */
     }
-
-    RNG_END();
 
     IGRAPH_CHECK(igraph_i_community_leiden_clean_refined_membership(node_subset, refined_membership, nb_refined_clusters));
 
@@ -1029,9 +1025,9 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
      * iteration may still find some improvement. This is because
      * each iteration explores different subsets of nodes.
      */
-    igraph_bool_t changed = false;
+    igraph_bool_t changed = true;
     for (igraph_integer_t itr = 0;
-         n_iterations >= 0 ? itr < n_iterations : !changed;
+         n_iterations < 0 ? changed : itr < n_iterations;
          itr++) {
         IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
                                                resolution_parameter, beta,

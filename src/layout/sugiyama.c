@@ -260,12 +260,12 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *              the remaining rows contain the positions of the dummy nodes.
  *              Therefore, you can use the result both with \p graph or with
  *              \p extended_graph.
- * \param extended_graph Pointer to an uninitialized graph object or \c NULL.
- *                       The extended graph with the added dummy nodes will be
- *                       returned here. In this graph, each edge points downwards
- *                       to lower layers, spans exactly one layer and the first
- *                       |V| vertices coincide with the vertices of the
- *                       original graph.
+ * \param extd_graph Pointer to an uninitialized graph object or \c NULL.
+ *                   The extended graph with the added dummy nodes will be
+ *                   returned here. In this graph, each edge points downwards
+ *                   to lower layers, spans exactly one layer and the first
+ *                   |V| vertices coincide with the vertices of the
+ *                   original graph.
  * \param extd_to_orig_eids Pointer to a vector or \c NULL. If not \c NULL, the
  *                          mapping from the edge IDs of the extended graph back
  *                          to the edge IDs of the original graph will be stored
@@ -281,6 +281,7 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * \param weights Weights of the edges. These are used only if the graph contains
  *                cycles; igraph will tend to reverse edges with smaller
  *                weights when breaking the cycles.
+ * \return Error code.
  */
 igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_t *extd_graph, igraph_vector_int_t *extd_to_orig_eids,

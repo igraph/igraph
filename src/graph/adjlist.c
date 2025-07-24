@@ -240,8 +240,8 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * are \em constructing a graph using an adjacency list representation as
  * it does not require your graph to exist yet.
  *
- * \param no_of_nodes The number of vertices
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \param no_of_nodes The number of vertices
  * \return Error code.
  *
  * Time complexity: O(n), linear in the number of vertices.
@@ -771,7 +771,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
  * \function igraph_inclist_destroy
  * \brief Frees all memory allocated for an incidence list.
  *
- * \param eal The incidence list to destroy.
+ * \param il The incidence list to destroy.
  *
  * Time complexity: O(n), where n is the size of the incidence list.
  */
@@ -1148,7 +1148,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
  * to a different value than \c IGRAPH_LOOPS_TWICE.
  *
  * \param graph The input graph.
- * \param al Pointer to an uninitialized incidence list.
+ * \param il Pointer to an uninitialized incidence list.
  * \param mode Constant, it gives whether incoming edges
  *   (<code>IGRAPH_IN</code>), outgoing edges
  *   (<code>IGRAPH_OUT</code>) or both types of edges
@@ -1199,7 +1199,8 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
  * \brief Deallocates a lazy incidence list.
  *
  * Frees all allocated memory for a lazy incidence list.
- * \param al The incidence list to deallocate.
+ *
+ * \param il The incidence list to deallocate.
  *
  * Time complexity: depends on memory management.
  */

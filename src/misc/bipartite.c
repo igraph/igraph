@@ -1175,16 +1175,12 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &maxedges_int));
         IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges_int));
 
-        RNG_BEGIN();
-
         last = RNG_GEOM(p);
         while (last < maxedges) {
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
             last += 1;
         }
-
-        RNG_END();
 
         slen = igraph_vector_size(&s);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, slen * 2));
@@ -1325,7 +1321,6 @@ igraph_error_t igraph_bipartite_iea_game(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < m; i++) {
         igraph_integer_t to, from;
 
@@ -1343,7 +1338,6 @@ igraph_error_t igraph_bipartite_iea_game(
         }
 
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);

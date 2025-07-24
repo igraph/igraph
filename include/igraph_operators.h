@@ -88,6 +88,7 @@ IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2,
                                             igraph_product_t type);
+IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
 
 IGRAPH_END_C_DECLS
 

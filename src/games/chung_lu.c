@@ -234,7 +234,6 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_sort_ind(in_weights, &idx, IGRAPH_DESCENDING));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < no_of_nodes; i++) {
         igraph_integer_t vi, vj;
         igraph_real_t wi, wj;
@@ -309,7 +308,6 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 16);
         }
     }
-    RNG_END();
 
     igraph_vector_int_destroy(&idx);
     IGRAPH_FINALLY_CLEAN(1);

@@ -65,8 +65,6 @@ int main(void) {
     igraph_vector_t b, x;
     igraph_integer_t i;
 
-    RNG_BEGIN();
-
     /* lsolve */
 
 #define DIM 10
@@ -303,8 +301,6 @@ int main(void) {
 
 #undef DIM
 #undef EDGES
-
-    RNG_END();
 
     return 0;
 }

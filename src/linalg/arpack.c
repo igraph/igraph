@@ -974,11 +974,9 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     } else {
         // we need to generate a random vector on our own; let's not rely on
         // ARPACK to do so because we want to use our own RNG
-        RNG_BEGIN();
         for (i = 0; i < options->n; i++) {
             resid[i] = RNG_UNIF(-1, 1);
         }
-        RNG_END();
     }
 
     /* Ok, we have everything */
@@ -1254,11 +1252,9 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     } else {
         // we need to generate a random vector on our own; let's not rely on
         // ARPACK to do so because we want to use our own RNG
-        RNG_BEGIN();
         for (i = 0; i < options->n; i++) {
             resid[i] = RNG_UNIF(-1, 1);
         }
-        RNG_END();
     }
 
     /* Ok, we have everything */

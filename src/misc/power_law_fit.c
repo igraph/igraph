@@ -197,8 +197,6 @@ igraph_error_t igraph_power_law_fit(
         }
     }
 
-    RNG_BEGIN();
-
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (discrete) {
         igraph_i_plfit_prepare_discrete_options(&disc_options, finite_size_correction);
@@ -218,8 +216,6 @@ igraph_error_t igraph_power_law_fit(
         }
     }
     plfit_set_error_handler(plfit_stored_error_handler);
-
-    RNG_END();
 
     IGRAPH_CHECK(igraph_i_handle_plfit_error(retval));
 
@@ -272,7 +268,7 @@ igraph_error_t igraph_power_law_fit(
  * \param result The calculated p-value is returned here
  * \param precision The desired precision of the p-value. Higher values correspond
  *        to longer calculation time.
- * @return igraph_error_t
+ * \return Error code.
  */
 igraph_error_t igraph_plfit_result_calculate_p_value(
     const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
@@ -293,8 +289,6 @@ igraph_error_t igraph_plfit_result_calculate_p_value(
 
     finite_size_correction = igraph_i_plfit_should_use_finite_size_correction(model->data);
 
-    RNG_BEGIN();
-
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (model->continuous) {
         igraph_i_plfit_prepare_continuous_options(&cont_options, finite_size_correction);
@@ -314,8 +308,6 @@ igraph_error_t igraph_plfit_result_calculate_p_value(
         );
     }
     plfit_set_error_handler(plfit_stored_error_handler);
-
-    RNG_END();
 
     IGRAPH_CHECK(igraph_i_handle_plfit_error(retval));
 

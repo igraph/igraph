@@ -127,7 +127,7 @@ void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
  * http://mrvar.fdv.uni-lj.si/pajek/history.htm
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param file An already opened file handler.
+ * \param instream An already opened file handler.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|
@@ -267,7 +267,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
 /* Pajek encodes newlines as \n, and any unicode character can be encoded
  * in the form &#hhhh;. Therefore we encode quotation marks as &#34; */
-static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
+static igraph_error_t pajek_escape(const char* src, char** dest) {
     igraph_integer_t destlen = 0;
     igraph_bool_t need_escape = false;
 
@@ -579,7 +579,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
                                  graph, vnames[V_ID], igraph_vss_1(id), &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+                IGRAPH_CHECK(pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
             } else {
@@ -610,7 +610,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
                                  graph, vnames[V_SHAPE], igraph_vss_1(id), &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+                IGRAPH_CHECK(pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
             }
@@ -630,7 +630,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
                                  graph, vstrnames[idx], igraph_vss_1(id), &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+                IGRAPH_CHECK(pajek_escape(s, &escaped));
                 fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
                 IGRAPH_FREE(escaped);
             }
@@ -716,7 +716,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(
                              graph, estrnames[idx], igraph_ess_1(edge), &strv));
             s = igraph_strvector_get(&strv, 0);
-            IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
+            IGRAPH_CHECK(pajek_escape(s, &escaped));
             fprintf(outstream, " %s %s", estrnames2[idx], escaped);
             IGRAPH_FREE(escaped);
         }

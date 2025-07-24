@@ -12,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -181,7 +181,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
                                  IGRAPH_ALL, IGRAPH_LOOPS, weights));
-    RNG_BEGIN();
+
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(degree)[i]) {
             /* Note: Keep random perturbation non-negative. */
@@ -198,7 +198,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         }
 
     }
-    RNG_END();
+
     igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -415,7 +415,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
                                  mode, IGRAPH_LOOPS, weights));
-    RNG_BEGIN();
+
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
             /* Note: Keep random perturbation non-negative. */
@@ -431,7 +431,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
     }
-    RNG_END();
+
     igraph_vector_destroy(&indegree);
     IGRAPH_FINALLY_CLEAN(1);
 

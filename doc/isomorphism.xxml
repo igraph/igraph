@@ -55,6 +55,7 @@
 </section>
 
 <section id="isomorphism-utility-functions"><title>Utility functions</title>
+<!-- doxrox-include igraph_invert_permutation -->
 <!-- doxrox-include igraph_permute_vertices -->
 <!-- doxrox-include igraph_simplify_and_colorize -->
 </section>

@@ -58,8 +58,6 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_int_resize(vertices, steps + 1));
 
-    RNG_BEGIN();
-
     VECTOR(*vertices)[0] = start;
     for (i = 1; i <= steps; i++) {
         igraph_vector_int_t *neis;
@@ -81,8 +79,6 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
-
-    RNG_END();
 
     igraph_lazy_adjlist_destroy(&adj);
     IGRAPH_FINALLY_CLEAN(1);
@@ -153,8 +149,6 @@ static igraph_error_t igraph_i_random_walk_inclist(
     for (i = 0; i < vc; ++i) {
         VECTOR(cdfs)[i] = NULL;
     }
-
-    RNG_BEGIN();
 
     if (vertices) {
         VECTOR(*vertices)[0] = start;
@@ -236,8 +230,6 @@ static igraph_error_t igraph_i_random_walk_inclist(
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    RNG_END();
-
     igraph_vector_ptr_destroy_all(&cdfs);
     igraph_vector_destroy(&weight_temp);
     igraph_lazy_inclist_destroy(&il);
@@ -270,13 +262,13 @@ static igraph_error_t igraph_i_random_walk_inclist(
  *   edges are stored here. It will be resized as needed.
  *   Length of the edges vector: \p steps
  * \param start The start vertex for the walk.
- * \param steps The number of steps to take. If the random walk gets
- *   stuck, then the \p stuck argument specifies what happens.
- *   \p steps is the number of edges to traverse during the walk.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
  *   edge directions. This argument is ignored for undirected graphs.
+ * \param steps The number of steps to take. If the random walk gets
+ *   stuck, then the \p stuck argument specifies what happens.
+ *   \p steps is the number of edges to traverse during the walk.
  * \param stuck What to do if the random walk gets stuck.
  *   \c IGRAPH_RANDOM_WALK_STUCK_RETURN means that the function returns
  *   with a shorter walk; \c IGRAPH_RANDOM_WALK_STUCK_ERROR means

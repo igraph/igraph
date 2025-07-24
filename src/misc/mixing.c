@@ -921,9 +921,9 @@ igraph_error_t igraph_joint_degree_distribution(
  * https://doi.org/10.1103/PhysRevE.67.026126.
  *
  * \param graph The input graph.
- * \param p The mixing matrix M_ij will be stored here.
  * \param weights A vector containing the weights of the edges. If passing a
  *    \c NULL pointer, edges will be assumed to have unit weights.
+ * \param p The mixing matrix \c M_ij will be stored here.
  * \param from_types Vertex types for source vertices. These must be non-negative integers.
  * \param to_types Vertex types for target vertices. These must be non-negative integers.
  *    If \c NULL, it is assumed to be the same as \p from_types.

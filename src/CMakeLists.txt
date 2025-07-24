@@ -60,6 +60,7 @@ add_library(
   core/progress.c
   core/psumtree.c
   core/set.c
+  core/setup.c
   core/sparsemat.c
   core/stack.c
   core/statusbar.c
@@ -108,6 +109,7 @@ add_library(
   constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
+  constructors/mycielskian.c
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c

@@ -532,28 +532,6 @@ igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
     }
 }
 
-/**
- * \function igraph_adjacent_triangles
- * \brief Count the number of triangles a vertex is part of (deprecated alias).
- *
- * \deprecated-by igraph_count_adjacent_triangles 0.10.15
- *
- * \param graph The input graph. Edge directions and multiplicities are ignored.
- * \param res Initiliazed vector, the results are stored here.
- * \param vids The vertices to perform the calculation for.
- * \return Error mode.
- *
- * \sa \ref igraph_list_triangles() to list them.
- *
- * Time complexity: O(d^2 n), d is the average vertex degree of the
- * queried vertices, n is their number.
- */
-
-igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vs_t vids) {
-    return igraph_count_adjacent_triangles(graph, res, vids);
-}
 
 /**
  * \function igraph_list_triangles
@@ -574,7 +552,7 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  * \return Error code.
  *
  * \sa \ref igraph_count_triangles() to count the triangles,
- * \ref igraph_adjacent_triangles() to count the triangles a vertex
+ * \ref igraph_count_adjacent_triangles() to count the triangles a vertex
  * participates in, \ref igraph_transitivity_undirected() to compute
  * the global clustering coefficient.
  *

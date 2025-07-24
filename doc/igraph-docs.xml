@@ -161,6 +161,8 @@
 
   <xi:include href="nongraph.xml"/>
 
+  <xi:include href="glossary.xml"/>
+
   <xi:include href="licenses.xml"/>
 
   <index/>

@@ -413,8 +413,6 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    RNG_BEGIN();
-
     dendro d;
 
     // If we want to start from HRG
@@ -438,8 +436,6 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
     } else {
         MCMCEquilibrium_Find(d, hrg);
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 
@@ -465,14 +461,10 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
 
     // TODO: error handling
 
-    RNG_BEGIN();
-
     d.clearDendrograph();
     d.importDendrogramStructure(hrg);
     d.makeRandomGraph();
     IGRAPH_CHECK(d.recordGraphStructure(sample));
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
     IGRAPH_HANDLE_EXCEPTIONS_END
@@ -512,8 +504,6 @@ igraph_error_t igraph_hrg_sample_many(
         return IGRAPH_SUCCESS;
     }
 
-    RNG_BEGIN();
-
     d.clearDendrograph();
     d.importDendrogramStructure(hrg);
     while (num_samples-- > 0) {
@@ -523,8 +513,6 @@ igraph_error_t igraph_hrg_sample_many(
         IGRAPH_CHECK(igraph_graph_list_push_back(samples, &g));
         IGRAPH_FINALLY_CLEAN(1);
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
     IGRAPH_HANDLE_EXCEPTIONS_END
@@ -721,8 +709,6 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
         IGRAPH_ERROR("`hrg' must be given if `start' is true.", IGRAPH_EINVAL);
     }
 
-    RNG_BEGIN();
-
     dendro d;
 
     if (start) {
@@ -740,8 +726,6 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
     markovChainMonteCarlo2(d, num_samples);
 
     d.recordConsensusTree(parents, weights);
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 
@@ -876,8 +860,6 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
         IGRAPH_ERROR("`hrg' must be given when `start' is true", IGRAPH_EINVAL);
     }
 
-    RNG_BEGIN();
-
     dendro d;
 
     std::unique_ptr<simpleGraph> sg = igraph_i_hrg_getsimplegraph(graph, d, num_bins);
@@ -903,8 +885,6 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
     MCMCEquilibrium_Sample(d, num_samples);
     rankCandidatesByProbability(*sg, d, br_list.get(), mk);
     IGRAPH_CHECK(recordPredictions(br_list.get(), edges, prob, mk));
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 

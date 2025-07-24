@@ -88,10 +88,6 @@ IGRAPH_EXPORT igraph_error_t igraph_count_adjacent_triangles(const igraph_t *gra
                                             igraph_vector_t *res,
                                             igraph_vs_t vids);
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         igraph_vs_t vids);
-
 IGRAPH_EXPORT igraph_error_t igraph_list_triangles(const igraph_t *graph,
                                         igraph_vector_int_t *res);
 

@@ -214,6 +214,7 @@ add_legacy_tests(
   igraph_extended_chordal_ring
   igraph_forest_fire_game
   igraph_from_prufer
+  igraph_full_bipartite
   igraph_full_citation
   igraph_full_multipartite
   igraph_generalized_petersen
@@ -368,6 +369,7 @@ add_legacy_tests(
   jdm
   knn
   minimum_spanning_tree
+  mycielskian
   paths
   random_spanning_tree
   reachability
@@ -1033,11 +1035,11 @@ add_benchmarks(
   spanning_tree
 )
 
-# dot product
+# sampling
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_sample_dirichlet
-  igraph_sample_sphere
+  igraph_rng_sample_dirichlet
+  igraph_rng_sample_sphere
 )
 
 # lattices

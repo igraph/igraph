@@ -12,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -403,7 +403,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     /* We calculate hub scores, which correlate with out-degrees / out-strengths.
      * Thus we use out-strengths as starting values. */
     IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
-    RNG_BEGIN();
+
     for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
             /* Note: Keep random perturbation non-negative. */
@@ -419,7 +419,6 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
             MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
     }
-    RNG_END();
 
     extra.in = &inadjlist; extra.out = &outadjlist; extra.tmp = &tmp;
     extra2.in = &ininclist; extra2.out = &outinclist; extra2.tmp = &tmp;

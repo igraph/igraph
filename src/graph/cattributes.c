@@ -782,8 +782,6 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
     igraph_vector_t *newv = newrec->value.as_vector;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -796,8 +794,6 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[r] ];
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -909,8 +905,6 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
     igraph_vector_bool_t *newv = newrec->value.as_vector_bool;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -923,8 +917,6 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[r] ];
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1027,8 +1019,6 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
     igraph_vector_bool_t *newv = newrec->value.as_vector_bool;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -1051,8 +1041,6 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
             }
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1098,8 +1086,6 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
     igraph_strvector_t *newv = newrec->value.as_strvector;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -1115,8 +1101,6 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -2291,7 +2275,7 @@ igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param vids The edges to query.
+ * \param eids The edges to query.
  * \param result Pointer to an initialized string vector, the result
  *     is stored here. It will be resized, if needed.
  * \return Error code.

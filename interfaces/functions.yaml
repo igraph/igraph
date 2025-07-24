@@ -12,27 +12,34 @@
 
 igraph_empty:
     PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=True
+    FLAGS: no_rng
 
 igraph_add_edges:
     PARAMS: INOUT GRAPH graph, VERTEX_INDEX_PAIRS edges, ATTRIBUTES attr
     DEPS: edges ON graph
+    FLAGS: no_rng
 
 igraph_empty_attrs:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed, ATTRIBUTES attr
+    FLAGS: no_rng
 
 igraph_add_vertices:
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
+    FLAGS: no_rng
 
 igraph_copy:
     PARAMS: OUT GRAPH to, IN GRAPH from
+    FLAGS: no_rng
 
 igraph_delete_edges:
     PARAMS: INOUT GRAPH graph, EDGE_SELECTOR edges
     DEPS: edges ON graph
+    FLAGS: no_rng
 
 igraph_delete_vertices:
     PARAMS: INOUT GRAPH graph, VERTEX_SELECTOR vertices
     DEPS: vertices ON graph
+    FLAGS: no_rng
 
 igraph_delete_vertices_map:
     PARAMS: |-
@@ -40,58 +47,71 @@ igraph_delete_vertices_map:
         OPTIONAL OUT VECTOR_INT idx,
         OPTIONAL OUT VECTOR_INT invidx
     DEPS: vertices ON graph
+    FLAGS: no_rng
 
 igraph_vcount:
     PARAMS: GRAPH graph
     RETURN: INTEGER
+    FLAGS: no_rng
 
 igraph_ecount:
     PARAMS: GRAPH graph
     RETURN: INTEGER
+    FLAGS: no_rng
 
 igraph_neighbors:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES neis, VERTEX vid, NEIMODE mode=ALL,
         LOOPS loops=TWICE, BOOLEAN multiple=True
+    FLAGS: no_rng
 
 igraph_is_directed:
     PARAMS: GRAPH graph
     RETURN: BOOLEAN
+    FLAGS: no_rng
 
 igraph_degree:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL,
         LOOPS loops=TWICE
     DEPS: vids ON graph
+    FLAGS: no_rng
 
 igraph_edge:
     PARAMS: GRAPH graph, INTEGER eid, OUT INTEGER from, OUT INTEGER to
+    FLAGS: no_rng
 
 igraph_edges:
     PARAMS: GRAPH graph, EDGE_SELECTOR eids, OUT VECTOR_INT edges, BOOLEAN bycol=False
     DEPS: eids ON graph
+    FLAGS: no_rng
 
 igraph_get_eid:
     PARAMS: |-
         GRAPH graph, OUT EDGE eid, VERTEX from, VERTEX to,
         BOOLEAN directed=True, BOOLEAN error=True
+    FLAGS: no_rng
 
 igraph_get_eids:
     PARAMS: |-
         GRAPH graph, OUT EDGE_INDICES eids, VERTEX_INDEX_PAIRS pairs,
         BOOLEAN directed=True, BOOLEAN error=True
     DEPS: pairs ON graph
+    FLAGS: no_rng
 
 igraph_get_all_eids_between:
     PARAMS: |-
         GRAPH graph, OUT EDGE_INDICES eids, VERTEX from, VERTEX to,
         BOOLEAN directed=True
+    FLAGS: no_rng
 
 igraph_incident:
     PARAMS: GRAPH graph, OUT EDGE_INDICES eids, VERTEX vid, NEIMODE mode=ALL, LOOPS loops=TWICE
+    FLAGS: no_rng
 
 igraph_is_same_graph:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN res
+    FLAGS: no_rng
 
 #######################################
 # Constructors, deterministic
@@ -99,6 +119,7 @@ igraph_is_same_graph:
 
 igraph_create:
     PARAMS: OUT GRAPH graph, VECTOR_INT edges, INTEGER n=0, BOOLEAN directed=True
+    FLAGS: no_rng
 
 igraph_adjacency:
     PARAMS: |-
@@ -145,6 +166,14 @@ igraph_ring:
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
         BOOLEAN circular=True
 
+igraph_path_graph:
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False
+
+igraph_cycle_graph:
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False
+
 igraph_kary_tree:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREE_MODE type=OUT
 
@@ -156,6 +185,7 @@ igraph_regular_tree:
 
 igraph_full:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
+    FLAGS: no_rng
 
 igraph_full_citation:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
@@ -177,15 +207,21 @@ igraph_linegraph:
 
 igraph_de_bruijn:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
+    FLAGS: no_rng
 
 igraph_kautz:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
+    FLAGS: no_rng
 
 igraph_famous:
     PARAMS: OUT GRAPH graph, CSTRING name
+    FLAGS: no_rng
 
 igraph_lcf:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
+
+igraph_mycielski_graph:
+    PARAMS: OUT GRAPH graph, INTEGER k
 
 igraph_adjlist:
     PARAMS: |-
@@ -401,19 +437,6 @@ igraph_correlated_pair_game:
 
 igraph_dot_product_game:
     PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
-
-igraph_sample_sphere_surface:
-    PARAMS: |-
-        INTEGER dim, INTEGER n=1, REAL radius=1,
-        BOOLEAN positive=True, OUT MATRIX res
-
-igraph_sample_sphere_volume:
-    PARAMS: |-
-        INTEGER dim, INTEGER n=1, REAL radius=1,
-        BOOLEAN positive=True, OUT MATRIX res
-
-igraph_sample_dirichlet:
-    PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
 
 #######################################
 # Basic query functions
@@ -2037,6 +2060,10 @@ igraph_induced_subgraph_map:
         GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl,
         OPTIONAL OUT INDEX_VECTOR map, OPTIONAL OUT INDEX_VECTOR invmap
     DEPS: vids ON graph
+
+igraph_mycielskian:
+    PARAMS: |-
+        IN GRAPH graph, OUT GRAPH res, INTEGER k=1
 
 igraph_product:
     PARAMS: |-

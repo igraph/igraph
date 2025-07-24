@@ -51,9 +51,6 @@
  *   greater than 0 and fewer than number of vertices in the graph.
  * \param membership The result vector mapping vertices to the communities
  * they are assigned to.
- * \param modularity If not a null pointer, then it must be a pointer
- *   to a real number. The modularity score of the detected community
- *   structure is stored here.
  * \return Error code.
  *
  * Time complexity: O(|E|)
@@ -149,8 +146,6 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_init(&label_counters, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
 
-    RNG_BEGIN();
-
     /* running is the convergence boolean variable */
     running = true;
     while (running) {
@@ -236,8 +231,6 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
             }
         }
     }
-
-    RNG_END();
 
     /* Shift back the membership vector */
     /* There must be no 0 labels in membership vector at this point */
