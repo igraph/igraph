@@ -25,8 +25,9 @@
 #include "igraph_vector.h"
 
 /**
- * \function igraph_i_percolate_edge
+ * \function percolate_edge
  * \brief Percolates a single edge.
+ *
  * \param links Vector representing parents.
  * \param sizes sizes[i] is the number of children of links[i]
  * \param biggest The biggest value in sizes, is updated if a bigger cluster is created.
@@ -85,20 +86,20 @@ static bool is_connected(igraph_vector_int_t *links, igraph_vector_int_t *sizes,
 
 /**
  * \function igraph_edgelist_percolation
- * \brief The size of the largest connected component as vertex pairs are connected.
+ * \brief The size of the largest component as vertex pairs are connected.
  *
  * \experimental
  *
- * Calculates the size of the largest component as edges are added to a graph in
- * the order given. This function differs from \ref igraph_bond_percolation() in that
- * it take a list of vertex pairs as input.
+ * Calculates the size of the largest connected component as edges are added
+ * to a graph in the given order. This function differs from
+ * \ref igraph_bond_percolation() in that it take a list of vertex pairs as input.
  *
- * \param edges Vector of edges, where the i-th edge has endpoints <code>edges[2i]</code>
- *    and <code>edges[2i+1]</code>.
- * \param giant_size <code>giant_size[i]</code> will contain the size of the largest connected
- *    component after edge \c i is added.
- * \param vertex_count <code>vertex_count[i]</code> will contain the number of vertices
- * with at least one edge after edge \c i is added.
+ * \param edges Vector of edges, where the i-th edge has endpoints
+ *    <code>edges[2i]</code> and <code>edges[2i+1]</code>.
+ * \param giant_size <code>giant_size[i]</code> will contain the size of the
+ *    largest connected component after edge \c i is added.
+ * \param vertex_count <code>vertex_count[i]</code> will contain the number of
+ *    vertices with at least one edge after edge \c i is added.
  * \return Error code.
  *
  * \sa \ref igraph_bond_percolation() to specify edges by their ID in a graph object.
@@ -129,8 +130,9 @@ igraph_error_t igraph_edgelist_percolation(
     if (vertex_count != NULL) {
         IGRAPH_CHECK(igraph_vector_int_resize(vertex_count, edge_count));
     }
-   // Handle edge case of no edges.
-    if (igraph_vector_int_size(edges) == 0) {
+
+    // Handle edge case of no edges.
+    if (edge_count == 0) {
          return IGRAPH_SUCCESS;
     }
 
@@ -178,17 +180,19 @@ igraph_error_t igraph_edgelist_percolation(
  *
  * \experimental
  *
- * Calculates the bond percolation curve, or the size of the largest component as
- * edges are added to the graph in the order given. If both the output and the input
- * are reversed, it is the size of the largest component as edges are removed.
+ * Calculates the bond percolation curve, or the size of the largest connected
+ * component as edges are added to the graph in the order given. If both the
+ * output and the input are reversed, it is the size of the largest component
+ * as edges are removed.
  *
  * \param graph The graph that edges are assumed to be in. Edge directions
  *    are ignored.
- * \param giant_size <code>giant_size[i]</code> will contain the size of the largest
- *    component after having added the edge with index <code>edge_order[i]</code>.
+ * \param giant_size <code>giant_size[i]</code> will contain the size of the
+ *    largest component after having added the edge with index
+ *    <code>edge_order[i]</code>.
  * \param vertex_count <code>vertex_count[i]</code> will contain the number
- *    of vertices that have at least one incident edge after adding the edge with
- *    index <code>edge_order[i]</code>.
+ *    of vertices that have at least one incident edge after adding the edge
+ *    with index <code>edge_order[i]</code>.
  * \param edge_order The order the edges are added in. Must not contain duplicates.
  *    If \c NULL, a random order will be used.
  * \return Error code.
@@ -284,8 +288,8 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  *
  * \param graph The graph that vertices are assumed to be in. Edge directions
  *    are ignored.
- * \param giant_size <code>giant_size[i]</code> will contain the size of the largest
- *    component after having added the vertex with index
+ * \param giant_size <code>giant_size[i]</code> will contain the size of the
+ *    largest component after having added the vertex with index
  *    <code>vertex_order[i]</code>.
  * \param edge_count <code>edge_count[i]</code> will contain the numer of edges
  *    in the graph having added the vertex with index
