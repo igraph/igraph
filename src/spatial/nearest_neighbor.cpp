@@ -6,7 +6,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-u
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,16 +30,22 @@ u
 
 #include <vector>
 
-class igraph_point_adaptor {
+class ig_point_adaptor {
     igraph_integer_t dimension;
     const igraph_matrix_t *points;
 
 public:
+    ig_point_adaptor(const igraph_matrix_t *points) {
+        this->dimension = igraph_matrix_ncol(points);
+        this->points = points;
+    }
+
     size_t kdtree_get_point_count() const {
         return igraph_matrix_nrow(points);
     }
+
     igraph_real_t kdtree_get_pt(const size_t idx, const size_t dim) const {
-        return igraph_matrix_get(points, idx, dim);
+        return MATRIX(*points, idx, dim);
     }
 
     // indicates that it should use default
@@ -48,48 +54,36 @@ public:
         IGRAPH_UNUSED(bb);
         return false;
     }
-
-public:
-    igraph_point_adaptor(const igraph_matrix_t *points) {
-        this -> dimension = igraph_matrix_ncol(points);
-        this -> points = points;
-    }
 };
-/*
-class L2_igraph_adaptor {
-public:
-    using ElementType = igraph_real_t;
-    using DistanceType = nanoflann::metric_L2;
-    L2_igraph_adaptor(const igraph_point_adaptor& point) {
 
-    }
-} ;
-*/
 
 class GraphBuildingResultSet {
-private:
     igraph_integer_t current_vertex = 0;
     igraph_integer_t current_added = 0;
     igraph_real_t max_distance;
     igraph_integer_t max_neighbors;
     igraph_integer_t *edges;
     igraph_real_t *dists;
+
 public:
     using DistanceType = igraph_real_t;
+
     GraphBuildingResultSet(igraph_integer_t neighbors, igraph_real_t distance) :
         max_distance(distance),
         max_neighbors(neighbors) {}
 
     bool addPoint(igraph_real_t distance, igraph_integer_t index) {
+        igraph_integer_t i;
+
         if (index == current_vertex) {
             return true;
         }
-        igraph_integer_t i;
+
         for (i = current_added; i > 0; i--) {
             if ((dists[i-1] > distance /*|| dists[i-1] == distance && index < edges[i-1]*/ )) {
-                if (i < max_neighbors) {
-                dists[i] = dists[i-1];
-                edges[i] = edges[i-1];
+                    if (i < max_neighbors) {
+                    dists[i] = dists[i-1];
+                    edges[i] = edges[i-1];
                 }
             } else {
                 break;
@@ -105,26 +99,27 @@ public:
         return true;
     }
 
-        void init(igraph_real_t *_dists, igraph_integer_t* _edges, igraph_integer_t current_vertex) {
-            edges = _edges;
-            dists = _dists;
-            current_added = 0;
-            this-> current_vertex = current_vertex;
-        }
+    void init(igraph_real_t *_dists, igraph_integer_t* _edges, igraph_integer_t current_vertex) {
+        edges = _edges;
+        dists = _dists;
+        current_added = 0;
+        this-> current_vertex = current_vertex;
+    }
 
-        void sort () {}
+    void sort() { }
 
-        igraph_integer_t size() {
-            return current_added;
-        }
+    igraph_integer_t size() {
+        return current_added;
+    }
 
-    bool full () const {
+    bool full() const {
         return false;
         return current_added == max_neighbors;
     }
-        bool empty() const {
-            return current_added == 0;
-        }
+
+    bool empty() const {
+        return current_added == 0;
+    }
 
     igraph_real_t worstDist() {
         if (current_added < max_neighbors || current_added == 0) {
@@ -137,28 +132,27 @@ public:
 
 template <typename Metric, igraph_integer_t Dimension>
 static igraph_error_t neighbor_helper(
-    igraph_t *graph,
-    const igraph_matrix_t *points,
-    igraph_integer_t neighbors,
-    igraph_real_t cutoff,
-    igraph_integer_t dimension) {
+        igraph_t *graph,
+        const igraph_matrix_t *points,
+        igraph_integer_t neighbors,
+        igraph_real_t cutoff,
+        igraph_integer_t dimension) {
 
-    igraph_integer_t point_count = igraph_matrix_nrow(points);
+    const igraph_integer_t point_count = igraph_matrix_nrow(points);
 
-    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, igraph_point_adaptor, Dimension>;
+    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, ig_point_adaptor, Dimension>;
 
-    igraph_point_adaptor adaptor(points);
+    ig_point_adaptor adaptor(points);
 
     kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
 
     tree.buildIndex();
 
     igraph_vector_t current_point;
-    IGRAPH_VECTOR_INIT_FINALLY(&current_point, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&current_point, dimension);
 
     igraph_integer_t neighbor_count = neighbors > 0 ? neighbors : point_count;
 
-    //using resultClass = nanoflann::RKNNResultSet<igraph_real_t, igraph_integer_t, igraph_integer_t>;
     using resultClass = GraphBuildingResultSet;
     resultClass results(neighbor_count, cutoff);
     std::vector<igraph_integer_t> neighbor_set(neighbor_count);
@@ -178,14 +172,14 @@ static igraph_error_t neighbor_helper(
             edges.push_back(neighbor_set[j]);
         }
     }
-    igraph_vector_int_t edge_view;
-    igraph_vector_int_view(&edge_view, edges.data(), edges.size());
-    igraph_create(graph, &edge_view, point_count, true);
-
-    //igraph_vector_int_destroy(&edge_view);
 
     igraph_vector_destroy(&current_point);
     IGRAPH_FINALLY_CLEAN(1);
+
+    igraph_vector_int_t edge_view;
+    igraph_vector_int_view(&edge_view, edges.data(), edges.size());
+    IGRAPH_CHECK(igraph_create(graph, &edge_view, point_count, true));
+
     return IGRAPH_SUCCESS;
 }
 
@@ -208,10 +202,8 @@ static igraph_error_t dimension_dispatcher(
 }
 
 
-
 /**
  * \function igraph_nearest_neighbor_graph
- *
  * \brief Computes the nearest neighbor graph for some given points.
  *
  * \param graph A pointer to the graph that will be created.
@@ -228,10 +220,11 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         igraph_real_t cutoff) {
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
-    igraph_integer_t dimension = igraph_matrix_ncol(points);
+
+    const igraph_integer_t dimension = igraph_matrix_ncol(points);
     switch (metric) {
     case IGRAPH_METRIC_L2 :
-        return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, igraph_point_adaptor> > (
+        return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor> > (
                    graph,
                    points,
                    neighbors,
@@ -239,5 +232,6 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
                    dimension);
     default : IGRAPH_ERROR("Metic type not implemented.", IGRAPH_UNIMPLEMENTED);
     }
+
     IGRAPH_HANDLE_EXCEPTIONS_END;
 }
