@@ -69,6 +69,8 @@ Tim Bernhard (@GenieTim)
 Maëlle Salmon (@maelle)
 Gulshan Kumar (@gulshan-123)
 Carlos Planelles (@carlos-planelles)
+Dev_Lohani (@devlohani99)
+Lucas Lopes Felipe (@lucaslopes)
 
 This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
 
