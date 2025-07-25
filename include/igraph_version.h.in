@@ -32,7 +32,7 @@ IGRAPH_BEGIN_C_DECLS
 IGRAPH_EXPORT void igraph_version(const char **version_string,
                                   int *major,
                                   int *minor,
-                                  int *subminor);
+                                  int *patch);
 
 IGRAPH_END_C_DECLS
 
