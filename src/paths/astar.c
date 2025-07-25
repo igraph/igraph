@@ -44,8 +44,6 @@ static igraph_error_t null_heuristic(
  * \function igraph_get_shortest_path_astar
  * \brief A* gives the shortest path from one vertex to another, with heuristic.
  *
- * \experimental
- *
  * Calculates a shortest path from a single source vertex to a single
  * target, using the A* algorithm. A* tries to find a shortest path by
  * starting at \p from and moving to vertices that lie on a path with

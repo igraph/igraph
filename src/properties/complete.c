@@ -214,8 +214,6 @@ done:
  * \function igraph_is_clique
  * \brief Does a set of vertices form a clique?
  *
- * \experimental
- *
  * Tests if all pairs within a set of vertices are adjacent, i.e. whether they
  * form a clique. An empty set and singleton set are considered to be a clique.
  *
@@ -251,8 +249,6 @@ igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
  * \ingroup structural
  * \function igraph_is_independent_vertex_set
  * \brief Does a set of vertices form an independent set?
- *
- * \experimental
  *
  * Tests if no pairs within a set of vertices are adjacenct, i.e. whether they
  * form an independent set. An empty set and singleton set are both considered

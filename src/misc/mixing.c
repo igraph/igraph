@@ -418,8 +418,6 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * \function igraph_joint_degree_matrix
  * \brief The joint degree matrix of a graph.
  *
- * \experimental
- *
  * In graph theory, the joint degree matrix \c J_ij of a graph gives the number
  * of edges, or sum of edge weights, between vertices of degree \c i and degree
  * \c j. This function stores \c J_ij into <code>jdm[i-1, j-1]</code>.
@@ -708,8 +706,6 @@ static igraph_error_t mixing_matrix(
  * \function igraph_joint_degree_distribution
  * \brief The joint degree distribution of a graph.
  *
- * \experimental
- *
  * Computes the joint degree distribution \c P_ij of a graph, used in the
  * study of degree correlations. \c P_ij is the probability that a randomly
  * chosen ordered pair of \em connected vertices have degrees \c i and \c j.
@@ -877,8 +873,6 @@ igraph_error_t igraph_joint_degree_distribution(
 /**
  * \function igraph_joint_type_distribution
  * \brief Mixing matrix for vertex categories.
- *
- * \experimental
  *
  * Computes the mixing matrix M_ij, i.e. the joint distribution of vertex types
  * at the endpoints directed of edges. Categories are represented by non-negative integer
