@@ -1090,12 +1090,17 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
 /* This implementation is used only with very large vertex counts, when the
  * default implementation would fail due to overflow. While this version
  * avoids overflow and uses less memory, it is also slower than the default
- * implementation. */
+ * implementation.
+ *
+ * This function expects that when multiple=true, the p parameter has already
+ * been transformed by p = p / (1 + p). This is currently done by the caller.
+ */
 static igraph_error_t gnp_bipartite_large(
         igraph_t *graph,
         igraph_int_t n1, igraph_int_t n2,
         igraph_real_t p,
         igraph_bool_t directed, igraph_neimode_t mode,
+        igraph_bool_t multiple,
         igraph_int_t ecount_estimate) {
 
     igraph_vector_int_t edges;
@@ -1145,7 +1150,7 @@ static igraph_error_t gnp_bipartite_large(
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
             }
 
-            j++;
+            j += ! multiple; /* 1 for simple graph, 0 for multigraph */
 
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
@@ -1273,7 +1278,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         if (maxedges > IGRAPH_MAX_EXACT_REAL) {
             /* Use a slightly slower, but overflow-free implementation. */
-            return gnp_bipartite_large(graph, n1, n2, p, directed, mode, ecount_estimate);
+            return gnp_bipartite_large(graph, n1, n2, p, directed, mode, multiple, ecount_estimate);
         }
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
