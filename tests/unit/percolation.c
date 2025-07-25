@@ -26,6 +26,12 @@
 igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
     igraph_vector_int_t giant_size, vertex_count;
     igraph_integer_t size = igraph_ecount(graph);
+    igraph_integer_t number_percolated;
+    if (edge_indices != NULL) {
+        number_percolated = igraph_vector_int_size(edge_indices);
+    } else {
+        number_percolated = size;
+    }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&giant_size, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_count, 0);
 
@@ -35,28 +41,30 @@ igraph_error_t percolate_b(igraph_t *graph, igraph_vector_int_t *edge_indices, i
         print_vector_int(&giant_size);
         print_vector_int(&vertex_count);
     }
+    if (number_percolated == size) {
+        // It's only guaranteed to have the same component size if all edges are included.
+        igraph_vector_int_t components;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
 
-    igraph_vector_int_t components;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
+        IGRAPH_CHECK(igraph_connected_components(graph, NULL, &components, NULL, IGRAPH_WEAK));
 
-    IGRAPH_CHECK(igraph_connected_components(graph, NULL, &components, NULL, IGRAPH_WEAK));
-
-    IGRAPH_ASSERT(igraph_vector_int_size(&giant_size) == size);
-    IGRAPH_ASSERT(igraph_vector_int_size(&vertex_count) == size);
-    if (size > 1) {
-        IGRAPH_ASSERT(igraph_vector_int_max(&giant_size) == igraph_vector_int_max(&components));
+        IGRAPH_ASSERT(igraph_vector_int_size(&giant_size) == size);
+        IGRAPH_ASSERT(igraph_vector_int_size(&vertex_count) == size);
+        if (size > 1) {
+            IGRAPH_ASSERT(igraph_vector_int_max(&giant_size) == igraph_vector_int_max(&components));
+        }
+        igraph_vector_int_destroy(&components);
+        IGRAPH_FINALLY_CLEAN(1);
     }
-    igraph_vector_int_destroy(&components);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_integer_t prev = 0;
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(giant_size)[i] > 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(giant_size)[i] >= prev);   // Size of largest component must be nondecreasing.
         IGRAPH_ASSERT(VECTOR(giant_size)[i] <= i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
         prev = VECTOR(giant_size)[i];
     }
     prev = 0;
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] > 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] >= prev);   // Size of largest component must be nondecreasing.
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] <= 2*i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
@@ -133,6 +141,13 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, i
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outputs, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_counts, 0);
     igraph_integer_t size = igraph_vcount(graph);
+    igraph_integer_t number_percolated;
+    if (vert_indices != NULL) {
+        number_percolated = igraph_vector_int_size(vert_indices);
+    }
+    else {
+        number_percolated = size;
+    }
     IGRAPH_CHECK(igraph_site_percolation(graph, &outputs, &edge_counts, vert_indices));
 
     if (printing) {
@@ -145,21 +160,23 @@ igraph_error_t percolate_s(igraph_t *graph, igraph_vector_int_t *vert_indices, i
 
     IGRAPH_CHECK(igraph_connected_components(graph, NULL, &components, NULL, IGRAPH_WEAK));
 
-    IGRAPH_ASSERT(igraph_vector_int_size(&outputs) == size);
-    if (size > 1) {
+    IGRAPH_ASSERT(igraph_vector_int_size(&outputs) == number_percolated);
+    if (number_percolated > 1 && number_percolated == size) {
+        // it is only guaranteed to have the same component size if all vertices are included
         IGRAPH_ASSERT(igraph_vector_int_max(&outputs) == igraph_vector_int_max(&components));
     }
     igraph_vector_int_destroy(&components);
     IGRAPH_FINALLY_CLEAN(1);
     igraph_integer_t prev = 0;
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < number_percolated; i++) {
+        IGRAPH_ASSERT(VECTOR(outputs)[i] <= size); //size cannot be greater than number of vertices
         IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(outputs)[i] >= prev);   // Size of largest component must be nondecreasing.
         IGRAPH_ASSERT(VECTOR(outputs)[i] <= i + 1); // Largest component cannot be bigger than a tree with the same number of vertices.
         prev = VECTOR(outputs)[i];
     }
     prev = 0;
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_integer_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(edge_counts)[i] >= 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(edge_counts)[i] >= prev);   // Size of largest component must be nondecreasing.
         prev = VECTOR(edge_counts)[i];
@@ -214,16 +231,16 @@ void test_site(void) {
 
     percolate_s(&random, NULL, false);
 
-    igraph_vector_int_t bad_vert_list_repeat, bad_vert_list_too_big, bad_vert_list_missing;
+    igraph_vector_int_t bad_vert_list_repeat, bad_vert_list_too_big, vert_list_missing_vertex;
     igraph_vector_int_init_int(&bad_vert_list_too_big, 6, 0, 1, 2, 3, 4, 5);
-    igraph_vector_int_init_int(&bad_vert_list_missing, 3, 0, 1, 2);
+    igraph_vector_int_init_int(&vert_list_missing_vertex, 3, 0, 1, 2);
     igraph_vector_int_init_int(&bad_vert_list_repeat,  5, 0, 0, 0, 0, 0);
-    // should error due to being too big
-    printf("K_5 with too big vertex list\n");
+    // should error due to vertex being too big
+    printf("K_5 with too big vertex index\n");
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_too_big, false), IGRAPH_EINVAL);
     // should error due to being too small
-    printf("K_5 with too small vertex list\n");
-    CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_missing, false), IGRAPH_EINVAL);
+    printf("K_5 with missing vertices\n");
+    percolate_s(&k_5, &vert_list_missing_vertex, true);
     // should error due to repeated vertices
     printf("K_5 with repeated vertices\n");
     CHECK_ERROR(percolate_s(&k_5, &bad_vert_list_repeat, false),  IGRAPH_EINVAL);
@@ -238,7 +255,7 @@ void test_site(void) {
     igraph_destroy(&karate);
     igraph_destroy(&random);
 
-    igraph_vector_int_destroy(&bad_vert_list_missing);
+    igraph_vector_int_destroy(&vert_list_missing_vertex);
     igraph_vector_int_destroy(&bad_vert_list_repeat);
     igraph_vector_int_destroy(&bad_vert_list_too_big);
 

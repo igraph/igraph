@@ -338,13 +338,8 @@ igraph_error_t igraph_site_percolation(
         p_vertex_order = vertex_order;
     }
 
+    igraph_integer_t number_percolated = igraph_vector_int_size(p_vertex_order);
     // Initialize variables
-    if (igraph_vector_int_size(p_vertex_order) != vcount) {
-        IGRAPH_ERRORF("Vertex order vector length (%" IGRAPH_PRId") "
-                      "does not match the vertex count (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL,
-                      igraph_vector_int_size(p_vertex_order), vcount);
-    }
     igraph_integer_t biggest = 1;
 
     igraph_vector_int_t sizes;
@@ -352,22 +347,27 @@ igraph_error_t igraph_site_percolation(
 
     igraph_vector_int_t links;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&links, vcount);
-    if (giant_size != NULL) {
-        IGRAPH_CHECK(igraph_vector_int_resize(giant_size, vcount));
-    }
-    if (edge_count != NULL) {
-        IGRAPH_CHECK(igraph_vector_int_resize(edge_count, vcount));
-    }
 
     for (igraph_integer_t i = 0; i < vcount; i++) {
         VECTOR(sizes)[i] = 0;
         VECTOR(links)[i] = i;
     }
 
+    if (giant_size != NULL) {
+        IGRAPH_CHECK(igraph_vector_int_resize(giant_size, number_percolated));
+    }
+    if (edge_count != NULL) {
+        IGRAPH_CHECK(igraph_vector_int_resize(edge_count, number_percolated));
+    }
+
+
     igraph_integer_t added = 0;
     igraph_vector_int_t neighbors;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0; i < number_percolated; i++) {
+        if (VECTOR(*p_vertex_order)[i] >= vcount) {
+            IGRAPH_ERROR("Vertex index not present in graph.", IGRAPH_EINVAL);
+        }
         IGRAPH_CHECK(percolate_site(graph, &links, &sizes, &biggest, &added, VECTOR(*p_vertex_order)[i], &neighbors));
         if (giant_size != NULL) {
             VECTOR(*giant_size)[i] = biggest;
@@ -378,12 +378,6 @@ igraph_error_t igraph_site_percolation(
     }
     igraph_vector_int_destroy(&neighbors);
     IGRAPH_FINALLY_CLEAN(1);
-
-    for (igraph_integer_t i = 0; i < vcount; i++) {
-        if (VECTOR(sizes)[i] == 0) {
-            IGRAPH_ERROR("Vertex order vector is missing vertices from graph.", IGRAPH_EINVAL);
-        }
-    }
 
     // Cleanup
     igraph_vector_int_destroy(&links);
