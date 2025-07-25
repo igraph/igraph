@@ -22,7 +22,7 @@
 void print_result(igraph_t *g, igraph_integer_t start_vid, igraph_bool_t directed, igraph_bool_t unconn) {
     igraph_real_t result;
     igraph_integer_t from, to;
-    IGRAPH_ASSERT(igraph_pseudo_diameter(g, &result, start_vid, &from, &to, directed, unconn) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(g, NULL, &result, start_vid, &from, &to, directed, unconn) == IGRAPH_SUCCESS);
     printf("result: ");
     print_real(stdout, result, "%g");
     printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n\n", from, to);
@@ -40,7 +40,7 @@ int main(void) {
     printf("No vertices, no allowed starting vertex ID.\n\n");
     igraph_small(&g, 0, 0, -1);
     ehandler = igraph_set_error_handler(igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &result, 0, NULL, NULL, 1, 1) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, NULL, &result, 0, NULL, NULL, 1, 1) == IGRAPH_EINVAL);
     igraph_set_error_handler(ehandler);
 
     printf("Null graph without explicit start vertex:\n");

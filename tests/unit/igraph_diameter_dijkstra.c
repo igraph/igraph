@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
@@ -29,7 +28,7 @@ void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn,
     igraph_vector_int_init(&path_edge, 0);
     igraph_vector_int_init(&path_vertex, 0);
 
-    igraph_diameter_dijkstra(g, weights, &result, &from, &to, &path_vertex, &path_edge, directed, unconn);
+    igraph_diameter(g, weights, &result, &from, &to, &path_vertex, &path_edge, directed, unconn);
 
     printf("Diameter: ");
     print_real(stdout, result, "%g");
@@ -94,10 +93,10 @@ int main(void) {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Ring with some negative weights:\n");
-    igraph_diameter_dijkstra(&g_ring, &weights_neg, NULL, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g_ring, &weights_neg, NULL, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
 
     printf("Ring with wrong weight vector size:\n");
-    igraph_diameter_dijkstra(&g_ring, &weights_0, NULL, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g_ring, &weights_0, NULL, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

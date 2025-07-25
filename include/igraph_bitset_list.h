@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2024  The igraph development team
+   Copyright (C) 2024-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_BITSET_LIST_H
@@ -26,9 +22,8 @@
 #include "igraph_bitset.h"
 #include "igraph_decls.h"
 #include "igraph_error.h"
-#include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* List of graphs                                     */
@@ -46,6 +41,6 @@ __BEGIN_DECLS
     do { IGRAPH_CHECK(igraph_bitset_list_init(v, size)); \
         IGRAPH_FINALLY(igraph_bitset_list_destroy, v); } while (0)
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

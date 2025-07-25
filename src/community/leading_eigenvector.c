@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -415,7 +413,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     if (!start) {
         /* Calculate the weakly connected components in the graph and use them as
          * an initial split */
-        IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, 0, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, NULL, IGRAPH_WEAK));
         communities = igraph_vector_int_size(&idx);
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history,
@@ -541,11 +539,11 @@ igraph_error_t igraph_community_leading_eigenvector(
          * convergence in most cases. */
         options->start = 1;
         options->mxiter = options->mxiter > 10000 ? options->mxiter : 10000;  /* use more iterations, we've had convergence problems with 3000 */
-        RNG_BEGIN();
+
         for (i = 0; i < options->n; i++) {
             storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
         }
-        RNG_END();
+
         igraph_vector_view(&start_vec, storage.resid, options->n);
         igraph_vector_shuffle(&start_vec);
 
@@ -553,7 +551,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             igraph_error_t retval;
             igraph_error_handler_t *errh =
                     igraph_set_error_handler(igraph_i_error_handler_none);
-            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
+            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ NULL, /*vectors=*/ NULL);
             igraph_set_error_handler(errh);
             if (retval == IGRAPH_EARPACK) {
                 /* TODO(ntamas): get last ARPACK error code. Some errors are OK. */
@@ -823,7 +821,7 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merg
         }
     }
 
-    IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, &fake_memb, 0));
+    IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, &fake_memb, NULL));
 
     /* Ok, now we have the membership of the initial components,
        rewrite the original membership vector. */

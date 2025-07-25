@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "plfit_error.h"
-#include "platform.h"
 
 static const char *plfit_i_error_strings[] = {
     "No error",

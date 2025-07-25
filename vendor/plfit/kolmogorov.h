@@ -20,24 +20,15 @@
 #ifndef __KOLMOGOROV_H__
 #define __KOLMOGOROV_H__
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
 #include <stdlib.h>
+#include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 double plfit_kolmogorov(double z);
 double plfit_ks_test_one_sample_p(double d, size_t n);
 double plfit_ks_test_two_sample_p(double d, size_t n1, size_t n2);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif

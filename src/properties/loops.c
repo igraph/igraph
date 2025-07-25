@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -39,6 +37,7 @@
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result.
+ * \return Error code.
  *
  * \sa \ref igraph_simplify() to get rid of loop edges.
  *
@@ -69,7 +68,7 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_is_loop
  * \brief Find the loop edges in a graph.
  *
- * A loop edge is an edge from a vertex to itself.
+ * A loop edge, also called a self-loop, is an edge from a vertex to itself.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result,
@@ -84,7 +83,7 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
  * \example examples/simple/igraph_is_loop.c
  */
 igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
-                   igraph_es_t es) {
+                              igraph_es_t es) {
     igraph_eit_t eit;
     igraph_bool_t found_loop = false;
 
@@ -125,12 +124,10 @@ done:
  * \function igraph_count_loops
  * \brief Counts the self-loops in the graph.
  *
- * \experimental
- *
  * Counts loop edges, i.e. edges whose two endpoints coincide.
  *
  * \param graph The input graph.
- * \param res Pointer to an integer, the number of self-loops will be stored here.
+ * \param loop_count Pointer to an integer, the number of self-loops will be stored here.
  * \return Error code.
  *
  * Time complexity: O(|E|), linear in the number of edges.

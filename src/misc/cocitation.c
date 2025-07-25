@@ -178,7 +178,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, true));
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, IGRAPH_LOOPS));
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         VECTOR(weights)[i] = VECTOR(degrees)[i];
         if (VECTOR(weights)[i] > 1) {
@@ -234,7 +234,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
         const igraph_real_t weight = weights ? VECTOR(*weights)[from] : 1;
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (i = 0; i < nei_count - 1; i++) {
@@ -288,9 +288,9 @@ static igraph_error_t igraph_i_neisets_intersect(
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
  *        as the number of vertex IDs in \p vit_from and \p vit_to, respectively.
- * \param vit_from The vertex IDs of the first set of vertices of the
+ * \param from The vertex IDs of the first set of vertices of the
  *        pairs for which the calculation will be done.
- * \param vit_to The vertex IDs of the second set of vertices of the
+ * \param to The vertex IDs of the second set of vertices of the
  *        pairs for which the calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -565,7 +565,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
     igraph_vector_int_t pairs;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&pairs, 0);
-    IGRAPH_CHECK(igraph_edges(graph, es, &pairs));
+    IGRAPH_CHECK(igraph_edges(graph, es, &pairs, 0));
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, &pairs, mode, loops));
     igraph_vector_int_destroy(&pairs);
     IGRAPH_FINALLY_CLEAN(1);

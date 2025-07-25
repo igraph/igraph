@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
@@ -23,7 +22,7 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_operators.h"
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "core/interruption.h"
 

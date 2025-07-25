@@ -40,11 +40,6 @@
 <!-- doxrox-include igraph_get_subisomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_subisomorphisms_vf2_callback -->
 
-<section id="vf2-algorithm-deprecated"><title>Deprecated aliases</title>
-<!-- doxrox-include igraph_isomorphic_function_vf2 -->
-<!-- doxrox-include igraph_subisomorphic_function_vf2 -->
-</section>
-
 </section>
 
 <section id="lad-algorithm"><title>The LAD algorithm</title>
@@ -60,12 +55,9 @@
 </section>
 
 <section id="isomorphism-utility-functions"><title>Utility functions</title>
+<!-- doxrox-include igraph_invert_permutation -->
 <!-- doxrox-include igraph_permute_vertices -->
 <!-- doxrox-include igraph_simplify_and_colorize -->
-</section>
-
-<section id="isomorphism-deprecated-functions"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_isomorphic_34 -->
 </section>
 
 </chapter>

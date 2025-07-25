@@ -1,11 +1,29 @@
+/*
+   IGraph library.
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <igraph.h>
 
 #include "bench.h"
 
 void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
-    igraph_integer_t i, n = igraph_ecount(graph);
+    const igraph_integer_t n = igraph_ecount(graph);
     igraph_vector_resize(vec, n);
-    for (i=0; i < n; ++i) {
+    for (igraph_integer_t i=0; i < n; ++i) {
         VECTOR(*vec)[i] = RNG_UNIF(1, 10);
     }
 }

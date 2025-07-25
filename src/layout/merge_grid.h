@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2020  The igraph development team
+   Copyright (C) 2009-2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_LAYOUT_MERGE_GRID_H
@@ -27,7 +23,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* A type of grid used for merging layouts; each cell is owned by exactly one graph */
 
@@ -54,6 +50,6 @@ igraph_integer_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid
 igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
                                               igraph_real_t x, igraph_real_t y, igraph_real_t r);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

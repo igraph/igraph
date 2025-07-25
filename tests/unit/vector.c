@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge MA, 02139 USA
+   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,21 +13,17 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
-#include <stdlib.h>
 
 #include "test_utilities.h"
 
 int main(void) {
 
     igraph_vector_t v;
-    igraph_vector_int_t v4, v5, v6;
+    igraph_vector_int_t v2, v4, v5, v6;
     igraph_integer_t i;
     igraph_real_t *ptr;
     igraph_integer_t pos;
@@ -284,7 +278,7 @@ int main(void) {
 
     printf("Test Binsearch in empty vector\n");
     igraph_vector_init(&v, 0);
-    IGRAPH_ASSERT(!igraph_vector_binsearch2(&v, 0));
+    IGRAPH_ASSERT(!igraph_vector_contains_sorted(&v, 0));
     IGRAPH_ASSERT(!igraph_vector_binsearch(&v, 1, &pos));
     IGRAPH_ASSERT(pos == 0);
     igraph_vector_destroy(&v);
@@ -310,18 +304,6 @@ int main(void) {
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
-    printf("Test order2\n");
-    igraph_vector_init_int_end(&v, -1, 10, 9, 8, 7, 6, 7, 8, 9, 10, -1);
-    igraph_vector_order2(&v);
-    print_vector_format(&v, stdout, "%g");
-    igraph_vector_destroy(&v);
-
-    printf("Test order2 on empty vector\n");
-    igraph_vector_init_int_end(&v, -1, -1);
-    igraph_vector_order2(&v);
-    print_vector_format(&v, stdout, "%g");
-    igraph_vector_destroy(&v);
-
     printf("Test filter_smaller, quite special....\n");
     igraph_vector_init_int_end(&v, -1, 0, 1, 2, 3, 4, 4, 4, 4, 5, 6, 7, 8, -1);
     igraph_vector_filter_smaller(&v, 4);
@@ -336,13 +318,15 @@ int main(void) {
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
-    printf("Test rank\n");
-    igraph_vector_init_int_end(&v, -1, 0, 1, 2, 6, 5, 2, 1, 0, -1);
+    printf("Test igraph_i_vector_int_rank and igraph_i_vector_int_order\n");
+    igraph_vector_int_init_int_end(&v2, -1, 0, 1, 2, 6, 5, 2, 1, 0, -1);
     igraph_vector_int_init(&v4, 0);
-    igraph_vector_rank(&v, &v4, 7);
-    print_vector_format(&v, stdout, "%g");
+    igraph_i_vector_int_rank(&v2, &v4, 7);
+    print_vector_int(&v2);
     print_vector_int(&v4);
-    igraph_vector_destroy(&v);
+    igraph_i_vector_int_order(&v2, &v4, 7);
+    print_vector_int(&v4);
+    igraph_vector_int_destroy(&v2);
     igraph_vector_int_destroy(&v4);
 
     printf("Test pair order\n");
@@ -374,10 +358,12 @@ int main(void) {
     }
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_int_init_range, igraph_vector_int_order1\n");
+    printf("Test igraph_vector_int_init_range, igraph_i_vector_int_order\n");
     igraph_vector_int_init_range(&v4, 1, 11);
+    igraph_vector_int_reverse(&v4);
+    igraph_vector_int_scale(&v4, 3);
     igraph_vector_int_init(&v5, 0);
-    igraph_vector_int_order1(&v4, &v5, 10);
+    igraph_i_vector_int_order(&v4, &v5, /* maxval */ igraph_vector_int_max(&v4));
     print_vector_int(&v5);
     igraph_vector_int_destroy(&v4);
     igraph_vector_int_destroy(&v5);

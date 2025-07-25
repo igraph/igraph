@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
@@ -201,7 +200,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
 
         for (v = 0; v < clsize; v++) {
             igraph_integer_t i, neilen, node = VECTOR(*clique)[v];
-            IGRAPH_CHECK(igraph_incident(graph, &neis, node, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, node, IGRAPH_ALL, IGRAPH_LOOPS));
             neilen = igraph_vector_int_size(&neis);
             VECTOR(mark)[node] = c + 1;
             for (i = 0; i < neilen; i++) {
@@ -785,12 +784,13 @@ igraph_error_t igraph_i_graphlets_project(
 
 /**
  * \function igraph_graphlets_project
- * Project a graph on a graphlets basis
+ * \brief Project a graph on a graphlets basis.
  *
  * Note that the graph projected does not have to be the same that
  * was used to calculate the graphlet basis, but it is assumed that
  * it has the same number of vertices, and the vertex IDs of the two
  * graphs match.
+ *
  * \param graph The input graph, it must be a simple graph, edge directions are
  *        ignored.
  * \param weights Weights of the edges in the input graph, a vector.
@@ -804,7 +804,7 @@ igraph_error_t igraph_i_graphlets_project(
  * \param startMu If true, then the supplied Mu vector is
  *        used as the starting point of the iteration. Otherwise a
  *        constant 1 vector is used.
- * \param niter Integer scalar, the number of iterations to perform.
+ * \param niter The number of iterations to perform.
  * \return Error code.
  *
  * See also: \ref igraph_graphlets() and
@@ -844,11 +844,12 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
 
 /**
  * \function igraph_graphlets
- * Calculate graphlets basis and project the graph on it
+ * \brief Calculate graphlets basis and project the graph on it.
  *
  * This function simply calls \ref igraph_graphlets_candidate_basis()
  * and \ref igraph_graphlets_project(), and then orders the graphlets
  * according to decreasing weights.
+ *
  * \param graph The input graph, it must be a simple graph, edge directions are
  *        ignored.
  * \param weights Weights of the edges, a vector.
@@ -857,8 +858,7 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  *        vertex IDs, encoding a single basis subgraph.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here.
- * \param niter Integer scalar, the number of iterations to perform
- *        for the projection step.
+ * \param niter The number of iterations to perform for the projection step.
  * \return Error code.
  *
  * See also: \ref igraph_graphlets_candidate_basis() and

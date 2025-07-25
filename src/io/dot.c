@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2020  The igraph development team
@@ -149,6 +148,7 @@ static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x, ig
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
+ * \return Error code.
  *
  * Time complexity: should be proportional to the number of characters written
  * to the file.

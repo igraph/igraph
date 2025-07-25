@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
@@ -172,8 +171,6 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
         VECTOR(*result)[i] = sir;
     }
 
-    RNG_BEGIN();
-
     for (j = 0; j < no_sim; j++) {
 
         igraph_sir_t *sir = VECTOR(*result)[j];
@@ -232,7 +229,13 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
                     igraph_integer_t nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
-                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate - beta));
+                        rate -= beta;
+                        /* Because of roundoff errors, it may happen that the rate
+                         * becomes slightly negative, which would cause psumtree_update()
+                         * to fail. We clip negative values to zero to avoid this.
+                         * See https://github.com/igraph/igraph/issues/2779 */
+                        if (rate < 0) rate = 0;
+                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate));
                     }
                 }
 
@@ -244,7 +247,8 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
                     igraph_integer_t nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
-                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate + beta));
+                        rate += beta;
+                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate));
                     }
                 }
             }
@@ -257,8 +261,6 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
         } /* psum > 0 */
 
     } /* j < no_sim */
-
-    RNG_END();
 
     igraph_psumtree_destroy(&tree);
     igraph_adjlist_destroy(&adjlist);

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -51,19 +49,19 @@
  *
  * </para><para>
  * Duncan J Watts and Steven H Strogatz:
- * Collective dynamics of <quote>small world</quote> networks, Nature
- * 393, 440-442, 1998.
+ * Collective dynamics of <quote>small world</quote> networks,
+ * Nature 393, 440-442, 1998.
+ * https://doi.org/10.1038/30918
  *
  * \param graph The graph to initialize.
  * \param dim The dimension of the lattice.
  * \param size The size of the lattice along each dimension.
  * \param nei The size of the neighborhood for each vertex. This is
- *    the same as the \p nei argument of \ref igraph_connect_neighborhood().
+ *    the same as the \p order argument of \ref igraph_connect_neighborhood().
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive).
- * \param loops Logical, whether to generate loop edges.
- * \param multiple Logical, whether to allow multiple edges in the
- *   generated graph.
+ * \param loops Whether to generate loop edges.
+ * \param multiple Whether to allow multiple edges in the generated graph.
  * \return Error code.
  *
  * \sa \ref igraph_square_lattice(), \ref igraph_connect_neighborhood() and

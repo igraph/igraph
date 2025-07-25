@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -179,11 +177,11 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * connected.
  *
  * \param graph The input graph.
+ * \param directed Whether to use the directed or undirected version
+ *    of modularity. Will be ignored for undirected graphs.
  * \param edges Vector containing the edges to be removed from the
  *    network, all edges are expected to appear exactly once in the
  *    vector.
- * \param directed Whether to use the directed or undirected version
- *    of modularity. Will be ignored for undirected graphs.
  * \param weights An optional vector containing edge weights. If null,
  *     the unweighted modularity scores will be calculated. If not null,
  *     the weighted modularity scores will be calculated. Ignored if both
@@ -426,7 +424,7 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  *     take weights into account if \p weights is not null.
  * \param membership If not a null pointer, then the membership vector,
  *     corresponding to the highest modularity value, is stored here.
- * \param directed Logical constant. Controls whether to calculate directed
+ * \param directed Boolean constant. Controls whether to calculate directed
  *    betweenness (i.e. directed paths) for directed graphs, and whether
  *    to use the directed version of modularity. It is ignored for undirected
  *    graphs.
@@ -537,18 +535,18 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     } else {
         if (igraph_vector_size(lengths) != no_of_edges) {
-            IGRAPH_ERROR("Egde length vector size must agree with number of edges.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Edge length vector size must agree with number of edges.", IGRAPH_EINVAL);
         }
 
         if (no_of_edges > 0) {
             /* Must not call vector_min on empty vector */
             igraph_real_t minlength = igraph_vector_min(lengths);
             if (minlength <= 0) {
-                IGRAPH_ERROR("Egde lengths must be strictly positive.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge lengths must be strictly positive.", IGRAPH_EINVAL);
             }
 
             if (isnan(minlength)) {
-                IGRAPH_ERROR("Egde lengths must not be NaN.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge lengths must not be NaN.", IGRAPH_EINVAL);
             }
         }
 

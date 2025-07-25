@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -21,9 +20,7 @@
 
 */
 
-#include "igraph.h"
-
-#include <math.h>
+#include <igraph.h>
 
 int main(void) {
 

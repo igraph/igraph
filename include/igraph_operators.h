@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_OPERATORS_H
@@ -34,7 +29,7 @@
 #include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Graph operators                                    */
@@ -78,22 +73,23 @@ IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
                                              igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
                                              const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
-                                              const igraph_vs_t vids,
+                                              igraph_vs_t vids,
                                               igraph_subgraph_implementation_t impl,
                                               igraph_vector_int_t *map,
                                               igraph_vector_int_t *invmap);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
-                                          const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
+                                          igraph_vs_t vids, igraph_subgraph_implementation_t impl);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_edges(
         const igraph_t *graph, igraph_vs_t vids, igraph_vector_int_t *edges);
 IGRAPH_EXPORT igraph_error_t igraph_subgraph_from_edges(const igraph_t *graph, igraph_t *res,
-                                        const igraph_es_t eids, igraph_bool_t delete_vertices);
-IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids);
+                                        igraph_es_t eids, igraph_bool_t delete_vertices);
+IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, igraph_es_t eids);
+IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
+                                            const igraph_t *g1,
+                                            const igraph_t *g2,
+                                            igraph_product_t type);
+IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subgraph_edges(
-        const igraph_t *graph, igraph_t *res, const igraph_es_t eids,
-        igraph_bool_t delete_vertices
-);
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

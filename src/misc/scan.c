@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
@@ -26,7 +25,6 @@
 #include "igraph_adjlist.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -65,46 +63,7 @@
 igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                         const igraph_vector_t *weights,
                         igraph_neimode_t mode) {
-    return igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
-                    weights);
-}
-
-/* This removes loop, multiple edges and edges that point
-   "backwards" according to the rank vector. It works on
-   edge lists */
-
-static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
-                                       const igraph_vector_int_t *rank) {
-
-    igraph_integer_t i;
-    igraph_integer_t n = il->length;
-    igraph_vector_int_t mark;
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, n);
-
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = &il->incs[i];
-        igraph_integer_t j, l = igraph_vector_int_size(v);
-        igraph_integer_t irank = VECTOR(*rank)[i];
-        VECTOR(mark)[i] = i + 1;
-        for (j = 0; j < l; /* nothing */) {
-            igraph_integer_t edge = VECTOR(*v)[j];
-            igraph_integer_t e = IGRAPH_OTHER(graph, edge, i);
-            if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i + 1) {
-                VECTOR(mark)[e] = i + 1;
-                j++;
-            } else {
-                VECTOR(*v)[j] = igraph_vector_int_tail(v);
-                igraph_vector_int_pop_back(v);
-                l--;
-            }
-        }
-    }
-
-    igraph_vector_int_destroy(&mark);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-
+    return igraph_strength(graph, res, igraph_vss_all(), mode, IGRAPH_LOOPS, weights);
 }
 
 /* This one handles both weighted and unweighted cases */
@@ -577,6 +536,7 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
  * \param them The input graph to perform the counting.
  * \param k The size of the neighborhood, non-negative integer.
  *        The k=0 case is special, see \ref igraph_local_scan_0_them().
+ * \param res An initialized vector, the results are stored here.
  * \param weights_them Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
  * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,

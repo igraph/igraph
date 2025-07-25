@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2011-2021  The igraph development team
@@ -88,7 +87,7 @@ void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits
         mask = ((igraph_integer_t) 1 << (j + 1)) - 1;
         igraph_vector_bool_init(&seen, mask + 1);
         for (i = 0; i < num_bits - j; i++, mask <<= 1) {
-            still_needed = (1 << (j + 1));
+            still_needed = ((igraph_uint_t) 1 << (j + 1));
             igraph_vector_bool_fill(&seen, 0);
             for (k = 0; k < n; k++) {
                 masked = (VECTOR(*numbers)[k] & mask) >> i;
@@ -140,13 +139,12 @@ void stress_tests(void) {
         &igraph_rngtype_pcg32,
         &igraph_rngtype_pcg64,
     };
-    igraph_integer_t i;
     igraph_vector_int_t numbers;
     const igraph_integer_t N = 1000;
 
     igraph_vector_int_init(&numbers, N);
 
-    for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
+    for (size_t i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
         igraph_error_handler_t *oldhandler = igraph_set_error_handler(&igraph_error_handler_printignore);
         igraph_error_t err = igraph_rng_init(&rng, rng_types[i]);
         switch (err) {

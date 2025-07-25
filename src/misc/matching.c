@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2012  Tamas Nepusz <ntamas@gmail.com>
@@ -34,23 +32,10 @@
 
 /* #define MATCHING_DEBUG */
 
-#ifdef _MSC_VER
-/* MSVC does not support variadic macros */
-#include <stdarg.h>
-static void debug(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-#ifdef MATCHING_DEBUG
-    vfprintf(stderr, fmt, args);
-#endif
-    va_end(args);
-}
-#else
 #ifdef MATCHING_DEBUG
     #define debug(...) fprintf(stderr, __VA_ARGS__)
 #else
     #define debug(...)
-#endif
 #endif
 
 /**
@@ -122,7 +107,7 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
         }
     }
 
-    if (types != 0) {
+    if (types) {
         /* Matched vertices must be of different types */
         for (i = 0; i < no_of_nodes; i++) {
             j = VECTOR(*matching)[i];
@@ -156,6 +141,7 @@ igraph_error_t igraph_is_matching(const igraph_t *graph,
  *                 or -1 if vertex i is unmatched.
  * \param result Pointer to a boolean variable, the result will be returned
  *               here.
+ * \return Error code.
  *
  * \sa \ref igraph_is_matching() if you are only interested in whether a
  *     matching vector is valid for a given graph.
@@ -180,21 +166,22 @@ igraph_error_t igraph_is_maximal_matching(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    valid = 1;
+    valid = true;
     for (i = 0; i < no_of_nodes; i++) {
         j = VECTOR(*matching)[i];
         if (j != -1) {
             continue;
         }
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
-                                      IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, i, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         n = igraph_vector_int_size(&neis);
         for (j = 0; j < n; j++) {
             if (VECTOR(*matching)[VECTOR(neis)[j]] == -1) {
-                if (types == 0 ||
+                if (types == NULL ||
                     VECTOR(*types)[i] != VECTOR(*types)[VECTOR(neis)[j]]) {
-                    valid = 0; break;
+                    valid = false; break;
                 }
             }
         }
@@ -368,8 +355,9 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
         if (MATCHED(i)) {
             continue;
         }
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
-                                      IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, i, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         n = igraph_vector_int_size(&neis);
         for (j = 0; j < n; j++) {
             k = VECTOR(neis)[j];
@@ -415,8 +403,9 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
         debug("Considering vertex %ld\n", v);
 
         /* Line 5: find row u among the neighbors of v s.t. label(u) is minimal */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v,
-                                      IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, v, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
         n = igraph_vector_int_size(&neis);
         for (i = 0; i < n; i++) {
             if (VECTOR(labels)[VECTOR(neis)[i]] < label_u) {
@@ -497,8 +486,9 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         igraph_integer_t v = igraph_dqueue_int_pop(&q);
         igraph_integer_t w;
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v,
-                                      IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, v, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE
+        ));
 
         n = igraph_vector_int_size(&neis);
         for (j = 0; j < n; j++) {

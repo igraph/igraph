@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -145,17 +144,32 @@ igraph_vs_t igraph_vss_all(void) {
  *          from/to \c vid. That is, all the neighbors of \c vid considered
  *          as if the graph is undirected.
  *        \endclist
+ * \param loops Whether to include the vertex itself in the neighborhood if the
+ *        vertex has a loop edge. If \c IGRAPH_NO_LOOPS, loop edges are
+ *        excluded. If \c IGRAPH_LOOPS_ONCE, the vertex is included in its own
+ *        neighborhood once for every loop edge that it has. If
+ *        \c IGRAPH_LOOPS_TWICE, the vertex is included twice in its own
+ *        neighborhood for every loop edge that it has, but only if the graph is
+ *        undirected or \p mode is set to \c IGRAPH_ALL.
+ * \param multiple Whether to include multiple edges. If \c IGRAPH_NO_MULTIPLE,
+ *        multiple edges are not included in the neighborhood. If
+ *        \c IGRAPH_MULTIPLE, multiple edges are included in the neighborhood.
+ *
  * \return Error code.
  * \sa \ref igraph_vs_destroy()
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
-                  igraph_integer_t vid, igraph_neimode_t mode) {
+igraph_error_t igraph_vs_adj(
+    igraph_vs_t *vs, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_bool_t multiple
+) {
     vs->type = IGRAPH_VS_ADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
+    vs->data.adj.loops = loops;
+    vs->data.adj.multiple = multiple;
     return IGRAPH_SUCCESS;
 }
 
@@ -201,6 +215,8 @@ igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
     vs->type = IGRAPH_VS_NONADJ;
     vs->data.adj.vid = vid;
     vs->data.adj.mode = mode;
+    vs->data.adj.loops = IGRAPH_LOOPS;
+    vs->data.adj.multiple = IGRAPH_MULTIPLE;
     return IGRAPH_SUCCESS;
 }
 
@@ -546,8 +562,9 @@ igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
  * \function igraph_vs_copy
  * \brief Creates a copy of a vertex selector.
  *
- * \param src The selector being copied.
  * \param dest An uninitialized selector that will contain the copy.
+ * \param src The selector being copied.
+ * \return Error code.
  */
 igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     igraph_vector_int_t *vec;
@@ -586,7 +603,9 @@ igraph_vs_type_t igraph_vs_type(const igraph_vs_t *vs) {
  * yield when it is iterated over.
  *
  * \param graph The graph over which we will iterate.
+ * \param vs the vertex selector.
  * \param result The result will be returned here.
+ * \return Error code.
  */
 igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
                    igraph_integer_t *result) {
@@ -615,7 +634,10 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
 
     case IGRAPH_VS_ADJ:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs->data.adj.vid, vs->data.adj.mode,
+            vs->data.adj.loops, vs->data.adj.multiple
+        ));
         *result = igraph_vector_int_size(&vec);
         igraph_vector_int_destroy(&vec);
         IGRAPH_FINALLY_CLEAN(1);
@@ -623,7 +645,10 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
 
     case IGRAPH_VS_NONADJ:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs->data.adj.vid, vs->data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs->data.adj.vid, vs->data.adj.mode,
+            vs->data.adj.loops, vs->data.adj.multiple
+        ));
         vec_len = igraph_vector_int_size(&vec);
         *result = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(*result, igraph_bool_t);
@@ -704,7 +729,10 @@ igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_v
         IGRAPH_FINALLY(igraph_free, vec_int);
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs.data.adj.vid, vs.data.adj.mode,
+            vs.data.adj.loops, vs.data.adj.multiple
+        ));
         n = igraph_vector_int_size(&vec);
         IGRAPH_CHECK(igraph_vector_int_resize(vec_int, n));
         for (i = 0; i < n; i++) {
@@ -727,7 +755,10 @@ igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_v
         IGRAPH_FINALLY(igraph_free, vec_int);
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, vs.data.adj.vid, vs.data.adj.mode));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &vec, vs.data.adj.vid, vs.data.adj.mode,
+            vs.data.adj.loops, vs.data.adj.multiple
+        ));
         vec_len = igraph_vector_int_size(&vec);
         n = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(n, igraph_bool_t);
@@ -937,17 +968,25 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  *        \c IGRAPH_OUT, outgoing edges;
  *        \c IGRAPH_IN, incoming edges;
  *        \c IGRAPH_ALL, all edges.
+ * \param loops Whether to include loop edges in the result. If
+ *        \c IGRAPH_NO_LOOPS, loop edges are excluded. If \c IGRAPH_LOOPS_ONCE,
+ *        loop edges are included once. If \c IGRAPH_LOOPS_TWICE, loop edges
+ *        are included twice, but only if the graph is undirected or \p mode is
+ *        set to \c IGRAPH_ALL.
  * \return Error code.
  * \sa \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t igraph_es_incident(igraph_es_t *es,
-                       igraph_integer_t vid, igraph_neimode_t mode) {
+igraph_error_t igraph_es_incident(
+    igraph_es_t *es, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops
+) {
     es->type = IGRAPH_ES_INCIDENT;
     es->data.incident.vid = vid;
     es->data.incident.mode = mode;
+    es->data.incident.loops = loops;
     return IGRAPH_SUCCESS;
 }
 
@@ -1113,7 +1152,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
  * interval is closed from the left and open from the right, following C
  * conventions.
  *
- * \param vs Pointer to an uninitialized edge selector object.
+ * \param es Pointer to an uninitialized edge selector object.
  * \param start The first edge ID to be included in the edge selector.
  * \param end The first edge ID \em not to be included in the edge selector.
  * \return Error code.
@@ -1335,7 +1374,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int
  * \param es Pointer to an uninitialized edge selector object.
  * \param from The ID of the source vertex.
  * \param to The ID of the target vertex.
- * \param direectd If edge directions should be taken into account. This
+ * \param directed If edge directions should be taken into account. This
  *      will be ignored if the graph to select from is undirected.
  * \return Error code.
  * \sa \ref igraph_es_destroy()
@@ -1410,8 +1449,11 @@ igraph_bool_t igraph_es_is_all(const igraph_es_t *es) {
 /**
  * \function igraph_es_copy
  * \brief Creates a copy of an edge selector.
- * \param src The selector being copied.
+ *
  * \param dest An uninitialized selector that will contain the copy.
+ * \param src The selector being copied.
+ * \return Error code.
+ *
  * \sa \ref igraph_es_destroy()
  */
 igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
@@ -1454,6 +1496,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
  * \param graph Pointer to a graph to check if the edges in the selector exist.
  * \param es An edge selector object.
  * \param v Pointer to initialized vector. The result will be stored here.
+ * \return Error code.
  *
  * Time complexity: O(n), the number of edges in the selector.
  */
@@ -1493,7 +1536,9 @@ static igraph_error_t igraph_i_es_all_between_size(const igraph_t *graph,
  * yield when it is iterated over.
  *
  * \param graph The graph over which we will iterate.
+ * \param es The edge selector.
  * \param result The result will be returned here.
+ * \return Error code.
  */
 igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
                    igraph_integer_t *result) {
@@ -1514,8 +1559,10 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
 
     case IGRAPH_ES_INCIDENT:
         IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 0);
-        IGRAPH_CHECK(igraph_incident(graph, &v,
-                                     es->data.incident.vid, es->data.incident.mode));
+        IGRAPH_CHECK(igraph_incident(
+            graph, &v, es->data.incident.vid, es->data.incident.mode,
+            es->data.incident.loops
+        ));
         *result = igraph_vector_int_size(&v);
         igraph_vector_int_destroy(&v);
         IGRAPH_FINALLY_CLEAN(1);
@@ -1662,7 +1709,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         igraph_vector_int_t adj;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode, IGRAPH_LOOPS));
             igraph_vector_int_append(vec, &adj);  /* reserved */
         }
         igraph_vector_int_destroy(&adj);
@@ -1675,7 +1722,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         IGRAPH_CHECK_OOM(added, "Cannot create edge iterator.");
         IGRAPH_FINALLY(igraph_free, added);
         for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL, IGRAPH_LOOPS));
             const igraph_integer_t length = igraph_vector_int_size(&adj);
             for (igraph_integer_t j = 0; j < length; j++) {
                 if (!added[ VECTOR(adj)[j] ]) {
@@ -1706,7 +1753,10 @@ static igraph_error_t igraph_i_eit_create_incident(const igraph_t* graph,
     igraph_integer_t i, n;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-    IGRAPH_CHECK(igraph_incident(graph, &vec, es.data.incident.vid, es.data.incident.mode));
+    IGRAPH_CHECK(igraph_incident(
+        graph, &vec, es.data.incident.vid, es.data.incident.mode,
+        es.data.incident.loops
+    ));
 
     vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec_int, "Cannot create edge iterator.");

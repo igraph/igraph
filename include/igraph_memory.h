@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_MEMORY_H
@@ -29,9 +24,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
-/* Helper macto to check if n*sizeof(t) overflows in IGRAPH_CALLOC and IGRAPH_REALLOC */
+/* Helper macro to check if n*sizeof(t) overflows in IGRAPH_CALLOC and IGRAPH_REALLOC */
 #define IGRAPH_I_ALLOC_CHECK_OVERFLOW(n,t,expr) \
     (t*) ((0 <= (n) && ((size_t)(n)) <= SIZE_MAX / sizeof(t)) ? (expr) : NULL)
 
@@ -45,6 +40,6 @@ IGRAPH_EXPORT void *igraph_malloc(size_t size);
 IGRAPH_EXPORT void *igraph_realloc(void* ptr, size_t size);
 IGRAPH_EXPORT void igraph_free(void *ptr);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

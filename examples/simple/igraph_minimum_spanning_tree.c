@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,19 +13,18 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 
 int main(void) {
-
-    igraph_t graph, tree;
+    igraph_t graph;
     igraph_vector_t eb;
     igraph_vector_int_t edges;
+
+    /* Create the vector where the tree edges will be stored. */
+    igraph_vector_int_init(&edges, 0);
 
     /* Create the Frucht graph */
     igraph_famous(&graph, "Frucht");
@@ -36,18 +33,18 @@ int main(void) {
     igraph_vector_init(&eb, igraph_ecount(&graph));
     igraph_edge_betweenness(&graph, &eb, IGRAPH_UNDIRECTED, /*weights=*/ NULL);
 
-    /* Compute and output a minimum weight spanning tree using edge betweenness
-     * values as weights. */
-    igraph_minimum_spanning_tree_prim(&graph, &tree, &eb);
-    printf("Minimum spanning tree:\n");
-    igraph_write_graph_edgelist(&tree, stdout);
+    /* Use Prim's algorithm to compute the edges that belong to the minimum weight
+     * spanning tree, using edge betweenness values as edge weights. */
+    igraph_minimum_spanning_tree(&graph, &edges, &eb, IGRAPH_MST_PRIM);
+    printf("Minimum spanning tree edges:\n");
+    igraph_vector_int_print(&edges);
 
     /* A maximum spanning tree can be computed by first negating the weights. */
     igraph_vector_scale(&eb, -1);
 
-    /* Compute and output the edges that belong to the maximum weight spanning tree. */
-    igraph_vector_int_init(&edges, 0);
-    igraph_minimum_spanning_tree(&graph, &edges, &eb);
+    /* Compute and output the edges that belong to the maximum weight spanning tree,
+     * letting igraph automatically select the most suitable algorithm. */
+    igraph_minimum_spanning_tree(&graph, &edges, &eb, IGRAPH_MST_AUTOMATIC);
     printf("\nMaximum spanning tree edges:\n");
     igraph_vector_int_print(&edges);
 
@@ -59,10 +56,9 @@ int main(void) {
     printf("\nTotal maximum spanning tree weight: %g\n", total_tree_weight);
 
     /* Clean up */
-    igraph_vector_int_destroy(&edges);
-    igraph_destroy(&tree);
     igraph_destroy(&graph);
     igraph_vector_destroy(&eb);
+    igraph_vector_int_destroy(&edges);
 
     return 0;
 }

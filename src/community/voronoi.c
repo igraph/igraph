@@ -170,7 +170,7 @@ static igraph_error_t choose_generators(
 
     /* ord[i] is the index of the ith largest element of local_rel_dens */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ord, 0);
-    IGRAPH_CHECK(igraph_vector_qsort_ind(local_rel_dens, &ord, IGRAPH_DESCENDING));
+    IGRAPH_CHECK(igraph_vector_sort_ind(local_rel_dens, &ord, IGRAPH_DESCENDING));
 
     /* If excluded[v] is true, then v is closer to some already chosen generator than r */
     IGRAPH_BITSET_INIT_FINALLY(&excluded, no_of_nodes);
@@ -635,7 +635,7 @@ igraph_error_t igraph_community_voronoi(
         IGRAPH_CHECK(choose_generators(graph, pgenerators, NULL, &local_rel_dens, &lengths2, mode, r));
         IGRAPH_CHECK(igraph_voronoi(graph, membership, NULL, pgenerators, &lengths2, mode, IGRAPH_VORONOI_RANDOM));
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, weights, 1,
+            IGRAPH_CHECK(igraph_modularity(graph, pmembership, weights, 1,
                                            mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED, modularity));
         }
     }

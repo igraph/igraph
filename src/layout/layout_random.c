@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2020  The igraph development team
@@ -49,14 +47,10 @@ igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res)
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
 
-    RNG_BEGIN();
-
     for (i = 0; i < no_of_nodes; i++) {
         MATRIX(*res, i, 0) = RNG_UNIF(-1, 1);
         MATRIX(*res, i, 1) = RNG_UNIF(-1, 1);
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -86,15 +80,11 @@ igraph_error_t igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *r
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
 
-    RNG_BEGIN();
-
     for (i = 0; i < no_of_nodes; i++) {
         MATRIX(*res, i, 0) = RNG_UNIF(-1, 1);
         MATRIX(*res, i, 1) = RNG_UNIF(-1, 1);
         MATRIX(*res, i, 2) = RNG_UNIF(-1, 1);
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -154,7 +144,6 @@ igraph_error_t igraph_i_layout_random_bounded(
         }
     }
 
-    RNG_BEGIN();
     IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
     for (igraph_integer_t i = 0; i < no_nodes; i++) {
         igraph_real_t x1 = minx ? VECTOR(*minx)[i] : dminx;
@@ -176,7 +165,6 @@ igraph_error_t igraph_i_layout_random_bounded(
         MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
         MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
     }
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -251,7 +239,6 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         }
     }
 
-    RNG_BEGIN();
     IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
     for (igraph_integer_t i = 0; i < no_nodes; i++) {
         igraph_real_t x1 = minx ? VECTOR(*minx)[i] : dminx;
@@ -282,7 +269,6 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
         MATRIX(*res, i, 2) = RNG_UNIF(z1, z2);
     }
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

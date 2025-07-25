@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
@@ -89,10 +88,17 @@ int main(void) {
     print_and_destroy(&g, IGRAPH_ALL, &weights);
     igraph_vector_destroy(&weights);
 
-    printf("Directed star graph with weights:\n");
+    printf("Directed out-star graph with weights:\n");
     igraph_star(&g, 5, IGRAPH_STAR_OUT, 0);
     igraph_vector_init(&weights, 4);
     igraph_vector_fill(&weights, 1);
+    print_and_destroy(&g, IGRAPH_OUT, &weights);
+    igraph_vector_destroy(&weights);
+
+    printf("Directed in-star graph with weights:\n");
+    igraph_star(&g, 5, IGRAPH_STAR_IN, 0);
+    igraph_vector_init(&weights, 4);
+    igraph_vector_fill(&weights, 2);
     print_and_destroy(&g, IGRAPH_OUT, &weights);
     igraph_vector_destroy(&weights);
 
@@ -137,7 +143,6 @@ int main(void) {
     igraph_vector_init_range(&weights, 1, igraph_ecount(&g)+1);
     print_and_destroy(&g, IGRAPH_ALL, &weights);
     igraph_vector_destroy(&weights);
-
 
     VERIFY_FINALLY_STACK();
 

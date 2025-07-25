@@ -1,3 +1,20 @@
+/*
+   IGraph library.
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
@@ -25,11 +42,9 @@ int main(void) {
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted, " TOSTR(REP) "x",
           REPEAT(igraph_distances(&g, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
@@ -50,14 +65,12 @@ int main(void) {
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < trunc(0.005 * igraph_ecount(&g)); i++) {
         /* For reproducibility, do not write two RNG_...() calls on the same line
          * as the C language does not guarantee any evaluation order between them. */
         igraph_real_t w = RNG_UNIF(-0.05, 0);
         VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = w;
     }
-    RNG_END();
 
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
@@ -88,11 +101,9 @@ int main(void) {
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted, " TOSTR(REP) "x",
           REPEAT(igraph_distances(&g, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
@@ -113,14 +124,12 @@ int main(void) {
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < trunc(0.002 * igraph_ecount(&g)); i++) {
         /* For reproducibility, do not write two RNG_...() calls on the same line
          * as the C language does not guarantee any evaluation order between them. */
         igraph_real_t w = RNG_UNIF(-0.02, 0);
         VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = w;
     }
-    RNG_END();
 
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
@@ -151,11 +160,9 @@ int main(void) {
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
-    RNG_END();
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted, " TOSTR(REP) "x",
           REPEAT(igraph_distances(&g, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
@@ -176,14 +183,12 @@ int main(void) {
           REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < trunc(0.01 * igraph_ecount(&g)); i++) {
         /* For reproducibility, do not write two RNG_...() calls on the same line
          * as the C language does not guarantee any evaluation order between them. */
         igraph_real_t w = RNG_UNIF(-0.02, 0);
         VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = w;
     }
-    RNG_END();
 
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)

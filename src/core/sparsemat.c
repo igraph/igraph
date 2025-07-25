@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -169,19 +168,6 @@ igraph_error_t igraph_sparsemat_init_copy(
     memcpy(to->cs->x, from->cs->x, sizeof(CS_ENTRY) * (size_t) (from->cs->nzmax));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_sparsemat_copy
- * \brief Copies a sparse matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_copy 0.10
- */
-
-igraph_error_t igraph_sparsemat_copy(
-    igraph_sparsemat_t *to, const igraph_sparsemat_t *from
-) {
-    return igraph_sparsemat_init_copy(to, from);
 }
 
 /**
@@ -932,9 +918,9 @@ igraph_error_t igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
  *
  * \param A The first input matrix, in column-compressed format.
  * \param B The second input matrix, in column-compressed format.
- * \param alpha Real scalar, \p A is multiplied by \p alpha before the
+ * \param alpha Real value, \p A is multiplied by \p alpha before the
  *    addition.
- * \param beta Real scalar, \p B is multiplied by \p beta before the
+ * \param beta Real value, \p B is multiplied by \p beta before the
  *    addition.
  * \param res Pointer to an uninitialized sparse matrix, the result
  *    is stored here.
@@ -1141,7 +1127,7 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
  * Solve Ax=b, where A is a symmetric positive definite matrix.
  *
  * \param A The input matrix, in column-compressed format.
- * \param v The right hand side.
+ * \param b The right hand side.
  * \param res An initialized vector, the result is stored here.
  * \param order An integer giving the ordering method to use for the
  *    factorization. Zero is the natural ordering; if it is one, then
@@ -1298,8 +1284,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
  * \param graph Pointer to an uninitialized igraph_t object, the
  *    graphs is stored here.
  * \param A The input matrix, in triplet or column-compressed format.
- * \param directed Boolean scalar, whether to create a directed
- *    graph.
+ * \param directed Whether to create a directed graph.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -1537,20 +1522,6 @@ igraph_error_t igraph_sparsemat_init_eye(
     }
 }
 
-/**
- * \function igraph_sparsemat_eye
- * \brief Creates a sparse identity matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_eye 0.10
- */
-
-igraph_error_t igraph_sparsemat_eye(
-    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
-    igraph_real_t value, igraph_bool_t compress
-) {
-    return igraph_sparsemat_init_eye(A, n, nzmax, value, compress);
-}
-
 static igraph_error_t igraph_i_sparsemat_init_diag_triplet(
     igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values
 ) {
@@ -1617,20 +1588,6 @@ igraph_error_t igraph_sparsemat_init_diag(
     }
 }
 
-/**
- * \function igraph_sparsemat_diag
- * \brief Creates a sparse diagonal matrix (deprecated alias).
- *
- * \deprecated-by igraph_sparsemat_init_diag 0.10
- */
-
-igraph_error_t igraph_sparsemat_diag(
-    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values,
-    igraph_bool_t compress
-) {
-    return igraph_sparsemat_init_diag(A, nzmax, values, compress);
-}
-
 static igraph_error_t igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
                                               const igraph_real_t *from,
                                               int n,
@@ -1678,7 +1635,7 @@ static igraph_error_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
  * \function igraph_sparsemat_arpack_rssolve
  * \brief Eigenvalues and eigenvectors of a symmetric sparse matrix via ARPACK.
  *
- * \param The input matrix, must be column-compressed.
+ * \param A The input matrix, must be column-compressed.
  * \param options It is passed to \ref igraph_arpack_rssolve(). Supply
  *    \c NULL here to use the defaults. See \ref igraph_arpack_options_t for the
  *    details. If \c mode is 1, then ARPACK uses regular mode, if \c mode is 3,
@@ -2116,9 +2073,9 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
  * \param res An uninitialized sparse matrix, the result is stored
  *    here.
  * \param mat The dense input matrix.
- * \param tol Real scalar, the tolerance. Values closer than \p tol to
- *    zero are considered as zero, and will not be included in the
- *    sparse matrix.
+ * \param tol The tolerance for zero comparisons. Values closer than
+ *    \p tol to zero are considered as zero, and will not be included
+ *    in the sparse matrix.
  * \return Error code.
  *
  * \sa \ref igraph_sparsemat_as_matrix() for the reverse conversion.
@@ -2370,10 +2327,10 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  * \function igraph_sparsemat_count_nonzerotol
  * \brief Counts nonzero elements of a sparse matrix, ignoring elements close to zero.
  *
- * Count the number of matrix entries that are closer to zero than \p
- * tol.
- * \param The input matrix, column-compressed.
- * \param Real scalar, the tolerance.
+ * Count the number of matrix entries that are closer to zero than \p tol.
+ *
+ * \param A The input matrix, column-compressed.
+ * \param tol The tolerance for zero comparisons.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -2862,7 +2819,8 @@ igraph_error_t igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
  * \function igraph_sparsemat_scale
  * \brief Scales a sparse matrix.
  *
- * Multiplies all elements of a sparse matrix, by the given scalar.
+ * Multiplies all elements of a sparse matrix, by the given factor.
+ *
  * \param A The input matrix.
  * \param by The scaling factor.
  * \return Error code.

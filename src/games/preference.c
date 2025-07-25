@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -67,10 +65,10 @@
  *   graph is undirected.
  * \param node_type_vec A vector where the individual generated vertex types
  *   will be stored. If \c NULL, the vertex types won't be saved.
- * \param directed Logical, whether to generate a directed graph. If undirected
+ * \param directed Whether to generate a directed graph. If undirected
  *   graphs are requested, only the lower left triangle of the preference
  *   matrix is considered.
- * \param loops Logical, whether loop edges are allowed.
+ * \param loops Whether loop edges are allowed.
  * \return Error code.
  *
  * Added in version 0.3.</para><para>
@@ -160,8 +158,6 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     }
 
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vids_by_type, types);
-
-    RNG_BEGIN();
 
     if (!fixed_sizes) {
 
@@ -327,8 +323,6 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         }
     }
 
-    RNG_END();
-
     igraph_vector_destroy(&s);
     igraph_vector_int_list_destroy(&vids_by_type);
     IGRAPH_FINALLY_CLEAN(2);
@@ -373,7 +367,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *   vertex types will be stored. If \c NULL, the vertex types won't be saved.
  * \param node_type_in_vec A vector where the individual generated "incoming"
  *   vertex types will be stored. If \c NULL, the vertex types won't be saved.
- * \param loops Logical, whether loop edges are allowed.
+ * \param loops Whether loop edges are allowed.
  * \return Error code.
  *
  * Added in version 0.3.</para><para>
@@ -490,8 +484,6 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     }
     maxcum = igraph_vector_tail(&cumdist);
 
-    RNG_BEGIN();
-
     for (i = 0; i < nodes; i++) {
         igraph_integer_t in_type, out_type;
         igraph_real_t uni1 = RNG_UNIF(0, maxcum);
@@ -592,8 +584,6 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             }
         }
     }
-
-    RNG_END();
 
     igraph_vector_destroy(&s);
     igraph_vector_int_destroy(&intersect);

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2020  The igraph development team
@@ -55,7 +54,7 @@ void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read the DL file from.
- * \param directed Logical scalar, whether to create a directed file.
+ * \param directed Boolean, whether to create a directed file.
  * \return Error code.
  *
  * Time complexity: linear in terms of the number of edges and

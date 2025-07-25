@@ -12,5 +12,10 @@ Directed graph with loops and multi-edges, order 2, mindist 2, IGRAPH_OUT:
 ( 1 1 2 0 0 0 )
 Directed graph with loops and multi-edges, order 4, mindist 4, IGRAPH_ALL:
 ( 0 0 0 0 0 0 )
-Negative order.
+Directed graph with loops and multi-edges, infinite order, IGRAPH_OUT:
+( 5 3 5 2 1 1 )
+Directed graph with loops and multi-edges, infinite order, mindist 2, IGRAPH_OUT:
+( 2 1 2 0 0 0 )
+Directed graph with loops and multi-edges, infinite order, mindist 2, IGRAPH_IN:
+( 0 1 0 1 3 0 )
 Negative mindist.

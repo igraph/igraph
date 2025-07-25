@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2020  The igraph development team
@@ -27,9 +25,26 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 #include "layout/merge_grid.h"
 #include "layout/layout_internal.h"
+
+static igraph_error_t vector_order(igraph_vector_t *v) {
+    const igraph_integer_t n = igraph_vector_size(v);
+    igraph_vector_int_t ind;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&ind, n);
+    IGRAPH_CHECK(igraph_vector_sort_ind(v, &ind, IGRAPH_DESCENDING));
+
+    for (igraph_integer_t i=0; i < n; i++) {
+        VECTOR(*v)[i] = VECTOR(ind)[i];
+    }
+
+    igraph_vector_int_destroy(&ind);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \function igraph_layout_merge_dla
@@ -84,8 +99,6 @@ igraph_error_t igraph_layout_merge_dla(
     IGRAPH_VECTOR_INIT_FINALLY(&ny, coords_len);
     IGRAPH_VECTOR_INIT_FINALLY(&nr, coords_len);
 
-    RNG_BEGIN();
-
     for (i = 0; i < coords_len; i++) {
         igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
         igraph_integer_t size = igraph_matrix_nrow(mat);
@@ -109,7 +122,7 @@ igraph_error_t igraph_layout_merge_dla(
                                   igraph_vector_get_ptr(&ny, i),
                                   igraph_vector_get_ptr(&nr, i));
     }
-    igraph_vector_order2(&sizes); /* largest first */
+    vector_order(&sizes); /* largest first */
 
     /* 0. create grid */
     minx = miny = -sqrt(5 * area);
@@ -165,8 +178,6 @@ igraph_error_t igraph_layout_merge_dla(
             ++respos;
         }
     }
-
-    RNG_END();
 
     igraph_i_layout_mergegrid_destroy(&grid);
     igraph_vector_destroy(&sizes);

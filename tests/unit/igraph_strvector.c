@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
@@ -183,6 +182,10 @@ int main(void) {
     igraph_strvector_set(&sv1, 0, "one");
     igraph_strvector_set(&sv1, 2, "two");
     strvector_print(&sv1);
+
+    igraph_strvector_swap_elements(&sv1, 1, 0);
+    strvector_print(&sv1);
+
     igraph_strvector_destroy(&sv1);
 
     VERIFY_FINALLY_STACK();

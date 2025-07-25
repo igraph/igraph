@@ -138,7 +138,7 @@ int main(void) {
         igraph_vector_int_resize(&membership, 1);
 
         handler = igraph_set_error_handler(igraph_error_handler_ignore);
-        ret = igraph_community_optimal_modularity(&g, &m, &membership, NULL);
+        ret = igraph_community_optimal_modularity(&g, NULL, 1, &m, &membership);
         igraph_set_error_handler(handler);
 
         if (ret != IGRAPH_UNIMPLEMENTED) {

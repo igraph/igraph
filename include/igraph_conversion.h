@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_CONVERSION_H
@@ -33,7 +28,7 @@
 #include "igraph_sparsemat.h"
 #include "igraph_attributes.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Conversion                                         */
@@ -58,14 +53,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_stochastic_sparse(
    const igraph_vector_t *weights
 );
 
-/* Deprecated, will be removed in 0.11. Use igraph_get_adjacency_sparse() instead, paying attention to differences. */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res);
-
-/* Deprecated, will be removed in 0.11. Use igraph_get_stochastic_sparse() instead, paying attention to differences. */
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
-                                                  igraph_sparsemat_t *res,
-                                                  igraph_bool_t column_wise);
-
 IGRAPH_EXPORT igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol);
 
 IGRAPH_EXPORT igraph_error_t igraph_to_directed(igraph_t *graph,
@@ -75,6 +62,6 @@ IGRAPH_EXPORT igraph_error_t igraph_to_undirected(igraph_t *graph,
                                        const igraph_attribute_combination_t *edge_comb);
 IGRAPH_EXPORT igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

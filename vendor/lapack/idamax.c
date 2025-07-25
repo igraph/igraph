@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -53,7 +53,7 @@
    > \param[in] INCX   
    > \verbatim   
    >          INCX is INTEGER   
-   >         storage spacing between elements of SX   
+   >         storage spacing between elements of DX   
    > \endverbatim   
 
     Authors:   
@@ -64,9 +64,7 @@
    > \author Univ. of Colorado Denver   
    > \author NAG Ltd.   
 
-   > \date November 2017   
-
-   > \ingroup aux_blas   
+   > \ingroup iamax   
 
    > \par Further Details:   
     =====================   
@@ -90,10 +88,9 @@ integer igraphidamax_(integer *n, doublereal *dx, integer *incx)
     doublereal dmax__;
 
 
-/*  -- Reference BLAS level1 routine (version 3.8.0) --   
+/*  -- Reference BLAS level1 routine --   
     -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2017   
 
 
     =====================================================================   
@@ -139,5 +136,8 @@ integer igraphidamax_(integer *n, doublereal *dx, integer *incx)
 	}
     }
     return ret_val;
+
+/*     End of IDAMAX */
+
 } /* igraphidamax_ */
 

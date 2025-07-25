@@ -62,11 +62,11 @@ int main(void) {
             }
         }
 
-        igraph_diameter(&g, /*res=*/ NULL, /*from=*/ NULL, /*to=*/ NULL, &path, NULL,
+        igraph_diameter(&g, /*weights=*/ NULL, /*res=*/ NULL, /*from=*/ NULL, /*to=*/ NULL, &path, NULL,
                         IGRAPH_UNDIRECTED, /*unconn=*/ true);
         igraph_vector_int_update(&pairs, &path);
         igraph_expand_path_to_pairs(&pairs);
-        igraph_get_eids(&g, &eids, &pairs, 0, /*error=*/ true);
+        igraph_get_eids(&g, &eids, &pairs, /* directed= */ false, /*error=*/ true);
         for (e = 0; e < igraph_vector_int_size(&path) - 1; e++) {
             igraph_integer_t edge = VECTOR(eids)[e];
             igraph_integer_t from1 = VECTOR(path)[e];

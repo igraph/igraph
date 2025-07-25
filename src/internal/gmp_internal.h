@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2020 The igraph development team
@@ -23,7 +21,7 @@
 #ifndef IGRAPH_GMP_H
 #define IGRAPH_GMP_H
 
-#include "config.h"
+#include "config.h" /* INTERNAL_GMP */
 
 #ifdef INTERNAL_GMP
 #include "mini-gmp/mini-gmp.h"

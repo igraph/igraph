@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2021 The igraph development team
@@ -27,12 +26,12 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
-igraph_error_t igraph_random_sample_real(
+igraph_error_t igraph_i_random_sample_real(
         igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
         igraph_integer_t length);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

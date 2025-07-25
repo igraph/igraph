@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2020  The igraph development team
@@ -28,7 +26,7 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
+#include "core/math.h" /* M_PI */
 
 /**
  * \ingroup layout
@@ -131,8 +129,6 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 10);
 
-    RNG_BEGIN();
-
     /* Initialization */
     IGRAPH_CHECK(igraph_strength(graph, &phi, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, /* weights = */ 0));
 
@@ -189,7 +185,9 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
             }
         }
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(
+            graph, &neis, v, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE
+        ));
         nlen = igraph_vector_int_size(&neis);
         for (j = 0; j < nlen; j++) {
             igraph_integer_t u = VECTOR(neis)[j];
@@ -237,9 +235,6 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
         maxiter--;
 
     } /* while temp && iter */
-
-
-    RNG_END();
 
     igraph_vector_int_destroy(&neis);
     igraph_vector_destroy(&phi);

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -21,7 +20,7 @@
 
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"

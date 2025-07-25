@@ -53,7 +53,7 @@ void igraph_i_property_cache_destroy(igraph_i_property_cache_t *cache) {
     /* Nothing to do */
 }
 
-/***** Developer fuctions, exposed *****/
+/***** Developer functions, exposed *****/
 
 /**
  * \brief Returns the value of a cached boolean property.

@@ -2,18 +2,22 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  CMAKE_COLOR_DIAGNOSTICS: ON
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M
   ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
   UBSAN_OPTIONS: print_stacktrace=1:color=always
   OMP_NUM_THREADS: 1
+  CTEST_PARALLEL_LEVEL: 0 # Since CMake 3.29, a setting of 0 will try to use all available resources
 
 jobs:
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
     steps:
-      - script: sudo apt-get install ninja-build ccache language-pack-de -y
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build ccache language-pack-de -y
         displayName: Install dependencies
 
       - script: |
@@ -74,19 +78,19 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
-  - job: linux_clang_19
+  - job: linux_clang_21
     steps:
       - script: |
           sudo apt-get install ninja-build ccache -y
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 19
+          sudo ./llvm.sh 21
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-19  -DCMAKE_CXX_COMPILER=clang++-19'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-21  -DCMAKE_CXX_COMPILER=clang++-21'
 
   - job: linux_x87
     steps:
@@ -104,11 +108,11 @@ jobs:
           set -e
           wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.14.0/alpine-chroot-install && echo 'ccbf65f85cdc351851f8ad025bb3e65bae4d5b06  alpine-chroot-install' | sha1sum -c || exit 1
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
-          sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex libxml2-dev'
+          sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex libxml2-dev' -k 'OMP_NUM_THREADS CTEST_.* CMAKE_.*'
           mkdir build && cd build
-          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_ENABLE_TLS=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+          alpine cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_USE_INTERNAL_PLFIT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON
           alpine cmake --build . --target build_tests
-          alpine ctest -j `nproc` --output-on-failure
+          alpine ctest --output-on-failure
 
   - job: macos
     pool:
@@ -143,7 +147,9 @@ jobs:
 
   - job: documentation
     steps:
-      - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop docbook2x -y
         displayName: Install dependencies
 
       - task: CMake@1

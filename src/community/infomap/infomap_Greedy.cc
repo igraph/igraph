@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -73,8 +71,6 @@ Greedy::Greedy(FlowGraph *fgraph) :
 bool Greedy::optimize() {
     bool moved = false;
     const std::vector<Node> &node = graph->node;
-
-    RNG_BEGIN();
 
     // Generate random enumeration of nodes
     vector<igraph_integer_t> randomOrder(Nnode);
@@ -302,8 +298,6 @@ bool Greedy::optimize() {
         }
         offset += Nnode;
     }
-
-    RNG_END();
 
     return moved;
 }

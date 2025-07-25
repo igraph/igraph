@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -138,9 +136,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     if (no_of_edges == 0) {
         /* Special case: the modularity of graphs with no edges is not
          * well-defined */
-        if (modularity) {
-            *modularity = IGRAPH_NAN;
-        }
+        *modularity = IGRAPH_NAN;
         return IGRAPH_SUCCESS;
     }
 
@@ -219,6 +215,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
            const igraph_t *graph, igraph_matrix_t *res,
            const igraph_vector_t *weights, igraph_bool_t directed) {
+
     /* Specifically used to handle weights and/or ignore direction */
     igraph_eit_t edgeit;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -296,6 +293,7 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
  *                   matrix is stored.
  * \param directed   For directed graphs: if the edges should be treated as
  *                   undirected. For undirected graphs this is ignored.
+ * \return Error code.
  *
  * \sa \ref igraph_modularity()
  */
@@ -305,13 +303,12 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                              igraph_matrix_t *modmat,
                              igraph_bool_t directed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
-    igraph_vector_t deg, deg_unscaled, in_deg, out_deg;
-    igraph_vector_int_t deg_int, in_deg_int, out_deg_int;
-    igraph_integer_t i, j;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
+    igraph_vector_t deg, in_deg, out_deg;
     igraph_real_t scaling_factor;
+
     if (weights && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
@@ -325,36 +322,29 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_i_modularity_matrix_get_adjacency(graph, modmat, weights, directed));
 
+    /* Performance notes:
+     *  - Iterating in column-major order makes a large difference.
+     *  - Applying the scaling_factor to in_deg (or out_deg) first to reduce the
+     *    number of multiplications does not make an appreciable performance
+     *    difference. However, doing this in the undirected case causes the result
+     *    matrix to sometimes not be strictly symmetric due to the non-associativity
+     *    of floating point multiplication.
+     */
+
     if (directed) {
         IGRAPH_VECTOR_INIT_FINALLY(&in_deg, no_of_nodes);
         IGRAPH_VECTOR_INIT_FINALLY(&out_deg, no_of_nodes);
-        if (!weights) {
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&in_deg_int, no_of_nodes);
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&out_deg_int, no_of_nodes);
-            IGRAPH_CHECK(igraph_degree(graph, &in_deg_int, igraph_vss_all(), IGRAPH_IN,
-                                       IGRAPH_LOOPS));
-            IGRAPH_CHECK(igraph_degree(graph, &out_deg_int, igraph_vss_all(), IGRAPH_OUT,
-                                       IGRAPH_LOOPS));
-            for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(in_deg)[i] = VECTOR(in_deg_int)[i];
-                VECTOR(out_deg)[i] = VECTOR(out_deg_int)[i];
-            }
-            igraph_vector_int_destroy(&in_deg_int);
-            igraph_vector_int_destroy(&out_deg_int);
-            IGRAPH_FINALLY_CLEAN(2);
-        } else {
-            IGRAPH_CHECK(igraph_strength(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
-                                         IGRAPH_LOOPS, weights));
-            IGRAPH_CHECK(igraph_strength(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
-                                         IGRAPH_LOOPS, weights));
-        }
-        /* Scaling one degree factor so every element gets scaled. */
-        scaling_factor = resolution / sw;
-        igraph_vector_scale(&out_deg, scaling_factor);
 
-        for (j = 0; j < no_of_nodes; j++) {
-            for (i = 0; i < no_of_nodes; i++) {
-                MATRIX(*modmat, i, j) -= VECTOR(out_deg)[i] * VECTOR(in_deg)[j];
+        IGRAPH_CHECK(igraph_strength(graph, &in_deg, igraph_vss_all(), IGRAPH_IN,
+                                     IGRAPH_LOOPS, weights));
+        IGRAPH_CHECK(igraph_strength(graph, &out_deg, igraph_vss_all(), IGRAPH_OUT,
+                                     IGRAPH_LOOPS, weights));
+
+        scaling_factor = resolution / sw;
+
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+                MATRIX(*modmat, i, j) -= VECTOR(out_deg)[i] * VECTOR(in_deg)[j] * scaling_factor;
             }
         }
         igraph_vector_destroy(&in_deg);
@@ -362,33 +352,19 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-        if (!weights) {
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_int, no_of_nodes);
-            IGRAPH_CHECK(igraph_degree(graph, &deg_int, igraph_vss_all(), IGRAPH_ALL,
-                                       IGRAPH_LOOPS));
-            for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(deg)[i] = VECTOR(deg_int)[i];
-            }
-            igraph_vector_int_destroy(&deg_int);
-            IGRAPH_FINALLY_CLEAN(1);
-        } else {
-            IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
-                                         IGRAPH_LOOPS, weights));
-        }
 
-        /* Scaling one degree factor so every element gets scaled. */
-        igraph_vector_init_copy(&deg_unscaled, &deg);
-        IGRAPH_FINALLY(igraph_vector_destroy, &deg_unscaled);
+        IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
+                                     IGRAPH_LOOPS, weights));
+
         scaling_factor = resolution / 2.0 / sw;
-        igraph_vector_scale(&deg, scaling_factor);
-        for (i = 0; i < no_of_nodes; i++) {
-            for (j = 0; j < no_of_nodes; j++) {
-                MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg_unscaled)[j];
+
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+                MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] * scaling_factor;
             }
         }
         igraph_vector_destroy(&deg);
-        igraph_vector_destroy(&deg_unscaled);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     return IGRAPH_SUCCESS;

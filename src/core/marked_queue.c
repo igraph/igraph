@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>

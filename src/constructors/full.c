@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -39,8 +38,8 @@
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.
- * \param directed Logical, whether to create a directed graph.
- * \param loops Logical, whether to include self-edges (loops).
+ * \param directed Whether to create a directed graph.
+ * \param loops Whether to include self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
  *

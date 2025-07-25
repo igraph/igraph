@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2020  The igraph development team
@@ -64,7 +63,7 @@
  * \param n The number of vertices in the graph. If smaller than the
  *        largest integer in the file it will be ignored. It is thus
  *        safe to supply zero here.
- * \param directed Logical, if true the graph is directed, if false it
+ * \param directed If true the graph is directed, if false it
  *        will be undirected.
  * \return Error code:
  *         \c IGRAPH_PARSEERROR: if there is a

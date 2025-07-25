@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -56,8 +54,6 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
         return IGRAPH_SUCCESS;
     }
 
-    RNG_BEGIN();
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 2);
 
     if (use_adjlist) {
@@ -112,7 +108,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             /* For an undirected graph, we have two "variants" of each edge, i.e.
              * a -- b and b -- a. Since some rewirings can be performed only when we
              * "swap" the endpoints, we do it now with probability 0.5 */
-            if (!directed && RNG_UNIF01() < 0.5) {
+            if (!directed && RNG_BOOL()) {
                 dummy = c; c = d; d = dummy;
                 if (use_adjlist) {
                     /* Flip the edge in the unordered edge-list, so the update later on
@@ -188,8 +184,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             }
             break;
         default:
-            RNG_END();
-            IGRAPH_ERROR("unknown rewiring mode", IGRAPH_EINVMODE);
+            IGRAPH_ERROR("Invalid rewiring mode.", IGRAPH_EINVAL);
         }
         num_swaps++;
     }
@@ -211,8 +206,6 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
 
     igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(use_adjlist ? 3 : 2);
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

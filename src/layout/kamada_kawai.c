@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2003-2020  The igraph development team
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_layout.h"
@@ -29,8 +24,10 @@
 #include "core/interruption.h"
 #include "layout/layout_internal.h"
 
-/* Energy gradient values below this threshold are considered to be zero. */
+/* Energy gradient values below this threshold are considered to be zero,
+ * for the 2D and 3D cases, respectively. */
 #define KK_EPS 1e-13
+#define KK3D_EPS 1e-8
 
 /**
  * \ingroup layout
@@ -79,12 +76,14 @@
  *        default value is at least ten (or more) times the number of
  *        vertices.
  * \param epsilon Stop the iteration, if the maximum delta value of the
- *        algorithm is smaller than still. It is safe to leave it at zero,
+ *        algorithm is smaller than this. It is safe to leave it at zero,
  *        and then \p maxiter iterations are performed.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
- * \param weights Edge weights, larger values will result longer edges.
- *        Weights must be positive. Pass \c NULL to assume unit weights
+ * \param weights A vector of edge weights. Weights are interpreted as edge
+ *        \em lengths in the shortest path calculation used by the
+ *        Kamada-Kawai algorithm. Therefore, vertices connected by high-weight
+ *        edges will be placed further apart. Pass \c NULL to assume unit weights
  *        for all edges.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -110,13 +109,13 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
                                const igraph_vector_t *minx, const igraph_vector_t *maxx,
                                const igraph_vector_t *miny, const igraph_vector_t *maxy) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
-    igraph_real_t L, L0 = sqrt(no_nodes);
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_real_t L, L0 = sqrt(vcount);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
     igraph_vector_t D1, D2;
-    igraph_integer_t i, j, m;
+    igraph_integer_t m;
 
     if (maxiter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -127,31 +126,31 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
                      IGRAPH_EINVAL);
     }
 
-    if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
+    if (use_seed && (igraph_matrix_nrow(res) != vcount ||
                      igraph_matrix_ncol(res) != 2)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
                      "Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
-    if (weights && igraph_vector_size(weights) != no_edges) {
+    if (weights && igraph_vector_size(weights) != ecount) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
-    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
+    if (weights && ecount > 0 && igraph_vector_min(weights) <= 0) {
         IGRAPH_ERROR("Weights must be positive for Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
 
-    if (minx && igraph_vector_size(minx) != no_nodes) {
+    if (minx && igraph_vector_size(minx) != vcount) {
         IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
-    if (maxx && igraph_vector_size(maxx) != no_nodes) {
+    if (maxx && igraph_vector_size(maxx) != vcount) {
         IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
         IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
-    if (miny && igraph_vector_size(miny) != no_nodes) {
+    if (miny && igraph_vector_size(miny) != vcount) {
         IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
-    if (maxy && igraph_vector_size(maxy) != no_nodes) {
+    if (maxy && igraph_vector_size(maxy) != vcount) {
         IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
@@ -171,21 +170,21 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
         }
     }
 
-    if (no_nodes <= 1) {
+    if (vcount <= 1) {
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
-    IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
-    IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
+    IGRAPH_MATRIX_INIT_FINALLY(&dij, vcount, vcount);
+    IGRAPH_MATRIX_INIT_FINALLY(&kij, vcount, vcount);
+    IGRAPH_MATRIX_INIT_FINALLY(&lij, vcount, vcount);
 
     IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
                  igraph_vss_all(), weights, IGRAPH_ALL));
 
     /* Find largest finite distance */
     max_dij = 0.0;
-    for (i = 0; i < no_nodes; i++) {
-        for (j = i + 1; j < no_nodes; j++) {
+    for (igraph_integer_t j = 0; j < vcount; j++) {
+        for (igraph_integer_t i = j + 1; i < vcount; i++) {
             if (!isfinite(MATRIX(dij, i, j))) {
                 continue;
             }
@@ -197,8 +196,8 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
     /* Replace infinite distances by the largest finite distance,
      * effectively making the graph connected. */
-    for (i = 0; i < no_nodes; i++) {
-        for (j = 0; j < no_nodes; j++) {
+    for (igraph_integer_t j = 0; j < vcount; j++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             if (MATRIX(dij, i, j) > max_dij) {
                 MATRIX(dij, i, j) = max_dij;
             }
@@ -206,23 +205,22 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     }
 
     L = L0 / max_dij;
-    for (i = 0; i < no_nodes; i++) {
-        for (j = 0; j < no_nodes; j++) {
-            igraph_real_t tmp = MATRIX(dij, i, j) * MATRIX(dij, i, j);
+    for (igraph_integer_t j = 0; j < vcount; j++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             if (i == j) {
                 continue;
             }
+            igraph_real_t tmp = MATRIX(dij, i, j) * MATRIX(dij, i, j);
             MATRIX(kij, i, j) = kkconst / tmp;
             MATRIX(lij, i, j) = L * MATRIX(dij, i, j);
         }
     }
 
     /* Initialize delta */
-    IGRAPH_VECTOR_INIT_FINALLY(&D1, no_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&D2, no_nodes);
-    for (m = 0; m < no_nodes; m++) {
-        igraph_real_t myD1 = 0.0, myD2 = 0.0;
-        for (i = 0; i < no_nodes; i++) {
+    IGRAPH_VECTOR_INIT_FINALLY(&D1, vcount);
+    IGRAPH_VECTOR_INIT_FINALLY(&D2, vcount);
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (m = 0; m < vcount; m++) {
             igraph_real_t dx, dy, mi_dist;
             if (i == m) {
                 continue;
@@ -230,14 +228,12 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
             dx = MATRIX(*res, m, 0) - MATRIX(*res, i, 0);
             dy = MATRIX(*res, m, 1) - MATRIX(*res, i, 1);
             mi_dist = sqrt(dx*dx + dy*dy);
-            myD1 += MATRIX(kij, m, i) * (dx - MATRIX(lij, m, i) * dx / mi_dist);
-            myD2 += MATRIX(kij, m, i) * (dy - MATRIX(lij, m, i) * dy / mi_dist);
+            VECTOR(D1)[m] += MATRIX(kij, m, i) * (dx - MATRIX(lij, m, i) * dx / mi_dist);
+            VECTOR(D2)[m] += MATRIX(kij, m, i) * (dy - MATRIX(lij, m, i) * dy / mi_dist);
         }
-        VECTOR(D1)[m] = myD1;
-        VECTOR(D2)[m] = myD2;
     }
 
-    for (j = 0; j < maxiter; j++) {
+    for (igraph_integer_t j = 0; j < maxiter; j++) {
         igraph_real_t myD1, myD2, A, B, C;
         igraph_real_t max_delta, delta_x, delta_y;
         igraph_real_t old_x, old_y, new_x, new_y;
@@ -248,7 +244,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
         /* Select maximal delta */
         m = 0; max_delta = -1;
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             igraph_real_t delta = (VECTOR(D1)[i] * VECTOR(D1)[i] +
                                    VECTOR(D2)[i] * VECTOR(D2)[i]);
             if (delta > max_delta) {
@@ -262,7 +258,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
         old_y = MATRIX(*res, m, 1);
 
         /* Calculate D1 and D2, A, B, C */
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             igraph_real_t dx, dy, dist, den;
             if (i == m) {
                 continue;
@@ -317,7 +313,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
         /* Update delta, only with/for the affected node */
         VECTOR(D1)[m] = VECTOR(D2)[m] = 0.0;
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             igraph_real_t old_dx, old_dy, new_dx, new_dy, new_mi_dist, old_mi_dist;
             if (i == m) {
                 continue;
@@ -384,12 +380,14 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  *        default value is at least ten (or more) times the number of
  *        vertices.
  * \param epsilon Stop the iteration, if the maximum delta value of the
- *        algorithm is smaller than still. It is safe to leave it at zero,
+ *        algorithm is smaller than this. It is safe to leave it at zero,
  *        and then \p maxiter iterations are performed.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
- * \param weights Edge weights, larger values will result longer edges.
- *        Weights must be positive. Pass \c NULL to assume unit weights
+ * \param weights A vector of edge weights. Weights are interpreted as edge
+ *        \em lengths in the shortest path calculation used by the
+ *        Kamada-Kawai algorithm. Therefore, vertices connected by high-weight
+ *        edges will be placed further apart. Pass \c NULL to assume unit weights
  *        for all edges.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -421,61 +419,61 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
                                   const igraph_vector_t *miny, const igraph_vector_t *maxy,
                                   const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    const igraph_integer_t no_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_edges = igraph_ecount(graph);
-    igraph_real_t L, L0 = sqrt(no_nodes);
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_real_t L, L0 = sqrt(vcount);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
     igraph_vector_t D1, D2, D3;
-    igraph_integer_t i, j, m;
+    igraph_integer_t m;
 
     if (maxiter < 0) {
-        IGRAPH_ERROR("Number of iterations must be non-negatice in "
-                     "Kamada-Kawai layout", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of iterations must be non-negative in "
+                     "3D Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
     if (kkconst <= 0) {
-        IGRAPH_ERROR("`K' constant must be positive in Kamada-Kawai layout",
+        IGRAPH_ERROR("`K' constant must be positive in Kamada-Kawai layout.",
                      IGRAPH_EINVAL);
     }
 
-    if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
+    if (use_seed && (igraph_matrix_nrow(res) != vcount ||
                      igraph_matrix_ncol(res) != 3)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
-                     "3d Kamada-Kawai layout", IGRAPH_EINVAL);
+                     "3D Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
-    if (weights && igraph_vector_size(weights) != no_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    if (weights && igraph_vector_size(weights) != ecount) {
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
-    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
-        IGRAPH_ERROR("Weights must be positive for Kamada-Kawai layout.", IGRAPH_EINVAL);
+    if (weights && ecount > 0 && igraph_vector_min(weights) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for 3D Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
 
-    if (minx && igraph_vector_size(minx) != no_nodes) {
-        IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+    if (minx && igraph_vector_size(minx) != vcount) {
+        IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
-    if (maxx && igraph_vector_size(maxx) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+    if (maxx && igraph_vector_size(maxx) != vcount) {
+        IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
-        IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
-    if (miny && igraph_vector_size(miny) != no_nodes) {
-        IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+    if (miny && igraph_vector_size(miny) != vcount) {
+        IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
-    if (maxy && igraph_vector_size(maxy) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+    if (maxy && igraph_vector_size(maxy) != vcount) {
+        IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
-        IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+        IGRAPH_ERROR("miny must not be greater than maxy.", IGRAPH_EINVAL);
     }
-    if (minz && igraph_vector_size(minz) != no_nodes) {
-        IGRAPH_ERROR("Invalid minz vector length", IGRAPH_EINVAL);
+    if (minz && igraph_vector_size(minz) != vcount) {
+        IGRAPH_ERROR("Invalid minz vector length.", IGRAPH_EINVAL);
     }
-    if (maxz && igraph_vector_size(maxz) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxz vector length", IGRAPH_EINVAL);
+    if (maxz && igraph_vector_size(maxz) != vcount) {
+        IGRAPH_ERROR("Invalid maxz vector length.", IGRAPH_EINVAL);
     }
     if (minz && maxz && !igraph_vector_all_le(minz, maxz)) {
-        IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minz must not be greater than maxz.", IGRAPH_EINVAL);
     }
 
     if (!use_seed) {
@@ -490,19 +488,19 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         }
     }
 
-    if (no_nodes <= 1) {
+    if (vcount <= 1) {
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
-    IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
-    IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
+    IGRAPH_MATRIX_INIT_FINALLY(&dij, vcount, vcount);
+    IGRAPH_MATRIX_INIT_FINALLY(&kij, vcount, vcount);
+    IGRAPH_MATRIX_INIT_FINALLY(&lij, vcount, vcount);
     IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
                  igraph_vss_all(), weights, IGRAPH_ALL));
 
     max_dij = 0.0;
-    for (i = 0; i < no_nodes; i++) {
-        for (j = i + 1; j < no_nodes; j++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_integer_t j = i + 1; j < vcount; j++) {
             if (!isfinite(MATRIX(dij, i, j))) {
                 continue;
             }
@@ -511,8 +509,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
             }
         }
     }
-    for (i = 0; i < no_nodes; i++) {
-        for (j = 0; j < no_nodes; j++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_integer_t j = 0; j < vcount; j++) {
             if (MATRIX(dij, i, j) > max_dij) {
                 MATRIX(dij, i, j) = max_dij;
             }
@@ -520,8 +518,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     }
 
     L = L0 / max_dij;
-    for (i = 0; i < no_nodes; i++) {
-        for (j = 0; j < no_nodes; j++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_integer_t j = 0; j < vcount; j++) {
             igraph_real_t tmp = MATRIX(dij, i, j) * MATRIX(dij, i, j);
             if (i == j) {
                 continue;
@@ -532,13 +530,13 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     }
 
     /* Initialize delta */
-    IGRAPH_VECTOR_INIT_FINALLY(&D1, no_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&D2, no_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&D3, no_nodes);
-    for (m = 0; m < no_nodes; m++) {
+    IGRAPH_VECTOR_INIT_FINALLY(&D1, vcount);
+    IGRAPH_VECTOR_INIT_FINALLY(&D2, vcount);
+    IGRAPH_VECTOR_INIT_FINALLY(&D3, vcount);
+    for (m = 0; m < vcount; m++) {
         igraph_real_t dx, dy, dz, mi_dist;
         igraph_real_t myD1 = 0.0, myD2 = 0.0, myD3 = 0.0;
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             if (i == m) {
                 continue;
             }
@@ -555,7 +553,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         VECTOR(D3)[m] = myD3;
     }
 
-    for (j = 0; j < maxiter; j++) {
+    for (igraph_integer_t j = 0; j < maxiter; j++) {
 
         igraph_real_t Ax = 0.0, Ay = 0.0, Az = 0.0;
         igraph_real_t Axx = 0.0, Axy = 0.0, Axz = 0.0, Ayy = 0.0, Ayz = 0.0, Azz = 0.0;
@@ -566,7 +564,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
 
         /* Select maximal delta */
         m = 0; max_delta = -1;
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             igraph_real_t delta = (VECTOR(D1)[i] * VECTOR(D1)[i] +
                                    VECTOR(D2)[i] * VECTOR(D2)[i] +
                                    VECTOR(D3)[i] * VECTOR(D3)[i]);
@@ -582,7 +580,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         old_z = MATRIX(*res, m, 2);
 
         /* Calculate D1, D2 and D3, and other coefficients */
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             igraph_real_t dx, dy, dz, dist, den, k_mi, l_mi;
             if (i == m) {
                 continue;
@@ -609,8 +607,10 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         /* Need to solve some linear equations, we just use Cramer's rule */
 #define DET(a,b,c,d,e,f,g,h,i) ((a*e*i+b*f*g+c*d*h)-(c*e*g+b*d*i+a*f*h))
 
-        /* See comments in 2D version for the reason for this check */
-        if (Ax*Ax + Ay*Ay + Az*Az < KK_EPS*KK_EPS) {
+        /* See comments in 2D version for the reason for this check.
+         * In the 3D case, a different threshold is needed (KK3D_EPS vs KK_EPS).
+         * See https://github.com/igraph/igraph/issues/2782 */
+        if (Ax*Ax + Ay*Ay + Az*Az < KK3D_EPS*KK3D_EPS) {
             delta_x = delta_y = delta_z = 0;
         } else {
             igraph_real_t detnum;
@@ -646,7 +646,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
 
         /* Update delta, only with/for the affected node */
         VECTOR(D1)[m] = VECTOR(D2)[m] = VECTOR(D3)[m] = 0.0;
-        for (i = 0; i < no_nodes; i++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
             igraph_real_t old_dx, old_dy, old_dz, old_mi_dist, new_dx, new_dy, new_dz, new_mi_dist;
             if (i == m) {
                 continue;

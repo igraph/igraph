@@ -24,7 +24,6 @@ int main(void) {
     igraph_t g;
     igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
-    igraph_vector_t x;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -48,11 +47,10 @@ int main(void) {
 
     igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_int_init(&membership, 0);
-    igraph_vector_init(&x, 0);
 
     igraph_community_leading_eigenvector(&g, /*weights=*/ NULL,
                                          &merges, &membership,
-                                         /*stpes=*/ 1,
+                                         /*steps=*/ 1,
                                          /*options=*/ NULL,
                                          /*modularity=*/ NULL,
                                          /*start=*/ NULL,
@@ -83,7 +81,6 @@ int main(void) {
     igraph_matrix_int_print(&merges);
     igraph_vector_int_print(&membership);
 
-    igraph_vector_destroy(&x);
     igraph_vector_int_destroy(&membership);
     igraph_matrix_int_destroy(&merges);
     igraph_destroy(&g);

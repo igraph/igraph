@@ -20,17 +20,9 @@
 #ifndef __GSS_H__
 #define __GSS_H__
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
+#include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 /**
  * Enum specifying what the search should do when the function is not U-shaped.
@@ -141,6 +133,6 @@ unsigned short int gss_get_warning_flag(void);
  */
 void gss_parameter_init(gss_parameter_t *param);
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif /* __GSS_H__ */

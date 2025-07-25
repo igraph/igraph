@@ -1,3 +1,21 @@
+/*
+   IGraph library.
+   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <igraph.h>
 #include <plfit_sampling.h>
 
@@ -72,11 +90,9 @@ double rzeta(igraph_integer_t xmin, double alpha) {
 int generate_continuous(double xmin, double alpha, size_t num_samples) {
     IGRAPH_CHECK(igraph_vector_resize(&data, num_samples));
 
-    RNG_BEGIN();
     for (size_t i = 0; i < num_samples; i++) {
         VECTOR(data)[i] = rpareto(xmin, alpha);
     }
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -84,11 +100,9 @@ int generate_continuous(double xmin, double alpha, size_t num_samples) {
 int generate_discrete(double xmin, double alpha, size_t num_samples) {
     IGRAPH_CHECK(igraph_vector_resize(&data, num_samples));
 
-    RNG_BEGIN();
     for (size_t i = 0; i < num_samples; i++) {
         VECTOR(data)[i] = rzeta(xmin, alpha);
     }
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }

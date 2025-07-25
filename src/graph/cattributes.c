@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -24,8 +23,6 @@
 #include "igraph_memory.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
-
-#include "internal/hacks.h" /* strdup */
 
 #include <string.h>
 
@@ -428,7 +425,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_for_numeric
 
     if (vec == NULL) {
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_init(vec, work_area->length));
         work_area->numeric = vec;
@@ -445,7 +442,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_for_boolean
 
     if (vec == NULL) {
         vec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_bool_init(vec, work_area->length));
         work_area->boolean = vec;
@@ -462,7 +459,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_for_strings
 
     if (vec == NULL) {
         vec = IGRAPH_CALLOC(1, igraph_vector_ptr_t);
-        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_ptr_init(vec, 0));
         IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vec, igraph_strvector_destroy);
@@ -481,7 +478,7 @@ static igraph_error_t igraph_i_attribute_permutation_work_area_permute_and_store
     igraph_strvector_t *new_vec;
 
     new_vec = IGRAPH_CALLOC(1, igraph_strvector_t);
-    IGRAPH_CHECK_OOM(new_vec, "Cannot permute attributes");
+    IGRAPH_CHECK_OOM(new_vec, "Cannot permute attributes.");
     IGRAPH_FINALLY(igraph_free, new_vec);
     IGRAPH_CHECK(igraph_strvector_init(new_vec, 0));
     IGRAPH_FINALLY(igraph_strvector_destroy, new_vec);
@@ -785,8 +782,6 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
     igraph_vector_t *newv = newrec->value.as_vector;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -799,8 +794,6 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[r] ];
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -912,8 +905,6 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
     igraph_vector_bool_t *newv = newrec->value.as_vector_bool;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -926,8 +917,6 @@ static igraph_error_t igraph_i_cattributes_cb_random(const igraph_attribute_reco
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[r] ];
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1030,8 +1019,6 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
     igraph_vector_bool_t *newv = newrec->value.as_vector_bool;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -1048,14 +1035,12 @@ static igraph_error_t igraph_i_cattributes_cb_majority(const igraph_attribute_re
             VECTOR(*newv)[i] = (num_trues > n / 2);
         } else {
             if (num_trues == n / 2) {
-                VECTOR(*newv)[i] = (RNG_UNIF01() < 0.5);
+                VECTOR(*newv)[i] = RNG_BOOL();
             } else {
                 VECTOR(*newv)[i] = (num_trues > n / 2);
             }
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1101,8 +1086,6 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
     igraph_strvector_t *newv = newrec->value.as_strvector;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
 
-    RNG_BEGIN();
-
     for (igraph_integer_t i = 0; i < newlen; i++) {
         const igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);
         igraph_integer_t n = igraph_vector_int_size(idx);
@@ -1118,8 +1101,6 @@ static igraph_error_t igraph_i_cattributes_sn_random(const igraph_attribute_reco
             IGRAPH_CHECK(igraph_strvector_set(newv, i, tmp));
         }
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1187,7 +1168,7 @@ static igraph_error_t igraph_i_cattributes_cs_concat(const igraph_attribute_reco
             len += strlen(tmp);
         }
         tmp2 = IGRAPH_CALLOC(len + 1, char);
-        IGRAPH_CHECK_OOM(tmp2, "Cannot combine attributes");
+        IGRAPH_CHECK_OOM(tmp2, "Cannot combine attributes.");
         IGRAPH_FINALLY(igraph_free, tmp2);
         len = 0;
         for (igraph_integer_t j = 0; j < n; j++) {
@@ -1294,7 +1275,7 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
     IGRAPH_ASSERT(igraph_attribute_record_list_empty(new_attrs));
 
     todo_items = IGRAPH_CALLOC(no_attrs, igraph_attribute_combination_todo_item_t);
-    IGRAPH_CHECK_OOM(todo_items, "Cannot combine attributes");
+    IGRAPH_CHECK_OOM(todo_items, "Cannot combine attributes.");
     IGRAPH_FINALLY(igraph_free, todo_items);
 
     for (igraph_integer_t i = 0; i < no_attrs; i++) {
@@ -1357,15 +1338,15 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                 IGRAPH_CHECK(igraph_i_cattributes_cn_mean(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-                IGRAPH_ERROR("Median calculation not implemented",
+                IGRAPH_ERROR("Median calculation not implemented.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-                IGRAPH_ERROR("Cannot concatenate numeric attributes",
+                IGRAPH_ERROR("Cannot concatenate numeric attributes.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             default:
-                IGRAPH_ERROR("Unknown attribute combination",
+                IGRAPH_ERROR("Unknown attribute combination.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
@@ -1397,11 +1378,11 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                 IGRAPH_CHECK(igraph_i_cattributes_cb_last(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-                IGRAPH_ERROR("Cannot calculate concatenation of Booleans",
+                IGRAPH_ERROR("Cannot calculate concatenation of Booleans.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             default:
-                IGRAPH_ERROR("Unknown attribute combination",
+                IGRAPH_ERROR("Unknown attribute combination.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
@@ -1412,25 +1393,25 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                              todo_item.func.as_str));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
-                IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
+                IGRAPH_ERROR("Cannot sum strings.", IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_PROD:
-                IGRAPH_ERROR("Cannot multiply strings", IGRAPH_EATTRCOMBINE);
+                IGRAPH_ERROR("Cannot multiply strings.", IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MIN:
-                IGRAPH_ERROR("Cannot find minimum of strings",
+                IGRAPH_ERROR("Cannot find minimum of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MAX:
-                IGRAPH_ERROR("Cannot find maximum of strings",
+                IGRAPH_ERROR("Cannot find maximum of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
-                IGRAPH_ERROR("Cannot calculate mean of strings",
+                IGRAPH_ERROR("Cannot calculate mean of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-                IGRAPH_ERROR("Cannot calculate median of strings",
+                IGRAPH_ERROR("Cannot calculate median of strings.",
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
@@ -1446,12 +1427,12 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                 IGRAPH_CHECK(igraph_i_cattributes_cs_concat(oldrec, &newrec, merges));
                 break;
             default:
-                IGRAPH_ERROR("Unknown attribute combination",
+                IGRAPH_ERROR("Unknown attribute combination.",
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
         } else {
-            IGRAPH_ERROR("Unknown attribute type, this should not happen",
+            IGRAPH_ERROR("Unknown attribute type, this should not happen.",
                          IGRAPH_UNIMPLEMENTED);
         }
 
@@ -1562,14 +1543,14 @@ static igraph_bool_t igraph_i_cattribute_has_attr(const igraph_t *graph,
     case IGRAPH_ATTRIBUTE_EDGE:
         return igraph_i_cattribute_find_index(&at->eal, name) >= 0;
     default:
-        IGRAPH_ERROR("Unknown attribute element type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown attribute element type.", IGRAPH_EINVAL);
         break;
     }
 
-    return 0;
+    return false;
 }
 
-static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
+static igraph_error_t igraph_i_cattribute_get_type(const igraph_t *graph,
                                        igraph_attribute_type_t *type,
                                        igraph_attribute_elemtype_t elemtype,
                                        const char *name) {
@@ -1588,7 +1569,7 @@ static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
         al = &at->eal;
         break;
     default:
-        IGRAPH_ERROR("Unknown attribute element type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown attribute element type.", IGRAPH_EINVAL);
         break;
     }
 
@@ -1604,13 +1585,9 @@ static igraph_error_t igraph_i_cattribute_get_numeric_graph_attr(
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_attribute_record_list_t *gal = &attr->gal;
     igraph_attribute_record_t *rec;
-    const igraph_vector_t *num;
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_return(gal, name, IGRAPH_ATTRIBUTE_NUMERIC, &rec));
-
-    num = rec->value.as_vector;
-    IGRAPH_CHECK(igraph_vector_resize(value, 1));
-    VECTOR(*value)[0] = VECTOR(*num)[0];
+    IGRAPH_CHECK(igraph_vector_push_back(value, VECTOR(*rec->value.as_vector)[0]));
 
     return IGRAPH_SUCCESS;
 }
@@ -1621,13 +1598,9 @@ static igraph_error_t igraph_i_cattribute_get_bool_graph_attr(
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_attribute_record_list_t *gal = &attr->gal;
     igraph_attribute_record_t *rec;
-    const igraph_vector_bool_t *log;
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_return(gal, name, IGRAPH_ATTRIBUTE_BOOLEAN, &rec));
-
-    log = rec->value.as_vector_bool;
-    IGRAPH_CHECK(igraph_vector_bool_resize(value, 1));
-    VECTOR(*value)[0] = VECTOR(*log)[0];
+    IGRAPH_CHECK(igraph_vector_bool_push_back(value, VECTOR(*rec->value.as_vector_bool)[0]));
 
     return IGRAPH_SUCCESS;
 }
@@ -1638,13 +1611,9 @@ static igraph_error_t igraph_i_cattribute_get_string_graph_attr(
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_attribute_record_list_t *gal = &attr->gal;
     igraph_attribute_record_t *rec;
-    const igraph_strvector_t *str;
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_return(gal, name, IGRAPH_ATTRIBUTE_STRING, &rec));
-
-    str = rec->value.as_strvector;
-    IGRAPH_CHECK(igraph_strvector_resize(value, 1));
-    IGRAPH_CHECK(igraph_strvector_set(value, 0, igraph_strvector_get(str, 0)));
+    IGRAPH_CHECK(igraph_strvector_push_back(value, igraph_strvector_get(rec->value.as_strvector, 0)));
 
     return IGRAPH_SUCCESS;
 }
@@ -1662,14 +1631,14 @@ static igraph_error_t igraph_i_cattribute_get_numeric_vertex_attr(const igraph_t
 
     num = rec->value.as_vector;
     if (igraph_vs_is_all(&vs)) {
-        igraph_vector_clear(value);
         IGRAPH_CHECK(igraph_vector_append(value, num));
     } else {
         igraph_vit_t it;
+        igraph_integer_t i = igraph_vector_size(value);
         IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
         IGRAPH_FINALLY(igraph_vit_destroy, &it);
-        IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
-        for (igraph_integer_t i = 0; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
+        IGRAPH_CHECK(igraph_vector_resize(value, i + IGRAPH_VIT_SIZE(it)));
+        for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
             igraph_integer_t v = IGRAPH_VIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*num)[v];
         }
@@ -1693,14 +1662,14 @@ static igraph_error_t igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *g
 
     log = rec->value.as_vector_bool;
     if (igraph_vs_is_all(&vs)) {
-        igraph_vector_bool_clear(value);
         IGRAPH_CHECK(igraph_vector_bool_append(value, log));
     } else {
         igraph_vit_t it;
+        igraph_integer_t i = igraph_vector_bool_size(value);
         IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
         IGRAPH_FINALLY(igraph_vit_destroy, &it);
-        IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_VIT_SIZE(it)));
-        for (igraph_integer_t i = 0; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(value, i + IGRAPH_VIT_SIZE(it)));
+        for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
             igraph_integer_t v = IGRAPH_VIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*log)[v];
         }
@@ -1728,13 +1697,13 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
         IGRAPH_CHECK(igraph_strvector_append(value, str));
     } else {
         igraph_vit_t it;
+        igraph_integer_t i = igraph_strvector_size(value);
         IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
         IGRAPH_FINALLY(igraph_vit_destroy, &it);
-        IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
-        for (igraph_integer_t i=0; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
+        IGRAPH_CHECK(igraph_strvector_resize(value, i + IGRAPH_VIT_SIZE(it)));
+        for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
             igraph_integer_t v = IGRAPH_VIT_GET(it);
-            const char *s = igraph_strvector_get(str, v);
-            IGRAPH_CHECK(igraph_strvector_set(value, i, s));
+            IGRAPH_CHECK(igraph_strvector_set(value, i, igraph_strvector_get(str, v)));
         }
         igraph_vit_destroy(&it);
         IGRAPH_FINALLY_CLEAN(1);
@@ -1755,14 +1724,14 @@ static igraph_error_t igraph_i_cattribute_get_numeric_edge_attr(
 
     num = rec->value.as_vector;
     if (igraph_es_is_all(&es)) {
-        igraph_vector_clear(value);
         IGRAPH_CHECK(igraph_vector_append(value, num));
     } else {
         igraph_eit_t it;
+        igraph_integer_t i = igraph_vector_size(value);
         IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
         IGRAPH_FINALLY(igraph_eit_destroy, &it);
-        IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
-        for (igraph_integer_t i=0; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
+        IGRAPH_CHECK(igraph_vector_resize(value, i + IGRAPH_EIT_SIZE(it)));
+        for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
             igraph_integer_t e = IGRAPH_EIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*num)[e];
         }
@@ -1786,17 +1755,16 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(
 
     str = rec->value.as_strvector;
     if (igraph_es_is_all(&es)) {
-        igraph_strvector_clear(value);
         IGRAPH_CHECK(igraph_strvector_append(value, str));
     } else {
         igraph_eit_t it;
+        igraph_integer_t i = igraph_strvector_size(value);
         IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
         IGRAPH_FINALLY(igraph_eit_destroy, &it);
-        IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
-        for (igraph_integer_t i=0; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
+        IGRAPH_CHECK(igraph_strvector_resize(value, i + IGRAPH_EIT_SIZE(it)));
+        for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
             igraph_integer_t e = IGRAPH_EIT_GET(it);
-            const char *s = igraph_strvector_get(str, e);
-            IGRAPH_CHECK(igraph_strvector_set(value, i, s));
+            IGRAPH_CHECK(igraph_strvector_set(value, i, igraph_strvector_get(str, e)));
         }
         igraph_eit_destroy(&it);
         IGRAPH_FINALLY_CLEAN(1);
@@ -1818,14 +1786,14 @@ static igraph_error_t igraph_i_cattribute_get_bool_edge_attr(
 
     log = rec->value.as_vector_bool;
     if (igraph_es_is_all(&es)) {
-        igraph_vector_bool_clear(value);
         IGRAPH_CHECK(igraph_vector_bool_append(value, log));
     } else {
         igraph_eit_t it;
+        igraph_integer_t i = igraph_vector_bool_size(value);
         IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
         IGRAPH_FINALLY(igraph_eit_destroy, &it);
-        IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_EIT_SIZE(it)));
-        for (igraph_integer_t i=0; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(value, i + IGRAPH_EIT_SIZE(it)));
+        for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
             igraph_integer_t e = IGRAPH_EIT_GET(it);
             VECTOR(*value)[i] = VECTOR(*log)[e];
         }
@@ -1850,7 +1818,7 @@ const igraph_attribute_table_t igraph_cattribute_table = {
     &igraph_i_cattribute_combine_edges,
     &igraph_i_cattribute_get_info,
     &igraph_i_cattribute_has_attr,
-    &igraph_i_cattribute_gettype,
+    &igraph_i_cattribute_get_type,
     &igraph_i_cattribute_get_numeric_graph_attr,
     &igraph_i_cattribute_get_string_graph_attr,
     &igraph_i_cattribute_get_bool_graph_attr,
@@ -2216,6 +2184,7 @@ const char *igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 
 igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
                            igraph_vs_t vids, igraph_vector_t *result) {
+    igraph_vector_clear(result);
     return igraph_i_cattribute_get_numeric_vertex_attr(graph, name, vids, result);
 }
 
@@ -2235,6 +2204,7 @@ igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
 
 igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
                            igraph_vs_t vids, igraph_vector_bool_t *result) {
+    igraph_vector_bool_clear(result);
     return igraph_i_cattribute_get_bool_vertex_attr(graph, name, vids, result);
 }
 
@@ -2254,6 +2224,7 @@ igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
 
 igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const char *name,
                            igraph_es_t eids, igraph_vector_t *result) {
+    igraph_vector_clear(result);
     return igraph_i_cattribute_get_numeric_edge_attr(graph, name, eids, result);
 }
 
@@ -2273,6 +2244,7 @@ igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const char *name,
 
 igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
                            igraph_es_t eids, igraph_vector_bool_t *result) {
+    igraph_vector_bool_clear(result);
     return igraph_i_cattribute_get_bool_edge_attr(graph, name, eids, result);
 }
 
@@ -2293,6 +2265,7 @@ igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
 
 igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
                            igraph_vs_t vids, igraph_strvector_t *result) {
+    igraph_strvector_clear(result);
     return igraph_i_cattribute_get_string_vertex_attr(graph, name, vids, result);
 }
 
@@ -2302,7 +2275,7 @@ igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
- * \param vids The edges to query.
+ * \param eids The edges to query.
  * \param result Pointer to an initialized string vector, the result
  *     is stored here. It will be resized, if needed.
  * \return Error code.
@@ -2313,6 +2286,7 @@ igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
 
 igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
                            igraph_es_t eids, igraph_strvector_t *result) {
+    igraph_strvector_clear(result);
     return igraph_i_cattribute_get_string_edge_attr(graph, name, eids, result);
 }
 
@@ -2352,7 +2326,7 @@ igraph_error_t igraph_cattribute_list(const igraph_t *graph,
  * \param type The type of the attribute, \c IGRAPH_ATTRIBUTE_GRAPH,
  *        \c IGRAPH_ATTRIBUTE_VERTEX or \c IGRAPH_ATTRIBUTE_EDGE.
  * \param name Character constant, the name of the attribute.
- * \return Logical value, \c true if the attribute exists, \c false otherwise.
+ * \return Boolean value, \c true if the attribute exists, \c false otherwise.
  *
  * Time complexity: O(A), the number of (graph, vertex or edge)
  * attributes, assuming attribute names are not too long.
@@ -2666,7 +2640,7 @@ igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_size(v) != nv) {
-        IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->val, name, IGRAPH_ATTRIBUTE_NUMERIC, nv, &rec));
@@ -2699,7 +2673,7 @@ igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_bool_size(v) != nv) {
-        IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->val, name, IGRAPH_ATTRIBUTE_BOOLEAN, nv, &rec));
@@ -2732,7 +2706,7 @@ igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_strvector_size(sv) != nv) {
-        IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid vertex attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->val, name, IGRAPH_ATTRIBUTE_STRING, nv, &rec));
@@ -2764,7 +2738,7 @@ igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_size(v) != ne) {
-        IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->eal, name, IGRAPH_ATTRIBUTE_NUMERIC, ne, &rec));
@@ -2796,7 +2770,7 @@ igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_vector_bool_size(v) != ne) {
-        IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->eal, name, IGRAPH_ATTRIBUTE_BOOLEAN, ne, &rec));
@@ -2829,7 +2803,7 @@ igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
 
     /* Check length first */
     if (igraph_strvector_size(sv) != ne) {
-        IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge attribute vector length.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_i_cattribute_find_or_create(&attr->eal, name, IGRAPH_ATTRIBUTE_STRING, ne, &rec));

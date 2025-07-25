@@ -1,4 +1,3 @@
-/* vim:set ts=4 sw=4 sts=4 et: */
 /* plfit.c
  *
  * Copyright (C) 2010-2011 Tamas Nepusz
@@ -24,13 +23,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "plfit_error.h"
 #include "gss.h"
 #include "lbfgs.h"
-#include "platform.h"
 #include "plfit.h"
 #include "kolmogorov.h"
-#include "plfit_sampling.h"
 #include "hzeta.h"
 
 /* #define PLFIT_DEBUG */

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -65,8 +64,6 @@ int main(void) {
     igraph_sparsemat_t A, B, C;
     igraph_vector_t b, x;
     igraph_integer_t i;
-
-    RNG_BEGIN();
 
     /* lsolve */
 
@@ -304,8 +301,6 @@ int main(void) {
 
 #undef DIM
 #undef EDGES
-
-    RNG_END();
 
     return 0;
 }

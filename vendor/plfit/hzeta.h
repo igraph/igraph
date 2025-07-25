@@ -32,17 +32,9 @@
 #ifndef __HZETA_H__
 #define __HZETA_H__
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
+#include "plfit_decls.h"
 
-__BEGIN_DECLS
+PLFIT_BEGIN_C_DECLS
 
 
 /* Hurwitz Zeta Function
@@ -91,6 +83,6 @@ double hsl_sf_lnhzeta_deriv(const double s, const double q);
 double hsl_sf_lnhzeta_deriv_tuple(const double s, const double q, double * deriv0, double * deriv1);
 
 
-__END_DECLS
+PLFIT_END_C_DECLS
 
 #endif // __HZETA_H__

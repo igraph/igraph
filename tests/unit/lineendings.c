@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -23,7 +22,7 @@
 
 #include <igraph.h>
 
-#include "../../tests/unit/test_utilities.h"
+#include "test_utilities.h"
 
 int main(void) {
 

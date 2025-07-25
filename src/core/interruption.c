@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -22,7 +21,8 @@
 */
 
 #include "igraph_interrupt.h"
-#include "config.h"
+
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_handler = NULL;
 

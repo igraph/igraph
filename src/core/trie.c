@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -378,7 +377,7 @@ igraph_error_t igraph_trie_get_len(
  * \param key The string to search for.
  * \param id If \p key is found, its index is stored here. Otherwise,
  *    a negative value is returned.
- * \param Error code.
+ * \return Error code.
  */
 
 igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id) {

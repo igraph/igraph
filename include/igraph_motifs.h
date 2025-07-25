@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_MOTIFS_H
@@ -30,7 +25,7 @@
 #include "igraph_error.h"
 #include "igraph_iterators.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Graph motifs                                       */
@@ -78,24 +73,26 @@ IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_callback(const igraph_t *grap
                                                  igraph_motifs_handler_t *callback,
                                                  void* extra);
 
-IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
+IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_real_t *est,
                                                  igraph_integer_t size, const igraph_vector_t *cut_prob,
                                                  igraph_integer_t sample_size,
                                                  const igraph_vector_int_t *sample);
-IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
+IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_real_t *no,
                                            igraph_integer_t size, const igraph_vector_t *cut_prob);
 
 IGRAPH_EXPORT igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_real_t *mut,
                                      igraph_real_t *asym, igraph_real_t *null);
 IGRAPH_EXPORT igraph_error_t igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
                                             igraph_vector_t *res,
-                                            const igraph_vs_t vids);
+                                            igraph_vs_t vids);
 
 IGRAPH_EXPORT igraph_error_t igraph_list_triangles(const igraph_t *graph,
                                         igraph_vector_int_t *res);
 
-__END_DECLS
+IGRAPH_EXPORT igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res);
+
+IGRAPH_END_C_DECLS
 
 #endif

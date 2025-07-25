@@ -22,7 +22,7 @@
 void print_result(igraph_t *g, igraph_vector_t *weights, igraph_integer_t start_vid, igraph_bool_t directed, igraph_bool_t unconn) {
     igraph_real_t result;
     igraph_integer_t from, to;
-    IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(g, weights, &result, start_vid, &from, &to, directed, unconn) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(g, weights, &result, start_vid, &from, &to, directed, unconn) == IGRAPH_SUCCESS);
     printf("result: ");
     print_real(stdout, result, "%g");
     printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n\n", from, to);
@@ -131,20 +131,20 @@ int main(void) {
     printf("Weight vector size too small.\n");
     igraph_vector_init_int(&weights, 3, 0, 1, 2);
     igraph_small(&g, 5, 1, 1,0, 2,1, 2,3, 3,4, -1);
-    IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
 
     printf("Starting vertex ID too large.\n");
-    IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(&g, NULL, &result, 10, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 10, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
 
     printf("Negative weight.\n");
     igraph_vector_init_int(&weights, 4, 0, 1, 2, -1);
-    IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
 
     printf("NaN weight.\n");
     igraph_vector_init_real(&weights, 4, 0., 1., 2., IGRAPH_NAN);
-    IGRAPH_ASSERT(igraph_pseudo_diameter_dijkstra(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_pseudo_diameter(&g, &weights, &result, 0, NULL, NULL, 0, 1) == IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 

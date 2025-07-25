@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -89,7 +88,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * Note however, that the version of the model in the published paper is incorrect
  * in the sense that it cannot generate the kind of graphs the authors
  * claim. A corrected version is available from
- * http://cs.stanford.edu/people/jure/pubs/powergrowth-tkdd.pdf , our
+ * https://www.cs.cmu.edu/~jure/pubs/powergrowth-tkdd.pdf, our
  * implementation is based on this.
  *
  * \param graph Pointer to an uninitialized graph object.
@@ -158,8 +157,6 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_CHECK(igraph_vector_int_init(&visited, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &visited);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&neiq, 10);
-
-    RNG_BEGIN();
 
 #define ADD_EDGE_TO(nei) \
     if (VECTOR(visited)[(nei)] != actnode+1) { \
@@ -242,8 +239,6 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     } /* actnode < no_of_nodes */
 
 #undef ADD_EDGE_TO
-
-    RNG_END();
 
     IGRAPH_PROGRESS("Forest fire: ", 100.0, NULL);
 

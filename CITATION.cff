@@ -27,7 +27,7 @@ authors:
     family-names: Noom
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.4319996
+    value: 10.5281/zenodo.3630268
     description: Zenodo
 repository-code: 'https://github.com/igraph/igraph'
 url: 'https://igraph.org'

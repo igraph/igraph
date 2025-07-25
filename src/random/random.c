@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -30,7 +29,6 @@
 #include "igraph_vector.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
 #include "math/safe_intop.h"
 #include "random/random_internal.h"
 
@@ -43,6 +41,7 @@
 #include <assert.h>
 #include <math.h>
 #include <float.h> /* DBL_MANT_DIG */
+#include <stdbool.h>
 
 /**
  * \section about_rngs
@@ -547,18 +546,45 @@ static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uin
 #endif
 }
 
+
+/**
+ * \function igraph_rng_get_bool
+ * \brief Generate a random boolean.
+ *
+ * Use this function only when a single random boolean, i.e. a single bit
+ * is needed at a time. It is not efficient for generating multiple bits.
+ *
+ * \param rng Pointer to the RNG to use for the generation. Use \ref
+ *        igraph_rng_default() here to use the default igraph RNG.
+ * \return The generated bit, as a truth value.
+ */
+
+igraph_bool_t igraph_rng_get_bool(igraph_rng_t *rng) {
+    const igraph_rng_type_t *type = rng->type;
+    const igraph_integer_t rng_bitwidth = igraph_rng_bits(rng);
+    /* Keep the highest bit as RNGs sometimes tend to have lower entropy in
+     * low bits than in high bits.
+     *
+     * Ensure that the return value is stricly 0 or 1 even if igraph_bool_t is
+     * defined to something else than a native bool.
+     */
+    return (type->get(rng->state) >> (rng_bitwidth - 1)) & (igraph_uint_t)1;
+}
+
 /**
  * \function igraph_rng_get_integer
  * \brief Generate an integer random number from an interval.
+ *
+ * Generate uniformly distributed integers from the interval <code>[l, h]</code>.
  *
  * \param rng Pointer to the RNG to use for the generation. Use \ref
  *        igraph_rng_default() here to use the default igraph RNG.
  * \param l Lower limit, inclusive, it can be negative as well.
  * \param h Upper limit, inclusive, it can be negative as well, but it
- *        should be at least <code>l</code>.
+ *        must be at least <code>l</code>.
  * \return The generated random integer.
  *
- * Time complexity: O(log2(h-l) / bits) where bits is the value of
+ * Time complexity: O(log2(h-l+1) / bits) where bits is the value of
  * \ref igraph_rng_bits(rng).
  */
 
@@ -968,8 +994,6 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
     igraph_vector_int_clear(res);
     IGRAPH_CHECK(igraph_vector_int_reserve(res, length));
 
-    RNG_BEGIN();
-
     Vprime = exp(log(RNG_UNIF01()) * ninv);
     l = l - 1;
 
@@ -1034,8 +1058,6 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
         igraph_vector_int_push_back(res, l);    /* allocated */
     }
 
-    RNG_END();
-
     return IGRAPH_SUCCESS;
 }
 
@@ -1074,7 +1096,7 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
 
 /**
  * \ingroup nongraph
- * \function igraph_random_sample_real
+ * \function igraph_i_random_sample_real
  * \brief Generates an increasing random sequence of integers (igraph_real_t version).
  *
  * This function is the 'real' version of \ref igraph_random_sample(), and was added
@@ -1099,7 +1121,7 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
  *         size of the candidate pool.
  */
 
-igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
+igraph_error_t igraph_i_random_sample_real(igraph_vector_t *res, igraph_real_t l,
                     igraph_real_t h, igraph_integer_t length) {
     /* This function is the 'real' version of igraph_random_sample, and was added
      * so erdos_renyi_game_gnm can use a random sample of doubles instead of integers
@@ -1153,8 +1175,6 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 
     igraph_vector_clear(res);
     IGRAPH_CHECK(igraph_vector_reserve(res, length));
-
-    RNG_BEGIN();
 
     Vprime = exp(log(RNG_UNIF01()) * ninv);
     l = l - 1;
@@ -1224,8 +1244,6 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
         l += S + 1;
         igraph_vector_push_back(res, l);    /* allocated */
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 }
@@ -1377,7 +1395,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 #define R_DT_log(p) (lower_tail? R_D_log(p) : R_D_LExp(p))/* log(p) in qF */
 #define R_DT_Clog(p)    (lower_tail? R_D_LExp(p): R_D_log(p))/* log(1-p) in qF*/
 #define R_DT_Log(p) (lower_tail? (p) : R_Log1_Exp(p))
-/* ==   R_DT_log when we already "know" log_p == TRUE :*/
+/* ==   R_DT_log when we already "know" log_p == true :*/
 
 #define R_Q_P01_check(p)            \
     if ((log_p  && p > 0) ||            \
@@ -1588,8 +1606,6 @@ static double igraph_i_exp_rand(igraph_rng_t *rng) {
 
 #define repeat for(;;)
 
-#define FALSE 0
-#define TRUE  1
 #define M_1_SQRT_2PI    0.398942280401432677939946059934     /* 1/sqrt(2pi) */
 
 static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
@@ -1610,7 +1626,9 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
     /* Local Vars  [initialize some for -Wall]: */
     double del, difmuk = 0., E = 0., fk = 0., fx, fy, g, px, py, t, u = 0., v, x;
     double pois = -1.;
-    int k, kflag, big_mu, new_big_mu = FALSE;
+    int k, big_mu;
+    bool new_big_mu = false;
+    bool kflag;
 
     if (!isfinite(mu) || mu < 0) {
         ML_ERR_return_NAN;
@@ -1622,13 +1640,13 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
 
     big_mu = mu >= 10.;
     if (big_mu) {
-        new_big_mu = FALSE;
+        new_big_mu = false;
     }
 
     if (!(big_mu && mu == muprev)) {/* maybe compute new persistent par.s */
 
         if (big_mu) {
-            new_big_mu = TRUE;
+            new_big_mu = true;
             /* Case A. (recalculation of s,d,l  because mu has changed):
              * The Poisson probabilities pk exceed the discrete normal
              * probabilities fk whenever k >= m(mu).
@@ -1730,7 +1748,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
 
     if (g >= 0.) {
         /* 'Subroutine' F is called (kflag=0 for correct return) */
-        kflag = 0;
+        kflag = false;
         goto Step_F;
     }
 
@@ -1750,7 +1768,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
             difmuk = mu - fk;
 
             /* 'subroutine' F is called (kflag=1 for correct return) */
-            kflag = 1;
+            kflag = true;
 
 Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 
@@ -1776,7 +1794,7 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
             x *= x;/* x^2 */
             fx = -0.5 * x;
             fy = omega * (((c3 * x + c2) * x + c1) * x + c0);
-            if (kflag > 0) {
+            if (kflag) {
                 /* Step H. Hat acceptance (E is repeated on rejection) */
                 if (c * fabs(u) <= py * exp(px + E) - fy * exp(fx + E)) {
                     break;
@@ -2208,33 +2226,4 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double a, double scale) {
     } /* repeat .. until  `t' is accepted */
     x = s + 0.5 * t;
     return scale * x * x;
-}
-
-igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
-                             const igraph_vector_t *alpha,
-                             igraph_vector_t *result) {
-
-    igraph_integer_t len = igraph_vector_size(alpha);
-    igraph_real_t sum = 0.0;
-
-    if (len < 2) {
-        IGRAPH_ERROR("Dirichlet parameter vector too short, must have at least two entries.",
-                     IGRAPH_EINVAL);
-    }
-    if (igraph_vector_min(alpha) <= 0) {
-        IGRAPH_ERROR("Dirichlet concentration parameters must be positive.",
-                     IGRAPH_EINVAL);
-    }
-
-    IGRAPH_CHECK(igraph_vector_resize(result, len));
-
-    for (igraph_integer_t i = 0; i < len; i++) {
-        VECTOR(*result)[i] = igraph_rng_get_gamma(rng, VECTOR(*alpha)[i], 1.0);
-        sum += VECTOR(*result)[i];
-    }
-    for (igraph_integer_t i = 0; i < len; i++) {
-        VECTOR(*result)[i] /= sum;
-    }
-
-    return IGRAPH_SUCCESS;
 }

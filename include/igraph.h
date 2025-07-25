@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_H
@@ -29,13 +24,13 @@
 #include "igraph_error.h"
 #include "igraph_random.h"
 #include "igraph_progress.h"
+#include "igraph_setup.h"
 #include "igraph_statusbar.h"
 
 #include "igraph_types.h"
 #include "igraph_complex.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
-#include "igraph_array.h"
 #include "igraph_bitset.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
@@ -54,14 +49,13 @@
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 #include "igraph_games.h"
-#include "igraph_microscopic_update.h"
 #include "igraph_centrality.h"
 #include "igraph_paths.h"
 #include "igraph_components.h"
 #include "igraph_structural.h"
 #include "igraph_transitivity.h"
 #include "igraph_neighborhood.h"
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 #include "igraph_bipartite.h"
 #include "igraph_cliques.h"
 #include "igraph_layout.h"
@@ -97,5 +91,6 @@
 #include "igraph_graphicality.h"
 #include "igraph_cycles.h"
 #include "igraph_reachability.h"
+#include "igraph_sampling.h"
 
 #endif

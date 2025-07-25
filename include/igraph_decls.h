@@ -1,11 +1,29 @@
-#undef __BEGIN_DECLS
-#undef __END_DECLS
+/*
+   IGraph library.
+   Copyright (C) 2016-2025  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#undef IGRAPH_BEGIN_C_DECLS
+#undef IGRAPH_END_C_DECLS
 #ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
+    #define IGRAPH_BEGIN_C_DECLS extern "C" {
+    #define IGRAPH_END_C_DECLS }
 #else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
+    #define IGRAPH_BEGIN_C_DECLS /* empty */
+    #define IGRAPH_END_C_DECLS /* empty */
 #endif
 
 /* This is to eliminate gcc warnings about unused parameters */

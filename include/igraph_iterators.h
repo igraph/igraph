@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_ITERATORS_H
@@ -31,7 +26,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
@@ -56,6 +51,8 @@ typedef struct igraph_vs_t {
         struct {
             igraph_integer_t vid;
             igraph_neimode_t mode;
+            igraph_loops_t loops;
+            igraph_bool_t multiple;
         } adj;                              /* adjacent vertices  */
         struct {
             igraph_integer_t start;         /* first index (inclusive) */
@@ -67,8 +64,10 @@ typedef struct igraph_vs_t {
 IGRAPH_EXPORT igraph_error_t igraph_vs_all(igraph_vs_t *vs);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_vs_t igraph_vss_all(void);
 
-IGRAPH_EXPORT igraph_error_t igraph_vs_adj(igraph_vs_t *vs,
-                                igraph_integer_t vid, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_vs_adj(
+    igraph_vs_t *vs, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops, igraph_bool_t multiple
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
                                    igraph_neimode_t mode);
@@ -237,7 +236,6 @@ typedef enum {
     IGRAPH_ES_RANGE,
     IGRAPH_ES_PAIRS,
     IGRAPH_ES_PATH,
-    IGRAPH_ES_UNUSED_WAS_MULTIPAIRS,  /* placeholder for deprecated IGRAPH_ES_MULTIPAIRS from igraph 0.10 */
     IGRAPH_ES_ALL_BETWEEN,
 } igraph_es_type_t;
 
@@ -250,6 +248,7 @@ typedef struct igraph_es_t {
         struct {
             igraph_integer_t vid;
             igraph_neimode_t mode;
+            igraph_loops_t loops;
         } incident;
         struct {
             igraph_integer_t start; /* first index (inclusive) */
@@ -271,8 +270,10 @@ IGRAPH_EXPORT igraph_error_t igraph_es_all(igraph_es_t *es,
                                 igraph_edgeorder_type_t order);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_incident(igraph_es_t *es,
-                                     igraph_integer_t vid, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_es_incident(
+    igraph_es_t *es, igraph_integer_t vid, igraph_neimode_t mode,
+    igraph_loops_t loops
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_es_none(igraph_es_t *es);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_es_t igraph_ess_none(void);
@@ -410,6 +411,6 @@ IGRAPH_EXPORT void igraph_eit_destroy(const igraph_eit_t *eit);
 
 IGRAPH_EXPORT igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_int_t *v);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif

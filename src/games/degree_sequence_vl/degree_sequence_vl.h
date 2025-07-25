@@ -23,12 +23,12 @@
 #include "igraph_datatype.h"
 #include "igraph_vector.h"
 
-__BEGIN_DECLS
+IGRAPH_BEGIN_C_DECLS
 
-igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
+igraph_error_t igraph_i_degree_sequence_game_vl(igraph_t *graph,
                                    const igraph_vector_int_t *out_seq,
                                    const igraph_vector_int_t *in_seq);
 
-__END_DECLS
+IGRAPH_END_C_DECLS
 
 #endif /* IGRAPH_GAMES_DEGREE_SEQUENCE_VL_H */

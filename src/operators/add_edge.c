@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2020 The igraph development team
@@ -36,7 +34,7 @@
  * Note that if you want to add many edges to a big graph, then it is
  * inefficient to add them one by one, it is better to collect them into
  * a vector and add all of them via a single \ref igraph_add_edges() call.
- * \param igraph The graph.
+ * \param graph The graph.
  * \param from The id of the first vertex of the edge.
  * \param to The id of the second vertex of the edge.
  * \return Error code.

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2021 The igraph development team
@@ -213,9 +211,9 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
          * using igraph_neighbors() due to branch mispredictions in IGRAPH_OTHER(), so we
          * use igraph_incident() only if the user needs the edge-paths */
         if (edges) {
-            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode, IGRAPH_LOOPS));
         } else {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         }
 
         n = igraph_vector_int_size(&neis);

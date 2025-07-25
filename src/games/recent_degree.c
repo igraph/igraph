@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -50,12 +48,12 @@
  * \param outseq The number of edges to add in each time step. This
  *        argument is ignored if it is a null pointer or a zero length
  *        vector. In this case the constant \p m parameter is used.
- * \param outpref Logical constant, if true the edges originated by a
+ * \param outpref Boolean constant, if true the edges originated by a
  *        vertex also count as recent incident edges.
  *        For most applications it is reasonable to set it to false.
  * \param zero_appeal Constant giving the attractiveness of the
  *        vertices which haven't gained any edge recently.
- * \param directed Logical constant, whether to generate a directed
+ * \param directed Boolean constant, whether to generate a directed
  *        graph.
  * \return Error code.
  *
@@ -81,16 +79,15 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
     igraph_dqueue_int_t history;
-    igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of vertices cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (have_outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
+    if (outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%" IGRAPH_PRId ") does not equal the number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
-    if (!have_outseq && m < 0) {
+    if (!outseq && m < 0) {
         IGRAPH_ERRORF("Number of edges per step cannot be negative, got %" IGRAPH_PRId ".",
                        IGRAPH_EINVAL, m);
     }
@@ -101,12 +98,14 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
-    if (nodes == 0) {
-        igraph_empty(graph, 0, directed);
+    /* This effectively also hanbdles an outseq size of 0.
+     * From here on we assume that outseq has a size of at least 1. */
+    if (no_of_nodes == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         return IGRAPH_SUCCESS;
     }
 
-    if (!have_outseq) {
+    if (!outseq) {
         no_of_neighbors = m;
         IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
@@ -126,8 +125,6 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
                                     1.5 * time_window * no_of_edges / no_of_nodes + 10));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &history);
 
-    RNG_BEGIN();
-
     /* first node */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
     IGRAPH_CHECK(igraph_dqueue_int_push(&history, -1));
@@ -136,7 +133,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
         igraph_integer_t to;
-        if (have_outseq) {
+        if (outseq) {
             no_of_neighbors = VECTOR(*outseq)[i];
         }
 
@@ -176,8 +173,6 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         }
     }
 
-    RNG_END();
-
     igraph_dqueue_int_destroy(&history);
     igraph_psumtree_destroy(&sumtree);
     igraph_vector_destroy(&degree);
@@ -213,7 +208,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
  * \param outseq Vector giving the number of edges to add in each time
  *        step. If it is a null pointer or a zero-length vector then
  *        it is ignored and the \p m argument is used.
- * \param outpref Logical constant, if true the edges initiated by a
+ * \param outpref Boolean constant, if true the edges initiated by a
  *        vertex are also counted. Normally it is false.
  * \param pa_exp The exponent for the preferential attachment.
  * \param aging_exp The exponent for the aging, normally it is
@@ -223,7 +218,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
  *        incident edges for the vertices.
  * \param zero_appeal The degree dependent part of the attractiveness
  *        for zero degree vertices.
- * \param directed Logical constant, whether to create a directed
+ * \param directed Boolean constant, whether to create a directed
  *        graph.
  * \return Error code.
  *
@@ -252,20 +247,15 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
     igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
     igraph_dqueue_int_t history;
-    igraph_bool_t have_outseq = outseq && igraph_vector_int_size(outseq) > 0;
 
-    if (no_of_nodes == 0) {
-        igraph_empty(graph, 0, directed);
-        return IGRAPH_SUCCESS;
-    }
     if (no_of_nodes < 0) {
         IGRAPH_ERRORF("Number of nodes should not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
-    if (have_outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
+    if (outseq && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("Out-degree sequence is specified, but its length (%" IGRAPH_PRId ") does not equal the number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
-    if (!have_outseq && m < 0) {
+    if (!outseq && m < 0) {
         IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bins <= 0) {
@@ -278,7 +268,14 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         IGRAPH_ERRORF("The zero appeal cannot be negative, got %g.", IGRAPH_EINVAL, zero_appeal);
     }
 
-    if (!have_outseq) {
+    /* This effectively also hanbdles an outseq size of 0.
+     * From here on we assume that outseq has a size of at least 1. */
+    if (no_of_nodes == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+        return IGRAPH_SUCCESS;
+    }
+
+    if (!outseq) {
         no_of_neighbors = m;
         IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
@@ -300,8 +297,6 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
                                         1.5 * time_window * no_of_edges / no_of_nodes + 10));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &history);
 
-    RNG_BEGIN();
-
     /* first node */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
     IGRAPH_CHECK(igraph_dqueue_int_push(&history, -1));
@@ -311,7 +306,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         igraph_real_t sum;
         igraph_integer_t to;
 
-        if (have_outseq) {
+        if (outseq) {
             no_of_neighbors = VECTOR(*outseq)[i];
         }
 
@@ -372,8 +367,6 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
             ));
         }
     }
-
-    RNG_END();
 
     igraph_dqueue_int_destroy(&history);
     igraph_vector_destroy(&degree);

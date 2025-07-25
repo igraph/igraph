@@ -39,7 +39,6 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
-  core/array.c
   core/bitset.c
   core/bitset_list.c
   core/buckets.c
@@ -61,6 +60,7 @@ add_library(
   core/progress.c
   core/psumtree.c
   core/set.c
+  core/setup.c
   core/sparsemat.c
   core/stack.c
   core/statusbar.c
@@ -84,6 +84,7 @@ add_library(
   random/rng_mt19937.c
   random/rng_pcg32.c
   random/rng_pcg64.c
+  random/sampling.c
 
   graph/adjlist.c
   graph/attributes.c
@@ -108,10 +109,10 @@ add_library(
   constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
+  constructors/mycielskian.c
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c
-
 
   games/barabasi.c
   games/callaway_traits.c
@@ -182,6 +183,8 @@ add_library(
   connectivity/separators.c
   connectivity/reachability.c
 
+  cycles/simple_cycles.c
+
   flow/flow.c
   flow/flow_conversion.c
   flow/st-cuts.c
@@ -204,6 +207,7 @@ add_library(
   io/parse_utils.c
   ${PARSER_SOURCES}
 
+  layout/align.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -238,6 +242,7 @@ add_library(
   operators/join.c
   operators/misc_internal.c
   operators/permute.c
+  operators/products.c
   operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
@@ -296,7 +301,6 @@ add_library(
   misc/feedback_arc_set.c
   misc/graphicality.c
   misc/matching.c
-  misc/microscopic_update.c
   misc/mixing.c
   misc/motifs.c
   misc/order_cycle.cpp
@@ -312,7 +316,6 @@ add_library(
   internal/qsort_r.c
   internal/qsort.c
   internal/utils.c
-  internal/zeroin.c
 
   version.c
 
@@ -330,7 +333,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.8")
+set_target_properties(igraph PROPERTIES VERSION "3.1.10")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -57,14 +56,14 @@ int main(void) {
     /* With eigenvector centrality, the most centralized structure is
      * a graph containing a single edge. */
     printf("\ngraph with single edge:\n");
-    igraph_small(&graph, /*n=*/ 10, /*directed=*/ 0,
+    igraph_small(&graph, /*n=*/ 10, IGRAPH_UNDIRECTED,
                  0,1, -1);
 
     igraph_centralization_eigenvector_centrality(
                 &graph,
                 /*vector=*/ NULL,
                 /*value=*/ NULL,
-                /*mode=*/ IGRAPH_OUT,
+                /*mode=*/ IGRAPH_ALL,
                 /*options=*/ NULL,
                 &cent,
                 /*theoretical_max=*/ NULL,

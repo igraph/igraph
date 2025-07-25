@@ -120,6 +120,11 @@ as the number of vertices is stored in a variable of type
 <type>igraph_integer_t</type>.
 </para>
 
+<para>
+Since igraph 1.0, the alias <type>igraph_int_t</type> may be used interchangeably
+with <type>igraph_integer_t</type>.
+</para>
+
 <para>Since the size of a variable of type <type>igraph_integer_t</type> may
 change depending on how &igraph; is compiled, you cannot simply use
 <code>%d</code> or <code>%ld</code> as a placeholder for &igraph; integers in

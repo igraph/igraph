@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -89,11 +87,11 @@
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param weights An optional vector containing edge weights for
- *        weighted closeness. No edge weight may be NaN. Supply a null
+ * \param weights An optional vector containing edge weights for weighted
+ *        closeness. NaN values re not allowed as weights. Supply a null
  *        pointer here for traditional, unweighted closeness.
  * \param normalized If true, the inverse of the mean distance to reachable
- *        vetices is returned. If false, the inverse of the sum of distances
+ *        vertices is returned. If false, the inverse of the sum of distances
  *        is returned.
  * \return Error code:
  *        \clist
@@ -183,8 +181,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init(&which, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &which);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&which, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     igraph_vector_null(res);
@@ -594,8 +591,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init(&which, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &which);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&which, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     igraph_vector_null(res);
@@ -719,7 +715,8 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
  * and |E| is the number of edges in the graph. The timing decreases with smaller
  * cutoffs in a way that depends on the graph structure.
  *
- * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
+ * \sa \ref igraph_harmonic_centrality() to calculate the exact harmonic centrality.
+ * Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
  */
 
 igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,

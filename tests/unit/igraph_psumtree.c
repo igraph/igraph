@@ -1,5 +1,4 @@
 
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -33,8 +32,6 @@ int main(void) {
     igraph_real_t sum;
 
     igraph_rng_seed(igraph_rng_default(), 42);
-
-    RNG_BEGIN();
 
     /* Uniform random numbers */
     igraph_vector_init(&vec, 16);
@@ -209,8 +206,6 @@ int main(void) {
     igraph_set_error_handler(oldhandler);
 
     igraph_psumtree_destroy(&tree);
-
-    RNG_END();
 
     VERIFY_FINALLY_STACK();
 

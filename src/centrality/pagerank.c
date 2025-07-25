@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
@@ -14,8 +12,8 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_centrality.h"
@@ -302,7 +300,7 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * This simplified interface takes a vertex sequence and resets the random walk to
  * one of the vertices in the specified vertex sequence, chosen uniformly. A typical
  * application of personalized PageRank is when the random walk is reset to the same
- * vertex every time - this can easily be achieved using \ref igraph_vss_1() which
+ * vertex every time: this can easily be achieved using \ref igraph_vss_1() which
  * generates a vertex sequence containing only a single vertex.
  *
  * </para><para>
@@ -330,6 +328,8 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * \param damping The damping factor ("d" in the original paper).
  *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset_vids IDs of the vertices used when resetting the random walk.
+ *    The walk will be restarted from a vertex in this set, chosen uniformly at
+ *    random. Duplicate vertices are allowed.
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
@@ -367,16 +367,18 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     while (!IGRAPH_VIT_END(vit)) {
-        VECTOR(reset)[IGRAPH_VIT_GET(vit)]++;
+        /* Increment by 1 instead of setting to 1 to handle duplicates. */
+        VECTOR(reset)[IGRAPH_VIT_GET(vit)] += 1.0;
         IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, vector,
-                 value, vids, directed,
-                 damping, &reset, weights,
-                 options));
+    IGRAPH_CHECK(igraph_personalized_pagerank(
+            graph, algo, vector,
+            value, vids, directed,
+            damping, &reset, weights,
+            options));
 
     igraph_vector_destroy(&reset);
     IGRAPH_FINALLY_CLEAN(1);
@@ -593,8 +595,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     IGRAPH_VECTOR_INIT_FINALLY(&outdegree, options->n);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
 
-    RNG_BEGIN();
-
     if (reset) {
         /* Normalize reset vector so the sum is 1 */
         IGRAPH_CHECK(igraph_vector_init_copy(&normalized_reset, reset));
@@ -662,8 +662,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         igraph_inclist_destroy(&inclist);
         IGRAPH_FINALLY_CLEAN(1);
     }
-
-    RNG_END();
 
     if (reset) {
         igraph_vector_destroy(&normalized_reset);

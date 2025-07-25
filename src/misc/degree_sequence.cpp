@@ -752,6 +752,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *          connected graph, regardless of whether multi-edges are allowed,
  *          provided that a connected realization exists (see Horvát and Modes,
  *          2021, as well as http://szhorvat.net/pelican/hh-connected-graphs.html).
+ *          This method can be used to construct a tree from its degrees.
  *          In the directed case it tends to generate weakly connected graphs,
  *          but this is not guaranteed.
  *          \cli IGRAPH_REALIZE_DEGSEQ_LARGEST

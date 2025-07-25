@@ -39,6 +39,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     /* Directed */
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_bool_t bres, bres2, bres3;
+        igraph_real_t r;
 
         igraph_has_multiple(&graph, &bres);
         igraph_has_loop(&graph, &bres2);
@@ -67,6 +68,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
         igraph_is_eulerian(&graph, &bres, &bres2);
         igraph_invalidate_cache(&graph);
+
+        igraph_density(&graph, &r, true);
 
         igraph_destroy(&graph);
     }

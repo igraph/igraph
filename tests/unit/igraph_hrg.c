@@ -55,10 +55,13 @@ int main(void) {
     igraph_vector_int_t neis;
     igraph_vector_int_init(&neis, 0);
     for (igraph_integer_t i=0; i < igraph_vcount(&graph)-1; i++) {
-       printf("Vertex # %2" IGRAPH_PRId ", ", (i+igraph_vcount(&graph)));
-       igraph_neighbors(&dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT);
-       printf("left: # %2" IGRAPH_PRId ", right: # %2" IGRAPH_PRId ", ", VECTOR(neis)[0], VECTOR(neis)[1]);
-       printf("prob: %6.2g\n", VECTOR(prob)[i+igraph_vcount(&graph)]);
+        printf("Vertex # %2" IGRAPH_PRId ", ", (i+igraph_vcount(&graph)));
+        igraph_neighbors(
+            &dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT,
+            IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE
+        );
+        printf("left: # %2" IGRAPH_PRId ", right: # %2" IGRAPH_PRId ", ", VECTOR(neis)[0], VECTOR(neis)[1]);
+        printf("prob: %6.2g\n", VECTOR(prob)[i+igraph_vcount(&graph)]);
     }
     igraph_vector_int_destroy(&neis);
 

@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2020 The igraph development team
@@ -28,6 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
+#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -190,7 +189,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
     igraph_vector_clear(links_weight);
 
     /* Get the list of incident edges */
-    IGRAPH_CHECK(igraph_incident(graph, edges, vertex, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_incident(graph, edges, vertex, IGRAPH_ALL, IGRAPH_LOOPS));
 
     n = igraph_vector_int_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);
@@ -392,6 +391,18 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
         /* Save the current membership, it will be restored in case of worse result */
         IGRAPH_CHECK(igraph_vector_int_update(&temp_membership, communities.membership));
+
+        /* Apply a random inversion to the node_order permutation vector to help escape
+         * rare situations of an infinite loop. A full re-shuffling of node_order would
+         * have a measurable performance impact, hence the single inversion.
+         * See https://github.com/igraph/igraph/issues/2650 for details. */
+        if (vcount > 1) {
+            igraph_integer_t i1 = RNG_INTEGER(0, vcount-1);
+            igraph_integer_t i2 = RNG_INTEGER(0, vcount-1);
+            igraph_integer_t tmp = VECTOR(node_order)[i1];
+            VECTOR(node_order)[i1] = VECTOR(node_order)[i2];
+            VECTOR(node_order)[i2] = tmp;
+        }
 
         for (igraph_integer_t i = 0; i < vcount; i++) {
             /* Exclude vertex from its current community */

@@ -247,8 +247,8 @@ the reference manual for the other arguments.
 
 <para>
 The vertices in a graph are identified by a <emphasis>vertex ID</emphasis>, an integer between
-<code>0</code> and <code>N-1</code>, where <code>N</code> is the number of vertices in the graph. The vertex count can be
-retrieved using <link linkend="igraph_vcount"><function>igraph_vcount()</function></link>,
+<code>0</code> and <code>n - 1</code>, where <code>n</code> is the number of vertices in the graph.
+The vertex count can be retrieved using <link linkend="igraph_vcount"><function>igraph_vcount()</function></link>,
 as in the example.
 </para>
 

@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -46,7 +45,7 @@
    -- Tamas Nepusz, 11 July 2013
 */
 
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_bitset.h"

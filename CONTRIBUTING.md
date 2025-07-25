@@ -165,7 +165,7 @@ Follow the following steps if you would like to make a new pull request:
    conflicts; however, if you already have many commits, merging the upstream
    development branch may be faster.
 
-7. WHen your topic branch is up-to-date with the upstream development branch, you can
+7. When your topic branch is up-to-date with the upstream development branch, you can
    push your topic branch up to your fork:
 
    ```bash
@@ -181,6 +181,10 @@ see also [Legal Stuff](#legal).
 
 <a name="branching"></a>
 ### Branching
+
+In short, always ask whether your contribution should target the `master` or
+`develop` branch _before_ starting any work. Read on for more details on how
+this is decided.
 
 `igraph` is committed to [semantic versioning](https://semver.org/). We are
 currently still in the development release (0.x), which in principle is a mark
@@ -212,10 +216,6 @@ always good to decide **before** starting to work on something whether you
 should start from the `master` branch or from the `develop` branch. In most
 cases, changes in the `master` branch will also be merged to the `develop`
 branch by the maintainers.
-
-If you are unsure about the branch to target, open an issue about your proposed
-feature and we can discuss the appropriate target branch in the issue before
-you send a PR.
 
 <a name="tips"></a>
 ## Writing igraph Code

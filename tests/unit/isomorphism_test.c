@@ -226,14 +226,10 @@ int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 293847); /* make tests deterministic */
 
-    RNG_BEGIN();
-
     test3();
     test4();
     test_bliss();
     test_bug_995();
-
-    RNG_END();
 
     VERIFY_FINALLY_STACK();
 

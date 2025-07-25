@@ -72,7 +72,7 @@ using namespace fitHRG;
  *
  * <para>The igraph HRG implementation is heavily based on the code
  * published by Aaron Clauset, at his website,
- * http://tuvalu.santafe.edu/~aaronc/hierarchy/
+ * https://aaronclauset.github.io/hierarchy/
  * </para>
  */
 
@@ -394,7 +394,7 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
  *   is stored here. It can also be used to pass a HRG to the
  *   function, that can be used as the starting point of the Markov
  *   Chain Monte Carlo fitting, if the \p start argument is true.
- * \param start Logical, whether to start the fitting from the given
+ * \param start Whether to start the fitting from the given
  *   HRG model.
  * \param steps Integer, the number of MCMC steps to take in the
  *   fitting procedure. If this is zero, then the fitting stops if a
@@ -412,8 +412,6 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-
-    RNG_BEGIN();
 
     dendro d;
 
@@ -439,8 +437,6 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
         MCMCEquilibrium_Find(d, hrg);
     }
 
-    RNG_END();
-
     return IGRAPH_SUCCESS;
 
     IGRAPH_HANDLE_EXCEPTIONS_END
@@ -465,14 +461,10 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
 
     // TODO: error handling
 
-    RNG_BEGIN();
-
     d.clearDendrograph();
     d.importDendrogramStructure(hrg);
     d.makeRandomGraph();
     IGRAPH_CHECK(d.recordGraphStructure(sample));
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
     IGRAPH_HANDLE_EXCEPTIONS_END
@@ -512,8 +504,6 @@ igraph_error_t igraph_hrg_sample_many(
         return IGRAPH_SUCCESS;
     }
 
-    RNG_BEGIN();
-
     d.clearDendrograph();
     d.importDendrogramStructure(hrg);
     while (num_samples-- > 0) {
@@ -523,8 +513,6 @@ igraph_error_t igraph_hrg_sample_many(
         IGRAPH_CHECK(igraph_graph_list_push_back(samples, &g));
         IGRAPH_FINALLY_CLEAN(1);
     }
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
     IGRAPH_HANDLE_EXCEPTIONS_END
@@ -700,7 +688,7 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
  * \param hrg A hierarchical random graph. It is used as a starting
  *   point for the sampling, if the \p start argument is true. It is
  *   modified along the MCMC.
- * \param start Logical, whether to use the supplied HRG (in \p hrg)
+ * \param start Whether to use the supplied HRG (in \p hrg)
  *   as a starting point for the MCMC.
  * \param num_samples The number of samples to generate for creating
  *   the consensus tree.
@@ -721,8 +709,6 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
         IGRAPH_ERROR("`hrg' must be given if `start' is true.", IGRAPH_EINVAL);
     }
 
-    RNG_BEGIN();
-
     dendro d;
 
     if (start) {
@@ -740,8 +726,6 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
     markovChainMonteCarlo2(d, num_samples);
 
     d.recordConsensusTree(parents, weights);
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 
@@ -854,7 +838,7 @@ static igraph_error_t recordPredictions(const pblock *br_list, igraph_vector_int
  *   edges, in the order corresponding to \c edges.
  * \param hrg A HRG, it is used as a starting point if \c start is
  *   true. It is also modified during the MCMC sampling.
- * \param start Logical, whether to start the MCMC from the given HRG.
+ * \param start Whether to start the MCMC from the given HRG.
  * \param num_samples The number of samples to generate.
  * \param num_bins Controls the resolution of the edge
  *   probabilities. Higher numbers result higher resolution.
@@ -875,8 +859,6 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
     if (start && !hrg) {
         IGRAPH_ERROR("`hrg' must be given when `start' is true", IGRAPH_EINVAL);
     }
-
-    RNG_BEGIN();
 
     dendro d;
 
@@ -903,8 +885,6 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
     MCMCEquilibrium_Sample(d, num_samples);
     rankCandidatesByProbability(*sg, d, br_list.get(), mk);
     IGRAPH_CHECK(recordPredictions(br_list.get(), edges, prob, mk));
-
-    RNG_END();
 
     return IGRAPH_SUCCESS;
 
@@ -1051,7 +1031,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
         if (ri >= 0) {
             continue;
         }
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         VECTOR(hrg->left )[-ri - 1] = VECTOR(idx)[ VECTOR(neis)[0] ];
         VECTOR(hrg->right)[-ri - 1] = VECTOR(idx)[ VECTOR(neis)[1] ];
         VECTOR(hrg->prob )[-ri - 1] = VECTOR(*prob)[i];

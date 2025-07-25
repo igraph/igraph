@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,13 +29,14 @@ typedef struct igraph_lazy_adjlist2_t {
     igraph_integer_t next_data;
     igraph_neimode_t mode;
     igraph_loops_t loops;
-    igraph_multiple_t multiple;
+    igraph_bool_t multiple;
 } igraph_lazy_adjlist2_t;
+
 igraph_error_t igraph_lazy_adjlist2_init(const igraph_t *graph,
                              igraph_lazy_adjlist2_t *al,
                              igraph_neimode_t mode,
                              igraph_loops_t loops,
-                             igraph_multiple_t multiple) {
+                             igraph_bool_t multiple) {
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannor create lazy adjacency list view", IGRAPH_EINVMODE);
     }
@@ -67,8 +68,9 @@ void igraph_lazy_adjlist2_destroy(igraph_lazy_adjlist2_t *al) {
     IGRAPH_FREE(al->data);
 }
 
-igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(igraph_lazy_adjlist2_t *al,
-        igraph_integer_t pno) {
+igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(
+    igraph_lazy_adjlist2_t *al, igraph_integer_t pno
+) {
     igraph_integer_t no = pno;
     igraph_error_t ret;
 
@@ -80,7 +82,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(igraph_lazy_adjlist2_t *al,
          * should never happen, because the stor_end is set to one past the
          * end of the latest integer.
          */
-        ret = igraph_neighbors(al->graph, &al->adjs[no], no, al->mode);
+        ret = igraph_neighbors(al->graph, &al->adjs[no], no, al->mode, al->loops, al->multiple);
         if (ret != IGRAPH_SUCCESS) {
             igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
             return NULL;
@@ -148,7 +150,6 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             neis = igraph_i_lazy_adjlist2_get_real(&adjlist2, actnode);
-            //IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
@@ -249,7 +250,6 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             neis = igraph_lazy_adjlist_get(&adjlist, actnode);
-            //IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
@@ -350,7 +350,6 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
             neis = igraph_adjlist_get(&adjlist, actnode);
-            //IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {

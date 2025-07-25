@@ -1,4 +1,3 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -111,8 +110,6 @@ int main(void) {
     igraph_matrix_t M, N;
     igraph_vector_int_t p, q;
     igraph_integer_t i;
-
-    RNG_BEGIN();
 
     /* Permutation of a matrix */
 
@@ -305,8 +302,6 @@ int main(void) {
     igraph_vector_int_destroy(&q);
     igraph_matrix_destroy(&M);
     igraph_matrix_destroy(&N);
-
-    RNG_END();
 
     return 0;
 }

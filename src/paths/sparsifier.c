@@ -260,13 +260,11 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         igraph_bitset_null(&is_cluster_sampled);
 
         // Step 1: sample cluster centers
-        RNG_BEGIN();
         for (j = 0; j < no_of_nodes; j++) {
             if (VECTOR(clustering)[j] == j && RNG_UNIF01() < sample_prob) {
                 IGRAPH_BIT_SET(is_cluster_sampled, j);
             }
         }
-        RNG_END();
 
         // Step 2 and 3
         for (v = 0; v < no_of_nodes; v++) {

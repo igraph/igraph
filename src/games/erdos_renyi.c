@@ -1,5 +1,3 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2003-2021 The igraph development team
@@ -66,7 +64,6 @@ static igraph_error_t gnp_large(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount_estimate));
 
-    RNG_BEGIN();
     for (igraph_integer_t i=0; i < n; i++) {
         igraph_integer_t j = directed ? 0 : i;
 
@@ -93,7 +90,6 @@ static igraph_error_t gnp_large(
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);
@@ -125,8 +121,8 @@ static igraph_error_t gnp_large(
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param p The probability of the existence of an edge in the graph.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate self-loops.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -159,10 +155,10 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     int iter = 0;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for G(n,p) model.", IGRAPH_EINVAL);
     }
     if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid probability given.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid probability given for G(n,p) model.", IGRAPH_EINVAL);
     }
 
     if (p == 0.0 || no_of_nodes == 0) {
@@ -193,8 +189,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&s, ecount_estimate));
 
-        RNG_BEGIN();
-
         last = RNG_GEOM(p);
         while (last < maxedges) {
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
@@ -202,8 +196,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             last += 1;
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
-
-        RNG_END();
 
         ecount = igraph_vector_size(&s);
         if (ecount > IGRAPH_ECOUNT_MAX) {
@@ -263,14 +255,47 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
 /**
  * \ingroup generators
- * \function igraph_erdos_renyi_game_gnm_multi
- * \brief Generates a random (Erdős-Rényi) graph with multi-edges.
+ * \function igraph_iea_game
+ * \brief Generates a random multigraph through independent edge assignment.
+ *
+ * \experimental
+ *
+ * This model generates random multigraphs on \p n vertices with \p m edges
+ * through independent edge assignment (IEA). Each of the \p m edges is assigned
+ * uniformly at random to an \em ordered vertex pair, independently of each
+ * other.
+ *
+ * </para><para>
+ * This model does not sample multigraphs uniformly. Undirected graphs are
+ * generated with probability proportional to
+ *
+ * </para><para>
+ * <code>(prod_(i&lt;j) A_ij ! prod_i A_ii !!)^(-1)</code>,
+ *
+ * </para><para>
+ * where \c A denotes the adjacency matrix and <code>!!</code> denotes
+ * the double factorial. Here \c A is assumed to have twice the number of
+ * self-loops on its diagonal. The corresponding  expression for directed
+ * graphs is
+ *
+ * </para><para>
+ * <code>(prod_(i,j) A_ij !)^(-1)</code>.
+ *
+ * </para><para>
+ * Thus the probability of all simple graphs (which only have 0s and 1s in
+ * the adjacency matrix) is the same, while that of non-simple ones depends
+ * on their edge and self-loop multiplicities.
+ *
+ * </para><para>
+ * An alternative way to think of this model is that it performs uniform
+ * sampling of \em edge-labeled graphs, i.e. graphs in which not only vertices,
+ * but also edges carry unique identities and are distinguishable.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges in the graph.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate loops (self) edges.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough
@@ -278,22 +303,38 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_erdos_renyi_game_gnm() to uniformly sample graphs with
+ * a given number of vertices and edges.
  */
-static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
-    igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
-    igraph_bool_t directed, igraph_bool_t loops
-) {
+igraph_error_t igraph_iea_game(
+        igraph_t *graph,
+        igraph_integer_t n, igraph_integer_t m,
+        igraph_bool_t directed, igraph_bool_t loops) {
 
     igraph_vector_int_t edges;
     int iter = 0;
 
-    /* No need for checking n or m here; it has already been done in
-     * igraph_erdos_renyi_game_gnm() */
+    if (n < 0) {
+        IGRAPH_ERROR("Invalid number of vertices for IEA model.", IGRAPH_EINVAL);
+    }
+    if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Invalid number of edges for IEA model.", IGRAPH_EINVAL);
+    }
+
+    /* Special cases of "too many edges" that also apply to multigraphs:
+     *  - The null graph cannot have edges.
+     *  - The singleton graph canot have edges unless loops are allowed.
+     */
+    if (m > 0 && ((n == 0) || (!loops && n == 1))) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for IEA model.",
+            IGRAPH_EINVAL);
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < m; i++) {
         igraph_integer_t from, to;
         from = RNG_INTEGER(0, n - 1);
@@ -309,9 +350,201 @@ static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
         igraph_vector_int_push_back(&edges, to); /* reserved */
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
     }
-    RNG_END();
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/* Uniform sampling of multigraphs from G(n,m) */
+static igraph_error_t gnm_multi(
+        igraph_t *graph,
+        igraph_integer_t n, igraph_integer_t m,
+        igraph_bool_t directed, igraph_bool_t loops) {
+
+    /* Conceptually, uniform multigraph sampling works as follows:
+     *
+     *  - Consider a list containing all vertex pairs. Use unordered pairs for
+     *    undirected graphs, ordered pairs for directed ones, and include
+     *    self-pairs if desired.
+     *  - Pick a list element uniformly at random with replacement and append
+     *    it to the list. Add the corresponding edge to the graph.
+     *  - Continue picking elements form the list uniformly at random and
+     *    appending the pick to the list until we have sampled the desired
+     *    number of edges.
+     *
+     * Let's illustrate how this is implemented on the directed case with loops
+     * allowed. Each element of the n*n adjacency matrix corresponds to an
+     * ordered vertex pair. Uniformly sampling a matrix element is possible
+     * by generating two random matrix indices. As an analog of appending to the
+     * list of pairs, we extend the matrix with additional rows. The last row
+     * will generally be incomplete, so we use rejection sampling to avoid
+     * exceeding its length.
+     *
+     * In the undirected case, we still sample _ordered_ vertex pairs for
+     * simplicity. To account for the resulting duplication, we append the
+     * sampled pair _twice_. In the undirected case with loops, we must also
+     * duplicate the matrix diagonal.
+     */
+
+    igraph_vector_int_t edges;
+    igraph_integer_t nrow, ncol;
+    igraph_integer_t last; /* column index of last element in last row */
+    int iter = 0;
+
+    /* Constraining n and m by IGRAPH_VCOUNT_MAX and IGRAPH_ECOUNT_MAX,
+     * as done in the caller, is sufficient to prevent overflow,
+     * except for the one special case below:
+     */
+
+    if (!directed && !loops &&
+        n == IGRAPH_VCOUNT_MAX && m == IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Too many edges or vertices for G(n,m) multigraph.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*m);
+
+    if (directed && loops) {
+        nrow = ncol = n;
+        last = ncol-1;
+        for (igraph_integer_t i=0; i < m; i++) {
+            while (true) {
+                igraph_integer_t r = RNG_INTEGER(0, nrow-1);
+                igraph_integer_t c = RNG_INTEGER(0, ncol-1);
+
+                if (r >= n) {
+                    igraph_integer_t j = (r - n) * ncol + c;
+                    if (IGRAPH_UNLIKELY(j >= i)) continue; /* rejection sampling */
+                    VECTOR(edges)[2*i]   = VECTOR(edges)[2*j];
+                    VECTOR(edges)[2*i+1] = VECTOR(edges)[2*j+1];
+                } else {
+                    VECTOR(edges)[2*i]   = r;
+                    VECTOR(edges)[2*i+1] = c;
+                }
+
+                last += 1;
+                if (last >= ncol) {
+                    last -= ncol;
+                    nrow++;
+                }
+
+                break;
+            }
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    } else if (directed && !loops) {
+        nrow = n;
+        ncol = n-1;
+        last = ncol-1;
+        for (igraph_integer_t i=0; i < m; i++) {
+            while (true) {
+                igraph_integer_t r = RNG_INTEGER(0, nrow-1);
+                igraph_integer_t c = RNG_INTEGER(0, ncol-1);
+
+                if (r >= n) {
+                    igraph_integer_t j = (r - n) * ncol + c;
+                    if (IGRAPH_UNLIKELY(j >= i)) continue; /* rejection sampling */
+                    VECTOR(edges)[2*i]   = VECTOR(edges)[2*j];
+                    VECTOR(edges)[2*i+1] = VECTOR(edges)[2*j+1];
+                } else {
+
+                    /* Eliminate self-loops. */
+                    if (c == r) {
+                        c = n-1;
+                    }
+
+                    VECTOR(edges)[2*i]   = r;
+                    VECTOR(edges)[2*i+1] = c;
+                }
+
+                last += 1;
+                if (last >= ncol) {
+                    last -= ncol;
+                    nrow++;
+                }
+
+                break;
+            }
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    } else if (!directed && loops) {
+        nrow = n;
+        ncol = n+1;
+        last = ncol-1;
+        for (igraph_integer_t i=0; i < m; i++) {
+            while (true) {
+                igraph_integer_t r = RNG_INTEGER(0, nrow-1);
+                igraph_integer_t c = RNG_INTEGER(0, ncol-1);
+
+                if (r >= n) {
+                    igraph_integer_t j = (r - n) * ncol + c;
+                    if (IGRAPH_UNLIKELY(j >= 2*i)) continue; /* rejection sampling */
+                    VECTOR(edges)[2*i]   = VECTOR(edges)[2*(j/2)];
+                    VECTOR(edges)[2*i+1] = VECTOR(edges)[2*(j/2)+1];
+                } else {
+
+                    /* Two chances to sample from matrix diagonal,
+                     * when c == r and when c == n. */
+                    if (c == n) {
+                        c = r;
+                    }
+
+                    VECTOR(edges)[2*i]   = r;
+                    VECTOR(edges)[2*i+1] = c;
+                }
+
+                last += 2;
+                while (last >= ncol) {
+                    last -= ncol;
+                    nrow++;
+                }
+
+                break;
+            }
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    } else  /* !directed && !loops */ {
+        nrow = n;
+        ncol = n-1;
+        last = ncol-1;
+        for (igraph_integer_t i=0; i < m; i++) {
+            while (true) {
+                igraph_integer_t r = RNG_INTEGER(0, nrow-1);
+                igraph_integer_t c = RNG_INTEGER(0, ncol-1);
+
+                if (r >= n) {
+                    igraph_integer_t j = (r - n) * ncol + c;
+                    if (IGRAPH_UNLIKELY(j >= 2*i)) continue; /* rejection sampling */
+                    VECTOR(edges)[2*i]   = VECTOR(edges)[2*(j/2)];
+                    VECTOR(edges)[2*i+1] = VECTOR(edges)[2*(j/2)+1];
+                } else {
+
+                    /* Eliminate self-loops. */
+                    if (c == r) {
+                        c = n-1;
+                    }
+
+                    VECTOR(edges)[2*i]   = r;
+                    VECTOR(edges)[2*i+1] = c;
+                }
+
+                last += 2;
+                while (last >= ncol) {
+                    last -= ncol;
+                    nrow++;
+                }
+
+                break;
+            }
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -329,10 +562,10 @@ static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges in the graph.
- * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate self-loops.
- * \param multiple Logical, whether it is allowed to generate more than one
- *        edge between the same pair of vertices.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
+ * \param multiple Whether it is allowed to generate more than one edge between
+ *    the same pair of vertices.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -342,6 +575,8 @@ static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
  *
  * \sa \ref igraph_erdos_renyi_game_gnp() to sample from the related
  * <code>G(n, p)</code> model, which constrains the \em expected edge count;
+ * \ref igraph_iea_game() to generate multigraph by assigning edges to vertex
+ * pairs uniformly and independently;
  * \ref igraph_degree_sequence_game() to constrain the degree sequence;
  * \ref igraph_bipartite_game_gnm() for the bipartite version of this model;
  * \ref igraph_barabasi_game() and \ref igraph_growing_random_game() for other
@@ -359,100 +594,108 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
      * IGRAPH_INTEGER_MAX and this will cause overflows when calculating `from` and `to`
      * for tests on large graphs. This is also why we need a 'real' version of random_sample.
     */
-    igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges = m;
-    igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
+    igraph_real_t n_real = (igraph_real_t) n; /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
     int iter = 0;
 
-    if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+    /* The multigraph implementation relies on the below checks to avoid overflow. */
+    if (n < 0 || n > IGRAPH_VCOUNT_MAX) {
+        IGRAPH_ERROR("Invalid number of vertices for G(n,m) model.", IGRAPH_EINVAL);
     }
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges for G(n,m) model.", IGRAPH_EINVAL);
+    }
+
+    /* Special cases of "too many edges" that also apply to multigraphs:
+     *  - The null graph cannot have edges.
+     *  - The singleton graph canot have edges unless loops are allowed.
+     */
+    if (m > 0 && ((n == 0) || (!loops && n == 1))) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for G(n,m) model.",
+             IGRAPH_EINVAL);
+    }
+
+    if (m == 0) {
+        return igraph_empty(graph, n, directed);
     }
 
     if (multiple) {
-        return igraph_i_erdos_renyi_game_gnm_multi(graph, n, m, directed, loops);
+        return gnm_multi(graph, n, m, directed, loops);
     }
 
-    if (m == 0.0 || no_of_nodes == 0) {
-        IGRAPH_CHECK(igraph_empty(graph, n, directed));
+    igraph_real_t maxedges = n;
+    if (directed && loops) {
+        maxedges *= n;
+    } else if (directed && !loops) {
+        maxedges *= (n - 1);
+    } else if (!directed && loops) {
+        maxedges *= (n + 1) / 2.0;
     } else {
+        maxedges *= (n - 1) / 2.0;
+    }
 
-        igraph_integer_t i;
-        igraph_real_t maxedges = n;
+    if (m > maxedges) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for G(n,m) model.",
+            IGRAPH_EINVAL);
+    }
+
+    if (maxedges == m) {
+        IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
+    } else {
+        igraph_integer_t slen;
+
+        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+        IGRAPH_CHECK(igraph_i_random_sample_real(&s, 0, maxedges - 1, m));
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
+
+        slen = igraph_vector_size(&s);
         if (directed && loops) {
-            maxedges *= n;
-        } else if (directed && !loops) {
-            maxedges *= (n - 1);
-        } else if (!directed && loops) {
-            maxedges *= (n + 1) / 2.0;
-        } else {
-            maxedges *= (n - 1) / 2.0;
-        }
-
-        if (no_of_edges > maxedges) {
-            IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
-        }
-
-        if (maxedges == no_of_edges) {
-            IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
-        } else {
-
-            igraph_integer_t slen;
-
-            IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-            IGRAPH_CHECK(igraph_random_sample_real(&s, 0, maxedges - 1, no_of_edges));
-
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
-
-            slen = igraph_vector_size(&s);
-            if (directed && loops) {
-                for (i = 0; i < slen; i++) {
-                    igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
-                    igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
-                    igraph_vector_int_push_back(&edges, from);
-                    igraph_vector_int_push_back(&edges, to);
-                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-                }
-            } else if (directed && !loops) {
-                for (i = 0; i < slen; i++) {
-                    igraph_integer_t from = floor(VECTOR(s)[i] / (no_of_nodes_real - 1));
-                    igraph_integer_t to = VECTOR(s)[i] - from * (no_of_nodes_real - 1);
-                    if (from == to) {
-                        to = no_of_nodes - 1;
-                    }
-                    igraph_vector_int_push_back(&edges, from);
-                    igraph_vector_int_push_back(&edges, to);
-                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-                }
-            } else if (!directed && loops) {
-                for (i = 0; i < slen; i++) {
-                    igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
-                    igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
-                    igraph_vector_int_push_back(&edges, from);
-                    igraph_vector_int_push_back(&edges, to);
-                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-                }
-            } else { /* !directed && !loops */
-                for (i = 0; i < slen; i++) {
-                    igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
-                    igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
-                    igraph_vector_int_push_back(&edges, from);
-                    igraph_vector_int_push_back(&edges, to);
-                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-                }
+            for (igraph_integer_t i = 0; i < slen; i++) {
+                igraph_integer_t to = floor(VECTOR(s)[i] / n_real);
+                igraph_integer_t from = VECTOR(s)[i] - to * n_real;
+                igraph_vector_int_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to);
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
-
-            igraph_vector_destroy(&s);
-            IGRAPH_FINALLY_CLEAN(1);
-            IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-            igraph_vector_int_destroy(&edges);
-            IGRAPH_FINALLY_CLEAN(1);
+        } else if (directed && !loops) {
+            for (igraph_integer_t i = 0; i < slen; i++) {
+                igraph_integer_t from = floor(VECTOR(s)[i] / (n_real - 1));
+                igraph_integer_t to = VECTOR(s)[i] - from * (n_real - 1);
+                if (from == to) {
+                    to = n - 1;
+                }
+                igraph_vector_int_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to);
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+            }
+        } else if (!directed && loops) {
+            for (igraph_integer_t i = 0; i < slen; i++) {
+                igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
+                igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
+                igraph_vector_int_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to);
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+            }
+        } else { /* !directed && !loops */
+            for (igraph_integer_t i = 0; i < slen; i++) {
+                igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
+                igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
+                igraph_vector_int_push_back(&edges, from);
+                igraph_vector_int_push_back(&edges, to);
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+            }
         }
+
+        igraph_vector_destroy(&s);
+        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+        igraph_vector_int_destroy(&edges);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     return IGRAPH_SUCCESS;

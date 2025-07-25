@@ -9,7 +9,6 @@ add_library(
   lbfgs.c
   mt.c
   options.c
-  platform.c
   plfit.c
   plfit_error.c
   rbinom.c
