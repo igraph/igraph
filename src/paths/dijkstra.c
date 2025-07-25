@@ -247,6 +247,94 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
 }
 
 /**
+ * TODO
+ */
+igraph_error_t igraph_distances_dijkstra_1(const igraph_t *graph,
+                                           igraph_inclist_t *inclist,
+                                           igraph_vector_t *res,
+                                           igraph_integer_t from,
+                                           const igraph_vector_t *weights) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_2wheap_t Q;
+    igraph_integer_t j;
+
+    IGRAPH_ASSERT(weights);  // should not be called without weights for now
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
+        } else if (isnan(min)) {
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
+        }
+    }
+
+    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    igraph_vector_fill(res, IGRAPH_INFINITY);
+
+    igraph_2wheap_clear(&Q);
+
+    /* Many systems distinguish between +0.0 and -0.0.
+        * Since we store negative distances in the heap,
+        * we must insert -0.0 in order to get +0.0 as the
+        * final distance result. */
+    igraph_2wheap_push_with_index(&Q, from, -0.0);
+
+    while (!igraph_2wheap_empty(&Q)) {
+        igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
+        igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
+        igraph_vector_int_t *neis;
+        igraph_integer_t nlen;
+
+        VECTOR(*res)[minnei] = mindist;
+
+        /* Now check all neighbors of 'minnei' for a shorter path */
+        neis = igraph_inclist_get(inclist, minnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+        nlen = igraph_vector_int_size(neis);
+        for (j = 0; j < nlen; j++) {
+            igraph_integer_t edge = VECTOR(*neis)[j];
+            igraph_real_t weight = VECTOR(*weights)[edge];
+
+            /* Optimization: do not follow infinite-weight edges. */
+            if (weight == IGRAPH_INFINITY) {
+                continue;
+            }
+
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_real_t altdist = mindist + weight;
+
+            if (! igraph_2wheap_has_elem(&Q, tto)) {
+                /* This is the first non-infinite distance */
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+            } else if (igraph_2wheap_has_active(&Q, tto)) {
+                igraph_real_t curdist = -igraph_2wheap_get(&Q, tto);
+                if (altdist < curdist) {
+                    /* This is a shorter path */
+                    igraph_2wheap_modify(&Q, tto, -altdist);
+                }
+            }
+        }
+
+    } /* !igraph_2wheap_empty(&Q) */
+
+    igraph_2wheap_destroy(&Q);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_distances_dijkstra
  * \brief Weighted shortest path lengths between vertices.
  *

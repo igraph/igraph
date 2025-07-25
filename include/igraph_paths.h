@@ -19,6 +19,7 @@
 #ifndef IGRAPH_PATHS_H
 #define IGRAPH_PATHS_H
 
+#include "igraph_adjlist.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
@@ -74,6 +75,10 @@ IGRAPH_EXPORT igraph_error_t igraph_diameter(
     igraph_vector_int_t *vertex_path, igraph_vector_int_t *edge_path,
     igraph_bool_t directed, igraph_bool_t unconn
 );
+IGRAPH_EXPORT igraph_error_t igraph_diameter_bound(
+    const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *res,
+    igraph_bool_t directed, igraph_bool_t unconn
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *res,
                                                      igraph_vs_t from, igraph_vs_t to,
@@ -81,6 +86,7 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igra
 IGRAPH_EXPORT igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
                                               igraph_vs_t from, igraph_vs_t to,
                                               igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_distances_1(const igraph_adjlist_t *adjlist, igraph_vector_t *res, igraph_integer_t from_vert);
 IGRAPH_EXPORT igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                                                      igraph_matrix_t *res,
                                                      igraph_vs_t from,
@@ -94,6 +100,11 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *gr
                                                               const igraph_vector_t *weights,
                                                               igraph_neimode_t mode,
                                                               igraph_real_t cutoff);
+IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra_1(const igraph_t *graph,
+                                           igraph_inclist_t *inclist,
+                                           igraph_vector_t *res,
+                                           igraph_integer_t from,
+                                           const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                                                        igraph_matrix_t *res,
                                                        igraph_vs_t from,
