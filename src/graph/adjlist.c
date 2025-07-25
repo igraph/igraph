@@ -109,7 +109,13 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  *
  * </para><para>
  * This function returns each neighbor list in sorted order, just
- * like \ref igraph_neighbors().
+ * like \ref igraph_neighbors(). However, adjacency lists \em "in general"
+ * are not guaranteed to be sorted, and we reserve the right to change the
+ * ordering of vertices in the result in the future without considering this
+ * a breaking change. If you need to ensure that the adjacency lists are
+ * sorted, you can use \ref igraph_adjlist_sort() to sort all the adjacency
+ * lists, or call \ref igraph_vector_int_sort() on the individual adjacency
+ * vectors after the initialization.
  *
  * </para><para>
  * As of igraph 0.10, there is a small performance cost to setting \p loops
