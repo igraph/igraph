@@ -17,6 +17,9 @@ int main(void) {
                                28,31, 28,33, 29,32, 29,33, 30,32, 30,33, 31,32,
                                31,33, 32,33 };
 
+  /* Initialize the library. */
+  igraph_setup();
+
   igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0]));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 

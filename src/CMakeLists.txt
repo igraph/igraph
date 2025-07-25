@@ -80,6 +80,7 @@ add_library(
   linalg/lapack.c
 
   random/random.c
+  random/random_device.cpp
   random/rng_glibc2.c
   random/rng_mt19937.c
   random/rng_pcg32.c
