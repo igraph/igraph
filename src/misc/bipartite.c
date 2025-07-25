@@ -1110,7 +1110,6 @@ static igraph_error_t gnp_bipartite_large(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount_estimate));
 
-    RNG_BEGIN();
     for (igraph_integer_t i = 0; i < n1; i++) {
         igraph_integer_t j = 0;
 
@@ -1148,7 +1147,6 @@ static igraph_error_t gnp_bipartite_large(
             IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
     }
-    RNG_END();
 
     /* n1 + n2 has already been checked for overflow in the caller function. */
     IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
