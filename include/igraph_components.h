@@ -43,24 +43,24 @@ __BEGIN_DECLS
 
 /* Deprecated alias to igraph_connected_components; will be removed in 0.11 */
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membership,
-        igraph_vector_int_t *csize, igraph_integer_t *no,
-        igraph_connectedness_t mode);
+                                  igraph_vector_int_t *csize, igraph_integer_t *no,
+                                  igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_connected_components(const igraph_t *graph, igraph_vector_int_t *membership,
-        igraph_vector_int_t *csize, igraph_integer_t *no,
-        igraph_connectedness_t mode);
+                                  igraph_vector_int_t *csize, igraph_integer_t *no,
+                                  igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
-        igraph_connectedness_t mode);
+                                  igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
-        igraph_connectedness_t mode,
-        igraph_integer_t maxcompno, igraph_integer_t minelements);
+                                  igraph_connectedness_t mode,
+                                  igraph_integer_t maxcompno, igraph_integer_t minelements);
 IGRAPH_EXPORT igraph_error_t igraph_articulation_points(const igraph_t *graph,
-        igraph_vector_int_t *res);
+                                  igraph_vector_int_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph,
-        igraph_integer_t *no,
-        igraph_vector_int_list_t *tree_edges,
-        igraph_vector_int_list_t *component_edges,
-        igraph_vector_int_list_t *components,
-        igraph_vector_int_t *articulation_points);
+                                  igraph_integer_t *no,
+                                  igraph_vector_int_list_t *tree_edges,
+                                  igraph_vector_int_list_t *component_edges,
+                                  igraph_vector_int_list_t *components,
+                                  igraph_vector_int_t *articulation_points);
 IGRAPH_EXPORT igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
 

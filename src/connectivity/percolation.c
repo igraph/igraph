@@ -77,14 +77,6 @@ static void percolate_edge(igraph_vector_int_t *links,
     }
 }
 
-
-// test if node is already connected to something
-// If it is a root, its size will be greater than 1
-// If it is not a root then it will link somewhere.
-static bool is_connected(igraph_vector_int_t *links, igraph_vector_int_t *sizes, igraph_integer_t vert) {
-    return VECTOR(*links)[vert] != vert || VECTOR(*sizes)[vert] > 1;
-}
-
 /**
  * \function igraph_edgelist_percolation
  * \brief The size of the largest component as vertex pairs are connected.
