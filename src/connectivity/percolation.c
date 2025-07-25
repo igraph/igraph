@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "igraph_bitset.h"
 #include "igraph_components.h"
 
 #include "igraph_constants.h"
@@ -216,7 +217,7 @@ igraph_error_t igraph_bond_percolation(
     igraph_vector_int_t edges;
 
     if (edge_order == NULL) {
-        // Use random edge order
+        // Use random edge order if none was provided
 
         IGRAPH_CHECK(igraph_vector_int_init_range(&i_edge_order, 0, igraph_ecount(graph)));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &i_edge_order);
@@ -224,13 +225,31 @@ igraph_error_t igraph_bond_percolation(
 
         p_edge_order = &i_edge_order;
     } else {
+        // Verify that there are no duplicates.
+        igraph_bitset_t present_edges;
+        igraph_integer_t edge_count = igraph_vector_int_size(edge_order);
+        igraph_bitset_init(&present_edges, edge_count);
+        IGRAPH_FINALLY(igraph_bitset_destroy, &present_edges);
+
+        for (igraph_integer_t i = 0; i < edge_count; i++) {
+            if (IGRAPH_BIT_TEST(present_edges, VECTOR(*edge_order)[i])) {
+                IGRAPH_ERROR("Duplicate edge ids in edge order.", IGRAPH_EINVAL);
+            }
+            IGRAPH_BIT_SET(present_edges, VECTOR(*edge_order)[i]);
+        }
+        igraph_bitset_destroy(&present_edges);
+        IGRAPH_FINALLY_CLEAN(1);
         p_edge_order = edge_order;
     }
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * igraph_vector_int_size(p_edge_order));
 
+    //initialize edge_list
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * igraph_vector_int_size(p_edge_order));
     IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges));
+
+    // defer to igraph_edgelist_percolation
     IGRAPH_CHECK(igraph_edgelist_percolation(&edges, output, vertex_count));
 
+    //cleanup
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

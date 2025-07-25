@@ -110,7 +110,11 @@ void test_bond(void) {
 
     percolate_b(&random, NULL, false); // sanity check
 
-
+    printf("Error on duplicates\n");
+    igraph_vector_int_t duplicates;
+    igraph_vector_int_init_int(&duplicates, 5, 0,1,2,3,3);
+    CHECK_ERROR(percolate_b(&c_4, &duplicates, false), IGRAPH_EINVAL);
+    igraph_vector_int_destroy(&duplicates);
     printf("Null outputs\n");
     igraph_bond_percolation(&karate, NULL, NULL, NULL);
 
