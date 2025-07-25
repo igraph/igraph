@@ -12,3 +12,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+
+
+#include "igraph_datatype.h"
+#include "igraph_error.h"
+#include "igraph_matrix.h"
+
+
+igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t points) {
+
+}
