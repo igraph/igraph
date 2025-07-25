@@ -47,7 +47,7 @@ int main(void) {
     if (igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 3;
     }
-    if (igraph_is_simple(&g, &is_simple) || !is_simple) {
+    if (igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED) || !is_simple) {
         return 4;
     }
     if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS)) {
@@ -76,7 +76,7 @@ int main(void) {
     if (igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 9;
     }
-    if (igraph_is_simple(&g, &is_simple) || !is_simple) {
+    if (igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED) || !is_simple) {
         return 10;
     }
     if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS)) {
@@ -90,7 +90,7 @@ int main(void) {
     if (!igraph_is_directed(&g) || igraph_vcount(&g) != 10) {
         return 12;
     }
-    if (igraph_is_simple(&g, &is_simple) || !is_simple) {
+    if (igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED) || !is_simple) {
         return 13;
     }
     if (igraph_degree(&g, &vec, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS)) {

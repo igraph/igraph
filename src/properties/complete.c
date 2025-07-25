@@ -119,7 +119,7 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res) {
     }
 
     /* If the graph is simple, compare and conclude */
-    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple, IGRAPH_DIRECTED));
 
     if (simple) {
         *res = (ecount == complete_ecount);

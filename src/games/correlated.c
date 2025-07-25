@@ -120,7 +120,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
                          IGRAPH_EINVAL);
         }
     }
-    IGRAPH_CHECK(igraph_is_simple(old_graph, &simple));
+    IGRAPH_CHECK(igraph_is_simple(old_graph, &simple, IGRAPH_DIRECTED));
     if (! simple) {
         IGRAPH_ERROR("The original graph must be simple for correlated Erdos-Renyi game.",
                      IGRAPH_EINVAL);

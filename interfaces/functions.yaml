@@ -863,7 +863,7 @@ igraph_is_acyclic:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_is_simple:
-    PARAMS: GRAPH graph, OUT BOOLEAN res
+    PARAMS: GRAPH graph, OUT BOOLEAN res, BOOLEAN directed=True
 
 igraph_is_multiple:
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGE_SELECTOR es=ALL

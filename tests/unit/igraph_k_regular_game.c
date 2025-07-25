@@ -37,7 +37,7 @@ int main(void) {
     igraph_k_regular_game(&g, 10, 4, 0, 0);
     igraph_degree(&g, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
     igraph_vector_int_print(&deg);
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     if (!is_simple) {
         return 1;
     }
@@ -50,7 +50,7 @@ int main(void) {
     igraph_k_regular_game(&g, 10, 3, 0, 0);
     igraph_degree(&g, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
     igraph_vector_int_print(&deg);
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     if (!is_simple) {
         return 2;
     }
@@ -93,7 +93,7 @@ int main(void) {
     igraph_vector_int_print(&deg);
     igraph_degree(&g, &deg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
     igraph_vector_int_print(&deg);
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     if (!is_simple) {
         return 5;
     }
@@ -108,7 +108,7 @@ int main(void) {
     igraph_vector_int_print(&deg);
     igraph_degree(&g, &deg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
     igraph_vector_int_print(&deg);
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     if (!is_simple) {
         return 6;
     }
@@ -123,7 +123,7 @@ int main(void) {
     igraph_vector_int_print(&deg);
     igraph_degree(&g, &deg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
     igraph_vector_int_print(&deg);
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     if (!is_simple) {
         return 7;
     }
