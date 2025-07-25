@@ -1005,6 +1005,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
 /* This implementation is used only with very large vertex counts, when the
  * default implementation would fail due to overflow. While this version
  * avoids overflow and uses less memory, it is also slower than the default
@@ -1346,7 +1347,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                     igraph_vector_int_push_back(&edges, to); /* reserved */
                     igraph_vector_int_push_back(&edges, from); /* reserved */
                 }
-                iter++;
+
                 IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
 
