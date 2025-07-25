@@ -375,6 +375,11 @@ LSETYPE:
     CTYPE: igraph_laplacian_spectral_embedding_type_t
     FLAGS: ENUM
 
+METRIC:
+    # Enum that describes the metric to be used for spatial algorithms
+    CTYPE: igraph_metric_t
+    FLAGS: ENUM
+
 MSTALGORITHM:
     # Enum that describes the algorithm for computing a minimum spanning tree
     CTYPE: igraph_mst_algorithm_t
