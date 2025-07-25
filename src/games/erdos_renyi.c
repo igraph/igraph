@@ -32,7 +32,11 @@
 /* This implementation is used only with very large vertex counts, above
  * sqrt(MAX_EXACT_REAL) ~ 100 million, when the default implementation would
  * fail due to overflow. While this version avoids overflow and uses less memory,
- * it is also slower than the default implementation. */
+ * it is also slower than the default implementation.
+ *
+ * This function expects that when multiple=true, the p parameter has already
+ * been transformed by p = p / (1 + p). This is currently done by the caller.
+ */
 static igraph_error_t gnp_large(
     igraph_t *graph, igraph_int_t n, igraph_real_t p,
     igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple,
