@@ -281,7 +281,13 @@ igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t 
  *   or both (\c IGRAPH_ALL) types of neighbors (in the
  *   complementer graph) to include in the adjacency list. It is
  *   ignored for undirected networks.
- * \param loops Whether to consider loop edges.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS will not
+ *   include loops edges in the returned adjacency list. \c IGRAPH_LOOPS_ONCE
+ *   will include vertex \p i in the adjacency list of vetex \p i \em once if
+ *   the original graph did not have a loop edge incident on vertex \p i,
+ *   while \c IGRAPH_LOOPS_TWICE will include vertex \p i \em twice \em if
+ *   \p mode is set to \c IGRAPH_ALL (otherwise it is treated the same way as
+ *   \c IGRAPH_LOOPS_ONCE ).
  * \return Error code.
  *
  * \sa \ref igraph_adjlist_init(), \ref igraph_complementer()
@@ -291,7 +297,7 @@ igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t 
 igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_adjlist_t *al,
                                      igraph_neimode_t mode,
-                                     igraph_bool_t loops) {
+                                     igraph_loops_t loops) {
 
     igraph_bitset_t seen;
     igraph_vector_int_t neis;
@@ -303,6 +309,10 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    if (loops == IGRAPH_LOOPS_TWICE && mode != IGRAPH_ALL) {
+        loops = IGRAPH_LOOPS_ONCE;
     }
 
     al->length = igraph_vcount(graph);
@@ -326,7 +336,8 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode, loops, IGRAPH_NO_MULTIPLE));
 
-        if (!loops) {
+        if (loops == IGRAPH_NO_LOOPS) {
+            /* If we want no loops, we pretend that we have always seen one */
             IGRAPH_BIT_SET(seen, i);
             n--;
         }
@@ -339,11 +350,23 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
             }
         }
 
+        if (loops == IGRAPH_LOOPS_TWICE) {
+            /* If we want loops twice and the bit corresponding to the loop
+             * edge is _not_ set, we need one extra slot in the allocated
+             * vector */
+            if (!IGRAPH_BIT_TEST(seen, i)) {
+                n++;
+            }
+        }
+
         /* Produce "non-neighbor" list in sorted order. */
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
         for (igraph_integer_t j = 0, k = 0; k < n; j++) {
             if (!IGRAPH_BIT_TEST(seen, j)) {
                 VECTOR(al->adjs[i])[k++] = j;
+                if (loops == IGRAPH_LOOPS_TWICE && i == j) {
+                    VECTOR(al->adjs[i])[k++] = j;
+                }
             }
         }
     }
