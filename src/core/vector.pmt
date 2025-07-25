@@ -768,6 +768,23 @@ void FUNCTION(igraph_vector, fill)(TYPE(igraph_vector) *v, BASE e) {
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    /* Optimize the commonly used integer case when filling with 0
+     * or -1, which are an all-0 and all-1 bit pattern that the
+     * compiler can generate higher efficiency code for. */
+#if defined(BASE_INT)
+    if (e == 0) {
+        FUNCTION(igraph_vector, null)(v);
+        return;
+    }
+    if (e == -1) {
+        for (ptr = v->stor_begin; ptr < v->end; ptr++) {
+            *ptr = -1;
+        }
+        return;
+    }
+#endif
+
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
         *ptr = e;
     }
