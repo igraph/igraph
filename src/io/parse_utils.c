@@ -296,8 +296,6 @@ struct igraph_safelocale_s {
  * \function igraph_enter_safelocale
  * \brief Temporarily set the C locale.
  *
- * \experimental
- *
  * igraph's foreign format readers and writers require a locale that uses a
  * decimal point instead of a decimal comma. This is a convenience function
  * that temporarily sets the C locale so that readers and writers would work
@@ -353,8 +351,6 @@ igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc) {
 /**
  * \function igraph_exit_safelocale
  * \brief Temporarily set the C locale.
- *
- * \experimental
  *
  * Restores a locale saved by \ref igraph_enter_safelocale() and deallocates
  * all associated data. This function \em must be paired with a call to

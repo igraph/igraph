@@ -244,7 +244,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
+    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple, IGRAPH_DIRECTED));
     if (!is_simple) {
         IGRAPH_ERROR("Cohesive blocking only works on simple graphs.",
                      IGRAPH_EINVAL);

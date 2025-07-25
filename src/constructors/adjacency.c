@@ -1138,6 +1138,7 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
  * This has the same functionality as \ref igraph_adjacency(), but uses
  * a column-compressed adjacency matrix.
  *
+ * </para><para>
  * Time complexity: O(|E|),
  * where |E| is the number of edges in the graph.
  */
@@ -1460,6 +1461,7 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
  * This has the same functionality as \ref igraph_weighted_adjacency(), but uses
  * a column-compressed adjacency matrix.
  *
+ * </para><para>
  * Time complexity: O(|E|),
  * where |E| is the number of edges in the graph.
  */

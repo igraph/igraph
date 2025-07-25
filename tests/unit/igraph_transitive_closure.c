@@ -28,7 +28,7 @@ void print_closure(const igraph_t *graph) {
     print_graph_canon(&closure);
     IGRAPH_ASSERT(igraph_vcount(graph) == igraph_vcount(&closure));
     IGRAPH_ASSERT(igraph_is_directed(graph) == igraph_is_directed(&closure));
-    igraph_is_simple(&closure, &simple);
+    igraph_is_simple(&closure, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&closure);
 }

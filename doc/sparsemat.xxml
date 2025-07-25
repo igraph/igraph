@@ -98,7 +98,6 @@
 </section>
 
 <section id="conversion-to-other-data-types"><title>Conversion to other data types</title>
-<!-- doxrox-include igraph_sparsemat -->
 <!-- doxrox-include igraph_matrix_as_sparsemat -->
 <!-- doxrox-include igraph_sparsemat_as_matrix -->
 </section>

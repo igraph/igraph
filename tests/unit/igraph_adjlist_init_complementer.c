@@ -23,20 +23,50 @@ int main(void) {
     igraph_t g;
     igraph_adjlist_t adjlist;
 
-    printf("Graph with loops and mutltiple edges, IGRAPH_IN, loops = 0:\n");
+    printf("Graph with loops and multiple edges, IGRAPH_IN, loops = IGRAPH_NO_LOOPS:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
-    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_IN, 0);
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_IN, IGRAPH_NO_LOOPS);
     igraph_adjlist_print(&adjlist);
     igraph_adjlist_destroy(&adjlist);
 
-    printf("Same graph, loops = 1:\n");
-    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_IN, 1);
+    printf("Same graph, IGRAPH_IN, loops = IGRAPH_LOOPS_ONCE:\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE);
     igraph_adjlist_print(&adjlist);
     igraph_adjlist_destroy(&adjlist);
 
-    printf("Same graph, IGRAPH_OUT:\n");
-    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_OUT, 0);
+    printf("Same graph, IGRAPH_IN, loops = IGRAPH_LOOPS_TWICE (ignored because directed):\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_TWICE);
+    igraph_adjlist_print(&adjlist);
+    igraph_adjlist_destroy(&adjlist);
+
+    printf("Same graph, IGRAPH_OUT, loops = IGRAPH_NO_LOOPS:\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_OUT, IGRAPH_NO_LOOPS);
     igraph_adjlist_fprint(&adjlist, stdout); /* to check fprint too */
+    igraph_adjlist_destroy(&adjlist);
+
+    printf("Same graph, IGRAPH_OUT, loops = IGRAPH_LOOPS_ONCE:\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
+    igraph_adjlist_print(&adjlist);
+    igraph_adjlist_destroy(&adjlist);
+
+    printf("Same graph, IGRAPH_OUT, loops = IGRAPH_LOOPS_TWICE (ignored because directed):\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE);
+    igraph_adjlist_print(&adjlist);
+    igraph_adjlist_destroy(&adjlist);
+
+    printf("Same graph, IGRAPH_ALL, loops = IGRAPH_NO_LOOPS:\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS);
+    igraph_adjlist_print(&adjlist);
+    igraph_adjlist_destroy(&adjlist);
+
+    printf("Same graph, IGRAPH_ALL, loops = IGRAPH_LOOPS_ONCE:\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    igraph_adjlist_print(&adjlist);
+    igraph_adjlist_destroy(&adjlist);
+
+    printf("Same graph, IGRAPH_ALL, loops = IGRAPH_LOOPS_TWICE:\n");
+    igraph_adjlist_init_complementer(&g, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
+    igraph_adjlist_print(&adjlist);
     igraph_adjlist_destroy(&adjlist);
 
     igraph_destroy(&g);
