@@ -1032,3 +1032,10 @@ add_legacy_tests(
   igraph_triangular_lattice
   igraph_hexagonal_lattice
 )
+
+# percolation
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  percolation
+)
+
