@@ -46,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_has_mutual(&graph, &bres3, false);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_simple(&graph, &bres3);
+        igraph_is_simple(&graph, &bres3, IGRAPH_DIRECTED);
         igraph_invalidate_cache(&graph);
 
         IGRAPH_ASSERT((bres || bres2) == !bres3);

@@ -29,7 +29,12 @@ file. Note that while igraph installs several sub-headers, the organization of t
 without notice. Only use <filename>igraph.h</filename> in your projects, not any of the sub-headers.
 </para></listitem>
 <listitem><para>
-Second, <command>igraph</command> uses the
+Second, the library must be initialized using
+<link linkend="igraph_setup"><function>igraph_setup()</function></link>
+before use.
+</para></listitem>
+<listitem><para>
+Third, <command>igraph</command> uses the
 <type>igraph_integer_t</type> type for integers instead of
 <type>int</type> or <type>long int</type>, and it also uses the
 <type>igraph_real_t</type> type for real numbers instead of
@@ -38,11 +43,11 @@ using a 32-bit or 64-bit system, <type>igraph_integer_t</type> may be a 32-bit
 or 64-bit integer.
 </para></listitem>
 <listitem><para>
-Third, <command>igraph</command> graph objects are represented by the <type>igraph_t</type> data
+Fourth, <command>igraph</command> graph objects are represented by the <type>igraph_t</type> data
 type.
 </para></listitem>
 <listitem><para>
-Fourth, the <link
+Fifth, the <link
 linkend="igraph_erdos_renyi_game_gnm"><function>igraph_erdos_renyi_game_gnm()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>

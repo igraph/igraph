@@ -84,18 +84,9 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
         IGRAPH_ERROR("Number of requested communities must not be greater than the number of nodes.",
                      IGRAPH_EINVAL);
     }
-    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
+    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple, IGRAPH_UNDIRECTED));
     if (!is_simple) {
         IGRAPH_ERROR("Fluid community detection supports only simple graphs.", IGRAPH_EINVAL);
-    }
-    if (igraph_is_directed(graph)) {
-        /* When the graph is directed, mutual edges are effectively multi-edges as we
-         * are ignoring edge directions. */
-        igraph_bool_t has_mutual;
-        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
-        if (has_mutual) {
-            IGRAPH_ERROR("Fluid community detection supports only simple graphs.", IGRAPH_EINVAL);
-        }
     }
     IGRAPH_CHECK(igraph_is_connected(graph, &is_connected, IGRAPH_WEAK));
     if (!is_connected) {

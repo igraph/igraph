@@ -630,6 +630,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "devlohani99",
+      "name": "Dev_Lohani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142163543?v=4",
+      "profile": "https://github.com/devlohani99",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lucaslopes",
+      "name": "Lucas Lopes Felipe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8731439?v=4",
+      "profile": "https://lucaslopes.me/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

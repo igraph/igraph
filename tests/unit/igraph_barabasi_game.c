@@ -29,7 +29,7 @@ void run_test(igraph_integer_t n, igraph_bool_t directed, const igraph_vector_in
         IGRAPH_ASSERT(igraph_vcount(&g) == n);
         IGRAPH_ASSERT(igraph_is_directed(&g) == directed);
         if (algo == IGRAPH_BARABASI_PSUMTREE) {
-            igraph_is_simple(&g, &simple);
+            igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
             IGRAPH_ASSERT(simple);
         }
         igraph_destroy(&g);

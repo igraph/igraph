@@ -59,7 +59,7 @@ int main(void) {
         SEED();
         igraph_watts_strogatz_game(&ws, /*dim=*/ 1, /*size=*/ 5, /*nei=*/ 1,
                                    /*p=*/ 0.5, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
-        igraph_is_simple(&ws, &sim);
+        igraph_is_simple(&ws, &sim, IGRAPH_DIRECTED);
         if (!sim) {
             ERR();
             return 1;
