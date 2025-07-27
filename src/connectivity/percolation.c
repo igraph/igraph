@@ -180,10 +180,11 @@ igraph_error_t igraph_edgelist_percolation(
  *
  * \experimental
  *
- * Calculates the bond percolation curve, or the size of the largest connected
- * component as edges are added to the graph in the order given. If both the
- * giant_size and the input are reversed, it is the size of the largest component
- * as edges are removed.
+ * Calculates the bond percolation curve, i.e. the size of the largest connected
+ * component as edges are added to the graph in the order given. If both
+ * \p giant_size and \p edge_order are reversed, it is the size of the largest
+ * component as edges are removed from the graph. If no edge order is given,
+ * a random one will be used.
  *
  * \param graph The graph that edges are assumed to be in. Edge directions
  *    are ignored.
@@ -294,10 +295,10 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  *
  * \experimental
  *
- * Calculates the site percolation curve, or the size of the largest connected
- * component as vertices are added in the order given. If the output is
- * reversed, it is the size of the largest component as vertices are removed
- * in the reverse of the order given. If no vertex order is given, a random
+ * Calculates the site percolation curve, i.e. the size of the largest connected
+ * component as vertices are added in the given order. If both \p giant_size
+ * and \p vertex_order are reversed, it is the size of the largest component
+ * as vertices are removed from the graph. If no vertex order is given, a random
  * one will be used.
  *
  * \param graph The graph that vertices are assumed to be in. Edge directions

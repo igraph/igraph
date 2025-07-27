@@ -109,9 +109,9 @@
 </section>
 
 <section id="percolation"><title>Percolation</title>
+<!-- doxrox-include igraph_site_percolation -->
 <!-- doxrox-include igraph_bond_percolation -->
 <!-- doxrox-include igraph_edgelist_percolation -->
-<!-- doxrox-include igraph_site_percolation -->
 </section>
 
 <section id="degree-sequences"><title>Degree sequences</title>
