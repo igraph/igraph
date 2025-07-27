@@ -158,6 +158,10 @@
  - `igraph_path_graph()` is a convenience wrapper for `igraph_ring()` with `circular=false`.
  - `igraph_cycle_graph()` is a convenience wrapper for `igraph_ring()` with `circular=true`.
 
+### Changed
+
+ - `igraph_bipartite_game_gnp()` can now generate graphs with more than a hundred million vertices. Thanks to Dev Lohani @devlohani99 for implementing this in #2767!
+
 ### Fixed
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
