@@ -220,7 +220,7 @@ igraph_error_t igraph_bond_percolation(
     if (edge_order == NULL) {
         IGRAPH_CHECK(igraph_vector_int_init_range(&i_edge_order, 0, igraph_ecount(graph)));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &i_edge_order);
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&i_edge_order));
+        igraph_vector_int_shuffle(&i_edge_order);
         p_edge_order = &i_edge_order;
     } else {
         // Verify that there are no duplicates.
@@ -242,7 +242,7 @@ igraph_error_t igraph_bond_percolation(
 
     // Initialize edge list. igraph_edges() will validate edge IDs.
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * igraph_vector_int_size(p_edge_order));
-    IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges));
+    IGRAPH_CHECK(igraph_edges(graph, igraph_ess_vector(p_edge_order), &edges, /* bycol = */ 0));
 
     // Defer to igraph_edgelist_percolation()
     IGRAPH_CHECK(igraph_edgelist_percolation(&edges, giant_size, vertex_count));
@@ -273,7 +273,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
     VECTOR(*sizes)[vertex] = 1;
 
-    IGRAPH_CHECK(igraph_neighbors(graph, neighbors, vertex, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_neighbors(graph, neighbors, vertex, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
 
     igraph_integer_t neighbor_count = igraph_vector_int_size(neighbors);
     for (igraph_integer_t i = 0; i < neighbor_count; i++) {
@@ -334,7 +334,7 @@ igraph_error_t igraph_site_percolation(
     if (vertex_order == NULL) {
         IGRAPH_CHECK(igraph_vector_int_init_range(&i_vertex_order, 0, vcount));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &i_vertex_order);
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&i_vertex_order));
+        igraph_vector_int_shuffle(&i_vertex_order);
         p_vertex_order = &i_vertex_order;
     } else {
         p_vertex_order = vertex_order;
