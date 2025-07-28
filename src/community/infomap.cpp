@@ -77,27 +77,16 @@ static void convert_igraph_to_infomap(const igraph_t *graph,
 
 /**
  * \function igraph_community_infomap
- * \brief Find community structure that minimizes the expected description length of a random walker trajectory.
+ * \brief Community structure that minimizes the expected description length of a random walker trajectory.
  *
  * Implementation of the Infomap community detection algorithm of
  * Martin Rosvall and Carl T. Bergstrom. This algorithm takes edge directions
- * into account.
+ * into account. For more details, see the visualization of the math and the
+ * map generator at https://www.mapequation.org.
  *
  * </para><para>
- * For more details, see the visualization of the math and the map generator
- * at https://www.mapequation.org . The original paper describing the algorithm
- * is: M. Rosvall and C. T. Bergstrom, Maps of information flow reveal community
- * structure in complex networks, PNAS 105, 1118 (2008)
- * (https://dx.doi.org/10.1073/pnas.0706851105, https://arxiv.org/abs/0707.0609).
- * A more detailed paper about the algorithm is: M. Rosvall, D. Axelsson, and
- * C. T. Bergstrom, The map equation, Eur. Phys. J. Special Topics 178, 13 (2009).
- * (https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405)
-
- * </para><para>
- * The original C++ implementation of Martin Rosvall is used,
- * see http://www.tp.umu.se/~rosvall/downloads/infomap_undir.tgz .
- * Integration in igraph was done by Emmanuel Navarro (who is grateful to
- * Martin Rosvall and Carl T. Bergstrom for providing this source code).
+ * As of igraph 1.0, the Infomap library written by Daniel Edler, Anton Holmgren
+ * and Martin Rosvall is used. See https://github.com/mapequation/infomap/.
  *
  * </para><para>
  * Note that the graph must not contain isolated vertices.
@@ -105,6 +94,21 @@ static void convert_igraph_to_infomap(const igraph_t *graph,
  * </para><para>
  * If you want to specify a random seed (as in the original
  * implementation) you can use \ref igraph_rng_seed().
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * M. Rosvall and C. T. Bergstrom:
+ * Maps of information flow reveal community structure in complex networks,
+ * PNAS 105, 1118 (2008).
+ * https://dx.doi.org/10.1073/pnas.0706851105, https://arxiv.org/abs/0707.0609
+ *
+ * </para><para>
+ * M. Rosvall, D. Axelsson, and C. T. Bergstrom:
+ * The map equation,
+ * Eur. Phys. J. Special Topics 178, 13 (2009).
+ * https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405
  *
  * \param graph The input graph. Edge directions are taken into account.
  * \param e_weights Numeric vector giving the weights of the edges.
