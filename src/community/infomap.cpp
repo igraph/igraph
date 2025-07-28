@@ -49,29 +49,38 @@ static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igra
 }
 
 static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
-                                      const igraph_vector_t *e_weights,
-                                      const igraph_vector_t *v_weights,
+                                      const igraph_vector_t *edge_weights,
+                                      const igraph_vector_t *vertex_weights,
                                       infomap::Network &network) {
 
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
 
     for (igraph_integer_t v = 0; v < vcount; v++) {
-        double weight = v_weights != NULL ? VECTOR(*v_weights)[v] : 1.0;
-        if (weight <= 0) {
-            IGRAPH_ERRORF("Vertex weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+        if (vertex_weights) {
+            double weight = VECTOR(*vertex_weights)[v];
+            if (weight <= 0) {
+                IGRAPH_ERRORF("Vertex weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+            }
+            network.addNode(v, weight);
+        } else {
+            network.addNode(v);
         }
-        network.addNode(v, weight);
     }
 
     for (igraph_integer_t e = 0; e < ecount; e++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, e);
         igraph_integer_t v2 = IGRAPH_TO(graph, e);
-        double weight = e_weights != NULL ? VECTOR(*e_weights)[e] : 1.0;
-        if (weight <= 0) {
-            IGRAPH_ERRORF("Edge weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+
+        if (edge_weights) {
+            double weight = VECTOR(*edge_weights)[e];
+            if (weight <= 0) {
+                IGRAPH_ERRORF("Edge weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+            }
+            network.addLink(v1, v2, weight);
+        } else {
+            network.addLink(v1, v2);
         }
-        network.addLink(v1, v2, weight);
     }
 
     return IGRAPH_SUCCESS;
