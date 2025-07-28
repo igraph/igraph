@@ -26,3 +26,9 @@ endif()
 # function as is (without visibility specification)
 target_compile_definitions(infomap_vendored PRIVATE IGRAPH_STATIC)
 
+# Infomap uses unsigned indices in OpenMP loops, which requires
+# at least OpenMP 3.0. As of 2025, MSVC only supports OpenMP 2.0,
+# thus this check is necessary.
+if(IGRAPH_OPENMP_SUPPORT AND OpenMP_CXX_VERSION VERSION_GREATER_EQUAL 3)
+  target_link_libraries(infomap_vendored PRIVATE OpenMP::OpenMP_CXX)
+endif()
