@@ -3,7 +3,7 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 
@@ -30,6 +30,7 @@ struct FlowModel {
   static constexpr int undirdir = 2;
   static constexpr int outdirdir = 3;
   static constexpr int rawdir = 4;
+  static constexpr int precomputed = 5;
 
   int value = 0;
 
@@ -57,6 +58,8 @@ inline const char* flowModelToString(const FlowModel& flowModel)
     return "outdirdir";
   case FlowModel::rawdir:
     return "rawdir";
+  case FlowModel::precomputed:
+    return "precomputed";
   case FlowModel::undirected:
   default:
     return "undirected";

@@ -3,7 +3,7 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 

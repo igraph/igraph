@@ -3,7 +3,7 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 
@@ -141,11 +141,9 @@ void InfomapBase::run(const std::string& parameters)
   }
 #endif
 
+  m_network.postProcessInputData();
   if (m_network.numNodes() == 0) {
-    m_network.postProcessInputData();
-    if (m_network.numNodes() == 0) {
-      m_network.readInputData(networkFile);
-    }
+    m_network.readInputData(networkFile);
   }
 
   if (!metaDataFile.empty()) {
@@ -165,9 +163,9 @@ void InfomapBase::run(Network& network)
   if (!isMainInfomap())
     throw std::logic_error("Can't run a non-main Infomap with an input network");
 
-  if (m_network.numNodes() == 0) {
-    m_network.postProcessInputData();
-    if (m_network.numNodes() == 0) {
+  if (network.numNodes() == 0) {
+    network.postProcessInputData();
+    if (network.numNodes() == 0) {
       throw std::domain_error("Network is empty");
     }
   }
@@ -513,7 +511,7 @@ InfomapBase& InfomapBase::initTree(const NodePaths& tree)
   }
   if (numNodesWithoutClusterInfo > 0) {
     if (assignToNeighbouringModule) {
-      Log() << "\n -> " << numNodesWithoutClusterInfo << " nodes not found in tree are put into neighbouring modules if possible.";
+      Log() << "\n -> " << numNodesWithoutClusterInfo << " nodes not found in tree, " << numNodesAddedToNeighbouringModules << " are put into neighbouring modules and " << (numNodesWithoutClusterInfo - numNodesAddedToNeighbouringModules) << " in separate.";
     } else {
       Log() << "\n -> " << numNodesWithoutClusterInfo << " nodes not found in tree are put into separate modules.";
     }
