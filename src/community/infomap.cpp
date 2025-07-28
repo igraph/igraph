@@ -18,6 +18,7 @@
 
 #include "igraph_community.h"
 
+#include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"
 
@@ -28,13 +29,6 @@
 #ifdef HAVE_INFOMAP
     #include "Infomap.h"
 #endif
-
-#include <cmath>
-
-// This is necessary for GCC 5 and earlier, where including <cmath>
-// makes isnan() unusable without the std:: prefix, even if <math.h>
-// was included as well.
-using std::isnan;
 
 static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
     igraph_integer_t n = infomap.numLeafNodes();
@@ -54,7 +48,7 @@ static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igra
     return IGRAPH_SUCCESS;
 }
 
-static void convert_igraph_to_infomap(const igraph_t *graph,
+static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
                                       const igraph_vector_t *e_weights,
                                       const igraph_vector_t *v_weights,
                                       infomap::Network *network) {
@@ -63,14 +57,24 @@ static void convert_igraph_to_infomap(const igraph_t *graph,
     igraph_integer_t ecount = igraph_ecount(graph);
 
     for (igraph_integer_t v = 0; v < vcount; v++) {
-        network->addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1.0);
+        double weight = v_weights != NULL ? VECTOR(*v_weights)[v] : 1.0;
+        if (weight <= 0) {
+            IGRAPH_ERRORF("Vertex weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+        }
+        network->addNode(v, weight);
     }
 
     for (igraph_integer_t e = 0; e < ecount; e++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, e);
         igraph_integer_t v2 = IGRAPH_TO(graph, e);
-        network->addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1.0);
+        double weight = e_weights != NULL ? VECTOR(*e_weights)[e] : 1.0;
+        if (weight <= 0) {
+            IGRAPH_ERRORF("Edge weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+        }
+        network->addLink(v1, v2, weight);
     }
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -149,6 +153,29 @@ igraph_error_t igraph_community_infomap(const igraph_t *graph,
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+
+    if (e_weights) {
+        if (igraph_vector_size(e_weights) != ecount) {
+            IGRAPH_ERROR("Length of edge weight vector does not match edge count.",
+                         IGRAPH_EINVAL);
+        }
+    }
+
+    if (v_weights) {
+        if (igraph_vector_size(v_weights) != vcount) {
+            IGRAPH_ERROR("Length of vertex weight vector does not match edge count.",
+                         IGRAPH_EINVAL);
+        }
+    }
+
+    if (nb_trials < 1) {
+        IGRAPH_ERRORF("Number of trials must be at least 1, got %" IGRAPH_PRId ".",
+                      IGRAPH_EINVAL,
+                      nb_trials);
+    }
+
     // Handle null graph
     if (igraph_vcount(graph) == 0) {
         if (membership) {
@@ -174,7 +201,7 @@ igraph_error_t igraph_community_infomap(const igraph_t *graph,
 
     infomap::InfomapBase infomap(conf);
 
-    convert_igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network()));
+    IGRAPH_CHECK(convert_igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network())));
 
     infomap.run();
 
