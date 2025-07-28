@@ -44,43 +44,35 @@ static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igra
     IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
 
     for (auto it(infomap.iterTreePhysical(1)); !it.isEnd(); ++it) {
-        infomap::InfoNode& node = *it;
+        infomap::InfoNode &node = *it;
         if (node.isLeaf()) {
             VECTOR(*membership)[node.physicalId] = it.moduleId();
         }
     }
 
     // Re-index membership
-    IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+    IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_to_infomap(const igraph_t *graph,
-                                       const igraph_vector_t *e_weights,
-                                       const igraph_vector_t *v_weights,
-                                       infomap::Network* network) {
+static void convert_igraph_to_infomap(const igraph_t *graph,
+                                      const igraph_vector_t *e_weights,
+                                      const igraph_vector_t *v_weights,
+                                      infomap::Network *network) {
 
-    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
 
-    igraph_integer_t n = igraph_vcount(graph);
-    igraph_integer_t m = igraph_ecount(graph);
-
-    for (igraph_integer_t v = 0; v < n; v++)
-    {
-        network->addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1);
+    for (igraph_integer_t v = 0; v < vcount; v++) {
+        network->addNode(v, v_weights != NULL ? VECTOR(*v_weights)[v] : 1.0);
     }
 
-    for (igraph_integer_t e = 0; e < m; e++)
-    {
+    for (igraph_integer_t e = 0; e < ecount; e++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, e);
         igraph_integer_t v2 = IGRAPH_TO(graph, e);
-        network->addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1);
+        network->addLink(v1, v2, e_weights != NULL ? VECTOR(*e_weights)[e] : 1.0);
     }
-
-    IGRAPH_HANDLE_EXCEPTIONS_END;
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -144,7 +136,7 @@ static igraph_error_t igraph_to_infomap(const igraph_t *graph,
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_community_infomap(const igraph_t * graph,
+igraph_error_t igraph_community_infomap(const igraph_t *graph,
                              const igraph_vector_t *e_weights,
                              const igraph_vector_t *v_weights,
                              igraph_integer_t nb_trials,
@@ -154,6 +146,8 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 #ifndef HAVE_INFOMAP
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
+
+    // Handle null graph
     if (igraph_vcount(graph) == 0) {
         if (membership) {
             IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
@@ -178,7 +172,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 
     infomap::InfomapBase infomap(conf);
 
-    IGRAPH_CHECK(igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network())));
+    convert_igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network()));
 
     infomap.run();
 
