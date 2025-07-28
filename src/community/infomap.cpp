@@ -19,10 +19,9 @@
 #include "igraph_community.h"
 
 #include "igraph_interface.h"
-#include "igraph_random.h"
+#include "igraph_interrupt.h"
 
 #include "core/exceptions.h"
-#include "core/interruption.h"
 
 #include "config.h"
 
@@ -31,7 +30,6 @@
 #endif
 
 #include <cmath>
-#include <vector>
 
 // This is necessary for GCC 5 and earlier, where including <cmath>
 // makes isnan() unusable without the std:: prefix, even if <math.h>
