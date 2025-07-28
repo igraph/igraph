@@ -175,6 +175,11 @@ static igraph_error_t neighbor_helper(
     igraph_vector_destroy(&current_point);
     IGRAPH_FINALLY_CLEAN(1);
 
+    if (edges.size() > 2 * IGRAPH_ECOUNT_MAX) {
+        // Overflow check
+        IGRAPH_ERROR("Too many edges.", IGRAPH_EOVERFLOW);
+    }
+
     igraph_vector_int_t edge_view;
     igraph_vector_int_view(&edge_view, edges.data(), edges.size());
     IGRAPH_CHECK(igraph_create(graph, &edge_view, point_count, true));
