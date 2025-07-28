@@ -32,6 +32,7 @@ IGRAPH_BEGIN_C_DECLS
  * \brief Metric functions for use with spatial computation.
  *
  * \enumval IGRAPH_METRIC_L2 The Euclidean distance, i.e. L2 distance.
+ * \enumval IGRAPH_METRIC_L1 The Manhattan distance, i.e. L1 distance.
  */
 typedef enum {
     IGRAPH_METRIC_L2 = 0,

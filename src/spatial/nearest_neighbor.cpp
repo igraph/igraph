@@ -198,7 +198,7 @@ static igraph_error_t dimension_dispatcher(
 
     switch (dimension) {
     case 0:
-        IGRAPH_ERROR("0-dimensional points are not supported", IGRAPH_EINVAL);
+        IGRAPH_ERROR("0-dimensional points are not supported.", IGRAPH_EINVAL);
     case 1:
         return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension, directed);
     case 2:
