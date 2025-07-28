@@ -40,7 +40,9 @@ static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igra
     for (auto it(infomap.iterTreePhysical(1)); !it.isEnd(); ++it) {
         infomap::InfoNode &node = *it;
         if (node.isLeaf()) {
-            VECTOR(*membership)[node.physicalId] = it.moduleId();
+            // Note: We must use moduleIndex() and not moduleId(), as the latter
+            // may be >= vcount, which causes igraph_reindex_membership() to fail.
+            VECTOR(*membership)[node.physicalId] = it.moduleIndex();
         }
     }
 
