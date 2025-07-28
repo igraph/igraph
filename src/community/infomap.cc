@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2011-2025  The igraph development team
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2011-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,18 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
-   ----
-   The original version of this file was written by Martin Rosvall
-   email: martin.rosvall@physics.umu.se
-   homePage: http://www.tp.umu.se/~rosvall/
-
-   It was integrated in igraph by Emmanuel Navarro
-   email: navarro@irit.fr
-   homePage: http://www.irit.fr/~Emmanuel.Navarro/
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_community.h"
