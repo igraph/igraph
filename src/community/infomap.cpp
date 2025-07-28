@@ -51,7 +51,7 @@ static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igra
 static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
                                       const igraph_vector_t *e_weights,
                                       const igraph_vector_t *v_weights,
-                                      infomap::Network *network) {
+                                      infomap::Network &network) {
 
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
@@ -61,7 +61,7 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
         if (weight <= 0) {
             IGRAPH_ERRORF("Vertex weights must be positive, got %g.", IGRAPH_EINVAL, weight);
         }
-        network->addNode(v, weight);
+        network.addNode(v, weight);
     }
 
     for (igraph_integer_t e = 0; e < ecount; e++) {
@@ -71,7 +71,7 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
         if (weight <= 0) {
             IGRAPH_ERRORF("Edge weights must be positive, got %g.", IGRAPH_EINVAL, weight);
         }
-        network->addLink(v1, v2, weight);
+        network.addLink(v1, v2, weight);
     }
 
     return IGRAPH_SUCCESS;
@@ -113,13 +113,13 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
  * https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405
  *
  * \param graph The input graph. Edge directions are taken into account.
- * \param e_weights Numeric vector giving the weights of the edges.
+ * \param edge_weights Numeric vector giving the weights of the edges.
  *     The random walker will favour edges with high weights over
  *     edges with low weights; the probability of picking a particular
  *     outbound edge from a node is directly proportional to its weight.
  *     If it is \c NULL then all edges will have equal
  *     weights. The weights are expected to be non-negative.
- * \param v_weights Numeric vector giving the weights of the vertices.
+ * \param vertex_weights Numeric vector giving the weights of the vertices.
  *     Vertices with higher weights are favoured by the random walker
  *     when it needs to "teleport" to a new node after getting stuck in
  *     a sink node (i.e. a node with no outbound edges). The probability
@@ -142,12 +142,13 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_community_infomap(const igraph_t *graph,
-                             const igraph_vector_t *e_weights,
-                             const igraph_vector_t *v_weights,
-                             igraph_integer_t nb_trials,
-                             igraph_vector_int_t *membership,
-                             igraph_real_t *codelength) {
+igraph_error_t igraph_community_infomap(
+        const igraph_t *graph,
+        const igraph_vector_t *edge_weights,
+        const igraph_vector_t *vertex_weights,
+        igraph_integer_t nb_trials,
+        igraph_vector_int_t *membership,
+        igraph_real_t *codelength) {
 
 #ifndef HAVE_INFOMAP
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
@@ -156,15 +157,15 @@ igraph_error_t igraph_community_infomap(const igraph_t *graph,
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
 
-    if (e_weights) {
-        if (igraph_vector_size(e_weights) != ecount) {
+    if (edge_weights) {
+        if (igraph_vector_size(edge_weights) != ecount) {
             IGRAPH_ERROR("Length of edge weight vector does not match edge count.",
                          IGRAPH_EINVAL);
         }
     }
 
-    if (v_weights) {
-        if (igraph_vector_size(v_weights) != vcount) {
+    if (vertex_weights) {
+        if (igraph_vector_size(vertex_weights) != vcount) {
             IGRAPH_ERROR("Length of vertex weight vector does not match edge count.",
                          IGRAPH_EINVAL);
         }
@@ -177,7 +178,7 @@ igraph_error_t igraph_community_infomap(const igraph_t *graph,
     }
 
     // Handle null graph
-    if (igraph_vcount(graph) == 0) {
+    if (vcount == 0) {
         if (membership) {
             IGRAPH_CHECK(igraph_vector_int_resize(membership, 0));
         }
@@ -201,7 +202,7 @@ igraph_error_t igraph_community_infomap(const igraph_t *graph,
 
     infomap::InfomapBase infomap(conf);
 
-    IGRAPH_CHECK(convert_igraph_to_infomap(graph, e_weights, v_weights, &(infomap.network())));
+    IGRAPH_CHECK(convert_igraph_to_infomap(graph, edge_weights, vertex_weights, infomap.network()));
 
     infomap.run();
 

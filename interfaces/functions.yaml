@@ -1743,10 +1743,10 @@ igraph_split_join_distance:
 
 igraph_community_infomap:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGE_WEIGHTS e_weights,
-        OPTIONAL VERTEX_WEIGHTS v_weights, INTEGER nb_trials=10,
-        OUT VECTOR_INT membership, OUT REAL codelength
-    DEPS: e_weights ON graph, v_weights ON graph
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS edge_weights,
+        OPTIONAL VERTEX_WEIGHTS vertex_weights, INTEGER nb_trials=10,
+        OPTIONAL OUT VECTOR_INT membership, OPTIONAL OUT REAL codelength
+    DEPS: edge_weights ON graph, vertex_weights ON graph
 
 igraph_community_voronoi:
     PARAMS: |-
