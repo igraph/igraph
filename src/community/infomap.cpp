@@ -30,6 +30,8 @@
     #include "Infomap.h"
 #endif
 
+#include <climits>
+
 static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
     igraph_integer_t n = infomap.numLeafNodes();
 
@@ -55,6 +57,10 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
 
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
+
+    if (vcount > UINT_MAX) {
+        IGRAPH_ERROR("Graph has too many vertices for Infomap.", IGRAPH_EINVAL);
+    }
 
     for (igraph_integer_t v = 0; v < vcount; v++) {
         if (vertex_weights) {
