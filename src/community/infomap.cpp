@@ -108,9 +108,6 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
  * and Martin Rosvall is used. See https://github.com/mapequation/infomap/.
  *
  * </para><para>
- * Note that the graph must not contain isolated vertices.
- *
- * </para><para>
  * If you want to specify a random seed (as in the original
  * implementation) you can use \ref igraph_rng_seed().
  *
