@@ -73,7 +73,7 @@ int main(void) {
     igraph_destroy(&g_un);
     igraph_destroy(&g_dir);
 
-    VERIFY_FINALLY_STACK()
+    VERIFY_FINALLY_STACK();
 
     {
         igraph_t g;
