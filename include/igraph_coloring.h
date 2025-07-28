@@ -48,7 +48,13 @@ typedef enum {
     IGRAPH_COLORING_GREEDY_DSATUR = 1
 } igraph_coloring_greedy_t;
 
+
 IGRAPH_EXPORT igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic);
+
+IGRAPH_EXPORT igraph_error_t igraph_vertex_coloring_AntColony(const igraph_t *graph, igraph_vector_int_t *colors,igraph_real_t alpha, igraph_real_t beta,
+    igraph_real_t rho, igraph_integer_t maxIters, igraph_integer_t tabuRangeUp, igraph_real_t tabuFactor, igraph_integer_t k_end , igraph_bool_t firstVariationFlag,
+    igraph_bool_t secondVariationFlag );
+
 
 __END_DECLS
 
