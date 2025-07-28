@@ -19,8 +19,9 @@
 #include "igraph_constructors.h"
 #include "igraph_spatial.h"
 
-#include "igraph_matrix.h"
+#include "igraph_conversion.h"
 #include "igraph_error.h"
+#include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -132,7 +133,8 @@ static igraph_error_t neighbor_helper(
         const igraph_matrix_t *points,
         igraph_integer_t neighbors,
         igraph_real_t cutoff,
-        igraph_integer_t dimension) {
+        igraph_integer_t dimension,
+        igraph_bool_t directed) {
 
     const igraph_integer_t point_count = igraph_matrix_nrow(points);
 
@@ -177,28 +179,34 @@ static igraph_error_t neighbor_helper(
     igraph_vector_int_view(&edge_view, edges.data(), edges.size());
     IGRAPH_CHECK(igraph_create(graph, &edge_view, point_count, true));
 
+    if (! directed) {
+        IGRAPH_CHECK(igraph_to_undirected(graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL));
+    }
+
     return IGRAPH_SUCCESS;
 }
 
 
 template <typename Metric>
 static igraph_error_t dimension_dispatcher(
-    igraph_t *graph,
-    const igraph_matrix_t *points,
-    igraph_integer_t neighbors,
-    igraph_real_t cutoff,
-    igraph_integer_t dimension) {
+        igraph_t *graph,
+        const igraph_matrix_t *points,
+        igraph_integer_t neighbors,
+        igraph_real_t cutoff,
+        igraph_integer_t dimension,
+        igraph_bool_t directed) {
+
     switch (dimension) {
     case 0:
         IGRAPH_ERROR("0-dimensional points are not supported", IGRAPH_EINVAL);
     case 1:
-        return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension);
+        return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension, directed);
     case 2:
-        return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension);
+        return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension, directed);
     case 3:
-        return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension);
+        return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension, directed);
     default:
-        return neighbor_helper<Metric, -1>(graph, points, neighbors, cutoff, dimension);
+        return neighbor_helper<Metric, -1>(graph, points, neighbors, cutoff, dimension, directed);
     }
 }
 
@@ -219,26 +227,39 @@ static igraph_error_t dimension_dispatcher(
  * \param neighbors How many neighbors will be added for each vertex, set to
  *    a negative value to ignore.
  * \param cutoff Maximum distance at which connections will be made, set to a
- *    negative value or INFINITY to ignore.
+ *    negative value or \c INFINITY to ignore.
+ * \param directed Whether to create a directed graph.
+ * \return Error code.
  */
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
         igraph_metric_t metric,
         igraph_integer_t k,
-        igraph_real_t cutoff) {
+        igraph_real_t cutoff,
+        igraph_bool_t directed) {
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     const igraph_integer_t dimension = igraph_matrix_ncol(points);
     switch (metric) {
-    case IGRAPH_METRIC_L2 :
+    case IGRAPH_METRIC_L2:
         return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor> > (
                    graph,
                    points,
                    k,
                    cutoff * cutoff, // L2 uses square distances, so adjust for that here.
-                   dimension);
-    default : IGRAPH_ERROR("Metric type not implemented.", IGRAPH_UNIMPLEMENTED);
+                   dimension,
+                   directed);
+    case IGRAPH_METRIC_L1:
+            return dimension_dispatcher<nanoflann::L1_Adaptor<igraph_real_t, ig_point_adaptor> > (
+                    graph,
+                    points,
+                    k,
+                    cutoff,
+                    dimension,
+                    directed);
+    default:
+        IGRAPH_ERROR("Invalid metric.", IGRAPH_EINVAL);
     }
 
     IGRAPH_HANDLE_EXCEPTIONS_END;

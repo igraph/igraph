@@ -34,7 +34,8 @@ IGRAPH_BEGIN_C_DECLS
  * \enumval IGRAPH_METRIC_L2 The Euclidean distance, i.e. L2 distance.
  */
 typedef enum {
-    IGRAPH_METRIC_L2 = 0
+    IGRAPH_METRIC_L2 = 0,
+    IGRAPH_METRIC_L1
 } igraph_metric_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
@@ -42,7 +43,8 @@ IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     const igraph_matrix_t *points,
     igraph_metric_t metric,
     igraph_integer_t neighbors,
-    igraph_real_t cutoff
+    igraph_real_t cutoff,
+    igraph_bool_t directed
 );
 
 IGRAPH_END_C_DECLS
