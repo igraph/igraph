@@ -17,6 +17,7 @@
 */
 
 #include "igraph_constructors.h"
+#include "igraph_interface.h"
 #include "igraph_spatial.h"
 
 #include "igraph_conversion.h"
@@ -150,7 +151,6 @@ static igraph_error_t neighbor_helper(
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, dimension);
 
     igraph_integer_t neighbor_count = neighbors >= 0 ? neighbors : point_count;
-    cutoff = cutoff >= 0 ? cutoff : INFINITY;
 
     using resultClass = GraphBuildingResultSet;
     resultClass results(neighbor_count, cutoff);
@@ -198,6 +198,11 @@ static igraph_error_t dimension_dispatcher(
 
     switch (dimension) {
     case 0:
+        if (igraph_matrix_nrow(points) == 0) {
+            // null matrix, should not error
+            igraph_empty(graph, 0, true);
+            return IGRAPH_SUCCESS;
+        }
         IGRAPH_ERROR("0-dimensional points are not supported.", IGRAPH_EINVAL);
     case 1:
         return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension, directed);
@@ -240,6 +245,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
+    cutoff = cutoff >= 0 ? cutoff : INFINITY;
     const igraph_integer_t dimension = igraph_matrix_ncol(points);
     switch (metric) {
     case IGRAPH_METRIC_L2:
