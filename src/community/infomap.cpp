@@ -165,7 +165,7 @@ igraph_error_t igraph_community_infomap(const igraph_t *graph,
     // Configure infomap
     infomap::Config conf;
     conf.twoLevel = true;
-    conf.numTrials = 1;
+    conf.numTrials = nb_trials;
     conf.silent = true;
     conf.directed = igraph_is_directed(graph);
     conf.interruptionHandler = &igraph_allow_interruption;
