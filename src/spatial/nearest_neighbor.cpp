@@ -203,11 +203,6 @@ static igraph_error_t dimension_dispatcher(
 
     switch (dimension) {
     case 0:
-        if (igraph_matrix_nrow(points) == 0) {
-            // null matrix, should not error
-            igraph_empty(graph, 0, true);
-            return IGRAPH_SUCCESS;
-        }
         IGRAPH_ERROR("0-dimensional points are not supported.", IGRAPH_EINVAL);
     case 1:
         return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension, directed);
@@ -248,10 +243,20 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         igraph_real_t cutoff,
         igraph_bool_t directed) {
 
+    const igraph_integer_t dimension = igraph_matrix_ncol(points);
+
+    // Negative cutoff values signify that no cutoff should be used.
+    cutoff = cutoff >= 0 ? cutoff : INFINITY;
+
+    // Handle null graph separately.
+    // The number of matrix columns is not meaningful when there are zero rows.
+    // This prevents throwing an error when both the column and the row counts are zero.
+    if (igraph_matrix_nrow(points) == 0) {
+        return igraph_empty(graph, 0, directed);
+    }
+
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-    cutoff = cutoff >= 0 ? cutoff : INFINITY;
-    const igraph_integer_t dimension = igraph_matrix_ncol(points);
     switch (metric) {
     case IGRAPH_METRIC_L2:
         return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor> > (
