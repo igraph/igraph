@@ -521,8 +521,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         if (reset_min < 0) {
             IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
         }
-        if (isnan(reset_min)) {
-            IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
+        if (!isfinite(reset_sum)) {
+            IGRAPH_ERROR("The reset vector must not contain infinite or NaN values.", IGRAPH_EINVAL);
         }
     }
 
