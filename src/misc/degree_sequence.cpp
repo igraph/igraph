@@ -72,10 +72,10 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 
 // "Bucket Node" for nodes of the same degree
 struct BNode {
-    igraph_integer_t count = 0;                // TODO: correct use of uint?
+    igraph_integer_t count = 0;
     std::stack<vd_pair> nodes;
-    BNode* next;       // next bucket (higher degree)
-    BNode* prev;       // prev bucket (lower degree)
+    igraph_integer_t next;       // next bucket (higher degree)
+    igraph_integer_t prev;       // prev bucket (lower degree)
 };
 
 struct HavelHakimiList {
@@ -86,11 +86,11 @@ struct HavelHakimiList {
     HavelHakimiList(igraph_vector_int_t degseq) : buckets(igraph_vector_int_size(&degseq)+1) {
         igraph_integer_t n_nodes = igraph_vector_int_size(&degseq);
         for (igraph_integer_t i = 0; i <= n_nodes; i++) {
-            if (i == 0) buckets[i].prev = nullptr;
-            else buckets[i].prev = &buckets[i-1];
+            if (i == 0) buckets[i].prev = -1;
+            else buckets[i].prev = i - 1;
 
-            if (i == n_nodes) buckets[i].next = nullptr;
-            else buckets[i].next = &buckets[i+1];
+            if (i == n_nodes) buckets[i].next = -1;
+            else buckets[i].next = i + 1;
         }
 
         for (igraph_integer_t i = 0; i < n_nodes; i++) {
@@ -101,29 +101,29 @@ struct HavelHakimiList {
     }
 
     // ----- O(1) convenience functions ----- //
-    BNode* head() {return &buckets.front();}
-    BNode* tail() {return &buckets.back();}
+    BNode head() {return buckets.front();}
+    BNode tail() {return buckets.back();}
 
     void remove_bucket(igraph_integer_t degree) {            // assuming sentinel nodes
-        BNode*& prev_ptr = buckets[degree].prev;
-        BNode*& next_ptr = buckets[degree].next;
-        if (prev_ptr) prev_ptr->next = next_ptr;
-        if (next_ptr) next_ptr->prev = prev_ptr;
+        igraph_integer_t& prev_idx = buckets[degree].prev;            // TODO: references
+        igraph_integer_t& next_idx = buckets[degree].next;
+        if (prev_idx != -1) buckets[prev_idx].next = next_idx;
+        if (next_idx != -1) buckets[next_idx].prev = prev_idx;
 
-        next_ptr = nullptr;
-        prev_ptr = nullptr;
+        prev_idx = -1;
+        next_idx = -1;
     }
 
     void insert_bucket(igraph_integer_t degree) {            // assuming sentinel nodes
-        BNode*& prev_ptr = buckets[degree].prev;
-        BNode*& next_ptr = buckets[degree].next;
+        igraph_integer_t& prev_idx = buckets[degree].prev;
+        igraph_integer_t& next_idx = buckets[degree].next;
 
-        if (prev_ptr == nullptr && next_ptr == nullptr) {
-            next_ptr = &buckets[degree+1];
-            prev_ptr = next_ptr->prev;
+        if (prev_idx == -1 && next_idx == -1) {
+            next_idx = degree + 1;
+            prev_idx = buckets[next_idx].prev;
 
-            next_ptr->prev = &buckets[degree];
-            prev_ptr->next = &buckets[degree];
+            buckets[next_idx].prev = degree;
+            buckets[prev_idx].next = degree;
         }
     }
 
@@ -133,52 +133,48 @@ struct HavelHakimiList {
         buckets[node.degree].count++;
     }
 
-    igraph_integer_t get_degree(BNode* bucket) {
-        return bucket - head();          // head always points to '0' bucket
-    }
-
     // ----- amortized ??? ----- //
     bool get_max_node(vd_pair& max_node) {
-        BNode*& max_bucket = tail()->prev;
-        while (max_bucket->nodes.empty()) {
-            remove_bucket(get_degree(max_bucket));
-            max_bucket = tail()->prev;
-            if (!max_bucket) return false;
+        igraph_integer_t max_bucket = tail().prev;
+        while (buckets[max_bucket].nodes.empty()) {
+            remove_bucket(max_bucket);
+            max_bucket = tail().prev;
+            if (max_bucket == -1) return false;
         }
-        max_node = max_bucket->nodes.top();
+        max_node = buckets[max_bucket].nodes.top();
         return true;
     }
 
     void remove_max_node() {
-        BNode* max_bucket = tail()->prev;
-        while (max_bucket->nodes.empty()) {
-            remove_bucket(get_degree(max_bucket));
-            max_bucket = tail()->prev;
+        igraph_integer_t max_bucket = tail().prev;
+        while (buckets[max_bucket].nodes.empty()) {
+            remove_bucket(max_bucket);
+            max_bucket = tail().prev;
         }
-        vd_pair max_node = max_bucket->nodes.top();
-        max_bucket->nodes.pop();
+        vd_pair max_node = buckets[max_bucket].nodes.top();
+        buckets[max_bucket].nodes.pop();
         buckets[max_node.degree].count--;
     }
 
     bool get_min_node(vd_pair& min_node) {
-        BNode*& min_bucket = head()->next;
-        while (min_bucket->nodes.empty()) {
-            remove_bucket(get_degree(min_bucket));
-            min_bucket = head()->next;
-            if (!min_bucket) return false;
+        igraph_integer_t min_bucket = head().next;
+        while (buckets[min_bucket].nodes.empty()) {
+            remove_bucket(min_bucket);
+            min_bucket = head().next;
+            if (min_bucket == -1) return false;
         }
-        min_node = min_bucket->nodes.top();
+        min_node = buckets[min_bucket].nodes.top();
         return true;
     }
 
     void remove_min_node() {
-        BNode*& min_bucket = head()->next;
-        while (min_bucket->nodes.empty()) {
-            remove_bucket(get_degree(min_bucket));
-            min_bucket = head()->next;
+        igraph_integer_t min_bucket = head().next;
+        while (buckets[min_bucket].nodes.empty()) {
+            remove_bucket(min_bucket);
+            min_bucket = head().next;
         }
-        vd_pair min_node = min_bucket->nodes.top();
-        min_bucket->nodes.pop();
+        vd_pair min_node = buckets[min_bucket].nodes.top();
+        buckets[min_bucket].nodes.pop();
         buckets[min_node.degree].count--;
     }
 
@@ -186,14 +182,14 @@ struct HavelHakimiList {
     // amortized O(alpha(n))
     igraph_error_t get_spokes(igraph_integer_t degree, const igraph_vector_int_t& seq,
                               igraph_vector_int_t& spokes) {
-        std::stack<BNode*> buckets_req;    // stack of needed degree buckets
+        std::stack<igraph_integer_t> buckets_req;    // stack of needed degree buckets
         igraph_integer_t num_nodes = 0;
-        BNode* curr = tail()->prev;        // starts with max_bucket
+        igraph_integer_t curr = tail().prev;        // starts with max_bucket
 
-        while (num_nodes < degree && get_degree(curr) > 0) {
-            num_nodes += curr->count;
+        while (num_nodes < degree && curr > 0) {
+            num_nodes += buckets[curr].count;
             buckets_req.push(curr);
-            curr = curr->prev;            // gets next smallest NON-EMPTY bucket
+            curr = buckets[curr].prev;            // gets next smallest NON-EMPTY bucket
         }
         if (num_nodes < degree) {         // not enough spokes for hub degree
             IGRAPH_ERROR("Degree sequence is not graphical.", IGRAPH_EINVAL);
@@ -201,22 +197,22 @@ struct HavelHakimiList {
 
         igraph_integer_t num_skip = num_nodes - degree;
         while (!buckets_req.empty()) {               // starting from smallest degree
-            BNode* bucket = buckets_req.top();
+            igraph_integer_t bucket = buckets_req.top();
             buckets_req.pop();
 
-            igraph_integer_t to_get = bucket->count - num_skip;
+            igraph_integer_t to_get = buckets[bucket].count - num_skip;
             while (to_get > 0) {
-                vd_pair node = bucket->nodes.top();
+                vd_pair node = buckets[bucket].nodes.top();
                 if (VECTOR(seq)[node.vertex] != 0) {                   // if "not marked for removal"
                     IGRAPH_CHECK(igraph_vector_int_push_back(&spokes, node.vertex)); // add as spoke
 
                     node.degree--;
                     insert_node(node);                // first, insert into bucket below
 
-                    bucket->count--;
+                    buckets[bucket].count--;
                     to_get--;
                 }
-                bucket->nodes.pop();                  // then pop from original bucket
+                buckets[bucket].nodes.pop();                  // then pop from original bucket
             }
             num_skip = 0;
         }
