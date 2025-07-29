@@ -1017,6 +1017,7 @@ add_benchmarks(
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
+  igraph_nearest_neighbor_graph
   igraph_neighborhood
   igraph_pagerank
   igraph_pagerank_weighted
