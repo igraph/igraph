@@ -143,7 +143,7 @@ static igraph_error_t neighbor_helper(
 
     ig_point_adaptor adaptor(points);
 
-    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(1));
+    kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
 
     tree.buildIndex();
 
