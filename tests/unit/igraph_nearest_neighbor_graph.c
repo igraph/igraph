@@ -180,7 +180,7 @@ int main(void) {
 
     printf("\nFibonacci spiral with 25 points, 1 neighbor unlimited cutoff.\n");
     const igraph_integer_t point_count = 25;
-    igraph_real_t fib[point_count * 2];
+    igraph_real_t fib[25 * 2];
 
     for (igraph_integer_t k = 0; k < point_count; k++) {
         igraph_real_t r = sqrt(k); //          pi               phi
