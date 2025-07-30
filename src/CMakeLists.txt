@@ -421,7 +421,7 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored pcg prpack
+  bliss cliquer cxsparse_vendored pcg prpack qhull_vendored
 )
 
 if (NOT BUILD_SHARED_LIBS)
