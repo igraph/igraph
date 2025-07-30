@@ -82,7 +82,9 @@ public:
         }
 
         for (i = added_count; i > 0; i--) {
-            if ((distances[i-1] > distance /*|| dists[i-1] == distance && index < edges[i-1]*/ )) {
+            // TODO: Stabilize result in case of multiple points at example the same distance?
+            // See NANOFLANN_FIRST_MATCH in RKNNResultSet in nanoflann.hpp for reference.
+            if (distances[i-1] > distance) {
                 if (i < max_neighbors) {
                     distances[i] = distances[i-1];
                     neighbors[i] = neighbors[i-1];
