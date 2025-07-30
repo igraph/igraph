@@ -924,6 +924,11 @@ add_legacy_tests(
   igraph_realize_bipartite_degree_sequence
 )
 
+# spatial
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_delaunay_triangulation
+)
 # cycle bases
 add_legacy_tests(
   FOLDER tests/unit NAMES

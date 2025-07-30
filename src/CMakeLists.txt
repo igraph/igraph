@@ -308,6 +308,8 @@ add_library(
   misc/sir.c
   misc/spanning_trees.c
 
+  spatial/delaunay.c
+
   internal/glpk_support.c
   internal/hacks.c
   internal/lsap.c
