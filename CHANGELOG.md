@@ -139,6 +139,7 @@
  - The deprecated `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` functions were removed.
  - The unused enum type `igraph_fileformat_type_t` was removed.
  - The deprecated `igraph_adjacent_triangles()` was removed. Use `igraph_count_adjacent_triangles()` instead.
+ - The macros `IGRAPH_POSINFINITY` and `IGRAPH_NEGINFINITY` were removed. Use `IGRAPH_INFINITY` and `-IGRAPH_INFINITY` instead.
 
 ### Deprecated
 
