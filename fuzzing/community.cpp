@@ -68,6 +68,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_community_walktrap(&graph, NULL, 3, &merges, &mv, &membership);
             igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, NULL, NULL);
+            igraph_community_leiden(&graph, NULL, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
 
             // Take the opportunity to run functions that can use the output of community detection.
 
@@ -105,7 +106,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
             igraph_community_fastgreedy(&graph, NULL, &merges, &mv, &membership);
-            igraph_community_leiden(&graph, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
+            igraph_community_leiden(&graph, NULL, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
             igraph_community_multilevel(&graph, NULL, 0.8, &membership, &im, &mv);
 
             igraph_is_connected(&graph, &b, IGRAPH_WEAK);

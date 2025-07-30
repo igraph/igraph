@@ -40,7 +40,7 @@ void verify_with_leiden(const igraph_t *graph, const igraph_vector_t *weights,
     igraph_strength(graph, &vertex_weights, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, weights);
 
     for (int i=0; i < 10; i++) {
-        igraph_community_leiden(graph, weights, &vertex_weights,
+        igraph_community_leiden(graph, weights, &vertex_weights, NULL,
                                 resolution / (2*m),
                                 0.01, false, 2, &leiden_membership, NULL, &Q);
         if (Q > maxQ) {

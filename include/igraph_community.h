@@ -230,16 +230,18 @@ IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               igraph_matrix_int_t *memberships,
                                               igraph_vector_t *modularity);
 
-IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
-                                          const igraph_vector_t *edge_weights,
-                                          const igraph_vector_t *vertex_weights,
-                                          igraph_real_t resolution,
-                                          igraph_real_t beta,
-                                          igraph_bool_t start,
-                                          igraph_integer_t n_iterations,
-                                          igraph_vector_int_t *membership,
-                                          igraph_integer_t *nb_clusters,
-                                          igraph_real_t *quality);
+IGRAPH_EXPORT igraph_error_t igraph_community_leiden(
+        const igraph_t *graph,
+        const igraph_vector_t *edge_weights,
+        const igraph_vector_t *vertex_out_weights,
+        const igraph_vector_t *vertex_in_weights,
+        igraph_real_t resolution,
+        igraph_real_t beta,
+        igraph_bool_t start,
+        igraph_integer_t n_iterations,
+        igraph_vector_int_t *membership,
+        igraph_integer_t *nb_clusters, igraph_real_t *quality);
+
 /* -------------------------------------------------- */
 /* Community Structure Comparison                     */
 /* -------------------------------------------------- */

@@ -91,6 +91,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_community_walktrap(&graph, &weights, 3, &merges, &mv, &membership);
             igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, &weights, NULL);
+            igraph_community_leiden(&graph, &weights, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
 
             // Take the opportunity to run functions that can use the output of community detection,
             // potentially with weights.
@@ -142,7 +143,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             EANV(&graph, "weight", &weights);
 
             igraph_community_fastgreedy(&graph, &weights, &merges, &mv, &membership);
-            igraph_community_leiden(&graph, &weights, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
+            igraph_community_leiden(&graph, &weights, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
             igraph_community_multilevel(&graph, &weights, 0.8, &membership, &im, &mv);
 
             // community_spinglass() only works on connected graphs
