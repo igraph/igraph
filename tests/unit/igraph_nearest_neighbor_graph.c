@@ -36,6 +36,7 @@ igraph_error_t RKNN_neighbors(
     igraph_matrix_t points;
     igraph_matrix_t adj_mat;
     igraph_matrix_t dist_mat;
+    igraph_vector_int_t degrees;
 
     // The cutoff value is not only passed to igraph_nearest_neighbor_graph()
     // but also used directly by this test function.
@@ -72,6 +73,12 @@ igraph_error_t RKNN_neighbors(
     print_matrix(&points);
     print_graph_canon(&graph);
 
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
+    IGRAPH_CHECK(igraph_degree(&graph, &degrees, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
+    if (neighbors >= 0) {
+        IGRAPH_ASSERT(igraph_vector_int_max(&degrees) <= neighbors);
+    }
+
     IGRAPH_MATRIX_INIT_FINALLY(&adj_mat, 0, 0);
     IGRAPH_CHECK(igraph_get_adjacency(&graph, &adj_mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS));
 
@@ -98,30 +105,42 @@ igraph_error_t RKNN_neighbors(
     }
 
     igraph_matrix_destroy(&adj_mat);
+    igraph_vector_int_destroy(&degrees);
     igraph_destroy(&graph);
     igraph_matrix_destroy(&points);
     igraph_matrix_destroy(&dist_mat);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }
 
 int main(void) {
-    igraph_real_t points1d[5] = {
+    igraph_real_t points1d[] = {
         12,
         8,
         5,
         10,
         12
     };
-    igraph_real_t points2d[10] = {
+
+    igraph_real_t points2d[] = {
         12, 8,
         8, 6,
         5, 12,
         10, 1,
         12, 2
     };
-    igraph_real_t points3d[15] = {
+
+    // Use coordinates that do not lead to roundoff errors
+    igraph_real_t points2d_4star[] = {
+            0, 0,
+            1, 0,
+            -1, 0,
+            0, 1,
+            0, -1
+    };
+
+    igraph_real_t points3d[] = {
         1, 6, 4,
         6, 2, 3,
         3, 6, 6,
@@ -129,7 +148,7 @@ int main(void) {
         2, 3, 3
     };
 
-    igraph_real_t points4d[20] = {
+    igraph_real_t points4d[] = {
         1, 6, 4, 4,
         6, 2, 3, 3,
         3, 6, 6, 5,
@@ -137,53 +156,64 @@ int main(void) {
         2, 3, 3, 4
     };
 
+#define PTCOUNT(points, dim) sizeof(points) / sizeof(points[0]) / dim
+
     printf("# L2 Metric test suite:\n");
 
     printf("\n1d 2 neighbors, cutoff 3\n");
-    RKNN_neighbors(&points1d[0], 5, 1, 2, 3, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points1d, PTCOUNT(points1d, 1), 1, 2, 3, IGRAPH_METRIC_L2);
     printf("\n1d 1 neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points1d[0], 5, 1, 1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points1d, PTCOUNT(points1d, 1), 1, 1, -1, IGRAPH_METRIC_L2);
     printf("\n1d unlimited neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points1d[0], 5, 1, -1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points1d, PTCOUNT(points1d, 1), 1, -1, -1, IGRAPH_METRIC_L2);
     printf("\n1d unlimited neighbors, cutoff 7\n");
-    RKNN_neighbors(&points1d[0], 5, 1, -1, 3, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points1d, PTCOUNT(points1d, 1), 1, -1, 3, IGRAPH_METRIC_L2);
 
     printf("\n2d 2 neighbors, cutoff 5\n");
-    RKNN_neighbors(&points2d[0], 5, 2, 2, 5, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points2d, PTCOUNT(points2d, 2), 2, 2, 5, IGRAPH_METRIC_L2);
     printf("\n2d 1 neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points2d[0], 5, 2, 1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points2d, PTCOUNT(points2d, 2), 2, 1, -1, IGRAPH_METRIC_L2);
     printf("\n2d unlimited neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points2d[0], 5, 2, -1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points2d, PTCOUNT(points2d, 2), 2, -1, -1, IGRAPH_METRIC_L2);
     printf("\n2d unlimited neighbors, cutoff 7\n");
-    RKNN_neighbors(&points2d[0], 5, 2, -1, 7, IGRAPH_METRIC_L2);
+    RKNN_neighbors(&points2d[0], PTCOUNT(points2d, 2), 2, -1, 7, IGRAPH_METRIC_L2);
+
+    printf("\n2d 2 neighbors, cutoff 1.2, degenerate case\n");
+    RKNN_neighbors(points2d_4star, PTCOUNT(points2d_4star, 2), 2, 2, 1.2, IGRAPH_METRIC_L2);
 
     printf("\n3d, 2 neighbors, cutoff 4\n");
-    RKNN_neighbors(&points3d[0], 5, 3, 2, 4, IGRAPH_METRIC_L2);
+    RKNN_neighbors(&points3d[0], PTCOUNT(points3d, 3), 3, 2, 4, IGRAPH_METRIC_L2);
     printf("\n3d, unlimited neighbors, cutoff 4\n");
-    RKNN_neighbors(&points3d[0], 5, 3, -1, 4, IGRAPH_METRIC_L2);
+    RKNN_neighbors(&points3d[0], PTCOUNT(points3d, 3), 3, -1, 4, IGRAPH_METRIC_L2);
     printf("\n3d, 2 neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points3d[0], 5, 3, 2, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(&points3d[0], PTCOUNT(points3d, 3), 3, 2, -1, IGRAPH_METRIC_L2);
     printf("\n3d, unlimited neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points3d[0], 5, 3, -1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(&points3d[0], PTCOUNT(points3d, 3), 3, -1, -1, IGRAPH_METRIC_L2);
 
     printf("\n4d 2 neighbors, cutoff 5\n");
-    RKNN_neighbors(&points4d[0], 5, 4, 2, 5, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points4d, PTCOUNT(points4d, 4), 4, 2, 5, IGRAPH_METRIC_L2);
     printf("\n4d 1 neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points4d[0], 5, 4, 1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points4d, PTCOUNT(points4d, 4), 4, 1, -1, IGRAPH_METRIC_L2);
     printf("\n4d unlimited neighbors, cutoff INFINITY\n");
-    RKNN_neighbors(&points4d[0], 5, 4, -1, -1, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points4d, PTCOUNT(points4d, 4), 4, -1, -1, IGRAPH_METRIC_L2);
     printf("\n4d unlimited neighbors, cutoff 4\n");
-    RKNN_neighbors(&points4d[0], 5, 4, -1, 4, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points4d, PTCOUNT(points4d, 4), 4, -1, 4, IGRAPH_METRIC_L2);
 
     printf("\n3d, no points\n");
-    RKNN_neighbors(&points3d[0], 0, 3, -1, 100, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points3d, 0, 3, -1, 100, IGRAPH_METRIC_L2);
     printf("\n0d, no points\n");
-    RKNN_neighbors(&points3d[0], 0, 0, -1, 100, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points3d, 0, 0, -1, 100, IGRAPH_METRIC_L2);
     printf("\n3d, 1 point\n");
-    RKNN_neighbors(&points3d[0], 1, 3, -1, 100, IGRAPH_METRIC_L2);
+    RKNN_neighbors(points3d, 1, 3, -1, 100, IGRAPH_METRIC_L2);
+
+    printf("\n2d, zero neighbors\n");
+    RKNN_neighbors(points2d, PTCOUNT(points2d, 2), 2, 0, 5, IGRAPH_METRIC_L2);
+
+    printf("\n2d, zero cutoff\n");
+    RKNN_neighbors(points2d, PTCOUNT(points2d, 2), 2, -1, 0, IGRAPH_METRIC_L2);
 
     printf("\n0d, 1 point should error\n");
-    CHECK_ERROR(RKNN_neighbors(&points3d[0], 1, 0, 10, INFINITY, IGRAPH_METRIC_L2), IGRAPH_EINVAL);
+    CHECK_ERROR(RKNN_neighbors(points3d, 1, 0, 10, INFINITY, IGRAPH_METRIC_L2), IGRAPH_EINVAL);
 
 
     printf("\nFibonacci spiral with 25 points, 1 neighbor unlimited cutoff.\n");
@@ -217,6 +247,9 @@ int main(void) {
     RKNN_neighbors(&points2d[0], 5, 2, -1, -1, IGRAPH_METRIC_L1);
     printf("\n2d unlimited neighbors, cutoff 7\n");
     RKNN_neighbors(&points2d[0], 5, 2, -1, 7, IGRAPH_METRIC_L1);
+
+    printf("\n2d 2 neighbors, cutoff INFINITY, degenerate case\n");
+    RKNN_neighbors(points2d_4star, PTCOUNT(points2d_4star, 2), 2, 2, -1, IGRAPH_METRIC_L1);
 
     printf("\n3d, 2 neighbors, cutoff 4\n");
     RKNN_neighbors(&points3d[0], 5, 3, 2, 4, IGRAPH_METRIC_L1);
