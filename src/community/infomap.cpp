@@ -114,6 +114,13 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
  * map generator at https://www.mapequation.org.
  *
  * </para><para>
+ * Infomap is based on a random walker model similar to PageRank: the walker
+ * either chooses out-edges to follow with probabilities proportional to edge
+ * weights, or teleports to a random vertex with probability 0.15. Vertex weights
+ * can be given to control the probability of choosing different vertices as
+ * the target of the teleportation.
+ *
+ * </para><para>
  * As of igraph 1.0, the Infomap library written by Daniel Edler, Anton Holmgren
  * and Martin Rosvall is used. See https://github.com/mapequation/infomap/.
  *
