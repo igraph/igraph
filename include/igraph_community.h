@@ -232,7 +232,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
                                           const igraph_vector_t *edge_weights,
-                                          const igraph_vector_t *node_weights,
+                                          const igraph_vector_t *vertex_weights,
                                           igraph_real_t resolution_parameter,
                                           igraph_real_t beta,
                                           igraph_bool_t start,
