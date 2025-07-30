@@ -164,7 +164,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INIT_FINALLY(&widths, no_of_nodes);
-    igraph_vector_fill(&widths, IGRAPH_NEGINFINITY);
+    igraph_vector_fill(&widths, -IGRAPH_INFINITY);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for widest paths.");
@@ -184,9 +184,9 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         }
     }
 
-    VECTOR(widths)[from] = IGRAPH_POSINFINITY;
+    VECTOR(widths)[from] = IGRAPH_INFINITY;
     parent_eids[from] = 0;
-    igraph_2wheap_push_with_index(&Q, from, IGRAPH_POSINFINITY);
+    igraph_2wheap_push_with_index(&Q, from, IGRAPH_INFINITY);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, maxnei = igraph_2wheap_max_index(&Q);
@@ -421,8 +421,8 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  *    should be passed here. The matrix will be resized as needed.
  *    Each row contains the widths from a single source, to the
  *    vertices given in the \c to argument.
- *    Unreachable vertices have width \c IGRAPH_NEGINFINITY, and vertices
- *    have a width of \c IGRAPH_POSINFINITY to themselves.
+ *    Unreachable vertices have width \c -IGRAPH_INFINITY, and vertices
+ *    have a width of \c IGRAPH_INFINITY to themselves.
  * \param from The source vertices.
  * \param to The target vertices.
  * \param weights The edge weights. Edge weights can be negative. If this
@@ -495,9 +495,9 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
 
     /* Fill out adjacency matrix */
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
-    igraph_matrix_fill(res, IGRAPH_NEGINFINITY);
+    igraph_matrix_fill(res, -IGRAPH_INFINITY);
     for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        MATRIX(*res, i, i) = IGRAPH_POSINFINITY;
+        MATRIX(*res, i, i) = IGRAPH_INFINITY;
     }
 
     for (igraph_integer_t edge=0; edge < no_of_edges; edge++) {
@@ -519,7 +519,7 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         /* Iterate in column-major order for better performance */
         for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
             igraph_real_t width_kj = MATRIX(*res, k, j);
-            if (j == k || width_kj == IGRAPH_NEGINFINITY) continue;
+            if (j == k || width_kj == -IGRAPH_INFINITY) continue;
 
             IGRAPH_ALLOW_INTERRUPTION();
 
@@ -561,8 +561,8 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
  *    should be passed here. The matrix will be resized as needed.
  *    Each row contains the widths from a single source, to the
  *    vertices given in the \c to argument.
- *    Unreachable vertices have width \c IGRAPH_NEGINFINITY, and vertices
- *    have a width of \c IGRAPH_POSINFINITY to themselves.
+ *    Unreachable vertices have width \c -IGRAPH_INFINITY, and vertices
+ *    have a width of \c IGRAPH_INFINITY to themselves.
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
@@ -655,7 +655,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, IGRAPH_NEGINFINITY);
+    igraph_matrix_fill(res, -IGRAPH_INFINITY);
 
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
@@ -664,7 +664,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
         igraph_integer_t reached = 0;
         igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
         igraph_2wheap_clear(&Q);
-        igraph_2wheap_push_with_index(&Q, source, IGRAPH_POSINFINITY);
+        igraph_2wheap_push_with_index(&Q, source, IGRAPH_INFINITY);
 
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t maxnei = igraph_2wheap_max_index(&Q);
@@ -698,7 +698,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                 igraph_real_t altwidth = maxwidth < edgewidth ? maxwidth : edgewidth;
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
-                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : IGRAPH_POSINFINITY;
+                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : IGRAPH_INFINITY;
                 if (edgewidth == IGRAPH_INFINITY) {
                     /* Ignore edges with infinite weight */
                 } else if (!has) {

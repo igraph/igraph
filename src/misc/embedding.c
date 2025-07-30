@@ -1135,7 +1135,7 @@ igraph_error_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *di
     igraph_real_t sumsq1 = 0.0, sumsq2 = 0.0; /* to be set */
     igraph_real_t oldmean1, oldmean2, mean1 = 0.0, mean2 = sum2 / n;
     igraph_real_t varsq1 = 0.0, varsq2 = 0.0; /* to be set */
-    igraph_real_t var1, var2, sd, profile, max = IGRAPH_NEGINFINITY;
+    igraph_real_t var1, var2, sd, profile, max = -IGRAPH_INFINITY;
 
     if (n == 0) {
         IGRAPH_ERROR("Need at least one singular value for dimensionality "
