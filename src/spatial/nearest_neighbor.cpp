@@ -80,7 +80,7 @@ public:
 
         for (i = current_added; i > 0; i--) {
             if ((dists[i-1] > distance /*|| dists[i-1] == distance && index < edges[i-1]*/ )) {
-                    if (i < max_neighbors) {
+                if (i < max_neighbors) {
                     dists[i] = dists[i-1];
                     edges[i] = edges[i-1];
                 }
@@ -174,8 +174,8 @@ static igraph_error_t neighbor_helper(
     igraph_vector_destroy(&current_point);
     IGRAPH_FINALLY_CLEAN(1);
 
+    // Overflow check
     if (edges.size() > 2 * IGRAPH_ECOUNT_MAX) {
-        // Overflow check
         IGRAPH_ERROR("Too many edges.", IGRAPH_EOVERFLOW);
     }
 
