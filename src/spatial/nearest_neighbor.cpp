@@ -231,6 +231,8 @@ static igraph_error_t dimension_dispatcher(
  *    negative value or \c IGRAPH_INFINITY to ignore.
  * \param directed Whether to create a directed graph.
  * \return Error code.
+ *
+ * Time complexity: O(n log(n)) where n is the number of points.
  */
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,

@@ -169,6 +169,23 @@ edges: {
 4 3
 }
 
+2d 2 neighbors, cutoff 1.2, degenerate case
+[        0        0
+         1        0
+        -1        0
+         0        1
+         0       -1 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 0
+2 0
+3 0
+4 0
+}
+
 3d, 2 neighbors, cutoff 4
 [        1        6        4
          6        2        3
@@ -364,6 +381,28 @@ edges: {
 [        1        6        4 ]
 directed: true
 vcount: 1
+edges: {
+}
+
+2d, zero neighbors
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+}
+
+2d, zero cutoff
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
 edges: {
 }
 
@@ -585,6 +624,27 @@ edges: {
 3 4
 4 0
 4 3
+}
+
+2d 2 neighbors, cutoff INFINITY, degenerate case
+[        0        0
+         1        0
+        -1        0
+         0        1
+         0       -1 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 0
+1 2
+2 0
+2 1
+3 0
+3 1
+4 0
+4 1
 }
 
 3d, 2 neighbors, cutoff 4
