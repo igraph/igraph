@@ -67,8 +67,13 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
     for (igraph_integer_t v = 0; v < vcount; v++) {
         if (vertex_weights) {
             double weight = VECTOR(*vertex_weights)[v];
-            if (weight <= 0) {
-                IGRAPH_ERRORF("Vertex weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+            if (weight < 0) {
+                IGRAPH_ERRORF("Vertex weights must not be negative, got %g.",
+                              IGRAPH_EINVAL, weight);
+            }
+            if (! std::isfinite(weight)) {
+                IGRAPH_ERRORF("Vertex weights must not be infinite or NaN, got %g.",
+                              IGRAPH_EINVAL, weight);
             }
             network.addNode(v, weight);
         } else {
@@ -82,8 +87,13 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
 
         if (edge_weights) {
             double weight = VECTOR(*edge_weights)[e];
-            if (weight <= 0) {
-                IGRAPH_ERRORF("Edge weights must be positive, got %g.", IGRAPH_EINVAL, weight);
+            if (weight < 0) {
+                IGRAPH_ERRORF("Edge weights must not be negative, got %g.",
+                              IGRAPH_EINVAL, weight);
+            }
+            if (! std::isfinite(weight)) {
+                IGRAPH_ERRORF("Edge weights must not be infinite or NaN, got %g.",
+                              IGRAPH_EINVAL, weight);
             }
             network.addLink(v1, v2, weight);
         } else {
