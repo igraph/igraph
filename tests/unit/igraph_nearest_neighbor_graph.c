@@ -20,12 +20,12 @@
 
 #include "test_utilities.h"
 
-#include <math.h>
+#include <math.h> /* fabs() */
 
 double sqr(double x) { return x*x; }
 
 igraph_error_t RKNN_neighbors(
-        igraph_real_t *arr,
+        const igraph_real_t *arr,
         igraph_integer_t num_points,
         igraph_integer_t dims,
         igraph_integer_t neighbors,
@@ -37,60 +37,68 @@ igraph_error_t RKNN_neighbors(
     igraph_matrix_t adj_mat;
     igraph_matrix_t dist_mat;
 
+    // The cutoff value is not only passed to igraph_nearest_neighbor_graph()
+    // but also used directly by this test function.
     cutoff = cutoff >= 0 ? cutoff : INFINITY;
 
     IGRAPH_MATRIX_INIT_FINALLY(&dist_mat, num_points, num_points);
 
+    IGRAPH_CHECK(igraph_matrix_init_array(&points, &arr[0], num_points, dims, IGRAPH_ROW_MAJOR));
     IGRAPH_FINALLY(igraph_matrix_destroy, &points);
-    igraph_matrix_init_array(&points, &arr[0], num_points, dims, IGRAPH_ROW_MAJOR);
 
-    for (igraph_integer_t start = 0; start < num_points-1; start++ ) {
+    for (igraph_integer_t start = 0; start < num_points - 1; start++) {
         for (igraph_integer_t end = start + 1; end < num_points; end++) {
             igraph_real_t distance = 0;
             switch (metric) {
-                case IGRAPH_METRIC_L2:
-                    for (igraph_integer_t i = 0; i < dims; i++) {
-                        distance += sqr(MATRIX(points, start, i) - MATRIX(points, end, i));
-                    }
-                    break;
-                case IGRAPH_METRIC_L1:
-                    for (igraph_integer_t i = 0; i < dims; i++) {
-                        distance += fabs(MATRIX(points, start, i) - MATRIX(points, end, i));
-                    }
-                    break;
+            case IGRAPH_METRIC_L2:
+                for (igraph_integer_t i = 0; i < dims; i++) {
+                    distance += sqr(MATRIX(points, start, i) - MATRIX(points, end, i));
+                }
+                break;
+            case IGRAPH_METRIC_L1:
+                for (igraph_integer_t i = 0; i < dims; i++) {
+                    distance += fabs(MATRIX(points, start, i) - MATRIX(points, end, i));
+                }
+                break;
             }
-            MATRIX(dist_mat, start,end) = distance;
-            MATRIX(dist_mat, end,start) = distance;
+            MATRIX(dist_mat, start, end) = distance;
+            MATRIX(dist_mat, end, start) = distance;
         }
     }
 
-
     IGRAPH_CHECK(igraph_nearest_neighbor_graph(&graph, &points, metric, neighbors, cutoff, IGRAPH_DIRECTED));
-    print_matrix(&points);
-    print_graph_canon(&graph);
-    igraph_matrix_init(&adj_mat, 0, 0);
-    IGRAPH_FINALLY(igraph_matrix_destroy, &adj_mat);
-    IGRAPH_CHECK(igraph_get_adjacency(&graph, &adj_mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_destroy, &graph);
 
-    for (igraph_integer_t start = 0; start < num_points; start ++) {
+    print_matrix(&points);
+    print_graph_canon(&graph);
 
-            igraph_real_t min_missing=INFINITY;
-            igraph_real_t max_present=0;
-        for (igraph_integer_t end = 0; end < num_points; end ++) {
-            if (start == end) continue;
+    IGRAPH_MATRIX_INIT_FINALLY(&adj_mat, 0, 0);
+    IGRAPH_CHECK(igraph_get_adjacency(&graph, &adj_mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS));
+
+    for (igraph_integer_t start = 0; start < num_points; start++) {
+        igraph_real_t min_missing = IGRAPH_INFINITY;
+        igraph_real_t max_present = 0;
+
+        for (igraph_integer_t end = 0; end < num_points; end++) {
+            if (start == end) {
+                continue;
+            }
             if (MATRIX(adj_mat, start, end) == 1) {
-                if (max_present < MATRIX(dist_mat, start, end)) max_present = MATRIX(dist_mat, start, end);
+                if (max_present < MATRIX(dist_mat, start, end)) {
+                    max_present = MATRIX(dist_mat, start, end);
+                }
             } else {
-                if (min_missing > MATRIX(dist_mat, start, end)) min_missing = MATRIX(dist_mat, start, end);
+                if (min_missing > MATRIX(dist_mat, start, end)) {
+                    min_missing = MATRIX(dist_mat, start, end);
+                }
             }
         }
         IGRAPH_ASSERT(min_missing >= max_present);
-        IGRAPH_ASSERT(max_present <= cutoff*cutoff);
+        IGRAPH_ASSERT(max_present <= cutoff * cutoff);
     }
 
-    igraph_destroy(&graph);
     igraph_matrix_destroy(&adj_mat);
+    igraph_destroy(&graph);
     igraph_matrix_destroy(&points);
     igraph_matrix_destroy(&dist_mat);
     IGRAPH_FINALLY_CLEAN(4);
@@ -107,26 +115,26 @@ int main(void) {
         12
     };
     igraph_real_t points2d[10] = {
-        12  , 8,
-        8   , 6,
-        5   , 12,
-        10  , 1,
-        12  , 2
+        12, 8,
+        8, 6,
+        5, 12,
+        10, 1,
+        12, 2
     };
     igraph_real_t points3d[15] = {
-        1,6,4,
-        6,2,3,
-        3,6,6,
-        3,2,2,
-        2,3,3
+        1, 6, 4,
+        6, 2, 3,
+        3, 6, 6,
+        3, 2, 2,
+        2, 3, 3
     };
 
     igraph_real_t points4d[20] = {
-        1,6,4,4,
-        6,2,3,3,
-        3,6,6,5,
-        3,2,2,3,
-        2,3,3,4
+        1, 6, 4, 4,
+        6, 2, 3, 3,
+        3, 6, 6, 5,
+        3, 2, 2, 3,
+        2, 3, 3, 4
     };
 
     printf("# L2 Metric test suite:\n");
