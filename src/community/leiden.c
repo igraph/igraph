@@ -50,7 +50,7 @@
  * and is updated in-place.
  *
  */
-static igraph_error_t igraph_i_community_leiden_fastmove_vertices(
+static igraph_error_t leiden_fastmove_vertices(
         const igraph_t *graph,
         const igraph_inclist_t *edges_per_vertex,
         const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
@@ -216,7 +216,7 @@ static igraph_error_t igraph_i_community_leiden_fastmove_vertices(
  * resulting \c nb_refined_clusters, then vertices in \c vertex_subset are numbered
  * C, C + 1, ..., C' - 1.
  */
-static igraph_error_t igraph_i_community_leiden_clean_refined_membership(
+static igraph_error_t leiden_clean_refined_membership(
         const igraph_vector_int_t* vertex_subset,
         igraph_vector_int_t *refined_membership,
         igraph_integer_t* nb_refined_clusters) {
@@ -279,10 +279,10 @@ static igraph_error_t igraph_i_community_leiden_clean_refined_membership(
  * merging, the refined membership starts with \c nb_refined_clusters, which is
  * also updated to ensure that the resulting \c nb_refined_clusters counts all
  * refined clusters that have already been processed. See
- * igraph_i_community_leiden_clean_refined_membership for more information about
+ * leiden_clean_refined_membership for more information about
  * this aspect.
  */
-static igraph_error_t igraph_i_community_leiden_merge_vertices(
+static igraph_error_t leiden_merge_vertices(
         const igraph_t *graph,
         const igraph_inclist_t *edges_per_vertex,
         const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
@@ -445,7 +445,7 @@ static igraph_error_t igraph_i_community_leiden_merge_vertices(
         } /* end if singleton and may be merged */
     }
 
-    IGRAPH_CHECK(igraph_i_community_leiden_clean_refined_membership(vertex_subset, refined_membership, nb_refined_clusters));
+    IGRAPH_CHECK(leiden_clean_refined_membership(vertex_subset, refined_membership, nb_refined_clusters));
 
     igraph_vector_destroy(&cum_trans_diff);
     igraph_vector_int_destroy(&neighbor_clusters);
@@ -468,7 +468,7 @@ static igraph_error_t igraph_i_community_leiden_merge_vertices(
  * in the membership vector), and that each item in the list of integer vectors
  * is empty.
  */
-static igraph_error_t igraph_i_community_get_clusters(const igraph_vector_int_t *membership, igraph_vector_int_list_t *clusters) {
+static igraph_error_t leiden_get_clusters(const igraph_vector_int_t *membership, igraph_vector_int_list_t *clusters) {
     igraph_integer_t n = igraph_vector_int_size(membership);
     igraph_vector_int_t *cluster;
 
@@ -497,7 +497,7 @@ static igraph_error_t igraph_i_community_get_clusters(const igraph_vector_int_t 
  * aggregated_membership are all expected to be initialized.
  *
  */
-static igraph_error_t igraph_i_community_leiden_aggregate(
+static igraph_error_t leiden_aggregate(
     const igraph_t *graph, const igraph_inclist_t *edges_per_vertex, const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
     const igraph_vector_int_t *membership, const igraph_vector_int_t *refined_membership, const igraph_integer_t nb_refined_clusters,
     igraph_t *aggregated_graph, igraph_vector_t *aggregated_edge_weights, igraph_vector_t *aggregated_vertex_weights, igraph_vector_int_t *aggregated_membership) {
@@ -511,7 +511,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
 
     /* Get refined clusters */
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&refined_clusters, nb_refined_clusters);
-    IGRAPH_CHECK(igraph_i_community_get_clusters(refined_membership, &refined_clusters));
+    IGRAPH_CHECK(leiden_get_clusters(refined_membership, &refined_clusters));
 
     /* Initialize new edges */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&aggregated_edges, 0);
@@ -617,7 +617,7 @@ static igraph_error_t igraph_i_community_leiden_aggregate(
  * weights inside cluster c. This is how the quality is calculated in practice.
  *
  */
-static igraph_error_t igraph_i_community_leiden_quality(
+static igraph_error_t leiden_quality(
         const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
         const igraph_vector_int_t *membership, const igraph_integer_t nb_comms, const igraph_real_t resolution_parameter,
         igraph_real_t *quality) {
@@ -672,7 +672,7 @@ static igraph_error_t igraph_i_community_leiden_quality(
  * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network.
  */
-static igraph_error_t igraph_i_community_leiden(
+static igraph_error_t community_leiden(
         const igraph_t *graph,
         igraph_vector_t *edge_weights, igraph_vector_t *vertex_weights,
         const igraph_real_t resolution_parameter, const igraph_real_t beta,
@@ -746,13 +746,13 @@ static igraph_error_t igraph_i_community_leiden(
         IGRAPH_FINALLY(igraph_inclist_destroy, &edges_per_vertex);
 
         /* Move around the vertices in order to increase the quality */
-        IGRAPH_CHECK(igraph_i_community_leiden_fastmove_vertices(i_graph,
-                                                                 &edges_per_vertex,
-                                                                 i_edge_weights, i_vertex_weights,
-                                                                 resolution_parameter,
-                                                                 nb_clusters,
-                                                                 i_membership,
-                                                                 changed));
+        IGRAPH_CHECK(leiden_fastmove_vertices(i_graph,
+                                              &edges_per_vertex,
+                                              i_edge_weights, i_vertex_weights,
+                                              resolution_parameter,
+                                              nb_clusters,
+                                              i_membership,
+                                              changed));
 
         /* We only continue clustering if not all clusters are represented by a
          * single vertex yet
@@ -769,7 +769,7 @@ static igraph_error_t igraph_i_community_leiden(
             }
 
             /* Get vertex sets for each cluster. */
-            IGRAPH_CHECK(igraph_i_community_get_clusters(i_membership, &clusters));
+            IGRAPH_CHECK(leiden_get_clusters(i_membership, &clusters));
 
             /* Ensure refined membership is correct size */
             IGRAPH_CHECK(igraph_vector_int_resize(&refined_membership, igraph_vcount(i_graph)));
@@ -778,12 +778,12 @@ static igraph_error_t igraph_i_community_leiden(
             nb_refined_clusters = 0;
             for (c = 0; c < *nb_clusters; c++) {
                 igraph_vector_int_t* cluster = igraph_vector_int_list_get_ptr(&clusters, c);
-                IGRAPH_CHECK(igraph_i_community_leiden_merge_vertices(i_graph,
-                                                                      &edges_per_vertex,
-                                                                      i_edge_weights, i_vertex_weights,
-                                                                      cluster, i_membership, c,
-                                                                      resolution_parameter, beta,
-                                                                      &nb_refined_clusters, &refined_membership));
+                IGRAPH_CHECK(leiden_merge_vertices(i_graph,
+                                                   &edges_per_vertex,
+                                                   i_edge_weights, i_vertex_weights,
+                                                   cluster, i_membership, c,
+                                                   resolution_parameter, beta,
+                                                   &nb_refined_clusters, &refined_membership));
                 /* Empty cluster */
                 igraph_vector_int_clear(cluster);
             }
@@ -803,10 +803,10 @@ static igraph_error_t igraph_i_community_leiden(
                 VECTOR(aggregate_vertex)[i] = VECTOR(refined_membership)[v_aggregate];
             }
 
-            IGRAPH_CHECK(igraph_i_community_leiden_aggregate(
-                             i_graph, &edges_per_vertex, i_edge_weights, i_vertex_weights,
-                             i_membership, &refined_membership, nb_refined_clusters,
-                             &aggregated_graph, &tmp_edge_weights, &tmp_vertex_weights, &tmp_membership));
+            IGRAPH_CHECK(leiden_aggregate(
+                    i_graph, &edges_per_vertex, i_edge_weights, i_vertex_weights,
+                    i_membership, &refined_membership, nb_refined_clusters,
+                    &aggregated_graph, &tmp_edge_weights, &tmp_vertex_weights, &tmp_membership));
 
             /* On the lowest level, the actual graph and vertex and edge weights and
              * membership are used. On higher levels, we will use the aggregated graph
@@ -851,7 +851,8 @@ static igraph_error_t igraph_i_community_leiden(
 
     /* Calculate quality */
     if (quality) {
-        IGRAPH_CHECK(igraph_i_community_leiden_quality(graph, edge_weights, vertex_weights, membership, *nb_clusters, resolution_parameter, quality));
+        IGRAPH_CHECK(leiden_quality(graph, edge_weights, vertex_weights, membership, *nb_clusters, resolution_parameter,
+                                    quality));
     }
 
     return IGRAPH_SUCCESS;
@@ -1029,9 +1030,9 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     for (igraph_integer_t itr = 0;
          n_iterations < 0 ? changed : itr < n_iterations;
          itr++) {
-        IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_vertex_weights,
-                                               resolution_parameter, beta,
-                                               membership, nb_clusters, quality, &changed));
+        IGRAPH_CHECK(community_leiden(graph, i_edge_weights, i_vertex_weights,
+                                      resolution_parameter, beta,
+                                      membership, nb_clusters, quality, &changed));
     }
 
     if (!edge_weights) {
