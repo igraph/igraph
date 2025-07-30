@@ -216,8 +216,8 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
             }
         }
     } else {
-        min_x = IGRAPH_INFINITY; max_x = IGRAPH_NEGINFINITY;
-        min_y = IGRAPH_INFINITY; max_y = IGRAPH_NEGINFINITY;
+        min_x = IGRAPH_INFINITY; max_x = -IGRAPH_INFINITY;
+        min_y = IGRAPH_INFINITY; max_y = -IGRAPH_INFINITY;
         for (igraph_integer_t i = 0; i < no_nodes; i++) {
             igraph_real_t x = MATRIX(*res, i, 0);
             igraph_real_t y = MATRIX(*res, i, 1);

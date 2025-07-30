@@ -286,7 +286,7 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         IGRAPH_VECTOR_INT_INIT_FINALLY(&permutation, dim);
 
         for (igraph_integer_t j=0; j < dim; j++) {
-            igraph_real_t min = IGRAPH_POSINFINITY, max = IGRAPH_NEGINFINITY;
+            igraph_real_t min = IGRAPH_INFINITY, max = -IGRAPH_INFINITY;
             for (igraph_integer_t i=0; i < vcount; i++) {
                 igraph_real_t c = MATRIX(temp_layout, i, j);
                 if (c < min) min = c;
