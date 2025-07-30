@@ -58,74 +58,74 @@ public:
 
 class GraphBuildingResultSet {
     igraph_integer_t current_vertex = 0;
-    igraph_integer_t current_added = 0;
-    igraph_real_t max_distance;
-    igraph_integer_t max_neighbors;
-    igraph_integer_t *edges;
-    igraph_real_t *dists;
+    size_t added_count = 0;
+    const igraph_real_t max_distance;
+    const igraph_integer_t max_neighbors;
 
 public:
+    std::vector<igraph_integer_t> neighbors;
+    std::vector<igraph_real_t> distances;
+
     using DistanceType = igraph_real_t;
 
-    GraphBuildingResultSet(const igraph_integer_t neighbors, const igraph_real_t distance) :
-        max_distance(distance),
-        max_neighbors(neighbors) {}
+    GraphBuildingResultSet(const igraph_integer_t max_neighbors, const igraph_real_t max_distance) :
+        max_distance(max_distance),
+        max_neighbors(max_neighbors),
+        neighbors(max_neighbors),
+        distances(max_neighbors) { }
 
     bool addPoint(const igraph_real_t distance, const igraph_integer_t index) {
-        igraph_integer_t i;
+        size_t i;
 
         if (index == current_vertex) {
             return true;
         }
 
-        for (i = current_added; i > 0; i--) {
-            if ((dists[i-1] > distance /*|| dists[i-1] == distance && index < edges[i-1]*/ )) {
+        for (i = added_count; i > 0; i--) {
+            if ((distances[i-1] > distance /*|| dists[i-1] == distance && index < edges[i-1]*/ )) {
                 if (i < max_neighbors) {
-                    dists[i] = dists[i-1];
-                    edges[i] = edges[i-1];
+                    distances[i] = distances[i-1];
+                    neighbors[i] = neighbors[i-1];
                 }
             } else {
                 break;
             }
         }
         if (i < max_neighbors) {
-            edges[i] = index;
-            dists[i] = distance;
+            neighbors[i] = index;
+            distances[i] = distance;
         }
-        if (current_added != max_neighbors) {
-            current_added++;
+        if (added_count != max_neighbors) {
+            added_count++;
         }
         return true;
     }
 
-    void init(igraph_real_t *dists_, igraph_integer_t *edges_, igraph_integer_t current_vertex_) {
-        edges = edges_;
-        dists = dists_;
-        current_added = 0;
+    void reset(igraph_integer_t current_vertex_) {
+        added_count = 0;
         current_vertex = current_vertex_;
     }
 
     void sort() { }
 
-    igraph_integer_t size() const {
-        return current_added;
+    size_t size() const {
+        return added_count;
     }
 
     bool full() const {
-        return current_added == max_neighbors;
+        return added_count == max_neighbors;
     }
 
     bool empty() const {
-        return current_added == 0;
+        return added_count == 0;
     }
 
     igraph_real_t worstDist() const {
-        if (current_added < max_neighbors || current_added == 0) {
+        if (added_count < max_neighbors || added_count == 0) {
             return  max_distance;
         }
-        return dists[current_added-1];
+        return distances[added_count-1];
     }
-
 };
 
 template <typename Metric, igraph_integer_t Dimension>
@@ -153,29 +153,24 @@ static igraph_error_t neighbor_helper(
     igraph_integer_t neighbor_count = neighbors >= 0 ? neighbors : point_count;
 
     GraphBuildingResultSet results(neighbor_count, cutoff);
-    std::vector<igraph_integer_t> neighbor_set(neighbor_count);
-    std::vector<igraph_real_t>    distances(neighbor_count);
     std::vector<igraph_integer_t> edges;
     for (igraph_integer_t i = 0; i < point_count; i++) {
 
-        std::fill(neighbor_set.begin(), neighbor_set.end(), 0);
-        std::fill(distances.begin(), distances.end(), 0);
-
-        results.init(distances.data(), neighbor_set.data(), i);
+        results.reset(i);
         IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
 
         tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
         for (igraph_integer_t j = 0; j < results.size(); j++) {
             edges.push_back(i);
-            edges.push_back(neighbor_set[j]);
+            edges.push_back(results.neighbors[j]);
         }
     }
 
     igraph_vector_destroy(&current_point);
     IGRAPH_FINALLY_CLEAN(1);
 
-    // Overflow check
-    if (edges.size() > 2 * IGRAPH_ECOUNT_MAX) {
+    // Overflow check, ensures that edges.size() is not too large for igraph vectors.
+    if (edges.size() > IGRAPH_INTEGER_MAX) {
         IGRAPH_ERROR("Too many edges.", IGRAPH_EOVERFLOW);
     }
 
