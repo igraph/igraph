@@ -16,12 +16,12 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_constructors.h"
-#include "igraph_interface.h"
 #include "igraph_spatial.h"
 
+#include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_error.h"
+#include "igraph_interface.h"
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
