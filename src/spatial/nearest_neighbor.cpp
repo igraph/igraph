@@ -34,13 +34,14 @@
 
 class ig_point_adaptor {
     const igraph_matrix_t *points;
+    const igraph_integer_t point_count;
 
 public:
     explicit ig_point_adaptor(const igraph_matrix_t *points) :
-        points(points) { }
+        points(points), point_count(igraph_matrix_nrow(points)) { }
 
     size_t kdtree_get_point_count() const {
-        return igraph_matrix_nrow(points);
+        return point_count;
     }
 
     igraph_real_t kdtree_get_pt(const size_t idx, const size_t dim) const {
