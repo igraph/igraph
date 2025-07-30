@@ -232,7 +232,7 @@ static igraph_error_t dimension_dispatcher(
  * \param neighbors How many neighbors will be added for each vertex, set to
  *    a negative value to ignore.
  * \param cutoff Maximum distance at which connections will be made, set to a
- *    negative value or \c INFINITY to ignore.
+ *    negative value or \c IGRAPH_INFINITY to ignore.
  * \param directed Whether to create a directed graph.
  * \return Error code.
  */
@@ -246,7 +246,7 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
     const igraph_integer_t dimension = igraph_matrix_ncol(points);
 
     // Negative cutoff values signify that no cutoff should be used.
-    cutoff = cutoff >= 0 ? cutoff : INFINITY;
+    cutoff = cutoff >= 0 ? cutoff : IGRAPH_INFINITY;
 
     // Handle null graph separately.
     // The number of matrix columns is not meaningful when there are zero rows.
