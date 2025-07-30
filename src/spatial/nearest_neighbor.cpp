@@ -48,11 +48,10 @@ public:
         return MATRIX(*points, idx, dim);
     }
 
-    // indicates that it should use default
     template <typename BoundingBox>
     bool kdtree_get_bbox(BoundingBox &bb) const {
         IGRAPH_UNUSED(bb);
-        return false;
+        return false; // indicates that it should use default
     }
 };
 
@@ -153,8 +152,7 @@ static igraph_error_t neighbor_helper(
 
     igraph_integer_t neighbor_count = neighbors >= 0 ? neighbors : point_count;
 
-    using resultClass = GraphBuildingResultSet;
-    resultClass results(neighbor_count, cutoff);
+    GraphBuildingResultSet results(neighbor_count, cutoff);
     std::vector<igraph_integer_t> neighbor_set(neighbor_count);
     std::vector<igraph_real_t>    distances(neighbor_count);
     std::vector<igraph_integer_t> edges;
