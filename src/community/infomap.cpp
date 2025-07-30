@@ -152,14 +152,12 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
  *     weights. The weights are expected to be non-negative.
  * \param vertex_weights Numeric vector giving the weights of the vertices.
  *     Vertices with higher weights are favoured by the random walker
- *     when it needs to "teleport" to a new node after getting stuck in
- *     a sink node (i.e. a node with no outbound edges). The probability
- *     of picking a vertex when the random walker teleports is directly
- *     proportional to the weight of the vertex. If this argument is \c NULL
- *     then all vertices will have equal weights. Weights are expected
- *     to be positive.
+ *     when it teleports to a new vertex. The probability of picking a vertex
+ *     when the random walker teleports is directly proportional to the weight
+ *     of the vertex. If this argument is \c NULL then all vertices will have
+ *     equal weights. Weights are expected to be positive.
  * \param nb_trials The number of attempts to partition the network
- *     (can be any integer value equal or larger than 1).
+ *     (can be any integer value equal to or larger than 1).
  * \param membership Pointer to a vector. The membership vector is
  *     stored here. \c NULL means that the caller is not interested in the
  *     membership vector.
