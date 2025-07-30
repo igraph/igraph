@@ -3,7 +3,24 @@ add_library(
   qhull_vendored
   OBJECT
   EXCLUDE_FROM_ALL
-  # list C files here
+  libqhull_r/accessors_r.c
+  libqhull_r/geom_r.c
+  libqhull_r/geom2_r.c
+  libqhull_r/global_r.c
+  libqhull_r/io_r.c
+  libqhull_r/libqhull_r.c
+  libqhull_r/mem_r.c
+  libqhull_r/merge_r.c
+  libqhull_r/poly_r.c
+  libqhull_r/poly2_r.c
+  libqhull_r/qset_r.c
+  libqhull_r/random_r.c
+  libqhull_r/rboxlib_r.c
+  libqhull_r/stat_r.c
+  libqhull_r/user_r.c
+  libqhull_r/usermem_r.c
+  libqhull_r/userprintf_r.c
+  libqhull_r/userprintf_rbox_r.c
 )
 
 target_include_directories(
