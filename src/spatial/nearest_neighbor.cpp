@@ -58,7 +58,7 @@ public:
 
 class GraphBuildingResultSet {
     igraph_integer_t current_vertex = 0;
-    size_t added_count = 0;
+    igraph_integer_t added_count = 0;
     const igraph_real_t max_distance;
     const igraph_integer_t max_neighbors;
 
@@ -75,7 +75,7 @@ public:
         distances(max_neighbors) { }
 
     bool addPoint(const igraph_real_t distance, const igraph_integer_t index) {
-        size_t i;
+        igraph_integer_t i;
 
         if (index == current_vertex) {
             return true;
@@ -108,7 +108,7 @@ public:
 
     void sort() { }
 
-    size_t size() const {
+    igraph_integer_t size() const {
         return added_count;
     }
 
