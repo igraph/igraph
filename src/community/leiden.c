@@ -54,7 +54,7 @@ static igraph_error_t leiden_fastmove_vertices(
         const igraph_t *graph,
         const igraph_inclist_t *edges_per_vertex,
         const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
-        const igraph_real_t resolution_parameter,
+        const igraph_real_t resolution,
         igraph_integer_t *nb_clusters,
         igraph_vector_int_t *membership,
         igraph_bool_t *changed) {
@@ -148,10 +148,10 @@ static igraph_error_t leiden_fastmove_vertices(
 
         /* Calculate maximum diff */
         best_cluster = current_cluster;
-        max_diff = VECTOR(edge_weights_per_cluster)[current_cluster] - VECTOR(*vertex_weights)[v] * VECTOR(cluster_weights)[current_cluster] * resolution_parameter;
+        max_diff = VECTOR(edge_weights_per_cluster)[current_cluster] - VECTOR(*vertex_weights)[v] * VECTOR(cluster_weights)[current_cluster] * resolution;
         for (igraph_integer_t i = 0; i < nb_neigh_clusters; i++) {
             c = VECTOR(neighbor_clusters)[i];
-            diff = VECTOR(edge_weights_per_cluster)[c] - VECTOR(*vertex_weights)[v] * VECTOR(cluster_weights)[c] * resolution_parameter;
+            diff = VECTOR(edge_weights_per_cluster)[c] - VECTOR(*vertex_weights)[v] * VECTOR(cluster_weights)[c] * resolution;
             /* Only consider strictly improving moves.
              * Note that this is important in considering convergence.
              */
@@ -289,7 +289,7 @@ static igraph_error_t leiden_merge_vertices(
         const igraph_vector_int_t *vertex_subset,
         const igraph_vector_int_t *membership,
         const igraph_integer_t cluster_subset,
-        const igraph_real_t resolution_parameter,
+        const igraph_real_t resolution,
         const igraph_real_t beta,
         igraph_integer_t *nb_refined_clusters,
         igraph_vector_int_t *refined_membership) {
@@ -355,7 +355,7 @@ static igraph_error_t leiden_merge_vertices(
 
         if (!IGRAPH_BIT_TEST(non_singleton_cluster, current_cluster) &&
             (VECTOR(external_edge_weight_per_cluster_in_subset)[current_cluster] >=
-             VECTOR(cluster_weights)[current_cluster] * (total_vertex_weight - VECTOR(cluster_weights)[current_cluster]) * resolution_parameter)) {
+             VECTOR(cluster_weights)[current_cluster] * (total_vertex_weight - VECTOR(cluster_weights)[current_cluster]) * resolution)) {
             /* Remove vertex from current cluster, which is then a singleton by
              * definition. */
             VECTOR(cluster_weights)[current_cluster] = 0.0;
@@ -388,8 +388,8 @@ static igraph_error_t leiden_merge_vertices(
             total_cum_trans_diff = 0.0;
             for (igraph_integer_t j = 0; j < nb_neigh_clusters; j++) {
                 igraph_integer_t c = VECTOR(neighbor_clusters)[j];
-                if (VECTOR(external_edge_weight_per_cluster_in_subset)[c] >= VECTOR(cluster_weights)[c] * (total_vertex_weight - VECTOR(cluster_weights)[c]) * resolution_parameter) {
-                    diff = VECTOR(edge_weights_per_cluster)[c] - VECTOR(*vertex_weights)[v] * VECTOR(cluster_weights)[c] * resolution_parameter;
+                if (VECTOR(external_edge_weight_per_cluster_in_subset)[c] >= VECTOR(cluster_weights)[c] * (total_vertex_weight - VECTOR(cluster_weights)[c]) * resolution) {
+                    diff = VECTOR(edge_weights_per_cluster)[c] - VECTOR(*vertex_weights)[v] * VECTOR(cluster_weights)[c] * resolution;
 
                     if (diff > max_diff) {
                         best_cluster = c;
@@ -619,7 +619,7 @@ static igraph_error_t leiden_aggregate(
  */
 static igraph_error_t leiden_quality(
         const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
-        const igraph_vector_int_t *membership, const igraph_integer_t nb_comms, const igraph_real_t resolution_parameter,
+        const igraph_vector_int_t *membership, const igraph_integer_t nb_comms, const igraph_real_t resolution,
         igraph_real_t *quality) {
     igraph_vector_t cluster_weights;
     igraph_real_t total_edge_weight = 0.0;
@@ -654,7 +654,7 @@ static igraph_error_t leiden_quality(
 
     /* We subtract gamma * N_c^2 */
     for (c = 0; c < nb_comms; c++) {
-        *quality -= resolution_parameter * VECTOR(cluster_weights)[c] * VECTOR(cluster_weights)[c];
+        *quality -= resolution * VECTOR(cluster_weights)[c] * VECTOR(cluster_weights)[c];
     }
 
     igraph_vector_destroy(&cluster_weights);
@@ -675,7 +675,7 @@ static igraph_error_t leiden_quality(
 static igraph_error_t community_leiden(
         const igraph_t *graph,
         igraph_vector_t *edge_weights, igraph_vector_t *vertex_weights,
-        const igraph_real_t resolution_parameter, const igraph_real_t beta,
+        const igraph_real_t resolution, const igraph_real_t beta,
         igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality,
         igraph_bool_t *changed) {
     igraph_integer_t nb_refined_clusters;
@@ -749,7 +749,7 @@ static igraph_error_t community_leiden(
         IGRAPH_CHECK(leiden_fastmove_vertices(i_graph,
                                               &edges_per_vertex,
                                               i_edge_weights, i_vertex_weights,
-                                              resolution_parameter,
+                                              resolution,
                                               nb_clusters,
                                               i_membership,
                                               changed));
@@ -782,7 +782,7 @@ static igraph_error_t community_leiden(
                                                    &edges_per_vertex,
                                                    i_edge_weights, i_vertex_weights,
                                                    cluster, i_membership, c,
-                                                   resolution_parameter, beta,
+                                                   resolution, beta,
                                                    &nb_refined_clusters, &refined_membership));
                 /* Empty cluster */
                 igraph_vector_int_clear(cluster);
@@ -851,7 +851,7 @@ static igraph_error_t community_leiden(
 
     /* Calculate quality */
     if (quality) {
-        IGRAPH_CHECK(leiden_quality(graph, edge_weights, vertex_weights, membership, *nb_clusters, resolution_parameter,
+        IGRAPH_CHECK(leiden_quality(graph, edge_weights, vertex_weights, membership, *nb_clusters, resolution,
                                     quality));
     }
 
@@ -934,7 +934,7 @@ static igraph_error_t community_leiden(
  *    has equal weight of 1. The weights need not be non-negative.
  * \param vertex_weights Numeric vector containing vertex weights. If \c NULL, every vertex
  *    has equal weight of 1.
- * \param resolution_parameter The resolution parameter used, which is
+ * \param resolution The resolution parameter used, which is
  *    represented by gamma in the objective function mentioned in the
  *    documentation.
  * \param beta The randomness used in the refinement step when merging. A small
@@ -963,7 +963,7 @@ static igraph_error_t community_leiden(
  */
 igraph_error_t igraph_community_leiden(const igraph_t *graph,
                             const igraph_vector_t *edge_weights, const igraph_vector_t *vertex_weights,
-                            const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
+                            const igraph_real_t resolution, const igraph_real_t beta, const igraph_bool_t start,
                             const igraph_integer_t n_iterations,
                             igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_vector_t *i_edge_weights, *i_vertex_weights;
@@ -1031,7 +1031,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
          n_iterations < 0 ? changed : itr < n_iterations;
          itr++) {
         IGRAPH_CHECK(community_leiden(graph, i_edge_weights, i_vertex_weights,
-                                      resolution_parameter, beta,
+                                      resolution, beta,
                                       membership, nb_clusters, quality, &changed));
     }
 
