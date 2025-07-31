@@ -244,7 +244,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     /* Initialize the edges vector */
     if (start_from) {
         IGRAPH_CHECK(igraph_get_edgelist(start_from, &edges, /* bycol= */ false));
-        igraph_vector_int_resize(&edges, no_of_edges * 2);
+        IGRAPH_CHECK(igraph_vector_int_resize(&edges, no_of_edges * 2));
     }
 
     /* And the rest: */
