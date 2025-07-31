@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ void test_vertex_coloring(void) {
     igraph_vector_int_t types;
     igraph_bool_t res;
 
-    printf("Testing igraph_is_vertex_coloring\n");
+    printf("Testing igraph_is_vertex_coloring()\n");
 
     /* Empty graph */
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
@@ -79,7 +79,7 @@ void test_vertex_coloring(void) {
     igraph_vector_int_destroy(&types);
     igraph_destroy(&graph);
 
-    printf("igraph_is_vertex_coloring tests passed\n");
+    printf("igraph_is_vertex_coloring() tests passed\n");
 }
 
 void test_bipartite_coloring(void) {
@@ -88,7 +88,7 @@ void test_bipartite_coloring(void) {
     igraph_bool_t res;
     igraph_neimode_t mode;
 
-    printf("Testing igraph_is_bipartite_coloring\n");
+    printf("Testing igraph_is_bipartite_coloring()\n");
 
     /* Empty graph */
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
@@ -160,7 +160,7 @@ void test_bipartite_coloring(void) {
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&graph);
 
-    printf("igraph_is_bipartite_coloring tests passed\n");
+    printf("igraph_is_bipartite_coloring() tests passed\n");
 }
 
 void test_edge_coloring(void) {
@@ -168,7 +168,7 @@ void test_edge_coloring(void) {
     igraph_vector_int_t types;
     igraph_bool_t res;
 
-    printf("Testing igraph_is_edge_coloring\n");
+    printf("Testing igraph_is_edge_coloring()\n");
 
     /* Empty graph */
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
@@ -230,7 +230,7 @@ void test_edge_coloring(void) {
     igraph_vector_int_destroy(&types);
     igraph_destroy(&graph);
 
-    printf("igraph_is_edge_coloring tests passed\n");
+    printf("igraph_is_edge_coloring() tests passed\n");
 }
 
 void test_error_conditions(void) {
@@ -274,6 +274,6 @@ int main(void) {
     test_error_conditions();
 
     VERIFY_FINALLY_STACK();
-    printf("All tests passed!\n");
+
     return 0;
 }
