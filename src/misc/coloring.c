@@ -475,37 +475,63 @@ igraph_error_t igraph_is_edge_coloring(const igraph_t *graph, const igraph_vecto
 
     /* For each vertex, check that all incident edges have different colors */
     for (igraph_integer_t v = 0; v < vcount; v++) {
-        igraph_vector_int_t edges, edge_colors;
+        igraph_vector_int_t edges, edge_colors, self_loops;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_colors, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&self_loops, 0);
         
         IGRAPH_CHECK(igraph_incident(graph, &edges, v, IGRAPH_ALL));
         igraph_integer_t degree = igraph_vector_int_size(&edges);
         
-        /* Create a list of colors for all incident edges */
-        IGRAPH_CHECK(igraph_vector_int_resize(&edge_colors, degree));
+        /* Create a list of colors for all incident edges, handling self-loops specially */
+        IGRAPH_CHECK(igraph_vector_int_resize(&edge_colors, 0));
+        igraph_vector_int_clear(&self_loops);
+        
         for (igraph_integer_t i = 0; i < degree; i++) {
             igraph_integer_t edge_id = VECTOR(edges)[i];
-            VECTOR(edge_colors)[i] = VECTOR(*types)[edge_id];
+            igraph_integer_t edge_color = VECTOR(*types)[edge_id];
+            
+            if (IGRAPH_FROM(graph, edge_id) == IGRAPH_TO(graph, edge_id)) {
+                /* This is a self-loop - check if we've seen it before */
+                igraph_bool_t already_seen = false;
+                for (igraph_integer_t j = 0; j < igraph_vector_int_size(&self_loops); j++) {
+                    if (VECTOR(self_loops)[j] == edge_id) {
+                        already_seen = true;
+                        break;
+                    }
+                }
+                if (!already_seen) {
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&self_loops, edge_id));
+                    /* Self-loops are considered adjacent to non-self-loop edges */
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edge_colors, edge_color));
+                }
+            } else {
+                /* Regular edge */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edge_colors, edge_color));
+            }
         }
+        
+        igraph_integer_t edge_color_count = igraph_vector_int_size(&edge_colors);
         
         /* Sort the list of colors */
         igraph_vector_int_sort(&edge_colors);
         
         /* Look for consecutive duplicates */
-        for (igraph_integer_t i = 0; i < degree - 1; i++) {
+        for (igraph_integer_t i = 0; i < edge_color_count - 1; i++) {
             if (VECTOR(edge_colors)[i] == VECTOR(edge_colors)[i + 1]) {
                 *res = false;
                 igraph_vector_int_destroy(&edge_colors);
+                igraph_vector_int_destroy(&self_loops); 
                 igraph_vector_int_destroy(&edges);
-                IGRAPH_FINALLY_CLEAN(2);
+                IGRAPH_FINALLY_CLEAN(3);
                 return IGRAPH_SUCCESS;
             }
         }
         
         igraph_vector_int_destroy(&edge_colors);
+        igraph_vector_int_destroy(&self_loops);
         igraph_vector_int_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(3);
         
         IGRAPH_ALLOW_INTERRUPTION();
     }
