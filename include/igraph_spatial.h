@@ -31,12 +31,14 @@ IGRAPH_BEGIN_C_DECLS
  * \typedef igraph_metric_t
  * \brief Metric functions for use with spatial computation.
  *
- * \enumval IGRAPH_METRIC_L2 The Euclidean distance, i.e. L2 distance.
- * \enumval IGRAPH_METRIC_L1 The Manhattan distance, i.e. L1 distance.
+ * \enumval IGRAPH_METRIC_EUCLIDEAN The Euclidean distance, i.e. L2 metric.
+ * \enumval IGRAPH_METRIC_MANHATTAN The Manhattan distance, i.e. L1 metric.
  */
 typedef enum {
-    IGRAPH_METRIC_L2 = 0,
-    IGRAPH_METRIC_L1
+    IGRAPH_METRIC_EUCLIDEAN = 0,
+    IGRAPH_METRIC_L2 = IGRAPH_METRIC_EUCLIDEAN,
+    IGRAPH_METRIC_MANHATTAN = 1,
+    IGRAPH_METRIC_L1 = IGRAPH_METRIC_MANHATTAN
 } igraph_metric_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
