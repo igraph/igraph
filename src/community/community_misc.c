@@ -223,6 +223,58 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     return IGRAPH_SUCCESS;
 }
 
+/* This alower implementation is used when cluster indices are not within
+ * the range 0..vcount-1. */
+igraph_error_t reindex_membership_large(igraph_vector_int_t *membership,
+                                        igraph_vector_int_t *new_to_old,
+                                        igraph_integer_t *nb_clusters) {
+
+    const igraph_integer_t vcount = igraph_vector_int_size(membership);
+    igraph_vector_int_t permutation;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&permutation, vcount);
+
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(membership, &permutation, IGRAPH_ASCENDING));
+
+    if (new_to_old) {
+        igraph_vector_int_clear(new_to_old);
+    }
+
+    igraph_integer_t j = VECTOR(permutation)[0];
+    igraph_integer_t c_old = VECTOR(*membership)[j];
+    igraph_integer_t c_old_prev = c_old;
+    igraph_integer_t c_new = 0;
+    if (new_to_old) {
+        IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c_old));
+    }
+    VECTOR(*membership)[j] = c_new;
+
+    for (igraph_integer_t i=1; i < vcount; i++) {
+        j = VECTOR(permutation)[i];
+        c_old = VECTOR(*membership)[j];
+        if (c_old != c_old_prev) {
+            if (new_to_old) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c_old));
+            }
+            c_new++;
+        }
+        VECTOR(*membership)[j] = c_new;
+    }
+
+    if (new_to_old) {
+        IGRAPH_ASSERT(igraph_vector_int_size(new_to_old) == c_new);
+    }
+
+    if (nb_clusters) {
+        *nb_clusters = c_new;
+    }
+
+    igraph_vector_int_destroy(&permutation);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_reindex_membership
  * \brief Makes the IDs in a membership vector contiguous.
@@ -252,13 +304,12 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
                               igraph_vector_int_t *new_to_old,
                               igraph_integer_t *nb_clusters) {
 
-    igraph_integer_t i, n = igraph_vector_int_size(membership);
-    igraph_vector_t new_cluster;
+    const igraph_integer_t vcount = igraph_vector_int_size(membership);
+    igraph_vector_int_t new_cluster;
     igraph_integer_t i_nb_clusters;
 
     /* We allow original cluster indices in the range 0, ..., n - 1 */
-    IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
-    IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&new_cluster, vcount);
 
     if (new_to_old) {
         igraph_vector_int_clear(new_to_old);
@@ -267,7 +318,7 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     /* Clean clusters. We will store the new cluster + 1 so that membership == 0
      * indicates that no cluster was assigned yet. */
     i_nb_clusters = 1;
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_integer_t c = VECTOR(*membership)[i];
 
         if (c < 0) {
@@ -275,13 +326,13 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
             "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
         }
 
-        if (c >= n) {
+        if (c >= vcount) {
             IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
-            "Found member of cluster %" IGRAPH_PRId ", but only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL, c, n);
+            "Found member of cluster %" IGRAPH_PRId ", but only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL, c, vcount);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
-            VECTOR(new_cluster)[c] = (igraph_real_t)i_nb_clusters;
+            VECTOR(new_cluster)[c] = i_nb_clusters;
             i_nb_clusters += 1;
             if (new_to_old) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c));
@@ -290,17 +341,17 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     }
 
     /* Assign new membership */
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_integer_t c = VECTOR(*membership)[i];
         VECTOR(*membership)[i] = VECTOR(new_cluster)[c] - 1;
     }
+
     if (nb_clusters) {
         /* We used the cluster + 1, so correct */
         *nb_clusters = i_nb_clusters - 1;
     }
 
-    igraph_vector_destroy(&new_cluster);
-
+    igraph_vector_int_destroy(&new_cluster);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
