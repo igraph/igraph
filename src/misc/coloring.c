@@ -479,7 +479,7 @@ igraph_error_t igraph_is_edge_coloring(const igraph_t *graph, const igraph_vecto
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_colors, 0);
         
-        IGRAPH_CHECK(igraph_i_incident(graph, &edges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_incident(graph, &edges, v, IGRAPH_ALL));
         igraph_integer_t degree = igraph_vector_int_size(&edges);
         
         /* Create a list of colors for all incident edges */
