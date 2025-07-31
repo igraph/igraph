@@ -9,6 +9,11 @@
 
 <!-- doxrox-include igraph_vertex_coloring_greedy -->
 <!-- doxrox-include igraph_coloring_greedy_t -->
+
+<!-- doxrox-include igraph_is_vertex_coloring -->
+<!-- doxrox-include igraph_is_bipartite_coloring -->
+<!-- doxrox-include igraph_is_edge_coloring -->
+
 <!-- doxrox-include igraph_is_perfect -->
 
 </chapter>

@@ -230,6 +230,21 @@ void test_edge_coloring(void) {
     igraph_vector_int_destroy(&types);
     igraph_destroy(&graph);
 
+    /* Graph with self-loop: 1 - 1 - 2 (self-loop and regular edge) */
+    /* Self-loops are not considered adjacent to themselves */
+    igraph_small(&graph, 2, IGRAPH_UNDIRECTED, 1, 1, 1, 0, -1);  /* vertex 1 self-loop, edge 1-0 */
+    igraph_vector_int_init_int(&types, 2, 0, 1);  /* Different colors - should be valid */
+    igraph_is_edge_coloring(&graph, &types, &res);
+    IGRAPH_ASSERT(res);
+    igraph_vector_int_destroy(&types);
+    
+    /* Same colors for self-loop and adjacent edge - should be invalid */
+    igraph_vector_int_init_int(&types, 2, 0, 0);  /* Same colors - should be invalid */
+    igraph_is_edge_coloring(&graph, &types, &res);
+    IGRAPH_ASSERT(!res);
+    igraph_vector_int_destroy(&types);
+    igraph_destroy(&graph);
+
     printf("igraph_is_edge_coloring() tests passed\n");
 }
 
