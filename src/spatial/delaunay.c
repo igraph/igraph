@@ -19,19 +19,25 @@
 #include "igraph_error.h"
 #include "igraph_matrix.h"
 
+#include "libqhull_r/io_r.h"
+#include "libqhull_r/merge_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
 
 igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
   int curlong, totlong; /* used !qh_NOmem */
-  int exitcode, numpoints, dim;
+  int exitcode;
+  int numpoints = 5;
+  int dim = 2;
   //coordT *points;
-  boolT ismalloc;
+  boolT ismalloc = False; // handle memory allocation of points explicitly
   qhT qh_qh;
   qhT *qh= &qh_qh;
-  double points[] = {
-    0, 1,
+double points[] = {
+    0, 0,
+    4, 3,
     2, 3,
-    0, 0
+    6, 4,
+    5, 3,
   };
 
   QHULL_LIB_CHECK; /* Check for compatible library */
@@ -44,22 +50,39 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
     qh->DELAUNAY= True;     /* 'd'   */
     qh->SCALElast= True;    /* 'Qbb' */
     qh->KEEPcoplanar= True; /* 'Qc', to keep coplanars in 'p' */
-    qh_checkflags(qh, qh->qhull_command, "");
+    qh->PROJECTdelaunay = False;
+    qh->TRIangulate = True;
+
+    qh_checkflags(qh, qh->qhull_command, "  ");
     qh_initflags(qh, qh->qhull_command);
-    //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc);
-    qh_init_B(qh, points, numpoints, dim, ismalloc);
+    qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
+    //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
+    qh_init_B(qh, &points[0], numpoints, dim, ismalloc);
     qh_qhull(qh);
     qh_check_output(qh);
     qh_produce_output(qh);
     if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone)
       qh_check_points(qh);
-    exitcode= qh_ERRnone;
+    FILE *fp = stdout;
+    facetT *facet;
+    vertexT *vertex, **vertexp;
+
+    FORALLfacets {
+      if (!facet->upperdelaunay) {
+        printf ("%d", qh_setsize (qh, facet->vertices));
+        FOREACHvertex_(facet->vertices)
+          printf (" v=%d", qh_pointid (qh, vertex->point));
+        printf ("\n");
+    }
   }
+  }
+  
   qh->NOerrexit= True;  /* no more setjmp */
   qh_freeqhull(qh, !qh_ALL);
   qh_memfreeshort(qh, &curlong, &totlong);
+
   if (curlong || totlong)
     qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
        totlong, curlong);
   return IGRAPH_SUCCESS;
-}
+  }
