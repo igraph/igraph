@@ -62,7 +62,7 @@ jobs:
             gmp-dev
             arpack-dev
             libxml2-dev
-            util-linux-misc
+            util-linux
 
       - name: CPU information (emulated)
         run: lscpu
