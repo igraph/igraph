@@ -27,6 +27,7 @@
 #include "igraph_vector.h"
 
 #include "core/exceptions.h"
+#include "core/interruption.h"
 
 #include "nanoflann/nanoflann.hpp"
 
@@ -140,11 +141,10 @@ static igraph_error_t neighbor_helper(
         igraph_bool_t directed) {
 
     const igraph_integer_t point_count = igraph_matrix_nrow(points);
+    ig_point_adaptor adaptor(points);
+    int iter = 0;
 
     using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, ig_point_adaptor, Dimension>;
-
-    ig_point_adaptor adaptor(points);
-
     kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
 
     tree.buildIndex();
@@ -157,7 +157,6 @@ static igraph_error_t neighbor_helper(
     GraphBuildingResultSet results(neighbor_count, cutoff);
     std::vector<igraph_integer_t> edges;
     for (igraph_integer_t i = 0; i < point_count; i++) {
-
         results.reset(i);
         IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
 
@@ -166,6 +165,8 @@ static igraph_error_t neighbor_helper(
             edges.push_back(i);
             edges.push_back(results.neighbors[j]);
         }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     igraph_vector_destroy(&current_point);
