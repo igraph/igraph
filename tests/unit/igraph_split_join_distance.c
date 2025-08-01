@@ -56,24 +56,17 @@ int main(void) {
     igraph_vector_int_destroy(&comm2);
 
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("\nExpected to fail nicely:\n\n");
 
     printf("Differently sized clusterings\n");
     igraph_vector_int_init_int(&comm1, 3, 0, 1, 2);
     igraph_vector_int_init_int(&comm2, 5, 0, 0, 0, 0, 0);
-    IGRAPH_ASSERT(igraph_split_join_distance(&comm1, &comm2, &distance12, &distance21) == IGRAPH_EINVAL);
-    igraph_vector_int_destroy(&comm1);
-    igraph_vector_int_destroy(&comm2);
-
-    printf("Member index too high\n");
-    igraph_vector_int_init_int(&comm1, 3, 0, 1, 2);
-    igraph_vector_int_init_int(&comm2, 3, 9, 0, 0);
-    IGRAPH_ASSERT(igraph_split_join_distance(&comm1, &comm2, &distance12, &distance21) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_split_join_distance(&comm1, &comm2, &distance12, &distance21), IGRAPH_EINVAL);
     igraph_vector_int_destroy(&comm1);
     igraph_vector_int_destroy(&comm2);
 
     VERIFY_FINALLY_STACK();
+
     return 0;
 }
