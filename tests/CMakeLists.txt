@@ -686,6 +686,7 @@ add_legacy_tests(
   igraph_le_community_to_membership
   igraph_modularity
   igraph_modularity_matrix
+  igraph_reindex_membership
   igraph_split_join_distance
   levc-stress
   null_communities
