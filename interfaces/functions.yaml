@@ -2678,7 +2678,7 @@ igraph_is_vertex_coloring:
     DEPS: types ON graph
 
 igraph_is_bipartite_coloring:
-    PARAMS: GRAPH graph, VERTEX_BIPARTITE_TYPES types, OUT BOOLEAN res, OPTIONAL OUT NEIMODE mode
+    PARAMS: GRAPH graph, BIPARTITE_TYPES types, OUT BOOLEAN res, OPTIONAL OUT NEIMODE mode
     DEPS: types ON graph
 
 igraph_is_edge_coloring:
