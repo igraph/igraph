@@ -15,82 +15,102 @@
 
 
 
+#include "igraph_constructors.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_matrix.h"
 
+#include "igraph_operators.h"
 #include "igraph_vector.h"
 #include "libqhull_r/io_r.h"
 #include "libqhull_r/merge_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
 
-igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
-  int curlong, totlong; /* used !qh_NOmem */
-  int exitcode;
-  int numpoints = 5;
-  int dim = 2;
-  //coordT *points;
-  boolT ismalloc = False; // handle memory allocation of points explicitly
-  qhT qh_qh;
-  qhT *qh= &qh_qh;
-  igraph_real_t *points;
-
-  points = &MATRIX(*points_,0,0);
-
-  QHULL_LIB_CHECK; /* Check for compatible library */
-
-  qh_init_A(qh, stdin, stdout, stderr, 0, NULL);  /* sets qh->qhull_command */
-  exitcode= setjmp(qh->errexit); /* simple statement for CRAY J916 */
-  if (!exitcode) {
-    qh->NOerrexit = False;
-    qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
-    qh->DELAUNAY= True;     /* 'd'   */
-    qh->SCALElast= True;    /* 'Qbb' */
-    qh->KEEPcoplanar= True; /* 'Qc', to keep coplanars in 'p' */
-    qh->PROJECTdelaunay = False;
-    qh->TRIangulate = True;
-
-    qh_checkflags(qh, qh->qhull_command, "  ");
-    qh_initflags(qh, qh->qhull_command);
-    qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
-    //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
-    qh_init_B(qh, points, numpoints, dim, ismalloc);
-    qh_qhull(qh);
-    qh_check_output(qh);
-    qh_produce_output(qh);
-    if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone)
-      qh_check_points(qh);
-
-    facetT *facet;
-    vertexT *vertex, **vertexp;
-
-    igraph_vector_int_t triangle;
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&triangle, 3);
-
-    igraph_integer_t curr_vert;
-
-    FORALLfacets {
-      if (!facet->upperdelaunay) {
-        printf ("%d", qh_setsize (qh, facet->vertices));
-        curr_vert = 0;
-        FOREACHvertex_(facet->vertices)
-          printf (" v=%d", qh_pointid (qh, vertex->point));
-        printf ("\n");
-      }
+void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
+    igraph_integer_t num_points = igraph_vector_int_size(source);
+    for (igraph_integer_t a = 0; a < num_points - 1; a++) {
+        for (igraph_integer_t b = a + 1; b < num_points; b++) {
+            igraph_vector_int_push_back(destination, VECTOR(*source)[a]);
+            igraph_vector_int_push_back(destination, VECTOR(*source)[b]);
+            printf("%li->%li, ", VECTOR(*source)[a], VECTOR(*source)[b]);
+        }
     }
-    igraph_vector_int_destroy(&triangle);
-    IGRAPH_FINALLY_CLEAN(1);
-  }
+    printf("\n");
+}
 
-  qh->NOerrexit= True;  /* no more setjmp */
-  qh_freeqhull(qh, !qh_ALL);
-  qh_memfreeshort(qh, &curlong, &totlong);
+igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
+    int curlong, totlong; /* used !qh_NOmem */
+    int exitcode;
+    int numpoints = 5;
+    int dim = 2;
+    //coordT *points;
+    boolT ismalloc = False; // handle memory allocation of points explicitly
+    qhT qh_qh;
+    qhT *qh = &qh_qh;
+    igraph_real_t *points;
 
-  if (curlong || totlong)
-    qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
-                      totlong, curlong);
+    points = &MATRIX(*points_, 0, 0);
 
-  return IGRAPH_SUCCESS;
+    QHULL_LIB_CHECK; /* Check for compatible library */
+
+    qh_init_A(qh, stdin, stdout, stderr, 0, NULL);  /* sets qh->qhull_command */
+    exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
+    if (!exitcode) {
+        qh->NOerrexit = False;
+        qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
+        qh->DELAUNAY = True;    /* 'd'   */
+        qh->SCALElast = True;   /* 'Qbb' */
+        qh->KEEPcoplanar = True; /* 'Qc', to keep coplanars in 'p' */
+        qh->TRIangulate = True;
+        qh_checkflags(qh, qh->qhull_command, "  ");
+        qh_initflags(qh, qh->qhull_command);
+        qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
+        //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
+        qh_init_B(qh, points, numpoints, dim, ismalloc);
+        qh_qhull(qh);
+        //qh_check_output(qh);
+        //qh_produce_output(qh);
+        //if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone)
+        //  qh_check_points(qh);
+
+        facetT *facet;
+        vertexT *vertex, **vertexp;
+
+        igraph_vector_int_t edges;
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
+        igraph_vector_int_t simplex;
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, 3);
+
+        igraph_integer_t curr_vert;
+
+
+
+        FORALLfacets {
+            if (!facet->upperdelaunay) {
+                //printf ("%d", qh_setsize (qh, facet->vertices));
+                curr_vert = 0;
+                FOREACHvertex_(facet->vertices) VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
+                add_clique(&edges, &simplex);
+            }
+        }
+        igraph_create(graph, &edges, numpoints, false);
+        igraph_simplify(graph, true, true, NULL);
+        igraph_vector_int_destroy(&simplex);
+        igraph_vector_int_destroy(&edges);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+
+    qh->NOerrexit = True; /* no more setjmp */
+    qh_freeqhull(qh, !qh_ALL);
+    qh_memfreeshort(qh, &curlong, &totlong);
+
+    if (curlong || totlong)
+        qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
+                          totlong, curlong);
+
+    return IGRAPH_SUCCESS;
 }

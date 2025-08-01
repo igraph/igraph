@@ -11,16 +11,17 @@ int main(void) {
     igraph_t g;
 
     igraph_real_t points_raw[10] = {
-        0,0,
-        4,3,
-        2,3,
-        6,4,
-        5,3,
+        1, 1,
+        4, 3,
+        2, 3,
+        6, 4,
+        5, 3,
     };
 
     igraph_matrix_init_array(&points, &points_raw[0], 5, 2, false);
-
     igraph_delaunay_triangulation(&g, &points);
+
+    print_graph_canon(&g);
     igraph_matrix_destroy(&points);
     igraph_destroy(&g);
 }
