@@ -26,6 +26,7 @@
 #include "libqhull_r/io_r.h"
 #include "libqhull_r/merge_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
+#include "qhull/libqhull_r/poly_r.h"
 
 void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
@@ -50,6 +51,8 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
     qhT *qh = &qh_qh;
     igraph_real_t *points;
 
+    IGRAPH_CHECK(igraph_matrix_transpose(points_));
+
     points = &MATRIX(*points_, 0, 0);
 
     QHULL_LIB_CHECK; /* Check for compatible library */
@@ -59,20 +62,25 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
     if (!exitcode) {
         qh->NOerrexit = False;
         qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
+        qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
+        qh->PRINToptions1st = True;
         qh->DELAUNAY = True;    /* 'd'   */
         qh->SCALElast = True;   /* 'Qbb' */
         qh->KEEPcoplanar = True; /* 'Qc', to keep coplanars in 'p' */
         qh->TRIangulate = True;
         qh_checkflags(qh, qh->qhull_command, "  ");
         qh_initflags(qh, qh->qhull_command);
-        qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
         //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
         qh_init_B(qh, points, numpoints, dim, ismalloc);
         qh_qhull(qh);
-        //qh_check_output(qh);
-        //qh_produce_output(qh);
-        //if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone)
-        //  qh_check_points(qh);
+        for (int i = 0; i < 10; i++) {
+            printf("%f, ", points[i]);
+        }
+        qh_check_output(qh);
+        qh_produce_output(qh);
+        if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone) {
+            qh_check_points(qh);
+        }
 
         facetT *facet;
         vertexT *vertex, **vertexp;
@@ -91,7 +99,7 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
 
         FORALLfacets {
             if (!facet->upperdelaunay) {
-                //printf ("%d", qh_setsize (qh, facet->vertices));
+                printf ("%d", qh_setsize (qh, facet->vertices));
                 curr_vert = 0;
                 FOREACHvertex_(facet->vertices) VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
                 add_clique(&edges, &simplex);

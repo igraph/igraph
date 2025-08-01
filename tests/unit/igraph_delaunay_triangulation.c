@@ -9,13 +9,12 @@ int main(void) {
     igraph_matrix_t points;
 
     igraph_t g;
-
-    igraph_real_t points_raw[10] = {
-        1, 1,
-        4, 3,
-        2, 3,
-        6, 4,
-        5, 3,
+    igraph_real_t points_raw[] = {
+        53, 26,
+        8, 13,
+        12, 5,
+        34, 24,
+        44, 10
     };
 
     igraph_matrix_init_array(&points, &points_raw[0], 5, 2, false);
