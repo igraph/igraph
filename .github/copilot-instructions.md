@@ -5,7 +5,7 @@ When performing a code review, keep in mind the following.
 
 ## Coding standards
 
- - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases such as the interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED`, which may be an `int`. The `long` and `long long` types must never be used.
+ - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases such as the interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED` and typically called `iter`, which may be an `int`. The `long` and `long long` types must never be used.
 
  - Check that the parameter ordering of newly added public functions conforms to the guidelines in our wiki at https://github.com/igraph/igraph/wiki/Guidelines-for-function-argument-ordering
 
@@ -24,9 +24,11 @@ When performing a code review, keep in mind the following.
 
  - Check that the formatting of the code is consistent with the rest of the igraph codebase. If the formatting is considerably different, suggest reformatting using `astyle` and the `.astylerc` file at the root of the repository.
 
+ - Check that C code follows the C99 standard while staying compatible with recent MSVC versions. VLAs and array designators must not be used.
+
 ## Memory management and error handling
 
- - Check that all calls to functions that return `igraph_error_t` are protected with `IGRAPH_CHECK`, or that there is a comment such as `/* reserved */` that makes it clear why such protection is not needed. This ensures that allocated resources will be freed if an error occurs.
+ - Check that in the library implementation, all calls to functions that return `igraph_error_t` are protected with `IGRAPH_CHECK`, or that there is a comment such as `/* reserved */` that makes it clear why such protection is not needed. This ensures that allocated resources will be freed if an error occurs. This is not necessary for tests, benchmarks and examples.
 
  - Check that whenever a new data structure is initialized, it is registered on igraph's "finally stack" using `IGRAPH_FINALLY()`, or by using a convenience macro that combines initialization with registration on the "finally stack" (e.g. `IGRAPH_VECTOR_INT_INIT_FINALLY()`). The `IGRAPH_FINALLY()` call must follow the initialization call directly.
 
