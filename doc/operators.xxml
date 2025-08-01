@@ -33,6 +33,7 @@
 <!-- doxrox-include igraph_induced_subgraph_edges -->
 <!-- doxrox-include igraph_linegraph -->
 <!-- doxrox-include igraph_mycielskian -->
+<!-- doxrox-include igraph_rooted_product -->
 <!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_subgraph_from_edges -->
 <!-- doxrox-include igraph_reverse_edges -->
