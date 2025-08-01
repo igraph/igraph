@@ -36,6 +36,7 @@ void check(const igraph_vector_int_t *m) {
 int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership;
+    igraph_real_t m;
     igraph_error_handler_t *handler;
     igraph_error_t ret;
 
@@ -64,6 +65,18 @@ int main(void) {
     check(&membership);
 
     igraph_community_multilevel(&graph, NULL, 1, &membership, NULL, NULL);
+    check(&membership);
+
+    igraph_community_fluid_communities(&graph, 10, &membership);
+    check(&membership);
+
+    igraph_community_voronoi(&graph, &membership, NULL, NULL, NULL, NULL, IGRAPH_ALL, -1);
+    check(&membership);
+
+    igraph_community_spinglass(&graph, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_ORIG, 1);
+    check(&membership);
+
+    igraph_community_spinglass(&graph, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
     check(&membership);
 
     igraph_destroy(&graph);
