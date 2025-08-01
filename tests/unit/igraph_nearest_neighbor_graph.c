@@ -101,7 +101,11 @@ igraph_error_t RKNN_neighbors(
             }
         }
         IGRAPH_ASSERT(min_missing >= max_present);
-        IGRAPH_ASSERT(max_present <= cutoff * cutoff);
+        if (metric == IGRAPH_METRIC_L2) {
+            IGRAPH_ASSERT(max_present <= cutoff * cutoff);
+        } else if (metric == IGRAPH_METRIC_L1) {
+            IGRAPH_ASSERT(max_present <= cutoff);
+        }
     }
 
     igraph_matrix_destroy(&adj_mat);
@@ -267,7 +271,7 @@ int main(void) {
     printf("\n4d unlimited neighbors, cutoff INFINITY\n");
     RKNN_neighbors(&points4d[0], 5, 4, -1, -1, IGRAPH_METRIC_L1);
     printf("\n4d unlimited neighbors, cutoff 8\n");
-    RKNN_neighbors(&points4d[0], 5, 4, -1, 5, IGRAPH_METRIC_L1);
+    RKNN_neighbors(&points4d[0], 5, 4, -1, 8, IGRAPH_METRIC_L1);
 
     VERIFY_FINALLY_STACK();
     return 0;

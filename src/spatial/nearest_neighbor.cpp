@@ -83,7 +83,7 @@ public:
         }
 
         for (i = added_count; i > 0; i--) {
-            // TODO: Stabilize result in case of multiple points at example the same distance?
+            // TODO: Stabilize result in case of multiple points at exactly the same distance?
             // See NANOFLANN_FIRST_MATCH in RKNNResultSet in nanoflann.hpp for reference.
             if (distances[i-1] > distance) {
                 if (i < max_neighbors) {
@@ -257,25 +257,25 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     switch (metric) {
-    case IGRAPH_METRIC_L2:
-        return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor> > (
-                   graph,
-                   points,
-                   k,
-                   cutoff * cutoff, // L2 uses square distances, so adjust for that here.
-                   dimension,
-                   directed);
-    case IGRAPH_METRIC_L1:
-            return dimension_dispatcher<nanoflann::L1_Adaptor<igraph_real_t, ig_point_adaptor> > (
+        case IGRAPH_METRIC_L2:
+            return dimension_dispatcher<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor> >(
+                    graph,
+                    points,
+                    k,
+                    cutoff * cutoff, // L2 uses square distances, so adjust for that here.
+                    dimension,
+                    directed);
+        case IGRAPH_METRIC_L1:
+            return dimension_dispatcher<nanoflann::L1_Adaptor<igraph_real_t, ig_point_adaptor> >(
                     graph,
                     points,
                     k,
                     cutoff,
                     dimension,
                     directed);
-    default:
-        IGRAPH_ERROR("Invalid metric.", IGRAPH_EINVAL);
+        default:
+            IGRAPH_ERROR("Invalid metric.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_HANDLE_EXCEPTIONS_END;
+IGRAPH_HANDLE_EXCEPTIONS_END;
 }
