@@ -25,11 +25,11 @@ add_library(
 
 target_include_directories(
   qhull_vendored
-  #PRIVATE
-  #${PROJECT_SOURCE_DIR}/include
-  #${PROJECT_BINARY_DIR}/include
-  PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  PRIVATE
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include
+  #PUBLIC
+  #${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 if (BUILD_SHARED_LIBS)

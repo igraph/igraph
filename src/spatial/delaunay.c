@@ -17,8 +17,10 @@
 
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_interface.h"
 #include "igraph_matrix.h"
 
+#include "igraph_vector.h"
 #include "libqhull_r/io_r.h"
 #include "libqhull_r/merge_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
@@ -32,13 +34,9 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
   boolT ismalloc = False; // handle memory allocation of points explicitly
   qhT qh_qh;
   qhT *qh= &qh_qh;
-double points[] = {
-    0, 0,
-    4, 3,
-    2, 3,
-    6, 4,
-    5, 3,
-  };
+  igraph_real_t *points;
+
+  points = &MATRIX(*points_,0,0);
 
   QHULL_LIB_CHECK; /* Check for compatible library */
 
@@ -57,32 +55,42 @@ double points[] = {
     qh_initflags(qh, qh->qhull_command);
     qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
     //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
-    qh_init_B(qh, &points[0], numpoints, dim, ismalloc);
+    qh_init_B(qh, points, numpoints, dim, ismalloc);
     qh_qhull(qh);
     qh_check_output(qh);
     qh_produce_output(qh);
     if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone)
       qh_check_points(qh);
-    FILE *fp = stdout;
+
     facetT *facet;
     vertexT *vertex, **vertexp;
+
+    igraph_vector_int_t triangle;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&triangle, 3);
+
+    igraph_integer_t curr_vert;
 
     FORALLfacets {
       if (!facet->upperdelaunay) {
         printf ("%d", qh_setsize (qh, facet->vertices));
+        curr_vert = 0;
         FOREACHvertex_(facet->vertices)
           printf (" v=%d", qh_pointid (qh, vertex->point));
         printf ("\n");
+      }
     }
+    igraph_vector_int_destroy(&triangle);
+    IGRAPH_FINALLY_CLEAN(1);
   }
-  }
-  
+
   qh->NOerrexit= True;  /* no more setjmp */
   qh_freeqhull(qh, !qh_ALL);
   qh_memfreeshort(qh, &curlong, &totlong);
 
   if (curlong || totlong)
     qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
-       totlong, curlong);
+                      totlong, curlong);
+
   return IGRAPH_SUCCESS;
-  }
+}
