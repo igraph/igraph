@@ -79,6 +79,9 @@ int main(void) {
     igraph_community_spinglass(&graph, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
     check(&membership);
 
+    igraph_community_infomap(&graph, NULL, NULL, 1, &membership, NULL);
+    check(&membership);
+
     igraph_destroy(&graph);
 
     igraph_grg_game(&graph, 20, 0.5, false, NULL, NULL);
