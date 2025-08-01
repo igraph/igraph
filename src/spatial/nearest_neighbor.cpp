@@ -144,7 +144,7 @@ static igraph_error_t neighbor_helper(
     ig_point_adaptor adaptor(points);
     int iter = 0;
 
-    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, ig_point_adaptor, Dimension>;
+    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, ig_point_adaptor, Dimension, igraph_integer_t>;
     kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
 
     tree.buildIndex();
