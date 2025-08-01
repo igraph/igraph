@@ -332,13 +332,13 @@ igraph_error_t igraph_is_vertex_coloring(
 
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
+    int iter = 0;
 
     if (igraph_vector_int_size(types) != vcount) {
         IGRAPH_ERROR("Invalid vertex type vector length.", IGRAPH_EINVAL);
     }
 
     *res = true;
-    int iter = 0;
 
     for (igraph_integer_t e = 0; e < ecount; e++) {
         igraph_integer_t from = IGRAPH_FROM(graph, e);
@@ -382,9 +382,15 @@ igraph_error_t igraph_is_vertex_coloring(
  *
  * Time complexity: O(|E|), linear in the number of edges.
  */
-igraph_error_t igraph_is_bipartite_coloring(const igraph_t *graph, const igraph_vector_bool_t *types, igraph_bool_t *res, igraph_neimode_t *mode) {
+igraph_error_t igraph_is_bipartite_coloring(
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types,
+        igraph_bool_t *res,
+        igraph_neimode_t *mode) {
+
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
+    int iter = 0;
 
     if (igraph_vector_bool_size(types) != vcount) {
         IGRAPH_ERROR("Invalid vertex type vector length.", IGRAPH_EINVAL);
@@ -398,7 +404,6 @@ igraph_error_t igraph_is_bipartite_coloring(const igraph_t *graph, const igraph_
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_bool_t has_false_to_true = false;
     igraph_bool_t has_true_to_false = false;
-    int iter = 0;
 
     for (igraph_integer_t e = 0; e < ecount; e++) {
         igraph_integer_t from = IGRAPH_FROM(graph, e);
@@ -472,6 +477,7 @@ igraph_error_t igraph_is_edge_coloring(
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
     igraph_vector_int_t edges, edge_colors;
+    int iter = 0;
 
     if (igraph_vector_int_size(types) != ecount) {
         IGRAPH_ERROR("Invalid edge type vector length.", IGRAPH_EINVAL);
@@ -500,7 +506,7 @@ igraph_error_t igraph_is_edge_coloring(
             }
         }
 
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 7);
     }
 
 done:
