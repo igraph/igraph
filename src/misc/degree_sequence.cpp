@@ -281,7 +281,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
         igraph_vector_int_t spokes;
         IGRAPH_CHECK(igraph_vector_int_init(&spokes, 0));        // init with size hub.degree instead?
         IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, hub.degree));
-        vault.get_spokes(hub.degree, seq, spokes);
+        IGRAPH_CHECK(vault.get_spokes(hub.degree, seq, spokes));
 
         igraph_integer_t n_spokes = igraph_vector_int_size(&spokes);
         for (igraph_integer_t i = 0; i < n_spokes; i++) {
