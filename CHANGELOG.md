@@ -81,7 +81,6 @@
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
  - `igraph_strvector_fprint()` prints a string vector to a file.
  - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
- - `igraph_invert_permutation()` inverts a permutation stored in an integer vector.
 
 ### Changed
 
@@ -97,7 +96,7 @@
  - `igraph_vector_append()`, `igraph_strvector_append()` and `igraph_vector_ptr_append()` now use a different allocation strategy: if the `to` vector has insufficient capacity, they double its capacity. Previously they reserved precisely as much capacity as needed for appending the `from` vector.
  - `igraph_degree_sequence_game()` no longer interprets an empty in-degree vector as a request for generating undirected graphs. To generate undirected graphs, pass `NULL` for in-degrees.
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`, `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` no longer interprets an empty `outseq` vector as a missing out-degree sequence. Pass `NULL` if you don't wish to specify an out-degree sequence.
- - The implementation of the Infomap algorithm behind `igraph_community_infomap()` has been updated with a more recent version (2.6.1), while keeping the API compatible with previous igraph versions.
+ - The implementation of the Infomap algorithm behind `igraph_community_infomap()` has been updated with a more recent version (2.8.0), while keeping the API compatible with previous igraph versions. Isolated vertices are now supported.
  - The following functions are not experimental any more: `igraph_count_loops()`, `igraph_distances_cutoff()`, `igraph_distances_floyd_warshall()`, `igraph_distances_dijkstra_cutoff()`, `igraph_enter_safelocale()`, `igraph_exit_safelocale()`, `igraph_get_shortest_path_astar()`, `igraph_graph_power()`,  `igraph_hexagonal_lattice()`,  `igraph_hypercube()`, `igraph_is_clique()`, `igraph_is_independent_vertex_set()`, `igraph_join()`,`igraph_joint_degree_distribution()`, `igraph_joint_degree_matrix()`, `igraph_joint_type_distribution()`, `igraph_layout_merge_dla()`, `igraph_mean_degree()`, `igraph_transitive_closure()`, `igraph_tree_from_parent_vector()`, `igraph_triangular_lattice()`.
 
 ### Fixed
@@ -139,6 +138,7 @@
  - The deprecated `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` functions were removed.
  - The unused enum type `igraph_fileformat_type_t` was removed.
  - The deprecated `igraph_adjacent_triangles()` was removed. Use `igraph_count_adjacent_triangles()` instead.
+ - The macros `IGRAPH_POSINFINITY` and `IGRAPH_NEGINFINITY` were removed. Use `IGRAPH_INFINITY` and `-IGRAPH_INFINITY` instead.
 
 ### Deprecated
 
@@ -157,7 +157,8 @@
  - `igraph_mycielskian()` and `igraph_mycielski_graph()` compute a Mycielski transformation of a graph, and a Mycielski graph, respectively. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2741!
  - `igraph_path_graph()` is a convenience wrapper for `igraph_ring()` with `circular=false`.
  - `igraph_cycle_graph()` is a convenience wrapper for `igraph_ring()` with `circular=true`.
- - `igraph_bond_percolation()`, `igraph_site_percolation()` and `igraph_edgelist_percolation()` calculates the time evolution of the size of the giant component of a graph when edges or vertices are added one by one in a certain (or random) order.
+ - `igraph_bond_percolation()`, `igraph_site_percolation()` and `igraph_edgelist_percolation()` calculates the time evolution of the size of the giant component of a graph when edges or vertices are added one by one in a certain (or random) order. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2778!
+ - `igraph_invert_permutation()` inverts a permutation stored in an integer vector.
 
 ### Changed
 

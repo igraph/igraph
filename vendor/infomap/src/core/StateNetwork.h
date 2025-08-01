@@ -3,7 +3,7 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 
@@ -104,6 +104,9 @@ protected:
   unsigned int m_numLinksIgnoredByWeightThreshold = 0;
   double m_totalLinkWeightIgnored = 0.0;
   std::map<unsigned int, double> m_outWeights;
+  bool m_haveNodeWeights = false;
+  bool m_haveStateNodeWeights = false;
+  bool m_haveFileInput = false;
   // Attributes
   std::map<unsigned int, std::string> m_names;
   std::map<unsigned int, PhysNode> m_physNodes;
@@ -175,6 +178,9 @@ public:
   std::map<unsigned int, double>& outWeights() { return m_outWeights; }
   std::map<unsigned int, std::string>& names() { return m_names; }
   const std::map<unsigned int, std::string>& names() const { return m_names; }
+  bool haveNodeWeights() const { return m_haveNodeWeights; }
+  bool haveStateNodeWeights() const { return m_haveStateNodeWeights; }
+  bool haveFileInput() const { return m_haveFileInput; }
 
   virtual const std::map<unsigned int, std::vector<int>>& metaData() const = 0;
 

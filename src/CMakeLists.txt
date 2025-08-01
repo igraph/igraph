@@ -165,7 +165,7 @@ add_library(
   community/leiden.c
   community/louvain.c
   community/modularity.c
-  community/infomap.cc
+  community/infomap.cpp
   community/optimal_modularity.c
   community/spinglass/clustertool.cpp
   community/spinglass/NetDataTypes.cpp

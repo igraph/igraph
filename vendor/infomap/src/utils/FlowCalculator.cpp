@@ -3,12 +3,13 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 
 #include "FlowCalculator.h"
 #include "../utils/Log.h"
+#include "../utils/infomath.h"
 #include "../core/StateNetwork.h"
 #include <iostream>
 #include <cmath>
@@ -177,6 +178,10 @@ FlowCalculator::FlowCalculator(StateNetwork& network, const Config& config)
     calcRawdirFlow();
     normalizeNodeFlow = true;
     break;
+  case FlowModel::precomputed:
+    usePrecomputedFlow(network, config);
+    normalizeNodeFlow = true;
+    break;
   }
 
   finalize(network, config, normalizeNodeFlow);
@@ -237,6 +242,48 @@ void FlowCalculator::calcRawdirFlow() noexcept
   }
 }
 
+void FlowCalculator::usePrecomputedFlow(const StateNetwork& network, const Config& config)
+{
+  Log() << "\n  -> Using directed links with precomputed flow from input data.";
+  Log() << "\n  -> Total link flow: " << sumLinkWeight << ".";
+
+  if (network.haveFileInput()) {
+    if (network.haveMemoryInput() && !network.haveStateNodeWeights()) {
+      Log() << std::endl;
+      throw std::runtime_error("Missing node flow in input data. Should be passed as a third field under a *States section.");
+    }
+    if (!network.haveMemoryInput() && !network.haveNodeWeights()) {
+      Log() << std::endl;
+      throw std::runtime_error("Missing node flow in input data. Should be passed as a third field under a *Vertices section.");
+    }
+  }
+
+  // Treat the link weights as flow
+  nodeFlow.assign(numNodes, 0.0);
+  double sumFlow = 0.0;
+
+  for (const auto& nodeIt : network.nodes()) {
+    auto& node = nodeIt.second;
+    nodeFlow[nodeIndexMap[node.id]] = node.weight;
+    sumFlow += node.weight;
+  }
+  Log() << "\n  -> Total node flow: " << sumFlow << ".";
+
+  if (infomath::isEqual(sumFlow, 0)) {
+    throw std::runtime_error("Missing node flow. Set it on the node weight property.");
+  }
+  if (!infomath::isEqual(sumFlow, 1)) {
+    if (infomath::isEqual(sumFlow, numNodes) && infomath::isEqual(nodeFlow[0], 1)) {
+      Log() << "\n  Warning: Node flow sums to the number of nodes, is node flow provided or is default node weights used? Normalizing.";
+    } else {
+      Log() << "\n  Warning: Node flow sums to " << sumFlow << ", normalizing.";
+    }
+    for (unsigned int i = 0; i < numNodes; ++i) {
+      nodeFlow[i] /= sumFlow;
+    }
+  }
+}
+
 struct IterationResult {
   double alpha;
   double beta;
@@ -254,8 +301,8 @@ IterationResult powerIterate(double alpha, Iteration&& iter)
     err = iter(iterations, alpha, beta);
 
     // Perturb the system if equilibrium
-    if (std::abs(err - oldErr) < 1e-15) {
-      alpha += 1.0e-10;
+    if (std::abs(err - oldErr) < 1e-17) {
+      alpha += 1.0e-12;
       beta = 1.0 - alpha;
     }
 

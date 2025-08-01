@@ -55,13 +55,14 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
         if (reset_min < 0) {
             IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
         }
-        if (isnan(reset_min)) {
-            IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
-        }
 
         double reset_sum = igraph_vector_sum(reset);
         if (reset_sum == 0) {
             IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
+        }
+
+        if (!isfinite(reset_sum)) {
+            IGRAPH_ERROR("The reset vector must not contain infinite or NaN values.", IGRAPH_EINVAL);
         }
 
         // Construct the personalization vector

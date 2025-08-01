@@ -3,7 +3,7 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 
@@ -22,6 +22,7 @@ constexpr int FlowModel::directed;
 constexpr int FlowModel::undirdir;
 constexpr int FlowModel::outdirdir;
 constexpr int FlowModel::rawdir;
+constexpr int FlowModel::precomputed;
 
 Config::Config(const std::string& flags, bool isCLI) : isCLI(isCLI)
 {
@@ -91,7 +92,7 @@ Config::Config(const std::string& flags, bool isCLI) : isCLI(isCLI)
 
   std::string flowModelArg;
 
-  api.addOptionArgument(flowModelArg, 'f', "flow-model", "Specify flow model. Options: undirected, directed, undirdir, outdirdir, rawdir.", ArgType::option, "Algorithm");
+  api.addOptionArgument(flowModelArg, 'f', "flow-model", "Specify flow model. Options: undirected, directed, undirdir, outdirdir, rawdir, precomputed.", ArgType::option, "Algorithm");
 
   api.addOptionArgument(directed, 'd', "directed", "Assume directed links. Shorthand for '--flow-model directed'.", "Algorithm");
 
@@ -186,8 +187,10 @@ Config::Config(const std::string& flags, bool isCLI) : isCLI(isCLI)
     setFlowModel(FlowModel::outdirdir);
   } else if (flowModelArg == "rawdir") {
     setFlowModel(FlowModel::rawdir);
+  } else if (flowModelArg == "precomputed") {
+    setFlowModel(FlowModel::precomputed);
   } else if (!flowModelArg.empty()) {
-    throw std::runtime_error("Unrecognized flow model");
+    throw std::runtime_error(io::Str() << "Unrecognized flow model: '" << flowModelArg << "'");
   }
 
   if (regularized) {

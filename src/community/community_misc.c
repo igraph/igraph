@@ -223,15 +223,70 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     return IGRAPH_SUCCESS;
 }
 
+
+/* This slower implementation is used when cluster indices are not within
+ * the range 0..vcount-1.
+ */
+static igraph_error_t reindex_membership_large(
+        igraph_vector_int_t *membership,
+        igraph_vector_int_t *new_to_old,
+        igraph_integer_t *nb_clusters) {
+
+    const igraph_integer_t vcount = igraph_vector_int_size(membership);
+    igraph_vector_int_t permutation;
+
+    /* This implementation cannot currently handle vcount == 0, and is not
+     * called with such input. Assert that the input is valid as a safety
+     * measure. */
+    IGRAPH_ASSERT(vcount > 0);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&permutation, vcount);
+
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(membership, &permutation, IGRAPH_ASCENDING));
+
+    if (new_to_old) {
+        igraph_vector_int_clear(new_to_old);
+    }
+
+    igraph_integer_t j = VECTOR(permutation)[0];
+    igraph_integer_t c_old = VECTOR(*membership)[j];
+    igraph_integer_t c_old_prev = c_old;
+    igraph_integer_t c_new = 0;
+    if (new_to_old) {
+        IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c_old));
+    }
+    VECTOR(*membership)[j] = c_new;
+
+    for (igraph_integer_t i=1; i < vcount; i++) {
+        j = VECTOR(permutation)[i];
+        c_old = VECTOR(*membership)[j];
+        if (c_old != c_old_prev) {
+            if (new_to_old) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c_old));
+            }
+            c_new++;
+        }
+        c_old_prev = c_old;
+        VECTOR(*membership)[j] = c_new;
+    }
+
+    if (nb_clusters) {
+        *nb_clusters = c_new+1;
+    }
+
+    igraph_vector_int_destroy(&permutation);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_reindex_membership
  * \brief Makes the IDs in a membership vector contiguous.
  *
- * This function reindexes component IDs in a membership vector
- * in a way that the new IDs start from zero and go up to C-1,
- * where C is the number of unique component IDs in the original
- * vector. The supplied membership is expected to fall in the
- * range 0, ..., n - 1.
+ * This function reindexes component IDs in a membership vector in a way that
+ * the new IDs start from zero and go up to <code>C-1</code>, where \c C is the
+ * number of unique component IDs in the original vector.
  *
  * \param  membership  Numeric vector which gives the type of each
  *                     vertex, i.e. the component to which it belongs.
@@ -246,19 +301,23 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
  *                     clusters found in membership.
  * \return Error code.
  *
- * Time complexity: should be O(n) for n elements.
+ * Time complexity: Let n be the length of the membership vector.
+ * O(n) if cluster indices are within 0..n-1, and O(n log(n)) otherwise.
  */
-igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
-                              igraph_vector_int_t *new_to_old,
-                              igraph_integer_t *nb_clusters) {
+igraph_error_t igraph_reindex_membership(
+        igraph_vector_int_t *membership,
+        igraph_vector_int_t *new_to_old,
+        igraph_integer_t *nb_clusters) {
 
-    igraph_integer_t i, n = igraph_vector_int_size(membership);
-    igraph_vector_t new_cluster;
+    const igraph_integer_t vcount = igraph_vector_int_size(membership);
+    igraph_vector_int_t new_cluster;
     igraph_integer_t i_nb_clusters;
 
-    /* We allow original cluster indices in the range 0, ..., n - 1 */
-    IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
-    IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
+    /* First, we assume cluster indices in the range 0..vcount-1,
+     * and attempt to use a performant implementation. If indices
+     * outside of this range are found, we will fall back to a
+     * slower alternative implementation. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&new_cluster, vcount);
 
     if (new_to_old) {
         igraph_vector_int_clear(new_to_old);
@@ -267,21 +326,19 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     /* Clean clusters. We will store the new cluster + 1 so that membership == 0
      * indicates that no cluster was assigned yet. */
     i_nb_clusters = 1;
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_integer_t c = VECTOR(*membership)[i];
 
-        if (c < 0) {
-            IGRAPH_ERRORF("Membership indices should be non-negative. "
-            "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
-        }
-
-        if (c >= n) {
-            IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
-            "Found member of cluster %" IGRAPH_PRId ", but only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL, c, n);
+        if (c < 0 || c >= vcount) {
+            /* Found cluster indices out of the 0..vcount-1 range.
+             * Use alternative implementation that supports these. */
+            igraph_vector_int_destroy(&new_cluster);
+            IGRAPH_FINALLY_CLEAN(1);
+            return reindex_membership_large(membership, new_to_old, nb_clusters);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
-            VECTOR(new_cluster)[c] = (igraph_real_t)i_nb_clusters;
+            VECTOR(new_cluster)[c] = i_nb_clusters;
             i_nb_clusters += 1;
             if (new_to_old) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(new_to_old, c));
@@ -290,17 +347,17 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
     }
 
     /* Assign new membership */
-    for (i = 0; i < n; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         igraph_integer_t c = VECTOR(*membership)[i];
         VECTOR(*membership)[i] = VECTOR(new_cluster)[c] - 1;
     }
+
     if (nb_clusters) {
         /* We used the cluster + 1, so correct */
         *nb_clusters = i_nb_clusters - 1;
     }
 
-    igraph_vector_destroy(&new_cluster);
-
+    igraph_vector_int_destroy(&new_cluster);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -670,7 +727,7 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
 /**
  * Implementation of the normalized mutual information (NMI) measure of
  * Danon et al. This function assumes that the community membership
- * vectors have already been normalized using igraph_reindex_communities().
+ * vectors have already been normalized using igraph_reindex_membership().
  *
  * </para><para>
  * Reference: Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community
@@ -697,7 +754,7 @@ static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_int_t
 /**
  * Implementation of the variation of information metric (VI) of
  * Meila et al. This function assumes that the community membership
- * vectors have already been normalized using igraph_reindex_communities().
+ * vectors have already been normalized using igraph_reindex_membership().
  *
  * </para><para>
  * Reference: Meila M: Comparing clusterings by the variation of information.
@@ -724,7 +781,7 @@ static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_int_t 
  *
  * </para><para>
  * This function assumes that the community membership vectors have already
- * been normalized using igraph_reindex_communities().
+ * been normalized using igraph_reindex_membership().
  *
  * </para><para>
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
@@ -757,7 +814,7 @@ static igraph_error_t igraph_i_confusion_matrix(const igraph_vector_int_t *v1, c
  *
  * </para><para>
  * This function assumes that the community membership vectors have already
- * been normalized using igraph_reindex_communities().
+ * been normalized using igraph_reindex_membership().
  *
  * </para><para>
  * Reference: van Dongen S: Performance criteria for graph clustering and Markov
@@ -826,7 +883,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  *
  * </para><para>
  * This function assumes that the community membership vectors have already
- * been normalized using igraph_reindex_communities().
+ * been normalized using igraph_reindex_membership().
  *
  * </para><para>
  * References:

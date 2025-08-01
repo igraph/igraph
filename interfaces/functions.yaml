@@ -1283,9 +1283,11 @@ igraph_count_reachable:
 
 igraph_bond_percolation:
     PARAMS: GRAPH graph, OUT VECTOR_INT giant_size, OUT VECTOR_INT vetex_count, OPTIONAL EDGE_INDICES edge_order
+    DEPS: edge_order ON graph
 
 igraph_site_percolation:
     PARAMS: GRAPH graph, OUT VECTOR_INT giant_size, OUT VECTOR_INT edge_count, OPTIONAL VERTEX_INDICES vertex_order
+    DEPS: vertex_order ON graph
 
 igraph_edgelist_percolation:
     PARAMS: VERTEX_INDEX_PAIRS edges, OUT VECTOR_INT giant_size, OUT VECTOR_INT vertex_count
@@ -1743,10 +1745,10 @@ igraph_split_join_distance:
 
 igraph_community_infomap:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGE_WEIGHTS e_weights,
-        OPTIONAL VERTEX_WEIGHTS v_weights, INTEGER nb_trials=10,
-        OUT VECTOR_INT membership, OUT REAL codelength
-    DEPS: e_weights ON graph, v_weights ON graph
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS edge_weights,
+        OPTIONAL VERTEX_WEIGHTS vertex_weights, INTEGER nb_trials=10,
+        OPTIONAL OUT VECTOR_INT membership, OPTIONAL OUT REAL codelength
+    DEPS: edge_weights ON graph, vertex_weights ON graph
 
 igraph_community_voronoi:
     PARAMS: |-
