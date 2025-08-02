@@ -24,7 +24,7 @@
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_isomorphism.h"
+#include "igraph_topology.h"
 
 #include "graph/attributes.h"
 
