@@ -310,6 +310,8 @@ add_library(
   misc/sir.c
   misc/spanning_trees.c
 
+  spatial/delaunay.c
+
   internal/glpk_support.c
   internal/hacks.c
   internal/lsap.c
@@ -421,7 +423,7 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored pcg prpack
+  bliss cliquer cxsparse_vendored pcg prpack qhull_vendored
 )
 
 if (NOT BUILD_SHARED_LIBS)
@@ -470,7 +472,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack qhull_vendored
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
