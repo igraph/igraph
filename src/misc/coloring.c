@@ -298,7 +298,7 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
  * \sa igraph_is_vertex_coloring() to check if a coloring is valid, i.e. if all
  * edges connect vertices of different colors.
  *
- * \example examples/simple/igraph_coloring.c
+ * \example examples/simple/coloring.c
  */
 igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic) {
     switch (heuristic) {

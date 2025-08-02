@@ -485,12 +485,12 @@ add_legacy_tests(
 # coloring.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_coloring
+  coloring
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_coloring
+  coloring
   is_coloring
 )
 
@@ -994,7 +994,7 @@ add_benchmarks(
   igraph_betweenness_weighted
   igraph_cliques
   igraph_closeness_weighted
-  igraph_coloring
+  coloring
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
