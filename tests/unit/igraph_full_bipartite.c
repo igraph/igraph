@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2025  The igraph development team 
+   Copyright (C) 2025  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,24 +20,24 @@
 
 #include "test_utilities.h"
 
-void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types, 
-                          igraph_integer_t n1, igraph_integer_t n2, 
+void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
+                          igraph_integer_t n1, igraph_integer_t n2,
                           igraph_bool_t directed, igraph_neimode_t mode) {
     igraph_integer_t vcount = igraph_vcount(g);
     igraph_integer_t ecount = igraph_ecount(g);
     igraph_integer_t expected_ecount;
     igraph_bool_t bipartite;
-    
+
     /* Check vertex count */
     IGRAPH_ASSERT(vcount == n1 + n2);
-    
+
     /* Check that the graph is bipartite */
     igraph_is_bipartite(g, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
-    
+
     /* Check directedness */
     IGRAPH_ASSERT(igraph_is_directed(g) == directed);
-    
+
     /* Check types vector if provided */
     if (types) {
         IGRAPH_ASSERT(igraph_vector_bool_size(types) == vcount);
@@ -49,7 +49,7 @@ void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
             IGRAPH_ASSERT(VECTOR(*types)[i] == true);
         }
     }
-    
+
     /* Check edge count */
     if (!directed) {
         expected_ecount = n1 * n2;
@@ -59,16 +59,16 @@ void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
         expected_ecount = 2 * n1 * n2;
     }
     IGRAPH_ASSERT(ecount == expected_ecount);
-    
+
     /* Check that edges are only between different partitions */
     for (igraph_integer_t i = 0; i < ecount; i++) {
         igraph_integer_t from = IGRAPH_FROM(g, i);
         igraph_integer_t to = IGRAPH_TO(g, i);
-        
+
         if (types) {
             IGRAPH_ASSERT(VECTOR(*types)[from] != VECTOR(*types)[to]);
         }
-        
+
         /* For directed graphs with specific modes, check edge directions */
         if (directed) {
             if (mode == IGRAPH_OUT) {

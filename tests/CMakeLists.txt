@@ -1041,4 +1041,3 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   percolation
 )
-

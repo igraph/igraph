@@ -67,8 +67,8 @@ When performing a code review, keep in mind the following.
 
  - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments.
 
- - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature. 
- 
+ - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature.
+
  - Check that the documentation of newly added public functions has a note on their time complexity.
 
  - Check that within the main description of the function each paragraph, except the first, is preceded by `</para><para>` on a separate line.
@@ -83,7 +83,7 @@ When performing a code review, keep in mind the following.
 
  - Check that error and warning messages use sentence case and end in a fullstop. Refer to https://github.com/igraph/igraph/wiki/Error-reporting-guidelines for more details, and link this page when commenting on error or warning messages.
 
- - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing. 
+ - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing.
 
 ## Review hints
 
