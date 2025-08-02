@@ -34,17 +34,17 @@ void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
         for (igraph_integer_t b = a + 1; b < num_points; b++) {
             igraph_vector_int_push_back(destination, VECTOR(*source)[a]);
             igraph_vector_int_push_back(destination, VECTOR(*source)[b]);
-            printf("%li->%li, ", VECTOR(*source)[a], VECTOR(*source)[b]);
+            //printf("%li->%li, ", VECTOR(*source)[a], VECTOR(*source)[b]);
         }
     }
-    printf("\n");
+    //printf("\n");
 }
 
 igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
     int curlong, totlong; /* used !qh_NOmem */
     int exitcode;
-    int numpoints = 5;
-    int dim = 2;
+    igraph_integer_t numpoints = igraph_matrix_nrow(points_);
+    igraph_integer_t dim = igraph_matrix_ncol(points_);
     //coordT *points;
     boolT ismalloc = False; // handle memory allocation of points explicitly
     qhT qh_qh;
@@ -99,7 +99,6 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
 
         FORALLfacets {
             if (!facet->upperdelaunay) {
-                printf ("%d", qh_setsize (qh, facet->vertices));
                 curr_vert = 0;
                 FOREACHvertex_(facet->vertices) VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
                 add_clique(&edges, &simplex);
