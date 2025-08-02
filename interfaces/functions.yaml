@@ -2651,6 +2651,18 @@ igraph_vertex_coloring_greedy:
     PARAMS: GRAPH graph, OUT VERTEX_COLORS colors, GREEDY_COLORING_HEURISTIC heuristic=NEIGHBORS
     DEPS: colors ON graph
 
+igraph_is_vertex_coloring:
+    PARAMS: GRAPH graph, VERTEX_COLOR types, OUT BOOLEAN res
+    DEPS: types ON graph
+
+igraph_is_bipartite_coloring:
+    PARAMS: GRAPH graph, BIPARTITE_TYPES types, OUT BOOLEAN res, OPTIONAL OUT NEIMODE mode
+    DEPS: types ON graph
+
+igraph_is_edge_coloring:
+    PARAMS: GRAPH graph, EDGE_COLOR types, OUT BOOLEAN res
+    DEPS: types ON graph
+
 #######################################
 # Other, (yet) undocumented functions
 #######################################
