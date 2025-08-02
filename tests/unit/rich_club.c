@@ -67,7 +67,7 @@ void undirected_no_loop_graph(void) {
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (int i = 0; i < vcount; i++){
+    for (igraph_integer_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_UNDIRECTED,
@@ -97,7 +97,7 @@ void directed_no_loop_graph(void) {
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (int i = 0; i < vcount; i++){
+    for (igraph_integer_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_DIRECTED,
@@ -127,7 +127,7 @@ void undirected_loop_graph(void) {
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (int i = 0; i < vcount; i++){
+    for (igraph_integer_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_UNDIRECTED,
@@ -157,7 +157,7 @@ void directed_loop_graph(void) {
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (int i = 0; i < vcount; i++){
+    for (igraph_integer_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_DIRECTED,
@@ -191,12 +191,12 @@ void weighted_graph(void) {
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (int i = 0; i < vcount; i++){
+    for (igraph_integer_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
 
     igraph_vector_init(&weights, igraph_ecount(&graph));
-    for (int i = 0; i < igraph_ecount(&graph); i++) {
+    for (igraph_integer_t i = 0; i < igraph_ecount(&graph); i++) {
         // all "edges" have weight 2, output should be double of Test 3a
         VECTOR(weights)[i] = 2;
     }
