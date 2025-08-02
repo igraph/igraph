@@ -536,20 +536,9 @@ igraph_error_t igraph_community_voronoi(
         IGRAPH_ERROR("Edge length vector size does not match edge count.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple, mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED));
     if (! simple) {
         IGRAPH_ERROR("The graph must be simple for Voronoi communities.", IGRAPH_EINVAL);
-    }
-    if (igraph_is_directed(graph) && mode == IGRAPH_ALL) {
-        igraph_bool_t has_mutual;
-        /* When the graph is directed but edge directions are ignored,
-         * mutual edges are effectively multi-edges. */
-        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
-        if (has_mutual) {
-            IGRAPH_ERROR("The graph must be simple for Voronoi communities. "
-                         "Mutual directed edges are effectively multi-edges when ignoring edge directions.",
-                         IGRAPH_EINVAL);
-        }
     }
 
     if (no_of_edges == 0) {

@@ -692,6 +692,7 @@ add_legacy_tests(
   igraph_le_community_to_membership
   igraph_modularity
   igraph_modularity_matrix
+  igraph_reindex_membership
   igraph_split_join_distance
   levc-stress
   null_communities
@@ -924,6 +925,13 @@ add_legacy_tests(
   igraph_realize_bipartite_degree_sequence
 )
 
+# spatial
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_nearest_neighbor_graph
+)
+
+
 # cycle bases
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -1010,6 +1018,7 @@ add_benchmarks(
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
+  igraph_nearest_neighbor_graph
   igraph_neighborhood
   igraph_pagerank
   igraph_pagerank_weighted
@@ -1040,4 +1049,10 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+# percolation
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  percolation
 )

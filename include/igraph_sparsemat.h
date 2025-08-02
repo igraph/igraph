@@ -151,13 +151,6 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_print(const igraph_sparsemat_t *A,
                                          FILE *outstream);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
-                                   igraph_bool_t directed);
-
-IGRAPH_EXPORT igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
-                                            igraph_bool_t directed, const char *attr,
-                                            igraph_bool_t loops);
-
 IGRAPH_EXPORT igraph_error_t igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
                                              const igraph_matrix_t *mat,
                                              igraph_real_t tol);

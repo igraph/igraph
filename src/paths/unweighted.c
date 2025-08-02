@@ -30,8 +30,6 @@
  * \function igraph_distances_cutoff
  * \brief Length of the shortest paths between vertices, with cutoff.
  *
- * \experimental
- *
  * This function is similar to \ref igraph_distances(), but
  * paths longer than \p cutoff will not be considered.
  *

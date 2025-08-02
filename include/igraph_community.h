@@ -88,9 +88,9 @@ IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                                             igraph_vector_t *modularity,
                                             igraph_vector_int_t *membership);
 
-IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
-                                           const igraph_vector_t *e_weights,
-                                           const igraph_vector_t *v_weights,
+IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t *graph,
+                                           const igraph_vector_t *edge_weights,
+                                           const igraph_vector_t *vertex_weights,
                                            igraph_integer_t nb_trials,
                                            igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
@@ -232,8 +232,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
                                           const igraph_vector_t *edge_weights,
-                                          const igraph_vector_t *node_weights,
-                                          igraph_real_t resolution_parameter,
+                                          const igraph_vector_t *vertex_weights,
+                                          igraph_real_t resolution,
                                           igraph_real_t beta,
                                           igraph_bool_t start,
                                           igraph_integer_t n_iterations,

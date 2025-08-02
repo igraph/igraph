@@ -7,6 +7,9 @@ int main(void) {
   igraph_vector_bool_t periodic;
   igraph_real_t avg_path_len;
 
+  /* Initialize the library. */
+  igraph_setup();
+
   igraph_vector_int_init(&dimvector, 2);
   VECTOR(dimvector)[0]=30;
   VECTOR(dimvector)[1]=30;
@@ -18,7 +21,9 @@ int main(void) {
   igraph_average_path_length(&graph, NULL, &avg_path_len, NULL, IGRAPH_UNDIRECTED, /* unconn= */ true);
   printf("Average path length (lattice):            %g\n", (double) avg_path_len);
 
-  igraph_rng_seed(igraph_rng_default(), 42); /* seed RNG before first use */
+  /* Seed the RNG to ensure identical results across runs. */
+  igraph_rng_seed(igraph_rng_default(), 42);
+
   igraph_vector_int_init(&edges, 20);
   for (igraph_integer_t i=0; i < igraph_vector_int_size(&edges); i++) {
     VECTOR(edges)[i] = RNG_INTEGER(0, igraph_vcount(&graph) - 1);

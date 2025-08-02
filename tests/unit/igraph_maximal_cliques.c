@@ -22,12 +22,11 @@
 #define NODES 1000
 #define CLIQUE_SIZE 10
 #define NO_CLIQUES 10
-#define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
 void permutation(igraph_vector_int_t *vec) {
     igraph_integer_t i, r, tmp;
     for (i = 0; i < CLIQUE_SIZE; i++) {
-        r = INT(NODES - 1);
+        r = RNG_INTEGER(0, NODES - 1);
         tmp = VECTOR(*vec)[i];
         VECTOR(*vec)[i] = VECTOR(*vec)[r];
         VECTOR(*vec)[r] = tmp;
@@ -66,14 +65,6 @@ void print_cliques(igraph_vector_int_list_t *cliques) {
     }
 }
 
-void invert_permutation(const igraph_vector_int_t *vec, igraph_vector_int_t *inv_vec) {
-    igraph_integer_t i, n = igraph_vector_int_size(vec);
-    igraph_vector_int_resize(inv_vec, n);
-    for (i = 0; i < n; i++) {
-        VECTOR(*inv_vec)[VECTOR(*vec)[i]] = i;
-    }
-}
-
 int main(void) {
 
     igraph_t g, g2, cli;
@@ -97,7 +88,7 @@ int main(void) {
          * with earlier tests when igraph_permute_vertices() took the inverse
          * permutation */
         permutation(&perm);
-        invert_permutation(&perm, &inv_perm);
+        igraph_invert_permutation(&perm, &inv_perm);
 
         /* Permute vertices of g */
         igraph_permute_vertices(&g, &g2, &inv_perm);

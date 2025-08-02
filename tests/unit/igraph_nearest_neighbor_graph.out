@@ -1,0 +1,809 @@
+# L2 Metric test suite:
+
+1d 2 neighbors, cutoff 3
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 3
+0 4
+1 3
+3 0
+3 1
+4 0
+4 3
+}
+
+1d 1 neighbors, cutoff INFINITY
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 4
+1 3
+2 1
+3 0
+4 0
+}
+
+1d unlimited neighbors, cutoff INFINITY
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+1d unlimited neighbors, cutoff 7
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 3
+0 4
+1 3
+3 0
+3 1
+3 4
+4 0
+4 3
+}
+
+2d 2 neighbors, cutoff 5
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+1 0
+3 4
+4 3
+}
+
+2d 1 neighbors, cutoff INFINITY
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+1 0
+2 1
+3 4
+4 3
+}
+
+2d unlimited neighbors, cutoff INFINITY
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+2d unlimited neighbors, cutoff 7
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 4
+1 0
+1 2
+1 3
+1 4
+2 1
+3 1
+3 4
+4 0
+4 1
+4 3
+}
+
+2d 2 neighbors, cutoff 1.2, degenerate case
+[        0        0
+         1        0
+        -1        0
+         0        1
+         0       -1 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 0
+2 0
+3 0
+4 0
+}
+
+3d, 2 neighbors, cutoff 4
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+2 0
+3 1
+3 4
+4 0
+4 3
+}
+
+3d, unlimited neighbors, cutoff 4
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+2 0
+3 1
+3 4
+4 0
+4 3
+}
+
+3d, 2 neighbors, cutoff INFINITY
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+1 4
+2 0
+2 4
+3 1
+3 4
+4 0
+4 3
+}
+
+3d, unlimited neighbors, cutoff INFINITY
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+4d 2 neighbors, cutoff 5
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+1 4
+2 0
+2 4
+3 1
+3 4
+4 0
+4 3
+}
+
+4d 1 neighbors, cutoff INFINITY
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+1 3
+2 0
+3 4
+4 3
+}
+
+4d unlimited neighbors, cutoff INFINITY
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+4d unlimited neighbors, cutoff 4
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+2 0
+3 1
+3 4
+4 0
+4 3
+}
+
+3d, no points
+[ 0-by-3 ]
+directed: true
+vcount: 0
+edges: {
+}
+
+0d, no points
+[ 0-by-0 ]
+directed: true
+vcount: 0
+edges: {
+}
+
+3d, 1 point
+[        1        6        4 ]
+directed: true
+vcount: 1
+edges: {
+}
+
+2d, zero neighbors
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+}
+
+2d, zero cutoff
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+}
+
+0d, 1 point should error
+
+Fibonacci spiral with 25 points, 1 neighbor unlimited cutoff.
+[        0        0
+  -0.737369 -0.67549
+  0.123639   1.4088
+   1.05385 -1.37456
+  -1.96943 0.348364
+   1.88669  1.20016
+  -0.635898 -2.36551
+  -1.21945  2.34797
+    2.6568 -0.97026
+  -2.77304 -1.14467
+   1.34032  2.86418
+  0.992612  -3.1646
+  -2.99718  1.73693
+   3.52145 0.774182
+  -2.15194 -3.06091
+  -0.49772  3.84087
+    3.0586 -2.57779
+  -4.11958 -0.170358
+   3.00731  2.99267
+  -0.201344 -4.35425
+  -2.86534  3.43363
+   4.54165 -0.611073
+  -3.85017 -2.67885
+    1.0526  4.67889
+   2.43568 -4.25058 ]
+directed: true
+vcount: 25
+edges: {
+0 1
+1 0
+2 0
+3 8
+4 1
+5 13
+6 14
+7 2
+8 3
+9 17
+10 18
+11 19
+12 20
+13 5
+14 6
+15 7
+16 8
+17 9
+18 10
+19 11
+20 12
+21 13
+22 14
+23 15
+24 16
+}
+# L1 Metric test suite:
+
+1d 2 neighbors, cutoff 3
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 3
+0 4
+1 3
+3 0
+3 1
+4 0
+4 3
+}
+
+1d 1 neighbors, cutoff INFINITY
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 4
+1 3
+2 1
+3 0
+4 0
+}
+
+1d unlimited neighbors, cutoff INFINITY
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+1d unlimited neighbors, cutoff 7
+[       12
+         8
+         5
+        10
+        12 ]
+directed: true
+vcount: 5
+edges: {
+0 3
+0 4
+1 3
+3 0
+3 1
+3 4
+4 0
+4 3
+}
+
+2d 2 neighbors, cutoff 5
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+3 4
+4 3
+}
+
+2d 1 neighbors, cutoff INFINITY
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+1 0
+2 1
+3 4
+4 3
+}
+
+2d unlimited neighbors, cutoff INFINITY
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+2d unlimited neighbors, cutoff 7
+[       12        8
+         8        6
+         5       12
+        10        1
+        12        2 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 4
+1 0
+3 4
+4 0
+4 3
+}
+
+2d 2 neighbors, cutoff INFINITY, degenerate case
+[        0        0
+         1        0
+        -1        0
+         0        1
+         0       -1 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+1 0
+1 2
+2 0
+2 1
+3 0
+3 1
+4 0
+4 1
+}
+
+3d, 2 neighbors, cutoff 4
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+3 4
+4 3
+}
+
+3d, unlimited neighbors, cutoff 4
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+3 4
+4 3
+}
+
+3d, 2 neighbors, cutoff INFINITY
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+1 4
+2 0
+2 4
+3 1
+3 4
+4 0
+4 3
+}
+
+3d, unlimited neighbors, cutoff INFINITY
+[        1        6        4
+         6        2        3
+         3        6        6
+         3        2        2
+         2        3        3 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+4d 2 neighbors, cutoff 5
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+1 3
+3 1
+3 4
+4 3
+}
+
+4d 1 neighbors, cutoff INFINITY
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+1 3
+2 0
+3 1
+4 3
+}
+
+4d unlimited neighbors, cutoff INFINITY
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 1
+0 2
+0 3
+0 4
+1 0
+1 2
+1 3
+1 4
+2 0
+2 1
+2 3
+2 4
+3 0
+3 1
+3 2
+3 4
+4 0
+4 1
+4 2
+4 3
+}
+
+4d unlimited neighbors, cutoff 8
+[        1        6        4        4
+         6        2        3        3
+         3        6        6        5
+         3        2        2        3
+         2        3        3        4 ]
+directed: true
+vcount: 5
+edges: {
+0 2
+0 4
+1 3
+1 4
+2 0
+3 1
+3 4
+4 0
+4 1
+4 3
+}

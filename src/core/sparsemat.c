@@ -1201,217 +1201,6 @@ igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
-                                 igraph_bool_t directed) {
-
-    igraph_vector_int_t edges;
-    CS_INT no_of_nodes = A->cs->m;
-    CS_INT no_of_edges = A->cs->p[A->cs->n];
-    CS_INT *p = A->cs->p;
-    CS_INT *i = A->cs->i;
-    igraph_integer_t from = 0;
-    igraph_integer_t to = 0;
-    igraph_integer_t e = 0;
-
-    if (no_of_nodes != A->cs->n) {
-        IGRAPH_ERROR("Cannot create graph object from non-square matrix.", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
-
-    while (*p < no_of_edges) {
-        while (to < * (p + 1)) {
-            if (directed || from >= *i) {
-                VECTOR(edges)[e++] = from;
-                VECTOR(edges)[e++] = (*i);
-            }
-            to++;
-            i++;
-        }
-        from++;
-        p++;
-    }
-    igraph_vector_int_resize(&edges, e);
-
-    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t *A,
-                                      igraph_bool_t directed) {
-
-    igraph_vector_int_t edges;
-    CS_INT no_of_nodes = A->cs->m;
-    CS_INT no_of_edges = A->cs->nz;
-    CS_INT *i = A->cs->p;
-    CS_INT *j = A->cs->i;
-    igraph_integer_t e;
-
-    if (no_of_nodes != A->cs->n) {
-        IGRAPH_ERROR("Cannot create graph object from non-square matrix.", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
-
-    for (e = 0; e < 2 * no_of_edges; i++, j++) {
-        if (directed || *i >= *j) {
-            VECTOR(edges)[e++] = (*i);
-            VECTOR(edges)[e++] = (*j);
-        }
-    }
-    igraph_vector_int_resize(&edges, e);
-
-    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_sparsemat
- * \brief Creates an igraph graph from a sparse matrix.
- *
- * One edge is created for each non-zero entry in the matrix. If you
- * have a symmetric matrix, and want to create an undirected graph,
- * then delete the entries in the upper diagonal first, or call \ref
- * igraph_simplify() on the result graph to eliminate the multiple
- * edges.
- *
- * \param graph Pointer to an uninitialized igraph_t object, the
- *    graphs is stored here.
- * \param A The input matrix, in triplet or column-compressed format.
- * \param directed Whether to create a directed graph.
- * \return Error code.
- *
- * Time complexity: TODO.
- */
-
-igraph_error_t igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
-                     igraph_bool_t directed) {
-
-    if (igraph_sparsemat_is_cc(A)) {
-        return (igraph_i_sparsemat_cc(graph, A, directed));
-    } else {
-        return (igraph_i_sparsemat_triplet(graph, A, directed));
-    }
-}
-
-static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A,
-                                          igraph_bool_t directed, const char *attr,
-                                          igraph_bool_t loops,
-                                          igraph_vector_int_t *edges,
-                                          igraph_vector_t *weights) {
-
-    CS_INT no_of_edges = A->cs->p[A->cs->n];
-    CS_INT *p = A->cs->p;
-    CS_INT *i = A->cs->i;
-    CS_ENTRY *x = A->cs->x;
-    igraph_integer_t from = 0;
-    igraph_integer_t to = 0;
-    igraph_integer_t e = 0, w = 0;
-
-    IGRAPH_UNUSED(attr);
-
-    IGRAPH_CHECK(igraph_vector_int_resize(edges, no_of_edges * 2));
-    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
-
-    while (*p < no_of_edges) {
-        while (to < * (p + 1)) {
-            if ( (loops || from != *i) && (directed || from >= *i) && *x != 0) {
-                VECTOR(*edges)[e++] = (*i);
-                VECTOR(*edges)[e++] = from;
-                VECTOR(*weights)[w++] = (*x);
-            }
-            to++;
-            i++;
-            x++;
-        }
-        from++;
-        p++;
-    }
-
-    igraph_vector_int_resize(edges, e); /* shrinks */
-    igraph_vector_resize(weights, w); /* shrinks */
-
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A,
-                                               igraph_bool_t directed,
-                                               const char *attr,
-                                               igraph_bool_t loops,
-                                               igraph_vector_int_t *edges,
-                                               igraph_vector_t *weights) {
-
-    IGRAPH_UNUSED(A); IGRAPH_UNUSED(directed); IGRAPH_UNUSED(attr);
-    IGRAPH_UNUSED(loops); IGRAPH_UNUSED(edges); IGRAPH_UNUSED(weights);
-
-    /* TODO */
-    IGRAPH_ERROR("Triplet matrices are not implemented",
-                 IGRAPH_UNIMPLEMENTED);
-}
-
-igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
-                              igraph_bool_t directed, const char *attr,
-                              igraph_bool_t loops) {
-
-    igraph_vector_int_t edges;
-    CS_INT pot_edges = igraph_i_sparsemat_count_elements(A);
-    const char* default_attr = "weight";
-    igraph_attribute_record_list_t attrs;
-    igraph_attribute_record_t attr_rec;
-    CS_INT no_of_nodes = A->cs->m;
-
-    if (no_of_nodes != A->cs->n) {
-        IGRAPH_ERROR("Cannot create graph object from non-square matrix.", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, pot_edges * 2);
-
-    /* Prepare attribute record list */
-    IGRAPH_CHECK(igraph_attribute_record_list_init(&attrs, 0));
-    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &attrs);
-
-    /* Prepare attribute record */
-    IGRAPH_CHECK(igraph_attribute_record_init(
-        &attr_rec, attr ? attr : default_attr, IGRAPH_ATTRIBUTE_NUMERIC
-    ));
-    IGRAPH_FINALLY(igraph_attribute_record_destroy, &attr_rec);
-
-    /* Convert sparse matrix, storing weights in the attribute record */
-    if (igraph_sparsemat_is_cc(A)) {
-        IGRAPH_CHECK(igraph_i_weighted_sparsemat_cc(A, directed, attr, loops,
-                     &edges, attr_rec.value.as_vector));
-    } else {
-        IGRAPH_CHECK(igraph_i_weighted_sparsemat_triplet(A, directed, attr,
-                     loops, &edges,
-                     attr_rec.value.as_vector));
-    }
-
-    /* Transfer ownership of attribute record to attribute record list */
-    IGRAPH_CHECK(igraph_attribute_record_list_push_back(&attrs, &attr_rec));
-    IGRAPH_FINALLY_CLEAN(1);
-
-    /* Create graph */
-    IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
-    if (igraph_vector_int_size(&edges) > 0) {
-        IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attrs));
-    }
-    IGRAPH_FINALLY_CLEAN(1);
-
-    /* Cleanup */
-    igraph_attribute_record_list_destroy(&attrs);
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
-}
-
 #define CHECK(x) if ((x)<0) { IGRAPH_ERROR("Cannot write to file", IGRAPH_EFILE); }
 
 /**
@@ -2190,7 +1979,7 @@ igraph_error_t igraph_sparsemat_as_matrix(igraph_matrix_t *res,
  * \brief Maximum of a sparse matrix.
  *
  * \param A The input matrix, column-compressed.
- * \return The maximum in the input matrix, or \c IGRAPH_NEGINFINITY
+ * \return The maximum in the input matrix, or <code>-IGRAPH_INFINITY</code>
  *    if the matrix has zero elements.
  *
  * Time complexity: TODO.
@@ -2206,7 +1995,7 @@ igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A) {
     ptr = A->cs->x;
     n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
-        return IGRAPH_NEGINFINITY;
+        return -IGRAPH_INFINITY;
     }
     res = *ptr;
     for (i = 1; i < n; i++, ptr++) {
@@ -2226,7 +2015,7 @@ igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A) {
  * \brief Minimum of a sparse matrix.
  *
  * \param A The input matrix, column-compressed.
- * \return The minimum in the input matrix, or \c IGRAPH_POSINFINITY
+ * \return The minimum in the input matrix, or \c IGRAPH_INFINITY
  *    if the matrix has zero elements.
  *
  * Time complexity: TODO.
@@ -2242,7 +2031,7 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
     ptr = A->cs->x;
     n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
-        return IGRAPH_POSINFINITY;
+        return IGRAPH_INFINITY;
     }
     res = *ptr;
     for (i = 1; i < n; i++, ptr++) {
@@ -2259,9 +2048,9 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
  *
  * \param A The input matrix, column-compressed.
  * \param min The minimum in the input matrix is stored here, or \c
- *    IGRAPH_POSINFINITY if the matrix has zero elements.
- * \param max The maximum in the input matrix is stored here, or \c
- *    IGRAPH_NEGINFINITY if the matrix has zero elements.
+ *    IGRAPH_INFINITY if the matrix has zero elements.
+ * \param max The maximum in the input matrix is stored here, or
+ *    <code>-IGRAPH_INFINITY</code> if the matrix has zero elements.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -2278,8 +2067,8 @@ igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
     ptr = A->cs->x;
     n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
-        *min = IGRAPH_POSINFINITY;
-        *max = IGRAPH_NEGINFINITY;
+        *min = IGRAPH_INFINITY;
+        *max = -IGRAPH_INFINITY;
         return IGRAPH_SUCCESS;
     }
     *min = *max = *ptr;

@@ -211,8 +211,6 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
  * \function igraph_transitive_closure
  * \brief Computes the transitive closure of a graph.
  *
- * \experimental
- *
  * The resulting graph will have an edge from vertex \c i to vertex \c j
  * if \c j is reachable from \c i.
  *

@@ -56,7 +56,7 @@ int main(void) {
     igraph_chung_lu_game(&g, &outdeg, NULL, false, IGRAPH_CHUNG_LU_ORIGINAL);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
-    igraph_is_simple(&g, &simple);
+    igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
@@ -70,7 +70,7 @@ int main(void) {
     igraph_chung_lu_game(&g, &outdeg, &indeg, false, IGRAPH_CHUNG_LU_ORIGINAL);
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
-    igraph_is_simple(&g, &simple);
+    igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
@@ -97,7 +97,7 @@ int main(void) {
     igraph_chung_lu_game(&g, &outdeg, NULL, false, IGRAPH_CHUNG_LU_MAXENT);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
-    igraph_is_simple(&g, &simple);
+    igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
@@ -111,7 +111,7 @@ int main(void) {
     igraph_chung_lu_game(&g, &outdeg, &indeg, false, IGRAPH_CHUNG_LU_MAXENT);
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
-    igraph_is_simple(&g, &simple);
+    igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
@@ -127,7 +127,7 @@ int main(void) {
     igraph_chung_lu_game(&g, &outdeg, NULL, false, IGRAPH_CHUNG_LU_NR);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
-    igraph_is_simple(&g, &simple);
+    igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
@@ -141,7 +141,7 @@ int main(void) {
     igraph_chung_lu_game(&g, &outdeg, &indeg, false, IGRAPH_CHUNG_LU_NR);
     IGRAPH_ASSERT(igraph_is_directed(&g));
     IGRAPH_ASSERT(igraph_vcount(&g) == igraph_vector_size(&outdeg));
-    igraph_is_simple(&g, &simple);
+    igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
     IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
