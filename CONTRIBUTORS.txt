@@ -71,6 +71,9 @@ Gulshan Kumar (@gulshan-123)
 Carlos Planelles (@carlos-planelles)
 Dev_Lohani (@devlohani99)
 Lucas Lopes Felipe (@lucaslopes)
+Sarah Rashidi (@its-serah)
+Zara Zong (@minifinity)
+Arnór Friðriksson (@Zepeacedust)
 
 This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
 
