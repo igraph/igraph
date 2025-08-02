@@ -97,7 +97,6 @@ igraph_error_t igraph_rich_club_sequence(
 
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_integer_t ecount = igraph_ecount(graph);
-    igraph_vector_t remaining_total_weight;
     igraph_vector_int_t order_of;
 
     // Error handling: invalid vertex_order and weights sizes
@@ -118,11 +117,10 @@ igraph_error_t igraph_rich_club_sequence(
         directed = false;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&remaining_total_weight, vcount);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&order_of, vcount);
-
     IGRAPH_CHECK(igraph_vector_resize(res, vcount));
+    igraph_vector_null(res);
 
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order_of, vcount);
     IGRAPH_CHECK(igraph_invert_permutation(vertex_order, &order_of));
 
     igraph_bool_t warning_issued = false;
@@ -141,14 +139,14 @@ igraph_error_t igraph_rich_club_sequence(
         igraph_integer_t order_v2 = VECTOR(order_of)[v2];
 
         igraph_integer_t edge_removal_index = (order_v1 < order_v2 ? order_v1 : order_v2);
-        VECTOR(remaining_total_weight)[edge_removal_index] += (weights ? VECTOR(*weights)[eid] : 1);
+        VECTOR(*res)[edge_removal_index] += (weights ? VECTOR(*weights)[eid] : 1);
     }
 
     // remaining_total_weight vector: edges (or total edge weight) remaining after i removals
     igraph_real_t total = 0;
     for (igraph_integer_t i = vcount - 1; i >= 0; i--) {
-        total += VECTOR(remaining_total_weight)[i];
-        VECTOR(remaining_total_weight)[i] = total;
+        total += VECTOR(*res)[i];
+        VECTOR(*res)[i] = total;
     }
 
     // Normalize edge counts to densities
@@ -156,14 +154,13 @@ igraph_error_t igraph_rich_club_sequence(
         for (igraph_integer_t i = 0; i < vcount; i++) {
             // (vcount - i) = the number of vertices left in this loop
             VECTOR(*res)[i] =
-                    VECTOR(remaining_total_weight)[i] /
+                    VECTOR(*res)[i] /
                     total_possible_edges(vcount - i, directed, loops);
         }
     }
 
     igraph_vector_int_destroy(&order_of);
-    igraph_vector_destroy(&remaining_total_weight);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
