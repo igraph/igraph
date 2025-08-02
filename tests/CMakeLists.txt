@@ -353,7 +353,6 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
-  igraph_rich_club
   igraph_simple_cycles
   igraph_similarity
   igraph_transitive_closure
@@ -369,6 +368,7 @@ add_legacy_tests(
   paths
   random_spanning_tree
   reachability
+  rich_club
   single_target_shortest_path
   topological_sorting
 )
