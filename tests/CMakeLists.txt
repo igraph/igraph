@@ -373,6 +373,7 @@ add_legacy_tests(
   paths
   random_spanning_tree
   reachability
+  rich_club
   single_target_shortest_path
   topological_sorting
 )
