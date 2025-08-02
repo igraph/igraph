@@ -490,6 +490,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_coloring
+  is_coloring
 )
 
 
