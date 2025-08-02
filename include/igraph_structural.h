@@ -144,6 +144,7 @@ IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
     const igraph_vector_t *weights,
     igraph_vector_t *res,
     const igraph_vector_int_t *vertex_order,
+    igraph_bool_t normalized,
     igraph_bool_t loops,
     igraph_bool_t directed);
 

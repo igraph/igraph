@@ -966,6 +966,7 @@ igraph_rich_club_sequence:
       GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
       OUT VECTOR res,
       INDEX_VECTOR vertex_order,
+      BOOLEAN normalized=True,
       BOOLEAN loops=False,
       BOOLEAN directed=True
   DEPS: weights ON graph

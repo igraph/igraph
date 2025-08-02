@@ -46,31 +46,37 @@ static igraph_real_t total_possible_edges(igraph_integer_t vcount,
  *
  * \experimental
  *
- * This function takes a graph and a vertex ordering as input, sequentially removes the
- * vertices in the given order, and calculates the density of the subgraph after each
- * removal.
+ * This function takes a graph and a vertex ordering as input, sequentially
+ * removes the vertices in the given order, and calculates the density of the
+ * remaining subgraph after each removal.
  *
  * </para><para>
- * Density is calculated as the ratio of the number of edges (or total edge weight, if
- * weighted) to the number of total possible edges in the graph. The latter is dependent
- * on whether the graph is directed and whether self-loops are assumed to be possible: for
- * undirected graphs without self-loops, this total is given by <code>n(n-1)/2</code>,
- * and for directed graphs by <code>n(n-1)</code>. When self-loops are allowed, these
- * are adjusted to <code>n(n+1)/2</code> for undirected and <code>n^2</code> for directed
- * graphs.
+ * Density is calculated as the ratio of the number of edges (or total edge
+ * weight, if weighted) to the number of total possible edges in the graph.
+ * The latter is dependent on whether the graph is directed and whether
+ * self-loops are assumed to be possible: for undirected graphs without
+ * self-loops, this total is given by <code>n(n-1)/2</code>,
+ * and for directed graphs by <code>n(n-1)</code>.
+ * When self-loops are allowed, these are adjusted to <code>n(n+1)/2</code>
+ * for undirected and <code>n^2</code> for directed graphs.
  *
  * </para><para>
- * Vertex order can be sorted by degree so that the resulting density sequence helps
- * reveal how interconnected a graph is across different degree levels, or the presence
- * of a "rich-club" effect.
+ * Vertex order can be sorted by degree so that the resulting density sequence
+ * helps reveal how interconnected a graph is across different degree levels,
+ * or the presence of a "rich-club" effect.
  *
  * \param graph The graph object to analyze.
- * \param weights Vector with weight of edges. If \c NULL all weights are
+ * \param weights Vector of edge weights. If \c NULL all weights are
  *    assumed to be 1.
- * \param res Vector containing the result. It must be initialized and
- *    will be resized to be the appropriate size.
+ * \param res Initialized vector, the result will be written here. <code>res[i]</code>
+ *    contain the density of the remaining graph after \c i vertices have been
+ *    removed. If \p normalized is set to \c false, it contains the remaining
+ *    edge count (or remaining total edge weights if weights were given).
  * \param vertex_order Vector giving the order in which vertices are removed.
- * \param loops Whether self-loops are assumed to be possible.
+ * \param normalized If \c false, return edge counts (or total edge weights).
+ *    If \c true, divide by the largest possible edge count to obtain densities.
+ * \param loops Whether self-loops are assumed to be possible. Ignored when
+ *    normalized is not requested.
  * \param directed If false, directed graphs will be treated as undirected.
  *    Ignored with undirected graphs.
  *
@@ -86,6 +92,7 @@ igraph_error_t igraph_rich_club_sequence(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *res,
         const igraph_vector_int_t *vertex_order,
+        igraph_bool_t normalized,
         igraph_bool_t loops, igraph_bool_t directed) {
 
     const igraph_integer_t vcount = igraph_vcount(graph);
@@ -124,9 +131,10 @@ igraph_error_t igraph_rich_club_sequence(
     for (igraph_integer_t eid = 0; eid < ecount; eid++) {
         igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
         igraph_integer_t v2 = IGRAPH_TO(graph, eid);
-        if (!loops && !warning_issued && v1 == v2) {
-            IGRAPH_WARNING("Self-loop encountered while `loops = false`. "
-                           "Proceeding as if loops were not possible (density computed accordingly).");
+        if (!loops && normalized && !warning_issued && v1 == v2) {
+            IGRAPH_WARNING("Self-loops were requested to be assumed absent, "
+                           "but encountered a self-loop. Density calculations will proceed "
+                           "with the assumption of no loops.");
             warning_issued = true;
         }
         igraph_integer_t order_v1 = VECTOR(order_of)[v1]; // order of endpoints
@@ -143,12 +151,14 @@ igraph_error_t igraph_rich_club_sequence(
         VECTOR(remaining_total_weight)[i] = total;
     }
 
-    // density calculation
-    for (igraph_integer_t i = 0; i < vcount; i++) {
-        // (vcount - i) = the number of vertices left in this loop
-        VECTOR(*res)[i] =
-                VECTOR(remaining_total_weight)[i] /
-                total_possible_edges(vcount - i, directed, loops);
+    // Normalize edge counts to densities
+    if (normalized) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
+            // (vcount - i) = the number of vertices left in this loop
+            VECTOR(*res)[i] =
+                    VECTOR(remaining_total_weight)[i] /
+                    total_possible_edges(vcount - i, directed, loops);
+        }
     }
 
     igraph_vector_int_destroy(&order_of);

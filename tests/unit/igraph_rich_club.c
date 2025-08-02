@@ -31,7 +31,7 @@ void null_graph(void) {
 
     /* output */
     printf("Test 1: null graph\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, false, false);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false, false);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -51,7 +51,7 @@ void singleton_graph(void) {
 
     /* output */
     printf("Test 2: singleton graph\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, false, false);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false, false);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -75,13 +75,13 @@ void undirected_no_loop_graph(void) {
 
     /* output */
     printf("Test 3a: undirected, no-loop graph (in-order vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, false, false);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false, false);
     print_vector(&result);
     printf("\n");
 
     igraph_vector_int_reverse(&vertex_order);
     printf("Test 3b: undirected, no-loop graph (reverse vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, false, false);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false, false);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -105,13 +105,13 @@ void directed_no_loop_graph(void) {
 
     /* output */
     printf("Test 4a: directed, no-loop graph (in-order vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, false, true);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false, true);
     print_vector(&result);
     printf("\n");
 
     igraph_vector_int_reverse(&vertex_order);
     printf("Test 4b: directed, no-loop graph (reverse vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, false, true);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false, true);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -135,13 +135,13 @@ void undirected_loop_graph(void) {
 
     /* output */
     printf("Test 5a: undirected, loop graph (in-order vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, true, false);
     print_vector(&result);
     printf("\n");
 
     igraph_vector_int_reverse(&vertex_order);
     printf("Test 5b: undirected, loop graph (reverse vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, false);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, true, false);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -165,13 +165,13 @@ void directed_loop_graph(void) {
 
     /* output */
     printf("Test 6a: directed, loop graph (in-order vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, true);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, true, true);
     print_vector(&result);
     printf("\n");
 
     igraph_vector_int_reverse(&vertex_order);
     printf("Test 6b: directed, loop graph (reverse vertex removal)\n");
-    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, true);
+    igraph_rich_club_sequence(&graph, NULL, &result, &vertex_order, true, true, true);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -204,7 +204,7 @@ void weighted_graph(void) {
     /* output */
     printf("Test 7a: weighted graph\n");
     igraph_rich_club_sequence(&graph, &weights, &result,
-                              &vertex_order, false, false);
+                              &vertex_order, true, false, false);
     print_vector(&result);
     printf("\n");
 
@@ -221,7 +221,7 @@ void weighted_graph(void) {
 
     printf("Test 7b: weighted graph (non-integer weights)\n");
     igraph_rich_club_sequence(&graph, &weights, &result,
-                              &vertex_order, false, false);
+                              &vertex_order, true, false, false);
     print_vector(&result);
 
     igraph_vector_int_destroy(&vertex_order);
@@ -244,14 +244,14 @@ void error_checks(void) {
     // wrong vertex order size (!= number of vertices)
     igraph_vector_int_init(&vertex_order, 1);
     CHECK_ERROR(igraph_rich_club_sequence(&graph, NULL, &result,
-                                          &vertex_order, false, false),
+                                          &vertex_order, true, false, false),
                 IGRAPH_EINVAL);
     igraph_vector_int_resize(&vertex_order, vcount);
 
     // wrong weights vector size (!= number of edges)
     igraph_vector_init(&weights, 1);
     CHECK_ERROR(igraph_rich_club_sequence(&graph, &weights, &result,
-                                          &vertex_order, false, false),
+                                          &vertex_order, true, false, false),
                 IGRAPH_EINVAL);
 
     igraph_vector_destroy(&weights);
