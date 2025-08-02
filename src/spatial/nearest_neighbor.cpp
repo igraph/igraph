@@ -68,6 +68,7 @@ public:
     std::vector<igraph_real_t> distances;
 
     using DistanceType = igraph_real_t;
+    using IndexType = igraph_integer_t;
 
     GraphBuildingResultSet(const igraph_integer_t max_neighbors, const igraph_real_t max_distance) :
         max_distance(max_distance),
@@ -109,6 +110,7 @@ public:
         current_vertex = current_vertex_;
     }
 
+    // Never called. Necessary to conform to the interface.
     void sort() { }
 
     igraph_integer_t size() const {
@@ -135,7 +137,7 @@ template <typename Metric, igraph_integer_t Dimension>
 static igraph_error_t neighbor_helper(
         igraph_t *graph,
         const igraph_matrix_t *points,
-        igraph_integer_t neighbors,
+        igraph_integer_t k,
         igraph_real_t cutoff,
         igraph_integer_t dimension,
         igraph_bool_t directed) {
@@ -152,7 +154,7 @@ static igraph_error_t neighbor_helper(
     igraph_vector_t current_point;
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, dimension);
 
-    igraph_integer_t neighbor_count = neighbors >= 0 ? neighbors : point_count;
+    igraph_integer_t neighbor_count = k >= 0 ? k : point_count;
 
     GraphBuildingResultSet results(neighbor_count, cutoff);
     std::vector<igraph_integer_t> edges;
@@ -193,7 +195,7 @@ template <typename Metric>
 static igraph_error_t dimension_dispatcher(
         igraph_t *graph,
         const igraph_matrix_t *points,
-        igraph_integer_t neighbors,
+        igraph_integer_t k,
         igraph_real_t cutoff,
         igraph_integer_t dimension,
         igraph_bool_t directed) {
@@ -202,13 +204,13 @@ static igraph_error_t dimension_dispatcher(
     case 0:
         IGRAPH_ERROR("0-dimensional points are not supported.", IGRAPH_EINVAL);
     case 1:
-        return neighbor_helper<Metric, 1>(graph, points, neighbors, cutoff, dimension, directed);
+        return neighbor_helper<Metric, 1>(graph, points, k, cutoff, dimension, directed);
     case 2:
-        return neighbor_helper<Metric, 2>(graph, points, neighbors, cutoff, dimension, directed);
+        return neighbor_helper<Metric, 2>(graph, points, k, cutoff, dimension, directed);
     case 3:
-        return neighbor_helper<Metric, 3>(graph, points, neighbors, cutoff, dimension, directed);
+        return neighbor_helper<Metric, 3>(graph, points, k, cutoff, dimension, directed);
     default:
-        return neighbor_helper<Metric, -1>(graph, points, neighbors, cutoff, dimension, directed);
+        return neighbor_helper<Metric, -1>(graph, points, k, cutoff, dimension, directed);
     }
 }
 
@@ -226,7 +228,7 @@ static igraph_error_t dimension_dispatcher(
  *    the graph. Each row is a point, dimensionality is inferred from the
  *    column count.
  * \param metric The distance metric to use. See \ref igraph_metric_t.
- * \param neighbors How many neighbors will be added for each vertex, set to
+ * \param k At most how many neighbors will be added for each vertex, set to
  *    a negative value to ignore.
  * \param cutoff Maximum distance at which connections will be made, set to a
  *    negative value or \c IGRAPH_INFINITY to ignore.
@@ -277,5 +279,5 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
             IGRAPH_ERROR("Invalid metric.", IGRAPH_EINVAL);
     }
 
-IGRAPH_HANDLE_EXCEPTIONS_END;
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 }
