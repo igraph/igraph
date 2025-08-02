@@ -310,6 +310,8 @@ add_library(
   misc/sir.c
   misc/spanning_trees.c
 
+  spatial/nearest_neighbor.cpp
+
   internal/glpk_support.c
   internal/hacks.c
   internal/lsap.c

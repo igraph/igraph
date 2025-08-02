@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Spatial">
+<title>Spatial operations</title>
+
+<section id="spatial-helpers"><title>Convenience functions</title>
+<!-- doxrox-include igraph_metric_t -->
+</section>
+
+<section id="spatial-constructors"><title>Spatial constructors</title>
+<!-- doxrox-include igraph_nearest_neighbor_graph -->
+</section>
+
+</chapter>
