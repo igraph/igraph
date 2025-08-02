@@ -139,6 +139,16 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
     const igraph_t *graph, igraph_vector_int_t *result,
     const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
+IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
+    const igraph_t *graph,
+    const igraph_vector_t *weights,
+    igraph_vector_t *res,
+    const igraph_vector_int_t *vertex_order,
+    igraph_bool_t normalized,
+    igraph_bool_t loops,
+    igraph_bool_t directed);
+
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
