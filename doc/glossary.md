@@ -1,4 +1,4 @@
-<!-- 
+<!--
   The glossary is generated from these Markdown sources using
     pandoc glossary.md --to docbook > glossary.xml
   and manually updated to fit into the documentation system.

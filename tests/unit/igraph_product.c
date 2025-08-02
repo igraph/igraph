@@ -27,7 +27,7 @@ void test_grid_vs_square_lattice(void) {
     igraph_ring(&p4, 4, IGRAPH_UNDIRECTED, false, false);  // P4
     igraph_ring(&p3, 3, IGRAPH_UNDIRECTED, false, false);  // P3
     igraph_product(&product, &p4, &p3, IGRAPH_PRODUCT_CARTESIAN);
-    
+
     igraph_vector_int_t dims;
     igraph_vector_int_init(&dims, 2);
     VECTOR(dims)[0] = 4;
@@ -174,7 +174,7 @@ void test_multigraph_cartesian(void) {
     IGRAPH_ASSERT(igraph_vcount(&product) == 6);
 
     // verified by v1*e2 + v2*e1, see: https://en.wikipedia.org/wiki/Graph_product
-    IGRAPH_ASSERT(igraph_ecount(&product) == 17); 
+    IGRAPH_ASSERT(igraph_ecount(&product) == 17);
 
     igraph_destroy(&g1);
     igraph_destroy(&g2);

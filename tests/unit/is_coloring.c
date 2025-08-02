@@ -237,7 +237,7 @@ void test_edge_coloring(void) {
     igraph_is_edge_coloring(&graph, &types, &res);
     IGRAPH_ASSERT(res);
     igraph_vector_int_destroy(&types);
-    
+
     /* Same colors for self-loop and adjacent edge - should be invalid */
     igraph_vector_int_init_int(&types, 2, 0, 0);  /* Same colors - should be invalid */
     igraph_is_edge_coloring(&graph, &types, &res);
