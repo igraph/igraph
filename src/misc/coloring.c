@@ -26,7 +26,6 @@
 #include "core/genheap.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "graph/internal.h" /* igraph_i_incident() */
 
 /* COLORED_NEIGHBORS: Choose vertices based on the number of already coloured neighbours. */
 
@@ -497,7 +496,7 @@ igraph_error_t igraph_is_edge_coloring(
 
     /* For each vertex, check that all incident edges have different colors */
     for (igraph_integer_t v = 0; v < vcount; v++) {
-        IGRAPH_CHECK(igraph_i_incident(graph, &edges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_incident(graph, &edges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
 
         /* Get sorted edge color list */
         IGRAPH_CHECK(igraph_vector_int_index(types, &edge_colors, &edges));

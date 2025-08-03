@@ -19,7 +19,7 @@
 #include "igraph_structural.h"
 
 #include "igraph_interface.h"
-#include "igraph_topology.h"
+#include "igraph_isomorphism.h"
 
 /* Returns the total number of possible edges given the number of vertices in a graph,
  * whether it is directed, and whether loops should be assumed possible.
