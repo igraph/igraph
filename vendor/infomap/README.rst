@@ -154,9 +154,9 @@ Infomap is released under a dual licence.
 
 To give everyone maximum freedom to make use of Infomap
 and derivative works, we make the code open source under
-the GNU Affero General Public License version 3 or any
-later version (see `LICENSE_AGPLv3.txt`_).
+the GNU General Public License version 3 or any
+later version (see `LICENSE_GPLv3.txt`_).
 
 For a non-copyleft license, please contact us.
 
-.. _LICENSE_AGPLv3.txt: https://github.com/mapequation/infomap/blob/master/LICENSE_AGPLv3.txt
+.. _LICENSE_GPLv3.txt: https://github.com/mapequation/infomap/blob/master/LICENSE_GPLv3.txt

@@ -1,9 +1,23 @@
-file(GLOB_RECURSE infomap_src CONFIGURE_DEPENDS "src/*.cpp")
-
+# Declare the files needed to compile our vendored Infomap copy
 add_library(infomap_vendored
   OBJECT
   EXCLUDE_FROM_ALL
-  ${infomap_src}
+  src/core/MetaMapEquation.cpp
+  src/core/MemMapEquation.cpp
+  src/core/InfoEdge.cpp
+  src/core/BiasedMapEquation.cpp
+  src/core/StateNetwork.cpp
+  src/core/iterators/InfomapIterator.cpp
+  src/core/InfomapBase.cpp
+  src/core/InfoNode.cpp
+  src/io/Network.cpp
+  src/io/ClusterMap.cpp
+  src/io/ProgramInterface.cpp
+  src/io/Output.cpp
+  src/io/Config.cpp
+  src/utils/Log.cpp
+  src/utils/FileURI.cpp
+  src/utils/FlowCalculator.cpp
 )
 
 target_include_directories(
