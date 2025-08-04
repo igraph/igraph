@@ -61,8 +61,8 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
     // Validate the stretch factor
     igraph_matrix_init(&res_spanner, 0, 0);
     igraph_matrix_init(&res_graph, 0, 0);
-    igraph_distances_dijkstra(graph, &res_graph, igraph_vss_all(), igraph_vss_all(), weights, IGRAPH_ALL);
-    igraph_distances_dijkstra(&spanner_graph, &res_spanner, igraph_vss_all(), igraph_vss_all(), &spanner_weights, IGRAPH_ALL);
+    igraph_distances(graph, weights, &res_graph, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
+    igraph_distances(&spanner_graph, &spanner_weights, &res_spanner, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
     for (igraph_integer_t x = 0; x < no_of_nodes; x++) {
         for (igraph_integer_t y = 0; y < no_of_nodes; y++) {
             if (x == y) {

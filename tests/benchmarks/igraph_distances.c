@@ -47,7 +47,7 @@ int main(void) {
     }
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted, " TOSTR(REP) "x",
-          REPEAT(igraph_distances(&g, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
+          REPEAT(igraph_distances(&g, NULL, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
     );
     BENCH(" 2 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Dijkstra, " TOSTR(REP) "x",
           REPEAT(igraph_distances_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
@@ -106,7 +106,7 @@ int main(void) {
     }
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted, " TOSTR(REP) "x",
-          REPEAT(igraph_distances(&g, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
+          REPEAT(igraph_distances(&g, NULL, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
     );
     BENCH(" 2 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Dijkstra, " TOSTR(REP) "x",
           REPEAT(igraph_distances_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
@@ -165,7 +165,7 @@ int main(void) {
     }
 
     BENCH(" 1 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted, " TOSTR(REP) "x",
-          REPEAT(igraph_distances(&g, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
+          REPEAT(igraph_distances(&g, NULL, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT), REP);
     );
     BENCH(" 2 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Dijkstra, " TOSTR(REP) "x",
           REPEAT(igraph_distances_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)

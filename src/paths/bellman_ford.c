@@ -93,7 +93,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
          n times.
     */
     if (!weights) {
-        return igraph_distances(graph, res, from, to, mode);
+        return igraph_distances(graph, NULL, res, from, to, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -313,7 +313,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     int counter = 0;
 
     if (!weights) {
-        return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
+        return igraph_get_shortest_paths(graph, NULL, vertices, edges, from, to, mode,
                                          parents, inbound_edges);
     }
 
