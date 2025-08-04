@@ -250,6 +250,182 @@ igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
 
 /**
  * \ingroup set
+ * \function igraph_set_push_back
+ * \brief Adds an element to the end of a set. Fail if it is smaller than some elements.
+ *
+ * \param set The set object.
+ * \param e The element to be added.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: input can't be inserted at the back.
+ *         \c IGRAPH_ENOMEM: not enough memory.
+ *
+ * Time complexity: O(1).
+ */
+igraph_error_t igraph_set_push_back(igraph_set_t *set, igraph_integer_t e) {
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
+
+    igraph_integer_t size = igraph_set_size(set);
+    if (size > 0) {
+        igraph_integer_t last = set->stor_begin[size - 1];
+        if (last == e) { return IGRAPH_SUCCESS; }  // element already in the set
+        if (last > e) { return IGRAPH_EINVAL; }  // element can't be last
+    }
+
+    // if we're here, the element is safe to push to end of the set.
+    // make sure we have enough capacity
+    if (set->stor_end == set->end) {
+        igraph_integer_t new_size = size < IGRAPH_INTEGER_MAX/2 ? size * 2 : IGRAPH_INTEGER_MAX;
+        if (size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot add to set, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
+        if (new_size == 0) {
+            new_size = 1;
+        }
+        IGRAPH_CHECK(igraph_set_reserve(set, new_size));
+    }
+
+    // push element
+    *(set->end) = e;
+    set->end++;
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup set
+ * \function igraph_set_remove
+ * \brief Adds an element to the set.
+ *
+ * If element not present, does nothing. Does not change capacity!
+ *
+ * \param set The set object.
+ * \param e The element to be removed.
+ *
+ * Time complexity: O(log(n)), n is the number of elements in \p set.
+ */
+void igraph_set_remove(igraph_set_t *set, igraph_integer_t e) {
+    igraph_integer_t left, right, middle;
+    igraph_integer_t size;
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
+
+    size = igraph_set_size(set);
+    if (size == 0) return;
+
+    /* find the element to remove */
+    // TODO: extract binsearch to own function for add and remove functions
+    // Also why is there an in-house binsearch implementation...
+    left = 0;
+    right = size - 1;
+    while (left < right - 1) {
+        middle = (left + right) / 2;
+        if (SET(*set)[middle] > e) {
+            right = middle;
+        } else if (SET(*set)[middle] < e) {
+            left = middle;
+        } else {
+            left = middle;
+            break;
+        }
+    }
+
+    // make sure left points at e
+    if (right >= 0 && SET(*set)[right] == e) {
+        left = right;
+    }
+
+    // if it still doesn't then element not found, there's nothing to do, return
+    if (SET(*set)[left] != e) return;
+
+    // if the element we found is not the last one, shift all following elements
+    // to the left by one.
+    if (left + 1 < size) {
+        memmove(
+            set->stor_begin + left,
+            set->stor_begin + left + 1,
+            (size - left - 1) * sizeof(set->stor_begin[0])
+        );
+    }
+
+    // delete the last element and return
+    set->end -= 1;
+}
+
+/**
+ * \ingroup set
+ * \function igraph_set_remove
+ * \brief Remove a set of elements from a set.
+ *
+ * Modifies \c set in-place. Computes \c set-to_remove
+ *
+ * \param set The set object.
+ * \param to_remove The element to be removed.
+ *
+ * Time complexity: O(n+m), n and m are the number of elements in \p set and
+ * \p to_remove respectively.
+ */
+void igraph_set_difference(igraph_set_t *set, igraph_set_t *to_remove) {
+    if (igraph_set_empty(set) || igraph_set_empty(to_remove)) return;  // nothing to do
+
+    igraph_integer_t a_read = 0, a_write = 0;  // read and write indices into set
+    igraph_integer_t b_read = 0;  // read index into to_remove
+    igraph_integer_t a_size = igraph_set_size(set);
+    igraph_integer_t b_size = igraph_set_size(to_remove);
+    igraph_integer_t unread, removed = 0;
+
+    igraph_integer_t *A = set->stor_begin;
+    igraph_integer_t *B = to_remove->stor_begin;
+
+    while (true) {
+        // catch b_read up to current a_read state
+        while (b_read < b_size && B[b_read] < A[a_read]) {
+            b_read++;
+        }
+
+        // if ran out of B elements, done
+        if (b_read == b_size) {
+            // there may still be unread A entries, they are all larger than all
+            // element of B so they should all be kept; memmove from read to write.
+            unread = a_size - a_read;
+            if (unread > 0) {
+                memmove(
+                    set->stor_begin+a_write,
+                    set->stor_begin+a_read,
+                    unread * sizeof(set->stor_begin[0])
+                );
+            }
+            break;
+        }
+
+        // catch a_read up to current b_read state
+        while (a_read < a_size && A[a_read] < B[b_read]) {
+            // the elements seen in A are not in B so they are safe to write
+            A[a_write] = A[a_read];
+            a_read++;
+            a_write++; // can't overshoot, since a_write <= a_read always holds
+        }
+
+        // if ran out of A elements, done
+        if (a_read == a_size) {
+            break;
+        }
+
+        // check if A element in B; if it is, it should be removed
+        // that means move read index ahead, but not write index
+        if (A[a_read] == B[b_read]) {
+            removed++;
+            a_read++;
+            b_read++;
+        }
+    }
+
+    // Now a_write points to just after the last element in the new set A\B
+    set->end -= removed;
+}
+
+/**
+ * \ingroup set
  * \function igraph_set_contains
  * \brief Checks whether a given element is in the set or not.
  *

@@ -307,6 +307,7 @@ add_legacy_tests(
   igraph_count_multiple
   igraph_density
   igraph_diameter
+  igraph_diameter_bound
   igraph_diameter_dijkstra
   igraph_diversity
   igraph_distances_floyd_warshall

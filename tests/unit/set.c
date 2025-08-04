@@ -68,6 +68,36 @@ int main(void) {
     if (igraph_set_contains(&set, 42) || !igraph_set_contains(&set, 7)) {
         return 3;
     }
+    
+    /* igraph_set_remove */
+    // remove element in the middle
+    igraph_set_remove(&set, 10);
+    if (igraph_set_size(&set) != 20 || igraph_set_contains(&set, 10)) {
+        return 5;
+    }
+    // remove element not in the set - above, below, middle
+    igraph_set_remove(&set, 25);
+    igraph_set_remove(&set, 10);
+    igraph_set_remove(&set, -25);
+    if (igraph_set_size(&set) != 20) {
+        return 6;
+    }
+    // remove last element
+    igraph_set_remove(&set, 21);
+    if (igraph_set_size(&set) != 19 || igraph_set_contains(&set, 21)) {
+        return 7;
+    }
+    // remove first element
+    igraph_set_remove(&set, 1);
+    if (igraph_set_size(&set) != 18 || igraph_set_contains(&set, 1)) {
+        return 8;
+    }
+    // remove elements around gap
+    igraph_set_remove(&set, 9);
+    igraph_set_remove(&set, 11);
+    if (igraph_set_size(&set) != 16 || igraph_set_contains(&set, 9) || igraph_set_contains(&set, 11)) {
+        return 9;
+    }
 
     /* igraph_set_empty, igraph_set_clear */
     if (igraph_set_empty(&set)) {
@@ -77,8 +107,33 @@ int main(void) {
     if (!igraph_set_empty(&set)) {
         return 2;
     }
-    igraph_set_destroy(&set);
 
+    /* igraph_set_empty for small sets */
+    igraph_set_remove(&set, 10);
+    if (igraph_set_size(&set) != 0) { return 12; }
+    igraph_set_add(&set, 10);
+    igraph_set_remove(&set, 10);
+    if (igraph_set_size(&set) != 0) { return 13; }
+    
+    /* igraph_set_difference 3n\5n*/
+    igraph_set_t small;
+    igraph_set_init(&small, 0);
+    for (i=0; i<=100/3; i++) {  // sets of multiples of 3 and 5
+        igraph_set_add(&set, 3*i);
+        igraph_set_add(&small, 5*i);
+    }
+    IGRAPH_ASSERT(igraph_set_size(&set) == 34);
+    igraph_set_difference(&set, &small);
+    print_set(&set, stdout);
+    IGRAPH_ASSERT(igraph_set_size(&set) == 27);
+    // Special memmove case - when B runs out before A
+    igraph_set_clear(&small);
+    igraph_set_add(&small, 9);
+    igraph_set_difference(&set, &small);
+    print_set(&set, stdout);
+    
+    igraph_set_destroy(&set);
+    igraph_set_destroy(&small);
     VERIFY_FINALLY_STACK();
 
     return 0;

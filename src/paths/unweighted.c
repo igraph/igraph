@@ -599,3 +599,56 @@ igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+// Same as igraph_distances, but takes one input vertex for starting point
+// and returns a vector of distances to all vertices. Unreachable vertices
+// are inf. Instead of taking a graph, takes an adjlist; makes re-calling cheap.
+igraph_error_t igraph_distances_1(const igraph_adjlist_t *adjlist, igraph_vector_t *res, igraph_integer_t from) {
+    igraph_integer_t no_of_nodes = igraph_adjlist_size(adjlist);
+    igraph_bool_t *already_counted;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
+    igraph_vector_int_t *neis;
+    igraph_integer_t i;
+
+    already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
+    IGRAPH_CHECK_OOM(already_counted,
+                    "Insufficient memory for graph distance calculation.");
+    IGRAPH_FINALLY(igraph_free, already_counted);
+
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    igraph_vector_fill(res, IGRAPH_INFINITY);
+
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, from));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
+    already_counted[from] = true;
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    while (!igraph_dqueue_int_empty(&q)) {
+        igraph_integer_t act = igraph_dqueue_int_pop(&q);
+        igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+
+        VECTOR(*res)[act] = actdist;
+
+        neis = igraph_adjlist_get(adjlist, act);
+        igraph_integer_t nei_count = igraph_vector_int_size(neis);
+        for (i = 0; i < nei_count; i++) {
+            igraph_integer_t neighbor = VECTOR(*neis)[i];
+            if (already_counted[neighbor]) {
+                continue;
+            }
+            already_counted[neighbor] = true;
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
+        }
+    }
+
+    /* Clean */
+    IGRAPH_FREE(already_counted);
+    igraph_dqueue_int_destroy(&q);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
