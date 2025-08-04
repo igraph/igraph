@@ -873,13 +873,8 @@ static igraph_error_t community_leiden(
     i_vertex_in_weights = directed ? vertex_in_weights : NULL;
     i_membership = membership;
 
-    /* Clean membership and count number of *clusters */
-
+    /* Clean membership: ensure that cluster indices are 0 <= c < n. */
     IGRAPH_CHECK(igraph_reindex_membership(i_membership, NULL, nb_clusters));
-
-    if (*nb_clusters > n) {
-        IGRAPH_ERROR("Too many communities in membership vector.", IGRAPH_EINVAL);
-    }
 
     /* We start out with no changes, whenever a vertex is moved, this will be set to true. */
     *changed = false;
@@ -1155,7 +1150,8 @@ igraph_error_t igraph_community_leiden(
         igraph_integer_t *nb_clusters,
         igraph_real_t *quality) {
 
-    const igraph_integer_t n = igraph_vcount(graph);
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
     const igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t *i_edge_weights, *i_vertex_out_weights, *i_vertex_in_weights;
     igraph_integer_t i_nb_clusters;
@@ -1169,15 +1165,15 @@ igraph_error_t igraph_community_leiden(
             IGRAPH_ERROR("Cannot start optimization if membership is missing.", IGRAPH_EINVAL);
         }
 
-        if (igraph_vector_int_size(membership) != n) {
-            IGRAPH_ERROR("Initial membership length does not equal the number of vertices.", IGRAPH_EINVAL);
+        if (igraph_vector_int_size(membership) != vcount) {
+            IGRAPH_ERROR("Membership vector length does not equal the number of vertices.", IGRAPH_EINVAL);
         }
     } else {
         if (!membership)
             IGRAPH_ERROR("Membership vector should be supplied and initialized, "
                          "even when not starting optimization from it.", IGRAPH_EINVAL);
 
-        IGRAPH_CHECK(igraph_vector_int_range(membership, 0, n));
+        IGRAPH_CHECK(igraph_vector_int_range(membership, 0, vcount));
     }
 
     /* Check edge weights to possibly use default. */
@@ -1189,6 +1185,10 @@ igraph_error_t igraph_community_leiden(
         IGRAPH_FINALLY(igraph_vector_destroy, i_edge_weights);
         igraph_vector_fill(i_edge_weights, 1);
     } else {
+        if (igraph_vector_size(edge_weights) != ecount) {
+            IGRAPH_ERRORF("Edge weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                          IGRAPH_EINVAL, igraph_vector_size(edge_weights), ecount);
+        }
         i_edge_weights = (igraph_vector_t*)edge_weights;
     }
 
@@ -1197,10 +1197,15 @@ igraph_error_t igraph_community_leiden(
         i_vertex_out_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         IGRAPH_CHECK_OOM(i_vertex_out_weights, "Leiden algorithm failed, could not allocate memory for vertex weights.");
         IGRAPH_FINALLY(igraph_free, i_vertex_out_weights);
-        IGRAPH_CHECK(igraph_vector_init(i_vertex_out_weights, n));
-        IGRAPH_FINALLY(igraph_vector_destroy, i_vertex_out_weights);
+        IGRAPH_VECTOR_INIT_FINALLY(i_vertex_out_weights, vcount);
         igraph_vector_fill(i_vertex_out_weights, 1);
     } else {
+        if (igraph_vector_size(vertex_out_weights) != vcount) {
+            IGRAPH_ERRORF("Vertex %sweight vector length (%" IGRAPH_PRId ") does not match number of vertices (%" IGRAPH_PRId ").",
+                          IGRAPH_EINVAL,
+                          directed ? "out-" : "",
+                          igraph_vector_size(vertex_out_weights), vcount);
+        }
         i_vertex_out_weights = (igraph_vector_t*)vertex_out_weights;
     }
 
@@ -1209,6 +1214,11 @@ igraph_error_t igraph_community_leiden(
          * assume that they are the same as the out-weights.
          * This effectively ignores edge directions. */
         if (vertex_in_weights) {
+            if (igraph_vector_size(vertex_in_weights) != vcount) {
+                IGRAPH_ERRORF("Vertex in-weight vector length (%" IGRAPH_PRId ") does not match number of vertices (%" IGRAPH_PRId ").",
+                              IGRAPH_EINVAL,
+                              igraph_vector_size(vertex_in_weights), vcount);
+            }
             i_vertex_in_weights = (igraph_vector_t*)vertex_in_weights;
         } else {
             i_vertex_in_weights = i_vertex_out_weights;
