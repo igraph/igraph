@@ -946,14 +946,14 @@ igraph_degree_correlation_vector:
     DEPS: weights ON graph
 
 igraph_rich_club_sequence:
-  PARAMS: |-
-      GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
-      OUT VECTOR res,
-      INDEX_VECTOR vertex_order,
-      BOOLEAN normalized=True,
-      BOOLEAN loops=False,
-      BOOLEAN directed=True
-  DEPS: weights ON graph
+    PARAMS: |-
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        OUT VECTOR res,
+        INDEX_VECTOR vertex_order,
+        BOOLEAN normalized=True,
+        BOOLEAN loops=False,
+        BOOLEAN directed=True
+    DEPS: weights ON graph
 
 igraph_strength:
     PARAMS: |-
@@ -1846,15 +1846,13 @@ igraph_get_adjacency:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH,
         OPTIONAL EDGE_WEIGHTS weights, LOOPS loops=ONCE
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_get_adjacency_sparse:
     PARAMS: |-
         GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH,
         OPTIONAL EDGE_WEIGHTS weights, LOOPS loops=ONCE
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, BOOLEAN bycol=False
@@ -1863,15 +1861,13 @@ igraph_get_stochastic:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False,
         OPTIONAL EDGE_WEIGHTS weights
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_get_stochastic_sparse:
     PARAMS: |-
         GRAPH graph, OUT SPARSEMAT sparsemat, BOOLEAN column_wise=False,
         OPTIONAL EDGE_WEIGHTS weights
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_to_directed:
     PARAMS: INOUT GRAPH graph, TODIRECTED mode=MUTUAL
@@ -2124,8 +2120,7 @@ igraph_mincut:
 
 igraph_mincut_value:
     PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITIES capacity
-    DEPS:
-        capacity ON graph
+    DEPS: capacity ON graph
 
 igraph_residual_graph:
     PARAMS: |-
@@ -2662,7 +2657,7 @@ igraph_vertex_coloring_greedy:
     DEPS: colors ON graph
 
 igraph_is_vertex_coloring:
-    PARAMS: GRAPH graph, VERTEX_COLOR types, OUT BOOLEAN res
+    PARAMS: GRAPH graph, VERTEX_COLORS types, OUT BOOLEAN res
     DEPS: types ON graph
 
 igraph_is_bipartite_coloring:
@@ -2670,7 +2665,7 @@ igraph_is_bipartite_coloring:
     DEPS: types ON graph
 
 igraph_is_edge_coloring:
-    PARAMS: GRAPH graph, EDGE_COLOR types, OUT BOOLEAN res
+    PARAMS: GRAPH graph, EDGE_COLORS types, OUT BOOLEAN res
     DEPS: types ON graph
 
 #######################################
