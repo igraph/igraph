@@ -44,10 +44,10 @@
 
 */
 
-#include <stdlib.h>
-
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
+
+#include <stdlib.h>
 
 #define YY_EXTRA_TYPE igraph_i_ncol_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
