@@ -814,7 +814,7 @@ igraph_maxdegree:
     DEPS: vids ON graph
 
 igraph_density:
-    PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=False
+    PARAMS: GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT REAL res, BOOLEAN loops=False
 
 igraph_mean_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=True
