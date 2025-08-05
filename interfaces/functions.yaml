@@ -1756,6 +1756,15 @@ igraph_community_leiden:
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_out_weights ON graph, vertex_in_weights ON graph
 
+igraph_community_leiden_simple:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        LEIDEN_OBJECTIVE objective,
+        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
+        OPTIONAL INOUT VECTOR_INT membership,
+        OUT INTEGER nb_clusters, OUT REAL quality
+    DEPS: weights ON graph
+
 igraph_split_join_distance:
     PARAMS: |-
         VECTOR_INT comm1, VECTOR_INT comm2, OUT INTEGER distance12,
