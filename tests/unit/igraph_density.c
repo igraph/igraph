@@ -27,7 +27,7 @@
 void test_density(const igraph_t *graph, igraph_bool_t loops) {
     igraph_real_t density;
 
-    if (igraph_density(graph, &density, loops)) {
+    if (igraph_density(graph, NULL, &density, loops)) {
         printf("FAILED!\n");
         return;
     }
