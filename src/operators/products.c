@@ -348,7 +348,7 @@ static igraph_error_t modular_product(igraph_t *res,
     IGRAPH_CHECK(igraph_is_simple(g1, &is_simple1));
     IGRAPH_CHECK(igraph_is_simple(g2, &is_simple2));
 
-    if (!is_simple1 || is_simple2) {
+    if (!is_simple1 || !is_simple2) {
         IGRAPH_ERROR("Modular product is implemented only for simple graphs.", IGRAPH_UNIMPLEMENTED);
     }
 
