@@ -308,19 +308,6 @@ void test_c4_p2_modular(void) {
     igraph_destroy(&prod);
 }
 
-// Not allowed for non-simple-graphs
-void test_non_simple_modular(void) {
-    igraph_t c4_mutual, p4, res;
-
-    igraph_ring(&c4_mutual, 4, false, false, true);
-    igraph_ring(&p4, 4, false, false, false);
-    IGRAPH_ASSERT(igraph_product(&res, &c4_mutual, &p4, IGRAPH_PRODUCT_MODULAR) == IGRAPH_UNIMPLEMENTED);
-
-    igraph_destroy(&c4_mutual);
-    igraph_destroy(&p4);
-    igraph_destroy(&res);
-}
-
 int main(void) {
     // CARTESIAN PRODUCT TEST
     test_grid_vs_square_lattice();
@@ -342,7 +329,7 @@ int main(void) {
 
     // MODULAR PRODUCT TEST
     test_c4_p2_modular();
-
+    
     VERIFY_FINALLY_STACK();
 
     return 0;
