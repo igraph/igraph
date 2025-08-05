@@ -279,12 +279,20 @@ igraph_error_t igraph_distances(
     const igraph_t *graph, const igraph_vector_t *weights, igraph_matrix_t *res,
     const igraph_vs_t from, const igraph_vs_t to, igraph_neimode_t mode
 ) {
+    igraph_integer_t from_size;
+
     if (weights == NULL || igraph_vector_size(weights) == 0 || igraph_vector_min(weights) >= 0) {
         /* These are handled by igraph_distances_cutoff() */
         return igraph_distances_cutoff(graph, weights, res, from, to, mode, -1);
     } else {
-        /* Negative weights; will use Bellman-Ford algorithm */
-        return igraph_distances_bellman_ford(graph, res, from, to, weights, mode);
+        /* Negative weights; will use Bellman-Ford or Johnson algorithm */
+        if (mode != IGRAPH_OUT) {
+            IGRAPH_CHECK(igraph_vs_size(graph, &from, &from_size));
+            if (from_size <= 100) {
+                return igraph_distances_bellman_ford(graph, res, from, to, weights, mode);
+            }
+        }
+        return igraph_distances_johnson(graph, res, from, to, weights, mode);
     }
 }
 
