@@ -535,11 +535,11 @@ igraph_error_t igraph_product(igraph_t *res,
  * appropriate type using \ref igraph_to_directed() or \ref igraph_to_undirected().
  *
  * </para><para>
- * The new vertex ID of the product graph is mapped similar to the mapping
- * done in \ref igraph_product.
+ * The vertex IDs in the product graph related to the IDs in the operands in
+ * the same convention as in \ref igraph_product().
  * 
  * </para><para>
- * In the rooted product graph of G and H, with root vertex ID \c root in H,
+ * In the rooted product graph of G and H, with root vertex ID \p root in H,
  * there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
  * if and only if
  * <code>u1 = u2</code> and <code>v1 ~ v2</code> or
@@ -569,6 +569,7 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
                                      const igraph_t *g1,
                                      const igraph_t *g2,
                                      const igraph_integer_t root) {
+
     const igraph_bool_t directed = igraph_is_directed(g1);
 
     if (igraph_is_directed(g2) != directed) {
@@ -580,7 +581,7 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
     const igraph_integer_t vcount2 = igraph_vcount(g2);
 
     if (root < 0 || root >= vcount2) { // root must be in range [0, vcount2-1]
-        IGRAPH_ERROR("Root vertex id out of range.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("The given root vertex is not present in the second graph.", IGRAPH_EINVVID);
     }
 
     const igraph_integer_t ecount1 = igraph_ecount(g1);
@@ -626,6 +627,7 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
