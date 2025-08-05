@@ -362,6 +362,12 @@ LAYOUT_GRID:
     CTYPE: igraph_layout_grid_t
     FLAGS: ENUM
 
+LEIDEN_OBJECTIVE:
+    # The objective function to maximize with the Leiden community detection
+    # method.
+    CTYPE: igraph_leiden_objective_t
+    FLAGS: ENUM
+
 LOOPS:
     # Enum that describes how loop edges should be handled in undirected graphs
     # in functions that support it. Possible options are: no loops, loops
