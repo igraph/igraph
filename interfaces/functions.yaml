@@ -1751,7 +1751,7 @@ igraph_community_leiden:
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OPTIONAL VERTEX_WEIGHTS vertex_out_weights,
         OPTIONAL VERTEX_WEIGHTS vertex_in_weights,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
+        REAL resolution, REAL beta=0.01, BOOLEAN start=False, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_out_weights ON graph, vertex_in_weights ON graph
@@ -1760,7 +1760,7 @@ igraph_community_leiden_simple:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         LEIDEN_OBJECTIVE objective,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
+        REAL resolution, REAL beta=0.01, BOOLEAN start=False, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph
