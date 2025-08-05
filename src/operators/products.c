@@ -20,6 +20,7 @@
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
+#include "igraph_structural.h"
 
 #include "math/safe_intop.h"
 
@@ -343,19 +344,28 @@ static igraph_error_t modular_product(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    const igraph_integer_t vcount1 = igraph_vcount(g1);
-    const igraph_integer_t vcount2 = igraph_vcount(g2);
-    const igraph_integer_t ecount1 = igraph_ecount(g1);
-    const igraph_integer_t ecount2 = igraph_ecount(g2);
-    igraph_integer_t vcount;
-    igraph_integer_t ecount, ecount_double;
-    igraph_vector_int_t edges;
+    igraph_bool_t is_simple1, is_simple2;
+    IGRAPH_CHECK(igraph_is_simple(g1, &is_simple1));
+    IGRAPH_CHECK(igraph_is_simple(g2, &is_simple2));
 
-    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+    if (!is_simple1 || is_simple2) {
+        IGRAPH_ERROR("Modular product is implemented only for simple graphs.", IGRAPH_UNIMPLEMENTED);
+    }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    // See: https://en.wikipedia.org/wiki/Graph_product#Overview_table
+    // Condition 1 of adjacency is same as tensor product
+    igraph_t tensor;
+    IGRAPH_CHECK(tensor_product(&tensor, g1, g2));
+
+    igraph_t g1_compl, g2_compl;
+    IGRAPH_CHECK(igraph_complementer(&g1_compl, g1, /*loops*/ false));
+    IGRAPH_CHECK(igraph_complementer(&g2_compl, g2, /*loops*/ false));
+
+    // Condition 2 of adjacency is same as tensor product of complements, without loop
+    igraph_t tensor_compl;
+    IGRAPH_CHECK(tensor_product(&tensor_compl, &g1_compl, &g2_compl));
+    
+    IGRAPH_CHECK(igraph_union(res, &tensor, &tensor_compl, /*edge_map1*/ NULL, /*edge_map2*/ NULL));
 
     return IGRAPH_SUCCESS;
 }
