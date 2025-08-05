@@ -74,6 +74,7 @@
  - `igraph_matrix_copy_to()` gained an `igraph_matrix_storage_t storage` parameter that specifies whether the data should be written in column-major or row-major format.
  - `igraph_sbm_game()` gained a `multiple` parameter and now supports generating multigraph with prescribed expected edge multiplicities. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
  - The `bfs_cutoff` parameter of the experimental functions `igraph_fundamental_cycles()` and `igraph_minimum_cycle_basis()` is now of type `igraph_real_t`.
+ - `igraph_density()` now takes an optional `weights` parameter.
 
 ### Added
 
@@ -91,6 +92,7 @@
  - `igraph_nearest_neighbor_graph()` computes a neighborhood graph of spatial points based on a neighbor count, cutoff distance, and chosen metric (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2788!
  - `igraph_delaunay_graph()` computes a Delaunay graph of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2806!
  - `igraph_spatial_edge_lengths()` computes edges lengths based on spatial vertex coordinates (experimental function).
+ - `igraph_community_leiden_simple()` is a simplified interface to `igraph_community_leiden()` that allows selecting the objective function to maximize directly.
 
 ### Changed
 
