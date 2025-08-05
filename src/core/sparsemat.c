@@ -1135,7 +1135,7 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
  * Solve Ax=b, where A is a symmetric positive definite matrix.
  *
  * \param A The input matrix, in column-compressed format.
- * \param v The right hand side.
+ * \param b The right hand side.
  * \param res An initialized vector, the result is stored here.
  * \param order An integer giving the ordering method to use for the
  *    factorization. Zero is the natural ordering; if it is one, then
@@ -1665,7 +1665,7 @@ static igraph_error_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
  * \function igraph_sparsemat_arpack_rssolve
  * \brief Eigenvalues and eigenvectors of a symmetric sparse matrix via ARPACK.
  *
- * \param The input matrix, must be column-compressed.
+ * \param A The input matrix, must be column-compressed.
  * \param options It is passed to \ref igraph_arpack_rssolve(). Supply
  *    \c NULL here to use the defaults. See \ref igraph_arpack_options_t for the
  *    details. If \c mode is 1, then ARPACK uses regular mode, if \c mode is 3,
@@ -2220,7 +2220,7 @@ igraph_error_t igraph_sparsemat_as_matrix(igraph_matrix_t *res,
  * \brief Maximum of a sparse matrix.
  *
  * \param A The input matrix, column-compressed.
- * \return The maximum in the input matrix, or \c IGRAPH_NEGINFINITY
+ * \return The maximum in the input matrix, or <code>-IGRAPH_INFINITY</code>
  *    if the matrix has zero elements.
  *
  * Time complexity: TODO.
@@ -2236,7 +2236,7 @@ igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A) {
     ptr = A->cs->x;
     n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
-        return IGRAPH_NEGINFINITY;
+        return -IGRAPH_INFINITY;
     }
     res = *ptr;
     for (i = 1; i < n; i++, ptr++) {
@@ -2256,7 +2256,7 @@ igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A) {
  * \brief Minimum of a sparse matrix.
  *
  * \param A The input matrix, column-compressed.
- * \return The minimum in the input matrix, or \c IGRAPH_POSINFINITY
+ * \return The minimum in the input matrix, or \c IGRAPH_INFINITY
  *    if the matrix has zero elements.
  *
  * Time complexity: TODO.
@@ -2272,7 +2272,7 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
     ptr = A->cs->x;
     n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
-        return IGRAPH_POSINFINITY;
+        return IGRAPH_INFINITY;
     }
     res = *ptr;
     for (i = 1; i < n; i++, ptr++) {
@@ -2289,9 +2289,9 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
  *
  * \param A The input matrix, column-compressed.
  * \param min The minimum in the input matrix is stored here, or \c
- *    IGRAPH_POSINFINITY if the matrix has zero elements.
- * \param max The maximum in the input matrix is stored here, or \c
- *    IGRAPH_NEGINFINITY if the matrix has zero elements.
+ *    IGRAPH_INFINITY if the matrix has zero elements.
+ * \param max The maximum in the input matrix is stored here, or
+ *    <code>-IGRAPH_INFINITY</code> if the matrix has zero elements.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -2308,8 +2308,8 @@ igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
     ptr = A->cs->x;
     n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
-        *min = IGRAPH_POSINFINITY;
-        *max = IGRAPH_NEGINFINITY;
+        *min = IGRAPH_INFINITY;
+        *max = -IGRAPH_INFINITY;
         return IGRAPH_SUCCESS;
     }
     *min = *max = *ptr;
@@ -2359,8 +2359,8 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  *
  * Count the number of matrix entries that are closer to zero than \p tol.
  *
- * \param The input matrix, column-compressed.
- * \param The tolerance for zero comparisons.
+ * \param A The input matrix, column-compressed.
+ * \param tol The tolerance for zero comparisons.
  * \return Error code.
  *
  * Time complexity: TODO.

@@ -88,13 +88,13 @@
  * https://doi.org/10.1103/PhysRevLett.87.278701.
  *
  * \param graph        Pointer to an uninitialized graph object.
+ * \param no_of_edges  The number of edges in the generated graph.
  * \param fitness_out  A numeric vector containing the fitness of each vertex.
  *                     For directed graphs, this specifies the out-fitness
  *                     of each vertex.
  * \param fitness_in   If \c NULL, the generated graph will be undirected.
  *                     If not \c NULL, this argument specifies the in-fitness
  *                     of each vertex.
- * \param no_of_edges  The number of edges in the generated graph.
  * \param loops        Whether to allow loop edges in the generated graph.
  * \param multiple     Whether to allow multiple edges in the generated graph.
  *

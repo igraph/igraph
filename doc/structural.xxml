@@ -108,6 +108,12 @@
 <!-- doxrox-include igraph_is_biconnected -->
 </section>
 
+<section id="percolation"><title>Percolation</title>
+<!-- doxrox-include igraph_site_percolation -->
+<!-- doxrox-include igraph_bond_percolation -->
+<!-- doxrox-include igraph_edgelist_percolation -->
+</section>
+
 <section id="degree-sequences"><title>Degree sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
@@ -215,6 +221,7 @@
 <!-- doxrox-include igraph_joint_type_distribution -->
 <!-- doxrox-include igraph_joint_degree_distribution -->
 <!-- doxrox-include igraph_joint_degree_matrix -->
+<!-- doxrox-include igraph_rich_club_sequence -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>

@@ -630,6 +630,51 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "devlohani99",
+      "name": "Dev_Lohani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142163543?v=4",
+      "profile": "https://github.com/devlohani99",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lucaslopes",
+      "name": "Lucas Lopes Felipe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8731439?v=4",
+      "profile": "https://lucaslopes.me/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "its-serah",
+      "name": "Sarah Rashidi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/153510021?v=4",
+      "profile": "https://github.com/its-serah",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "minifinity",
+      "name": "Zara Zong",
+      "avatar_url": "https://avatars.githubusercontent.com/u/124811507?v=4",
+      "profile": "https://github.com/minifinity",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Zepeacedust",
+      "name": "Arnór Friðriksson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41028225?v=4",
+      "profile": "https://github.com/Zepeacedust",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

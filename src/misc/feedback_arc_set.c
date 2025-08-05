@@ -154,17 +154,17 @@ finish:
         while (VECTOR(vpath)[i-1] != va) i--;
         for (; i < depth; i++) {
             if (vertices) {
-                igraph_vector_int_push_back(vertices, VECTOR(vpath)[i]);
+                IGRAPH_CHECK(igraph_vector_int_push_back(vertices, VECTOR(vpath)[i]));
             }
             if (edges) {
-                igraph_vector_int_push_back(edges, VECTOR(epath)[i]);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, VECTOR(epath)[i]));
             }
         }
         if (vertices) {
-            igraph_vector_int_push_back(vertices, va);
+            IGRAPH_CHECK(igraph_vector_int_push_back(vertices, va));
         }
         if (edges) {
-            igraph_vector_int_push_back(edges, ea);
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, ea));
         }
         if (found) {
             *found = true;

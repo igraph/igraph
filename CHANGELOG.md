@@ -7,15 +7,31 @@
  - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
  - `igraph_product()` supports the lexicographic and strong graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772!
  - `igraph_mycielskian()` and `igraph_mycielski_graph()` compute a Mycielski transformation of a graph, and a Mycielski graph, respectively. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2741!
+ - `igraph_path_graph()` is a convenience wrapper for `igraph_ring()` with `circular=false`.
+ - `igraph_cycle_graph()` is a convenience wrapper for `igraph_ring()` with `circular=true`.
+ - `igraph_bond_percolation()`, `igraph_site_percolation()` and `igraph_edgelist_percolation()` calculates the time evolution of the size of the giant component of a graph when edges or vertices are added one by one in a certain (or random) order. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2778!
+ - `igraph_invert_permutation()` inverts a permutation stored in an integer vector.
+ - `igraph_is_vertex_coloring()` and `igraph_is_edge_coloring()` check if a vertex or edge coloring is valid, i.e. whether adjacenct vertices/edges always have distinct colors. Thanks to Sarah Rashidi @its-serah for contributing this in #2807!
+ - `igraph_rich_club_sequence()` calculates how the density of a graph changes as vertices are removed. Thanks to Zara Zong @minifinity for contributing this in #2740!
+
+### Changed
+
+ - `igraph_bipartite_game_gnp()` can now generate graphs with more than a hundred million vertices. Thanks to Dev Lohani @devlohani99 for implementing this in #2767!
+ - `igraph_reindex_membership()` now supports arbitrary cluster indices. Previously, it would error when indices are not within `0 .. n-1` where `n` is the membership vector length.
 
 ### Fixed
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
  - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
+ - `igraph_community_leiden()` did not iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
+
+### Deprecated
+
+ - `igraph_sparsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
 
 ### Other
 
- - Documentation improvements.
+ - Documentation improvements, including a new glossary.
  - Simple cycle search (`igraph_simple_cycles()` and `igraph_simple_cycles_callback()`) is sped up by skipping cycle search from some redundant start vertices. Thanks to Tim Bernhard @GenieTim for contributing this improvement in #2714!
 
 ## [0.10.16] - 2025-06-10

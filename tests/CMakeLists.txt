@@ -215,6 +215,7 @@ add_legacy_tests(
   igraph_extended_chordal_ring
   igraph_forest_fire_game
   igraph_from_prufer
+  igraph_full_bipartite
   igraph_full_citation
   igraph_full_multipartite
   igraph_generalized_petersen
@@ -368,6 +369,7 @@ add_legacy_tests(
   paths
   random_spanning_tree
   reachability
+  rich_club
   single_target_shortest_path
   topological_sorting
 )
@@ -484,12 +486,13 @@ add_legacy_tests(
 # coloring.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_coloring
+  coloring
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_coloring
+  coloring
+  is_coloring
 )
 
 
@@ -686,6 +689,7 @@ add_legacy_tests(
   igraph_le_community_to_membership
   igraph_modularity
   igraph_modularity_matrix
+  igraph_reindex_membership
   igraph_split_join_distance
   levc-stress
   null_communities
@@ -991,7 +995,7 @@ add_benchmarks(
   igraph_betweenness_weighted
   igraph_cliques
   igraph_closeness_weighted
-  igraph_coloring
+  coloring
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
@@ -1031,4 +1035,10 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+# percolation
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  percolation
 )

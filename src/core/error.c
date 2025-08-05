@@ -192,7 +192,7 @@ const char *igraph_strerror(const igraph_error_t igraph_errno) {
  * \param line The number of line in the source file which triggered the
  *   error.
  * \param igraph_errno The \a igraph error code.
- * \return the error code (if it returns)
+ * \return The error code (if it returns).
  *
  * \sa \ref igraph_errorf()
  */
@@ -222,6 +222,7 @@ igraph_error_t igraph_error(const char *reason, const char *file, int line,
  * \param igraph_errno The \a igraph error code.
  * \param ... Additional parameters, the values to substitute into the
  *            format string.
+ * \return The error code (if it returns).
  *
  * \sa \ref igraph_error()
  */
@@ -409,8 +410,6 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
  *         warning..
- * \param igraph_errno Warnings could have potentially error codes as well,
- *        but this is currently not used in igraph.
  */
 
 void igraph_warning_handler_ignore(const char *reason, const char *file, int line) {
@@ -431,8 +430,6 @@ void igraph_warning_handler_ignore(const char *reason, const char *file, int lin
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
  *         warning..
- * \param igraph_errno Warnings could have potentially error codes as well,
- *        but this is currently not used in igraph.
  */
 
 void igraph_warning_handler_print(const char *reason, const char *file, int line) {
@@ -452,9 +449,6 @@ void igraph_warning_handler_print(const char *reason, const char *file, int line
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
  *         warning.
- * \param igraph_errno Warnings could have potentially error codes as well,
- *        but this is currently not used in igraph.
- * \return The supplied error code.
  */
 
 void igraph_warning(const char *reason, const char *file, int line) {
@@ -482,8 +476,6 @@ void igraph_warning(const char *reason, const char *file, int line) {
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
  *         warning.
- * \param igraph_errno Warnings could have potentially error codes as well,
- *        but this is currently not used in igraph.
  * \param ... The additional arguments to be substituted into the
  *        template string.
  */

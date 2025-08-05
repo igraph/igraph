@@ -125,6 +125,8 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vcount(&graph) == n1 + n2);
     IGRAPH_ASSERT(igraph_ecount(&graph) > 0); /* 0 is exceedingly unlikely */
 
+    check_partitions(&graph, &types, IGRAPH_ALL);
+
     igraph_destroy(&graph);
 
     /* directed */

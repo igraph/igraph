@@ -295,6 +295,7 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
  *                   matrix is stored.
  * \param directed   For directed graphs: if the edges should be treated as
  *                   undirected. For undirected graphs this is ignored.
+ * \return Error code.
  *
  * \sa \ref igraph_modularity()
  */

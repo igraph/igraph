@@ -49,13 +49,13 @@ int main(void) {
     igraph_destroy(&g);
 
     printf("\nUndirected path graph:\n");
-    igraph_ring(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 0);
+    igraph_path_graph(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ false);
     igraph_eccentricity(&g, &ecc, igraph_vss_all(), IGRAPH_OUT);
     print_vector(&ecc);
     igraph_destroy(&g);
 
     printf("\nDirected path graph:\n");
-    igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ 0, /* circular */ 0);
+    igraph_path_graph(&g, 5, IGRAPH_DIRECTED, /* mutual */ false);
     igraph_eccentricity(&g, &ecc, igraph_vss_all(), IGRAPH_OUT);
     print_vector(&ecc);
     igraph_destroy(&g);

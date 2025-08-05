@@ -165,7 +165,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
 
         igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS);
+        igraph_is_vertex_coloring(&graph, &iv1, &b);
+        IGRAPH_ASSERT(b);
         igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_DSATUR);
+        igraph_is_vertex_coloring(&graph, &iv1, &b);
+        IGRAPH_ASSERT(b);
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
         igraph_minimum_spanning_tree(&graph, &iv1, NULL);

@@ -51,6 +51,8 @@ IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_transitive_closure_dag(con
 IGRAPH_EXPORT igraph_error_t igraph_simplify_and_colorize(
     const igraph_t *graph, igraph_t *res,
     igraph_vector_int_t *vertex_color, igraph_vector_int_t *edge_color);
+IGRAPH_EXPORT igraph_error_t igraph_invert_permutation(
+    const igraph_vector_int_t *permutation, igraph_vector_int_t *inverse);
 
 /* Generic interface */
 IGRAPH_EXPORT igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,

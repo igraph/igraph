@@ -121,24 +121,24 @@ void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff);
 void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
 
 #define VERIFY_FINALLY_STACK() \
-    if (!IGRAPH_FINALLY_STACK_EMPTY) { \
+    do { if (!IGRAPH_FINALLY_STACK_EMPTY) { \
         IGRAPH_FATALF( \
           "Finally stack is not empty (stack size is %d). " \
           "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n", \
           IGRAPH_FINALLY_STACK_SIZE()); \
-    }
+    } } while (0)
 
 /* Run a test in a separate function; return the return value of the function
  * if it is nonzero. Also verify the FINALLY stack and bail out if it is not
  * empty. Needs an integer variable named 'retval' in the local context. */
 #define RUN_TEST(func) \
-    { \
+    do { \
         int retval = func(); \
         if (retval) { \
             return retval; \
         } \
         VERIFY_FINALLY_STACK(); \
-    }
+    } while (0)
 
 #define CHECK_ERROR(funcall, expected_err) \
     do { \

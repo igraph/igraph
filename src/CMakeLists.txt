@@ -180,6 +180,7 @@ add_library(
 
   connectivity/cohesive_blocks.c
   connectivity/components.c
+  connectivity/percolation.c
   connectivity/separators.c
   connectivity/reachability.c
 
@@ -279,6 +280,7 @@ add_library(
   properties/multiplicity.c
   properties/neighborhood.c
   properties/perfect.c
+  properties/rich_club.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
