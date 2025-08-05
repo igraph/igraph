@@ -367,6 +367,11 @@ static igraph_error_t modular_product(igraph_t *res,
     
     IGRAPH_CHECK(igraph_union(res, &tensor, &tensor_compl, /*edge_map1*/ NULL, /*edge_map2*/ NULL));
 
+    igraph_destroy(&g1_compl);
+    igraph_destroy(&g2_compl);
+    igraph_destroy(&tensor);
+    igraph_destroy(&tensor_compl);
+    
     return IGRAPH_SUCCESS;
 }
 
