@@ -349,28 +349,38 @@ static igraph_error_t modular_product(igraph_t *res,
     IGRAPH_CHECK(igraph_is_simple(g2, &is_simple2));
 
     if (!is_simple1 || !is_simple2) {
-        IGRAPH_ERROR("Modular product is implemented only for simple graphs.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Modular product requires simple graph as input.", IGRAPH_EINVAL);
     }
 
     // See: https://en.wikipedia.org/wiki/Graph_product#Overview_table
-    // Condition 1 of adjacency is same as tensor product
-    igraph_t tensor;
-    IGRAPH_CHECK(tensor_product(&tensor, g1, g2));
 
     igraph_t g1_compl, g2_compl;
     IGRAPH_CHECK(igraph_complementer(&g1_compl, g1, /*loops*/ false));
+    IGRAPH_FINALLY(igraph_destroy, &g1_compl);
+
     IGRAPH_CHECK(igraph_complementer(&g2_compl, g2, /*loops*/ false));
+    IGRAPH_FINALLY(igraph_destroy, &g2_compl);
 
     // Condition 2 of adjacency is same as tensor product of complements, without loop
     igraph_t tensor_compl;
     IGRAPH_CHECK(tensor_product(&tensor_compl, &g1_compl, &g2_compl));
+
+    igraph_destroy(&g2_compl);
+    igraph_destroy(&g1_compl);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    IGRAPH_FINALLY(igraph_destroy, &tensor_compl);
+
+    // Condition 1 of adjacency is same as tensor product
+    igraph_t tensor;
+    IGRAPH_CHECK(tensor_product(&tensor, g1, g2));
+    IGRAPH_FINALLY(igraph_destroy, &tensor);
     
     IGRAPH_CHECK(igraph_union(res, &tensor, &tensor_compl, /*edge_map1*/ NULL, /*edge_map2*/ NULL));
 
-    igraph_destroy(&g1_compl);
-    igraph_destroy(&g2_compl);
     igraph_destroy(&tensor);
     igraph_destroy(&tensor_compl);
+    IGRAPH_FINALLY_CLEAN(2);
     
     return IGRAPH_SUCCESS;
 }
