@@ -56,7 +56,7 @@ int main(void) {
         igraph_square_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, 0, &periodic);
         igraph_vector_int_destroy(&dims);
         igraph_vector_bool_destroy(&periodic);
-        igraph_rewire(&graph, 100, IGRAPH_REWIRING_SIMPLE);
+        igraph_rewire(&graph, 100, IGRAPH_SIMPLE_SW);
         igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
     }
 

@@ -31,7 +31,7 @@ int main(void) {
         printf("Assortativity before rewiring = %g\n", assortativity);
 
         /* Rewire graph */
-        igraph_rewire(&g, 10 * igraph_ecount(&g), IGRAPH_REWIRING_SIMPLE);
+        igraph_rewire(&g, 10 * igraph_ecount(&g), IGRAPH_SIMPLE_SW);
 
         igraph_assortativity_nominal(&g, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
         printf("Assortativity after rewiring = %g\n\n", assortativity);

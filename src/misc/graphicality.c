@@ -18,8 +18,7 @@
 
 #include "igraph_graphicality.h"
 
-#define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
-#define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
+#include "misc/graphicality.h"
 
 static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_int_t *degrees, igraph_bool_t *res);
 static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_int_t *degrees, igraph_bool_t *res);

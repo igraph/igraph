@@ -423,11 +423,6 @@ RECIP:
     CTYPE: igraph_reciprocity_t
     FLAGS: ENUM
 
-REWIRING_MODE:
-    # Enum for the rewiring modes of igraph_rewire()
-    CTYPE: igraph_rewiring_t
-    FLAGS: ENUM
-
 ROOTCHOICE:
     # Enum for the heuristic of igraph_roots_for_tree_layout()
     CTYPE: igraph_root_choice_t
