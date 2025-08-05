@@ -25,9 +25,6 @@
 
 */
 
-#include <vector>
-#include <unordered_set>
-
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
@@ -38,6 +35,9 @@
 
 #include "core/exceptions.h"
 #include "core/interruption.h"
+
+#include <vector>
+#include <unordered_set>
 
 using std::vector;
 using std::unordered_set;
