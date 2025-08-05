@@ -419,7 +419,7 @@ static igraph_error_t tensor_product(igraph_t *res,
  *     <code>2 |E1| |E2|</code> in the undirected case.
  *
  *     </para><para>
- *     Time Complexity: O(|V1| |V2| + |E1| |E2|)
+ *     Time complexity: O(|V1| |V2| + |E1| |E2|)
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
  * \endclist

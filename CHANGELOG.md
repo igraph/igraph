@@ -174,11 +174,11 @@
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
  - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
- - `igraph_community_leiden()` did iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
+ - `igraph_community_leiden()` did not iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
 
 ### Deprecated
 
- - `igraph_sparmsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
+ - `igraph_sparsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
 
 ### Other
 
