@@ -44,6 +44,7 @@
 <!-- doxrox-include igraph_community_fastgreedy -->
 <!-- doxrox-include igraph_community_multilevel -->
 <!-- doxrox-include igraph_community_leiden -->
+<!-- doxrox-include igraph_community_leiden_simple -->
 </section>
 
 <section id="fluid-communities"><title>Fluid communities</title>
