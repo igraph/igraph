@@ -2127,6 +2127,11 @@ igraph_product:
     PARAMS: |-
         OUT GRAPH res, GRAPH g1, GRAPH g2, GRAPH_PRODUCT_TYPE type=CARTESIAN
 
+igraph_rooted_product:
+    PARAMS: |-
+        OUT GRAPH res, GRAPH g1, GRAPH g2, VERTEX root
+    DEPS: root ON g2
+
 #######################################
 # Maximum flows, minimum cuts
 #######################################
