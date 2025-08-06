@@ -475,6 +475,23 @@ static igraph_error_t modular_product(igraph_t *res,
  *     Time complexity: O(|V1| |V2| + |E1| |E2|)
  *     where |V1| and |V2| are the number of vertices, and
  *     |E1| and |E2| are the number of edges of the operands.
+ *
+ *     \cli IGRAPH_PRODUCT_MODULAR
+ *     Computes the modular product of two graphs. In the product graph,
+ *     there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
+ *     if and only if
+ *     <code>u1 ~ u2</code> and <code>v1 ~ v2</code> or
+ *     <code>NOT (u1 ~ u2)</code> and <code>NOT (v1 ~ v2)</code>.
+ *     The modular product requires both the graphs to be simple.
+ *     Thus, the number of edges in the product is
+ *     <code>|E1| |E2| + |E1'| |E2'|</code> in the directed case and
+ *     <code>2 |E1| |E2| + 2 |E1'| |E2'|</code> in the undirected case.
+ *
+ *     </para><para>
+ *     Time complexity: O(|V1| |V2| + |E1| |E2| + |E1'| |E2'|)
+ *     where |V1| and |V2| are the number of vertices,
+ *     |E1| and |E2| are the number of edges of the operands, and
+ *     |E1'| and |E2'| are the number of edges of their complement.
  * \endclist
  *
  * </para><para>
