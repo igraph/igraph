@@ -2129,7 +2129,7 @@ igraph_product:
 
 igraph_rooted_product:
     PARAMS: |-
-        OUT GRAPH res, GRAPH g1, GRAPH g2, INTEGER root
+        OUT GRAPH res, GRAPH g1, GRAPH g2, VERTEX root
 
 #######################################
 # Maximum flows, minimum cuts
