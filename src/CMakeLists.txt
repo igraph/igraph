@@ -308,7 +308,7 @@ add_library(
   misc/sir.c
   misc/spanning_trees.c
 
-  spatial/delaunay.cpp
+  spatial/delaunay.c
 
   internal/glpk_support.c
   internal/hacks.c

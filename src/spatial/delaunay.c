@@ -22,17 +22,16 @@
 #include "igraph_matrix.h"
 
 #include "igraph_operators.h"
+#include "igraph_qsort.h"
+#include "igraph_types.h"
 #include "igraph_vector.h"
+#include "igraph_vector_list.h"
 #include "libqhull_r/io_r.h"
 #include "libqhull_r/merge_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
+#include <stdio.h>
 
-FILE get_null_fp() {
-  #if 1 == 1
-  return 1;
-  #endif
-}
 
 void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
@@ -46,24 +45,74 @@ void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     //printf("\n");
 }
 
-igraph_error_t old_igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
+int edge_comparator(const void *a, const void *b) {
+    igraph_integer_t * A = (igraph_integer_t *)a;
+    igraph_integer_t * B = (igraph_integer_t *)b;
+    if (A[0] < B[0]) {
+        return -1;
+    }
+    if (A[0] > B[0]) {
+        return  1;
+    }
+    //first are equal
+    if (A[1] < B[1]) {
+        return -1;
+    }
+    if (A[1] > B[1]) {
+        return  1;
+    }
+
+    // second are equal
+    return 0;
+}
+
+// Simplify an edge list
+void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out) {
+    igraph_integer_t size = igraph_vector_int_size(in);
+    if (size == 0) {
+        return;
+    }
+    // reorder
+    igraph_integer_t temp;
+    for (igraph_integer_t i = 0; i < size; i += 2) {
+        if (VECTOR(*in)[i] > VECTOR(*in)[i + 1]) {
+            temp = VECTOR(*in)[i];
+            VECTOR(*in)[i + 1] = VECTOR(*in)[i];
+            VECTOR(*in)[i] = temp;
+        }
+    }
+    // sort
+    igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
+
+    igraph_vector_int_push_back(out, VECTOR(*in)[0]);
+    igraph_vector_int_push_back(out, VECTOR(*in)[1]);
+    // nub
+    for (igraph_integer_t i = 2; i < size; i += 2) {
+        if (VECTOR(*in)[i] != VECTOR(*in)[i - 2] && VECTOR(*in)[i + 1] != VECTOR(*in)[i - 1]) {
+            igraph_vector_int_push_back(out, VECTOR(*in)[i]);
+            igraph_vector_int_push_back(out, VECTOR(*in)[i + 1]);
+        }
+    }
+}
+
+igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix_t *points) {
     int curlong, totlong; /* used !qh_NOmem */
     int exitcode;
-    igraph_integer_t numpoints = igraph_matrix_nrow(points_);
-    igraph_integer_t dim = igraph_matrix_ncol(points_);
+    igraph_integer_t numpoints = igraph_matrix_nrow(points);
+    igraph_integer_t dim = igraph_matrix_ncol(points);
     //coordT *points;
     boolT ismalloc = False; // handle memory allocation of points explicitly
     qhT qh_qh;
     qhT *qh = &qh_qh;
-    igraph_real_t *points;
 
-    IGRAPH_CHECK(igraph_matrix_transpose(points_));
+    igraph_vector_int_t int_edges;
 
-    points = &MATRIX(*points_, 0, 0);
+
+    IGRAPH_CHECK(igraph_matrix_transpose(points)); // get in row-major order
 
     QHULL_LIB_CHECK; /* Check for compatible library */
 
-    qh_init_A(qh, stdin, stdout, stderr, 0, NULL);  /* sets qh->qhull_command */
+    qh_init_A(qh, NULL, NULL, NULL, 0, NULL);  /* sets qh->qhull_command */
     exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
     if (!exitcode) {
         qh->NOerrexit = False;
@@ -78,23 +127,19 @@ igraph_error_t old_igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_
         qh_checkflags(qh, qh->qhull_command, "  ");
         qh_initflags(qh, qh->qhull_command);
         //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
-        qh_init_B(qh, points, numpoints, dim, ismalloc);
+        qh_init_B(qh, &MATRIX(*points, 0, 0), numpoints, dim, ismalloc); // read points and fiddle with them a little.
         qh_qhull(qh);
-        for (int i = 0; i < 10; i++) {
-            printf("%f, ", points[i]);
-        }
-        qh_check_output(qh);
-        qh_produce_output(qh);
-        if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone) {
-            qh_check_points(qh);
-        }
+        //qh_check_output(qh);
+        //qh_produce_output(qh);
+        //if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone) {
+        //    qh_check_points(qh);
+        //}
 
         facetT *facet;
         vertexT *vertex, **vertexp;
 
-        igraph_vector_int_t edges;
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&int_edges, 0);
 
         igraph_vector_int_t simplex;
 
@@ -108,26 +153,46 @@ igraph_error_t old_igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_
             if (!facet->upperdelaunay) {
                 curr_vert = 0;
                 FOREACHvertex_(facet->vertices) VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
-                add_clique(&edges, &simplex);
+                add_clique(&int_edges, &simplex);
             }
         }
-        igraph_create(graph, &edges, numpoints, false);
-        igraph_simplify(graph, true, true, NULL);
+        IGRAPH_CHECK(igraph_matrix_transpose(points));
+        simplify_edge_list(&int_edges, edges);
+
+        igraph_vector_int_destroy(&int_edges);
         igraph_vector_int_destroy(&simplex);
-        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(2);
     } else {
-      IGRAPH_ERROR("qhull error", IGRAPH_EINVAL);
-    }
+        char error[100];
 
+        snprintf(error, sizeof(error) / sizeof(error[0]), "Error while computing delaunay triangulation, qhull code = %i", qh->last_errcode);
+        IGRAPH_ERROR(&error[0], IGRAPH_EINVAL);
+    }
 
     qh->NOerrexit = True; /* no more setjmp */
     qh_freeqhull(qh, !qh_ALL);
     qh_memfreeshort(qh, &curlong, &totlong);
 
-    if (curlong || totlong)
-        qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
-                          totlong, curlong);
+    //if (curlong || totlong)
+    //    qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
+    //                      totlong, curlong);
 
+
+
+    return IGRAPH_SUCCESS;
+}
+
+
+igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points) {
+    igraph_vector_int_t edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
+    IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_matrix_nrow(points), false));
+
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
