@@ -84,8 +84,10 @@ struct HavelHakimiList {
     // Given degree sequence, sets up linked list of BNodes (degree buckets)
     // sentinel BNode [0] and [N] as bookends
     // O(N)
-    explicit HavelHakimiList(igraph_vector_int_t degseq) : buckets(igraph_vector_int_size(&degseq)+1) {
-        igraph_integer_t n_nodes = igraph_vector_int_size(&degseq);
+    explicit HavelHakimiList(const igraph_vector_int_t *degseq) :
+        buckets(igraph_vector_int_size(degseq)+1)
+    {
+        igraph_integer_t n_nodes = igraph_vector_int_size(degseq);
         for (igraph_integer_t i = 0; i <= n_nodes; i++) {
             if (i == 0) buckets[i].prev = -1;
             else buckets[i].prev = i - 1;
@@ -95,15 +97,15 @@ struct HavelHakimiList {
         }
 
         for (igraph_integer_t i = 0; i < n_nodes; i++) {
-            igraph_integer_t degree = VECTOR(degseq)[i];
+            igraph_integer_t degree = VECTOR(*degseq)[i];
             buckets[degree].nodes.push(vd_pair{i, degree});
             buckets[degree].count++;
         }
     }
 
     // ----- O(1) convenience functions ----- //
-    BNode head() {return buckets.front();}
-    BNode tail() {return buckets.back();}
+    const BNode & head() const { return buckets.front(); }
+    const BNode & tail() const { return buckets.back(); }
 
     void remove_bucket(igraph_integer_t degree) { // assuming sentinel nodes
         igraph_integer_t& prev_idx = buckets[degree].prev;
@@ -220,62 +222,64 @@ struct HavelHakimiList {
     }
 };
 
-// This implementation works by grouping nodes by their remaining "stubs" (degrees) into an
-// array of "degree buckets" (see struct HavelHakimiList above) - i.e. each bucket holds
-// all nodes with that degree. The array runs from index 0 to index N, with 0 and N as
-// sentinel buckets (since any graphical sequence for a simple graph will not have degrees
-// greater than N - 1, and nodes with degree 0 can be ignored). Thus, only O(V) time is
-// needed to allocate each node to its starting degree bucket, after which no re-sorting is
-// done - if a node is used up as a "hub", it is simply removed (or lazy deleted if not 
-// immediately accessible), and if it is chosen as a "spoke", it will only shift down one
-// bucket (constant operation).
-// 
-// Additionally, each degree bucket keeps track of its next largest and next smallest degree
-// bucket via their index in the array. This makes it very time efficient to find the
-// largest and/or smallest nodes as needed for both "hub" and "spoke" nodes (specifically,
-// amortized near-constant time).
-//
-// Below is an example run-through using the degree sequence [3, 2, 3, 1, 1] and the 
-// IGRAPH_REALIZE_DEGSEQ_SMALLEST method:
-//
-// Initial list
-// [0][1][2][3][4][5] <- degree buckets
-//     4  1  2        <- node ID (index in the degseq) in each bucket
-//     3     0
-//
-// By the smallest first method, we must first choose a node with the smallest degree to
-// serve as the "hub". get_min_node() retrieves a node from bucket [1], which sentinel [0]
-// indicates as its next largest non-empty bucket in its .next field. 
-// [0][1][2][3][4][5]       4 <- retrieved "hub" node. It is removed from the bucket
-//     3  1  2
-//           0
-//
-// Node 4 has degree 1, therefore we need to select 1 "spoke" node to connect it to. Using
-// get_max_node(), we go to retrieve a node from bucket [4], which sentinel [5] indicates 
-// as its next smallest non-empty bucket. Finding [4] empty, the bucket is removed, and
-// node 2 is finally retrieved from bucket [3].
-// [0][1][2][3][5]          4-2 <- an edge is formed between them
-//     3  1  0
-//
-// After one "stub"/degree of node 2 is used up, it gets shifted down one bucket.
-// [0][1][2][3][5]          4-2
-//     3  2  0
-//        1
-//
-// The process repeats. We look at the smallest degree bucket for a "hub" and remove it.
-// [0][1][2][3][5]          4-2
-//        2  0              3
-//        1
-//
-// Node 3 has degree 1, so we pick 1 "spoke", and replace it into the bucket below.
-// [0][1][2][3][5]          4-2
-//        0                 3-0
-//        2
-//        1
-//
-// The process continues until we are unable to find either a non-zero "hub" node
-// (algorithm complete and sequence is graphical) or enough non-zero "spoke" nodes once a
-// hub has been selected (sequence is non-graphical).
+/*
+ * This implementation works by grouping nodes by their remaining "stubs" (degrees) into an
+ * array of "degree buckets" (see struct HavelHakimiList above) - i.e. each bucket holds
+ * all nodes with that degree. The array runs from index 0 to index N, with 0 and N as
+ * sentinel buckets (since any graphical sequence for a simple graph will not have degrees
+ * greater than N - 1, and nodes with degree 0 can be ignored). Thus, only O(V) time is
+ * needed to allocate each node to its starting degree bucket, after which no re-sorting is
+ * done - if a node is used up as a "hub", it is simply removed (or lazy deleted if not
+ * immediately accessible), and if it is chosen as a "spoke", it will only shift down one
+ * bucket (constant operation).
+ *
+ * Additionally, each degree bucket keeps track of its next largest and next smallest degree
+ * bucket via their index in the array. This makes it very time efficient to find the
+ * largest and/or smallest nodes as needed for both "hub" and "spoke" nodes (specifically,
+ * amortized near-constant time).
+ *
+ * Below is an example run-through using the degree sequence [3, 2, 3, 1, 1] and the
+ * IGRAPH_REALIZE_DEGSEQ_SMALLEST method:
+ *
+ * Initial list
+ * [0][1][2][3][4][5] <- degree buckets
+ *     4  1  2        <- node ID (index in the degseq) in each bucket
+ *     3     0
+ *
+ * By the smallest first method, we must first choose a node with the smallest degree to
+ * serve as the "hub". get_min_node() retrieves a node from bucket [1], which sentinel [0]
+ * indicates as its next largest non-empty bucket in its .next field.
+ * [0][1][2][3][4][5]       4 <- retrieved "hub" node. It is removed from the bucket
+ *     3  1  2
+ *           0
+ *
+ * Node 4 has degree 1, therefore we need to select 1 "spoke" node to connect it to. Using
+ * get_max_node(), we go to retrieve a node from bucket [4], which sentinel [5] indicates
+ * as its next smallest non-empty bucket. Finding [4] empty, the bucket is removed, and
+ * node 2 is finally retrieved from bucket [3].
+ * [0][1][2][3][5]          4-2 <- an edge is formed between them
+ *     3  1  0
+ *
+ * After one "stub"/degree of node 2 is used up, it gets shifted down one bucket.
+ * [0][1][2][3][5]          4-2
+ *     3  2  0
+ *        1
+ *
+ * The process repeats. We look at the smallest degree bucket for a "hub" and remove it.
+ * [0][1][2][3][5]          4-2
+ *        2  0              3
+ *        1
+ *
+ * Node 3 has degree 1, so we pick 1 "spoke", and replace it into the bucket below.
+ * [0][1][2][3][5]          4-2
+ *        0                 3-0
+ *        2
+ *        1
+ *
+ * The process continues until we are unable to find either a non-zero "hub" node
+ * (algorithm complete and sequence is graphical) or enough non-zero "spoke" nodes once a
+ * hub has been selected (sequence is non-graphical).
+ */
 static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
                                             igraph_vector_int_t *edges,
                                             igraph_realize_degseq_t method) {
@@ -300,7 +304,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
     IGRAPH_CHECK(igraph_vector_int_init_copy(&seq, degseq));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &seq);
 
-    HavelHakimiList vault(seq);
+    HavelHakimiList vault(&seq);
 
     igraph_integer_t n_edges_added = 0;
     for (igraph_integer_t i = 0; i < n_nodes; i++) {
@@ -328,8 +332,8 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
         IGRAPH_CHECK(vault.get_spokes(hub.degree, seq, spokes));
 
         igraph_integer_t n_spokes = igraph_vector_int_size(&spokes);
-        for (igraph_integer_t i = 0; i < n_spokes; i++) {
-            igraph_integer_t spoke_idx = VECTOR(spokes)[i];
+        for (igraph_integer_t j = 0; j < n_spokes; j++) {
+            igraph_integer_t spoke_idx = VECTOR(spokes)[j];
             VECTOR(*edges)[2*n_edges_added] = hub.vertex;
             VECTOR(*edges)[2*n_edges_added + 1] = spoke_idx;
             n_edges_added++;
@@ -856,7 +860,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * connected are chosen. In the undirected case, \c IGRAPH_REALIZE_DEGSEQ_SMALLEST
  * produces a connected graph when one exists. This makes this method suitable
  * for constructing trees with a given degree sequence.
- * 
+ *
  * </para><para>
  * For a undirected simple graph, the time complexity is O(V + alpha(V) * E).
  * For an undirected multi graph, the time complexity is O(V * E + V log V).
