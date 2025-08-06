@@ -1704,14 +1704,17 @@ igraph_reindex_membership:
 
 igraph_community_leading_eigenvector:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
-        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VECTOR_INT membership,
+        GRAPH graph, 
+        OPTIONAL EDGE_WEIGHTS weights,
+        OPTIONAL OUT MATRIX_INT merges, 
+        OPTIONAL OUT VECTOR_INT membership,
         INTEGER steps=-1,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
-        OPTIONAL OUT REAL modularity, BOOLEAN start=False,
+        OPTIONAL OUT REAL modularity, 
+        BOOLEAN start=False,
         OPTIONAL OUT VECTOR eigenvalues,
         OPTIONAL OUT VECTOR_LIST eigenvectors,
-        OPTIONAL OUT VECTOR history,
+        OPTIONAL OUT VECTOR_INT history,
         OPTIONAL LEVC_FUNC callback,
         OPTIONAL EXTRA callback_extra
 
