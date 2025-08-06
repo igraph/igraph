@@ -349,7 +349,7 @@ static igraph_error_t modular_product(igraph_t *res,
     IGRAPH_CHECK(igraph_is_simple(g2, &is_simple2));
 
     if (!is_simple1 || !is_simple2) {
-        IGRAPH_ERROR("Modular product requires simple graph as input.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Modular product requires simple graphs as input.", IGRAPH_EINVAL);
     }
 
     // See: https://en.wikipedia.org/wiki/Graph_product#Overview_table
@@ -375,13 +375,13 @@ static igraph_error_t modular_product(igraph_t *res,
     igraph_t tensor;
     IGRAPH_CHECK(tensor_product(&tensor, g1, g2));
     IGRAPH_FINALLY(igraph_destroy, &tensor);
-    
+
     IGRAPH_CHECK(igraph_union(res, &tensor, &tensor_compl, /*edge_map1*/ NULL, /*edge_map2*/ NULL));
 
     igraph_destroy(&tensor);
     igraph_destroy(&tensor_compl);
     IGRAPH_FINALLY_CLEAN(2);
-    
+
     return IGRAPH_SUCCESS;
 }
 
@@ -482,7 +482,7 @@ static igraph_error_t modular_product(igraph_t *res,
  *     if and only if
  *     <code>u1 ~ u2</code> and <code>v1 ~ v2</code> or
  *     <code>NOT (u1 ~ u2)</code> and <code>NOT (v1 ~ v2)</code>.
- *     The modular product requires both the graphs to be simple.
+ *     The modular product requires both graphs to be simple.
  *     Thus, the number of edges in the product is
  *     <code>|E1| |E2| + |E1'| |E2'|</code> in the directed case and
  *     <code>2 |E1| |E2| + 2 |E1'| |E2'|</code> in the undirected case.
@@ -498,7 +498,7 @@ static igraph_error_t modular_product(igraph_t *res,
  * Reference:
  *
   * </para><para>
- * Richar Hammack, Wilfried Imrich, and Sandi Klavžar (2011).
+ * Richard Hammack, Wilfried Imrich, and Sandi Klavžar (2011).
  * Handbook of Product Graphs (2nd ed.). CRC Press.
  * https://doi.org/10.1201/b10959
  *
@@ -511,8 +511,8 @@ static igraph_error_t modular_product(igraph_t *res,
  * \return Error code:
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
  *         graphs \p g1 and \p g2 are incompatible for the requested product.
- * 
- * \sa \ref igraph_rooted_product
+ *
+ * \sa \ref igraph_rooted_product() for the rooted product.
  */
 
 igraph_error_t igraph_product(igraph_t *res,
@@ -531,7 +531,7 @@ igraph_error_t igraph_product(igraph_t *res,
 
     case IGRAPH_PRODUCT_TENSOR:
         return tensor_product(res, g1, g2);
-    
+
     case IGRAPH_PRODUCT_MODULAR:
         return modular_product(res, g1, g2);
 
@@ -554,7 +554,7 @@ igraph_error_t igraph_product(igraph_t *res,
  * </para><para>
  * The vertex IDs in the product graph related to the IDs in the operands in
  * the same convention as in \ref igraph_product().
- * 
+ *
  * </para><para>
  * In the rooted product graph of G and H, with root vertex ID \p root in H,
  * there is a connection from <code>(u1, v1)</code> to <code>(u2, v2)</code>
@@ -574,9 +574,9 @@ igraph_error_t igraph_product(igraph_t *res,
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
  *         graphs \p g1 and \p g2 are incompatible for the requested product.
  *         \c IGRAPH_EINVVID if invalid vertex ID passed as \p root.
- * 
- * \sa \ref igraph_product
- * 
+ *
+ * \sa \ref igraph_product() for other types of graph products.
+ *
  * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
  * where |V1| and |V2| are the number of vertices, and
  * |E1| and |E2| are the number of edges of the operands.
