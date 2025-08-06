@@ -242,12 +242,11 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * https://doi.org/10.1103/PhysRevE.74.036104
  *
  * \param graph The input graph. Edge directions will be ignored.
- * \param weights The weights of the edges, or a null pointer for
- *    unweighted graphs.
+ * \param weights The weights of the edges, or \c NULL for unweighted graphs.
  * \param merges The result of the algorithm, a matrix containing the
  *    information about the splits performed. The matrix is built in
  *    the opposite way however, it is like the result of an
- *    agglomerative algorithm. Unlike with most other hierarchicaly
+ *    agglomerative algorithm. Unlike with most other hierarchical
  *    community detection functions in igraph, the integers in this matrix
  *    represent community indices, not vertex indices. If at the end of
  *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
@@ -264,7 +263,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    This argument is ignored if it is \c NULL. This argument can
  *    also be used to supply a starting configuration for the community
  *    finding, in the format of a membership vector. In this case the
- *    \p start argument must be set to 1.
+ *    \p start argument must be set to \c true.
  * \param steps The maximum number of steps to perform. It might
  *    happen that some component (or the whole network) has no
  *    underlying community structure and no further steps can be
