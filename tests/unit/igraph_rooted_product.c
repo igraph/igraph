@@ -82,10 +82,32 @@ void test_directed(void) {
     igraph_destroy(&exp_prod);
 }
 
+void test_null_and_singleton(void) {
+    igraph_t null_g, singleton_g, product;
+
+    igraph_empty(&null_g, 0, IGRAPH_UNDIRECTED);
+    igraph_empty(&singleton_g, 1, IGRAPH_UNDIRECTED);
+
+    igraph_rooted_product(&product, &null_g, &singleton_g, 0);
+    IGRAPH_ASSERT(igraph_vcount(&product) == 0);
+    igraph_destroy(&product);
+
+    igraph_rooted_product(&product, &singleton_g, &singleton_g, 0);
+    IGRAPH_ASSERT(igraph_vcount(&product) == 1);
+    IGRAPH_ASSERT(igraph_ecount(&product) == 0);
+    igraph_destroy(&product);
+
+    CHECK_ERROR(igraph_rooted_product(&product, &singleton_g, &null_g, 0), IGRAPH_EINVVID);
+
+    igraph_destroy(&singleton_g);
+    igraph_destroy(&null_g);
+}
+
 int main(void) {
     test_p2_p4();
     test_multigraph();
     test_directed();
+    test_null_and_singleton();
 
     VERIFY_FINALLY_STACK();
 
