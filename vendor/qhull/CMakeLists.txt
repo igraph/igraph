@@ -21,6 +21,30 @@ add_library(
   libqhull_r/usermem_r.c
   libqhull_r/userprintf_r.c
   libqhull_r/userprintf_rbox_r.c
+
+  libqhullcpp/Coordinates.cpp
+  libqhullcpp/PointCoordinates.cpp
+  libqhullcpp/Qhull.cpp
+  libqhullcpp/QhullFacet.cpp
+  libqhullcpp/QhullFacetList.cpp
+  libqhullcpp/QhullFacetSet.cpp
+  libqhullcpp/QhullHyperplane.cpp
+  libqhullcpp/QhullPoint.cpp
+  libqhullcpp/QhullPoints.cpp
+  libqhullcpp/QhullPointSet.cpp
+  libqhullcpp/QhullQh.cpp
+  libqhullcpp/QhullRidge.cpp
+  libqhullcpp/QhullSet.cpp
+  libqhullcpp/QhullStat.cpp
+  libqhullcpp/QhullUser.cpp
+  libqhullcpp/QhullVertex.cpp
+  libqhullcpp/QhullVertexSet.cpp
+  libqhullcpp/qt-qhull.cpp
+  libqhullcpp/RboxPoints.cpp
+  libqhullcpp/RoadError.cpp
+  libqhullcpp/RoadLogEvent.cpp
+  libqhullcpp/usermem_r-cpp.cpp
+
 )
 
 target_include_directories(

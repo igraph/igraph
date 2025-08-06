@@ -28,12 +28,6 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
-FILE get_null_fp() {
-  #if 1 == 1
-  return 1;
-  #endif
-}
-
 void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
@@ -46,7 +40,7 @@ void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     //printf("\n");
 }
 
-igraph_error_t old_igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
+igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points_) {
     int curlong, totlong; /* used !qh_NOmem */
     int exitcode;
     igraph_integer_t numpoints = igraph_matrix_nrow(points_);
