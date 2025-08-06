@@ -292,12 +292,12 @@ void test_c4_p2_modular(void) {
     igraph_t c4, p2, res, prod;
     igraph_bool_t is_iso;
 
-    igraph_ring(&c4, 4, false, false, true);
-    igraph_ring(&p2, 2, false, false, false);
+    igraph_ring(&c4, 4, IGRAPH_UNDIRECTED, false, true);
+    igraph_ring(&p2, 2, IGRAPH_UNDIRECTED, false, false);
 
     igraph_product(&res, &c4, &p2, IGRAPH_PRODUCT_MODULAR);
 
-    igraph_small(&prod, 8, false, 0,3,  0,7,  1,2,  1,6,  2,5,  3,4,  4,7,  5,6,  -1);
+    igraph_small(&prod, 8, IGRAPH_UNDIRECTED, 0,3,  0,7,  1,2,  1,6,  2,5,  3,4,  4,7,  5,6,  -1);
 
     igraph_isomorphic(&res, &prod, &is_iso);
     IGRAPH_ASSERT(is_iso);
