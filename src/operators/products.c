@@ -497,7 +497,7 @@ static igraph_error_t modular_product(igraph_t *res,
  * </para><para>
  * Reference:
  *
-  * </para><para>
+ * </para><para>
  * Richard Hammack, Wilfried Imrich, and Sandi Klavžar (2011).
  * Handbook of Product Graphs (2nd ed.). CRC Press.
  * https://doi.org/10.1201/b10959
