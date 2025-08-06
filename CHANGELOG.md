@@ -70,6 +70,7 @@
  - `igraph_is_simple()` gained an extra `igraph_bool_t` argument that decides whether edge directions should be considered. Directed graphs with a mutual edge pair are treated as non-simple if this argument is set to `IGRAPH_UNDIRECTED` (which treats the graph as if it was undirected).
  - `igraph_community_leiden()` now takes two `vertex_out_weights` and `vertex_in_weights` parameters in order to support directed graphs, instead of the previou single `node_weights` parameter. To obtain the old behavior for undirected graphs, pass the vertex weights as `vertex_out_weights` and set `vertex_in_weights` to `NULL`.
  - `igraph_rewire()` now takes an `igraph_edge_type_sw_t` parameter to specify whether to create self-loops. The `igraph_rewiring_t` enum type was removed. Instead of the old `IGRAPH_REWIRING_SIMPLE`, use `IGRAPH_SIMPLE_SW`. Instead of the old `IGRAPH_REWIRING_SIMPLE_LOOPS`, use `IGRAPH_LOOPS_SW`.
+ - `igraph_density()` now takes an optional `weights` parameter.
 
 ### Added
 
@@ -85,6 +86,7 @@
  - `igraph_strvector_fprint()` prints a string vector to a file.
  - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
  - `igraph_nearest_neighbor_graph()` computes a neighborhood graph of spatial points based on a neighbor count, cutoff distance, and chosen metric. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2788!
+ - `igraph_community_leiden_simple()` is a simplified interface to `igraph_community_leiden()` that allows selecting the objective function to maximize directly.
 
 ### Changed
 
