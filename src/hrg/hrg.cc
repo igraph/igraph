@@ -955,7 +955,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple, IGRAPH_DIRECTED));
     if (!simple) {
         IGRAPH_ERROR("HRG graph must be a simple graph.", IGRAPH_EINVAL);
     }

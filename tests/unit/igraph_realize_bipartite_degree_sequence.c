@@ -132,7 +132,7 @@ int main(void) {
 
     igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
 
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
     igraph_is_bipartite(&g, &is_bipartite, NULL);
 
@@ -186,7 +186,7 @@ int main(void) {
 
     igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
 
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     // For this method, it does not have to be connected
     igraph_is_connected(&g, &is_connected, IGRAPH_WEAK);
     igraph_is_bipartite(&g, &is_bipartite, NULL);
@@ -240,7 +240,7 @@ int main(void) {
 
     igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
 
-    igraph_is_simple(&g, &is_simple);
+    igraph_is_simple(&g, &is_simple, IGRAPH_DIRECTED);
     // For this method, it does not have to be connected
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
     igraph_is_bipartite(&g, &is_bipartite, NULL);

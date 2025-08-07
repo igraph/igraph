@@ -37,8 +37,6 @@
  * \function igraph_distances_dijkstra_cutoff
  * \brief Weighted shortest path lengths between vertices, with cutoff.
  *
- * \experimental
- *
  * This function is similar to \ref igraph_distances_dijkstra(), but
  * paths longer than \p cutoff will not be considered.
  *

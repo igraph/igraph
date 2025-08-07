@@ -93,14 +93,17 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         IGRAPH_ERROR("Number of points in layout does not match vertex count.", IGRAPH_EINVAL);
     }
 
-    if (dim == 0) {
-        IGRAPH_ERROR("Vertex coordinates must be at least one dimensional, "
-                     "but received a zero-dimensional input.", IGRAPH_EINVAL);
-    }
-
     if (vcount == 0) {
         /* Null graph, nothing to do. */
         return IGRAPH_SUCCESS;
+    }
+
+    /* This check is not done for the null graph, which was handled above.
+     * Skipping the check is necessary due to the different handling of
+     * zero-by-n matrices i various systems. */
+    if (dim == 0) {
+        IGRAPH_ERROR("Vertex coordinates must be at least one dimensional, "
+                     "but received a zero-dimensional input.", IGRAPH_EINVAL);
     }
 
     /* Shift layout to origin. */

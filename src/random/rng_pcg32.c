@@ -116,7 +116,7 @@ static pcg32_random_t igraph_i_rng_default_state = PCG32_INITIALIZER;
 igraph_rng_t igraph_i_rng_default = {
     addr(igraph_rngtype_pcg32),
     addr(igraph_i_rng_default_state),
-    /* is_seeded = */ true
+    /* is_seeded = */ false
 };
 
 #undef addr

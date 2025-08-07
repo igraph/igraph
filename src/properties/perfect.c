@@ -68,7 +68,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
     }
 
     // If the graph isn't simple then return an error.
-    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
+    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple, IGRAPH_DIRECTED));
     if (!is_simple) {
         IGRAPH_ERROR("Perfect graph testing is implemented for simple graphs only. Simplify the graph.", IGRAPH_EINVAL);
     }
