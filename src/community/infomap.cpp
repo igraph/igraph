@@ -31,6 +31,7 @@
 #endif
 
 #include <climits>
+#include <cmath>
 
 static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
     igraph_integer_t n = infomap.numLeafNodes();
