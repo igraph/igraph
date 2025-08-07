@@ -650,3 +650,87 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
 
     return IGRAPH_SUCCESS;
 }
+
+igraph_error_t igraph_corona_product(igraph_t *res,
+                                     const igraph_t *g1,
+                                     const igraph_t *g2,
+                                     const igraph_neimode_t dir) {
+
+    const igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Corona product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    // New vertex count = vcount1 * (vcount2+1)
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+    IGRAPH_SAFE_ADD(vcount, vcount1, &vcount);
+
+    // No. of edges: e1 + v1.e2 + v1.v2
+    {
+        igraph_integer_t tmp;
+        IGRAPH_SAFE_MULT(vcount1, vcount2, &tmp);
+        IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+        IGRAPH_SAFE_ADD(tmp, ecount, &ecount);
+        IGRAPH_SAFE_ADD(ecount1, ecount, &ecount);
+    }
+
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
+    // Indexing of vertex: (i, j), 0 <= i < v1, 0 <= j <=v2
+    igraph_integer_t edge_index = 0;
+    // if j = 0, then it is the centre graph, else it is the copy of graph g2
+    // types of edges: 1. (i, 0) to (i, j) for j != 0 --> centre to outer graph edges --> v1.v2
+    //      2. (i, u+1) to (i, v+1) for each i and edge u-->v exists in g2 --> edges of g2 in copies of g2 --> v1.e2
+    //      3. (u, 0) to (v, 0) for every edge (u,v) in g1 --> original edge of g1 --> e1
+
+    for (igraph_integer_t i = 0; i < vcount1; ++i) {
+        // Type 1 Edge:
+        for (igraph_integer_t j = 1; j <= vcount2; ++j) {
+            // If IGRAPH_ALL is given, it will still add edges from centre to out
+            if (dir & IGRAPH_OUT) {
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1);
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + j;
+            }
+            else if (dir & IGRAPH_IN) {
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + j;
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1);
+            }
+        }
+
+        // Type 2 Edge
+        for (igraph_integer_t j = 0; j < ecount2; j++) {
+            igraph_integer_t from = IGRAPH_FROM(g2, j);
+            igraph_integer_t to = IGRAPH_TO(g2, j);
+
+            VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + (from + 1);
+            VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + (to + 1);
+        }
+    }
+
+    // Type 3 Edge:
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g1, i);
+        igraph_integer_t to = IGRAPH_TO(g1, i);
+
+        VECTOR(edges)[edge_index++] = from * (vcount2 + 1);
+        VECTOR(edges)[edge_index++] = to * (vcount2 + 1);
+    }
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
