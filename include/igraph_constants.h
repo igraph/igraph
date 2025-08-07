@@ -95,10 +95,6 @@ typedef enum { IGRAPH_RANDOM_TREE_PRUFER = 0,
                IGRAPH_RANDOM_TREE_LERW
              } igraph_random_tree_t;
 
-typedef enum { IGRAPH_REWIRING_SIMPLE = 0,
-               IGRAPH_REWIRING_SIMPLE_LOOPS
-             } igraph_rewiring_t;
-
 typedef enum { IGRAPH_EDGEORDER_ID = 0,
                IGRAPH_EDGEORDER_FROM,
                IGRAPH_EDGEORDER_TO
@@ -197,6 +193,7 @@ typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
                IGRAPH_PRODUCT_LEXICOGRAPHIC,
                IGRAPH_PRODUCT_STRONG,
                IGRAPH_PRODUCT_TENSOR,
+               IGRAPH_PRODUCT_MODULAR
              } igraph_product_t;
 
 /**

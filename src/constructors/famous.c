@@ -19,8 +19,6 @@
 
 */
 
-#include <string.h>
-
 #include "igraph_constructors.h"
 
 #include "internal/hacks.h" /* strcasecmp */

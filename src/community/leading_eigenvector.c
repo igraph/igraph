@@ -242,12 +242,11 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * https://doi.org/10.1103/PhysRevE.74.036104
  *
  * \param graph The input graph. Edge directions will be ignored.
- * \param weights The weights of the edges, or a null pointer for
- *    unweighted graphs.
+ * \param weights The weights of the edges, or \c NULL for unweighted graphs.
  * \param merges The result of the algorithm, a matrix containing the
  *    information about the splits performed. The matrix is built in
  *    the opposite way however, it is like the result of an
- *    agglomerative algorithm. Unlike with most other hierarchicaly
+ *    agglomerative algorithm. Unlike with most other hierarchical
  *    community detection functions in igraph, the integers in this matrix
  *    represent community indices, not vertex indices. If at the end of
  *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
@@ -264,7 +263,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    This argument is ignored if it is \c NULL. This argument can
  *    also be used to supply a starting configuration for the community
  *    finding, in the format of a membership vector. In this case the
- *    \p start argument must be set to 1.
+ *    \p start argument must be set to \c true.
  * \param steps The maximum number of steps to perform. It might
  *    happen that some component (or the whole network) has no
  *    underlying community structure and no further steps can be
@@ -340,7 +339,7 @@ igraph_error_t igraph_community_leading_eigenvector(
         igraph_bool_t start,
         igraph_vector_t *eigenvalues,
         igraph_vector_list_t *eigenvectors,
-        igraph_vector_t *history,
+        igraph_vector_int_t *history,
         igraph_community_leading_eigenvector_callback_t *callback,
         void *callback_extra) {
 
@@ -416,16 +415,16 @@ igraph_error_t igraph_community_leading_eigenvector(
         IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, NULL, IGRAPH_WEAK));
         communities = igraph_vector_int_size(&idx);
         if (history) {
-            IGRAPH_CHECK(igraph_vector_push_back(history,
+            IGRAPH_CHECK(igraph_vector_int_push_back(history,
                                                  IGRAPH_LEVC_HIST_START_FULL));
         }
     } else {
         /* Just create the idx vector for the given membership vector */
         communities = igraph_vector_int_max(mymembership) + 1;
         if (history) {
-            IGRAPH_CHECK(igraph_vector_push_back(history,
+            IGRAPH_CHECK(igraph_vector_int_push_back(history,
                                                  IGRAPH_LEVC_HIST_START_GIVEN));
-            IGRAPH_CHECK(igraph_vector_push_back(history, communities));
+            IGRAPH_CHECK(igraph_vector_int_push_back(history, communities));
         }
         IGRAPH_CHECK(igraph_vector_int_resize(&idx, communities));
         igraph_vector_int_null(&idx);
@@ -455,8 +454,8 @@ igraph_error_t igraph_community_leading_eigenvector(
             IGRAPH_CHECK(igraph_vector_list_push_back_new(eigenvectors, NULL));
         }
         if (history) {
-            IGRAPH_CHECK(igraph_vector_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
-            IGRAPH_CHECK(igraph_vector_push_back(history, i - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
+            IGRAPH_CHECK(igraph_vector_int_push_back(history, i - 1));
         }
     }
     staken = communities - 1;
@@ -632,9 +631,9 @@ igraph_error_t igraph_community_leading_eigenvector(
 
         if (storage.d[0] <= 0) {
             if (history) {
-                IGRAPH_CHECK(igraph_vector_push_back(history,
+                IGRAPH_CHECK(igraph_vector_int_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
-                IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+                IGRAPH_CHECK(igraph_vector_int_push_back(history, comm));
             }
             continue;
         }
@@ -651,9 +650,9 @@ igraph_error_t igraph_community_leading_eigenvector(
         }
         if (l == 0 || l == size) {
             if (history) {
-                IGRAPH_CHECK(igraph_vector_push_back(history,
+                IGRAPH_CHECK(igraph_vector_int_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
-                IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+                IGRAPH_CHECK(igraph_vector_int_push_back(history, comm));
             }
             continue;
         }
@@ -666,9 +665,9 @@ igraph_error_t igraph_community_leading_eigenvector(
         }
         if (mod <= 1e-8) {
             if (history) {
-                IGRAPH_CHECK(igraph_vector_push_back(history,
+                IGRAPH_CHECK(igraph_vector_int_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
-                IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+                IGRAPH_CHECK(igraph_vector_int_push_back(history, comm));
             }
             continue;
         }
@@ -687,8 +686,8 @@ igraph_error_t igraph_community_leading_eigenvector(
         IGRAPH_CHECK(igraph_vector_push_back(&mymerges, comm));
         IGRAPH_CHECK(igraph_vector_push_back(&mymerges, communities - 1));
         if (history) {
-            IGRAPH_CHECK(igraph_vector_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
-            IGRAPH_CHECK(igraph_vector_push_back(history, comm));
+            IGRAPH_CHECK(igraph_vector_int_push_back(history, IGRAPH_LEVC_HIST_SPLIT));
+            IGRAPH_CHECK(igraph_vector_int_push_back(history, comm));
         }
 
         /* Store the resulting communities in the queue if needed */

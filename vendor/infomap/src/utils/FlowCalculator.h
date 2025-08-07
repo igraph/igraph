@@ -3,7 +3,7 @@
  Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
 
  This file is part of the Infomap software package.
- See file LICENSE_AGPLv3.txt for full license details.
+ See file LICENSE_GPLv3.txt for full license details.
  For more information, see <http://www.mapequation.org>
  ******************************************************************************/
 
@@ -41,6 +41,7 @@ private:
   void calcDirectedBipartiteFlow(const StateNetwork&, const Config&) noexcept;
   void calcDirdirFlow(const Config&) noexcept;
   void calcRawdirFlow() noexcept;
+  void usePrecomputedFlow(const StateNetwork&, const Config&);
 
   void finalize(StateNetwork&, const Config&, bool) noexcept;
 
@@ -64,7 +65,7 @@ private:
   std::vector<FlowLink> flowLinks;
 };
 
-inline void calculateFlow(StateNetwork& network, const Config& config) noexcept
+inline void calculateFlow(StateNetwork& network, const Config& config)
 {
   FlowCalculator(network, config);
 }

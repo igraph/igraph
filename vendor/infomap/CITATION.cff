@@ -1,4 +1,4 @@
-cff-version: 2.6.1
+cff-version: 2.8.0
 message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Edler"
@@ -11,6 +11,6 @@ authors:
   given-names: "Martin"
   orcid: "https://orcid.org/0000-0002-7181-9940"
 title: "The MapEquation software package"
-version: 2.6.1
-date-released: 2022-10-31
+version: 2.8.0
+date-released: 2024-06-20
 url: "https://mapequation.org"

@@ -176,8 +176,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         // These algorithms require a starting vertex,
         // so we require the graph to have at least one vertex.
         if (igraph_vcount(&graph) >= 1) {
-            igraph_distances(&graph, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_ALL);
-            igraph_get_shortest_paths(&graph, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_ALL, &iv1, &iv2);
+            igraph_distances(&graph, NULL, &m, igraph_vss_1(0), igraph_vss_all(), IGRAPH_ALL);
+            igraph_get_shortest_paths(&graph, NULL, &ivl1, &ivl2, 0, igraph_vss_all(), IGRAPH_ALL, &iv1, &iv2);
             igraph_pseudo_diameter(&graph, NULL, &r, 0, &i, &i2, false, true);
             igraph_bfs(&graph, 0, NULL, IGRAPH_ALL, true, NULL, &iv1, &iv2, &iv3, &iv4, NULL, &iv5, NULL, NULL);
             igraph_dfs(&graph, 0, IGRAPH_ALL, true, &iv1, &iv2, &iv3, &iv4, NULL, NULL, NULL);
@@ -204,7 +204,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (b2) igraph_eulerian_cycle(&graph, &iv1, &iv2);
 
         igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS);
+        igraph_is_vertex_coloring(&graph, &iv1, &b);
+        IGRAPH_ASSERT(b);
         igraph_vertex_coloring_greedy(&graph, &iv1, IGRAPH_COLORING_GREEDY_DSATUR);
+        igraph_is_vertex_coloring(&graph, &iv1, &b);
+        IGRAPH_ASSERT(b);
 
         igraph_connected_components(&graph, &iv1, &iv2, &i, IGRAPH_WEAK);
         igraph_minimum_spanning_tree(&graph, &iv1, NULL, IGRAPH_MST_UNWEIGHTED);
@@ -236,7 +240,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         if (igraph_vcount(&graph) >=1) {
             // Run only on the simplified graph to avoid a very large number of
             // shortest paths due to multi-edges.
-            igraph_get_all_shortest_paths(&graph, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
+            igraph_get_all_shortest_paths(&graph, NULL, &ivl1, &ivl2, &iv1, 0, igraph_vss_all(), IGRAPH_ALL);
         }
 
         /* Basic graph modification */
@@ -248,7 +252,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_delete_edges(&graph, igraph_ess_1(0));
 
         if (igraph_vcount(&graph) >= 4) {
-            igraph_rewire(&graph, igraph_ecount(&graph) + 1, IGRAPH_REWIRING_SIMPLE);
+            igraph_rewire(&graph, igraph_ecount(&graph) + 1, IGRAPH_SIMPLE_SW);
         }
 
         igraph_matrix_destroy(&m);

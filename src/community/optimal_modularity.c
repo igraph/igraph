@@ -36,8 +36,9 @@
  * \function igraph_community_optimal_modularity
  * \brief Calculate the community structure with the highest modularity value.
  *
- * This function calculates the optimal community structure for a
- * graph, in terms of maximal modularity score.
+ * This function calculates the optimal community structure for a graph, in
+ * terms of maximal modularity score. Both undirected and directed graphs
+ * are supported.
  *
  * </para><para>
  * The calculation is done by transforming the modularity maximization
@@ -90,7 +91,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t no_of_variables;
     igraph_integer_t i, j, k, l;
     int st;

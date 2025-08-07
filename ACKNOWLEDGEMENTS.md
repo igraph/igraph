@@ -225,6 +225,14 @@ use or performance of this software.
    License: [GNU LGPLv2.1][lgpl2] or later
 
 
+#### [Infomap](https://www.mapequation.org/)
+
+Infomap software package for multi-level network clustering
+Copyright (c) 2013, 2014 Daniel Edler, Anton Holmgren, Martin Rosvall
+
+License: [GNU GPLv3][gpl3] or later
+
+
 #### [GLPK (GNU Linear Programming Kit) Version 5.0](https://www.gnu.org/software/glpk/)
 
 Copyright (C) 2000-2020 Free Software Foundation, Inc.
@@ -249,6 +257,7 @@ Copyright (C) 1998-2012 Daniel Veillard.
 License: [MIT license][mit]
 
 
+ [bsd]:   https://opensource.org/license/BSD-2-Clause
  [mit]:   https://opensource.org/licenses/mit-license.html
  [gpl2]:  https://www.gnu.org/licenses/gpl-2.0.html
  [lgpl2]: https://www.gnu.org/licenses/lgpl-2.1.html

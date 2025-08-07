@@ -306,6 +306,5 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, inte
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                                  TYPE(igraph_vector) *newv,
                                                  const igraph_vector_int_t *idx);
-
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index_in_place)(TYPE(igraph_vector) *v,
                                                      const igraph_vector_int_t *idx);

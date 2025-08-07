@@ -375,6 +375,11 @@ LSETYPE:
     CTYPE: igraph_laplacian_spectral_embedding_type_t
     FLAGS: ENUM
 
+METRIC:
+    # Enum that describes the metric to be used for spatial algorithms
+    CTYPE: igraph_metric_t
+    FLAGS: ENUM
+
 MSTALGORITHM:
     # Enum that describes the algorithm for computing a minimum spanning tree
     CTYPE: igraph_mst_algorithm_t
@@ -416,11 +421,6 @@ REALIZE_DEGSEQ_METHOD:
 RECIP:
     # Enum that describes how the reciprocity of a graph should be calculated
     CTYPE: igraph_reciprocity_t
-    FLAGS: ENUM
-
-REWIRING_MODE:
-    # Enum for the rewiring modes of igraph_rewire()
-    CTYPE: igraph_rewiring_t
     FLAGS: ENUM
 
 ROOTCHOICE:

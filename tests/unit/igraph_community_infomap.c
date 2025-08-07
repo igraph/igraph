@@ -1,7 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2011-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
@@ -25,40 +21,46 @@
 #include "test_utilities.h"
 
 
-void gsummary(const igraph_t * g) {
-    printf("|V|=%" IGRAPH_PRId " |E|=%" IGRAPH_PRId " directed=%d\n",
+void gsummary(const igraph_t *g) {
+    printf("|V|=%" IGRAPH_PRId ", |E|=%" IGRAPH_PRId ", directed=%d\n",
            igraph_vcount(g), igraph_ecount(g), (int) igraph_is_directed(g));
 }
 
-void show_results(igraph_vector_int_t * membership, igraph_real_t codelength) {
-    int i;
-    printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n", codelength, igraph_vector_int_max(membership) + 1 );
+void show_results(const igraph_vector_int_t *membership, igraph_real_t codelength) {
+    const igraph_integer_t n = igraph_vector_int_size(membership);
+    printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n",
+           codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership: ");
-    for (i = 0; i < igraph_vector_int_size(membership); i++) {
-        printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
+    for (igraph_integer_t i = 0; i < n; i++) {
+        printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i]);
     }
     printf("\n");
 }
 
 void show_results_lite(igraph_vector_int_t * membership, igraph_real_t codelength) {
-    int i;
-    printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n", codelength, igraph_vector_int_max(membership) + 1 );
-    printf("Membership (1/100 of vertices): ");
-    for (i = 0; i < igraph_vector_int_size(membership); i += 100) {
+    const igraph_integer_t n = igraph_vector_int_size(membership);
+    printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n",
+           codelength, igraph_vector_int_max(membership) + 1 );
+    printf("Membership (every 100th vertex): ");
+    for (igraph_integer_t i = 0; i < n; i += 100) {
         printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
     }
     printf("\n");
 }
 
-igraph_real_t infomap_weighted_test(const igraph_t * g, const igraph_vector_t *weights, igraph_bool_t smoke_test) {
+igraph_real_t infomap_weighted_test(const igraph_t *graph, const igraph_vector_t *weights, igraph_bool_t smoke_test) {
+    igraph_real_t codelength = -1;
     igraph_vector_int_t membership;
-    igraph_real_t codelength = 1000;
+
     igraph_vector_int_init(&membership, 0);
 
-    igraph_community_infomap(/*in */ g, /*e_weight=*/ weights, NULL, /*nb_trials=*/5,
-                                     /*out*/ &membership, &codelength);
+    igraph_community_infomap(graph, /*edge_weights=*/ weights, /*vertex_weights=*/ NULL,
+                             /*nb_trials=*/5, &membership, &codelength);
+
+    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == igraph_vcount(graph));
+
     if (!smoke_test) {
-        if (igraph_vcount(g) > 500) {
+        if (igraph_vcount(graph) > 500) {
             show_results_lite(&membership, codelength);
         } else {
             show_results(&membership, codelength);
@@ -71,8 +73,8 @@ igraph_real_t infomap_weighted_test(const igraph_t * g, const igraph_vector_t *w
 }
 
 
-igraph_real_t infomap_test(const igraph_t * g, igraph_bool_t smoke_test) {
-    return infomap_weighted_test(g, 0, smoke_test);
+igraph_real_t infomap_test(const igraph_t *graph, igraph_bool_t smoke_test) {
+    return infomap_weighted_test(graph, NULL, smoke_test);
 }
 
 
@@ -91,21 +93,21 @@ int main(void) {
                  3, 4, 4, 5, 5, 3,
                  0, 5,
                  -1);
-    infomap_test(&g, /* smoke_test = */ 0);
+    infomap_test(&g, /*smoke_test=*/ false);
     igraph_destroy(&g);
 
     /* Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5) */
-    printf("# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
+    printf("\n# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1,  0, 2,  0, 3,  1, 2,  1, 3,  2, 3, /* 4-clique 0,1,2,3 */
                  7, 4,  7, 5,  7, 6,  4, 5,  4, 6,  5, 6, /* 4-clique 4,5,6,7 */
                  0, 4,  1, 5, /* 8, 0, 8, 4, */
                  -1);
-    infomap_test(&g, /* smoke_test = */ 0);
+    infomap_test(&g, /*smoke_test=*/ false);
     igraph_destroy(&g);
 
     /* Zachary Karate club -- this is just a quick smoke test */
-    printf("# Zachary Karate club\n");
+    printf("\n# Zachary Karate club\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0,  1,  0,  2,  0,  3,  0,  4,  0,  5, /* 0,  5, 0,  5, 0,  5, */
                  0,  6,  0,  7,  0,  8,  0, 10,  0, 11,
@@ -124,22 +126,22 @@ int main(void) {
                  28, 33, 29, 32, 29, 33, 30, 32, 30, 33,
                  31, 32, 31, 33, 32, 33,
                  -1);
-    infomap_test(&g, /* smoke_test = */ 0);
+    infomap_test(&g, /*smoke_test=*/ false);
     igraph_destroy(&g);
 
     /* Flow.net that come in infomap_dir.tgz  */
-    printf("# Flow (from infomap_dir.tgz)\n");
+    printf("\n# Flow (from infomap_dir.tgz)\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED,
                  0, 1,     1, 2,    2, 3,    3, 0,    1, 4,
                  4, 5,     5, 6,    6, 7,    7, 4,    5, 8,
                  8, 9,     9, 10,  10, 11,  11, 8,    9, 12,
                  12, 13,  13, 14,  14, 15,  15, 12,  13, 0,
                  -1);
-    infomap_test(&g, /* smoke_test = */ 0);
+    infomap_test(&g, /*smoke_test=*/ false);
     igraph_destroy(&g);
 
     /* MultiphysChemBioEco40W_weighted_dir.net */
-    printf("# MultiphysChemBioEco40W_weighted_dir.net (from infomap_dir.tgz)\n");
+    printf("\n# MultiphysChemBioEco40W_weighted_dir.net (from infomap_dir.tgz)\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED,
                  1, 0,  2, 0,  3, 0,  4, 0,  5, 0,  6, 0,  7, 0,
                  8, 0,  9, 0,  16, 0,  18, 0,  0, 1,  2, 1,  3, 1,
@@ -238,7 +240,7 @@ int main(void) {
                             9.0,  2.0,  2.0,  5.0,  4.0,  2.0,  7.0,  3.0,
                             3.0,  5.0,  8.0,  14.0,  3.0,  38.0,  3.0,  9.0,
                             2.0,  8.0,  21.0,  18.0,  58.0);
-    infomap_weighted_test(&g, &weights, /* smoke_test = */ 0);
+    infomap_weighted_test(&g, &weights, /*smoke_test=*/ false);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
@@ -247,14 +249,62 @@ int main(void) {
      * a quick smoke test but don't check the results too thoroughly as some
      * changes are expected. We only check the codelength of the partition,
      * this is more reliable. */
-    printf("# Wiktionary english verbs (synonymy 2008)\n");
+    printf("\n# Wiktionary english verbs (synonymy 2008)\n");
     wikt = fopen("wikti_en_V_syn.elist", "r");
     IGRAPH_ASSERT(wikt != NULL);
     igraph_read_graph_edgelist(&g, wikt, 0, IGRAPH_UNDIRECTED);
     fclose(wikt);
     gsummary(&g);
-    codelength = infomap_test(&g, /* smoke_test = */ 1);
-    printf("Codelength %0.2f", codelength);
+    codelength = infomap_test(&g, /*smoke_test=*/ true);
+    printf("Codelength: %0.2f\n", codelength);
+    igraph_destroy(&g);
+
+    printf("\n# Singleton\n");
+    igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
+    infomap_test(&g, /*smoke_test=*/ false);
+    igraph_destroy(&g);
+
+    printf("\n# Two isolated vertices\n");
+    igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
+    infomap_test(&g, /*smoke_test=*/ false);
+    igraph_destroy(&g);
+
+    printf("\n# Small undirected disconnected graph\n");
+    igraph_small(&g, 6, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 2,0, 3,4,
+                 -1);
+    infomap_test(&g, /*smoke_test=*/ false);
+    igraph_destroy(&g);
+
+    printf("\n# Undirected P_3 with loops at the ends\n");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 0,0, 2,2,
+                 -1);
+    infomap_test(&g, /*smoke_test=*/ false);
+    igraph_destroy(&g);
+
+    printf("\n# Same as above, but directed, single loops\n");
+    igraph_small(&g, 2, IGRAPH_DIRECTED,
+                 0,1, 1,0, 1,2, 2,1, 0,0, 2,2,
+                 -1);
+    infomap_test(&g, /*smoke_test=*/ false);
+    igraph_destroy(&g);
+
+    printf("\n# Same as above, but double loops\n");
+    igraph_small(&g, 2, IGRAPH_DIRECTED,
+                 0,1, 1,0, 1,2, 2,1, 0,0, 2,2, 0,0, 2,2,
+                 -1);
+    infomap_test(&g, /*smoke_test=*/ false);
+    igraph_destroy(&g);
+
+    printf("\n# Same as above, but instead of doubling loops, we double the loop weight\n");
+    igraph_small(&g, 2, IGRAPH_DIRECTED,
+                 0,1, 1,0, 1,2, 2,1, 0,0, 2,2,
+                 -1);
+    igraph_vector_init_real(&weights, 6,
+                            1.0, 1.0, 1.0, 1.0, 2.0, 2.0);
+    infomap_weighted_test(&g, &weights, /*smoke_test=*/ false);
+    igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

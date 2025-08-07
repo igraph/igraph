@@ -44,11 +44,10 @@
 
 */
 
-#include <stdlib.h>
-#include <stdarg.h>
-
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"
+
+#include <stdlib.h>
 
 #define YY_EXTRA_TYPE igraph_i_dl_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;

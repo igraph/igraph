@@ -9,7 +9,7 @@
 IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_rewire(
-    igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
+    igraph_t *graph, igraph_integer_t n, igraph_bool_t loops,
     igraph_bool_t use_adjlist);
 
 IGRAPH_END_C_DECLS

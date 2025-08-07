@@ -10,4 +10,3 @@ Comparing ((0,1), (), 2) with ((0), (), (1,2))
 Expected to fail nicely:
 
 Differently sized clusterings
-Member index too high

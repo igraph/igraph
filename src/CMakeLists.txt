@@ -165,7 +165,7 @@ add_library(
   community/leiden.c
   community/louvain.c
   community/modularity.c
-  community/infomap.cc
+  community/infomap.cpp
   community/optimal_modularity.c
   community/spinglass/clustertool.cpp
   community/spinglass/NetDataTypes.cpp
@@ -279,6 +279,7 @@ add_library(
   properties/multiplicity.c
   properties/neighborhood.c
   properties/perfect.c
+  properties/rich_club.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
@@ -311,6 +312,7 @@ add_library(
   misc/spanning_trees.c
 
   spatial/delaunay.c
+  spatial/nearest_neighbor.cpp
 
   internal/glpk_support.c
   internal/hacks.c

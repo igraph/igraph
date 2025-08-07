@@ -136,7 +136,7 @@ int check_flow(int errorinc,
     }
     igraph_delete_edges(&graph_copy, igraph_ess_vector(&cut_int));
     igraph_matrix_init(&sp, 1, 1);
-    igraph_distances(&graph_copy, &sp, /*from=*/ igraph_vss_1(source),
+    igraph_distances(&graph_copy, NULL, &sp, /*from=*/ igraph_vss_1(source),
                      /*to=*/ igraph_vss_1(target), IGRAPH_OUT);
     if (MATRIX(sp, 0, 0) != IGRAPH_INFINITY) {
         return errorinc + 10;

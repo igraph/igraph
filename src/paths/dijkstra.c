@@ -107,7 +107,7 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
     igraph_vector_int_t indexv;
 
     if (!weights) {
-        return igraph_distances_cutoff(graph, res, from, to, mode, cutoff);
+        return igraph_distances_cutoff(graph, NULL, res, from, to, mode, cutoff);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -416,7 +416,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_integer_t i, to_reach;
 
     if (!weights) {
-        return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
+        return igraph_get_shortest_paths(graph, NULL, vertices, edges, from, to, mode,
                                          parents, inbound_edges);
     }
 
@@ -783,7 +783,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (!weights) {
-        return igraph_get_all_shortest_paths(graph, vertices, edges, nrgeo, from, to, mode);
+        return igraph_get_all_shortest_paths(graph, NULL, vertices, edges, nrgeo, from, to, mode);
     }
 
     if (from < 0 || from >= no_of_nodes) {

@@ -872,7 +872,7 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
                    igraph_i_graphlets_order_cmp);
 
     IGRAPH_CHECK(igraph_vector_int_list_permute(cliques, &order));
-    IGRAPH_CHECK(igraph_vector_index_int(Mu, &order));
+    IGRAPH_CHECK(igraph_vector_index_in_place(Mu, &order));
 
     igraph_vector_int_destroy(&order);
     IGRAPH_FINALLY_CLEAN(1);

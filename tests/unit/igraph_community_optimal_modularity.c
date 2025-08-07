@@ -17,6 +17,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.h"
+
 void prepare_weights_vector(igraph_vector_t *weights, const igraph_t *graph) {
     const igraph_integer_t m = igraph_ecount(graph);
     igraph_edge_betweenness(graph, weights, true, NULL);
@@ -25,23 +27,30 @@ void prepare_weights_vector(igraph_vector_t *weights, const igraph_t *graph) {
     }
 }
 
-/* Only for undirected! */
 void verify_with_leiden(const igraph_t *graph, const igraph_vector_t *weights,
                         igraph_real_t resolution, igraph_real_t modularity) {
 
+    const igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_real_t directed_multiplier = directed ? 1.0 : 2.0;
     igraph_vector_int_t leiden_membership;
-    igraph_vector_t vertex_weights;
+    igraph_vector_t vertex_out_weights, vertex_in_weights;
     igraph_real_t Q, maxQ = 0.0;
     igraph_real_t m = weights ? igraph_vector_sum(weights) : igraph_ecount(graph);
 
-    igraph_vector_init(&vertex_weights, 0);
+    igraph_vector_init(&vertex_out_weights, 0);
+    if (directed) igraph_vector_init(&vertex_in_weights, 0);
     igraph_vector_int_init(&leiden_membership, 0);
 
-    igraph_strength(graph, &vertex_weights, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, weights);
+    if (directed) {
+        igraph_strength(graph, &vertex_out_weights, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights);
+        igraph_strength(graph, &vertex_in_weights, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, weights);
+    } else {
+        igraph_strength(graph, &vertex_out_weights, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, weights);
+    }
 
     for (int i=0; i < 10; i++) {
-        igraph_community_leiden(graph, weights, &vertex_weights,
-                                resolution / (2*m),
+        igraph_community_leiden(graph, weights, &vertex_out_weights, directed ? &vertex_in_weights : NULL,
+                                resolution / (directed_multiplier * m),
                                 0.01, false, 2, &leiden_membership, NULL, &Q);
         if (Q > maxQ) {
             maxQ = Q;
@@ -52,11 +61,14 @@ void verify_with_leiden(const igraph_t *graph, const igraph_vector_t *weights,
         printf("Partitioning doesn't achieve maximum modularity. "
                "With Leiden: Q=%g; with optimal modularity: Q=%g\n",
                maxQ, modularity);
+        printf("Leiden membership: ");
+        print_vector_int(&leiden_membership);
         IGRAPH_ASSERT(igraph_cmp_epsilon(modularity, maxQ, 1e-15) >= 0);
     }
 
     igraph_vector_int_destroy(&leiden_membership);
-    igraph_vector_destroy(&vertex_weights);
+    if (directed) igraph_vector_destroy(&vertex_in_weights);
+    igraph_vector_destroy(&vertex_out_weights);
 }
 
 int main(void) {
@@ -66,6 +78,8 @@ int main(void) {
     igraph_real_t modularity;
     igraph_error_handler_t *handler;
     igraph_error_t errcode;
+
+    igraph_rng_seed(igraph_rng_default(), 321);
 
     igraph_vector_init(&weights, 0);
     igraph_vector_int_init(&membership, 0);
@@ -141,12 +155,15 @@ int main(void) {
     igraph_small(&graph, 5, IGRAPH_DIRECTED,
                  1, 0, 1, 2, 1, 4, 2, 0, 2, 3, 3, 1, 3, 4, 4, 0, -1);
     igraph_community_optimal_modularity(&graph, NULL, 1, &modularity, &membership);
+    verify_with_leiden(&graph, NULL, 1, modularity);
     IGRAPH_ASSERT(igraph_almost_equals(modularity, 0.09375, 1e-15));
 
     igraph_destroy(&graph);
 
     igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&weights);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

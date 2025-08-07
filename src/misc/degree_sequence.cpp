@@ -21,14 +21,12 @@
 
 #include "core/exceptions.h"
 #include "math/safe_intop.h"
+#include "misc/graphicality.h"
 
 #include <vector>
 #include <list>
 #include <algorithm>
 #include <utility>
-
-#define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
-#define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
 
 /******************************/
 /***** Helper constructs ******/

@@ -100,7 +100,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 
     /* If no weights, then we can just run the unweighted version */
     if (!weights) {
-        return igraph_distances(graph, res, from, to, mode);
+        return igraph_distances(graph, NULL, res, from, to, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -111,7 +111,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 
     /* If no edges, then we can just run the unweighted version */
     if (no_of_edges == 0) {
-        return igraph_distances(graph, res, from, to, mode);
+        return igraph_distances(graph, NULL, res, from, to, mode);
     }
 
     /* If no negative weights, then we can run Dijkstra's algorithm */

@@ -27,7 +27,7 @@ void test_grid_vs_square_lattice(void) {
     igraph_ring(&p4, 4, IGRAPH_UNDIRECTED, false, false);  // P4
     igraph_ring(&p3, 3, IGRAPH_UNDIRECTED, false, false);  // P3
     igraph_product(&product, &p4, &p3, IGRAPH_PRODUCT_CARTESIAN);
-    
+
     igraph_vector_int_t dims;
     igraph_vector_int_init(&dims, 2);
     VECTOR(dims)[0] = 4;
@@ -174,7 +174,7 @@ void test_multigraph_cartesian(void) {
     IGRAPH_ASSERT(igraph_vcount(&product) == 6);
 
     // verified by v1*e2 + v2*e1, see: https://en.wikipedia.org/wiki/Graph_product
-    IGRAPH_ASSERT(igraph_ecount(&product) == 17); 
+    IGRAPH_ASSERT(igraph_ecount(&product) == 17);
 
     igraph_destroy(&g1);
     igraph_destroy(&g2);
@@ -286,6 +286,28 @@ void test_p8_p8_strong(void) {
     igraph_vector_int_destroy(&edges);
 }
 
+/********************** Modular Product ************************/
+// C4 X P2
+void test_c4_p2_modular(void) {
+    igraph_t c4, p2, res, prod;
+    igraph_bool_t is_iso;
+
+    igraph_ring(&c4, 4, IGRAPH_UNDIRECTED, false, true);
+    igraph_ring(&p2, 2, IGRAPH_UNDIRECTED, false, false);
+
+    igraph_product(&res, &c4, &p2, IGRAPH_PRODUCT_MODULAR);
+
+    igraph_small(&prod, 8, IGRAPH_UNDIRECTED, 0,3,  0,7,  1,2,  1,6,  2,5,  3,4,  4,7,  5,6,  -1);
+
+    igraph_isomorphic(&res, &prod, &is_iso);
+    IGRAPH_ASSERT(is_iso);
+
+    igraph_destroy(&c4);
+    igraph_destroy(&p2);
+    igraph_destroy(&res);
+    igraph_destroy(&prod);
+}
+
 int main(void) {
     // CARTESIAN PRODUCT TEST
     test_grid_vs_square_lattice();
@@ -305,6 +327,9 @@ int main(void) {
     // STRONG PRODUCT TEST
     test_p8_p8_strong();
 
+    // MODULAR PRODUCT TEST
+    test_c4_p2_modular();
+    
     VERIFY_FINALLY_STACK();
 
     return 0;

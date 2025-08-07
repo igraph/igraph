@@ -111,7 +111,7 @@ int main(void) {
     m = 2;
     igraph_vector_int_resize(&membership, 1);
 
-    igraph_community_leiden(&g, NULL, NULL, 1, 0.01, 0, 1, &membership, NULL, &m);
+    igraph_community_leiden(&g, NULL, NULL, NULL, 1, 0.01, 0, 1, &membership, NULL, &m);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
     IGRAPH_ASSERT(isnan(m));
@@ -161,7 +161,7 @@ int main(void) {
     m = 2;
     igraph_vector_int_resize(&membership, 1);
 
-    igraph_community_spinglass(&g, NULL, &m, NULL, &membership, NULL, 5, 0, 1, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
+    igraph_community_spinglass(&g, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
     IGRAPH_ASSERT(isnan(m));

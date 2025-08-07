@@ -530,14 +530,15 @@ static igraph_error_t community_fast_label_propagation(
  *   and igraph may renumber labels. However, co-membership constraints
  *   will be respected: two vertices can be fixed to be in the same or in
  *   different communities.
- * \param lpa_variant Which variant of label propagation algorithm to run.
- *   One of
- *   \c IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after each
- *                           iteration.
- *   \c IGRAPH_LPA_RETENTION Keep current label if among dominant labels,
- *                           only check if labels changed.
- *   \c IGRAPH_LPA_FAST      Sample from dominant labels, only check
- *                           neighbors.
+ * \param lpa_variant Which variant of the label propagation algorithm to run.
+ *   \clist
+ *   \cli IGRAPH_LPA_DOMINANCE
+ *     check for dominance of all nodes after each iteration.
+ *   \cli IGRAPH_LPA_RETENTION
+ *     keep current label if among dominant labels, only check if labels changed.
+ *   \cli IGRAPH_LPA_FAST
+ *     sample from dominant labels, only check neighbors.
+ *   \endclist
  * \return Error code.
  *
  * Time complexity: O(m+n)

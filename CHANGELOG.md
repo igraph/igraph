@@ -9,6 +9,7 @@
  - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
  - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
  - `igraph_delete_vertices_map()` (formerly called `igraph_delete_vertices_idx()`) and `igraph_induced_subgraph_map()` now use -1 to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. (Note that the inverse map always behaved this way, this change makes the two mappings consistent).
+ - `igraph_distances()`, `igraph_distances_cutoff()`, `igraph_get_shortest_path()`, `igraph_get_shortest_paths()` and `igraph_get_all_shortest_paths()` gained a `weights` argument. The functions now automatically select the appropriate implementation (unweighted, Dijkstra, Bellman-Ford or Johnson) algorithm based on whether weights are present and whether there are negative weights or not. You can still call the individual methods by their more specific names.
  - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
  - `igraph_vector_shuffle()` no longer returns an error code.
  - `igraph_vector_swap()` no longer returns an error code.
@@ -67,6 +68,9 @@
  - The `RNG_BEGIN()` and `RNG_END()` macros were removed. You are now responsible for seeding the RNG before using any igraph function that may use random numbers by calling `igraph_rng_seed(igraph_rng_default(), ...)`.
  - The deprecated `igraph_sparsemat()` and `igraph_weighted_sparsemat()` functions were removed; use `igraph_get_adjacency_sparse()` instead.
  - `igraph_is_simple()` gained an extra `igraph_bool_t` argument that decides whether edge directions should be considered. Directed graphs with a mutual edge pair are treated as non-simple if this argument is set to `IGRAPH_UNDIRECTED` (which treats the graph as if it was undirected).
+ - `igraph_community_leiden()` now takes two `vertex_out_weights` and `vertex_in_weights` parameters in order to support directed graphs, instead of the previou single `node_weights` parameter. To obtain the old behavior for undirected graphs, pass the vertex weights as `vertex_out_weights` and set `vertex_in_weights` to `NULL`.
+ - `igraph_rewire()` now takes an `igraph_edge_type_sw_t` parameter to specify whether to create self-loops. The `igraph_rewiring_t` enum type was removed. Instead of the old `IGRAPH_REWIRING_SIMPLE`, use `IGRAPH_SIMPLE_SW`. Instead of the old `IGRAPH_REWIRING_SIMPLE_LOOPS`, use `IGRAPH_LOOPS_SW`.
+ - The `history` parameter of `igraph_community_leading_eigenvector()` is now a pointer to an `igraph_vector_int_t` instead of an `igraph_vector_t`.
 
 ### Added
 
@@ -81,7 +85,7 @@
  - `igraph_vector_ptr_resize_min()` deallocates unused capacity of a pointer vector.
  - `igraph_strvector_fprint()` prints a string vector to a file.
  - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
- - `igraph_invert_permutation()` inverts a permutation stored in an integer vector.
+ - `igraph_nearest_neighbor_graph()` computes a neighborhood graph of spatial points based on a neighbor count, cutoff distance, and chosen metric. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2788!
 
 ### Changed
 
@@ -97,7 +101,7 @@
  - `igraph_vector_append()`, `igraph_strvector_append()` and `igraph_vector_ptr_append()` now use a different allocation strategy: if the `to` vector has insufficient capacity, they double its capacity. Previously they reserved precisely as much capacity as needed for appending the `from` vector.
  - `igraph_degree_sequence_game()` no longer interprets an empty in-degree vector as a request for generating undirected graphs. To generate undirected graphs, pass `NULL` for in-degrees.
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`, `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` no longer interprets an empty `outseq` vector as a missing out-degree sequence. Pass `NULL` if you don't wish to specify an out-degree sequence.
- - The implementation of the Infomap algorithm behind `igraph_community_infomap()` has been updated with a more recent version (2.6.1), while keeping the API compatible with previous igraph versions.
+ - The implementation of the Infomap algorithm behind `igraph_community_infomap()` has been updated with a more recent version (2.8.0), while keeping the API compatible with previous igraph versions. Isolated vertices are now supported.
  - The following functions are not experimental any more: `igraph_count_loops()`, `igraph_distances_cutoff()`, `igraph_distances_floyd_warshall()`, `igraph_distances_dijkstra_cutoff()`, `igraph_enter_safelocale()`, `igraph_exit_safelocale()`, `igraph_get_shortest_path_astar()`, `igraph_graph_power()`,  `igraph_hexagonal_lattice()`,  `igraph_hypercube()`, `igraph_is_clique()`, `igraph_is_independent_vertex_set()`, `igraph_join()`,`igraph_joint_degree_distribution()`, `igraph_joint_degree_matrix()`, `igraph_joint_type_distribution()`, `igraph_layout_merge_dla()`, `igraph_mean_degree()`, `igraph_transitive_closure()`, `igraph_tree_from_parent_vector()`, `igraph_triangular_lattice()`.
 
 ### Fixed
@@ -139,6 +143,7 @@
  - The deprecated `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` functions were removed.
  - The unused enum type `igraph_fileformat_type_t` was removed.
  - The deprecated `igraph_adjacent_triangles()` was removed. Use `igraph_count_adjacent_triangles()` instead.
+ - The macros `IGRAPH_POSINFINITY` and `IGRAPH_NEGINFINITY` were removed. Use `IGRAPH_INFINITY` and `-IGRAPH_INFINITY` instead.
 
 ### Deprecated
 
@@ -153,25 +158,30 @@
 ### Added
 
  - `igraph_layout_align()` attempts to align a graph layout with the coordinate axes in a visually pleasing manner (experimental function).
- - `igraph_product()` supports the lexicographic and strong graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772!
+ - `igraph_product()` supports the lexicographic, strong and modular graph products. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2772 and #2793!
+ - `igraph_rooted_product()` computes the the rooted graph product. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2793!
  - `igraph_mycielskian()` and `igraph_mycielski_graph()` compute a Mycielski transformation of a graph, and a Mycielski graph, respectively. Thanks to Gulshan Kumar @gulshan-123 for contributing this functionality in #2741!
  - `igraph_path_graph()` is a convenience wrapper for `igraph_ring()` with `circular=false`.
  - `igraph_cycle_graph()` is a convenience wrapper for `igraph_ring()` with `circular=true`.
- - `igraph_bond_percolation()`, `igraph_site_percolation()` and `igraph_edgelist_percolation()` calculates the time evolution of the size of the giant component of a graph when edges or vertices are added one by one in a certain (or random) order.
+ - `igraph_bond_percolation()`, `igraph_site_percolation()` and `igraph_edgelist_percolation()` calculates the time evolution of the size of the giant component of a graph when edges or vertices are added one by one in a certain (or random) order. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2778!
+ - `igraph_invert_permutation()` inverts a permutation stored in an integer vector.
+ - `igraph_is_vertex_coloring()` and `igraph_is_edge_coloring()` check if a vertex or edge coloring is valid, i.e. whether adjacenct vertices/edges always have distinct colors. Thanks to Sarah Rashidi @its-serah for contributing this in #2807!
+ - `igraph_rich_club_sequence()` calculates how the density of a graph changes as vertices are removed. Thanks to Zara Zong @minifinity for contributing this in #2740!
 
 ### Changed
 
  - `igraph_bipartite_game_gnp()` can now generate graphs with more than a hundred million vertices. Thanks to Dev Lohani @devlohani99 for implementing this in #2767!
+ - `igraph_reindex_membership()` now supports arbitrary cluster indices. Previously, it would error when indices are not within `0 .. n-1` where `n` is the membership vector length.
 
 ### Fixed
 
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
  - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
- - `igraph_community_leiden()` did iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
+ - `igraph_community_leiden()` did not iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
 
 ### Deprecated
 
- - `igraph_sparmsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
+ - `igraph_sparsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
 
 ### Other
 

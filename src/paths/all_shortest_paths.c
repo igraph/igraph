@@ -29,6 +29,12 @@
 
 #include <string.h>  /* memset */
 
+static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
+    const igraph_t *graph, igraph_vector_int_list_t *vertices,
+    igraph_vector_int_list_t *edges, igraph_vector_int_t *nrgeo,
+    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode
+);
+
 /**
  * \function igraph_get_all_shortest_paths
  * \brief All shortest paths (geodesics) from a vertex.
@@ -93,13 +99,30 @@
  * case.
  */
 
-igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
-                                  igraph_vector_int_list_t *vertices,
-                                  igraph_vector_int_list_t *edges,
-                                  igraph_vector_int_t *nrgeo,
-                                  igraph_integer_t from, const igraph_vs_t to,
-                                  igraph_neimode_t mode) {
+igraph_error_t igraph_get_all_shortest_paths(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+    igraph_vector_int_t *nrgeo,
+    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode
+) {
+    if (weights == NULL) {
+        /* Unweighted version */
+        return igraph_i_get_all_shortest_paths_unweighted(
+            graph, vertices, edges, nrgeo, from, to, mode
+        );
+    } else {
+        /* Weighted version */
+        return igraph_get_all_shortest_paths_dijkstra(
+            graph, vertices, edges, nrgeo, from, to, weights, mode
+        );
+    }
+}
 
+static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
+    const igraph_t *graph, igraph_vector_int_list_t *vertices,
+    igraph_vector_int_list_t *edges, igraph_vector_int_t *nrgeo,
+    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode
+) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t *geodist;
     igraph_vector_int_list_t paths;

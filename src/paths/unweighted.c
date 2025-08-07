@@ -25,6 +25,17 @@
 
 #include "core/interruption.h"
 
+static igraph_error_t igraph_i_distances_cutoff_unweighted(
+    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_vs_t from, const igraph_vs_t to,
+    igraph_neimode_t mode, igraph_real_t cutoff
+);
+static igraph_error_t igraph_i_get_shortest_paths_unweighted(
+    const igraph_t *graph, igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode,
+    igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges
+);
+
 /**
  * \ingroup structural
  * \function igraph_distances_cutoff
@@ -34,6 +45,8 @@
  * paths longer than \p cutoff will not be considered.
  *
  * \param graph The graph object.
+ * \param weights Optional edge weights. If \c NULL, the graph is considered
+ *        unweighted, i.e. all edge weights are equal to 1.
  * \param res The result of the calculation, a matrix. A pointer to an
  *        initialized matrix, to be more precise. The matrix will be
  *        resized if needed. It will have the same
@@ -79,10 +92,25 @@
  *
  * \example examples/simple/distances.c
  */
-igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *res,
-                          const igraph_vs_t from, const igraph_vs_t to,
-                          igraph_neimode_t mode, igraph_real_t cutoff) {
+igraph_error_t igraph_distances_cutoff(
+    const igraph_t *graph, const igraph_vector_t* weights, igraph_matrix_t *res,
+    const igraph_vs_t from, const igraph_vs_t to,
+    igraph_neimode_t mode, igraph_real_t cutoff
+) {
+    if (weights == NULL) {
+        /* Unweighted distances */
+        return igraph_i_distances_cutoff_unweighted(graph, res, from, to, mode, cutoff);
+    } else {
+        /* Dijkstra's algorithm; will return an error if there are negative weights */
+        return igraph_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, cutoff);
+    }
+}
 
+static igraph_error_t igraph_i_distances_cutoff_unweighted(
+    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_vs_t from, const igraph_vs_t to,
+    igraph_neimode_t mode, igraph_real_t cutoff
+) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_from, no_of_to;
     igraph_integer_t *already_counted;
@@ -201,6 +229,8 @@ igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *r
  * \brief Length of the shortest paths between vertices.
  *
  * \param graph The graph object.
+ * \param weights Optional edge weights. If \c NULL, the graph is considered
+ *        unweighted, i.e. all edge weights are 1.
  * \param res The result of the calculation, a matrix. A pointer to an
  *        initialized matrix, to be more precise. The matrix will be
  *        resized if needed. It will have the same
@@ -245,10 +275,25 @@ igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *r
  *
  * \example examples/simple/distances.c
  */
-igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
-                                const igraph_vs_t from, const igraph_vs_t to,
-                                igraph_neimode_t mode) {
-    return igraph_distances_cutoff(graph, res, from, to, mode, -1);
+igraph_error_t igraph_distances(
+    const igraph_t *graph, const igraph_vector_t *weights, igraph_matrix_t *res,
+    const igraph_vs_t from, const igraph_vs_t to, igraph_neimode_t mode
+) {
+    igraph_integer_t from_size;
+
+    if (weights == NULL || igraph_vector_size(weights) == 0 || igraph_vector_min(weights) >= 0) {
+        /* These are handled by igraph_distances_cutoff() */
+        return igraph_distances_cutoff(graph, weights, res, from, to, mode, -1);
+    } else {
+        /* Negative weights; will use Bellman-Ford or Johnson algorithm */
+        if (mode != IGRAPH_OUT) {
+            IGRAPH_CHECK(igraph_vs_size(graph, &from, &from_size));
+            if (from_size <= 100) {
+                return igraph_distances_bellman_ford(graph, res, from, to, weights, mode);
+            }
+        }
+        return igraph_distances_johnson(graph, res, from, to, weights, mode);
+    }
 }
 
 /**
@@ -262,6 +307,8 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
  * to find \em all shortest paths.
  *
  * \param graph The graph object.
+ * \param weights Optional edge weights. If \c NULL, the graph is considered
+ *        unweighted, i.e. all edge weights are equal to 1.
  * \param vertices The result, the IDs of the vertices along the paths.
  *        This is a list of integer vectors where each element is an
  *        \ref igraph_vector_int_t object. The list will be resized as needed.
@@ -326,14 +373,28 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_get_shortest_paths.c
  */
-igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
-                              igraph_vector_int_list_t *vertices,
-                              igraph_vector_int_list_t *edges,
-                              igraph_integer_t from, const igraph_vs_t to,
-                              igraph_neimode_t mode,
-                              igraph_vector_int_t *parents,
-                              igraph_vector_int_t *inbound_edges) {
+igraph_error_t igraph_get_shortest_paths(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode,
+    igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges
+) {
+    if (weights == NULL) {
+        return igraph_i_get_shortest_paths_unweighted(graph, vertices, edges, from, to, mode, parents, inbound_edges);
+    } else if (igraph_vector_size(weights) == 0 || igraph_vector_min(weights) >= 0) {
+        /* Dijkstra's algorithm */
+        return igraph_get_shortest_paths_dijkstra(graph, vertices, edges, from, to, weights, mode, parents, inbound_edges);
+    } else {
+        /* Negative weights; will use Bellman-Ford algorithm */
+        return igraph_get_shortest_paths_bellman_ford(graph, vertices, edges, from, to, weights, mode, parents, inbound_edges);
+    }
+}
 
+static igraph_error_t igraph_i_get_shortest_paths_unweighted(
+    const igraph_t *graph, igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode,
+    igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges
+) {
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -534,6 +595,8 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  * \param graph The input graph, it can be directed or
  *        undirected. Directed paths are considered in directed
  *        graphs.
+ * \param weights Optional edge weights. If \c NULL, the graph is considered
+ *        unweighted, i.e. all edge weights are equal to 1.
  * \param vertices Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
@@ -558,12 +621,12 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  * vertices.
  */
 
-igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
-                             igraph_vector_int_t *vertices,
-                             igraph_vector_int_t *edges,
-                             igraph_integer_t from,
-                             igraph_integer_t to,
-                             igraph_neimode_t mode) {
+igraph_error_t igraph_get_shortest_path(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_vector_int_t *vertices, igraph_vector_int_t *edges,
+    igraph_integer_t from, igraph_integer_t to,
+    igraph_neimode_t mode
+) {
 
     igraph_vector_int_list_t vertices2, *vp = &vertices2;
     igraph_vector_int_list_t edges2, *ep = &edges2;
@@ -581,7 +644,7 @@ igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
         ep = NULL;
     }
 
-    IGRAPH_CHECK(igraph_get_shortest_paths(graph, vp, ep, from,
+    IGRAPH_CHECK(igraph_get_shortest_paths(graph, weights, vp, ep, from,
                                            igraph_vss_1(to), mode, NULL, NULL));
 
     /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the

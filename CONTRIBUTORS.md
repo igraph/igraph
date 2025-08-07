@@ -99,6 +99,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://lucaslopes.me/"><img src="https://avatars.githubusercontent.com/u/8731439?v=4?s=100" width="100px;" alt="Lucas Lopes Felipe"/><br /><sub><b>Lucas Lopes Felipe</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=lucaslopes" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/its-serah"><img src="https://avatars.githubusercontent.com/u/153510021?v=4?s=100" width="100px;" alt="Sarah Rashidi"/><br /><sub><b>Sarah Rashidi</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=its-serah" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/minifinity"><img src="https://avatars.githubusercontent.com/u/124811507?v=4?s=100" width="100px;" alt="Zara Zong"/><br /><sub><b>Zara Zong</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=minifinity" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Zepeacedust"><img src="https://avatars.githubusercontent.com/u/41028225?v=4?s=100" width="100px;" alt="Arnór Friðriksson"/><br /><sub><b>Arnór Friðriksson</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Zepeacedust" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

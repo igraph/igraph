@@ -25,6 +25,7 @@
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_graphicality.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
@@ -68,7 +69,7 @@ IGRAPH_EXPORT igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph
                                               igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
                                                 igraph_integer_t order, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_edge_type_sw_t allowed_edge_types);
 IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
                                              igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
                                              const igraph_attribute_combination_t *edge_comb);
@@ -88,6 +89,10 @@ IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2,
                                             igraph_product_t type);
+IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t *res,
+                                                   const igraph_t *g1,
+                                                   const igraph_t *g2,
+                                                   const igraph_integer_t root);
 IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
 
 IGRAPH_END_C_DECLS

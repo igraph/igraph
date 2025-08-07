@@ -16,14 +16,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_bitset.h"
 #include "igraph_components.h"
 
+#include "igraph_bitset.h"
 #include "igraph_constants.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
+
+#include "core/interruption.h"
 
 /**
  * \function percolate_edge
@@ -108,6 +110,7 @@ igraph_error_t igraph_edgelist_percolation(
     igraph_integer_t biggest = 1;
     igraph_integer_t vertices_added = 0;
     igraph_integer_t lower, upper;
+    int iter = 0;
 
     igraph_integer_t ecount = igraph_vector_int_size(edges);
 
@@ -165,6 +168,8 @@ igraph_error_t igraph_edgelist_percolation(
         if (vertex_count != NULL) {
             VECTOR(*vertex_count)[i] = vertices_added;
         }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     igraph_vector_int_destroy(&links);
@@ -329,6 +334,7 @@ igraph_error_t igraph_site_percolation(
     const igraph_integer_t vcount = igraph_vcount(graph);
     const igraph_vector_int_t *p_vertex_order;
     igraph_vector_int_t i_vertex_order;
+    int iter = 0;
 
     // Use a random vertex order when no vertex order was given
     if (vertex_order == NULL) {
@@ -380,6 +386,7 @@ igraph_error_t igraph_site_percolation(
         if (edge_count != NULL) {
             VECTOR(*edge_count)[i] = edges_added;
         }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     // Cleanup

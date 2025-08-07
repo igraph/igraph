@@ -357,6 +357,7 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_rooted_product
   igraph_simple_cycles
   igraph_similarity
   igraph_transitive_closure
@@ -373,6 +374,7 @@ add_legacy_tests(
   paths
   random_spanning_tree
   reachability
+  rich_club
   single_target_shortest_path
   topological_sorting
 )
@@ -489,12 +491,13 @@ add_legacy_tests(
 # coloring.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_coloring
+  coloring
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_coloring
+  coloring
+  is_coloring
 )
 
 
@@ -692,6 +695,7 @@ add_legacy_tests(
   igraph_le_community_to_membership
   igraph_modularity
   igraph_modularity_matrix
+  igraph_reindex_membership
   igraph_split_join_distance
   levc-stress
   null_communities
@@ -928,7 +932,10 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_delaunay_triangulation
+  igraph_nearest_neighbor_graph
 )
+
+
 # cycle bases
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -1004,7 +1011,7 @@ add_benchmarks(
   igraph_betweenness_weighted
   igraph_cliques
   igraph_closeness_weighted
-  igraph_coloring
+  coloring
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
@@ -1015,6 +1022,7 @@ add_benchmarks(
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
+  igraph_nearest_neighbor_graph
   igraph_neighborhood
   igraph_pagerank
   igraph_pagerank_weighted
