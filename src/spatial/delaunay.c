@@ -18,16 +18,11 @@
 #include "igraph_constructors.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
-#include "igraph_interface.h"
 #include "igraph_matrix.h"
 
-#include "igraph_operators.h"
 #include "igraph_qsort.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_vector_list.h"
-#include "libqhull_r/io_r.h"
-#include "libqhull_r/merge_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 #include <stdio.h>
@@ -98,7 +93,7 @@ void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out) {
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix_t *points) {
     int curlong, totlong; /* used !qh_NOmem */
     int exitcode;
-    igraph_integer_t numpoints = igraph_matrix_nrow(points);
+    igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
     igraph_integer_t dim = igraph_matrix_ncol(points);
     //coordT *points;
     boolT ismalloc = False; // handle memory allocation of points explicitly
@@ -118,7 +113,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         qh->NOerrexit = False;
         qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
         qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
-        qh->PRINToptions1st = True;
         qh->USEstdout = False;
         qh->DELAUNAY = True;    /* 'd'   */
         qh->SCALElast = True;   /* 'Qbb' */
@@ -126,6 +120,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         qh->TRIangulate = True;
         qh_checkflags(qh, qh->qhull_command, "  ");
         qh_initflags(qh, qh->qhull_command);
+        qh->ATinfinity = True;
         //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
         qh_init_B(qh, &MATRIX(*points, 0, 0), numpoints, dim, ismalloc); // read points and fiddle with them a little.
         qh_qhull(qh);
@@ -152,7 +147,11 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         FORALLfacets {
             if (!facet->upperdelaunay) {
                 curr_vert = 0;
-                FOREACHvertex_(facet->vertices) VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
+                FOREACHvertex_(facet->vertices) {
+                    printf("%i\n", qh_pointid(qh, vertex->point));
+                    VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
+
+                }
                 add_clique(&int_edges, &simplex);
             }
         }
