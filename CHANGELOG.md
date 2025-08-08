@@ -172,6 +172,7 @@
 
  - `igraph_bipartite_game_gnp()` can now generate graphs with more than a hundred million vertices. Thanks to Dev Lohani @devlohani99 for implementing this in #2767!
  - `igraph_reindex_membership()` now supports arbitrary cluster indices. Previously, it would error when indices are not within `0 .. n-1` where `n` is the membership vector length.
+ - `igraph_modularity()` now supports arbitrary cluster indices. However, ensuring that cluster indices are within the range `0 .. n-1`, where `n` is the vertex count, allows for better performance.
 
 ### Fixed
 

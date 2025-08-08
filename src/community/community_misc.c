@@ -20,6 +20,8 @@
 #include "igraph_memory.h"
 #include "igraph_sparsemat.h"
 
+#include "community/community_internal.h"
+
 #include <string.h>
 #include <math.h>
 
@@ -224,10 +226,19 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
 }
 
 
-/* This slower implementation is used when cluster indices are not within
- * the range 0..vcount-1.
+/**
+ * This slower implementation of igraph_reindex_membership() is used when
+ * cluster indices are not within the range 0..vcount-1.
+ *
+ * \param membership Vector encoding the membership of each vertex.
+ *    Elements may be arbitrary integers, however, its length must not be zero.
+ * \param new_to_old If not \c NULL, a mapping from new to old cluster
+ *    indices will be stored here.
+ * \param nb_clusters If not \c NULL, the number of clusters will be stored here.
+ *
+ * Time complexity: O(n log(n)) where n is the membership vector length.
  */
-static igraph_error_t reindex_membership_large(
+igraph_error_t igraph_i_reindex_membership_large(
         igraph_vector_int_t *membership,
         igraph_vector_int_t *new_to_old,
         igraph_integer_t *nb_clusters) {
@@ -235,10 +246,17 @@ static igraph_error_t reindex_membership_large(
     const igraph_integer_t vcount = igraph_vector_int_size(membership);
     igraph_vector_int_t permutation;
 
-    /* This implementation cannot currently handle vcount == 0, and is not
-     * called with such input. Assert that the input is valid as a safety
-     * measure. */
-    IGRAPH_ASSERT(vcount > 0);
+    /* The vcount == 0 case requires special handling because the main
+     * algorithm of this function cannot handle it. */
+    if (vcount == 0) {
+        if (new_to_old) {
+            igraph_vector_int_clear(new_to_old);
+        }
+        if (nb_clusters) {
+            *nb_clusters = 0;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&permutation, vcount);
 
@@ -334,7 +352,7 @@ igraph_error_t igraph_reindex_membership(
              * Use alternative implementation that supports these. */
             igraph_vector_int_destroy(&new_cluster);
             IGRAPH_FINALLY_CLEAN(1);
-            return reindex_membership_large(membership, new_to_old, nb_clusters);
+            return igraph_i_reindex_membership_large(membership, new_to_old, nb_clusters);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
