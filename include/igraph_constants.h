@@ -193,8 +193,7 @@ typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
                IGRAPH_PRODUCT_LEXICOGRAPHIC,
                IGRAPH_PRODUCT_STRONG,
                IGRAPH_PRODUCT_TENSOR,
-               IGRAPH_PRODUCT_MODULAR,
-               IGRAPH_PRODUCT_CORONA
+               IGRAPH_PRODUCT_MODULAR
              } igraph_product_t;
 
 /**
