@@ -512,7 +512,7 @@ static igraph_error_t modular_product(igraph_t *res,
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
  *         graphs \p g1 and \p g2 are incompatible for the requested product.
  *
- * \sa \ref igraph_rooted_product() for the rooted product.
+ * \sa \ref igraph_rooted_product(), \ref igraph_corona_product() for other types of graph products.
  */
 
 igraph_error_t igraph_product(igraph_t *res,
@@ -575,7 +575,7 @@ igraph_error_t igraph_product(igraph_t *res,
  *         for the rooted product.
  *         \c IGRAPH_EINVVID if invalid vertex ID passed as \p root.
  *
- * \sa \ref igraph_product() for other types of graph products.
+ * \sa \ref igraph_product(), \ref igraph_corona_product() for other types of graph products.
  *
  * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
  * where |V1| and |V2| are the number of vertices, and
@@ -690,9 +690,9 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
  *         \c IGRAPH_EINVAL if the input graphs \p g1 and \p g2 are incompatible
  *         for the corona product.
  *
- * \sa \ref igraph_product() for other types of graph products.
+ * \sa \ref igraph_product(), \ref igraph_rooted_product() for other types of graph products.
  *
- * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
+ * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1| + |V1|)
  * where |V1| and |V2| are the number of vertices, and
  * |E1| and |E2| are the number of edges of the operands.
  */
