@@ -571,8 +571,8 @@ igraph_error_t igraph_product(igraph_t *res,
  * \param root The root vertex id of the second graph.
  *
  * \return Error code:
- *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
- *         graphs \p g1 and \p g2 are incompatible for the requested product.
+ *         \c IGRAPH_EINVAL if the input graphs \p g1 and \p g2 are incompatible
+ *         for the rooted product.
  *         \c IGRAPH_EINVVID if invalid vertex ID passed as \p root.
  *
  * \sa \ref igraph_product() for other types of graph products.
@@ -650,6 +650,52 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_corona_product
+ * \brief The corona graph product of two graphs.
+ *
+ * \experimental
+ *
+ * This function computes the corona product of two graphs. The two graphs
+ * must be of the same type, either directed or undirected. If a product of
+ * an undirected and a directed graph is required, convert one of them to the
+ * appropriate type using \ref igraph_to_directed() or \ref igraph_to_undirected().
+ *
+ * </para><para>
+ * There are |V1| copies of the second graph, and the first graph is the
+ * center graph. Thus, the number of vertices in the product graph is
+ * <code>|V1| * (|V2| + 1)</code>. The vertex IDs in the product graph may
+ * be represented as (\c i, \c j), where <code>0 <= i < |V1|</code> and
+ * <code>0 <= j <= |V2|</code>. The vertex ID \c (i, 0) corresponds to the
+ * center graph, and the vertex ID \c (i, j) j > 0 corresponds to the \c i-th
+ * copy of vertex ID j-1 of graph \p g2. Then (i, j) is mapped to a unique
+ * vertex index in the product graph using <code>index = i * (|V2| + 1) + j</code>.
+ *
+ * </para><para>
+ * In the corona product graph of G and H, the central graph is G, and all
+ * the vertices of i-th copy of H are connected to the i-th vertex of G.
+ * Thus, the number of edges in the product graph is
+ * <code>|V1| |E2| + |V1| |V2| + |E1|</code>.
+ *
+ * \param res Pointer to an uninitialized graph object. The product graph will
+ *   be stored here.
+ * \param g1 The first operand graph.
+ * \param g2 The second operand graph. It must have the same directedness as \p g1.
+ * \param dir The direction of the edges in the product graph from the centre graph
+ *  to the copies of the second graph. It can be one of \c IGRAPH_OUT or \c IGRAPH_IN.
+ *  It is ignored if the operands are undirected.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL if the input graphs \p g1 and \p g2 are incompatible
+ *         for the corona product.
+ *
+ * \sa \ref igraph_product() for other types of graph products.
+ *
+ * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
+ * where |V1| and |V2| are the number of vertices, and
+ * |E1| and |E2| are the number of edges of the operands.
+ */
 
 igraph_error_t igraph_corona_product(igraph_t *res,
                                      const igraph_t *g1,
