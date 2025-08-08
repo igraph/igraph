@@ -1200,6 +1200,8 @@ igraph_weighted_biadjacency:
         OUT BIPARTITE_TYPES types, OUT EDGE_WEIGHTS weights,
         MATRIX biadjmatrix,
         BOOLEAN directed=False, NEIMODE mode=ALL
+    DEPS: |-
+        weights ON graph, biadjmatrix ON graph, types ON graph
 
 igraph_get_biadjacency:
     PARAMS: |-
@@ -1228,6 +1230,8 @@ igraph_bipartite_iea_game:
         OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
         INTEGER n1, INTEGER n2, INTEGER m,
         BOOLEAN directed=False, NEIMODE mode=ALL
+    DEPS: |-
+        types ON graph
 
 #######################################
 # Spectral properties
@@ -1704,13 +1708,13 @@ igraph_reindex_membership:
 
 igraph_community_leading_eigenvector:
     PARAMS: |-
-        GRAPH graph, 
+        GRAPH graph,
         OPTIONAL EDGE_WEIGHTS weights,
-        OPTIONAL OUT MATRIX_INT merges, 
+        OPTIONAL OUT MATRIX_INT merges,
         OPTIONAL OUT VECTOR_INT membership,
         INTEGER steps=-1,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
-        OPTIONAL OUT REAL modularity, 
+        OPTIONAL OUT REAL modularity,
         BOOLEAN start=False,
         OPTIONAL OUT VECTOR eigenvalues,
         OPTIONAL OUT VECTOR_LIST eigenvectors,

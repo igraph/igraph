@@ -31,6 +31,7 @@
 #endif
 
 #include <climits>
+#include <cmath>
 
 static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
     igraph_integer_t n = infomap.numLeafNodes();
@@ -102,6 +103,12 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
     }
 
     return IGRAPH_SUCCESS;
+}
+
+// Needed in case C++'s bool is not compatible with igraph's igraph_bool_t
+// which may happen in some configurations on some platforms, notable with R/igraph.
+static bool infomap_allow_interruption() {
+    return igraph_allow_interruption();
 }
 
 /**
@@ -227,7 +234,7 @@ igraph_error_t igraph_community_infomap(
     conf.numTrials = nb_trials;
     conf.silent = true;
     conf.directed = igraph_is_directed(graph);
-    conf.interruptionHandler = &igraph_allow_interruption;
+    conf.interruptionHandler = &infomap_allow_interruption;
 
     infomap::InfomapBase infomap(conf);
 
