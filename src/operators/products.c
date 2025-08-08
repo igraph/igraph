@@ -683,7 +683,7 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
  *   be stored here.
  * \param g1 The first operand graph.
  * \param g2 The second operand graph. It must have the same directedness as \p g1.
- * \param dir The direction of the edges in the product graph from the centre graph
+ * \param mode The direction of the edges in the product graph from the centre graph
  *  to the copies of the second graph. It can be one of \c IGRAPH_OUT or \c IGRAPH_IN.
  *  It is ignored if the operands are undirected.
  *
@@ -701,7 +701,7 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
 igraph_error_t igraph_corona_product(igraph_t *res,
                                      const igraph_t *g1,
                                      const igraph_t *g2,
-                                     const igraph_neimode_t dir) {
+                                     const igraph_neimode_t mode) {
 
     const igraph_bool_t directed = igraph_is_directed(g1);
 
@@ -745,11 +745,11 @@ igraph_error_t igraph_corona_product(igraph_t *res,
         // Type 1 Edge:
         for (igraph_integer_t j = 1; j <= vcount2; ++j) {
             // If IGRAPH_ALL is given, it will still add edges from centre to out
-            if (dir & IGRAPH_OUT) {
+            if (mode & IGRAPH_OUT) {
                 VECTOR(edges)[edge_index++] = i * (vcount2 + 1);
                 VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + j;
             }
-            else if (dir & IGRAPH_IN) {
+            else if (mode & IGRAPH_IN) {
                 VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + j;
                 VECTOR(edges)[edge_index++] = i * (vcount2 + 1);
             }
