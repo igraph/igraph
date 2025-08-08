@@ -23,6 +23,8 @@
 #include "igraph_qsort.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
+#include "igraph_vector_list.h"
+#include "qhull/libqhull_r/io_r.h"
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 #include <stdio.h>
@@ -62,7 +64,7 @@ int edge_comparator(const void *a, const void *b) {
 }
 
 // Simplify an edge list
-void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out) {
+void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
         return;
@@ -72,8 +74,8 @@ void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out) {
     for (igraph_integer_t i = 0; i < size; i += 2) {
         if (VECTOR(*in)[i] > VECTOR(*in)[i + 1]) {
             temp = VECTOR(*in)[i];
-            VECTOR(*in)[i + 1] = VECTOR(*in)[i];
-            VECTOR(*in)[i] = temp;
+            VECTOR(*in)[i] = VECTOR(*in)[i+1];
+            VECTOR(*in)[i+1] = temp;
         }
     }
     // sort
@@ -81,9 +83,9 @@ void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out) {
 
     igraph_vector_int_push_back(out, VECTOR(*in)[0]);
     igraph_vector_int_push_back(out, VECTOR(*in)[1]);
-    // nub
+    // nub and filter out point at infinity
     for (igraph_integer_t i = 2; i < size; i += 2) {
-        if (VECTOR(*in)[i] != VECTOR(*in)[i - 2] && VECTOR(*in)[i + 1] != VECTOR(*in)[i - 1]) {
+        if ((VECTOR(*in)[i] != VECTOR(*in)[i - 2] || VECTOR(*in)[i + 1] != VECTOR(*in)[i - 1]) && VECTOR(*in)[i+1] != except) {
             igraph_vector_int_push_back(out, VECTOR(*in)[i]);
             igraph_vector_int_push_back(out, VECTOR(*in)[i + 1]);
         }
@@ -103,7 +105,16 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
     igraph_vector_int_t int_edges;
 
 
+
+    igraph_vector_t int_points;
+
     IGRAPH_CHECK(igraph_matrix_transpose(points)); // get in row-major order
+
+    IGRAPH_VECTOR_INIT_FINALLY(&int_points, numpoints * dim); //allocate space for extra ponint added due to
+
+    igraph_matrix_copy_to(points, VECTOR(int_points));
+
+    IGRAPH_CHECK(igraph_matrix_transpose(points)); // Transpose = Transpose ^ -1, so this returns the point set to the initial state.
 
     QHULL_LIB_CHECK; /* Check for compatible library */
 
@@ -111,7 +122,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
     exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
     if (!exitcode) {
         qh->NOerrexit = False;
-        qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
+        qh_option(qh, "delaunay  Qbbound-last QJ", NULL, NULL);
         qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay
         qh->USEstdout = False;
         qh->DELAUNAY = True;    /* 'd'   */
@@ -121,9 +132,11 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         qh_checkflags(qh, qh->qhull_command, "  ");
         qh_initflags(qh, qh->qhull_command);
         qh->ATinfinity = True;
+        qh->MERGEvertices = False;
         //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
-        qh_init_B(qh, &MATRIX(*points, 0, 0), numpoints, dim, ismalloc); // read points and fiddle with them a little.
+        qh_init_B(qh, VECTOR(int_points), numpoints, dim, ismalloc); // read points and fiddle with them a little.
         qh_qhull(qh);
+        qh_triangulate(qh);
         //qh_check_output(qh);
         //qh_produce_output(qh);
         //if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone) {
@@ -135,6 +148,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
 
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&int_edges, 0);
+
 
         igraph_vector_int_t simplex;
 
@@ -148,24 +162,28 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
             if (!facet->upperdelaunay) {
                 curr_vert = 0;
                 FOREACHvertex_(facet->vertices) {
-                    printf("%i\n", qh_pointid(qh, vertex->point));
                     VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
-
                 }
                 add_clique(&int_edges, &simplex);
             }
         }
         IGRAPH_CHECK(igraph_matrix_transpose(points));
-        simplify_edge_list(&int_edges, edges);
+        simplify_edge_list(&int_edges, edges, numpoints + 1);
 
+
+        igraph_vector_destroy(&int_points);
         igraph_vector_int_destroy(&int_edges);
         igraph_vector_int_destroy(&simplex);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(3);
     } else {
+    qh->NOerrexit = True; /* no more setjmp */
+    qh_freeqhull(qh, !qh_ALL);
+    qh_memfreeshort(qh, &curlong, &totlong);
+
         char error[100];
 
         snprintf(error, sizeof(error) / sizeof(error[0]), "Error while computing delaunay triangulation, qhull code = %i", qh->last_errcode);
-        IGRAPH_ERROR(&error[0], IGRAPH_EINVAL);
+        IGRAPH_ERROR("bruh &error[0]", IGRAPH_EINVAL);
     }
 
     qh->NOerrexit = True; /* no more setjmp */
