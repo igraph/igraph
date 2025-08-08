@@ -2101,7 +2101,7 @@ igraph_rooted_product:
 
 igraph_corona_product:
     PARAMS: |-
-        OUT GRAPH res, GRAPH g1, GRAPH g2, NEIMODE mode=OUT,
+        OUT GRAPH res, GRAPH g1, GRAPH g2, NEIMODE mode=OUT
 
 #######################################
 # Maximum flows, minimum cuts
