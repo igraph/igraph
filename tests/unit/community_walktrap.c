@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2006-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,31 +13,13 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 
-#include <math.h>
-
 #include "test_utilities.h"
 
-/* Replace modularity values which are very close to zero
- * by exact zeros, so that we can have consistent test outputs
- * across platforms. */
-void fixup_modularity(igraph_vector_t *modularity) {
-    igraph_integer_t i;
-    igraph_integer_t len = igraph_vector_size(modularity);
-
-    for (i=0; i < len; ++i) {
-        if (fabs(VECTOR(*modularity)[i]) < 1e-15) {
-            VECTOR(*modularity)[i] = 0.0;
-        }
-    }
-}
 
 int main(void) {
   igraph_t graph;
@@ -66,8 +46,11 @@ int main(void) {
   printf("Merges:\n");
   print_matrix_int(&merges);
 
+  /* We replace modularity values which are very close to zero
+   * by exact zeros, so that we can have consistent test outputs
+   * across platforms. */
   printf("Modularity: ");
-  fixup_modularity(&modularity);
+  igraph_vector_zapsmall(&modularity, 1e-15);
   print_vector(&modularity);
 
   printf("Membership: ");
@@ -98,7 +81,7 @@ int main(void) {
   igraph_vector_init(&modularity, 0);
   igraph_community_walktrap(&graph, NULL, 4, NULL, &modularity, NULL);
   printf("Modularity:\n");
-  fixup_modularity(&modularity);
+  igraph_vector_zapsmall(&modularity, 1e-15);
   print_vector(&modularity);
   igraph_vector_destroy(&modularity);
 
@@ -121,7 +104,7 @@ int main(void) {
   print_matrix_int(&merges);
 
   printf("Modularity: ");
-  fixup_modularity(&modularity);
+  igraph_vector_zapsmall(&modularity, 1e-15);
   print_vector(&modularity);
 
   printf("Membership: ");
@@ -149,7 +132,7 @@ int main(void) {
   print_matrix_int(&merges);
 
   printf("Modularity: ");
-  fixup_modularity(&modularity);
+  igraph_vector_zapsmall(&modularity, 1e-15);
   print_vector(&modularity);
 
   printf("Membership: ");
@@ -184,7 +167,7 @@ int main(void) {
   print_matrix_int(&merges);
 
   printf("Modularity: ");
-  fixup_modularity(&modularity);
+  igraph_vector_zapsmall(&modularity, 1e-15);
   print_vector(&modularity);
 
   printf("Membership: ");
