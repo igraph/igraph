@@ -105,6 +105,19 @@ int main(void) {
         printf("Modularity (resolution %.2f) is %g after aggregation.\n", resolution, modularity);
     }
 
+    {
+        igraph_real_t modularity2;
+        igraph_modularity(&graph, &membership, &weights, 1.0, IGRAPH_DIRECTED, &modularity);
+
+        /* All entries are distinct in the current membership vector.
+         * We replace one with an element that will trigger automatic
+         * reindexing within igraph_modularity().
+         * The modularity should not change. */
+        VECTOR(membership)[1] = -5;
+        igraph_modularity(&graph, &membership, &weights, 1.0, IGRAPH_DIRECTED, &modularity2);
+        IGRAPH_ASSERT(modularity == modularity2);
+    }
+
     igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
