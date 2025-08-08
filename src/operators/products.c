@@ -666,9 +666,9 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
  * There are |V1| copies of the second graph, and the first graph is the
  * center graph. Thus, the number of vertices in the product graph is
  * <code>|V1| * (|V2| + 1)</code>. The vertex IDs in the product graph may be
- * represented as <code>(i, j)</code>, where <code>0 <= i < |V1|</code> and
- * <code>0 <= j <= |V2|</code>. The vertex ID <code>(i, 0)</code> corresponds to
- * the center graph, and the vertex ID <code>(i, j)</code> for <code>j > 0</code>
+ * represented as <code>(i, j)</code>, where <code>0 &lt;= i &lt; |V1|</code> and
+ * <code>0 &lt;= j &lt;= |V2|</code>. The vertex ID <code>(i, 0)</code> corresponds to
+ * the center graph, and the vertex ID <code>(i, j)</code> for <code>j &gt; 0</code>
  * corresponds to the <code>i-th</code> copy of vertex ID <code>(j-1)</code> of
  * graph \p g2. Then <code>(i, j)</code> is mapped to a unique vertex index in
  * the product graph using <code>index = i * (|V2| + 1) + j</code>.
