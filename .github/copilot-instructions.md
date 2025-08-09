@@ -5,11 +5,11 @@ When performing a code review, keep in mind the following.
 
 ## Coding standards
 
- - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases such as the interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED` and typically called `iter`, which may be an `int`. The `long` and `long long` types must never be used.
+ - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases. Such a special case is the interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED` and typically called `iter`, which should be an `int`. The `long` and `long long` types must never be used.
 
  - Check that the parameter ordering of newly added public functions conforms to the guidelines in our wiki at https://github.com/igraph/igraph/wiki/Guidelines-for-function-argument-ordering
 
- - Check that input parameters that are passed by reference (i.e. as a pointer) are marked as `const`. When a parameter that is passed by reference to a public function is modified, and therefore cannot be const, the documentation of that public function should make this clear.
+ - Check that input parameters that are passed by reference (i.e. as a pointer) are marked as `const`. When a parameter that is passed by reference to a public function is modified, and therefore cannot be `const`, the documentation of that public function should make this clear. Parameters that are passed by value should not be marked as `const`.
 
  - Check that header includes are ordered according to the following guidelines:
     * The first included header must be the one that declares the functions *defined* in this file (optionally followed by an empty line).
