@@ -1,7 +1,16 @@
-No vertices, not directed:
+No vertices, undirected:
 [ 0-by-0 ]
 No vertices, directed:
 [ 0-by-0 ]
+No edges, undirected:
+[        0      Inf      Inf
+       Inf        0      Inf
+       Inf      Inf        0 ]
+No edges, directed:
+[        0      Inf      Inf      Inf
+       Inf        0      Inf      Inf
+       Inf      Inf        0      Inf
+       Inf      Inf      Inf        0 ]
 Directed graph with loops and multi-edges:
 [        0       -1       -3        1        6      Inf
          1        0       -2        2        7      Inf

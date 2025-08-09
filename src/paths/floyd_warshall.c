@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2022-2023  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include "core/interruption.h"
 #include "internal/utils.h"
+#include "paths/paths_internal.h"
 
 static igraph_error_t distances_floyd_warshall_original(igraph_matrix_t *res) {
 
@@ -272,13 +273,20 @@ igraph_error_t igraph_distances_floyd_warshall(
         const igraph_vector_t *weights, igraph_neimode_t mode,
         const igraph_floyd_warshall_algorithm_t method) {
 
+    igraph_bool_t negative_weights;
+    IGRAPH_CHECK(igraph_i_validate_distance_weights(graph, weights, &negative_weights));
+    return igraph_i_distances_floyd_warshall(graph, res, from, to, weights, mode, method);
+}
+
+igraph_error_t igraph_i_distances_floyd_warshall(
+        const igraph_t *graph, igraph_matrix_t *res,
+        igraph_vs_t from, igraph_vs_t to,
+        const igraph_vector_t *weights, igraph_neimode_t mode,
+        const igraph_floyd_warshall_algorithm_t method) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t in = false, out = false;
-
-    if (weights && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
-    }
 
     if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
@@ -296,10 +304,6 @@ igraph_error_t igraph_distances_floyd_warshall(
         break;
     default:
         IGRAPH_ERROR("Invalid mode for Floyd-Warshall shortest path calculation.", IGRAPH_EINVMODE);
-    }
-
-    if (weights && igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));

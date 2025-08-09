@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 int main(void) {
-    igraph_t g_empty, g_empty_dir, g_lm;
+    igraph_t g_empty, g_lm;
     igraph_matrix_t result;
     igraph_matrix_t bf_result;
     igraph_vs_t vids;
@@ -32,16 +32,34 @@ int main(void) {
     igraph_vector_init(&weights_empty, 0);
     igraph_vector_init_int(&weights_lm_neg_loop, 9, -4, -3, -2, -1, 0, 1, 2, 3, 4);
     igraph_vector_init_int(&weights_lm, 9, -1, 0, 1, -2, 2, 3, 4, 5, 6);
-    igraph_small(&g_empty, 0, 0, -1);
-    igraph_small(&g_empty_dir, 0, 1, -1);
     igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,2, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
 
-    printf("No vertices, not directed:\n");
+    printf("No vertices, undirected:\n");
+    igraph_empty(&g_empty, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_resize(&weights_empty, igraph_ecount(&g_empty));
     igraph_distances_johnson(&g_empty, &result, vids, vids, &weights_empty, IGRAPH_OUT);
+    igraph_destroy(&g_empty);
     print_matrix(&result);
 
     printf("No vertices, directed:\n");
-    igraph_distances_johnson(&g_empty_dir, &result, vids, vids, &weights_empty, IGRAPH_OUT);
+    igraph_empty(&g_empty, 0, IGRAPH_DIRECTED);
+    igraph_vector_resize(&weights_empty, igraph_ecount(&g_empty));
+    igraph_distances_johnson(&g_empty, &result, vids, vids, &weights_empty, IGRAPH_OUT);
+    igraph_destroy(&g_empty);
+    print_matrix(&result);
+
+    printf("No edges, undirected:\n");
+    igraph_empty(&g_empty, 3, IGRAPH_UNDIRECTED);
+    igraph_vector_resize(&weights_empty, igraph_ecount(&g_empty));
+    igraph_distances_johnson(&g_empty, &result, vids, vids, &weights_empty, IGRAPH_OUT);
+    igraph_destroy(&g_empty);
+    print_matrix(&result);
+
+    printf("No edges, directed:\n");
+    igraph_empty(&g_empty, 4, IGRAPH_DIRECTED);
+    igraph_vector_resize(&weights_empty, igraph_ecount(&g_empty));
+    igraph_distances_johnson(&g_empty, &result, vids, vids, &weights_empty, IGRAPH_OUT);
+    igraph_destroy(&g_empty);
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges:\n");
@@ -76,8 +94,6 @@ int main(void) {
 
     igraph_matrix_destroy(&result);
     igraph_matrix_destroy(&bf_result);
-    igraph_destroy(&g_empty);
-    igraph_destroy(&g_empty_dir);
     igraph_destroy(&g_lm);
     igraph_vector_destroy(&weights_empty);
     igraph_vector_destroy(&weights_lm);
