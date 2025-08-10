@@ -589,10 +589,10 @@ static igraph_bool_t igraph_i_fastgreedy_community_update_dq(
  *    weights. Supply a null pointer here for unweighted graphs. The
  *    weights are expected to be non-negative.
  * \param merges Pointer to an initialized matrix or \c NULL, the result of the
- *    computation is stored here. The matrix has two columns and each
- *    merge corresponds to one merge, the IDs of the two merged
- *    components are stored. The component IDs are numbered from zero and
- *    the first \c n components are the individual vertices, \c n is
+ *    computation is stored here as a merges matrix representing a dendrogram.
+ *    The matrix has two columns and each merge corresponds to one merge, the
+ *    IDs of the two merged components are stored. The component IDs are numbered
+ *    from zero and the first \c n components are the individual vertices, \c n is
  *    the number of vertices in the graph. Component \c n is created
  *    in the first merge, component <code>n+1</code> in the second merge, etc.
  *    The matrix will be resized as needed. If this argument is \c NULL
@@ -606,10 +606,8 @@ static igraph_bool_t igraph_i_fastgreedy_community_update_dq(
  *    of modularity) is stored here.
  * \return Error code.
  *
- * \sa \ref igraph_community_walktrap(), \ref
- * igraph_community_edge_betweenness() for other community detection
- * algorithms, \ref igraph_community_to_membership() to convert the
- * dendrogram to a membership vector.
+ * \sa \ref igraph_community_to_membership() to cut the dendrogram at
+ * an arbitrary number of steps.
  *
  * Time complexity: O(|E||V|log|V|) in the worst case,
  * O(|E|+|V|log^2|V|) typically, |V| is the number of vertices, |E| is
