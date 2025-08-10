@@ -72,7 +72,7 @@ igraph_error_t igraph_sbm_game(
         const igraph_vector_int_t *block_sizes,
         igraph_bool_t directed, igraph_bool_t loops) {
 
-#define IGRAPH_CHECK_MAXEDGES() \
+#define CHECK_MAXEDGES() \
     do {if (maxedges > IGRAPH_MAX_EXACT_REAL) { \
         IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW); \
     }} while (0)
@@ -137,7 +137,7 @@ igraph_error_t igraph_sbm_game(
 
             if (directed && loops) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
@@ -148,7 +148,7 @@ igraph_error_t igraph_sbm_game(
                 }
             } else if (directed && !loops && from != to) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
@@ -159,7 +159,7 @@ igraph_error_t igraph_sbm_game(
                 }
             } else if (directed && !loops && from == to) {
                 maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0);
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
@@ -173,7 +173,7 @@ igraph_error_t igraph_sbm_game(
                 }
             } else if (!directed && loops && from != to) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
@@ -184,7 +184,7 @@ igraph_error_t igraph_sbm_game(
                 }
             } else if (!directed && loops && from == to) {
                 maxedges = ((igraph_real_t) fromsize) * (fromsize + 1.0) / 2.0;
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor((sqrt(8 * last + 1) - 1) / 2);
                     vfrom = last - (((igraph_real_t) vto) * (vto + 1.0)) / 2.0;
@@ -195,7 +195,7 @@ igraph_error_t igraph_sbm_game(
                 }
             } else if (!directed && !loops && from != to) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
@@ -206,7 +206,7 @@ igraph_error_t igraph_sbm_game(
                 }
             } else { /*!directed && !loops && from==to */
                 maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0) / 2.0;
-                IGRAPH_CHECK_MAXEDGES();
+                CHECK_MAXEDGES();
                 while (last < maxedges) {
                     vto = floor((sqrt(8 * last + 1) + 1) / 2);
                     vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
@@ -228,7 +228,7 @@ igraph_error_t igraph_sbm_game(
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-#undef IGRAPH_CHECK_MAXEDGES
+#undef CHECK_MAXEDGES
 }
 
 /**
@@ -259,7 +259,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                      igraph_integer_t m, const igraph_vector_t *rho,
                      const igraph_matrix_t *C, igraph_real_t p) {
 
-#define IGRAPH_CHECK_MAXEDGES() \
+#define CHECK_MAXEDGES() \
     do {if (maxedges > IGRAPH_MAX_EXACT_REAL) { \
         IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW); \
     }} while (0)
@@ -331,7 +331,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                 igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
                 if (from != to) {
                     maxedges = ((igraph_real_t) fromsize) * tosize;
-                    IGRAPH_CHECK_MAXEDGES();
+                    CHECK_MAXEDGES();
                     while (last < maxedges) {
                         igraph_integer_t vto = floor(last / fromsize);
                         igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
@@ -342,7 +342,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                     }
                 } else { /* from==to */
                     maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0) / 2.0;
-                    IGRAPH_CHECK_MAXEDGES();
+                    CHECK_MAXEDGES();
                     while (last < maxedges) {
                         igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
                         igraph_integer_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
@@ -384,7 +384,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
             igraph_integer_t fromsize = m;
             igraph_integer_t tosize = n - tooff;
             igraph_real_t maxedges = ((igraph_real_t) fromsize) * tosize;
-            IGRAPH_CHECK_MAXEDGES();
+            CHECK_MAXEDGES();
             igraph_real_t last = RNG_GEOM(p);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
             while (last < maxedges) {
                 igraph_integer_t vto = floor(last / fromsize);
@@ -407,7 +407,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
-#undef IGRAPH_CHECK_MAXEDGES
+#undef CHECK_MAXEDGES
 }
 
 /**
