@@ -406,7 +406,7 @@ igraph_sbm_game:
     PARAMS: |-
         OUT GRAPH graph, MATRIX pref_matrix,
         VECTOR_INT block_sizes, BOOLEAN directed=False,
-        BOOLEAN loops=False
+        BOOLEAN loops=False, BOOLEAN multiple=False
 
 igraph_hsbm_game:
     INTERNAL: true
