@@ -557,7 +557,7 @@ add_legacy_tests(
   all_almost_e
   cmp_epsilon
   igraph_almost_equals
-  igraph_convex_hull
+  igraph_convex_hull_2d
   igraph_power_law_fit
   overflow
   prop_caching
