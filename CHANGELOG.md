@@ -72,6 +72,7 @@
  - `igraph_rewire()` now takes an `igraph_edge_type_sw_t` parameter to specify whether to create self-loops. The `igraph_rewiring_t` enum type was removed. Instead of the old `IGRAPH_REWIRING_SIMPLE`, use `IGRAPH_SIMPLE_SW`. Instead of the old `IGRAPH_REWIRING_SIMPLE_LOOPS`, use `IGRAPH_LOOPS_SW`.
  - The `history` parameter of `igraph_community_leading_eigenvector()` is now a pointer to an `igraph_vector_int_t` instead of an `igraph_vector_t`.
  - `igraph_matrix_copy_to()` gained an `igraph_matrix_storage_t storage` parameter that specifies whether the data should be written in column-major or row-major format.
+ - `igraph_sbm_game()` gained a `multiple` parameter and now supports generating multigraph with prescribed expected edge multiplicities. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
 
 ### Added
 
