@@ -50,6 +50,11 @@ IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_bool_t directed
 );
 
+IGRAPH_EXPORT igraph_error_t igraph_convex_hull_2d(
+    const igraph_matrix_t *data,
+    igraph_vector_int_t *resverts,
+    igraph_matrix_t *rescoords);
+
 IGRAPH_END_C_DECLS
 
 #endif

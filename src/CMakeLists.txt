@@ -311,6 +311,7 @@ add_library(
   misc/sir.c
   misc/spanning_trees.c
 
+  spatial/convex_hull.c
   spatial/nearest_neighbor.cpp
 
   internal/glpk_support.c
