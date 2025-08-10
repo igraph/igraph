@@ -404,7 +404,7 @@ igraph_k_regular_game:
 
 igraph_sbm_game:
     PARAMS: |-
-        OUT GRAPH graph, INTEGER n, MATRIX pref_matrix,
+        OUT GRAPH graph, MATRIX pref_matrix,
         VECTOR_INT block_sizes, BOOLEAN directed=False,
         BOOLEAN loops=False
 

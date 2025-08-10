@@ -19,9 +19,9 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_integer_t n, igraph_matrix_t *pref_matrix, igraph_vector_int_t *block_sizes, igraph_bool_t directed, igraph_bool_t loops) {
+void call_and_print(igraph_matrix_t *pref_matrix, igraph_vector_int_t *block_sizes, igraph_bool_t directed, igraph_bool_t loops) {
     igraph_t result;
-    IGRAPH_ASSERT(igraph_sbm_game(&result, n, pref_matrix, block_sizes, directed, loops) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_sbm_game(&result, pref_matrix, block_sizes, directed, loops) == IGRAPH_SUCCESS);
     print_graph_canon(&result);
     printf("\n");
     igraph_destroy(&result);
@@ -65,42 +65,39 @@ int main(void) {
     igraph_vector_int_init_int(&block_sizes_neg, 3, 2, 2, -2);
 
     printf("No vertices.\n");
-    call_and_print(0, &pref_matrix_0, &block_sizes_0, 0, 0);
+    call_and_print(&pref_matrix_0, &block_sizes_0, 0, 0);
 
     printf("One vertex, directed, with loops.\n");
-    call_and_print(1, &pref_matrix_1, &block_sizes_1, 1, 1);
+    call_and_print(&pref_matrix_1, &block_sizes_1, 1, 1);
 
     printf("Six vertices, directed, only edges from block 0 to 1 and 2 to 2.\n");
-    call_and_print(6, &pref_matrix_3, &block_sizes_3, 1, 1);
+    call_and_print(&pref_matrix_3, &block_sizes_3, 1, 1);
 
     printf("Six vertices, directed, only edges from block 0 to 1 and 2 to 2, no loops.\n");
-    call_and_print(6, &pref_matrix_3, &block_sizes_3, 1, 0);
+    call_and_print(&pref_matrix_3, &block_sizes_3, 1, 0);
 
     printf("Six vertices, undirected, only edges between block 0 and 1, and inside block 2.\n");
-    call_and_print(6, &pref_matrix_3u, &block_sizes_3, 0, 1);
+    call_and_print(&pref_matrix_3u, &block_sizes_3, 0, 1);
 
     printf("Six vertices, undirected, only edges between block 0 and 1, and inside block 2, no loops.\n");
-    call_and_print(6, &pref_matrix_3u, &block_sizes_3, 0, 0);
+    call_and_print(&pref_matrix_3u, &block_sizes_3, 0, 0);
 
     VERIFY_FINALLY_STACK();
 
     printf("Check for nonsquare matrix error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_nonsq, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_nonsq, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
 
     printf("Check for preference matrix probability out of range error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_oor, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_oor, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
 
     printf("Check for nonsymmetric preference matrix for undirected graph error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_nsym, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_nsym, &block_sizes_3, 0, 0), IGRAPH_EINVAL);
 
     printf("Check for incorrect block size vector error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_3, &block_sizes_1, 1, 0), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_1, 1, 0), IGRAPH_EINVAL);
 
     printf("Check for negative block size error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 6, &pref_matrix_3, &block_sizes_neg, 1, 0), IGRAPH_EINVAL);
-
-    printf("Check for sum of block sizes not equal to number of vertices error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, 3, &pref_matrix_3, &block_sizes_3, 1, 0), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_neg, 1, 0), IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&pref_matrix_0);
     igraph_matrix_destroy(&pref_matrix_1);

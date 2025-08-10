@@ -179,7 +179,7 @@ IGRAPH_EXPORT igraph_error_t igraph_k_regular_game(igraph_t *graph,
                                         igraph_integer_t no_of_nodes, igraph_integer_t k,
                                         igraph_bool_t directed, igraph_bool_t multiple);
 
-IGRAPH_EXPORT igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
+IGRAPH_EXPORT igraph_error_t igraph_sbm_game(igraph_t *graph,
                                   const igraph_matrix_t *pref_matrix,
                                   const igraph_vector_int_t *block_sizes,
                                   igraph_bool_t directed, igraph_bool_t loops);

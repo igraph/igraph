@@ -39,6 +39,7 @@
  * given by the Bernoulli rate matrix, \p pref_matrix.
  * See Faust, K., &amp; Wasserman, S. (1992a). Blockmodels:
  * Interpretation and evaluation. Social Networks, 14, 5-–61.
+ * https://doi.org/10.1016/0378-8733(92)90013-W
  *
  * </para><para>
  * The order of the vertex IDs in the generated graph corresponds to
@@ -46,9 +47,8 @@
  *
  * \param graph The output graph. This should be a pointer to an
  *     uninitialized graph.
- * \param n Number of vertices.
  * \param pref_matrix The matrix giving the Bernoulli rates.
- *     This is a KxK matrix, where K is the number of groups.
+ *     This is a k-by-k matrix, where k is the number of groups.
  *     The probability of creating an edge between vertices from
  *     groups i and j is given by element (i,j).
  * \param block_sizes An integer vector giving the number of
@@ -58,25 +58,27 @@
  * \param loops Boolean, whether to create self-loops.
  * \return Error code.
  *
- * Time complexity: O(|V|+|E|+K^2), where |V| is the number of
- * vertices, |E| is the number of edges, and K is the number of
+ * Time complexity: O(|V|+|E|+k^2), where |V| is the number of
+ * vertices, |E| is the number of edges, and k is the number of
  * groups.
  *
  * \sa \ref igraph_erdos_renyi_game_gnp() for a simple Bernoulli graph.
  *
  */
 
-igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
-                    const igraph_matrix_t *pref_matrix,
-                    const igraph_vector_int_t *block_sizes,
-                    igraph_bool_t directed, igraph_bool_t loops) {
+igraph_error_t igraph_sbm_game(
+        igraph_t *graph,
+        const igraph_matrix_t *pref_matrix,
+        const igraph_vector_int_t *block_sizes,
+        igraph_bool_t directed, igraph_bool_t loops) {
 
 #define IGRAPH_CHECK_MAXEDGES() \
     do {if (maxedges > IGRAPH_MAX_EXACT_REAL) { \
         IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW); \
     }} while (0)
 
-    igraph_integer_t no_blocks = igraph_matrix_nrow(pref_matrix);
+    const igraph_integer_t n = igraph_vector_int_sum(block_sizes);
+    const igraph_integer_t no_blocks = igraph_matrix_nrow(pref_matrix);
     igraph_integer_t from, to, fromoff = 0;
     igraph_real_t minp, maxp;
     igraph_vector_int_t edges;
@@ -113,16 +115,6 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                           IGRAPH_EINVAL, igraph_vector_int_min(block_sizes));
         }
     }
-
-    if (igraph_vector_int_sum(block_sizes) != n) {
-        IGRAPH_ERRORF("Sum of the block sizes (%" IGRAPH_PRId ") must equal the number of vertices (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL, igraph_vector_int_sum(block_sizes), n);
-    }
-
-    /* Since the sum of the block sizes should equal the number of vertices,
-     * and the block sizes are non-negative, the number of vertices is
-     * guaranteed to be non-negative. This shouldn't be checked separately.
-     */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
