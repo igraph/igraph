@@ -93,10 +93,6 @@ IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
     const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
 );
 
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_convex_hull(
-    const igraph_matrix_t *data, igraph_vector_int_t *resverts,
-    igraph_matrix_t *rescoords);
-
 IGRAPH_END_C_DECLS
 
 #endif

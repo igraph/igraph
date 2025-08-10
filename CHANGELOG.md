@@ -144,6 +144,7 @@
  - The unused enum type `igraph_fileformat_type_t` was removed.
  - The deprecated `igraph_adjacent_triangles()` was removed. Use `igraph_count_adjacent_triangles()` instead.
  - The macros `IGRAPH_POSINFINITY` and `IGRAPH_NEGINFINITY` were removed. Use `IGRAPH_INFINITY` and `-IGRAPH_INFINITY` instead.
+ - The deprecated `igraph_convex_hull()` was removed. Use `igraph_convex_hull_2d()` instead.
 
 ### Deprecated
 

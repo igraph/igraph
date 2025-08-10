@@ -41,8 +41,4 @@
 <!-- doxrox-include igraph_complex_almost_equals -->
 </section>
 
-<section id="deprecated"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_convex_hull -->
-</section>
-
 </chapter>
