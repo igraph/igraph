@@ -85,7 +85,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
 
 /**
  * \ingroup nongraph
- * \function igraph_convex_hull
+ * \function igraph_convex_hull_2d
  * \brief Determines the convex hull of a given set of points in the 2D plane.
  *
  * </para><para>
@@ -112,7 +112,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  *
  * Time complexity: O(n log(n)) where n is the number of vertices.
  */
-igraph_error_t igraph_convex_hull(
+igraph_error_t igraph_convex_hull_2d(
     const igraph_matrix_t *data, igraph_vector_int_t *resverts,
     igraph_matrix_t *rescoords
 ) {
@@ -427,4 +427,41 @@ igraph_error_t igraph_vertex_path_from_edge_path(
     igraph_vector_int_push_back(vertex_path, start);  /* reserved */
 
     return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup nongraph
+ * \function igraph_convex_hull
+ * \brief Determines the convex hull of a given set of points in the 2D plane (deprecated alias)
+ *
+ * </para><para>
+ * The convex hull is determined by the Graham scan algorithm.
+ * See the following reference for details:
+ *
+ * </para><para>
+ * Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford
+ * Stein. Introduction to Algorithms, Second Edition. MIT Press and
+ * McGraw-Hill, 2001. ISBN 0262032937. Pages 949-955 of section 33.3:
+ * Finding the convex hull.
+ *
+ * \param data vector containing the coordinates. The length of the
+ *        vector must be even, since it contains X-Y coordinate pairs.
+ * \param resverts the vector containing the result, e.g. the vector of
+ *        vertex indices used as the corners of the convex hull. Supply
+ *        \c NULL here if you are only interested in the coordinates of
+ *        the convex hull corners.
+ * \param rescoords the matrix containing the coordinates of the selected
+ *        corner vertices. Supply \c NULL here if you are only interested in
+ *        the vertex indices.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory
+ *
+ * Time complexity: O(n log(n)) where n is the number of vertices.
+ */
+igraph_error_t igraph_convex_hull(
+        const igraph_matrix_t *data, igraph_vector_int_t *resverts,
+        igraph_matrix_t *rescoords
+) {
+    return igraph_convex_hull_2d(data, resverts, rescoords);
 }

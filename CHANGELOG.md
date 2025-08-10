@@ -183,6 +183,7 @@
 ### Deprecated
 
  - `igraph_sparsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
+ - `igraph_convex_hull()` is deprecated in favour of `igraph_convex_hull_2d()` and scheduled for removal in 1.0.
 
 ### Other
 

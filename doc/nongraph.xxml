@@ -26,7 +26,7 @@
 </section>
 
 <section id="convex-hull-of-a-set-of-points-on-a-plane"><title>Convex hull of a set of points on a plane</title>
-<!-- doxrox-include igraph_convex_hull -->
+<!-- doxrox-include igraph_convex_hull_2d -->
 </section>
 
 <section id="fitting-powerlaw-distributions-to-empirical-data"><title>Fitting power-law distributions to empirical data</title>
@@ -39,6 +39,10 @@
 <!-- doxrox-include igraph_cmp_epsilon -->
 <!-- doxrox-include igraph_almost_equals -->
 <!-- doxrox-include igraph_complex_almost_equals -->
+</section>
+
+<section id="deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_convex_hull -->
 </section>
 
 </chapter>
