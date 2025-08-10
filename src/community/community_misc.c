@@ -51,42 +51,44 @@
 
 /**
  * \function igraph_community_to_membership
- * \brief Creates a membership vector from a community structure dendrogram.
+ * \brief Cut a dendrogram after a given number of merges.
  *
- * This function creates a membership vector from a community
- * structure dendrogram. A membership vector contains for each vertex
- * the id of its graph component, the graph components are numbered
- * from zero, see the same argument of \ref igraph_connected_components()
- * for an example of a membership vector.
+ * This function creates a membership vector from a dendrogram whose leaves
+ * are individual vertices by cutting it at the specified level. It produces
+ * a membership vector that contains for each vertex its cluster ID, numbered
+ * from zero. This is the same membership vector format that is produced by
+ * \ref igraph_connected_components(), as well as all community detection
+ * functions in igraph.
  *
  * </para><para>
- * Many community detection algorithms return with a \em merges
- * matrix, \ref igraph_community_walktrap() and \ref
- * igraph_community_edge_betweenness() are two examples. The matrix
- * contains the merge operations performed while mapping the
- * hierarchical structure of a network. If the matrix has \c n-1 rows,
- * where \c n is the number of vertices in the graph, then it contains
- * the hierarchical structure of the whole network and it is called a
- * dendrogram.
+ * It takes as input the number of vertices \p n, and a \p merges matrix
+ * encoding the dendrogram, in the format produced by hierarchical clustering
+ * functions such as \ref igraph_community_edge_betweenness(),
+ * \ref igraph_community_walktrap() or \ref igraph_community_fastgreedy().
+ * The matrix must have two columns and up to <code>n - 1</code> rows.
+ * Each row represents merging two dendrogram nodes into their parent node.
+ * The leaf nodes of the dendrogram are indexed from 0 to <code>n - 1</code>
+ * and are identical to the vertices of the graph that is being partitioned
+ * into communities. Row \c i contains the children of dendrogram node
+ * with index <code>n + i</code>.
  *
  * </para><para>
  * This function performs \p steps merge operations as prescribed by
- * the \p merges matrix and returns the current state of the network.
+ * the \p merges matrix and returns the resulting partitioning into
+ * <code>n - steps</code> communities.
  *
  * </para><para>
  * If \p merges is not a complete dendrogram, it is possible to
  * take \p steps steps if \p steps is not bigger than the number
  * lines in \p merges.
  *
- * \param merges The two-column matrix containing the merge
- *    operations. See \ref igraph_community_walktrap() for the
- *    detailed syntax.
+ * \param merges The two-column matrix containing the merge operations.
  * \param nodes The number of leaf nodes in the dendrogram.
  * \param steps Integer constant, the number of steps to take.
  * \param membership Pointer to an initialized vector, the membership
- *    results will be stored here, if not NULL. The vector will be
+ *    results will be stored here, if not \c NULL. The vector will be
  *    resized as needed.
- * \param csize Pointer to an initialized vector, or NULL. If not NULL
+ * \param csize Pointer to an initialized vector, or \c NULL. If not \c NULL
  *    then the sizes of the components will be stored here, the vector
  *    will be resized as needed.
  * \return Error code.
@@ -94,7 +96,9 @@
  * \sa \ref igraph_community_walktrap(), \ref
  * igraph_community_edge_betweenness(), \ref
  * igraph_community_fastgreedy() for community structure detection
- * algorithms.
+ * algorithms producing merge matrices in this format;
+ * \ref igraph_le_community_to_membership() to perform merges
+ * starting from a given cluster assignment.
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
