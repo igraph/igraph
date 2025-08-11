@@ -428,7 +428,7 @@ void qh_appendmergeset(qhT *qh, facetT *facet, facetT *neighbor, mergeType merge
   }
   if (!qh->facet_mergeset || !qh->degen_mergeset) {
     qh_fprintf(qh, qh->ferr, 6403, "qhull internal error (qh_appendmergeset): expecting temp set defined for qh.facet_mergeset (%p) and qh.degen_mergeset (%p).  Got NULL\n",
-      qh->facet_mergeset, qh->degen_mergeset);
+      (void *)qh->facet_mergeset, (void *)qh->degen_mergeset);
     /* otherwise qh_setappend creates a new set that is not freed by qh_freebuild() */
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
@@ -1654,7 +1654,7 @@ void qh_freemergesets(qhT *qh) {
 
   if (!qh->facet_mergeset || !qh->degen_mergeset || !qh->vertex_mergeset) {
     qh_fprintf(qh, qh->ferr, 6388, "qhull internal error (qh_freemergesets): expecting mergesets.  Got a NULL mergeset, qh.facet_mergeset (%p), qh.degen_mergeset (%p), qh.vertex_mergeset (%p)\n",
-      qh->facet_mergeset, qh->degen_mergeset, qh->vertex_mergeset);
+      (void *)qh->facet_mergeset, (void *)qh->degen_mergeset, (void *)qh->vertex_mergeset);
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
   if (!SETempty_(qh->facet_mergeset) || !SETempty_(qh->degen_mergeset) || !SETempty_(qh->vertex_mergeset)) {
@@ -2034,7 +2034,7 @@ void qh_initmergesets(qhT *qh /* qh.facet_mergeset,degen_mergeset,vertex_mergese
 
   if (qh->facet_mergeset || qh->degen_mergeset || qh->vertex_mergeset) {
     qh_fprintf(qh, qh->ferr, 6386, "qhull internal error (qh_initmergesets): expecting NULL mergesets.  Got qh.facet_mergeset (%p), qh.degen_mergeset (%p), qh.vertex_mergeset (%p)\n",
-      qh->facet_mergeset, qh->degen_mergeset, qh->vertex_mergeset);
+      (void *)qh->facet_mergeset, (void *)qh->degen_mergeset, (void *)qh->vertex_mergeset);
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
   qh->degen_mergeset= qh_settemp(qh, qh->TEMPsize);
@@ -3881,7 +3881,7 @@ void qh_mergevertex_neighbors(qhT *qh, facetT *facet1, facetT *facet2) {
           facet1->id, facet2->id));
   if (qh->tracevertex) {
     qh_fprintf(qh, qh->ferr, 8081, "qh_mergevertex_neighbors: of f%d into f%d at furthest p%d f0= %p\n",
-             facet1->id, facet2->id, qh->furthest_id, qh->tracevertex->neighbors->e[0].p);
+             facet1->id, facet2->id, qh->furthest_id, (void *)qh->tracevertex->neighbors->e[0].p);
     qh_errprint(qh, "TRACE", NULL, NULL, NULL, qh->tracevertex);
   }
   FOREACHvertex_(facet1->vertices) {
