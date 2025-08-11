@@ -2554,7 +2554,7 @@ igraph_running_mean:
 igraph_random_sample:
     PARAMS: OUT VECTOR_INT res, INTEGER l, INTEGER h, INTEGER length
 
-igraph_convex_hull:
+igraph_convex_hull_2d:
     PARAMS: MATRIX data, OUT INDEX_VECTOR resverts, OUT MATRIX rescoords
 
 igraph_dim_select:
