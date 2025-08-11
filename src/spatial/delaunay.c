@@ -167,10 +167,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
                 IGRAPH_ERRORF("Error while computing delaunay triangulation, qhull error code %" IGRAPH_PRId "", IGRAPH_EINVAL, (igraph_integer_t)qh->last_errcode);
 
         }
-        char error[100];
-
-        snprintf(error, sizeof(error) / sizeof(error[0]), "Error while computing delaunay triangulation, qhull code = %i", qh->last_errcode);
-        IGRAPH_ERROR("bruh &error[0]", IGRAPH_EINVAL);
     }
 
     qh->NOerrexit = True; /* no more setjmp */
