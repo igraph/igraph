@@ -2231,11 +2231,14 @@ void qh_option(qhT *qh, const char *option, int *i, realT *r) {
         (int)strlen(option), (int)sizeof(buf)-30-30, option);
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
-  sprintf(buf, "  %s", option);
+
+  buflen = 0;
+  buflen += snprintf(buf, sizeof(buf) / sizeof(buf[0]), "  %s", option);
   if (i)
-    sprintf(buf+strlen(buf), " %d", *i);
+    buflen += snprintf(buf+buflen, sizeof(buf) / sizeof(buf[0]) - buflen, " %d", *i);
   if (r)
-    sprintf(buf+strlen(buf), " %2.2g", *r);
+    buflen += snprintf(buf+buflen, sizeof(buf) / sizeof(buf[0]) - buflen, " %2.2g", *r);
+  sprintf(buf, "  %s", option);
   buflen= (int)strlen(buf);   /* WARN64 */
   qh->qhull_optionlen += buflen;
   remainder= (int)(sizeof(qh->qhull_options) - strlen(qh->qhull_options)) - 1;    /* WARN64 */

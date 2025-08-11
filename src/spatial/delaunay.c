@@ -15,18 +15,17 @@
 
 
 
+#include "igraph_spatial.h"
+
 #include "igraph_constructors.h"
-#include "igraph_datatype.h"
 #include "igraph_error.h"
 #include "igraph_matrix.h"
-
 #include "igraph_qsort.h"
-#include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_vector_list.h"
-#include "qhull/libqhull_r/io_r.h"
+
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
+
 #include <stdio.h>
 
 
@@ -176,9 +175,9 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         igraph_vector_int_destroy(&simplex);
         IGRAPH_FINALLY_CLEAN(3);
     } else {
-    qh->NOerrexit = True; /* no more setjmp */
-    qh_freeqhull(qh, !qh_ALL);
-    qh_memfreeshort(qh, &curlong, &totlong);
+        qh->NOerrexit = True; /* no more setjmp */
+        qh_freeqhull(qh, !qh_ALL);
+        qh_memfreeshort(qh, &curlong, &totlong);
 
         char error[100];
 
