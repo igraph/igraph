@@ -66,6 +66,9 @@ void bench_ba(igraph_integer_t n, igraph_integer_t m, int rep) {
 
 int main(void) {
 
+    igraph_rng_seed(igraph_rng_default(), 789);
+    BENCH_INIT();
+
     bench_gnm(100, 200, 10000);
     bench_gnm(100, 1000, 10000);
 

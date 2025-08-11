@@ -43,6 +43,8 @@ void bench(int m, int n, int rep) {
 }
 
 int main(void) {
+    BENCH_INIT();
+
     bench(30, 30, 100000);
     bench(100, 100, 10000);
     bench(1000, 1000, 100);
