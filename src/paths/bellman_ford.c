@@ -60,8 +60,8 @@
  * Time complexity: O(s*|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_distances() for a faster unweighted version
- * or \ref igraph_distances_dijkstra() if you do not have negative
+ * \sa \ref igraph_distances() for a non-algorithm-specific interface;
+ * \ref igraph_distances_dijkstra() if you do not have negative
  * edge weights.
  *
  * \example examples/simple/bellman_ford.c
@@ -291,8 +291,7 @@ igraph_error_t igraph_i_distances_bellman_ford(
  *
  * \sa \ref igraph_distances_bellman_ford() to compute only shortest path
  * lengths, but not the paths themselves; \ref igraph_get_shortest_paths() for
- * a faster unweighted version or \ref igraph_get_shortest_paths_dijkstra()
- * if you do not have negative edge weights.
+ * a non-algorithm-specific interface.
  */
 igraph_error_t igraph_get_shortest_paths_bellman_ford(
         const igraph_t *graph,
