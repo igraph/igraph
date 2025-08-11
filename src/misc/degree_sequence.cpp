@@ -188,6 +188,9 @@ struct HavelHakimiList {
         igraph_integer_t num_nodes = 0;
         igraph_integer_t curr = tail().prev; // starts with max_bucket
 
+        igraph_vector_int_clear(&spokes);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, degree));
+
         while (num_nodes < degree && curr > 0) {
             num_nodes += buckets[curr].count;
             buckets_req.push(curr);
@@ -307,6 +310,9 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
     HavelHakimiList vault(&seq);
 
     igraph_integer_t n_edges_added = 0;
+    igraph_vector_int_t spokes; // TODO: allocate spokes vector once
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&spokes, 0);
+
     for (igraph_integer_t i = 0; i < n_nodes; i++) {
         // hub node selection
         vd_pair hub;
@@ -326,9 +332,6 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
         VECTOR(seq)[hub.vertex] = 0;
 
         // spoke nodes selection
-        igraph_vector_int_t spokes;
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&spokes, 0);
-        IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, hub.degree));
         IGRAPH_CHECK(vault.get_spokes(hub.degree, seq, spokes));
 
         igraph_integer_t n_spokes = igraph_vector_int_size(&spokes);
@@ -340,9 +343,10 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
 
             VECTOR(seq)[spoke_idx]--;
         }
-        IGRAPH_FINALLY_CLEAN(1);
     }
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_destroy(&spokes);
+    igraph_vector_int_destroy(&seq);
+    IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
 
