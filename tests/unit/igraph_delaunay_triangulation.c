@@ -18,7 +18,7 @@ igraph_error_t delaunay(igraph_real_t *points, igraph_integer_t numpoints, igrap
     IGRAPH_CHECK(igraph_delaunay_triangulation(&g, &points_mat));
     IGRAPH_FINALLY(igraph_destroy, &g);
     if (printing) {
-        printf("%li\n", igraph_ecount(&g));
+        printf("%" IGRAPH_PRId "\n", igraph_ecount(&g));
         print_graph_canon(&g);
     }
 
