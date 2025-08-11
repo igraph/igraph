@@ -151,7 +151,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
 
         igraph_vector_int_t simplex;
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, 3);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, dim + 1); // a simplex in n dimensions has n+1 incident vertices.
 
         igraph_integer_t curr_vert;
 
