@@ -35,7 +35,7 @@ jobs:
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install ninja-build cmake libarpack2-dev libglpk-dev libgmp-dev
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 

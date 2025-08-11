@@ -15,7 +15,7 @@ jobs:
       run: sudo apt-get install lcov libglpk-dev libarpack2-dev
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
