@@ -12,6 +12,7 @@
 </section>
 
 <section id="spatial-constructors"><title>Spatial constructors</title>
+<!-- doxrox-include igraph_delaunay_triangulation -->
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
 </section>
 

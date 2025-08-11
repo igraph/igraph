@@ -180,11 +180,16 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
 }
 
 /**
+ * \function igraph_delaunay_triangulation
+ * \brief Computes the delaunay triangulation for a spatial point set.
  *
+ * This function constructs the delaunay triangulation of a given spatial point set.
  *
+ * \param graph A pointer to the graph that will be created.
+ * \param points a matrix containing the points that will be used to create the graph.
+ *     Each row is a point, dimensionality is inferred from the column count.
  *
- *
- *
+ * \return Error code, often a qhull error code, refer to qhull for more detail.
  *
  * */
 igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points) {
@@ -194,7 +199,6 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
 
     IGRAPH_CHECK(igraph_create(graph, &edges, igraph_matrix_nrow(points), false));
-
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
