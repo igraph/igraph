@@ -427,9 +427,9 @@ void qh_check_points(qhT *qh) {
   trace1((qh, qh->ferr, 1025, "qh_check_points: check all points below %2.2g of all facet planes\n",
           maxoutside));
   if (qh->num_good)   /* miss counts other_points and !good facets */
-     total= (float)qh->num_good * (float)qh->num_points;
+     total= (realT)qh->num_good * (realT)qh->num_points;
   else
-     total= (float)qh->num_facets * (float)qh->num_points;
+     total= (realT)qh->num_facets * (realT)qh->num_points;
   if (total >= qh_VERIFYdirect && !qh->maxoutdone) {
     if (!qh_QUICKhelp && qh->SKIPcheckmax && qh->MERGING)
       qh_fprintf(qh, qh->ferr, 7075, "qhull input warning: merging without checking outer planes('Q5' or 'Po').  Verify may report that a point is outside of a facet.\n");
@@ -3702,13 +3702,13 @@ void qh_triangulate_facet(qhT *qh, facetT *facetA, vertexT **first_vertex) {
     if (qh->TRInormals) { /* 'Q11' triangulate duplicates ->normal and ->center */
       newfacet->keepcentrum= True;
       if(facetA->normal){
-        newfacet->normal= (double *)qh_memalloc(qh, qh->normal_size);
+        newfacet->normal= (coordT *)qh_memalloc(qh, qh->normal_size);
         memcpy((char *)newfacet->normal, facetA->normal, (size_t)qh->normal_size);
       }
       if (qh->CENTERtype == qh_AScentrum)
         newfacet->center= qh_getcentrum(qh, newfacet);
       else if (qh->CENTERtype == qh_ASvoronoi && facetA->center){
-        newfacet->center= (double *)qh_memalloc(qh, qh->center_size);
+        newfacet->center= (coordT *)qh_memalloc(qh, qh->center_size);
         memcpy((char *)newfacet->center, facetA->center, (size_t)qh->center_size);
       }
     }else {
