@@ -758,12 +758,32 @@ igraph_error_t igraph_community_leading_eigenvector(
 
 /**
  * \function igraph_le_community_to_membership
- * \brief Vertex membership from the leading eigenvector community structure.
+ * \brief Cut an incomplete dendrogram after a given number of merges, starting with an initial cluster assignment.
  *
- * This function creates a membership vector from the
- * result of \ref igraph_community_leading_eigenvector().
- * It takes \c membership and performs \c steps merges,
- * according to the supplied \c merges matrix.
+ * This function takes a dendrogram whose leaves are cluster IDs given in an
+ * initial cluster assignment provided in \p membership. Then it updates
+ * the cluster assignment by performing the specified number of mergers,
+ * as given by the dendrogram encoded in \p merges. It is a more general
+ * version of \ref igraph_community_to_membership(), which assumes that
+ * the dendrogram leaves are singleton clusters corresponding to individual
+ * vertices.
+ *
+ * </para><para>
+ * This dendrogram format is suitable for divise hierarchical community
+ * detection algorithms that stop before dividing the graph into individual
+ * vertices, such as \ref igraph_community_leading_eigenvector().
+ *
+ * </para><para>
+ * Initially, \p membership is expected to contain \c m contiguous cluster
+ * indices, numbered from zero. These correspond to the leaf nodes of the
+ * dendrogram. Row \c i of the two-column \p merges matrix contains the IDs of
+ * clusters that are merged together into dendrogram node <code>m + i</code>.
+ * It may have up to <code>m - 1</code> rows.
+ *
+ * </para><para>
+ * This function performs \p steps merge operations as prescribed by the
+ * \p merges matrix and updates \p membership to the resulting partitioning
+ * into <code>m - steps</code> communities.
  *
  * \param merges The two-column matrix containing the merge operations.
  *    See \ref igraph_community_leading_eigenvector() for the
@@ -775,6 +795,9 @@ igraph_error_t igraph_community_leading_eigenvector(
  * \param csize Optionally the sizes of the communities are stored here,
  *     if this is not a null pointer, but an initialized vector.
  * \return Error code.
+ *
+ * \sa \ref igraph_community_to_membership() for a simpler interface that
+ * starts by merging individual vertices.
  *
  * Time complexity: O(|V|), the number of vertices.
  */

@@ -144,6 +144,7 @@
  - The unused enum type `igraph_fileformat_type_t` was removed.
  - The deprecated `igraph_adjacent_triangles()` was removed. Use `igraph_count_adjacent_triangles()` instead.
  - The macros `IGRAPH_POSINFINITY` and `IGRAPH_NEGINFINITY` were removed. Use `IGRAPH_INFINITY` and `-IGRAPH_INFINITY` instead.
+ - The deprecated `igraph_convex_hull()` was removed. Use `igraph_convex_hull_2d()` instead.
 
 ### Deprecated
 
@@ -172,6 +173,7 @@
 
  - `igraph_bipartite_game_gnp()` can now generate graphs with more than a hundred million vertices. Thanks to Dev Lohani @devlohani99 for implementing this in #2767!
  - `igraph_reindex_membership()` now supports arbitrary cluster indices. Previously, it would error when indices are not within `0 .. n-1` where `n` is the membership vector length.
+ - `igraph_modularity()` now supports arbitrary cluster indices. However, ensuring that cluster indices are within the range `0 .. n-1`, where `n` is the vertex count, allows for better performance.
 
 ### Fixed
 
@@ -182,6 +184,7 @@
 ### Deprecated
 
  - `igraph_sparsemat()` and `igraph_weighted_sparsemat()` are now deprecated; their functionality is duplicated by `igraph_get_adjacency_sparse()`. They will be removed in veresion 1.0.
+ - `igraph_convex_hull()` is deprecated in favour of `igraph_convex_hull_2d()` and scheduled for removal in 1.0.
 
 ### Other
 

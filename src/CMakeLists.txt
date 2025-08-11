@@ -312,6 +312,7 @@ add_library(
   misc/spanning_trees.c
 
   spatial/delaunay.c
+  spatial/convex_hull.c
   spatial/nearest_neighbor.cpp
 
   internal/glpk_support.c

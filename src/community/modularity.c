@@ -24,6 +24,8 @@
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
+#include "community/community_internal.h"
+
 /**
  * \function igraph_modularity
  * \brief Calculates the modularity of a graph with respect to some clusters or vertex types.
@@ -93,7 +95,9 @@
  * \param membership Numeric vector of integer values which gives the type of each
  *                   vertex, i.e. the cluster to which it belongs.
  *                   It does not have to be consecutive, i.e. empty communities
- *                   are allowed.
+ *                   are allowed. For better performance, ensure that community
+ *                   indices are nonnegative and smaller than the vertex count.
+ *                   This can be ensured using \ref igraph_reindex_membership().
  * \param weights    Weight vector or \c NULL if no weights are specified.
  * \param resolution The resolution parameter \c γ. Must not be negative.
  *                   Set it to 1 to use the classical definition of modularity.
@@ -106,7 +110,8 @@
  * \sa \ref igraph_modularity_matrix()
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
- * of edges.
+ * of edges, assuming that community indices are nonnegative and smaller
+ * than the vertex count. Otherwise, O(|V| log |V| + |E|).
  */
 igraph_error_t igraph_modularity(const igraph_t *graph,
                       const igraph_vector_int_t *membership,
@@ -115,9 +120,13 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
                       const igraph_bool_t directed,
                       igraph_real_t *modularity) {
 
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_vector_int_t *p_membership;
+    igraph_vector_int_t i_membership;
+    igraph_bool_t using_i_membership = false;
     igraph_vector_t k_out, k_in;
-    igraph_integer_t no_of_partitions;
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t min_cluster_id, max_cluster_id, no_of_partitions;
     igraph_real_t e; /* count/fraction of edges/weights within partitions */
     igraph_real_t m; /* edge count / weight sum */
     igraph_integer_t c1, c2;
@@ -125,7 +134,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_real_t directed_multiplier = (use_directed ? 1 : 2);
 
-    if (igraph_vector_int_size(membership) != igraph_vcount(graph)) {
+    if (igraph_vector_int_size(membership) != vcount) {
         IGRAPH_ERROR("Membership vector size differs from number of vertices.",
                      IGRAPH_EINVAL);
     }
@@ -133,7 +142,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
       IGRAPH_ERROR("The resolution parameter must not be negative.", IGRAPH_EINVAL);
     }
 
-    if (no_of_edges == 0) {
+    if (ecount == 0) {
         /* Special case: the modularity of graphs with no edges is not
          * well-defined */
         *modularity = IGRAPH_NAN;
@@ -141,12 +150,20 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     }
 
     /* At this point, the 'membership' vector does not have length zero,
-       thus it is safe to call igraph_vector_max() and min(). */
+       thus it is safe to call igraph_vector_int_minmax(). */
 
-    no_of_partitions = igraph_vector_int_max(membership) + 1;
-
-    if (igraph_vector_int_min(membership) < 0) {
-        IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
+    /* If community indices are outside of the standard range, automatically
+     * reindex them. */
+    igraph_vector_int_minmax(membership, &min_cluster_id, &max_cluster_id);
+    if (min_cluster_id < 0 || max_cluster_id >= vcount) {
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&i_membership, membership));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &i_membership);
+        IGRAPH_CHECK(igraph_i_reindex_membership_large(&i_membership, NULL, &no_of_partitions));
+        p_membership = &i_membership;
+        using_i_membership = true;
+    } else {
+        no_of_partitions = max_cluster_id + 1;
+        p_membership = membership;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&k_out, no_of_partitions);
@@ -154,17 +171,17 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 
     e = 0.0;
     if (weights) {
-        if (igraph_vector_size(weights) != no_of_edges)
+        if (igraph_vector_size(weights) != ecount)
             IGRAPH_ERROR("Weight vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = 0.0;
-        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < ecount; i++) {
             igraph_real_t w = VECTOR(*weights)[i];
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
             }
-            c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
-            c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
+            c1 = VECTOR(*p_membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = VECTOR(*p_membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 e += directed_multiplier * w;
             }
@@ -173,10 +190,10 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
             m += w;
         }
     } else {
-        m = no_of_edges;
-        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
-            c1 = VECTOR(*membership)[ IGRAPH_FROM(graph, i) ];
-            c2 = VECTOR(*membership)[ IGRAPH_TO(graph, i) ];
+        m = ecount;
+        for (igraph_integer_t i = 0; i < ecount; i++) {
+            c1 = VECTOR(*p_membership)[ IGRAPH_FROM(graph, i) ];
+            c2 = VECTOR(*p_membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
                 e += directed_multiplier;
             }
@@ -208,6 +225,11 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     igraph_vector_destroy(&k_out);
     igraph_vector_destroy(&k_in);
     IGRAPH_FINALLY_CLEAN(2);
+
+    if (using_i_membership) {
+        igraph_vector_int_destroy(&i_membership);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     return IGRAPH_SUCCESS;
 }

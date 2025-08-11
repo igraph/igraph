@@ -25,10 +25,6 @@
 <!-- doxrox-include igraph_rng_sample_dirichlet -->
 </section>
 
-<section id="convex-hull-of-a-set-of-points-on-a-plane"><title>Convex hull of a set of points on a plane</title>
-<!-- doxrox-include igraph_convex_hull -->
-</section>
-
 <section id="fitting-powerlaw-distributions-to-empirical-data"><title>Fitting power-law distributions to empirical data</title>
 <!-- doxrox-include igraph_plfit_result_t -->
 <!-- doxrox-include igraph_power_law_fit -->

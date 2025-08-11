@@ -29,14 +29,14 @@ void check_convex_hull(igraph_matrix_t *coords) {
 
     /* Testing with index output mode */
     igraph_vector_int_init(&result, 1);
-    igraph_convex_hull(coords, &result, 0);
+    igraph_convex_hull_2d(coords, &result, 0);
 
     print_vector_int(&result);
     igraph_vector_int_destroy(&result);
 
     /* Testing with coordinate output mode */
     igraph_matrix_init(&resmat, 0, 0);
-    igraph_convex_hull(coords, 0, &resmat);
+    igraph_convex_hull_2d(coords, 0, &resmat);
 
     print_matrix(&resmat);
     igraph_matrix_destroy(&resmat);

@@ -15,4 +15,8 @@
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
 </section>
 
+<section id="nongraph-spatial"><title>Non-graph related spatial processing</title>
+<!-- doxrox-include igraph_convex_hull_2d -->
+</section>
+
 </chapter>
