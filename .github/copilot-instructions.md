@@ -5,7 +5,11 @@ When performing a code review, keep in mind the following.
 
 ## Coding standards
 
- - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases. Such a special case is the interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED` and typically called `iter`, which should be an `int`. The `long` and `long long` types must never be used.
+ - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases. Such special cases are:
+    * The interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED`, typically called `iter`, which should be an `int`.
+    * When interfacing with a library that uses a different type. Before passing igraph data to this library, it must be checked that the values will not overflow.
+
+ - The `long` and `long long` types must never be used in native igraph code, as their sizes are inconsistent between platforms.
 
  - Check that the parameter ordering of newly added public functions conforms to the guidelines in our wiki at https://github.com/igraph/igraph/wiki/Guidelines-for-function-argument-ordering
 
