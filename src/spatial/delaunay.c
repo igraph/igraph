@@ -35,10 +35,8 @@ void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
         for (igraph_integer_t b = a + 1; b < num_points; b++) {
             igraph_vector_int_push_back(destination, VECTOR(*source)[a]);
             igraph_vector_int_push_back(destination, VECTOR(*source)[b]);
-            //printf("%li->%li, ", VECTOR(*source)[a], VECTOR(*source)[b]);
         }
     }
-    //printf("\n");
 }
 
 int edge_comparator(const void *a, const void *b) {
@@ -96,14 +94,11 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
     int exitcode;
     igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
     igraph_integer_t dim = igraph_matrix_ncol(points);
-    //coordT *points;
     boolT ismalloc = False; // handle memory allocation of points explicitly
     qhT qh_qh;
     qhT *qh = &qh_qh;
 
     igraph_vector_int_t int_edges;
-
-
 
     igraph_vector_t int_points;
 
@@ -132,30 +127,20 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         qh_initflags(qh, qh->qhull_command);
         qh->ATinfinity = True;
         qh->MERGEvertices = False;
-        //points = qh_readpoints(qh, &numpoints, &dim, &ismalloc); // read points from file
         qh_init_B(qh, VECTOR(int_points), numpoints, dim, ismalloc); // read points and fiddle with them a little.
         qh_qhull(qh);
         qh_triangulate(qh);
-        //qh_check_output(qh);
-        //qh_produce_output(qh);
-        //if (qh->VERIFYoutput && !qh->FORCEoutput && !qh->STOPpoint && !qh->STOPcone) {
-        //    qh_check_points(qh);
-        //}
 
         facetT *facet;
         vertexT *vertex, **vertexp;
 
-
         IGRAPH_VECTOR_INT_INIT_FINALLY(&int_edges, 0);
-
 
         igraph_vector_int_t simplex;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, dim + 1); // a simplex in n dimensions has n+1 incident vertices.
 
         igraph_integer_t curr_vert;
-
-
 
         FORALLfacets {
             if (!facet->upperdelaunay) {
@@ -169,7 +154,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         IGRAPH_CHECK(igraph_matrix_transpose(points));
         simplify_edge_list(&int_edges, edges, numpoints + 1);
 
-
         igraph_vector_destroy(&int_points);
         igraph_vector_int_destroy(&int_edges);
         igraph_vector_int_destroy(&simplex);
@@ -178,7 +162,11 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         qh->NOerrexit = True; /* no more setjmp */
         qh_freeqhull(qh, !qh_ALL);
         qh_memfreeshort(qh, &curlong, &totlong);
+        switch (qh->last_errcode) {
+            default:
+                IGRAPH_ERRORF("Error while computing delaunay triangulation, qhull error code %" IGRAPH_PRId "", IGRAPH_EINVAL, (igraph_integer_t)qh->last_errcode);
 
+        }
         char error[100];
 
         snprintf(error, sizeof(error) / sizeof(error[0]), "Error while computing delaunay triangulation, qhull code = %i", qh->last_errcode);
@@ -188,17 +176,17 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
     qh->NOerrexit = True; /* no more setjmp */
     qh_freeqhull(qh, !qh_ALL);
     qh_memfreeshort(qh, &curlong, &totlong);
-
-    //if (curlong || totlong)
-    //    qh_fprintf_stderr(7079, "qhull internal warning (main): did not free %d bytes of long memory(%d pieces)\n",
-    //                      totlong, curlong);
-
-
-
     return IGRAPH_SUCCESS;
 }
 
-
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ * */
 igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points) {
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
