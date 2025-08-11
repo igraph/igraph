@@ -1618,7 +1618,7 @@ void qh_printcenter(qhT *qh, FILE *fp, qh_PRINT format, const char *string, face
   if (qh->CENTERtype != qh_ASvoronoi && qh->CENTERtype != qh_AScentrum)
     return;
   if (string)
-    qh_fprintf(qh, fp, 9066, string);
+    qh_fprintf(qh, fp, 9066, "%s", string);
   if (qh->CENTERtype == qh_ASvoronoi) {
     num= qh->hull_dim-1;
     if (!facet->normal || !facet->upperdelaunay || !qh->ATinfinity) {

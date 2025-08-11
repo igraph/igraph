@@ -2201,7 +2201,7 @@ void qh_lib_check(int qhullLibraryType, int qhTsize, int vertexTsize, int ridgeT
       last_errcode= 6253;
     }
     if (qhmemTsize && qhmemTsize != sizeof(qhmemT)) {
-      qh_fprintf_stderr(6254, "qh_lib_check: Incorrect qhull library called.  Size of qhmemT for caller is %d, but for qhull library is %d.\n", qhmemTsize, sizeof(qhmemT));
+      qh_fprintf_stderr(6254, "qh_lib_check: Incorrect qhull library called.  Size of qhmemT for caller is %d, but for qhull library is %d.\n", qhmemTsize, (int)sizeof(qhmemT));
       last_errcode= 6254;
     }
     if (last_errcode) {

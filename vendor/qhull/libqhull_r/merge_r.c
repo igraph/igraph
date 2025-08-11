@@ -427,7 +427,7 @@ void qh_appendmergeset(qhT *qh, facetT *facet, facetT *neighbor, mergeType merge
     return;
   }
   if (!qh->facet_mergeset || !qh->degen_mergeset) {
-    qh_fprintf(qh, qh->ferr, 6403, "qhull internal error (qh_appendmergeset): expecting temp set defined for qh.facet_mergeset (0x%x) and qh.degen_mergeset (0x%x).  Got NULL\n",
+    qh_fprintf(qh, qh->ferr, 6403, "qhull internal error (qh_appendmergeset): expecting temp set defined for qh.facet_mergeset (%p) and qh.degen_mergeset (%p).  Got NULL\n",
       qh->facet_mergeset, qh->degen_mergeset);
     /* otherwise qh_setappend creates a new set that is not freed by qh_freebuild() */
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
@@ -513,8 +513,7 @@ void qh_appendvertexmerge(qhT *qh, vertexT *vertex, vertexT *destination, mergeT
   const char *mergename;
 
   if (!qh->vertex_mergeset) {
-    qh_fprintf(qh, qh->ferr, 6387, "qhull internal error (qh_appendvertexmerge): expecting temp set defined for qh.vertex_mergeset (0x%x).  Got NULL\n",
-      qh->vertex_mergeset);
+    qh_fprintf(qh, qh->ferr, 6387, "qhull internal error (qh_appendvertexmerge): expecting temp set defined for qh.vertex_mergeset.  Got NULL\n");
     /* otherwise qh_setappend creates a new set that is not freed by qh_freebuild() */
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
@@ -1654,7 +1653,7 @@ void qh_forcedmerges(qhT *qh, boolT *wasmerge) {
 void qh_freemergesets(qhT *qh) {
 
   if (!qh->facet_mergeset || !qh->degen_mergeset || !qh->vertex_mergeset) {
-    qh_fprintf(qh, qh->ferr, 6388, "qhull internal error (qh_freemergesets): expecting mergesets.  Got a NULL mergeset, qh.facet_mergeset (0x%x), qh.degen_mergeset (0x%x), qh.vertex_mergeset (0x%x)\n",
+    qh_fprintf(qh, qh->ferr, 6388, "qhull internal error (qh_freemergesets): expecting mergesets.  Got a NULL mergeset, qh.facet_mergeset (%p), qh.degen_mergeset (%p), qh.vertex_mergeset (%p)\n",
       qh->facet_mergeset, qh->degen_mergeset, qh->vertex_mergeset);
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
@@ -2034,7 +2033,7 @@ ridgeT *qh_hashridge_find(qhT *qh, setT *hashtable, int hashsize, ridgeT *ridge,
 void qh_initmergesets(qhT *qh /* qh.facet_mergeset,degen_mergeset,vertex_mergeset */) {
 
   if (qh->facet_mergeset || qh->degen_mergeset || qh->vertex_mergeset) {
-    qh_fprintf(qh, qh->ferr, 6386, "qhull internal error (qh_initmergesets): expecting NULL mergesets.  Got qh.facet_mergeset (0x%x), qh.degen_mergeset (0x%x), qh.vertex_mergeset (0x%x)\n",
+    qh_fprintf(qh, qh->ferr, 6386, "qhull internal error (qh_initmergesets): expecting NULL mergesets.  Got qh.facet_mergeset (%p), qh.degen_mergeset (%p), qh.vertex_mergeset (%p)\n",
       qh->facet_mergeset, qh->degen_mergeset, qh->vertex_mergeset);
     qh_errexit(qh, qh_ERRqhull, NULL, NULL);
   }
@@ -2304,7 +2303,7 @@ void qh_maybe_duplicateridge(qhT *qh, ridgeT *ridgeA) {
             if (k == last) {
               vertex= qh_findbest_ridgevertex(qh, ridge, &pinched, &dist);
               trace2((qh, qh->ferr, 2069, "qh_maybe_duplicateridge: will merge v%d into v%d (dist %2.2g) due to duplicate ridges r%d/r%d with the same vertices.  mergevertex set\n",
-                pinched->id, vertex->id, dist, ridgeA->id, ridge->id, ridgeA->top->id, ridgeA->bottom->id, ridge->top->id, ridge->bottom->id));
+                pinched->id, vertex->id, dist, ridgeA->id, ridge->id));
               qh_appendvertexmerge(qh, pinched, vertex, MRGvertices, dist, ridgeA, ridge);
               ridge->mergevertex= True; /* disables check for duplicate vertices in qh_checkfacet */
               ridgeA->mergevertex= True;

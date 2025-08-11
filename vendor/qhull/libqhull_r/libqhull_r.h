@@ -48,6 +48,13 @@
 #endif
 #endif
 
+#if defined(__GNUC__)
+/* See https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-format-function-attribute */
+#define QH_PRINTF_LIKE(string_index, first_to_check) __attribute__((format(printf, string_index, first_to_check)))
+#else
+#define QH_PRINTF_LIKE(string_index, first_to_check)
+#endif
+
 /*============ constants and basic types ====================*/
 
 extern const char qh_version[]; /* defined in global_r.c */
@@ -1132,13 +1139,13 @@ void    qh_user_memsizes(qhT *qh);
 
 /********* -usermem_r.c prototypes (alphabetical) **********************/
 void    qh_exit(int exitcode);
-void    qh_fprintf_stderr(int msgcode, const char *fmt, ... );
+void    qh_fprintf_stderr(int msgcode, const char *fmt, ... ) QH_PRINTF_LIKE(2, 3);
 void    qh_free(void *mem);
 void   *qh_malloc(size_t size);
 
 /********* -userprintf_r.c and userprintf_rbox_r.c prototypes **********************/
-void    qh_fprintf(qhT *qh, FILE *fp, int msgcode, const char *fmt, ... );
-void    qh_fprintf_rbox(qhT *qh, FILE *fp, int msgcode, const char *fmt, ... );
+void    qh_fprintf(qhT *qh, FILE *fp, int msgcode, const char *fmt, ... ) QH_PRINTF_LIKE(4, 5);
+void    qh_fprintf_rbox(qhT *qh, FILE *fp, int msgcode, const char *fmt, ... ) QH_PRINTF_LIKE(4, 5);
 
 /***** -geom_r.c/geom2_r.c/random_r.c prototypes (duplicated from geom_r.h, random_r.h) ****************/
 
@@ -1149,7 +1156,6 @@ facetT *qh_findbestnew(qhT *qh, pointT *point, facetT *startfacet,
                      realT *dist, boolT bestoutside, boolT *isoutside, int *numpart);
 boolT   qh_gram_schmidt(qhT *qh, int dim, realT **rows);
 void    qh_outerinner(qhT *qh, facetT *facet, realT *outerplane, realT *innerplane);
-void    qh_printsummary(qhT *qh, FILE *fp);
 void    qh_projectinput(qhT *qh);
 void    qh_randommatrix(qhT *qh, realT *buffer, int dim, realT **row);
 void    qh_rotateinput(qhT *qh, realT **rows);
@@ -1189,11 +1195,6 @@ void    qh_produce_output(qhT *qh);
 coordT *qh_readpoints(qhT *qh, int *numpoints, int *dimension, boolT *ismalloc);
 
 
-/********* -mem_r.c prototypes (duplicated from mem_r.h) **********************/
-
-void qh_meminit(qhT *qh, FILE *ferr);
-void qh_memfreeshort(qhT *qh, int *curlong, int *totlong);
-
 /********* -poly_r.c/poly2_r.c prototypes (duplicated from poly_r.h) **********************/
 
 void    qh_check_output(qhT *qh);
@@ -1212,11 +1213,6 @@ void    qh_triangulate(qhT *qh /* qh.facet_list */);
 /********* -rboxlib_r.c prototypes **********************/
 int     qh_rboxpoints(qhT *qh, char* rbox_command);
 void    qh_errexit_rbox(qhT *qh, int exitcode);
-
-/********* -stat_r.c prototypes (duplicated from stat_r.h) **********************/
-
-void    qh_collectstatistics(qhT *qh);
-void    qh_printallstatistics(qhT *qh, FILE *fp, const char *string);
 
 /************************** accessors.c prototypes ******************************/
 

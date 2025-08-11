@@ -44,7 +44,6 @@
 
 void qh_fprintf(qhT *qh, FILE *fp, int msgcode, const char *fmt, ... ) {
     va_list args;
-    facetT *neighbor, **neighborp;
     if (qh) {
         if (msgcode >= MSG_ERROR && msgcode < MSG_WARNING) {
             qh->last_errcode = msgcode;
