@@ -26,6 +26,7 @@
  - Fix failure in SIR simulation due to roundoff errors creating slightly negative rates.
  - Fix infinite coordinates for certain path graphs with `igraph_layout_kamada_kawai_3d()`.
  - `igraph_community_leiden()` did not iterate until the partition ceased to change when `n_iterations < 0`. Thanks to Lucas Lopes Felipe @lucaslopes for fixing this in #2799!
+ - The widest path functions `igraph_widest_path_widths_floyd_warshall()`, `igraph_widest_path_widths_dijkstra()`, `igraph_get_widest_paths()`, and `igraph_get_widest_path()` incorrectly ignored edges with positive infinite width. Now they ignore edges with negative infinite width.
 
 ### Deprecated
 
