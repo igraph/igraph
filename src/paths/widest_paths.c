@@ -405,12 +405,13 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  * \function igraph_widest_path_widths_floyd_warshall
  * \brief Widths of widest paths between vertices.
  *
- * This function implements a modified Floyd-Warshall algorithm,
- * to find the widest path widths between a set of source and target
- * vertices. It is primarily useful for all-pairs path widths in very dense
- * graphs, as its running time is manily determined by the vertex count,
- * and is not sensitive to the graph density. In sparse graphs, other methods
- * such as the Dijkstra algorithm, will perform better.
+ * This function implements a modified Floyd-Warshall algorithm, to find the
+ * widest path widths between a set of source and target vertices. It is
+ * primarily useful for all-pairs path widths in very dense graphs, as its
+ * running time is manily determined by the vertex count, and is not sensitive
+ * to the graph density. In sparse graphs, other methods such as Dijkstra's
+ * algorithm, implemented in \ref igraph_widest_path_widths_dijkstra() will
+ * perform better.
  *
  * </para><para>
  * Note that internally this function always computes the path width matrix
@@ -419,17 +420,17 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  * calculation.
  *
  * \param graph The input graph, can be directed.
- * \param res The result, a matrix. A pointer to an initialized matrix
- *    should be passed here. The matrix will be resized as needed.
- *    Each row contains the widths from a single source, to the
- *    vertices given in the \c to argument.
+ * \param res An initialized matrix, the result will be written here. The
+ *    matrix will be resized as needed. Each row will contain the widths
+ *    from a single source to the vertices given in the \p to argument.
  *    Unreachable vertices have width \c -IGRAPH_INFINITY, and vertices
  *    have a width of \c IGRAPH_INFINITY to themselves.
  * \param from The source vertices.
  * \param to The target vertices.
- * \param weights The edge weights. Edge weights can be negative. If this
- *        is a null pointer or if any edge weight is NaN, then an error
- *        is returned. Edges with positive infinite weight are ignored.
+ * \param weights The edge weights, interpreted as widths. Edge weights can be
+ *    negative, but must not be NaN. Edges with positive infinite weight are
+ *    ignored. The weight vector is required: if \c NULL is passed, an error is
+ *    raised.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -551,26 +552,29 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
  * \function igraph_widest_path_widths_dijkstra
  * \brief Widths of widest paths between vertices.
  *
- * This function implements a modified Dijkstra's algorithm, which
- * can find the widest path widths from a source vertex to all
- * other vertices. This function allows specifying a set of source
- * and target vertices. The algorithm is run independently for each
- * source and the results are retained only for the specified targets.
- * This implementation uses a binary heap for efficiency.
+ * This function implements a modified Dijkstra's algorithm, which can find
+ * the widest path widths from a source vertex to all other vertices. The width
+ * of a path is defined as the width of the narrowest edge in the path.
+ *
+ * </para><para>
+ * This function allows specifying a set of source and target vertices. The
+ * algorithm is run independently for each source and the results are retained
+ * only for the specified targets. This implementation uses a binary heap for
+ * efficiency.
  *
  * \param graph The input graph, can be directed.
- * \param res The result, a matrix. A pointer to an initialized matrix
- *    should be passed here. The matrix will be resized as needed.
- *    Each row contains the widths from a single source, to the
- *    vertices given in the \c to argument.
+ * \param res An initialized matrix, the result will be written here. The
+ *    matrix will be resized as needed. Each row will contain the widths
+ *    from a single source to the vertices given in the \p to argument.
  *    Unreachable vertices have width \c -IGRAPH_INFINITY, and vertices
  *    have a width of \c IGRAPH_INFINITY to themselves.
  * \param from The source vertices.
- * \param to The target vertices. It is not allowed to include a
- *    vertex twice or more.
- * \param weights The edge weights. Edge weights can be negative. If this
- *        is a null pointer or if any edge weight is NaN, then an error
- *        is returned. Edges with positive infinite weight are ignored.
+ * \param to The target vertices. It is not allowed to include a vertex twice
+ *    or more.
+ * \param weights The edge weights, interpreted as widths. Edge weights can be
+ *    negative, but must not be NaN. Edges with positive infinite weight are
+ *    ignored. The weight vector is required: if \c NULL is passed, an error is
+ *    raised.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -580,8 +584,8 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
  * Time complexity: O(s*(|E|log|E|+|V|)), where |V| is the number of
  * vertices in the graph, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_widest_path_widths_floyd_warshall() for a variant that runs faster
- * on dense graphs.
+ * \sa \ref igraph_widest_path_widths_floyd_warshall() for a variant that runs
+ * faster on dense graphs.
  */
 igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                                    igraph_matrix_t *res,
