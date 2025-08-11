@@ -42,7 +42,7 @@ void bench(const igraph_t *graph, const char *what, int rep) {
     igraph_destroy(&new_graph);
 
     sprintf(name, "%s, n=%5" IGRAPH_PRId ", m=%5" IGRAPH_PRId ", INDEX, %dx", what, vcount, ecount, rep);
-    BENCH(name, REPEAT(igraph_realize_degree_sequence(&new_graph, &degrees, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST), rep));
+    BENCH(name, REPEAT(igraph_realize_degree_sequence(&new_graph, &degrees, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX), rep));
     igraph_destroy(&new_graph);
 
     printf("\n");
