@@ -49,7 +49,7 @@ static int edge_comparator(const void *a, const void *b) {
     if (A[0] > B[0]) {
         return  1;
     }
-    //first are equal
+    // first are equal
     if (A[1] < B[1]) {
         return -1;
     }
@@ -62,10 +62,10 @@ static int edge_comparator(const void *a, const void *b) {
 }
 
 // Simplify an edge list
-static void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
+static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
-        return;
+        return IGRAPH_SUCCESS;
     }
     // reorder
     igraph_integer_t temp;
@@ -79,15 +79,16 @@ static void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out
     // sort
     igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
 
-    igraph_vector_int_push_back(out, VECTOR(*in)[0]);
-    igraph_vector_int_push_back(out, VECTOR(*in)[1]);
+    IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[0]));
+    IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[1]));
     // nub and filter out point at infinity
     for (igraph_integer_t i = 2; i < size; i += 2) {
         if ((VECTOR(*in)[i] != VECTOR(*in)[i - 2] || VECTOR(*in)[i + 1] != VECTOR(*in)[i - 1]) && VECTOR(*in)[i+1] != except) {
-            igraph_vector_int_push_back(out, VECTOR(*in)[i]);
-            igraph_vector_int_push_back(out, VECTOR(*in)[i + 1]);
+            IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[i]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[i + 1]));
         }
     }
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -139,14 +140,14 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         qh->DELAUNAY = True;    /* 'd'   */
         qh->SCALElast = True;   /* 'Qbb' */
         qh->KEEPcoplanar = True; /* 'Qc', to keep coplanars in 'p' */
-        qh->TRIangulate = True;
+        qh->TRIangulate = True;  // Set flag to split non-simplicial points into
         qh_checkflags(qh, qh->qhull_command, "  ");
         qh_initflags(qh, qh->qhull_command);
-        qh->ATinfinity = True;
-        qh->MERGEvertices = False;
-        qh_init_B(qh, &MATRIX(int_points,0,0), numpoints, dim, ismalloc); // read points and fiddle with them a little.
-        qh_qhull(qh);
-        qh_triangulate(qh);
+        qh->ATinfinity = True; // required for cocircular points, should not mess anything else up.
+        qh->MERGEvertices = False; // Do not merge identical vertices
+        qh_init_B(qh, &MATRIX(int_points,0,0), numpoints, dim, ismalloc); // read points and project them to parabola.
+        qh_qhull(qh); // Do the triangulation
+        qh_triangulate(qh); // In some cases, the triangulate flag is not enough, this guarantees that everyhing is simplicial
 
         facetT *facet;
         vertexT *vertex, **vertexp;
@@ -167,7 +168,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 add_clique(&int_edges, &simplex);
             }
         }
-        simplify_edge_list(&int_edges, edges, numpoints + 1);
+        IGRAPH_CHECK(simplify_edge_list(&int_edges, edges, numpoints + 1));
 
         igraph_matrix_destroy(&int_points);
         igraph_vector_int_destroy(&int_edges);
