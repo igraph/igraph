@@ -61,8 +61,9 @@ static int edge_comparator(const void *a, const void *b) {
     return 0;
 }
 
-// Simplify an edge list
-static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
+// Simplify an edge list in place
+// except is the vertex "at infinity", and should not be included in the edge list.
+static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_integer_t except) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
         return IGRAPH_SUCCESS;
@@ -78,19 +79,27 @@ static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_vector_
     }
     // sort
     igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
-
-    IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[0]));
-    IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[1]));
     // nub and filter out point at infinity
+    igraph_integer_t last_added = 0;
     for (igraph_integer_t i = 2; i < size; i += 2) {
-        if ((VECTOR(*in)[i] != VECTOR(*in)[i - 2] || VECTOR(*in)[i + 1] != VECTOR(*in)[i - 1]) && VECTOR(*in)[i+1] != except) {
-            IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[i]));
-            IGRAPH_CHECK(igraph_vector_int_push_back(out, VECTOR(*in)[i + 1]));
+        if ((VECTOR(*in)[i] != VECTOR(*in)[2 * last_added] || VECTOR(*in)[i + 1] != VECTOR(*in)[2*last_added + 1]) && VECTOR(*in)[i+1] != except) {
+            last_added += 1;
+            VECTOR(*in)[2*last_added]      = VECTOR(*in)[i];
+            VECTOR(*in)[2*last_added + 1 ] = VECTOR(*in)[i+1];
         }
     }
+    IGRAPH_CHECK(igraph_vector_int_resize(in, 2*last_added+2));
     return IGRAPH_SUCCESS;
 }
 
+
+// helper that can go on the finally stack to free qhull
+static void destroy_qhull(qhT *qh) {
+    int curlong, totlong;
+    qh->NOerrexit = True; /* no more setjmp */
+    qh_freeqhull(qh, !qh_ALL);
+    qh_memfreeshort(qh, &curlong, &totlong);
+}
 
 // Make a transposed copy with space for added point at infinity.
 igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t *out) {
@@ -117,12 +126,20 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     qhT qh_qh;
     qhT *qh = &qh_qh;
 
-    igraph_vector_int_t int_edges;
-
     igraph_matrix_t int_points;
 
     if (numpoints > INT_MAX) {
         IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
+    }
+
+    // For internal use, it returns a complete graph.
+    // This is not nessecarily a delaunay graph, but for nondegenerate point sets it is.
+    if (numpoints <= dim) {
+
+    }
+
+    if (dim == 0) {
+        IGRAPH_ERROR("0 dimensional point sets are not supported.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(copy_transpose(points, &int_points));
@@ -131,6 +148,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     QHULL_LIB_CHECK; /* Check for compatible library */
 
     qh_init_A(qh, NULL, NULL, NULL, 0, NULL);  /* sets qh->qhull_command */
+    IGRAPH_FINALLY(destroy_qhull, qh);
     exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
     if (!exitcode) {
         qh->NOerrexit = False;
@@ -152,8 +170,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         facetT *facet;
         vertexT *vertex, **vertexp;
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&int_edges, 0);
-
         igraph_vector_int_t simplex;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, dim + 1); // a simplex in n dimensions has n+1 incident vertices.
 
@@ -165,28 +181,23 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 FOREACHvertex_(facet->vertices) {
                     VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
                 }
-                add_clique(&int_edges, &simplex);
+                add_clique(edges, &simplex);
             }
         }
-        IGRAPH_CHECK(simplify_edge_list(&int_edges, edges, numpoints + 1));
+        IGRAPH_CHECK(simplify_edge_list(edges, numpoints + 1));
 
         igraph_matrix_destroy(&int_points);
-        igraph_vector_int_destroy(&int_edges);
         igraph_vector_int_destroy(&simplex);
-        IGRAPH_FINALLY_CLEAN(3);
+        IGRAPH_FINALLY_CLEAN(2);
     } else {
-        qh->NOerrexit = True; /* no more setjmp */
-        qh_freeqhull(qh, !qh_ALL);
-        qh_memfreeshort(qh, &curlong, &totlong);
         switch (qh->last_errcode) {
             default:
                 IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
 
-    qh->NOerrexit = True; /* no more setjmp */
-    qh_freeqhull(qh, !qh_ALL);
-    qh_memfreeshort(qh, &curlong, &totlong);
+    destroy_qhull(qh);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -213,8 +224,18 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    igraph_integer_t num_points = igraph_matrix_nrow(points);
 
+    if (num_points < 2) {
+        igraph_full(graph, num_points, false, false);
+        return IGRAPH_SUCCESS;
+    }
+
+    if (num_points <= igraph_matrix_ncol(points)) {
+        IGRAPH_ERROR("General point sets without enough points to create a simplex (dimension + 1) are not supported.", IGRAPH_UNIMPLEMENTED);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
     IGRAPH_CHECK(igraph_create(graph, &edges, igraph_matrix_nrow(points), false));
 

@@ -142,6 +142,12 @@ int main(void) {
         3,3,
         4,4,
     };
+
+    igraph_real_t points_3d_line[] = {
+        0,0,0,
+        1,1,1,
+        2,2,2
+    };
     printf("100 point cloud in 2d\n");
     delaunay(&points_raw[0], 100, 2, true);
     printf("50 point cloud in 3d\n");
@@ -156,6 +162,16 @@ int main(void) {
     delaunay(&points_not_quite_colinear[0], 4, 2, true);
     printf("4 points on a line\n");
     CHECK_ERROR(delaunay(&points_all_colinear[0], 4, 2, true),IGRAPH_EINVAL);
+    printf("One point in 2d\n");
+    delaunay(&points_raw[0], 1, 2, true);
+    printf("No points in 2d\n");
+    delaunay(&points_raw[0], 0, 2, true);
+    printf("0x0 matrix\n");
+    delaunay(&points_raw[0], 0, 0, true);
+    printf("2 points in 0d\n");
+    CHECK_ERROR(delaunay(&points_raw[0], 2, 0, true), IGRAPH_EINVAL);
+    printf("4 points in 3d\n");
+    delaunay(&point_cloud_3d[0], 4, 3, true);
     VERIFY_FINALLY_STACK();
 
     return 0;
