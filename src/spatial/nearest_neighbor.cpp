@@ -26,6 +26,8 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "spatial/nanoflann_internal.hpp"
+
 #include "core/exceptions.h"
 #include "core/interruption.h"
 #include "spatial/spatial_internal.h"
