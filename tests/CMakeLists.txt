@@ -365,7 +365,6 @@ add_legacy_tests(
   igraph_transitivity_barrat
   igraph_unfold_tree
   igraph_voronoi
-  igraph_widest_paths
   igraph_spanner
   jdm
   knn
@@ -377,6 +376,7 @@ add_legacy_tests(
   rich_club
   single_target_shortest_path
   topological_sorting
+  widest_paths
 )
 
 add_legacy_tests(

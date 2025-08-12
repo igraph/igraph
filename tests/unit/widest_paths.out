@@ -231,3 +231,51 @@ inbound_edges: ( -1 1 2 -1 -1 )
 vertex path:   ( )
 edge path:     ( )
 
+[ Inf 0.500000 0.500000 -Inf -Inf -Inf -Inf -Inf -Inf -Inf
+  0.500000 Inf Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf
+  0.500000 Inf Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf
+  -Inf -Inf -Inf Inf 1.500000 -Inf -Inf -Inf -Inf -Inf
+  -Inf -Inf -Inf 1.500000 Inf -Inf -Inf -Inf -Inf -Inf
+  -Inf -Inf -Inf -Inf -Inf Inf -Inf -Inf -Inf -Inf
+  -Inf -Inf -Inf -Inf -Inf -Inf Inf Inf -Inf -Inf
+  -Inf -Inf -Inf -Inf -Inf -Inf Inf Inf -Inf -Inf
+  -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf Inf -Inf
+  -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf -Inf Inf ]
+
+path to node 0:
+  vertices: ( )
+  edges:    ( )
+path to node 1:
+  vertices: ( )
+  edges:    ( )
+path to node 2:
+  vertices: ( )
+  edges:    ( )
+path to node 3:
+  vertices: ( 3 )
+  edges:    ( )
+path to node 4:
+  vertices: ( 3 4 )
+  edges:    ( 2 )
+path to node 5:
+  vertices: ( )
+  edges:    ( )
+path to node 6:
+  vertices: ( )
+  edges:    ( )
+path to node 7:
+  vertices: ( )
+  edges:    ( )
+path to node 8:
+  vertices: ( )
+  edges:    ( )
+path to node 9:
+  vertices: ( )
+  edges:    ( )
+
+parents:  ( -2 -2 -2 -1 3 -2 -2 -2 -2 -2 )
+inbound_edges: ( -1 -1 -1 -1 2 -1 -1 -1 -1 -1 )
+
+vertex path:   ( )
+edge path:     ( )
+
