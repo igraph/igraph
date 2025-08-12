@@ -1,19 +1,20 @@
 /*
-    IGraph library.
-    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   IGraph library.
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-
 
 #include "igraph_spatial.h"
 
@@ -26,7 +27,7 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
-void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
+static void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
         for (igraph_integer_t b = a + 1; b < num_points; b++) {
@@ -36,7 +37,7 @@ void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     }
 }
 
-int edge_comparator(const void *a, const void *b) {
+static int edge_comparator(const void *a, const void *b) {
     igraph_integer_t * A = (igraph_integer_t *)a;
     igraph_integer_t * B = (igraph_integer_t *)b;
     if (A[0] < B[0]) {
@@ -58,7 +59,7 @@ int edge_comparator(const void *a, const void *b) {
 }
 
 // Simplify an edge list
-void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
+static void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
         return;
@@ -177,17 +178,23 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
 
 /**
  * \function igraph_delaunay_triangulation
- * \brief Computes the delaunay triangulation for a spatial point set.
+ * \brief Computes the Delaunay graph of a spatial point set.
  *
- * This function constructs the delaunay triangulation of a given spatial point set.
+ * \experimental
+ *
+ * This function constructs the graph corresponding to the Delaunay triangulation
+ * of an n-dimensional spatial point set.
+ *
+ * </para><para>
+ * The current implementation uses Qhull.
  *
  * \param graph A pointer to the graph that will be created.
- * \param points a matrix containing the points that will be used to create the graph.
+ * \param points A matrix containing the points that will be used to create the graph.
  *     Each row is a point, dimensionality is inferred from the column count.
  *
- * \return Error code, often a qhull error code, refer to qhull for more detail.
+ * \return Error code.
  *
- * */
+ */
 igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points) {
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -198,5 +205,6 @@ igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *p
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
