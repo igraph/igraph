@@ -306,7 +306,14 @@ igraph_error_t igraph_distances(
         /* Non-negative weights: use Dijkstra's algorithm. */
         return igraph_i_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, -1);
     } else {
-        /* Negative weights: use Bellman-Ford or Johnson's algorithm. */
+        /* Negative weights: use Bellman-Ford or Johnson's algorithm.
+         *
+         * In the undirected case we always use Bellman-Ford. Normally, a negative weight
+         * undirected edge triggers an error as it is effectively a negative cycle.
+         * However, with Bellman-Ford the negative edge might be avoided if it is
+         * not reachable from the 'from' vertices. In cotrast, Johnson will always raise
+         * an error.
+         */
         if (mode != IGRAPH_ALL) {
             IGRAPH_CHECK(igraph_vs_size(graph, &from, &from_size));
             if (from_size > 100) {
