@@ -19,4 +19,24 @@
 #include <igraph.h>
 #include "bench.h"
 
+void bench_erdos_renyi(int nodes, int edges, int rewirings, int rep) {
+   igraph_t graph;
 
+   igraph_erdos_renyi_game_gnm(&graph, nodes, edges, false, false, false);
+
+   char name[200];
+   sprintf(name, "Erdős-Rényi graph rewire %d nodes, %d edges, %d swaps, %dx",
+           nodes, edges, rewirings, rep);
+
+   BENCH(name, REPEAT(igraph_rewire(&graph, rewirings, IGRAPH_REWIRING_SIMPLE), rep));
+
+   igraph_destroy(&graph);
+}
+
+int main(void) {
+   igraph_rng_seed(igraph_rng_default(), 137);
+   BENCH_INIT();
+
+   bench_erdos_renyi(/* nodes */100, /* edges */3000, /* rewirings */30000, /* rep */500);
+   return 0;
+}

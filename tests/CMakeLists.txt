@@ -1031,6 +1031,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_realize_degree_sequence
+  igraph_rewire
   igraph_strength
   igraph_transitivity
   igraph_tree_game
