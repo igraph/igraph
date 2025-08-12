@@ -1,11 +1,6 @@
-#include "igraph_error.h"
-#include "igraph_interface.h"
-#include "igraph_matrix.h"
-#include "test_utilities.h"
-
 #include <igraph.h>
-#include <math.h>
-#include <stdbool.h>
+
+#include "test_utilities.h"
 
 igraph_error_t delaunay(igraph_real_t *points, igraph_integer_t numpoints, igraph_integer_t dimension, igraph_bool_t printing) {
 

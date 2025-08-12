@@ -26,10 +26,6 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
-#include <climits>
-#include <stdio.h>
-
-
 void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
