@@ -143,11 +143,6 @@ int main(void) {
         4,4,
     };
 
-    igraph_real_t points_3d_line[] = {
-        0,0,0,
-        1,1,1,
-        2,2,2
-    };
     printf("100 point cloud in 2d\n");
     delaunay(&points_raw[0], 100, 2, true);
     printf("50 point cloud in 3d\n");
