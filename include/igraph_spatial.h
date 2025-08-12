@@ -29,6 +29,18 @@ IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points);
 
+IGRAPH_EXPORT igraph_error_t igraph_lune_beta_skeleton(
+    igraph_t *graph,
+    const igraph_matrix_t *points,
+    igraph_real_t beta
+);
+
+IGRAPH_EXPORT igraph_error_t igraph_circle_beta_skeleton(
+    igraph_t *graph,
+    const igraph_matrix_t *points,
+    igraph_real_t beta
+);
+
 /**
  * \typedef igraph_metric_t
  * \brief Metric functions for use with spatial computation.
