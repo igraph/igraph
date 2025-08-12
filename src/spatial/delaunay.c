@@ -125,6 +125,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     }
 
     IGRAPH_CHECK(copy_transpose(points, &int_points));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &int_points);
 
     QHULL_LIB_CHECK; /* Check for compatible library */
 
