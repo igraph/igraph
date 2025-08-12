@@ -26,6 +26,7 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
+#include <climits>
 #include <stdio.h>
 
 
@@ -102,6 +103,10 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
 
     igraph_vector_t int_points;
 
+    if (numpoints > INT_MAX) {
+        IGRAPH_ERROR("Too many points", IGRAPH_EINVAL);
+    }
+
     IGRAPH_CHECK(igraph_matrix_transpose(points)); // get in row-major order
 
     IGRAPH_VECTOR_INIT_FINALLY(&int_points, numpoints * dim); //allocate space for extra ponint added due to
@@ -165,7 +170,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         switch (qh->last_errcode) {
             default:
                 IGRAPH_ERRORF("Error while computing delaunay triangulation, qhull error code %" IGRAPH_PRId "", IGRAPH_EINVAL, (igraph_integer_t)qh->last_errcode);
-
         }
     }
 
