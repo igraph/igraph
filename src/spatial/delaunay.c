@@ -121,7 +121,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     igraph_matrix_t int_points;
 
     if (numpoints > INT_MAX) {
-        IGRAPH_ERROR("Too many points", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
     }
 
     IGRAPH_CHECK(copy_transpose(points, &int_points));
@@ -153,7 +153,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_VECTOR_INT_INIT_FINALLY(&int_edges, 0);
 
         igraph_vector_int_t simplex;
-
         IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, dim + 1); // a simplex in n dimensions has n+1 incident vertices.
 
         igraph_integer_t curr_vert;
@@ -179,13 +178,14 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         qh_memfreeshort(qh, &curlong, &totlong);
         switch (qh->last_errcode) {
             default:
-                IGRAPH_ERRORF("Error while computing delaunay triangulation, qhull error code %" IGRAPH_PRId "", IGRAPH_EINVAL, (igraph_integer_t)qh->last_errcode);
+                IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
 
     qh->NOerrexit = True; /* no more setjmp */
     qh_freeqhull(qh, !qh_ALL);
     qh_memfreeshort(qh, &curlong, &totlong);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -210,10 +210,10 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
  */
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
-
     IGRAPH_CHECK(igraph_create(graph, &edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&edges);
