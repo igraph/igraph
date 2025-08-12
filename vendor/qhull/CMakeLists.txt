@@ -21,7 +21,6 @@ add_library(
   libqhull_r/usermem_r.c
   libqhull_r/userprintf_r.c
   libqhull_r/userprintf_rbox_r.c
-
 )
 
 target_include_directories(
