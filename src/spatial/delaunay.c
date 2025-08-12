@@ -16,10 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_foreign.h"
 #include "igraph_spatial.h"
-
-#include "spatial_internal.h"
 
 #include "igraph_constructors.h"
 #include "igraph_error.h"
@@ -27,10 +24,12 @@
 #include "igraph_qsort.h"
 #include "igraph_vector.h"
 
+#include "spatial/spatial_internal.h"
+
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
-static void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *source) {
+static void add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
         for (igraph_integer_t b = a + 1; b < num_points; b++) {
@@ -39,6 +38,7 @@ static void add_clique(igraph_vector_int_t *destination, igraph_vector_int_t *so
         }
     }
 }
+
 
 static int edge_comparator(const void *a, const void *b) {
     igraph_integer_t * A = (igraph_integer_t *)a;
@@ -61,8 +61,9 @@ static int edge_comparator(const void *a, const void *b) {
     return 0;
 }
 
+
 // Simplify an edge list
-static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
+static igraph_error_t simplify_edge_list(const igraph_vector_int_t *in, igraph_vector_int_t *out, igraph_integer_t except) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
         return IGRAPH_SUCCESS;
@@ -93,7 +94,7 @@ static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_vector_
 
 
 // Make a transposed copy with space for added point at infinity.
-igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t *out) {
+static igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t *out) {
     igraph_integer_t rows = igraph_matrix_nrow(in), columns = igraph_matrix_ncol(in);
 
     // add extra space for point at infinity
@@ -107,6 +108,7 @@ igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t *out) {
 
     return IGRAPH_SUCCESS;
 }
+
 
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
     int curlong, totlong; /* used !qh_NOmem */
@@ -190,6 +192,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 
     return IGRAPH_SUCCESS;
 }
+
 
 /**
  * \function igraph_delaunay_triangulation
