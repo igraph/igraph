@@ -16,7 +16,10 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "igraph_foreign.h"
 #include "igraph_spatial.h"
+
+#include "spatial_internal.h"
 
 #include "igraph_constructors.h"
 #include "igraph_error.h"
@@ -87,7 +90,24 @@ static void simplify_edge_list(igraph_vector_int_t *in, igraph_vector_int_t *out
     }
 }
 
-igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix_t *points) {
+
+// Make a transposed copy with space for added point at infinity.
+igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t *out) {
+    igraph_integer_t rows = igraph_matrix_nrow(in), columns = igraph_matrix_ncol(in);
+
+    // add extra space for point at infinity
+    IGRAPH_CHECK(igraph_matrix_init(out, columns, rows+1));
+
+    for (igraph_integer_t row = 0; row < rows; row++) {
+        for (igraph_integer_t col = 0; col < columns; col++) {
+            MATRIX(*out, col, row) = MATRIX(*in, row, col);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
     int curlong, totlong; /* used !qh_NOmem */
     int exitcode;
     igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
@@ -98,19 +118,13 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
 
     igraph_vector_int_t int_edges;
 
-    igraph_vector_t int_points;
+    igraph_matrix_t int_points;
 
     if (numpoints > INT_MAX) {
         IGRAPH_ERROR("Too many points", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_matrix_transpose(points)); // get in row-major order
-
-    IGRAPH_VECTOR_INIT_FINALLY(&int_points, numpoints * dim); //allocate space for extra ponint added due to
-
-    igraph_matrix_copy_to(points, VECTOR(int_points));
-
-    IGRAPH_CHECK(igraph_matrix_transpose(points)); // Transpose = Transpose ^ -1, so this returns the point set to the initial state.
+    IGRAPH_CHECK(copy_transpose(points, &int_points));
 
     QHULL_LIB_CHECK; /* Check for compatible library */
 
@@ -129,7 +143,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
         qh_initflags(qh, qh->qhull_command);
         qh->ATinfinity = True;
         qh->MERGEvertices = False;
-        qh_init_B(qh, VECTOR(int_points), numpoints, dim, ismalloc); // read points and fiddle with them a little.
+        qh_init_B(qh, &MATRIX(int_points,0,0), numpoints, dim, ismalloc); // read points and fiddle with them a little.
         qh_qhull(qh);
         qh_triangulate(qh);
 
@@ -153,10 +167,9 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
                 add_clique(&int_edges, &simplex);
             }
         }
-        IGRAPH_CHECK(igraph_matrix_transpose(points));
         simplify_edge_list(&int_edges, edges, numpoints + 1);
 
-        igraph_vector_destroy(&int_points);
+        igraph_matrix_destroy(&int_points);
         igraph_vector_int_destroy(&int_edges);
         igraph_vector_int_destroy(&simplex);
         IGRAPH_FINALLY_CLEAN(3);
@@ -195,7 +208,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, igraph_matrix
  * \return Error code.
  *
  */
-igraph_error_t igraph_delaunay_triangulation(igraph_t *graph, igraph_matrix_t *points) {
+igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
