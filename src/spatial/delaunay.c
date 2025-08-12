@@ -119,7 +119,6 @@ static igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t 
 
 
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
-    int curlong, totlong; /* used !qh_NOmem */
     int exitcode;
     igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
     igraph_integer_t dim = igraph_matrix_ncol(points);
