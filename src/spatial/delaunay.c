@@ -159,13 +159,15 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     qhT *qh = &qh_qh;
     igraph_matrix_t int_points;
 
-    if (dim == 0) {
+    /* The point matrix must have at least one column, unless it has zero rows. */
+    if (dim == 0 && numpoints > 0) {
         IGRAPH_ERROR("0 dimensional point sets are not supported.", IGRAPH_EINVAL);
     }
 
-    /* No edges for one or zero points */
+    /* No edges for one or zero points. */
     if (numpoints <= 1) {
         igraph_vector_int_clear(edges);
+        return IGRAPH_SUCCESS;
     }
 
     /* Qhull does not support the 1D case. */
@@ -179,7 +181,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
     }
 
-    IGRAPH_CHECK(copy_transpose(points, &int_points));
+    IGRAPH_CHECK(igraph_matrix_init_array(&int_points, &MATRIX(*points, 0, 0), dim, numpoints, IGRAPH_ROW_MAJOR));
     IGRAPH_FINALLY(igraph_matrix_destroy, &int_points);
 
     QHULL_LIB_CHECK; /* Check for compatible library */
@@ -263,13 +265,9 @@ igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *poi
     igraph_vector_int_t edges;
     const igraph_integer_t numpoints = igraph_matrix_nrow(points);
 
-    if (numpoints <= igraph_matrix_ncol(points)) {
-        IGRAPH_ERROR("General point sets without enough points to create a simplex (dimension + 1) are not supported.", IGRAPH_UNIMPLEMENTED);
-    }
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
-    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_matrix_nrow(points), false));
+    IGRAPH_CHECK(igraph_create(graph, &edges, numpoints, IGRAPH_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
