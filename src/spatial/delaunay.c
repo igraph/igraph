@@ -118,28 +118,65 @@ static igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t 
 }
 
 
+/* In the 1D case we simply connect points in sorted order.
+ * This function assumes that there is at least one point. */
+static igraph_error_t delaunay_edges_1d(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
+    const igraph_integer_t numpoints = igraph_matrix_nrow(points);
+    igraph_vector_t coords;
+    igraph_vector_int_t order;
+
+    IGRAPH_ASSERT(igraph_matrix_ncol(points) == 1);
+
+    igraph_vector_view(&coords, &MATRIX(*points, 0, 0), numpoints);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, numpoints);
+
+    IGRAPH_CHECK(igraph_vector_sort_ind(&coords, &order, IGRAPH_ASCENDING));
+
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, 2*(numpoints-1)));
+
+    for (igraph_integer_t i=0; i < numpoints-1; i++) {
+        igraph_integer_t from = VECTOR(order)[i];
+        igraph_integer_t to   = VECTOR(order)[i+1];
+        VECTOR(*edges)[2*i] = from;
+        VECTOR(*edges)[2*i + 1] = to;
+        if (VECTOR(coords)[from] == VECTOR(coords)[to]) {
+            IGRAPH_ERROR("Duplicate points for Delaunay triangulation.", IGRAPH_EINVAL);
+        }
+    }
+
+    igraph_vector_int_destroy(&order);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
+    const igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
+    const igraph_integer_t dim = igraph_matrix_ncol(points);
     int exitcode;
-    igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
-    igraph_integer_t dim = igraph_matrix_ncol(points);
     boolT ismalloc = False; // handle memory allocation of points explicitly
     qhT qh_qh;
     qhT *qh = &qh_qh;
-
     igraph_matrix_t int_points;
-
-    if (numpoints > INT_MAX) {
-        IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
-    }
-
-    // For internal use, it returns a complete graph.
-    // This is not nessecarily a delaunay graph, but for nondegenerate point sets it is.
-    if (numpoints <= dim) {
-
-    }
 
     if (dim == 0) {
         IGRAPH_ERROR("0 dimensional point sets are not supported.", IGRAPH_EINVAL);
+    }
+
+    /* No edges for one or zero points */
+    if (numpoints <= 1) {
+        igraph_vector_int_clear(edges);
+    }
+
+    /* Qhull does not support the 1D case. */
+    if (dim == 1) {
+        return delaunay_edges_1d(edges, points);
+    }
+
+    /* Prevent overflow in igraph_integer_t -> int conversions below.
+     * Note that Qhull will likely already fail for a much smaller point count. */
+    if (numpoints > INT_MAX) {
+        IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
     }
 
     IGRAPH_CHECK(copy_transpose(points, &int_points));
@@ -224,15 +261,9 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
  */
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
+    const igraph_integer_t numpoints = igraph_matrix_nrow(points);
 
-    igraph_integer_t num_points = igraph_matrix_nrow(points);
-
-    if (num_points < 2) {
-        igraph_full(graph, num_points, false, false);
-        return IGRAPH_SUCCESS;
-    }
-
-    if (num_points <= igraph_matrix_ncol(points)) {
+    if (numpoints <= igraph_matrix_ncol(points)) {
         IGRAPH_ERROR("General point sets without enough points to create a simplex (dimension + 1) are not supported.", IGRAPH_UNIMPLEMENTED);
     }
 
