@@ -20,6 +20,7 @@
 #include "igraph_matrix.h"
 #include "igraph_spatial.h"
 
+#include "igraph_types.h"
 #include "igraph_vector.h"
 
 #include "spatial/spatial_internal.h"
@@ -29,6 +30,7 @@
 #include "igraph_error.h"
 #include <algorithm>
 #include <cstdlib>
+#include <math.h>
 #include <vector>
 
 template <igraph_integer_t Dimension>
@@ -49,9 +51,6 @@ igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges, const igr
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t filter_small_edges(igraph_vector_int_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
-    return IGRAPH_SUCCESS;
-}
 
 igraph_bool_t is_overlap(std::vector<igraph_integer_t> &a, igraph_integer_t a_size, std::vector<igraph_integer_t> &b, igraph_integer_t b_size) {
     igraph_integer_t
@@ -84,17 +83,197 @@ igraph_real_t sqrDistance(igraph_vector_t *a, igraph_vector_t *b) {
     return accumulator;
 }
 
-igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
 
-    // position centres correctly
 
+igraph_error_t small_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
+        // position centres correctly
     igraph_vector_t a_point, b_point;
-
-    //printf("Processing verts %li %li\n", a, b);
-
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
 
+    IGRAPH_CHECK(igraph_matrix_get_row(points, &a_point, a));
+    IGRAPH_CHECK(igraph_matrix_get_row(points, &b_point, b));
+
+    igraph_vector_t a_centre, b_centre;
+
+    igraph_integer_t dims = igraph_matrix_ncol(points);
+
+    IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
+    IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
+
+    igraph_vector_t mid, perp;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&mid, dims);
+    IGRAPH_VECTOR_INIT_FINALLY(&perp, dims);
+    for (igraph_integer_t i = 0; i < dims; i++) {
+        VECTOR(mid)[i] = (VECTOR(a_point)[i] + VECTOR(b_point)[i]) * 0.5;
+        VECTOR(perp)[i] = (VECTOR(a_point)[i] - VECTOR(b_point)[i]) * sqrt(0.5*0.5/(beta*beta) -0.25);
+    }
+
+    // Since this is only well defined for 2d, a manual 90 degree rotation works and is simpler.
+    // the rotation being x = -y, y = x, 90 degrees counter-clockwise.
+    igraph_real_t temp = VECTOR(perp)[0];
+    VECTOR(perp)[0] = - VECTOR(perp)[1];
+    VECTOR(perp)[1] = temp;
+
+    for (igraph_integer_t i = 0; i < dims; i++) {
+        VECTOR(a_centre)[i] = VECTOR(mid)[i] + VECTOR(perp)[i];
+        VECTOR(b_centre)[i] = VECTOR(mid)[i] - VECTOR(perp)[i];
+    }
+
+    igraph_real_t distance = sqrDistance(&a_point, &b_point) * (0.5/beta * 0.5/beta) ; // nanoflann uses squared distances
+    // beta term is used to scale to the actual circles, not just distance between points.
+    GraphBuildingResultSet a_results(IGRAPH_INTEGER_MAX, distance); // TODO: use correct neighbor count
+    GraphBuildingResultSet b_results(IGRAPH_INTEGER_MAX, distance);
+
+    a_results.reset(a);
+    b_results.reset(b);
+
+    tree.findNeighbors(a_results, VECTOR(a_centre));
+    tree.findNeighbors(b_results, VECTOR(b_centre));
+
+    std::sort(a_results.neighbors.begin(), a_results.neighbors.begin()+a_results.size());
+    std::sort(b_results.neighbors.begin(), b_results.neighbors.begin()+b_results.size());
+
+    igraph_vector_destroy(&mid);
+    igraph_vector_destroy(&perp);
+    igraph_vector_destroy(&a_point);
+    igraph_vector_destroy(&b_point);
+    igraph_vector_destroy(&a_centre);
+    igraph_vector_destroy(&b_centre);
+    IGRAPH_FINALLY_CLEAN(6);
+
+    *result = !is_overlap(a_results.neighbors, a_results.size(), b_results.neighbors, b_results.size());
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t filter_small_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
+    if (igraph_matrix_ncol(points) != 2) {
+        IGRAPH_ERROR("Beta-skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
+    }
+     igraph_integer_t point_count = igraph_matrix_nrow(points);
+    igraph_integer_t available_edges = igraph_vector_int_size(edges);
+    igraph_integer_t added_edges = 0;
+    ig_point_adaptor adaptor(points);
+    igraph_integer_t dim = igraph_matrix_ncol(points);
+    kdTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    tree.buildIndex();
+    igraph_bool_t result;
+    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
+        small_is_present(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
+        if (result) {
+            VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i*2];
+            VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i*2 + 1];
+            added_edges+=1;
+        }
+    }
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t circle_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
+        // position centres correctly
+    igraph_vector_t a_point, b_point;
+    IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
+
+    IGRAPH_CHECK(igraph_matrix_get_row(points, &a_point, a));
+    IGRAPH_CHECK(igraph_matrix_get_row(points, &b_point, b));
+
+    igraph_vector_t a_centre, b_centre;
+
+    igraph_integer_t dims = igraph_matrix_ncol(points);
+
+    IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
+    IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
+
+    igraph_vector_t mid, perp;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&mid, dims);
+    IGRAPH_VECTOR_INIT_FINALLY(&perp, dims);
+    for (igraph_integer_t i = 0; i < dims; i++) {
+        VECTOR(mid)[i] = (VECTOR(a_point)[i] + VECTOR(b_point)[i]) * 0.5;
+        VECTOR(perp)[i] = (VECTOR(a_point)[i] - VECTOR(b_point)[i]) * sqrt(0.5*0.5*(beta*beta) -0.25);
+    }
+
+    // Since this is only well defined for 2d, a manual 90 degree rotation works and is simpler.
+    // the rotation being x = -y, y = x, 90 degrees counter-clockwise.
+    igraph_real_t temp = VECTOR(perp)[0];
+    VECTOR(perp)[0] = - VECTOR(perp)[1];
+    VECTOR(perp)[1] = temp;
+
+    for (igraph_integer_t i = 0; i < dims; i++) {
+        VECTOR(a_centre)[i] = VECTOR(mid)[i] + VECTOR(perp)[i];
+        VECTOR(b_centre)[i] = VECTOR(mid)[i] - VECTOR(perp)[i];
+    }
+
+    igraph_real_t distance = sqrDistance(&a_point, &b_point) * (0.5*beta * 0.5*beta) ; // nanoflann uses squared distances
+    // beta term is used to scale to the actual circles, not just distance between points.
+    GraphBuildingResultSet a_results(IGRAPH_INTEGER_MAX, distance); // TODO: use correct neighbor count
+    GraphBuildingResultSet b_results(IGRAPH_INTEGER_MAX, distance);
+
+    a_results.reset(a);
+    b_results.reset(b);
+
+    tree.findNeighbors(a_results, VECTOR(a_centre));
+    tree.findNeighbors(b_results, VECTOR(b_centre));
+
+    std::sort(a_results.neighbors.begin(), a_results.neighbors.begin()+a_results.size());
+    std::sort(b_results.neighbors.begin(), b_results.neighbors.begin()+b_results.size());
+
+    igraph_vector_destroy(&mid);
+    igraph_vector_destroy(&perp);
+    igraph_vector_destroy(&a_point);
+    igraph_vector_destroy(&b_point);
+    igraph_vector_destroy(&a_centre);
+    igraph_vector_destroy(&b_centre);
+    IGRAPH_FINALLY_CLEAN(6);
+
+    *result = true;
+    printf("calculating %li and %li\n", a, b);
+    for (igraph_integer_t i = 0; i < a_results.size(); i++) {
+        if (a_results.neighbors[i] != b){
+            *result = false;
+            printf("Found counterexample in a: %li\n", a_results.neighbors[i]);
+            return IGRAPH_SUCCESS;
+        }
+    }
+    for (igraph_integer_t i = 0; i < b_results.size(); i++) {
+        if (b_results.neighbors[i] != a) {
+            *result = false;
+            printf("Found counterexample in b: %li\n", b_results.neighbors[i]);
+            return IGRAPH_SUCCESS;
+        }
+    }
+    printf("added!\n");
+    return IGRAPH_SUCCESS;
+}
+igraph_error_t filter_circle_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
+    igraph_integer_t point_count = igraph_matrix_nrow(points);
+    igraph_integer_t available_edges = igraph_vector_int_size(edges);
+    igraph_integer_t added_edges = 0;
+    ig_point_adaptor adaptor(points);
+    igraph_integer_t dim = igraph_matrix_ncol(points);
+    kdTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    tree.buildIndex();
+    igraph_bool_t result;
+    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
+        circle_is_present(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
+        if (result) {
+            VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i*2];
+            VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i*2 + 1];
+            added_edges+=1;
+        }
+    }
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t lune_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
+    // position centres correctly
+    igraph_vector_t a_point, b_point;
+    IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
 
     IGRAPH_CHECK(igraph_matrix_get_row(points, &a_point, a));
     IGRAPH_CHECK(igraph_matrix_get_row(points, &b_point, b));
@@ -109,34 +288,18 @@ igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integ
     for (igraph_integer_t i = 0; i < dims; i++) {
         VECTOR(a_centre)[i] = VECTOR(a_point)[i] + (0.5*beta - 1) * (VECTOR(a_point)[i] - VECTOR(b_point)[i]);
         VECTOR(b_centre)[i] = VECTOR(b_point)[i] + (0.5*beta - 1) * (VECTOR(b_point)[i] - VECTOR(a_point)[i]);
-        //printf("a_centre: %f\n", VECTOR(a_centre)[i]);
-        //printf("b_centre: %f\n", VECTOR(b_centre)[i]);
     }
 
     igraph_real_t distance = sqrDistance(&a_point, &b_point) * (0.5*beta) * (0.5*beta) ; // nanoflann uses squared distances
-    //printf("distance %f\n", distance);
     // beta term is used to scale to the actual circles, not just distance between points.
-    GraphBuildingResultSet a_results(10000, distance); // TODO: use correct neighbor count
-    GraphBuildingResultSet b_results(10000, distance);
+    GraphBuildingResultSet a_results(IGRAPH_INTEGER_MAX, distance); // TODO: use correct neighbor count
+    GraphBuildingResultSet b_results(IGRAPH_INTEGER_MAX, distance);
 
     a_results.reset(a);
     b_results.reset(b);
 
-   // printf("radius search a\n");
     tree.findNeighbors(a_results, VECTOR(a_centre));
-
-    for (igraph_integer_t i : a_results.neighbors) {
-        //printf("%li, ", i);
-    }
-
-    //printf("\nradius search b\n");
     tree.findNeighbors(b_results, VECTOR(b_centre));
-
-    for (igraph_integer_t i : b_results.neighbors) {
-        //printf("%li, ", i);
-    }
-
-
 
     std::sort(a_results.neighbors.begin(), a_results.neighbors.begin()+a_results.size());
     std::sort(b_results.neighbors.begin(), b_results.neighbors.begin()+b_results.size());
@@ -147,17 +310,12 @@ igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integ
     igraph_vector_destroy(&b_centre);
     IGRAPH_FINALLY_CLEAN(4);
 
-    igraph_bool_t result = !is_overlap(a_results.neighbors, a_results.size(), b_results.neighbors, b_results.size());
-   // printf("result: %i\n", result);
-    return result;
+    *result = !is_overlap(a_results.neighbors, a_results.size(), b_results.neighbors, b_results.size());
+    return IGRAPH_SUCCESS;
 }
 
-igraph_error_t filter_lune_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    if (beta < 1) {
-        IGRAPH_CHECK(filter_small_edges(edges, points, beta));
-        return IGRAPH_SUCCESS;
-    }
 
+igraph_error_t filter_lune_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_integer_t point_count = igraph_matrix_nrow(points);
     igraph_integer_t available_edges = igraph_vector_int_size(edges);
     igraph_integer_t added_edges = 0;
@@ -165,8 +323,10 @@ igraph_error_t filter_lune_edges(igraph_vector_int_t *edges, const igraph_matrix
     igraph_integer_t dim = igraph_matrix_ncol(points);
     kdTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
+    igraph_bool_t result;
     for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
-        if (lune_is_present(tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta)) {
+        lune_is_present(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
+        if (result) {
             VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i*2];
             VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i*2 + 1];
             added_edges+=1;
@@ -181,8 +341,11 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
-
-    IGRAPH_CHECK(filter_lune_edges(&potential_edges, points, beta));
+    if (beta >= 1) {
+        IGRAPH_CHECK(filter_lune_edges(&potential_edges, points, beta));
+    } else {
+        IGRAPH_CHECK(filter_small_edges(&potential_edges, points, beta));
+    }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
 
@@ -194,6 +357,24 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
 
 
 igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
+    igraph_vector_int_t potential_edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
+
+    if (igraph_matrix_ncol(points) != 2) {
+        IGRAPH_ERROR("Circle based beta skeletons are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
+    }
+
+    IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
+    if (beta >= 1) {
+        IGRAPH_CHECK(filter_circle_edges(&potential_edges, points, beta));
+    } else {
+        IGRAPH_CHECK(filter_small_edges(&potential_edges, points, beta));
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
+
+    igraph_vector_int_destroy(&potential_edges);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
