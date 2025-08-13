@@ -932,6 +932,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_delaunay_graph
+  beta_skeletons
   igraph_nearest_neighbor_graph
 )
 

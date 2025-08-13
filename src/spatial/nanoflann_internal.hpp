@@ -10,7 +10,6 @@
 
 #include <vector>
 
-IGRAPH_BEGIN_C_DECLS
 
 class ig_point_adaptor {
     const igraph_matrix_t *points;
@@ -27,13 +26,14 @@ public:
     igraph_real_t kdtree_get_pt(const size_t idx, const size_t dim) const {
         return MATRIX(*points, idx, dim);
     }
-
-    bool kdtree_get_bbox(void *bb) const {
+    template <typename BoundingBox>
+    bool kdtree_get_bbox(BoundingBox &bb) const {
         IGRAPH_UNUSED(bb);
         return false; // indicates that it should use default
     }
 };
 
+IGRAPH_BEGIN_C_DECLS
 
 class GraphBuildingResultSet {
     igraph_integer_t current_vertex = 0;
