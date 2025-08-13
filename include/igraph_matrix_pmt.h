@@ -69,7 +69,7 @@ IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vecto
 /* Copying matrices */
 /*------------------*/
 
-IGRAPH_EXPORT void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to);
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to, igraph_matrix_storage_t storage);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
                                                   const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,

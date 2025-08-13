@@ -1029,6 +1029,7 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_realize_degree_sequence
   igraph_strength
   igraph_transitivity
   igraph_tree_game
