@@ -30,14 +30,15 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
-static void add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
+static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
         for (igraph_integer_t b = a + 1; b < num_points; b++) {
-            igraph_vector_int_push_back(destination, VECTOR(*source)[a]);
-            igraph_vector_int_push_back(destination, VECTOR(*source)[b]);
+            IGRAPH_CHECK(igraph_vector_int_push_back(destination, VECTOR(*source)[a]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(destination, VECTOR(*source)[b]));
         }
     }
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -208,7 +209,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 FOREACHvertex_(facet->vertices) {
                     VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
                 }
-                add_clique(edges, &simplex);
+                IGRAPH_CHECK(add_clique(edges, &simplex));
             }
         }
         IGRAPH_CHECK(simplify_edge_list(edges, numpoints + 1));
