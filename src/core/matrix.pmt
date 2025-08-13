@@ -368,8 +368,8 @@ static void FUNCTION(igraph_i, transpose_copy)(
 void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to, igraph_matrix_storage_t storage) {
     if (storage == IGRAPH_ROW_MAJOR) {
         TYPE(igraph_vector) dst;
-        FUNCTION(igraph_vector, view)(&dst, to, m->ncol * m->nrow);
-        FUNCTION(igraph_i, transpose_copy)(&dst, &m->data, m->ncol, m->nrow);
+        FUNCTION(igraph_vector, view)(&dst, to, m->nrow * m->ncol);
+        FUNCTION(igraph_i, transpose_copy)(&dst, &m->data, m->nrow, m->ncol);
     } else if (storage == IGRAPH_COLUMN_MAJOR) {
         FUNCTION(igraph_vector, copy_to)(&m->data, to);
     } else {
