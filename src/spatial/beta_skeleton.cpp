@@ -54,6 +54,13 @@ igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges, const igr
     return IGRAPH_SUCCESS;
 }
 
+igraph_real_t standard_r(igraph_real_t beta) {
+    return beta * 0.5;
+}
+
+igraph_real_t small_r(igraph_real_t beta) {
+    return 0.5/beta;
+}
 
 igraph_bool_t is_overlap(std::vector<igraph_integer_t> &a, igraph_integer_t a_size, std::vector<igraph_integer_t> &b, igraph_integer_t b_size) {
     igraph_integer_t
@@ -72,15 +79,26 @@ igraph_bool_t is_overlap(std::vector<igraph_integer_t> &a, igraph_integer_t a_si
     return false;
 }
 
-igraph_real_t sqr_distance(igraph_vector_t *a, igraph_vector_t *b) {
-    igraph_integer_t size = igraph_vector_size(a);
-    igraph_real_t accumulator = 0;
-    igraph_real_t temp;
-    for (igraph_integer_t i = 0; i < size; i++) {
-        temp = abs(VECTOR(*a)[i] - VECTOR(*b)[i]);
-        accumulator += temp * temp;
+igraph_error_t intersection_predicate(igraph_bool_t *result, GraphBuildingResultSet *a_results, GraphBuildingResultSet *b_results) {
+    *result = !is_overlap(a_results->neighbors, a_results->size(), b_results->neighbors, b_results->size());
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t union_predicate(igraph_bool_t *result, GraphBuildingResultSet * a_results, GraphBuildingResultSet * b_results) {
+    *result = true;
+    for (igraph_integer_t i = 0; i < a_results->size(); i++) {
+        if (a_results->neighbors[i] != b_results->current_vertex){
+            *result = false;
+            return IGRAPH_SUCCESS;
+        }
     }
-    return accumulator;
+    for (igraph_integer_t i = 0; i < b_results->size(); i++) {
+        if (b_results->neighbors[i] != a_results->current_vertex) {
+            *result = false;
+            return IGRAPH_SUCCESS;
+        }
+    }
+    return IGRAPH_SUCCESS;
 }
 
 igraph_real_t get_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
@@ -94,7 +112,7 @@ igraph_real_t get_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igr
     return distance;
 }
 
-igraph_error_t construct_lune_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t beta, const igraph_matrix_t *points){
+igraph_error_t construct_lune_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points){
     igraph_vector_t a_point, b_point;
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
@@ -104,8 +122,8 @@ igraph_error_t construct_lune_centres(igraph_vector_t *a_centre, igraph_vector_t
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
     for (igraph_integer_t i = 0; i < dims; i++) {
-        VECTOR(*a_centre)[i] = VECTOR(a_point)[i] + (0.5*beta - 1) * (VECTOR(a_point)[i] - VECTOR(b_point)[i]);
-        VECTOR(*b_centre)[i] = VECTOR(b_point)[i] + (0.5*beta - 1) * (VECTOR(b_point)[i] - VECTOR(a_point)[i]);
+        VECTOR(*a_centre)[i] = VECTOR(a_point)[i] + (r-1) * (VECTOR(a_point)[i] - VECTOR(b_point)[i]);
+        VECTOR(*b_centre)[i] = VECTOR(b_point)[i] + (r-1) * (VECTOR(b_point)[i] - VECTOR(a_point)[i]);
     }
 
     igraph_vector_destroy(&a_point);
@@ -184,16 +202,14 @@ igraph_error_t small_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_
     igraph_vector_destroy(&a_centre);
     igraph_vector_destroy(&b_centre);
     IGRAPH_FINALLY_CLEAN(2);
+
     *result = !is_overlap(a_results.neighbors, a_results.size(), b_results.neighbors, b_results.size());
     return IGRAPH_SUCCESS;
 }
 
 template <igraph_error_t filter(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta)>
 igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    if (igraph_matrix_ncol(points) != 2) {
-        IGRAPH_ERROR("Beta-skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
-    }
-     igraph_integer_t point_count = igraph_matrix_nrow(points);
+    igraph_integer_t point_count = igraph_matrix_nrow(points);
     igraph_integer_t available_edges = igraph_vector_int_size(edges);
     igraph_integer_t added_edges = 0;
     ig_point_adaptor adaptor(points);
@@ -216,7 +232,7 @@ igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *p
 igraph_error_t circle_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
         // position centres correctly
     igraph_vector_t a_centre, b_centre;
-    igraph_real_t r = 0.5 * beta;
+    igraph_real_t r = standard_r(beta);
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
     IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
@@ -242,6 +258,8 @@ igraph_error_t circle_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph
     igraph_vector_destroy(&b_centre);
     IGRAPH_FINALLY_CLEAN(2);
 
+    IGRAPH_CHECK(union_predicate(result, &a_results, &b_results));
+    return IGRAPH_SUCCESS;
     *result = true;
     for (igraph_integer_t i = 0; i < a_results.size(); i++) {
         if (a_results.neighbors[i] != b){
@@ -258,18 +276,52 @@ igraph_error_t circle_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph
     return IGRAPH_SUCCESS;
 }
 
+template <igraph_real_t r_calculation(igraph_real_t beta),
+          igraph_error_t centre_positions(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t beta, const igraph_matrix_t * points),
+          igraph_error_t result_predicate(igraph_bool_t *result, GraphBuildingResultSet *a_results, GraphBuildingResultSet *b_results)>
+igraph_error_t edge_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
+    // position centres correctly
+    igraph_integer_t dims = igraph_matrix_ncol(points);
+    igraph_real_t r = r_calculation(beta);
+    igraph_vector_t a_centre, b_centre;
+    IGRAPH_VECTOR_INIT_FINALLY (&a_centre, dims);
+    IGRAPH_VECTOR_INIT_FINALLY (&b_centre, dims);
+
+    IGRAPH_CHECK(centre_positions(&a_centre, &b_centre, a, b, r,  points));
+
+    igraph_real_t distance = get_sqr_distance(a,b, points) * r * r ; // nanoflann uses squared distances
+    // beta term is used to scale to the actual circles, not just distance between points.
+    GraphBuildingResultSet a_results(IGRAPH_INTEGER_MAX, distance); // TODO: use correct neighbor count
+    GraphBuildingResultSet b_results(IGRAPH_INTEGER_MAX, distance);
+
+    a_results.reset(a);
+    b_results.reset(b);
+
+    tree.findNeighbors(a_results, VECTOR(a_centre));
+    tree.findNeighbors(b_results, VECTOR(b_centre));
+
+    std::sort(a_results.neighbors.begin(), a_results.neighbors.begin()+a_results.size());
+    std::sort(b_results.neighbors.begin(), b_results.neighbors.begin()+b_results.size());
+
+    igraph_vector_destroy(&a_centre);
+    igraph_vector_destroy(&b_centre);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    IGRAPH_CHECK(result_predicate(result, &a_results, &b_results));
+    return IGRAPH_SUCCESS;
+}
+
 igraph_error_t lune_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
     // position centres correctly
-
     igraph_integer_t dims = igraph_matrix_ncol(points);
-
+    igraph_real_t r = standard_r(beta);
     igraph_vector_t a_centre, b_centre;
     IGRAPH_VECTOR_INIT_FINALLY (&a_centre, dims);
     IGRAPH_VECTOR_INIT_FINALLY (&b_centre, dims);
 
     IGRAPH_CHECK(construct_lune_centres(&a_centre, &b_centre, a, b, beta,  points));
 
-    igraph_real_t distance = get_sqr_distance(a,b, points) * (0.5*beta) * (0.5*beta) ; // nanoflann uses squared distances
+    igraph_real_t distance = get_sqr_distance(a,b, points) * r * r ; // nanoflann uses squared distances
     // beta term is used to scale to the actual circles, not just distance between points.
     GraphBuildingResultSet a_results(IGRAPH_INTEGER_MAX, distance); // TODO: use correct neighbor count
     GraphBuildingResultSet b_results(IGRAPH_INTEGER_MAX, distance);
@@ -298,8 +350,14 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
         IGRAPH_CHECK(filter_edges<lune_is_present>(&potential_edges, points, beta));
+        //IGRAPH_CHECK((filter_edges<edge_is_present<standard_r, construct_lune_centres, intersection_predicate>>(&potential_edges, points, beta)));
     } else {
+        if (igraph_matrix_ncol(points) != 2) {
+            IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
+        }
+
         IGRAPH_CHECK(filter_edges<small_is_present>(&potential_edges, points, beta));
+        //IGRAPH_CHECK((filter_edges<edge_is_present<small_r, construct_perp_centres, intersection_predicate>>(&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
@@ -321,9 +379,12 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
+
         IGRAPH_CHECK(filter_edges<circle_is_present>(&potential_edges, points, beta));
+        //IGRAPH_CHECK((filter_edges<edge_is_present<standard_r, construct_perp_centres, union_predicate>>(&potential_edges, points, beta)));
     } else {
         IGRAPH_CHECK(filter_edges<small_is_present>(&potential_edges, points, beta));
+        //IGRAPH_CHECK((filter_edges<edge_is_present<small_r, construct_perp_centres, intersection_predicate>>(&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));

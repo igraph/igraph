@@ -36,12 +36,12 @@ public:
 IGRAPH_BEGIN_C_DECLS
 
 class GraphBuildingResultSet {
-    igraph_integer_t current_vertex = 0;
     igraph_integer_t added_count = 0;
     const igraph_real_t max_distance;
     const igraph_integer_t max_neighbors;
 
 public:
+    igraph_integer_t current_vertex = 0;
     std::vector<igraph_integer_t> neighbors;
     std::vector<igraph_real_t> distances;
 
