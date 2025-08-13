@@ -21,6 +21,7 @@
 #include "igraph_constructors.h"
 #include "igraph_error.h"
 #include "igraph_matrix.h"
+#include "igraph_memory.h"
 #include "igraph_qsort.h"
 #include "igraph_vector.h"
 
@@ -157,7 +158,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     boolT ismalloc = False; // handle memory allocation of points explicitly
     qhT qh_qh;
     qhT *qh = &qh_qh;
-    igraph_matrix_t int_points;
+    coordT *qhull_points;
 
     /* The point matrix must have at least one column, unless it has zero rows. */
     if (dim == 0 && numpoints > 0) {
@@ -181,13 +182,16 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
     }
 
-    IGRAPH_CHECK(igraph_matrix_init_array(&int_points, &MATRIX(*points, 0, 0), dim, numpoints, IGRAPH_ROW_MAJOR));
-    IGRAPH_FINALLY(igraph_matrix_destroy, &int_points);
+    qhull_points = IGRAPH_CALLOC(dim*numpoints, igraph_real_t);
+    IGRAPH_CHECK_OOM(qhull_points, "Insufficient memory for constructing Delaunay graph.");
+    IGRAPH_FINALLY(igraph_free, qhull_points);
+    igraph_matrix_copy_to(points, qhull_points, IGRAPH_ROW_MAJOR);
 
     QHULL_LIB_CHECK; /* Check for compatible library */
 
     qh_init_A(qh, NULL, NULL, NULL, 0, NULL);  /* sets qh->qhull_command */
     IGRAPH_FINALLY(destroy_qhull, qh);
+
     exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
     if (!exitcode) {
         qh->NOerrexit = False;
@@ -202,7 +206,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         qh_initflags(qh, qh->qhull_command);
         qh->ATinfinity = True; // required for cocircular points, should not mess anything else up.
         qh->MERGEvertices = False; // Do not merge identical vertices
-        qh_init_B(qh, &MATRIX(int_points,0,0), numpoints, dim, ismalloc); // read points and project them to parabola.
+        qh_init_B(qh, qhull_points, numpoints, dim, ismalloc); // read points and project them to parabola.
         qh_qhull(qh); // Do the triangulation
         qh_triangulate(qh); // In some cases, the triangulate flag is not enough, this guarantees that everyhing is simplicial
 
@@ -225,18 +229,16 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         }
         IGRAPH_CHECK(simplify_edge_list(edges, numpoints + 1));
 
-        igraph_matrix_destroy(&int_points);
         igraph_vector_int_destroy(&simplex);
-        IGRAPH_FINALLY_CLEAN(2);
+        destroy_qhull(qh);
+        igraph_free(qhull_points);
+        IGRAPH_FINALLY_CLEAN(3);
     } else {
         switch (qh->last_errcode) {
             default:
                 IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
-
-    destroy_qhull(qh);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
