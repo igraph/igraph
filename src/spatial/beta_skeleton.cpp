@@ -181,9 +181,6 @@ igraph_error_t small_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_
     std::sort(a_results.neighbors.begin(), a_results.neighbors.begin()+a_results.size());
     std::sort(b_results.neighbors.begin(), b_results.neighbors.begin()+b_results.size());
 
-    //printf("processing %li %li\n", a, b);
-    //printf("centre a: %f %f\n", VECTOR(a_centre)[0], VECTOR(a_centre)[1]);
-    //printf("centre b: %f %f\n", VECTOR(b_centre)[0], VECTOR(b_centre)[1]);
     igraph_vector_destroy(&a_centre);
     igraph_vector_destroy(&b_centre);
     IGRAPH_FINALLY_CLEAN(2);
@@ -191,7 +188,8 @@ igraph_error_t small_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t filter_small_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
+template <igraph_error_t filter(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta)>
+igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
     if (igraph_matrix_ncol(points) != 2) {
         IGRAPH_ERROR("Beta-skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
     }
@@ -204,7 +202,7 @@ igraph_error_t filter_small_edges(igraph_vector_int_t *edges, const igraph_matri
     tree.buildIndex();
     igraph_bool_t result;
     for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
-        small_is_present(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
+        filter(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
         if (result) {
             VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i*2];
             VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i*2 + 1];
@@ -259,26 +257,6 @@ igraph_error_t circle_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph
     }
     return IGRAPH_SUCCESS;
 }
-igraph_error_t filter_circle_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    igraph_integer_t point_count = igraph_matrix_nrow(points);
-    igraph_integer_t available_edges = igraph_vector_int_size(edges);
-    igraph_integer_t added_edges = 0;
-    ig_point_adaptor adaptor(points);
-    igraph_integer_t dim = igraph_matrix_ncol(points);
-    kdTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
-    tree.buildIndex();
-    igraph_bool_t result;
-    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
-        circle_is_present(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
-        if (result) {
-            VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i*2];
-            VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i*2 + 1];
-            added_edges+=1;
-        }
-    }
-    IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
-    return IGRAPH_SUCCESS;
-}
 
 igraph_error_t lune_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) {
     // position centres correctly
@@ -313,37 +291,15 @@ igraph_error_t lune_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_i
     return IGRAPH_SUCCESS;
 }
 
-
-igraph_error_t filter_lune_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    igraph_integer_t point_count = igraph_matrix_nrow(points);
-    igraph_integer_t available_edges = igraph_vector_int_size(edges);
-    igraph_integer_t added_edges = 0;
-    ig_point_adaptor adaptor(points);
-    igraph_integer_t dim = igraph_matrix_ncol(points);
-    kdTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
-    tree.buildIndex();
-    igraph_bool_t result;
-    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
-        lune_is_present(&result, tree, VECTOR(*edges)[2*i], VECTOR(*edges)[2*i+1], points, beta);
-        if (result) {
-            VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i*2];
-            VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i*2 + 1];
-            added_edges+=1;
-        }
-    }
-    IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
-    return IGRAPH_SUCCESS;
-}
-
 igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_lune_edges(&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<lune_is_present>(&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK(filter_small_edges(&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<small_is_present>(&potential_edges, points, beta));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
@@ -365,9 +321,9 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_circle_edges(&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<circle_is_present>(&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK(filter_small_edges(&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<small_is_present>(&potential_edges, points, beta));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
