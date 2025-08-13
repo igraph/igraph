@@ -102,22 +102,6 @@ static void destroy_qhull(qhT *qh) {
     qh_memfreeshort(qh, &curlong, &totlong);
 }
 
-// Make a transposed copy with space for added point at infinity.
-static igraph_error_t copy_transpose(const igraph_matrix_t *in, igraph_matrix_t *out) {
-    igraph_integer_t rows = igraph_matrix_nrow(in), columns = igraph_matrix_ncol(in);
-
-    // add extra space for point at infinity
-    IGRAPH_CHECK(igraph_matrix_init(out, columns, rows+1));
-
-    for (igraph_integer_t row = 0; row < rows; row++) {
-        for (igraph_integer_t col = 0; col < columns; col++) {
-            MATRIX(*out, col, row) = MATRIX(*in, row, col);
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 
 /* In the 1D case we simply connect points in sorted order.
  * This function assumes that there is at least one point. */
