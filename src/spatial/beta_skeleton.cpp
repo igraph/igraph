@@ -58,11 +58,9 @@ igraph_bool_t is_overlap(std::vector<igraph_integer_t> &a, igraph_integer_t a_si
         a_pos = 0,
         b_pos = 0;
 
-    printf("a(%li): %li %li, b(%li): %li %li\n", a_size, a[0], a[1], b_size, b[0], b[1]);
-
     while (a_pos < a_size && b_pos < b_size) {
         if (a[a_pos] == b[b_pos]) {
-            printf("index match found at %li\n", a[a_pos]);
+            //printf("index match found at %li\n", a[a_pos]);
             return true;
         }
         if (a[a_pos] < b[b_pos]) {
@@ -71,7 +69,7 @@ igraph_bool_t is_overlap(std::vector<igraph_integer_t> &a, igraph_integer_t a_si
             b_pos++;
         }
     }
-    printf("No overlap found\n");
+    //printf("No overlap found\n");
     return false;
 }
 
@@ -92,7 +90,7 @@ igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integ
 
     igraph_vector_t a_point, b_point;
 
-    printf("Processing verts %li %li\n", a, b);
+    //printf("Processing verts %li %li\n", a, b);
 
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
@@ -111,12 +109,12 @@ igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integ
     for (igraph_integer_t i = 0; i < dims; i++) {
         VECTOR(a_centre)[i] = VECTOR(a_point)[i] + (0.5*beta - 1) * (VECTOR(a_point)[i] - VECTOR(b_point)[i]);
         VECTOR(b_centre)[i] = VECTOR(b_point)[i] + (0.5*beta - 1) * (VECTOR(b_point)[i] - VECTOR(a_point)[i]);
-        printf("a_centre: %f\n", VECTOR(a_centre)[i]);
-        printf("b_centre: %f\n", VECTOR(b_centre)[i]);
+        //printf("a_centre: %f\n", VECTOR(a_centre)[i]);
+        //printf("b_centre: %f\n", VECTOR(b_centre)[i]);
     }
 
-    igraph_real_t distance = sqrDistance(&a_point, &b_point) * (0.5*beta -1 ) * (0.5*beta - 1) ; // nanoflann uses squared distances
-    printf("distance %f\n", distance);
+    igraph_real_t distance = sqrDistance(&a_point, &b_point) * (0.5*beta) * (0.5*beta) ; // nanoflann uses squared distances
+    //printf("distance %f\n", distance);
     // beta term is used to scale to the actual circles, not just distance between points.
     GraphBuildingResultSet a_results(10000, distance); // TODO: use correct neighbor count
     GraphBuildingResultSet b_results(10000, distance);
@@ -124,11 +122,24 @@ igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integ
     a_results.reset(a);
     b_results.reset(b);
 
+   // printf("radius search a\n");
     tree.findNeighbors(a_results, VECTOR(a_centre));
+
+    for (igraph_integer_t i : a_results.neighbors) {
+        //printf("%li, ", i);
+    }
+
+    //printf("\nradius search b\n");
     tree.findNeighbors(b_results, VECTOR(b_centre));
 
-    std::sort(a_results.neighbors.begin(), a_results.neighbors.end());
-    std::sort(b_results.neighbors.begin(), b_results.neighbors.end());
+    for (igraph_integer_t i : b_results.neighbors) {
+        //printf("%li, ", i);
+    }
+
+
+
+    std::sort(a_results.neighbors.begin(), a_results.neighbors.begin()+a_results.size());
+    std::sort(b_results.neighbors.begin(), b_results.neighbors.begin()+b_results.size());
 
     igraph_vector_destroy(&a_point);
     igraph_vector_destroy(&b_point);
@@ -137,7 +148,7 @@ igraph_bool_t lune_is_present(kdTree<-1> &tree, igraph_integer_t a, igraph_integ
     IGRAPH_FINALLY_CLEAN(4);
 
     igraph_bool_t result = !is_overlap(a_results.neighbors, a_results.size(), b_results.neighbors, b_results.size());
-    printf("result: %i\n", result);
+   // printf("result: %i\n", result);
     return result;
 }
 

@@ -51,8 +51,8 @@ public:
     GraphBuildingResultSet(const igraph_integer_t max_neighbors, const igraph_real_t max_distance) :
         max_distance(max_distance),
         max_neighbors(max_neighbors),
-        neighbors(max_neighbors),
-        distances(max_neighbors) { }
+        neighbors(1),
+        distances(1) { }
 
     bool addPoint(const igraph_real_t distance, const igraph_integer_t index) {
         igraph_integer_t i;
@@ -79,6 +79,8 @@ public:
         }
         if (added_count != max_neighbors) {
             added_count++;
+            neighbors.push_back(0); // always keep space
+            distances.push_back(0);
         }
         return true;
     }
