@@ -16,24 +16,24 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_bitset.h"
 #include "igraph_spatial.h"
 
+#include "igraph_bitset.h"
 #include "igraph_constructors.h"
 #include "igraph_error.h"
 #include "igraph_matrix.h"
 #include "igraph_memory.h"
-#include "igraph_qsort.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "internal/utils.h"
 #include "spatial/spatial_internal.h"
 
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
 // Append an undirected clique of the indices in destination to source.
-// Assumes that source is an initialized vector
+// Assumes that source is an initialized vector.
 static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
@@ -45,82 +45,8 @@ static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_
     return IGRAPH_SUCCESS;
 }
 
-// Lexicographic comparator, used for qsort in simplify_edge_list
-static int edge_comparator(const void *a, const void *b) {
-    igraph_integer_t * A = (igraph_integer_t *)a;
-    igraph_integer_t * B = (igraph_integer_t *)b;
-    if (A[0] < B[0]) {
-        return -1;
-    }
-    if (A[0] > B[0]) {
-        return  1;
-    }
-    // first are equal
-    if (A[1] < B[1]) {
-        return -1;
-    }
-    if (A[1] > B[1]) {
-        return  1;
-    }
 
-    // second are equal, so the edges must be equal.
-    return 0;
-}
-
-// Simplify an edge list in place
-// except is the vertex "at infinity", and should not be included in the edge list.
-static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_bool_t self_loops, igraph_bool_t multi_edges, igraph_bool_t directed) {
-    igraph_integer_t size = igraph_vector_int_size(in);
-    if (size == 0) {
-        return IGRAPH_SUCCESS;
-    }
-    // reorder
-    if (!directed) {
-        igraph_integer_t temp;
-        for (igraph_integer_t i = 0; i < size; i += 2) {
-            if (VECTOR(*in)[i] > VECTOR(*in)[i + 1]) {
-                temp = VECTOR(*in)[i];
-                VECTOR(*in)[i] = VECTOR(*in)[i+1];
-                VECTOR(*in)[i+1] = temp;
-            }
-        }
-    }
-
-    // sort, not needed if multi edges are allowed
-    if (!multi_edges) {
-        igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
-    }
-
-    // remove duplicates
-    igraph_integer_t last_added = 0;
-
-    igraph_integer_t skipped = 0;
-
-    if (!self_loops) {
-        for (igraph_integer_t i = 0; i < size; i += 2) {
-            if (VECTOR(*in)[i] == VECTOR(*in)[i+1]) {
-                skipped += 1;
-            } else {
-                break;
-            }
-        }
-    }
-    for (igraph_integer_t i = skipped * 2 + 2 ; i < size; i += 2) {
-        if ( !(
-            (!multi_edges && VECTOR(*in)[i] == VECTOR(*in)[2 * last_added] && VECTOR(*in)[i + 1] == VECTOR(*in)[2*last_added + 1])
-            || (!self_loops && VECTOR(*in)[i] == VECTOR(*in)[i+1]))) {
-            last_added += 1;
-            VECTOR(*in)[2*last_added]      = VECTOR(*in)[i];
-            VECTOR(*in)[2*last_added + 1 ] = VECTOR(*in)[i+1];
-        }
-    }
-
-    IGRAPH_CHECK(igraph_vector_int_resize(in, 2*last_added+2));
-    return IGRAPH_SUCCESS;
-}
-
-
-// helper that can go on the finally stack to free qhull in case of an error
+// Helper that can go on the finally stack to free qhT Qhull data structure in case of an error.
 static void destroy_qhull(qhT *qh) {
     int curlong, totlong;
     qh->NOerrexit = True; /* no more setjmp */
@@ -206,18 +132,18 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     qh_init_A(qh, NULL, NULL, NULL, 0, NULL);  /* sets qh->qhull_command */
     IGRAPH_FINALLY(destroy_qhull, qh);
 
-    exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
+    exitcode = setjmp(qh->errexit);
     if (!exitcode) {
         // flag setting
         qh->NOerrexit = False;
         qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
         qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay triangulation
-        qh->DELAUNAY = True;    /* 'd'   */
-        qh->ATinfinity = True; // required for cocircular points, should not mess anything else up.
-        qh->MERGEvertices = True; // Do not merge identical vertices
+        qh->DELAUNAY = True; // 'd'
+        qh->ATinfinity = True; // required for cocircular points, should not mess anything else up
+        qh->MERGEvertices = True; // do not merge identical vertices
         qh_initflags(qh, qh->qhull_command);
         qh_init_B(qh, qhull_points, numpoints, dim, ismalloc); // read points and project them to parabola.
-        qh_qhull(qh); // Do the triangulation
+        qh_qhull(qh); // do the triangulation
         qh_triangulate(qh); // this guarantees that everything is simplicial
 
 
@@ -238,14 +164,14 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 IGRAPH_CHECK(add_clique(edges, &simplex));
             }
         }
-        IGRAPH_CHECK(simplify_edge_list(edges, false, false, false));
+        IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, false, false, false));
 
         // ensure that there are no disconnected vertices, should only happen if there are duplicate points.
-        igraph_integer_t edge_size = igraph_vector_int_size(edges);
+        igraph_integer_t edges_size = igraph_vector_int_size(edges);
         igraph_bitset_t connected_verts;
 
         IGRAPH_BITSET_INIT_FINALLY(&connected_verts, numpoints);
-        for (igraph_integer_t i = 0; i < edge_size; i++) {
+        for (igraph_integer_t i = 0; i < edges_size; i++) {
             IGRAPH_BIT_SET(connected_verts, VECTOR(*edges)[i]);
         }
         if (igraph_bitset_is_any_zero(&connected_verts)) {
@@ -258,8 +184,8 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_FINALLY_CLEAN(4);
     } else {
         switch (qh->last_errcode) {
-            default:
-                IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
+        default:
+            IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
 
@@ -279,17 +205,28 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
  * </para><para>
  * The current implementation uses Qhull.
  *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Barber, C. Bradford, David P. Dobkin, and Hannu Huhdanpaa.
+ * The Quickhull Algorithm for Convex Hulls.
+ * ACM Transactions on Mathematical Software 22, no. 4 (1996): 469–83.
+ * https://doi.org/10.1145/235815.235821.
+ *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the graph.
  *     Each row is a point, dimensionality is inferred from the column count.
- *
+ *     There must not be duplicate points.
  * \return Error code.
  *
+ * Time complexity: According to Theorem 3.2 in the Qhull paper,
+ * O(n log n) for d <= 3 and O(n^floor(d/2) / floor(d/2)!) where
+ * n is the number of points and d is the dimensionality of the point set.
  */
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
     const igraph_integer_t numpoints = igraph_matrix_nrow(points);
-
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
