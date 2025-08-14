@@ -16,6 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "igraph_bitset.h"
 #include "igraph_spatial.h"
 
 #include "igraph_constructors.h"
@@ -213,10 +214,22 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         }
         IGRAPH_CHECK(simplify_edge_list(edges, numpoints + 1));
 
+
+        igraph_integer_t edge_size = igraph_vector_int_size(edges);
+        igraph_bitset_t connected_verts;
+
+        IGRAPH_BITSET_INIT_FINALLY(&connected_verts, numpoints);
+        for (igraph_integer_t i = 0; i < edge_size; i++) {
+            IGRAPH_BIT_SET(connected_verts, VECTOR(*edges)[i]);
+        }
+        if (igraph_bitset_is_any_zero(&connected_verts)) {
+            IGRAPH_ERROR("Duplicate points for Delaunay triangulation.", IGRAPH_EINVAL);
+        }
+        igraph_bitset_destroy(&connected_verts);
         igraph_vector_int_destroy(&simplex);
         destroy_qhull(qh);
         igraph_free(qhull_points);
-        IGRAPH_FINALLY_CLEAN(3);
+        IGRAPH_FINALLY_CLEAN(4);
     } else {
         switch (qh->last_errcode) {
             default:

@@ -18,7 +18,6 @@
 
 #include <igraph.h>
 
-#include "linalg/blas_internal.h"
 #include "test_utilities.h"
 
 igraph_error_t delaunay(igraph_real_t *points, igraph_integer_t numpoints, igraph_integer_t dimension, igraph_bool_t printing) {
@@ -144,6 +143,13 @@ int main(void) {
         4,4,
     };
 
+    igraph_real_t points_duplicate[] ={
+        1,1,
+        0,1,
+        1,0,
+        1,1
+    };
+
     printf("100 point cloud in 2d\n");
     delaunay(&points_raw[0], 100, 2, true);
     printf("50 point cloud in 3d\n");
@@ -168,6 +174,8 @@ int main(void) {
     CHECK_ERROR(delaunay(&points_raw[0], 2, 0, true), IGRAPH_EINVAL);
     printf("4 points in 3d\n");
     delaunay(&point_cloud_3d[0], 4, 3, true);
+    printf("Identical points\n");
+    CHECK_ERROR(delaunay(&points_duplicate[0], 4,2,false), IGRAPH_EINVAL);
     VERIFY_FINALLY_STACK();
 
     return 0;
