@@ -24,6 +24,7 @@
 #include "igraph_matrix.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
+#include "igraph_types.h"
 #include "igraph_vector.h"
 
 #include "spatial/spatial_internal.h"
@@ -67,6 +68,7 @@ static int edge_comparator(const void *a, const void *b) {
 }
 
 // Simplify an edge list in place
+// except is the vertex "at infinity", and should not be included in the edge list.
 static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_bool_t self_loops, igraph_bool_t multi_edges, igraph_bool_t directed) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
@@ -91,9 +93,21 @@ static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_bool_t 
 
     // remove duplicates
     igraph_integer_t last_added = 0;
-    for (igraph_integer_t i = 2; i < size; i += 2) {
+
+    igraph_integer_t skipped = 0;
+
+    if (!self_loops) {
+        for (igraph_integer_t i = 0; i < size; i += 2) {
+            if (VECTOR(*in)[i] == VECTOR(*in)[i+1]) {
+                skipped += 1;
+            } else {
+                break;
+            }
+        }
+    }
+    for (igraph_integer_t i = skipped * 2 + 2 ; i < size; i += 2) {
         if ( !(
-               (!multi_edges && VECTOR(*in)[i] == VECTOR(*in)[2 * last_added] && VECTOR(*in)[i + 1] == VECTOR(*in)[2*last_added + 1])
+            (!multi_edges && VECTOR(*in)[i] == VECTOR(*in)[2 * last_added] && VECTOR(*in)[i + 1] == VECTOR(*in)[2*last_added + 1])
             || (!self_loops && VECTOR(*in)[i] == VECTOR(*in)[i+1]))) {
             last_added += 1;
             VECTOR(*in)[2*last_added]      = VECTOR(*in)[i];
