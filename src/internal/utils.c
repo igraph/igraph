@@ -93,3 +93,69 @@ igraph_error_t igraph_i_matrix_subset_vertices(
 
     return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * Simplify an edge list in-place. Edges may be reordered by this function.
+ *
+ * \param edges The edge list vector, as a consecutive list of pairs. It will be modified in-place.
+ * \param self_loops Set to \c false to remove self-loops.
+ * \param multi_edges Set to \c false to eliminate multi-edges.
+ * \param directed Whether to treat edges as directed.
+ * \return Error code.
+ */
+igraph_error_t igraph_i_simplify_edge_list(
+        igraph_vector_int_t *edges,
+        igraph_bool_t self_loops, igraph_bool_t multi_edges,
+        igraph_bool_t directed) {
+
+    igraph_integer_t size = igraph_vector_int_size(edges);
+    if (size == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Canonicalize undirected edges. */
+    if (!directed) {
+        for (igraph_integer_t i = 0; i < size; i += 2) {
+            if (VECTOR(*edges)[i] > VECTOR(*edges)[i + 1]) {
+                igraph_integer_t temp = VECTOR(*edges)[i];
+                VECTOR(*edges)[i] = VECTOR(*edges)[i + 1];
+                VECTOR(*edges)[i + 1] = temp;
+            }
+        }
+    }
+
+    /* Sort edge list. Not needed if multi edges are allowed. */
+    if (!multi_edges) {
+        igraph_qsort(VECTOR(*edges), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
+    }
+
+    /* Remove self-loops and duplicate edges */
+
+    igraph_integer_t last_added = 0;
+    igraph_integer_t skipped = 0;
+
+    if (!self_loops) {
+        for (igraph_integer_t i = 0; i < size; i += 2) {
+            if (VECTOR(*edges)[i] == VECTOR(*edges)[i + 1]) {
+                skipped += 1;
+            } else {
+                break;
+            }
+        }
+    }
+
+    for (igraph_integer_t i = skipped * 2 + 2 ; i < size; i += 2) {
+        if ( !(
+                (!multi_edges && VECTOR(*edges)[i] == VECTOR(*edges)[2 * last_added] && VECTOR(*edges)[i + 1] == VECTOR(*edges)[2 * last_added + 1])
+                || (!self_loops && VECTOR(*edges)[i] == VECTOR(*edges)[i + 1]))) {
+            last_added += 1;
+            VECTOR(*edges)[2 * last_added]      = VECTOR(*edges)[i];
+            VECTOR(*edges)[2 * last_added + 1 ] = VECTOR(*edges)[i + 1];
+        }
+    }
+
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, 2 * last_added + 2));
+
+    return IGRAPH_SUCCESS;
+}

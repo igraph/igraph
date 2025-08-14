@@ -27,6 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "internal/utils.h"
 #include "spatial/spatial_internal.h"
 
 #include "qhull/libqhull_r/libqhull_r.h"
@@ -45,7 +46,7 @@ static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_
     return IGRAPH_SUCCESS;
 }
 
-// Lexicographic comparator, used for qsort in simplify_edge_list
+// Lexicographic comparator, used for qsort in igraph_i_simplify_edge_list
 static int edge_comparator(const void *a, const void *b) {
     igraph_integer_t * A = (igraph_integer_t *)a;
     igraph_integer_t * B = (igraph_integer_t *)b;
@@ -66,59 +67,6 @@ static int edge_comparator(const void *a, const void *b) {
     // second are equal, so the edges must be equal.
     return 0;
 }
-
-// Simplify an edge list in place
-// except is the vertex "at infinity", and should not be included in the edge list.
-static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_bool_t self_loops, igraph_bool_t multi_edges, igraph_bool_t directed) {
-    igraph_integer_t size = igraph_vector_int_size(in);
-    if (size == 0) {
-        return IGRAPH_SUCCESS;
-    }
-    // reorder
-    if (!directed) {
-        igraph_integer_t temp;
-        for (igraph_integer_t i = 0; i < size; i += 2) {
-            if (VECTOR(*in)[i] > VECTOR(*in)[i + 1]) {
-                temp = VECTOR(*in)[i];
-                VECTOR(*in)[i] = VECTOR(*in)[i+1];
-                VECTOR(*in)[i+1] = temp;
-            }
-        }
-    }
-
-    // sort, not needed if multi edges are allowed
-    if (!multi_edges) {
-        igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
-    }
-
-    // remove duplicates
-    igraph_integer_t last_added = 0;
-
-    igraph_integer_t skipped = 0;
-
-    if (!self_loops) {
-        for (igraph_integer_t i = 0; i < size; i += 2) {
-            if (VECTOR(*in)[i] == VECTOR(*in)[i+1]) {
-                skipped += 1;
-            } else {
-                break;
-            }
-        }
-    }
-    for (igraph_integer_t i = skipped * 2 + 2 ; i < size; i += 2) {
-        if ( !(
-            (!multi_edges && VECTOR(*in)[i] == VECTOR(*in)[2 * last_added] && VECTOR(*in)[i + 1] == VECTOR(*in)[2*last_added + 1])
-            || (!self_loops && VECTOR(*in)[i] == VECTOR(*in)[i+1]))) {
-            last_added += 1;
-            VECTOR(*in)[2*last_added]      = VECTOR(*in)[i];
-            VECTOR(*in)[2*last_added + 1 ] = VECTOR(*in)[i+1];
-        }
-    }
-
-    IGRAPH_CHECK(igraph_vector_int_resize(in, 2*last_added+2));
-    return IGRAPH_SUCCESS;
-}
-
 
 // helper that can go on the finally stack to free qhull in case of an error
 static void destroy_qhull(qhT *qh) {
@@ -238,7 +186,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 IGRAPH_CHECK(add_clique(edges, &simplex));
             }
         }
-        IGRAPH_CHECK(simplify_edge_list(edges, false, false, false));
+        IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, false, false, false));
 
         // ensure that there are no disconnected vertices, should only happen if there are duplicate points.
         igraph_integer_t edge_size = igraph_vector_int_size(edges);
