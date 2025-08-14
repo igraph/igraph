@@ -186,6 +186,10 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         return delaunay_edges_1d(edges, points);
     }
 
+    if (dim >= numpoints) {
+        IGRAPH_ERRORF("Not enough points to create simplex, need at least %" IGRAPH_PRId ".", IGRAPH_EINVAL, dim);
+    }
+
     /* Prevent overflow in igraph_integer_t -> int conversions below.
      * Note that Qhull will likely already fail for a much smaller point count. */
     if (numpoints > INT_MAX) {
@@ -287,9 +291,6 @@ igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *poi
     const igraph_integer_t numpoints = igraph_matrix_nrow(points);
     const igraph_integer_t dims = igraph_matrix_ncol(points);
 
-    if (dims >= numpoints) {
-        IGRAPH_ERRORF("Not enough points to create simplex, need at least %" IGRAPH_PRId ".", IGRAPH_EINVAL, dims);
-    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
