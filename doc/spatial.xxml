@@ -14,6 +14,8 @@
 <section id="spatial-constructors"><title>Spatial constructors</title>
 <!-- doxrox-include igraph_delaunay_graph -->
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
+<!-- doxrox-include igraph_lune_beta_skeleton -->
+<!-- doxrox-include igraph_circle_beta_skeleton -->
 </section>
 
 <section id="nongraph-spatial"><title>Non-graph related spatial processing</title>

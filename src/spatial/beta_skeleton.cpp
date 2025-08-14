@@ -233,6 +233,28 @@ igraph_error_t edge_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_i
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_lune_beta_skeleton
+ * \brief computes the lune based beta skeleton of a spatial point set.
+ *
+ * \experimental
+ *
+ * This function constructs the graph corresponding to the lune based Delaunay triangulation
+ * of an n-dimensional spatial point set.
+ *
+ * Two points are connected if a region between them whose shape is parameterized by beta
+ * is free of other points.
+ *
+ * A larger beta results in a larger region, and a sparser graph.
+ *
+ * Values of beta \lt 1 are only supported in 2d, and are considerably slower.
+ *
+ * \param graph A pointer to the graph that will be created.
+ * \param points A matrix containing the points that will be used to create the graph.
+ *     Each row is a point, dimensionality is inferred from the column count.
+ *
+ * \return Error code.
+ */
 igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
@@ -256,7 +278,28 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     return IGRAPH_SUCCESS;
 }
 
-
+/**
+ * \function igraph_circle_beta_skeleton
+ * \brief Computes the circle based beta skeleton of a 2d spatial point set.
+ *
+ * \experimental
+ *
+ * This function constructs the graph corresponding to the circle based Delaunay triangulation
+ * of a 2-dimensional spatial point set.
+ *
+ * Two points are connected if a region between them whose shape is parameterized by beta
+ * is free of other points.
+ *
+ * A larger beta results in a larger region, and a sparser graph.
+ *
+ * Values of beta \lt 1 are considerably slower
+ *
+ * \param graph A pointer to the graph that will be created
+ * \param points A Matrix containing the points that will be used to create the graph.
+ *     Each row is a point.
+ * \param beta A positive real value used to parameterize the graph.
+ * \return Error code.
+ */
 igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
