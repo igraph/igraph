@@ -205,17 +205,28 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
  * </para><para>
  * The current implementation uses Qhull.
  *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Barber, C. Bradford, David P. Dobkin, and Hannu Huhdanpaa.
+ * The Quickhull Algorithm for Convex Hulls.
+ * ACM Transactions on Mathematical Software 22, no. 4 (1996): 469–83.
+ * https://doi.org/10.1145/235815.235821.
+ *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the graph.
  *     Each row is a point, dimensionality is inferred from the column count.
- *
+ *     There must not be duplicate points.
  * \return Error code.
  *
+ * Time complexity: According to Theorem 3.2 in the Qhull paper,
+ * O(n log n) for d <= 3 and O(n^floor(d/2) / floor(d/2)!) where
+ * n is the number of points and d is the dimensionality of the point set.
  */
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
     const igraph_integer_t numpoints = igraph_matrix_nrow(points);
-
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));

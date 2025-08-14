@@ -96,7 +96,7 @@ igraph_error_t igraph_i_matrix_subset_vertices(
 }
 
 
-/* Lexicographic edge comparator, used for qsort in igraph_i_simplify_edge_list() */
+/* Lexicographic edge comparator, used with igraph_qsort() in igraph_i_simplify_edge_list() */
 static int edge_comparator(const void *a, const void *b) {
     igraph_integer_t *A = (igraph_integer_t *) a;
     igraph_integer_t *B = (igraph_integer_t *) b;
@@ -135,6 +135,7 @@ igraph_error_t igraph_i_simplify_edge_list(
         igraph_bool_t directed) {
 
     igraph_integer_t size = igraph_vector_int_size(edges);
+
     if (size == 0) {
         return IGRAPH_SUCCESS;
     }
