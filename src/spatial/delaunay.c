@@ -16,14 +16,13 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_bitset.h"
 #include "igraph_spatial.h"
 
+#include "igraph_bitset.h"
 #include "igraph_constructors.h"
 #include "igraph_error.h"
 #include "igraph_matrix.h"
 #include "igraph_memory.h"
-#include "igraph_qsort.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -46,27 +45,6 @@ static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_
     return IGRAPH_SUCCESS;
 }
 
-// Lexicographic comparator, used for qsort in igraph_i_simplify_edge_list
-static int edge_comparator(const void *a, const void *b) {
-    igraph_integer_t * A = (igraph_integer_t *)a;
-    igraph_integer_t * B = (igraph_integer_t *)b;
-    if (A[0] < B[0]) {
-        return -1;
-    }
-    if (A[0] > B[0]) {
-        return  1;
-    }
-    // first are equal
-    if (A[1] < B[1]) {
-        return -1;
-    }
-    if (A[1] > B[1]) {
-        return  1;
-    }
-
-    // second are equal, so the edges must be equal.
-    return 0;
-}
 
 // helper that can go on the finally stack to free qhull in case of an error
 static void destroy_qhull(qhT *qh) {

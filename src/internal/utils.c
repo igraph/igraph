@@ -17,6 +17,7 @@
 */
 
 #include "igraph_interface.h"
+#include "igraph_qsort.h"
 
 #include "internal/utils.h"
 
@@ -94,6 +95,30 @@ igraph_error_t igraph_i_matrix_subset_vertices(
     return IGRAPH_SUCCESS;
 }
 
+
+/* Lexicographic edge comparator, used for qsort in igraph_i_simplify_edge_list() */
+static int edge_comparator(const void *a, const void *b) {
+    igraph_integer_t *A = (igraph_integer_t *) a;
+    igraph_integer_t *B = (igraph_integer_t *) b;
+
+    if (A[0] < B[0]) {
+        return -1;
+    }
+    if (A[0] > B[0]) {
+        return  1;
+    }
+
+    /* first are equal */
+    if (A[1] < B[1]) {
+        return -1;
+    }
+    if (A[1] > B[1]) {
+        return  1;
+    }
+
+    /* second are equal, so the edges must be equal */
+    return 0;
+}
 
 /**
  * Simplify an edge list in-place. Edges may be reordered by this function.
