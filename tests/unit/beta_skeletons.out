@@ -1,3 +1,4 @@
+Relative neighborhood graph, 25 points
 directed: false
 vcount: 25
 edges: {
@@ -30,6 +31,7 @@ edges: {
 18 19
 19 20
 }
+Gabriel graph, 25 points
 directed: false
 vcount: 25
 edges: {
@@ -73,6 +75,7 @@ edges: {
 18 19
 19 20
 }
+Beta = 0.5, 25 points
 directed: false
 vcount: 25
 edges: {
@@ -207,6 +210,7 @@ edges: {
 20 24
 21 22
 }
+Beta = 1.1, Circle based 25 points
 directed: false
 vcount: 25
 edges: {
@@ -233,4 +237,20 @@ edges: {
 16 17
 18 19
 19 20
+}
+Beta = 1.1, Circle based 2 points
+directed: false
+vcount: 2
+edges: {
+0 1
+}
+Beta = 1.1, Circle based 1 point
+directed: false
+vcount: 1
+edges: {
+}
+Beta = 1.1, Circle based 0 points
+directed: false
+vcount: 0
+edges: {
 }

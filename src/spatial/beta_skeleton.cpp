@@ -40,9 +40,12 @@ template <igraph_integer_t Dimension>
 using kdTree = nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>, ig_point_adaptor, Dimension, igraph_integer_t>;
 
 igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    if (beta >= 1) { // large beta, subset of delaunay
+    igraph_integer_t num_points = igraph_matrix_nrow(points);
+    igraph_integer_t num_dims   = igraph_matrix_ncol(points);
+    if (beta >= 1 && num_points > num_dims) { // large beta, subset of delaunay
         IGRAPH_CHECK(igraph_i_delaunay_edges(edges, points));
     } else { // small beta, not subset of delaunay, give complete graph.
+             // Or delaunay not calculable due to point count
         igraph_integer_t numpoints = igraph_matrix_nrow(points);
         for (igraph_integer_t a = 0; a < numpoints -1; a++) {
             for (igraph_integer_t b = a+1; b < numpoints; b++) {
@@ -270,7 +273,7 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
         IGRAPH_CHECK((filter_edges<edge_is_present<small_r, construct_perp_centres, intersection_predicate>>(&potential_edges, points, beta)));
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
+    IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&potential_edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -316,7 +319,7 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
         IGRAPH_CHECK((filter_edges<edge_is_present<small_r, construct_perp_centres, intersection_predicate>>(&potential_edges, points, beta)));
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &potential_edges, false, false));
+    IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&potential_edges);
     IGRAPH_FINALLY_CLEAN(1);
