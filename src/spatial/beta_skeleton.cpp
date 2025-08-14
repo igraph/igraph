@@ -252,6 +252,10 @@ igraph_error_t edge_is_present(igraph_bool_t *result, kdTree<-1> &tree, igraph_i
  *
  * Values of beta \lt 1 are only supported in 2d, and are considerably slower.
  *
+ * The gabriel graph is a special case of beta skeleton where beta = 1.
+ *
+ * The Relative Neighborhood graph is a special case of beta skeleton where beta = 2.
+ *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the graph.
  *     Each row is a point, dimensionality is inferred from the column count.
