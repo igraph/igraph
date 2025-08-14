@@ -123,6 +123,8 @@ static int edge_comparator(const void *a, const void *b) {
 /**
  * Simplify an edge list in-place. Edges may be reordered by this function.
  *
+ * TODO: Refactor this to take the number of vertices as input and use linear-time radix sort.
+ *
  * \param edges The edge list vector, as a consecutive list of pairs. It will be modified in-place.
  * \param self_loops Set to \c false to remove self-loops.
  * \param multi_edges Set to \c false to eliminate multi-edges.
