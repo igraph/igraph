@@ -18,6 +18,7 @@
 
 #include <igraph.h>
 
+#include "linalg/blas_internal.h"
 #include "test_utilities.h"
 
 igraph_error_t delaunay(igraph_real_t *points, igraph_integer_t numpoints, igraph_integer_t dimension, igraph_bool_t printing) {
