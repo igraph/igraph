@@ -67,32 +67,40 @@ static int edge_comparator(const void *a, const void *b) {
 }
 
 // Simplify an edge list in place
-// except is the vertex "at infinity", and should not be included in the edge list.
-static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_integer_t except) {
+static igraph_error_t simplify_edge_list(igraph_vector_int_t *in, igraph_bool_t self_loops, igraph_bool_t multi_edges, igraph_bool_t directed) {
     igraph_integer_t size = igraph_vector_int_size(in);
     if (size == 0) {
         return IGRAPH_SUCCESS;
     }
     // reorder
-    igraph_integer_t temp;
-    for (igraph_integer_t i = 0; i < size; i += 2) {
-        if (VECTOR(*in)[i] > VECTOR(*in)[i + 1]) {
-            temp = VECTOR(*in)[i];
-            VECTOR(*in)[i] = VECTOR(*in)[i+1];
-            VECTOR(*in)[i+1] = temp;
+    if (!directed) {
+        igraph_integer_t temp;
+        for (igraph_integer_t i = 0; i < size; i += 2) {
+            if (VECTOR(*in)[i] > VECTOR(*in)[i + 1]) {
+                temp = VECTOR(*in)[i];
+                VECTOR(*in)[i] = VECTOR(*in)[i+1];
+                VECTOR(*in)[i+1] = temp;
+            }
         }
     }
-    // sort
-    igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
-    // remove duplicates and filter out point at infinity
+
+    // sort, not needed if multi edges are allowed
+    if (!multi_edges) {
+        igraph_qsort(VECTOR(*in), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
+    }
+
+    // remove duplicates
     igraph_integer_t last_added = 0;
     for (igraph_integer_t i = 2; i < size; i += 2) {
-        if ((VECTOR(*in)[i] != VECTOR(*in)[2 * last_added] || VECTOR(*in)[i + 1] != VECTOR(*in)[2*last_added + 1]) && VECTOR(*in)[i+1] != except) {
+        if ( !(
+               (!multi_edges && VECTOR(*in)[i] == VECTOR(*in)[2 * last_added] && VECTOR(*in)[i + 1] == VECTOR(*in)[2*last_added + 1])
+            || (!self_loops && VECTOR(*in)[i] == VECTOR(*in)[i+1]))) {
             last_added += 1;
             VECTOR(*in)[2*last_added]      = VECTOR(*in)[i];
             VECTOR(*in)[2*last_added + 1 ] = VECTOR(*in)[i+1];
         }
     }
+
     IGRAPH_CHECK(igraph_vector_int_resize(in, 2*last_added+2));
     return IGRAPH_SUCCESS;
 }
@@ -212,7 +220,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 IGRAPH_CHECK(add_clique(edges, &simplex));
             }
         }
-        IGRAPH_CHECK(simplify_edge_list(edges, numpoints + 1));
+        IGRAPH_CHECK(simplify_edge_list(edges, false, false, false));
 
 
         igraph_integer_t edge_size = igraph_vector_int_size(edges);
