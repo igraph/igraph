@@ -79,8 +79,10 @@ public:
         }
         if (added_count != max_neighbors) {
             added_count++;
-            neighbors.push_back(0); // always keep space
-            distances.push_back(0);
+            if (added_count >= neighbors.size()) {
+                neighbors.push_back(0); // always keep space to add new point.
+                distances.push_back(0);
+            }
         }
         return true;
     }
