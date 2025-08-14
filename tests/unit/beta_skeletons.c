@@ -21,9 +21,12 @@ int main(void) {
         0.739752, 0.447069, 0.0443581, 0.444839
     };
 
-    igraph_matrix_t point_mat;
+    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat;
 
     igraph_matrix_init_array(&point_mat, points, 25, 2, false);
+    igraph_matrix_init_array(&point_small_mat, points, 2, 2, false);
+    igraph_matrix_init_array(&point_singleton_mat, points, 1, 2, false);
+    igraph_matrix_init_array(&point_null_mat, points, 0, 2, false);
 
     igraph_matrix_init_array(&point_3d_mat, points, 10, 3, false);
 
@@ -32,14 +35,17 @@ int main(void) {
     print_graph_canon(&graph);
     igraph_destroy(&graph);
 
+    printf("Gabriel graph, 25 points\n");
     igraph_lune_beta_skeleton(&graph, &point_mat, 1);
     print_graph_canon(&graph);
     igraph_destroy(&graph);
 
+    printf("Beta = 0.5, 25 points\n");
     igraph_lune_beta_skeleton(&graph, &point_mat, 0.5);
     print_graph_canon(&graph);
     igraph_destroy(&graph);
 
+    printf("Beta = 1.1, Circle based 25 points\n");
     igraph_circle_beta_skeleton(&graph, &point_mat, 1.1);
     print_graph_canon(&graph);
     igraph_destroy(&graph);
@@ -76,6 +82,9 @@ int main(void) {
 
     igraph_matrix_destroy(&point_3d_mat);
     igraph_matrix_destroy(&point_mat);
+    igraph_matrix_destroy(&point_small_mat);
+    igraph_matrix_destroy(&point_singleton_mat);
+    igraph_matrix_destroy(&point_null_mat);
     VERIFY_FINALLY_STACK();
     return 0;
 }
