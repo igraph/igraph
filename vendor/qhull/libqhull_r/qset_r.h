@@ -87,7 +87,7 @@ union setelemT {
 
 struct setT {
   int maxsize;          /* maximum number of elements (except NULL) */
-  setelemT e[1];        /* array of pointers, tail is NULL */
+  setelemT e[];        /* array of pointers, tail is NULL */
                         /* last slot (unless NULL) is actual size+1
                            e[maxsize]==NULL or e[e[maxsize]-1]==NULL */
                         /* this may generate a warning since e[] contains
@@ -103,6 +103,15 @@ struct setT {
     size of a set element in bytes
 */
 #define SETelemsize ((int)sizeof(setelemT))
+
+/*
+   SETbasesize - size of setT with a single element
+   in e[]. Before C99, setT has been declared with e[1], so
+   sizeof(setT) included already space for one element, but with e[]
+   (C99), it does not. All instances of (int)sizeof(setT) have been
+   replaced with SETbasesize throughout the code -- Tomas Kalibera,
+   2025-01-09 */
+#define SETbasesize ((int)sizeof(setT) + SETelemsize)
 
 
 /*=========== -macros- =========================*/

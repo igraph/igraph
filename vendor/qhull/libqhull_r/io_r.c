@@ -70,7 +70,7 @@ void qh_produce_output2(qhT *qh) {
   if (qh->PRINTstatistics) {
     qh_printstatistics(qh, qh->ferr, "");
     qh_memstatistics(qh, qh->ferr);
-    d_1= (int)sizeof(setT) + (qh->hull_dim - 1) * SETelemsize;
+    d_1= SETbasesize + (qh->hull_dim - 1) * SETelemsize;
     qh_fprintf(qh, qh->ferr, 8040, "\
     size in bytes: merge %d ridge %d vertex %d facet %d\n\
          normal %d ridge vertices %d facet vertices or neighbors %d\n",

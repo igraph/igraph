@@ -720,7 +720,7 @@ void qh_setfree(qhT *qh, setT **setp) {
   void **freelistp;  /* used if !qh_NOmem by qh_memfree_() */
 
   if (*setp) {
-    size= (int)sizeof(setT) + ((*setp)->maxsize)*SETelemsize;
+    size= SETbasesize + ((*setp)->maxsize)*SETelemsize;
     if (size <= qh->qhmem.LASTsize) {
       qh_memfree_(qh, *setp, size, freelistp);
     }else
@@ -773,7 +773,7 @@ void qh_setfreelong(qhT *qh, setT **setp) {
   int size;
 
   if (*setp) {
-    size= (int)sizeof(setT) + ((*setp)->maxsize)*SETelemsize;
+    size= SETbasesize + ((*setp)->maxsize)*SETelemsize;
     if (size > qh->qhmem.LASTsize) {
       qh_memfree(qh, *setp, size);
       *setp= NULL;
@@ -910,7 +910,7 @@ int qh_setlarger_quick(qhT *qh, int setsize, int *newsize) {
     int lastquickset;
 
     *newsize= 2 * setsize;
-    lastquickset= (qh->qhmem.LASTsize - (int)sizeof(setT)) / SETelemsize; /* matches size computation in qh_setnew */
+    lastquickset= (qh->qhmem.LASTsize - SETbasesize) / SETelemsize; /* matches size computation in qh_setnew */
     if (*newsize <= lastquickset)
       return 1;
     if (setsize + 4 > lastquickset)
@@ -971,7 +971,7 @@ setT *qh_setnew(qhT *qh, int setsize) {
 
   if (!setsize)
     setsize++;
-  size= (int)sizeof(setT) + setsize * SETelemsize; /* setT includes NULL terminator, see qh.LASTquickset */
+  size= SETbasesize + setsize * SETelemsize; /* setT includes NULL terminator, see qh.LASTquickset */
   if (size>0 && size <= qh->qhmem.LASTsize) {
     qh_memalloc_(qh, size, freelistp, set, setT);
 #ifndef qh_NOmem
@@ -1096,11 +1096,11 @@ void qh_setprint(qhT *qh, FILE *fp, const char* string, setT *set) {
   else {
     SETreturnsize_(set, size);
     qh_fprintf(qh, fp, 9347, "%s set=%p maxsize=%d size=%d elems=",
-             string, (void *)set, set->maxsize, size);
+             string, (void *) set, set->maxsize, size);
     if (size > set->maxsize)
       size= set->maxsize+1;
     for (k=0; k < size; k++)
-      qh_fprintf(qh, fp, 9348, " %p", (void *)set->e[k].p);
+      qh_fprintf(qh, fp, 9348, " %p", (void *) set->e[k].p);
     qh_fprintf(qh, fp, 9349, "\n");
   }
 } /* setprint */
@@ -1193,7 +1193,7 @@ setT *qh_settemp(qhT *qh, int setsize) {
   qh_setappend(qh, &qh->qhmem.tempstack, newset);
   if (qh->qhmem.IStracing >= 5)
     qh_fprintf(qh, qh->qhmem.ferr, 8123, "qh_settemp: temp set %p of %d elements, depth %d\n",
-       (void *)newset, newset->maxsize, qh_setsize(qh, qh->qhmem.tempstack));
+       (void *) newset, newset->maxsize, qh_setsize(qh, qh->qhmem.tempstack));
   return newset;
 } /* settemp */
 
@@ -1223,8 +1223,8 @@ void qh_settempfree(qhT *qh, setT **set) {
   if (stackedset != *set) {
     qh_settemppush(qh, stackedset);
     qh_fprintf(qh, qh->qhmem.ferr, 6179, "qhull internal error (qh_settempfree): set %p(size %d) was not last temporary allocated(depth %d, set %p, size %d)\n",
-             (void *)*set, qh_setsize(qh, *set), qh_setsize(qh, qh->qhmem.tempstack)+1,
-             (void *)stackedset, qh_setsize(qh, stackedset));
+             (void *) *set, qh_setsize(qh, *set), qh_setsize(qh, qh->qhmem.tempstack)+1,
+             (void *) stackedset, qh_setsize(qh, stackedset));
     qh_errexit(qh, qhmem_ERRqhull, NULL, NULL);
   }
   qh_setfree(qh, set);
@@ -1271,7 +1271,7 @@ setT *qh_settemppop(qhT *qh) {
   }
   if (qh->qhmem.IStracing >= 5)
     qh_fprintf(qh, qh->qhmem.ferr, 8124, "qh_settemppop: depth %d temp set %p of %d elements\n",
-       qh_setsize(qh, qh->qhmem.tempstack)+1, (void *)stackedset, qh_setsize(qh, stackedset));
+       qh_setsize(qh, qh->qhmem.tempstack)+1, (void *) stackedset, qh_setsize(qh, stackedset));
   return stackedset;
 } /* settemppop */
 
@@ -1295,7 +1295,7 @@ void qh_settemppush(qhT *qh, setT *set) {
   qh_setappend(qh, &qh->qhmem.tempstack, set);
   if (qh->qhmem.IStracing >= 5)
     qh_fprintf(qh, qh->qhmem.ferr, 8125, "qh_settemppush: depth %d temp set %p of %d elements\n",
-      qh_setsize(qh, qh->qhmem.tempstack), (void *)set, qh_setsize(qh, set));
+      qh_setsize(qh, qh->qhmem.tempstack), (void *) set, qh_setsize(qh, set));
 } /* settemppush */
 
 

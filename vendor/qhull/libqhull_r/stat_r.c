@@ -391,17 +391,17 @@ void qh_collectstatistics(qhT *qh) {
       zadd_(Znumridges, sizridges);
       zmax_(Zmaxridges, sizridges);
     }
-    zadd_(Zmemfacets, (int)sizeof(facetT) + qh->normal_size + 2*(int)sizeof(setT)
+    zadd_(Zmemfacets, (int)sizeof(facetT) + qh->normal_size + 2*SETbasesize
        + SETelemsize * (sizneighbors + sizvertices));
     if (facet->ridges) {
       zadd_(Zmemridges,
-        (int)sizeof(setT) + SETelemsize * sizridges + sizridges *
-         ((int)sizeof(ridgeT) + (int)sizeof(setT) + SETelemsize * (qh->hull_dim-1))/2);
+        SETbasesize + SETelemsize * sizridges + sizridges *
+         ((int)sizeof(ridgeT) + SETbasesize + SETelemsize * (qh->hull_dim-1))/2);
     }
     if (facet->outsideset)
-      zadd_(Zmempoints, (int)sizeof(setT) + SETelemsize * qh_setsize(qh, facet->outsideset));
+      zadd_(Zmempoints, SETbasesize + SETelemsize * qh_setsize(qh, facet->outsideset));
     if (facet->coplanarset)
-      zadd_(Zmempoints, (int)sizeof(setT) + SETelemsize * qh_setsize(qh, facet->coplanarset));
+      zadd_(Zmempoints, SETbasesize + SETelemsize * qh_setsize(qh, facet->coplanarset));
     if (facet->seen) /* Delaunay upper envelope */
       continue;
     facet->seen= True;

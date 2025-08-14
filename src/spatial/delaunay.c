@@ -236,7 +236,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         }
         IGRAPH_CHECK(simplify_edge_list(edges, false, false, false));
 
-
+        // ensure that there are no disconnected vertices, should only happen if there are duplicate points.
         igraph_integer_t edge_size = igraph_vector_int_size(edges);
         igraph_bitset_t connected_verts;
 
