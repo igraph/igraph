@@ -93,6 +93,7 @@ static igraph_error_t set_weights(const igraph_vector_t *vertex_weights, graph_t
 typedef struct {
     igraph_vector_int_t clique;
     igraph_vector_int_list_t* result;
+    igraph_int_t max_result_count;
 } igraph_i_cliquer_cliques_user_data_t;
 
 static igraph_error_t igraph_i_cliquer_cliques_user_data_init(
@@ -100,6 +101,7 @@ static igraph_error_t igraph_i_cliquer_cliques_user_data_init(
     igraph_vector_int_list_t* result
 ) {
     data->result = result;
+    data->max_result_count = -1;
     igraph_vector_int_list_clear(result);
     return igraph_vector_int_init(&data->clique, 0);
 }
@@ -129,11 +131,18 @@ static igraph_error_t collect_cliques_callback(set_t s, graph_t *g, clique_optio
 
     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(data->result, &data->clique));
 
-    return IGRAPH_SUCCESS;
+    if (data->max_result_count > 0 && igraph_vector_int_list_size(data->result) == data->max_result_count) {
+        return IGRAPH_STOP;
+    } else {
+        return IGRAPH_SUCCESS;
+    }
 }
 
-igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int_list_t *res,
-                             igraph_int_t min_size, igraph_int_t max_size) {
+igraph_error_t igraph_i_cliquer_cliques(
+        const igraph_t *graph, igraph_vector_int_list_t *res,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_result_count) {
+
     graph_t *g;
     igraph_int_t vcount = igraph_vcount(graph);
     igraph_i_cliquer_cliques_user_data_t data;
@@ -161,6 +170,12 @@ igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int
 
     IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
     IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
+
+    data.max_result_count = max_result_count;
+
+    if (max_result_count == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);

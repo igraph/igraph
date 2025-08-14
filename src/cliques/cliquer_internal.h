@@ -25,7 +25,8 @@
 IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_int_list_t *res,
-                             igraph_int_t min_size, igraph_int_t max_size);
+                             igraph_int_t min_size, igraph_int_t max_size,
+                             igraph_int_t max_result_count);
 
 igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t *hist,
                                igraph_int_t min_size, igraph_int_t max_size);
