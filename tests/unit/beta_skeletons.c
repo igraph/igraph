@@ -21,7 +21,7 @@ int main(void) {
         0.739752, 0.447069, 0.0443581, 0.444839
     };
 
-    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat;
+    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat, point_3d_mat;
 
     igraph_matrix_init_array(&point_mat, points, 25, 2, false);
     igraph_matrix_init_array(&point_small_mat, points, 2, 2, false);
@@ -86,5 +86,6 @@ int main(void) {
     igraph_matrix_destroy(&point_singleton_mat);
     igraph_matrix_destroy(&point_null_mat);
     VERIFY_FINALLY_STACK();
+
     return 0;
 }
