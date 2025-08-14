@@ -289,7 +289,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
     const igraph_integer_t numpoints = igraph_matrix_nrow(points);
-    const igraph_integer_t dims = igraph_matrix_ncol(points);
 
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
