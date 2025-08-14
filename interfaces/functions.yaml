@@ -814,7 +814,7 @@ igraph_maxdegree:
     DEPS: vids ON graph
 
 igraph_density:
-    PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=False
+    PARAMS: GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT REAL res, BOOLEAN loops=False
 
 igraph_mean_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=True
@@ -1751,10 +1751,19 @@ igraph_community_leiden:
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OPTIONAL VERTEX_WEIGHTS vertex_out_weights,
         OPTIONAL VERTEX_WEIGHTS vertex_in_weights,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
+        REAL resolution, REAL beta=0.01, BOOLEAN start=False, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_out_weights ON graph, vertex_in_weights ON graph
+
+igraph_community_leiden_simple:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        LEIDEN_OBJECTIVE objective,
+        REAL resolution, REAL beta=0.01, BOOLEAN start=False, INTEGER n_iterations=2,
+        OPTIONAL INOUT VECTOR_INT membership,
+        OUT INTEGER nb_clusters, OUT REAL quality
+    DEPS: weights ON graph
 
 igraph_split_join_distance:
     PARAMS: |-

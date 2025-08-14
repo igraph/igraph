@@ -42,48 +42,70 @@
  * \p loops parameter.
  *
  * </para><para>
- * Note that density is ill-defined for graphs which have multiple edges
- * between some pairs of vertices. Consider calling \ref igraph_simplify()
- * on such graphs. This function does not check whether the graph has
- * parallel edges. The result it returns for such graphs is not meaningful.
+ * The classic definition of the density is formulated for unweighted
+ * graphs without multi-edges. This function allows multigraphs and
+ * weighted graphs as well. In this case, it computes the ratio of the
+ * total edge weight to the largest possible number of adjacent vertex
+ * pairs the graph could have. This value may be larger than 1.
+ *
+ * </para><para>
+ * If you need the density concept for simple graphs, make sure to
+ * eliminate any multi-edges appropriately. This can be done using
+ * \ref igraph_simplify().
  *
  * \param graph The input graph object. It must not have parallel edges.
  * \param res Pointer to a real number, the result will be stored here.
+ * \param weights Vector of edge weights. Pass \c NULL to to perform
+ *   an unweighted density calculation.
  * \param loops Boolean constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
  *   necessarily mean that the graph really contains any loops). If
  *   this is \c false then the result is only correct if the graph does not
- *   contain loops.
+ *   contain loops. This function does not check if loops are actually
+ *   present.
  * \return Error code.
  *
  * Time complexity: O(1).
  */
-igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
-                   igraph_bool_t loops) {
+igraph_error_t igraph_density(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_real_t *res,
+        igraph_bool_t loops) {
 
-    igraph_real_t no_of_nodes = (igraph_real_t) igraph_vcount(graph);
-    igraph_real_t no_of_edges = (igraph_real_t) igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_real_t vcount = (igraph_real_t) igraph_vcount(graph); /* note real type */
+    igraph_real_t total_weight;
 
-    if (no_of_nodes == 0) {
+    if (vcount == 0) {
         *res = IGRAPH_NAN;
         return IGRAPH_SUCCESS;
     }
 
+    if (weights) {
+        if (igraph_vector_size(weights) != ecount) {
+            IGRAPH_ERROR("Weight vector length does not match edge count.", IGRAPH_EINVAL);
+        }
+        total_weight = igraph_vector_sum(weights);
+    } else {
+        total_weight = ecount;
+    }
+
     if (!loops) {
-        if (no_of_nodes == 1) {
+        if (vcount == 1) {
             *res = IGRAPH_NAN;
         } else if (directed) {
-            *res = no_of_edges / no_of_nodes / (no_of_nodes - 1);
+            *res = total_weight / vcount / (vcount - 1);
         } else {
-            *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes - 1);
+            *res = total_weight / vcount * 2.0 / (vcount - 1);
         }
     } else {
         if (directed) {
-            *res = no_of_edges / no_of_nodes / no_of_nodes;
+            *res = total_weight / vcount / vcount;
         } else {
-            *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes + 1);
+            *res = total_weight / vcount * 2.0 / (vcount + 1);
         }
     }
 

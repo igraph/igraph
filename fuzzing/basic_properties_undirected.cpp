@@ -74,7 +74,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_is_chordal(&graph, NULL, NULL, &bres, NULL, NULL);
         igraph_invalidate_cache(&graph);
 
-        igraph_density(&graph, &r, true);
+        igraph_density(&graph, NULL, &r, true);
 
         igraph_destroy(&graph);
     }

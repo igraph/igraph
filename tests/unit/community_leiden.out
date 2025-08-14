@@ -35,7 +35,7 @@ Leiden found 3 clusters using modularity, undirected, quality is 0.50000.
 Membership: 0 0 0 0 1 1 1 1 2
 
 Leiden found 4 clusters using modularity, undirected, quality is 0.55000.
-Membership: 0 0 0 0 1 1 1 1 1 0 2 2 3 3 3 3 3 2 2 2
+Membership: 0 0 0 1 1 1 1 1 0 0 2 2 2 2 2 3 3 3 3 3
 
 Leiden found 2 clusters using CPM (resolution parameter=0.05), quality is 0.75000.
 Membership: 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1
