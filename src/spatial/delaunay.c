@@ -33,7 +33,7 @@
 #include "qhull/libqhull_r/poly_r.h"
 
 // Append an undirected clique of the indices in destination to source.
-// Assumes that source is an initialized vector
+// Assumes that source is an initialized vector.
 static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
     igraph_integer_t num_points = igraph_vector_int_size(source);
     for (igraph_integer_t a = 0; a < num_points - 1; a++) {
@@ -46,7 +46,7 @@ static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_
 }
 
 
-// helper that can go on the finally stack to free qhull in case of an error
+// Helper that can go on the finally stack to free qhT Qhull data structure in case of an error.
 static void destroy_qhull(qhT *qh) {
     int curlong, totlong;
     qh->NOerrexit = True; /* no more setjmp */
@@ -132,18 +132,18 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     qh_init_A(qh, NULL, NULL, NULL, 0, NULL);  /* sets qh->qhull_command */
     IGRAPH_FINALLY(destroy_qhull, qh);
 
-    exitcode = setjmp(qh->errexit); /* simple statement for CRAY J916 */
+    exitcode = setjmp(qh->errexit);
     if (!exitcode) {
         // flag setting
         qh->NOerrexit = False;
         qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
         qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay triangulation
-        qh->DELAUNAY = True;    /* 'd'   */
-        qh->ATinfinity = True; // required for cocircular points, should not mess anything else up.
-        qh->MERGEvertices = True; // Do not merge identical vertices
+        qh->DELAUNAY = True; // 'd'
+        qh->ATinfinity = True; // required for cocircular points, should not mess anything else up
+        qh->MERGEvertices = True; // do not merge identical vertices
         qh_initflags(qh, qh->qhull_command);
         qh_init_B(qh, qhull_points, numpoints, dim, ismalloc); // read points and project them to parabola.
-        qh_qhull(qh); // Do the triangulation
+        qh_qhull(qh); // do the triangulation
         qh_triangulate(qh); // this guarantees that everything is simplicial
 
 
@@ -167,11 +167,11 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, false, false, false));
 
         // ensure that there are no disconnected vertices, should only happen if there are duplicate points.
-        igraph_integer_t edge_size = igraph_vector_int_size(edges);
+        igraph_integer_t edges_size = igraph_vector_int_size(edges);
         igraph_bitset_t connected_verts;
 
         IGRAPH_BITSET_INIT_FINALLY(&connected_verts, numpoints);
-        for (igraph_integer_t i = 0; i < edge_size; i++) {
+        for (igraph_integer_t i = 0; i < edges_size; i++) {
             IGRAPH_BIT_SET(connected_verts, VECTOR(*edges)[i]);
         }
         if (igraph_bitset_is_any_zero(&connected_verts)) {
@@ -184,8 +184,8 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_FINALLY_CLEAN(4);
     } else {
         switch (qh->last_errcode) {
-            default:
-                IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
+        default:
+            IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
 
