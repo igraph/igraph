@@ -1015,6 +1015,7 @@ add_benchmarks(
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
+  igraph_delaunay_graph
   igraph_distances
   igraph_ecc
   igraph_induced_subgraph
