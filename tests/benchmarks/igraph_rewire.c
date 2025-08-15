@@ -17,6 +17,7 @@
 */
 
 #include <igraph.h>
+#include "igraph_constants.h"
 #include "bench.h"
 
 void bench_erdos_renyi(int nodes, int edges, int rewirings, int rep) {
