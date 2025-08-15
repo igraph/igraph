@@ -470,15 +470,17 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  * https://doi.org/10.1080/0022250X.2001.9990249
  *
  * \param graph The graph object.
+ * \param weights An optional vector containing edge weights for
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
  * \param vids The vertices of which the betweenness centrality scores
  *        will be calculated.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. No edge weight may be NaN.
- *        Supply a null pointer here for unweighted betweenness.
+ * \param normalized Whether to normalize betweenness scores. Normalization is
+ *        currently unimplemented, and setting this to \c true raises an error.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids.
@@ -495,10 +497,11 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  *     of the edges in a graph. See \ref igraph_betweenness_cutoff() to
  *     calculate the range-limited betweenness of the vertices in a graph.
  */
-igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
-                       const igraph_vs_t vids, igraph_bool_t directed,
-                       const igraph_vector_t* weights) {
-    return igraph_betweenness_cutoff(graph, res, vids, directed, weights, -1);
+igraph_error_t igraph_betweenness(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *res, igraph_vs_t vids,
+        igraph_bool_t directed, igraph_bool_t normalized) {
+    return igraph_betweenness_cutoff(graph, weights, res, vids, directed, normalized, -1);
 }
 
 /**
@@ -511,15 +514,17 @@ igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  * then the given cutoff value.
  *
  * \param graph The graph object.
+ * \param weights An optional vector containing edge weights for
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \param res The result of the computation, a vector containing the
  *        range-limited betweenness scores for the specified vertices.
  * \param vids The vertices for which the range-limited betweenness centrality
  *        scores will be computed.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. No edge weight may be NaN.
- *        Supply a null pointer here for unweighted betweenness.
+ * \param normalized Whether to normalize betweenness scores. Normalization is
+ *        currently unimplemented, and setting this to \c true raises an error.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated, and
  *        there will be no upper limit on path lengths.
@@ -538,9 +543,12 @@ igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  * \ref igraph_edge_betweenness_cutoff() to calculate the range-limited
  * edge betweenness.
  */
-igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
-                              const igraph_vs_t vids, igraph_bool_t directed,
-                              const igraph_vector_t *weights, igraph_real_t cutoff) {
+igraph_error_t igraph_betweenness_cutoff(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *res,
+        igraph_vs_t vids,
+        igraph_bool_t directed, igraph_bool_t normalized,
+        igraph_real_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -562,6 +570,10 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     igraph_real_t *tmpscore;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_vit_t vit;
+
+    if (normalized) {
+        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+    }
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
@@ -708,13 +720,15 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
  * https://doi.org/10.1080/0022250X.2001.9990249
  *
  * \param graph The graph object.
- * \param result The result of the computation, vector containing the
- *        betweenness scores for the edges.
- * \param directed If true directed paths will be considered
- *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted edge
  *        betweenness. No edge weight may be NaN. Supply a null
  *        pointer here for the unweighted version.
+ * \param res The result of the computation, vector containing the
+ *        betweenness scores for the edges.
+ * \param directed If true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param normalized Whether to normalize betweenness scores. Normalization is
+ *        currently unimplemented, and setting this to \c true raises an error.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -729,11 +743,11 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
  *     of the edges in a graph. See \ref igraph_edge_betweenness_cutoff() to
  *     compute the range-limited betweenness score of the edges in a graph.
  */
-igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed,
-                            const igraph_vector_t *weights) {
-    return igraph_edge_betweenness_cutoff(graph, result, directed,
-                                          weights, -1);
+igraph_error_t igraph_edge_betweenness(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *res,
+        igraph_bool_t directed, igraph_bool_t normalized) {
+    return igraph_edge_betweenness_cutoff(graph, weights, res, directed, normalized, -1);
 }
 
 /**
@@ -746,13 +760,15 @@ igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *r
  * then the given cutoff value.
  *
  * \param graph The graph object.
- * \param result The result of the computation, vector containing the
- *        betweenness scores for the edges.
- * \param directed If true directed paths will be considered
- *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted
  *        betweenness. No edge weight may be NaN. Supply a null
  *        pointer here for unweighted betweenness.
+ * \param res The result of the computation, vector containing the
+ *        betweenness scores for the edges.
+ * \param directed If true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param normalized Whether to normalize betweenness scores. Normalization is
+ *        currently unimplemented, and setting this to \c true raises an error.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated (no
  *        upper limit on path lengths).
@@ -768,9 +784,12 @@ igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *r
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_betweenness_cutoff() to compute the range-limited vertex betweenness.
  */
-igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
-                                   igraph_bool_t directed,
-                                   const igraph_vector_t *weights, igraph_real_t cutoff) {
+igraph_error_t igraph_edge_betweenness_cutoff(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *res,
+        igraph_bool_t directed, igraph_bool_t normalized,
+        igraph_real_t cutoff) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_inclist_t inclist, parents;
@@ -780,6 +799,10 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
     igraph_stack_int_t S;
+
+    if (normalized) {
+        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+    }
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
@@ -804,8 +827,8 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
     IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
 
-    IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
-    igraph_vector_null(result);
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges));
+    igraph_vector_null(res);
 
     for (source = 0; source < no_of_nodes; source++) {
 
@@ -840,7 +863,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
                 igraph_integer_t fedge = VECTOR(*fatv)[j];
                 igraph_integer_t neighbor = IGRAPH_OTHER(graph, fedge, actnode);
                 tmpscore[neighbor] += nrgeo[neighbor] * coeff;
-                VECTOR(*result)[fedge] += nrgeo[neighbor] * coeff;
+                VECTOR(*res)[fedge] += nrgeo[neighbor] * coeff;
             }
 
             /* Reset variables to ensure that the 'for' loop invariant will
@@ -854,7 +877,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
     } /* source < no_of_nodes */
 
     if (!directed || !igraph_is_directed(graph)) {
-        igraph_vector_scale(result, 0.5);
+        igraph_vector_scale(res, 0.5);
     }
 
     IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
@@ -880,19 +903,21 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
  * source and target subset.
  *
  * \param graph The graph object.
+ * \param weights An optional vector containing edge weights for
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \param res The result of the computation, a vector containing the
  *         betweenness score for the subset of vertices.
- * \param vids The vertices for which the subset-limited betweenness centrality
- *        scores will be computed.
- * \param directed If true directed paths will be considered
- *        for directed graphs. It is ignored for undirected graphs.
  * \param sources A vertex selector for the sources of the shortest paths taken
  *        into considuration in the betweenness calculation.
  * \param targets A vertex selector for the targets of the shortest paths taken
  *        into considuration in the betweenness calculation.
- * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. No edge weight may be NaN.
- *        Supply a null pointer here for unweighted betweenness.
+ * \param vids The vertices for which the subset-limited betweenness centrality
+ *        scores will be computed.
+ * \param directed If true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param normalized Whether to normalize betweenness scores. Normalization is
+ *        currently unimplemented, and setting this to \c true raises an error.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids,
@@ -906,10 +931,12 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
  * \ref igraph_betweenness_cutoff() to calculate the range-limited vertex
  * betweenness.
  */
-igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
-                              const igraph_vs_t vids, igraph_bool_t directed,
-                              const igraph_vs_t sources, const igraph_vs_t targets,
-                              const igraph_vector_t *weights) {
+igraph_error_t igraph_betweenness_subset(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *res,
+        igraph_vs_t sources, igraph_vs_t targets,
+        igraph_vs_t vids,
+        igraph_bool_t directed, igraph_bool_t normalized) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -927,6 +954,10 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
     igraph_real_t *tmpscore;
     igraph_vit_t vit;
     bool *is_target;
+
+    if (normalized) {
+        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+    }
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
@@ -1100,19 +1131,21 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
  * source and target subset.
  *
  * \param graph The graph object.
+ * \param weights An optional weight vector for weighted
+ *        betweenness. No edge weight may be NaN. Supply a null
+ *        pointer here for unweighted betweenness.
  * \param res The result of the computation, vector containing the
  *        betweenness scores for the edges.
- * \param eids The edges for which the subset-limited betweenness centrality
- *        scores will be computed.
- * \param directed If true directed paths will be considered
- *        for directed graphs. It is ignored for undirected graphs.
  * \param sources A vertex selector for the sources of the shortest paths taken
  *        into considuration in the betweenness calculation.
  * \param targets A vertex selector for the targets of the shortest paths taken
  *        into considuration in the betweenness calculation.
- * \param weights An optional weight vector for weighted
- *        betweenness. No edge weight may be NaN. Supply a null
- *        pointer here for unweighted betweenness.
+ * \param eids The edges for which the subset-limited betweenness centrality
+ *        scores will be computed.
+ * \param directed If true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param normalized Whether to normalize betweenness scores. Normalization is
+ *        currently unimplemented, and setting this to \c true raises an error.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p sources or \p targets
@@ -1124,10 +1157,13 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_edge_betweenness_cutoff() to compute the range-limited edge betweenness.
  */
-igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
-                                   const igraph_es_t eids, igraph_bool_t directed,
-                                   const igraph_vs_t sources, const igraph_vs_t targets,
-                                   const igraph_vector_t *weights) {
+igraph_error_t igraph_edge_betweenness_subset(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *res,
+        igraph_vs_t sources, igraph_vs_t targets,
+        igraph_es_t eids,
+        igraph_bool_t directed, igraph_bool_t normalized) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_sources;
@@ -1143,6 +1179,10 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
     igraph_integer_t source, j;
     bool *is_target;
     igraph_stack_int_t S;
+
+    if (normalized) {
+        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+    }
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
