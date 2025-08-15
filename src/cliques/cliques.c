@@ -302,7 +302,7 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
                             const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res,
                             igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     if (vertex_weights) {
-        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
+        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal, -1);
     } else if (maximal) {
         return igraph_maximal_cliques(graph, res, min_weight, max_weight);
     } else {
