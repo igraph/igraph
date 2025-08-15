@@ -126,21 +126,21 @@ int main(void) {
         2,2
     };
 
-    igraph_real_t points_colinear[] = {
+    igraph_real_t points_collinear[] = {
         0,0,
         2,0,
         0,2,
         1,0
     };
 
-    igraph_real_t points_not_quite_colinear[] = {
+    igraph_real_t points_not_quite_collinear[] = {
         0,0,
         2,0,
         0,2,
         1,0.0000000001
     };
 
-    igraph_real_t points_all_colinear[] = {
+    igraph_real_t points_all_collinear[] = {
         1,1,
         2,2,
         3,3,
@@ -174,14 +174,14 @@ int main(void) {
     delaunay(points_lattice, PTCOUNT(points_lattice, 2), 2, true);
 
     printf("Triangle with one subdivided edge\n");
-    delaunay(points_colinear, PTCOUNT(points_colinear, 2), 2, true);
+    delaunay(points_collinear, PTCOUNT(points_collinear, 2), 2, true);
 
     printf("Triangle with one subdivided edge, point then slightly perturbed\n");
-    delaunay(points_not_quite_colinear, PTCOUNT(points_not_quite_colinear, 2), 2, true);
+    delaunay(points_not_quite_collinear, PTCOUNT(points_not_quite_collinear, 2), 2, true);
 
     /* TODO: Planned to be supported without error in the future. */
     printf("4 points on a line in 2d\n");
-    CHECK_ERROR(delaunay(points_all_colinear, PTCOUNT(points_all_colinear, 2), 2, true), IGRAPH_EINVAL);
+    CHECK_ERROR(delaunay(points_all_collinear, PTCOUNT(points_all_collinear, 2), 2, true), IGRAPH_EINVAL);
 
     /* TODO: Planned to be supported without error in the future. */
     printf("4 points on a plane in 3d\n");
