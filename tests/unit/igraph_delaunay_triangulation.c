@@ -147,6 +147,13 @@ int main(void) {
         4,4,
     };
 
+    igraph_real_t points_all_coplanar[] = {
+            0., 0., 0.,
+            -0.9852739637886722, 0.00098610486426615, 0.17098024411421095,
+            0.14677925443983744, 0.5177782140612408, 0.842829503226861,
+            -0.8384947093488347, 0.518764318925507, 1.0138097473410719
+    };
+
     igraph_real_t points_duplicate[] ={
         1,1,
         0,1,
@@ -172,8 +179,13 @@ int main(void) {
     printf("Triangle with one subdivided edge, point then slightly perturbed\n");
     delaunay(points_not_quite_colinear, PTCOUNT(points_not_quite_colinear, 2), 2, true);
 
-    printf("4 points on a line\n");
-    CHECK_ERROR(delaunay(points_all_colinear, PTCOUNT(points_all_colinear, 2), 2, true),IGRAPH_EINVAL);
+    /* TODO: Planned to be supported without error in the future. */
+    printf("4 points on a line in 2d\n");
+    CHECK_ERROR(delaunay(points_all_colinear, PTCOUNT(points_all_colinear, 2), 2, true), IGRAPH_EINVAL);
+
+    /* TODO: Planned to be supported without error in the future. */
+    printf("4 points on a plane in 3d\n");
+    CHECK_ERROR(delaunay(points_all_coplanar, PTCOUNT(points_all_coplanar, 3), 3, true), IGRAPH_EINVAL);
 
     printf("One point in 2d\n");
     delaunay(points_raw, 1, 2, true);
