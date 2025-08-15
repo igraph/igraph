@@ -206,7 +206,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         /* TODO: More specific error descriptions for common Qhull errors. */
         default:
             /* TODO: Report Qhull error text? */
-            IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
+            IGRAPH_ERRORF("Error while computing Delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
 
