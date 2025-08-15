@@ -206,7 +206,7 @@ igraph_i_fundamental_cycles_bfs(
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_vector_int_list_t *result,
                                          igraph_integer_t start_vid,
-                                         igraph_integer_t bfs_cutoff,
+                                         igraph_real_t bfs_cutoff,
                                          const igraph_vector_t *weights) {
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -416,7 +416,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_vector_int_list_t *result,
-                                          igraph_integer_t bfs_cutoff,
+                                          igraph_real_t bfs_cutoff,
                                           igraph_bool_t complete,
                                           igraph_bool_t use_cycle_order,
                                           const igraph_vector_t *weights) {

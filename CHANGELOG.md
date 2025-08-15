@@ -73,6 +73,7 @@
  - The `history` parameter of `igraph_community_leading_eigenvector()` is now a pointer to an `igraph_vector_int_t` instead of an `igraph_vector_t`.
  - `igraph_matrix_copy_to()` gained an `igraph_matrix_storage_t storage` parameter that specifies whether the data should be written in column-major or row-major format.
  - `igraph_sbm_game()` gained a `multiple` parameter and now supports generating multigraph with prescribed expected edge multiplicities. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
+ - The `bfs_cutoff` parameter of the experimental functions `igraph_fundamental_cycles()` and `igraph_minimum_cycle_basis()` is now of type `igraph_real_t`.
 
 ### Added
 
