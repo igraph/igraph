@@ -931,7 +931,7 @@ add_legacy_tests(
 # spatial
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_delaunay_triangulation
+  igraph_delaunay_graph
   igraph_nearest_neighbor_graph
 )
 
