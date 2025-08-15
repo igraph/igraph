@@ -91,7 +91,6 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     const igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
     const igraph_integer_t dim = igraph_matrix_ncol(points);
     int exitcode;
-    boolT ismalloc = False; // handle memory allocation of points explicitly
     qhT qh_qh; /* Qhull's data structure. First argument of most Qhull calls. */
     qhT *qh = &qh_qh; /* Convenience pointer. */
 
@@ -160,7 +159,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         qh->MERGEvertices = False; // 'Q3', do not merge identical vertices
 
         qh_initflags(qh, qh->qhull_command);
-        qh_init_B(qh, qhull_points, numpoints, dim, ismalloc); // read points and project them to parabola.
+        qh_init_B(qh, qhull_points, numpoints, dim, /*ismalloc=*/ False); // read points and project them to parabola.
         qh_qhull(qh); // do the triangulation
         qh_triangulate(qh); // this guarantees that everything is simplicial
 
