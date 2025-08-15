@@ -59,7 +59,7 @@
  * \param  adjlist the adjacency list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static igraph_error_t igraph_i_sspf(
+static igraph_error_t sspf(
         igraph_integer_t source,
         igraph_vector_t *dist,
         igraph_real_t *nrgeo,
@@ -139,7 +139,7 @@ static igraph_error_t igraph_i_sspf(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static igraph_error_t igraph_i_sspf_edge(
+static igraph_error_t sspf_edge(
         const igraph_t *graph,
         igraph_integer_t source,
         igraph_vector_t *dist,
@@ -222,7 +222,7 @@ static igraph_error_t igraph_i_sspf_edge(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static igraph_error_t igraph_i_sspf_weighted(
+static igraph_error_t sspf_weighted(
         const igraph_t *graph,
         igraph_integer_t source,
         igraph_vector_t *dist,
@@ -331,7 +331,7 @@ static igraph_error_t igraph_i_sspf_weighted(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static igraph_error_t igraph_i_sspf_weighted_edge(
+static igraph_error_t sspf_weighted_edge(
         const igraph_t *graph,
         igraph_integer_t source,
         igraph_vector_t *dist,
@@ -422,7 +422,7 @@ static igraph_error_t igraph_i_sspf_weighted_edge(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_betweenness_check_weights(
+static igraph_error_t betweenness_check_weights(
     const igraph_vector_t* weights, igraph_integer_t no_of_edges
 ) {
     igraph_real_t minweight;
@@ -575,7 +575,7 @@ igraph_error_t igraph_betweenness_cutoff(
         IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
+    IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
     if (weights) {
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
@@ -627,9 +627,9 @@ igraph_error_t igraph_betweenness_cutoff(
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, cutoff));
+            IGRAPH_CHECK(sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, cutoff));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &parents, &adjlist, cutoff));
+            IGRAPH_CHECK(sspf(source, &dist, nrgeo, &S, &parents, &adjlist, cutoff));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
@@ -804,7 +804,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(
         IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
+    IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -846,9 +846,9 @@ igraph_error_t igraph_edge_betweenness_cutoff(
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, cutoff));
+            IGRAPH_CHECK(sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, cutoff));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &parents, &inclist, cutoff));
+            IGRAPH_CHECK(sspf_edge(graph, source, &dist, nrgeo, &S, &parents, &inclist, cutoff));
         }
 
         /* Aggregate betweenness scores for the edges we have reached in this
@@ -959,7 +959,7 @@ igraph_error_t igraph_betweenness_subset(
         IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
+    IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
@@ -1043,9 +1043,9 @@ igraph_error_t igraph_betweenness_subset(
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
+            IGRAPH_CHECK(sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &parents, &adjlist, -1));
+            IGRAPH_CHECK(sspf(source, &dist, nrgeo, &S, &parents, &adjlist, -1));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
@@ -1184,7 +1184,7 @@ igraph_error_t igraph_edge_betweenness_subset(
         IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
+    IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
@@ -1262,9 +1262,9 @@ igraph_error_t igraph_edge_betweenness_subset(
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
+            IGRAPH_CHECK(sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &parents, &inclist, -1));
+            IGRAPH_CHECK(sspf_edge(graph, source, &dist, nrgeo, &S, &parents, &inclist, -1));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
