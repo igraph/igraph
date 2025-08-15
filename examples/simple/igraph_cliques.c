@@ -81,7 +81,7 @@ void test_callback(const igraph_t *graph) {
     struct userdata ud;
 
     igraph_vector_int_list_init(&list, 0);
-    igraph_cliques(graph, &list, 0, 0);
+    igraph_cliques(graph, &list, 0, 0, -1);
 
     ud.i = 0;
     ud.list = &list;
@@ -111,7 +111,7 @@ int main(void) {
 
     for (j = 0; j < sizeof(params) / (2 * sizeof(params[0])); j++) {
         if (params[2 * j + 1] != 0) {
-            igraph_cliques(&g, &result, params[2 * j], params[2 * j + 1]);
+            igraph_cliques(&g, &result, params[2 * j], params[2 * j + 1], -1);
         } else {
             igraph_largest_cliques(&g, &result);
         }
@@ -132,7 +132,7 @@ int main(void) {
     igraph_destroy(&g);
 
     igraph_kary_tree(&g, 5, 2, IGRAPH_TREE_OUT);
-    igraph_cliques(&g, &result, 5, 5);
+    igraph_cliques(&g, &result, 5, 5, -1);
     if (igraph_vector_int_list_size(&result) != 0) {
         return 1;
     }
