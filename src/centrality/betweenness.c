@@ -423,24 +423,25 @@ static igraph_error_t sspf_weighted_edge(
 }
 
 static igraph_error_t betweenness_check_weights(
-    const igraph_vector_t* weights, igraph_integer_t no_of_edges
+    const igraph_vector_t *weights, igraph_integer_t no_of_edges
 ) {
     igraph_real_t minweight;
 
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length must match the number of edges.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Edge weight vector length must match the number of edges.", IGRAPH_EINVAL);
         }
         if (no_of_edges > 0) {
             minweight = igraph_vector_min(weights);
             if (minweight <= 0) {
-                IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge weights must be positive for betweenness.", IGRAPH_EINVAL);
             } else if (isnan(minweight)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge weights must not contain NaN values.", IGRAPH_EINVAL);
             } else if (minweight <= IGRAPH_SHORTEST_PATH_EPSILON) {
-                IGRAPH_WARNING(
-                    "Some weights are smaller than epsilon, calculations may "
-                    "suffer from numerical precision issues."
+                IGRAPH_WARNINGF(
+                    "Some weights are smaller than the path length comparison tolerance (%g), "
+                    "betweenness calculations may suffer from numerical precision issues.",
+                    IGRAPH_SHORTEST_PATH_EPSILON
                 );
             }
         }
