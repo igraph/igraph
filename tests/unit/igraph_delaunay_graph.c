@@ -187,6 +187,11 @@ int main(void) {
     printf("4 points on a plane in 3d\n");
     CHECK_ERROR(delaunay(points_all_coplanar, PTCOUNT(points_all_coplanar, 3), 3, true), IGRAPH_EINVAL);
 
+    printf("Identical points\n");
+    CHECK_ERROR(delaunay(points_duplicate, PTCOUNT(points_duplicate, 2), 2,false), IGRAPH_EINVAL);
+
+    /* The below coordinate arrays are used only partially, hence no PTCOUNT */
+
     printf("One point in 2d\n");
     delaunay(points_raw, 1, 2, true);
 
@@ -202,8 +207,9 @@ int main(void) {
     printf("4 points in 3d\n");
     delaunay(point_cloud_3d, 4, 3, true);
 
-    printf("Identical points\n");
-    CHECK_ERROR(delaunay(points_duplicate, PTCOUNT(points_duplicate, 2), 2,false), IGRAPH_EINVAL);
+    /* TODO: Planned to be supported without error in the future. */
+    printf("3 points in 3d\n");
+    CHECK_ERROR(delaunay(point_cloud_3d, 3, 3, true), IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();
 
