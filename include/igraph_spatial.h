@@ -41,6 +41,13 @@ IGRAPH_EXPORT igraph_error_t igraph_circle_beta_skeleton(
     igraph_real_t beta
 );
 
+IGRAPH_EXPORT igraph_error_t igraph_beta_weighted_gabriel_graph(
+    igraph_t * graph,
+    igraph_vector_t *edge_weights,
+    const igraph_matrix_t *points,
+    igraph_real_t max_beta
+);
+
 /**
  * \typedef igraph_metric_t
  * \brief Metric functions for use with spatial computation.
