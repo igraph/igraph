@@ -2249,8 +2249,18 @@ igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector)
  */
 
 void FUNCTION(igraph_vector, scale)(TYPE(igraph_vector) *v, BASE by) {
-    igraph_integer_t i;
-    for (i = 0; i < FUNCTION(igraph_vector, size)(v); i++) {
+    const igraph_integer_t n = FUNCTION(igraph_vector, size)(v);
+#ifdef EQ
+    const BASE one = ONE;
+    if (EQ(by, one)) {
+        return;
+    }
+#else
+    if (by == ONE) {
+        return;
+    }
+#endif
+    for (igraph_integer_t i = 0; i < n; i++) {
 #ifdef PROD
         PROD(VECTOR(*v)[i], VECTOR(*v)[i], by);
 #else
@@ -2272,8 +2282,18 @@ void FUNCTION(igraph_vector, scale)(TYPE(igraph_vector) *v, BASE by) {
  */
 
 void FUNCTION(igraph_vector, add_constant)(TYPE(igraph_vector) *v, BASE plus) {
-    igraph_integer_t i, n = FUNCTION(igraph_vector, size)(v);
-    for (i = 0; i < n; i++) {
+    const igraph_integer_t n = FUNCTION(igraph_vector, size)(v);
+#ifdef EQ
+    const BASE zero = ZERO;
+    if (EQ(plus, zero)) {
+        return;
+    }
+#else
+    if (plus == ZERO) {
+        return;
+    }
+#endif
+    for (igraph_integer_t i = 0; i < n; i++) {
 #ifdef SUM
         SUM(VECTOR(*v)[i], VECTOR(*v)[i], plus);
 #else
