@@ -215,7 +215,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 
 
 /**
- * \function igraph_delaunay_triangulation
+ * \function igraph_delaunay_graph
  * \brief Computes the Delaunay graph of a spatial point set.
  *
  * \experimental
