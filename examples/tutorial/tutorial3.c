@@ -39,8 +39,8 @@ int main(void) {
            (double) igraph_vector_max(&result_real),
            igraph_vector_which_max(&result_real));
 
-    igraph_betweenness(&graph, &result_real, igraph_vss_all(),
-                       IGRAPH_UNDIRECTED, /* weights= */ NULL);
+    igraph_betweenness(&graph, /* weights= */ NULL, &result_real, igraph_vss_all(),
+                       IGRAPH_UNDIRECTED, false);
     printf("Maximum betweenness is %10g, vertex %2" IGRAPH_PRId ".\n",
            (double) igraph_vector_max(&result_real),
            igraph_vector_which_max(&result_real));

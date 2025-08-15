@@ -46,7 +46,7 @@ void test_bug950(void) {
 
     igraph_vector_init(&eb, 0);
 
-    igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
+    igraph_edge_betweenness(&g, &weights, &eb, IGRAPH_UNDIRECTED, false);
     print_vector(&eb);
 
     igraph_vector_destroy(&eb);
@@ -68,8 +68,8 @@ void test_bug1050(void) {
     igraph_vector_init(&eb, igraph_ecount(&g));
     igraph_vector_init(&eb2, igraph_ecount(&g));
 
-    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /* weights */ 0, /* cutoff */ -1);
-    igraph_edge_betweenness_cutoff(&g, &eb2, IGRAPH_UNDIRECTED, /* weights */ 0, /* cutoff */ 0);
+    igraph_edge_betweenness_cutoff(&g, /* weights */ 0, &eb, IGRAPH_UNDIRECTED, false, /* cutoff */ -1);
+    igraph_edge_betweenness_cutoff(&g, /* weights */ 0, &eb2, IGRAPH_UNDIRECTED, false, /* cutoff */ 0);
 
     /* results must differ */
     IGRAPH_ASSERT(! igraph_vector_all_e(&eb, &eb2));
@@ -85,8 +85,8 @@ void test_bug1050(void) {
     igraph_vector_fill(&weights, 1);
     VECTOR(weights)[0] = 2;
 
-    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, &weights, /* cutoff */ -1);
-    igraph_edge_betweenness_cutoff(&g, &eb2, IGRAPH_UNDIRECTED, &weights, /* cutoff */ 0);
+    igraph_edge_betweenness_cutoff(&g, &weights, &eb, IGRAPH_UNDIRECTED, false, /* cutoff */ -1);
+    igraph_edge_betweenness_cutoff(&g, &weights, &eb2, IGRAPH_UNDIRECTED, false, /* cutoff */ 0);
 
     /* results must differ */
     IGRAPH_ASSERT(! igraph_vector_all_e(&eb, &eb2));
@@ -107,13 +107,13 @@ int main(void) {
 
     printf("Null graph\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, NULL);
+    igraph_edge_betweenness(&g, NULL, &eb, IGRAPH_UNDIRECTED, false);
     print_vector(&eb);
     igraph_destroy(&g);
 
     printf("\nEdgeless graph on 3 vertices\n");
     igraph_empty(&g, 3, IGRAPH_DIRECTED);
-    igraph_edge_betweenness(&g, &eb, IGRAPH_DIRECTED, NULL);
+    igraph_edge_betweenness(&g, NULL, &eb, IGRAPH_DIRECTED, false);
     print_vector(&eb);
     igraph_destroy(&g);
 
@@ -122,14 +122,14 @@ int main(void) {
     printf("\nNo cutoff, undirected, unweighted\n");
     igraph_famous(&g, "zachary");
     igraph_vector_init(&eb, 0);
-    igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
+    igraph_edge_betweenness(&g, /*weights=*/ 0, &eb, IGRAPH_UNDIRECTED, false);
     print_vector(&eb);
 
     printf("\nNo cutoff, undirected, unit weighted\n");
     igraph_vector_init(&eb2, 0);
     igraph_vector_init(&weights, igraph_ecount(&g));
     igraph_vector_fill(&weights, 1.0);
-    igraph_edge_betweenness(&g, &eb2, IGRAPH_UNDIRECTED, &weights);
+    igraph_edge_betweenness(&g, &weights, &eb2, IGRAPH_UNDIRECTED, false);
     print_vector(&eb2);
 
     /* check that weighted and unweighted calculations give the same result */
@@ -148,7 +148,7 @@ int main(void) {
                  1,0, 2,0, 0,3, 3,4, 4,5, 5,0, 5,6,
                  -1);
     igraph_vector_init(&eb, 0);
-    igraph_edge_betweenness(&g, &eb, IGRAPH_DIRECTED, /* weights */ NULL);
+    igraph_edge_betweenness(&g, /* weights */ NULL, &eb, IGRAPH_DIRECTED, false);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
@@ -157,7 +157,7 @@ int main(void) {
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, 0);
-    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
+    igraph_edge_betweenness_cutoff(&g, /*weights=*/ 0, &eb, IGRAPH_UNDIRECTED, false, /*cutoff=*/2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
@@ -167,7 +167,7 @@ int main(void) {
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
                  6, 7, 7, 8, -1);
     igraph_vector_init(&eb, 0);
-    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0, /*cutoff=*/2);
+    igraph_edge_betweenness_cutoff(&g, /*weights=*/ 0, &eb, IGRAPH_UNDIRECTED, false, /*cutoff=*/2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
@@ -176,9 +176,9 @@ int main(void) {
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 1, 2, 1, 1, 2, 3, 3, 0, 3, 3, -1);
     igraph_vector_init(&eb, 0);
     igraph_edge_betweenness(/* graph=     */ &g,
+            /* weights=   */ 0,
             /* res=       */ &eb,
-            /* directed = */ IGRAPH_UNDIRECTED,
-            /* weights=   */ 0);
+            /* directed = */ IGRAPH_UNDIRECTED, false);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);

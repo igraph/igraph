@@ -49,13 +49,17 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_init(&v, 0);
             igraph_vector_int_init(&iv, 0);
 
-            igraph_betweenness_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL, 4);
-            igraph_betweenness_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_DIRECTED, NULL, 5);
-            igraph_edge_betweenness_cutoff(&graph, &v, IGRAPH_DIRECTED, NULL, 4);
-            igraph_edge_betweenness_cutoff(&graph, &v, IGRAPH_UNDIRECTED, NULL, 3);
+            igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
+            igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
+            igraph_edge_betweenness_cutoff(&graph, NULL, &v, IGRAPH_DIRECTED, false, 4);
+            igraph_edge_betweenness_cutoff(&graph, NULL, &v, IGRAPH_UNDIRECTED, false, 3);
             if (igraph_vcount(&graph) >= 10) {
-                igraph_betweenness_subset(&graph, &v, igraph_vss_all(), IGRAPH_DIRECTED, igraph_vss_range(0,5), igraph_vss_range(5,10), NULL);
-                igraph_edge_betweenness_subset(&graph, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED, igraph_vss_range(0,10), igraph_vss_range(0,10), NULL);
+                igraph_betweenness_subset(&graph, NULL, &v,
+                                          igraph_vss_range(0,5), igraph_vss_range(5,10),
+                                          igraph_vss_all(), IGRAPH_DIRECTED, false);
+                igraph_edge_betweenness_subset(&graph, NULL, &v,
+                                               igraph_vss_range(0,10), igraph_vss_range(0,10),
+                                               igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED, false);
             }
             igraph_closeness_cutoff(&graph, &v, &iv, &b, igraph_vss_all(), IGRAPH_ALL, NULL, true, 3);
             igraph_closeness_cutoff(&graph, &v, &iv, &b, igraph_vss_all(), IGRAPH_OUT, NULL, true, 4);

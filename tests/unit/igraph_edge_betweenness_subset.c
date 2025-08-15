@@ -49,12 +49,12 @@ void test_bug950_edge(void) {
     igraph_vector_init(&eb, 0);
 
     igraph_edge_betweenness_subset(/* graph=     */ &g,
-        /* res=       */ &eb,
-        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ igraph_vss_all(),
-        /* target = */ igraph_vss_all(),
-        /* weights=   */ &weights);
+            /* weights=   */ &weights,
+            /* res=       */ &eb,
+            /* sources = */ igraph_vss_all(),
+            /* target = */ igraph_vss_all(),
+            /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     print_vector(&eb);
     igraph_vector_destroy(&eb);
@@ -103,14 +103,13 @@ int main(void) {
     igraph_vector_init(&bet, 0);
 
     igraph_edge_betweenness_subset(
-        /* graph=     */ &g,
-        /* res=       */ &bet,
-        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources =  */ vs_source,
-        /* target =   */ vs_target,
-        /* weights=   */ NULL
-    );
+            /* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &bet,
+            /* sources =  */ vs_source,
+            /* target =   */ vs_target,
+            /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     printf("Max edge betweenness: %f\n", igraph_vector_max(&bet));
 
@@ -161,14 +160,13 @@ int main(void) {
     igraph_vector_fill(&weights, 1.0);
 
     igraph_edge_betweenness_subset(
-        /* graph=     */ &g,
-        /* res=       */ &bet2,
-        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ vs_source,
-        /* target = */ vs_target,
-        /* weights=   */ &weights
-    );
+            /* graph=     */ &g,
+            /* weights=   */ &weights,
+            /* res=       */ &bet2,
+            /* sources = */ vs_source,
+            /* target = */ vs_target,
+            /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
 
@@ -188,13 +186,13 @@ int main(void) {
     igraph_vs_vector(&vs_target, &target_vec);
     igraph_vector_init(&eb, 0);
 
-    igraph_edge_betweenness_subset (/* graph=     */ &g,
-    /* res=       */ &eb,
-    /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-    /* directed = */ IGRAPH_UNDIRECTED,
-    /* sources = */ vs_source,
-    /* target = */ vs_target,
-    /* weights=   */ NULL);
+    igraph_edge_betweenness_subset(/* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &eb,
+            /* sources = */ vs_source,
+            /* target = */ vs_target,
+            /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     print_vector(&eb);
     igraph_vector_destroy(&eb);
@@ -214,13 +212,13 @@ int main(void) {
     igraph_es_vector(&es, &node_vec);
     igraph_vector_int_init_range(&target_vec, 1, 5);
     igraph_vs_vector(&vs_target, &target_vec);
-    igraph_edge_betweenness_subset (/* graph=     */ &g,
-        /* res=       */ &eb,
-        /* eids=      */ es,
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ igraph_vss_all(),
-        /* target = */ vs_target,
-        /* weights=   */ NULL);
+    igraph_edge_betweenness_subset(/* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &eb,
+            /* sources = */ igraph_vss_all(),
+            /* target = */ vs_target,
+            /* eids=      */ es,
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     print_vector(&eb);
     igraph_vector_destroy(&eb);
@@ -239,13 +237,13 @@ int main(void) {
     igraph_vector_int_init_range(&source_vec, 1, 9);
     igraph_vs_vector(&vs_source, &source_vec);
 
-    igraph_edge_betweenness_subset (/* graph=     */ &g,
-        /* res=       */ &eb,
-        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ vs_source,
-        /* target = */ igraph_vss_all(),
-        /* weights=   */ NULL);
+    igraph_edge_betweenness_subset(/* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &eb,
+            /* sources = */ vs_source,
+            /* target = */ igraph_vss_all(),
+            /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_vs_destroy(&vs_source);
@@ -259,13 +257,13 @@ int main(void) {
     igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
 
     igraph_vector_init(&bet, 0);
-    igraph_edge_betweenness_subset (/* graph=     */ &g,
-        /* res=       */ &bet,
-        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ igraph_vss_all(),
-        /* target = */ igraph_vss_all(),
-        /* weights=   */ NULL);
+    igraph_edge_betweenness_subset(/* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &bet,
+            /* sources = */ igraph_vss_all(),
+            /* target = */ igraph_vss_all(),
+            /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
     print_vector(&bet);
     igraph_vector_destroy(&bet);
 
@@ -291,13 +289,13 @@ int main(void) {
         igraph_vector_int_remove(&source_vec, 0);
         igraph_vs_vector(&vs_source, &source_vec);
 
-        igraph_edge_betweenness_subset (/* graph=     */ &g,
-        /* res=       */ &bet,
-        /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ vs_source,
-        /* target = */ vs_target,
-        /* weights=   */ NULL);
+        igraph_edge_betweenness_subset(/* graph=     */ &g,
+                /* weights=   */ NULL,
+                /* res=       */ &bet,
+                /* sources = */ vs_source,
+                /* target = */ vs_target,
+                /* eids=      */ igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                /* directed = */ IGRAPH_UNDIRECTED, false);
         printf("Max edge betweenness: %f\n", igraph_vector_max(&bet));
 
         igraph_vector_destroy(&bet);
