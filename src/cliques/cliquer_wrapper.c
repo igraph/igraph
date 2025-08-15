@@ -346,7 +346,8 @@ igraph_error_t igraph_i_cliquer_callback(const igraph_t *graph,
 
 igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
                               const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res,
-                              igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
+                              igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal,
+                              igraph_integer_t max_result_count) {
     graph_t *g;
     igraph_int_t vcount = igraph_vcount(graph);
     igraph_i_cliquer_cliques_user_data_t data;
@@ -380,6 +381,11 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
     IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
+    data.max_result_count = max_result_count;
+
+    if (max_result_count == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
