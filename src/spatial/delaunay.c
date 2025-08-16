@@ -30,7 +30,6 @@
 #include "spatial/spatial_internal.h"
 
 #include "qhull/libqhull_r/libqhull_r.h"
-#include "qhull/libqhull_r/poly_r.h"
 
 /**
  * Raises an error if a spatial point set is invalid.
