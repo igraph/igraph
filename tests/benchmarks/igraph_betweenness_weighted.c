@@ -55,19 +55,19 @@ int main(void) {
 #define REP 100
 
     BENCH(" 1 Betweenness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH(" 2 Betweenness, unweighted, " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     rand_weight_vec(&weight, &graph);
 
     BENCH(" 3 Betweenness, weighted,   " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH(" 4 Betweenness, weighted,   " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     igraph_destroy(&graph);
@@ -81,19 +81,19 @@ int main(void) {
     igraph_de_bruijn(&graph, 5, 5);
 
     BENCH(" 5 Betweenness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH(" 6 Betweenness, unweighted, " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     rand_weight_vec(&weight, &graph);
 
     BENCH(" 7 Betweenness, weighted,   " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH(" 8 Betweenness, weighted,   " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     igraph_destroy(&graph);
@@ -112,19 +112,19 @@ int main(void) {
     igraph_erdos_renyi_game_gnm(&graph, 3000, 10000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
 
     BENCH(" 9 Betweenness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH("10 Betweenness, unweighted, " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     rand_weight_vec(&weight, &graph);
 
     BENCH("11 Betweenness, weighted,   " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH("12 Betweenness, weighted,   " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     igraph_destroy(&graph);
@@ -140,19 +140,19 @@ int main(void) {
     igraph_erdos_renyi_game_gnm(&graph, 3000, 30000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
 
     BENCH("13 Betweenness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH("14 Betweenness, unweighted, " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL), REP)
+          REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     rand_weight_vec(&weight, &graph);
 
     BENCH("15 Betweenness, weighted,   " NAME ", directed, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
     );
     BENCH("16 Betweenness, weighted,   " NAME ", undirected, " TOSTR(REP) "x",
-          REPEAT(igraph_betweenness(&graph, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, &weight), REP)
+          REPEAT(igraph_betweenness(&graph, &weight, &betweenness, igraph_vss_all(), IGRAPH_UNDIRECTED, false), REP)
     );
 
     igraph_destroy(&graph);

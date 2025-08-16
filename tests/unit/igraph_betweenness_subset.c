@@ -63,12 +63,12 @@ int main(void) {
     igraph_vs_range(&vs_target, 500, 1000);
 
     igraph_betweenness_subset(/* graph=     */ &g,
-        /* res=       */ &bet,
-        /* vids=      */ igraph_vss_all(),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ vs_source,
-        /* target = */ vs_target,
-        /* weights=   */ NULL);
+            /* weights=   */ NULL,
+            /* res=       */ &bet,
+            /* sources = */ vs_source,
+            /* target = */ vs_target,
+            /* vids=      */ igraph_vss_all(),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     igraph_vector_destroy(&bet);
     igraph_vs_destroy(&vs_source);
@@ -103,14 +103,13 @@ int main(void) {
     igraph_vector_init(&bet, 0);
 
     igraph_betweenness_subset(
-        /* graph=     */ &g,
-        /* res=       */ &bet,
-        /* vids=      */ igraph_vss_all(),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources =  */ vs_source,
-        /* target =   */ vs_target,
-        /* weights=   */ NULL
-    );
+            /* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &bet,
+            /* sources =  */ vs_source,
+            /* target =   */ vs_target,
+            /* vids=      */ igraph_vss_all(),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     printf("Max betweenness: %f\n", igraph_vector_max(&bet));
 
@@ -159,12 +158,12 @@ int main(void) {
     igraph_vector_fill(&weights, 1.0);
 
     igraph_betweenness_subset(/* graph=     */ &g,
+            /* weights=   */ &weights,
             /* res=       */ &bet2,
-            /* vids=      */ igraph_vss_all(),
-            /* directed = */ IGRAPH_UNDIRECTED,
             /* sources = */ vs_source,
             /* target = */ vs_target,
-            /* weights=   */ &weights);
+            /* vids=      */ igraph_vss_all(),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     IGRAPH_ASSERT(igraph_vector_all_e(&bet, &bet2));
 
@@ -184,12 +183,12 @@ int main(void) {
 
     igraph_vector_init(&bet, 0);
     igraph_betweenness_subset(/* graph=     */ &g,
-        /* res=       */ &bet,
-        /* vids=      */ igraph_vss_all(),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ igraph_vss_all(),
-        /* target = */ igraph_vss_all(),
-        /* weights=   */ &weights);
+            /* weights=   */ &weights,
+            /* res=       */ &bet,
+            /* sources = */ igraph_vss_all(),
+            /* target = */ igraph_vss_all(),
+            /* vids=      */ igraph_vss_all(),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     print_vector(&bet);
 
@@ -219,22 +218,22 @@ int main(void) {
         printf("subset without %" IGRAPH_PRId "\n", i);
         printf("Unweighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet,
-            /* vids=      */ vs,
-            /* directed = */ IGRAPH_UNDIRECTED,
-            /* sources = */ vs_source,
-            /* target = */ igraph_vss_all(),
-            /* weights=   */ NULL);
+                /* weights=   */ NULL,
+                /* res=       */ &bet,
+                /* sources = */ vs_source,
+                /* target = */ igraph_vss_all(),
+                /* vids=      */ vs,
+                /* directed = */ IGRAPH_UNDIRECTED, false);
         print_vector(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet2,
-            /* vids=      */ vs,
-            /* directed = */ IGRAPH_UNDIRECTED,
-            /* sources = */ vs_source,
-            /* target = */ igraph_vss_all(),
-            /* weights */ &weights);
+                /* weights */ &weights,
+                /* res=       */ &bet2,
+                /* sources = */ vs_source,
+                /* target = */ igraph_vss_all(),
+                /* vids=      */ vs,
+                /* directed = */ IGRAPH_UNDIRECTED, false);
         print_vector(&bet2);
         printf("\n");
 
@@ -273,22 +272,22 @@ int main(void) {
         printf("subset without %" IGRAPH_PRId "\n", i);
         printf("Unweighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet,
-            /* vids=      */ igraph_vss_all(),
-            /* directed = */ 0,
-            /* sources = */ igraph_vss_all(),
-            /* target = */ vs_target,
-            /* weights */ NULL);
+                /* weights */ NULL,
+                /* res=       */ &bet,
+                /* sources = */ igraph_vss_all(),
+                /* target = */ vs_target,
+                /* vids=      */ igraph_vss_all(),
+                /* directed = */ 0, false);
         print_vector(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_subset(/* graph=     */ &g,
-            /* res=       */ &bet2,
-            /* vids=      */ igraph_vss_all(),
-            /* directed = */ 0,
-            /* sources = */ igraph_vss_all(),
-            /* target = */ vs_target,
-            /* weights */ &weights);
+                /* weights */ &weights,
+                /* res=       */ &bet2,
+                /* sources = */ igraph_vss_all(),
+                /* target = */ vs_target,
+                /* vids=      */ igraph_vss_all(),
+                /* directed = */ 0, false);
         print_vector(&bet2);
         printf("\n");
 
@@ -305,13 +304,13 @@ int main(void) {
     printf("==========================================================\n");
     igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
     igraph_vector_init(&bet, 0);
-    igraph_betweenness_subset (/* graph=     */ &g,
-        /* res=       */ &bet,
-        /* vids=      */ igraph_vss_all(),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ igraph_vss_all(),
-        /* target = */ igraph_vss_all(),
-        /* weights=   */ NULL);
+    igraph_betweenness_subset(/* graph=     */ &g,
+            /* weights=   */ NULL,
+            /* res=       */ &bet,
+            /* sources = */ igraph_vss_all(),
+            /* target = */ igraph_vss_all(),
+            /* vids=      */ igraph_vss_all(),
+            /* directed = */ IGRAPH_UNDIRECTED, false);
 
     print_vector(&bet);
 
@@ -338,13 +337,13 @@ int main(void) {
         igraph_vector_int_remove(&source_vec, 0);
         igraph_vs_vector(&vs_source, &source_vec);
 
-        igraph_betweenness_subset (/* graph=     */ &g,
-        /* res=       */ &bet,
-        /* vids=      */ igraph_vss_all(),
-        /* directed = */ IGRAPH_UNDIRECTED,
-        /* sources = */ vs_source,
-        /* target = */ vs_target,
-        /* weights=   */ NULL);;
+        igraph_betweenness_subset(/* graph=     */ &g,
+                /* weights=   */ NULL,
+                /* res=       */ &bet,
+                /* sources = */ vs_source,
+                /* target = */ vs_target,
+                /* vids=      */ igraph_vss_all(),
+                /* directed = */ IGRAPH_UNDIRECTED, false);;
         printf("Max betweenness: %f\n", igraph_vector_max(&bet));
 
         igraph_vector_destroy(&bet);

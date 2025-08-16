@@ -31,7 +31,7 @@ int main(void) {
 
     /* Compute the edge betweenness. */
     igraph_vector_init(&eb, igraph_ecount(&graph));
-    igraph_edge_betweenness(&graph, &eb, IGRAPH_UNDIRECTED, /*weights=*/ NULL);
+    igraph_edge_betweenness(&graph, /*weights=*/ NULL, &eb, IGRAPH_UNDIRECTED, false);
 
     /* Use Prim's algorithm to compute the edges that belong to the minimum weight
      * spanning tree, using edge betweenness values as edge weights. */
