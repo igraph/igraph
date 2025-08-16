@@ -16,8 +16,8 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef IGRAPH_SPATIAL_INTERNAL_H_
-#define IGRAPH_SPATIAL_INTERNAL_H_
+#ifndef IGRAPH_SPATIAL_INTERNAL_H
+#define IGRAPH_SPATIAL_INTERNAL_H
 
 #include "igraph_decls.h"
 #include "igraph_error.h"
@@ -31,4 +31,4 @@ igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points);
 
 IGRAPH_END_C_DECLS
 
-#endif // SPATIAL_INTERNAL_H_
+#endif /* IGRAPH_SPATIAL_INTERNAL_H */
