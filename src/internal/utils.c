@@ -159,12 +159,15 @@ igraph_error_t igraph_i_simplify_edge_list(
                      &edge_comparator);
     }
 
-    /* Remove self-loops and duplicate edges from the sorted edge list, in place. */
+    /* Remove self-loops and duplicate edges from the sorted edge list, in place.
+     * i points to the current edge being examined, j points to the last edge copied. */
 
-    igraph_integer_t j = 0;
+    igraph_integer_t j = -2;
     for (igraph_integer_t i = 2 ; i < size; i += 2) {
         if (remove_multiple &&
-            /* If current edge is equal to the previously copied one: */
+            /* If we've already copied some edges, */
+            j != -2 &&
+            /* and the current edge is equal to the previously copied one: */
             VECTOR(*edges)[i] == VECTOR(*edges)[j] &&
             VECTOR(*edges)[i + 1] == VECTOR(*edges)[j + 1])
         {
