@@ -931,6 +931,7 @@ add_legacy_tests(
 # spatial
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_delaunay_graph
   igraph_nearest_neighbor_graph
 )
 
@@ -1014,6 +1015,7 @@ add_benchmarks(
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
+  igraph_delaunay_graph
   igraph_distances
   igraph_ecc
   igraph_induced_subgraph

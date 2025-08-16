@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2008-2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,22 +16,19 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef IGRAPH_INTERNAL_UTILS_H
-#define IGRAPH_INTERNAL_UTILS_H
+#ifndef IGRAPH_SPATIAL_INTERNAL_H
+#define IGRAPH_SPATIAL_INTERNAL_H
 
-#include "igraph_datatype.h"
-#include "igraph_iterators.h"
+#include "igraph_decls.h"
+#include "igraph_error.h"
+#include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-igraph_error_t igraph_i_matrix_subset_vertices(
-        igraph_matrix_t *m,
-        const igraph_t *graph,
-        igraph_vs_t from,
-        igraph_vs_t to);
+IGRAPH_BEGIN_C_DECLS
 
-void igraph_i_simplify_edge_list(
-        igraph_vector_int_t *edges,
-        igraph_bool_t self_loops, igraph_bool_t multi_edges,
-        igraph_bool_t directed);
+igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points);
+igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points);
 
-#endif /* IGRAPH_INTERNAL_UTILS_H */
+IGRAPH_END_C_DECLS
+
+#endif /* IGRAPH_SPATIAL_INTERNAL_H */
