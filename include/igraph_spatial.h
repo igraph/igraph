@@ -28,6 +28,7 @@
 IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points);
+
 /**
  * \typedef igraph_metric_t
  * \brief Metric functions for use with spatial computation.

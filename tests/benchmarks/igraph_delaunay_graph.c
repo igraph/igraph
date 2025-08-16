@@ -20,7 +20,6 @@
 #include <igraph.h>
 
 #include "bench.h"
-#include "igraph_spatial.h"
 
 void bench_delaunay(const char *message, igraph_integer_t point_count, igraph_integer_t dimensions) {
     igraph_matrix_t points;
@@ -35,7 +34,6 @@ void bench_delaunay(const char *message, igraph_integer_t point_count, igraph_in
         }
     }
 
-
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "%s Delaunay triangulation in %dD, n=%6" IGRAPH_PRId,
              message, (int) dimensions, point_count);
@@ -44,17 +42,18 @@ void bench_delaunay(const char *message, igraph_integer_t point_count, igraph_in
 
     igraph_destroy(&g);
     igraph_matrix_destroy(&points);
-
-
 }
 
 int main(void) {
     BENCH_INIT();
     igraph_rng_seed(igraph_rng_default(), 20250814);
+
     bench_delaunay(" 1", 1000000, 1);
     bench_delaunay(" 1", 100000, 2);
     bench_delaunay(" 2", 10000, 3);
     bench_delaunay(" 3", 2000, 4);
     bench_delaunay(" 4", 500, 5);
     bench_delaunay(" 5", 200, 6);
+
+    return 0;
 }

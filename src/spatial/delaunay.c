@@ -32,6 +32,32 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
+/**
+ * Raises an error if a spatial point set is invalid.
+ * The coordinate matrix must have at least one column and must not
+ * contain NaN or infinities.
+ *
+ * \param points Matrix, each row is a spatial point.
+ * \return Error code.
+ */
+igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points) {
+    const igraph_integer_t dim = igraph_matrix_ncol(points);
+    const igraph_integer_t n = igraph_matrix_nrow(points);
+
+    /* Special case: we allow zero columns when there are zero rows, i.e. no points.
+     * Some languages cannot represent size-zero matrices and length-zero point
+     * lists may translate as a 0-by-0 matrix to igraph. */
+    if (dim == 0 && n > 0) {
+        IGRAPH_ERROR("Point sets must not be zero-dimensional.", IGRAPH_EINVAL);
+    }
+
+    if (!igraph_vector_is_all_finite(&points->data)) {
+        IGRAPH_ERROR("Coordinates must not be NaN or infinite.", IGRAPH_EINVAL);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 // Append an undirected clique of the indices in destination to source.
 // Assumes that source is an initialized vector.
 static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
@@ -91,15 +117,13 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     const igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
     const igraph_integer_t dim = igraph_matrix_ncol(points);
     int exitcode;
-    boolT ismalloc = False; // handle memory allocation of points explicitly
-    qhT qh_qh;
-    qhT *qh = &qh_qh;
-    coordT *qhull_points;
+    qhT qh_qh; /* Qhull's data structure. First argument of most Qhull calls. */
+    qhT *qh = &qh_qh; /* Convenience pointer. */
 
-    /* The point matrix must have at least one column, unless it has zero rows. */
-    if (dim == 0 && numpoints > 0) {
-        IGRAPH_ERROR("0 dimensional point sets are not supported.", IGRAPH_EINVAL);
-    }
+    /* Error checks */
+
+    /* Validate point set. */
+    IGRAPH_CHECK(igraph_i_check_spatial_points(points));
 
     /* No edges for one or zero points. */
     if (numpoints <= 1) {
@@ -122,42 +146,56 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
     }
 
-    qhull_points = IGRAPH_CALLOC(dim*numpoints, igraph_real_t);
+    /* Prepare point set in row-major format for Qhull */
+
+    coordT *qhull_points = IGRAPH_CALLOC(dim*numpoints, igraph_real_t);
     IGRAPH_CHECK_OOM(qhull_points, "Insufficient memory for constructing Delaunay graph.");
     IGRAPH_FINALLY(igraph_free, qhull_points);
     igraph_matrix_copy_to(points, qhull_points, IGRAPH_ROW_MAJOR);
 
-    QHULL_LIB_CHECK; /* Check for compatible library */
+    /* Call Qhull.
+     *
+     * This is mainly based on qdelaunay/qdelaun_r.c and qh_new_qhull() in user_r.c.
+     *
+     * Note that output routines in userprintf_r.c are patched to not print
+     * when passing NULL as a file pointer, which is what we do here. */
 
-    qh_init_A(qh, NULL, NULL, NULL, 0, NULL);  /* sets qh->qhull_command */
+    /* Check for compatible library. Not technically necessary, as igraph
+     * vendors Qhull due to the need to override output routines. Would
+     * become necessary if linking to an external Qhull. */
+    QHULL_LIB_CHECK
+
+    /* Initializes qh, sets qh->qhull_command. */
+    qh_init_A(qh, NULL, NULL, NULL, 0, NULL);
     IGRAPH_FINALLY(destroy_qhull, qh);
 
     exitcode = setjmp(qh->errexit);
     if (!exitcode) {
-        // flag setting
         qh->NOerrexit = False;
-        qh_option(qh, "delaunay  Qbbound-last", NULL, NULL);
+
+        /* qh_option() does not change the operation of Qhull. It simply records options to be
+         * output with error messages. Here we manually keep it in sync with the settings below. */
+        qh_option(qh, "delaunay  Qz-infinity-point Q3-no-merge-vertices", NULL, NULL);
+
         qh->PROJECTdelaunay = True; // project points to parabola to calculate delaunay triangulation
         qh->DELAUNAY = True; // 'd'
-        qh->ATinfinity = True; // required for cocircular points, should not mess anything else up
-        qh->MERGEvertices = True; // do not merge identical vertices
+        qh->ATinfinity = True; // 'Qz', required for cocircular points
+        qh->MERGEvertices = False; // 'Q3', do not merge identical vertices
+
         qh_initflags(qh, qh->qhull_command);
-        qh_init_B(qh, qhull_points, numpoints, dim, ismalloc); // read points and project them to parabola.
+        qh_init_B(qh, qhull_points, numpoints, dim, /*ismalloc=*/ False); // read points and project them to parabola.
         qh_qhull(qh); // do the triangulation
         qh_triangulate(qh); // this guarantees that everything is simplicial
 
-
         igraph_vector_int_t simplex;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&simplex, dim + 1); // a simplex in n dimensions has n+1 incident vertices.
-
-        igraph_integer_t curr_vert;
 
         facetT *facet; // required for FORALLfacets
         vertexT *vertex, **vertexp; // required for FOREACHvertex_
 
         FORALLfacets {
             if (!facet->upperdelaunay) {
-                curr_vert = 0;
+                igraph_integer_t curr_vert = 0;
                 FOREACHvertex_(facet->vertices) {
                     VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
                 }
@@ -166,26 +204,31 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         }
         IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, true, true, false));
 
-        // ensure that there are no disconnected vertices, should only happen if there are duplicate points.
+        /* Check if there are any points/vertices that do not appear in the edge list.
+         * This happens when there are duplicate points, as Qhull ignores one of them.
+         * We raise an error when there are duplicates. */
         igraph_integer_t edges_size = igraph_vector_int_size(edges);
-        igraph_bitset_t connected_verts;
+        igraph_bitset_t in_edge_list;
 
-        IGRAPH_BITSET_INIT_FINALLY(&connected_verts, numpoints);
+        IGRAPH_BITSET_INIT_FINALLY(&in_edge_list, numpoints);
         for (igraph_integer_t i = 0; i < edges_size; i++) {
-            IGRAPH_BIT_SET(connected_verts, VECTOR(*edges)[i]);
+            IGRAPH_BIT_SET(in_edge_list, VECTOR(*edges)[i]);
         }
-        if (igraph_bitset_is_any_zero(&connected_verts)) {
+        if (igraph_bitset_is_any_zero(&in_edge_list)) {
             IGRAPH_ERROR("Duplicate points for Delaunay triangulation.", IGRAPH_EINVAL);
         }
-        igraph_bitset_destroy(&connected_verts);
+
+        igraph_bitset_destroy(&in_edge_list);
         igraph_vector_int_destroy(&simplex);
         destroy_qhull(qh);
         igraph_free(qhull_points);
         IGRAPH_FINALLY_CLEAN(4);
     } else {
         switch (qh->last_errcode) {
+        /* TODO: More specific error descriptions for common Qhull errors. */
         default:
-            IGRAPH_ERRORF("Error while computing delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
+            /* TODO: Report Qhull error text? */
+            IGRAPH_ERRORF("Error while computing Delaunay triangulation, Qhull error code %d.", IGRAPH_EINVAL, qh->last_errcode);
         }
     }
 
@@ -194,7 +237,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 
 
 /**
- * \function igraph_delaunay_triangulation
+ * \function igraph_delaunay_graph
  * \brief Computes the Delaunay graph of a spatial point set.
  *
  * \experimental
