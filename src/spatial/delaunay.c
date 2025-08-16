@@ -164,7 +164,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 IGRAPH_CHECK(add_clique(edges, &simplex));
             }
         }
-        IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, false, false, false));
+        IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, true, true, false));
 
         // ensure that there are no disconnected vertices, should only happen if there are duplicate points.
         igraph_integer_t edges_size = igraph_vector_int_size(edges);

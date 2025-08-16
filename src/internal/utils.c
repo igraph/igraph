@@ -133,7 +133,7 @@ static int edge_comparator(const void *a, const void *b) {
  */
 igraph_error_t igraph_i_simplify_edge_list(
         igraph_vector_int_t *edges,
-        igraph_bool_t self_loops, igraph_bool_t multi_edges,
+        igraph_bool_t remove_loops, igraph_bool_t remove_multiple,
         igraph_bool_t directed) {
 
     igraph_integer_t size = igraph_vector_int_size(edges);
@@ -154,33 +154,33 @@ igraph_error_t igraph_i_simplify_edge_list(
     }
 
     /* Sort edge list. Not needed if multi edges are allowed. */
-    if (!multi_edges) {
+    if (remove_multiple) {
         igraph_qsort(VECTOR(*edges), size / 2, 2 * sizeof(igraph_integer_t), &edge_comparator);
     }
 
     /* Remove self-loops and duplicate edges */
 
-    igraph_integer_t last_added = 0;
-    igraph_integer_t skipped = 0;
+    igraph_integer_t last_added = -1;
 
-    if (!self_loops) {
-        for (igraph_integer_t i = 0; i < size; i += 2) {
-            if (VECTOR(*edges)[i] == VECTOR(*edges)[i + 1]) {
-                skipped += 1;
-            } else {
-                break;
-            }
+    for (igraph_integer_t i = 0 ; i < size; i += 2) {
+        if (remove_multiple &&
+            /* If there are no other edges added yet, then there can be no duplicates. */
+            last_added != -1 &&
+            /* This current edge is equal to the last added edge */
+            VECTOR(*edges)[i] == VECTOR(*edges)[2 * last_added] && VECTOR(*edges)[i + 1] == VECTOR(*edges)[2 * last_added + 1]) {
+            /* this edge is a duplicate, and should be skipped */
+            continue;
         }
-    }
 
-    for (igraph_integer_t i = skipped * 2 + 2 ; i < size; i += 2) {
-        if ( !(
-                (!multi_edges && VECTOR(*edges)[i] == VECTOR(*edges)[2 * last_added] && VECTOR(*edges)[i + 1] == VECTOR(*edges)[2 * last_added + 1])
-                || (!self_loops && VECTOR(*edges)[i] == VECTOR(*edges)[i + 1]))) {
-            last_added += 1;
-            VECTOR(*edges)[2 * last_added]      = VECTOR(*edges)[i];
-            VECTOR(*edges)[2 * last_added + 1 ] = VECTOR(*edges)[i + 1];
+        if (remove_loops &&
+            VECTOR(*edges)[i] == VECTOR(*edges)[i + 1]) {
+            /* this edge is a self loop, and should be skipped */
+            continue;
         }
+        // tests have passed, add edge.
+        last_added += 1;
+        VECTOR(*edges)[2 * last_added]      = VECTOR(*edges)[i];
+        VECTOR(*edges)[2 * last_added + 1 ] = VECTOR(*edges)[i + 1];
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(edges, 2 * last_added + 2));
