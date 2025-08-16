@@ -162,7 +162,7 @@ void igraph_i_simplify_edge_list(
      * i points to the current edge being examined, j points to the last edge copied. */
 
     igraph_integer_t j = -2;
-    for (igraph_integer_t i = 2 ; i < size; i += 2) {
+    for (igraph_integer_t i = 0 ; i < size; i += 2) {
         if (remove_multiple &&
             /* If we've already copied some edges, */
             j != -2 &&
