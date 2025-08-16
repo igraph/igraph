@@ -28,6 +28,7 @@
 
 #include "core/exceptions.h"
 #include "core/interruption.h"
+#include "spatial/spatial_internal.h"
 
 #include "nanoflann/nanoflann.hpp"
 
@@ -255,6 +256,8 @@ igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
     if (igraph_matrix_nrow(points) == 0) {
         return igraph_empty(graph, 0, directed);
     }
+
+    IGRAPH_CHECK(igraph_i_check_spatial_points(points));
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
