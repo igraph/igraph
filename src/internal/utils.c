@@ -138,7 +138,7 @@ void igraph_i_simplify_edge_list(
     igraph_integer_t size = igraph_vector_int_size(edges);
 
     if (size == 0 || (!remove_loops && !remove_multiple)) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     /* Canonicalize undirected edges. */
@@ -187,6 +187,4 @@ void igraph_i_simplify_edge_list(
     }
 
     igraph_vector_int_resize(edges, j + 2); /* shrinks */
-
-    return IGRAPH_SUCCESS;
 }
