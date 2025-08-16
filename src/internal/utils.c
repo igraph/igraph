@@ -129,9 +129,8 @@ static int edge_comparator(const void *a, const void *b) {
  * \param self_loops Set to \c false to remove self-loops.
  * \param multi_edges Set to \c false to eliminate multi-edges.
  * \param directed Whether to treat edges as directed.
- * \return Error code.
  */
-igraph_error_t igraph_i_simplify_edge_list(
+void igraph_i_simplify_edge_list(
         igraph_vector_int_t *edges,
         igraph_bool_t remove_loops, igraph_bool_t remove_multiple,
         igraph_bool_t directed) {

@@ -201,7 +201,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
                 IGRAPH_CHECK(add_clique(edges, &simplex));
             }
         }
-        IGRAPH_CHECK(igraph_i_simplify_edge_list(edges, true, true, false));
+        igraph_i_simplify_edge_list(edges, true, true, false);
 
         /* Check if there are any points/vertices that do not appear in the edge list.
          * This happens when there are duplicate points, as Qhull ignores one of them.
