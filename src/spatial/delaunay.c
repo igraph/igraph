@@ -32,6 +32,32 @@
 #include "qhull/libqhull_r/libqhull_r.h"
 #include "qhull/libqhull_r/poly_r.h"
 
+/**
+ * Raises an error if a spatial point set is invalid.
+ * The coordinate matrix must have at least one column and must not
+ * contain NaN or infinities.
+ *
+ * \param points Matrix, each row is a spatial point.
+ * \return Error code.
+ */
+igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points) {
+    const igraph_integer_t dim = igraph_matrix_ncol(points);
+    const igraph_integer_t n = igraph_matrix_nrow(points);
+
+    /* Special case: we allow zero columns when there are zero rows, i.e. no points.
+     * Some languages cannot represent size-zero matrices and length-zero point
+     * lists may translate as a 0-by-0 matrix to igraph. */
+    if (dim == 0 && n > 0) {
+        IGRAPH_ERROR("Point sets must not be zero-dimensional.", IGRAPH_EINVAL);
+    }
+
+    if (!igraph_vector_is_all_finite(&points->data)) {
+        IGRAPH_ERROR("Coordinates must not be NaN or infinite.", IGRAPH_EINVAL);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 // Append an undirected clique of the indices in destination to source.
 // Assumes that source is an initialized vector.
 static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
@@ -96,10 +122,8 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 
     /* Error checks */
 
-    /* The point matrix must have at least one column, unless it has zero rows. */
-    if (dim == 0 && numpoints > 0) {
-        IGRAPH_ERROR("0 dimensional point sets are not supported.", IGRAPH_EINVAL);
-    }
+    /* Validate point set. */
+    IGRAPH_CHECK(igraph_i_check_spatial_points(points));
 
     /* No edges for one or zero points. */
     if (numpoints <= 1) {

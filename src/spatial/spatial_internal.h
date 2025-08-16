@@ -27,6 +27,7 @@
 IGRAPH_BEGIN_C_DECLS
 
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points);
+igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points);
 
 IGRAPH_END_C_DECLS
 
