@@ -264,7 +264,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
  * \return Error code.
  *
  * Time complexity: According to Theorem 3.2 in the Qhull paper,
- * O(n log n) for d <= 3 and O(n^floor(d/2) / floor(d/2)!) where
+ * O(n log n) for d &lt;= 3 and O(n^floor(d/2) / floor(d/2)!) where
  * n is the number of points and d is the dimensionality of the point set.
  */
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
