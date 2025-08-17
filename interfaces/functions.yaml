@@ -2658,8 +2658,12 @@ igraph_tree_game:
 #######################################
 # Spatial
 #######################################
+
 igraph_nearest_neighbor_graph:
     PARAMS: OUT GRAPH graph, MATRIX points, METRIC metric, INTEGER neighbors, REAL cutoff, BOOLEAN directed
+
+igraph_delaunay_graph:
+    PARAMS: OUT GRAPH graph, MATRIX points
 
 #######################################
 # Coloring
