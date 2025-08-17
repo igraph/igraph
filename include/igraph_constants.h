@@ -27,6 +27,15 @@ IGRAPH_BEGIN_C_DECLS
 /* Constants                                          */
 /* -------------------------------------------------- */
 
+/**
+ * \define IGRAPH_UNLIMITED
+ *
+ * A constant signifying that no limitation should be used with various cutoff
+ * or size limit parameters, such as maximum clique size, maximum path length,
+ * etc. Currently defined to <code>-1</code>
+ */
+#define IGRAPH_UNLIMITED (-1)
+
 /* These constants are meant to be used for sake of readability */
 enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
 enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };

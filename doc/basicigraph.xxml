@@ -231,6 +231,7 @@ initialization steps.
 <section id="misc-helper-functions"><title>Miscellaneous macros and helper functions</title>
 <!-- doxrox-include IGRAPH_VCOUNT_MAX -->
 <!-- doxrox-include IGRAPH_ECOUNT_MAX -->
+<!-- doxrox-include IGRAPH_UNLIMITED -->
 <!-- doxrox-include igraph_expand_path_to_pairs -->
 <!-- doxrox-include igraph_invalidate_cache -->
 <!-- doxrox-include igraph_is_same_graph -->
