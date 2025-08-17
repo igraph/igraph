@@ -89,6 +89,7 @@
  - `igraph_strvector_fprint()` prints a string vector to a file.
  - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
  - `igraph_nearest_neighbor_graph()` computes a neighborhood graph of spatial points based on a neighbor count, cutoff distance, and chosen metric. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2788!
+ - `igraph_delaunay_graph()` computes a Delaunay graph of a spatial point set. Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2806!
 
 ### Changed
 
