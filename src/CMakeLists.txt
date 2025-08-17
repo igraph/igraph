@@ -313,6 +313,7 @@ add_library(
 
   spatial/delaunay.c
   spatial/convex_hull.c
+  spatial/edge_lengths.c
   spatial/nearest_neighbor.cpp
 
   internal/glpk_support.c

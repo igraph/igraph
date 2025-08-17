@@ -933,6 +933,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_delaunay_graph
   igraph_nearest_neighbor_graph
+  igraph_spatial_edge_lengths
 )
 
 
