@@ -127,6 +127,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_matrix_view(&points3d, coords, coord_count / 3, 3);
     igraph_matrix_view(&points4d, coords, coord_count / 4, 4);
 
+    {
+        igraph_vector_int_t iv;
+        igraph_vector_int_init(&iv, 0);
+        igraph_convex_hull_2d(&points2d, &iv, NULL);
+        igraph_vector_int_destroy(&iv);
+    }
+
     if (igraph_nearest_neighbor_graph(&graph, &points1d, IGRAPH_METRIC_EUCLIDEAN, 2, IGRAPH_INFINITY, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
         igraph_destroy(&graph);
     }
