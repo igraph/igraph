@@ -40,11 +40,37 @@ IGRAPH_BEGIN_C_DECLS
 enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
 enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
 
-/* Note for the enum below: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
+/**
+ * \typedef igraph_loops_t
+ * \brief How to interpret self-loops in undirected graphs?
+ *
+ * Controls the interpretation of self-loops in undirected graphs, typically
+ * in the context of adjacency matrices or degrees.
+ *
+ * </para><para>These constants are also used to improve readability in
+ * boolean contexts, with \c IGRAPH_NO_LOOPS, equivalent to \c false,
+ * signifying that loops should be ignored and \c IGRAPH_LOOPS, equivalent
+ * to \c true, that loops should be considered.
+ *
+ * \enumval IGRAPH_NO_LOOPS Self-loops are ignored.
+ * \enumval IGRAPH_LOOPS_TWICE Self-loops are considered, and counted twice
+ *    in undirected graphs. For example, a self-loop contributes two to the
+ *    degree of a vertex and to diagonal entries of adjacency matrices. This
+ *    is the standard interpretation in graph theory, thus \c IGRAPH_LOOPS
+ *    serves as an alias for this option.
+ * \enumval IGRAPH_LOOPS_ONCE Self-loops are considered, and counted only
+ *    once in undirected graphs.
+ */
+typedef enum {
+    IGRAPH_NO_LOOPS = 0,
+    IGRAPH_LOOPS_TWICE = 1,
+    IGRAPH_LOOPS_ONCE = 2,
+    IGRAPH_LOOPS = IGRAPH_LOOPS_TWICE
+} igraph_loops_t;
+/* Note for the enum above: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
  * is 2. This is intentional, for the sake of backwards compatibility with
  * earlier versions where we only had IGRAPH_LOOPS and it meant
  * IGRAPH_LOOPS_TWICE */
-typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IGRAPH_LOOPS_ONCE = 2 } igraph_loops_t;
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
