@@ -29,7 +29,7 @@ void bench_erdos_renyi(int nodes, int edges, int rewirings, int rep) {
    sprintf(name, "Erdős-Rényi graph rewire %d nodes, %d edges, %d swaps, %dx",
            nodes, edges, rewirings, rep);
 
-   BENCH(name, REPEAT(igraph_rewire(&graph, rewirings, IGRAPH_REWIRING_SIMPLE), rep));
+   BENCH(name, REPEAT(igraph_rewire(&graph, rewirings, IGRAPH_SIMPLE_SW), rep));
 
    igraph_destroy(&graph);
 }
@@ -38,6 +38,6 @@ int main(void) {
    igraph_rng_seed(igraph_rng_default(), 137);
    BENCH_INIT();
 
-   bench_erdos_renyi(/* nodes */100, /* edges */3000, /* rewirings */30000, /* rep */500);
+   bench_erdos_renyi(/* nodes */100, /* edges */3000, /* rewirings */30000, /* rep */400);
    return 0;
 }
