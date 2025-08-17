@@ -255,7 +255,7 @@
 <!-- doxrox-include igraph_get_edgelist -->
 </section>
 
-<section id="types-and-constants"><title>Common types and constants</title>
+<section id="structural-types-and-constants"><title>Common types and constants</title>
 <!-- doxrox-include igraph_loops_t -->
 <!-- doxrox-include igraph_neimode_t -->
 </section>
