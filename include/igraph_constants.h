@@ -74,9 +74,29 @@ typedef enum {
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
-/* Do not renumber the following values! Some internal code treats them as bitmasks
+/**
+ * \typedef igraph_neimode_t
+ * \brief How to interpret edge directions in directed graphs?
+ *
+ * These "neighbor mode" constants are typically used to specify the treatment
+ * of edge directions in directed graphs, or which vertices to consider as
+ * adjacent to (i.e. neighbor of) a vertex. It is typically ignored in undirected
+ * graphs.
+ *
+ * \enumval IGRAPH_OUT Follow edge directions in directed graphs, or consider
+ *    out-neighbors of vertices.
+ * \enumval IGRAPH_IN Follow edges in the reverse direction in directed graphs,
+ *    or consider in-neighbors of vertices.
+ * \enumval IGRAPH_ALL Ignore edge directions in directed graphs, or consider
+ *    all neighbours (both out and in-neighbors) of vertices.
+ */
+typedef enum {
+    IGRAPH_OUT = 1,
+    IGRAPH_IN = 2,
+    IGRAPH_ALL = 3
+} igraph_neimode_t;
+/* Do not renumber the vaues above! Some internal code treats them as bitmasks
  * and assumes that IGRAPH_ALL == IGRAPH_IN | IGRAPH_OUT and IGRAPH_IN & IGRAPH_OUT == 0. */
-typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
 
 /* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
 #define IGRAPH_REVERSE_MODE(mode) \
