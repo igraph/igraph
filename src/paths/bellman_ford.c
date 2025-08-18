@@ -44,10 +44,10 @@
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
  * \param to The target vertices.
- * \param weights The edge weights. There must not be any closed loop in
+ * \param weights The edge weights. There must not be any cycle in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
- *    vertex of this loop infinitely). Additionally, no edge weight may
+ *    vertex of this cycle infinitely). Additionally, no edge weight may
  *    be NaN. If either case does not hold, an error is returned. If this
  *    is a null pointer, then the unweighted version,
  *    \ref igraph_distances() is called.
@@ -103,7 +103,7 @@ igraph_error_t igraph_i_distances_bellman_ford(
        - speedup: a vertex is marked clean if its distance from the source
          did not change during the last phase. Neighbors of a clean vertex
          are not relaxed again, since it would mean no change in the
-         shortest path values. Dirty vertices are queued. Negative loops can
+         shortest path values. Dirty vertices are queued. Negative cycles can
          be detected by checking whether a vertex has been queued at least
          n times.
     */
@@ -161,7 +161,7 @@ igraph_error_t igraph_i_distances_bellman_ford(
             IGRAPH_BIT_SET(clean_vertices, j);
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
-                IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
+                IGRAPH_ERROR("Negative cycle in graph while calculating distances with Bellman-Ford algorithm.",
                              IGRAPH_ENEGLOOP);
             }
 
@@ -247,10 +247,10 @@ igraph_error_t igraph_i_distances_bellman_ford(
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param weights The edge weights. There must not be any closed loop in
+ * \param weights The edge weights. There must not be any cycle in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
- *    vertex of this loop infinitely). If this is a null pointer, then the
+ *    vertex of this cycle infinitely). If this is a null pointer, then the
  *    unweighted version, \ref igraph_get_shortest_paths() is called.
  *    Edges with positive infinite weights are ignored.
  * \param mode For directed graphs; whether to follow paths along edge
@@ -283,7 +283,7 @@ igraph_error_t igraph_i_distances_bellman_ford(
  *         \cli IGRAPH_EINVVID
  *           \p from is invalid vertex ID
  *         \cli IGRAPH_ENEGLOOP
- *           Bellman-ford algorithm encounted a negative loop.
+ *           Bellman-ford algorithm encounted a negative cycle.
  *         \endclist
  *
  * Time complexity: O(|E|*|V|), where |V| is the number of
@@ -376,7 +376,7 @@ igraph_error_t igraph_i_get_shortest_paths_bellman_ford(
         IGRAPH_BIT_SET(clean_vertices, j);
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
-            IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
+            IGRAPH_ERROR("Negative cycle in graph while calculating distances with Bellman-Ford algorithm.",
                          IGRAPH_ENEGLOOP);
         }
 
@@ -527,10 +527,10 @@ igraph_error_t igraph_i_get_shortest_paths_bellman_ford(
  *        path are stored here.
  * \param from The ID of the source vertex.
  * \param to The ID of the target vertex.
- * \param weights The edge weights. There must not be any closed loop in
+ * \param weights The edge weights. There must not be any cycle in
  *        the graph that has a negative total weight (since this would allow
  *        us to decrease the weight of any path containing at least a single
- *        vertex of this loop infinitely). If this is a null pointer, then the
+ *        vertex of this cycle infinitely). If this is a null pointer, then the
  *        unweighted version is called.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. \c IGRAPH_OUT follows edge
