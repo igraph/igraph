@@ -58,7 +58,7 @@ int main(void) {
     igraph_vector_init(&values, 0);
 
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
     printf("Null graph nominal assortativity: ");
     igraph_real_printf(assort);
     printf("\n");
@@ -76,11 +76,11 @@ int main(void) {
     igraph_vector_resize(&values, 1);
     VECTOR(values)[0] = 0;
 
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
     printf("Singleton graph nominal assortativity: ");
     igraph_real_printf(assort);
     printf("\n");
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ false);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ false);
     printf("Singleton graph nominal assortativity, unnormalized: ");
     igraph_real_printf(assort);
     printf("\n");
@@ -94,11 +94,11 @@ int main(void) {
     printf("\n");
 
     igraph_add_edge(&g, 0, 0);
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
     printf("Singleton graph with loop, nominal assortativity: ");
     igraph_real_printf(assort);
     printf("\n");
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ false);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ false);
     printf("Singleton graph with loop, nominal assortativity, unnormalized: ");
     igraph_real_printf(assort);
     printf("\n");
@@ -120,10 +120,10 @@ int main(void) {
 
     igraph_degree(&g, &types, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
 
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ true);
     printf("Karate club, normalized assortativity based on degree categories: %g\n", assort);
 
-    igraph_assortativity_nominal(&g, &types, &assort_unnorm, IGRAPH_UNDIRECTED, /* normalized */ false);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort_unnorm, IGRAPH_UNDIRECTED, /* normalized */ false);
     printf("Karate club, non-normalized assortativity based on degree categories: %g\n", assort_unnorm);
 
     /* unnormalized assortativity based on categories is the same as modularity */
@@ -346,7 +346,7 @@ int main(void) {
                  -1);
     igraph_simplify(&g, /*remove_multiple=*/ true, /*remove_loops=*/ true, /*edge_comb=*/ NULL);
     igraph_vector_int_view(&types, football_types, sizeof(football_types) / sizeof(football_types[0]));
-    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ true);
+    igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ true);
     printf("%g\n", assort);
 
     igraph_destroy(&g);

@@ -72,6 +72,8 @@
  * https://doi.org/10.1093/acprof%3Aoso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
+ * \param weights Weighted nominal assortativity is not currently implemented.
+ *    Pass \c NULL to ignore.
  * \param types Integer vector giving the vertex categories. The types
  *    are represented by integers starting at zero.
  * \param res Pointer to a real variable, the result is stored here.
@@ -94,11 +96,11 @@
  * \example examples/simple/igraph_assortativity_nominal.c
  */
 
-igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
-                                            const igraph_vector_int_t *types,
-                                            igraph_real_t *res,
-                                            igraph_bool_t directed,
-                                            igraph_bool_t normalized) {
+igraph_error_t igraph_assortativity_nominal(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        const igraph_vector_int_t *types,
+        igraph_real_t *res,
+        igraph_bool_t directed, igraph_bool_t normalized) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -106,6 +108,11 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     igraph_integer_t no_of_types;
     igraph_vector_int_t ai, bi, eii;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
+
+    if (weights) {
+        IGRAPH_ERROR("Weighted nominal assortativity is not yet implemented.",
+                     IGRAPH_UNIMPLEMENTED);
+    }
 
     if (igraph_vector_int_size(types) != no_of_nodes) {
         IGRAPH_ERROR("Invalid types vector length.", IGRAPH_EINVAL);
