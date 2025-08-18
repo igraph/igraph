@@ -19,24 +19,59 @@
 #include <igraph.h>
 #include "bench.h"
 
-void bench_erdos_renyi(int nodes, int edges, int rewirings, int rep) {
-   igraph_t graph;
+void bench(const char *name, igraph_t *graph, int rep) {
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_integer_t trials = 10*ecount;
+    char msg[200];
 
-   igraph_erdos_renyi_game_gnm(&graph, nodes, edges, false, false, false);
+    snprintf(msg, sizeof(msg) / sizeof(msg[0]),
+             "%s, |V|=%6" IGRAPH_PRId ", |E|=%6" IGRAPH_PRId ", %6" IGRAPH_PRId " swaps, %dx",
+             name, vcount, ecount, trials, rep);
 
-   char name[200];
-   sprintf(name, "Erdős-Rényi graph rewire %d nodes, %d edges, %d swaps, %dx",
-           nodes, edges, rewirings, rep);
+    BENCH(msg, REPEAT(igraph_rewire(graph, trials, IGRAPH_SIMPLE_SW), rep));
+}
 
-   BENCH(name, REPEAT(igraph_rewire(&graph, rewirings, IGRAPH_SIMPLE_SW), rep));
+void bench_er(igraph_integer_t n, igraph_integer_t m, int rep) {
+    igraph_t graph;
 
-   igraph_destroy(&graph);
+    igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+
+    bench("G(n,m)", &graph, rep);
+
+    igraph_destroy(&graph);
+}
+
+void bench_ba(igraph_integer_t n, igraph_integer_t m, int rep) {
+    igraph_t graph;
+
+    igraph_barabasi_game(&graph, n, 1, m ,NULL, true, 1, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_BAG, NULL);
+
+    bench("BA", &graph, rep);
+
+    igraph_destroy(&graph);
 }
 
 int main(void) {
-   igraph_rng_seed(igraph_rng_default(), 137);
-   BENCH_INIT();
+    igraph_rng_seed(igraph_rng_default(), 137);
+    BENCH_INIT();
 
-   bench_erdos_renyi(/* nodes */100, /* edges */3000, /* rewirings */30000, /* rep */400);
-   return 0;
+    bench_er(100, 3000, 100);
+    bench_er(300, 3000, 100);
+    bench_er(1000, 3000, 100);
+    bench_er(3000, 3000, 100);
+    bench_er(10000, 3000, 100);
+
+    printf("\n");
+    bench_er(300, 30000, 10);
+    bench_er(1000, 30000, 10);
+    bench_er(3000, 30000, 10);
+    bench_er(10000, 30000, 10);
+
+    printf("\n");
+    bench_ba(1000, 3, 100);
+    bench_ba(10000, 3, 10);
+    bench_ba(100000, 3, 1);
+
+    return 0;
 }
