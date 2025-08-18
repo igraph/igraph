@@ -87,4 +87,8 @@
 <!-- doxrox-include igraph_simple_interconnected_islands_game -->
 </section>
 
+<section id="generator-types-and-constants"><title>Common types and constants</title>
+<!-- doxrox-include igraph_edge_type_sw_t -->
+</section>
+
 </chapter>

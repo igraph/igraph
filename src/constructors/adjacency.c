@@ -310,9 +310,9 @@ static igraph_error_t igraph_i_adjacency_min(
  *          An undirected graph will be created. Only the lower left triangle
  *          (including the diagonal) is used for the number of edges.
  *       \endclist
- * \param loops Constant to specify how the diagonal of the matrix should be
- *        treated when creating loop edges. Ignored for modes
- *        \c IGRAPH_ADJ_DIRECTED, \c IGRAPH_ADJ_UPPER and \c IGRAPH_ADJ_LOWER.
+ * \param loops Constant of type \ref igraph_loops_t to specify how the diagonal
+ *        of the matrix should be treated when creating loop edges. Ignored for
+ *        modes \c IGRAPH_ADJ_DIRECTED, \c IGRAPH_ADJ_UPPER and \c IGRAPH_ADJ_LOWER.
  *        \clist
  *        \cli IGRAPH_NO_LOOPS
  *          Ignore the diagonal of the input matrix and do not create loops.
