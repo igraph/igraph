@@ -751,7 +751,7 @@ igraph_error_t igraph_edge_betweenness(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *res, igraph_es_t eids,
         igraph_bool_t directed, igraph_bool_t normalized) {
-    
+
     return igraph_edge_betweenness_cutoff(
             graph, weights,
             res, eids,
@@ -875,12 +875,12 @@ igraph_error_t igraph_edge_betweenness_cutoff(
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *fatv = igraph_inclist_get(&parents, actnode);
-            igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
+            igraph_vector_int_t *parentv = igraph_inclist_get(&parents, actnode);
+            igraph_integer_t parentv_len = igraph_vector_int_size(parentv);
             igraph_real_t coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
 
-            for (j = 0; j < fatv_len; j++) {
-                igraph_integer_t fedge = VECTOR(*fatv)[j];
+            for (j = 0; j < parentv_len; j++) {
+                igraph_integer_t fedge = VECTOR(*parentv)[j];
                 igraph_integer_t neighbor = IGRAPH_OTHER(graph, fedge, actnode);
                 tmpscore[neighbor] += nrgeo[neighbor] * coeff;
                 VECTOR(*tmpres)[fedge] += nrgeo[neighbor] * coeff;
@@ -892,7 +892,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(
             VECTOR(dist)[actnode] = 0;
             nrgeo[actnode] = 0;
             tmpscore[actnode] = 0;
-            igraph_vector_int_clear(fatv);
+            igraph_vector_int_clear(parentv);
         }
     } /* source < no_of_nodes */
 
@@ -988,7 +988,7 @@ igraph_error_t igraph_betweenness_subset(
     igraph_stack_int_t S;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
-    igraph_integer_t father;
+    igraph_integer_t parent;
     igraph_vector_t dist;
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
@@ -1092,8 +1092,8 @@ igraph_error_t igraph_betweenness_subset(
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *fatv = igraph_adjlist_get(&parents, actnode);
-            igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
+            igraph_vector_int_t *parentv = igraph_adjlist_get(&parents, actnode);
+            igraph_integer_t parentv_len = igraph_vector_int_size(parentv);
             igraph_real_t coeff;
 
             if (is_target[actnode]) {
@@ -1102,9 +1102,9 @@ igraph_error_t igraph_betweenness_subset(
                 coeff = tmpscore[actnode] / nrgeo[actnode];
             }
 
-            for (j = 0; j < fatv_len; j++) {
-                father = VECTOR(*fatv)[j];
-                tmpscore[father] += nrgeo[father] * coeff;
+            for (j = 0; j < parentv_len; j++) {
+                parent = VECTOR(*parentv)[j];
+                tmpscore[parent] += nrgeo[parent] * coeff;
             }
 
             if (actnode != source) {
@@ -1117,7 +1117,7 @@ igraph_error_t igraph_betweenness_subset(
             VECTOR(dist)[actnode] = 0;
             nrgeo[actnode] = 0;
             tmpscore[actnode] = 0;
-            igraph_vector_int_clear(fatv);
+            igraph_vector_int_clear(parentv);
         }
     }
 
@@ -1312,8 +1312,8 @@ igraph_error_t igraph_edge_betweenness_subset(
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *fatv = igraph_inclist_get(&parents, actnode);
-            igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
+            igraph_vector_int_t *parentv = igraph_inclist_get(&parents, actnode);
+            igraph_integer_t parentv_len = igraph_vector_int_size(parentv);
             igraph_real_t coeff;
 
             if (is_target[actnode]) {
@@ -1322,11 +1322,11 @@ igraph_error_t igraph_edge_betweenness_subset(
                 coeff = tmpscore[actnode] / nrgeo[actnode];
             }
 
-            for (j = 0; j < fatv_len; j++) {
-                igraph_integer_t father_edge = VECTOR(*fatv)[j];
-                igraph_integer_t neighbor = IGRAPH_OTHER(graph, father_edge, actnode);
+            for (j = 0; j < parentv_len; j++) {
+                igraph_integer_t parent_edge = VECTOR(*parentv)[j];
+                igraph_integer_t neighbor = IGRAPH_OTHER(graph, parent_edge, actnode);
                 tmpscore[neighbor] += nrgeo[neighbor] * coeff;
-                VECTOR(*tmpres)[father_edge] += nrgeo[neighbor] * coeff;
+                VECTOR(*tmpres)[parent_edge] += nrgeo[neighbor] * coeff;
             }
 
             /* Reset variables to ensure that the 'for' loop invariant will
@@ -1335,7 +1335,7 @@ igraph_error_t igraph_edge_betweenness_subset(
             VECTOR(dist)[actnode] = 0;
             nrgeo[actnode] = 0;
             tmpscore[actnode] = 0;
-            igraph_vector_int_clear(fatv);
+            igraph_vector_int_clear(parentv);
         }
     }
 
