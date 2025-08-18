@@ -270,13 +270,11 @@ igraph_error_t igraph_assortativity_nominal(
  * based on vertex degrees.
  */
 
-igraph_error_t igraph_assortativity(const igraph_t *graph,
-                         const igraph_vector_t *weights,
-                         const igraph_vector_t *values,
-                         const igraph_vector_t *values_in,
-                         igraph_real_t *res,
-                         igraph_bool_t directed,
-                         igraph_bool_t normalized) {
+igraph_error_t igraph_assortativity(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        const igraph_vector_t *values, const igraph_vector_t *values_in,
+        igraph_real_t *res,
+        igraph_bool_t directed, igraph_bool_t normalized) {
 
     const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_integer_t no_of_edges = igraph_ecount(graph);
