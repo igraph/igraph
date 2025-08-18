@@ -457,10 +457,9 @@ static igraph_error_t betweenness_check_weights(
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
  *
- * The betweenness centrality of a vertex is the number of geodesics
- * going through it. If there are more than one geodesic between two
- * vertices, the value of these geodesics are weighted by one over the
- * number of geodesics.
+ * The betweenness centrality of a vertex \c v is the number of shortest paths
+ * passing through it. If there is more than one shortest path between two
+ * vertices, the fraction of these passing through \c v is counted.
  *
  * </para><para>
  * Reference:
@@ -476,8 +475,10 @@ static igraph_error_t betweenness_check_weights(
  *        Supply a null pointer here for unweighted betweenness.
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
- * \param vids The vertices of which the betweenness centrality scores
- *        will be calculated.
+ * \param vids The vertices for which the range-limited betweenness centrality
+ *        scores will be returned. This paramerer is for convenience only and
+ *        does not affect performance. Internally, the betewenness of all
+ *        vertices is calculated.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
@@ -494,10 +495,11 @@ static igraph_error_t betweenness_check_weights(
  * Note that the time complexity is independent of the number of
  * vertices for which the score is calculated.
  *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
- *     See \ref igraph_edge_betweenness() for calculating the betweenness score
- *     of the edges in a graph. See \ref igraph_betweenness_cutoff() to
- *     calculate the range-limited betweenness of the vertices in a graph.
+ * \sa \ref igraph_edge_betweenness() for calculating the betweenness score
+ * of the edges in a graph; \ref igraph_betweenness_cutoff() to
+ * calculate the range-limited betweenness of the vertices in a graph;
+ * \ref igraph_betweenness_subset() to consider shortest paths only between
+ * two vertex subsets for calculating betweenness.
  */
 igraph_error_t igraph_betweenness(
         const igraph_t *graph, const igraph_vector_t *weights,
@@ -522,7 +524,9 @@ igraph_error_t igraph_betweenness(
  * \param res The result of the computation, a vector containing the
  *        range-limited betweenness scores for the specified vertices.
  * \param vids The vertices for which the range-limited betweenness centrality
- *        scores will be computed.
+ *        scores will be returned. This paramerer is for convenience only and
+ *        does not affect performance. Internally, the betewenness of all
+ *        vertices is calculated.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
@@ -717,10 +721,9 @@ igraph_error_t igraph_betweenness_cutoff(
  * \function igraph_edge_betweenness
  * \brief Betweenness centrality of the edges.
  *
- * The betweenness centrality of an edge is the number of geodesics
- * going through it. If there are more than one geodesics between two
- * vertices, the value of these geodesics are weighted by one over the
- * number of geodesics.
+ * The betweenness centrality of an edge \c e is the number of shortest paths
+ * passing through it. If there is more than one shortest path between two
+ * vertices, the fraction of these passing through \c e is counted.
  *
  * </para><para>
  * Reference:
@@ -736,9 +739,10 @@ igraph_error_t igraph_betweenness_cutoff(
  *        pointer here for the unweighted version.
  * \param res The result of the computation, vector containing the
  *        betweenness scores for the edges.
- * \param eids The edges for which the subset-limited betweenness centrality
- *        scores will be returned. This parameter is for convenience only.
- *        Internally, the betweenness will be calculated for all edges.
+ * \param eids The edges for which the betweenness centrality will be returned.
+ *        This parameter is for convenience only, and does not affect
+ *        performance. Internally, the betweenness is be calculated for all
+ *        edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
@@ -753,10 +757,11 @@ igraph_error_t igraph_betweenness_cutoff(
  * |E| are the number of vertices and
  * edges in the graph.
  *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
- *     See \ref igraph_edge_betweenness() for calculating the betweenness score
- *     of the edges in a graph. See \ref igraph_edge_betweenness_cutoff() to
- *     compute the range-limited betweenness score of the edges in a graph.
+ * \sa \ref igraph_betweenness() for calculating the betweenness score of the
+ * vertices in a graph; \ref igraph_edge_betweenness_cutoff() to compute the
+ * range-limited betweenness score of the edges in a graph;
+ * \ref igraph_edge_betweenness_subset() to consider shortest paths only between
+ * two vertex subsets for calculating betweenness.
  */
 igraph_error_t igraph_edge_betweenness(
         const igraph_t *graph, const igraph_vector_t *weights,
@@ -784,9 +789,10 @@ igraph_error_t igraph_edge_betweenness(
  *        pointer here for unweighted betweenness.
  * \param res The result of the computation, vector containing the
  *        betweenness scores for the edges.
- * \param eids The edges for which the subset-limited betweenness centrality
- *        scores will be returned. This parameter is for convenience only.
- *        Internally, the betweenness will be calculated for all edges.
+ * \param eids The edges for which the betweenness centrality will be returned.
+ *        This parameter is for convenience only, and does not affect
+ *        performance. Internally, the betweenness is be calculated for all
+ *        edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores by the number of
