@@ -61,8 +61,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_ALL, false, 4);
             igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_IN, false, 5);
-            igraph_edge_betweenness_cutoff(&graph, &weights, &v, IGRAPH_DIRECTED, false, 4);
-            igraph_edge_betweenness_cutoff(&graph, &weights, &v, IGRAPH_UNDIRECTED, false, 3);
+            igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
+                                           false, 4);
+            igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
+                                           false, 3);
             if (igraph_vcount(&graph) >= 10) {
                 igraph_betweenness_subset(&graph, &weights,
                                           &v,

@@ -726,6 +726,9 @@ igraph_error_t igraph_betweenness_cutoff(
  *        pointer here for the unweighted version.
  * \param res The result of the computation, vector containing the
  *        betweenness scores for the edges.
+ * \param eids The edges for which the subset-limited betweenness centrality
+ *        scores will be returned. This parameter is for convenience only.
+ *        Internally, the betweenness will be calculated for all edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores. Normalization is
@@ -746,9 +749,13 @@ igraph_error_t igraph_betweenness_cutoff(
  */
 igraph_error_t igraph_edge_betweenness(
         const igraph_t *graph, const igraph_vector_t *weights,
-        igraph_vector_t *res,
+        igraph_vector_t *res, igraph_es_t eids,
         igraph_bool_t directed, igraph_bool_t normalized) {
-    return igraph_edge_betweenness_cutoff(graph, weights, res, directed, normalized, -1);
+    
+    return igraph_edge_betweenness_cutoff(
+            graph, weights,
+            res, eids,
+            directed, normalized, -1);
 }
 
 /**
@@ -766,6 +773,9 @@ igraph_error_t igraph_edge_betweenness(
  *        pointer here for unweighted betweenness.
  * \param res The result of the computation, vector containing the
  *        betweenness scores for the edges.
+ * \param eids The edges for which the subset-limited betweenness centrality
+ *        scores will be returned. This parameter is for convenience only.
+ *        Internally, the betweenness will be calculated for all edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores. Normalization is
@@ -788,6 +798,7 @@ igraph_error_t igraph_edge_betweenness(
 igraph_error_t igraph_edge_betweenness_cutoff(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *res,
+        igraph_es_t eids,
         igraph_bool_t directed, igraph_bool_t normalized,
         igraph_real_t cutoff) {
 
@@ -796,6 +807,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(
     igraph_inclist_t inclist, parents;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t dist;
+    igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
@@ -828,8 +840,15 @@ igraph_error_t igraph_edge_betweenness_cutoff(
     IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
 
-    IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges));
-    igraph_vector_null(res);
+    if (!igraph_es_is_all(&eids)) {
+        /* result needed only for a subset of the vertices */
+        IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_edges);
+    } else {
+        /* result covers all vertices */
+        IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges));
+        igraph_vector_null(res);
+        tmpres = res;
+    }
 
     for (source = 0; source < no_of_nodes; source++) {
 
@@ -864,7 +883,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(
                 igraph_integer_t fedge = VECTOR(*fatv)[j];
                 igraph_integer_t neighbor = IGRAPH_OTHER(graph, fedge, actnode);
                 tmpscore[neighbor] += nrgeo[neighbor] * coeff;
-                VECTOR(*res)[fedge] += nrgeo[neighbor] * coeff;
+                VECTOR(*tmpres)[fedge] += nrgeo[neighbor] * coeff;
             }
 
             /* Reset variables to ensure that the 'for' loop invariant will
@@ -876,6 +895,26 @@ igraph_error_t igraph_edge_betweenness_cutoff(
             igraph_vector_int_clear(fatv);
         }
     } /* source < no_of_nodes */
+
+    /* Keep only the requested edges */
+    if (!igraph_es_is_all(&eids)) {
+        igraph_eit_t eit;
+
+        IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
+        IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+        IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+
+        for (j = 0, IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit);
+             IGRAPH_EIT_NEXT(eit), j++) {
+            igraph_integer_t edge = IGRAPH_EIT_GET(eit);
+            VECTOR(*res)[j] = VECTOR(*tmpres)[edge];
+        }
+
+        igraph_eit_destroy(&eit);
+        igraph_vector_destroy(tmpres);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
 
     if (!directed || !igraph_is_directed(graph)) {
         igraph_vector_scale(res, 0.5);
@@ -1142,7 +1181,8 @@ igraph_error_t igraph_betweenness_subset(
  * \param targets A vertex selector for the targets of the shortest paths taken
  *        into considuration in the betweenness calculation.
  * \param eids The edges for which the subset-limited betweenness centrality
- *        scores will be computed.
+ *        scores will be returned. This parameter is for convenience only.
+ *        Internally, the betweenness will be calculated for all edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param normalized Whether to normalize betweenness scores. Normalization is

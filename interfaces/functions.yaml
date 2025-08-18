@@ -678,13 +678,13 @@ igraph_betweenness_subset:
 
 igraph_edge_betweenness:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VECTOR res,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
         BOOLEAN directed=True, BOOLEAN normalized=False
     DEPS: weights ON graph
 
 igraph_edge_betweenness_cutoff:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VECTOR res,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
         BOOLEAN directed=True, BOOLEAN normalized=False, REAL cutoff=-1
     DEPS: weights ON graph
 
