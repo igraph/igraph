@@ -480,8 +480,9 @@ static igraph_error_t betweenness_check_weights(
  *        will be calculated.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param normalized Whether to normalize betweenness scores. Normalization is
- *        currently unimplemented, and setting this to \c true raises an error.
+ * \param normalized Whether to normalize betweenness scores by the number of
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
+ *        in undirected graphs the number of unordered vertex pairs is used.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids.
@@ -524,8 +525,9 @@ igraph_error_t igraph_betweenness(
  *        scores will be computed.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param normalized Whether to normalize betweenness scores. Normalization is
- *        currently unimplemented, and setting this to \c true raises an error.
+ * \param normalized Whether to normalize betweenness scores by the number of
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
+ *        in undirected graphs the number of unordered vertex pairs is used.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated, and
  *        there will be no upper limit on path lengths.
@@ -557,7 +559,7 @@ igraph_error_t igraph_betweenness_cutoff(
     igraph_inclist_t inclist;
     igraph_integer_t source, j, neighbor;
     igraph_stack_int_t S;
-    igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
+    igraph_neimode_t mode;
     igraph_vector_t dist;
     /* Note: nrgeo holds the number of shortest paths, which may be very large in some cases,
      * e.g. in a grid graph. If using an integer type, this results in overflow.
@@ -571,10 +573,12 @@ igraph_error_t igraph_betweenness_cutoff(
     igraph_real_t *tmpscore;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_vit_t vit;
+    igraph_real_t normalization_factor;
 
-    if (normalized) {
-        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+    if (!igraph_is_directed(graph)) {
+        directed = false;
     }
+    mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
@@ -678,9 +682,15 @@ igraph_error_t igraph_betweenness_cutoff(
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    if (!directed || !igraph_is_directed(graph)) {
-        igraph_vector_scale(res, 0.5);
+    /* The betweenness calculation is always done for all _ordered_ vertex pairs.
+     * We only need to correct for this in undirected graphs when normalized=false. */
+    if (normalized) {
+        normalization_factor = 1.0 / (no_of_nodes * (no_of_nodes - 1.0));
+    } else {
+        normalization_factor = directed ? 1.0 : 0.5;
     }
+
+    igraph_vector_scale(res, normalization_factor);
 
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
 
@@ -731,8 +741,9 @@ igraph_error_t igraph_betweenness_cutoff(
  *        Internally, the betweenness will be calculated for all edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param normalized Whether to normalize betweenness scores. Normalization is
- *        currently unimplemented, and setting this to \c true raises an error.
+ * \param normalized Whether to normalize betweenness scores by the number of
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
+ *        in undirected graphs the number of unordered vertex pairs is used.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -778,8 +789,9 @@ igraph_error_t igraph_edge_betweenness(
  *        Internally, the betweenness will be calculated for all edges.
  * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param normalized Whether to normalize betweenness scores. Normalization is
- *        currently unimplemented, and setting this to \c true raises an error.
+ * \param normalized Whether to normalize betweenness scores by the number of
+ *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
+ *        in undirected graphs the number of unordered vertex pairs is used.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact betweenness will be calculated (no
  *        upper limit on path lengths).
@@ -805,17 +817,19 @@ igraph_error_t igraph_edge_betweenness_cutoff(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_inclist_t inclist, parents;
-    igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
+    igraph_neimode_t mode;
     igraph_vector_t dist;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
     igraph_stack_int_t S;
+    igraph_real_t normalization_factor;
 
-    if (normalized) {
-        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+    if (!igraph_is_directed(graph)) {
+        directed = false;
     }
+    mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
 
@@ -916,9 +930,15 @@ igraph_error_t igraph_edge_betweenness_cutoff(
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    if (!directed || !igraph_is_directed(graph)) {
-        igraph_vector_scale(res, 0.5);
+    /* The betweenness calculation is always done for all _ordered_ vertex pairs.
+     * We only need to correct for this in undirected graphs when normalized=false. */
+    if (normalized) {
+        normalization_factor = 1.0 / (no_of_nodes * (no_of_nodes - 1.0));
+    } else {
+        normalization_factor = directed ? 1.0 : 0.5;
     }
+
+    igraph_vector_scale(res, normalization_factor);
 
     IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
 
@@ -996,7 +1016,7 @@ igraph_error_t igraph_betweenness_subset(
     bool *is_target;
 
     if (normalized) {
-        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Normalization is not yet implemented for subset betweenness.", IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
@@ -1222,7 +1242,7 @@ igraph_error_t igraph_edge_betweenness_subset(
     igraph_stack_int_t S;
 
     if (normalized) {
-        IGRAPH_ERROR("Normalization is not yet implemented for betweenness.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Normalization is not yet implemented for subset edge betweenness.", IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_CHECK(betweenness_check_weights(weights, no_of_edges));
