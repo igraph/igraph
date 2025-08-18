@@ -1021,14 +1021,18 @@ igraph_centralization_eigenvector_centrality_tmax:
 
 igraph_assortativity_nominal:
     PARAMS: |-
-        GRAPH graph, INDEX_VECTOR types, OUT REAL res,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        INDEX_VECTOR types,
+        OUT REAL res,
         BOOLEAN directed=True, BOOLEAN normalized=True
+    DEPS: weights ON graph, types ON graph
 
 igraph_assortativity:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         VECTOR values, OPTIONAL VECTOR values_in,
         OUT REAL res, BOOLEAN directed=True, BOOLEAN normalized=True
+    DEPS: weights ON graph, values ON graph, values_in ON graph
 
 igraph_assortativity_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN directed=True
