@@ -2665,6 +2665,10 @@ igraph_nearest_neighbor_graph:
 igraph_delaunay_graph:
     PARAMS: OUT GRAPH graph, MATRIX points
 
+igraph_spatial_edge_lengths:
+    PARAMS: GRAPH graph, OUT EDGE_LENGTHS lengths, MATRIX points, METRIC METRIC
+    DEPS: lengths ON graph
+
 #######################################
 # Coloring
 #######################################

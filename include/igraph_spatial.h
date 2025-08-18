@@ -49,8 +49,13 @@ IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_metric_t metric,
     igraph_integer_t neighbors,
     igraph_real_t cutoff,
-    igraph_bool_t directed
-);
+    igraph_bool_t directed);
+
+IGRAPH_EXPORT igraph_error_t igraph_spatial_edge_lengths(
+    const igraph_t *graph,
+    igraph_vector_t *lengths,
+    const igraph_matrix_t *points,
+    igraph_metric_t metric);
 
 IGRAPH_EXPORT igraph_error_t igraph_convex_hull_2d(
     const igraph_matrix_t *data,
