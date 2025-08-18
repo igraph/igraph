@@ -1,8 +1,5 @@
 
 #include <igraph.h>
-#include "igraph_interface.h"
-#include "igraph_matrix.h"
-#include "igraph_spatial.h"
 #include "test_utilities.h"
 
 int main(void) {
@@ -72,11 +69,33 @@ int main(void) {
     igraph_destroy(&graph);
 
     igraph_vector_t weights;
-    igraph_vector_init(&weights, 0);
-    igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_mat, 100000000);
-    print_graph_canon(&graph);
-    igraph_destroy(&graph);
 
+
+    printf("Beta weighted gabriel graph, 2d 25 points cutoff = Infinity\n");
+    igraph_vector_init(&weights, 0);
+    igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_mat, IGRAPH_INFINITY);
+    igraph_destroy(&graph);
+    print_vector(&weights);
+    igraph_vector_destroy(&weights);
+
+    printf("Beta weighted gabriel graph, 2d 25 points cutoff = 5\n");
+    igraph_vector_init(&weights, 0);
+    igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_mat, 5);
+    igraph_destroy(&graph);
+    print_vector(&weights);
+    igraph_vector_destroy(&weights);
+
+    printf("Beta weighted gabriel graph, 3d 10 points cutoff = Infinity\n");
+    igraph_vector_init(&weights, 0);
+    igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_3d_mat, IGRAPH_INFINITY);
+    igraph_destroy(&graph);
+    print_vector(&weights);
+    igraph_vector_destroy(&weights);
+
+    printf("Beta weighted gabriel graph, 3d 10 points cutoff = 5\n");
+    igraph_vector_init(&weights, 0);
+    igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_3d_mat, 5);
+    igraph_destroy(&graph);
     print_vector(&weights);
     igraph_vector_destroy(&weights);
 
