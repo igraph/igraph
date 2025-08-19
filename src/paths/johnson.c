@@ -123,7 +123,7 @@ igraph_error_t igraph_i_distances_johnson(
 
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
         IGRAPH_ERROR("Undirected graph with negative weight.",
-                     IGRAPH_ENEGLOOP);
+                     IGRAPH_ENEGCYCLE);
     }
 
     /* ------------------------------------------------------------ */

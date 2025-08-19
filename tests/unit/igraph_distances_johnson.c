@@ -87,10 +87,10 @@ int main(void) {
     VERIFY_FINALLY_STACK();
 
     printf("Checking error for directed graph with loops and multi-edges with negative loop.\n");
-    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop, IGRAPH_OUT), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop, IGRAPH_OUT), IGRAPH_ENEGCYCLE);
 
     printf("Directed graph with loops and multi-edges, IGRAPH_ALL:\n");
-    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_ENEGCYCLE);
 
     igraph_matrix_destroy(&result);
     igraph_matrix_destroy(&bf_result);
