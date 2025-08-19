@@ -35,9 +35,8 @@
 #include <math.h>
 #include <vector>
 
-
-
-igraph_real_t get_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
+// Methods to get distances between two vectors, including when one or both are embedded in a matrix
+igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
@@ -70,6 +69,7 @@ igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t 
 }
 
 // Adapted from code originally by szabolcs
+// used in is_union_empty
 class NeighborCounts {
     const double radius; // L2 search radius
     const igraph_integer_t a, b; // edge endpoits; excluded from the count
@@ -111,6 +111,8 @@ public:
 
 // Helper result class for listing the points in the lune's bounding disk
 // and counting how many are within the lune.
+// used in is_intersection_empty
+// adapted from code by Szabolcs in IGraphM
 class IntersectionCounts {
     const double radius; // L2 search radius
     const double beta_radius;
@@ -169,15 +171,23 @@ public:
 };
 
 template <igraph_integer_t Dimension>
-using kdTree = nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>, ig_point_adaptor, Dimension, igraph_integer_t>;
+using kdTree = nanoflann::KDTreeSingleIndexAdaptor <
+               nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
+               ig_point_adaptor, Dimension, igraph_integer_t >;
 
-igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
+// give a known good superset of edges for a given value of beta.
+// In the case of beta < 1, that is a complete graph, for
+// beta >= 1 it is the delaunay triangulation of the points.
+igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
+        const igraph_matrix_t *points,
+        igraph_real_t beta) {
     igraph_integer_t num_points = igraph_matrix_nrow(points);
     igraph_integer_t num_dims   = igraph_matrix_ncol(points);
     if (beta >= 1 && num_points > num_dims) { // large beta, subset of delaunay
         IGRAPH_CHECK(igraph_i_delaunay_edges(edges, points));
     } else { // small beta, not subset of delaunay, give complete graph.
         // Or delaunay not calculable due to point count
+        // TODO: update when/if delaunay supports small numbers.
         igraph_integer_t numpoints = igraph_matrix_nrow(points);
         for (igraph_integer_t a = 0; a < numpoints - 1; a++) {
             for (igraph_integer_t b = a + 1; b < numpoints; b++) {
@@ -189,31 +199,33 @@ igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges, const igr
     return IGRAPH_SUCCESS;
 }
 
+// formulas to calculate the radius of the circles, as a multiple of the
+// distance between the points.
+
+// beta >= 1
 igraph_real_t standard_r(igraph_real_t beta) {
     return beta * 0.5;
 }
-
+// beta < 1
 igraph_real_t small_r(igraph_real_t beta) {
     return 0.5 / beta;
 }
 
-igraph_bool_t is_overlap(std::vector<igraph_integer_t> &a, igraph_integer_t a_size, std::vector<igraph_integer_t> &b, igraph_integer_t b_size) {
-    igraph_integer_t
-    a_pos = 0,
-    b_pos = 0;
-    while (a_pos < a_size && b_pos < b_size) {
-        if (a[a_pos] == b[b_pos]) {
-            return true;
-        }
-        if (a[a_pos] < b[b_pos]) {
-            a_pos++;
-        } else {
-            b_pos++;
-        }
-    }
-    return false;
-}
 
+/* -!- centre construction interface -!-
+ * igraph_vector_t *a_centre, b_centre : Expects an initialized vector of the
+ * correct size, will be written to.
+ * igraph_integer_t a, b: the indices of the points,
+ *
+ * igraph_real_t r: the circles will be constructed with radius r * (distance a-> b)
+ *
+ * const igraph_matrix_t *points: point set containing the ponits a and b
+ */
+
+
+// construct the centers of the points for lune based beta skeletons with beta
+// >= 1. The points lie on the line from a to b, such that the points lie on one
+// of the circles.
 igraph_error_t construct_lune_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
     igraph_vector_t a_point, b_point;
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
@@ -235,6 +247,8 @@ igraph_error_t construct_lune_centres(igraph_vector_t *a_centre, igraph_vector_t
     return IGRAPH_SUCCESS;
 }
 
+// construct the centres of the circles for beta < 1, or circle based beta
+// skeletons.
 igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
     igraph_vector_t a_point, b_point;
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
@@ -273,7 +287,9 @@ igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t
     IGRAPH_FINALLY_CLEAN(4);
     return IGRAPH_SUCCESS;
 }
-
+// iterate through the edges given, applying the provided filter.
+// currently used with is_intersection_empty and is_union_empty.
+// todo: specialize for multiple dimensions?
 template < igraph_error_t filter(igraph_bool_t *result, kdTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) >
 igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_integer_t point_count = igraph_matrix_nrow(points);
@@ -295,7 +311,17 @@ igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *p
     IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
     return IGRAPH_SUCCESS;
 }
+/* -!- Filter interface -!-
+ * igraph_bool_t *result        : will be overwritten with the result
+ * kdTree <-1> &tree            : used for nanoflann check, should be
+ * initialized and filed with points. igraph_integer_t a, b        : the
+ * endpoints of the edge being evaluated. igraph_real_t beta           :
+ * parameter for beta-skeletons. const igraph_matrix_t *points: matrix
+ * containing all the points.
+ */
 
+// test whether the intersection of the two circles as generated by r_calcuation
+// and centre_positions is empty of points except for a and b.
 template <igraph_real_t r_calculation(igraph_real_t beta),
           igraph_error_t centre_positions(igraph_vector_t *a_centre,
                   igraph_vector_t *b_centre,
@@ -312,7 +338,7 @@ igraph_error_t is_intersection_empty(
     igraph_real_t beta) {
 
     igraph_real_t r = r_calculation(beta);
-    igraph_real_t distance = get_sqr_distance(a, b, points);
+    igraph_real_t distance = ind_ind_sqr_distance(a, b, points);
 
     igraph_vector_t midpoint;
     igraph_integer_t dims = igraph_matrix_ncol(points);
@@ -337,7 +363,7 @@ igraph_error_t is_intersection_empty(
     tree.findNeighbors(intersections, VECTOR(midpoint));
 
     *result = intersections.size() == 0;
-    //else         {printf("Not adding %li-%li\n", a, b);}
+
     igraph_vector_destroy(&midpoint);
     igraph_vector_destroy(&a_centre);
     igraph_vector_destroy(&b_centre);
@@ -346,6 +372,8 @@ igraph_error_t is_intersection_empty(
     return IGRAPH_SUCCESS;
 }
 
+// test whether the union of the circles given by r_calculation and
+// centre_positions is empty of other points except for a and b.
 template <igraph_real_t r_calculation(igraph_real_t beta),
           igraph_error_t centre_positions(igraph_vector_t *a_centre,
                   igraph_vector_t *b_centre,
@@ -363,7 +391,7 @@ igraph_error_t is_union_empty(
 
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
-    igraph_real_t distance = get_sqr_distance(a, b, points);
+    igraph_real_t distance = ind_ind_sqr_distance(a, b, points);
     igraph_real_t r = r_calculation(beta);
     igraph_vector_t a_centre, b_centre;
 
@@ -422,6 +450,7 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
+    // determine filter required based on beta.
     if (beta >= 1) {
         IGRAPH_CHECK((filter_edges < is_intersection_empty < standard_r, construct_lune_centres > > (&potential_edges, points, beta)));
     } else {
@@ -503,7 +532,7 @@ public:
     using IndexType = igraph_integer_t;
     BetaFinder(double max_beta, double tol, igraph_integer_t v1, igraph_integer_t v2, const igraph_matrix_t *ps) :
         max_beta(max_beta), tol(tol), ai(v1), bi(v2), ps(ps),
-        ab2(get_sqr_distance(ai, bi, ps)) {
+        ab2(ind_ind_sqr_distance(ai, bi, ps)) {
         init();
     }
 
@@ -532,8 +561,8 @@ public:
     }
 
     igraph_real_t pointBeta(igraph_integer_t index) const {
-        igraph_real_t ap2 = get_sqr_distance(ai, index, ps);
-        igraph_real_t bp2 = get_sqr_distance(bi, index, ps);
+        igraph_real_t ap2 = ind_ind_sqr_distance(ai, index, ps);
+        igraph_real_t bp2 = ind_ind_sqr_distance(bi, index, ps);
 
         if (ap2 > bp2) {
             std::swap(ap2, bp2);
