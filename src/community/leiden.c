@@ -1079,7 +1079,10 @@ static igraph_error_t community_leiden(
  * is the vertex weight of vertex \c i (separate out- and in-weights are used
  * with directed graphs), <code>s_i</code> is the cluster of vertex
  * \c i and <code>δ(x, y) = 1</code> if and only if <code>x = y</code> and 0
- * otherwise. By setting <code>n_i = k_i</code>, the degree of vertex \c i, and
+ * otherwise.
+ *
+ * </para><para>
+ * By setting <code>n_i = k_i</code>, the degree of vertex \c i, and
  * dividing \c γ by <code>2m</code> (by \c m in the directed case), we effectively
  * obtain an expression for modularity. Hence, the standard modularity will be
  * optimized when you supply the degrees (out- and in-degrees with directed graphs)
@@ -1278,9 +1281,10 @@ igraph_error_t igraph_community_leiden(
  *
  * This is a simplified interface to \ref igraph_community_leiden() for
  * convenience purposes. Instead of requiring vertex weights, it allows
- * choosing from a set of objective functions to maximize, and calculates
- * the vertex weights and resolution parameter to pass to
- * \ref igraph_community_leiden() accordingly.
+ * choosing from a set of objective functions to maximize. It implements
+ * these objective functions by passing suitable vertex weights to
+ * \ref igraph_community_leiden(), as explained in the documentation of
+ * that function.
  *
  * \param graph The input graph. May be directed or undirected.
  * \param weights The edge weights. If \c NULL, all weights are assumed to be 1.
