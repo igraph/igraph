@@ -254,7 +254,8 @@ directed: false
 vcount: 0
 edges: {
 }
-Relative neighborhood graph, 10 points 3ddirected: false
+Relative neighborhood graph, 10 points 3d
+directed: false
 vcount: 10
 edges: {
 0 3

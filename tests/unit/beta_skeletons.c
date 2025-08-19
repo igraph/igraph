@@ -63,7 +63,7 @@ int main(void) {
     igraph_destroy(&graph);
 
 
-    printf("Relative neighborhood graph, 10 points 3d");
+    printf("Relative neighborhood graph, 10 points 3d\n");
     igraph_lune_beta_skeleton(&graph, &point_3d_mat, 2);
     print_graph_canon(&graph);
     igraph_destroy(&graph);
