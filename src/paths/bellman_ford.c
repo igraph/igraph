@@ -160,7 +160,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
                 IGRAPH_ERROR("Negative cycle in graph while calculating distances with Bellman-Ford algorithm.",
-                             IGRAPH_ENEGLOOP);
+                             IGRAPH_ENEGCYCLE);
             }
 
             /* If we cannot get to j in finite time yet, there is no need to relax
@@ -294,7 +294,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *           The weight vector doesn't math the number of edges.
  *         \cli IGRAPH_EINVVID
  *           \p from is invalid vertex ID
- *         \cli IGRAPH_ENEGLOOP
+ *         \cli IGRAPH_ENEGCYCLE
  *           Bellman-ford algorithm encounted a negative cycle.
  *         \endclist
  *
@@ -382,7 +382,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
             IGRAPH_ERROR("Negative cycle in graph while calculating distances with Bellman-Ford algorithm.",
-                         IGRAPH_ENEGLOOP);
+                         IGRAPH_ENEGCYCLE);
         }
 
         /* If we cannot get to j in finite time yet, there is no need to relax its edges */

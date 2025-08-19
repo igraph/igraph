@@ -124,7 +124,7 @@ static const char *igraph_i_error_strings[] = {
     /* 34 */ "Error from calculation of a real Schur form",
     /* 35 */ "LAPACK (dtrevc) error for calculating eigenvectors",
     /* 36 */ "Unknown ARPACK error",
-    /* 37 */ "Negative loop detected while calculating shortest paths",
+    /* 37 */ "Negative cycle detected while calculating shortest paths",
     /* 38 */ "Internal error, likely a bug in igraph",
     /* 39 */ "Maximum number of iterations reached",
     /* 40 */ "No shifts could be applied during a cycle of the "
