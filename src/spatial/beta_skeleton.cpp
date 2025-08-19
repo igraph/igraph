@@ -18,7 +18,6 @@
 
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
-#include "igraph_interface.h"
 #include "igraph_matrix.h"
 #include "igraph_spatial.h"
 
@@ -30,12 +29,9 @@
 #include "nanoflann/nanoflann.hpp"
 
 #include "igraph_error.h"
-#include <algorithm>
-#include <cstdlib>
-#include <math.h>
 #include <vector>
 
-// Methods to get distances between two vectors, including when one or both are embedded in a matrix
+// Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
 igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_real_t temp;
@@ -68,8 +64,8 @@ igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t 
     return distance;
 }
 
-// Adapted from code originally by szabolcs
-// used in is_union_empty
+// Adapted from code by Szabolcs at https://github.com/szhorvat/IGraphM
+// Used in is_union_empty
 class NeighborCounts {
     const double radius; // L2 search radius
     const igraph_integer_t a, b; // edge endpoits; excluded from the count
@@ -77,11 +73,13 @@ class NeighborCounts {
     igraph_integer_t found;
 
 public:
+    // Boilerplate
     using DistanceType = igraph_real_t;
     NeighborCounts(igraph_real_t radius, igraph_integer_t a, igraph_integer_t b, igraph_bool_t short_circuit)
         : radius(radius), a(a), b(b), short_circuit(short_circuit) {
         init();
     }
+
     void init() {
         clear();
     }
@@ -94,25 +92,32 @@ public:
     bool full() const {
         return true;
     }
+
+    void sort() const {}
+
+    double worstDist() const {
+        return radius;
+    }
+
+    // Business logic
+    // Add the point if it's close enough
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
         if (dist < radius && index != a && index != b) {
             found += 1;
             if (short_circuit) {
+                // Dont continue searching if it only matters if there's one or more.
                 return false;
             }
         }
         return true;
     }
-    void sort() const {}
-    double worstDist() const {
-        return radius;
-    }
+
 };
 
 // Helper result class for listing the points in the lune's bounding disk
 // and counting how many are within the lune.
-// used in is_intersection_empty
-// adapted from code by Szabolcs in IGraphM
+// Used in is_intersection_empty.
+// Adapted from code by Szabolcs at https://github.com/szhorvat/IGraphM.
 class IntersectionCounts {
     const double radius; // L2 search radius
     const double beta_radius;
@@ -120,10 +125,9 @@ class IntersectionCounts {
     const igraph_integer_t a, b; // edge endpoits; excluded from the count
     const igraph_vector_t *a_centre, *b_centre; // disc centres
     const igraph_matrix_t *points;
-
     size_t count;
-
 public:
+    // Boilerplate
     using DistanceType = igraph_real_t;
     IntersectionCounts(
         double radius_, double beta_radius_,
@@ -135,10 +139,10 @@ public:
           a_centre(a_centre), b_centre(b_centre), points(points) {
         init();
     }
-
     void init() {
         clear();
     }
+
     void clear() {
         count = 0;
     }
@@ -150,14 +154,21 @@ public:
     bool full() const {
         return true;
     }
+
     void sort() const {}
 
+    double worstDist() const {
+        return radius;
+    }
+    // business logic is all contained here.
+    // Count the point if it is within the radius from both centres, and if it's not one of the endpoints.
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
         if (dist < radius && index != a && index != b) {
             double pd1 = vec_ind_sqr_dist(a_centre, index, points);
             double pd2 = vec_ind_sqr_dist(b_centre, index, points);
             if (pd1 < beta_radius && pd2 < beta_radius) {
                 count++;
+                // Stop searching if it only matters to have at least one point.
                 if (short_circuit) {
                     return false;
                 }
@@ -165,11 +176,9 @@ public:
         }
         return true;
     }
-    double worstDist() const {
-        return radius;
-    }
 };
 
+// shrinks type signatures significantly.
 template <igraph_integer_t Dimension>
 using kdTree = nanoflann::KDTreeSingleIndexAdaptor <
                nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
@@ -181,8 +190,10 @@ using kdTree = nanoflann::KDTreeSingleIndexAdaptor <
 igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
         const igraph_matrix_t *points,
         igraph_real_t beta) {
+
     igraph_integer_t num_points = igraph_matrix_nrow(points);
     igraph_integer_t num_dims   = igraph_matrix_ncol(points);
+
     if (beta >= 1 && num_points > num_dims) { // large beta, subset of delaunay
         IGRAPH_CHECK(igraph_i_delaunay_edges(edges, points));
     } else { // small beta, not subset of delaunay, give complete graph.
@@ -199,22 +210,18 @@ igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
     return IGRAPH_SUCCESS;
 }
 
-// formulas to calculate the radius of the circles, as a multiple of the
-// distance between the points.
-
-// beta >= 1
-igraph_real_t standard_r(igraph_real_t beta) {
-    return beta * 0.5;
-}
-// beta < 1
-igraph_real_t small_r(igraph_real_t beta) {
-    return 0.5 / beta;
+igraph_real_t calculate_r(igraph_real_t beta) {
+    if (beta < 1) {
+        return 0.5 / beta;
+    }
+    return 0.5 * beta;
 }
 
 
 /* -!- centre construction interface -!-
  * igraph_vector_t *a_centre, b_centre : Expects an initialized vector of the
  * correct size, will be written to.
+ *
  * igraph_integer_t a, b: the indices of the points,
  *
  * igraph_real_t r: the circles will be constructed with radius r * (distance a-> b)
@@ -226,7 +233,12 @@ igraph_real_t small_r(igraph_real_t beta) {
 // construct the centers of the points for lune based beta skeletons with beta
 // >= 1. The points lie on the line from a to b, such that the points lie on one
 // of the circles.
-igraph_error_t construct_lune_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
+igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
+                                      igraph_vector_t *b_centre,
+                                      igraph_integer_t a,
+                                      igraph_integer_t b,
+                                      igraph_real_t r,
+                                      const igraph_matrix_t *points) {
     igraph_vector_t a_point, b_point;
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
@@ -287,6 +299,7 @@ igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t
     IGRAPH_FINALLY_CLEAN(4);
     return IGRAPH_SUCCESS;
 }
+
 // iterate through the edges given, applying the provided filter.
 // currently used with is_intersection_empty and is_union_empty.
 // todo: specialize for multiple dimensions?
@@ -311,6 +324,7 @@ igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *p
     IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
     return IGRAPH_SUCCESS;
 }
+
 /* -!- Filter interface -!-
  * igraph_bool_t *result        : will be overwritten with the result
  * kdTree <-1> &tree            : used for nanoflann check, should be
@@ -320,15 +334,14 @@ igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *p
  * containing all the points.
  */
 
-// test whether the intersection of the two circles as generated by r_calcuation
-// and centre_positions is empty of points except for a and b.
-template <igraph_real_t r_calculation(igraph_real_t beta),
-          igraph_error_t centre_positions(igraph_vector_t *a_centre,
-                  igraph_vector_t *b_centre,
-                  igraph_integer_t a,
-                  igraph_integer_t b,
-                  igraph_real_t beta,
-                  const igraph_matrix_t * points)>
+// test whether the intersection of the two circles as generated
+// centre_positions is empty of points except for a and b.
+template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
+          igraph_vector_t *b_centre,
+          igraph_integer_t a,
+          igraph_integer_t b,
+          igraph_real_t beta,
+          const igraph_matrix_t * points)>
 igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
     kdTree < -1 > &tree,
@@ -337,7 +350,7 @@ igraph_error_t is_intersection_empty(
     const igraph_matrix_t *points,
     igraph_real_t beta) {
 
-    igraph_real_t r = r_calculation(beta);
+    igraph_real_t r = calculate_r(beta);
     igraph_real_t distance = ind_ind_sqr_distance(a, b, points);
 
     igraph_vector_t midpoint;
@@ -374,13 +387,12 @@ igraph_error_t is_intersection_empty(
 
 // test whether the union of the circles given by r_calculation and
 // centre_positions is empty of other points except for a and b.
-template <igraph_real_t r_calculation(igraph_real_t beta),
-          igraph_error_t centre_positions(igraph_vector_t *a_centre,
-                  igraph_vector_t *b_centre,
-                  igraph_integer_t a,
-                  igraph_integer_t b,
-                  igraph_real_t beta,
-                  const igraph_matrix_t * points)>
+template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
+          igraph_vector_t *b_centre,
+          igraph_integer_t a,
+          igraph_integer_t b,
+          igraph_real_t beta,
+          const igraph_matrix_t * points)>
 igraph_error_t is_union_empty(
     igraph_bool_t *result,
     kdTree < -1 > &tree,
@@ -392,7 +404,7 @@ igraph_error_t is_union_empty(
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
     igraph_real_t distance = ind_ind_sqr_distance(a, b, points);
-    igraph_real_t r = r_calculation(beta);
+    igraph_real_t r = calculate_r(beta);
     igraph_vector_t a_centre, b_centre;
 
 
@@ -452,13 +464,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK((filter_edges < is_intersection_empty < standard_r, construct_lune_centres > > (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges < is_intersection_empty < construct_lune_centres > > (&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<small_r, construct_perp_centres >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty< construct_perp_centres >> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -502,9 +514,9 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
 
-        IGRAPH_CHECK((filter_edges<is_union_empty<standard_r, construct_perp_centres >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_union_empty<construct_perp_centres >> (&potential_edges, points, beta)));
     } else {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<small_r, construct_perp_centres >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres >> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -604,6 +616,28 @@ public:
     }
 };
 
+/**
+ * \function igraph_beta_weighted_gabriel_graph
+ *
+ *  \brief Computes a weighted graph where edge weight represent the beta value at which the edge would disappear.
+ *
+ * \experimental
+ *
+ * This function computes a gabriel graph, where the weight of each edge represents
+ *   the value of beta at which the edge would disappear in a lune based beta skeleton.
+ *
+ * \param graph A pointer to the graph that will be created.
+ * \param edge_weights Will contain the edge weights corresponding to the edge indices from the graph.
+ * \param points A matrix containing the points that will be used.
+ *     Each row is a point, dimensionality is inferred from the column count.
+ *    There must be no duplicate points.
+ * \param max_beta Maxium value of beta to search to, higher values will be represented as infinity.
+ * \return Error code.
+ *
+ * \sa \ref igraph_lune_beta_skeleton() or \ref igraph_circle_beta_skeleton() to generate a graph with a given value of beta.
+ *
+ * Time complexity: TODO
+ */
 igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector_t *edge_weights, const igraph_matrix_t *points, igraph_real_t max_beta) {
     igraph_vector_int_t edges;
     igraph_vector_int_init(&edges, 0);
