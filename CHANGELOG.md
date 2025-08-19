@@ -122,6 +122,7 @@
  - `igraph_array3_t` and all associated functions are deprecated and scheduled for removal in igraph 1.0.
  - `igraph_vector_qsort_ind()` is deprecated in favour of `igraph_vector_sort_ind()`.
  - `igraph_vector_binsearch2()` is deprecated in favour of `igraph_vector_contains_sorted()`.
+ - The error code `IGRAPH_ENEGLOOP` is deprecated in favour of the newly introduced `IGRAPH_ENEGCYCLE`. The underlying integer code did not change.
 
 ### Other
 
