@@ -92,16 +92,16 @@ int main(void) {
     /* Check bad inputs */
 
     /* Negative weight edge in undirected graph */
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_ALL, IGRAPH_FLOYD_WARSHALL_ORIGINAL), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_ALL, IGRAPH_FLOYD_WARSHALL_ORIGINAL), IGRAPH_ENEGCYCLE);
 
     /* Negative cycle in directed graph */
     VECTOR(weights)[1] = -10;
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), IGRAPH_ENEGCYCLE);
 
     /* Negative self-loop in directed graph */
     VECTOR(weights)[1] = 1;
     VECTOR(weights)[10] = -1;
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), IGRAPH_ENEGCYCLE);
 
     /* NaN weight */
     VECTOR(weights)[1] = IGRAPH_NAN;

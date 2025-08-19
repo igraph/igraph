@@ -287,7 +287,7 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
  * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
  * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
- * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
+ * \enumval IGRAPH_ENEGCYCLE Negative cycle detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EDIVZERO Big integer division by zero.
  * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
@@ -352,7 +352,8 @@ typedef enum {
     IGRAPH_ARPACK_SHUR       = 34,
     IGRAPH_ARPACK_LAPACK     = 35,
     IGRAPH_ARPACK_UNKNOWN    = 36,
-    IGRAPH_ENEGLOOP          = 37,
+    IGRAPH_ENEGCYCLE         = 37,
+    IGRAPH_ENEGLOOP IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ENEGCYCLE,
     IGRAPH_EINTERNAL         = 38,
     IGRAPH_ARPACK_MAXIT      = 39,
     IGRAPH_ARPACK_NOSHIFT    = 40,
