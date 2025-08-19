@@ -1765,6 +1765,7 @@ igraph_community_infomap:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS edge_weights,
         OPTIONAL VERTEX_WEIGHTS vertex_weights, INTEGER nb_trials=10,
+        OPTIONAL BOOLEAN is_regularized=false, OPTIONAL REAL regularization_strength=1,
         OPTIONAL OUT VECTOR_INT membership, OPTIONAL OUT REAL codelength
     DEPS: edge_weights ON graph, vertex_weights ON graph
 

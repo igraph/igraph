@@ -92,6 +92,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t *graph,
                                            const igraph_vector_t *edge_weights,
                                            const igraph_vector_t *vertex_weights,
                                            igraph_integer_t nb_trials,
+                                           igraph_bool_t is_regularized,
+                                           igraph_real_t regularization_strength,
                                            igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
 

@@ -125,7 +125,8 @@ static bool infomap_allow_interruption() {
  * either chooses out-edges to follow with probabilities proportional to edge
  * weights, or teleports to a random vertex with probability 0.15. Vertex weights
  * can be given to control the probability of choosing different vertices as
- * the target of the teleportation.
+ * the target of the teleportation. In addition, Infomap can be regularized to
+ * account for potential missing links.
  *
  * </para><para>
  * As of igraph 1.0, the Infomap library written by Daniel Edler, Anton Holmgren
@@ -150,6 +151,11 @@ static bool infomap_allow_interruption() {
  * Eur. Phys. J. Special Topics 178, 13 (2009).
  * https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405
  *
+ * </para><para>
+ * Smiljanić, Jelena, Daniel Edler, and Martin Rosvall: Mapping Flows on
+ * Sparse Networks with Missing Links. Phys Rev E 102 (1–1): 012302 (2020).
+ * https://doi.org/10.1103/PhysRevE.102.012302, https://arxiv.org/abs/2106.14798
+ *
  * \param graph The input graph. Edge directions are taken into account.
  * \param edge_weights Numeric vector giving the weights of the edges.
  *     The random walker will favour edges with high weights over
@@ -165,6 +171,11 @@ static bool infomap_allow_interruption() {
  *     equal weights. Weights are expected to be positive.
  * \param nb_trials The number of attempts to partition the network
  *     (can be any integer value equal to or larger than 1).
+ * \param is_regularized If true, adds a fully connected Bayesian prior network
+ *     to avoid overfitting due to missing links.
+ * \param regularization_strength Adjust relative strength of the Bayesian prior
+ *     network used for regularization. This multiplies the default strength, a
+ *     parameter of 1 hence uses the default regularization strength.
  * \param membership Pointer to a vector. The membership vector is
  *     stored here. \c NULL means that the caller is not interested in the
  *     membership vector.
@@ -183,6 +194,8 @@ igraph_error_t igraph_community_infomap(
         const igraph_vector_t *edge_weights,
         const igraph_vector_t *vertex_weights,
         igraph_integer_t nb_trials,
+        igraph_bool_t is_regularized,
+        igraph_real_t regularization_strength,
         igraph_vector_int_t *membership,
         igraph_real_t *codelength) {
 
@@ -235,6 +248,8 @@ igraph_error_t igraph_community_infomap(
     conf.silent = true;
     conf.directed = igraph_is_directed(graph);
     conf.interruptionHandler = &infomap_allow_interruption;
+    conf.regularized = is_regularized;
+    conf.regularizationStrength = regularization_strength;
 
     infomap::InfomapBase infomap(conf);
 
