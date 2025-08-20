@@ -566,7 +566,7 @@ public:
         return 1;
     }
 
-    double luneHalfHeight2(double beta) const {
+    igraph_real_t luneHalfHeight2(double beta) const {
         if (beta == 0) {
             return 0;
         }
