@@ -99,7 +99,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_modularity(&graph, &membership, NULL, 1.5, IGRAPH_UNDIRECTED, &m);
             igraph_modularity_matrix(&graph, NULL, 0.75, &mat, IGRAPH_DIRECTED);
-            igraph_assortativity_nominal(&graph, &membership, &r, IGRAPH_DIRECTED, true);
+            igraph_assortativity_nominal(&graph, NULL, &membership, &r, IGRAPH_DIRECTED, true);
 
             igraph_simplify(&graph, true, true, NULL);
             igraph_community_voronoi(&graph, &membership, &iv, &m, NULL, NULL, IGRAPH_OUT, 1.0);
