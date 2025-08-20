@@ -37,7 +37,7 @@ igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = abs(MATRIX(*points, a, i) - MATRIX(*points, b, i));
+        temp = fabs(MATRIX(*points, a, i) - MATRIX(*points, b, i));
         distance += temp * temp;
     }
     return distance;
@@ -48,7 +48,7 @@ igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *
     igraph_real_t temp;
     igraph_integer_t dims = igraph_vector_size(a);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = abs(VECTOR(*a)[i] - VECTOR(*b)[i]);
+        temp = fabs(VECTOR(*a)[i] - VECTOR(*b)[i]);
         distance += temp * temp;
     }
     return distance;
@@ -58,7 +58,7 @@ igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t 
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = abs(VECTOR(*a)[i] - MATRIX(*points, b, i));
+        temp = fabs(VECTOR(*a)[i] - MATRIX(*points, b, i));
         distance += temp * temp;
     }
     return distance;
