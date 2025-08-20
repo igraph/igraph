@@ -1008,6 +1008,7 @@ add_benchmarks(
   graphicality
   igraph_adjacency
   igraph_average_path_length_unweighted
+  beta_skeletons
   igraph_betweenness
   igraph_betweenness_weighted
   igraph_cliques
