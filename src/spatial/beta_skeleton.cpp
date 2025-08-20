@@ -308,7 +308,6 @@ igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t
 // TODO: specialize for multiple dimensions?
 template < igraph_error_t filter(igraph_bool_t *result, kdTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) >
 igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    igraph_integer_t point_count = igraph_matrix_nrow(points);
     igraph_integer_t available_edges = igraph_vector_int_size(edges);
     igraph_integer_t added_edges = 0;
     ig_point_adaptor adaptor(points);
@@ -612,7 +611,7 @@ public:
         return max_radius;
     }
     void sort() {}
-    igraph_real_t const thresholdBeta() const {
+    igraph_real_t thresholdBeta() const {
         return smallest_beta;
     }
 };
