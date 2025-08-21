@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "misc/order_cycle.h"
+#include "cycles/order_cycle.h"
 
 #include "igraph_interface.h"
 

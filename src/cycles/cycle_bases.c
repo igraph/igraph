@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "igraph_interface.h"
 
 #include "core/interruption.h"
-#include "misc/order_cycle.h"
+#include "cycles/order_cycle.h"
 
 /**** Fundamental cycles *****/
 
