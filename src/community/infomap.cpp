@@ -175,7 +175,8 @@ static bool infomap_allow_interruption() {
  *     to avoid overfitting due to missing links.
  * \param regularization_strength Adjust relative strength of the Bayesian prior
  *     network used for regularization. This multiplies the default strength, a
- *     parameter of 1 hence uses the default regularization strength.
+ *     parameter of 1 hence uses the default regularization strength. Ignored
+ *     when \p is_regularized is set to \c false.
  * \param membership Pointer to a vector. The membership vector is
  *     stored here. \c NULL means that the caller is not interested in the
  *     membership vector.
