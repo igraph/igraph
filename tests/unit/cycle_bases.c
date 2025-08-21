@@ -55,31 +55,31 @@ int main(void) {
 
     printf("\nNull graph\n");
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
-    igraph_fundamental_cycles(&graph, &result, -1, -1, NULL);
+    igraph_fundamental_cycles(&graph, NULL, &result, -1, -1);
     print_check_destroy(&graph, &result);
 
     printf("\nSingleton graph\n");
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
-    igraph_fundamental_cycles(&graph, &result, -1, -1, NULL);
+    igraph_fundamental_cycles(&graph, NULL, &result, -1, -1);
     print_check_destroy(&graph, &result);
 
     printf("\nSingle vertex with loop\n");
     igraph_small(&graph, 1, IGRAPH_UNDIRECTED,
                  0,0,
                  -1);
-    igraph_fundamental_cycles(&graph, &result, -1, -1, NULL);
+    igraph_fundamental_cycles(&graph, NULL, &result, -1, -1);
     print_check_destroy(&graph, &result);
 
     printf("\nTree\n");
     igraph_kary_tree(&graph, 3, 2, IGRAPH_TREE_UNDIRECTED);
-    igraph_fundamental_cycles(&graph, &result, -1, -1, NULL);
+    igraph_fundamental_cycles(&graph, NULL, &result, -1, -1);
     print_check_destroy(&graph, &result);
 
     printf("\n2-cycle\n");
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
                  0,1, 0,1,
                  -1);
-    igraph_fundamental_cycles(&graph, &result, -1, -1, NULL);
+    igraph_fundamental_cycles(&graph, NULL, &result, -1, -1);
     print_check_destroy(&graph, &result);
 
     printf("\nDisconnected\n");
@@ -90,38 +90,38 @@ int main(void) {
                  10,10, 10,11,
                  12,12,
                  -1);
-    igraph_fundamental_cycles(&graph, &result, -1, -1, NULL);
+    igraph_fundamental_cycles(&graph, NULL, &result, -1, -1);
     print_check_destroy(&graph, &result);
 
     printf("\nMINIMUM WEIGHT CYCLE BASIS\n");
 
     printf("\nNull graph\n");
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
     print_check_destroy(&graph, &result);
 
     printf("\nSingleton graph\n");
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
     print_check_destroy(&graph, &result);
 
     printf("\nSingle vertex with loop\n");
     igraph_small(&graph, 1, IGRAPH_UNDIRECTED,
                  0,0,
                  -1);
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
     print_check_destroy(&graph, &result);
 
     printf("\nTree\n");
     igraph_kary_tree(&graph, 3, 2, IGRAPH_TREE_UNDIRECTED);
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
     print_check_destroy(&graph, &result);
 
     printf("\n2-cycle\n");
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
                  0,1, 0,1,
                  -1);
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
     print_check_destroy(&graph, &result);
 
     printf("\nDisconnected\n");
@@ -132,7 +132,7 @@ int main(void) {
                  10,10, 10,11,
                  12,12,
                  -1);
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
     print_check_destroy(&graph, &result);
 
     printf("\nPeriodic (5,6)-grid\n");
@@ -154,7 +154,7 @@ int main(void) {
         igraph_vector_int_destroy(&dimvec);
     }
 
-    igraph_minimum_cycle_basis(&graph, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true, NULL);
+    igraph_minimum_cycle_basis(&graph, NULL, &result, /* cutoff */ -1, /* complete */ true, /* ordered */ true);
 
     rank = igraph_vector_int_list_size(&result);
 

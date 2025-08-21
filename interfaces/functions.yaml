@@ -2624,15 +2624,18 @@ igraph_eulerian_cycle:
 
 igraph_fundamental_cycles:
     PARAMS: |-
-        GRAPH graph, OUT EDGE_INDICES_LIST basis, OPTIONAL VERTEX start,
-        REAL bfs_cutoff=-1, OPTIONAL EDGE_WEIGHTS weights
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        OUT EDGE_INDICES_LIST basis, 
+        OPTIONAL VERTEX start,
+        REAL bfs_cutoff=-1
     DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
     PARAMS: |-
-        GRAPH graph, OUT EDGE_INDICES_LIST basis, REAL bfs_cutoff=-1,
-        BOOLEAN complete=True, BOOLEAN use_cycle_order=True,
-        OPTIONAL EDGE_WEIGHTS weights
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, 
+        OUT EDGE_INDICES_LIST basis, 
+        REAL bfs_cutoff=-1,
+        BOOLEAN complete=True, BOOLEAN use_cycle_order=True
     DEPS: weights ON graph, basis ON graph
 
 #######################################
