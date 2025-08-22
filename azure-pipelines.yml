@@ -99,6 +99,7 @@ jobs:
 
       - template: .azure/build.yml
         parameters:
+          build_type: Debug
           extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-mfpmath=387" -DCMAKE_CXX_FLAGS="-mfpmath=387"'
 
   - job: linux_alpine
