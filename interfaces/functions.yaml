@@ -711,10 +711,11 @@ igraph_harmonic_centrality_cutoff:
 
 igraph_pagerank:
     PARAMS: |-
-        GRAPH graph, PAGERANKALGO algo=PRPACK,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT VERTEX_QTY vector, OUT REAL value,
-        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
-        REAL damping=0.85, OPTIONAL EDGE_WEIGHTS weights,
+        REAL damping=0.85, BOOLEAN directed=True, 
+        VERTEX_SELECTOR vids=ALL, 
+        PAGERANKALGO algo=PRPACK,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,
@@ -722,11 +723,12 @@ igraph_pagerank:
 
 igraph_personalized_pagerank:
     PARAMS: |-
-        GRAPH graph, PAGERANKALGO algo=PRPACK,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT VERTEX_QTY vector, OUT REAL value,
-        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
-        REAL damping=0.85, OPTIONAL VECTOR personalized,
-        OPTIONAL EDGE_WEIGHTS weights,
+        OPTIONAL VECTOR reset,
+        REAL damping=0.85, BOOLEAN directed=True,
+        VERTEX_SELECTOR vids=ALL,
+        PAGERANKALGO algo=PRPACK,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,
@@ -734,12 +736,12 @@ igraph_personalized_pagerank:
 
 igraph_personalized_pagerank_vs:
     PARAMS: |-
-        GRAPH graph, PAGERANKALGO algo=PRPACK,
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         PRIMARY OUT VERTEX_QTY vector, OUT REAL value,
-        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
-        REAL damping=0.85,
         VERTEX_SELECTOR reset_vids,
-        OPTIONAL EDGE_WEIGHTS weights,
+        REAL damping=0.85, BOOLEAN directed=True,
+        VERTEX_SELECTOR vids=ALL, 
+        PAGERANKALGO algo=PRPACK,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,

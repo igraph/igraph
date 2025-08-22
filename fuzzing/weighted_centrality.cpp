@@ -73,7 +73,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_harmonic_centrality_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_IN, &weights, true, 4);
             igraph_global_efficiency(&graph, &weights, &r, IGRAPH_DIRECTED);
             igraph_local_efficiency(&graph, &weights, &v, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_OUT);
-            igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &v, &r, igraph_vss_all(), IGRAPH_DIRECTED, 0.6, &weights, NULL);
+            igraph_pagerank(&graph, &weights, &v, &r, 0.6, IGRAPH_DIRECTED, igraph_vss_all(),
+                            IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
             igraph_constraint(&graph, &v, igraph_vss_all(), &weights);
 
             {

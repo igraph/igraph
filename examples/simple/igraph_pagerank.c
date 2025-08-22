@@ -13,10 +13,10 @@ int main(void) {
     /* Initialize the vector where the results will be stored */
     igraph_vector_init(&pagerank, 0);
 
-    igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK,
+    igraph_pagerank(&graph, /* weights */ NULL,
                     &pagerank, &value,
-                    igraph_vss_all(), IGRAPH_DIRECTED,
-                    /* damping */ 0.85, /* weights */ NULL,
+            /* damping */ 0.85, IGRAPH_DIRECTED,
+                    igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK,
                     NULL /* not needed with PRPACK method */);
 
     /* Check that the eigenvalue is 1, as expected. */
