@@ -595,7 +595,7 @@ public:
 
         igraph_real_t beta = 2 * ap2 / denom;
 
-        return beta < 1 + tol ? 0 : beta;
+        return beta < 1 - tol ? 0 : beta; // TODO: revert to 1 + tol
     }
 
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
