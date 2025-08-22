@@ -1,9 +1,26 @@
+/*
+   IGraph library.
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #include <igraph.h>
 
 #include "bench.h"
 #include "igraph_spatial.h"
 
-
+#include <float.h>
 
 void bench_lune(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_integer_t dimensions, igraph_real_t beta) {
     igraph_matrix_t points;
@@ -30,7 +47,7 @@ void bench_lune(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_i
 }
 
 void bench_circle(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_integer_t dimensions, igraph_real_t beta) {
- igraph_matrix_t points;
+    igraph_matrix_t points;
     igraph_t g;
     char msg[200];
 

@@ -31,13 +31,17 @@
 #include "igraph_error.h"
 #include <vector>
 
+#include <float.h>
+
+#define TOLERANCE (128 * DBL_EPSILON)
+
 // Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
 igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = fabs(MATRIX(*points, a, i) - MATRIX(*points, b, i));
+        temp = MATRIX(*points, a, i) - MATRIX(*points, b, i);
         distance += temp * temp;
     }
     return distance;
@@ -48,7 +52,7 @@ igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *
     igraph_real_t temp;
     igraph_integer_t dims = igraph_vector_size(a);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = fabs(VECTOR(*a)[i] - VECTOR(*b)[i]);
+        temp = VECTOR(*a)[i] - VECTOR(*b)[i];
         distance += temp * temp;
     }
     return distance;
@@ -58,7 +62,7 @@ igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t 
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = fabs(VECTOR(*a)[i] - MATRIX(*points, b, i));
+        temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
         distance += temp * temp;
     }
     return distance;
@@ -353,7 +357,7 @@ igraph_error_t is_intersection_empty(
     igraph_real_t beta) {
 
     igraph_real_t r = calculate_r(beta);
-    igraph_real_t distance = ind_ind_sqr_distance(a, b, points);
+    igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
 
     igraph_vector_t midpoint;
     igraph_integer_t dims = igraph_matrix_ncol(points);
@@ -371,9 +375,9 @@ igraph_error_t is_intersection_empty(
         VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_centre)[i] + VECTOR(b_centre)[i]);
     }
     //squared halfheight of lune
-    igraph_real_t lune_height = distance - vec_vec_sqr_dist(&midpoint, &a_centre);
+    igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_centre);
 
-    IntersectionCounts intersections(lune_height, distance * r * r, true, a, b, &a_centre, &b_centre, points);
+    IntersectionCounts intersections(lune_height, sqr_dist * r * r * (1 + TOLERANCE), true, a, b, &a_centre, &b_centre, points);
 
     tree.findNeighbors(intersections, VECTOR(midpoint));
 
@@ -405,7 +409,7 @@ igraph_error_t is_union_empty(
 
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
-    igraph_real_t distance = ind_ind_sqr_distance(a, b, points);
+    igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
     igraph_real_t r = calculate_r(beta);
     igraph_vector_t a_centre, b_centre;
 
@@ -415,7 +419,7 @@ igraph_error_t is_union_empty(
     IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
     IGRAPH_CHECK(centre_positions(&a_centre, &b_centre, a, b, r, points));
 
-    NeighborCounts neighbor_search(distance * r * r, a, b, true);
+    NeighborCounts neighbor_search(sqr_dist * r * r * (1 + TOLERANCE), a, b, true);
 
     tree.findNeighbors(neighbor_search, VECTOR(a_centre));
 
@@ -656,7 +660,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector
     IGRAPH_VECTOR_INIT_FINALLY(&midpoint, dim);
 
     for (igraph_integer_t i = 0; i < edge_count; i++) {
-        BetaFinder finder(max_beta, /*tolerance=*/0, VECTOR(edges)[2 * i], VECTOR(edges)[2 * i + 1], points);
+        BetaFinder finder(max_beta, TOLERANCE, VECTOR(edges)[2 * i], VECTOR(edges)[2 * i + 1], points);
 
         for (igraph_integer_t axis = 0; axis < dim; axis++) {
             VECTOR(midpoint)[axis] = 0.5 * (

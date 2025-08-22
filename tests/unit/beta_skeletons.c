@@ -1,3 +1,20 @@
+/*
+   IGraph library.
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 #include "test_utilities.h"
@@ -8,13 +25,13 @@ int main(void) {
 
     igraph_real_t points[] = {
 
-        0.474217, 0.0314797, 0.208089, 0.439308, 0.967367, 0.530466, \
-        0.177005, 0.426713, 0.568462, 0.57507, 0.441834, 0.284514, 0.479224, \
-        0.817988, 0.720209, 0.225744, 0.204941, 0.44297, 0.285318, 0.912984, \
-        0.831097, 0.0176603, 0.827154, 0.472702, 0.173059, 0.561858, \
-        0.156276, 0.88019, 0.65935, 0.538207, 0.570379, 0.518081, 0.900553, \
-        0.656416, 0.726631, 0.863709, 0.380264, 0.287159, 0.31098, 0.230773, \
-        0.243089, 0.164584, 0.967974, 0.524992, 0.726605, 0.0724703, \
+        0.474217, 0.0314797, 0.208089, 0.439308, 0.967367, 0.530466,
+        0.177005, 0.426713, 0.568462, 0.57507, 0.441834, 0.284514, 0.479224,
+        0.817988, 0.720209, 0.225744, 0.204941, 0.44297, 0.285318, 0.912984,
+        0.831097, 0.0176603, 0.827154, 0.472702, 0.173059, 0.561858,
+        0.156276, 0.88019, 0.65935, 0.538207, 0.570379, 0.518081, 0.900553,
+        0.656416, 0.726631, 0.863709, 0.380264, 0.287159, 0.31098, 0.230773,
+        0.243089, 0.164584, 0.967974, 0.524992, 0.726605, 0.0724703,
         0.739752, 0.447069, 0.0443581, 0.444839
     };
 
