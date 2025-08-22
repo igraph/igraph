@@ -71,7 +71,7 @@ igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t 
 // Adapted from code by Szabolcs at https://github.com/szhorvat/IGraphM
 // Used in is_union_empty
 class NeighborCounts {
-    const double radius; // L2 search radius
+    const igraph_real_t radius; // L2 search radius
     const igraph_integer_t a, b; // edge endpoits; excluded from the count
     igraph_bool_t short_circuit;
     igraph_integer_t found;
@@ -99,7 +99,7 @@ public:
 
     void sort() const {}
 
-    double worstDist() const {
+    igraph_real_t worstDist() const {
         return radius;
     }
 
@@ -123,9 +123,9 @@ public:
 // Used in is_intersection_empty.
 // Adapted from code by Szabolcs at https://github.com/szhorvat/IGraphM.
 class IntersectionCounts {
-    const double radius;                        // Half height of intersection lune
-    const double beta_radius;                   // Radius of circles
-    const bool short_circuit;                   // Whether to stop after one point has been found
+    const igraph_real_t radius;                        // Half height of intersection lune
+    const igraph_real_t beta_radius;                   // Radius of circles
+    const igraph_bool_t short_circuit;                   // Whether to stop after one point has been found
     const igraph_integer_t a, b;                // Edge endpoits; excluded from the count.
     const igraph_vector_t *a_centre, *b_centre; // Circle centres.
     const igraph_matrix_t *points;              // List of points, used to test if points are in range
@@ -134,7 +134,7 @@ public:
     // Boilerplate for nanoflann
     using DistanceType = igraph_real_t;
     IntersectionCounts(
-        double radius_, double beta_radius_,
+        igraph_real_t radius_, igraph_real_t beta_radius_,
         bool short_circuit_,
         igraph_integer_t a, igraph_integer_t b, const igraph_vector_t *a_centre, const igraph_vector_t *b_centre, const igraph_matrix_t *points)
         : radius(radius_), beta_radius(beta_radius_),
@@ -161,15 +161,15 @@ public:
 
     void sort() const {}
 
-    double worstDist() const {
+    igraph_real_t worstDist() const {
         return radius;
     }
     // Business logic is all contained here.
     // Count the point if it is within the radius from both centres, and if it's not one of the endpoints.
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
         if (dist < radius && index != a && index != b) {
-            double pd1 = vec_ind_sqr_dist(a_centre, index, points);
-            double pd2 = vec_ind_sqr_dist(b_centre, index, points);
+            igraph_real_t pd1 = vec_ind_sqr_dist(a_centre, index, points);
+            igraph_real_t pd2 = vec_ind_sqr_dist(b_centre, index, points);
             if (pd1 < beta_radius && pd2 < beta_radius) {
                 count++;
                 // Stop searching if it only matters to have at least one point.
@@ -541,13 +541,13 @@ class BetaFinder {
     const igraph_matrix_t *ps;
     const igraph_real_t ab2;
 
-    double smallest_beta;
-    double max_radius;
+    igraph_real_t smallest_beta;
+    igraph_real_t max_radius;
 
 public:
     using DistanceType = igraph_real_t;
     using IndexType = igraph_integer_t;
-    BetaFinder(double max_beta, double tol, igraph_integer_t v1, igraph_integer_t v2, const igraph_matrix_t *ps) :
+    BetaFinder(igraph_real_t max_beta, igraph_real_t tol, igraph_integer_t v1, igraph_integer_t v2, const igraph_matrix_t *ps) :
         max_beta(max_beta), tol(tol), ai(v1), bi(v2), ps(ps),
         ab2(ind_ind_sqr_distance(ai, bi, ps)) {
         init();
@@ -570,7 +570,7 @@ public:
         return 1;
     }
 
-    igraph_real_t luneHalfHeight2(double beta) const {
+    igraph_real_t luneHalfHeight2(igraph_real_t beta) const {
         if (beta == 0) {
             return 0;
         }
@@ -587,10 +587,10 @@ public:
             std::swap(ap2, bp2);
         }
 
-        double denom = ab2 + ap2 - bp2;
+        igraph_real_t denom = ab2 + ap2 - bp2;
 
         if (denom <= 0) {
-            return std::numeric_limits<double>::infinity();
+            return IGRAPH_INFINITY;
         }
 
         igraph_real_t beta = 2 * ap2 / denom;
@@ -601,7 +601,7 @@ public:
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
 
         if (dist < max_radius) {
-            double beta = pointBeta(index);
+            igraph_real_t beta = pointBeta(index);
             if (beta < smallest_beta && beta < max_beta) {
                 smallest_beta = beta;
                 max_radius = luneHalfHeight2(beta);
