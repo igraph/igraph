@@ -576,10 +576,10 @@ public:
     // If calculated beta is under 1, it would not appear in the gabriel graph, so a 0 is returned
     // which is to be interpreted as the edge being missing.
     igraph_real_t pointBeta(igraph_integer_t index) const {
+        if (index == ai || index == bi) return IGRAPH_INFINITY;
+
         igraph_real_t ap2 = ind_ind_sqr_distance(ai, index, ps);
         igraph_real_t bp2 = ind_ind_sqr_distance(bi, index, ps);
-
-
 
         if (ap2 > bp2) {
             std::swap(ap2, bp2);
