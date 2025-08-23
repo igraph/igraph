@@ -94,10 +94,10 @@ int main(void) {
     igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_mat, IGRAPH_INFINITY);
     igraph_lune_beta_skeleton(&graph2, &point_mat, 1);
     igraph_is_same_graph(&graph, &graph2, &is_same);
-    IGRAPH_ASSERT(is_same);
     igraph_destroy(&graph2);
     igraph_destroy(&graph);
     print_vector(&weights);
+    IGRAPH_ASSERT(is_same);
     igraph_vector_destroy(&weights);
 
     printf("Beta weighted gabriel graph, 2d 25 points cutoff = 5\n");
@@ -112,10 +112,10 @@ int main(void) {
     igraph_beta_weighted_gabriel_graph(&graph, &weights, &point_3d_mat, IGRAPH_INFINITY);
     igraph_lune_beta_skeleton(&graph2, &point_3d_mat, 1);
     igraph_is_same_graph(&graph, &graph2, &is_same);
-    IGRAPH_ASSERT(is_same);
     igraph_destroy(&graph2);
     igraph_destroy(&graph);
     print_vector(&weights);
+    IGRAPH_ASSERT(is_same);
     igraph_vector_destroy(&weights);
 
     printf("Beta weighted gabriel graph, 3d 10 points cutoff = 5\n");
