@@ -595,7 +595,11 @@ public:
 
         igraph_real_t beta = 2 * ap2 / denom;
 
-        return beta < 1 - tol ? 0 : beta; // TODO: revert to 1 + tol
+        if (beta < 1 + tol) {
+            printf("XXX Dropping edge (%d, %d) with calculated beta of %g.\n", (int) ai, (int) bi, beta);
+        }
+
+        return beta < 1 + tol ? 0 : beta;
     }
 
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
