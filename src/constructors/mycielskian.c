@@ -29,6 +29,8 @@
  * \function igraph_mycielskian
  * \brief Generate the Mycielskian of a graph with \p k iterations.
  *
+ * \experimental
+ *
  * The Mycielskian of a graph is a larger graph formed using a construction due
  * to Jan Mycielski that increases the chromatic number by one while preserving
  * the triangle-free property. The Mycielski construction can be used to create
@@ -184,6 +186,8 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 /**
  * \function igraph_mycielski_graph
  * \brief The Mycielski graph of order \p k.
+ *
+ * \experimental
  *
  * The Mycielski graph of order \p k, denoted \c M_k, is a triangle-free graph on
  * \p k vertices with chromatic number \p k. It is defined through the Mycielski
