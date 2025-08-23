@@ -31,7 +31,7 @@
 #define TOLERANCE (128 * DBL_EPSILON)
 
 // Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
-igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
+static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
@@ -42,7 +42,7 @@ igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const
     return distance;
 }
 
-igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *b) {
+static inline igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *b) {
     igraph_real_t distance = 0;
     igraph_real_t temp;
     igraph_integer_t dims = igraph_vector_size(a);
@@ -52,7 +52,8 @@ igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *
     }
     return distance;
 }
-igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t b, const igraph_matrix_t *points) {
+
+static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
@@ -186,7 +187,7 @@ using kdTree = nanoflann::KDTreeSingleIndexAdaptor <
 // give a known good superset of edges for a given value of beta.
 // In the case of beta < 1, that is a complete graph, for
 // beta >= 1 it is the delaunay triangulation of the points.
-igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
+static igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
         const igraph_matrix_t *points,
         igraph_real_t beta) {
 
@@ -211,7 +212,7 @@ igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
     return IGRAPH_SUCCESS;
 }
 
-igraph_real_t calculate_r(igraph_real_t beta) {
+static inline igraph_real_t calculate_r(igraph_real_t beta) {
     if (beta < 1) {
         return 0.5 / beta;
     }
@@ -235,7 +236,7 @@ igraph_real_t calculate_r(igraph_real_t beta) {
 // >= 1. The points lie on the line from a to b, such that the points lie on one
 // of the circles.
 // formula is a_centre = a + (r-1) * (a - b), similar for b_centre
-igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
+static igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
                                       igraph_vector_t *b_centre,
                                       igraph_integer_t a,
                                       igraph_integer_t b,
@@ -263,7 +264,7 @@ igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
 
 // construct the centres of the circles for beta < 1, or circle based beta
 // skeletons. Since it relies on a 90 degree rotatio, it is only well defined in 2d.
-igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
+static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
     igraph_vector_t a_point, b_point;
     IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
@@ -306,7 +307,7 @@ igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t
 // Currently used with is_intersection_empty and is_union_empty.
 // TODO: specialize for multiple dimensions?
 template < igraph_error_t filter(igraph_bool_t *result, kdTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) >
-igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
+static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_integer_t available_edges = igraph_vector_int_size(edges);
     igraph_integer_t added_edges = 0;
     ig_point_adaptor adaptor(points);
@@ -343,7 +344,7 @@ template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
           igraph_integer_t b,
           igraph_real_t beta,
           const igraph_matrix_t * points)>
-igraph_error_t is_intersection_empty(
+static igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
     kdTree < -1 > &tree,
     igraph_integer_t a,
@@ -394,7 +395,7 @@ template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
           igraph_integer_t b,
           igraph_real_t beta,
           const igraph_matrix_t * points)>
-igraph_error_t is_union_empty(
+static igraph_error_t is_union_empty(
     igraph_bool_t *result,
     kdTree < -1 > &tree,
     igraph_integer_t a,
