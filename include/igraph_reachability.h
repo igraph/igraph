@@ -27,7 +27,7 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_reachability(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_reachability(
             const igraph_t *graph,
             igraph_vector_int_t *membership,
             igraph_vector_int_t *csize,
@@ -35,7 +35,7 @@ IGRAPH_EXPORT igraph_error_t igraph_reachability(
             igraph_bitset_list_t *reach,
             igraph_neimode_t mode);
 
-IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
             const igraph_t *graph,
             igraph_vector_int_t *counts,
             igraph_neimode_t mode);

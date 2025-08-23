@@ -49,7 +49,7 @@ IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph
                                               igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
                                               igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple);
-IGRAPH_EXPORT igraph_error_t igraph_iea_game(igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_iea_game(igraph_t *graph,
                                              igraph_integer_t n, igraph_integer_t m,
                                              igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_int_t *out_deg,
@@ -169,7 +169,7 @@ IGRAPH_EXPORT igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                                igraph_bool_t loops, igraph_bool_t multiple,
                                                igraph_bool_t finite_size_correction);
 
-IGRAPH_EXPORT igraph_error_t igraph_chung_lu_game(igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_chung_lu_game(igraph_t *graph,
                                                   const igraph_vector_t *expected_out_deg,
                                                   const igraph_vector_t *expected_in_deg,
                                                   igraph_bool_t loops,

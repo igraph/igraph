@@ -85,15 +85,15 @@ IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_edges(
 IGRAPH_EXPORT igraph_error_t igraph_subgraph_from_edges(const igraph_t *graph, igraph_t *res,
                                         igraph_es_t eids, igraph_bool_t delete_vertices);
 IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, igraph_es_t eids);
-IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2,
                                             igraph_product_t type);
-IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t *res,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t *res,
                                                    const igraph_t *g1,
                                                    const igraph_t *g2,
                                                    const igraph_integer_t root);
-IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
 
 IGRAPH_END_C_DECLS
 

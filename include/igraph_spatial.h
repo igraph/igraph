@@ -27,7 +27,7 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points);
 
 /**
  * \typedef igraph_metric_t
@@ -51,7 +51,7 @@ IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_real_t cutoff,
     igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_spatial_edge_lengths(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_spatial_edge_lengths(
     const igraph_t *graph,
     igraph_vector_t *lengths,
     const igraph_matrix_t *points,
