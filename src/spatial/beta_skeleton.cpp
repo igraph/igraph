@@ -497,7 +497,7 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  *
  * A larger beta results in a larger region, and a sparser graph.
  *
- * Values of beta \lt 1 are considerably slower
+ * Values of beta &lt; 1 are considerably slower
  *
  * \param graph A pointer to the graph that will be created
  * \param points A Matrix containing the points that will be used to create the graph.
