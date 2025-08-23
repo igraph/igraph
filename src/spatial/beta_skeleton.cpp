@@ -596,7 +596,7 @@ public:
         igraph_real_t beta = 2 * ap2 / denom;
 
         if (beta < 1 + tol) {
-            printf("XXX Dropping edge (%d, %d) with calculated beta of %g.\n", (int) ai, (int) bi, beta);
+            printf("XXX Dropping edge (%d, %d) with beta=%g, denom=%g, ab2=%g, ap2=%g, bp2=%g\n", (int) ai, (int) bi, beta, denom, ab2, ap2, bp2);
         }
 
         return beta < 1 + tol ? 0 : beta;
