@@ -49,11 +49,16 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 20250814);
 
     bench_delaunay(" 1", 1000000, 1);
-    bench_delaunay(" 1", 100000, 2);
-    bench_delaunay(" 2", 10000, 3);
-    bench_delaunay(" 3", 2000, 4);
-    bench_delaunay(" 4", 500, 5);
-    bench_delaunay(" 5", 200, 6);
+    bench_delaunay(" 2", 100000, 2);
+    bench_delaunay(" 3", 10000, 2);
+    bench_delaunay(" 4", 1000, 2);
+    bench_delaunay(" 5", 100, 2);
+    bench_delaunay(" 6", 10000, 3);
+    bench_delaunay(" 7", 1000, 3);
+    bench_delaunay(" 8", 100, 3);
+    bench_delaunay(" 9", 2000, 4);
+    bench_delaunay("10", 500, 5);
+    bench_delaunay("11", 200, 6);
 
     return 0;
 }
