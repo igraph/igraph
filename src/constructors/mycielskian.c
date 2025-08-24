@@ -187,8 +187,6 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * \function igraph_mycielski_graph
  * \brief The Mycielski graph of order \p k.
  *
- * \experimental
- *
  * The Mycielski graph of order \p k, denoted \c M_k, is a triangle-free graph on
  * \p k vertices with chromatic number \p k. It is defined through the Mycielski
  * construction described in the documentation of \ref igraph_mycielskian().
