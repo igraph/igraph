@@ -174,6 +174,8 @@ static igraph_error_t igraph_i_find_k_indsets(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_result_count At most this many cliques will be recorded. If
+ *   negative, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_largest_cliques() and \ref igraph_clique_number().
@@ -182,9 +184,11 @@ static igraph_error_t igraph_i_find_k_indsets(
  *
  * \example examples/simple/igraph_cliques.c
  */
-igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_int_list_t *res,
-                   igraph_integer_t min_size, igraph_integer_t max_size) {
-    return igraph_i_cliquer_cliques(graph, res, min_size, max_size);
+igraph_error_t igraph_cliques(
+        const igraph_t *graph, igraph_vector_int_list_t *res,
+        igraph_integer_t min_size, igraph_integer_t max_size,
+        igraph_integer_t max_result_count) {
+    return igraph_i_cliquer_cliques(graph, res, min_size, max_size, max_result_count);
 }
 
 
@@ -298,11 +302,11 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
                             const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res,
                             igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     if (vertex_weights) {
-        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
+        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal, -1);
     } else if (maximal) {
         return igraph_maximal_cliques(graph, res, min_weight, max_weight);
     } else {
-        return igraph_cliques(graph, res, min_weight, max_weight);
+        return igraph_cliques(graph, res, min_weight, max_weight, -1);
     }
 }
 
