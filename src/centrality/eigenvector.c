@@ -231,7 +231,13 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
             if (! negative_weights) {
                 for (i = 0; i < no_of_nodes; i++) {
                     if (VECTOR(*vector)[i] < 0) {
-                        VECTOR(*vector)[i] = 0;
+                        if (VECTOR(*vector)[i] > -1e-7) {
+                            VECTOR(*vector)[i] = 0;
+                        } else {
+                            /* This eigenvector component is probably too negative;
+                            * throw an error instead */
+                            IGRAPH_ERROR("ARPACK eigenvector computation failed.", IGRAPH_DIVERGED);
+                        }
                     }
                 }
             }
@@ -450,7 +456,13 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         if (! negative_weights) {
             for (i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*vector)[i] < 0) {
-                    VECTOR(*vector)[i] = 0;
+                    if (VECTOR(*vector)[i] > -1e-7) {
+                        VECTOR(*vector)[i] = 0;
+                    } else {
+                        /* This eigenvector component is probably too negative;
+                         * throw an error instead */
+                        IGRAPH_ERROR("ARPACK eigenvector computation failed.", IGRAPH_DIVERGED);
+                    }
                 }
             }
         }
