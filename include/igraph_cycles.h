@@ -41,18 +41,18 @@ IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t 
 /* Cycle bases                                        */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_int_list_t *result,
         igraph_integer_t start_vid, igraph_real_t bfs_cutoff);
 
-IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_int_list_t *result,
         igraph_real_t bfs_cutoff,
         igraph_bool_t complete, igraph_bool_t use_cycle_order);
 
-IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
         const igraph_t *graph,
         igraph_vector_int_t *vertices,
         igraph_vector_int_t *edges,
@@ -76,14 +76,14 @@ typedef igraph_error_t igraph_cycle_handler_t(
         const igraph_vector_int_t *edges,
         void *arg);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_neimode_t mode,
         igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length,
         igraph_cycle_handler_t *callback, void *arg);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,

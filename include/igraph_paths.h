@@ -208,12 +208,12 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity(
     igraph_vs_t vids, igraph_neimode_t mode
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_radius(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_radius(
     const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *radius,
     igraph_neimode_t mode
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_graph_center(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_graph_center(
     const igraph_t *graph, const igraph_vector_t *weights,
     igraph_vector_int_t *res, igraph_neimode_t mode
 );
@@ -284,7 +284,7 @@ IGRAPH_EXPORT igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *
                                              igraph_vs_t to,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_voronoi(const igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_voronoi(const igraph_t *graph,
                                             igraph_vector_int_t *membership,
                                             igraph_vector_t *distances,
                                             const igraph_vector_int_t *generators,

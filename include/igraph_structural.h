@@ -81,7 +81,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_boo
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
                                               igraph_bool_t directed, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,
@@ -115,7 +115,7 @@ IGRAPH_EXPORT igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *
                                                      igraph_vector_t *knn,
                                                      igraph_vector_t *knnk,
                                                      const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *knnk,
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
@@ -125,11 +125,11 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
     const igraph_t *graph, igraph_vector_int_t *result,
     const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
     const igraph_t *graph, igraph_vector_int_t *result,
     const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
-IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
     const igraph_t *graph,
     const igraph_vector_t *weights,
     igraph_vector_t *res,

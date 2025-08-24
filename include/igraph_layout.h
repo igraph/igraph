@@ -133,7 +133,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                                           igraph_matrix_t *res, igraph_real_t hgap,
                                           igraph_real_t vgap, igraph_integer_t maxiter);
 
-IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                                 igraph_matrix_t *res,
                                                 igraph_bool_t use_seed,
                                                 const igraph_vector_t *distances,
@@ -141,7 +141,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                                 igraph_integer_t epochs,
                                                 igraph_bool_t distances_are_weights);
 
-IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                                 igraph_matrix_t *res,
                                                 igraph_bool_t use_seed,
                                                 const igraph_vector_t *distances,
@@ -149,7 +149,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                                 igraph_integer_t epochs,
                                                 igraph_bool_t distances_are_weights);
 
-IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_weights(const igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_weights(const igraph_t *graph,
                                                 const igraph_vector_t *distances,
                                                 igraph_vector_t *weights);
 
@@ -287,7 +287,7 @@ IGRAPH_EXPORT igraph_error_t igraph_roots_for_tree_layout(
         igraph_vector_int_t *roots,
         igraph_root_choice_t use_eccentricity);
 
-IGRAPH_EXPORT igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layout);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layout);
 
 IGRAPH_END_C_DECLS
 
