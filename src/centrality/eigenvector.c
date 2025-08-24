@@ -235,8 +235,10 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
                             VECTOR(*vector)[i] = 0;
                         } else {
                             /* This eigenvector component is probably too negative;
-                            * throw an error instead */
-                            IGRAPH_ERROR("ARPACK eigenvector computation failed.", IGRAPH_DIVERGED);
+                             * throw an error instead */
+                            IGRAPH_ERRORF("Negative value in eigenvector: %g. "
+                                         "ARPACK likely did not converge to the principal eigenvector.",
+                                         IGRAPH_DIVERGED, VECTOR(*vector)[i]);
                         }
                     }
                 }
@@ -461,7 +463,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                     } else {
                         /* This eigenvector component is probably too negative;
                          * throw an error instead */
-                        IGRAPH_ERROR("ARPACK eigenvector computation failed.", IGRAPH_DIVERGED);
+                        IGRAPH_ERRORF("Negative value in eigenvector: %g. "
+                                      "ARPACK likely did not converge to the principal eigenvector.",
+                                      IGRAPH_DIVERGED, VECTOR(*vector)[i]);
                     }
                 }
             }
