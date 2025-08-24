@@ -16,8 +16,8 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef IGRAPH_FEEDBACK_ARC_SET_INTERNAL_H
-#define IGRAPH_FEEDBACK_ARC_SET_INTERNAL_H
+#ifndef IGRAPH_CYCLES_FEEDBACK_SETS_H
+#define IGRAPH_CYCLES_FEEDBACK_SETS_H
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
@@ -49,4 +49,4 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
 
 IGRAPH_END_C_DECLS
 
-#endif
+#endif /* IGRAPH_CYCLES_FEEDBACK_SETS_H */

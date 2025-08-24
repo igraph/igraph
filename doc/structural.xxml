@@ -219,13 +219,6 @@
 <!-- doxrox-include igraph_trussness -->
 </section>
 
-<section id="topological-sorting-directed-acyclic-graphs"><title>Topological sorting, directed acyclic graphs</title>
-<!-- doxrox-include igraph_is_dag -->
-<!-- doxrox-include igraph_topological_sorting -->
-<!-- doxrox-include igraph_feedback_arc_set -->
-<!-- doxrox-include igraph_feedback_vertex_set -->
-</section>
-
 <section id="maximum-cardinality-search-chordal-graphs"><title>Maximum cardinality search and chordal graphs</title>
 <!-- doxrox-include igraph_maximum_cardinality_search -->
 <!-- doxrox-include igraph_is_chordal -->

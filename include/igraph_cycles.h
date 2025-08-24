@@ -91,6 +91,14 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
         igraph_integer_t min_cycle_length,
         igraph_integer_t max_cycle_length);
 
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
+
 IGRAPH_END_C_DECLS
 
 #endif

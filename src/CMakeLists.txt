@@ -184,6 +184,7 @@ add_library(
   connectivity/reachability.c
 
   cycles/cycle_bases.c
+        cycles/feedback_sets.c
   cycles/order_cycle.cpp
   cycles/simple_cycles.c
 
@@ -300,7 +301,6 @@ add_library(
   misc/conversion.c
   misc/degree_sequence.cpp
   misc/embedding.c
-  misc/feedback_arc_set.c
   misc/graphicality.c
   misc/matching.c
   misc/mixing.c

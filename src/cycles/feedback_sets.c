@@ -16,16 +16,16 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_structural.h"
-#include "misc/feedback_arc_set.h"
+#include "igraph_cycles.h"
+#include "cycles/feedback_sets.h"
 
 #include "igraph_bitset.h"
 #include "igraph_components.h"
-#include "igraph_cycles.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_stack.h"
+#include "igraph_structural.h"
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 #include "igraph_visitor.h"
