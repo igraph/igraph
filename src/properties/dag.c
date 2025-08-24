@@ -130,7 +130,7 @@ igraph_error_t igraph_topological_sorting(
  * A directed acyclic graph (DAG) is a directed graph with no cycles.
  *
  * </para><para>
- * This function returns false for undirected graphs.
+ * This function returns \c false for undirected graphs.
  *
  * </para><para>
  * The return value of this function is cached in the graph itself; calling
