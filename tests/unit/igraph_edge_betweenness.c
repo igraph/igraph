@@ -102,6 +102,142 @@ void test_bug1050(void) {
 }
 
 
+void test_eids_parameter(void) {
+    /* Test the eids parameter for edge betweenness functions to ensure
+     * that subsetting works correctly and repeated edges are handled properly */
+    igraph_t g;
+    igraph_vector_t eb_full, eb_subset;
+    igraph_vector_int_t edge_vec;
+    igraph_integer_t i, no_of_edges;
+
+    printf("\nTesting eids parameter edge selection\n");
+
+    /* Create a simple undirected graph for testing */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3, -1);
+    no_of_edges = igraph_ecount(&g);
+
+    /* Calculate full edge betweenness for reference */
+    igraph_vector_init(&eb_full, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID), 
+                           IGRAPH_UNDIRECTED, false);
+
+    printf("Full edge betweenness: ");
+    print_vector(&eb_full);
+
+    /* Test 1: Range selection (edges 1-3) */
+    printf("Range selection (edges 1-3): ");
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_range(1, 4), 
+                           IGRAPH_UNDIRECTED, false);
+    print_vector(&eb_subset);
+
+    /* Verify range results match full results */
+    for (i = 0; i < igraph_vector_size(&eb_subset); i++) {
+        IGRAPH_ASSERT(VECTOR(eb_subset)[i] == VECTOR(eb_full)[i + 1]);
+    }
+    igraph_vector_destroy(&eb_subset);
+
+    /* Test 2: Single edge selection (edge 2) */
+    printf("Single edge selection (edge 2): ");
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_1(2), 
+                           IGRAPH_UNDIRECTED, false);
+    print_vector(&eb_subset);
+
+    /* Verify single edge result */
+    IGRAPH_ASSERT(igraph_vector_size(&eb_subset) == 1);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[0] == VECTOR(eb_full)[2]);
+    igraph_vector_destroy(&eb_subset);
+
+    /* Test 3: Vector selection with specific edges (0, 2, 4) */
+    printf("Vector selection (edges 0, 2, 4): ");
+    igraph_vector_int_init_int(&edge_vec, 3, 0, 2, 4);
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_vector(&edge_vec), 
+                           IGRAPH_UNDIRECTED, false);
+    print_vector(&eb_subset);
+
+    /* Verify vector results match */
+    IGRAPH_ASSERT(igraph_vector_size(&eb_subset) == 3);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[0] == VECTOR(eb_full)[0]);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[1] == VECTOR(eb_full)[2]);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[2] == VECTOR(eb_full)[4]);
+    igraph_vector_destroy(&eb_subset);
+    igraph_vector_int_destroy(&edge_vec);
+
+    /* Test 4: Vector selection with repeated edges (0, 2, 0, 2) */
+    printf("Vector selection with duplicates (edges 0, 2, 0, 2): ");
+    igraph_vector_int_init_int(&edge_vec, 4, 0, 2, 0, 2);
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_vector(&edge_vec), 
+                           IGRAPH_UNDIRECTED, false);
+    print_vector(&eb_subset);
+
+    /* Verify repeated edges are handled correctly */
+    IGRAPH_ASSERT(igraph_vector_size(&eb_subset) == 4);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[0] == VECTOR(eb_full)[0]);  /* edge 0 */
+    IGRAPH_ASSERT(VECTOR(eb_subset)[1] == VECTOR(eb_full)[2]);  /* edge 2 */
+    IGRAPH_ASSERT(VECTOR(eb_subset)[2] == VECTOR(eb_full)[0]);  /* edge 0 again */
+    IGRAPH_ASSERT(VECTOR(eb_subset)[3] == VECTOR(eb_full)[2]);  /* edge 2 again */
+    igraph_vector_destroy(&eb_subset);
+    igraph_vector_int_destroy(&edge_vec);
+
+    /* Test 5: Test with igraph_edge_betweenness_cutoff as well */
+    printf("Cutoff version range selection (edges 1-3): ");
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness_cutoff(&g, NULL, &eb_subset, igraph_ess_range(1, 4), 
+                                  IGRAPH_UNDIRECTED, false, -1);
+    print_vector(&eb_subset);
+
+    /* Verify cutoff results match full results too */
+    for (i = 0; i < igraph_vector_size(&eb_subset); i++) {
+        IGRAPH_ASSERT(VECTOR(eb_subset)[i] == VECTOR(eb_full)[i + 1]);
+    }
+    igraph_vector_destroy(&eb_subset);
+
+    /* Test 6: Empty edge selection */
+    printf("Empty edge selection: ");
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_range(3, 3), 
+                           IGRAPH_UNDIRECTED, false);
+    print_vector(&eb_subset);
+    IGRAPH_ASSERT(igraph_vector_size(&eb_subset) == 0);
+    igraph_vector_destroy(&eb_subset);
+
+    /* Test 7: Test with a more interesting graph to verify correctness */
+    igraph_destroy(&g);
+    igraph_vector_destroy(&eb_full);
+
+    /* Path graph: 0-1-2-3 (3 edges) */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, -1);
+    
+    igraph_vector_init(&eb_full, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID), 
+                           IGRAPH_UNDIRECTED, false);
+    printf("Path graph full betweenness: ");
+    print_vector(&eb_full);
+
+    /* Test first and last edges */
+    igraph_vector_int_init_int(&edge_vec, 2, 0, 2);
+    igraph_vector_init(&eb_subset, 0);
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_vector(&edge_vec), 
+                           IGRAPH_UNDIRECTED, false);
+    printf("Path graph edges (0, 2): ");
+    print_vector(&eb_subset);
+    
+    /* Verify */
+    IGRAPH_ASSERT(igraph_vector_size(&eb_subset) == 2);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[0] == VECTOR(eb_full)[0]);
+    IGRAPH_ASSERT(VECTOR(eb_subset)[1] == VECTOR(eb_full)[2]);
+    
+    igraph_vector_destroy(&eb_subset);
+    igraph_vector_int_destroy(&edge_vec);
+    igraph_vector_destroy(&eb_full);
+    igraph_destroy(&g);
+}
+
+
 int main(void) {
     igraph_t g;
     igraph_vector_t eb, eb2;
@@ -194,6 +330,8 @@ int main(void) {
 
     printf("\nTesting bug 1050, cutoff values\n");
     test_bug1050();
+
+    test_eids_parameter();
 
     VERIFY_FINALLY_STACK();
 
