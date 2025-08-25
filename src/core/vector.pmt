@@ -3129,8 +3129,6 @@ static void FUNCTION(igraph_i_vector, intersection_size_sorted)(
  * \function igraph_vector_intersection_size_sorted
  * \brief Intersection size of two sorted vectors.
  *
- * \experimental
- *
  * Counts elements that are present in both vectors. This is particularly
  * useful for counting common neighbours of two vertices.
  *

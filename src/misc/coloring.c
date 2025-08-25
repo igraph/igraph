@@ -314,8 +314,6 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
  * \function igraph_is_vertex_coloring
  * \brief Checks whether a vertex coloring is valid.
  *
- * \experimental
- *
  * This function checks whether the given vertex type/color assignment is a valid
  * vertex coloring, i.e., no two adjacent vertices have the same color.
  * Self-loops are ignored.
@@ -457,8 +455,6 @@ igraph_error_t igraph_is_bipartite_coloring(
 /**
  * \function igraph_is_edge_coloring
  * \brief Checks whether an edge coloring is valid.
- *
- * \experimental
  *
  * This function checks whether the given edge color assignment is a valid
  * edge coloring, i.e., no two adjacent edges have the same color.

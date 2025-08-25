@@ -156,8 +156,6 @@ igraph_error_t igraph_reachability(
  * \function igraph_count_reachable
  * \brief The number of vertices reachable from each vertex in the graph.
  *
- * \experimental
- *
  * \param graph The graph object to analyze.
  * \param counts Integer vector. <code>counts[v]</code> will store the number
  *    of vertices reachable from vertex \c v, including \c v itself.

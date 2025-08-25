@@ -927,8 +927,6 @@ fail:
  * \function igraph_realize_bipartite_degree_sequence
  * \brief Generates a bipartite graph with the given bidegree sequence.
  *
- * \experimental
- *
  * This function generates a bipartite graph with the given bidegree sequence,
  * using a Havel-Hakimi-like construction algorithm. The order in which vertices
  * are connected up is controlled by the \p method parameter. When using the

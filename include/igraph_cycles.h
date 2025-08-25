@@ -52,7 +52,7 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
         igraph_real_t bfs_cutoff,
         igraph_bool_t complete, igraph_bool_t use_cycle_order);
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
+IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
         const igraph_t *graph,
         igraph_vector_int_t *vertices,
         igraph_vector_int_t *edges,
@@ -95,7 +95,7 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 

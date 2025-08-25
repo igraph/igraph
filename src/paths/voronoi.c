@@ -313,8 +313,6 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  * \function igraph_voronoi
  * \brief Voronoi partitioning of a graph.
  *
- * \experimental
- *
  * To obtain a Voronoi partitioning of a graph, we start with a set of generator
  * vertices, which will define the partitions. Each vertex is assigned to the generator
  * vertex from (or to) which it is closest.

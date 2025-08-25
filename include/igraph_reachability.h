@@ -35,7 +35,7 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_reachability(
             igraph_bitset_list_t *reach,
             igraph_neimode_t mode);
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
+IGRAPH_EXPORT igraph_error_t igraph_count_reachable(
             const igraph_t *graph,
             igraph_vector_int_t *counts,
             igraph_neimode_t mode);

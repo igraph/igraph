@@ -185,8 +185,6 @@ finish:
  * \function igraph_find_cycle
  * \brief Finds a single cycle in the graph.
  *
- * \experimental
- *
  * This function returns a cycle of the graph, if there is one. If the graph
  * is acyclic, it returns empty vectors.
  *
@@ -384,8 +382,6 @@ igraph_error_t igraph_feedback_arc_set(
 /**
  * \function igraph_feedback_vertex_set
  * \brief Feedback vertex set of a graph.
- *
- * \experimental
  *
  * A feedback vertex set is a set of vertices whose removal makes the graph
  * acyclic. Finding a \em minimum feedback vertex set is an NP-complete
