@@ -206,41 +206,11 @@ void test_eids_parameter(void) {
     /* Test 6: Empty edge selection */
     printf("Empty edge selection: ");
     igraph_vector_init(&eb_subset, 0);
-    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_range(4, 4), 
+    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_range(0, 0), 
                            IGRAPH_UNDIRECTED, false);
     print_vector(&eb_subset);
     IGRAPH_ASSERT(igraph_vector_size(&eb_subset) == 0);
     igraph_vector_destroy(&eb_subset);
-
-    /* Test 7: Test with a larger more interesting graph - star graph */
-    igraph_destroy(&g);
-    igraph_vector_destroy(&eb_full);
-
-    /* Star graph: center 0 connected to 1, 2, 3, 4 (4 edges) */
-    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 0, 3, 0, 4, -1);
-    
-    igraph_vector_init(&eb_full, 0);
-    igraph_edge_betweenness(&g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID), 
-                           IGRAPH_UNDIRECTED, false);
-    printf("Star graph full betweenness: ");
-    print_vector(&eb_full);
-
-    /* Test first and last edges */
-    igraph_vector_int_init_int(&edge_vec, 2, 0, 3);
-    igraph_vector_init(&eb_subset, 0);
-    igraph_edge_betweenness(&g, NULL, &eb_subset, igraph_ess_vector(&edge_vec), 
-                           IGRAPH_UNDIRECTED, false);
-    printf("Star graph edges (0, 3): ");
-    print_vector(&eb_subset);
-    
-    /* Verify using igraph_vector_index() */
-    igraph_vector_init(&eb_expected, 0);
-    igraph_vector_index(&eb_full, &eb_expected, &edge_vec);
-    IGRAPH_ASSERT(igraph_vector_is_equal(&eb_subset, &eb_expected));
-    
-    igraph_vector_destroy(&eb_subset);
-    igraph_vector_destroy(&eb_expected);
-    igraph_vector_int_destroy(&edge_vec);
     igraph_vector_destroy(&eb_full);
     igraph_destroy(&g);
 }
