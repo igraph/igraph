@@ -144,6 +144,7 @@
 <!-- doxrox-include igraph_vector_intersect_sorted -->
 <!-- doxrox-include igraph_vector_intersection_size_sorted -->
 <!-- doxrox-include igraph_vector_difference_sorted -->
+<!-- doxrox-include igraph_vector_difference_and_intersection_sorted -->
 </section>
 
 <section id="about-vector-ptr">
