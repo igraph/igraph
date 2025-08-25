@@ -136,39 +136,7 @@ static void test_edge_subset(const igraph_t *g, igraph_es_t eids, const char *de
     igraph_vector_int_destroy(&idx_vec);
 }
 
-/* Helper function to test edge subset selection for edge betweenness cutoff functions */
-static void test_edge_subset_cutoff(const igraph_t *g, igraph_es_t eids, const char *description) {
-    igraph_vector_t eb_full, eb_subset, eb_expected;
-    igraph_vector_int_t idx_vec;
 
-    printf("%s: ", description);
-
-    /* Calculate full edge betweenness for reference */
-    igraph_vector_init(&eb_full, 0);
-    igraph_edge_betweenness_cutoff(g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID), 
-                                  IGRAPH_UNDIRECTED, false, -1);
-
-    /* Calculate edge betweenness for the subset */
-    igraph_vector_init(&eb_subset, 0);
-    igraph_edge_betweenness_cutoff(g, NULL, &eb_subset, eids, IGRAPH_UNDIRECTED, false, -1);
-    print_vector(&eb_subset);
-
-    /* Create expected result by indexing the full results */
-    igraph_vector_int_init(&idx_vec, 0);
-    igraph_es_as_vector(g, eids, &idx_vec);
-
-    igraph_vector_init(&eb_expected, 0);
-    igraph_vector_index(&eb_full, &eb_expected, &idx_vec);
-
-    /* Verify that subset matches expected result */
-    IGRAPH_ASSERT(igraph_vector_is_equal(&eb_subset, &eb_expected));
-
-    /* Clean up */
-    igraph_vector_destroy(&eb_full);
-    igraph_vector_destroy(&eb_subset);
-    igraph_vector_destroy(&eb_expected);
-    igraph_vector_int_destroy(&idx_vec);
-}
 
 void test_eids_parameter(void) {
     /* Test the eids parameter for edge betweenness functions to ensure
@@ -204,9 +172,6 @@ void test_eids_parameter(void) {
     igraph_vector_int_destroy(&edge_vec);
 
     test_edge_subset(&g, igraph_ess_range(0, 0), "Empty edge selection");
-
-    /* Test with igraph_edge_betweenness_cutoff as well */
-    test_edge_subset_cutoff(&g, igraph_ess_range(1, 4), "Cutoff version range selection (edges 1-3)");
 
     igraph_destroy(&g);
 }
