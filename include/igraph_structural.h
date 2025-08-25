@@ -81,7 +81,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_boo
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
+IGRAPH_EXPORT igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
                                               igraph_bool_t directed, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs_t candidate,

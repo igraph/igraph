@@ -287,7 +287,7 @@ IGRAPH_EXPORT igraph_error_t igraph_roots_for_tree_layout(
         igraph_vector_int_t *roots,
         igraph_root_choice_t use_eccentricity);
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layout);
+IGRAPH_EXPORT igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layout);
 
 IGRAPH_END_C_DECLS
 

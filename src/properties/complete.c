@@ -26,8 +26,6 @@
  * \function igraph_is_complete
  * \brief Decides whether the graph is complete.
  *
- * \experimental
- *
  * A graph is considered complete if all pairs of different vertices are
  * adjacent.
  *

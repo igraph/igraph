@@ -27,7 +27,7 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_reachability(
+IGRAPH_EXPORT igraph_error_t igraph_reachability(
             const igraph_t *graph,
             igraph_vector_int_t *membership,
             igraph_vector_int_t *csize,

@@ -30,8 +30,6 @@
  * \function igraph_reachability
  * \brief Calculates which vertices are reachable from each vertex in the graph.
  *
- * \experimental
- *
  * The resulting list will contain one bitset for each strongly connected component.
  * The bitset for component i will have its j-th bit set, if vertex j is reachable
  * from some vertex in component i in 0 or more steps.
