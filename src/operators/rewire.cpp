@@ -24,6 +24,7 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 
+#include "core/exceptions.h"
 #include "operators/rewire_internal.h"
 
 struct Edge {
@@ -95,7 +96,10 @@ igraph_error_t rewire_once(igraph_vector_int_t& edgelist, igraph_adjlist_t& adjl
 
 igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_integer_t n, 
                                igraph_edge_type_sw_t allowed_edge_types) {
+
     const igraph_integer_t n_edges = igraph_ecount(graph);
+
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     // set up edgelist
     igraph_vector_int_t edgelist;
@@ -121,6 +125,8 @@ igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_integer_t n,
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&edgelist);
     IGRAPH_FINALLY_CLEAN(2);
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     return IGRAPH_SUCCESS;
 }
