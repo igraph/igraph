@@ -106,7 +106,6 @@ void test_bug1050(void) {
 static void test_edge_subset(const igraph_t *g, igraph_es_t eids, const char *description) {
     igraph_vector_t eb_full, eb_subset, eb_expected;
     igraph_vector_int_t idx_vec;
-    igraph_eit_t eit;
 
     printf("%s: ", description);
 
@@ -121,13 +120,8 @@ static void test_edge_subset(const igraph_t *g, igraph_es_t eids, const char *de
     print_vector(&eb_subset);
 
     /* Create expected result by indexing the full results */
-    igraph_eit_create(g, eids, &eit);
-    igraph_vector_int_init(&idx_vec, IGRAPH_EIT_SIZE(eit));
-    igraph_integer_t i = 0;
-    for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
-        VECTOR(idx_vec)[i] = IGRAPH_EIT_GET(eit);
-    }
-    igraph_eit_destroy(&eit);
+    igraph_vector_int_init(&idx_vec, 0);
+    igraph_es_as_vector(g, eids, &idx_vec);
 
     igraph_vector_init(&eb_expected, 0);
     igraph_vector_index(&eb_full, &eb_expected, &idx_vec);
@@ -146,7 +140,6 @@ static void test_edge_subset(const igraph_t *g, igraph_es_t eids, const char *de
 static void test_edge_subset_cutoff(const igraph_t *g, igraph_es_t eids, const char *description) {
     igraph_vector_t eb_full, eb_subset, eb_expected;
     igraph_vector_int_t idx_vec;
-    igraph_eit_t eit;
 
     printf("%s: ", description);
 
@@ -161,13 +154,8 @@ static void test_edge_subset_cutoff(const igraph_t *g, igraph_es_t eids, const c
     print_vector(&eb_subset);
 
     /* Create expected result by indexing the full results */
-    igraph_eit_create(g, eids, &eit);
-    igraph_vector_int_init(&idx_vec, IGRAPH_EIT_SIZE(eit));
-    igraph_integer_t i = 0;
-    for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
-        VECTOR(idx_vec)[i] = IGRAPH_EIT_GET(eit);
-    }
-    igraph_eit_destroy(&eit);
+    igraph_vector_int_init(&idx_vec, 0);
+    igraph_es_as_vector(g, eids, &idx_vec);
 
     igraph_vector_init(&eb_expected, 0);
     igraph_vector_index(&eb_full, &eb_expected, &idx_vec);
