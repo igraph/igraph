@@ -54,7 +54,6 @@ static inline igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igr
 
 static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
-    igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
         igraph_real_t temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
@@ -234,7 +233,8 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  * const igraph_matrix_t *points: point set containing the ponits a and b
  */
 
-typedef igraph_error_t CentreConstructor(igraph_vector_t *a_centre,
+typedef igraph_error_t CentreConstructor(
+	  igraph_vector_t *a_centre,
           igraph_vector_t *b_centre,
           igraph_integer_t a,
           igraph_integer_t b,
@@ -566,12 +566,6 @@ public:
         }
 
         igraph_real_t beta = 2 * ap2 / denom;
-
-        /*
-        if (beta < 1 + tol) {
-            printf("XXX Dropping edge (%d, %d) with index=%d, beta=%g, denom=%g, ab2=%g, ap2=%g, bp2=%g\n", (int) ai, (int) bi, (int) index, beta, denom, ab2, ap2, bp2);
-        }*/
-
         return beta < 1 + tol ? 0 : beta;
     }
 
@@ -675,7 +669,22 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector
     return IGRAPH_SUCCESS;
 }
 
-
+/**
+ * \function igraph_gabriel_graph
+ * \brief Generates the gabriel graph of a point set.
+ * \experimental
+ *
+ * This function computes the gabriel graph of a point set.
+ * The gabriel graph is constructed by connecting any two points if there is no point in a circle between them.
+ *
+ * \param graph A pointer to the graph to be created.
+ * \param pointes The point set that will be used. Each row is a point, dimensionality is inferred from column count.
+ *
+ * \return Error Code.
+ * \sa The gabriel graph is a special case of
+ *     \ref igraph_lune_beta_skeleton() and \ref igraph_circle_beta_skeleton()
+ *     where beta = 1; 
+ */
 igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
@@ -691,7 +700,25 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
     return IGRAPH_SUCCESS;
 }
-
+/**
+ * \function igraph_relative_neighborhood_graph
+ * \brief Calculate the relative neighborhood graph of a point set.
+ *
+ * \experimental
+ *
+ * This function calculates the relative neighborhood graph of a point set.
+ * The relative neighborhood graph is the graph such that any two points
+ * a and b are connected if there is no point p strictly closer to each of them. 
+ *
+ * \param graph A pointer to the graph that will be created.
+ * \param points The point set that will be used, each row is a point.
+ *     Dimensionality is inferred from the column number.
+ *
+ * \return Error code.
+ *
+ * \sa The relative neighborhood graph is a special case of \ref igraph_lune_beta_skeleton()
+ *     where beta = 2, but it has closed exclusion region.
+ */
 igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
