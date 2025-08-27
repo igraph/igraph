@@ -16,6 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "igraph_constants.h"
 #include "igraph_constructors.h"
 #include "igraph_error.h"
 #include "igraph_matrix.h"
@@ -33,10 +34,9 @@
 // Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
 static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
-    igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = MATRIX(*points, a, i) - MATRIX(*points, b, i);
+        igraph_real_t temp = MATRIX(*points, a, i) - MATRIX(*points, b, i);
         distance += temp * temp;
     }
     return distance;
@@ -44,10 +44,9 @@ static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_inte
 
 static inline igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *b) {
     igraph_real_t distance = 0;
-    igraph_real_t temp;
     igraph_integer_t dims = igraph_vector_size(a);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = VECTOR(*a)[i] - VECTOR(*b)[i];
+        igraph_real_t temp = VECTOR(*a)[i] - VECTOR(*b)[i];
         distance += temp * temp;
     }
     return distance;
@@ -58,7 +57,7 @@ static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igr
     igraph_real_t temp;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
+        igraph_real_t temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
         distance += temp * temp;
     }
     return distance;
@@ -83,15 +82,19 @@ public:
     void init() {
         clear();
     }
+  
     void clear() {
         found = 0;
     }
+
     size_t size() const {
         return found;
     }
+
     bool full() const {
         return true;
     }
+
 
     void sort() const {}
 
@@ -180,7 +183,7 @@ public:
 
 // Shrinks type signatures significantly.
 template <igraph_integer_t Dimension>
-using kdTree = nanoflann::KDTreeSingleIndexAdaptor <
+using KDTree = nanoflann::KDTreeSingleIndexAdaptor <
                nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
                ig_point_adaptor, Dimension, igraph_integer_t >;
 
@@ -242,77 +245,52 @@ static igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
                                       igraph_integer_t b,
                                       igraph_real_t r,
                                       const igraph_matrix_t *points) {
-    igraph_vector_t a_point, b_point;
-    IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
-
-    IGRAPH_CHECK(igraph_matrix_get_row(points, &a_point, a));
-    IGRAPH_CHECK(igraph_matrix_get_row(points, &b_point, b));
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
     for (igraph_integer_t i = 0; i < dims; i++) {
-        VECTOR(*a_centre)[i] = VECTOR(a_point)[i] + (r - 1) * (VECTOR(a_point)[i] - VECTOR(b_point)[i]);
-        VECTOR(*b_centre)[i] = VECTOR(b_point)[i] + (r - 1) * (VECTOR(b_point)[i] - VECTOR(a_point)[i]);
+        VECTOR(*a_centre)[i] = MATRIX(*points, a, i) + (r - 1) * (MATRIX(*points, a, i) - MATRIX(*points, b, i));
+        VECTOR(*b_centre)[i] = MATRIX(*points, b, i) + (r - 1) * (MATRIX(*points, b, i) - MATRIX(*points, a, i));
     }
 
-    igraph_vector_destroy(&a_point);
-    igraph_vector_destroy(&b_point);
-
-    IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
 
 // construct the centres of the circles for beta < 1, or circle based beta
-// skeletons. Since it relies on a 90 degree rotatio, it is only well defined in 2d.
+// skeletons.
+// Since it relies on a 90 degree rotation around the axis perpendicular
+// to the line AB, it is only well defined in 2d.
 static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
-    igraph_vector_t a_point, b_point;
-    IGRAPH_VECTOR_INIT_FINALLY(&a_point, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&b_point, 0);
+    igraph_real_t mid[2], perp[2];
 
-    IGRAPH_CHECK(igraph_matrix_get_row(points, &a_point, a));
-    IGRAPH_CHECK(igraph_matrix_get_row(points, &b_point, b));
-
-
-    igraph_integer_t dims = igraph_matrix_ncol(points);
-
-    igraph_vector_t mid, perp;
-
-    IGRAPH_VECTOR_INIT_FINALLY(&mid, dims);
-    IGRAPH_VECTOR_INIT_FINALLY(&perp, dims);
-    for (igraph_integer_t i = 0; i < dims; i++) {
-        VECTOR(mid)[i] = (VECTOR(a_point)[i] + VECTOR(b_point)[i]) * 0.5;
-        VECTOR(perp)[i] = (VECTOR(a_point)[i] - VECTOR(b_point)[i]) * sqrt(r * r - 0.25);
+    for (igraph_integer_t i = 0; i < 2; i++) {
+      mid[i]  = (MATRIX(*points, a, i) + MATRIX(*points, b, i)) * 0.5;
+      perp[i] = (MATRIX(*points, a, i) - MATRIX(*points, b, i)) * sqrt(r * r - 0.25);
     }
 
     // Since this is only well defined for 2d, a manual 90 degree rotation works and is simpler.
     // The rotation being x = -y, y = x, 90 degrees counter-clockwise.
-    igraph_real_t temp = VECTOR(perp)[0];
-    VECTOR(perp)[0] = - VECTOR(perp)[1];
-    VECTOR(perp)[1] = temp;
+    igraph_real_t temp = perp[0];
+    perp[0] = - perp[1];
+    perp[1] = temp;
 
-    for (igraph_integer_t i = 0; i < dims; i++) {
-        VECTOR(*a_centre)[i] = VECTOR(mid)[i] + VECTOR(perp)[i];
-        VECTOR(*b_centre)[i] = VECTOR(mid)[i] - VECTOR(perp)[i];
+    for (igraph_integer_t i = 0; i < 2; i++) {
+        VECTOR(*a_centre)[i] = mid[i] + perp[i];
+        VECTOR(*b_centre)[i] = mid[i] - perp[i];
     }
 
-    igraph_vector_destroy(&mid);
-    igraph_vector_destroy(&perp);
-    igraph_vector_destroy(&a_point);
-    igraph_vector_destroy(&b_point);
-    IGRAPH_FINALLY_CLEAN(4);
     return IGRAPH_SUCCESS;
 }
 
 // Iterate through the edges given, applying the provided filter.
 // Currently used with is_intersection_empty and is_union_empty.
 // TODO: specialize for multiple dimensions?
-template < igraph_error_t filter(igraph_bool_t *result, kdTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) >
+template < igraph_error_t filter(igraph_bool_t *result, KDTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) >
 static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_integer_t available_edges = igraph_vector_int_size(edges);
     igraph_integer_t added_edges = 0;
     ig_point_adaptor adaptor(points);
     igraph_integer_t dim = igraph_matrix_ncol(points);
-    kdTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
     igraph_bool_t result;
     for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
@@ -343,10 +321,10 @@ template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
           igraph_integer_t a,
           igraph_integer_t b,
           igraph_real_t beta,
-          const igraph_matrix_t * points)>
+          const igraph_matrix_t *points)>
 static igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
-    kdTree < -1 > &tree,
+    KDTree < -1 > &tree,
     igraph_integer_t a,
     igraph_integer_t b,
     const igraph_matrix_t *points,
@@ -394,10 +372,10 @@ template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
           igraph_integer_t a,
           igraph_integer_t b,
           igraph_real_t beta,
-          const igraph_matrix_t * points)>
+          const igraph_matrix_t *points)>
 static igraph_error_t is_union_empty(
     igraph_bool_t *result,
-    kdTree < -1 > &tree,
+    KDTree < -1 > &tree,
     igraph_integer_t a,
     igraph_integer_t b,
     const igraph_matrix_t *points,
@@ -656,7 +634,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
     igraph_integer_t edge_count = igraph_vector_int_size(&edges) / 2;
     IGRAPH_CHECK(igraph_vector_resize(edge_weights, edge_count));
-    kdTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
 
     igraph_vector_t midpoint;

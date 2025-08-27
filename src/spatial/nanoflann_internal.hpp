@@ -33,7 +33,6 @@ public:
     }
 };
 
-IGRAPH_BEGIN_C_DECLS
 
 class GraphBuildingResultSet {
     igraph_integer_t added_count = 0;
@@ -64,10 +63,10 @@ public:
         for (i = added_count; i > 0; i--) {
             // TODO: Stabilize result in case of multiple points at exactly the same distance?
             // See NANOFLANN_FIRST_MATCH in RKNNResultSet in nanoflann.hpp for reference.
-            if (distances[i-1] > distance) {
+            if (distances[i - 1] > distance) {
                 if (i < max_neighbors) {
-                    distances[i] = distances[i-1];
-                    neighbors[i] = neighbors[i-1];
+                    distances[i] = distances[i - 1];
+                    neighbors[i] = neighbors[i - 1];
                 }
             } else {
                 break;
@@ -111,10 +110,9 @@ public:
         if (added_count < max_neighbors || added_count == 0) {
             return  max_distance;
         }
-        return distances[added_count-1];
+        return distances[added_count - 1];
     }
 };
 
-IGRAPH_END_C_DECLS
 
 #endif // NANOFLANN_INTERNAL_H_
