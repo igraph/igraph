@@ -234,6 +234,12 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  * const igraph_matrix_t *points: point set containing the ponits a and b
  */
 
+typedef igraph_error_t CentreConstructor(igraph_vector_t *a_centre,
+          igraph_vector_t *b_centre,
+          igraph_integer_t a,
+          igraph_integer_t b,
+          igraph_real_t beta,
+          const igraph_matrix_t *points);
 
 // construct the centers of the points for lune based beta skeletons with beta
 // >= 1. The points lie on the line from a to b, such that the points lie on one
@@ -281,30 +287,6 @@ static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_v
     return IGRAPH_SUCCESS;
 }
 
-// Iterate through the edges given, applying the provided filter.
-// Currently used with is_intersection_empty and is_union_empty.
-// TODO: specialize for multiple dimensions?
-template < igraph_error_t filter(igraph_bool_t *result, KDTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta) >
-static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    igraph_integer_t available_edges = igraph_vector_int_size(edges);
-    igraph_integer_t added_edges = 0;
-    ig_point_adaptor adaptor(points);
-    igraph_integer_t dim = igraph_matrix_ncol(points);
-    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
-    tree.buildIndex();
-    igraph_bool_t result;
-    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
-        filter(&result, tree, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1], points, beta);
-        if (result) {
-            VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i * 2];
-            VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i * 2 + 1];
-            added_edges += 1;
-        }
-    }
-    IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
-    return IGRAPH_SUCCESS;
-}
-
 /* -!- Filter interface -!-
  * igraph_bool_t *result        : will be overwritten with the result
  * kdTree <-1> &tree            : used for nanoflann check, should be
@@ -313,15 +295,10 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  * parameter for beta-skeletons. const igraph_matrix_t *points: matrix
  * containing all the points.
  */
-
+typedef igraph_error_t FilterFunc(igraph_bool_t *result, KDTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta);
 // Test whether the intersection of the two circles as generated
 // by centre_positions is empty of points except for a and b.
-template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
-          igraph_vector_t *b_centre,
-          igraph_integer_t a,
-          igraph_integer_t b,
-          igraph_real_t beta,
-          const igraph_matrix_t *points)>
+template <CentreConstructor centre_positions, igraph_bool_t is_closed>
 static igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
     KDTree < -1 > &tree,
@@ -350,8 +327,8 @@ static igraph_error_t is_intersection_empty(
     }
     //squared halfheight of lune
     igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_centre);
-
-    IntersectionCounts intersections(lune_height, sqr_dist * r * r * (1 + TOLERANCE), true, a, b, &a_centre, &b_centre, points);
+    igraph_real_t tol = is_closed ? 1+TOLERANCE : 1-TOLERANCE;
+    IntersectionCounts intersections(lune_height, sqr_dist * r * r * tol, true, a, b, &a_centre, &b_centre, points);
 
     tree.findNeighbors(intersections, VECTOR(midpoint));
 
@@ -367,12 +344,7 @@ static igraph_error_t is_intersection_empty(
 
 // Test whether the union of the circles given by centre_positions
 //  is empty of other points except for a and b.
-template <igraph_error_t centre_positions(igraph_vector_t *a_centre,
-          igraph_vector_t *b_centre,
-          igraph_integer_t a,
-          igraph_integer_t b,
-          igraph_real_t beta,
-          const igraph_matrix_t *points)>
+template <CentreConstructor centre_positions>
 static igraph_error_t is_union_empty(
     igraph_bool_t *result,
     KDTree < -1 > &tree,
@@ -411,6 +383,30 @@ static igraph_error_t is_union_empty(
     return IGRAPH_SUCCESS;
 }
 
+// Iterate through the edges given, applying the provided filter.
+// Currently used with is_intersection_empty and is_union_empty.
+// TODO: specialize for multiple dimensions?
+template < FilterFunc filter >
+static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
+    igraph_integer_t available_edges = igraph_vector_int_size(edges);
+    igraph_integer_t added_edges = 0;
+    ig_point_adaptor adaptor(points);
+    igraph_integer_t dim = igraph_matrix_ncol(points);
+    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    tree.buildIndex();
+    igraph_bool_t result;
+    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
+        filter(&result, tree, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1], points, beta);
+        if (result) {
+            VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i * 2];
+            VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i * 2 + 1];
+            added_edges += 1;
+        }
+    }
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, added_edges * 2));
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_lune_beta_skeleton
  * \brief computes the lune based beta skeleton of a spatial point set.
@@ -444,13 +440,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_edges<is_intersection_empty<construct_lune_centres>>(&potential_edges, points, beta));
+      IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>>(&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK(filter_edges<is_intersection_empty<construct_perp_centres>>(&potential_edges, points, beta));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>>(&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -495,7 +491,7 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
     if (beta >= 1) {
         IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centres>>(&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK(filter_edges<is_intersection_empty<construct_perp_centres>>(&potential_edges, points, beta));
+      IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>>(&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -621,6 +617,7 @@ public:
  * \return Error code.
  *
  * \sa \ref igraph_lune_beta_skeleton() or \ref igraph_circle_beta_skeleton() to generate a graph with a given value of beta.
+ *   \ref igraph_gabriel_graph() to only generate a gabriel graph.
  *
  * Time complexity: TODO
  */
@@ -676,4 +673,38 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
+}
+
+
+igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *points) {
+    igraph_vector_int_t potential_edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
+
+    IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
+    
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>>(&potential_edges, points, 1)));
+
+    IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
+
+    igraph_vector_int_destroy(&potential_edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_matrix_t *points) {
+    igraph_vector_int_t potential_edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
+
+    IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
+    
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, false>>(&potential_edges, points, 2)));
+
+    IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
+
+    igraph_vector_int_destroy(&potential_edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+    
 }
