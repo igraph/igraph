@@ -523,11 +523,28 @@ igraph_get_shortest_paths:
         OPTIONAL OUT VECTOR_INT inbound_edges
     DEPS: edges ON graph, from ON graph, to ON graph
 
+igraph_get_shortest_paths_cutoff:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
+        VERTEX from, VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT,
+        OPTIONAL OUT VECTOR_INT parents,
+        OPTIONAL OUT VECTOR_INT inbound_edges,
+        REAL cutoff=-1
+    DEPS: edges ON graph, from ON graph, to ON graph
+
 igraph_get_all_shortest_paths:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
         VERTEX from, VERTEX_SELECTOR to, NEIMODE mode=OUT
+    DEPS: edges ON graph, from ON graph, to ON graph
+
+igraph_get_all_shortest_paths_cutoff:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
+        VERTEX from, VERTEX_SELECTOR to, NEIMODE mode=OUT, REAL cutoff=-1
     DEPS: edges ON graph, from ON graph, to ON graph
 
 igraph_distances_dijkstra:
@@ -553,6 +570,18 @@ igraph_get_shortest_paths_dijkstra:
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
         weights ON graph
 
+igraph_get_shortest_paths_dijkstra_cutoff:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEX_SELECTOR to=ALL,
+        EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
+        OPTIONAL OUT VECTOR_INT parents=0,
+        OPTIONAL OUT VECTOR_INT inbound_edges=0,
+        REAL cutoff=-1
+    DEPS: |-
+        vertices ON graph, edges ON graph, from ON graph, to ON graph,
+        weights ON graph
+
 igraph_get_shortest_paths_bellman_ford:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
@@ -570,6 +599,16 @@ igraph_get_all_shortest_paths_dijkstra:
         OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
         VERTEX from, VERTEX_SELECTOR to=ALL, OPTIONAL EDGEWEIGHTS weights,
         NEIMODE mode=OUT
+    DEPS: |-
+        weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
+
+igraph_get_all_shortest_paths_dijkstra_cutoff:
+    PARAMS: |-
+        GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
+        OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
+        VERTEX from, VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights,
+        NEIMODE mode=OUT,
+        REAL cutoff=-1
     DEPS: |-
         weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
 
@@ -962,14 +1001,14 @@ igraph_degree_correlation_vector:
     DEPS: weights ON graph
 
 igraph_rich_club_sequence:
-  PARAMS: |-
-      GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
-      OUT VECTOR res,
-      INDEX_VECTOR vertex_order,
-      BOOLEAN normalized=True,
-      BOOLEAN loops=False,
-      BOOLEAN directed=True
-  DEPS: weights ON graph
+    PARAMS: |-
+        GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
+        OUT VECTOR res,
+        INDEX_VECTOR vertex_order,
+        BOOLEAN normalized=True,
+        BOOLEAN loops=False,
+        BOOLEAN directed=True
+    DEPS: weights ON graph
 
 igraph_strength:
     PARAMS: |-
@@ -1265,7 +1304,6 @@ igraph_bipartite_game:
         OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
         ERDOS_RENYI_TYPE type, INTEGER n1, INTEGER n2, REAL p=0.0,
         INTEGER m=0, BOOLEAN directed=False, NEIMODE mode=ALL
-
 
 #######################################
 # Spectral properties
@@ -1883,15 +1921,13 @@ igraph_get_adjacency:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH,
         OPTIONAL EDGEWEIGHTS weights, LOOPS loops=ONCE
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_get_adjacency_sparse:
     PARAMS: |-
         GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH,
         OPTIONAL EDGEWEIGHTS weights, LOOPS loops=ONCE
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, BOOLEAN bycol=False
@@ -1900,15 +1936,13 @@ igraph_get_stochastic:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False,
         OPTIONAL EDGEWEIGHTS weights
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_get_stochastic_sparse:
     PARAMS: |-
         GRAPH graph, OUT SPARSEMAT sparsemat, BOOLEAN column_wise=False,
         OPTIONAL EDGEWEIGHTS weights
-    DEPS:
-        weights ON graph
+    DEPS: weights ON graph
 
 igraph_to_directed:
     PARAMS: INOUT GRAPH graph, TODIRECTED mode=MUTUAL
@@ -2166,8 +2200,7 @@ igraph_mincut:
 
 igraph_mincut_value:
     PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITY capacity
-    DEPS:
-        capacity ON graph
+    DEPS: capacity ON graph
 
 igraph_residual_graph:
     PARAMS: |-

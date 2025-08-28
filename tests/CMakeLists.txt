@@ -283,6 +283,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
+  all_shortest_paths_cutoff
   assortativity
   igraph_product
   components
@@ -319,10 +320,12 @@ add_legacy_tests(
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_paths_cutoff
   igraph_get_shortest_path_astar
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
   igraph_get_shortest_paths_dijkstra
+  igraph_get_shortest_paths_dijkstra_cutoff
   igraph_graph_center
   igraph_has_mutual
   igraph_is_bipartite

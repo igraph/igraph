@@ -271,8 +271,10 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
 
 /**
  * \ingroup structural
- * \function igraph_get_shortest_paths
- * \brief Shortest paths from a vertex.
+ * \function igraph_get_shortest_paths_cutoff
+ * \brief Shortest paths from a vertex with a cutoff.
+ *
+ * \experimental
  *
  * Finds unweighted shortest paths from a single source vertex to the specified
  * sets of target vertices. If there is more than one geodesic between two vertices,
@@ -321,6 +323,8 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  *        during the search will have -1 in the corresponding entry of the
  *        vector. Note that the search terminates if all the vertices in
  *        \p to are reached.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  *
  * \return Error code:
  *        \clist
@@ -337,20 +341,21 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  * |E| the number of edges in the
  * graph.
  *
- * \sa \ref igraph_distances() if you only need the path lengths but
- * not the paths themselves; \ref igraph_get_shortest_paths_dijkstra()
- * for the weighted version; \ref igraph_get_all_shortest_paths() to
+ * \sa \ref igraph_distances_cutoff() if you only need the path lengths but
+ * not the paths themselves; \ref igraph_get_shortest_paths_dijkstra_cutoff()
+ * for the weighted version; \ref igraph_get_all_shortest_paths_cutoff() to
  * return all shortest paths between (source, target) pairs.
  *
  * \example examples/simple/igraph_get_shortest_paths.c
  */
-igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths_cutoff(const igraph_t *graph,
                               igraph_vector_int_list_t *vertices,
                               igraph_vector_int_list_t *edges,
                               igraph_integer_t from, const igraph_vs_t to,
                               igraph_neimode_t mode,
                               igraph_vector_int_t *parents,
-                              igraph_vector_int_t *inbound_edges) {
+                              igraph_vector_int_t *inbound_edges,
+                              igraph_real_t cutoff) {
 
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
@@ -422,6 +427,9 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     }
     parent_eids[ from ] = 1;
 
+    igraph_integer_t distance = 1;
+    igraph_integer_t new_nodes_this_round = 0;
+    igraph_integer_t nodes_until_next_round = 1;
     while (!igraph_dqueue_int_empty(&q) && reached < to_reach) {
         igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
 
@@ -430,13 +438,22 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         for (j = 0; j < vsize; j++) {
             igraph_integer_t edge = VECTOR(tmp)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, act);
-            if (parent_eids[neighbor] > 0) {
-                continue;
-            } else if (parent_eids[neighbor] < 0) {
+            if (parent_eids[neighbor] < 0) {
                 reached++;
             }
-            parent_eids[neighbor] = edge + 2;
-            IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor + 1));
+            if (parent_eids[neighbor] <= 0) {
+                parent_eids[neighbor] = edge + 2;
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor + 1));
+                new_nodes_this_round++;
+            }
+        }
+        if (cutoff < 0) continue;
+        nodes_until_next_round--;
+        if (nodes_until_next_round == 0) {
+            distance++;
+            if (distance > cutoff) break;
+            nodes_until_next_round = new_nodes_this_round;
+            new_nodes_this_round = 0;
         }
     }
 
@@ -537,6 +554,33 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup structural
+ * \function igraph_get_shortest_paths
+ * \brief Shortest paths from a vertex.
+ *
+ * \ref igraph_get_shortest_paths_cutoff without a cutoff.
+ *
+ * \sa \ref igraph_distances() if you only need the path lengths but
+ * not the paths themselves.
+ *
+ * \example examples/simple/igraph_get_shortest_paths.c
+ */
+igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
+                              igraph_vector_int_list_t *vertices,
+                              igraph_vector_int_list_t *edges,
+                              igraph_integer_t from, const igraph_vs_t to,
+                              igraph_neimode_t mode,
+                              igraph_vector_int_t *parents,
+                              igraph_vector_int_t *inbound_edges) {
+    return igraph_get_shortest_paths_cutoff(graph,
+                              vertices,
+                              edges,
+                              from, to,
+                              mode,
+                              parents,
+                              inbound_edges, -1);
+}
 /**
  * \function igraph_get_shortest_path
  * \brief Shortest path from one vertex to another one.

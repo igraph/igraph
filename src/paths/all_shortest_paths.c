@@ -32,8 +32,10 @@
 #include <string.h>  /* memset */
 
 /**
- * \function igraph_get_all_shortest_paths
- * \brief All shortest paths (geodesics) from a vertex.
+ * \function igraph_get_all_shortest_paths_cutoff
+ * \brief All shortest paths (geodesics) from a vertex, with cutoff.
+ *
+ * \experimental
  *
  * When there is more than one shortest path between two vertices,
  * all of them will be returned. Every edge is considered separately,
@@ -79,6 +81,8 @@
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -95,12 +99,12 @@
  * case.
  */
 
-igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_shortest_paths_cutoff(const igraph_t *graph,
                                   igraph_vector_int_list_t *vertices,
                                   igraph_vector_int_list_t *edges,
                                   igraph_vector_int_t *nrgeo,
                                   igraph_integer_t from, const igraph_vs_t to,
-                                  igraph_neimode_t mode) {
+                                  igraph_neimode_t mode, igraph_real_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t *geodist;
@@ -206,6 +210,10 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
                 IGRAPH_ASSERT(maxdist >= 0);
                 break;
             }
+        }
+
+        if (cutoff >= 0 && actdist >= cutoff) {
+            continue;
         }
 
         /* If we need the edge-paths, we need to use igraph_incident() followed by an
@@ -335,4 +343,19 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_get_all_shortest_paths
+ * \brief All shortest paths (geodesics) from a vertex.
+ *
+ * \ref igraph_get_all_shortest_paths() without a cutoff.
+ */
+igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
+                                  igraph_vector_int_list_t *vertices,
+                                  igraph_vector_int_list_t *edges,
+                                  igraph_vector_int_t *nrgeo,
+                                  igraph_integer_t from, const igraph_vs_t to,
+                                  igraph_neimode_t mode) {
+    return igraph_get_all_shortest_paths_cutoff(graph, vertices, edges, nrgeo, from, to, mode, -1);
 }
