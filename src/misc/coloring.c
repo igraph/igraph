@@ -364,8 +364,6 @@ igraph_error_t igraph_is_vertex_coloring(
  * \function igraph_is_bipartite_coloring
  * \brief Checks whether a bipartite vertex coloring is valid.
  *
- * \experimental
- *
  * This function checks whether the given vertex type assignment is a valid
  * bipartite coloring, i.e., no two adjacent vertices have the same type.
  * Additionally, for directed graphs, it determines the mode of edge directions.
