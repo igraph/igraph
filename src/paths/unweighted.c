@@ -355,7 +355,7 @@ igraph_error_t igraph_get_shortest_paths_cutoff(const igraph_t *graph,
                               igraph_neimode_t mode,
                               igraph_vector_int_t *parents,
                               igraph_vector_int_t *inbound_edges,
-                              igraph_integer_t cutoff) {
+                              igraph_real_t cutoff) {
 
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
