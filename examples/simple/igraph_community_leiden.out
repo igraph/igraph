@@ -7,3 +7,6 @@ Membership: 0 0 0 0 0 1 1 1 1 1
 Leiden found 2 clusters using modularity, quality is 0.4524.
 Membership: 0 0 0 0 0 1 1 1 1 1
 
+Leiden found 3 clusters using modularity, quality is 0.1852.
+Membership: 0 1 2 2 1 0
+

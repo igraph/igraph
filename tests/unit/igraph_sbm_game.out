@@ -66,4 +66,3 @@ Check for preference matrix probability out of range error handling.
 Check for nonsymmetric preference matrix for undirected graph error handling.
 Check for incorrect block size vector error handling.
 Check for negative block size error handling.
-Check for sum of block sizes not equal to number of vertices error handling.

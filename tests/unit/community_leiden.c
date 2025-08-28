@@ -24,55 +24,113 @@
 
 #include "test_utilities.h"
 
-void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_real_t resolution_parameter) {
+#define TOL (1e-15)
+
+void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_real_t resolution) {
 
     igraph_vector_int_t membership;
     igraph_integer_t nb_clusters = igraph_vcount(graph);
-    igraph_real_t quality;
+    igraph_real_t quality, quality2;
 
     /* Initialize with singleton partition. */
     igraph_vector_int_init(&membership, igraph_vcount(graph));
 
-    igraph_community_leiden(graph, edge_weights, NULL, resolution_parameter, 0.01, 0, 1, &membership, &nb_clusters, &quality);
+    /* Use same seed as for the simplified interface below, to ensure the same result. */
+    igraph_rng_seed(igraph_rng_default(), 123);
+    igraph_community_leiden(graph,
+                            edge_weights, NULL, NULL,
+                            resolution, 0.01, false, 2, &membership,
+                            &nb_clusters,
+                            &quality);
 
-    printf("Leiden found %" IGRAPH_PRId " clusters using CPM (resolution parameter=%.2f), quality is %.4f.\n", nb_clusters, resolution_parameter, quality);
+    /* Handle negative zeros. */
+    if (fabs(quality) < TOL) quality = 0.0;
+
+    printf("Leiden found %" IGRAPH_PRId " clusters using CPM (resolution parameter=%.2f), quality is %.5f.\n", nb_clusters, resolution, quality);
 
     printf("Membership: ");
     igraph_vector_int_print(&membership);
     printf("\n");
+
+    quality2 = quality;
+
+    /* Use same seed as for the generic interface above, to ensure the same result. */
+    igraph_rng_seed(igraph_rng_default(), 123);
+    igraph_community_leiden_simple(graph,
+                                   edge_weights,
+                                   IGRAPH_LEIDEN_OBJECTIVE_CPM,
+                                   resolution, 0.01, false, 2, &membership,
+                                   NULL,
+                                   &quality);
+    if (fabs(quality) < TOL) quality = 0.0;
+    IGRAPH_ASSERT((isnan(quality) && isnan(quality2)) ||
+                  igraph_almost_equals(quality, quality2, TOL));
 
     igraph_vector_int_destroy(&membership);
 }
 
 void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
 
+    const igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_int_t membership;
-    igraph_vector_t strength;
+    igraph_vector_t out_strength, in_strength;
     igraph_integer_t nb_clusters = igraph_vcount(graph);
-    igraph_real_t quality;
+    igraph_real_t quality, quality2;
+    const igraph_real_t directed_multiplier = directed ? 1.0 : 2.0;
     igraph_real_t m;
 
-    igraph_vector_init(&strength, igraph_vcount(graph));
-    igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, edge_weights);
+    igraph_vector_init(&out_strength, igraph_vcount(graph));
+    igraph_strength(graph, &out_strength, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, edge_weights);
+
+    if (directed) {
+        igraph_vector_init(&in_strength, igraph_vcount(graph));
+        igraph_strength(graph, &in_strength, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, edge_weights);
+    }
+
     m = edge_weights ? igraph_vector_sum(edge_weights) : igraph_ecount(graph);
 
     /* Initialize with singleton partition. */
     igraph_vector_int_init(&membership, igraph_vcount(graph));
 
-    igraph_community_leiden(graph, edge_weights, &strength, 1.0 / (2 * m), 0.01, 0, 1, &membership, &nb_clusters, &quality);
+    /* Use same seed as for the simplified interface below, to ensure the same result. */
+    igraph_rng_seed(igraph_rng_default(), 123);
+    igraph_community_leiden(graph,
+                            edge_weights, &out_strength, directed ? &in_strength : NULL,
+                            1.0 / (directed_multiplier * m), 0.01, false, 2, &membership, &nb_clusters,
+                            &quality);
 
+    igraph_modularity(graph, &membership, edge_weights, 1.0, IGRAPH_DIRECTED, &quality2);
     if (isnan(quality)) {
-        printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is nan.\n", nb_clusters);
+        printf("Leiden found %" IGRAPH_PRId " clusters using modularity, %s, quality is nan.\n", nb_clusters, directed ? "directed" : "undirected");
+        IGRAPH_ASSERT(isnan(quality2));
     } else {
-        printf("Leiden found %" IGRAPH_PRId " clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
+        /* It is necessary to not only use igraph_almost_equals(), but also check
+         * if the values are both very close to zero due to roundoff errors. */
+
+        if (fabs(quality) < TOL) quality = 0.0;
+        if (fabs(quality2) < TOL) quality2 = 0.0;
+
+        printf("Leiden found %" IGRAPH_PRId " clusters using modularity, %s, quality is %.5f.\n", nb_clusters, directed ? "directed" : "undirected", quality);
+        IGRAPH_ASSERT(igraph_almost_equals(quality, quality2, TOL));
     }
 
     printf("Membership: ");
     igraph_vector_int_print(&membership);
     printf("\n");
 
+    /* Use same seed as for the generic interface above, to ensure the same result. */
+    igraph_rng_seed(igraph_rng_default(), 123);
+    igraph_community_leiden_simple(graph,
+                                   edge_weights,
+                                   IGRAPH_LEIDEN_OBJECTIVE_MODULARITY,
+                                   1.0, 0.01, false, 2, &membership, NULL, &quality);
+    if (fabs(quality) < TOL) quality = 0.0;
+    IGRAPH_ASSERT((isnan(quality) && isnan(quality2)) ||
+                  igraph_almost_equals(quality, quality2, TOL));
+
     igraph_vector_int_destroy(&membership);
-    igraph_vector_destroy(&strength);
+    if (directed) igraph_vector_destroy(&in_strength);
+    igraph_vector_destroy(&out_strength);
 }
 
 int main(void) {
@@ -95,6 +153,31 @@ int main(void) {
     igraph_vector_resize(&weights, igraph_ecount(&graph));
     igraph_vector_fill(&weights, 2);
     run_leiden_modularity(&graph, &weights);
+
+    /* Same simple graph, but directed with reciprocal edges */
+    igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_MUTUAL);
+    run_leiden_modularity(&graph, NULL);
+
+    igraph_destroy(&graph);
+
+    /* Tiny directed graph; optimal community structure is different if
+     * ignoring edge directions. */
+    igraph_small(&graph, 4, IGRAPH_DIRECTED, 0, 2, 0, 3, 1, 2, 3, 1, 3, 2, -1);
+    run_leiden_modularity(&graph, NULL);
+    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_EACH, NULL);
+    run_leiden_modularity(&graph, NULL);
+    igraph_destroy(&graph);
+
+    /* Larger directed graph; optimal community structure is different if
+     * ignoring edge directions. */
+    igraph_small(
+        &graph, 10, IGRAPH_DIRECTED,
+        0, 3, 0, 4, 1, 0, 1, 4, 2, 1, 3, 0, 3, 2, 4, 0, 4, 3, 4, 7, 5, 0, 5,
+        1, 5, 3, 5, 6, 5, 8, 5, 9, 7, 0, 8, 2, 8, 3, 9, 1, 9, 3, 9, 8,
+        -1);
+    run_leiden_modularity(&graph, NULL);
+    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_EACH, NULL);
+    run_leiden_modularity(&graph, NULL);
     igraph_destroy(&graph);
 
     /* Simple nonuniform weighted graph, with and without weights */
@@ -189,6 +272,37 @@ int main(void) {
     /* Edgeless graph */
     igraph_empty(&graph, 5, IGRAPH_UNDIRECTED);
     run_leiden_modularity(&graph, &weights);
+    igraph_destroy(&graph);
+
+    /* Check that the input is validated properly. */
+
+    /* Small test graph. */
+    igraph_small(&graph, 4, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 2,0, 0,3, 3,3,
+                 -1);
+    igraph_vector_range(&weights, 1, igraph_ecount(&graph) + 1);
+
+    /* Omitting membership should raise no error. */
+    igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_MODULARITY,
+                                   1.0, 0.01, false, 1, NULL, NULL, NULL);
+
+    /* Negative weight. */
+    VECTOR(weights)[0] = -1;
+    CHECK_ERROR(igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_MODULARITY,
+                                               1.0, 0.01, false, 1, NULL, NULL, NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_ER,
+                                               1.0, 0.01, false, 1, NULL, NULL, NULL), IGRAPH_EINVAL);
+
+    /* NaN weight. */
+    VECTOR(weights)[0] = IGRAPH_NAN;
+    CHECK_ERROR(igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_CPM,
+                                               1.0, 0.01, false, 1, NULL, NULL, NULL), IGRAPH_EINVAL);
+
+    /* Invalid weight vector length. */
+    igraph_vector_range(&weights, 1, igraph_ecount(&graph) + 2);
+    CHECK_ERROR(igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_MODULARITY,
+                                               1.0, 0.01, false, 1, NULL, NULL, NULL), IGRAPH_EINVAL);
+
     igraph_destroy(&graph);
 
     igraph_vector_destroy(&weights);

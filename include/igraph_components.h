@@ -54,17 +54,17 @@ IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph
 IGRAPH_EXPORT igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
 
-IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_bond_percolation(
         const igraph_t *graph,
         igraph_vector_int_t *giant_size,
         igraph_vector_int_t *vertex_count,
         const igraph_vector_int_t *edge_order);
-IGRAPH_EXPORT igraph_error_t igraph_site_percolation(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_site_percolation(
         const igraph_t *graph,
         igraph_vector_int_t *giant_size,
         igraph_vector_int_t *edge_count,
         const igraph_vector_int_t *vertex_order);
-IGRAPH_EXPORT igraph_error_t igraph_edgelist_percolation(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_edgelist_percolation(
         const igraph_vector_int_t *edges,
         igraph_vector_int_t *giant_size,
         igraph_vector_int_t *vertex_count);

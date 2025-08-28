@@ -29,4 +29,9 @@ igraph_error_t igraph_i_matrix_subset_vertices(
         igraph_vs_t from,
         igraph_vs_t to);
 
+void igraph_i_simplify_edge_list(
+        igraph_vector_int_t *edges,
+        igraph_bool_t self_loops, igraph_bool_t multi_edges,
+        igraph_bool_t directed);
+
 #endif /* IGRAPH_INTERNAL_UTILS_H */

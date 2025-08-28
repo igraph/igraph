@@ -61,7 +61,7 @@ int main(void) {
     igraph_community_leading_eigenvector(&graph, NULL, NULL, &membership, igraph_vcount(&graph), NULL, NULL, false, NULL, NULL, NULL, NULL, NULL);
     check(&membership);
 
-    igraph_community_leiden(&graph, NULL, NULL, 1, 0.01, 1, false, &membership, NULL, NULL);
+    igraph_community_leiden(&graph, NULL, NULL, NULL, 1, 0.01, 1, false, &membership, NULL, NULL);
     check(&membership);
 
     igraph_community_multilevel(&graph, NULL, 1, &membership, NULL, NULL);
@@ -79,7 +79,7 @@ int main(void) {
     igraph_community_spinglass(&graph, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
     check(&membership);
 
-    igraph_community_infomap(&graph, NULL, NULL, 1, &membership, NULL);
+    igraph_community_infomap(&graph, NULL, NULL, 1, false, 0, &membership, NULL);
     check(&membership);
 
     igraph_destroy(&graph);

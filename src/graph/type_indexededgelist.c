@@ -1236,10 +1236,11 @@ igraph_error_t igraph_degree_1(
  *        \c IGRAPH_ALL, total degree (sum of the
  *        in- and out-degree).
  *        This parameter is ignored for undirected graphs.
- * \param loops Specifies how to treat loop edges when calculating the
- *        degree. \c IGRAPH_NO_LOOPS ignores loop edges; \c IGRAPH_LOOPS_ONCE
- *        counts each loop edge only once; \c IGRAPH_LOOPS_TWICE counts each
- *        loop edge twice in undirected graphs and once in directed graphs.
+ * \param loops Constant of type \ref igraph_loops_t, specifies how to treat
+ *        loop edges when calculating the degree. \c IGRAPH_NO_LOOPS ignores
+ *        loop edges; \c IGRAPH_LOOPS_ONCE counts each loop edge only once;
+ *        \c IGRAPH_LOOPS_TWICE counts each loop edge twice in undirected
+ *        graphs and once in directed graphs.
  * \return Error code:
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.

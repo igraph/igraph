@@ -541,6 +541,38 @@ int main(void) {
     destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &parents, &inbound_edges,
                 &vertices2, &edges2);
 
+    /* ==================================================================== */
+    /* 16. Infinite weights                                                 */
+
+    n = 10;
+    m = 6;
+    igraph_small(&g, n, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 3,4, 4,5, 6,7, 8,9,
+                 -1);
+    igraph_vector_init_real(&w, m,
+                            0.5, IGRAPH_INFINITY, /* 0,1, 1,2 */
+                            1.5, -IGRAPH_INFINITY, /* 3,4, 4,5 */
+                            IGRAPH_INFINITY, /* 6,7 */
+                            -IGRAPH_INFINITY); /* 8,9 */
+
+    igraph_matrix_init(&res1, n, n);
+    igraph_matrix_init(&res2, n, n);
+    igraph_vs_all(&from);
+    igraph_vs_all(&to);
+
+    init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
+
+    /* Note: Since edges with negative infinite weight are ignored, there is
+     * no path from 3 to 5. */
+    run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_ALL);
+    run_get_widest_paths(&g, &w, /* source */ 3, /* destination */ 5, &to, IGRAPH_ALL,
+                         &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
+
+    print_results(n, &res1, &res2, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
+
+    destroy_all(&g, &w, &res1, &res2, &from, &to, &vertices, &edges, &parents, &inbound_edges,
+                &vertices2, &edges2);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

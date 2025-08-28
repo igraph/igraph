@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2005-2021 The igraph development team
+   Copyright (C) 2005-2025 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+#include "paths/paths_internal.h"
 
 /**
  * \function igraph_distances_bellman_ford
@@ -43,10 +44,10 @@
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
  * \param to The target vertices.
- * \param weights The edge weights. There must not be any closed loop in
+ * \param weights The edge weights. There must not be any cycle in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
- *    vertex of this loop infinitely). Additionally, no edge weight may
+ *    vertex of this cycle infinitely). Additionally, no edge weight may
  *    be NaN. If either case does not hold, an error is returned. If this
  *    is a null pointer, then the unweighted version,
  *    \ref igraph_distances() is called.
@@ -59,19 +60,33 @@
  * Time complexity: O(s*|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_distances() for a faster unweighted version
- * or \ref igraph_distances_dijkstra() if you do not have negative
+ * \sa \ref igraph_distances() for a non-algorithm-specific interface;
+ * \ref igraph_distances_dijkstra() if you do not have negative
  * edge weights.
  *
  * \example examples/simple/bellman_ford.c
  */
-igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
-                                       igraph_matrix_t *res,
-                                       const igraph_vs_t from,
-                                       const igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+igraph_error_t igraph_distances_bellman_ford(
+        const igraph_t *graph,
+        igraph_matrix_t *res,
+        const igraph_vs_t from,
+        const igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode) {
+
+    igraph_bool_t negative_weights;
+    IGRAPH_CHECK(igraph_i_validate_distance_weights(graph, weights, &negative_weights));
+    return igraph_i_distances_bellman_ford(graph, res, from, to, weights, mode);
+}
+
+igraph_error_t igraph_i_distances_bellman_ford(
+        const igraph_t *graph,
+        igraph_matrix_t *res,
+        const igraph_vs_t from, const igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode) {
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i;
@@ -82,27 +97,19 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     igraph_vit_t fromvit, tovit;
     igraph_bool_t all_to;
     igraph_vector_t dist;
-    int counter = 0;
+    int iter = 0;
 
     /*
        - speedup: a vertex is marked clean if its distance from the source
          did not change during the last phase. Neighbors of a clean vertex
          are not relaxed again, since it would mean no change in the
-         shortest path values. Dirty vertices are queued. Negative loops can
+         shortest path values. Dirty vertices are queued. Negative cycles can
          be detected by checking whether a vertex has been queued at least
          n times.
     */
-    if (!weights) {
-        return igraph_distances(graph, res, from, to, mode);
-    }
 
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL,
-                      igraph_vector_size(weights), no_of_edges);
-    }
-    if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+    if (!weights || no_of_edges == 0) {
+        return igraph_i_distances_unweighted_cutoff(graph, res, from, to, mode, -1);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
@@ -148,17 +155,14 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
         }
 
         while (!igraph_dqueue_int_empty(&Q)) {
-            if (++counter >= 10000) {
-                counter = 0;
-                IGRAPH_ALLOW_INTERRUPTION();
-            }
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 13);
 
             igraph_integer_t j = igraph_dqueue_int_pop(&Q);
             IGRAPH_BIT_SET(clean_vertices, j);
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
-                IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
-                             IGRAPH_ENEGLOOP);
+                IGRAPH_ERROR("Negative cycle in graph while calculating distances with Bellman-Ford algorithm.",
+                             IGRAPH_ENEGCYCLE);
             }
 
             /* If we cannot get to j in finite time yet, there is no need to relax
@@ -188,7 +192,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
         /* Copy it to the result */
         if (all_to) {
-            igraph_matrix_set_row(res, &dist, i);
+            IGRAPH_CHECK(igraph_matrix_set_row(res, &dist, i));
         } else {
             igraph_integer_t j;
             for (IGRAPH_VIT_RESET(tovit), j = 0; !IGRAPH_VIT_END(tovit);
@@ -243,10 +247,10 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param weights The edge weights. There must not be any closed loop in
+ * \param weights The edge weights. There must not be any cycle in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
- *    vertex of this loop infinitely). If this is a null pointer, then the
+ *    vertex of this cycle infinitely). If this is a null pointer, then the
  *    unweighted version, \ref igraph_get_shortest_paths() is called.
  *    Edges with positive infinite weights are ignored.
  * \param mode For directed graphs; whether to follow paths along edge
@@ -278,8 +282,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
  *           The weight vector doesn't math the number of edges.
  *         \cli IGRAPH_EINVVID
  *           \p from is invalid vertex ID
- *         \cli IGRAPH_ENEGLOOP
- *           Bellman-ford algorithm encounted a negative loop.
+ *         \cli IGRAPH_ENEGCYCLE
+ *           Bellman-ford algorithm encounted a negative cycle.
  *         \endclist
  *
  * Time complexity: O(|E|*|V|), where |V| is the number of
@@ -287,21 +291,36 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
  *
  * \sa \ref igraph_distances_bellman_ford() to compute only shortest path
  * lengths, but not the paths themselves; \ref igraph_get_shortest_paths() for
- * a faster unweighted version or \ref igraph_get_shortest_paths_dijkstra()
- * if you do not have negative edge weights.
+ * a non-algorithm-specific interface.
  */
+igraph_error_t igraph_get_shortest_paths_bellman_ford(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_integer_t from,
+        igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode,
+        igraph_vector_int_t *parents,
+        igraph_vector_int_t *inbound_edges) {
 
-igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
-                                        igraph_vector_int_list_t *vertices,
-                                        igraph_vector_int_list_t *edges,
-                                        igraph_integer_t from,
-                                        igraph_vs_t to,
-                                        const igraph_vector_t *weights,
-                                        igraph_neimode_t mode,
-                                        igraph_vector_int_t *parents,
-                                        igraph_vector_int_t *inbound_edges) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t negative_weights;
+    IGRAPH_CHECK(igraph_i_validate_distance_weights(graph, weights, &negative_weights));
+    return igraph_i_get_shortest_paths_bellman_ford(graph, vertices, edges, from, to, weights, mode, parents, inbound_edges);
+}
+
+igraph_error_t igraph_i_get_shortest_paths_bellman_ford(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_integer_t from,
+        igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode,
+        igraph_vector_int_t *parents,
+        igraph_vector_int_t *inbound_edges) {
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t *parent_eids;
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j, k;
@@ -310,19 +329,14 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
     igraph_vector_t dist;
-    int counter = 0;
+    int iter = 0;
 
     if (!weights) {
-        return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
-                                         parents, inbound_edges);
+        return igraph_i_get_shortest_paths_unweighted(graph, vertices, edges, from, to, mode, parents, inbound_edges);
     }
 
     if (from < 0 || from >= no_of_nodes) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
-    }
-
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
     }
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
@@ -356,17 +370,14 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     while (!igraph_dqueue_int_empty(&Q)) {
-        if (++counter >= 10000) {
-            counter = 0;
-            IGRAPH_ALLOW_INTERRUPTION();
-        }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 13);
 
         j = igraph_dqueue_int_pop(&Q);
         IGRAPH_BIT_SET(clean_vertices, j);
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
-            IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
-                         IGRAPH_ENEGLOOP);
+            IGRAPH_ERROR("Negative cycle in graph while calculating distances with Bellman-Ford algorithm.",
+                         IGRAPH_ENEGCYCLE);
         }
 
         /* If we cannot get to j in finite time yet, there is no need to relax its edges */
@@ -383,10 +394,6 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             igraph_integer_t target = IGRAPH_OTHER(graph, nei, j);
             igraph_real_t weight = VECTOR(*weights)[nei];
             igraph_real_t altdist = VECTOR(dist)[j] + weight;
-
-            if (isnan(weight)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-            }
 
             /* infinite weights are handled correctly here; if an edge has
              * infinite weight, altdist will also be infinite so the condition
@@ -520,10 +527,10 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
  *        path are stored here.
  * \param from The ID of the source vertex.
  * \param to The ID of the target vertex.
- * \param weights The edge weights. There must not be any closed loop in
+ * \param weights The edge weights. There must not be any cycle in
  *        the graph that has a negative total weight (since this would allow
  *        us to decrease the weight of any path containing at least a single
- *        vertex of this loop infinitely). If this is a null pointer, then the
+ *        vertex of this cycle infinitely). If this is a null pointer, then the
  *        unweighted version is called.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. \c IGRAPH_OUT follows edge

@@ -183,6 +183,9 @@ add_library(
   connectivity/separators.c
   connectivity/reachability.c
 
+  cycles/cycle_bases.c
+        cycles/feedback_sets.c
+  cycles/order_cycle.cpp
   cycles/simple_cycles.c
 
   flow/flow.c
@@ -279,6 +282,7 @@ add_library(
   properties/multiplicity.c
   properties/neighborhood.c
   properties/perfect.c
+  properties/rich_club.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
@@ -295,21 +299,21 @@ add_library(
   misc/cocitation.c
   misc/coloring.c
   misc/conversion.c
-  misc/cycle_bases.c
   misc/degree_sequence.cpp
   misc/embedding.c
-  misc/feedback_arc_set.c
   misc/graphicality.c
   misc/matching.c
   misc/mixing.c
   misc/motifs.c
-  misc/order_cycle.cpp
   misc/other.c
   misc/power_law_fit.c
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
 
+  spatial/delaunay.c
+  spatial/convex_hull.c
+  spatial/edge_lengths.c
   spatial/nearest_neighbor.cpp
 
   internal/glpk_support.c
@@ -423,7 +427,7 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored pcg prpack
+  bliss cliquer cxsparse_vendored pcg prpack qhull_vendored
 )
 
 if (NOT BUILD_SHARED_LIBS)
@@ -472,7 +476,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack qhull_vendored
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

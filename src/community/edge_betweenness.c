@@ -412,8 +412,8 @@ static igraph_integer_t igraph_i_which_max_active_ratio(
  *     then merges performed by the algorithm are stored here. Even if
  *     this is a divisive algorithm, we can replay it backwards and
  *     note which two clusters were merged. Clusters are numbered from
- *     zero, see the \p merges argument of \ref igraph_community_walktrap()
- *     for details. The matrix will be resized as needed.
+ *     zero. See \ref igraph_community_to_membership() for details. The
+ *     matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     \c NULL then the indices into \p result of all edges which caused
  *     one of the \p merges will be put here. This is equivalent to all edge removals

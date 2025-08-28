@@ -33,7 +33,7 @@
 #include "igraph_types.h"
 
 #include "internal/glpk_support.h"
-#include "misc/feedback_arc_set.h"
+#include "cycles/feedback_sets.h"
 
 #include <limits.h>
 

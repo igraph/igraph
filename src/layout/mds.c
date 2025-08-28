@@ -210,7 +210,7 @@ igraph_error_t igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
     /* Copy or obtain the distance matrix */
     if (dist == 0) {
         IGRAPH_MATRIX_INIT_FINALLY(&m, no_of_nodes, no_of_nodes);
-        IGRAPH_CHECK(igraph_distances(graph, &m, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_distances(graph, NULL, &m, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL));
     } else {
         IGRAPH_CHECK(igraph_matrix_init_copy(&m, dist));
         IGRAPH_FINALLY(igraph_matrix_destroy, &m);

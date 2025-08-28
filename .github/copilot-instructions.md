@@ -5,11 +5,15 @@ When performing a code review, keep in mind the following.
 
 ## Coding standards
 
- - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases such as the interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED` and typically called `iter`, which may be an `int`. The `long` and `long long` types must never be used.
+ - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases. Such special cases are:
+    * The interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED`, typically called `iter`, which should be an `int`.
+    * When interfacing with a library that uses a different type. Before passing igraph data to this library, it must be checked that the values will not overflow.
+
+ - The `long` and `long long` types must never be used in native igraph code, as their sizes are inconsistent between platforms.
 
  - Check that the parameter ordering of newly added public functions conforms to the guidelines in our wiki at https://github.com/igraph/igraph/wiki/Guidelines-for-function-argument-ordering
 
- - Check that input parameters that are passed by reference (i.e. as a pointer) are marked as `const`. When a parameter that is passed by reference to a public function is modified, and therefore cannot be const, the documentation of that public function should make this clear.
+ - Check that input parameters that are passed by reference (i.e. as a pointer) are marked as `const`. When a parameter that is passed by reference to a public function is modified, and therefore cannot be `const`, the documentation of that public function should make this clear. Parameters that are passed by value should not be marked as `const`.
 
  - Check that header includes are ordered according to the following guidelines:
     * The first included header must be the one that declares the functions *defined* in this file (optionally followed by an empty line).
@@ -17,6 +21,11 @@ When performing a code review, keep in mind the following.
     * Next come private igraph headers (those in subdirectories of `/src`), ordered alphabetically.
     * Next come headers of igraph's dependencies, if any are used.
     * Standard C library headers must come last.
+
+ - Check that all newly added public and private functions follow these conventions:
+    * Public functions must have a name starting with `igraph_`.
+    * Private functions that can be used from multiple translation units must have a name starting with `igraph_i_`, and must be included in a private header.
+    * Private functions that are local to their translation unit must be marked as `static` and should not use the above two prefixes in their name.
 
  - Public igraph functions that are written in C++ (i.e. defined in `.cpp` files) must catch all exceptions before returning. This can be done using the `IGRAPH_HANDLE_EXCEPTIONS_BEGIN;` and `IGRAPH_HANDLE_EXCEPTIONS_END;` macros.
 
@@ -46,18 +55,19 @@ When performing a code review, keep in mind the following.
 
  - Check that integer overflow checks are performed when there is a risk of overflow. `math/safe_intop.h` contains helper macros and functions for overflow-safe arithmetic.
 
+ - Check that edge and vertex weights, as well as spatial coordinates, are protected against invalid values such as NaN, or that there is a comment explaining why such a check is not present.
+
 ## Testing
 
  - Check that all newly added public functions have tests. If they do not, include a link in your response to the testing guide in our wiki at https://github.com/igraph/igraph/wiki/How-to-write-unit-tests%3F. Check that edge cases, such as the null graph and singleton graph (i.e. graphs with 0 and 1 vertices) are included in tests when relevant.
 
- - Check that all newly added public and private functions follow these conventions:
-    * Public functions must have a name starting with `igraph_`.
-    * Private functions that can be used from multiple translation units must have a name starting with `igraph_i_`, and must be included in a private header.
-    * Private functions that are local to their translation unit must be marked as `static` and should not use the above two prefixes in their name.
-
- - Tests for public igraph functions must only include the main igraph header `<igraph.h>`, not any of igraph's sub-headers such as `igraph_interface.h`.
+ - Tests for public igraph functions must only include the main igraph header `<igraph.h>` (with angle brackets), not any of igraph's sub-headers such as `"igraph_interface.h"`.
 
  - Tests must contain `#include "test_utilities.h"` at the top. Whenever possible, tests should use the helper functions in this header (such as `print_vector()`) for printing output. Tests must use the `VERIFY_FINALLY_STACK();` macro to check the consistency of igraph's "finally stack". This macro is typically called before the `main()` function returns.
+
+ - Ensure that important edge cases are tested. What these are differs from situation to situation, but typical cases are making sure that graphs with zero vertices (null graph) or zero edges (empty graph) are handled well.
+
+ - It is not necessary to use `IGRAPH_CHECK`, `IGRAPH_FINALLY` and related functions in tests. Do not suggest using these.
 
 ## Documentation and error messages
 
@@ -67,8 +77,8 @@ When performing a code review, keep in mind the following.
 
  - Check that American spelling is used in all documentation, error messages and symbol names. This instruction does not apply to code comments.
 
- - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature. 
- 
+ - Check that the documentation of newly added or updated public functions describes all function parameters, as well as the return value. The parameters must be documented in the same order, and must have the same name as in the function signature.
+
  - Check that the documentation of newly added public functions has a note on their time complexity.
 
  - Check that within the main description of the function each paragraph, except the first, is preceded by `</para><para>` on a separate line.
@@ -83,7 +93,7 @@ When performing a code review, keep in mind the following.
 
  - Check that error and warning messages use sentence case and end in a fullstop. Refer to https://github.com/igraph/igraph/wiki/Error-reporting-guidelines for more details, and link this page when commenting on error or warning messages.
 
- - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing. 
+ - Check that error messages do not include indices (such as vertex or edge IDs), as igraph has high-level interfaces to languages using both 0-based and 1-based indexing.
 
 ## Review hints
 

@@ -979,6 +979,9 @@ igraph_error_t igraph_get_biadjacency(
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
+ *
+ * \sa igraph_is_bipartite_coloring() to determine if all edges connect
+ * vertices of different types, given a specific type vector.
  */
 
 igraph_error_t igraph_is_bipartite(const igraph_t *graph,

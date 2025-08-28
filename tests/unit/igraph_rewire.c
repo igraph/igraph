@@ -34,7 +34,7 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
     igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
 
-    igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_REWIRING_SIMPLE_LOOPS : IGRAPH_REWIRING_SIMPLE, use_adjlist);
+    igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_LOOPS_SW : IGRAPH_SIMPLE_SW, use_adjlist);
 
     igraph_vector_int_init(&indegree_after, 0);
     igraph_vector_int_init(&outdegree_after, 0);
@@ -64,8 +64,8 @@ int main(void) {
     /* Short test for the top-level igraph_rewire() functions (instead of igraph_i_rewire()). */
     {
         igraph_t graph;
-        igraph_ring(&graph, 12, IGRAPH_UNDIRECTED, /* mutual= */ 0, /* circular= */ 1);
-        igraph_rewire(&graph, 50, IGRAPH_REWIRING_SIMPLE);
+        igraph_cycle_graph(&graph, 12, IGRAPH_UNDIRECTED, /* mutual= */ false);
+        igraph_rewire(&graph, 50, IGRAPH_SIMPLE_SW);
         igraph_destroy(&graph);
     }
 

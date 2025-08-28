@@ -7,22 +7,29 @@
 <chapter id="igraph-Cycles">
 <title>Graph cycles</title>
 
-<section><title>Finding cycles</title>
+<section id="finding-cycles"><title>Finding cycles</title>
 <!-- doxrox-include igraph_find_cycle -->
 <!-- doxrox-include igraph_simple_cycles -->
 <!-- doxrox-include igraph_simple_cycles_callback -->
 <!-- doxrox-include igraph_cycle_handler_t -->
-<!-- doxrox-include igraph_is_acyclic -->
 </section>
 
-<section><title>Eulerian cycles and paths</title>
+<section id="acyclic-graphs-feedback-sets"><title>Acyclic graphs and feedback sets</title>
+<!-- doxrox-include igraph_is_dag -->
+<!-- doxrox-include igraph_is_acyclic -->
+<!-- doxrox-include igraph_topological_sorting -->
+<!-- doxrox-include igraph_feedback_arc_set -->
+<!-- doxrox-include igraph_feedback_vertex_set -->
+</section>
+
+<section id="eulerian-cycles"><title>Eulerian cycles and paths</title>
 <!-- doxrox-include about_eulerian -->
 <!-- doxrox-include igraph_is_eulerian -->
 <!-- doxrox-include igraph_eulerian_cycle -->
 <!-- doxrox-include igraph_eulerian_path -->
 </section>
 
-<section><title>Cycle bases</title>
+<section id="cycle-bases"><title>Cycle bases</title>
 <!-- doxrox-include igraph_fundamental_cycles -->
 <!-- doxrox-include igraph_minimum_cycle_basis -->
 </section>

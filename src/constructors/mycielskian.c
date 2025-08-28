@@ -29,6 +29,8 @@
  * \function igraph_mycielskian
  * \brief Generate the Mycielskian of a graph with \p k iterations.
  *
+ * \experimental
+ *
  * The Mycielskian of a graph is a larger graph formed using a construction due
  * to Jan Mycielski that increases the chromatic number by one while preserving
  * the triangle-free property. The Mycielski construction can be used to create
@@ -43,7 +45,7 @@
  * \ili A vertex \c u_i corresponding to each vertex \c v_i of \c G.
  * \ili An extra vertex \c w.
  * \endilist
- * 
+ *
  * </para><para>
  * The edges are added as follows:
  *
@@ -52,7 +54,7 @@
  * \ili For each edge <code>(v_i, v_j)</code> in \c G, two new edges are added:
  *   <code>(u_i, v_j)</code> and <code>(v_i, u_j)</code>.
  * \endilist
- * 
+ *
  * Thus, if \c G has \c n vertices and \c m edges, the Mycielskian <code>M(G)</code>
  * has <code>2n + 1</code> vertices, and <code>3m + n</code> edges.
  *
@@ -80,7 +82,7 @@
  * <code>m_k = ((2m + 2n + 1) * 3^k - n_{k+1}) / 2</code>
  * edges, where \c n and \c m are the vertex and edge count of the original
  * graph, respectively.
- * 
+ *
  * \param graph Pointer to the input graph.
  * \param res Pointer to an uninitialized graph object where the Mycielskian
  *        of the input graph will be stored.
@@ -188,7 +190,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * The Mycielski graph of order \p k, denoted \c M_k, is a triangle-free graph on
  * \p k vertices with chromatic number \p k. It is defined through the Mycielski
  * construction described in the documentation of \ref igraph_mycielskian().
- * 
+ *
  * </para><para>
  * Some authors define Mycielski graphs only for <code>k > 1</code>.
  * igraph extends this to all <code>k >= 0</code>.
@@ -206,7 +208,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  * The edge count is
  * <code>m_k = (7 * 3^(k-2) + 1) / 2 - 3 * 2^(k - 2)</code> for <code>k > 1</code>
  * and 0 otherwise.
- * 
+ *
  * \param graph Pointer to an uninitialized graph object. The generated
  *        Mycielski graph will be stored here.
  * \param k Integer, the order of the Mycielski graph (must be non-negative).

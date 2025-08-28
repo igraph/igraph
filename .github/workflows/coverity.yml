@@ -21,7 +21,7 @@ jobs:
       run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
         ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref_name }}

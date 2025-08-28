@@ -38,7 +38,7 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     IGRAPH_CHECK(igraph_get_shortest_paths(
-        g, &vpath, &epath, from, *to, IGRAPH_IN,
+        g, NULL, &vpath, &epath, from, *to, IGRAPH_IN,
         &parents, &inbound_edges
     ));
 

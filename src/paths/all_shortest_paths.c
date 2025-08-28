@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2005-2021 The igraph development team
+   Copyright (C) 2005-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_paths.h"
@@ -26,6 +23,7 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+#include "paths/paths_internal.h"
 
 #include <string.h>  /* memset */
 
@@ -92,15 +90,37 @@
  * Time complexity: O(|V|+|E|) for most graphs, O(|V|^2) in the worst
  * case.
  */
+igraph_error_t igraph_get_all_shortest_paths(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_vector_int_t *nrgeo,
+        igraph_integer_t from, const igraph_vs_t to,
+        igraph_neimode_t mode) {
 
-igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
-                                  igraph_vector_int_list_t *vertices,
-                                  igraph_vector_int_list_t *edges,
-                                  igraph_vector_int_t *nrgeo,
-                                  igraph_integer_t from, const igraph_vs_t to,
-                                  igraph_neimode_t mode) {
+    if (weights == NULL) {
+        /* Unweighted version */
+        return igraph_i_get_all_shortest_paths_unweighted(
+            graph, vertices, edges, nrgeo, from, to, mode
+        );
+    } else {
+        /* Weighted version */
+        return igraph_get_all_shortest_paths_dijkstra(
+            graph, vertices, edges, nrgeo, from, to, weights, mode
+        );
+    }
+}
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_vector_int_t *nrgeo,
+        igraph_integer_t from, const igraph_vs_t to,
+        igraph_neimode_t mode) {
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t *geodist;
     igraph_vector_int_list_t paths;
     igraph_vector_int_list_t path_edge;

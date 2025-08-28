@@ -43,7 +43,7 @@ int main(void) {
     igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound_edges, 0);
 
-    igraph_get_shortest_paths(&g, &resvertices, &resedges, /*from=*/ 0,
+    igraph_get_shortest_paths(&g, NULL, &resvertices, &resedges, /*from=*/ 0,
                               /*to=*/ igraph_vss_all(), /*mode=*/ IGRAPH_OUT,
                               &parents, &inbound_edges);
 

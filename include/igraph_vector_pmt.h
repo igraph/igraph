@@ -297,6 +297,10 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, get_interval)(
 #ifndef NOTORDERED
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
                                                              const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, difference_and_intersection_sorted)(
+        const TYPE(igraph_vector) *v1, const TYPE(igraph_vector) *v2,
+        TYPE(igraph_vector) *vdiff12, TYPE(igraph_vector) *vdiff21,
+        TYPE(igraph_vector) *vinter);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
                                                             const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, intersection_size_sorted)(
@@ -306,6 +310,5 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, inte
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                                  TYPE(igraph_vector) *newv,
                                                  const igraph_vector_int_t *idx);
-
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, index_in_place)(TYPE(igraph_vector) *v,
                                                      const igraph_vector_int_t *idx);

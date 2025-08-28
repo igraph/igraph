@@ -30,8 +30,6 @@
  * \function igraph_layout_align
  * \brief Aligns a graph layout with the coordinate axes.
  *
- * \experimental
- *
  * This function centers a vertex layout on the coordinate system origin and
  * rotates the layout to achieve a visually pleasing alignment with the coordinate
  * axes. Doing this is particularly useful with force-directed layouts such as

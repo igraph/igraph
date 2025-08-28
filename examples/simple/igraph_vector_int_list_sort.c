@@ -13,9 +13,9 @@ int main(void) {
     /* Create a random graph with a given number of vertices and edges */
     igraph_erdos_renyi_game_gnm(&graph, 15, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
-    /* Find all maximal cliques in the graph */
+    /* Find all maximal cliques in the graph. IGRAPH_UNLIMITED signifies no limit on the clique sizes. */
     igraph_vector_int_list_init(&cliques, 0);
-    igraph_maximal_cliques(&graph, &cliques, -1, -1);
+    igraph_maximal_cliques(&graph, &cliques, /* min_size */ IGRAPH_UNLIMITED, /* max_size */ IGRAPH_UNLIMITED);
 
     /* Print the cliques in lexicographical order */
     printf("Maximal cliques in lexicographical order:\n");

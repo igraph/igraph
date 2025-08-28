@@ -357,6 +357,7 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_rooted_product
   igraph_simple_cycles
   igraph_similarity
   igraph_transitive_closure
@@ -364,7 +365,6 @@ add_legacy_tests(
   igraph_transitivity_barrat
   igraph_unfold_tree
   igraph_voronoi
-  igraph_widest_paths
   igraph_spanner
   jdm
   knn
@@ -373,8 +373,10 @@ add_legacy_tests(
   paths
   random_spanning_tree
   reachability
+  rich_club
   single_target_shortest_path
   topological_sorting
+  widest_paths
 )
 
 add_legacy_tests(
@@ -489,12 +491,13 @@ add_legacy_tests(
 # coloring.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_coloring
+  coloring
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_coloring
+  coloring
+  is_coloring
 )
 
 
@@ -559,7 +562,7 @@ add_legacy_tests(
   all_almost_e
   cmp_epsilon
   igraph_almost_equals
-  igraph_convex_hull
+  igraph_convex_hull_2d
   igraph_power_law_fit
   overflow
   prop_caching
@@ -928,7 +931,9 @@ add_legacy_tests(
 # spatial
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_delaunay_graph
   igraph_nearest_neighbor_graph
+  igraph_spatial_edge_lengths
 )
 
 
@@ -1007,10 +1012,11 @@ add_benchmarks(
   igraph_betweenness_weighted
   igraph_cliques
   igraph_closeness_weighted
-  igraph_coloring
+  coloring
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
+  igraph_delaunay_graph
   igraph_distances
   igraph_ecc
   igraph_induced_subgraph
@@ -1025,6 +1031,8 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_realize_degree_sequence
+  igraph_rewire
   igraph_strength
   igraph_transitivity
   igraph_tree_game

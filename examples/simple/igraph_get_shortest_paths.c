@@ -86,7 +86,7 @@ int main(void) {
 
     igraph_vs_vector_small(&vs, 1, 3, 5, 2, 1,  -1);
 
-    igraph_get_shortest_paths(&g, &vecs, &evecs, 0, vs, IGRAPH_OUT, &parents, &inbound);
+    igraph_get_shortest_paths(&g, NULL, &vecs, &evecs, 0, vs, IGRAPH_OUT, &parents, &inbound);
 
     check_evecs(&g, &vecs, &evecs, 10);
 

@@ -313,26 +313,68 @@ igraph_integer_t FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m) {
 }
 
 /**
+ * Copies matrix data stored contiguously while transposing. Applications include implementing
+ * matrix transposition as well as changing between row-major and column-major storage formats.
+ *
+ * \param dst Data will be copied into this vector. It must have length m-by-n. It will not be resized.
+ * \param src Vector containing the data to be copied. It is assumed to have length m-by-n.
+ *   Must not be the same as \p dst .
+ * \param m The size of contiguous blocks. This is the number of columns when using column-major
+ *   storage format, or the number of rows when using row-major format.
+ * \param n The number of blocks. This is the number of rows when using column-major format,
+ *   or the number of columns when using row-major format.
+ */
+static void FUNCTION(igraph_i, transpose_copy)(
+        TYPE(igraph_vector) *dst, const TYPE(igraph_vector) *src,
+        size_t m, size_t n) {
+
+    IGRAPH_ASSERT(dst != src);
+
+    /* Block size of 4 was found to yield the best performance when benchmarking with:
+     *  - Intel Core i7-7920HQ on macOS.
+     *  - AMD Ryzen Threadripper 3990X on Linux.
+     */
+    const size_t blocksize = 4;
+    for (size_t i=0; i < m; i += blocksize) {
+        for (size_t j=0; j < n; j++) {
+            for (size_t k=0; k < blocksize && i+k < m; k++) {
+                VECTOR(*dst)[j + (i+k)*n] = VECTOR(*src)[i+k + j*m];
+            }
+        }
+    }
+}
+
+/**
  * \ingroup matrix
  * \function igraph_matrix_copy_to
  * \brief Copies a matrix to a regular C array.
  *
  * </para><para>
- * The matrix is copied columnwise, as this is the format most
- * programs and languages use.
  * The C array should be of sufficient size; there are (of course) no
  * range checks.
+ *
  * \param m Pointer to an initialized matrix object.
  * \param to Pointer to a C array; the place to copy the data to.
+ * \param storage \c IGRAPH_ROW_MAJOR to write the data in row-major format,
+ *    \c IGRAPH_COLUMN_MAJOR to write it in column-major format. Currently
+ *    igraph uses column-major storage internally, thus \c IGRAPH_COLUMN_MAJOR
+ *    is much faster.
  * \return Error code.
  *
  * Time complexity: O(n),
  * n is the number of
  * elements in the matrix.
  */
-
-void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to) {
-    FUNCTION(igraph_vector, copy_to)(&m->data, to);
+void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to, igraph_matrix_storage_t storage) {
+    if (storage == IGRAPH_ROW_MAJOR) {
+        TYPE(igraph_vector) dst;
+        FUNCTION(igraph_vector, view)(&dst, to, m->nrow * m->ncol);
+        FUNCTION(igraph_i, transpose_copy)(&dst, &m->data, m->nrow, m->ncol);
+    } else if (storage == IGRAPH_COLUMN_MAJOR) {
+        FUNCTION(igraph_vector, copy_to)(&m->data, to);
+    } else {
+        IGRAPH_FATAL("Invalid matrix storage format.");
+    }
 }
 
 /**
@@ -445,38 +487,6 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
 }
 
 /**
- * Copies matrix data stored contiguously while transposing. Applications include implementing
- * matrix transposition as well as changing between row-major and column-major storage formats.
- *
- * \param dst Data will be copied into this vector. It must have length m-by-n. It will not be resized.
- * \param src Vector containing the data to be copied. It is assumed to have length m-by-n.
- *   Must not be the same as \p dst .
- * \param m The size of contiguous blocks. This is the number of columns when using column-major
- *   storage format, or the number of rows when using row-major format.
- * \param n The number of blocks. The is the number of rows when using column-major format,
- *   or the number of column when using row-major format.
- */
-static void FUNCTION(igraph_i, transpose_copy)(
-        TYPE(igraph_vector) *dst, const TYPE(igraph_vector) *src,
-        size_t m, size_t n) {
-
-    IGRAPH_ASSERT(dst != src);
-
-    /* Block size of 4 was found to yield the best performance when benchmarking with:
-     *  - Intel Core i7-7920HQ on macOS.
-     *  - AMD Ryzen Threadripper 3990X on Linux.
-     */
-    const size_t blocksize = 4;
-    for (size_t i=0; i < m; i += blocksize) {
-        for (size_t j=0; j < n; j++) {
-            for (size_t k=0; k < blocksize && i+k < m; k++) {
-                VECTOR(*dst)[j + (i+k)*n] = VECTOR(*src)[i+k + j*m];
-            }
-        }
-    }
-}
-
-/**
  * \ingroup matrix
  * \function igraph_matrix_init_array
  * \brief Initializes a matrix from an ordinary C array (constructor).
@@ -517,7 +527,7 @@ igraph_error_t FUNCTION(igraph_matrix, init_array)(
     } else if (storage == IGRAPH_ROW_MAJOR) {
         FUNCTION(igraph_i, transpose_copy)(&m->data, &v, ncol, nrow);
     } else {
-        IGRAPH_ERROR("Invalid storage type argument", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid storage type argument.", IGRAPH_EINVAL);
     }
 
     return IGRAPH_SUCCESS;

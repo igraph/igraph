@@ -294,7 +294,10 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
  *
  * \return Error code.
  *
- * \example examples/simple/igraph_coloring.c
+ * \sa igraph_is_vertex_coloring() to check if a coloring is valid, i.e. if all
+ * edges connect vertices of different colors.
+ *
+ * \example examples/simple/coloring.c
  */
 igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic) {
     switch (heuristic) {
@@ -305,4 +308,210 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
     default:
         IGRAPH_ERROR("Invalid heuristic for greedy vertex coloring.", IGRAPH_EINVAL);
     }
+}
+
+/**
+ * \function igraph_is_vertex_coloring
+ * \brief Checks whether a vertex coloring is valid.
+ *
+ * This function checks whether the given vertex type/color assignment is a valid
+ * vertex coloring, i.e., no two adjacent vertices have the same color.
+ * Self-loops are ignored.
+ *
+ * \param graph The input graph.
+ * \param types The vertex types/colors as an integer vector.
+ * \param res Pointer to a boolean, the result is stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|), linear in the number of edges.
+ */
+igraph_error_t igraph_is_vertex_coloring(
+        const igraph_t *graph,
+        const igraph_vector_int_t *types,
+        igraph_bool_t *res) {
+
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    int iter = 0;
+
+    if (igraph_vector_int_size(types) != vcount) {
+        IGRAPH_ERROR("Invalid vertex type vector length.", IGRAPH_EINVAL);
+    }
+
+    *res = true;
+
+    for (igraph_integer_t e = 0; e < ecount; e++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, e);
+        igraph_integer_t to = IGRAPH_TO(graph, e);
+
+        /* Skip self-loops */
+        if (from == to) {
+            continue;
+        }
+
+        if (VECTOR(*types)[from] == VECTOR(*types)[to]) {
+            *res = false;
+            break;
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_is_bipartite_coloring
+ * \brief Checks whether a bipartite vertex coloring is valid.
+ *
+ * This function checks whether the given vertex type assignment is a valid
+ * bipartite coloring, i.e., no two adjacent vertices have the same type.
+ * Additionally, for directed graphs, it determines the mode of edge directions.
+ * Self-loops are ignored.
+ *
+ * \param graph The input graph.
+ * \param types The vertex types as a boolean vector.
+ * \param res Pointer to a boolean, the result is stored here.
+ * \param mode Pointer to store the edge direction mode. Can be \c NULL if not needed.
+ *   If all edges go from false to true vertices, \c IGRAPH_OUT is returned.
+ *   If all edges go from true to false vertices, \c IGRAPH_IN is returned.
+ *   If edges go in both directions or graph is undirected, \c IGRAPH_ALL is returned.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|), linear in the number of edges.
+ *
+ * \sa igraph_is_bipartite() to determine whether a graph is bipartite,
+ * i.e. 2-colorable, and find such a coloring.
+ */
+igraph_error_t igraph_is_bipartite_coloring(
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types,
+        igraph_bool_t *res,
+        igraph_neimode_t *mode) {
+
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    int iter = 0;
+
+    if (igraph_vector_bool_size(types) != vcount) {
+        IGRAPH_ERROR("Invalid vertex type vector length.", IGRAPH_EINVAL);
+    }
+
+    *res = true;
+    if (mode) {
+        *mode = IGRAPH_ALL;
+    }
+
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_bool_t has_false_to_true = false;
+    igraph_bool_t has_true_to_false = false;
+
+    for (igraph_integer_t e = 0; e < ecount; e++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, e);
+        igraph_integer_t to = IGRAPH_TO(graph, e);
+
+        /* Skip self-loops */
+        if (from == to) {
+            continue;
+        }
+
+        igraph_bool_t from_type = VECTOR(*types)[from];
+        igraph_bool_t to_type = VECTOR(*types)[to];
+
+        /* Check if adjacent vertices have the same type */
+        if (from_type == to_type) {
+            *res = false;
+            break;
+        }
+
+        /* Track edge directions for directed graphs */
+        if (directed && mode) {
+            if (!from_type && to_type) {
+                has_false_to_true = true;
+            } else if (from_type && !to_type) {
+                has_true_to_false = true;
+            }
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
+    }
+
+    /* Determine the mode for directed graphs */
+    if (*res && directed && mode) {
+        if (has_false_to_true && !has_true_to_false) {
+            *mode = IGRAPH_OUT;
+        } else if (!has_false_to_true && has_true_to_false) {
+            *mode = IGRAPH_IN;
+        } else {
+            *mode = IGRAPH_ALL;
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_is_edge_coloring
+ * \brief Checks whether an edge coloring is valid.
+ *
+ * This function checks whether the given edge color assignment is a valid
+ * edge coloring, i.e., no two adjacent edges have the same color.
+ *
+ * Note that this function does not consider self-edges (loops) as being
+ * adjacent to themselves, so graphs with self-loops may still be considered
+ * to have a valid edge coloring.
+ *
+ * \param graph The input graph.
+ * \param types The edge colors as an integer vector.
+ * \param res Pointer to a boolean, the result is stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|*d*log(d)), where d is the maximum degree.
+ */
+igraph_error_t igraph_is_edge_coloring(
+        const igraph_t *graph,
+        const igraph_vector_int_t *types,
+        igraph_bool_t *res) {
+
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_vector_int_t edges, edge_colors;
+    int iter = 0;
+
+    if (igraph_vector_int_size(types) != ecount) {
+        IGRAPH_ERROR("Invalid edge type vector length.", IGRAPH_EINVAL);
+    }
+
+    /* Be optimistic */
+    *res = true;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_colors, 0);
+
+    /* For each vertex, check that all incident edges have different colors */
+    for (igraph_integer_t v = 0; v < vcount; v++) {
+        IGRAPH_CHECK(igraph_incident(graph, &edges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+
+        /* Get sorted edge color list */
+        IGRAPH_CHECK(igraph_vector_int_index(types, &edge_colors, &edges));
+        igraph_vector_int_sort(&edge_colors);
+
+        /* Look for consecutive duplicates in edge color list */
+        igraph_integer_t edge_color_count = igraph_vector_int_size(&edge_colors);
+        for (igraph_integer_t i = 0; i < edge_color_count - 1; i++) {
+            if (VECTOR(edge_colors)[i] == VECTOR(edge_colors)[i + 1]) {
+                *res = false;
+                goto done;
+            }
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 7);
+    }
+
+done:
+    igraph_vector_int_destroy(&edge_colors);
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
 }

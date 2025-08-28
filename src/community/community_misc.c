@@ -20,6 +20,8 @@
 #include "igraph_memory.h"
 #include "igraph_sparsemat.h"
 
+#include "community/community_internal.h"
+
 #include <string.h>
 #include <math.h>
 
@@ -49,42 +51,44 @@
 
 /**
  * \function igraph_community_to_membership
- * \brief Creates a membership vector from a community structure dendrogram.
+ * \brief Cut a dendrogram after a given number of merges.
  *
- * This function creates a membership vector from a community
- * structure dendrogram. A membership vector contains for each vertex
- * the id of its graph component, the graph components are numbered
- * from zero, see the same argument of \ref igraph_connected_components()
- * for an example of a membership vector.
+ * This function creates a membership vector from a dendrogram whose leaves
+ * are individual vertices by cutting it at the specified level. It produces
+ * a membership vector that contains for each vertex its cluster ID, numbered
+ * from zero. This is the same membership vector format that is produced by
+ * \ref igraph_connected_components(), as well as all community detection
+ * functions in igraph.
  *
  * </para><para>
- * Many community detection algorithms return with a \em merges
- * matrix, \ref igraph_community_walktrap() and \ref
- * igraph_community_edge_betweenness() are two examples. The matrix
- * contains the merge operations performed while mapping the
- * hierarchical structure of a network. If the matrix has \c n-1 rows,
- * where \c n is the number of vertices in the graph, then it contains
- * the hierarchical structure of the whole network and it is called a
- * dendrogram.
+ * It takes as input the number of vertices \p n, and a \p merges matrix
+ * encoding the dendrogram, in the format produced by hierarchical clustering
+ * functions such as \ref igraph_community_edge_betweenness(),
+ * \ref igraph_community_walktrap() or \ref igraph_community_fastgreedy().
+ * The matrix must have two columns and up to <code>n - 1</code> rows.
+ * Each row represents merging two dendrogram nodes into their parent node.
+ * The leaf nodes of the dendrogram are indexed from 0 to <code>n - 1</code>
+ * and are identical to the vertices of the graph that is being partitioned
+ * into communities. Row \c i contains the children of dendrogram node
+ * with index <code>n + i</code>.
  *
  * </para><para>
  * This function performs \p steps merge operations as prescribed by
- * the \p merges matrix and returns the current state of the network.
+ * the \p merges matrix and returns the resulting partitioning into
+ * <code>n - steps</code> communities.
  *
  * </para><para>
  * If \p merges is not a complete dendrogram, it is possible to
  * take \p steps steps if \p steps is not bigger than the number
  * lines in \p merges.
  *
- * \param merges The two-column matrix containing the merge
- *    operations. See \ref igraph_community_walktrap() for the
- *    detailed syntax.
+ * \param merges The two-column matrix containing the merge operations.
  * \param nodes The number of leaf nodes in the dendrogram.
  * \param steps Integer constant, the number of steps to take.
  * \param membership Pointer to an initialized vector, the membership
- *    results will be stored here, if not NULL. The vector will be
+ *    results will be stored here, if not \c NULL. The vector will be
  *    resized as needed.
- * \param csize Pointer to an initialized vector, or NULL. If not NULL
+ * \param csize Pointer to an initialized vector, or \c NULL. If not \c NULL
  *    then the sizes of the components will be stored here, the vector
  *    will be resized as needed.
  * \return Error code.
@@ -92,7 +96,9 @@
  * \sa \ref igraph_community_walktrap(), \ref
  * igraph_community_edge_betweenness(), \ref
  * igraph_community_fastgreedy() for community structure detection
- * algorithms.
+ * algorithms producing merge matrices in this format;
+ * \ref igraph_le_community_to_membership() to perform merges
+ * starting from a given cluster assignment.
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
@@ -224,10 +230,19 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
 }
 
 
-/* This slower implementation is used when cluster indices are not within
- * the range 0..vcount-1.
+/**
+ * This slower implementation of igraph_reindex_membership() is used when
+ * cluster indices are not within the range 0..vcount-1.
+ *
+ * \param membership Vector encoding the membership of each vertex.
+ *    Elements may be arbitrary integers, however, its length must not be zero.
+ * \param new_to_old If not \c NULL, a mapping from new to old cluster
+ *    indices will be stored here.
+ * \param nb_clusters If not \c NULL, the number of clusters will be stored here.
+ *
+ * Time complexity: O(n log(n)) where n is the membership vector length.
  */
-static igraph_error_t reindex_membership_large(
+igraph_error_t igraph_i_reindex_membership_large(
         igraph_vector_int_t *membership,
         igraph_vector_int_t *new_to_old,
         igraph_integer_t *nb_clusters) {
@@ -235,10 +250,17 @@ static igraph_error_t reindex_membership_large(
     const igraph_integer_t vcount = igraph_vector_int_size(membership);
     igraph_vector_int_t permutation;
 
-    /* This implementation cannot currently handle vcount == 0, and is not
-     * called with such input. Assert that the input is valid as a safety
-     * measure. */
-    IGRAPH_ASSERT(vcount > 0);
+    /* The vcount == 0 case requires special handling because the main
+     * algorithm of this function cannot handle it. */
+    if (vcount == 0) {
+        if (new_to_old) {
+            igraph_vector_int_clear(new_to_old);
+        }
+        if (nb_clusters) {
+            *nb_clusters = 0;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&permutation, vcount);
 
@@ -334,7 +356,7 @@ igraph_error_t igraph_reindex_membership(
              * Use alternative implementation that supports these. */
             igraph_vector_int_destroy(&new_cluster);
             IGRAPH_FINALLY_CLEAN(1);
-            return reindex_membership_large(membership, new_to_old, nb_clusters);
+            return igraph_i_reindex_membership_large(membership, new_to_old, nb_clusters);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
