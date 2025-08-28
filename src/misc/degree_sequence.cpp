@@ -107,6 +107,9 @@ struct HavelHakimiList {
     const BNode & head() const { return buckets.front(); }
     const BNode & tail() const { return buckets.back(); }
 
+    igraph_integer_t get_max_bucket() const { return tail().prev; }
+    igraph_integer_t get_min_bucket() const { return head().next; }
+
     void remove_bucket(igraph_integer_t degree) { // assuming sentinel nodes
         igraph_integer_t& prev_idx = buckets[degree].prev;
         igraph_integer_t& next_idx = buckets[degree].next;
@@ -137,10 +140,10 @@ struct HavelHakimiList {
     }
 
     bool get_max_node(vd_pair& max_node) {
-        igraph_integer_t max_bucket = tail().prev;
+        igraph_integer_t max_bucket = get_max_bucket();
         while (buckets[max_bucket].nodes.empty()) {
             remove_bucket(max_bucket);
-            max_bucket = tail().prev;
+            max_bucket = get_max_bucket();
             if (max_bucket == -1) return false;
         }
         max_node = buckets[max_bucket].nodes.top();
@@ -148,10 +151,10 @@ struct HavelHakimiList {
     }
 
     void remove_max_node() {
-        igraph_integer_t max_bucket = tail().prev;
+        igraph_integer_t max_bucket = get_max_bucket();
         while (buckets[max_bucket].nodes.empty()) {
             remove_bucket(max_bucket);
-            max_bucket = tail().prev;
+            max_bucket = get_max_bucket();
         }
         vd_pair max_node = buckets[max_bucket].nodes.top();
         buckets[max_bucket].nodes.pop();
@@ -159,10 +162,10 @@ struct HavelHakimiList {
     }
 
     bool get_min_node(vd_pair& min_node) {
-        igraph_integer_t min_bucket = head().next;
+        igraph_integer_t min_bucket = get_min_bucket();
         while (buckets[min_bucket].nodes.empty()) {
             remove_bucket(min_bucket);
-            min_bucket = head().next;
+            min_bucket = get_min_bucket();
             if (min_bucket == -1) return false;
         }
         min_node = buckets[min_bucket].nodes.top();
@@ -170,10 +173,10 @@ struct HavelHakimiList {
     }
 
     void remove_min_node() {
-        igraph_integer_t min_bucket = head().next;
+        igraph_integer_t min_bucket = get_min_bucket();
         while (buckets[min_bucket].nodes.empty()) {
             remove_bucket(min_bucket);
-            min_bucket = head().next;
+            min_bucket = get_min_bucket();
         }
         vd_pair min_node = buckets[min_bucket].nodes.top();
         buckets[min_bucket].nodes.pop();
@@ -186,7 +189,7 @@ struct HavelHakimiList {
                               igraph_vector_int_t& spokes) {
         std::stack<igraph_integer_t> buckets_req; // stack of needed degree buckets
         igraph_integer_t num_nodes = 0;
-        igraph_integer_t curr = tail().prev; // starts with max_bucket
+        igraph_integer_t curr = get_max_bucket(); // starts with max_bucket
 
         igraph_vector_int_clear(&spokes);
         IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, degree));
