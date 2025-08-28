@@ -31,29 +31,30 @@
 /**
  * \ingroup layout
  * \function igraph_layout_random
- * \brief Places the vertices uniform randomly on a plane.
+ * \brief Places the vertices uniformly randomly within a square.
+ *
+ * Vertex coordinates range from -1 to 1, and are placed in two columns
+ * of a matrix, with a row for each vertex.
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \return Error code. The current implementation always returns with
- * success.
+ * \return Error code.
  *
- * Time complexity: O(|V|), the
- * number of vertices.
+ * Time complexity: O(|V|), the number of vertices.
  */
 igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
+    const igraph_integer_t vcount = igraph_vcount(graph);
 
-    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+    IGRAPH_CHECK(igraph_matrix_resize(res, vcount, 2));
 
     RNG_BEGIN();
 
-    for (i = 0; i < no_of_nodes; i++) {
-        MATRIX(*res, i, 0) = RNG_UNIF(-1, 1);
-        MATRIX(*res, i, 1) = RNG_UNIF(-1, 1);
+    for (igraph_integer_t j = 0; j < 2; j++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
+            MATRIX(*res, i, j) = RNG_UNIF(-1, 1);
+        }
     }
 
     RNG_END();
@@ -63,17 +64,15 @@ igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res)
 
 /**
  * \function igraph_layout_random_3d
- * \brief Places the vertices uniform randomly in a cube.
+ * \brief Places the vertices uniformly randomly in a cube.
  *
- * </para><para>
- * Vertex coordinates range from -1 to 1, and are placed in 3 columns
+ * Vertex coordinates range from -1 to 1, and are placed in three columns
  * of a matrix, with a row for each vertex.
  *
  * \param graph The graph to place.
  * \param res Pointer to an initialized matrix object. It will be
  * resized to hold the result.
- * \return Error code. The current implementation always returns with
- * success.
+ * \return Error code.
  *
  * Added in version 0.2.</para><para>
  *
@@ -81,17 +80,16 @@ igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res)
  */
 igraph_error_t igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
+    const igraph_integer_t vcount = igraph_vcount(graph);
 
-    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
+    IGRAPH_CHECK(igraph_matrix_resize(res, vcount, 3));
 
     RNG_BEGIN();
 
-    for (i = 0; i < no_of_nodes; i++) {
-        MATRIX(*res, i, 0) = RNG_UNIF(-1, 1);
-        MATRIX(*res, i, 1) = RNG_UNIF(-1, 1);
-        MATRIX(*res, i, 2) = RNG_UNIF(-1, 1);
+    for (igraph_integer_t j = 0; j < 3; j++) {
+        for (igraph_integer_t i = 0; i < vcount; i++) {
+            MATRIX(*res, i, j) = RNG_UNIF(-1, 1);
+        }
     }
 
     RNG_END();
@@ -119,7 +117,7 @@ igraph_error_t igraph_i_layout_random_bounded(
 
     if (minx && !igraph_vector_empty(minx)) {
         igraph_real_t m = igraph_vector_max(minx);
-        if (m == IGRAPH_POSINFINITY) {
+        if (m == IGRAPH_INFINITY) {
             IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m > dmaxx) {
@@ -128,7 +126,7 @@ igraph_error_t igraph_i_layout_random_bounded(
     }
     if (maxx && !igraph_vector_empty(maxx)) {
         igraph_real_t m = igraph_vector_min(maxx);
-        if (m == IGRAPH_NEGINFINITY) {
+        if (m == -IGRAPH_INFINITY) {
             IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m < dminx) {
@@ -137,7 +135,7 @@ igraph_error_t igraph_i_layout_random_bounded(
     }
     if (miny && !igraph_vector_empty(miny)) {
         igraph_real_t m = igraph_vector_max(miny);
-        if (m == IGRAPH_POSINFINITY) {
+        if (m == IGRAPH_INFINITY) {
             IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m > dmaxy) {
@@ -146,7 +144,7 @@ igraph_error_t igraph_i_layout_random_bounded(
     }
     if (maxy && !igraph_vector_empty(maxy)) {
         igraph_real_t m = igraph_vector_min(maxy);
-        if (m == IGRAPH_NEGINFINITY) {
+        if (m == -IGRAPH_INFINITY) {
             IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m < dminy) {
@@ -198,7 +196,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
 
     if (minx && !igraph_vector_empty(minx)) {
         igraph_real_t m = igraph_vector_max(minx);
-        if (m == IGRAPH_POSINFINITY) {
+        if (m == IGRAPH_INFINITY) {
             IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m > dmaxx) {
@@ -207,7 +205,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
     }
     if (maxx && !igraph_vector_empty(maxx)) {
         igraph_real_t m = igraph_vector_min(maxx);
-        if (m == IGRAPH_NEGINFINITY) {
+        if (m == -IGRAPH_INFINITY) {
             IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m < dminx) {
@@ -216,7 +214,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
     }
     if (miny && !igraph_vector_empty(miny)) {
         igraph_real_t m = igraph_vector_max(miny);
-        if (m == IGRAPH_POSINFINITY) {
+        if (m == IGRAPH_INFINITY) {
             IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m > dmaxy) {
@@ -225,7 +223,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
     }
     if (maxy && !igraph_vector_empty(maxy)) {
         igraph_real_t m = igraph_vector_min(maxy);
-        if (m == IGRAPH_NEGINFINITY) {
+        if (m == -IGRAPH_INFINITY) {
             IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m < dminy) {
@@ -234,7 +232,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
     }
     if (minz && !igraph_vector_empty(minz)) {
         igraph_real_t m = igraph_vector_max(minz);
-        if (m == IGRAPH_POSINFINITY) {
+        if (m == IGRAPH_INFINITY) {
             IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m > dmaxz) {
@@ -243,7 +241,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
     }
     if (maxz && !igraph_vector_empty(maxz)) {
         igraph_real_t m = igraph_vector_min(maxz);
-        if (m == IGRAPH_NEGINFINITY) {
+        if (m == -IGRAPH_INFINITY) {
             IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
         }
         if (m < dminz) {

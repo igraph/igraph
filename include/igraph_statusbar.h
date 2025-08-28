@@ -42,7 +42,7 @@ __BEGIN_DECLS
  *
  * <para>
  * Status handler functions must be of type \ref igraph_status_handler_t
- * and they can be install by a call to \ref igraph_set_status_handler().
+ * and they can be installed by a call to \ref igraph_set_status_handler().
  * Currently there is a simple predefined status handler function,
  * called \ref igraph_status_handler_stderr(), but the user can define
  * new ones.

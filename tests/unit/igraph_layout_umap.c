@@ -213,6 +213,11 @@ int main(void) {
 
     igraph_matrix_init(&layout, 0, 0);
 
+    /* Check passing NULL as distances */
+    igraph_ring(&graph, 10, IGRAPH_UNDIRECTED, false, true);
+    igraph_layout_umap(&graph, &layout, false, NULL, 0.01, 100, true);
+    igraph_destroy(&graph);
+
     /* Check simple graphs (empty, singleton) */
     igraph_small(&empty_graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_small(&singleton_graph, 1, IGRAPH_UNDIRECTED, -1);

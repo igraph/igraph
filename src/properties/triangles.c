@@ -113,7 +113,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
+static igraph_error_t transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -125,7 +125,7 @@ static igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *grap
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
+static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -321,7 +321,7 @@ igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
+static igraph_error_t transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -378,7 +378,7 @@ igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_transitivity_mode_t mode) {
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_transitivity_local_undirected4(graph, res, mode);
+        return transitivity_local_undirected4(graph, res, mode);
     } else {
         igraph_vit_t vit;
         igraph_integer_t size;
@@ -388,29 +388,157 @@ igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vit_destroy(&vit);
         IGRAPH_FINALLY_CLEAN(1);
         if (size < 100) {
-            return igraph_transitivity_local_undirected1(graph, res, vids, mode);
+            return transitivity_local_undirected1(graph, res, vids, mode);
         } else {
-            return igraph_transitivity_local_undirected2(graph, res, vids, mode);
+            return transitivity_local_undirected2(graph, res, vids, mode);
         }
     }
 }
 
-static igraph_error_t igraph_adjacent_triangles1(const igraph_t *graph,
+static igraph_error_t adjacent_triangles1(const igraph_t *graph,
                                       igraph_vector_t *res,
                                       const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_adjacent_triangles4(const igraph_t *graph,
+static igraph_error_t adjacent_triangles4(const igraph_t *graph,
                                       igraph_vector_t *res) {
 # include "properties/triangles_template.h"
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t count_triangles_and_triples(
+        const igraph_t *graph, igraph_real_t *triangles, igraph_real_t *connected_triples)
+{
+    const igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_vector_int_t mark;
+    igraph_adjlist_t al;
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, vcount);
+
+    *triangles = 0;
+    if (connected_triples) *connected_triples = 0;
+
+    /* In a simple graph we could loop through all edges and count how many common
+     * neighbours their endpoints have. However, we only need to consider each
+     * connected vertex pair once, even if there are multiple edges between them.
+     * The nested for loop below uses an adjlist that already has multi-edges and
+     * self-loops filtered, and solves this problem.
+     *
+     * Performance trick:
+     *
+     * We only consider connected u-v pairs when v < u to avoid triple-counting
+     * and speed up the procedure. This effectively orients an undirected graph
+     * as directed acyclic. In an arbitrary orientation, an originally undirected
+     * triangle may appear as one of these two directed patterns:
+     *  - A -> B -> C -> A. This is NOT acyclic, so we don't encounter it.
+     *  - A -> B -> C, A -> C. This is the only one we need to count.
+     * This is implemented through the `if (v >= u) break;` lines below.
+     *
+     * Some other functions achieve the same via igraph_i_trans4_al_simplify().
+     */
+    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
+        const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
+        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
+        if (d1 > 1) {
+            if (connected_triples) {
+                *connected_triples += (igraph_real_t) d1 * (d1 - 1.0) / 2.0;
+            }
+
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 >= v1) break;
+
+                VECTOR(mark)[v2] = v1+1;
+            }
+            for (igraph_integer_t i=0; i < d1; i++) {
+                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+                if (v2 >= v1) break;
+
+                const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
+                const igraph_integer_t d2 = igraph_vector_int_size(nei2);
+                for (igraph_integer_t j=0; j < d2; j++) {
+                    const igraph_integer_t v3 = VECTOR(*nei2)[j];
+                    if (v3 >= v2) break;
+
+                    if (VECTOR(mark)[v3] == v1+1) {
+                        *triangles += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    igraph_vector_int_destroy(&mark);
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_count_triangles
+ * \brief Counts triangles in a graph.
+ *
+ * This function computes the total number of triangles, i.e. fully connected
+ * vertex triples, in a graph. Edge directions, edge multiplicities, and self-loops
+ * are ignored.
+ *
+ * \param graph The graph object. Edge directions and multiplicites are ignored.
+ * \param res Pointer to a real variable, the result will be stored here.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory for
+ *         temporary data.
+ *
+ * \sa \ref igraph_list_triangles(), \ref igraph_count_adjacent_triangles(),
+ * \ref igraph_transitivity_undirected().
+ *
+ * Time complexity: O(|V|*d^2), |V| is the number of vertices in
+ * the graph, d is the average node degree.
+ */
+
+igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res) {
+    return count_triangles_and_triples(graph, res, NULL);
+}
+
+
+/**
+ * \function igraph_count_adjacent_triangles
+ * \brief Count the number of triangles a vertex is part of.
+ *
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
+ * \param res Initiliazed vector, the results are stored here.
+ * \param vids The vertices to perform the calculation for.
+ * \return Error mode.
+ *
+ * \sa \ref igraph_list_triangles() to list triangles,
+ * \ref igraph_count_triangles() to count all triangles at once.
+ *
+ * Time complexity: O(d^2 n), d is the average vertex degree of the
+ * queried vertices, n is their number.
+ */
+
+igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
+                              igraph_vector_t *res,
+                              const igraph_vs_t vids) {
+    if (igraph_vs_is_all(&vids)) {
+        return adjacent_triangles4(graph, res);
+    } else {
+        return adjacent_triangles1(graph, res, vids);
+    }
+}
+
 /**
  * \function igraph_adjacent_triangles
- * \brief Count the number of triangles a vertex is part of.
+ * \brief Count the number of triangles a vertex is part of (deprecated alias).
+ *
+ * \deprecated-by igraph_count_adjacent_triangles 0.10.15
  *
  * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Initiliazed vector, the results are stored here.
@@ -424,13 +552,9 @@ static igraph_error_t igraph_adjacent_triangles4(const igraph_t *graph,
  */
 
 igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
-                              igraph_vector_t *res,
-                              const igraph_vs_t vids) {
-    if (igraph_vs_is_all(&vids)) {
-        return igraph_adjacent_triangles4(graph, res);
-    } else {
-        return igraph_adjacent_triangles1(graph, res, vids);
-    }
+                                         igraph_vector_t *res,
+                                         const igraph_vs_t vids) {
+    return igraph_count_adjacent_triangles(graph, res, vids);
 }
 
 /**
@@ -451,9 +575,10 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  *        listed exactly once.
  * \return Error code.
  *
- * \sa \ref igraph_transitivity_undirected() to count the triangles,
+ * \sa \ref igraph_count_triangles() to count the triangles,
  * \ref igraph_adjacent_triangles() to count the triangles a vertex
- * participates in.
+ * participates in, \ref igraph_transitivity_undirected() to compute
+ * the global clustering coefficient.
  *
  * Time complexity: O(d^2 n), d is the average degree, n is the number
  * of vertices.
@@ -518,94 +643,20 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_real_t triples = 0, triangles = 0;
-    igraph_integer_t node, nn;
-    igraph_integer_t maxdegree;
-    igraph_integer_t *neis;
-    igraph_vector_int_t order;
-    igraph_vector_t rank;
-    igraph_vector_int_t degree;
+    igraph_real_t triangles, connected_triples;
 
-    igraph_adjlist_t allneis;
-    igraph_vector_int_t *neis1, *neis2;
-    igraph_integer_t i, j, neilen1, neilen2;
+    IGRAPH_CHECK(count_triangles_and_triples(graph, &triangles, &connected_triples));
 
-    if (no_of_nodes == 0) {
-        *res = mode == IGRAPH_TRANSITIVITY_ZERO ? 0.0 : IGRAPH_NAN;
-        return IGRAPH_SUCCESS;
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
-
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
-                               IGRAPH_LOOPS));
-    maxdegree = igraph_vector_int_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
-
-    igraph_vector_int_destroy(&degree);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
-    }
-
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-
-    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (! neis) {
-        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, neis);
-
-    for (nn = no_of_nodes - 1; nn >= 0; nn--) {
-        node = VECTOR(order)[nn];
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        neis1 = igraph_adjlist_get(&allneis, node);
-        neilen1 = igraph_vector_int_size(neis1);
-        triples += (igraph_real_t)neilen1 * (neilen1 - 1);
-        /* Mark the neighbors of 'node' */
-        for (i = 0; i < neilen1; i++) {
-            igraph_integer_t nei = VECTOR(*neis1)[i];
-            neis[nei] = node + 1;
-        }
-        for (i = 0; i < neilen1; i++) {
-            igraph_integer_t nei = VECTOR(*neis1)[i];
-            /* If 'nei' is not ready yet */
-            if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
-                neis2 = igraph_adjlist_get(&allneis, nei);
-                neilen2 = igraph_vector_int_size(neis2);
-                for (j = 0; j < neilen2; j++) {
-                    igraph_integer_t nei2 = VECTOR(*neis2)[j];
-                    if (neis[nei2] == node + 1) {
-                        triangles += 1.0;
-                    }
-                }
-            }
-        }
-    }
-
-    IGRAPH_FREE(neis);
-    igraph_adjlist_destroy(&allneis);
-    igraph_vector_destroy(&rank);
-    igraph_vector_int_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(4);
-
-    if (triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO) {
+    if (connected_triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO) {
         *res = 0;
     } else {
-        *res = triangles / triples * 2.0;
+        *res = triangles / connected_triples * 3.0;
     }
 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_transitivity_barrat1(
+static igraph_error_t transitivity_barrat1(
         const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
@@ -697,7 +748,7 @@ static igraph_error_t igraph_i_transitivity_barrat1(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_transitivity_barrat4(
+static igraph_error_t transitivity_barrat4(
         const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
@@ -889,8 +940,8 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     /* Preconditions validated, now we can call the real implementation */
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_i_transitivity_barrat4(graph, res, weights, mode);
+        return transitivity_barrat4(graph, res, weights, mode);
     } else {
-        return igraph_i_transitivity_barrat1(graph, res, vids, weights, mode);
+        return transitivity_barrat1(graph, res, vids, weights, mode);
     }
 }

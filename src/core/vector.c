@@ -335,7 +335,7 @@ igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
  * \brief Gives the imaginary part of a complex vector.
  *
  * \param v Pointer to a complex vector.
- * \param real Pointer to an initialized vector. The result will be stored here.
+ * \param imag Pointer to an initialized vector. The result will be stored here.
  * \return Error code.
  *
  * Time complexity: O(n), n is the number of elements in the vector.
@@ -416,7 +416,7 @@ igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
  * \function igraph_vector_complex_create_polar
  * \brief Creates a complex matrix from a magnitude and an angle.
  *
- * \param m Pointer to an uninitialized complex vector.
+ * \param v Pointer to an uninitialized complex vector.
  * \param r Pointer to a real vector containing magnitudes.
  * \param theta Pointer to a real vector containing arguments (phase angles).
  * \return Error code.

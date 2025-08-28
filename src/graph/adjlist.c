@@ -241,8 +241,8 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * are \em constructing a graph using an adjacency list representation as
  * it does not require your graph to exist yet.
  *
- * \param no_of_nodes The number of vertices
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \param no_of_nodes The number of vertices
  * \return Error code.
  *
  * Time complexity: O(|V|), linear in the number of vertices.
@@ -562,15 +562,33 @@ igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) 
         }                      \
     } while (0);
 
-igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed) {
-    igraph_vector_int_t* fromvec;
+/**
+ * \function igraph_adjlist_has_edge
+ * \brief Checks if an adjacency list contains an edge.
+ *
+ * \param al The adjacency list. It must be sorted.
+ * \param from The source vertex of the edge.
+ * \param to The target vertex of the edge.
+ * \param directed Whether to treat the graph as directed.
+ * \return
+ */
+
+igraph_bool_t igraph_adjlist_has_edge(
+        igraph_adjlist_t* al,
+        igraph_integer_t from, igraph_integer_t to,
+        igraph_bool_t directed) {
+
+    const igraph_vector_int_t *fromvec;
     ADJLIST_CANON_EDGE(from, to, directed);
     fromvec = igraph_adjlist_get(al, from);
-    return igraph_vector_int_binsearch2(fromvec, to);
-
+    return igraph_vector_int_contains_sorted(fromvec, to);
 }
 
-igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
+igraph_error_t igraph_adjlist_replace_edge(
+        igraph_adjlist_t* al,
+        igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto,
+        igraph_bool_t directed) {
+
     igraph_vector_int_t *oldfromvec, *newfromvec;
     igraph_bool_t found_old, found_new;
     igraph_integer_t oldpos, newpos;
@@ -827,7 +845,7 @@ igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t 
  * \function igraph_inclist_destroy
  * \brief Frees all memory allocated for an incidence list.
  *
- * \param eal The incidence list to destroy.
+ * \param il The incidence list to destroy.
  *
  * Time complexity: depends on memory management.
  */
@@ -1213,7 +1231,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
  * to a different value than \c IGRAPH_LOOPS_TWICE.
  *
  * \param graph The input graph.
- * \param al Pointer to an uninitialized incidence list.
+ * \param il Pointer to an uninitialized incidence list.
  * \param mode Constant, it gives whether incoming edges
  *   (<code>IGRAPH_IN</code>), outgoing edges
  *   (<code>IGRAPH_OUT</code>) or both types of edges
@@ -1264,7 +1282,8 @@ igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
  * \brief Deallocates a lazy incidence list.
  *
  * Frees all allocated memory for a lazy incidence list.
- * \param al The incidence list to deallocate.
+ *
+ * \param il The incidence list to deallocate.
  *
  * Time complexity: depends on memory management.
  */

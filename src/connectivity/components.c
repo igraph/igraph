@@ -84,7 +84,7 @@ igraph_error_t igraph_clusters(const igraph_t *graph, igraph_vector_int_t *membe
  *    \cli IGRAPH_WEAK
  *       Compute weakly connected components, i.e. ignore edge directions.
  *    \cli IGRAPH_STRONG
- *       Compute strongly connnected components, i.e. considr edge directions.
+ *       Compute strongly connnected components, i.e. consider edge directions.
  *    \endclist
  *    This parameter is ignored for undirected graphs.
  * \return Error code.
@@ -425,7 +425,7 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  * time.
  *
  * \param graph The graph object to analyze.
- * \param res Pointer to a logical variable, the result will be stored
+ * \param res Pointer to a Boolean variable, the result will be stored
  *        here.
  * \param mode For a directed graph this specifies whether to calculate
  *        weak or strong connectedness. Possible values:
@@ -434,6 +434,9 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  *        ignored for undirected graphs.
  * \return Error code:
  *        \c IGRAPH_EINVAL: invalid mode argument.
+ *
+ * \sa \ref igraph_connected_components() to find the connected components,
+ * \ref igraph_is_biconnected() to check if the graph is 2-vertex-connected.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices
@@ -625,7 +628,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  *    want to limit the number of components.
  * \param minelements The minimum number of vertices a component
  *    should contain in order to place it in the \p components
- *    vector. For example, supplying 2 here ignored isolated vertices.
+ *    vector. For example, supplying 2 here ignores isolated vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
  *
@@ -640,13 +643,18 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                      igraph_connectedness_t mode,
                      igraph_integer_t maxcompno, igraph_integer_t minelements) {
-    if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
-    } else if (mode == IGRAPH_STRONG) {
-        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_WEAK;
     }
 
-    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
+    switch (mode) {
+    case IGRAPH_WEAK:
+        return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
+    case IGRAPH_STRONG:
+        return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+    default:
+        IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
 }
 
 static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
@@ -1270,7 +1278,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * two connected vertices as biconnected, however, igraph does.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param result If not a \c NULL pointer, the result will be returned here.
+ * \param res If not a \c NULL pointer, the result will be returned here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
@@ -1416,7 +1424,7 @@ exit2:
  * connected components in the graph.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param res Pointer to an initialized vector, the
+ * \param bridges Pointer to an initialized vector, the
  *    bridges will be stored here as edge indices.
  * \return Error code.
  *
@@ -1578,7 +1586,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
  * a given set of vertices and the edges between them;
  * \ref igraph_reachability() to efficiently compute the reachable set from \em all
- * vertices.
+ * vertices; \ref igraph_neighborhood() to find vertices within a given distance.
  */
 igraph_error_t igraph_subcomponent(
     const igraph_t *graph, igraph_vector_int_t *res, igraph_integer_t vertex,

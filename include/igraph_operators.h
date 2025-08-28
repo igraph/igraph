@@ -90,10 +90,21 @@ IGRAPH_EXPORT igraph_error_t igraph_subgraph_from_edges(const igraph_t *graph, i
                                         const igraph_es_t eids, igraph_bool_t delete_vertices);
 IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids);
 
+IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
+                                            const igraph_t *g1,
+                                            const igraph_t *g2,
+                                            igraph_product_t type);
+IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t *res,
+                                                   const igraph_t *g1,
+                                                   const igraph_t *g2,
+                                                   const igraph_integer_t root);
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subgraph_edges(
         const igraph_t *graph, igraph_t *res, const igraph_es_t eids,
         igraph_bool_t delete_vertices
 );
+
+IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
+
 __END_DECLS
 
 #endif

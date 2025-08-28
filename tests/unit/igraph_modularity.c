@@ -44,18 +44,17 @@ int main(void) {
 
     /* Null graph */
     igraph_vector_int_init(&membership, 0);
+
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
-
     igraph_destroy(&graph);
+
     igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
     IGRAPH_ASSERT(isnan(modularity));
-
-    /* Should not crash if we omit 'modularity' */
-    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, /* modularity = */ NULL);
     igraph_destroy(&graph);
+
     igraph_vector_int_destroy(&membership);
 
     /* Simple unweighted graph */
@@ -104,6 +103,19 @@ int main(void) {
                         /* resolution */ resolution,
                         IGRAPH_DIRECTED, &modularity);
         printf("Modularity (resolution %.2f) is %g after aggregation.\n", resolution, modularity);
+    }
+
+    {
+        igraph_real_t modularity2;
+        igraph_modularity(&graph, &membership, &weights, 1.0, IGRAPH_DIRECTED, &modularity);
+
+        /* All entries are distinct in the current membership vector.
+         * We replace one with an element that will trigger automatic
+         * reindexing within igraph_modularity().
+         * The modularity should not change. */
+        VECTOR(membership)[1] = -5;
+        igraph_modularity(&graph, &membership, &weights, 1.0, IGRAPH_DIRECTED, &modularity2);
+        IGRAPH_ASSERT(modularity == modularity2);
     }
 
     igraph_vector_int_destroy(&membership);

@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -58,9 +58,7 @@
    > \author Univ. of Colorado Denver   
    > \author NAG Ltd.   
 
-   > \date December 2016   
-
-   > \ingroup aux_blas   
+   > \ingroup lsame   
 
     ===================================================================== */
 logical igraphlsame_(char *ca, char *cb)
@@ -72,10 +70,9 @@ logical igraphlsame_(char *ca, char *cb)
     integer inta, intb, zcode;
 
 
-/*  -- Reference BLAS level1 routine (version 3.1) --   
+/*  -- Reference BLAS level1 routine --   
     -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       December 2016   
 
 
    =====================================================================   

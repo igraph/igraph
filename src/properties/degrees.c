@@ -74,7 +74,7 @@ igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+static igraph_error_t avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vs_t vids,
         igraph_neimode_t mode,
         igraph_neimode_t neighbor_degree_mode,
@@ -237,7 +237,6 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  * \param neighbor_degree_mode The type of degree to average in directed graphs.
  *   \c IGRAPH_OUT averages out-degrees, \c IGRAPH_IN averages in-degrees
  *   and \c IGRAPH_ALL ignores edge directions for the degree calculation.
- * \param vids The vertices for which the calculation is performed.
  * \param knn Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed. Supply a \c NULL pointer
  *   here if you only want to calculate \c knnk.
@@ -278,7 +277,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     igraph_vector_int_t deghist;
 
     if (weights) {
-        return igraph_i_avg_nearest_neighbor_degree_weighted(graph, vids,
+        return avg_nearest_neighbor_degree_weighted(graph, vids,
                 mode, neighbor_degree_mode, knn, knnk, weights);
     }
 
@@ -536,7 +535,7 @@ igraph_error_t igraph_degree_correlation_vector(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_strength_all(
+static igraph_error_t strength_all(
         const igraph_t *graph, igraph_vector_t *res,
         igraph_neimode_t mode, igraph_bool_t loops,
         const igraph_vector_t *weights) {
@@ -600,7 +599,7 @@ igraph_error_t igraph_i_strength_all(
  * \param mode Gives whether to count only outgoing (\c IGRAPH_OUT),
  *   incoming (\c IGRAPH_IN) edges or both (\c IGRAPH_ALL).
  *   This parameter is ignored for undirected graphs.
- * \param loops A logical scalar, whether to count loop edges as well.
+ * \param loops Boolean, whether to count loop edges as well.
  * \param weights A vector giving the edge weights. If this is a \c NULL
  *   pointer, then \ref igraph_degree() is called to perform the
  *   calculation.
@@ -642,7 +641,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
     }
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_i_strength_all(graph, res, mode, loops, weights);
+        return strength_all(graph, res, mode, loops, weights);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -731,7 +730,7 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
     igraph_vector_int_t vs_vec;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, vids, mode, loops));
-    IGRAPH_CHECK(igraph_vector_int_qsort_ind(&degrees, outvids, order));
+    IGRAPH_CHECK(igraph_vector_int_sort_ind(&degrees, outvids, order));
     if (only_indices || igraph_vs_is_all(&vids) ) {
         igraph_vector_int_destroy(&degrees);
         IGRAPH_FINALLY_CLEAN(1);

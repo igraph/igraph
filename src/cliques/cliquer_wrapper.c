@@ -23,7 +23,7 @@
 #include "cliques/cliquer_internal.h"
 #include "cliques/cliquer/cliquer.h"
 
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 #include <limits.h>
 

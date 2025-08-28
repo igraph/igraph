@@ -1,9 +1,3 @@
-Taking sum of squares of empty vector:
-0
-Taking sum of squares of vector with NaN:
-NaN
-Taking sum of squares of vector:
-30
 Checking if vector is equal to itself:
 1
 Checking if vector is equal to other vector:

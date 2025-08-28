@@ -1,8 +1,11 @@
 Empty graph.
 [ 0-by-2 ]
+[ 0-by-3 ]
 Singleton graph in a box.
 Two connected vertices.
 Two connected vertices in a box.
+P_3 graph.
+P_4 graph.
 A few tests with a disconnected graph of 10 vertices with loops in a box from -1 to 1.
 Without weights or bounds.
 With weights.

@@ -59,7 +59,7 @@
 
 #include "walktrap_graph.h"
 #include "walktrap_heap.h"
-#include "config.h"
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 namespace igraph {
 

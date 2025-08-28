@@ -254,10 +254,10 @@
       ]
     },
     {
-      "login": "araujo88",
-      "name": "Leonardo de Araujo",
+      "login": "leo-aa88",
+      "name": "Leonardo",
       "avatar_url": "https://avatars.githubusercontent.com/u/46436462?v=4",
-      "profile": "https://araujo88.medium.com/",
+      "profile": "https://medium.com/@leo88",
       "contributions": [
         "code"
       ]
@@ -591,6 +591,87 @@
       "name": "Michael",
       "avatar_url": "https://avatars.githubusercontent.com/u/14215028?v=4",
       "profile": "https://github.com/gendelpiekel",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "GenieTim",
+      "name": "Tim Bernhard",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8596965?v=4",
+      "profile": "https://github.com/GenieTim",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "maelle",
+      "name": "Maëlle Salmon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8360597?v=4",
+      "profile": "https://masalmon.eu/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "gulshan-123",
+      "name": "Gulshan Kumar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72340125?v=4",
+      "profile": "https://github.com/gulshan-123",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "carlos-planelles",
+      "name": "Carlos Planelles",
+      "avatar_url": "https://avatars.githubusercontent.com/u/132953755?v=4",
+      "profile": "https://github.com/carlos-planelles",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "devlohani99",
+      "name": "Dev_Lohani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/142163543?v=4",
+      "profile": "https://github.com/devlohani99",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lucaslopes",
+      "name": "Lucas Lopes Felipe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8731439?v=4",
+      "profile": "https://lucaslopes.me/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "its-serah",
+      "name": "Sarah Rashidi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/153510021?v=4",
+      "profile": "https://github.com/its-serah",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "minifinity",
+      "name": "Zara Zong",
+      "avatar_url": "https://avatars.githubusercontent.com/u/124811507?v=4",
+      "profile": "https://github.com/minifinity",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Zepeacedust",
+      "name": "Arnór Friðriksson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41028225?v=4",
+      "profile": "https://github.com/Zepeacedust",
       "contributions": [
         "code"
       ]

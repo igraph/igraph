@@ -112,6 +112,12 @@
 <!-- doxrox-include igraph_is_biconnected -->
 </section>
 
+<section id="percolation"><title>Percolation</title>
+<!-- doxrox-include igraph_site_percolation -->
+<!-- doxrox-include igraph_bond_percolation -->
+<!-- doxrox-include igraph_edgelist_percolation -->
+</section>
+
 <section id="degree-sequences"><title>Degree sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
@@ -210,13 +216,16 @@
 <!-- doxrox-include igraph_count_multiple_1 -->
 </section>
 
-<section id="mixing-patterns"><title>Mixing patterns</title>
+<section id="mixing-patterns"><title>Mixing patterns and degree correlations</title>
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_joint_type_distribution -->
 <!-- doxrox-include igraph_joint_degree_distribution -->
 <!-- doxrox-include igraph_joint_degree_matrix -->
+<!-- doxrox-include igraph_rich_club_sequence -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>
@@ -228,6 +237,7 @@
 <!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
 <!-- doxrox-include igraph_feedback_arc_set -->
+<!-- doxrox-include igraph_feedback_vertex_set -->
 </section>
 
 <section id="maximum-cardinality-search-chordal-graphs"><title>Maximum cardinality search and chordal graphs</title>
@@ -252,14 +262,11 @@
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_has_mutual -->
-<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
-<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparse -->
 <!-- doxrox-include igraph_get_edgelist -->
-<!-- doxrox-include igraph_is_acyclic -->
 </section>
 
 <section id="structural-properties-deprecated"><title>Deprecated functions</title>

@@ -121,6 +121,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_rng_bits(const igraph
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_uint_t igraph_rng_max(const igraph_rng_t *rng);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_rng_name(const igraph_rng_t *rng);
 
+IGRAPH_EXPORT igraph_bool_t igraph_rng_get_bool(igraph_rng_t *rng) ;
 IGRAPH_EXPORT igraph_integer_t igraph_rng_get_integer(
     igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
 );
@@ -140,9 +141,8 @@ IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(
     igraph_rng_t *rng, igraph_real_t shape, igraph_real_t scale
 );
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate);
-IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
-                                           const igraph_vector_t *alpha,
-                                           igraph_vector_t *result);
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(
+    igraph_rng_t *rng, const igraph_vector_t *alpha, igraph_vector_t *result);
 
 /* --------------------------------- */
 
@@ -174,6 +174,7 @@ void PutRNGstate(void);
     do { /* nothing */ } while (0)
 #endif
 
+#define RNG_BOOL()       (igraph_rng_get_bool(igraph_rng_default()))
 #define RNG_INTEGER(l,h) (igraph_rng_get_integer(igraph_rng_default(),(l),(h)))
 #define RNG_NORMAL(m,s)  (igraph_rng_get_normal(igraph_rng_default(),(m),(s)))
 #define RNG_UNIF(l,h)    (igraph_rng_get_unif(igraph_rng_default(),(l),(h)))

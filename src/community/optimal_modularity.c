@@ -32,20 +32,15 @@
 #include "internal/glpk_support.h"
 #include "math/safe_intop.h"
 
-#include "config.h"
-
-#ifdef HAVE_GLPK
-    #include <glpk.h>
-#endif
-
 #include <limits.h>
 
 /**
  * \function igraph_community_optimal_modularity
  * \brief Calculate the community structure with the highest modularity value.
  *
- * This function calculates the optimal community structure for a
- * graph, in terms of maximal modularity score.
+ * This function calculates the optimal community structure for a graph, in
+ * terms of maximal modularity score. Both undirected and directed graphs
+ * are supported.
  *
  * </para><para>
  * The calculation is done by transforming the modularity maximization
@@ -62,7 +57,7 @@
  * graphs. Graphs with up to fifty vertices should be fine, graphs
  * with a couple of hundred vertices might be possible.
  *
- * \param graph The input graph. It is always treated as undirected.
+ * \param graph The input graph. It may be undirected or directed.
  * \param modularity Pointer to a real number, or a null pointer.
  *        If it is not a null pointer, then a optimal modularity value
  *        is returned here.
@@ -91,9 +86,9 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_bool_t directed = igraph_is_directed(graph);
     igraph_integer_t no_of_variables;
     igraph_integer_t i, j, k, l;
     int st;
@@ -124,13 +119,27 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
 
     /* Avoid problems with the null graph */
     if (no_of_nodes < 2) {
+        /* Cater for the case when membership was not given, but modularity was requested. */
+        igraph_vector_int_t imembership, *pmembership;
         if (membership) {
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_null(membership);
+            pmembership = membership;
+        } else {
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&imembership, no_of_nodes);
+            pmembership = &imembership;
         }
+
+        IGRAPH_CHECK(igraph_vector_int_resize(pmembership, no_of_nodes));
+        igraph_vector_int_null(pmembership);
+
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+            IGRAPH_CHECK(igraph_modularity(graph, pmembership, NULL, 1, igraph_is_directed(graph), modularity));
         }
+
+        if (! membership) {
+            igraph_vector_int_destroy(&imembership);
+            IGRAPH_FINALLY_CLEAN(1);
+        }
+
         return IGRAPH_SUCCESS;
     }
 

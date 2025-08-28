@@ -249,8 +249,8 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
  *    is ignored for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(v*(|V|+|E|)), where |V| is the number of
- * vertices, |E| is the number of edges and v is the number of
+ * Time complexity: O(|S| (|V|+|E|)), where |V| is the number of
+ * vertices, |E| is the number of edges and |S| is the number of
  * vertices for which eccentricity is calculated.
  *
  * \sa \ref igraph_radius().
@@ -269,7 +269,7 @@ igraph_error_t igraph_eccentricity(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_i_eccentricity(graph, res, vids, &adjlist,
-                                       /*vid_ecc*/ NULL, /*unconn*/ 1));
+                                       /*vid_ecc*/ NULL, /*unconn*/ true));
     igraph_lazy_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
@@ -349,7 +349,7 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     for (IGRAPH_VIT_RESET(vit);
             !IGRAPH_VIT_END(vit);
             IGRAPH_VIT_NEXT(vit)) {
-        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc, IGRAPH_VIT_GET(vit), /*vid_ecc*/ &dump, /*unconn*/ 1, &inclist));
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc, IGRAPH_VIT_GET(vit), /*vid_ecc*/ &dump, /*unconn*/ true, &inclist));
         IGRAPH_CHECK(igraph_vector_push_back(res, ecc));
     }
     igraph_lazy_inclist_destroy(&inclist);
@@ -496,7 +496,7 @@ igraph_error_t igraph_radius_dijkstra(const igraph_t *graph, const igraph_vector
  *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
  * \return Error code.
  *
- * Time complexity: O(|V||E|)), where |V| is the number of
+ * Time complexity: O(|V| |E|)), where |V| is the number of
  * vertices and |E| is the number of edges.
  *
  * \sa \ref igraph_eccentricity(), \ref igraph_diameter().
@@ -564,7 +564,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                 ito = vid_ecc;
 
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_vec, igraph_vss_1(vid_ecc),
-                                                   &adjlist, &vid_ecc, 1));
+                                                   &adjlist, &vid_ecc, true));
 
                 ecc_v = VECTOR(ecc_vec)[0];
 
@@ -626,9 +626,9 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                  * same distance based on their degree. In te directed case, should we
                  * use in-, out- or total degree? */
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_out, igraph_vss_1(vid_ecc),
-                                                   &adjlist_out, &vid_ecc_out, 1));
+                                                   &adjlist_out, &vid_ecc_out, true));
                 IGRAPH_CHECK(igraph_i_eccentricity(graph, &ecc_in, igraph_vss_1(vid_ecc),
-                                                   &adjlist_in, &vid_ecc_in, 1));
+                                                   &adjlist_in, &vid_ecc_in, true));
 
                 if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
                     vid_ecc = vid_ecc_out;
@@ -730,7 +730,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
  *        returned.
  * \return Error code.
  *
- * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
+ * Time complexity: O(|V| |E| log|E|), |V| is the number of vertices,
  * |E| is the number of edges.
  *
  * \sa \ref igraph_diameter_dijkstra()

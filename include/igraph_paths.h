@@ -40,7 +40,7 @@ __BEGIN_DECLS
  *
  * \ref igraph_get_shortest_path_astar() uses a heuristic based on a distance
  * estimate to the target vertex to guide its search, and determine
- * which vertex to try next. The heurstic function is expected to compute
+ * which vertex to try next. The heuristic function is expected to compute
  * an estimate of the distance between \p from and \p to. In order for
  * \ref igraph_get_shortest_path_astar() to find an exact shortest path,
  * the distance must not be overestimated, i.e. the heuristic function

@@ -31,7 +31,7 @@
 
 __BEGIN_DECLS
 
-/* Helper macto to check if n*sizeof(t) overflows in IGRAPH_CALLOC and IGRAPH_REALLOC */
+/* Helper macro to check if n*sizeof(t) overflows in IGRAPH_CALLOC and IGRAPH_REALLOC */
 #define IGRAPH_I_ALLOC_CHECK_OVERFLOW(n,t,expr) \
     (t*) ((0 <= (n) && ((size_t)(n)) <= SIZE_MAX / sizeof(t)) ? (expr) : NULL)
 

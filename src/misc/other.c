@@ -86,7 +86,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
 
 /**
  * \ingroup nongraph
- * \function igraph_convex_hull
+ * \function igraph_convex_hull_2d
  * \brief Determines the convex hull of a given set of points in the 2D plane.
  *
  * </para><para>
@@ -113,7 +113,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  *
  * Time complexity: O(n log(n)) where n is the number of vertices.
  */
-igraph_error_t igraph_convex_hull(
+igraph_error_t igraph_convex_hull_2d(
     const igraph_matrix_t *data, igraph_vector_int_t *resverts,
     igraph_matrix_t *rescoords
 ) {
@@ -168,7 +168,7 @@ igraph_error_t igraph_convex_hull(
 
     /* Sort points by angles */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_qsort_ind(&angles, &order, IGRAPH_ASCENDING));
+    IGRAPH_CHECK(igraph_vector_sort_ind(&angles, &order, IGRAPH_ASCENDING));
 
     /* Check if two points have the same angle. If so, keep only the point that
      * is farthest from the pivot */
@@ -295,74 +295,127 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
 
 /**
  * \function igraph_vertex_path_from_edge_path
- * \brief Converts a path of edge IDs to the traversed vertex IDs.
+ * \brief Converts a walk of edge IDs to the traversed vertex IDs.
  *
- * </para><para>
  * This function is useful when you have a sequence of edge IDs representing a
- * continuous path in a graph and you would like to obtain the vertex IDs that
- * the path traverses. The function is used implicitly by several shortest path
+ * continuous walk in a graph and you would like to obtain the vertex IDs that
+ * the walk traverses. The function is used implicitly by several shortest path
  * related functions to convert a path of edge IDs to the corresponding
  * representation that describes the path in terms of vertex IDs instead.
  *
- * \param  graph  the graph that the edge IDs refer to
- * \param  start  the start vertex of the path
- * \param  edge_path  the sequence of edge IDs that describe the path
- * \param  vertex_path  the sequence of vertex IDs traversed will be returned here
+ * </para><para>
+ * The result will always contain one more vertex than the number of provided
+ * edges. If no edges are given, the output will contain only the start vertex.
+ *
+ * </para><para>
+ * The walk is allowed to traverse the same vertex more than once. It is
+ * suitable for use on paths, cycles, or arbitrary walks.
+ *
+ * \param  graph The graph that the edge IDs refer to.
+ * \param  start The start vertex of the path. If negative, it is determined
+ *         automatically. This is only possible if the walk contains at least
+ *         one edge. If only one edge is present in an undirected walk,
+ *         one of its endpoints will be selected arbitrarily.
+ * \param  edge_path The sequence of edge IDs that describe the path.
+ * \param  vertex_path The sequence of vertex IDs traversed will be returned here.
+ * \param  mode A constant specifying how edge directions are
+ *         considered in directed graphs. \c IGRAPH_OUT follows edge
+ *         directions, \c IGRAPH_IN follows the opposite directions,
+ *         and \c IGRAPH_ALL ignores edge directions. This argument is
+ *         ignored for undirected graphs.
  * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory,
- *         \c IGRAPH_EINVAL if the edge path does not start at the given vertex
+ *         \c IGRAPH_EINVVID if the start vertex is invalid,
+ *         \c IGRAPH_EINVAL if the edge walk does not start at the given vertex
  *         or if there is at least one edge whose start vertex does not match
- *         the end vertex of the previous edge
+ *         the end vertex of the previous edge.
+ *
+ * Time complexity: O(n) where n is the length of the walk.
  */
 igraph_error_t igraph_vertex_path_from_edge_path(
    const igraph_t *graph, igraph_integer_t start,
    const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
    igraph_neimode_t mode
 ) {
-    igraph_integer_t i, no_of_edges;
-    igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_bool_t next_edge_ok;
-    igraph_integer_t next_start;
+    const igraph_integer_t no_of_edges = igraph_vector_int_size(edge_path);
 
     igraph_vector_int_clear(vertex_path);
-
-    no_of_edges = igraph_vector_int_size(edge_path);
     IGRAPH_CHECK(igraph_vector_int_reserve(vertex_path, no_of_edges + 1));
 
-    if (!directed) {
+    if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(*edge_path)[i]);
-        igraph_integer_t to = IGRAPH_TO(graph, VECTOR(*edge_path)[i]);
+    /* Detect start vertex automatically if necessary. */
+    if (start < 0) {
+        if (no_of_edges == 0) {
+            IGRAPH_ERROR("The path must contain at least one edge in order to "
+                         "determine its starting vertex automatically.", IGRAPH_EINVAL);
+        }
+        const igraph_integer_t edge = VECTOR(*edge_path)[0];
+        switch (mode) {
+        case IGRAPH_OUT:
+            start = IGRAPH_FROM(graph, edge);
+            break;
+        case IGRAPH_IN:
+            start = IGRAPH_TO(graph, edge);
+            break;
+        case IGRAPH_ALL:
+            if (no_of_edges > 1) {
+                const igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                const igraph_integer_t to = IGRAPH_TO(graph, edge);
+                const igraph_integer_t next_edge = VECTOR(*edge_path)[1];
+                if (to == IGRAPH_FROM(graph, next_edge) || to == IGRAPH_TO(graph, next_edge)) {
+                    start = from;
+                } else {
+                    start = to;
+                    /* If the walk is not continuous, this will be detected in the next stage. */
+                }
+            } else {
+                /* There is a single undirected edge.
+                 * Choose an arbitrary endpoint the start vertex. */
+                start = IGRAPH_FROM(graph, edge);
+            }
+        }
+    }
+
+    if (start >= igraph_vcount(graph)) {
+        IGRAPH_ERROR("Invalid start vertex.", IGRAPH_EINVVID);
+    }
+
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+        const igraph_integer_t edge = VECTOR(*edge_path)[i];
+        const igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        const igraph_integer_t to = IGRAPH_TO(graph, edge);
+        igraph_bool_t next_edge_ok;
+        igraph_integer_t next_start;
 
         igraph_vector_int_push_back(vertex_path, start);  /* reserved */
 
         switch (mode) {
-            case IGRAPH_OUT:
-                next_edge_ok = from == start;
+        case IGRAPH_OUT:
+            next_edge_ok = from == start;
+            next_start = to;
+            break;
+
+        case IGRAPH_IN:
+            next_edge_ok = to == start;
+            next_start = from;
+            break;
+
+        case IGRAPH_ALL:
+            if (from == start) {
+                next_edge_ok = true;
                 next_start = to;
-                break;
-
-            case IGRAPH_IN:
-                next_edge_ok = to == start;
+            } else if (to == start) {
+                next_edge_ok = true;
                 next_start = from;
-                break;
+            } else {
+                next_edge_ok = false;
+            }
+            break;
 
-            case IGRAPH_ALL:
-                if (from == start) {
-                    next_edge_ok = true;
-                    next_start = to;
-                } else if (to == start) {
-                    next_edge_ok = true;
-                    next_start = from;
-                } else {
-                    next_edge_ok = false;
-                }
-                break;
-
-            default:
-                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVMODE);
+        default:
+            IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVMODE);
         }
 
         if (!next_edge_ok) {
@@ -375,4 +428,41 @@ igraph_error_t igraph_vertex_path_from_edge_path(
     igraph_vector_int_push_back(vertex_path, start);  /* reserved */
 
     return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup nongraph
+ * \function igraph_convex_hull
+ * \brief Determines the convex hull of a given set of points in the 2D plane (deprecated alias)
+ *
+ * </para><para>
+ * The convex hull is determined by the Graham scan algorithm.
+ * See the following reference for details:
+ *
+ * </para><para>
+ * Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford
+ * Stein. Introduction to Algorithms, Second Edition. MIT Press and
+ * McGraw-Hill, 2001. ISBN 0262032937. Pages 949-955 of section 33.3:
+ * Finding the convex hull.
+ *
+ * \param data vector containing the coordinates. The length of the
+ *        vector must be even, since it contains X-Y coordinate pairs.
+ * \param resverts the vector containing the result, e.g. the vector of
+ *        vertex indices used as the corners of the convex hull. Supply
+ *        \c NULL here if you are only interested in the coordinates of
+ *        the convex hull corners.
+ * \param rescoords the matrix containing the coordinates of the selected
+ *        corner vertices. Supply \c NULL here if you are only interested in
+ *        the vertex indices.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory
+ *
+ * Time complexity: O(n log(n)) where n is the number of vertices.
+ */
+igraph_error_t igraph_convex_hull(
+        const igraph_matrix_t *data, igraph_vector_int_t *resverts,
+        igraph_matrix_t *rescoords
+) {
+    return igraph_convex_hull_2d(data, resverts, rescoords);
 }

@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -16,94 +16,94 @@
 
 static integer c__1 = 1;
 
-/* -----------------------------------------------------------------------   
-   \BeginDoc   
+/* -----------------------------------------------------------------------
+   \BeginDoc
 
-   \Name: dseigt   
+   \Name: dseigt
 
-   \Description:   
-    Compute the eigenvalues of the current symmetric tridiagonal matrix   
-    and the corresponding error bounds given the current residual norm.   
+   \Description:
+    Compute the eigenvalues of the current symmetric tridiagonal matrix
+    and the corresponding error bounds given the current residual norm.
 
-   \Usage:   
-    call dseigt   
-       ( RNORM, N, H, LDH, EIG, BOUNDS, WORKL, IERR )   
+   \Usage:
+    call dseigt
+       ( RNORM, N, H, LDH, EIG, BOUNDS, WORKL, IERR )
 
-   \Arguments   
-    RNORM   Double precision scalar.  (INPUT)   
-            RNORM contains the residual norm corresponding to the current   
-            symmetric tridiagonal matrix H.   
+   \Arguments
+    RNORM   Double precision scalar.  (INPUT)
+            RNORM contains the residual norm corresponding to the current
+            symmetric tridiagonal matrix H.
 
-    N       Integer.  (INPUT)   
-            Size of the symmetric tridiagonal matrix H.   
+    N       Integer.  (INPUT)
+            Size of the symmetric tridiagonal matrix H.
 
-    H       Double precision N by 2 array.  (INPUT)   
-            H contains the symmetric tridiagonal matrix with the   
-            subdiagonal in the first column starting at H(2,1) and the   
-            main diagonal in second column.   
+    H       Double precision N by 2 array.  (INPUT)
+            H contains the symmetric tridiagonal matrix with the
+            subdiagonal in the first column starting at H(2,1) and the
+            main diagonal in second column.
 
-    LDH     Integer.  (INPUT)   
-            Leading dimension of H exactly as declared in the calling   
-            program.   
+    LDH     Integer.  (INPUT)
+            Leading dimension of H exactly as declared in the calling
+            program.
 
-    EIG     Double precision array of length N.  (OUTPUT)   
-            On output, EIG contains the N eigenvalues of H possibly   
-            unsorted.  The BOUNDS arrays are returned in the   
-            same sorted order as EIG.   
+    EIG     Double precision array of length N.  (OUTPUT)
+            On output, EIG contains the N eigenvalues of H possibly
+            unsorted.  The BOUNDS arrays are returned in the
+            same sorted order as EIG.
 
-    BOUNDS  Double precision array of length N.  (OUTPUT)   
-            On output, BOUNDS contains the error estimates corresponding   
-            to the eigenvalues EIG.  This is equal to RNORM times the   
-            last components of the eigenvectors corresponding to the   
-            eigenvalues in EIG.   
+    BOUNDS  Double precision array of length N.  (OUTPUT)
+            On output, BOUNDS contains the error estimates corresponding
+            to the eigenvalues EIG.  This is equal to RNORM times the
+            last components of the eigenvectors corresponding to the
+            eigenvalues in EIG.
 
-    WORKL   Double precision work array of length 3*N.  (WORKSPACE)   
-            Private (replicated) array on each PE or array allocated on   
-            the front end.   
+    WORKL   Double precision work array of length 3*N.  (WORKSPACE)
+            Private (replicated) array on each PE or array allocated on
+            the front end.
 
-    IERR    Integer.  (OUTPUT)   
-            Error exit flag from dstqrb.   
+    IERR    Integer.  (OUTPUT)
+            Error exit flag from dstqrb.
 
-   \EndDoc   
+   \EndDoc
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
-   \BeginLib   
+   \BeginLib
 
-   \Local variables:   
-       xxxxxx  real   
+   \Local variables:
+       xxxxxx  real
 
-   \Routines called:   
-       dstqrb  ARPACK routine that computes the eigenvalues and the   
-               last components of the eigenvectors of a symmetric   
-               and tridiagonal matrix.   
-       second  ARPACK utility routine for timing.   
-       dvout   ARPACK utility routine that prints vectors.   
-       dcopy   Level 1 BLAS that copies one vector to another.   
+   \Routines called:
+       dstqrb  ARPACK routine that computes the eigenvalues and the
+               last components of the eigenvectors of a symmetric
+               and tridiagonal matrix.
+       arscnd  ARPACK utility routine for timing.
+       dvout   ARPACK utility routine that prints vectors.
+       dcopy   Level 1 BLAS that copies one vector to another.
 
-   \Author   
-       Danny Sorensen               Phuong Vu   
-       Richard Lehoucq              CRPC / Rice University   
-       Dept. of Computational &     Houston, Texas   
-       Applied Mathematics   
-       Rice University   
-       Houston, Texas   
+   \Author
+       Danny Sorensen               Phuong Vu
+       Richard Lehoucq              CRPC / Rice University
+       Dept. of Computational &     Houston, Texas
+       Applied Mathematics
+       Rice University
+       Houston, Texas
 
-   \Revision history:   
-       xx/xx/92: Version ' 2.4'   
+   \Revision history:
+       xx/xx/92: Version ' 2.4'
 
-   \SCCS Information: @(#)   
-   FILE: seigt.F   SID: 2.4   DATE OF SID: 8/27/96   RELEASE: 2   
+   \SCCS Information: @(#)
+   FILE: seigt.F   SID: 2.4   DATE OF SID: 8/27/96   RELEASE: 2
 
-   \Remarks   
-       None   
+   \Remarks
+       None
 
-   \EndLib   
+   \EndLib
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
-   Subroutine */ int igraphdseigt_(doublereal *rnorm, integer *n, doublereal *h__, 
-	integer *ldh, doublereal *eig, doublereal *bounds, doublereal *workl, 
+   Subroutine */ int igraphdseigt_(doublereal *rnorm, integer *n, doublereal *h__,
+	integer *ldh, doublereal *eig, doublereal *bounds, doublereal *workl,
 	integer *ierr)
 {
     /* System generated locals */
@@ -112,55 +112,55 @@ static integer c__1 = 1;
 
     /* Local variables */
     integer k;
-    IGRAPH_F77_SAVE real t0, t1;
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal 
-	    *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, mseigt = 0;
+    real t0, t1;
+    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *,
+	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal
+	    *, integer *, char *, ftnlen), igrapharscnd_(real *);
+    integer logfil=6, ndigit=-3, mseigt=0;
     extern /* Subroutine */ int igraphdstqrb_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *);
-    real tseigt = 0.0;
+    real tseigt=0;
     integer msglvl;
 
 
-/*     %----------------------------------------------------%   
-       | Include files for debugging and timing information |   
-       %----------------------------------------------------%   
+/*     %----------------------------------------------------%
+       | Include files for debugging and timing information |
+       %----------------------------------------------------%
 
 
-       %------------------%   
-       | Scalar Arguments |   
-       %------------------%   
+       %------------------%
+       | Scalar Arguments |
+       %------------------%
 
 
-       %-----------------%   
-       | Array Arguments |   
-       %-----------------%   
+       %-----------------%
+       | Array Arguments |
+       %-----------------%
 
 
-       %------------%   
-       | Parameters |   
-       %------------%   
+       %------------%
+       | Parameters |
+       %------------%
 
 
-       %---------------%   
-       | Local Scalars |   
-       %---------------%   
+       %---------------%
+       | Local Scalars |
+       %---------------%
 
 
-       %----------------------%   
-       | External Subroutines |   
-       %----------------------%   
+       %----------------------%
+       | External Subroutines |
+       %----------------------%
 
 
-       %-----------------------%   
-       | Executable Statements |   
-       %-----------------------%   
+       %-----------------------%
+       | Executable Statements |
+       %-----------------------%
 
-       %-------------------------------%   
-       | Initialize timing statistics  |   
-       | & message level for debugging |   
-       %-------------------------------%   
+       %-------------------------------%
+       | Initialize timing statistics  |
+       | & message level for debugging |
+       %-------------------------------%
 
        Parameter adjustments */
     --workl;
@@ -171,7 +171,7 @@ static integer c__1 = 1;
     h__ -= h_offset;
 
     /* Function Body */
-    igraphsecond_(&t0);
+    igrapharscnd_(&t0);
     msglvl = mseigt;
 
     if (msglvl > 0) {
@@ -196,9 +196,9 @@ static integer c__1 = 1;
 		"envector matrix for H", (ftnlen)48);
     }
 
-/*     %-----------------------------------------------%   
-       | Finally determine the error bounds associated |   
-       | with the n Ritz values of H.                  |   
+/*     %-----------------------------------------------%
+       | Finally determine the error bounds associated |
+       | with the n Ritz values of H.                  |
        %-----------------------------------------------% */
 
     i__1 = *n;
@@ -207,14 +207,14 @@ static integer c__1 = 1;
 /* L30: */
     }
 
-    igraphsecond_(&t1);
+    igrapharscnd_(&t1);
     tseigt += t1 - t0;
 
 L9000:
     return 0;
 
-/*     %---------------%   
-       | End of dseigt |   
+/*     %---------------%
+       | End of dseigt |
        %---------------% */
 
 } /* igraphdseigt_ */

@@ -244,12 +244,11 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * https://doi.org/10.1103/PhysRevE.74.036104
  *
  * \param graph The input graph. Edge directions will be ignored.
- * \param weights The weights of the edges, or a null pointer for
- *    unweighted graphs.
+ * \param weights The weights of the edges, or \c NULL for unweighted graphs.
  * \param merges The result of the algorithm, a matrix containing the
  *    information about the splits performed. The matrix is built in
  *    the opposite way however, it is like the result of an
- *    agglomerative algorithm. Unlike with most other hierarchicaly
+ *    agglomerative algorithm. Unlike with most other hierarchical
  *    community detection functions in igraph, the integers in this matrix
  *    represent community indices, not vertex indices. If at the end of
  *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
@@ -266,7 +265,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    This argument is ignored if it is \c NULL. This argument can
  *    also be used to supply a starting configuration for the community
  *    finding, in the format of a membership vector. In this case the
- *    \p start argument must be set to 1.
+ *    \p start argument must be set to \c true.
  * \param steps The maximum number of steps to perform. It might
  *    happen that some component (or the whole network) has no
  *    underlying community structure and no further steps can be
@@ -755,12 +754,32 @@ igraph_error_t igraph_community_leading_eigenvector(
 
 /**
  * \function igraph_le_community_to_membership
- * \brief Vertex membership from the leading eigenvector community structure.
+ * \brief Cut an incomplete dendrogram after a given number of merges, starting with an initial cluster assignment.
  *
- * This function creates a membership vector from the
- * result of \ref igraph_community_leading_eigenvector().
- * It takes \c membership and performs \c steps merges,
- * according to the supplied \c merges matrix.
+ * This function takes a dendrogram whose leaves are cluster IDs given in an
+ * initial cluster assignment provided in \p membership. Then it updates
+ * the cluster assignment by performing the specified number of mergers,
+ * as given by the dendrogram encoded in \p merges. It is a more general
+ * version of \ref igraph_community_to_membership(), which assumes that
+ * the dendrogram leaves are singleton clusters corresponding to individual
+ * vertices.
+ *
+ * </para><para>
+ * This dendrogram format is suitable for divise hierarchical community
+ * detection algorithms that stop before dividing the graph into individual
+ * vertices, such as \ref igraph_community_leading_eigenvector().
+ *
+ * </para><para>
+ * Initially, \p membership is expected to contain \c m contiguous cluster
+ * indices, numbered from zero. These correspond to the leaf nodes of the
+ * dendrogram. Row \c i of the two-column \p merges matrix contains the IDs of
+ * clusters that are merged together into dendrogram node <code>m + i</code>.
+ * It may have up to <code>m - 1</code> rows.
+ *
+ * </para><para>
+ * This function performs \p steps merge operations as prescribed by the
+ * \p merges matrix and updates \p membership to the resulting partitioning
+ * into <code>m - steps</code> communities.
  *
  * \param merges The two-column matrix containing the merge operations.
  *    See \ref igraph_community_leading_eigenvector() for the
@@ -772,6 +791,9 @@ igraph_error_t igraph_community_leading_eigenvector(
  * \param csize Optionally the sizes of the communities are stored here,
  *     if this is not a null pointer, but an initialized vector.
  * \return Error code.
+ *
+ * \sa \ref igraph_community_to_membership() for a simpler interface that
+ * starts by merging individual vertices.
  *
  * Time complexity: O(|V|), the number of vertices.
  */

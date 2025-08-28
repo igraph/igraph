@@ -112,7 +112,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             /* For an undirected graph, we have two "variants" of each edge, i.e.
              * a -- b and b -- a. Since some rewirings can be performed only when we
              * "swap" the endpoints, we do it now with probability 0.5 */
-            if (!directed && RNG_UNIF01() < 0.5) {
+            if (!directed && RNG_BOOL()) {
                 dummy = c; c = d; d = dummy;
                 if (use_adjlist) {
                     /* Flip the edge in the unordered edge-list, so the update later on
@@ -189,7 +189,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
             break;
         default:
             RNG_END();
-            IGRAPH_ERROR("unknown rewiring mode", IGRAPH_EINVMODE);
+            IGRAPH_ERROR("Invalid rewiring mode.", IGRAPH_EINVAL);
         }
         num_swaps++;
     }

@@ -108,6 +108,7 @@ add_library(
   constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
+  constructors/mycielskian.c
   constructors/prufer.c
   constructors/regular.c
   constructors/trees.c
@@ -179,8 +180,11 @@ add_library(
 
   connectivity/cohesive_blocks.c
   connectivity/components.c
+  connectivity/percolation.c
   connectivity/separators.c
   connectivity/reachability.c
+
+  cycles/simple_cycles.c
 
   flow/flow.c
   flow/flow_conversion.c
@@ -204,6 +208,7 @@ add_library(
   io/parse_utils.c
   ${PARSER_SOURCES}
 
+  layout/align.c
   layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -238,6 +243,7 @@ add_library(
   operators/join.c
   operators/misc_internal.c
   operators/permute.c
+  operators/products.c
   operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
@@ -274,6 +280,7 @@ add_library(
   properties/multiplicity.c
   properties/neighborhood.c
   properties/perfect.c
+  properties/rich_club.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
@@ -330,7 +337,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.8")
+set_target_properties(igraph PROPERTIES VERSION "3.1.10")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed

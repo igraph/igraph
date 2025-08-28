@@ -302,7 +302,11 @@ static void igraph_i_move_nodes(
  * anything like that, so a stable fixed point is not guaranteed.)
  *
  * </para><para>
- * See also http://www.schmuhl.org/graphopt/ for the original graphopt.
+ * See also
+ * https://web.archive.org/web/20220611030748/http://www.schmuhl.org/graphopt/
+ * and
+ * https://sourceforge.net/projects/graphopt/
+ * for the original graphopt.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result will be stored here
@@ -328,7 +332,7 @@ static void igraph_i_move_nodes(
  * \param max_sa_movement Real constant, it gives the maximum amount of movement
  *    allowed in a single step along a single axis. The original graphopt
  *    default is 5.
- * \param use_seed Logical scalar, whether to use the positions in \p res as
+ * \param use_seed Boolean, whether to use the positions in \p res as
  *    a starting configuration. See also \p res above.
  * \return Error code.
  *

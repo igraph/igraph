@@ -1,7 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2021 The igraph development team
+   Copyright (C) 2009-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #ifndef IGRAPH_FEEDBACK_ARC_SET_INTERNAL_H
@@ -33,13 +29,23 @@ igraph_error_t igraph_i_feedback_arc_set_eades(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights, igraph_vector_int_t *layering
 );
-igraph_error_t igraph_i_feedback_arc_set_ip(
+igraph_error_t igraph_i_feedback_arc_set_ip_ti(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights);
+igraph_error_t igraph_i_feedback_arc_set_ip_cg(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights);
+igraph_error_t igraph_i_feedback_arc_set_ip_cb(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights);
 igraph_error_t igraph_i_feedback_arc_set_undirected(
         const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights, igraph_vector_int_t *layering
 );
+
+igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights);
 
 __END_DECLS
 

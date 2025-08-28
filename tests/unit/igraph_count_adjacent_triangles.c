@@ -1,0 +1,85 @@
+/*
+   IGraph library.
+   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include <igraph.h>
+
+#include "test_utilities.h"
+
+int main(void) {
+    igraph_t graph;
+    igraph_vector_t count_per_vertex;
+    igraph_real_t total_count;
+    igraph_vs_t vertices;
+
+    igraph_vector_init(&count_per_vertex, 0);
+
+    igraph_small(&graph, 20, IGRAPH_DIRECTED,
+                 15, 12, 12, 10, 15, 0, 11, 10, 2, 8, 8, 6, 13, 17, 10, 10, 17, 2, 14,
+                 0, 16, 13, 14, 14, 0, 5, 6, 4, 0, 9, 0, 6, 10, 9, 16, 4, 14, 5, 17,
+                 15, 14, 9, 17, 17, 1, 4, 10, 16, 7, 0, 11, 12, 6, 13, 2, 17, 4, 0, 0,
+                 14, 4, 0, 6, 16, 16, 14, 13, 13, 12, 11, 3, 11, 11, 3, 6, 7, 4, 14,
+                 10, 8, 13, 7, 14, 2, 5, 2, 0, 14, 3, 15, 5, 5, 7, 2, 14, 15, 5, 10,
+                 10, 16, 7, 9, 14, 0, 15, 7, 13, 1, 15, 1, 4, 5, 4, 6, 16, 13, 6, 17,
+                 8, 6, 9, 3, 8, 6, 6, 14, 11, 14, 6, 10, 10, 5, 1, 0, 16, 17, 9, 1, 5,
+                 0, 5, 15, 8, 0, 0, 8, 5, 3, 9, 4, 13, 12, 11, 0, 11, 0, 10, 6, 4, 13,
+                 8, 9, 11, 11, 3, 16, 1, 2, 16, 0, 9, 8, 3, 8, 8, 7, 12, 10, 9, 3, 13,
+                 5, 3, 9, 6, 2, 11, 10, 1, 16, 0, 2, 10, 17, 16, 8, 11, 5, 13, 0, 19, 19,
+                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                 -1);
+
+    igraph_vs_range(&vertices, 0, igraph_vcount(&graph));
+
+    printf("\nDirected multi:\n");
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, igraph_vss_all());
+    print_vector(&count_per_vertex);
+    igraph_count_triangles(&graph, &total_count);
+    printf("Total count: %g\n", total_count);
+    IGRAPH_ASSERT(igraph_vector_sum(&count_per_vertex) == 3*total_count);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, vertices);
+    print_vector(&count_per_vertex);
+
+    printf("\nUndirected multi:\n");
+    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, igraph_vss_all());
+    print_vector(&count_per_vertex);
+    igraph_count_triangles(&graph, &total_count);
+    printf("Total count: %g\n", total_count);
+    IGRAPH_ASSERT(igraph_vector_sum(&count_per_vertex) == 3*total_count);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, vertices);
+    print_vector(&count_per_vertex);
+
+    printf("\nSimple:\n");
+    igraph_simplify(&graph, true, true, NULL);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, igraph_vss_all());
+    print_vector(&count_per_vertex);
+    igraph_count_triangles(&graph, &total_count);
+    printf("Total count: %g\n", total_count);
+    IGRAPH_ASSERT(igraph_vector_sum(&count_per_vertex) == 3*total_count);
+    igraph_count_adjacent_triangles(&graph, &count_per_vertex, vertices);
+    print_vector(&count_per_vertex);
+
+    igraph_vs_destroy(&vertices);
+
+    igraph_destroy(&graph);
+
+    igraph_vector_destroy(&count_per_vertex);
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
+}

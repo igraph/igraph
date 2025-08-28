@@ -287,7 +287,7 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
  * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
  * \enumval IGRAPH_ARPACK_UNKNOWN Unknown ARPACK error.
- * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
+ * \enumval IGRAPH_ENEGCYCLE Negative cycle detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EDIVZERO Big integer division by zero.
  * \enumval IGRAPH_GLP_EBOUND GLPK error (GLP_EBOUND).
@@ -352,7 +352,8 @@ typedef enum {
     IGRAPH_ARPACK_SHUR       = 34,
     IGRAPH_ARPACK_LAPACK     = 35,
     IGRAPH_ARPACK_UNKNOWN    = 36,
-    IGRAPH_ENEGLOOP          = 37,
+    IGRAPH_ENEGCYCLE         = 37,
+    IGRAPH_ENEGLOOP IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ENEGCYCLE,
     IGRAPH_EINTERNAL         = 38,
     IGRAPH_ARPACK_MAXIT      = 39,
     IGRAPH_ARPACK_NOSHIFT    = 40,
@@ -638,10 +639,27 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * \brief Registers an object for deallocation.
  *
  * This macro places the address of an object, together with the
- * address of its destructor in a stack. This stack is used if an
+ * address of its destructor on a stack. This stack is used if an
  * error happens to deallocate temporarily allocated objects to
  * prevent memory leaks. After manual deallocation, objects are removed
  * from the stack using \ref IGRAPH_FINALLY_CLEAN().
+ *
+ * </para><para>
+ * The typical usage is just after an initialization:
+ *
+ * <programlisting>
+ * IGRAPH_CHECK(igraph_vector_init(&amp;vector, 0));
+ * IGRAPH_FINALLY(igraph_vector_destroy, &amp;vector);
+ * </programlisting>
+ *
+ * The most commonly used data structures, such as \ref igraph_vector_t,
+ * have associated convenience macros that initialize the object and register
+ * it on this stack in one step. Thus the pattern above can be replaced with a
+ * single line:
+ *
+ * <programlisting>
+ * IGRAPH_VECTOR_INIT_FINALLY(&amp;vector, 0);
+ * </programlisting>
  *
  * \param func The function which is normally called to
  *   destroy the object.
@@ -657,13 +675,9 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
         IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
     } while (0)
 
-#if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
-    #define GCC_VERSION_MAJOR  __GNUC__
-#endif
-
-#if defined(GCC_VERSION_MAJOR) && (GCC_VERSION_MAJOR >= 3)
-    #define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
-    #define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
+#if defined(__GNUC__)
+    #define IGRAPH_UNLIKELY(a) __builtin_expect(!!(a), 0)
+    #define IGRAPH_LIKELY(a)   __builtin_expect(!!(a), 1)
 #else
     #define IGRAPH_UNLIKELY(a) a
     #define IGRAPH_LIKELY(a)   a

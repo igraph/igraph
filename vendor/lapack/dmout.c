@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20191129).
+/*  -- translated by f2c (version 20240504).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -17,27 +17,27 @@
 static integer c__1 = 1;
 static integer c__3 = 3;
 
-/* -----------------------------------------------------------------------   
-    Routine:    DMOUT   
+/* -----------------------------------------------------------------------
+    Routine:    DMOUT
 
-    Purpose:    Real matrix output routine.   
+    Purpose:    Real matrix output routine.
 
-    Usage:      CALL DMOUT (LOUT, M, N, A, LDA, IDIGIT, IFMT)   
+    Usage:      CALL DMOUT (LOUT, M, N, A, LDA, IDIGIT, IFMT)
 
-    Arguments   
-       M      - Number of rows of A.  (Input)   
-       N      - Number of columns of A.  (Input)   
-       A      - Real M by N matrix to be printed.  (Input)   
-       LDA    - Leading dimension of A exactly as specified in the   
-                dimension statement of the calling program.  (Input)   
-       IFMT   - Format to be used in printing matrix A.  (Input)   
-       IDIGIT - Print up to IABS(IDIGIT) decimal digits per number.  (In)   
-                If IDIGIT .LT. 0, printing is done with 72 columns.   
-                If IDIGIT .GT. 0, printing is done with 132 columns.   
+    Arguments
+       M      - Number of rows of A.  (Input)
+       N      - Number of columns of A.  (Input)
+       A      - Real M by N matrix to be printed.  (Input)
+       LDA    - Leading dimension of A exactly as specified in the
+                dimension statement of the calling program.  (Input)
+       IFMT   - Format to be used in printing matrix A.  (Input)
+       IDIGIT - Print up to IABS(IDIGIT) decimal digits per number.  (In)
+                If IDIGIT .LT. 0, printing is done with 72 columns.
+                If IDIGIT .GT. 0, printing is done with 132 columns.
 
-   -----------------------------------------------------------------------   
+   -----------------------------------------------------------------------
 
-   Subroutine */ int igraphdmout_(integer *lout, integer *m, integer *n, doublereal 
+   Subroutine */ int igraphdmout_(integer *lout, integer *m, integer *n, doublereal
 	*a, integer *lda, integer *idigit, char *ifmt, ftnlen ifmt_len)
 {
     /* Initialized data */
@@ -66,7 +66,7 @@ static integer c__3 = 3;
     /* Local variables */
     integer i__, j, k1, k2, lll;
     char line[80];
-    integer ndigit;
+    integer ndigit=-3;
 
     /* Fortran I/O blocks */
     static cilist io___5 = { 0, 0, 0, fmt_9999, 0 };
@@ -89,18 +89,18 @@ static integer c__3 = 3;
     static cilist io___26 = { 0, 0, 0, fmt_9990, 0 };
 
 
-/*     ...   
-       ... SPECIFICATIONS FOR ARGUMENTS   
-       ...   
-       ... SPECIFICATIONS FOR LOCAL VARIABLES   
+/*     ...
+       ... SPECIFICATIONS FOR ARGUMENTS
+       ...
+       ... SPECIFICATIONS FOR LOCAL VARIABLES
        Parameter adjustments */
     a_dim1 = *lda;
     a_offset = 1 + a_dim1;
     a -= a_offset;
 
-    /* Function Body   
-       ...   
-       ... FIRST EXECUTABLE STATEMENT   
+    /* Function Body
+       ...
+       ... FIRST EXECUTABLE STATEMENT
 
    Computing MIN */
     i__1 = i_len(ifmt, ifmt_len);
@@ -130,8 +130,8 @@ static integer c__3 = 3;
 	ndigit = 4;
     }
 
-/* =======================================================================   
-               CODE FOR OUTPUT USING 72 COLUMNS FORMAT   
+/* =======================================================================
+               CODE FOR OUTPUT USING 72 COLUMNS FORMAT
    ======================================================================= */
 
     if (*idigit < 0) {
@@ -257,8 +257,8 @@ static integer c__3 = 3;
 	    }
 	}
 
-/* =======================================================================   
-               CODE FOR OUTPUT USING 132 COLUMNS FORMAT   
+/* =======================================================================
+               CODE FOR OUTPUT USING 132 COLUMNS FORMAT
    ======================================================================= */
 
     } else {

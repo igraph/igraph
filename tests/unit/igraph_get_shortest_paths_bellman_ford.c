@@ -200,7 +200,7 @@ int main(void) {
                                                          /*from=*/ 0, /*to=*/ vs,
                                                          &weights_vec, IGRAPH_OUT,
                                                          &parents,
-                                                         /*inbound_edges=*/ &inbound) == IGRAPH_ENEGLOOP);
+                                                         /*inbound_edges=*/ &inbound) == IGRAPH_ENEGCYCLE);
 
     igraph_vector_int_list_destroy(&vecs);
     igraph_vector_int_list_destroy(&evecs);

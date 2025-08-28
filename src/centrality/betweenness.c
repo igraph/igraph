@@ -461,12 +461,20 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
  *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Ulrik Brandes: A faster algorithm for betweenness centrality.
+ * The Journal of Mathematical Sociology, 25(2), 163–177 (2001).
+ * https://doi.org/10.1080/0022250X.2001.9990249
+ *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
  * \param vids The vertices of which the betweenness centrality scores
  *        will be calculated.
- * \param directed Logical, if true directed paths will be considered
+ * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. No edge weight may be NaN.
@@ -509,7 +517,7 @@ igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
  *        range-limited betweenness scores for the specified vertices.
  * \param vids The vertices for which the range-limited betweenness centrality
  *        scores will be computed.
- * \param directed Logical, if true directed paths will be considered
+ * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. No edge weight may be NaN.
@@ -695,10 +703,18 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
  *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Ulrik Brandes: A faster algorithm for betweenness centrality.
+ * The Journal of Mathematical Sociology, 25(2), 163–177 (2001).
+ * https://doi.org/10.1080/0022250X.2001.9990249
+ *
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
  *        betweenness scores for the edges.
- * \param directed Logical, if true directed paths will be considered
+ * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted edge
  *        betweenness. No edge weight may be NaN. Supply a null
@@ -736,7 +752,7 @@ igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *r
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
  *        betweenness scores for the edges.
- * \param directed Logical, if true directed paths will be considered
+ * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted
  *        betweenness. No edge weight may be NaN. Supply a null
@@ -872,15 +888,15 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
  *         betweenness score for the subset of vertices.
  * \param vids The vertices for which the subset-limited betweenness centrality
  *        scores will be computed.
- * \param directed Logical, if true directed paths will be considered
+ * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param weights An optional vector containing edge weights for
- *        calculating weighted betweenness. No edge weight may be NaN.
- *        Supply a null pointer here for unweighted betweenness.
  * \param sources A vertex selector for the sources of the shortest paths taken
  *        into considuration in the betweenness calculation.
  * \param targets A vertex selector for the targets of the shortest paths taken
  *        into considuration in the betweenness calculation.
+ * \param weights An optional vector containing edge weights for
+ *        calculating weighted betweenness. No edge weight may be NaN.
+ *        Supply a null pointer here for unweighted betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids,
@@ -1092,15 +1108,15 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
  *        betweenness scores for the edges.
  * \param eids The edges for which the subset-limited betweenness centrality
  *        scores will be computed.
- * \param directed Logical, if true directed paths will be considered
+ * \param directed If true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param weights An optional weight vector for weighted
- *        betweenness. No edge weight may be NaN. Supply a null
- *        pointer here for unweighted betweenness.
  * \param sources A vertex selector for the sources of the shortest paths taken
  *        into considuration in the betweenness calculation.
  * \param targets A vertex selector for the targets of the shortest paths taken
  *        into considuration in the betweenness calculation.
+ * \param weights An optional weight vector for weighted
+ *        betweenness. No edge weight may be NaN. Supply a null
+ *        pointer here for unweighted betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p sources or \p targets

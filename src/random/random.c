@@ -547,18 +547,45 @@ static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uin
 #endif
 }
 
+
+/**
+ * \function igraph_rng_get_bool
+ * \brief Generate a random boolean.
+ *
+ * Use this function only when a single random boolean, i.e. a single bit
+ * is needed at a time. It is not efficient for generating multiple bits.
+ *
+ * \param rng Pointer to the RNG to use for the generation. Use \ref
+ *        igraph_rng_default() here to use the default igraph RNG.
+ * \return The generated bit, as a truth value.
+ */
+
+igraph_bool_t igraph_rng_get_bool(igraph_rng_t *rng) {
+    const igraph_rng_type_t *type = rng->type;
+    const igraph_integer_t rng_bitwidth = igraph_rng_bits(rng);
+    /* Keep the highest bit as RNGs sometimes tend to have lower entropy in
+     * low bits than in high bits.
+     *
+     * Ensure that the return value is stricly 0 or 1 even if igraph_bool_t is
+     * defined to something else than a native bool.
+     */
+    return (type->get(rng->state) >> (rng_bitwidth - 1)) & (igraph_uint_t)1;
+}
+
 /**
  * \function igraph_rng_get_integer
  * \brief Generate an integer random number from an interval.
+ *
+ * Generate uniformly distributed integers from the interval <code>[l, h]</code>.
  *
  * \param rng Pointer to the RNG to use for the generation. Use \ref
  *        igraph_rng_default() here to use the default igraph RNG.
  * \param l Lower limit, inclusive, it can be negative as well.
  * \param h Upper limit, inclusive, it can be negative as well, but it
- *        should be at least <code>l</code>.
+ *        must be at least <code>l</code>.
  * \return The generated random integer.
  *
- * Time complexity: O(log2(h-l) / bits) where bits is the value of
+ * Time complexity: O(log2(h-l+1) / bits) where bits is the value of
  * \ref igraph_rng_bits(rng).
  */
 

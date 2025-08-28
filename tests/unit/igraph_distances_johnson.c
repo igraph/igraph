@@ -45,7 +45,7 @@ int main(void) {
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges with negative loop:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop) == IGRAPH_ENEGLOOP);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop) == IGRAPH_ENEGCYCLE);
 
     printf("Directed graph with loops and multi-edges:\n");
     IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm) == IGRAPH_SUCCESS);

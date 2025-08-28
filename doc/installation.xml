@@ -70,7 +70,7 @@
     </listitem>
     <listitem>
       <para>
-        <ulink url="https://www.caam.rice.edu/software/ARPACK/">ARPACK</ulink>
+        <ulink url="https://github.com/opencollab/arpack-ng">ARPACK</ulink>
       </para>
     </listitem>
     <listitem>
@@ -83,7 +83,7 @@
         A library providing a
         <ulink url="https://www.netlib.org/blas/">BLAS</ulink> API
         (available by default on macOS;
-        <ulink url="https://www.openblas.net">OpenBLAS</ulink> is one
+        <ulink url="http://www.openmathlib.org/OpenBLAS/">OpenBLAS</ulink> is one
         option on other systems)
       </para>
     </listitem>
@@ -92,7 +92,7 @@
         A library providing a
         <ulink url="https://www.netlib.org/lapack/">LAPACK</ulink>
         API (available by default on macOS;
-        <ulink url="https://openblas.net">OpenBLAS</ulink> is one
+        <ulink url="http://www.openmathlib.org/OpenBLAS/">OpenBLAS</ulink> is one
         option on other systems)
       </para>
     </listitem>
@@ -469,11 +469,12 @@ $ cmake --build . --target html
 </programlisting>
   <para>
     Building the HTML documentation requires Python 3, <literal>xmlto</literal>
-    and <literal>source-highlight</literal>. Building the PDF documentation also
-    requires <literal>xsltproc</literal>, <literal>xmllint</literal> and
-    <literal>fop</literal>. Building the Texinfo documentation also requires
-    the docbook2X package, <literal>xmllint</literal> and
-    <literal>makeinfo</literal>.
+    and <literal>source-highlight</literal>. On some platforms, it is necessary
+    to explicitly install the docbook-xsl package as well. Building the PDF
+    documentation also requires <literal>xsltproc</literal>,
+    <literal>xmllint</literal> and <literal>fop</literal>. Building the Texinfo
+    documentation also requires the docbook2X package, <literal>xmllint</literal>
+    and <literal>makeinfo</literal>.
   </para>
 </section>
 

@@ -768,6 +768,23 @@ void FUNCTION(igraph_vector, fill)(TYPE(igraph_vector) *v, BASE e) {
     BASE *ptr;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+
+    /* Optimize the commonly used integer case when filling with 0
+     * or -1, which are an all-0 and all-1 bit pattern that the
+     * compiler can generate higher efficiency code for. */
+#if defined(BASE_INT)
+    if (e == 0) {
+        FUNCTION(igraph_vector, null)(v);
+        return;
+    }
+    if (e == -1) {
+        for (ptr = v->stor_begin; ptr < v->end; ptr++) {
+            *ptr = -1;
+        }
+        return;
+    }
+#endif
+
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
         *ptr = e;
     }
@@ -871,8 +888,8 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector) *v) {
  *
  * </para><para>
  * The index vector that this function takes is compatible with the index vector
- * returned from \ref igraph_vector_qsort_ind(); passing in the index vector
- * from \ref igraph_vector_qsort_ind() will sort the original vector.
+ * returned from \ref igraph_vector_sort_ind(); passing in the index vector
+ * from \ref igraph_vector_sort_ind() will sort the original vector.
  *
  * </para><para>
  * As a special case, this function allows the index vector to be \em shorter
@@ -989,9 +1006,9 @@ void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v) {
 }
 
 /**
- * Ascending comparison function passed to qsort from  igraph_vector_qsort_ind
+ * Ascending comparison function passed to qsort from  igraph_vector_sort_ind
  */
-static int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
+static int FUNCTION(igraph_vector, i_sort_ind_cmp_asc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -1004,9 +1021,9 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const vo
 }
 
 /**
- * Descending comparison function passed to qsort from  igraph_vector_qsort_ind
+ * Descending comparison function passed to qsort from  igraph_vector_sort_ind
  */
-static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
+static int FUNCTION(igraph_vector, i_sort_ind_cmp_desc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -1019,7 +1036,7 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
 }
 
 /**
- * \function igraph_vector_qsort_ind
+ * \function igraph_vector_sort_ind
  * \brief Returns a permutation of indices that sorts a vector.
  *
  * Takes an unsorted array \c v as input and computes an array of indices
@@ -1044,8 +1061,11 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
  * position in the array. Use this to set the values of inds.
  */
 
-igraph_error_t FUNCTION(igraph_vector, qsort_ind)(const TYPE(igraph_vector) *v,
-        igraph_vector_int_t *inds, igraph_order_t order) {
+igraph_error_t FUNCTION(igraph_vector, sort_ind)(
+        const TYPE(igraph_vector) *v,
+        igraph_vector_int_t *inds,
+        igraph_order_t order) {
+
     igraph_integer_t i, n = FUNCTION(igraph_vector, size)(v);
     BASE **vind, *first;
     IGRAPH_CHECK(igraph_vector_int_resize(inds, n));
@@ -1054,22 +1074,33 @@ igraph_error_t FUNCTION(igraph_vector, qsort_ind)(const TYPE(igraph_vector) *v,
     }
     vind = IGRAPH_CALLOC(n, BASE*);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("igraph_vector_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < n; i++) {
         vind[i] = &VECTOR(*v)[i];
     }
     first = vind[0];
     if (order == IGRAPH_ASCENDING) {
-        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_qsort_ind_cmp_asc));
+        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_sort_ind_cmp_asc));
     } else {
-        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_qsort_ind_cmp_desc));
+        igraph_qsort(vind, n, sizeof(BASE*), FUNCTION(igraph_vector, i_sort_ind_cmp_desc));
     }
     for (i = 0; i < n; i++) {
         VECTOR(*inds)[i] = vind[i] - first;
     }
     IGRAPH_FREE(vind);
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_vector_qsort_ind
+ * \brief Returns a permutation of indices that sorts a vector (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_sort_ind 0.10.14
+ */
+igraph_error_t FUNCTION(igraph_vector, qsort_ind)(const TYPE(igraph_vector) *v,
+                                                 igraph_vector_int_t *inds, igraph_order_t order) {
+    return FUNCTION(igraph_vector, sort_ind)(v, inds, order);
 }
 
 /**
@@ -1582,7 +1613,7 @@ igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
 
 BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v) {
     BASE res = ZERO;
-    BASE *p;
+    const BASE *p;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
@@ -1597,7 +1628,7 @@ BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v) {
 
 igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
     igraph_real_t res = 0.0;
-    BASE *p;
+    const BASE *p;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
@@ -1626,7 +1657,7 @@ igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
 
 BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
     BASE res = ONE;
-    BASE *p;
+    const BASE *p;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
@@ -1657,7 +1688,8 @@ BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
 igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     BASE res = ZERO;
-    BASE *p, *p2;
+    const BASE *p;
+    BASE *p2;
 
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(from->stor_begin != NULL);
@@ -1971,9 +2003,24 @@ igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
     }
 }
 
-igraph_bool_t
-FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
-                       const TYPE(igraph_vector) *rhs) {
+/**
+ * \ingroup vector
+ * \function igraph_vector_is_equal
+ * \brief Are all elements equal?
+ *
+ * This is an alias of \ref igraph_vector_all_e() with a more intuitive name.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return True if the elements in the \p lhs are all
+ *    equal to the corresponding elements in \p rhs. Returns
+ *    false if the lengths of the vectors don't match.
+ *
+ * Time complexity: O(n), the length of the vectors.
+ */
+
+igraph_bool_t FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
+                                     const TYPE(igraph_vector) *rhs) {
     return FUNCTION(igraph_vector, all_e)(lhs, rhs);
 }
 
@@ -2250,11 +2297,11 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
 
 /**
  * \ingroup vector
- * \function igraph_vector_binsearch2
- * \brief Binary search, without returning the index.
+ * \function igraph_vector_contains_sorted
+ * \brief Binary search in a sorted vector.
  *
- * </para><para>
  * It is assumed that the vector is sorted.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \return True if \p what is found in the vector, false otherwise.
@@ -2262,8 +2309,7 @@ static igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igrap
  * Time complexity: O(log(n)), n is the number of elements in \p v.
  */
 
-igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
-        BASE what) {
+igraph_bool_t FUNCTION(igraph_vector, contains_sorted)(const TYPE(igraph_vector) *v, BASE what) {
     igraph_integer_t left = 0;
     igraph_integer_t right = FUNCTION(igraph_vector, size)(v) - 1;
 
@@ -2282,6 +2328,18 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
     return false;
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_binsearch2
+ * \brief Binary search, without returning the index.
+ *
+ * \deprecated-by igraph_vector_contains_sorted 0.10.14
+ */
+igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
+                                                  BASE what) {
+    return FUNCTION(igraph_vector, contains_sorted)(v, what);
+}
+
 #endif
 
 /**
@@ -2298,8 +2356,18 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
  */
 
 void FUNCTION(igraph_vector, scale)(TYPE(igraph_vector) *v, BASE by) {
-    igraph_integer_t i;
-    for (i = 0; i < FUNCTION(igraph_vector, size)(v); i++) {
+    const igraph_integer_t n = FUNCTION(igraph_vector, size)(v);
+#ifdef EQ
+    const BASE one = ONE;
+    if (EQ(by, one)) {
+        return;
+    }
+#else
+    if (by == ONE) {
+        return;
+    }
+#endif
+    for (igraph_integer_t i = 0; i < n; i++) {
 #ifdef PROD
         PROD(VECTOR(*v)[i], VECTOR(*v)[i], by);
 #else
@@ -2321,8 +2389,18 @@ void FUNCTION(igraph_vector, scale)(TYPE(igraph_vector) *v, BASE by) {
  */
 
 void FUNCTION(igraph_vector, add_constant)(TYPE(igraph_vector) *v, BASE plus) {
-    igraph_integer_t i, n = FUNCTION(igraph_vector, size)(v);
-    for (i = 0; i < n; i++) {
+    const igraph_integer_t n = FUNCTION(igraph_vector, size)(v);
+#ifdef EQ
+    const BASE zero = ZERO;
+    if (EQ(plus, zero)) {
+        return;
+    }
+#else
+    if (plus == ZERO) {
+        return;
+    }
+#endif
+    for (igraph_integer_t i = 0; i < n; i++) {
 #ifdef SUM
         SUM(VECTOR(*v)[i], VECTOR(*v)[i], plus);
 #else
@@ -2337,21 +2415,22 @@ void FUNCTION(igraph_vector, add_constant)(TYPE(igraph_vector) *v, BASE plus) {
  *
  * Check whether the supplied element is included in the vector, by
  * linear search.
+ *
  * \param v The input vector.
- * \param e The element to look for.
+ * \param what The element to look for.
  * \return \c true if the element is found and \c false otherwise.
  *
  * Time complexity: O(n), the length of the vector.
  */
 
 igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v,
-        BASE e) {
-    BASE *p = v->stor_begin;
+        BASE what) {
+    const BASE *p = v->stor_begin;
     while (p < v->end) {
 #ifdef EQ
-        if (EQ(*p, e)) {
+        if (EQ(*p, what)) {
 #else
-        if (*p == e) {
+        if (*p == what) {
 #endif
             return true;
         }
@@ -2584,28 +2663,71 @@ igraph_error_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
 }
 
 /**
+ * \function igraph_vector_reverse_section
+ * \brief Reverse the elements in a section of a vector.
+ *
+ * \param v The input vector.
+ * \param from Index of the first element to include in the reversal.
+ * \param to Index of the first element \em not to include in the reversal.
+ *
+ * \sa igraph_vector_reverse() to reverse the entire vector.
+ *
+ * Time complexity: O(to - from), the number of elements to reverse.
+ */
+
+void FUNCTION(igraph_vector, reverse_section)(TYPE(igraph_vector) *v, igraph_integer_t from, igraph_integer_t to) {
+    const igraph_integer_t mid = (from + to) / 2;
+    for (igraph_integer_t i = from, j = to - 1; i < mid; i++, j--) {
+        BASE tmp = VECTOR(*v)[i];
+        VECTOR(*v)[i] = VECTOR(*v)[j];
+        VECTOR(*v)[j] = tmp;
+    }
+}
+
+/**
  * \function igraph_vector_reverse
  * \brief Reverse the elements of a vector.
  *
  * The first element will be last, the last element will be
  * first, etc.
+ *
  * \param v The input vector.
  * \return Error code, currently always \c IGRAPH_SUCCESS.
+ *
+ * \sa igraph_vector_reverse_section() to reverse only a section of a vector.
  *
  * Time complexity: O(n), the number of elements.
  */
 
 igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
-
-    igraph_integer_t n = FUNCTION(igraph_vector, size)(v), n2 = n / 2;
-    igraph_integer_t i, j;
-    for (i = 0, j = n - 1; i < n2; i++, j--) {
-        BASE tmp;
-        tmp = VECTOR(*v)[i];
-        VECTOR(*v)[i] = VECTOR(*v)[j];
-        VECTOR(*v)[j] = tmp;
-    }
+    FUNCTION(igraph_vector, reverse_section)(v, 0, FUNCTION(igraph_vector, size)(v));
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_vector_rotate_left
+ * \brief Rotates the elements of a vector to the left.
+ *
+ * Rotates the elements of a vector to the left by the given number of steps.
+ * Element index \p n will have index 0 after the rotation.
+ * For example, rotating <code>(0, 1, 2, 3, 4, 5)</code> by 2 yields
+ * <code>(2, 3, 4, 5, 0, 1)</code>.
+ *
+ * \param v The input vector.
+ * \param n The number of steps to rotate by. Passing a negative value rotates
+ *    to the right.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+
+void FUNCTION(igraph_vector, rotate_left)(TYPE(igraph_vector) *v, igraph_integer_t n) {
+    const igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
+    n = n % size;
+    if (n < 0) n += size;
+    if (n == 0) return;
+    FUNCTION(igraph_vector, reverse_section)(v, 0, n);
+    FUNCTION(igraph_vector, reverse_section)(v, n, size);
+    FUNCTION(igraph_vector, reverse_section)(v, 0, size);
 }
 
 /**

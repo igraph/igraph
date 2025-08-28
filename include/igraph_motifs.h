@@ -89,12 +89,18 @@ IGRAPH_EXPORT igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_re
                                      igraph_real_t *asym, igraph_real_t *null);
 IGRAPH_EXPORT igraph_error_t igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
                                             igraph_vector_t *res,
                                             const igraph_vs_t vids);
 
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
+                                         igraph_vector_t *res,
+                                         const igraph_vs_t vids);
+
 IGRAPH_EXPORT igraph_error_t igraph_list_triangles(const igraph_t *graph,
                                         igraph_vector_int_t *res);
+
+IGRAPH_EXPORT igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res);
 
 __END_DECLS
 

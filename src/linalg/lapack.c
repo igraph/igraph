@@ -169,7 +169,7 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
  *      A * X = B  or  A' * X = B
  * with a general N-by-N matrix A using the LU factorization
  * computed by \ref igraph_lapack_dgetrf.
- * \param transpose Logical scalar, whether to transpose the input
+ * \param transpose Boolean, whether to transpose the input
  *      matrix.
  * \param a A matrix containing the L and U factors from the
  *      factorization A = P*L*U. L is expected to be unitriangular,
@@ -381,7 +381,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  * \brief Selected eigenvalues and optionally eigenvectors of a symmetric matrix.
  *
  * Calls the DSYEVR LAPACK function to compute selected eigenvalues
- * and, optionally, eigenvectors of a real symmetric matrix A.
+ * and, optionally, eigenvectors of a real symmetric matrix \c A.
  * Eigenvalues and eigenvectors can be selected by specifying either
  * a range of values or a range of indices for the desired eigenvalues.
  *
@@ -395,7 +395,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        the corresponding eigenvectors) to calculate. Possible
  *        values are \c IGRAPH_LAPACK_DSYEV_ALL, all eigenvalues;
  *        \c IGRAPH_LAPACK_DSYEV_INTERVAL, all eigenvalues in the
- *        half-open interval (vl,vu];
+ *        half-open interval <code>(vl, vu]</code>;
  *        \c IGRAPH_LAPACK_DSYEV_SELECT, the il-th through iu-th
  *        eigenvalues.
  * \param vl If \p which is \c IGRAPH_LAPACK_DSYEV_INTERVAL, then
@@ -405,7 +405,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        this is the upper bound of the interval to be searched for
  *        eigenvalues. See also the \p vestimate argument.
  * \param vestimate An upper bound for the number of eigenvalues in
- *        the (vl,vu] interval, if \p which is \c
+ *        the <code>(vl, vu]</code> interval, if \p which is \c
  *        IGRAPH_LAPACK_DSYEV_INTERVAL. Memory is allocated only for
  *        the given number of eigenvalues (and eigenvectors), so this
  *        upper bound must be correct.
@@ -415,14 +415,14 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
  *        which is \c IGRAPH_LAPACK_DSYEV_SELECT.
  * \param abstol The absolute error tolerance for the eigevalues. An
  *        approximate eigenvalue is accepted as converged when it is
- *        determined to lie in an interval [a,b] of width less than or
- *        equal to abstol + EPS * max(|a|,|b|), where EPS is the
- *        machine precision.
+ *        determined to lie in an interval <code>[a,b]</code> of width
+ *        less than or equal to <code>abstol + EPS * max(|a|,|b|)</code>,
+ *        where \c EPS is the machine precision.
  * \param values An initialized vector, the eigenvalues are stored
  *        here, unless it is a null pointer. It will be resized as
  *        needed.
- * \param vectors An initialized matrix, the eigenvectors are stored
- *        in its columns, unless it is a null pointer. It will be
+ * \param vectors An initialized matrix. A set of orthonormal eigenvectors
+ *        are stored in its columns, unless it is a null pointer. It will be
  *        resized as needed.
  * \param support An integer vector. If not a null pointer, then it
  *        will be resized to (2*max(1,M)) (M is a the total number of
@@ -748,8 +748,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Users' Guide. Note that the eigenvectors obtained for the balanced
  * matrix are backtransformed to those of \p A.
  *
- * \param balance Scalar that indicated, whether the input matrix
- *   should be balanced. Possible values:
+ * \param balance Indicates whether the input matrix should be balanced.
+ *   Possible values:
  *   \clist
  *     \cli IGRAPH_LAPACK_DGEEVX_BALANCE_NONE
  *          no not diagonally scale or permute.
@@ -765,13 +765,13 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *          both diagonally scale and permute A.
  *   \endclist
  * \param A The input matrix, must be square.
- * \param valuesreal An initialized vector, or a NULL pointer. If not
- *   a NULL pointer, then the real parts of the eigenvalues are stored
+ * \param valuesreal An initialized vector, or a \c NULL pointer. If not
+ *   a \c NULL pointer, then the real parts of the eigenvalues are stored
  *   here. The vector will be resized, as needed.
- * \param valuesimag An initialized vector, or a NULL pointer. If not
- *   a NULL pointer, then the imaginary parts of the eigenvalues are stored
+ * \param valuesimag An initialized vector, or a \c NULL pointer. If not
+ *   a \c NULL pointer, then the imaginary parts of the eigenvalues are stored
  *   here. The vector will be resized, as needed.
- * \param vectorsleft An initialized matrix or a NULL pointer. If not
+ * \param vectorsleft An initialized matrix or a \c NULL pointer. If not
  *   a null pointer, then the left eigenvectors are stored here. The
  *   order corresponds to the eigenvalues and the eigenvectors are
  *   stored in a compressed form. If the j-th eigenvalue is real then
@@ -779,7 +779,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
  *   and (j+1)-th columns contain the real and imaginary parts of the
  *   corresponding eigenvectors.
- * \param vectorsright An initialized matrix or a NULL pointer. If not
+ * \param vectorsright An initialized matrix or a \c NULL pointer. If not
  *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo

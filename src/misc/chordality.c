@@ -319,18 +319,16 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                      (igraph_vector_int_t*) my_alpha,
                      (igraph_vector_int_t*) my_alpham1));
     } else if (alpha && !alpham1) {
-        igraph_integer_t v;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpham1, no_of_nodes);
         my_alpham1 = &v_alpham1;
-        for (v = 0; v < no_of_nodes; v++) {
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
             igraph_integer_t i = VECTOR(*my_alpha)[v];
             VECTOR(*my_alpham1)[i] = v;
         }
     } else if (!alpha && alpham1) {
-        igraph_integer_t i;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpha, no_of_nodes);
         my_alpha = &v_alpha;
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t v = VECTOR(*my_alpham1)[i];
             VECTOR(*my_alpha)[v] = i;
         }

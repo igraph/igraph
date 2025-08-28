@@ -7,6 +7,7 @@ set(
   installation.xml
   introduction.xml
   licenses.xml
+  glossary.xml
   pmt.xml
   tutorial.xml
 )

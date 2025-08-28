@@ -65,7 +65,7 @@ static igraph_error_t igraph_i_collect_lightest_edges_to_clusters(
     // the vector and return the lightest edge to each neighboring cluster and the index of the lightest
     // sampled cluster (if any)
 
-    igraph_real_t lightest_weight_to_sampled = INFINITY;
+    igraph_real_t lightest_weight_to_sampled = IGRAPH_INFINITY;
     igraph_vector_int_t* adjacent_nodes = igraph_adjlist_get(adjlist, v);
     igraph_vector_int_t* incident_edges = igraph_inclist_get(inclist, v);
     igraph_integer_t i, nlen = igraph_vector_int_size(incident_edges);
@@ -108,7 +108,7 @@ static void igraph_i_clear_lightest_edges_to_clusters(
     igraph_integer_t i, n = igraph_vector_int_size(dirty_vids);
     for (i = 0; i < n; i++) {
         igraph_integer_t vid = VECTOR(*dirty_vids)[i];
-        VECTOR(*lightest_weight)[vid] = INFINITY;
+        VECTOR(*lightest_weight)[vid] = IGRAPH_INFINITY;
         VECTOR(*lightest_eid)[vid] = -1;
     }
 
@@ -251,7 +251,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
         IGRAPH_CHECK(igraph_vector_int_push_back(spanner, edge)); \
     }
 
-    igraph_vector_fill(&lightest_weight, INFINITY);
+    igraph_vector_fill(&lightest_weight, IGRAPH_INFINITY);
 
     for (i = 0; i < k - 1; i++) {
         IGRAPH_ALLOW_INTERRUPTION();

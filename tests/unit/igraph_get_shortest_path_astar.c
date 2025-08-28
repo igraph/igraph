@@ -58,6 +58,8 @@ int check_edges(const igraph_t *graph, const igraph_vector_int_t *vertices,
 }
 
 igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
+    IGRAPH_UNUSED(target_id);
+    IGRAPH_UNUSED(extra);
     int x[4];
     for (int i = 0; i < 4; i++) {
         x[i] = source_id % LENGTH;

@@ -271,13 +271,13 @@ static igraph_error_t igraph_i_random_walk_inclist(
  *   edges are stored here. It will be resized as needed.
  *   Length of the edges vector: \p steps
  * \param start The start vertex for the walk.
- * \param steps The number of steps to take. If the random walk gets
- *   stuck, then the \p stuck argument specifies what happens.
- *   \p steps is the number of edges to traverse during the walk.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
  *   edge directions. This argument is ignored for undirected graphs.
+ * \param steps The number of steps to take. If the random walk gets
+ *   stuck, then the \p stuck argument specifies what happens.
+ *   \p steps is the number of edges to traverse during the walk.
  * \param stuck What to do if the random walk gets stuck.
  *   \c IGRAPH_RANDOM_WALK_STUCK_RETURN means that the function returns
  *   with a shorter walk; \c IGRAPH_RANDOM_WALK_STUCK_ERROR means

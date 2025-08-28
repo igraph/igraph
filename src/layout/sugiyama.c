@@ -37,8 +37,6 @@
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 /* #define SUGIYAMA_DEBUG */
@@ -276,12 +274,12 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *              the remaining rows contain the positions of the dummy nodes.
  *              Therefore, you can use the result both with \p graph or with
  *              \p extended_graph.
- * \param extended_graph Pointer to an uninitialized graph object or \c NULL.
- *                       The extended graph with the added dummy nodes will be
- *                       returned here. In this graph, each edge points downwards
- *                       to lower layers, spans exactly one layer and the first
- *                       |V| vertices coincide with the vertices of the
- *                       original graph.
+ * \param extd_graph Pointer to an uninitialized graph object or \c NULL.
+ *                   The extended graph with the added dummy nodes will be
+ *                   returned here. In this graph, each edge points downwards
+ *                   to lower layers, spans exactly one layer and the first
+ *                   |V| vertices coincide with the vertices of the
+ *                   original graph.
  * \param extd_to_orig_eids Pointer to a vector or \c NULL. If not \c NULL, the
  *                          mapping from the edge IDs of the extended graph back
  *                          to the edge IDs of the original graph will be stored
@@ -297,6 +295,7 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  * \param weights Weights of the edges. These are used only if the graph contains
  *                cycles; igraph will tend to reverse edges with smaller
  *                weights when breaking the cycles.
+ * \return Error code.
  */
 igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_t *extd_graph, igraph_vector_int_t *extd_to_orig_eids,
@@ -344,7 +343,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
     if (no_of_nodes > 0) {
         igraph_vector_int_t inds;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
-        IGRAPH_CHECK(igraph_vector_int_qsort_ind(&layers_own, &inds, IGRAPH_ASCENDING));
+        IGRAPH_CHECK(igraph_vector_int_sort_ind(&layers_own, &inds, IGRAPH_ASCENDING));
         j = -1; dx = VECTOR(layers_own)[VECTOR(inds)[0]] - 1;
         for (i = 0; i < no_of_nodes; i++) {
             k = VECTOR(inds)[i];
@@ -721,7 +720,7 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
             VECTOR(*barycenters)[i] = MATRIX(*layout, i, 0);
         } else {
             for (j = 0; j < m; j++) {
-                VECTOR(*barycenters)[i] += MATRIX(*layout, (igraph_integer_t) VECTOR(neis)[j], 0);
+                VECTOR(*barycenters)[i] += MATRIX(*layout, VECTOR(neis)[j], 0);
             }
             VECTOR(*barycenters)[i] /= m;
         }
@@ -756,9 +755,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     /* Start with a first-seen ordering within each layer */
     {
         igraph_integer_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_integer_t);
-        if (xs == 0) {
-            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(xs, "Cannot order nodes horizontally during Sugiyama layout.");
         for (i = 0; i < no_of_vertices; i++) {
             MATRIX(*layout, i, 0) = xs[(igraph_integer_t)MATRIX(*layout, i, 1)]++;
         }
@@ -791,7 +788,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
             printf("Vertices: "); igraph_vector_int_print(layer_members);
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
-            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
+            IGRAPH_CHECK(igraph_vector_sort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
             for (i = 0; i < n; i++) {
                 nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(new_layer_members)[i] = nei;
@@ -825,7 +822,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
 
-            IGRAPH_CHECK(igraph_vector_qsort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
+            IGRAPH_CHECK(igraph_vector_sort_ind(&barycenters, &sort_indices, IGRAPH_ASCENDING));
             for (i = 0; i < n; i++) {
                 nei = VECTOR(*layer_members)[VECTOR(sort_indices)[i]];
                 VECTOR(new_layer_members)[i] = nei;
@@ -1140,7 +1137,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
                 for (k = 0; k < n; k++) {
                     VECTOR(xs)[k] = X_POS(VECTOR(neis)[k]);
                 }
-                IGRAPH_CHECK(igraph_vector_qsort_ind(&xs, &inds, IGRAPH_ASCENDING));
+                IGRAPH_CHECK(igraph_vector_sort_ind(&xs, &inds, IGRAPH_ASCENDING));
 
                 if (n % 2 == 1) {
                     /* Odd number of neighbors, so the median is unique */

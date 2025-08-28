@@ -62,7 +62,7 @@
  * All elements of the string vector are set to the empty string.
  *
  * \param sv Pointer to an initialized string vector.
- * \param len The (initial) length of the string vector.
+ * \param size The (initial) length of the string vector.
  * \return Error code.
  *
  * Time complexity: O(\p len).
@@ -266,7 +266,7 @@ igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
                 IGRAPH_FREE(to->stor_begin[j]);
             }
             IGRAPH_FREE(to->stor_begin);
-            IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM);
             /* LCOV_EXCL_STOP */
         }
     }
@@ -696,4 +696,22 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *sv,
     }
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_strvector_swap_elements
+ * \brief Swap two elements in a string vector.
+ *
+ * Note that currently no range checking is performed.
+ *
+ * \param sv The string vector.
+ * \param i Index of the first element.
+ * \param j Index of the second element (may be the same as the first one).
+ *
+ * Time complexity: O(1).
+ */
+void igraph_strvector_swap_elements(igraph_strvector_t *sv, igraph_integer_t i, igraph_integer_t j) {
+    char *tmp = sv->stor_begin[i];
+    sv->stor_begin[i] = sv->stor_begin[j];
+    sv->stor_begin[j] = tmp;
 }
