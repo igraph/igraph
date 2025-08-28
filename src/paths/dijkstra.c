@@ -345,6 +345,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  * \function igraph_get_shortest_paths_dijkstra_cutoff
  * \brief Weighted shortest paths from a vertex with a cutoff.
  *
+ * \experimental
+ *
  * Finds weighted shortest paths from a single source vertex to the specified
  * sets of target vertices using Dijkstra's algorithm. If there is more than
  * one path with the smallest weight between two vertices, this function gives

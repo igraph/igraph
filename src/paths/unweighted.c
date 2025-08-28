@@ -274,6 +274,8 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  * \function igraph_get_shortest_paths_cutoff
  * \brief Shortest paths from a vertex with a cutoff.
  *
+ * \experimental
+ *
  * Finds unweighted shortest paths from a single source vertex to the specified
  * sets of target vertices. If there is more than one geodesic between two vertices,
  * this function gives only one of them. Use \ref igraph_get_all_shortest_paths()

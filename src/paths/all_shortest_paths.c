@@ -35,6 +35,8 @@
  * \function igraph_get_all_shortest_paths_cutoff
  * \brief All shortest paths (geodesics) from a vertex, with cutoff.
  *
+ * \experimental
+ *
  * When there is more than one shortest path between two vertices,
  * all of them will be returned. Every edge is considered separately,
  * therefore in graphs with multi-edges, this function may produce
@@ -102,7 +104,7 @@ igraph_error_t igraph_get_all_shortest_paths_cutoff(const igraph_t *graph,
                                   igraph_vector_int_list_t *edges,
                                   igraph_vector_int_t *nrgeo,
                                   igraph_integer_t from, const igraph_vs_t to,
-                                  igraph_neimode_t mode, igraph_integer_t cutoff) {
+                                  igraph_neimode_t mode, igraph_real_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t *geodist;
