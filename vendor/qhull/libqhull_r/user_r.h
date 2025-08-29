@@ -573,7 +573,7 @@ try twice at the original value in case of bad luck the first time
   notes:
     if 0, code size is reduced by about 4%.
 */
-#define qh_KEEPstatistics 1
+#define qh_KEEPstatistics 0
 
 /*-<a                             href="qh-user_r.htm#TOC"
   >--------------------------------</a><a name="MAXoutside">-</a>
@@ -624,6 +624,7 @@ try twice at the original value in case of bad luck the first time
 
   #define qh_NOtrace
 */
+#define qh_NOtrace
 
 #if 0  /* sample code */
     exitcode= qh_new_qhull(qhT *qh, dim, numpoints, points, ismalloc,
