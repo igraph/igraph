@@ -24,6 +24,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "core/exceptions.h"
 #include "spatial/nanoflann_internal.hpp"
 #include "spatial/spatial_internal.h"
 
@@ -444,25 +445,29 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  * \return Error code.
  */
 igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>> (&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&potential_edges);
     IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     return IGRAPH_SUCCESS;
 }
@@ -490,6 +495,8 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  * \return Error code.
  */
 igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
@@ -499,15 +506,17 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centres >> (&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centres>> (&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&potential_edges);
     IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     return IGRAPH_SUCCESS;
 }
@@ -630,10 +639,12 @@ public:
  * Time complexity: TODO
  */
 igraph_error_t igraph_beta_weighted_gabriel_graph(
-    igraph_t *graph,
-    igraph_vector_t *edge_weights,
-    const igraph_matrix_t *points,
-    igraph_real_t max_beta) {
+        igraph_t *graph,
+        igraph_vector_t *edge_weights,
+        const igraph_matrix_t *points,
+        igraph_real_t max_beta) {
+
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     igraph_vector_int_t edges;
     igraph_vector_int_init(&edges, 0);
@@ -643,7 +654,9 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
 
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
     igraph_integer_t edge_count = igraph_vector_int_size(&edges) / 2;
+
     IGRAPH_CHECK(igraph_vector_resize(edge_weights, edge_count));
+
     KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
 
@@ -684,6 +697,8 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     igraph_vector_destroy(&midpoint);
     IGRAPH_FINALLY_CLEAN(1);
 
+    IGRAPH_HANDLE_EXCEPTIONS_END;
+
     return IGRAPH_SUCCESS;
 }
 
@@ -707,17 +722,21 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  *     where <code>β = 1</code>.
  */
 igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *points) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true >> (&potential_edges, points, 1)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>> (&potential_edges, points, 1)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&potential_edges);
     IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     return IGRAPH_SUCCESS;
 }
@@ -739,20 +758,24 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
  * \return Error code.
  *
  * \sa The relative neighborhood graph is a special case of \ref igraph_lune_beta_skeleton()
- *     where beta = 2, but it has closed exclusion region.
+ *     where beta = 2, but it has a closed exclusion region.
  */
 igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_matrix_t *points) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
+
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, false >> (&potential_edges, points, 2)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, false>>(&potential_edges, points, 2)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
     igraph_vector_int_destroy(&potential_edges);
     IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
     return IGRAPH_SUCCESS;
 }
