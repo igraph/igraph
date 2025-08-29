@@ -1,4 +1,4 @@
-Relative neighborhood graph, 25 points
+Lune beta skeleton beta = 2, 25 points
 directed: false
 vcount: 25
 edges: {
@@ -279,3 +279,31 @@ Beta weighted gabriel graph, 3d 10 points cutoff = Infinity
 ( 2.29424 2.87805 1.51364 15.0303 1.01534 2.12088 1.05443 1.30234 2.07368 8.72711 1.0848 1.99727 2.0717 1.25544 1.77266 2.21701 4.16352 58.0727 4.91485 1.47137 1.89216 2.00274 )
 Beta weighted gabriel graph, 3d 10 points cutoff = 5
 ( 2.29424 2.87805 1.51364 Inf 1.01534 2.12088 1.05443 1.30234 2.07368 Inf 1.0848 1.99727 2.0717 1.25544 1.77266 2.21701 4.16352 Inf 4.91485 1.47137 1.89216 2.00274 )
+Relative neighborhood graph, triangular lattice
+directed: false
+vcount: 10
+edges: {
+0 1
+0 2
+1 2
+1 3
+1 4
+2 4
+2 5
+3 4
+3 6
+3 7
+4 5
+4 7
+4 8
+5 8
+5 9
+6 7
+7 8
+8 9
+}
+Lune beta skeleton beta = 2, triangular_lattice
+directed: false
+vcount: 10
+edges: {
+}

@@ -1,5 +1,5 @@
-#ifndef NANOFLANN_INTERNAL_H_
-#define NANOFLANN_INTERNAL_H_
+#ifndef SPATIAL_NANOFLANN_INTERNAL_H
+#define SPATIAL_NANOFLANN_INTERNAL_H
 
 #include "igraph_decls.h"
 #include "igraph_types.h"
@@ -115,4 +115,4 @@ public:
 };
 
 
-#endif // NANOFLANN_INTERNAL_H_
+#endif // SPATIAL_NANOFLANN_INTERNAL_H

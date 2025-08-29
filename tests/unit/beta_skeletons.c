@@ -17,6 +17,7 @@
 */
 
 #include <igraph.h>
+#include "igraph_spatial.h"
 #include "test_utilities.h"
 
 int main(void) {
@@ -36,16 +37,33 @@ int main(void) {
         0.739752, 0.447069, 0.0443581, 0.444839
     };
 
-    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat, point_3d_mat;
+    igraph_real_t trig_lattice_points[] = {0.50000000000000000000000000000000000000000000000000, \
+                                           2.5980762113533159402911695122588085504142078807156, 0, \
+                                           1.7320508075688772935274463415058723669428052538104, \
+                                           1.0000000000000000000000000000000000000000000000000, \
+                                           1.7320508075688772935274463415058723669428052538104, \
+                                           -0.50000000000000000000000000000000000000000000000000, \
+                                           0.86602540378443864676372317075293618347140262690519, \
+                                           0.50000000000000000000000000000000000000000000000000, \
+                                           0.86602540378443864676372317075293618347140262690519, \
+                                           1.5000000000000000000000000000000000000000000000000, \
+                                           0.86602540378443864676372317075293618347140262690519, \
+                                           -1.0000000000000000000000000000000000000000000000000, 0, 0, 0, \
+                                           1.0000000000000000000000000000000000000000000000000, 0, \
+                                           2.0000000000000000000000000000000000000000000000000, 0
+                                          };
+
+    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat, point_3d_mat, trig_lattice;
 
     igraph_matrix_init_array(&point_mat, points, 25, 2, false);
     igraph_matrix_init_array(&point_small_mat, points, 2, 2, false);
     igraph_matrix_init_array(&point_singleton_mat, points, 1, 2, false);
     igraph_matrix_init_array(&point_null_mat, points, 0, 2, false);
 
+    igraph_matrix_init_array(&trig_lattice, trig_lattice_points, 10, 2, false);
     igraph_matrix_init_array(&point_3d_mat, points, 10, 3, false);
 
-    printf("Relative neighborhood graph, 25 points\n");
+    printf("Lune beta skeleton beta = 2, 25 points\n");
     igraph_lune_beta_skeleton(&graph, &point_mat, 2);
     print_graph_canon(&graph);
     igraph_destroy(&graph);
@@ -125,12 +143,21 @@ int main(void) {
     print_vector(&weights);
     igraph_vector_destroy(&weights);
 
+    printf("Relative neighborhood graph, triangular lattice\n");
+    igraph_relative_neighborhood_graph(&graph, &trig_lattice);
+    print_graph_canon(&graph);
+    igraph_destroy(&graph);
+    printf("Lune beta skeleton beta = 2, triangular_lattice\n");
+    igraph_lune_beta_skeleton(&graph, &trig_lattice, 2);
+    print_graph_canon(&graph);
+    igraph_destroy(&graph);
+
+    igraph_matrix_destroy(&trig_lattice);
     igraph_matrix_destroy(&point_3d_mat);
     igraph_matrix_destroy(&point_mat);
     igraph_matrix_destroy(&point_small_mat);
     igraph_matrix_destroy(&point_singleton_mat);
     igraph_matrix_destroy(&point_null_mat);
     VERIFY_FINALLY_STACK();
-
     return 0;
 }

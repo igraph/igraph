@@ -81,7 +81,7 @@ public:
     void init() {
         clear();
     }
-  
+
     void clear() {
         found = 0;
     }
@@ -234,23 +234,23 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  */
 
 typedef igraph_error_t CentreConstructor(
-	  igraph_vector_t *a_centre,
-          igraph_vector_t *b_centre,
-          igraph_integer_t a,
-          igraph_integer_t b,
-          igraph_real_t beta,
-          const igraph_matrix_t *points);
+    igraph_vector_t *a_centre,
+    igraph_vector_t *b_centre,
+    igraph_integer_t a,
+    igraph_integer_t b,
+    igraph_real_t beta,
+    const igraph_matrix_t *points);
 
 // construct the centers of the points for lune based beta skeletons with beta
 // >= 1. The points lie on the line from a to b, such that the points lie on one
 // of the circles.
 // formula is a_centre = a + (r-1) * (a - b), similar for b_centre
 static igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
-                                      igraph_vector_t *b_centre,
-                                      igraph_integer_t a,
-                                      igraph_integer_t b,
-                                      igraph_real_t r,
-                                      const igraph_matrix_t *points) {
+        igraph_vector_t *b_centre,
+        igraph_integer_t a,
+        igraph_integer_t b,
+        igraph_real_t r,
+        const igraph_matrix_t *points) {
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
     for (igraph_integer_t i = 0; i < dims; i++) {
@@ -269,8 +269,8 @@ static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_v
     igraph_real_t mid[2], perp[2];
 
     for (igraph_integer_t i = 0; i < 2; i++) {
-      mid[i]  = (MATRIX(*points, a, i) + MATRIX(*points, b, i)) * 0.5;
-      perp[i] = (MATRIX(*points, a, i) - MATRIX(*points, b, i)) * sqrt(r * r - 0.25);
+        mid[i]  = (MATRIX(*points, a, i) + MATRIX(*points, b, i)) * 0.5;
+        perp[i] = (MATRIX(*points, a, i) - MATRIX(*points, b, i)) * sqrt(r * r - 0.25);
     }
 
     // Since this is only well defined for 2d, a manual 90 degree rotation works and is simpler.
@@ -327,8 +327,8 @@ static igraph_error_t is_intersection_empty(
     }
     //squared halfheight of lune
     igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_centre);
-    igraph_real_t tol = is_closed ? 1+TOLERANCE : 1-TOLERANCE;
-    IntersectionCounts intersections(lune_height, sqr_dist * r * r * tol, true, a, b, &a_centre, &b_centre, points);
+    igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
+    IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, &a_centre, &b_centre, points);
 
     tree.findNeighbors(intersections, VECTOR(midpoint));
 
@@ -440,13 +440,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-      IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>>(&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true >> (&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>>(&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true >> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -489,9 +489,9 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centres>>(&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centres >> (&potential_edges, points, beta));
     } else {
-      IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>>(&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true >> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -550,7 +550,9 @@ public:
     // If calculated beta is under 1, it would not appear in the gabriel graph, so a 0 is returned
     // which is to be interpreted as the edge being missing.
     igraph_real_t pointBeta(igraph_integer_t index) const {
-        if (index == ai || index == bi) return IGRAPH_INFINITY;
+        if (index == ai || index == bi) {
+            return IGRAPH_INFINITY;
+        }
 
         igraph_real_t ap2 = ind_ind_sqr_distance(ai, index, ps);
         igraph_real_t bp2 = ind_ind_sqr_distance(bi, index, ps);
@@ -683,15 +685,15 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector
  * \return Error Code.
  * \sa The gabriel graph is a special case of
  *     \ref igraph_lune_beta_skeleton() and \ref igraph_circle_beta_skeleton()
- *     where beta = 1; 
+ *     where beta = 1;
  */
 igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t potential_edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
-    
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>>(&potential_edges, points, 1)));
+
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true >> (&potential_edges, points, 1)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
@@ -708,7 +710,7 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
  *
  * This function calculates the relative neighborhood graph of a point set.
  * The relative neighborhood graph is the graph such that any two points
- * a and b are connected if there is no point p strictly closer to each of them. 
+ * a and b are connected if there is no point p strictly closer to each of them.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points The point set that will be used, each row is a point.
@@ -724,8 +726,8 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
-    
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, false>>(&potential_edges, points, 2)));
+
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, false >> (&potential_edges, points, 2)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
@@ -733,5 +735,5 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-    
+
 }
