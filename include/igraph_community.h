@@ -92,6 +92,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t *graph,
                                            const igraph_vector_t *edge_weights,
                                            const igraph_vector_t *vertex_weights,
                                            igraph_integer_t nb_trials,
+                                           igraph_bool_t is_regularized,
+                                           igraph_real_t regularization_strength,
                                            igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
 
@@ -130,7 +132,7 @@ IGRAPH_EXPORT igraph_error_t igraph_le_community_to_membership(const igraph_matr
                                                     igraph_vector_int_t *membership,
                                                     igraph_vector_int_t *csize);
 
-IGRAPH_EXPORT igraph_error_t igraph_community_voronoi(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_community_voronoi(
     const igraph_t *graph,
     igraph_vector_int_t *membership, igraph_vector_int_t *generators, igraph_real_t *modularity,
     const igraph_vector_t *lengths, const igraph_vector_t *weights,
@@ -230,6 +232,12 @@ IGRAPH_EXPORT igraph_error_t igraph_community_multilevel(const igraph_t *graph,
                                               igraph_matrix_int_t *memberships,
                                               igraph_vector_t *modularity);
 
+typedef enum {
+    IGRAPH_LEIDEN_OBJECTIVE_MODULARITY = 0,
+    IGRAPH_LEIDEN_OBJECTIVE_CPM,
+    IGRAPH_LEIDEN_OBJECTIVE_ER
+} igraph_leiden_objective_t;
+
 IGRAPH_EXPORT igraph_error_t igraph_community_leiden(
         const igraph_t *graph,
         const igraph_vector_t *edge_weights,
@@ -241,6 +249,18 @@ IGRAPH_EXPORT igraph_error_t igraph_community_leiden(
         igraph_integer_t n_iterations,
         igraph_vector_int_t *membership,
         igraph_integer_t *nb_clusters, igraph_real_t *quality);
+
+IGRAPH_EXPORT igraph_error_t igraph_community_leiden_simple(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_leiden_objective_t objective,
+        igraph_real_t resolution,
+        igraph_real_t beta,
+        igraph_bool_t start,
+        igraph_integer_t n_iterations,
+        igraph_vector_int_t *membership,
+        igraph_integer_t *nb_clusters,
+        igraph_real_t *quality);
 
 /* -------------------------------------------------- */
 /* Community Structure Comparison                     */

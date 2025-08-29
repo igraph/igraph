@@ -55,6 +55,19 @@
 #define QH_PRINTF_LIKE(string_index, first_to_check)
 #endif
 
+/* QH_NORETURN marks as a function as never returning. This is primarily
+   beneficial for aiding static analyzers and reducing compiler warnings.
+   It must come before function declarations, as MSVC only supports this syntax. */
+#if defined(__GNUC__)
+/* Compilers that support the GNU C syntax. Use __noreturn__ instead of 'noreturn' as the latter is a macro in C11. */
+#define QH_NORETURN __attribute__((__noreturn__))
+#elif defined(_MSC_VER)
+/* Compilers that support the MSVC syntax. */
+#define QH_NORETURN __declspec(noreturn)
+#else
+#define QH_NORETURN /* empty */
+#endif
+
 /*============ constants and basic types ====================*/
 
 extern const char qh_version[]; /* defined in global_r.c */
@@ -1119,12 +1132,12 @@ extern "C" {
 
 void    qh_qhull(qhT *qh);
 boolT   qh_addpoint(qhT *qh, pointT *furthest, facetT *facet, boolT checkdist);
-void    qh_errexit2(qhT *qh, int exitcode, facetT *facet, facetT *otherfacet);
+void    QH_NORETURN qh_errexit2(qhT *qh, int exitcode, facetT *facet, facetT *otherfacet);
 void    qh_printsummary(qhT *qh, FILE *fp);
 
 /********* -user_r.c prototypes (alphabetical) **********************/
 
-void    qh_errexit(qhT *qh, int exitcode, facetT *facet, ridgeT *ridge);
+void    QH_NORETURN qh_errexit(qhT *qh, int exitcode, facetT *facet, ridgeT *ridge);
 void    qh_errprint(qhT *qh, const char* string, facetT *atfacet, facetT *otherfacet, ridgeT *atridge, vertexT *atvertex);
 int     qh_new_qhull(qhT *qh, int dim, int numpoints, coordT *points, boolT ismalloc,
                 char *qhull_cmd, FILE *outfile, FILE *errfile);
@@ -1138,7 +1151,7 @@ void    qh_printhelp_wide(qhT *qh, FILE *fp);
 void    qh_user_memsizes(qhT *qh);
 
 /********* -usermem_r.c prototypes (alphabetical) **********************/
-void    qh_exit(int exitcode);
+void    QH_NORETURN qh_exit(int exitcode);
 void    qh_fprintf_stderr(int msgcode, const char *fmt, ... ) QH_PRINTF_LIKE(2, 3);
 void    qh_free(void *mem);
 void   *qh_malloc(size_t size);
@@ -1212,7 +1225,7 @@ void    qh_triangulate(qhT *qh /* qh.facet_list */);
 
 /********* -rboxlib_r.c prototypes **********************/
 int     qh_rboxpoints(qhT *qh, char* rbox_command);
-void    qh_errexit_rbox(qhT *qh, int exitcode);
+void    QH_NORETURN qh_errexit_rbox(qhT *qh, int exitcode);
 
 /************************** accessors.c prototypes ******************************/
 

@@ -77,7 +77,7 @@ int main(void) {
     m = 2;
     igraph_vector_int_resize(&membership, 1);
 
-    igraph_community_infomap(&g, NULL, NULL, 3, &membership, &m);
+    igraph_community_infomap(&g, NULL, NULL, 3, false, 0, &membership, &m);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
 

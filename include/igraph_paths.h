@@ -213,7 +213,7 @@ IGRAPH_EXPORT igraph_error_t igraph_radius(
     igraph_neimode_t mode
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_graph_center(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_graph_center(
     const igraph_t *graph, const igraph_vector_t *weights,
     igraph_vector_int_t *res, igraph_neimode_t mode
 );

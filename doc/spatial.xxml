@@ -21,6 +21,10 @@
 <!-- doxrox-include igraph_beta_weighted_gabriel_graph -->
 </section>
 
+<section id="spatial-properties"><title>Properties of spatial graphs</title>
+<!-- doxrox-include igraph_spatial_edge_lengths -->
+</section>
+
 <section id="nongraph-spatial"><title>Non-graph related spatial processing</title>
 <!-- doxrox-include igraph_convex_hull_2d -->
 </section>

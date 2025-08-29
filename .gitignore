@@ -8,3 +8,4 @@
 /build
 /build-*
 /tools/**/*.pyc
+/include/igraph_version.h

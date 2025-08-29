@@ -27,13 +27,13 @@ int main(void) {
         /* Generate undirected graph with 1000 nodes and 50 vertex types */
         igraph_preference_game(&g, nodes, types, /* type_dist= */ NULL, /* fixed_sizes= */ 1, &pref_matrix, &node_type_vec, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
-        igraph_assortativity_nominal(&g, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
+        igraph_assortativity_nominal(&g, NULL, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
         printf("Assortativity before rewiring = %g\n", assortativity);
 
         /* Rewire graph */
         igraph_rewire(&g, 10 * igraph_ecount(&g), IGRAPH_SIMPLE_SW);
 
-        igraph_assortativity_nominal(&g, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
+        igraph_assortativity_nominal(&g, NULL, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
         printf("Assortativity after rewiring = %g\n\n", assortativity);
 
         igraph_destroy(&g);

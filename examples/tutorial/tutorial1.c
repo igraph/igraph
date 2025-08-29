@@ -1,34 +1,33 @@
 #include <igraph.h>
 
 int main(void) {
-  igraph_integer_t num_vertices = 1000;
-  igraph_integer_t num_edges = 1000;
-  igraph_real_t diameter;
-  igraph_t graph;
+    igraph_integer_t num_vertices = 1000;
+    igraph_integer_t num_edges = 1000;
+    igraph_real_t diameter, mean_degree;
+    igraph_t graph;
 
-  /* Initialize the library. */
-  igraph_setup();
+    /* Initialize the library. */
+    igraph_setup();
 
-  /* Ensure identical results across runs. */
-  igraph_rng_seed(igraph_rng_default(), 42);
+    /* Ensure identical results across runs. */
+    igraph_rng_seed(igraph_rng_default(), 42);
 
-  igraph_erdos_renyi_game_gnm(
-    &graph, num_vertices, num_edges,
-    IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
-  );
+    igraph_erdos_renyi_game_gnm(
+        &graph, num_vertices, num_edges,
+        IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
 
-  igraph_diameter(
-    &graph, /* weights = */ NULL,
-    &diameter,
-    /* from = */ NULL, /* to = */ NULL,
-    /* vertex_path = */ NULL, /* edge_path = */ NULL,
-    IGRAPH_UNDIRECTED, /* unconn= */ true
-  );
-  printf("Diameter of a random graph with average degree %g: %g\n",
-          2.0 * igraph_ecount(&graph) / igraph_vcount(&graph),
-          (double) diameter);
+    igraph_diameter(
+        &graph, /* weights = */ NULL,
+        &diameter,
+        /* from = */ NULL, /* to = */ NULL,
+        /* vertex_path = */ NULL, /* edge_path = */ NULL,
+        IGRAPH_UNDIRECTED, /* unconn= */ true);
 
-  igraph_destroy(&graph);
+    igraph_mean_degree(&graph, &mean_degree, IGRAPH_LOOPS);
+    printf("Diameter of a random graph with average degree %g: %g\n",
+           mean_degree, diameter);
 
-  return 0;
+    igraph_destroy(&graph);
+
+    return 0;
 }

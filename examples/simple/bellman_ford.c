@@ -70,13 +70,13 @@ int main(void) {
 
     /***************************************/
 
-    /* Same graph with negative loop */
+    /* Same graph with negative cycle */
     igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_vector_view(&weights, weights_data_2,
                        sizeof(weights_data_2) / sizeof(weights_data_2[0]));
     if (igraph_distances_bellman_ford(&g, &res, igraph_vss_all(),
                                       igraph_vss_all(),
-                                      &weights, IGRAPH_OUT) != IGRAPH_ENEGLOOP) {
+                                      &weights, IGRAPH_OUT) != IGRAPH_ENEGCYCLE) {
         return 1;
     }
 

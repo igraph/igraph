@@ -183,6 +183,9 @@ add_library(
   connectivity/separators.c
   connectivity/reachability.c
 
+  cycles/cycle_bases.c
+        cycles/feedback_sets.c
+  cycles/order_cycle.cpp
   cycles/simple_cycles.c
 
   flow/flow.c
@@ -296,15 +299,12 @@ add_library(
   misc/cocitation.c
   misc/coloring.c
   misc/conversion.c
-  misc/cycle_bases.c
   misc/degree_sequence.cpp
   misc/embedding.c
-  misc/feedback_arc_set.c
   misc/graphicality.c
   misc/matching.c
   misc/mixing.c
   misc/motifs.c
-  misc/order_cycle.cpp
   misc/other.c
   misc/power_law_fit.c
   misc/scan.c
@@ -314,6 +314,7 @@ add_library(
   spatial/beta_skeleton.cpp
   spatial/delaunay.c
   spatial/convex_hull.c
+  spatial/edge_lengths.c
   spatial/nearest_neighbor.cpp
 
   internal/glpk_support.c

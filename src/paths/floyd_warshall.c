@@ -47,7 +47,7 @@ static igraph_error_t distances_floyd_warshall_original(igraph_matrix_t *res) {
                 }
                 if (i == j && MATRIX(*res, i, i) < 0) {
                     IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
-                                 IGRAPH_ENEGLOOP);
+                                 IGRAPH_ENEGCYCLE);
                 }
             }
         }
@@ -178,7 +178,7 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
                 }
                 if (i == j && MATRIX(*res, i, i) < 0) {
                     IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
-                                 IGRAPH_ENEGLOOP);
+                                 IGRAPH_ENEGCYCLE);
                 }
             }
         }
@@ -255,7 +255,7 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
  *          the "Tree" speedup of Brodnik et al., faster than the original algorithm
  *          in most cases.
  *        \endclist
- * \return Error code. \c IGRAPH_ENEGLOOP is returned if a negative-weight
+ * \return Error code. \c IGRAPH_ENEGCYCLE is returned if a negative-weight
  *   cycle is found.
  *
  * \sa \ref igraph_distances(), \ref igraph_distances_dijkstra(),
@@ -322,11 +322,11 @@ igraph_error_t igraph_i_distances_floyd_warshall(
             if (mode == IGRAPH_ALL) {
                 IGRAPH_ERRORF("Negative edge weight (%g) found in undirected graph "
                               "while calculating distances with Floyd-Warshall.",
-                              IGRAPH_ENEGLOOP, w);
+                              IGRAPH_ENEGCYCLE, w);
             } else if (to == from) {
                 IGRAPH_ERRORF("Self-loop with negative weight (%g) found "
                               "while calculating distances with Floyd-Warshall.",
-                              IGRAPH_ENEGLOOP, w);
+                              IGRAPH_ENEGCYCLE, w);
             }
         } else if (w == IGRAPH_INFINITY) {
             /* Ignore edges with infinite weight */

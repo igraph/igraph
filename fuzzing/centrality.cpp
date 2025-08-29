@@ -49,13 +49,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_init(&v, 0);
             igraph_vector_int_init(&iv, 0);
 
-            igraph_betweenness_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_ALL, NULL, 4);
-            igraph_betweenness_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_IN, NULL, 5);
-            igraph_edge_betweenness_cutoff(&graph, &v, IGRAPH_DIRECTED, NULL, 4);
-            igraph_edge_betweenness_cutoff(&graph, &v, IGRAPH_UNDIRECTED, NULL, 3);
+            igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
+            igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
+            igraph_edge_betweenness_cutoff(&graph, NULL, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
+                                           false, 4);
+            igraph_edge_betweenness_cutoff(&graph, NULL, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
+                                           false, 3);
             if (igraph_vcount(&graph) >= 10) {
-                igraph_betweenness_subset(&graph, &v, igraph_vss_all(), IGRAPH_DIRECTED, igraph_vss_range(0,5), igraph_vss_range(5,10), NULL);
-                igraph_edge_betweenness_subset(&graph, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED, igraph_vss_range(0,10), igraph_vss_range(0,10), NULL);
+                igraph_betweenness_subset(&graph, NULL, &v,
+                                          igraph_vss_range(0,5), igraph_vss_range(5,10),
+                                          igraph_vss_all(), IGRAPH_DIRECTED, false);
+                igraph_edge_betweenness_subset(&graph, NULL, &v,
+                                               igraph_vss_range(0,10), igraph_vss_range(0,10),
+                                               igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED, false);
             }
             igraph_closeness_cutoff(&graph, &v, &iv, &b, igraph_vss_all(), IGRAPH_ALL, NULL, true, 3);
             igraph_closeness_cutoff(&graph, &v, &iv, &b, igraph_vss_all(), IGRAPH_OUT, NULL, true, 4);
@@ -67,7 +73,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_transitivity_local_undirected(&graph, &v, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
             igraph_transitivity_avglocal_undirected(&graph, &r, IGRAPH_TRANSITIVITY_ZERO);
             igraph_count_adjacent_triangles(&graph, &v, igraph_vss_all());
-            igraph_pagerank(&graph, IGRAPH_PAGERANK_ALGO_PRPACK, &v, &r, igraph_vss_all(), IGRAPH_DIRECTED, 0.6, NULL, NULL);
+            igraph_pagerank(&graph, NULL, &v, &r, 0.6, IGRAPH_DIRECTED, igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK,
+                            NULL);
             igraph_constraint(&graph, &v, igraph_vss_all(), NULL);
             igraph_spanner(&graph, &iv, 2.34, NULL);
 

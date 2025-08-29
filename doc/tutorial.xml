@@ -207,9 +207,9 @@ directed or undirected paths.
 <command>igraph</command> has sophisticated ways for creating graphs. The simplest
 graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>),
-ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices
+cycle graphs (<link linkend="igraph_cycle_graph"><function>igraph_cycle_graph()</function></link>), lattices
 (<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link>) or trees
-(<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>).
+(<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>), and many more.
 </para>
 
 <para>

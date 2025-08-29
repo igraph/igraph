@@ -3129,8 +3129,6 @@ static void FUNCTION(igraph_i_vector, intersection_size_sorted)(
  * \function igraph_vector_intersection_size_sorted
  * \brief Intersection size of two sorted vectors.
  *
- * \experimental
- *
  * Counts elements that are present in both vectors. This is particularly
  * useful for counting common neighbours of two vertices.
  *
@@ -3210,63 +3208,145 @@ igraph_integer_t FUNCTION(igraph_vector, intersection_size_sorted)(
  * The elements that are contained in only the first vector but not the second are
  * stored in the result vector. All three vectors must be initialized.
  *
+ * </para><para>
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * \c k1 times in the first vector and \c k2 times in the second, the result
+ * will include that element <code>max(0, k1-k2)</code> times.
+ *
  * \param v1 the first vector
  * \param v2 the second vector
  * \param result the result vector
  */
 igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
         const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
-    igraph_integer_t i, j, i0, j0;
+    return FUNCTION(igraph_vector, difference_and_intersection_sorted)(
+        v1, v2, result, NULL, NULL
+    );
+}
+
+/**
+ * \function igraph_vector_difference_and_intersection_sorted
+ * \brief Simultaneous difference and intersection of two sorted vectors.
+ *
+ * This function iterates over all the elements of the two input vectors and
+ * sorts them into three other vectors: elements that are in the first vector
+ * but not in the second, elements that are in the second vector but not in the
+ * first, and the intersection of the two vectors. The input vectors must be
+ * initialized. The output arguments can be \c NULL, but they must be initialized
+ * if they are not \c NULL and will be resized accordingly.
+ *
+ * </para><para>
+ * The multiplicities of the individual elements are treated consistently with
+ * \ref igraph_vector_difference_sorted() and \ref igraph_vector_intersection_sorted():
+ * The algorithm keeps the multiplicities of the elements: if an element appears
+ * \c k1 times in the first vector and \c k2 times in the second, the intersection
+ * vector will include that element <code>min(k1, k2)</code> times, while the
+ * difference vectors will include that element <code>max(0, k1-k2)</code> and
+ * <code>max(0, k2-k1)</code> times, respectively.
+ *
+ * \param v1 the first vector
+ * \param v2 the second vector
+ * \param vdiff12 output vector containing the elements that are in the first
+ *        vector but not the second one, or \c NULL if not needed
+ * \param vdiff21 output vector containing the elements that are in the second
+ *        vector but not the first one, or \c NULL if not needed
+ * \param vint output vector containing the intersection, or \c NULL if not
+ *        needed
+ */
+igraph_error_t FUNCTION(igraph_vector, difference_and_intersection_sorted)(
+        const TYPE(igraph_vector) *v1, const TYPE(igraph_vector) *v2,
+        TYPE(igraph_vector) *vdiff12, TYPE(igraph_vector)*vdiff21,
+        TYPE(igraph_vector)*vint) {
+    igraph_integer_t i, j, i0, j0, oldsize;
     i0 = FUNCTION(igraph_vector, size)(v1);
     j0 = FUNCTION(igraph_vector, size)(v2);
     i = j = 0;
 
+    if (!vdiff12 && !vdiff21 && !vint) {
+        /* nothing to compute */
+        return IGRAPH_SUCCESS;
+    }
+
+    if (vdiff12) {
+        FUNCTION(igraph_vector, clear)(vdiff12);
+    }
+    if (vdiff21) {
+        FUNCTION(igraph_vector, clear)(vdiff21);
+    }
+    if (vint) {
+        FUNCTION(igraph_vector, clear)(vint);
+    }
+
     if (i0 == 0) {
         /* v1 is empty, this is easy */
-        FUNCTION(igraph_vector, clear)(result);
+        if (vdiff21) {
+            IGRAPH_CHECK(FUNCTION(igraph_vector, update)(vdiff21, v2));
+        }
         return IGRAPH_SUCCESS;
     }
 
     if (j0 == 0) {
         /* v2 is empty, this is easy */
-        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(result, i0));
-        memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * i0);
+        if (vdiff12) {
+            IGRAPH_CHECK(FUNCTION(igraph_vector, update)(vdiff12, v1));
+        }
         return IGRAPH_SUCCESS;
     }
-
-    FUNCTION(igraph_vector, clear)(result);
 
     /* Copy the part of v1 that is less than the first element of v2 */
     while (i < i0 && VECTOR(*v1)[i] < VECTOR(*v2)[j]) {
         i++;
     }
-    if (i > 0) {
-        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(result, i));
-        memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * i);
+    if (vdiff12 && i > 0) {
+        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(vdiff12, i));
+        memcpy(vdiff12->stor_begin, v1->stor_begin, sizeof(BASE) * i);
     }
 
+    /* Copy the part of v2 that is less than the first element of v1 */
+    while (j < j0 && VECTOR(*v2)[j] < VECTOR(*v1)[i]) {
+        j++;
+    }
+    if (vdiff21 && j > 0) {
+        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(vdiff21, j));
+        memcpy(vdiff21->stor_begin, v2->stor_begin, sizeof(BASE) * j);
+    }
+
+    /* Now process the common segments */
     while (i < i0 && j < j0) {
-        BASE element = VECTOR(*v1)[i];
-        if (element == VECTOR(*v2)[j]) {
+        BASE element1 = VECTOR(*v1)[i];
+        BASE element2 = VECTOR(*v2)[j];
+        if (element1 == element2) {
             i++; j++;
-            while (i < i0 && VECTOR(*v1)[i] == element) {
-                i++;
+            if (vint) {
+                IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(vint, element1));
             }
-            while (j < j0 && VECTOR(*v2)[j] == element) {
-                j++;
+        } else if (element1 < element2) {
+            if (vdiff12) {
+                IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(vdiff12, element1));
             }
-        } else if (element < VECTOR(*v2)[j]) {
-            IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(result, element));
             i++;
         } else {
+            if (vdiff21) {
+                IGRAPH_CHECK(FUNCTION(igraph_vector, push_back)(vdiff21, element2));
+            }
             j++;
         }
     }
-    if (i < i0) {
-        igraph_integer_t oldsize = FUNCTION(igraph_vector, size)(result);
-        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(result, oldsize + i0 - i));
-        memcpy(result->stor_begin + oldsize, v1->stor_begin + i,
+
+    /* Copy the part of v1 that is greater than the last element of v2 */
+    if (vdiff12 && i < i0) {
+        oldsize = FUNCTION(igraph_vector, size)(vdiff12);
+        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(vdiff12, oldsize + i0 - i));
+        memcpy(vdiff12->stor_begin + oldsize, v1->stor_begin + i,
                sizeof(BASE) * (i0 - i));
+    }
+
+    /* Copy the part of v2 that is greater than the last element of v1 */
+    if (vdiff21 && j < j0) {
+        oldsize = FUNCTION(igraph_vector, size)(vdiff21);
+        IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(vdiff21, oldsize + j0 - j));
+        memcpy(vdiff21->stor_begin + oldsize, v2->stor_begin + j,
+               sizeof(BASE) * (j0 - j));
     }
 
     return IGRAPH_SUCCESS;

@@ -29,6 +29,8 @@
  * \function igraph_mycielskian
  * \brief Generate the Mycielskian of a graph with \p k iterations.
  *
+ * \experimental
+ *
  * The Mycielskian of a graph is a larger graph formed using a construction due
  * to Jan Mycielski that increases the chromatic number by one while preserving
  * the triangle-free property. The Mycielski construction can be used to create

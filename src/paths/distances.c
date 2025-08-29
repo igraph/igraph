@@ -316,8 +316,6 @@ igraph_error_t igraph_eccentricity(
  * \function igraph_radius
  * \brief Radius of a graph, using weighted edges.
  *
- * \experimental
- *
  * The radius of a graph is the defined as the minimum eccentricity of
  * its vertices, see \ref igraph_eccentricity().
  *

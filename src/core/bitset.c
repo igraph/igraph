@@ -146,8 +146,6 @@ igraph_integer_t igraph_i_clz64(igraph_uint_t x) {
  * \function igraph_bitset_init
  * \brief Initializes a bitset object (constructor).
  *
- * \experimental
- *
  * </para><para>
  * Every bitset needs to be initialized before it can be used, and
  * there are a number of initialization functions or otherwise called
@@ -186,8 +184,6 @@ igraph_error_t igraph_bitset_init(igraph_bitset_t *bitset, igraph_integer_t size
  * \function igraph_bitset_destroy
  * \brief Destroys a bitset object.
  *
- * \experimental
- *
  * All bitsets initialized by \ref igraph_bitset_init() should be properly
  * destroyed by this function. A destroyed bitset needs to be
  * reinitialized by \ref igraph_bitset_init() or
@@ -209,8 +205,6 @@ void igraph_bitset_destroy(igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_init_copy
  * \brief Initializes a bitset from another bitset object (constructor).
- *
- * \experimental
  *
  * The contents of the existing bitset object will be copied to
  * the new one.
@@ -241,8 +235,6 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
  * \function igraph_bitset_update
  * \brief Update a bitset from another one.
  *
- * \experimental
- *
  * The size and contents of \p dest will be identical to that of \p src.
  *
  * \param dest Pointer to an initialized bitset object. This will be updated.
@@ -272,8 +264,6 @@ igraph_error_t igraph_bitset_update(igraph_bitset_t *dest, const igraph_bitset_t
  * \function igraph_bitset_capacity
  * \brief Returns the allocated capacity of the bitset.
  *
- * \experimental
- *
  * Note that this might be different from the size of the bitset (as
  * queried by \ref igraph_bitset_size()), and specifies how many elements
  * the bitset can hold, without reallocation.
@@ -296,8 +286,6 @@ igraph_integer_t igraph_bitset_capacity(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_size
  * \brief Returns the length of the bitset.
  *
- * \experimental
- *
  * \param bitset The bitset object
  * \return The size of the bitset.
  *
@@ -312,8 +300,6 @@ igraph_integer_t igraph_bitset_size(const igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_reserve
  * \brief Reserves memory for a bitset.
- *
- * \experimental
  *
  * \a igraph bitsets are flexible, they can grow and
  * shrink. Growing
@@ -367,8 +353,6 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_integer_t c
  * \function igraph_bitset_resize
  * \brief Resizes the bitset.
  *
- * \experimental
- *
  * Note that this function does not free any memory, just sets the
  * size of the bitset to the given one. It may, on the other hand,
  * allocate more memory if the new size is larger than the previous
@@ -414,8 +398,6 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_integer_t ne
  * \function igraph_bitset_popcount
  * \brief The population count of the bitset.
  *
- * \experimental
- *
  * Returns the number of set bits, also called the population count,
  * of the bitset.
  *
@@ -446,8 +428,6 @@ igraph_integer_t igraph_bitset_popcount(const igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_countl_zero
  * \brief The number of leading zeros in the bitset.
- *
- * \experimental
  *
  * Returns the number of leading (starting at the most significant bit)
  * zeros in the bitset before the first one is encountered. If the bitset
@@ -483,8 +463,6 @@ igraph_integer_t igraph_bitset_countl_zero(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_countl_one
  * \brief The number of leading ones in the bitset.
  *
- * \experimental
- *
  * Returns the number of leading ones (starting at the most significant bit)
  * in the bitset before the first zero is encountered.
  * If the bitset is all ones, then its size is returned.
@@ -519,8 +497,6 @@ igraph_integer_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_countr_zero
  * \brief The number of trailing zeros in the bitset.
  *
- * \experimental
- *
  * Returns the number of trailing (starting at the least significant bit)
  * zeros in the bitset before the first one is encountered.
  * If the bitset is all zeros, then its size is returned.
@@ -553,8 +529,6 @@ igraph_integer_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_countr_one
  * \brief The number of trailing ones in the bitset.
- *
- * \experimental
  *
  * Returns the number of trailing ones (starting at the least significant bit)
  * in the bitset before the first zero is encountered.
@@ -589,8 +563,6 @@ igraph_integer_t igraph_bitset_countr_one(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_is_all_zero
  * \brief Are all bits zeros?
  *
- * \experimental
- *
  * \param bitset The bitset object to test.
  * \return True if none of the bits are set.
  *
@@ -618,8 +590,6 @@ igraph_bool_t igraph_bitset_is_all_zero(const igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_is_all_one
  * \brief Are all bits ones?
- *
- * \experimental
  *
  * \param bitset The bitset object to test.
  * \return True if all of the bits are set.
@@ -649,8 +619,6 @@ igraph_bool_t igraph_bitset_is_all_one(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_is_any_zero
  * \brief Are any bits zeros?
  *
- * \experimental
- *
  * \param bitset The bitset object to test.
  * \return True if at least one bit is zero.
  *
@@ -666,8 +634,6 @@ igraph_bool_t igraph_bitset_is_any_zero(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_is_any_one
  * \brief Are any bits ones?
  *
- * \experimental
- *
  * \param bitset The bitset object to test.
  * \return True if at least one bit is one.
  *
@@ -682,8 +648,6 @@ igraph_bool_t igraph_bitset_is_any_one(const igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_or
  * \brief Bitwise OR of two bitsets.
- *
- * \experimental
  *
  * Applies a bitwise or to the contents of two bitsets and stores it in an
  * already initialized bitset. The destination bitset may be equal to one
@@ -711,8 +675,6 @@ void igraph_bitset_or(igraph_bitset_t *dest,
  * \function igraph_bitset_and
  * \brief Bitwise AND of two bitsets.
  *
- * \experimental
- *
  * Applies a bitwise and to the contents of two bitsets and stores it in an
  * already initialized bitset. The destination bitset may be equal to one
  * (or even both) of the sources. When working with bitsets, it is common
@@ -737,8 +699,6 @@ void igraph_bitset_and(igraph_bitset_t *dest, const igraph_bitset_t *src1, const
  * \ingroup bitset
  * \function igraph_bitset_xor
  * \brief Bitwise XOR of two bitsets.
- *
- * \experimental
  *
  * Applies a bitwise xor to the contents of two bitsets and stores it in
  * an already initialized bitset. The destination bitset may be equal to
@@ -766,8 +726,6 @@ void igraph_bitset_xor(igraph_bitset_t *dest,
  * \function igraph_bitset_not
  * \brief Bitwise negation of a bitset.
  *
- * \experimental
- *
  * Applies a bitwise not to the contents of a bitset and stores it in an
  * already initialized bitset. The destination bitset may be equal to the
  * source. When working with bitsets, it is common that those created are
@@ -791,8 +749,6 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src) {
  * \function igraph_bitset_fill
  * \brief Fills a bitset with a constant value.
  *
- * \experimental
- *
  * Sets all bits of a bitset to the same value.
  *
  * \param bitset The bitset object to modify.
@@ -814,8 +770,6 @@ void igraph_bitset_fill(igraph_bitset_t *bitset, igraph_bool_t value) {
  * \function igraph_bitset_null
  * \brief Clears all bits in a bitset.
  *
- * \experimental
- *
  * \param bitset The bitset object to clear all bits in.
  *
  * \sa \ref igraph_bitset_fill()
@@ -831,8 +785,6 @@ void igraph_bitset_null(igraph_bitset_t *bitset) {
  * \ingroup bitset
  * \function igraph_bitset_fprint
  * \brief Prints the bits of a bitset.
- *
- * \experimental
  *
  * Outputs the contents of a bitset to a file.
  * The bitset is written from index n-1 to index 0, left to right,

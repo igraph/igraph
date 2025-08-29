@@ -226,6 +226,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_bool_
  * \param graph The graph object to be rewired.
  * \param n Number of rewiring trials to perform.
  * \param allowed_edge_types The types of edges that rewiring may create in the graph.
+ *    See \ref igraph_edge_type_sw_t for details.
  *    Currently, the following are implemented:
  *    \clist
  *      \cli IGRAPH_SIMPLE_SW

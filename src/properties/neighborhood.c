@@ -89,7 +89,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     }
 
     if (mindist < 0) {
-        IGRAPH_ERRORF("Minium distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
+        IGRAPH_ERRORF("Minimum distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
     }
     if (!inf_order && mindist > order) {
         IGRAPH_ERRORF("Minimum distance must not exceed the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
@@ -223,7 +223,7 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
     }
 
     if (mindist < 0) {
-        IGRAPH_ERRORF("Minium distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
+        IGRAPH_ERRORF("Minimum distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
     }
     if (!inf_order && mindist > order) {
         IGRAPH_ERRORF("Minimum distance must not exceed the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
@@ -368,7 +368,7 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
     }
 
     if (mindist < 0) {
-        IGRAPH_ERRORF("Minium distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
+        IGRAPH_ERRORF("Minimum distance must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, mindist);
     }
     if (!inf_order && mindist > order) {
         IGRAPH_ERRORF("Minimum distance must not exceed the neighborhood order (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",

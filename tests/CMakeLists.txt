@@ -934,6 +934,7 @@ add_legacy_tests(
   beta_skeletons
   igraph_delaunay_graph
   igraph_nearest_neighbor_graph
+  igraph_spatial_edge_lengths
 )
 
 
@@ -1033,6 +1034,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_realize_degree_sequence
+  igraph_rewire
   igraph_strength
   igraph_transitivity
   igraph_tree_game

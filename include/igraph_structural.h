@@ -38,8 +38,8 @@ IGRAPH_BEGIN_C_DECLS
 IGRAPH_EXPORT igraph_error_t igraph_are_adjacent(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res, igraph_integer_t eid);
-IGRAPH_EXPORT igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
-                                 igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_density(const igraph_t *graph, const igraph_vector_t *weights,
+                                            igraph_real_t *res, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
                                    igraph_vector_t *res, igraph_vs_t vs);
 IGRAPH_EXPORT igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
@@ -115,21 +115,13 @@ IGRAPH_EXPORT igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *
                                                      igraph_vector_t *knn,
                                                      igraph_vector_t *knnk,
                                                      const igraph_vector_t *weights);
-IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *knnk,
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors);
 
-IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
-    const igraph_t *graph, igraph_vector_int_t *result,
-    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
-
-IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
-    const igraph_t *graph, igraph_vector_int_t *result,
-    const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
-
-IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rich_club_sequence(
     const igraph_t *graph,
     const igraph_vector_t *weights,
     igraph_vector_t *res,

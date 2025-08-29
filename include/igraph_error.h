@@ -260,7 +260,7 @@ IGRAPH_BEGIN_C_DECLS
  * \enumval IGRAPH_ARPACK An error happened inside a calculation implemented
  *   in ARPACK. The calculation involved is most likely an eigenvector-related
  *   calculation.
- * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
+ * \enumval IGRAPH_ENEGCYCLE Negative cycle detected while calculating shortest paths.
  * \enumval IGRAPH_EINTERNAL Internal error, likely a bug in igraph.
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
@@ -288,7 +288,7 @@ typedef enum {
     IGRAPH_DIVERGED          = 14,
     IGRAPH_EARPACK           = 15,
     /* ARPACK error codes from 15 to 36 were moved to igraph_arpack_error_t in 1.0 */
-    IGRAPH_ENEGLOOP          = 37,
+    IGRAPH_ENEGCYCLE         = 37,
     IGRAPH_EINTERNAL         = 38,
     /* ARPACK error codes from 39 to 41 were moved to igraph_arpack_error_t in 1.0 */
     /* IGRAPH_EDIVZERO          = 42, */   /* removed in 1.0 */
