@@ -27,71 +27,71 @@
 #include "test_utilities.h"
 
 int main(void) {
-    igraph_t g, extd_g;
+    igraph_t g;
     igraph_matrix_t coords;
-    igraph_vector_int_t edgelist, extd_edgelist, extd_to_orig_eids;
+    igraph_vector_int_t edgelist;
+    igraph_matrix_list_t routing;
     igraph_vector_int_t layers;
 
     igraph_matrix_init(&coords, 0, 0);
-    igraph_vector_int_init(&extd_to_orig_eids, 0);
+    igraph_matrix_list_init(&routing, 0);
 
     /* Layout on simple graph with predefined layers */
+    printf("Simple graph with predefined layers\n");
     igraph_vector_int_init_int_end(&layers, -1, 0, 1, 1, 2, 3, 3, 4, 4, 5, -1);
     igraph_vector_int_init_int_end(&edgelist, -1,
                                0, 1, 0, 2, 0, 3, 1, 2, 2, 2, 1, 4, 2, 5, 4, 6, 5, 7, 6, 8, 7, 8,
                                3, 8, 8, 1, 8, 2, -1);
     igraph_create(&g, &edgelist, 0, 1);
 
-    igraph_layout_sugiyama(&g, &coords, 0, 0, &layers,
+    igraph_layout_sugiyama(&g, &coords, 0, &layers,
                            /* hgap = */ 1,
                            /* vgap = */ 1,
                            /* maxiter = */ 100,
                            /* weights = */ 0);
-    igraph_matrix_print(&coords);
-    printf("===\n");
+    print_matrix(&coords);
+    printf("\n");
 
-    /* Same, but this time also return the extended graph */
-    igraph_layout_sugiyama(&g, &coords, &extd_g, &extd_to_orig_eids, &layers,
+    /* Same, but this time also return the routing information */
+    printf("Simple graph with routing information\n");
+    igraph_layout_sugiyama(&g, &coords, &routing, &layers,
                            /* hgap = */ 1,
                            /* vgap = */ 1,
                            /* maxiter = */ 100,
                            /* weights = */ 0);
-    igraph_matrix_print(&coords);
-    printf("===\n");
-    igraph_vector_int_init(&extd_edgelist, 0);
-    igraph_get_edgelist(&extd_g, &extd_edgelist, 0);
-    igraph_vector_int_print(&extd_edgelist);
-    igraph_vector_int_destroy(&extd_edgelist);
-    igraph_destroy(&extd_g);
-    printf("===\n");
-    igraph_vector_int_print(&extd_to_orig_eids);
-    printf("===\n");
+    print_matrix(&coords);
+    print_matrix_list(&routing);
+    printf("\n");
 
     igraph_vector_int_destroy(&layers);
 
     /* Same, but with automatic layering */
-    igraph_layout_sugiyama(&g, &coords, 0, 0, 0,
+    printf("Simple graph with automatic layers\n");
+    igraph_layout_sugiyama(&g, &coords, &routing, 0,
                            /* hgap = */ 1,
                            /* vgap = */ 1,
                            /* maxiter = */ 100,
                            /* weights = */ 0);
-    igraph_matrix_print(&coords);
-    printf("===\n");
+    print_matrix(&coords);
+    print_matrix_list(&routing);
+    printf("\n");
 
     /* Layering with gaps in it */
+    printf("Simple graph with gaps in layers\n");
     igraph_vector_int_init_int_end(&layers, -1, 0, 2, 2, 4, 6, 6, 12, 12, 15, -1);
-    igraph_layout_sugiyama(&g, &coords, 0, 0, &layers,
+    igraph_layout_sugiyama(&g, &coords, &routing, &layers,
                            /* hgap = */ 1,
                            /* vgap = */ 1,
                            /* maxiter = */ 100,
                            /* weights = */ 0);
-    igraph_matrix_print(&coords);
+    print_matrix(&coords);
+    print_matrix_list(&routing);
     igraph_vector_int_destroy(&layers);
-    printf("===\n");
+    printf("\n");
 
     igraph_vector_int_destroy(&edgelist);
     igraph_matrix_destroy(&coords);
-    igraph_vector_int_destroy(&extd_to_orig_eids);
+    igraph_matrix_list_destroy(&routing);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

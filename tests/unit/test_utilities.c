@@ -71,16 +71,20 @@ void print_vector_int_list(const igraph_vector_int_list_t *v) {
     printf("}\n");
 }
 
-/* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
 void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
+    print_matrix_format_indent(m, f, format, "");
+}
+
+/* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
+void print_matrix_format_indent(const igraph_matrix_t *m, FILE *f, const char *format, const char *indent) {
     igraph_integer_t i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
     if (nrow == 0 || ncol == 0) {
         /* When the matrix is empty, output the dimensions */
-        fprintf(f, "[ %" IGRAPH_PRId "-by-%" IGRAPH_PRId" ]\n", nrow, ncol);
+        fprintf(f, "%s[ %" IGRAPH_PRId "-by-%" IGRAPH_PRId" ]\n", indent, nrow, ncol);
         return;
     }
     for (i = 0; i < nrow; i++) {
-        fprintf(f, i == 0 ? "[" : " ");
+        fprintf(f, i == 0 ? "%s[" : "%s ", indent);
         for (j = 0; j < ncol; j++) {
             fprintf(f, " ");
             print_real(f, MATRIX(*m, i, j), format);
@@ -90,7 +94,11 @@ void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) 
 }
 
 void print_matrix(const igraph_matrix_t *m) {
-    print_matrix_format(m, stdout, "%8g");
+    print_matrix_indent(m, "");
+}
+
+void print_matrix_indent(const igraph_matrix_t *m, const char *indent) {
+    print_matrix_format_indent(m, stdout, "%8g", indent);
 }
 
 void print_matrix_int(const igraph_matrix_int_t *m) {
@@ -131,6 +139,22 @@ void print_matrix_complex_round(const igraph_matrix_complex_t *m) {
         }
         printf("\n");
     }
+}
+
+void print_matrix_list(const igraph_matrix_list_t *m) {
+    igraph_integer_t i, n = igraph_matrix_list_size(m);
+    printf("{\n");
+    for (i = 0; i < n; ++i) {
+        igraph_matrix_t *mat = igraph_matrix_list_get_ptr(m, i);
+        if (igraph_matrix_nrow(mat) < 2) {
+            printf("  %2" IGRAPH_PRId ": ", i);
+            print_matrix(mat);
+        } else {
+            printf("  %2" IGRAPH_PRId ":\n", i);
+            print_matrix_indent(mat, "      ");
+        }
+    }
+    printf("}\n");
 }
 
 /* Print an adjacency list. Use brackets around each vector and also use
