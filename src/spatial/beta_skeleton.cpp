@@ -421,16 +421,21 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  * This function constructs the graph corresponding to the lune based Delaunay triangulation
  * of an n-dimensional spatial point set.
  *
+ * </para><para>
  * Two points are connected if a region between them whose shape is parameterized by beta
  * is free of other points.
  *
- * A larger beta results in a larger region, and a sparser graph.
+ * </para><para>
+ * A larger β results in a larger region, and a sparser graph.
  *
- * Values of beta \lt 1 are only supported in 2d, and are considerably slower.
+ * </para><para>
+ * Values of β &lt; 1 are only supported in 2D, and are considerably slower.
  *
- * The gabriel graph is a special case of beta skeleton where beta = 1.
+  * </para><para>
+ * The Gabriel graph is a special case of beta skeleton where β = 1.
  *
- * The Relative Neighborhood graph is a special case of beta skeleton where beta = 2.
+  * </para><para>
+ * The Relative Neighborhood graph is a special case of beta skeleton where β = 2.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the graph.
@@ -468,11 +473,11 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  *
  * \experimental
  *
- * This function constructs the graph corresponding to the circle based Delaunay triangulation
- * of a 2-dimensional spatial point set.
+ * This function constructs the graph corresponding to the circle based Delaunay
+ * triangulation of a 2-dimensional spatial point set.
  *
- * Two points are connected if a region between them whose shape is parameterized by beta
- * is free of other points.
+ * Two points are connected if a region between them whose shape is
+ * parameterized by beta is free of other points.
  *
  * A larger beta results in a larger region, and a sparser graph.
  *
@@ -685,18 +690,21 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
 /**
  * \function igraph_gabriel_graph
  * \brief Generates the gabriel graph of a point set.
+ *
  * \experimental
  *
- * This function computes the gabriel graph of a point set.
- * The gabriel graph is constructed by connecting any two points if there is no point in a circle between them.
+ * This function computes the gabriel graph of a point set. The Gabriel graph
+ * is constructed by connecting any two points if there is no point in a circle
+ * between them.
  *
  * \param graph A pointer to the graph to be created.
- * \param pointes The point set that will be used. Each row is a point, dimensionality is inferred from column count.
+ * \param pointes The point set that will be used. Each row is a point,
+ *    dimensionality is inferred from column count.
  *
  * \return Error Code.
- * \sa The gabriel graph is a special case of
+ * \sa The Gabriel graph is a special case of
  *     \ref igraph_lune_beta_skeleton() and \ref igraph_circle_beta_skeleton()
- *     where beta = 1;
+ *     where <code>β = 1</code>.
  */
 igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t potential_edges;
