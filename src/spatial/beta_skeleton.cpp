@@ -120,9 +120,9 @@ public:
 // Used in is_intersection_empty.
 // Adapted from code by Szabolcs at https://github.com/szhorvat/IGraphM.
 class IntersectionCounts {
-    const igraph_real_t radius;                        // Half height of intersection lune
-    const igraph_real_t beta_radius;                   // Radius of circles
-    const igraph_bool_t short_circuit;                   // Whether to stop after one point has been found
+    const igraph_real_t radius;                 // Half height of intersection lune
+    const igraph_real_t beta_radius;            // Radius of circles
+    const igraph_bool_t short_circuit;          // Whether to stop after one point has been found
     const igraph_integer_t a, b;                // Edge endpoits; excluded from the count.
     const igraph_vector_t *a_centre, *b_centre; // Circle centres.
     const igraph_matrix_t *points;              // List of points, used to test if points are in range
@@ -182,10 +182,10 @@ public:
 };
 
 // Shrinks type signatures significantly.
-template <igraph_integer_t Dimension>
-using KDTree = nanoflann::KDTreeSingleIndexAdaptor <
-               nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
-               ig_point_adaptor, Dimension, igraph_integer_t >;
+template<igraph_integer_t Dimension>
+using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
+                    nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
+                    ig_point_adaptor, Dimension, igraph_integer_t >;
 
 // give a known good superset of edges for a given value of beta.
 // In the case of beta < 1, that is a complete graph, for
@@ -201,8 +201,8 @@ static igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
         // Large beta and enough points, subset of delaunay.
         IGRAPH_CHECK(igraph_i_delaunay_edges(edges, points));
     } else {
-        // Small beta, not subset of delaunay, give complete graph.
-        // Or delaunay not calculable due to point count
+        // Small beta, not subset of Delaunay, give complete graph.
+        // Or Delaunay not calculable due to point count
         // TODO: update when/if Delaunay supports small numbers.
         igraph_integer_t numpoints = igraph_matrix_nrow(points);
         for (igraph_integer_t a = 0; a < numpoints - 1; a++) {
@@ -298,7 +298,7 @@ static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_v
  */
 typedef igraph_error_t FilterFunc(
     igraph_bool_t *result,
-    KDTree < -1 > &tree,
+    KDTree<-1> &tree,
     igraph_integer_t a,
     igraph_integer_t b,
     const igraph_matrix_t *points,
@@ -308,10 +308,10 @@ typedef igraph_error_t FilterFunc(
 
 // Test whether the intersection of the two circles as generated
 // by centre_positions is empty of points except for a and b.
-template <CentreConstructor centre_positions, igraph_bool_t is_closed>
+template<CentreConstructor centre_positions, igraph_bool_t is_closed>
 static igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
-    KDTree < -1 > &tree,
+    KDTree<-1> &tree,
     igraph_integer_t a,
     igraph_integer_t b,
     const igraph_matrix_t *points,
@@ -333,7 +333,7 @@ static igraph_error_t is_intersection_empty(
         VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_centre)[i] + VECTOR(b_centre)[i]);
     }
 
-    //squared halfheight of lune
+    // squared half-height of lune
     igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_centre);
     igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
     IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, &a_centre, &b_centre, points);
@@ -352,10 +352,10 @@ static igraph_error_t is_intersection_empty(
 
 // Test whether the union of the circles given by centre_positions
 //  is empty of other points except for a and b.
-template <CentreConstructor centre_positions>
+template<CentreConstructor centre_positions>
 static igraph_error_t is_union_empty(
     igraph_bool_t *result,
-    KDTree < -1 > &tree,
+    KDTree<-1> &tree,
     igraph_integer_t a,
     igraph_integer_t b,
     const igraph_matrix_t *points,
@@ -391,13 +391,13 @@ static igraph_error_t is_union_empty(
 // Iterate through the edges given, applying the provided filter.
 // Currently used with is_intersection_empty and is_union_empty.
 // TODO: specialize for multiple dimensions?
-template < FilterFunc filter >
+template<FilterFunc filter>
 static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
     igraph_integer_t available_edges = igraph_vector_int_size(edges);
     igraph_integer_t added_edges = 0;
     ig_point_adaptor adaptor(points);
     igraph_integer_t dim = igraph_matrix_ncol(points);
-    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
     igraph_bool_t result;
     for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
@@ -644,7 +644,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
     igraph_integer_t edge_count = igraph_vector_int_size(&edges) / 2;
     IGRAPH_CHECK(igraph_vector_resize(edge_weights, edge_count));
-    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
 
     igraph_vector_t midpoint;
@@ -755,5 +755,4 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-
 }
