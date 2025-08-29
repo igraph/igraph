@@ -113,7 +113,6 @@ public:
         }
         return true;
     }
-
 };
 
 // Helper result class for listing the points in the intersection of two spheres
@@ -141,6 +140,7 @@ public:
           a_centre(a_centre), b_centre(b_centre), points(points) {
         init();
     }
+
     void init() {
         clear();
     }
@@ -162,6 +162,7 @@ public:
     igraph_real_t worstDist() const {
         return radius;
     }
+
     // Business logic is all contained here.
     // Count the point if it is within the radius from both centres, and if it's not one of the endpoints.
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
@@ -295,7 +296,16 @@ static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_v
  * parameter for beta-skeletons. const igraph_matrix_t *points: matrix
  * containing all the points.
  */
-typedef igraph_error_t FilterFunc(igraph_bool_t *result, KDTree < -1 > &tree, igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points, igraph_real_t beta);
+typedef igraph_error_t FilterFunc(
+    igraph_bool_t *result,
+    KDTree < -1 > &tree,
+    igraph_integer_t a,
+    igraph_integer_t b,
+    const igraph_matrix_t *points,
+    igraph_real_t beta
+);
+
+
 // Test whether the intersection of the two circles as generated
 // by centre_positions is empty of points except for a and b.
 template <CentreConstructor centre_positions, igraph_bool_t is_closed>
@@ -313,18 +323,16 @@ static igraph_error_t is_intersection_empty(
     igraph_vector_t midpoint;
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
-
     igraph_vector_t a_centre, b_centre;
     IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
     IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
     IGRAPH_CHECK(centre_positions(&a_centre, &b_centre, a, b, r, points));
 
     IGRAPH_VECTOR_INIT_FINALLY(&midpoint, dims);
-
-
     for (igraph_integer_t i = 0; i < dims; i++) {
         VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_centre)[i] + VECTOR(b_centre)[i]);
     }
+
     //squared halfheight of lune
     igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_centre);
     igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
@@ -359,8 +367,6 @@ static igraph_error_t is_union_empty(
     igraph_real_t r = calculate_r(beta);
     igraph_vector_t a_centre, b_centre;
 
-
-
     IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
     IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
     IGRAPH_CHECK(centre_positions(&a_centre, &b_centre, a, b, r, points));
@@ -368,7 +374,6 @@ static igraph_error_t is_union_empty(
     NeighborCounts neighbor_search(sqr_dist * r * r * (1 + TOLERANCE), a, b, true);
 
     tree.findNeighbors(neighbor_search, VECTOR(a_centre));
-
 
     if (neighbor_search.size() > 0) {
         *result = false;
@@ -546,6 +551,7 @@ public:
         }
         return (ab2 / 4) * (2 * beta - 1);
     }
+
     // Calculate the beta at which point index would make the edge a-b diappear.
     // If calculated beta is under 1, it would not appear in the gabriel graph, so a 0 is returned
     // which is to be interpreted as the edge being missing.
@@ -572,7 +578,6 @@ public:
     }
 
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
-
         if (dist < max_radius) {
             igraph_real_t beta = pointBeta(index);
             if (beta < smallest_beta && beta < max_beta) {
@@ -587,7 +592,9 @@ public:
     igraph_real_t worstDist() const {
         return max_radius;
     }
+
     void sort() {}
+
     igraph_real_t thresholdBeta() const {
         return smallest_beta;
     }
@@ -617,7 +624,12 @@ public:
  *
  * Time complexity: TODO
  */
-igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector_t *edge_weights, const igraph_matrix_t *points, igraph_real_t max_beta) {
+igraph_error_t igraph_beta_weighted_gabriel_graph(
+    igraph_t *graph,
+    igraph_vector_t *edge_weights,
+    const igraph_matrix_t *points,
+    igraph_real_t max_beta) {
+
     igraph_vector_int_t edges;
     igraph_vector_int_init(&edges, 0);
     igraph_integer_t dim = igraph_matrix_ncol(points);
@@ -645,7 +657,6 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(igraph_t *graph, igraph_vector
 
         tree.findNeighbors(finder, VECTOR(midpoint));
         VECTOR(*edge_weights)[i] = finder.thresholdBeta();
-
     }
 
     // Filter out edges with beta == 0.
@@ -702,6 +713,7 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
     return IGRAPH_SUCCESS;
 }
+
 /**
  * \function igraph_relative_neighborhood_graph
  * \brief Calculate the relative neighborhood graph of a point set.

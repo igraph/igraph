@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include "igraph_spatial.h"
 #include "test_utilities.h"
 
 int main(void) {
