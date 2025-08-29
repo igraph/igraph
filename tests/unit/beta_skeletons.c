@@ -51,14 +51,28 @@ int main(void) {
                                            1.0000000000000000000000000000000000000000000000000, 0, \
                                            2.0000000000000000000000000000000000000000000000000, 0
                                           };
+    igraph_real_t rotated_square_lattice_points[] = {
+        -0.3594924531727418, 1.3677591805986329, -1.2231182700584293,
+        1.8718925443115786, -2.0867440869441167, 2.3760259080245243,
+        -2.950369903829804, 2.8801592717374698, 0.14464091054020378,
+        2.2313849974843203, -0.7189849063454836, 2.7355183611972658,
+        -1.582610723231171, 3.2396517249102117, -2.4462365401168586,
+        3.743785088623157, 0.6487742742531495, 3.0950108143700077,
+        -0.21485154263253792, 3.5991441780829536, -1.0784773595182253,
+        4.103277541795899, -1.9421031764039127, 4.607410905508845,
+        1.152907637966095, 3.958636631255695, 0.28928182108040756,
+        4.462769994968641, -0.5743439958052798, 4.966903358681586,
+        -1.4379698126909672, 5.4710367223945315
+    };
 
-    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat, point_3d_mat, trig_lattice;
+    igraph_matrix_t point_mat, point_small_mat, point_singleton_mat, point_null_mat, point_3d_mat, trig_lattice, rot_square_lattice;
 
     igraph_matrix_init_array(&point_mat, points, 25, 2, false);
     igraph_matrix_init_array(&point_small_mat, points, 2, 2, false);
     igraph_matrix_init_array(&point_singleton_mat, points, 1, 2, false);
     igraph_matrix_init_array(&point_null_mat, points, 0, 2, false);
 
+    igraph_matrix_init_array(&rot_square_lattice, rotated_square_lattice_points, 16, 2, false);
     igraph_matrix_init_array(&trig_lattice, trig_lattice_points, 10, 2, false);
     igraph_matrix_init_array(&point_3d_mat, points, 10, 3, false);
 
@@ -151,6 +165,12 @@ int main(void) {
     print_graph_canon(&graph);
     igraph_destroy(&graph);
 
+    printf("Gabriel graph of rotated square lattice\n");
+    igraph_gabriel_graph(&graph, &rot_square_lattice);
+    print_graph_canon(&graph);
+    igraph_destroy(&graph);
+
+    igraph_matrix_destroy(&rot_square_lattice);
     igraph_matrix_destroy(&trig_lattice);
     igraph_matrix_destroy(&point_3d_mat);
     igraph_matrix_destroy(&point_mat);

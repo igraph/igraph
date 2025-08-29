@@ -307,3 +307,32 @@ directed: false
 vcount: 10
 edges: {
 }
+Gabriel graph of rotated square lattice
+directed: false
+vcount: 16
+edges: {
+0 1
+0 4
+1 2
+1 5
+2 3
+2 6
+3 7
+4 5
+4 8
+5 6
+5 9
+6 7
+6 10
+7 11
+8 9
+8 12
+9 10
+9 13
+10 11
+10 14
+11 15
+12 13
+13 14
+14 15
+}
