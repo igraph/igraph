@@ -16,23 +16,24 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_constants.h"
+#include "igraph_spatial.h"
+
 #include "igraph_constructors.h"
 #include "igraph_error.h"
 #include "igraph_matrix.h"
-#include "igraph_spatial.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-#include "spatial/spatial_internal.h"
 #include "spatial/nanoflann_internal.hpp"
+#include "spatial/spatial_internal.h"
 
 #include <cfloat>
 
 #define TOLERANCE (128 * DBL_EPSILON)
 
 // Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
-static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b, const igraph_matrix_t *points) {
+static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b,
+                                                 const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_integer_t dims = igraph_matrix_ncol(points);
     for (igraph_integer_t i = 0; i < dims; i++) {
@@ -94,7 +95,6 @@ public:
         return true;
     }
 
-
     void sort() const {}
 
     igraph_real_t worstDist() const {
@@ -107,7 +107,7 @@ public:
         if (dist < radius && index != a && index != b) {
             found += 1;
             if (short_circuit) {
-                // Dont continue searching if it only matters if there's one or more.
+                // Don't continue searching if it only matters if there's one or more.
                 return false;
             }
         }
@@ -203,7 +203,7 @@ static igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
     } else {
         // Small beta, not subset of delaunay, give complete graph.
         // Or delaunay not calculable due to point count
-        // TODO: update when/if delaunay supports small numbers.
+        // TODO: update when/if Delaunay supports small numbers.
         igraph_integer_t numpoints = igraph_matrix_nrow(points);
         for (igraph_integer_t a = 0; a < numpoints - 1; a++) {
             for (igraph_integer_t b = a + 1; b < numpoints; b++) {
