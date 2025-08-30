@@ -146,5 +146,5 @@ int main(void) {
     bench_gabriel(++test_nr, 1000, 3, 2);
     bench_gabriel(++test_nr, 10000, 3, 2);
     bench_gabriel(++test_nr, 100000, 3, 2);
-    return 1;
+    return 0;
 }
