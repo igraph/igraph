@@ -289,7 +289,7 @@ igraph_error_t igraph_layout_sugiyama(
     igraph_integer_t no_of_components;  /* number of components of the original graph */
     igraph_vector_int_t membership;         /* components of the original graph */
     igraph_vector_int_t layers_own;  /* layer indices after having eliminated empty layers */
-    igraph_real_t dx = 0, dx2 = 0; /* displacement of the current component on the X axis */
+    igraph_real_t dx = 0;   /* displacement of the current component on the X axis */
     igraph_vector_t layer_to_y; /* mapping from layer indices to final Y coordinates */
     igraph_matrix_t *control_points;
 
@@ -402,7 +402,9 @@ igraph_error_t igraph_layout_sugiyama(
                     /* Edge goes within the same layer, we don't need this in the
                      * layered graph */
                 } else if (VECTOR(layers_own)[i] > VECTOR(layers_own)[nei]) {
-                    /* Edge goes upwards, we have to flip it */
+                    /* Edge goes upwards, we have to flip it and then later on we need to traverse
+                     * its control points in reverse order. We remember that we need to flip it
+                     * by storing -eid-1 in `new_vertex_id_to_edge_id` instead of eid */
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist,
                                                          VECTOR(old2new_vertex_ids)[nei]));
                     for (l = VECTOR(layers_own)[nei] + 1;
@@ -410,7 +412,7 @@ igraph_error_t igraph_layout_sugiyama(
                         IGRAPH_CHECK(igraph_vector_int_push_back(&new_layers, l));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist, next_new_vertex_id));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist, next_new_vertex_id++));
-                        IGRAPH_CHECK(igraph_vector_int_push_back(&new_vertex_id_to_edge_id, eid));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&new_vertex_id_to_edge_id, -eid-1));
                     }
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edgelist,
                                                          VECTOR(old2new_vertex_ids)[i]));
@@ -437,8 +439,10 @@ igraph_error_t igraph_layout_sugiyama(
             igraph_matrix_t layout;
             igraph_i_layering_t layering;
             igraph_t subgraph;
-            igraph_real_t x;
             igraph_integer_t eid;
+            igraph_real_t max_x;
+            igraph_bool_t flipped;
+            igraph_matrix_t *control_points;
 
             IGRAPH_CHECK(igraph_matrix_init(&layout, next_new_vertex_id, 2));
             IGRAPH_FINALLY(igraph_matrix_destroy, &layout);
@@ -470,40 +474,58 @@ igraph_error_t igraph_layout_sugiyama(
 
             /* Arrange rows of the layout into the result matrix, and at the same time, */
             /* adjust dx so that the next component does not overlap this one */
-            dx2 = dx;
+
             /* First we arrange the "real" vertices */
             for (i = 0; i < component_size; i++) {
-                x = MATRIX(layout, i, 0) + dx;
-                if (dx2 < x) {
-                    dx2 = x;
-                }
-
                 k = VECTOR(new2old_vertex_ids)[i];
-                MATRIX(*res, k, 0) = x;
+                MATRIX(*res, k, 0) = MATRIX(layout, i, 0) + dx;
                 MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
             }
-            /* Next we arrange the "dummy" vertices that become control points in the
-             * routing matrix list */
-            for (i = component_size; i < next_new_vertex_id; i++) {
-                /* TODO we might have to reverse the order of edges in the matrix
-                 * if the original edge pointed "upwards" in an undirected graph? */
-                x = MATRIX(layout, i, 0) + dx;
-                if (dx2 < x) {
-                    dx2 = x;
-                }
 
-                if (routing) {
+            /* Next we arrange the "dummy" vertices that become control points in the
+             * routing matrix list. Note that the dummy vertices were added in a way that
+             * the vertices that will become control points on an edge with a particular ID
+             * are always consecutive in `new_vertex_id_to_edge_id` so we can count the number
+             * of waypoints in an edg easily */
+            if (routing) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_vertex_id_to_edge_id, -1));   /* sentinel */
+                while (i < next_new_vertex_id) {
                     eid = VECTOR(new_vertex_id_to_edge_id)[i];
+
+                    /* Find out how many control points we have for this edge */
+                    for (j = i; VECTOR(new_vertex_id_to_edge_id)[j] == eid; j++);
+
+                    /* Is this edge flipped in the layered graph? If so, recover the original eid */
+                    flipped = eid < 0;
+                    if (flipped) {
+                        eid = -eid-1;
+                    }
+
                     control_points = igraph_matrix_list_get_ptr(routing, eid);
-                    k = igraph_matrix_nrow(control_points);
-                    /* TODO: Adding rows to a matrix is not as efficient as adding
-                     * columns; this could be made faster in the future */
-                    IGRAPH_CHECK(igraph_matrix_add_rows(control_points, 1));
-                    MATRIX(*control_points, k, 0) = x;
-                    MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
+                    IGRAPH_CHECK(igraph_matrix_resize(control_points, j - i, 2));
+
+                    if (flipped) {
+                        for (k = j - i - 1; i < j; k--, i++) {
+                            MATRIX(*control_points, k, 0) = MATRIX(layout, i, 0) + dx;
+                            MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
+                        }
+                    } else {
+                        for (k = 0; i < j; k++, i++) {
+                            MATRIX(*control_points, k, 0) = MATRIX(layout, i, 0) + dx;
+                            MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
+                        }
+                    }
                 }
             }
-            dx = dx2 + hgap;
+
+            /* Update the left margin for the next component */
+            max_x = 0;
+            for (i = 0; i < next_new_vertex_id; i++) {
+                if (MATRIX(layout, i, 0) > max_x) {
+                    max_x = MATRIX(layout, i, 0);
+                }
+            }
+            dx += max_x + hgap;
 
             igraph_destroy(&subgraph);
             igraph_i_layering_destroy(&layering);

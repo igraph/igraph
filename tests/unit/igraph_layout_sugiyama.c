@@ -29,7 +29,7 @@
 int main(void) {
     igraph_t g;
     igraph_matrix_t coords;
-    igraph_vector_int_t edgelist;
+    igraph_vector_int_t edgelist, edgelist2;
     igraph_matrix_list_t routing;
     igraph_vector_int_t layers;
 
@@ -42,7 +42,7 @@ int main(void) {
     igraph_vector_int_init_int_end(&edgelist, -1,
                                0, 1, 0, 2, 0, 3, 1, 2, 2, 2, 1, 4, 2, 5, 4, 6, 5, 7, 6, 8, 7, 8,
                                3, 8, 8, 1, 8, 2, -1);
-    igraph_create(&g, &edgelist, 0, 1);
+    igraph_create(&g, &edgelist, 0, IGRAPH_DIRECTED);
 
     igraph_layout_sugiyama(&g, &coords, 0, &layers,
                            /* hgap = */ 1,
@@ -86,13 +86,66 @@ int main(void) {
                            /* weights = */ 0);
     print_matrix(&coords);
     print_matrix_list(&routing);
-    igraph_vector_int_destroy(&layers);
     printf("\n");
 
-    igraph_vector_int_destroy(&edgelist);
-    igraph_matrix_destroy(&coords);
-    igraph_matrix_list_destroy(&routing);
     igraph_destroy(&g);
+    igraph_vector_int_destroy(&edgelist);
+    igraph_vector_int_destroy(&layers);
+
+    /* Check edge directions and the order of control points within edges */
+    igraph_vector_int_init_int_end(&edgelist, -1, 0, 1, 1, 2, 2, 3, 0, 3, 3, 0, -1);
+    igraph_vector_int_init_int_end(&layers, -1, 0, 1, 2, 3, -1);
+
+    printf("Path graph with two shortcuts, directed\n");
+    igraph_create(&g, &edgelist, 0, IGRAPH_DIRECTED);
+    igraph_vector_int_init(&edgelist2, 0);
+    igraph_get_edgelist(&g, &edgelist2, 0);
+    print_vector_int(&edgelist2);
+    igraph_vector_int_destroy(&edgelist2);
+    igraph_layout_sugiyama(&g, &coords, &routing, &layers,
+                           /* hgap = */ 1,
+                           /* vgap = */ 1,
+                           /* maxiter = */ 100,
+                           /* weights = */ 0);
+    print_matrix(&coords);
+    print_matrix_list(&routing);
+    igraph_destroy(&g);
+    printf("\n");
+
+    printf("Path graph with two shortcuts, undirected\n");
+    igraph_create(&g, &edgelist, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_int_init(&edgelist2, 0);
+    igraph_get_edgelist(&g, &edgelist2, 0);
+    print_vector_int(&edgelist2);
+    igraph_vector_int_destroy(&edgelist2);
+    igraph_layout_sugiyama(&g, &coords, &routing, &layers,
+                           /* hgap = */ 1,
+                           /* vgap = */ 1,
+                           /* maxiter = */ 100,
+                           /* weights = */ 0);
+    print_matrix(&coords);
+    print_matrix_list(&routing);
+    igraph_destroy(&g);
+    printf("\n");
+
+    printf("Path graph with two shortcuts, undirected, opposite layer order\n");
+    igraph_vector_int_reverse(&layers);
+    igraph_create(&g, &edgelist, 0, IGRAPH_UNDIRECTED);
+    igraph_layout_sugiyama(&g, &coords, &routing, &layers,
+                           /* hgap = */ 1,
+                           /* vgap = */ 1,
+                           /* maxiter = */ 100,
+                           /* weights = */ 0);
+    print_matrix(&coords);
+    print_matrix_list(&routing);
+    igraph_destroy(&g);
+    printf("\n");
+
+    igraph_vector_int_destroy(&layers);
+    igraph_vector_int_destroy(&edgelist);
+
+    igraph_matrix_list_destroy(&routing);
+    igraph_matrix_destroy(&coords);
 
     VERIFY_FINALLY_STACK();
 
