@@ -357,8 +357,6 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * \function igraph_degree_correlation_vector
  * \brief Degree correlation function.
  *
- * \experimental
- *
  * Computes the degree correlation function <code>k_nn(k)</code>, defined as the
  * mean degree of the targets of directed edges whose source has degree \c k.
  * The averaging is done over all directed edges. The \p from_mode and \p to_mode

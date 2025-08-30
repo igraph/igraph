@@ -115,7 +115,7 @@ IGRAPH_EXPORT igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *
                                                      igraph_vector_t *knn,
                                                      igraph_vector_t *knnk,
                                                      const igraph_vector_t *weights);
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
+IGRAPH_EXPORT igraph_error_t igraph_degree_correlation_vector(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_t *knnk,
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
