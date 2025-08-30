@@ -18,6 +18,7 @@
 
 #include "igraph_interface.h"
 #include "igraph_qsort.h"
+#include "igraph_random.h"
 
 #include "internal/utils.h"
 
@@ -187,4 +188,37 @@ void igraph_i_simplify_edge_list(
     }
 
     igraph_vector_int_resize(edges, j + 2); /* shrinks */
+}
+
+/**
+ * Shuffle a list of pairs, such as an edge list.
+ *
+ * \param pairs Vector of pairs, will be modified in-place.
+ * \return Error code, when the input is not of even length.
+ */
+igraph_error_t igraph_i_vector_int_shuffle_pairs(igraph_vector_int_t *pairs) {
+    igraph_integer_t pair_count = igraph_vector_int_size(pairs);
+
+    if (pair_count % 2 == 1) {
+        IGRAPH_ERROR("A vector of pairs must have an even length.", IGRAPH_EINVAL);
+    }
+
+    pair_count /= 2;
+    while (pair_count > 1) {
+        igraph_integer_t dummy, k;
+
+        pair_count--;
+        k = RNG_INTEGER(0, pair_count);
+
+        dummy = VECTOR(*pairs)[pair_count * 2];
+        VECTOR(*pairs)[pair_count * 2] = VECTOR(*pairs)[k * 2];
+
+        VECTOR(*pairs)[k * 2] = dummy;
+        dummy = VECTOR(*pairs)[pair_count * 2 + 1];
+
+        VECTOR(*pairs)[pair_count * 2] = VECTOR(*pairs)[k * 2 + 1];
+        VECTOR(*pairs)[k * 2 + 1] = dummy;
+    }
+
+    return IGRAPH_SUCCESS;
 }
