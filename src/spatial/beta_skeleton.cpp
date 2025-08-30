@@ -647,7 +647,8 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     igraph_vector_int_t edges;
-    igraph_vector_int_init(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
     igraph_integer_t dim = igraph_matrix_ncol(points);
     igraph_integer_t point_count = igraph_matrix_nrow(points);
     ig_point_adaptor adaptor(points);
@@ -695,7 +696,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
 
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&midpoint);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
 
