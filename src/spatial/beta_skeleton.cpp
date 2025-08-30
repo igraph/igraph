@@ -719,7 +719,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  * with <code>β=1</code>.
  *
  * \param graph A pointer to the graph to be created.
- * \param pointes The point set that will be used. Each row is a point,
+ * \param points The point set that will be used. Each row is a point,
  *    dimensionality is inferred from column count.
  *
  * \return Error Code.
