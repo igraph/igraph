@@ -3237,7 +3237,7 @@ igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vect
  *
  * </para><para>
  * The multiplicities of the individual elements are treated consistently with
- * \ref igraph_vector_difference_sorted() and \ref igraph_vector_intersection_sorted():
+ * \ref igraph_vector_difference_sorted() and \ref igraph_vector_intersect_sorted():
  * The algorithm keeps the multiplicities of the elements: if an element appears
  * \c k1 times in the first vector and \c k2 times in the second, the intersection
  * vector will include that element <code>min(k1, k2)</code> times, while the

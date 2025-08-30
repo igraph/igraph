@@ -34,4 +34,6 @@ void igraph_i_simplify_edge_list(
         igraph_bool_t self_loops, igraph_bool_t multi_edges,
         igraph_bool_t directed);
 
+igraph_error_t igraph_i_vector_int_shuffle_pairs(igraph_vector_int_t *pairs);
+
 #endif /* IGRAPH_INTERNAL_UTILS_H */
