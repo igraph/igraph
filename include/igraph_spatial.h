@@ -43,7 +43,7 @@ IGRAPH_EXPORT igraph_error_t igraph_circle_beta_skeleton(
 
 IGRAPH_EXPORT igraph_error_t igraph_beta_weighted_gabriel_graph(
     igraph_t *graph,
-    igraph_vector_t *edge_weights,
+    igraph_vector_t *weights,
     const igraph_matrix_t *points,
     igraph_real_t max_beta
 );

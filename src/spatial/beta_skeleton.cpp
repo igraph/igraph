@@ -415,32 +415,27 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
 
 /**
  * \function igraph_lune_beta_skeleton
- * \brief computes the lune based beta skeleton of a spatial point set.
+ * \brief The lune based β-skeleton of a spatial point set.
  *
  * \experimental
  *
- * This function constructs the graph corresponding to the lune based Delaunay triangulation
- * of an n-dimensional spatial point set.
- *
- * </para><para>
- * Two points are connected if a region between them whose shape is parameterized by beta
- * is free of other points.
+ * This function constructs the lune-based β-skeleton of an n-dimensional
+ * spatial point set.
  *
  * </para><para>
  * A larger β results in a larger region, and a sparser graph.
- *
- * </para><para>
  * Values of β &lt; 1 are only supported in 2D, and are considerably slower.
  *
-  * </para><para>
- * The Gabriel graph is a special case of beta skeleton where β = 1.
+ * </para><para>
+ * The Gabriel graph is a special case of beta skeleton where <code>β = 1</code>.
  *
-  * </para><para>
- * The Relative Neighborhood graph is a special case of beta skeleton where β = 2.
+ * </para><para>
+ * The Relative Neighborhood graph is a special case of beta skeleton where
+ * β approaches
  *
  * \param graph A pointer to the graph that will be created.
- * \param points A matrix containing the points that will be used to create the graph.
- *     Each row is a point, dimensionality is inferred from the column count.
+ * \param points A matrix containing the points that will be used to create the
+ *     graph. Each row is a point, dimensionality is inferred from the column count.
  *
  * \return Error code.
  */
@@ -474,23 +469,19 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
 
 /**
  * \function igraph_circle_beta_skeleton
- * \brief Computes the circle based beta skeleton of a 2d spatial point set.
+ * \brief The circle based β-skeleton of a 2D spatial point set.
  *
  * \experimental
  *
- * This function constructs the graph corresponding to the circle based Delaunay
- * triangulation of a 2-dimensional spatial point set.
+ * This function constructs the circle based β-skeleton of a 2D spatial point set.
  *
- * Two points are connected if a region between them whose shape is
- * parameterized by beta is free of other points.
- *
- * A larger beta results in a larger region, and a sparser graph.
- *
+ * </para><para>
+ * A larger \p beta value results in a larger region, and a sparser graph.
  * Values of beta &lt; 1 are considerably slower
  *
- * \param graph A pointer to the graph that will be created
- * \param points A Matrix containing the points that will be used to create the graph.
- *     Each row is a point.
+ * \param graph A pointer to the graph that will be created.
+ * \param points An n-by-2 matrix containing the points that will be used to
+ *    create the graph. Each row is a point.
  * \param beta A positive real value used to parameterize the graph.
  * \return Error code.
  */
@@ -616,31 +607,40 @@ public:
 
 /**
  * \function igraph_beta_weighted_gabriel_graph
- *
- *  \brief Computes a weighted graph where edge weight represent the beta value at which the edge would disappear.
+ * \brief A Gabriel graph, with edges weighted by the β value at which it disappears.
  *
  * \experimental
  *
- * This function computes a gabriel graph, where the weight of each edge represents
- *   the value of beta at which the edge would disappear in a lune based beta skeleton.
- * Larger values of max_beta are slower to calculate.
+ * This function generates a Gabriel graph, and for each edge of this graph it
+ * computes the threshold β value at which the edge ceases to be part of the
+ * lune-based β-skeleton. For edges that continue to be part of β-skeletons
+ * for arbitrarily large β, \c IGRAPH_INFINITΥ is returned.
+ *
+ * </para><para>
+ * The \p max_beta cutoff parameter controls the largest β value to consider
+ * For edges that persist above this β value, \c IGRAPH_INFINITΥ is returned.
+ * This parameter serves to improve performance: the smaller this cutoff,
+ * the faster the computation. Pass \c IGRAPH_INFINITY to use no cutoff.
  *
  * \param graph A pointer to the graph that will be created.
- * \param edge_weights Will contain the edge weights corresponding to the edge indices from the graph.
+ * \param weights Will contain the edge weights corresponding to the edge
+ *    indices from the graph.
  * \param points A matrix containing the points that will be used.
- *     Each row is a point, dimensionality is inferred from the column count.
+ *    Each row is a point, dimensionality is inferred from the column count.
  *    There must be no duplicate points.
- * \param max_beta Maximum value of beta to search to, higher values will be represented as infinity.
+ * \param max_beta Maximum value of beta to search to, higher values will be
+ *    represented as \c IGRAPH_INFINITY.
  * \return Error code.
  *
- * \sa \ref igraph_lune_beta_skeleton() or \ref igraph_circle_beta_skeleton() to generate a graph with a given value of beta.
- *   \ref igraph_gabriel_graph() to only generate a gabriel graph.
+ * \sa \ref igraph_lune_beta_skeleton() or \ref igraph_circle_beta_skeleton()
+ * to generate a graph with a given value of beta; \ref igraph_gabriel_graph()
+ * to only generate a Gabriel graph, without edge weights.
  *
  * Time complexity: TODO
  */
 igraph_error_t igraph_beta_weighted_gabriel_graph(
         igraph_t *graph,
-        igraph_vector_t *edge_weights,
+        igraph_vector_t *weights,
         const igraph_matrix_t *points,
         igraph_real_t max_beta) {
 
@@ -655,7 +655,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
     igraph_integer_t edge_count = igraph_vector_int_size(&edges) / 2;
 
-    IGRAPH_CHECK(igraph_vector_resize(edge_weights, edge_count));
+    IGRAPH_CHECK(igraph_vector_resize(weights, edge_count));
 
     KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
@@ -674,14 +674,14 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
         }
 
         tree.findNeighbors(finder, VECTOR(midpoint));
-        VECTOR(*edge_weights)[i] = finder.thresholdBeta();
+        VECTOR(*weights)[i] = finder.thresholdBeta();
     }
 
     // Filter out edges with beta == 0.
     igraph_integer_t added_edges = 0;
     for (igraph_integer_t i = 0; i < edge_count; i++) {
-        if (VECTOR(*edge_weights)[i] != 0) {
-            VECTOR(*edge_weights)[added_edges] = VECTOR(*edge_weights)[i];
+        if (VECTOR(*weights)[i] != 0) {
+            VECTOR(*weights)[added_edges] = VECTOR(*weights)[i];
             VECTOR(edges)[added_edges * 2] = VECTOR(edges)[i * 2];
             VECTOR(edges)[added_edges * 2 + 1] = VECTOR(edges)[i * 2 + 1];
             added_edges += 1;
@@ -689,7 +689,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, added_edges * 2));
-    IGRAPH_CHECK(igraph_vector_resize(edge_weights, added_edges));
+    IGRAPH_CHECK(igraph_vector_resize(weights, added_edges));
 
     IGRAPH_CHECK(igraph_create(graph, &edges, point_count, false));
 
@@ -704,13 +704,18 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
 
 /**
  * \function igraph_gabriel_graph
- * \brief Generates the gabriel graph of a point set.
+ * \brief The Gabriel graph of a point set.
  *
  * \experimental
  *
- * This function computes the gabriel graph of a point set. The Gabriel graph
- * is constructed by connecting any two points if there is no point in a circle
- * between them.
+ * In the Gabriel graph of a point set, two points A and B are connected if
+ * there is no other point C within the closed ball of which AB is a diameter.
+ * The Gabriel graph is connected, and in 2D it is planar. igraph supports
+ * computing the Gabriel graph of arbitrary dimensional point sets.
+ *
+ * </para><para>
+ * The Gabriel graph is a special case of lune-based and circle-based β-skeletons
+ * with <code>β=1</code>.
  *
  * \param graph A pointer to the graph to be created.
  * \param pointes The point set that will be used. Each row is a point,
@@ -743,22 +748,33 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
 /**
  * \function igraph_relative_neighborhood_graph
- * \brief Calculate the relative neighborhood graph of a point set.
+ * \brief The relative neighborhood graph of a point set.
  *
  * \experimental
  *
- * This function calculates the relative neighborhood graph of a point set.
- * The relative neighborhood graph is the graph such that any two points
- * a and b are connected if there is no point p strictly closer to each of them.
+ * The relative neighborhood graph is constructed from a set of points in space.
+ * Two points A and B are connected if and only if there is no other point C so
+ * that AC &lt; AB and BC &lt; AB, with the inequalities being strict.
+ *
+ * </para><para>
+ * Most authors define the relative neighborhood graph to coincide with a
+ * lune-based β-skeleton for <code>β = 2</code>. In igraph, there is a subtle
+ * difference: the <code>β = 2</code> skeleton connects points A and B when there
+ * is no point C so that AC &lt;= AB and BC &lt;= AB. Therefore, three points
+ * forming an equilateral triangle are connected in the relative neighborhood graph,
+ * but disconnected in the <code>β = 2</code> skeleton.
+ *
+ * </para><para>
+ * With these definitions, the relative neighborhood graph is always connected,
+ * while the <code>β = 2</code> skeleton is always triangle-free.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points The point set that will be used, each row is a point.
  *     Dimensionality is inferred from the column number.
- *
  * \return Error code.
  *
- * \sa The relative neighborhood graph is a special case of \ref igraph_lune_beta_skeleton()
- *     where beta = 2, but it has a closed exclusion region.
+ * \sa \ref igraph_lune_beta_skeleton() to compute the lune based β-skeleton
+ * for <code>β = 2</code> or other β values.
  */
 igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_matrix_t *points) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
