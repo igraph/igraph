@@ -713,8 +713,8 @@ igraph_pagerank:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT VERTEX_QTY vector, OUT REAL value,
-        REAL damping=0.85, BOOLEAN directed=True, 
-        VERTEX_SELECTOR vids=ALL, 
+        REAL damping=0.85, BOOLEAN directed=True,
+        VERTEX_SELECTOR vids=ALL,
         PAGERANKALGO algo=PRPACK,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
@@ -740,7 +740,7 @@ igraph_personalized_pagerank_vs:
         PRIMARY OUT VERTEX_QTY vector, OUT REAL value,
         VERTEX_SELECTOR reset_vids,
         REAL damping=0.85, BOOLEAN directed=True,
-        VERTEX_SELECTOR vids=ALL, 
+        VERTEX_SELECTOR vids=ALL,
         PAGERANKALGO algo=PRPACK,
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
@@ -1524,8 +1524,7 @@ igraph_layout_merge_dla:
 
 igraph_layout_sugiyama:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, OPTIONAL OUT GRAPH extd_graph,
-        OPTIONAL OUT INDEX_VECTOR extd_to_orig_eids,
+        GRAPH graph, OUT MATRIX res, OPTIONAL OUT MATRIX_LIST routing,
         OPTIONAL INDEX_VECTOR layers,
         REAL hgap=1, REAL vgap=1, INTEGER maxiter=100,
         OPTIONAL EDGE_WEIGHTS weights
@@ -2627,15 +2626,15 @@ igraph_eulerian_cycle:
 igraph_fundamental_cycles:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
-        OUT EDGE_INDICES_LIST basis, 
+        OUT EDGE_INDICES_LIST basis,
         OPTIONAL VERTEX start,
         REAL bfs_cutoff=-1
     DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, 
-        OUT EDGE_INDICES_LIST basis, 
+        GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
+        OUT EDGE_INDICES_LIST basis,
         REAL bfs_cutoff=-1,
         BOOLEAN complete=True, BOOLEAN use_cycle_order=True
     DEPS: weights ON graph, basis ON graph
