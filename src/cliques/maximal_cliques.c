@@ -361,6 +361,8 @@ igraph_error_t igraph_i_maximal_cliques(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many cliques will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_independent_vertex_sets() to find maximal
@@ -451,6 +453,8 @@ igraph_error_t igraph_i_maximal_cliques_file(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many cliques will be output. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques().
@@ -502,6 +506,8 @@ igraph_error_t igraph_i_maximal_cliques_subset(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many cliques will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques().
