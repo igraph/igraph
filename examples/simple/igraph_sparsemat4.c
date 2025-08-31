@@ -69,6 +69,9 @@ int main(void) {
     /* Initialize the library. */
     igraph_setup();
 
+    /* Seed the RNG for reproducible results */
+    igraph_rng_seed(igraph_rng_default(), 123);
+
     /* lsolve */
 
 #define DIM 10
