@@ -429,6 +429,8 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the sets to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many independent vertex sets will be recorded.
+ *    If negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_largest_independent_vertex_sets(),
@@ -438,10 +440,12 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * \example examples/simple/igraph_independent_sets.c
  */
-igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
-                                   igraph_vector_int_list_t *res,
-                                   igraph_int_t min_size,
-                                   igraph_int_t max_size) {
+igraph_error_t igraph_independent_vertex_sets(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *res,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+
     igraph_int_t no_of_nodes;
     igraph_vector_int_t *indset;
     igraph_int_t *member_storage, *new_member_storage, *c1;
@@ -461,8 +465,27 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     if (max_size > no_of_nodes || max_size <= 0) {
         max_size = no_of_nodes;
     }
+    if (max_results < 0) {
+        max_results = IGRAPH_INTEGER_MAX;
+    }
 
     igraph_vector_int_list_clear(res);
+
+    /* Add size-1 indsets if requested */
+    if (min_size <= 1) {
+        igraph_int_t max_singletons_to_add =
+                (max_results > no_of_nodes) ? no_of_nodes : max_results;
+        IGRAPH_CHECK(igraph_vector_int_list_resize(res, max_singletons_to_add));
+        for (igraph_int_t i = 0; i < max_singletons_to_add; i++) {
+            indset = igraph_vector_int_list_get_ptr(res, i);
+            IGRAPH_CHECK(igraph_vector_int_push_back(indset, i));
+            --max_results;
+        }
+    }
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
@@ -482,15 +505,6 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     }
     indset_count = no_of_nodes;
     old_indset_count = 0;
-
-    /* Add size 1 indsets if requested */
-    if (min_size <= 1) {
-        IGRAPH_CHECK(igraph_vector_int_list_resize(res, no_of_nodes));
-        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
-            indset = igraph_vector_int_list_get_ptr(res, i);
-            IGRAPH_CHECK(igraph_vector_int_push_back(indset, i));
-        }
-    }
 
     for (igraph_int_t i = 2; i <= max_size && indset_count > 1; i++) {
 
@@ -520,11 +534,15 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
             for (igraph_int_t j = 0, k = 0; j < indset_count; j++, k += i) {
                 igraph_vector_int_view(&new_member_storage_view, new_member_storage + k, i);
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &new_member_storage_view));
+                if (--max_results == 0) {
+                    goto done;
+                }
             }
         }
 
     } /* i <= max_size && clique_count != 0 */
 
+done:
     IGRAPH_FREE(new_member_storage);
     IGRAPH_FREE(member_storage);
     igraph_lazy_adjlist_destroy(&al);
