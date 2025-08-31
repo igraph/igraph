@@ -76,7 +76,9 @@ IGRAPH_EXPORT igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_
 IGRAPH_EXPORT igraph_error_t igraph_weighted_cliques(
         const igraph_t *graph, const igraph_vector_t *vertex_weights,
         igraph_vector_int_list_t *res,
-        igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal);
+        igraph_bool_t maximal,
+        igraph_real_t min_weight, igraph_real_t max_weight,
+        igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_largest_weighted_cliques(
         const igraph_t *graph, const igraph_vector_t *vertex_weights,
