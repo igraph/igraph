@@ -41,8 +41,9 @@ int main(void) {
     igraph_vector_int_list_init(&res, 0);
 
     BENCH(" 1 Maximal cliques of almost complete graph",
-          igraph_maximal_cliques(&g, &res, /* min_size= */ 0,
-                                 /* max_size= */ 0);
+          igraph_maximal_cliques(&g, &res,
+                                 /* min_size= */ IGRAPH_UNLIMITED, /* max_size= */ IGRAPH_UNLIMITED,
+                                 /* max_results= */ IGRAPH_UNLIMITED);
          );
 
     igraph_destroy(&g);
