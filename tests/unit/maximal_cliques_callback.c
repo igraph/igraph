@@ -91,10 +91,10 @@ int main(void) {
     ud.list = &list;
 
     /* Check that the callback function finds the same cliques as igraph_maximal_cliques() */
-    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, &handler, (void *) &ud, 0, 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, 0, 0, &handler, (void *) &ud) == IGRAPH_SUCCESS);
 
     /* Check that the search can be stopped correctly */
-    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, 0, 0, &handler_stop, NULL) == IGRAPH_SUCCESS);
 
     igraph_vector_int_list_destroy(&list);
 
