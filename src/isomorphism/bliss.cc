@@ -537,7 +537,7 @@ igraph_error_t igraph_automorphism_group_bliss(
 /* The following license notice applies to the rest of this file */
 
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify

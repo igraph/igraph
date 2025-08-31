@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify

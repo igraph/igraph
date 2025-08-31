@@ -1,5 +1,5 @@
 /*
-  IGraph library.
+  igraph library.
   Constructing realizations of degree sequences and bi-degree sequences.
   Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 

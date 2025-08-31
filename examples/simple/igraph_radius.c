@@ -1,6 +1,6 @@
 /* vim:set ts=4 sts=4 sw=4 et: */
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge MA, 02139 USA
 

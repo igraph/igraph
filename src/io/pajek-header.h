@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi@rmki.kfki.hu>
    334 Harvard street, Cambridge MA, 02139 USA
 
