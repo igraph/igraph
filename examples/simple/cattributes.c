@@ -23,7 +23,7 @@
 void print_attributes(const igraph_t *g) {
     igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     igraph_vector_int_init(&gtypes, 0);
     igraph_vector_int_init(&vtypes, 0);

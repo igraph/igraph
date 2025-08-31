@@ -69,10 +69,10 @@ igraph_error_t igraph_compose(igraph_t *res,
                               igraph_vector_int_t *edge_map1,
                               igraph_vector_int_t *edge_map2) {
 
-    const igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
-    const igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
+    const igraph_int_t no_of_nodes_left = igraph_vcount(g1);
+    const igraph_int_t no_of_nodes_right = igraph_vcount(g2);
     const igraph_bool_t directed = igraph_is_directed(g1);
-    const igraph_integer_t no_of_nodes = no_of_nodes_left > no_of_nodes_right ?
+    const igraph_int_t no_of_nodes = no_of_nodes_left > no_of_nodes_right ?
                                              no_of_nodes_left : no_of_nodes_right;
     igraph_vector_int_t edges;
     igraph_vector_int_t neis1, neis2;
@@ -93,20 +93,20 @@ igraph_error_t igraph_compose(igraph_t *res,
         igraph_vector_int_clear(edge_map2);
     }
 
-    for (igraph_integer_t i = 0; i < no_of_nodes_left; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes_left; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
         IGRAPH_CHECK(igraph_incident(g1, &neis1, i, IGRAPH_OUT, IGRAPH_LOOPS));
         while (!igraph_vector_int_empty(&neis1)) {
-            const igraph_integer_t con = igraph_vector_int_pop_back(&neis1);
-            const igraph_integer_t v1 = IGRAPH_OTHER(g1, con, i);
+            const igraph_int_t con = igraph_vector_int_pop_back(&neis1);
+            const igraph_int_t v1 = IGRAPH_OTHER(g1, con, i);
             if (v1 < no_of_nodes_right) {
                 IGRAPH_CHECK(igraph_incident(g2, &neis2, v1, IGRAPH_OUT, IGRAPH_LOOPS));
             } else {
                 continue;
             }
             while (!igraph_vector_int_empty(&neis2)) {
-                const igraph_integer_t con2 = igraph_vector_int_pop_back(&neis2);
-                const igraph_integer_t v2 = IGRAPH_OTHER(g2, con2, v1);
+                const igraph_int_t con2 = igraph_vector_int_pop_back(&neis2);
+                const igraph_int_t v2 = IGRAPH_OTHER(g2, con2, v1);
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v2));
                 if (edge_map1) {

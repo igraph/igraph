@@ -23,7 +23,7 @@
 #define TOSTR1(x) #x
 #define TOSTR(x) TOSTR1(x)
 
-void tree_game(igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
+void tree_game(igraph_int_t n, igraph_bool_t directed, igraph_random_tree_t method) {
     igraph_t g;
     igraph_tree_game(&g, n, directed, method);
     igraph_destroy(&g);

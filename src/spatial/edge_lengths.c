@@ -59,9 +59,9 @@ igraph_error_t igraph_spatial_edge_lengths(
         const igraph_matrix_t *points,
         igraph_metric_t metric) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
-    const igraph_integer_t dim = igraph_matrix_ncol(points);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
+    const igraph_int_t dim = igraph_matrix_ncol(points);
 
     /* Validate input.
      *
@@ -92,12 +92,12 @@ igraph_error_t igraph_spatial_edge_lengths(
 
     /* Compute edge lengths. */
 
-    for (igraph_integer_t eid=0; eid < ecount; eid++) {
-        const igraph_integer_t from = IGRAPH_FROM(graph, eid);
-        const igraph_integer_t to = IGRAPH_TO(graph, eid);
+    for (igraph_int_t eid=0; eid < ecount; eid++) {
+        const igraph_int_t from = IGRAPH_FROM(graph, eid);
+        const igraph_int_t to = IGRAPH_TO(graph, eid);
         igraph_real_t length = 0.0;
 
-        for (igraph_integer_t i=0; i < dim; i++) {
+        for (igraph_int_t i=0; i < dim; i++) {
             igraph_real_t diff = MATRIX(*points, from, i) - MATRIX(*points, to, i);
 
             switch (metric) {

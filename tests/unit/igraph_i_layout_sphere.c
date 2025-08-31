@@ -29,7 +29,7 @@
 #include "test_utilities.h"
 
 int main(void) {
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_matrix_t m;
     igraph_real_t x, y, z, r;
 

@@ -22,7 +22,7 @@
 #include "test_utilities.h"
 
 /* initialise structures used in "get_widest_path(s)" algorithms */
-void init_vertices_and_edges(igraph_integer_t n,
+void init_vertices_and_edges(igraph_int_t n,
                             igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                             igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                             igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
@@ -70,7 +70,7 @@ void destroy_all(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1, igraph_
 
 /* confirm that all widest paths algorithms fail */
 void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res,
-                        igraph_integer_t source, igraph_integer_t destination,
+                        igraph_int_t source, igraph_int_t destination,
                         igraph_vs_t *from, igraph_vs_t *to,
                         igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                         igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
@@ -91,7 +91,7 @@ void run_widest_paths(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1, ig
 
 /* runs the path finding algorithms and asserts they succeed */
 void run_get_widest_paths(igraph_t *g, igraph_vector_t *w,
-                        igraph_integer_t source, igraph_integer_t destination,
+                        igraph_int_t source, igraph_int_t destination,
                         igraph_vs_t *to, igraph_neimode_t mode,
                         igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                         igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
@@ -109,11 +109,11 @@ void check_and_print_matrices(igraph_matrix_t *res1, igraph_matrix_t *res2) {
 }
 
 /* prints results of all widest path algorithms */
-void print_results(igraph_integer_t n, igraph_matrix_t *res1, igraph_matrix_t *res2,
+void print_results(igraph_int_t n, igraph_matrix_t *res1, igraph_matrix_t *res2,
                     igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                     igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                     igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
-    igraph_integer_t i;
+    igraph_int_t i;
 
     check_and_print_matrices(res1, res2);
     printf("\n");
@@ -145,7 +145,7 @@ void print_results(igraph_integer_t n, igraph_matrix_t *res1, igraph_matrix_t *r
 
 int main(void) {
 
-    igraph_integer_t n, m;
+    igraph_int_t n, m;
     igraph_t g;
     igraph_matrix_t res1, res2;
     igraph_vs_t from, to;

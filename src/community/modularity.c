@@ -120,16 +120,16 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
                       const igraph_bool_t directed,
                       igraph_real_t *modularity) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     const igraph_vector_int_t *p_membership;
     igraph_vector_int_t i_membership;
     igraph_bool_t using_i_membership = false;
     igraph_vector_t k_out, k_in;
-    igraph_integer_t min_cluster_id, max_cluster_id, no_of_partitions;
+    igraph_int_t min_cluster_id, max_cluster_id, no_of_partitions;
     igraph_real_t e; /* count/fraction of edges/weights within partitions */
     igraph_real_t m; /* edge count / weight sum */
-    igraph_integer_t c1, c2;
+    igraph_int_t c1, c2;
     /* Only consider the graph as directed if it actually is directed */
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_real_t directed_multiplier = (use_directed ? 1 : 2);
@@ -175,7 +175,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
             IGRAPH_ERROR("Weight vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = 0.0;
-        for (igraph_integer_t i = 0; i < ecount; i++) {
+        for (igraph_int_t i = 0; i < ecount; i++) {
             igraph_real_t w = VECTOR(*weights)[i];
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
@@ -191,7 +191,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
         }
     } else {
         m = ecount;
-        for (igraph_integer_t i = 0; i < ecount; i++) {
+        for (igraph_int_t i = 0; i < ecount; i++) {
             c1 = VECTOR(*p_membership)[ IGRAPH_FROM(graph, i) ];
             c2 = VECTOR(*p_membership)[ IGRAPH_TO(graph, i) ];
             if (c1 == c2) {
@@ -215,7 +215,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 
     if (m > 0) {
         *modularity = e;
-        for (igraph_integer_t i = 0; i < no_of_partitions; i++) {
+        for (igraph_int_t i = 0; i < no_of_partitions; i++) {
             *modularity -= resolution * VECTOR(k_out)[i] * VECTOR(k_in)[i];
         }
     } else {
@@ -240,8 +240,8 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
 
     /* Specifically used to handle weights and/or ignore direction */
     igraph_eit_t edgeit;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t from, to;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t from, to;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_null(res);
@@ -250,7 +250,7 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
 
     if (weights) {
         for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_int_t edge = IGRAPH_EIT_GET(edgeit);
             from = IGRAPH_FROM(graph, edge);
             to = IGRAPH_TO(graph, edge);
             MATRIX(*res, from, to) += VECTOR(*weights)[edge];
@@ -260,7 +260,7 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
         }
     } else {
         for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_int_t edge = IGRAPH_EIT_GET(edgeit);
             from = IGRAPH_FROM(graph, edge);
             to = IGRAPH_TO(graph, edge);
             MATRIX(*res, from, to) += 1;
@@ -325,8 +325,8 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                              igraph_matrix_t *modmat,
                              igraph_bool_t directed) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
     const igraph_real_t sw = weights ? igraph_vector_sum(weights) : no_of_edges;
     igraph_vector_t deg, in_deg, out_deg;
     igraph_real_t scaling_factor;
@@ -364,8 +364,8 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
 
         scaling_factor = resolution / sw;
 
-        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t j = 0; j < no_of_nodes; j++) {
+            for (igraph_int_t i = 0; i < no_of_nodes; i++) {
                 MATRIX(*modmat, i, j) -= VECTOR(out_deg)[i] * VECTOR(in_deg)[j] * scaling_factor;
             }
         }
@@ -380,8 +380,8 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
 
         scaling_factor = resolution / 2.0 / sw;
 
-        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t j = 0; j < no_of_nodes; j++) {
+            for (igraph_int_t i = 0; i < no_of_nodes; i++) {
                 MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] * scaling_factor;
             }
         }

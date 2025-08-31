@@ -123,7 +123,7 @@ public:
 class Communities {
 private:
     igraph_matrix_int_t *merges;
-    igraph_integer_t mergeidx;
+    igraph_int_t mergeidx;
     igraph_vector_t *modularity;
 
 public:

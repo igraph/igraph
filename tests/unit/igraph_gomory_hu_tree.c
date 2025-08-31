@@ -26,13 +26,13 @@
 
 igraph_error_t validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
-    igraph_integer_t n = igraph_vcount(graph);
-    igraph_integer_t no_of_clusters, min_weight_edge_index;
+    igraph_int_t n = igraph_vcount(graph);
+    igraph_int_t no_of_clusters, min_weight_edge_index;
     igraph_vector_int_t edges;
     igraph_vector_int_t membership;
     igraph_real_t min_weight, flow_value;
     igraph_t copy;
-    igraph_integer_t i, j, k, m;
+    igraph_int_t i, j, k, m;
 
     if (igraph_vcount(tree) != n) {
         printf("Gomory-Hu tree should have %" IGRAPH_PRId " vertices\n", n);

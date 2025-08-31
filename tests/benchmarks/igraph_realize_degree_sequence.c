@@ -24,8 +24,8 @@
 #define TOSTR(x) TOSTR1(x)
 
 void bench(const igraph_t *graph, const char *what, int rep) {
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_int_t degrees;
     igraph_t new_graph;
 
@@ -50,14 +50,14 @@ void bench(const igraph_t *graph, const char *what, int rep) {
     igraph_vector_int_destroy(&degrees);
 }
 
-void bench_gnm(igraph_integer_t n, igraph_integer_t m, int rep) {
+void bench_gnm(igraph_int_t n, igraph_int_t m, int rep) {
     igraph_t graph;
     igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     bench(&graph, "G(n,m)", rep);
     igraph_destroy(&graph);
 }
 
-void bench_ba(igraph_integer_t n, igraph_integer_t m, int rep) {
+void bench_ba(igraph_int_t n, igraph_int_t m, int rep) {
     igraph_t graph;
     igraph_barabasi_game(&graph, n, 1, m, NULL, true, 0, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE, NULL);
     bench(&graph, "BA", rep);

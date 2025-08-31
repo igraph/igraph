@@ -118,14 +118,14 @@ igraph_error_t igraph_union_many(
     igraph_vector_int_list_t *edgemaps
 ) {
 
-    igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
-    igraph_integer_t no_of_nodes = 0;
+    igraph_int_t no_of_graphs = igraph_vector_ptr_size(graphs);
+    igraph_int_t no_of_nodes = 0;
     igraph_bool_t directed = true;
     igraph_vector_int_t edges;
     igraph_vector_int_list_t edge_vects, order_vects;
     igraph_vector_int_t no_edges;
-    igraph_integer_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
-    igraph_integer_t idx = 0;
+    igraph_int_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
+    igraph_int_t idx = 0;
 
     /* Check directedness */
     if (no_of_graphs != 0) {
@@ -145,7 +145,7 @@ igraph_error_t igraph_union_many(
 
     /* Calculate number of nodes, query number of edges */
     for (i = 0; i < no_of_graphs; i++) {
-        igraph_integer_t n = igraph_vcount(VECTOR(*graphs)[i]);
+        igraph_int_t n = igraph_vcount(VECTOR(*graphs)[i]);
         if (n > no_of_nodes) {
             no_of_nodes = n;
         }
@@ -166,14 +166,14 @@ igraph_error_t igraph_union_many(
 
     /* Query and sort the edge lists */
     for (i = 0; i < no_of_graphs; i++) {
-        igraph_integer_t k, j, n = VECTOR(no_edges)[i];
+        igraph_int_t k, j, n = VECTOR(no_edges)[i];
         igraph_vector_int_t *ev = igraph_vector_int_list_get_ptr(&edge_vects, i);
         igraph_vector_int_t *order = igraph_vector_int_list_get_ptr(&order_vects, i);
         IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], ev, /*bycol=*/ false));
         if (!directed) {
             for (k = 0, j = 0; k < n; k++, j += 2) {
                 if (VECTOR(*ev)[j] > VECTOR(*ev)[j + 1]) {
-                    igraph_integer_t tmp = VECTOR(*ev)[j];
+                    igraph_int_t tmp = VECTOR(*ev)[j];
                     VECTOR(*ev)[j] = VECTOR(*ev)[j + 1];
                     VECTOR(*ev)[j + 1] = tmp;
                 }
@@ -195,9 +195,9 @@ igraph_error_t igraph_union_many(
             igraph_vector_int_t *order = igraph_vector_int_list_get_ptr(&order_vects, j);
             if (!igraph_vector_int_empty(order)) {
                 igraph_vector_int_t *ev = igraph_vector_int_list_get_ptr(&edge_vects, j);
-                igraph_integer_t edge = igraph_vector_int_tail(order);
-                igraph_integer_t from = VECTOR(*ev)[2 * edge];
-                igraph_integer_t to = VECTOR(*ev)[2 * edge + 1];
+                igraph_int_t edge = igraph_vector_int_tail(order);
+                igraph_int_t from = VECTOR(*ev)[2 * edge];
+                igraph_int_t to = VECTOR(*ev)[2 * edge + 1];
                 if (from > tailfrom || (from == tailfrom && to > tailto)) {
                     tailfrom = from; tailto = to;
                 }
@@ -216,9 +216,9 @@ igraph_error_t igraph_union_many(
             igraph_vector_int_t *order = igraph_vector_int_list_get_ptr(&order_vects, j);
             if (!igraph_vector_int_empty(order)) {
                 igraph_vector_int_t *ev = igraph_vector_int_list_get_ptr(&edge_vects, j);
-                igraph_integer_t edge = igraph_vector_int_tail(order);
-                igraph_integer_t from = VECTOR(*ev)[2 * edge];
-                igraph_integer_t to = VECTOR(*ev)[2 * edge + 1];
+                igraph_int_t edge = igraph_vector_int_tail(order);
+                igraph_int_t from = VECTOR(*ev)[2 * edge];
+                igraph_int_t to = VECTOR(*ev)[2 * edge + 1];
                 if (from == tailfrom && to == tailto) {
                     igraph_vector_int_pop_back(order);
                     if (edgemaps) {

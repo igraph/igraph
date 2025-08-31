@@ -23,8 +23,8 @@
 void stress_test(void) {
     igraph_rng_seed(igraph_rng_default(), 137);
 
-    for (igraph_integer_t size=2; size < 5; size++) {
-        for (igraph_integer_t i=0; i < 100; i++) {
+    for (igraph_int_t size=2; size < 5; size++) {
+        for (igraph_int_t i=0; i < 100; i++) {
             igraph_t g;
             igraph_bool_t simple;
 
@@ -42,8 +42,8 @@ void stress_test(void) {
         }
     }
 
-    for (igraph_integer_t size=2; size < 5; size++) {
-        for (igraph_integer_t i=0; i < 100; i++) {
+    for (igraph_int_t size=2; size < 5; size++) {
+        for (igraph_int_t i=0; i < 100; i++) {
             igraph_t g;
             igraph_bool_t simple;
 

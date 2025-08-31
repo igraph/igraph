@@ -25,11 +25,11 @@
 
 //TODO make public?
 igraph_error_t igraph_is_same_graph_weighted(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res, igraph_vector_t *weights1, igraph_vector_t *weights2) {
-    igraph_integer_t nv1 = igraph_vcount(graph1);
-    igraph_integer_t nv2 = igraph_vcount(graph2);
-    igraph_integer_t ne1 = igraph_ecount(graph1);
-    igraph_integer_t ne2 = igraph_ecount(graph2);
-    igraph_integer_t i, eid1, eid2;
+    igraph_int_t nv1 = igraph_vcount(graph1);
+    igraph_int_t nv2 = igraph_vcount(graph2);
+    igraph_int_t ne1 = igraph_ecount(graph1);
+    igraph_int_t ne2 = igraph_ecount(graph2);
+    igraph_int_t i, eid1, eid2;
 
     *res = 0; /* Assume that the graphs differ */
 
@@ -146,7 +146,7 @@ int main(void) {
     igraph_matrix_t mat_sym;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 4, 0 }, { 0, 1, 0, 0 } };
     int m_sym[4][4] = { { 0, 2, 2, 0 }, { 2, 0, 0, 1 }, { 2, 0, 4, 0 }, { 0, 1, 0, 0 } };
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     printf("0x0 matrix\n");
     printf("==========\n\n");

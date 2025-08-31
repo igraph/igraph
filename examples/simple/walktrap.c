@@ -26,8 +26,8 @@ int main(void) {
     igraph_t g;
     igraph_matrix_int_t merges;
     igraph_vector_t modularity;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t i;
+    igraph_int_t no_of_nodes;
+    igraph_int_t i;
 
     /* Initialize the library. */
     igraph_setup();

@@ -23,7 +23,7 @@
 void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn, igraph_bool_t directed) {
     igraph_vector_int_t path_vertex, path_edge;
     igraph_real_t result;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
 
     igraph_vector_int_init(&path_edge, 0);
     igraph_vector_int_init(&path_vertex, 0);

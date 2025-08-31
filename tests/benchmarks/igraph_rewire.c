@@ -20,9 +20,9 @@
 #include "bench.h"
 
 void bench(const char *name, igraph_t *graph, int rep) {
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
-    igraph_integer_t trials = 10*ecount;
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
+    igraph_int_t trials = 10*ecount;
     char msg[200];
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
@@ -32,7 +32,7 @@ void bench(const char *name, igraph_t *graph, int rep) {
     BENCH(msg, REPEAT(igraph_rewire(graph, trials, IGRAPH_SIMPLE_SW), rep));
 }
 
-void bench_er(igraph_integer_t n, igraph_integer_t m, int rep) {
+void bench_er(igraph_int_t n, igraph_int_t m, int rep) {
     igraph_t graph;
 
     igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
@@ -42,7 +42,7 @@ void bench_er(igraph_integer_t n, igraph_integer_t m, int rep) {
     igraph_destroy(&graph);
 }
 
-void bench_ba(igraph_integer_t n, igraph_integer_t m, int rep) {
+void bench_ba(igraph_int_t n, igraph_int_t m, int rep) {
     igraph_t graph;
 
     igraph_barabasi_game(&graph, n, 1, m ,NULL, true, 1, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_BAG, NULL);

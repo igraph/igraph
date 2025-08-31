@@ -119,7 +119,7 @@ int main(void) {
     igraph_sparsemat_t A, B;
     igraph_matrix_t vectors, values2;
     igraph_vector_t values;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_arpack_options_t options;
     igraph_real_t min, max;
     igraph_t g1, g2, g3;

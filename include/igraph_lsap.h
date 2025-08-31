@@ -27,7 +27,7 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
+IGRAPH_EXPORT igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_int_t n,
                       igraph_vector_int_t *p);
 
 IGRAPH_END_C_DECLS

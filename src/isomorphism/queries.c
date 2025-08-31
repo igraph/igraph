@@ -100,8 +100,8 @@ static igraph_error_t igraph_i_isomorphic_small(
 igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
                       igraph_bool_t *iso) {
 
-    igraph_integer_t nodes1 = igraph_vcount(graph1), nodes2 = igraph_vcount(graph2);
-    igraph_integer_t edges1 = igraph_ecount(graph1), edges2 = igraph_ecount(graph2);
+    igraph_int_t nodes1 = igraph_vcount(graph1), nodes2 = igraph_vcount(graph2);
+    igraph_int_t edges1 = igraph_ecount(graph1), edges2 = igraph_ecount(graph2);
     igraph_bool_t dir1 = igraph_is_directed(graph1), dir2 = igraph_is_directed(graph2);
     igraph_bool_t loop1, loop2, multi1, multi2;
 
@@ -180,7 +180,7 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 igraph_error_t igraph_i_isomorphic_small(
     const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
 ) {
-    igraph_integer_t class1, class2;
+    igraph_int_t class1, class2;
     IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
     IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
     *iso = (class1 == class2);

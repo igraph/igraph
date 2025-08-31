@@ -42,9 +42,9 @@
 
 /* TODO: Slight speedup may be possible if repeated vertex count queries are avoided. */
 static int code_cmp(void *graph, const void *va, const void *vb) {
-    const igraph_integer_t *a = (const igraph_integer_t *) va;
-    const igraph_integer_t *b = (const igraph_integer_t *) vb;
-    const igraph_integer_t no_of_nodes = igraph_vcount((igraph_t *) graph);
+    const igraph_int_t *a = (const igraph_int_t *) va;
+    const igraph_int_t *b = (const igraph_int_t *) vb;
+    const igraph_int_t no_of_nodes = igraph_vcount((igraph_t *) graph);
     const igraph_bool_t directed = igraph_is_directed((igraph_t *) graph);
     const igraph_real_t codea = CODE(a[0], a[1]);
     const igraph_real_t codeb = CODE(b[0], b[1]);
@@ -59,7 +59,7 @@ static int code_cmp(void *graph, const void *va, const void *vb) {
 
 /* Sort an edge vector by edge codes. */
 static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
-    igraph_qsort_r(VECTOR(*edges), igraph_vector_int_size(edges) / 2, 2*sizeof(igraph_integer_t), (void *) graph, code_cmp);
+    igraph_qsort_r(VECTOR(*edges), igraph_vector_int_size(edges) / 2, 2*sizeof(igraph_int_t), (void *) graph, code_cmp);
 }
 
 /**
@@ -88,8 +88,8 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
                            igraph_real_t corr, igraph_real_t p,
                            const igraph_vector_int_t *permutation) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(old_graph);
-    igraph_integer_t no_of_edges = igraph_ecount(old_graph);
+    igraph_int_t no_of_nodes = igraph_vcount(old_graph);
+    igraph_int_t no_of_edges = igraph_ecount(old_graph);
     igraph_bool_t directed = igraph_is_directed(old_graph);
     igraph_real_t no_of_all = directed ? ((igraph_real_t) no_of_nodes) * (no_of_nodes - 1) :
                               ((igraph_real_t) no_of_nodes) * (no_of_nodes - 1) / 2;
@@ -100,10 +100,10 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_vector_t add, delete;
     igraph_vector_int_t edges, newedges;
     igraph_real_t last;
-    igraph_integer_t p_e = 0, p_a = 0, p_d = 0;
-    igraph_integer_t no_add, no_del;
+    igraph_int_t p_e = 0, p_a = 0, p_d = 0;
+    igraph_int_t no_add, no_del;
     igraph_real_t next_e, next_a, next_d;
-    igraph_integer_t i, newec;
+    igraph_int_t i, newec;
     igraph_bool_t simple;
 
     if (corr < 0 || corr > 1) {
@@ -138,7 +138,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         if (permutation) {
             newec = igraph_vector_int_size(&edges);
             for (i = 0; i < newec; i++) {
-                igraph_integer_t tmp = VECTOR(edges)[i];
+                igraph_int_t tmp = VECTOR(edges)[i];
                 VECTOR(edges)[i] = VECTOR(*permutation)[tmp];
             }
         }
@@ -194,9 +194,9 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     /* First we (re)code the edges to delete */
 
     for (i = 0; i < no_del; i++) {
-        igraph_integer_t td = VECTOR(delete)[i];
-        igraph_integer_t from = VECTOR(edges)[2 * td];
-        igraph_integer_t to = VECTOR(edges)[2 * td + 1];
+        igraph_int_t td = VECTOR(delete)[i];
+        igraph_int_t from = VECTOR(edges)[2 * td];
+        igraph_int_t to = VECTOR(edges)[2 * td + 1];
         VECTOR(delete)[i] = CODE(from, to);
     }
 
@@ -235,7 +235,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         } else {
 
             /* add an edge */
-            igraph_integer_t to, from;
+            igraph_int_t to, from;
             IGRAPH_ASSERT(isfinite(next_a));
             if (directed) {
                 to = floor(next_a / no_of_nodes);
@@ -262,7 +262,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     if (permutation) {
         newec = igraph_vector_int_size(&newedges);
         for (i = 0; i < newec; i++) {
-            igraph_integer_t tmp = VECTOR(newedges)[i];
+            igraph_int_t tmp = VECTOR(newedges)[i];
             VECTOR(newedges)[i] = VECTOR(*permutation)[tmp];
         }
     }
@@ -307,7 +307,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
  * to a given graph.
  */
 igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
-                                igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
+                                igraph_int_t n, igraph_real_t corr, igraph_real_t p,
                                 igraph_bool_t directed,
                                 const igraph_vector_int_t *permutation) {
 

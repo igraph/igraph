@@ -24,16 +24,16 @@
 #define TRANSIT_TRIEDGES
 #endif
 
-igraph_integer_t no_of_nodes = igraph_vcount(graph);
-igraph_integer_t node, i, j, nn;
+igraph_int_t no_of_nodes = igraph_vcount(graph);
+igraph_int_t node, i, j, nn;
 igraph_adjlist_t allneis;
 igraph_vector_int_t *neis1, *neis2;
-igraph_integer_t neilen1, neilen2;
-igraph_integer_t *neis;
-igraph_integer_t maxdegree;
+igraph_int_t neilen1, neilen2;
+igraph_int_t *neis;
+igraph_int_t maxdegree;
 
 #ifdef TRANSIT_TRIEDGES
-igraph_integer_t deg1;
+igraph_int_t deg1;
 #endif
 
 igraph_vector_int_t order;
@@ -68,7 +68,7 @@ for (i = 0; i < no_of_nodes; i++) {
 
 IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
 
-neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+neis = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
 IGRAPH_CHECK_OOM(neis, "Insufficient memory to count triangles.");
 IGRAPH_FINALLY(igraph_free, neis);
 
@@ -97,11 +97,11 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
     }
 
     for (i = 0; i < neilen1; i++) {
-        igraph_integer_t nei = VECTOR(*neis1)[i];
+        igraph_int_t nei = VECTOR(*neis1)[i];
         neis2 = igraph_adjlist_get(&allneis, nei);
         neilen2 = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen2; j++) {
-            igraph_integer_t nei2 = VECTOR(*neis2)[j];
+            igraph_int_t nei2 = VECTOR(*neis2)[j];
             if (neis[nei2] == node + 1) {
 #ifndef TRIANGLES
                 VECTOR(*res)[nei2] += 1;

@@ -40,18 +40,18 @@ has_path is set to 1 if a path exists, 0 otherwise
 has_cycle is set to 1 if a cycle exists, 0 otherwise
 */
 static igraph_error_t igraph_i_is_eulerian_undirected(
-        const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
-    igraph_integer_t odd;
+        const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_int_t *start_of_path) {
+    igraph_int_t odd;
     igraph_vector_int_t degree;
     igraph_vector_int_t csize;
     /* boolean vector to mark singletons: */
     igraph_vector_int_t nonsingleton;
-    igraph_integer_t i, n, vsize;
-    igraph_integer_t cluster_count;
+    igraph_int_t i, n, vsize;
+    igraph_int_t cluster_count;
     /* number of self-looping singletons: */
-    igraph_integer_t es;
+    igraph_int_t es;
     /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
-    igraph_integer_t ens;
+    igraph_int_t ens;
 
     n = igraph_vcount(graph);
 
@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_is_eulerian_undirected(
     es = 0;
     ens = 0;
     for (i = 0; i < n; i++) {
-        igraph_integer_t deg = VECTOR(degree)[i];
+        igraph_int_t deg = VECTOR(degree)[i];
         /* Eulerian is about edges, so skip free vertices */
         if (deg == 0) continue;
 
@@ -163,18 +163,18 @@ static igraph_error_t igraph_i_is_eulerian_undirected(
 
 
 static igraph_error_t igraph_i_is_eulerian_directed(
-        const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
-    igraph_integer_t incoming_excess, outgoing_excess, n;
-    igraph_integer_t i, vsize;
-    igraph_integer_t cluster_count;
+        const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_int_t *start_of_path) {
+    igraph_int_t incoming_excess, outgoing_excess, n;
+    igraph_int_t i, vsize;
+    igraph_int_t cluster_count;
     igraph_vector_int_t out_degree, in_degree;
     igraph_vector_int_t csize;
     /* boolean vector to mark singletons: */
     igraph_vector_int_t nonsingleton;
     /* number of self-looping singletons: */
-    igraph_integer_t es;
+    igraph_int_t es;
     /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
-    igraph_integer_t ens;
+    igraph_int_t ens;
 
     n = igraph_vcount(graph);
 
@@ -231,8 +231,8 @@ static igraph_error_t igraph_i_is_eulerian_directed(
     ens = 0;
     *start_of_path = -1;
     for (i = 0; i < n; i++) {
-        igraph_integer_t degin = VECTOR(in_degree)[i];
-        igraph_integer_t degout = VECTOR(out_degree)[i];
+        igraph_int_t degin = VECTOR(in_degree)[i];
+        igraph_int_t degout = VECTOR(out_degree)[i];
 
         /* Eulerian is about edges, so skip free vertices */
         if (degin + degout == 0) continue;
@@ -331,7 +331,7 @@ static igraph_error_t igraph_i_is_eulerian_directed(
  */
 
 igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
-    igraph_integer_t start_of_path = 0;
+    igraph_int_t start_of_path = 0;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, has_path, has_cycle, &start_of_path));
@@ -344,10 +344,10 @@ igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path
 
 static igraph_error_t igraph_i_eulerian_path_undirected(
         const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res,
-        igraph_integer_t start_of_path) {
+        igraph_int_t start_of_path) {
 
-    igraph_integer_t curr;
-    igraph_integer_t n, m;
+    igraph_int_t curr;
+    igraph_int_t n, m;
     igraph_inclist_t il;
     igraph_stack_int_t path, tracker, edge_tracker, edge_path;
     igraph_bitset_t visited_list;
@@ -388,8 +388,8 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
 
         if (VECTOR(degree)[curr] != 0) {
             igraph_vector_int_t *incedges;
-            igraph_integer_t nc, edge = -1;
-            igraph_integer_t j, next;
+            igraph_int_t nc, edge = -1;
+            igraph_int_t j, next;
             IGRAPH_CHECK(igraph_stack_int_push(&tracker, curr));
 
             incedges = igraph_inclist_get(&il, curr);
@@ -414,7 +414,7 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
 
             curr = next;
         } else { /* back track to find remaining circuit */
-            igraph_integer_t curr_e;
+            igraph_int_t curr_e;
             IGRAPH_CHECK(igraph_stack_int_push(&path, curr));
             curr = igraph_stack_int_pop(&tracker);
             if (!igraph_stack_int_empty(&edge_tracker)) {
@@ -452,10 +452,10 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
 static igraph_error_t igraph_i_eulerian_path_directed(
         const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res,
-        igraph_integer_t start_of_path) {
+        igraph_int_t start_of_path) {
 
-    igraph_integer_t curr;
-    igraph_integer_t n, m;
+    igraph_int_t curr;
+    igraph_int_t n, m;
     igraph_inclist_t il;
     igraph_stack_int_t path, tracker, edge_tracker, edge_path;
     igraph_bitset_t visited_list;
@@ -496,8 +496,8 @@ static igraph_error_t igraph_i_eulerian_path_directed(
 
         if (VECTOR(remaining_out_edges)[curr] != 0) {
             igraph_vector_int_t *incedges;
-            igraph_integer_t nc, edge = -1;
-            igraph_integer_t j, next;
+            igraph_int_t nc, edge = -1;
+            igraph_int_t j, next;
             IGRAPH_CHECK(igraph_stack_int_push(&tracker, curr));
 
             incedges = igraph_inclist_get(&il, curr);
@@ -521,7 +521,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
 
             curr = next;
         } else { /* back track to find remaining circuit */
-            igraph_integer_t curr_e;
+            igraph_int_t curr_e;
             IGRAPH_CHECK(igraph_stack_int_push(&path, curr));
             curr = igraph_stack_int_pop(&tracker);
             if (!igraph_stack_int_empty(&edge_tracker)) {
@@ -596,7 +596,7 @@ igraph_error_t igraph_eulerian_cycle(
 
     igraph_bool_t has_cycle;
     igraph_bool_t has_path;
-    igraph_integer_t start_of_path = 0;
+    igraph_int_t start_of_path = 0;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, &has_path, &has_cycle, &start_of_path));
@@ -658,7 +658,7 @@ igraph_error_t igraph_eulerian_path(
 
     igraph_bool_t has_cycle;
     igraph_bool_t has_path;
-    igraph_integer_t start_of_path = 0;
+    igraph_int_t start_of_path = 0;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, &has_path, &has_cycle, &start_of_path));

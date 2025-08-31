@@ -5,8 +5,8 @@ int main(void) {
     igraph_t graph;
     igraph_strvector_t names;
     igraph_vector_t weights;
-    igraph_integer_t i;
-    igraph_integer_t vcount, ecount;
+    igraph_int_t i;
+    igraph_int_t vcount, ecount;
 
     /* Initialize the library. */
     igraph_setup();

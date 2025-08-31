@@ -20,7 +20,7 @@
 
 int main(void) {
     igraph_t g;
-    igraph_integer_t eid;
+    igraph_int_t eid;
 
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
 

@@ -28,7 +28,7 @@
 
 int main(void) {
     igraph_i_cutheap_t ch;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_i_cutheap_init(&ch, 10);
 
@@ -36,7 +36,7 @@ int main(void) {
         igraph_i_cutheap_update(&ch, i, i);
     }
     while (!igraph_i_cutheap_empty(&ch)) {
-        igraph_integer_t idx = igraph_i_cutheap_popmax(&ch);
+        igraph_int_t idx = igraph_i_cutheap_popmax(&ch);
         printf("%" IGRAPH_PRId " ", idx);
     }
     printf("\n");

@@ -26,9 +26,9 @@ double sqr(double x) { return x*x; }
 
 igraph_error_t RKNN_neighbors(
         const igraph_real_t *arr,
-        igraph_integer_t num_points,
-        igraph_integer_t dims,
-        igraph_integer_t neighbors,
+        igraph_int_t num_points,
+        igraph_int_t dims,
+        igraph_int_t neighbors,
         igraph_real_t cutoff,
         igraph_metric_t metric) {
 
@@ -47,17 +47,17 @@ igraph_error_t RKNN_neighbors(
     IGRAPH_CHECK(igraph_matrix_init_array(&points, &arr[0], num_points, dims, IGRAPH_ROW_MAJOR));
     IGRAPH_FINALLY(igraph_matrix_destroy, &points);
 
-    for (igraph_integer_t start = 0; start < num_points - 1; start++) {
-        for (igraph_integer_t end = start + 1; end < num_points; end++) {
+    for (igraph_int_t start = 0; start < num_points - 1; start++) {
+        for (igraph_int_t end = start + 1; end < num_points; end++) {
             igraph_real_t distance = 0;
             switch (metric) {
             case IGRAPH_METRIC_L2:
-                for (igraph_integer_t i = 0; i < dims; i++) {
+                for (igraph_int_t i = 0; i < dims; i++) {
                     distance += sqr(MATRIX(points, start, i) - MATRIX(points, end, i));
                 }
                 break;
             case IGRAPH_METRIC_L1:
-                for (igraph_integer_t i = 0; i < dims; i++) {
+                for (igraph_int_t i = 0; i < dims; i++) {
                     distance += fabs(MATRIX(points, start, i) - MATRIX(points, end, i));
                 }
                 break;
@@ -82,11 +82,11 @@ igraph_error_t RKNN_neighbors(
     IGRAPH_MATRIX_INIT_FINALLY(&adj_mat, 0, 0);
     IGRAPH_CHECK(igraph_get_adjacency(&graph, &adj_mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS));
 
-    for (igraph_integer_t start = 0; start < num_points; start++) {
+    for (igraph_int_t start = 0; start < num_points; start++) {
         igraph_real_t min_missing = IGRAPH_INFINITY;
         igraph_real_t max_present = 0;
 
-        for (igraph_integer_t end = 0; end < num_points; end++) {
+        for (igraph_int_t end = 0; end < num_points; end++) {
             if (start == end) {
                 continue;
             }
@@ -221,10 +221,10 @@ int main(void) {
 
 
     printf("\nFibonacci spiral with 25 points, 1 neighbor unlimited cutoff.\n");
-    const igraph_integer_t point_count = 25;
+    const igraph_int_t point_count = 25;
     igraph_real_t fib[25 * 2];
 
-    for (igraph_integer_t k = 0; k < point_count; k++) {
+    for (igraph_int_t k = 0; k < point_count; k++) {
         igraph_real_t r = sqrt(k); //          pi               phi
         fib[2 * k    ] = r * cos(2 * k * 3.14159265359 / 1.618033988749);
         fib[2 * k + 1] = r * sin(2 * k * 3.14159265359 / 1.618033988749);

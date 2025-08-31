@@ -24,11 +24,11 @@ int main(void) {
 
     igraph_vector_t v;
     igraph_vector_int_t v2, v4, v5, v6;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t *ptr;
-    igraph_integer_t pos;
+    igraph_int_t pos;
     igraph_real_t min, max, min2, max2;
-    igraph_integer_t which_min, which_max, which_min2, which_max2;
+    igraph_int_t which_min, which_max, which_min2, which_max2;
 
     printf("Initialise empty vector\n");
     igraph_vector_init(&v, 0);
@@ -66,7 +66,7 @@ int main(void) {
         *igraph_vector_get_ptr(&v, i) = 100 * i;
     }
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_get(&v, i));
+        printf(" %" IGRAPH_PRId "", (igraph_int_t)igraph_vector_get(&v, i));
     }
     printf("\n");
     igraph_vector_destroy(&v);
@@ -97,8 +97,8 @@ int main(void) {
         VECTOR(v)[i] = i + 1;
     }
     while (!igraph_vector_empty(&v)) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_tail(&v));
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_pop_back(&v));
+        printf(" %" IGRAPH_PRId "", (igraph_int_t)igraph_vector_tail(&v));
+        printf(" %" IGRAPH_PRId "", (igraph_int_t)igraph_vector_pop_back(&v));
     }
     printf("\n");
     igraph_vector_destroy(&v);
@@ -119,7 +119,7 @@ int main(void) {
         VECTOR(v)[i] = 100 - i;
     }
     for (i = 0; i < 10; i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)VECTOR(v)[i]);
+        printf(" %" IGRAPH_PRId "", (igraph_int_t)VECTOR(v)[i]);
     }
     printf("\n");
 
@@ -199,7 +199,7 @@ int main(void) {
     igraph_vector_init_range(&v, 11, 21);
     igraph_vector_copy_to(&v, ptr);
     for (i = 0; i < 10; i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)ptr[i]);
+        printf(" %" IGRAPH_PRId "", (igraph_int_t)ptr[i]);
     }
     printf("\n");
     free(ptr);
@@ -207,8 +207,8 @@ int main(void) {
 
     printf("Test igraph_vector_init_range, igraph_vector_sum, igraph_vector_prod\n");
     igraph_vector_init_range(&v, 1, 6);
-    printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_sum(&v));
-    printf(" %" IGRAPH_PRId "\n", (igraph_integer_t)igraph_vector_prod(&v));
+    printf(" %" IGRAPH_PRId "", (igraph_int_t)igraph_vector_sum(&v));
+    printf(" %" IGRAPH_PRId "\n", (igraph_int_t)igraph_vector_prod(&v));
 
     printf("Test igraph_vector_remove_section\n");
     igraph_vector_remove_section(&v, 2, 4);

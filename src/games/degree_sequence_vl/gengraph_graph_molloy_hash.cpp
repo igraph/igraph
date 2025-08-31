@@ -38,8 +38,8 @@ namespace gengraph {
 
 //_________________________________________________________________________
 void graph_molloy_hash::compute_neigh() {
-    igraph_integer_t *p = links;
-    for (igraph_integer_t i = 0; i < n; i++) {
+    igraph_int_t *p = links;
+    for (igraph_int_t i = 0; i < n; i++) {
         neigh[i] = p;
         p += HASH_SIZE(deg[i]);
     }
@@ -48,14 +48,14 @@ void graph_molloy_hash::compute_neigh() {
 //_________________________________________________________________________
 void graph_molloy_hash::compute_size() {
     size = 0;
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         size += HASH_SIZE(deg[i]);
     }
 }
 
 //_________________________________________________________________________
 void graph_molloy_hash::init() {
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_int_t i = 0; i < size; i++) {
         links[i] = HASH_NONE;
     }
 }
@@ -66,29 +66,29 @@ graph_molloy_hash::graph_molloy_hash(degree_sequence &degs) {
 }
 
 //_________________________________________________________________________
-igraph_integer_t graph_molloy_hash::alloc(degree_sequence &degs) {
+igraph_int_t graph_molloy_hash::alloc(degree_sequence &degs) {
     n = degs.size();
     a = degs.sum();
     assert(a % 2 == 0);
 
     deg = degs.seq();
     compute_size();
-    deg = new igraph_integer_t[n + size];
+    deg = new igraph_int_t[n + size];
     if (deg == NULL) {
         return 0;
     }
-    igraph_integer_t i;
+    igraph_int_t i;
     for (i = 0; i < n; i++) {
         deg[i] = degs[i];
     }
     links = deg + n;
     init();
-    neigh = new igraph_integer_t*[n];
+    neigh = new igraph_int_t*[n];
     if (neigh == NULL) {
         return 0;
     }
     compute_neigh();
-    return sizeof(igraph_integer_t *)*n + sizeof(igraph_integer_t) * (n + size);
+    return sizeof(igraph_int_t *)*n + sizeof(igraph_int_t) * (n + size);
 }
 
 //_________________________________________________________________________
@@ -104,7 +104,7 @@ graph_molloy_hash::~graph_molloy_hash() {
 }
 
 //_________________________________________________________________________
-graph_molloy_hash::graph_molloy_hash(igraph_integer_t *svg) {
+graph_molloy_hash::graph_molloy_hash(igraph_int_t *svg) {
     // Read n
     n = *(svg++);
     // Read a
@@ -119,15 +119,15 @@ graph_molloy_hash::graph_molloy_hash(igraph_integer_t *svg) {
 }
 
 //_________________________________________________________________________
-igraph_integer_t *graph_molloy_hash::hard_copy() {
-    igraph_integer_t *hc = new igraph_integer_t[2 + n + a / 2]; // to store n,a,deg[] and links[]
+igraph_int_t *graph_molloy_hash::hard_copy() {
+    igraph_int_t *hc = new igraph_int_t[2 + n + a / 2]; // to store n,a,deg[] and links[]
     hc[0] = n;
     hc[1] = a;
-    memcpy(hc + 2, deg, sizeof(igraph_integer_t)*n);
-    igraph_integer_t *p = hc + 2 + n;
-    igraph_integer_t *l = links;
-    for (igraph_integer_t i = 0; i < n; i++) for (igraph_integer_t j = HASH_SIZE(deg[i]); j--; l++) {
-            igraph_integer_t d;
+    memcpy(hc + 2, deg, sizeof(igraph_int_t)*n);
+    igraph_int_t *p = hc + 2 + n;
+    igraph_int_t *l = links;
+    for (igraph_int_t i = 0; i < n; i++) for (igraph_int_t j = HASH_SIZE(deg[i]); j--; l++) {
+            igraph_int_t d;
             if ((d = *l) != HASH_NONE && d >= i) {
                 *(p++) = d;
             }
@@ -139,20 +139,20 @@ igraph_integer_t *graph_molloy_hash::hard_copy() {
 //_________________________________________________________________________
 bool graph_molloy_hash::is_connected() {
     bool *visited = new bool[n];
-    igraph_integer_t *buff = new igraph_integer_t[n];
-    igraph_integer_t comp_size = depth_search(visited, buff);
+    igraph_int_t *buff = new igraph_int_t[n];
+    igraph_int_t comp_size = depth_search(visited, buff);
     delete[] visited;
     delete[] buff;
     return (comp_size == n);
 }
 
 //_________________________________________________________________________
-igraph_integer_t* graph_molloy_hash::backup() {
-    igraph_integer_t *b = new igraph_integer_t[a / 2];
-    igraph_integer_t *c = b;
-    igraph_integer_t *p = links;
-    for (igraph_integer_t i = 0; i < n; i++)
-        for (igraph_integer_t d = HASH_SIZE(deg[i]); d--; p++) if (*p != HASH_NONE && *p > i) {
+igraph_int_t* graph_molloy_hash::backup() {
+    igraph_int_t *b = new igraph_int_t[a / 2];
+    igraph_int_t *c = b;
+    igraph_int_t *p = links;
+    for (igraph_int_t i = 0; i < n; i++)
+        for (igraph_int_t d = HASH_SIZE(deg[i]); d--; p++) if (*p != HASH_NONE && *p > i) {
                 *(c++) = *p;
             }
     assert(c == b + (a / 2));
@@ -160,11 +160,11 @@ igraph_integer_t* graph_molloy_hash::backup() {
 }
 
 //_________________________________________________________________________
-void graph_molloy_hash::restore(igraph_integer_t* b) {
+void graph_molloy_hash::restore(igraph_int_t* b) {
     init();
-    igraph_integer_t i;
-    igraph_integer_t *dd = new igraph_integer_t[n];
-    memcpy(dd, deg, sizeof(igraph_integer_t)*n);
+    igraph_int_t i;
+    igraph_int_t *dd = new igraph_int_t[n];
+    memcpy(dd, deg, sizeof(igraph_int_t)*n);
     for (i = 0; i < n; i++) {
         deg[i] = 0;
     }
@@ -178,7 +178,7 @@ void graph_molloy_hash::restore(igraph_integer_t* b) {
 }
 
 //_________________________________________________________________________
-bool graph_molloy_hash::isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited) {
+bool graph_molloy_hash::isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited) {
     if (K < 2) {
         return false;
     }
@@ -187,18 +187,18 @@ bool graph_molloy_hash::isolated(igraph_integer_t v, igraph_integer_t K, igraph_
         return false;
     }
 #endif //OPT_ISOLATED
-    igraph_integer_t *seen  = Kbuff;
-    igraph_integer_t *known = Kbuff;
-    igraph_integer_t *max   = Kbuff + K;
+    igraph_int_t *seen  = Kbuff;
+    igraph_int_t *known = Kbuff;
+    igraph_int_t *max   = Kbuff + K;
     *(known++) = v;
     visited[v] = true;
     bool is_isolated = true;
 
     while (known != seen) {
         v = *(seen++);
-        igraph_integer_t *ww = neigh[v];
-        igraph_integer_t w;
-        for (igraph_integer_t d = HASH_SIZE(deg[v]); d--; ww++) if ((w = *ww) != HASH_NONE && !visited[w]) {
+        igraph_int_t *ww = neigh[v];
+        igraph_int_t w;
+        for (igraph_int_t d = HASH_SIZE(deg[v]); d--; ww++) if ((w = *ww) != HASH_NONE && !visited[w]) {
 #ifdef OPT_ISOLATED
                 if (K <= deg[w] + 1 || known == max) {
 #else //OPT_ISOLATED
@@ -220,19 +220,19 @@ end_isolated:
 }
 
 //_________________________________________________________________________
-int graph_molloy_hash::random_edge_swap(igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited) {
+int graph_molloy_hash::random_edge_swap(igraph_int_t K, igraph_int_t *Kbuff, bool *visited) {
     // Pick two random vertices a and c
-    igraph_integer_t f1 = pick_random_vertex();
-    igraph_integer_t f2 = pick_random_vertex();
+    igraph_int_t f1 = pick_random_vertex();
+    igraph_int_t f2 = pick_random_vertex();
     // Check that f1 != f2
     if (f1 == f2) {
         return 0;
     }
     // Get two random edges (f1,*f1t1) and (f2,*f2t2)
-    igraph_integer_t *f1t1 = random_neighbour(f1);
-    igraph_integer_t t1 = *f1t1;
-    igraph_integer_t *f2t2 = random_neighbour(f2);
-    igraph_integer_t t2 = *f2t2;
+    igraph_int_t *f1t1 = random_neighbour(f1);
+    igraph_int_t t1 = *f1t1;
+    igraph_int_t *f2t2 = random_neighbour(f2);
+    igraph_int_t t2 = *f2t2;
     // Check simplicity
     if (t1 == t2 || f1 == t2 || f2 == t1) {
         return 0;
@@ -241,10 +241,10 @@ int graph_molloy_hash::random_edge_swap(igraph_integer_t K, igraph_integer_t *Kb
         return 0;
     }
     // Swap
-    igraph_integer_t *f1t2 = H_rpl(neigh[f1], deg[f1], f1t1, t2);
-    igraph_integer_t *f2t1 = H_rpl(neigh[f2], deg[f2], f2t2, t1);
-    igraph_integer_t *t1f2 = H_rpl(neigh[t1], deg[t1], f1, f2);
-    igraph_integer_t *t2f1 = H_rpl(neigh[t2], deg[t2], f2, f1);
+    igraph_int_t *f1t2 = H_rpl(neigh[f1], deg[f1], f1t1, t2);
+    igraph_int_t *f2t1 = H_rpl(neigh[f2], deg[f2], f2t2, t1);
+    igraph_int_t *t1f2 = H_rpl(neigh[t1], deg[t1], f1, f2);
+    igraph_int_t *t2f1 = H_rpl(neigh[t2], deg[t2], f2, f1);
     // isolation test
     if (K <= 2) {
         return 1;
@@ -261,13 +261,13 @@ int graph_molloy_hash::random_edge_swap(igraph_integer_t K, igraph_integer_t *Kb
 }
 
 //_________________________________________________________________________
-igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
-        igraph_integer_t maxtimes, int type) {
+igraph_int_t graph_molloy_hash::shuffle(igraph_int_t times,
+        igraph_int_t maxtimes, int type) {
     igraph_progress("Shuffle", 0, 0);
     // assert(verify());
     // counters
-    igraph_integer_t nb_swaps = 0;
-    igraph_integer_t all_swaps = 0;
+    igraph_int_t nb_swaps = 0;
+    igraph_int_t all_swaps = 0;
     unsigned long cost = 0;
     // window
     double T = double(((a < times) ? a : times) / 10);
@@ -279,14 +279,14 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
     }
     // isolation test parameter, and buffers
     double K = 2.4;
-    igraph_integer_t *Kbuff = new igraph_integer_t[int(K) + 1];
+    igraph_int_t *Kbuff = new igraph_int_t[int(K) + 1];
     bool *visited = new bool[n];
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         visited[i] = false;
     }
     // Used for monitoring , active only if VERBOSE()
-    igraph_integer_t failures = 0;
-    igraph_integer_t successes = 0;
+    igraph_int_t failures = 0;
+    igraph_int_t successes = 0;
     double avg_K = 0;
     double avg_T = 0;
     unsigned long next = times;
@@ -295,14 +295,14 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
     // Shuffle: while #edge swap attempts validated by connectivity < times ...
     while (times > nb_swaps && maxtimes > all_swaps) {
         // Backup graph
-        igraph_integer_t *save = backup();
+        igraph_int_t *save = backup();
         // Prepare counters, K, T
-        igraph_integer_t swaps = 0;
-        igraph_integer_t K_int = 0;
+        igraph_int_t swaps = 0;
+        igraph_int_t K_int = 0;
         if (type == FINAL_HEURISTICS || type == BRUTE_FORCE_HEURISTICS) {
-            K_int = igraph_integer_t(K);
+            K_int = igraph_int_t(K);
         }
-        igraph_integer_t T_int = (igraph_integer_t)(floor(T));
+        igraph_int_t T_int = (igraph_int_t)(floor(T));
         if (T_int < 1) {
             T_int = 1;
         }
@@ -312,7 +312,7 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
             cost += K_int + T_int;
         }
         // Perform T edge swap attempts
-        for (igraph_integer_t i = T_int; i > 0; i--) {
+        for (igraph_int_t i = T_int; i > 0; i--) {
             // try one swap
             swaps += random_edge_swap(K_int, Kbuff, visited);
             all_swaps++;
@@ -377,7 +377,7 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
             } else {
                 K *= 1.35;
                 delete[] Kbuff;
-                Kbuff = new igraph_integer_t[igraph_integer_t(K) + 1];
+                Kbuff = new igraph_int_t[igraph_int_t(K) + 1];
             }
             break;
         case OPTIMAL_HEURISTICS:
@@ -386,7 +386,7 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
             }
             break;
         case BRUTE_FORCE_HEURISTICS:
-            K *= 2; delete[] Kbuff; Kbuff = new igraph_integer_t[igraph_integer_t(K) + 1];
+            K *= 2; delete[] Kbuff; Kbuff = new igraph_int_t[igraph_int_t(K) + 1];
             break;
         default:
             throw std::invalid_argument("Error in graph_molloy_hash::shuffle(): Unknown heuristics type.");
@@ -407,7 +407,7 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
 
 /*
 void graph_molloy_hash::print(FILE *f) {
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
     for (i = 0; i < n; i++) {
         fprintf(f, "%" IGRAPH_PRId, i);
         for (j = 0; j < HASH_SIZE(deg[i]); j++) if (neigh[i][j] != HASH_NONE) {
@@ -419,8 +419,8 @@ void graph_molloy_hash::print(FILE *f) {
 */
 
 igraph_error_t graph_molloy_hash::print(igraph_t *graph) {
-    igraph_integer_t i, j;
-    igraph_integer_t ptr = 0;
+    igraph_int_t i, j;
+    igraph_int_t ptr = 0;
     igraph_vector_int_t edges;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, a); // every edge is counted twice....
@@ -444,18 +444,18 @@ igraph_error_t graph_molloy_hash::print(igraph_t *graph) {
 }
 
 //_________________________________________________________________________
-bool graph_molloy_hash::try_shuffle(igraph_integer_t T, igraph_integer_t K, igraph_integer_t *backup_graph) {
+bool graph_molloy_hash::try_shuffle(igraph_int_t T, igraph_int_t K, igraph_int_t *backup_graph) {
     // init all
-    igraph_integer_t *Kbuff = NULL;
+    igraph_int_t *Kbuff = NULL;
     bool *visited = NULL;
     if (K > 2) {
-        Kbuff = new igraph_integer_t[K];
+        Kbuff = new igraph_int_t[K];
         visited = new bool[n];
-        for (igraph_integer_t i = 0; i < n; i++) {
+        for (igraph_int_t i = 0; i < n; i++) {
             visited[i] = false;
         }
     }
-    igraph_integer_t *back = backup_graph;
+    igraph_int_t *back = backup_graph;
     if (back == NULL) {
         back = backup();
     }
@@ -506,7 +506,7 @@ bool bernoulli_param_is_lower(int success, int trials, double param) {
 
 //_________________________________________________________________________
 #define _MIN_SUCCESS_FOR_BERNOULLI_TRUST 100
-double graph_molloy_hash::average_cost(igraph_integer_t T, igraph_integer_t *backup, double min_cost) {
+double graph_molloy_hash::average_cost(igraph_int_t T, igraph_int_t *backup, double min_cost) {
     if (T < 1) {
         return 1e+99;
     }
@@ -527,11 +527,11 @@ double graph_molloy_hash::average_cost(igraph_integer_t T, igraph_integer_t *bac
 }
 
 //_________________________________________________________________________
-igraph_integer_t graph_molloy_hash::optimal_window() {
-    igraph_integer_t Tmax;
-    igraph_integer_t optimal_T = 1;
+igraph_int_t graph_molloy_hash::optimal_window() {
+    igraph_int_t Tmax;
+    igraph_int_t optimal_T = 1;
     double min_cost = 1e+99;
-    igraph_integer_t *back = backup();
+    igraph_int_t *back = backup();
     // on cherche une borne sup pour Tmax
     int been_greater = 0;
     for (Tmax = 1; Tmax <= 5 * a ; Tmax *= 2) {
@@ -551,8 +551,8 @@ igraph_integer_t graph_molloy_hash::optimal_window() {
     double span = 2.0;
     int try_again = 4;
     while (span > 1.05 && optimal_T <= 5 * a) {
-        igraph_integer_t T_low  = igraph_integer_t(double(optimal_T) / span);
-        igraph_integer_t T_high = igraph_integer_t(double(optimal_T) * span);
+        igraph_int_t T_low  = igraph_int_t(double(optimal_T) / span);
+        igraph_int_t T_high = igraph_int_t(double(optimal_T) * span);
         double c_low  = average_cost(T_low, back, min_cost);
         double c_high = average_cost(T_high, back, min_cost);
         if (c_low < min_cost && c_high < min_cost) {
@@ -594,21 +594,21 @@ double graph_molloy_hash::eval_K(int quality) {
 }
 
 //_________________________________________________________________________
-double graph_molloy_hash::effective_K(igraph_integer_t K, int quality) {
+double graph_molloy_hash::effective_K(igraph_int_t K, int quality) {
     if (K < 3) {
         return 0.0;
     }
     long sum_K = 0;
-    igraph_integer_t *Kbuff = new igraph_integer_t[K];
+    igraph_int_t *Kbuff = new igraph_int_t[K];
     bool *visited = new bool[n];
-    igraph_integer_t i;
+    igraph_int_t i;
     for (i = 0; i < n; i++) {
         visited[i] = false;
     }
     for (i = 0; i < quality; i++) {
         // assert(verify());
-        igraph_integer_t f1, f2, t1, t2;
-        igraph_integer_t *f1t1, *f2t2;
+        igraph_int_t f1, f2, t1, t2;
+        igraph_int_t *f1t1, *f2t2;
         do {
             // Pick two random vertices
             do {
@@ -639,14 +639,14 @@ double graph_molloy_hash::effective_K(igraph_integer_t K, int quality) {
 }
 
 //_________________________________________________________________________
-igraph_integer_t graph_molloy_hash::effective_isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited) {
-    igraph_integer_t i;
+igraph_int_t graph_molloy_hash::effective_isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited) {
+    igraph_int_t i;
     for (i = 0; i < K; i++) {
         Kbuff[i] = -1;
     }
-    igraph_integer_t count = 0;
-    igraph_integer_t left = K;
-    igraph_integer_t *KB = Kbuff;
+    igraph_int_t count = 0;
+    igraph_int_t left = K;
+    igraph_int_t *KB = Kbuff;
     //yapido = (my_random()%1000 == 0);
     depth_isolated(v, count, left, K, KB, visited);
     while (KB-- != Kbuff) {
@@ -657,7 +657,7 @@ igraph_integer_t graph_molloy_hash::effective_isolated(igraph_integer_t v, igrap
 }
 
 //_________________________________________________________________________
-void graph_molloy_hash::depth_isolated(igraph_integer_t v, igraph_integer_t &calls, igraph_integer_t &left_to_explore, igraph_integer_t dmax, igraph_integer_t * &Kbuff, bool *visited) {
+void graph_molloy_hash::depth_isolated(igraph_int_t v, igraph_int_t &calls, igraph_int_t &left_to_explore, igraph_int_t dmax, igraph_int_t * &Kbuff, bool *visited) {
     if (left_to_explore == 0) {
         return;
     }
@@ -674,16 +674,16 @@ void graph_molloy_hash::depth_isolated(igraph_integer_t v, igraph_integer_t &cal
 //  print();
 //  fflush(stdout);
     calls++;
-    igraph_integer_t *copy = NULL;
-    igraph_integer_t *w = neigh[v];
+    igraph_int_t *copy = NULL;
+    igraph_int_t *w = neigh[v];
     if (IS_HASH(deg[v])) {
-        copy = new igraph_integer_t[deg[v]];
+        copy = new igraph_int_t[deg[v]];
         H_copy(copy, w, deg[v]);
         w = copy;
     }
     qsort(deg, w, deg[v]);
     w += deg[v];
-    for (igraph_integer_t i = deg[v]; i--; ) {
+    for (igraph_int_t i = deg[v]; i--; ) {
         if (visited[*--w]) {
             calls++;
         } else {
@@ -699,19 +699,19 @@ void graph_molloy_hash::depth_isolated(igraph_integer_t v, igraph_integer_t &cal
 }
 
 //_________________________________________________________________________
-igraph_integer_t graph_molloy_hash::depth_search(bool *visited, igraph_integer_t *buff, igraph_integer_t v0) {
-    for (igraph_integer_t i = 0; i < n; i++) {
+igraph_int_t graph_molloy_hash::depth_search(bool *visited, igraph_int_t *buff, igraph_int_t v0) {
+    for (igraph_int_t i = 0; i < n; i++) {
         visited[i] = false;
     }
-    igraph_integer_t *to_visit = buff;
-    igraph_integer_t nb_visited = 1;
+    igraph_int_t *to_visit = buff;
+    igraph_int_t nb_visited = 1;
     visited[v0] = true;
     *(to_visit++) = v0;
     while (to_visit != buff && nb_visited < n) {
-        igraph_integer_t v = *(--to_visit);
-        igraph_integer_t *ww = neigh[v];
-        igraph_integer_t w;
-        for (igraph_integer_t k = HASH_SIZE(deg[v]); k--; ww++) {
+        igraph_int_t v = *(--to_visit);
+        igraph_int_t *ww = neigh[v];
+        igraph_int_t w;
+        for (igraph_int_t k = HASH_SIZE(deg[v]); k--; ww++) {
             if (HASH_NONE != (w = *ww) && !visited[w]) {
                 visited[w] = true;
                 nb_visited++;

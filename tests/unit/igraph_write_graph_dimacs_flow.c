@@ -23,8 +23,8 @@ int main(void) {
 
     igraph_t g;
     igraph_vector_t capacity;
-    igraph_integer_t source = 0;
-    igraph_integer_t target = 5;
+    igraph_int_t source = 0;
+    igraph_int_t target = 5;
 
     /*
     Expected output:

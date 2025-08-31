@@ -22,7 +22,7 @@
 int main(void) {
     igraph_t left, right, uni;
     igraph_vector_ptr_t glist;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     /* Initialize the library. */
     igraph_setup();

@@ -22,8 +22,8 @@
 int main(void) {
     igraph_sparsemat_t spmat;
     igraph_matrix_t mat;
-    igraph_integer_t p[] = {0, 1, 3};
-    igraph_integer_t i[]  = {1, 0, 2};
+    igraph_int_t p[] = {0, 1, 3};
+    igraph_int_t i[]  = {1, 0, 2};
     igraph_real_t x[] = {1, 5, 2};
 
     printf("Empty sparsemat.\n");

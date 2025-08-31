@@ -55,9 +55,9 @@
 igraph_error_t igraph_coreness(const igraph_t *graph,
         igraph_vector_int_t *cores, igraph_neimode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t *bin, *vert, *pos;
-    igraph_integer_t maxdeg;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t *bin, *vert, *pos;
+    igraph_int_t maxdeg;
     igraph_vector_int_t neis;
     igraph_neimode_t omode;
 
@@ -75,11 +75,11 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    vert = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    vert = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(vert, "Insufficient memory for k-cores.");
     IGRAPH_FINALLY(igraph_free, vert);
 
-    pos = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    pos = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(pos, "Insufficient memory for k-cores.");
     IGRAPH_FINALLY(igraph_free, pos);
 
@@ -89,50 +89,50 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     /* null graph was already handled earlier, 'cores' is not empty */
     maxdeg = igraph_vector_int_max(cores);
 
-    bin = IGRAPH_CALLOC(maxdeg + 1, igraph_integer_t);
+    bin = IGRAPH_CALLOC(maxdeg + 1, igraph_int_t);
     IGRAPH_CHECK_OOM(bin, "Insufficient memory for k-cores.");
     IGRAPH_FINALLY(igraph_free, bin);
 
     /* degree histogram */
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         bin[ VECTOR(*cores)[i] ] += 1;
     }
 
     /* start pointers */
-    for (igraph_integer_t d = 0, start = 0; d <= maxdeg; d++) {
-        igraph_integer_t k = bin[d];
+    for (igraph_int_t d = 0, start = 0; d <= maxdeg; d++) {
+        igraph_int_t k = bin[d];
         bin[d] = start;
         start += k;
     }
 
     /* sort in vert (and corrupt bin) */
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         pos[i] = bin[VECTOR(*cores)[i]];
         vert[pos[i]] = i;
         bin[VECTOR(*cores)[i]] += 1;
     }
 
     /* correct bin */
-    for (igraph_integer_t d = maxdeg; d > 0; d--) {
+    for (igraph_int_t d = maxdeg; d > 0; d--) {
         bin[d] = bin[d - 1];
     }
     bin[0] = 0;
 
     /* this is the main algorithm */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, maxdeg);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t v = vert[i];
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+        igraph_int_t v = vert[i];
         IGRAPH_CHECK(igraph_neighbors(
             graph, &neis, v, omode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
         ));
-        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
-        for (igraph_integer_t j = 0; j < nei_count; j++) {
-            igraph_integer_t u = VECTOR(neis)[j];
+        igraph_int_t nei_count = igraph_vector_int_size(&neis);
+        for (igraph_int_t j = 0; j < nei_count; j++) {
+            igraph_int_t u = VECTOR(neis)[j];
             if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
-                igraph_integer_t du = VECTOR(*cores)[u];
-                igraph_integer_t pu = pos[u];
-                igraph_integer_t pw = bin[du];
-                igraph_integer_t w = vert[pw];
+                igraph_int_t du = VECTOR(*cores)[u];
+                igraph_int_t pu = pos[u];
+                igraph_int_t pw = bin[du];
+                igraph_int_t w = vert[pw];
                 if (u != w) {
                     pos[u] = pw;
                     pos[w] = pu;

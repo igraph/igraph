@@ -75,10 +75,10 @@
  * reading an integer requires O(1) time.
  */
 igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
-                               igraph_integer_t n, igraph_bool_t directed) {
+                               igraph_int_t n, igraph_bool_t directed) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 100));
@@ -142,7 +142,7 @@ igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstrea
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
 
     while (!IGRAPH_EIT_END(it)) {
-        igraph_integer_t from, to;
+        igraph_int_t from, to;
         int ret;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
         ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",

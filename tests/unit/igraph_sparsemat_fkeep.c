@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-igraph_integer_t fkeep_none(igraph_integer_t row, igraph_integer_t col, igraph_real_t value, void *other) {
+igraph_int_t fkeep_none(igraph_int_t row, igraph_int_t col, igraph_real_t value, void *other) {
     IGRAPH_UNUSED(row);
     IGRAPH_UNUSED(col);
     IGRAPH_UNUSED(value);
@@ -27,7 +27,7 @@ igraph_integer_t fkeep_none(igraph_integer_t row, igraph_integer_t col, igraph_r
     return 0;
 }
 
-igraph_integer_t fkeep(igraph_integer_t row, igraph_integer_t col, igraph_real_t value, void *other) {
+igraph_int_t fkeep(igraph_int_t row, igraph_int_t col, igraph_real_t value, void *other) {
     if (row == 0 || col == 1 || value > *(int*)other) {
         return 0;
     }

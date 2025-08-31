@@ -27,7 +27,7 @@ IGRAPH_BEGIN_C_DECLS
 igraph_error_t igraph_i_reindex_membership_large(
     igraph_vector_int_t *membership,
     igraph_vector_int_t *new_to_old,
-    igraph_integer_t *nb_clusters);
+    igraph_int_t *nb_clusters);
 
 IGRAPH_END_C_DECLS
 

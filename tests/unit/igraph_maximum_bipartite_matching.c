@@ -26,7 +26,7 @@ int test_weighted_graph_from_mit_notes(void) {
     igraph_vector_bool_t types;
     igraph_vector_int_t matching;
     igraph_vector_t weights;
-    igraph_integer_t matching_size;
+    igraph_int_t matching_size;
     igraph_real_t matching_weight;
     igraph_bool_t is_matching;
     igraph_real_t weight_array[] = { 2, 7, 2, 3,
@@ -58,7 +58,7 @@ int test_weighted_graph_from_mit_notes(void) {
         return 1;
     }
     if (matching_weight != 19) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: 19\n", (igraph_integer_t) matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 19\n", (igraph_int_t) matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
@@ -82,7 +82,7 @@ int test_weighted_graph_generated(void) {
     igraph_vector_bool_t types;
     igraph_vector_int_t matching;
     igraph_vector_t weights;
-    igraph_integer_t matching_size;
+    igraph_int_t matching_size;
     igraph_real_t matching_weight;
     igraph_real_t weight_array_1[] = { 8, 5, 9, 18, 20, 13 };
     igraph_real_t weight_array_2[] = { 20, 4, 20, 3, 13, 1 };
@@ -102,7 +102,7 @@ int test_weighted_graph_generated(void) {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 43) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: 43\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 43\n", (igraph_int_t)matching_weight);
         return 2;
     }
     igraph_vector_destroy(&weights);
@@ -116,7 +116,7 @@ int test_weighted_graph_generated(void) {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 41) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: 41\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 41\n", (igraph_int_t)matching_weight);
         return 2;
     }
     igraph_vector_destroy(&weights);
@@ -133,7 +133,7 @@ int main(void) {
     igraph_vector_bool_t types;
     igraph_vector_t weights;
 
-    igraph_integer_t matching_size;
+    igraph_int_t matching_size;
     igraph_real_t weighted_size;
 
     igraph_vector_int_t matching;

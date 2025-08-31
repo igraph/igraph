@@ -66,35 +66,35 @@ int main(void) {
 
         {
             printf("No contraction:\n");
-            igraph_integer_t mappings[6] = {0, 1, 2, 3, 4, 5};
+            igraph_int_t mappings[6] = {0, 1, 2, 3, 4, 5};
             igraph_vector_int_view(&mapping, mappings, 6);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 5 into 4:\n");
-            igraph_integer_t mappings[6] = {0, 1, 2, 3, 4, 4};
+            igraph_int_t mappings[6] = {0, 1, 2, 3, 4, 4};
             igraph_vector_int_view(&mapping, mappings, 6);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 4 into 3:\n");
-            igraph_integer_t mappings[5] = {0, 1, 2, 3, 3};
+            igraph_int_t mappings[5] = {0, 1, 2, 3, 3};
             igraph_vector_int_view(&mapping, mappings, 5);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 3 into 2:\n");
-            igraph_integer_t mappings[4] = {0, 1, 2, 2};
+            igraph_int_t mappings[4] = {0, 1, 2, 2};
             igraph_vector_int_view(&mapping, mappings, 4);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 2 into 0:\n");
-            igraph_integer_t mappings[3] = {0, 1, 0};
+            igraph_int_t mappings[3] = {0, 1, 0};
             igraph_vector_int_view(&mapping, mappings, 3);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
@@ -105,7 +105,7 @@ int main(void) {
 
     {
         printf("Check incorrect mapping size error.\n");
-        igraph_integer_t mappings[3] = {0, 1, 0};
+        igraph_int_t mappings[3] = {0, 1, 0};
         igraph_vector_int_view(&mapping, mappings, 3);
         CHECK_ERROR(igraph_contract_vertices(&g, &mapping, &comb), IGRAPH_EINVAL);
     }

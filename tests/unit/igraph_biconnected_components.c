@@ -24,7 +24,7 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_list_t result;
     igraph_vector_int_t ap;
-    igraph_integer_t no;
+    igraph_int_t no;
 
     igraph_vector_int_list_init(&result, 0);
     igraph_vector_int_init(&ap, 0);

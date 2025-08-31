@@ -44,43 +44,43 @@ typedef struct igraph_gml_tree_t {
 
 igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
                                             const char *name,
-                                            igraph_integer_t line,
-                                            igraph_integer_t value);
+                                            igraph_int_t line,
+                                            igraph_int_t value);
 igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
                                          const char *name,
-                                         igraph_integer_t line,
+                                         igraph_int_t line,
                                          igraph_real_t value);
 igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
                                            const char *name,
-                                           igraph_integer_t line,
+                                           igraph_int_t line,
                                            const char *value);
 igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
                                          const char *name,
-                                         igraph_integer_t line,
+                                         igraph_int_t line,
                                          igraph_gml_tree_t *value);
 igraph_error_t igraph_gml_tree_init_empty(igraph_gml_tree_t *t);
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t);
 
-void igraph_gml_tree_delete(igraph_gml_tree_t *t, igraph_integer_t pos);
+void igraph_gml_tree_delete(igraph_gml_tree_t *t, igraph_int_t pos);
 igraph_error_t igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_t *t2);
 
-IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gml_tree_length(const igraph_gml_tree_t *t);
-IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gml_tree_find(const igraph_gml_tree_t *t,
-                              const char *name, igraph_integer_t from);
-IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gml_tree_findback(const igraph_gml_tree_t *t,
-                                  const char *name, igraph_integer_t from);
-IGRAPH_FUNCATTR_PURE igraph_i_gml_tree_type_t igraph_gml_tree_type(const igraph_gml_tree_t *t, igraph_integer_t pos);
-IGRAPH_FUNCATTR_PURE const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, igraph_integer_t pos);
-IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gml_tree_line(const igraph_gml_tree_t *t, igraph_integer_t pos);
-IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gml_tree_get_integer(const igraph_gml_tree_t *t,
-        igraph_integer_t pos);
+IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gml_tree_length(const igraph_gml_tree_t *t);
+IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gml_tree_find(const igraph_gml_tree_t *t,
+                              const char *name, igraph_int_t from);
+IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gml_tree_findback(const igraph_gml_tree_t *t,
+                                  const char *name, igraph_int_t from);
+IGRAPH_FUNCATTR_PURE igraph_i_gml_tree_type_t igraph_gml_tree_type(const igraph_gml_tree_t *t, igraph_int_t pos);
+IGRAPH_FUNCATTR_PURE const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, igraph_int_t pos);
+IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gml_tree_line(const igraph_gml_tree_t *t, igraph_int_t pos);
+IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gml_tree_get_integer(const igraph_gml_tree_t *t,
+        igraph_int_t pos);
 IGRAPH_FUNCATTR_PURE igraph_real_t igraph_gml_tree_get_real(const igraph_gml_tree_t *t,
-                                       igraph_integer_t pos);
+                                       igraph_int_t pos);
 IGRAPH_FUNCATTR_PURE const char *igraph_gml_tree_get_string(const igraph_gml_tree_t *t,
-                                       igraph_integer_t pos);
+                                       igraph_int_t pos);
 
 IGRAPH_FUNCATTR_PURE igraph_gml_tree_t *igraph_gml_tree_get_tree(const igraph_gml_tree_t *t,
-        igraph_integer_t pos);
+        igraph_int_t pos);
 
 IGRAPH_END_C_DECLS
 

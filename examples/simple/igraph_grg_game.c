@@ -28,9 +28,9 @@ int main(void) {
     igraph_vector_init(&weights, igraph_ecount(&graph));
     igraph_eit_create(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
     for (; ! IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t e = IGRAPH_EIT_GET(eit);
-        igraph_integer_t u = IGRAPH_FROM(&graph, e);
-        igraph_integer_t v = IGRAPH_TO(&graph, e);
+        igraph_int_t e = IGRAPH_EIT_GET(eit);
+        igraph_int_t u = IGRAPH_FROM(&graph, e);
+        igraph_int_t v = IGRAPH_TO(&graph, e);
 
         VECTOR(weights)[e] = hypot(VECTOR(x)[u] - VECTOR(x)[v], VECTOR(y)[u] - VECTOR(y)[v]);
     }

@@ -21,15 +21,15 @@
 
 #include "bench.h"
 
-void bench_delaunay(const char *message, igraph_integer_t point_count, igraph_integer_t dimensions) {
+void bench_delaunay(const char *message, igraph_int_t point_count, igraph_int_t dimensions) {
     igraph_matrix_t points;
     igraph_t g;
     char msg[200];
 
     igraph_matrix_init(&points, point_count, dimensions);
 
-    for (igraph_integer_t point = 0; point < point_count; point++) {
-        for (igraph_integer_t dim = 0; dim < dimensions; dim++) {
+    for (igraph_int_t point = 0; point < point_count; point++) {
+        for (igraph_int_t dim = 0; dim < dimensions; dim++) {
             MATRIX(points, point, dim) = RNG_UNIF01();
         }
     }

@@ -281,8 +281,8 @@ int test_caching(void) {
     igraph_neimode_t modes[] = {IGRAPH_OUT, IGRAPH_ALL};
 
     igraph_vector_int_t edge;
-    igraph_integer_t vloop[] = {0,0};
-    igraph_integer_t vmult[] = {0,1};
+    igraph_int_t vloop[] = {0,0};
+    igraph_int_t vmult[] = {0,1};
 
     igraph_full(&g_simple, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
     igraph_full(&g_loop, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);

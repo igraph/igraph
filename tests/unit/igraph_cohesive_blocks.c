@@ -24,7 +24,7 @@ void doit(igraph_t *g) {
     igraph_vector_int_t cohesion;
     igraph_vector_int_t parent;
     igraph_t block_tree;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_vector_int_list_init(&blocks, 0);
     igraph_vector_int_init(&cohesion, 0);

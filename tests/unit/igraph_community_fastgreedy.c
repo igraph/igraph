@@ -25,7 +25,7 @@
 
 void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_int_t *merges,
                   igraph_vector_int_t *membership, FILE* f) {
-    igraph_integer_t i = 0;
+    igraph_int_t i = 0;
     igraph_vector_int_t our_membership;
 
     igraph_vector_int_init(&our_membership, 0);

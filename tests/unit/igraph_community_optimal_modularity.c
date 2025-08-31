@@ -20,9 +20,9 @@
 #include "test_utilities.h"
 
 void prepare_weights_vector(igraph_vector_t *weights, const igraph_t *graph) {
-    const igraph_integer_t m = igraph_ecount(graph);
+    const igraph_int_t m = igraph_ecount(graph);
     igraph_edge_betweenness(graph, NULL, weights, igraph_ess_all(IGRAPH_EDGEORDER_ID), true, false);
-    for (igraph_integer_t i=0; i < m; i++) {
+    for (igraph_int_t i=0; i < m; i++) {
         VECTOR(*weights)[i] = 1 / VECTOR(*weights)[i];
     }
 }

@@ -45,7 +45,7 @@ IGRAPH_EXPORT igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_ecc(const igraph_t *graph,
                                         igraph_vector_t *res,
                                         igraph_es_t eids,
-                                        igraph_integer_t k,
+                                        igraph_int_t k,
                                         igraph_bool_t offset,
                                         igraph_bool_t normalize);
 

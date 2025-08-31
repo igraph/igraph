@@ -26,7 +26,7 @@
 int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t separators;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     /* Initialize the library. */
     igraph_setup();

@@ -29,7 +29,7 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
      * the values are relatively large negative numbers, in which case we should
      * negate the eigenvector.
      */
-    igraph_integer_t n = igraph_vector_size(vector);
+    igraph_int_t n = igraph_vector_size(vector);
     igraph_real_t mi, ma;
 
     if (n == 0) {
@@ -54,11 +54,11 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
  * produce eigenvector-like centrality values, scaling the largest centrality
  * to 1.0. */
 void igraph_i_vector_scale_by_max_abs(igraph_vector_t *vec) {
-    const igraph_integer_t n = igraph_vector_size(vec);
+    const igraph_int_t n = igraph_vector_size(vec);
     igraph_real_t amax = 0;
-    igraph_integer_t which = 0;
+    igraph_int_t which = 0;
 
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         igraph_real_t tmp;
         tmp = fabs(VECTOR(*vec)[i]);
         if (tmp > amax) {

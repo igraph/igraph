@@ -20,13 +20,13 @@
 
 #include "bench.h"
 
-void gnp(igraph_integer_t n, igraph_real_t p, igraph_bool_t directed, igraph_bool_t loops) {
+void gnp(igraph_int_t n, igraph_real_t p, igraph_bool_t directed, igraph_bool_t loops) {
     igraph_t g;
     igraph_erdos_renyi_game_gnp(&g, n, p, directed, loops);
     igraph_destroy(&g);
 }
 
-void gnm(igraph_integer_t n, igraph_real_t meandeg, igraph_bool_t directed, igraph_bool_t loops) {
+void gnm(igraph_int_t n, igraph_real_t meandeg, igraph_bool_t directed, igraph_bool_t loops) {
     igraph_t g;
     igraph_erdos_renyi_game_gnm(&g, n, round(directed ? n*meandeg : 0.5*n*meandeg), directed, loops, IGRAPH_NO_MULTIPLE);
     igraph_destroy(&g);
@@ -38,7 +38,7 @@ void chung_lu(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igrap
     igraph_destroy(&g);
 }
 
-void run_bench(igraph_integer_t vcount, igraph_real_t meandeg, igraph_integer_t rep) {
+void run_bench(igraph_int_t vcount, igraph_real_t meandeg, igraph_int_t rep) {
     igraph_t g;
     igraph_real_t p = meandeg / vcount;
     igraph_vector_t outdeg, indeg;

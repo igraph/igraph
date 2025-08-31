@@ -28,7 +28,7 @@
 int main(void) {
     igraph_psumtree_t tree;
     igraph_vector_t vec;
-    igraph_integer_t i, idx;
+    igraph_int_t i, idx;
     igraph_real_t sum;
 
     igraph_rng_seed(igraph_rng_default(), 42);

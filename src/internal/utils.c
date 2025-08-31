@@ -53,9 +53,9 @@ igraph_error_t igraph_i_matrix_subset_vertices(
 
     /* Assertion: the size of 'm' agrees with 'graph': */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t ncol = igraph_matrix_ncol(m);
-    igraph_integer_t nrow = igraph_matrix_nrow(m);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t ncol = igraph_matrix_ncol(m);
+    igraph_int_t nrow = igraph_matrix_nrow(m);
 
     IGRAPH_ASSERT(nrow == no_of_nodes && nrow == ncol);
 
@@ -78,8 +78,8 @@ igraph_error_t igraph_i_matrix_subset_vertices(
 
     IGRAPH_MATRIX_INIT_FINALLY(&tmp, IGRAPH_VIT_SIZE(fromvit), IGRAPH_VIT_SIZE(tovit));
 
-    for (igraph_integer_t j=0; ! IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), j++) {
-        igraph_integer_t i;
+    for (igraph_int_t j=0; ! IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), j++) {
+        igraph_int_t i;
         for (IGRAPH_VIT_RESET(fromvit), i=0; ! IGRAPH_VIT_END(fromvit); IGRAPH_VIT_NEXT(fromvit), i++) {
             MATRIX(tmp, i, j) = MATRIX(*m, IGRAPH_VIT_GET(fromvit), IGRAPH_VIT_GET(tovit));
         }
@@ -99,8 +99,8 @@ igraph_error_t igraph_i_matrix_subset_vertices(
 
 /* Lexicographic edge comparator, used with igraph_qsort() in igraph_i_simplify_edge_list() */
 static int edge_comparator(const void *a, const void *b) {
-    igraph_integer_t *A = (igraph_integer_t *) a;
-    igraph_integer_t *B = (igraph_integer_t *) b;
+    igraph_int_t *A = (igraph_int_t *) a;
+    igraph_int_t *B = (igraph_int_t *) b;
 
     if (A[0] < B[0]) {
         return -1;
@@ -136,7 +136,7 @@ void igraph_i_simplify_edge_list(
         igraph_bool_t remove_loops, igraph_bool_t remove_multiple,
         igraph_bool_t directed) {
 
-    igraph_integer_t size = igraph_vector_int_size(edges);
+    igraph_int_t size = igraph_vector_int_size(edges);
 
     if (size == 0 || (!remove_loops && !remove_multiple)) {
         return;
@@ -144,9 +144,9 @@ void igraph_i_simplify_edge_list(
 
     /* Canonicalize undirected edges. */
     if (!directed) {
-        for (igraph_integer_t i = 0; i < size; i += 2) {
+        for (igraph_int_t i = 0; i < size; i += 2) {
             if (VECTOR(*edges)[i] > VECTOR(*edges)[i + 1]) {
-                igraph_integer_t temp = VECTOR(*edges)[i];
+                igraph_int_t temp = VECTOR(*edges)[i];
                 VECTOR(*edges)[i] = VECTOR(*edges)[i + 1];
                 VECTOR(*edges)[i + 1] = temp;
             }
@@ -155,15 +155,15 @@ void igraph_i_simplify_edge_list(
 
     /* Sort edge list. Not needed if multi edges are allowed. */
     if (remove_multiple) {
-        igraph_qsort(VECTOR(*edges), size / 2, 2 * sizeof(igraph_integer_t),
+        igraph_qsort(VECTOR(*edges), size / 2, 2 * sizeof(igraph_int_t),
                      &edge_comparator);
     }
 
     /* Remove self-loops and duplicate edges from the sorted edge list, in place.
      * i points to the current edge being examined, j points to the last edge copied. */
 
-    igraph_integer_t j = -2;
-    for (igraph_integer_t i = 0 ; i < size; i += 2) {
+    igraph_int_t j = -2;
+    for (igraph_int_t i = 0 ; i < size; i += 2) {
         if (remove_multiple &&
             /* If we've already copied some edges, */
             j != -2 &&
@@ -197,7 +197,7 @@ void igraph_i_simplify_edge_list(
  * \return Error code, when the input is not of even length.
  */
 igraph_error_t igraph_i_vector_int_shuffle_pairs(igraph_vector_int_t *pairs) {
-    igraph_integer_t pair_count = igraph_vector_int_size(pairs);
+    igraph_int_t pair_count = igraph_vector_int_size(pairs);
 
     if (pair_count % 2 == 1) {
         IGRAPH_ERROR("A vector of pairs must have an even length.", IGRAPH_EINVAL);
@@ -205,7 +205,7 @@ igraph_error_t igraph_i_vector_int_shuffle_pairs(igraph_vector_int_t *pairs) {
 
     pair_count /= 2;
     while (pair_count > 1) {
-        igraph_integer_t dummy, k;
+        igraph_int_t dummy, k;
 
         pair_count--;
         k = RNG_INTEGER(0, pair_count);

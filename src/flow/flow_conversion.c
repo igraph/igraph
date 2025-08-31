@@ -59,9 +59,9 @@
  * \param result an uninitialized graph object; the result will be returned here
  */
 igraph_error_t igraph_i_split_vertices(const igraph_t* graph, igraph_t* result) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i;
     igraph_vector_int_t edges;
 
     if (!igraph_is_directed(graph)) {
@@ -74,7 +74,7 @@ igraph_error_t igraph_i_split_vertices(const igraph_t* graph, igraph_t* result) 
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, 2 * (no_of_edges + no_of_nodes)));
 
     for (i = 0; i < 2 * no_of_edges; i += 2) {
-        igraph_integer_t to = VECTOR(edges)[i + 1];
+        igraph_int_t to = VECTOR(edges)[i + 1];
         VECTOR(edges)[i + 1] = no_of_nodes + to;
     }
 

@@ -70,7 +70,7 @@ int main(void) {
     igraph_destroy(&graph);
     igraph_erdos_renyi_game_gnp(&graph, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_resize(&distances, igraph_ecount(&graph));
-    for (igraph_integer_t i=0; i < igraph_ecount(&graph); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&graph); i++) {
         VECTOR(distances)[i] = RNG_UNIF(0.05, 0.15);
     }
 

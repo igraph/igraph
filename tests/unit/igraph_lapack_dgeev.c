@@ -28,8 +28,8 @@ int real_cplx_mult(const igraph_matrix_t *A,
                    igraph_vector_t *res_real,
                    igraph_vector_t *res_imag) {
 
-    igraph_integer_t n = igraph_vector_size(v_real);
-    igraph_integer_t r, c;
+    igraph_int_t n = igraph_vector_size(v_real);
+    igraph_int_t r, c;
 
     if (igraph_matrix_nrow(A) != n ||
         igraph_matrix_ncol(A) != n ||
@@ -62,8 +62,8 @@ int sc_cplx_cplx_mult(igraph_real_t lambda_real,
                       igraph_vector_t *res_real,
                       igraph_vector_t *res_imag) {
 
-    igraph_integer_t r;
-    igraph_integer_t n = igraph_vector_size(v_real);
+    igraph_int_t r;
+    igraph_int_t n = igraph_vector_size(v_real);
 
     if (igraph_vector_size(v_imag) != n) {
         printf("Wrong vector sizes");

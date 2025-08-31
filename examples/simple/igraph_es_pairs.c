@@ -24,8 +24,8 @@
 
 int main(void) {
     igraph_t g;
-    igraph_integer_t i;
-    igraph_integer_t size;
+    igraph_int_t i;
+    igraph_int_t size;
 
     /* Initialize the library. */
     igraph_setup();

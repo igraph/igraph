@@ -76,12 +76,12 @@
 igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                       igraph_vs_t vids, const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
-    igraph_integer_t nodes_to_calc;
-    igraph_integer_t a, b, c, i, j, q, vsize, vsize2;
-    igraph_integer_t edge, edge2;
+    igraph_int_t nodes_to_calc;
+    igraph_int_t a, b, c, i, j, q, vsize, vsize2;
+    igraph_int_t edge, edge2;
 
     igraph_vector_t contrib;
     igraph_vector_t degree;

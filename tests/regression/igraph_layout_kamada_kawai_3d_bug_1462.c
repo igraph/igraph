@@ -30,7 +30,7 @@ void snap_to_zero(igraph_real_t* value) {
 int main(void) {
     igraph_t graph;
     igraph_matrix_t layout;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     if (igraph_empty(&graph, 2, 0)) {
         return 1;

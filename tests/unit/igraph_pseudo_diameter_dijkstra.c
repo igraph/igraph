@@ -19,9 +19,9 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_result(igraph_t *g, igraph_vector_t *weights, igraph_integer_t start_vid, igraph_bool_t directed, igraph_bool_t unconn) {
+void print_result(igraph_t *g, igraph_vector_t *weights, igraph_int_t start_vid, igraph_bool_t directed, igraph_bool_t unconn) {
     igraph_real_t result;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
     IGRAPH_ASSERT(igraph_pseudo_diameter(g, weights, &result, start_vid, &from, &to, directed, unconn) == IGRAPH_SUCCESS);
     printf("result: ");
     print_real(stdout, result, "%g");

@@ -26,22 +26,22 @@
 int main(void) {
     igraph_matrix_t rm1, rm2;
     igraph_matrix_complex_t cm1, cm2;
-    const igraph_integer_t nrow = 50, ncol = 60;
+    const igraph_int_t nrow = 50, ncol = 60;
 
     igraph_rng_seed(igraph_rng_default(), 97);
 
     /* Real matrices */
 
     igraph_matrix_init(&rm1, nrow, ncol);
-    for (igraph_integer_t i=0; i < nrow; i++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t i=0; i < nrow; i++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             MATRIX(rm1, i, j) = RNG_UNIF(0.0, 3.0);
         }
     }
 
     igraph_matrix_init_copy(&rm2, &rm1);
-    for (igraph_integer_t i=0; i < nrow; i++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t i=0; i < nrow; i++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             MATRIX(rm2, i, j) = pow(MATRIX(rm2, i, j), 1 / 7.0);
             MATRIX(rm2, i, j) = pow(MATRIX(rm2, i, j), 7.0);
         }
@@ -58,8 +58,8 @@ int main(void) {
 
     igraph_matrix_complex_init(&cm1, nrow, ncol);
 
-    for (igraph_integer_t i=0; i < nrow; i++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t i=0; i < nrow; i++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             IGRAPH_REAL(MATRIX(cm1, i, j)) = RNG_NORMAL(0,1);
             IGRAPH_IMAG(MATRIX(cm1, i, j)) = RNG_NORMAL(0,1);
         }
@@ -67,8 +67,8 @@ int main(void) {
 
 
     igraph_matrix_complex_init_copy(&cm2, &cm1);
-    for (igraph_integer_t i=0; i < nrow; i++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t i=0; i < nrow; i++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             MATRIX(cm2, i, j) = igraph_complex_pow_real(MATRIX(cm2, i, j), 1 / 7.0);
             MATRIX(cm2, i, j) = igraph_complex_pow_real(MATRIX(cm2, i, j), 7.0);
         }

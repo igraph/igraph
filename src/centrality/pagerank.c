@@ -66,7 +66,7 @@ static igraph_error_t pagerank_operator_unweighted(igraph_real_t *to, const igra
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
     igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
     igraph_real_t fact = 1 - data->damping;
 
@@ -92,7 +92,7 @@ static igraph_error_t pagerank_operator_unweighted(igraph_real_t *to, const igra
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_int_t nei = VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -129,7 +129,7 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
     igraph_vector_t *outdegree = data->outdegree;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
     igraph_vector_int_t *neis;
     igraph_real_t fact = 1 - data->damping;
@@ -159,8 +159,8 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_int_t edge = VECTOR(*neis)[j];
+            igraph_int_t nei = IGRAPH_OTHER(graph, edge, i);
             to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -501,9 +501,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_vector_t tmp;
     igraph_vector_t normalized_reset;
 
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
 
     igraph_real_t reset_sum; /* used only when reset != NULL */
 
@@ -687,7 +687,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
     if (vector) {
         igraph_vit_t vit;
-        igraph_integer_t nodes_to_calc;
+        igraph_int_t nodes_to_calc;
         igraph_real_t sum = 0;
 
         for (i = 0; i < no_of_nodes; i++) {

@@ -30,7 +30,7 @@ int main(void) {
     igraph_matrix_t pref_mat, type_dist_mat;
     igraph_vector_int_t types, out_types, in_types;
     igraph_bool_t connected, has_loop, has_multi;
-    igraph_integer_t i, j, count;
+    igraph_int_t i, j, count;
 
     igraph_vector_int_init(&types, 0);
 

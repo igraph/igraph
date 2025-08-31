@@ -6,8 +6,8 @@ int main(void) {
 
     igraph_t ring, g, *component;
     igraph_graph_list_t complist;
-    igraph_integer_t i;
-    igraph_integer_t edges[] = { 0, 1, 1, 2, 2, 0,
+    igraph_int_t i;
+    igraph_int_t edges[] = { 0, 1, 1, 2, 2, 0,
                               3, 4, 4, 5, 5, 6,
                               8, 9, 9, 10
                             };

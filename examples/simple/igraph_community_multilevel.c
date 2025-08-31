@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_int_t *memberships, igraph_vector_t *modularity, FILE* f) {
-    igraph_integer_t i, j, no_of_nodes = igraph_vcount(g);
+    igraph_int_t i, j, no_of_nodes = igraph_vcount(g);
 
     j = igraph_vector_which_max(modularity);
     for (i = 0; i < igraph_vector_int_size(membership); i++) {
@@ -53,7 +53,7 @@ int main(void) {
     igraph_vector_int_t edges;
     igraph_vector_int_t membership;
     igraph_matrix_int_t memberships;
-    igraph_integer_t i, j, k;
+    igraph_int_t i, j, k;
 
     /* Initialize the library. */
     igraph_setup();

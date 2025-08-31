@@ -22,7 +22,7 @@
 
 /* Matrix-vector multiplication: y = A.x */
 void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t *y, igraph_real_t beta) {
-    igraph_integer_t i, j, nr = igraph_matrix_nrow(A), nc = igraph_matrix_ncol(A);
+    igraph_int_t i, j, nr = igraph_matrix_nrow(A), nc = igraph_matrix_ncol(A);
 
     IGRAPH_ASSERT(nc == igraph_vector_size(x));
     IGRAPH_ASSERT(nr == igraph_vector_size(y));
@@ -39,8 +39,8 @@ void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t 
 int main(void) {
     igraph_matrix_t A;
     igraph_vector_t x, y1, y2;
-    igraph_integer_t i, j;
-    const igraph_integer_t nr = 5, nc = 8;
+    igraph_int_t i, j;
+    const igraph_int_t nr = 5, nc = 8;
 
     igraph_rng_seed(igraph_rng_default(), 54632);
 

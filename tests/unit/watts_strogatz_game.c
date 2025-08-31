@@ -49,7 +49,7 @@ int main(void) {
 
     igraph_t ws;
     igraph_bool_t sim, seen_loops, seen_multiple;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_uint_t seed = 1305473657;
 
     igraph_rng_seed(igraph_rng_default(), seed);

@@ -29,7 +29,7 @@
  * Loops, undirected:    n * (n+1) / 2
  * Loops, directed:      n^2
  */
-static igraph_real_t total_possible_edges(igraph_integer_t vcount,
+static igraph_real_t total_possible_edges(igraph_int_t vcount,
                                           igraph_bool_t directed,
                                           igraph_bool_t loops) {
     igraph_real_t nv = (igraph_real_t) vcount;
@@ -95,8 +95,8 @@ igraph_error_t igraph_rich_club_sequence(
         igraph_bool_t normalized,
         igraph_bool_t loops, igraph_bool_t directed) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_int_t order_of;
 
     // Error handling: invalid vertex_order and weights sizes
@@ -126,32 +126,32 @@ igraph_error_t igraph_rich_club_sequence(
     igraph_bool_t warning_issued = false;
 
     // remaining_total_weight vector: number of edges (or total edge weight) removed by index
-    for (igraph_integer_t eid = 0; eid < ecount; eid++) {
-        igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
-        igraph_integer_t v2 = IGRAPH_TO(graph, eid);
+    for (igraph_int_t eid = 0; eid < ecount; eid++) {
+        igraph_int_t v1 = IGRAPH_FROM(graph, eid);
+        igraph_int_t v2 = IGRAPH_TO(graph, eid);
         if (!loops && normalized && !warning_issued && v1 == v2) {
             IGRAPH_WARNING("Self-loops were requested to be assumed absent, "
                            "but encountered a self-loop. Density calculations will proceed "
                            "with the assumption of no loops.");
             warning_issued = true;
         }
-        igraph_integer_t order_v1 = VECTOR(order_of)[v1]; // order of endpoints
-        igraph_integer_t order_v2 = VECTOR(order_of)[v2];
+        igraph_int_t order_v1 = VECTOR(order_of)[v1]; // order of endpoints
+        igraph_int_t order_v2 = VECTOR(order_of)[v2];
 
-        igraph_integer_t edge_removal_index = (order_v1 < order_v2 ? order_v1 : order_v2);
+        igraph_int_t edge_removal_index = (order_v1 < order_v2 ? order_v1 : order_v2);
         VECTOR(*res)[edge_removal_index] += (weights ? VECTOR(*weights)[eid] : 1);
     }
 
     // remaining_total_weight vector: edges (or total edge weight) remaining after i removals
     igraph_real_t total = 0;
-    for (igraph_integer_t i = vcount - 1; i >= 0; i--) {
+    for (igraph_int_t i = vcount - 1; i >= 0; i--) {
         total += VECTOR(*res)[i];
         VECTOR(*res)[i] = total;
     }
 
     // Normalize edge counts to densities
     if (normalized) {
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             // (vcount - i) = the number of vertices left in this loop
             VECTOR(*res)[i] =
                     VECTOR(*res)[i] /

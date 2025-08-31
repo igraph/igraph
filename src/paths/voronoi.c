@@ -35,8 +35,8 @@ static igraph_error_t igraph_i_voronoi(
         igraph_neimode_t mode,
         igraph_voronoi_tiebreaker_t tiebreaker) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_generators = igraph_vector_int_size(generators);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_generators = igraph_vector_int_size(generators);
     igraph_adjlist_t al;
     igraph_dqueue_int_t q;
 
@@ -69,8 +69,8 @@ static igraph_error_t igraph_i_voronoi(
      * is shorter than what was recorded so far in 'mindist', we update 'mindist' and
      * assign that vertex to the current generator.
      */
-    for (igraph_integer_t i=0; i < no_of_generators; i++) {
-        igraph_integer_t g = VECTOR(*generators)[i];
+    for (igraph_int_t i=0; i < no_of_generators; i++) {
+        igraph_int_t g = VECTOR(*generators)[i];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -83,10 +83,10 @@ static igraph_error_t igraph_i_voronoi(
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t vid  = igraph_dqueue_int_pop(&q);
-            igraph_integer_t dist = igraph_dqueue_int_pop(&q);
+            igraph_int_t vid  = igraph_dqueue_int_pop(&q);
+            igraph_int_t dist = igraph_dqueue_int_pop(&q);
 
-            /* Attention! This must be igraph_real_t, not igraph_integer_t
+            /* Attention! This must be igraph_real_t, not igraph_int_t
              * because later it will be compared with another igraph_real_t
              * whose value may be infinite. */
             igraph_real_t md = VECTOR(*mindist)[vid];
@@ -128,9 +128,9 @@ static igraph_error_t igraph_i_voronoi(
             }
 
             igraph_vector_int_t *neis = igraph_adjlist_get(&al, vid);
-            igraph_integer_t nei_count = igraph_vector_int_size(neis);
-            for (igraph_integer_t j = 0; j < nei_count; j++) {
-                igraph_integer_t neighbor = VECTOR(*neis)[j];
+            igraph_int_t nei_count = igraph_vector_int_size(neis);
+            for (igraph_int_t j = 0; j < nei_count; j++) {
+                igraph_int_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_counted)[neighbor] == i + 1) {
                     continue;
                 }
@@ -164,9 +164,9 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
         igraph_neimode_t mode,
         igraph_voronoi_tiebreaker_t tiebreaker) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_generators = igraph_vector_int_size(generators);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_generators = igraph_vector_int_size(generators);
     igraph_inclist_t il;
     igraph_2wheap_t q;
 
@@ -211,8 +211,8 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
      * is shorter than what was recorded so far in 'mindist', we update 'mindist' and
      * assign that vertex to the current generator.
      */
-    for (igraph_integer_t i=0; i < no_of_generators; i++) {
-        igraph_integer_t g = VECTOR(*generators)[i];
+    for (igraph_int_t i=0; i < no_of_generators; i++) {
+        igraph_int_t g = VECTOR(*generators)[i];
 
         /* Weighted shortest path implementation using Dijkstra's algorithm */
 
@@ -226,7 +226,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
         IGRAPH_CHECK(igraph_2wheap_push_with_index(&q, g, -0.0));
 
         while (!igraph_2wheap_empty(&q)) {
-            igraph_integer_t vid = igraph_2wheap_max_index(&q);
+            igraph_int_t vid = igraph_2wheap_max_index(&q);
             igraph_real_t dist = -igraph_2wheap_deactivate_max(&q);
 
             igraph_real_t md = VECTOR(*mindist)[vid];
@@ -269,9 +269,9 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
             }
 
             igraph_vector_int_t *inc_edges = igraph_inclist_get(&il, vid);
-            igraph_integer_t inc_count = igraph_vector_int_size(inc_edges);
-            for (igraph_integer_t j=0; j < inc_count; j++) {
-                igraph_integer_t edge = VECTOR(*inc_edges)[j];
+            igraph_int_t inc_count = igraph_vector_int_size(inc_edges);
+            for (igraph_int_t j=0; j < inc_count; j++) {
+                igraph_int_t edge = VECTOR(*inc_edges)[j];
                 igraph_real_t weight = VECTOR(*weights)[edge];
 
                 /* Optimization: do not follow infinite-weight edges. */
@@ -279,7 +279,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
                     continue;
                 }
 
-                igraph_integer_t to = IGRAPH_OTHER(graph, edge, vid);
+                igraph_int_t to = IGRAPH_OTHER(graph, edge, vid);
                 igraph_real_t altdist = dist + weight;
 
                 if (! igraph_2wheap_has_elem(&q, to)) {
@@ -365,7 +365,7 @@ igraph_error_t igraph_voronoi(
         igraph_neimode_t mode,
         igraph_voronoi_tiebreaker_t tiebreaker) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t *pmembership;
     igraph_vector_int_t imembership;
     igraph_vector_t *pdistances;

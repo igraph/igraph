@@ -25,7 +25,7 @@
 #include "test_utilities.h"
 
 igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
-                          igraph_integer_t isoclass, void* extra) {
+                          igraph_int_t isoclass, void* extra) {
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(extra);
     printf("Class %" IGRAPH_PRId ": ", isoclass);
@@ -37,7 +37,7 @@ int main(void) {
 
     igraph_t g;
     igraph_vector_t hist;
-    igraph_integer_t size;
+    igraph_int_t size;
 
     igraph_ring(&g, 1000, IGRAPH_DIRECTED, 1, 1);
     igraph_vector_init(&hist, 0);

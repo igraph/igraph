@@ -31,7 +31,7 @@ int main(void) {
     igraph_vector_t capacity;
     igraph_vector_int_t partition, partition2;
     igraph_vector_t flow;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_maxflow_stats_t stats;
 
     /* Initialize the library. */
@@ -48,7 +48,7 @@ int main(void) {
     igraph_maxflow(&g, &flow_value, &flow, &cut, &partition, &partition2,
                    /*source=*/ 0, /*target=*/ 2, &capacity, &stats);
 
-    igraph_integer_t nc = igraph_vector_int_size(&cut);
+    igraph_int_t nc = igraph_vector_int_size(&cut);
     printf("flow value: %g\n", (double) flow_value);
     printf("flow: ");
     igraph_vector_print(&flow);
@@ -58,9 +58,9 @@ int main(void) {
     igraph_vector_int_print(&partition2);
     printf("edges in the cut: ");
     for (i = 0; i < nc; i++) {
-        igraph_integer_t edge = VECTOR(cut)[i];
-        igraph_integer_t from = IGRAPH_FROM(&g, edge);
-        igraph_integer_t to  = IGRAPH_TO(&g, edge);
+        igraph_int_t edge = VECTOR(cut)[i];
+        igraph_int_t from = IGRAPH_FROM(&g, edge);
+        igraph_int_t to  = IGRAPH_TO(&g, edge);
         printf("%" IGRAPH_PRId "-%" IGRAPH_PRId " (%g), ", from, to, VECTOR(capacity)[edge]);
     }
     printf("\n");

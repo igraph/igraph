@@ -72,7 +72,7 @@
  * Time complexity: O(\p capacity).
  */
 
-igraph_error_t FUNCTION(igraph_dqueue, init)(TYPE(igraph_dqueue)* q, igraph_integer_t capacity) {
+igraph_error_t FUNCTION(igraph_dqueue, init)(TYPE(igraph_dqueue)* q, igraph_int_t capacity) {
     IGRAPH_ASSERT(q != NULL);
     IGRAPH_ASSERT(capacity >= 0);
 
@@ -168,7 +168,7 @@ igraph_bool_t FUNCTION(igraph_dqueue, full)(TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t FUNCTION(igraph_dqueue, size)(const TYPE(igraph_dqueue)* q) {
+igraph_int_t FUNCTION(igraph_dqueue, size)(const TYPE(igraph_dqueue)* q) {
     IGRAPH_ASSERT(q != NULL);
     IGRAPH_ASSERT(q->stor_begin != NULL);
     if (q->end == NULL) {
@@ -321,8 +321,8 @@ igraph_error_t FUNCTION(igraph_dqueue, push)(TYPE(igraph_dqueue)* q, BASE elem) 
         /* full, allocate more storage */
 
         BASE *bigger = NULL, *old = q->stor_begin;
-        igraph_integer_t old_size = q->stor_end - q->stor_begin;
-        igraph_integer_t new_capacity = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        igraph_int_t old_size = q->stor_end - q->stor_begin;
+        igraph_int_t new_capacity = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
 
         if (old_size == IGRAPH_INTEGER_MAX) {
             IGRAPH_ERROR("Cannot push to dqueue, already at maximum size.", IGRAPH_EOVERFLOW);
@@ -413,7 +413,7 @@ igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FIL
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_dqueue, get)(const TYPE(igraph_dqueue) *q, igraph_integer_t idx) {
+BASE FUNCTION(igraph_dqueue, get)(const TYPE(igraph_dqueue) *q, igraph_int_t idx) {
     IGRAPH_ASSERT(idx >= 0);
     IGRAPH_ASSERT(idx < FUNCTION(igraph_dqueue, size)(q));
     if ((q->begin + idx < q->end) ||

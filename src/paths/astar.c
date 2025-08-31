@@ -28,7 +28,7 @@
 #include "core/interruption.h"
 
 static igraph_error_t null_heuristic(
-    igraph_real_t *result, igraph_integer_t from, igraph_integer_t to,
+    igraph_real_t *result, igraph_int_t from, igraph_int_t to,
 	void *extra
 ) {
     IGRAPH_UNUSED(from);
@@ -93,8 +93,8 @@ static igraph_error_t null_heuristic(
 igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
                                       igraph_vector_int_t *vertices,
                                       igraph_vector_int_t *edges,
-                                      igraph_integer_t from,
-                                      igraph_integer_t to,
+                                      igraph_int_t from,
+                                      igraph_int_t to,
                                       const igraph_vector_t *weights,
                                       igraph_neimode_t mode,
                                       igraph_astar_heuristic_func_t *heuristic,
@@ -102,12 +102,12 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 {
     igraph_real_t heur_res;
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists;
-    igraph_integer_t *parent_eids;
+    igraph_int_t *parent_eids;
 
     if (from < 0 || from >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex out of range.", IGRAPH_EINVVID);
@@ -148,7 +148,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     /* parent_eids[v] is the 1 + the ID of v's inbound edge in the shortest path tree.
      * A value of 0 indicates unreachable vertices. */
-    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for shortest paths with A* algorithm.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
 
@@ -170,7 +170,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
          * in order to obtain smallest values first. The value taken off
          * the heap is ignored, we just want the index of 'u'. */
 
-        igraph_integer_t u;
+        igraph_int_t u;
         igraph_2wheap_delete_max_index(&Q, &u);
 
         /* Reached the target vertex, the search can be stopped. */
@@ -185,10 +185,10 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
         igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, u);
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
 
-        igraph_integer_t nlen = igraph_vector_int_size(neis);
-        for (igraph_integer_t i = 0; i < nlen; i++) {
-            igraph_integer_t edge = VECTOR(*neis)[i];
-            igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
+        igraph_int_t nlen = igraph_vector_int_size(neis);
+        for (igraph_int_t i = 0; i < nlen; i++) {
+            igraph_int_t edge = VECTOR(*neis)[i];
+            igraph_int_t v = IGRAPH_OTHER(graph, edge, u);
             igraph_real_t altdist; /* candidate from -> v distance */
             if (weights) {
                 igraph_real_t weight = VECTOR(*weights)[edge];
@@ -223,7 +223,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
-        igraph_integer_t size, act, edge;
+        igraph_int_t size, act, edge;
 
         if (vertices) {
             igraph_vector_int_clear(vertices);

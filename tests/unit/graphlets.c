@@ -42,7 +42,7 @@ void test_graphlets_candidate_basis_simple(void) {
     igraph_vector_int_list_t cliques;
     igraph_vector_t thresholds;
     igraph_vector_t weights;
-    igraph_integer_t eid;
+    igraph_int_t eid;
 
     igraph_full(&g, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_int_list_init(&cliques, 0);

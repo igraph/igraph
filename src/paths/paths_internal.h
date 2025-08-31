@@ -81,7 +81,7 @@ igraph_error_t igraph_i_get_shortest_paths_unweighted(
         const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
-        igraph_integer_t from, igraph_vs_t to,
+        igraph_int_t from, igraph_vs_t to,
         igraph_neimode_t mode,
         igraph_vector_int_t *parents,
         igraph_vector_int_t *inbound_edges);
@@ -90,7 +90,7 @@ igraph_error_t igraph_i_get_shortest_paths_dijkstra(
         const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
-        igraph_integer_t from, igraph_vs_t to,
+        igraph_int_t from, igraph_vs_t to,
         const igraph_vector_t *weights,
         igraph_neimode_t mode,
         igraph_vector_int_t *parents,
@@ -100,7 +100,7 @@ igraph_error_t igraph_i_get_shortest_paths_bellman_ford(
         const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
-        igraph_integer_t from, igraph_vs_t to,
+        igraph_int_t from, igraph_vs_t to,
         const igraph_vector_t *weights,
         igraph_neimode_t mode,
         igraph_vector_int_t *parents,
@@ -111,7 +111,7 @@ igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
         igraph_vector_int_t *nrgeo,
-        igraph_integer_t from, igraph_vs_t to,
+        igraph_int_t from, igraph_vs_t to,
         igraph_neimode_t mode);
 
 IGRAPH_END_C_DECLS

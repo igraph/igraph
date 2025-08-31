@@ -33,7 +33,7 @@ int main(void) {
     igraph_vector_int_list_init(&sep, 0);
     igraph_minimum_size_separators(&g, &sep);
 
-    for (igraph_integer_t i = 0; i < igraph_vector_int_list_size(&sep); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_int_list_size(&sep); i++) {
         igraph_vector_int_t* v = igraph_vector_int_list_get_ptr(&sep, i);
         igraph_vector_int_print(v);
     }

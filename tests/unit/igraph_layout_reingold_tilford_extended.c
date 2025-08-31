@@ -30,7 +30,7 @@ int main(void) {
     igraph_t g;
     FILE *f;
     igraph_matrix_t coords;
-    /* igraph_integer_t i, n; */
+    /* igraph_int_t i, n; */
 
     f = fopen("igraph_layout_reingold_tilford_extended.in", "r");
     IGRAPH_ASSERT(f != NULL);

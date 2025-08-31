@@ -59,16 +59,16 @@
 igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                             igraph_bool_t directed) {
 
-    igraph_integer_t nrow = igraph_matrix_nrow(vecs);
-    igraph_integer_t ncol = igraph_matrix_ncol(vecs);
-    igraph_integer_t i, j;
+    igraph_int_t nrow = igraph_matrix_nrow(vecs);
+    igraph_int_t ncol = igraph_matrix_ncol(vecs);
+    igraph_int_t i, j;
     igraph_vector_int_t edges;
     igraph_bool_t warned_neg = false, warned_big = false;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     for (i = 0; i < ncol; i++) {
-        igraph_integer_t from = directed ? 0 : i + 1;
+        igraph_int_t from = directed ? 0 : i + 1;
         igraph_vector_t v1;
         igraph_vector_view(&v1, &MATRIX(*vecs, 0, i), nrow);
         for (j = from; j < ncol; j++) {

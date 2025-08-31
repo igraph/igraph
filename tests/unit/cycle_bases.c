@@ -21,15 +21,15 @@
 #include "test_utilities.h"
 
 void print_check_destroy(igraph_t *graph, igraph_vector_int_list_t *result) {
-    igraph_integer_t i, rank = igraph_vector_int_list_size(result);
-    igraph_integer_t ecount = igraph_ecount(graph), vcount = igraph_vcount(graph);
-    igraph_integer_t ccount;
+    igraph_int_t i, rank = igraph_vector_int_list_size(result);
+    igraph_int_t ecount = igraph_ecount(graph), vcount = igraph_vcount(graph);
+    igraph_int_t ccount;
 
     for (i=0; i < rank; ++i) {
         igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(result, i);
         IGRAPH_ASSERT(igraph_vector_int_size(cycle) > 0);
-        igraph_integer_t first_edge = VECTOR(*cycle)[0];
-        igraph_integer_t last_edge = VECTOR(*cycle)[igraph_vector_int_size(cycle) - 1];
+        igraph_int_t first_edge = VECTOR(*cycle)[0];
+        igraph_int_t last_edge = VECTOR(*cycle)[igraph_vector_int_size(cycle) - 1];
         /* Verify that first and last edges of the cycle share a vertex */
         IGRAPH_ASSERT(
             (IGRAPH_FROM(graph, first_edge) == IGRAPH_FROM(graph, last_edge) ||
@@ -47,7 +47,7 @@ void print_check_destroy(igraph_t *graph, igraph_vector_int_list_t *result) {
 int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t result;
-    igraph_integer_t rank;
+    igraph_int_t rank;
 
     igraph_vector_int_list_init(&result, 0);
 

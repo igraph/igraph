@@ -24,7 +24,7 @@ int main(void) {
     igraph_bool_t is_dag;
 
     // directed empty graphs
-    for (igraph_integer_t n=0; n < 3; n++ ){
+    for (igraph_int_t n=0; n < 3; n++ ){
         igraph_empty(&graph, n, IGRAPH_DIRECTED);
         igraph_is_dag(&graph, &is_dag);
         IGRAPH_ASSERT(is_dag);
@@ -32,7 +32,7 @@ int main(void) {
     }
 
     // undirected graphs
-    for (igraph_integer_t n=0; n < 3; n++ ){
+    for (igraph_int_t n=0; n < 3; n++ ){
         igraph_empty(&graph, n, IGRAPH_UNDIRECTED);
         igraph_is_dag(&graph, &is_dag);
         IGRAPH_ASSERT(!is_dag);

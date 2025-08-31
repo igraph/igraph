@@ -29,19 +29,19 @@
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
 static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t adjedges, adjedges2;
     igraph_vector_int_t edges;
-    igraph_integer_t prev = -1;
+    igraph_int_t prev = -1;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges2, 0);
 
-    for (igraph_integer_t e1 = 0; e1 < no_of_edges; e1++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e1);
-        igraph_integer_t to = IGRAPH_TO(graph, e1);
-        igraph_integer_t n;
+    for (igraph_int_t e1 = 0; e1 < no_of_edges; e1++) {
+        igraph_int_t from = IGRAPH_FROM(graph, e1);
+        igraph_int_t to = IGRAPH_TO(graph, e1);
+        igraph_int_t n;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -49,8 +49,8 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
             IGRAPH_CHECK(igraph_incident(graph, &adjedges, from, IGRAPH_ALL, IGRAPH_LOOPS));
         }
         n = igraph_vector_int_size(&adjedges);
-        for (igraph_integer_t i = 0; i < n; i++) {
-            igraph_integer_t e2 = VECTOR(adjedges)[i];
+        for (igraph_int_t i = 0; i < n; i++) {
+            igraph_int_t e2 = VECTOR(adjedges)[i];
             if (e2 < e1) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e1));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e2));
@@ -59,8 +59,8 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
 
         IGRAPH_CHECK(igraph_incident(graph, &adjedges2, to, IGRAPH_ALL, IGRAPH_LOOPS));
         n = igraph_vector_int_size(&adjedges2);
-        for (igraph_integer_t i = 0; i < n; i++) {
-            igraph_integer_t e2 = VECTOR(adjedges2)[i];
+        for (igraph_int_t i = 0; i < n; i++) {
+            igraph_int_t e2 = VECTOR(adjedges2)[i];
             if (e2 < e1) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e1));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e2));
@@ -89,17 +89,17 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
 }
 
 static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i, j, n;
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i, j, n;
     igraph_vector_int_t adjedges;
     igraph_vector_int_t edges;
-    igraph_integer_t prev = -1;
+    igraph_int_t prev = -1;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adjedges, 0);
 
     for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_int_t from = IGRAPH_FROM(graph, i);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
         }
         n = igraph_vector_int_size(&adjedges);
         for (j = 0; j < n; j++) {
-            igraph_integer_t e = VECTOR(adjedges)[j];
+            igraph_int_t e = VECTOR(adjedges)[j];
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, e));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
         }

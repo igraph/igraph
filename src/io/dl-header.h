@@ -43,8 +43,8 @@ typedef struct {
     char errmsg[300];
     igraph_error_t igraph_errno;
     int mode;
-    igraph_integer_t n;
-    igraph_integer_t from, to;
+    igraph_int_t n;
+    igraph_int_t from, to;
     igraph_vector_int_t edges;
     igraph_vector_t weights;
     igraph_strvector_t labels;

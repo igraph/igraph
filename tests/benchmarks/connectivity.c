@@ -22,7 +22,7 @@
 
 /* Benchmarks related to biconnected components. */
 
-void run_bench(igraph_integer_t vcount, igraph_real_t meandeg, igraph_integer_t rep) {
+void run_bench(igraph_int_t vcount, igraph_real_t meandeg, igraph_int_t rep) {
     igraph_t g;
     igraph_bool_t b;
     igraph_vector_int_t ivec;

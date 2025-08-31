@@ -26,8 +26,8 @@
 #include "test_utilities.h"
 
 void byrow(igraph_matrix_t *m) {
-    igraph_integer_t r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
-    igraph_integer_t n = 0, i, j;
+    igraph_int_t r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
+    igraph_int_t n = 0, i, j;
     for (i = 0; i < r; i++) {
         for (j = 0; j < c; j++) {
             MATRIX(*m, i, j) = n++;
@@ -48,7 +48,7 @@ int main(void) {
     igraph_matrix_t m, m2;
     igraph_vector_t v;
     igraph_vector_int_t index;
-    igraph_integer_t i, j, i2, j2;
+    igraph_int_t i, j, i2, j2;
     igraph_real_t r1, r2;
 
     igraph_matrix_init(&m, 4, 3);

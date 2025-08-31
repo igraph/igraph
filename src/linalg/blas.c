@@ -113,10 +113,10 @@ igraph_error_t igraph_blas_dgemm(igraph_bool_t transpose_a, igraph_bool_t transp
     char trans_a = transpose_a ? 'T' : 'N';
     char trans_b = transpose_b ? 'T' : 'N';
     int m, n, k, lda, ldb, ldc;
-    igraph_integer_t nrow_oa = transpose_a ? igraph_matrix_ncol(a) : igraph_matrix_nrow(a);
-    igraph_integer_t ncol_oa = transpose_a ? igraph_matrix_nrow(a) : igraph_matrix_ncol(a);
-    igraph_integer_t nrow_ob = transpose_b ? igraph_matrix_ncol(b) : igraph_matrix_nrow(b);
-    igraph_integer_t ncol_ob = transpose_b ? igraph_matrix_nrow(b) : igraph_matrix_ncol(b);
+    igraph_int_t nrow_oa = transpose_a ? igraph_matrix_ncol(a) : igraph_matrix_nrow(a);
+    igraph_int_t ncol_oa = transpose_a ? igraph_matrix_nrow(a) : igraph_matrix_ncol(a);
+    igraph_int_t nrow_ob = transpose_b ? igraph_matrix_ncol(b) : igraph_matrix_nrow(b);
+    igraph_int_t ncol_ob = transpose_b ? igraph_matrix_nrow(b) : igraph_matrix_ncol(b);
 
     if (ncol_oa != nrow_ob) {
         IGRAPH_ERRORF("%" IGRAPH_PRId "-by-%" IGRAPH_PRId " and %" IGRAPH_PRId "-by-%" IGRAPH_PRId

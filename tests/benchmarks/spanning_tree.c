@@ -22,8 +22,8 @@
 
 void run_bench(const igraph_t *graph, const igraph_vector_t *weights, int rep, const char *name) {
     igraph_vector_int_t edges;
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     char msg[128];
 
     igraph_vector_int_init(&edges, vcount - 1);
@@ -49,9 +49,9 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights, int rep, c
 }
 
 void rand_weights(const igraph_t *graph, igraph_vector_t *weights) {
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_resize(weights, ecount);
-    for (igraph_integer_t i=0; i < ecount; i++) {
+    for (igraph_int_t i=0; i < ecount; i++) {
         VECTOR(*weights)[i] = RNG_UNIF01();
     }
 }

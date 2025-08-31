@@ -22,17 +22,17 @@
 
 /* Check that isoclass() and isoclass_create() are consistent with each other. */
 void verify_classes(void) {
-    igraph_integer_t class;
-    igraph_integer_t size;
+    igraph_int_t class;
+    igraph_int_t size;
 
-    igraph_integer_t classcountD[] = { 1, 1, 3, 16, 218 }; /* no. of unlabelled directed graphs */
-    igraph_integer_t classcountU[] = { 1, 1, 2, 4, 11, 34, 156 }; /* no. of unlabelled undirected graphs */
+    igraph_int_t classcountD[] = { 1, 1, 3, 16, 218 }; /* no. of unlabelled directed graphs */
+    igraph_int_t classcountU[] = { 1, 1, 2, 4, 11, 34, 156 }; /* no. of unlabelled undirected graphs */
 
     /* Directed */
     for (size=3; size <= 4; size++) {
         for (class=0; class < classcountD[size]; class++) {
             igraph_t g;
-            igraph_integer_t class2;
+            igraph_int_t class2;
 
             igraph_isoclass_create(&g, size, class, IGRAPH_DIRECTED);
             igraph_isoclass(&g, &class2);
@@ -46,7 +46,7 @@ void verify_classes(void) {
     for (size=3; size <= 6; size++) {
         for (class=0; class < classcountU[size]; class++) {
             igraph_t g;
-            igraph_integer_t class2;
+            igraph_int_t class2;
 
             igraph_isoclass_create(&g, size, class, IGRAPH_UNDIRECTED);
             igraph_isoclass(&g, &class2);
@@ -59,7 +59,7 @@ void verify_classes(void) {
 
 /* Generate small random graphs and check that their isoclasses are identified correctly. */
 void random_test(void) {
-    igraph_integer_t size, i;
+    igraph_int_t size, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
 
@@ -67,7 +67,7 @@ void random_test(void) {
     for (size=3; size <= 4; size++) {
         for (i=0; i < 200; ++i) {
             igraph_t g1, g2;
-            igraph_integer_t class;
+            igraph_int_t class;
             igraph_bool_t iso;
 
             igraph_erdos_renyi_game_gnp(&g1, size, 0.5, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
@@ -87,7 +87,7 @@ void random_test(void) {
     for (size=3; size <= 6; size++) {
         for (i=0; i < 200; ++i) {
             igraph_t g1, g2;
-            igraph_integer_t class;
+            igraph_int_t class;
             igraph_bool_t iso;
 
             igraph_erdos_renyi_game_gnp(&g1, size, 0.5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
@@ -108,7 +108,7 @@ void random_test(void) {
  * isoclasses are identified correctly. */
 void random_subgraph_test(void) {
     igraph_t graph;
-    igraph_integer_t size, i;
+    igraph_int_t size, i;
     igraph_vector_int_t vids;
 
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -122,7 +122,7 @@ void random_subgraph_test(void) {
     for (size=3; size <= 4; size++) {
         for (i=0; i < 100; ++i) {
             igraph_t sg1, sg2;
-            igraph_integer_t class;
+            igraph_int_t class;
             igraph_bool_t iso;
 
             igraph_random_sample(&vids, 0, igraph_vcount(&graph) - 1, size);
@@ -147,7 +147,7 @@ void random_subgraph_test(void) {
     for (size=3; size <= 6; size++) {
         for (i=0; i < 100; ++i) {
             igraph_t sg1, sg2;
-            igraph_integer_t class;
+            igraph_int_t class;
             igraph_bool_t iso;
 
             igraph_random_sample(&vids, 0, igraph_vcount(&graph) - 1, size);

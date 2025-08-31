@@ -43,12 +43,12 @@
  */
 igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
 
     IGRAPH_CHECK(igraph_matrix_resize(res, vcount, 2));
 
-    for (igraph_integer_t j = 0; j < 2; j++) {
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t j = 0; j < 2; j++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             MATRIX(*res, i, j) = RNG_UNIF(-1, 1);
         }
     }
@@ -74,12 +74,12 @@ igraph_error_t igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res)
  */
 igraph_error_t igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
 
     IGRAPH_CHECK(igraph_matrix_resize(res, vcount, 3));
 
-    for (igraph_integer_t j = 0; j < 3; j++) {
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t j = 0; j < 3; j++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             MATRIX(*res, i, j) = RNG_UNIF(-1, 1);
         }
     }
@@ -97,7 +97,7 @@ igraph_error_t igraph_i_layout_random_bounded(
         const igraph_vector_t *minx, const igraph_vector_t *maxx,
         const igraph_vector_t *miny, const igraph_vector_t *maxy) {
 
-    const igraph_integer_t no_nodes = igraph_vcount(graph);
+    const igraph_int_t no_nodes = igraph_vcount(graph);
     const igraph_real_t width = sqrt(no_nodes), height = width;
 
     igraph_real_t dminx = -width/2,  dmaxx = width/2,
@@ -143,7 +143,7 @@ igraph_error_t igraph_i_layout_random_bounded(
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
-    for (igraph_integer_t i = 0; i < no_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_nodes; i++) {
         igraph_real_t x1 = minx ? VECTOR(*minx)[i] : dminx;
         igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] : dmaxx;
         igraph_real_t y1 = miny ? VECTOR(*miny)[i] : dminy;
@@ -173,7 +173,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         const igraph_vector_t *miny, const igraph_vector_t *maxy,
         const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    const igraph_integer_t no_nodes = igraph_vcount(graph);
+    const igraph_int_t no_nodes = igraph_vcount(graph);
     const igraph_real_t width = sqrt(no_nodes), height = width, depth = width;
 
     igraph_real_t dminx = -width/2,  dmaxx = width/2,
@@ -238,7 +238,7 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
-    for (igraph_integer_t i = 0; i < no_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_nodes; i++) {
         igraph_real_t x1 = minx ? VECTOR(*minx)[i] : dminx;
         igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] : dmaxx;
         igraph_real_t y1 = miny ? VECTOR(*miny)[i] : dminy;

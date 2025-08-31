@@ -52,7 +52,7 @@ void test_simple(void) {
     printf("test_simple\n");
 
     igraph_matrix_init(&coords, 10, 2);
-    for (igraph_integer_t i = 0; i < 20; i++) {
+    for (igraph_int_t i = 0; i < 20; i++) {
         MATRIX(coords, i / 2, i % 2) = coords_array[i / 2][i % 2];
     }
     check_convex_hull(&coords);
@@ -67,7 +67,7 @@ void test_collinear(void) {
     printf("test_collinear\n");
 
     igraph_matrix_init(&coords, 5, 2);
-    for (igraph_integer_t i = 0; i < 10; i++) {
+    for (igraph_int_t i = 0; i < 10; i++) {
         MATRIX(coords, i / 2, i % 2) = coords_array[i / 2][i % 2];
     }
     check_convex_hull(&coords);
@@ -111,7 +111,7 @@ void test_bug_805(void) {
     printf("test_bug_805\n");
 
     igraph_matrix_init(&coords, 33, 2);
-    for (igraph_integer_t i = 0; i < 66; i++) {
+    for (igraph_int_t i = 0; i < 66; i++) {
         MATRIX(coords, i / 2, i % 2) = coords_array[i / 2][i % 2];
     }
     check_convex_hull(&coords);
@@ -133,7 +133,7 @@ void test_bug_1115(void) {
     printf("test_bug_1115\n");
 
     igraph_matrix_init(&coords, 51, 2);
-    for (igraph_integer_t i = 0; i < 102; i++) {
+    for (igraph_int_t i = 0; i < 102; i++) {
         MATRIX(coords, i / 2, i % 2) = coords_array[i / 2][i % 2];
     }
     check_convex_hull(&coords);

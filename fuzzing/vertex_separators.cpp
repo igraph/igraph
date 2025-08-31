@@ -55,7 +55,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_all_minimal_st_separators(&graph, &ivl);
 
         // Check that all returned sets are indeed separators.
-        for (igraph_integer_t i=0; i < igraph_vector_int_list_size(&ivl); i++) {
+        for (igraph_int_t i=0; i < igraph_vector_int_list_size(&ivl); i++) {
             igraph_is_separator(
                 &graph,
                 igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),
@@ -69,8 +69,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         // enables a straightforward check for complete graphs below.
         igraph_simplify(&graph, true, true, NULL);
 
-        const igraph_integer_t vcount = igraph_vcount(&graph);
-        const igraph_integer_t ecount = igraph_ecount(&graph);
+        const igraph_int_t vcount = igraph_vcount(&graph);
+        const igraph_int_t ecount = igraph_ecount(&graph);
 
         if (ecount != vcount*(vcount-1)/2) {
             // minimum_size_separators() returns all size n-1 subsets
@@ -78,7 +78,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             // consider these to be separators. Therefore we skip complete
             // graphs. For non-complete graphs we check that all results
             // are minimal separators.
-            for (igraph_integer_t i=0; i < igraph_vector_int_list_size(&ivl); i++) {
+            for (igraph_int_t i=0; i < igraph_vector_int_list_size(&ivl); i++) {
                 igraph_is_minimal_separator(
                     &graph,
                     igraph_vss_vector(igraph_vector_int_list_get_ptr(&ivl, i)),

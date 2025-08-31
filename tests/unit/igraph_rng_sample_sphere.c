@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void check(igraph_bool_t volume, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius, igraph_bool_t positive) {
+void check(igraph_bool_t volume, igraph_int_t dim, igraph_int_t n, igraph_real_t radius, igraph_bool_t positive) {
     igraph_matrix_t samples;
 
     igraph_matrix_init(&samples, 0, 0);
@@ -30,9 +30,9 @@ void check(igraph_bool_t volume, igraph_integer_t dim, igraph_integer_t n, igrap
     }
     IGRAPH_ASSERT(igraph_matrix_ncol(&samples) == n);
     IGRAPH_ASSERT(igraph_matrix_nrow(&samples) == dim);
-    for (igraph_integer_t col = 0; col < n; col++) {
+    for (igraph_int_t col = 0; col < n; col++) {
         igraph_real_t sum = 0;
-        for (igraph_integer_t row = 0; row < dim; row++) {
+        for (igraph_int_t row = 0; row < dim; row++) {
             if (positive) {
                 IGRAPH_ASSERT(MATRIX(samples, row, col) >= 0);
             }

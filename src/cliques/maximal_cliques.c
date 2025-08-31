@@ -37,42 +37,42 @@
 
 static igraph_error_t igraph_i_maximal_cliques_reorder_adjlists(
         const igraph_vector_int_t *PX,
-        igraph_integer_t PS, igraph_integer_t PE, igraph_integer_t XS, igraph_integer_t XE,
+        igraph_int_t PS, igraph_int_t PE, igraph_int_t XS, igraph_int_t XE,
         const igraph_vector_int_t *pos,
         igraph_adjlist_t *adjlist);
 
 static igraph_error_t igraph_i_maximal_cliques_select_pivot(
         const igraph_vector_int_t *PX,
-        igraph_integer_t PS, igraph_integer_t PE, igraph_integer_t XS, igraph_integer_t XE,
+        igraph_int_t PS, igraph_int_t PE, igraph_int_t XS, igraph_int_t XE,
         const igraph_vector_int_t *pos,
         const igraph_adjlist_t *adjlist,
-        igraph_integer_t *pivot,
+        igraph_int_t *pivot,
         igraph_vector_int_t *nextv,
-        igraph_integer_t oldPS, igraph_integer_t oldXE);
+        igraph_int_t oldPS, igraph_int_t oldXE);
 
 static igraph_error_t igraph_i_maximal_cliques_down(
         igraph_vector_int_t *PX,
-        igraph_integer_t PS, igraph_integer_t PE, igraph_integer_t XS, igraph_integer_t XE,
+        igraph_int_t PS, igraph_int_t PE, igraph_int_t XS, igraph_int_t XE,
         igraph_vector_int_t *pos,
-        igraph_adjlist_t *adjlist, igraph_integer_t mynextv,
+        igraph_adjlist_t *adjlist, igraph_int_t mynextv,
         igraph_vector_int_t *R,
-        igraph_integer_t *newPS, igraph_integer_t *newXE);
+        igraph_int_t *newPS, igraph_int_t *newXE);
 
 static igraph_error_t igraph_i_maximal_cliques_PX(
-        igraph_vector_int_t *PX, igraph_integer_t PS, igraph_integer_t *PE,
-        igraph_integer_t *XS, igraph_integer_t XE, igraph_vector_int_t *pos,
-        igraph_adjlist_t *adjlist, igraph_integer_t v,
+        igraph_vector_int_t *PX, igraph_int_t PS, igraph_int_t *PE,
+        igraph_int_t *XS, igraph_int_t XE, igraph_vector_int_t *pos,
+        igraph_adjlist_t *adjlist, igraph_int_t v,
         igraph_vector_int_t *H);
 
 static igraph_error_t igraph_i_maximal_cliques_up(
-        igraph_vector_int_t *PX, igraph_integer_t PS, igraph_integer_t PE,
-        igraph_integer_t XS, igraph_integer_t XE, igraph_vector_int_t *pos,
+        igraph_vector_int_t *PX, igraph_int_t PS, igraph_int_t PE,
+        igraph_int_t XS, igraph_int_t XE, igraph_vector_int_t *pos,
         igraph_adjlist_t *adjlist,
         igraph_vector_int_t *R,
         igraph_vector_int_t *H);
 
 #define PRINT_PX do { \
-        igraph_integer_t j; \
+        igraph_int_t j; \
         printf("PX="); \
         for (j=0; j<PS; j++) { \
             printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
@@ -93,7 +93,7 @@ static igraph_error_t igraph_i_maximal_cliques_up(
     } while (0);
 
 #define PRINT_PX1 do { \
-        igraph_integer_t j; \
+        igraph_int_t j; \
         printf("PX="); \
         for (j=0; j<PS; j++) { \
             printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
@@ -115,28 +115,28 @@ static igraph_error_t igraph_i_maximal_cliques_up(
 
 static igraph_error_t igraph_i_maximal_cliques_reorder_adjlists(
         const igraph_vector_int_t *PX,
-        igraph_integer_t PS, igraph_integer_t PE,
-        igraph_integer_t XS, igraph_integer_t XE,
+        igraph_int_t PS, igraph_int_t PE,
+        igraph_int_t XS, igraph_int_t XE,
         const igraph_vector_int_t *pos,
         igraph_adjlist_t *adjlist) {
-    igraph_integer_t j;
-    igraph_integer_t sPS = PS + 1, sPE = PE + 1;
+    igraph_int_t j;
+    igraph_int_t sPS = PS + 1, sPE = PE + 1;
 
     IGRAPH_UNUSED(XS);
 
     for (j = PS; j <= XE; j++) {
-        igraph_integer_t av = VECTOR(*PX)[j];
+        igraph_int_t av = VECTOR(*PX)[j];
         igraph_vector_int_t *avneis = igraph_adjlist_get(adjlist, av);
-        igraph_integer_t *avp = VECTOR(*avneis);
-        igraph_integer_t avlen = igraph_vector_int_size(avneis);
-        igraph_integer_t *ave = avp + avlen;
-        igraph_integer_t *avnei = avp, *pp = avp;
+        igraph_int_t *avp = VECTOR(*avneis);
+        igraph_int_t avlen = igraph_vector_int_size(avneis);
+        igraph_int_t *ave = avp + avlen;
+        igraph_int_t *avnei = avp, *pp = avp;
 
         for (; avnei < ave; avnei++) {
-            igraph_integer_t avneipos = VECTOR(*pos)[(*avnei)];
+            igraph_int_t avneipos = VECTOR(*pos)[(*avnei)];
             if (avneipos >= sPS && avneipos <= sPE) {
                 if (pp != avnei) {
-                    igraph_integer_t tmp = *avnei;
+                    igraph_int_t tmp = *avnei;
                     *avnei = *pp;
                     *pp = tmp;
                 }
@@ -150,37 +150,37 @@ static igraph_error_t igraph_i_maximal_cliques_reorder_adjlists(
 
 static igraph_error_t igraph_i_maximal_cliques_select_pivot(
         const igraph_vector_int_t *PX,
-        igraph_integer_t PS, igraph_integer_t PE,
-        igraph_integer_t XS, igraph_integer_t XE,
+        igraph_int_t PS, igraph_int_t PE,
+        igraph_int_t XS, igraph_int_t XE,
         const igraph_vector_int_t *pos,
         const igraph_adjlist_t *adjlist,
-        igraph_integer_t *pivot,
+        igraph_int_t *pivot,
         igraph_vector_int_t *nextv,
-        igraph_integer_t oldPS, igraph_integer_t oldXE) {
+        igraph_int_t oldPS, igraph_int_t oldXE) {
     igraph_vector_int_t *pivotvectneis;
-    igraph_integer_t j, pivotvectlen;
-    igraph_integer_t i, usize = -1;
-    igraph_integer_t soldPS = oldPS + 1, soldXE = oldXE + 1, sPS = PS + 1, sPE = PE + 1;
+    igraph_int_t j, pivotvectlen;
+    igraph_int_t i, usize = -1;
+    igraph_int_t soldPS = oldPS + 1, soldXE = oldXE + 1, sPS = PS + 1, sPE = PE + 1;
 
     IGRAPH_UNUSED(XS);
 
     /* Choose a pivotvect, and bring up P vertices at the same time */
     for (i = PS; i <= XE; i++) {
-        igraph_integer_t av = VECTOR(*PX)[i];
+        igraph_int_t av = VECTOR(*PX)[i];
         igraph_vector_int_t *avneis = igraph_adjlist_get(adjlist, av);
-        igraph_integer_t *avp = VECTOR(*avneis);
-        igraph_integer_t avlen = igraph_vector_int_size(avneis);
-        igraph_integer_t *ave = avp + avlen;
-        igraph_integer_t *avnei = avp, *pp = avp;
+        igraph_int_t *avp = VECTOR(*avneis);
+        igraph_int_t avlen = igraph_vector_int_size(avneis);
+        igraph_int_t *ave = avp + avlen;
+        igraph_int_t *avnei = avp, *pp = avp;
 
         for (; avnei < ave; avnei++) {
-            igraph_integer_t avneipos = VECTOR(*pos)[(*avnei)];
+            igraph_int_t avneipos = VECTOR(*pos)[(*avnei)];
             if (avneipos < soldPS || avneipos > soldXE) {
                 break;
             }
             if (avneipos >= sPS && avneipos <= sPE) {
                 if (pp != avnei) {
-                    igraph_integer_t tmp = *avnei;
+                    igraph_int_t tmp = *avnei;
                     *avnei = *pp;
                     *pp = tmp;
                 }
@@ -198,12 +198,12 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
     pivotvectlen = igraph_vector_int_size(pivotvectneis);
 
     for (j = PS; j <= PE; j++) {
-        igraph_integer_t vcand = VECTOR(*PX)[j];
+        igraph_int_t vcand = VECTOR(*PX)[j];
         igraph_bool_t nei = false;
-        igraph_integer_t k = 0;
+        igraph_int_t k = 0;
         for (k = 0; k < pivotvectlen; k++) {
-            igraph_integer_t unv = VECTOR(*pivotvectneis)[k];
-            igraph_integer_t unvpos = VECTOR(*pos)[unv];
+            igraph_int_t unv = VECTOR(*pivotvectneis)[k];
+            igraph_int_t unvpos = VECTOR(*pos)[unv];
             if (unvpos < sPS || unvpos > sPE) {
                 break;
             }
@@ -221,8 +221,8 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
 }
 
 #define SWAP(p1,p2) do { \
-        igraph_integer_t v1=VECTOR(*PX)[p1]; \
-        igraph_integer_t v2=VECTOR(*PX)[p2]; \
+        igraph_int_t v1=VECTOR(*PX)[p1]; \
+        igraph_int_t v2=VECTOR(*PX)[p2]; \
         VECTOR(*PX)[p1] = v2; \
         VECTOR(*PX)[p2] = v1; \
         VECTOR(*pos)[v1] = (p2)+1; \
@@ -230,21 +230,21 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
     } while (0)
 
 static igraph_error_t igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
-                                         igraph_integer_t PS, igraph_integer_t PE,
-                                         igraph_integer_t XS, igraph_integer_t XE,
+                                         igraph_int_t PS, igraph_int_t PE,
+                                         igraph_int_t XS, igraph_int_t XE,
                                          igraph_vector_int_t *pos,
-                                         igraph_adjlist_t *adjlist, igraph_integer_t mynextv,
+                                         igraph_adjlist_t *adjlist, igraph_int_t mynextv,
                                          igraph_vector_int_t *R,
-                                         igraph_integer_t *newPS, igraph_integer_t *newXE) {
+                                         igraph_int_t *newPS, igraph_int_t *newXE) {
 
     igraph_vector_int_t *vneis = igraph_adjlist_get(adjlist, mynextv);
-    igraph_integer_t j, vneislen = igraph_vector_int_size(vneis);
-    igraph_integer_t sPS = PS + 1, sPE = PE + 1, sXS = XS + 1, sXE = XE + 1;
+    igraph_int_t j, vneislen = igraph_vector_int_size(vneis);
+    igraph_int_t sPS = PS + 1, sPE = PE + 1, sXS = XS + 1, sXE = XE + 1;
 
     *newPS = PE + 1; *newXE = XS - 1;
     for (j = 0; j < vneislen; j++) {
-        igraph_integer_t vnei = VECTOR(*vneis)[j];
-        igraph_integer_t vneipos = VECTOR(*pos)[vnei];
+        igraph_int_t vnei = VECTOR(*vneis)[j];
+        igraph_int_t vneipos = VECTOR(*pos)[vnei];
         if (vneipos >= sPS && vneipos <= sPE) {
             (*newPS)--;
             SWAP(vneipos - 1, *newPS);
@@ -262,13 +262,13 @@ static igraph_error_t igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
 #undef SWAP
 
 static igraph_error_t igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX,
-    igraph_integer_t PS, igraph_integer_t *PE, igraph_integer_t *XS, igraph_integer_t XE,
-    igraph_vector_int_t *pos, igraph_adjlist_t *adjlist, igraph_integer_t v,
+    igraph_int_t PS, igraph_int_t *PE, igraph_int_t *XS, igraph_int_t XE,
+    igraph_vector_int_t *pos, igraph_adjlist_t *adjlist, igraph_int_t v,
     igraph_vector_int_t *H
 ) {
 
-    igraph_integer_t vpos = VECTOR(*pos)[v] - 1;
-    igraph_integer_t tmp = VECTOR(*PX)[*PE];
+    igraph_int_t vpos = VECTOR(*pos)[v] - 1;
+    igraph_int_t tmp = VECTOR(*PX)[*PE];
 
     IGRAPH_UNUSED(PS);
     IGRAPH_UNUSED(XE);
@@ -285,13 +285,13 @@ static igraph_error_t igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX,
 }
 
 static igraph_error_t igraph_i_maximal_cliques_up(
-    igraph_vector_int_t *PX, igraph_integer_t PS, igraph_integer_t PE,
-    igraph_integer_t XS, igraph_integer_t XE, igraph_vector_int_t *pos,
+    igraph_vector_int_t *PX, igraph_int_t PS, igraph_int_t PE,
+    igraph_int_t XS, igraph_int_t XE, igraph_vector_int_t *pos,
     igraph_adjlist_t *adjlist,
     igraph_vector_int_t *R,
     igraph_vector_int_t *H
 ) {
-    igraph_integer_t vv;
+    igraph_int_t vv;
 
     IGRAPH_UNUSED(PS);
     IGRAPH_UNUSED(PE);
@@ -301,8 +301,8 @@ static igraph_error_t igraph_i_maximal_cliques_up(
     igraph_vector_int_pop_back(R);
 
     while ((vv = igraph_vector_int_pop_back(H)) != -1) {
-        igraph_integer_t vvpos = VECTOR(*pos)[vv];
-        igraph_integer_t tmp = VECTOR(*PX)[XS];
+        igraph_int_t vvpos = VECTOR(*pos)[vv];
+        igraph_int_t tmp = VECTOR(*PX)[XS];
         VECTOR(*PX)[XS] = vv;
         VECTOR(*PX)[vvpos - 1] = tmp;
         VECTOR(*pos)[vv] = XS + 1;
@@ -363,7 +363,7 @@ static igraph_error_t igraph_i_maximal_cliques_up(
 
 igraph_error_t igraph_maximal_cliques(
     const igraph_t *graph, igraph_vector_int_list_t *res,
-    igraph_integer_t min_size, igraph_integer_t max_size
+    igraph_int_t min_size, igraph_int_t max_size
 );
 
 #define IGRAPH_MC_ORIG
@@ -377,7 +377,7 @@ igraph_error_t igraph_maximal_cliques(
  * See \ref igraph_maximal_cliques() for details.
  *
  * \param graph The input graph. Edge directions are ignored.
- * \param res Pointer to an \c igraph_integer_t; the number of maximal
+ * \param res Pointer to an \c igraph_int_t; the number of maximal
  *   cliques will be stored here.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
@@ -394,9 +394,9 @@ igraph_error_t igraph_maximal_cliques(
  */
 
 igraph_error_t igraph_maximal_cliques_count(const igraph_t *graph,
-                                 igraph_integer_t *res,
-                                 igraph_integer_t min_size,
-                                 igraph_integer_t max_size);
+                                 igraph_int_t *res,
+                                 igraph_int_t min_size,
+                                 igraph_int_t max_size);
 
 #define IGRAPH_MC_COUNT
 #include "maximal_cliques_template.h"
@@ -427,8 +427,8 @@ igraph_error_t igraph_maximal_cliques_count(const igraph_t *graph,
 
 igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
                                 FILE *outfile,
-                                igraph_integer_t min_size,
-                                igraph_integer_t max_size);
+                                igraph_int_t min_size,
+                                igraph_int_t max_size);
 
 #define IGRAPH_MC_FILE
 #include "maximal_cliques_template.h"
@@ -447,7 +447,7 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  *   subset of initial vertices.
  * \param res Pointer to a list of integer vectors; the cliques will be
  *   stored here.
- * \param no Pointer to an \c igraph_integer_t; the number of maximal
+ * \param no Pointer to an \c igraph_int_t; the number of maximal
  *   cliques will be stored here.
  * \param outfile Pointer to an output file or \c NULL.
  *   When not \c NULL, the file should be writable.
@@ -466,8 +466,8 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
 
 igraph_error_t igraph_maximal_cliques_subset(
     const igraph_t *graph, const igraph_vector_int_t *subset,
-    igraph_vector_int_list_t *res, igraph_integer_t *no,
-    FILE *outfile, igraph_integer_t min_size, igraph_integer_t max_size
+    igraph_vector_int_list_t *res, igraph_int_t *no,
+    FILE *outfile, igraph_int_t min_size, igraph_int_t max_size
 );
 
 #define IGRAPH_MC_FULL
@@ -505,7 +505,7 @@ igraph_error_t igraph_maximal_cliques_subset(
 
 igraph_error_t igraph_maximal_cliques_callback(const igraph_t *graph,
                                     igraph_clique_handler_t *cliquehandler_fn, void *arg,
-                                    igraph_integer_t min_size, igraph_integer_t max_size);
+                                    igraph_int_t min_size, igraph_int_t max_size);
 
 #define IGRAPH_MC_CALLBACK
 #include "maximal_cliques_template.h"
@@ -539,8 +539,8 @@ igraph_error_t igraph_maximal_cliques_callback(const igraph_t *graph,
 
 igraph_error_t igraph_maximal_cliques_hist(const igraph_t *graph,
                                 igraph_vector_t *hist,
-                                igraph_integer_t min_size,
-                                igraph_integer_t max_size);
+                                igraph_int_t min_size,
+                                igraph_int_t max_size);
 
 #define IGRAPH_MC_HIST
 #include "maximal_cliques_template.h"

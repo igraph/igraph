@@ -73,13 +73,13 @@
 igraph_error_t igraph_get_all_simple_paths(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_integer_t from,
+        igraph_int_t from,
         const igraph_vs_t to,
-        igraph_integer_t minlen,
-        igraph_integer_t maxlen,
+        igraph_int_t minlen,
+        igraph_int_t maxlen,
         igraph_neimode_t mode) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
     const igraph_bool_t toall = igraph_vs_is_all(&to);
     igraph_vit_t vit;
     igraph_lazy_adjlist_t adjlist;
@@ -121,17 +121,17 @@ igraph_error_t igraph_get_all_simple_paths(
     igraph_vector_int_push_back(&dist, 0);
     IGRAPH_BIT_SET(added, from);
     while (!igraph_vector_int_empty(&stack)) {
-        const igraph_integer_t act = igraph_vector_int_tail(&stack);
-        const igraph_integer_t curdist = igraph_vector_int_tail(&dist);
+        const igraph_int_t act = igraph_vector_int_tail(&stack);
+        const igraph_int_t curdist = igraph_vector_int_tail(&dist);
 
         const igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
         IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
-        const igraph_integer_t n = igraph_vector_int_size(neis);
-        igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
+        const igraph_int_t n = igraph_vector_int_size(neis);
+        igraph_int_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
-        igraph_integer_t nei;
+        igraph_int_t nei;
 
         within_dist = (curdist < maxlen || maxlen < 0);
         if (within_dist) {
@@ -156,7 +156,7 @@ igraph_error_t igraph_get_all_simple_paths(
             }
         } else {
             /* There is no such neighbor, finished with the subtree */
-            igraph_integer_t up = igraph_vector_int_pop_back(&stack);
+            igraph_int_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
             IGRAPH_BIT_CLEAR(added, up);
             VECTOR(nptr)[up] = 0;

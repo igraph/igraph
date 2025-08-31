@@ -30,7 +30,7 @@
 int main(void) {
     igraph_matrix_t mat, mat2;
     igraph_sparsemat_t spmat, spmat2;
-    igraph_integer_t i, j, nz1, nz2;
+    igraph_int_t i, j, nz1, nz2;
     igraph_vector_t sums1, sums2;
 
     /* Initialize the library. */

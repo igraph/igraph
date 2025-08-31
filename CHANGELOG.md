@@ -10,6 +10,7 @@ This section gives detailed on breaking changes you need to consider when updati
 
  - igraph now requires a C++ compiler that supports the C++14 standard.
  - `igraph_setup()` is now recommended to be called before using the library. This function may gain essential functions in the future. See below for details.
+ - `igraph_integer_t` was renamed to `igraph_int_t`, but `igraph_integer_t` is kept as an alias and it will remain available for at least the next major version. Library headers and source code uses `igraph_int_t` from now on.
  - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
  - Interruption handlers do not take a `void*` argument any more; this is relevant to maintainers of higher-level interfaces only.
  - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.

@@ -32,10 +32,10 @@ int main(void) {
     /*******************/
     /* Testing the DLA */
     /*******************/
-    igraph_integer_t nodes = 10;
+    igraph_int_t nodes = 10;
     igraph_i_layout_mergegrid_t grid;
     igraph_vector_t x, y, r;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

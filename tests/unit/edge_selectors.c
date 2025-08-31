@@ -21,7 +21,7 @@
 
 void check(igraph_t *graph, igraph_es_t *es) {
     igraph_eit_t eit;
-    igraph_integer_t edge;
+    igraph_int_t edge;
     IGRAPH_ASSERT(igraph_eit_create(graph, *es, &eit) == IGRAPH_SUCCESS);
     for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         edge = IGRAPH_EIT_GET(eit);

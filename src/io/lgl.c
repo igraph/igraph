@@ -270,9 +270,9 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                            const char *names, const char *weights,
                            igraph_bool_t isolates) {
     igraph_eit_t it;
-    igraph_integer_t actvertex = -1;
+    igraph_int_t actvertex = -1;
     igraph_attribute_type_t nametype, weighttype;
-    const igraph_integer_t vcount = igraph_vcount(graph), ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph), ecount = igraph_ecount(graph);
 
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
                                    &it));
@@ -310,7 +310,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     if (names == NULL && weights == NULL) {
         /* No names, no weights */
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t from, to;
+            igraph_int_t from, to;
             int ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
             if (from == actvertex) {
@@ -332,8 +332,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                      igraph_vss_all(),
                      &nvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
+            igraph_int_t edge = IGRAPH_EIT_GET(it);
+            igraph_int_t from, to;
             int ret = 0;
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
@@ -363,8 +363,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
+            igraph_int_t edge = IGRAPH_EIT_GET(it);
+            igraph_int_t from, to;
             int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
             if (from == actvertex) {
@@ -395,8 +395,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                      igraph_vss_all(),
                      &nvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
+            igraph_int_t edge = IGRAPH_EIT_GET(it);
+            igraph_int_t from, to;
             int ret = 0, ret2;
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
@@ -427,10 +427,10 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     }
 
     if (isolates) {
-        igraph_integer_t nov = vcount;
-        igraph_integer_t i;
+        igraph_int_t nov = vcount;
+        igraph_int_t i;
         int ret = 0;
-        igraph_integer_t deg;
+        igraph_int_t deg;
         igraph_strvector_t nvec;
         const char *str;
 

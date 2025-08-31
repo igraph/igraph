@@ -35,7 +35,7 @@ igraph_error_t igraph_i_attribute_copy(
    igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea
 );
 igraph_error_t igraph_i_attribute_add_vertices(
-   igraph_t *graph, igraph_integer_t nv,
+   igraph_t *graph, igraph_int_t nv,
    const igraph_attribute_record_list_t *attr
 );
 igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,

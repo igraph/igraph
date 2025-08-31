@@ -89,11 +89,11 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
     const igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t no_of_variables;
-    igraph_integer_t i, j, k, l;
+    igraph_int_t no_of_variables;
+    igraph_int_t i, j, k, l;
     int st;
     int idx[] = { 0, 0, 0, 0 };
     double coef[] = { 0.0, 1.0, 1.0, -2.0 };
@@ -283,7 +283,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     }
 
     if (membership) {
-        igraph_integer_t comm = 0;   /* id of the last community that was found */
+        igraph_int_t comm = 0;   /* id of the last community that was found */
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
 

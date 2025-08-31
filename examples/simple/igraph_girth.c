@@ -27,7 +27,7 @@ int main(void) {
     igraph_real_t girth;
     igraph_vector_int_t v;
     igraph_vector_int_t circle;
-    igraph_integer_t chord[] = { 0, 50 };
+    igraph_int_t chord[] = { 0, 50 };
 
     /* Initialize the library. */
     igraph_setup();

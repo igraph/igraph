@@ -29,7 +29,7 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_t edges;
     igraph_vector_int_t vids;
-    igraph_integer_t class;
+    igraph_int_t class;
 
     igraph_vector_int_init_int_end(&edges, -1,
                                0, 1, 1, 3, 1, 4, 1, 6, 3, 1,

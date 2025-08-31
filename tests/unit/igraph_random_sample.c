@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void check(igraph_integer_t l, igraph_integer_t h, igraph_integer_t s) {
+void check(igraph_int_t l, igraph_int_t h, igraph_int_t s) {
     igraph_vector_int_t v;
 
     igraph_vector_int_init(&v, 0);
@@ -28,7 +28,7 @@ void check(igraph_integer_t l, igraph_integer_t h, igraph_integer_t s) {
     IGRAPH_ASSERT(VECTOR(v)[0] >= l);
     IGRAPH_ASSERT(VECTOR(v)[igraph_vector_int_size(&v) - 1] <= h);
 
-    for (igraph_integer_t i = 0; i < s - 1; i++) {
+    for (igraph_int_t i = 0; i < s - 1; i++) {
         IGRAPH_ASSERT(VECTOR(v)[i] < VECTOR(v)[i + 1]);
     }
 

@@ -63,7 +63,7 @@
     #define EQ(a,b) ((a && b) || (!a && !b))
 
 #elif defined(BASE_INT)
-    #define BASE igraph_integer_t
+    #define BASE igraph_int_t
     #define BASE_VECTOR igraph_vector_int_t
     #define BASE_MATRIX igraph_matrix_int_t
     #define SHORT int

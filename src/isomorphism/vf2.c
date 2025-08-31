@@ -143,20 +143,20 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     igraph_isocompat_t *edge_compat_fn, void *arg
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph1);
-    igraph_integer_t no_of_edges = igraph_ecount(graph1);
+    igraph_int_t no_of_nodes = igraph_vcount(graph1);
+    igraph_int_t no_of_edges = igraph_ecount(graph1);
     igraph_vector_int_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
     igraph_vector_int_t in_1, in_2, out_1, out_2;
-    igraph_integer_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
+    igraph_int_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
     igraph_vector_int_t *inneis_1, *inneis_2, *outneis_1, *outneis_2;
-    igraph_integer_t matched_nodes = 0;
-    igraph_integer_t depth;
-    igraph_integer_t cand1, cand2;
-    igraph_integer_t last1, last2;
+    igraph_int_t matched_nodes = 0;
+    igraph_int_t depth;
+    igraph_int_t cand1, cand2;
+    igraph_int_t last1, last2;
     igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
     igraph_vector_int_t indeg1, indeg2, outdeg1, outdeg2;
-    igraph_integer_t vsize;
+    igraph_int_t vsize;
 
     IGRAPH_CHECK(igraph_i_perform_vf2_pre_checks(graph1, graph2));
 
@@ -274,7 +274,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
     depth = 0; last1 = -1; last2 = -1;
     while (depth >= 0) {
-        igraph_integer_t i;
+        igraph_int_t i;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -380,7 +380,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_1)[i];
+                    igraph_int_t node = VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == depth) {
                         VECTOR(in_1)[node] = 0;
                         in_1_size -= 1;
@@ -392,7 +392,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_1)[i];
+                    igraph_int_t node = VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == depth) {
                         VECTOR(out_1)[node] = 0;
                         out_1_size -= 1;
@@ -404,7 +404,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_2)[i];
+                    igraph_int_t node = VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == depth) {
                         VECTOR(in_2)[node] = 0;
                         in_2_size -= 1;
@@ -416,7 +416,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_2)[i];
+                    igraph_int_t node = VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == depth) {
                         VECTOR(out_2)[node] = 0;
                         out_2_size -= 1;
@@ -430,7 +430,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
         } else {
             /**************************************************************/
             /* step forward if worth, check if worth first */
-            igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
+            igraph_int_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
             igraph_bool_t end = false;
 
             inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
@@ -455,14 +455,14 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
             vsize = igraph_vector_int_size(inneis_1);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*inneis_1)[i];
+                igraph_int_t node = VECTOR(*inneis_1)[i];
                 if (VECTOR(*core_1)[node] >= 0) {
-                    igraph_integer_t node2 = VECTOR(*core_1)[node];
+                    igraph_int_t node2 = VECTOR(*core_1)[node];
                     /* check if there is a node2->cand2 edge */
                     if (!igraph_vector_int_contains_sorted(inneis_2, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
-                        igraph_integer_t eid1, eid2;
+                        igraph_int_t eid1, eid2;
                         igraph_get_eid(graph1, &eid1, node, cand1, IGRAPH_DIRECTED,
                                        /*error=*/ true);
                         igraph_get_eid(graph2, &eid2, node2, cand2, IGRAPH_DIRECTED,
@@ -487,14 +487,14 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
             }
             vsize = igraph_vector_int_size(outneis_1);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*outneis_1)[i];
+                igraph_int_t node = VECTOR(*outneis_1)[i];
                 if (VECTOR(*core_1)[node] >= 0) {
-                    igraph_integer_t node2 = VECTOR(*core_1)[node];
+                    igraph_int_t node2 = VECTOR(*core_1)[node];
                     /* check if there is a cand2->node2 edge */
                     if (!igraph_vector_int_contains_sorted(outneis_2, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
-                        igraph_integer_t eid1, eid2;
+                        igraph_int_t eid1, eid2;
                         igraph_get_eid(graph1, &eid1, cand1, node, IGRAPH_DIRECTED,
                                        /*error=*/ true);
                         igraph_get_eid(graph2, &eid2, cand2, node2, IGRAPH_DIRECTED,
@@ -519,14 +519,14 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
             }
             vsize = igraph_vector_int_size(inneis_2);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*inneis_2)[i];
+                igraph_int_t node = VECTOR(*inneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
-                    igraph_integer_t node2 = VECTOR(*core_2)[node];
+                    igraph_int_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a node2->cand1 edge */
                     if (!igraph_vector_int_contains_sorted(inneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
-                        igraph_integer_t eid1, eid2;
+                        igraph_int_t eid1, eid2;
                         igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
                                        /*error=*/ true);
                         igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
@@ -551,14 +551,14 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
             }
             vsize = igraph_vector_int_size(outneis_2);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*outneis_2)[i];
+                igraph_int_t node = VECTOR(*outneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
-                    igraph_integer_t node2 = VECTOR(*core_2)[node];
+                    igraph_int_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a cand1->node2 edge */
                     if (!igraph_vector_int_contains_sorted(outneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
-                        igraph_integer_t eid1, eid2;
+                        igraph_int_t eid1, eid2;
                         igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
                                        /*error=*/ true);
                         igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
@@ -610,7 +610,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_1)[i];
+                    igraph_int_t node = VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(in_1)[node] = depth;
                         in_1_size += 1;
@@ -622,7 +622,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_1)[i];
+                    igraph_int_t node = VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(out_1)[node] = depth;
                         out_1_size += 1;
@@ -634,7 +634,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_2)[i];
+                    igraph_int_t node = VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(in_2)[node] = depth;
                         in_2_size += 1;
@@ -646,7 +646,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_2)[i];
+                    igraph_int_t node = VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(out_2)[node] = depth;
                         out_2_size += 1;
@@ -704,8 +704,8 @@ typedef struct {
 static igraph_bool_t igraph_i_isocompat_node_cb(
         const igraph_t *graph1,
         const igraph_t *graph2,
-        const igraph_integer_t g1_num,
-        const igraph_integer_t g2_num,
+        const igraph_int_t g1_num,
+        const igraph_int_t g2_num,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     return data->node_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
@@ -714,8 +714,8 @@ static igraph_bool_t igraph_i_isocompat_node_cb(
 static igraph_bool_t igraph_i_isocompat_edge_cb(
         const igraph_t *graph1,
         const igraph_t *graph2,
-        const igraph_integer_t g1_num,
-        const igraph_integer_t g2_num,
+        const igraph_int_t g1_num,
+        const igraph_int_t g2_num,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     return data->edge_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
@@ -824,7 +824,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
     void *arg
 ) {
     igraph_i_iso_cb_data_t *data = arg;
-    igraph_integer_t *count = data->arg;
+    igraph_int_t *count = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *count += 1;
     return IGRAPH_SUCCESS;
@@ -874,7 +874,7 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
                                   const igraph_vector_int_t *vertex_color2,
                                   const igraph_vector_int_t *edge_color1,
                                   const igraph_vector_int_t *edge_color2,
-                                  igraph_integer_t *count,
+                                  igraph_int_t *count,
                                   igraph_isocompat_t *node_compat_fn,
                                   igraph_isocompat_t *edge_compat_fn,
                                   void *arg) {
@@ -1029,22 +1029,22 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
     igraph_isocompat_t *edge_compat_fn, void *arg
 ) {
 
-    igraph_integer_t no_of_nodes1 = igraph_vcount(graph1),
+    igraph_int_t no_of_nodes1 = igraph_vcount(graph1),
              no_of_nodes2 = igraph_vcount(graph2);
-    igraph_integer_t no_of_edges1 = igraph_ecount(graph1),
+    igraph_int_t no_of_edges1 = igraph_ecount(graph1),
              no_of_edges2 = igraph_ecount(graph2);
     igraph_vector_int_t mycore_1, mycore_2, *core_1 = &mycore_1, *core_2 = &mycore_2;
     igraph_vector_int_t in_1, in_2, out_1, out_2;
-    igraph_integer_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
+    igraph_int_t in_1_size = 0, in_2_size = 0, out_1_size = 0, out_2_size = 0;
     igraph_vector_int_t *inneis_1, *inneis_2, *outneis_1, *outneis_2;
-    igraph_integer_t matched_nodes = 0;
-    igraph_integer_t depth;
-    igraph_integer_t cand1, cand2;
-    igraph_integer_t last1, last2;
+    igraph_int_t matched_nodes = 0;
+    igraph_int_t depth;
+    igraph_int_t cand1, cand2;
+    igraph_int_t last1, last2;
     igraph_stack_int_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
     igraph_vector_int_t indeg1, indeg2, outdeg1, outdeg2;
-    igraph_integer_t vsize;
+    igraph_int_t vsize;
 
     IGRAPH_CHECK(igraph_i_perform_vf2_pre_checks(graph1, graph2));
 
@@ -1131,7 +1131,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
     depth = 0; last1 = -1; last2 = -1;
     while (depth >= 0) {
-        igraph_integer_t i;
+        igraph_int_t i;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -1237,7 +1237,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_1)[i];
+                    igraph_int_t node = VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == depth) {
                         VECTOR(in_1)[node] = 0;
                         in_1_size -= 1;
@@ -1249,7 +1249,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_1)[i];
+                    igraph_int_t node = VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == depth) {
                         VECTOR(out_1)[node] = 0;
                         out_1_size -= 1;
@@ -1261,7 +1261,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_2)[i];
+                    igraph_int_t node = VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == depth) {
                         VECTOR(in_2)[node] = 0;
                         in_2_size -= 1;
@@ -1273,7 +1273,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_2)[i];
+                    igraph_int_t node = VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == depth) {
                         VECTOR(out_2)[node] = 0;
                         out_2_size -= 1;
@@ -1287,7 +1287,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
         } else {
             /**************************************************************/
             /* step forward if worth, check if worth first */
-            igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
+            igraph_int_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
             igraph_bool_t end = false;
 
             inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
@@ -1312,7 +1312,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
             vsize = igraph_vector_int_size(inneis_1);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*inneis_1)[i];
+                igraph_int_t node = VECTOR(*inneis_1)[i];
                 if (VECTOR(*core_1)[node] < 0) {
                     if (VECTOR(in_1)[node] != 0) {
                         xin1++;
@@ -1324,7 +1324,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             }
             vsize = igraph_vector_int_size(outneis_1);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*outneis_1)[i];
+                igraph_int_t node = VECTOR(*outneis_1)[i];
                 if (VECTOR(*core_1)[node] < 0) {
                     if (VECTOR(in_1)[node] != 0) {
                         xin1++;
@@ -1336,14 +1336,14 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             }
             vsize = igraph_vector_int_size(inneis_2);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*inneis_2)[i];
+                igraph_int_t node = VECTOR(*inneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
-                    igraph_integer_t node2 = VECTOR(*core_2)[node];
+                    igraph_int_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a node2->cand1 edge */
                     if (!igraph_vector_int_contains_sorted(inneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
-                        igraph_integer_t eid1, eid2;
+                        igraph_int_t eid1, eid2;
                         igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
                                        /*error=*/ true);
                         igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
@@ -1368,14 +1368,14 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             }
             vsize = igraph_vector_int_size(outneis_2);
             for (i = 0; !end && i < vsize; i++) {
-                igraph_integer_t node = VECTOR(*outneis_2)[i];
+                igraph_int_t node = VECTOR(*outneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
-                    igraph_integer_t node2 = VECTOR(*core_2)[node];
+                    igraph_int_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a cand1->node2 edge */
                     if (!igraph_vector_int_contains_sorted(outneis_1, node2)) {
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
-                        igraph_integer_t eid1, eid2;
+                        igraph_int_t eid1, eid2;
                         igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
                                        /*error=*/ true);
                         igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
@@ -1427,7 +1427,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_1)[i];
+                    igraph_int_t node = VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(in_1)[node] = depth;
                         in_1_size += 1;
@@ -1439,7 +1439,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_1)[i];
+                    igraph_int_t node = VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(out_1)[node] = depth;
                         out_1_size += 1;
@@ -1451,7 +1451,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*inneis_2)[i];
+                    igraph_int_t node = VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(in_2)[node] = depth;
                         in_2_size += 1;
@@ -1463,7 +1463,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
-                    igraph_integer_t node = VECTOR(*outneis_2)[i];
+                    igraph_int_t node = VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(out_2)[node] = depth;
                         out_2_size += 1;
@@ -1605,7 +1605,7 @@ static igraph_error_t igraph_i_count_subisomorphisms_vf2_cb(
     void *arg
 ) {
     igraph_i_iso_cb_data_t *data = arg;
-    igraph_integer_t *count = data->arg;
+    igraph_int_t *count = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *count += 1;
     return IGRAPH_SUCCESS;
@@ -1654,7 +1654,7 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
                                      const igraph_vector_int_t *vertex_color2,
                                      const igraph_vector_int_t *edge_color1,
                                      const igraph_vector_int_t *edge_color2,
-                                     igraph_integer_t *count,
+                                     igraph_int_t *count,
                                      igraph_isocompat_t *node_compat_fn,
                                      igraph_isocompat_t *edge_compat_fn,
                                      void *arg) {

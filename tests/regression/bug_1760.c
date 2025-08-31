@@ -22,9 +22,9 @@
 
 /* Regression test for https://github.com/igraph/igraph/issues/1760 */
 
-int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t* to) {
+int test_unweighted(const igraph_t* g, igraph_int_t from, const igraph_vs_t* to) {
     igraph_vector_int_list_t vpath, epath;
-    igraph_integer_t num_paths;
+    igraph_int_t num_paths;
     igraph_vector_int_t parents;
     igraph_vector_int_t inbound_edges;
 
@@ -67,11 +67,11 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
 }
 
 int test_weighted(
-    const igraph_t* g, const igraph_vector_t* weights, igraph_integer_t from,
+    const igraph_t* g, const igraph_vector_t* weights, igraph_int_t from,
     const igraph_vs_t* to, igraph_bool_t use_bellman_ford
 ) {
     igraph_vector_int_list_t vpath, epath;
-    igraph_integer_t num_paths;
+    igraph_int_t num_paths;
     igraph_vector_int_t parents;
     igraph_vector_int_t inbound_edges;
 

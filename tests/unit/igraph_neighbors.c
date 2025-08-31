@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_t *graph, igraph_integer_t pnode, igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple) {
+void call_and_print(igraph_t *graph, igraph_int_t pnode, igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple) {
     igraph_vector_int_t neis;
     igraph_vector_int_init(&neis, 0);
     IGRAPH_ASSERT(igraph_neighbors(graph, &neis, pnode, mode, loops, multiple) == IGRAPH_SUCCESS);

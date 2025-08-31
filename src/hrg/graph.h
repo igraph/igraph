@@ -133,7 +133,7 @@ public:
     // clear all links from graph
     void resetLinks();
     // allocate edge histograms
-    void setAdjacencyHistograms(igraph_integer_t);
+    void setAdjacencyHistograms(igraph_int_t);
     // set name of vertex i
     bool setName(int, const std::string &);
 

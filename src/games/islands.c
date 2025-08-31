@@ -55,21 +55,21 @@
  */
 igraph_error_t igraph_simple_interconnected_islands_game(
         igraph_t *graph,
-        igraph_integer_t islands_n,
-        igraph_integer_t islands_size,
+        igraph_int_t islands_n,
+        igraph_int_t islands_size,
         igraph_real_t islands_pin,
-        igraph_integer_t n_inter) {
+        igraph_int_t n_inter) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    igraph_integer_t number_of_nodes;
+    igraph_int_t number_of_nodes;
     igraph_real_t max_possible_edges_per_island;
     igraph_real_t avg_edges_per_island;
-    igraph_integer_t number_of_inter_island_edges;
-    igraph_integer_t start_index_of_island, start_index_of_other_island;
-    igraph_integer_t i, j, is, from, to;
+    igraph_int_t number_of_inter_island_edges;
+    igraph_int_t start_index_of_island, start_index_of_other_island;
+    igraph_int_t i, j, is, from, to;
     igraph_real_t last;
-    igraph_integer_t island_ecount;
+    igraph_int_t island_ecount;
     igraph_real_t nr_edges_reserved;
 
     if (islands_n < 0) {

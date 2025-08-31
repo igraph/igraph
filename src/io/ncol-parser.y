@@ -75,7 +75,7 @@ int igraph_ncol_yyerror(YYLTYPE* locp,
 %lex-param { void *scanner }
 
 %union {
-  igraph_integer_t edgenum;
+  igraph_int_t edgenum;
   igraph_real_t weightnum;
 }
 
@@ -109,7 +109,7 @@ endpoints : edgeid edgeid  {
 };
 
 edgeid : ALNUM  {
-  igraph_integer_t trie_id;
+  igraph_int_t trie_id;
   IGRAPH_YY_CHECK(igraph_trie_get_len(context->trie,
     igraph_ncol_yyget_text(scanner),
     igraph_ncol_yyget_leng(scanner),

@@ -21,7 +21,7 @@
 void analyze_loops(const igraph_t *graph) {
     igraph_vector_bool_t is_loop;
     igraph_bool_t has_loop;
-    igraph_integer_t loop_count;
+    igraph_int_t loop_count;
 
     igraph_has_loop(graph, &has_loop);
     printf("Has loops? %s\n", has_loop ? "Yes" : "No");

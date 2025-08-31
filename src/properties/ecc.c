@@ -34,7 +34,7 @@ static igraph_error_t igraph_i_ecc3_1(
         const igraph_t *graph, igraph_vector_t *res, const igraph_es_t eids,
         igraph_bool_t offset, igraph_bool_t normalize) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degree;
     igraph_adjlist_t al;
     igraph_eit_t eit;
@@ -51,12 +51,12 @@ static igraph_error_t igraph_i_ecc3_1(
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
 
-    for (igraph_integer_t i=0;
+    for (igraph_int_t i=0;
          ! IGRAPH_EIT_END(eit);
          IGRAPH_EIT_NEXT(eit), i++) {
 
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
 
         igraph_real_t z; /* number of triangles the edge participates in */
         igraph_real_t s; /* max number of triangles the edge could be part of */
@@ -69,7 +69,7 @@ static igraph_error_t igraph_i_ecc3_1(
             s = 0.0;
         } else {
             const igraph_vector_int_t *a1 = igraph_adjlist_get(&al, v1), *a2 = igraph_adjlist_get(&al, v2);
-            igraph_integer_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
+            igraph_int_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
 
             z = igraph_vector_int_intersection_size_sorted(a1, a2);
             s = (d1 < d2 ? d1 : d2) - 1.0;
@@ -105,12 +105,12 @@ static igraph_error_t igraph_i_ecc3_2(
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
 
-    for (igraph_integer_t i=0;
+    for (igraph_int_t i=0;
          ! IGRAPH_EIT_END(eit);
          IGRAPH_EIT_NEXT(eit), i++) {
 
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
 
         igraph_real_t z; /* number of triangles the edge participates in */
         igraph_real_t s; /* max number of triangles the edge could be part of */
@@ -125,7 +125,7 @@ static igraph_error_t igraph_i_ecc3_2(
             igraph_vector_int_t *a1 = igraph_lazy_adjlist_get(&al, v1);
             igraph_vector_int_t *a2 = igraph_lazy_adjlist_get(&al, v2);
 
-            igraph_integer_t d1, d2;
+            igraph_int_t d1, d2;
             IGRAPH_CHECK(igraph_degree_1(graph, &d1, v1, IGRAPH_ALL, IGRAPH_LOOPS));
             IGRAPH_CHECK(igraph_degree_1(graph, &d2, v2, IGRAPH_ALL, IGRAPH_LOOPS));
 
@@ -150,7 +150,7 @@ static igraph_error_t igraph_i_ecc4_1(
         const igraph_t *graph, igraph_vector_t *res,
         const igraph_es_t eids, igraph_bool_t offset, igraph_bool_t normalize) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degree;
     igraph_adjlist_t al;
     igraph_eit_t eit;
@@ -167,12 +167,12 @@ static igraph_error_t igraph_i_ecc4_1(
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
 
-    for (igraph_integer_t i=0;
+    for (igraph_int_t i=0;
          ! IGRAPH_EIT_END(eit);
          IGRAPH_EIT_NEXT(eit), i++) {
 
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
 
         igraph_real_t z; /* number of 4-cycles the edge participates in */
         igraph_real_t s; /* max number of 4-cycles the edge could be part of */
@@ -185,16 +185,16 @@ static igraph_error_t igraph_i_ecc4_1(
         } else {
             /* ensure that v1 is the vertex with the smaller degree */
             if (VECTOR(degree)[v1] > VECTOR(degree)[v2]) {
-                igraph_integer_t tmp = v1;
+                igraph_int_t tmp = v1;
                 v1 = v2;
                 v2 = tmp;
             }
 
             z = 0.0;
             const igraph_vector_int_t *a1 = igraph_adjlist_get(&al, v1);
-            const igraph_integer_t n = igraph_vector_int_size(a1);
-            for (igraph_integer_t j=0; j < n; j++) {
-                igraph_integer_t v3 = VECTOR(*a1)[j];
+            const igraph_int_t n = igraph_vector_int_size(a1);
+            for (igraph_int_t j=0; j < n; j++) {
+                igraph_int_t v3 = VECTOR(*a1)[j];
 
                 /* It is not possible that v3 == v1 because self-loops have been removed from the adjlist. */
 
@@ -205,7 +205,7 @@ static igraph_error_t igraph_i_ecc4_1(
                 z += igraph_vector_int_intersection_size_sorted(a2, a3) - 1.0;
             }
 
-            igraph_integer_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
+            igraph_int_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
             s = (d1 - 1.0) * (d2 - 1.0);
         }
 
@@ -239,19 +239,19 @@ static igraph_error_t igraph_i_ecc4_2(
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
 
-    for (igraph_integer_t i=0;
+    for (igraph_int_t i=0;
          ! IGRAPH_EIT_END(eit);
          IGRAPH_EIT_NEXT(eit), i++) {
 
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t v1 = IGRAPH_FROM(graph, edge), v2 = IGRAPH_TO(graph, edge);
 
         igraph_real_t z; /* number of 4-cycles the edge participates in */
         igraph_real_t s; /* max number of 4-cycles the edge could be part of */
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        igraph_integer_t d1, d2;
+        igraph_int_t d1, d2;
         IGRAPH_CHECK(igraph_degree_1(graph, &d1, v1, IGRAPH_ALL, IGRAPH_LOOPS));
         IGRAPH_CHECK(igraph_degree_1(graph, &d2, v2, IGRAPH_ALL, IGRAPH_LOOPS));
 
@@ -261,7 +261,7 @@ static igraph_error_t igraph_i_ecc4_2(
         } else {
             /* ensure that v1 is the vertex with the smaller degree */
             if (d1 > d2) {
-                igraph_integer_t tmp = v1;
+                igraph_int_t tmp = v1;
                 v1 = v2;
                 v2 = tmp;
 
@@ -274,9 +274,9 @@ static igraph_error_t igraph_i_ecc4_2(
 
             igraph_vector_int_t *a1 = igraph_lazy_adjlist_get(&al, v1);
 
-            const igraph_integer_t n = igraph_vector_int_size(a1);
-            for (igraph_integer_t j=0; j < n; j++) {
-                igraph_integer_t v3 = VECTOR(*a1)[j];
+            const igraph_int_t n = igraph_vector_int_size(a1);
+            for (igraph_int_t j=0; j < n; j++) {
+                igraph_int_t v3 = VECTOR(*a1)[j];
 
                 /* It is not possible that v3 == v1 because self-loops have been removed from the adjlist. */
 
@@ -357,7 +357,7 @@ static igraph_error_t igraph_i_ecc4_2(
  * When \p k is 4, O(|V| d log d + |E| d^2). d denotes the degree of vertices.
  */
 igraph_error_t igraph_ecc(const igraph_t *graph, igraph_vector_t *res,
-                          const igraph_es_t eids, igraph_integer_t k,
+                          const igraph_es_t eids, igraph_int_t k,
                           igraph_bool_t offset, igraph_bool_t normalize) {
 
     if (k < 3) {

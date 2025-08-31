@@ -26,9 +26,9 @@
 int main(void) {
 
     igraph_t g, gbar;
-    igraph_integer_t k1, k2 = INT_MAX;
+    igraph_int_t k1, k2 = INT_MAX;
     igraph_real_t tmpk;
-    igraph_integer_t i, j, n;
+    igraph_int_t i, j, n;
     igraph_maxflow_stats_t stats;
 
     /* Initialize the library. */

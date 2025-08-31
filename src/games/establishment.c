@@ -54,13 +54,13 @@
  * Time complexity: O(|V|*k*log(|V|)), |V| is the number of vertices
  * and k is the \p k parameter.
  */
-igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
-                              igraph_integer_t types, igraph_integer_t k,
+igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_int_t nodes,
+                              igraph_int_t types, igraph_int_t k,
                               const igraph_vector_t *type_dist,
                               const igraph_matrix_t *pref_matrix,
                               igraph_bool_t directed,
                               igraph_vector_int_t *node_type_vec) {
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
     igraph_vector_int_t edges;
     igraph_vector_t cumdist;
     igraph_vector_int_t potneis;
@@ -147,16 +147,16 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
 
     for (i = 0; i < nodes; i++) {
         igraph_real_t uni = RNG_UNIF(0, maxcum);
-        igraph_integer_t type;
+        igraph_int_t type;
         igraph_vector_binsearch(&cumdist, uni, &type);
         VECTOR(*nodetypes)[i] = type - 1;
     }
 
     for (i = k; i < nodes; i++) {
-        igraph_integer_t type1 = VECTOR(*nodetypes)[i];
+        igraph_int_t type1 = VECTOR(*nodetypes)[i];
         igraph_random_sample(&potneis, 0, i - 1, k);
         for (j = 0; j < k; j++) {
-            igraph_integer_t type2 = VECTOR(*nodetypes)[VECTOR(potneis)[j]];
+            igraph_int_t type2 = VECTOR(*nodetypes)[VECTOR(potneis)[j]];
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, VECTOR(potneis)[j]));

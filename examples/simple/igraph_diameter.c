@@ -22,7 +22,7 @@ int main(void) {
 
     igraph_t graph;
     igraph_real_t result;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
     igraph_vector_int_t path, path_edge;
 
     /* Initialize the library. */

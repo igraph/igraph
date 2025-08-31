@@ -26,20 +26,20 @@
 
 static igraph_error_t distances_floyd_warshall_original(igraph_matrix_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(res);
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(res);
 
-    for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
+    for (igraph_int_t k = 0; k < no_of_nodes; k++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Iteration order matters for performance!
          * First j, then i, because matrices are stored as column-major. */
-        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_int_t j = 0; j < no_of_nodes; j++) {
             igraph_real_t dkj = MATRIX(*res, k, j);
             if (dkj == IGRAPH_INFINITY) {
                 continue;
             }
 
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (igraph_int_t i = 0; i < no_of_nodes; i++) {
                 igraph_real_t di = MATRIX(*res, i, k) + dkj;
                 igraph_real_t dd = MATRIX(*res, i, j);
                 if (di < dd) {
@@ -65,7 +65,7 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
      * This makes it easier to iterate through matrices in column-major order,
      * i.e. storage order, thus increasing performance. */
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(res);
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(res);
 
     /* successors[v][u] is the second vertex on the shortest path from v to u,
        i.e. the parent of v in the IN_u tree. */
@@ -100,28 +100,28 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
     igraph_stack_int_t stack;
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
-    for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
-        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+    for (igraph_int_t u = 0; u < no_of_nodes; u++) {
+        for (igraph_int_t v = 0; v < no_of_nodes; v++) {
             MATRIX(successors, v, u) = u;
         }
     }
 
-    for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
+    for (igraph_int_t k = 0; k < no_of_nodes; k++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Count the children of each node in the shortest path tree, assuming that at
            this point all elements of no_of_children[] are zeros. */
-        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+        for (igraph_int_t v = 0; v < no_of_nodes; v++) {
             if (v == k) continue;
-            igraph_integer_t parent = MATRIX(successors, v, k);
+            igraph_int_t parent = MATRIX(successors, v, k);
             VECTOR(no_of_children)[parent]++;
         }
 
         /* Note: we do not use igraph_vector_int_cumsum() here as that function produces
            an output vector of the same length as the input vector. Here we need an output
            one longer, with a 0 being prepended to what vector_cumsum() would produce. */
-        igraph_integer_t cumsum = 0;
-        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+        igraph_int_t cumsum = 0;
+        for (igraph_int_t v = 0; v < no_of_nodes; v++) {
             VECTOR(children_start)[v] = cumsum;
             cumsum += VECTOR(no_of_children)[v];
         }
@@ -132,25 +132,25 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
            vector as re-used as an index of where to insert child node indices.
            At the end of the calculation, all elements of no_of_children[] will be zeros,
            making this vector ready for the next iteration of the outer loop. */
-        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+        for (igraph_int_t v = 0; v < no_of_nodes; v++) {
             if (v == k) continue;
-            igraph_integer_t parent = MATRIX(successors, v, k);
+            igraph_int_t parent = MATRIX(successors, v, k);
             VECTOR(no_of_children)[parent]--;
             VECTOR(children)[ VECTOR(children_start)[parent] + VECTOR(no_of_children)[parent] ] = v;
         }
 
         /* constructing dfs-traversal and dfs-skip arrays for the IN_k tree */
         IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
-        igraph_integer_t counter = 0;
+        igraph_int_t counter = 0;
         while (!igraph_stack_int_empty(&stack)) {
-            igraph_integer_t parent = igraph_stack_int_pop(&stack);
+            igraph_int_t parent = igraph_stack_int_pop(&stack);
             if (parent >= 0) {
                 VECTOR(dfs_traversal)[counter] = parent;
                 counter++;
                 /* a negative marker -parent - 1 that is popped right after
                    all the descendants of the parent were processed */
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
-                for (igraph_integer_t l = VECTOR(children_start)[parent]; l < VECTOR(children_start)[parent + 1]; l++) {
+                for (igraph_int_t l = VECTOR(children_start)[parent]; l < VECTOR(children_start)[parent + 1]; l++) {
                     IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children)[l]));
                 }
             } else {
@@ -159,14 +159,14 @@ static igraph_error_t distances_floyd_warshall_tree(igraph_matrix_t *res) {
         }
 
         /* main inner loop */
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             igraph_real_t dki = MATRIX(*res, k, i);
             if (dki == IGRAPH_INFINITY || i == k) {
                 continue;
             }
-            igraph_integer_t counter = 1;
+            igraph_int_t counter = 1;
             while (counter < no_of_nodes) {
-                igraph_integer_t j = VECTOR(dfs_traversal)[counter];
+                igraph_int_t j = VECTOR(dfs_traversal)[counter];
                 igraph_real_t di = MATRIX(*res, j, k) + dki;
                 igraph_real_t dd = MATRIX(*res, j, i);
                 if (di < dd) {
@@ -284,8 +284,8 @@ igraph_error_t igraph_i_distances_floyd_warshall(
         const igraph_vector_t *weights, igraph_neimode_t mode,
         const igraph_floyd_warshall_algorithm_t method) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t in = false, out = false;
 
     if (! igraph_is_directed(graph)) {
@@ -309,13 +309,13 @@ igraph_error_t igraph_i_distances_floyd_warshall(
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_fill(res, IGRAPH_INFINITY);
 
-    for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+    for (igraph_int_t v = 0; v < no_of_nodes; v++) {
         MATRIX(*res, v, v) = 0;
     }
 
-    for (igraph_integer_t e = 0; e < no_of_edges; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
+    for (igraph_int_t e = 0; e < no_of_edges; e++) {
+        igraph_int_t from = IGRAPH_FROM(graph, e);
+        igraph_int_t to = IGRAPH_TO(graph, e);
         igraph_real_t w = weights ? VECTOR(*weights)[e] : 1;
 
         if (w < 0) {

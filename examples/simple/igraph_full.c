@@ -21,7 +21,7 @@
 
 int main(void) {
     igraph_t graph;
-    igraph_integer_t n_vertices = 10;
+    igraph_int_t n_vertices = 10;
 
     /* Initialize the library. */
     igraph_setup();

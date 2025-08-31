@@ -40,9 +40,9 @@
 
 static void percolate_edge(igraph_vector_int_t *links,
                            igraph_vector_int_t *sizes,
-                           igraph_integer_t *biggest,
-                           igraph_integer_t a,
-                           igraph_integer_t b) {
+                           igraph_int_t *biggest,
+                           igraph_int_t a,
+                           igraph_int_t b) {
 
     // Find head of each tree
     while (VECTOR(*links)[a] != a) {
@@ -60,7 +60,7 @@ static void percolate_edge(igraph_vector_int_t *links,
     }
 
     // Make smaller child of larger
-    igraph_integer_t parent, child;
+    igraph_int_t parent, child;
     if (VECTOR(*sizes)[a] < VECTOR(*sizes)[b]) {
         parent = b;
         child = a;
@@ -107,12 +107,12 @@ igraph_error_t igraph_edgelist_percolation(
         igraph_vector_int_t *giant_size,
         igraph_vector_int_t *vertex_count) {
 
-    igraph_integer_t biggest = 1;
-    igraph_integer_t vertices_added = 0;
-    igraph_integer_t lower, upper;
+    igraph_int_t biggest = 1;
+    igraph_int_t vertices_added = 0;
+    igraph_int_t lower, upper;
     int iter = 0;
 
-    igraph_integer_t ecount = igraph_vector_int_size(edges);
+    igraph_int_t ecount = igraph_vector_int_size(edges);
 
     if (ecount % 2 == 1) {
         IGRAPH_ERROR("Invalid edge list, odd number of elements.", IGRAPH_EINVAL);
@@ -137,7 +137,7 @@ igraph_error_t igraph_edgelist_percolation(
         IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVVID);
     }
 
-    const igraph_integer_t vcount = upper + 1;
+    const igraph_int_t vcount = upper + 1;
 
     igraph_vector_int_t sizes;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, vcount);
@@ -145,14 +145,14 @@ igraph_error_t igraph_edgelist_percolation(
     igraph_vector_int_t links;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&links, vcount);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         VECTOR(sizes)[i] = -1;
         VECTOR(links)[i] =  i;
     }
 
-    for (igraph_integer_t i = 0; i < ecount; i++) {
-        const igraph_integer_t from = VECTOR(*edges)[2*i];
-        const igraph_integer_t to   = VECTOR(*edges)[2*i + 1];
+    for (igraph_int_t i = 0; i < ecount; i++) {
+        const igraph_int_t from = VECTOR(*edges)[2*i];
+        const igraph_int_t to   = VECTOR(*edges)[2*i + 1];
         if (VECTOR(sizes)[from] == -1) {
             vertices_added++;
             VECTOR(sizes)[from] = 1;
@@ -229,12 +229,12 @@ igraph_error_t igraph_bond_percolation(
         p_edge_order = &i_edge_order;
     } else {
         // Verify that there are no duplicates.
-        const igraph_integer_t no_of_added_edges = igraph_vector_int_size(edge_order);
+        const igraph_int_t no_of_added_edges = igraph_vector_int_size(edge_order);
         igraph_bitset_t present_edges;
 
         IGRAPH_BITSET_INIT_FINALLY(&present_edges, no_of_added_edges);
 
-        for (igraph_integer_t i = 0; i < no_of_added_edges; i++) {
+        for (igraph_int_t i = 0; i < no_of_added_edges; i++) {
             if (IGRAPH_BIT_TEST(present_edges, VECTOR(*edge_order)[i])) {
                 IGRAPH_ERROR("Duplicate edges in edge order vector.", IGRAPH_EINVAL);
             }
@@ -267,9 +267,9 @@ igraph_error_t igraph_bond_percolation(
 static igraph_error_t percolate_site(const igraph_t *graph,
                                      igraph_vector_int_t *links,
                                      igraph_vector_int_t *sizes,
-                                     igraph_integer_t *biggest,
-                                     igraph_integer_t *edges_added,
-                                     igraph_integer_t vertex,
+                                     igraph_int_t *biggest,
+                                     igraph_int_t *edges_added,
+                                     igraph_int_t vertex,
                                      igraph_vector_int_t *neighbors) {
 
     if (VECTOR(*sizes)[vertex] != 0) {
@@ -280,8 +280,8 @@ static igraph_error_t percolate_site(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_neighbors(graph, neighbors, vertex, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
 
-    igraph_integer_t neighbor_count = igraph_vector_int_size(neighbors);
-    for (igraph_integer_t i = 0; i < neighbor_count; i++) {
+    igraph_int_t neighbor_count = igraph_vector_int_size(neighbors);
+    for (igraph_int_t i = 0; i < neighbor_count; i++) {
         // Do not add edges to vertices that have not been added.
         if (VECTOR(*sizes)[VECTOR(*neighbors)[i]] == 0) {
             continue;
@@ -331,7 +331,7 @@ igraph_error_t igraph_site_percolation(
         igraph_vector_int_t *edge_count,
         const igraph_vector_int_t *vertex_order) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
     const igraph_vector_int_t *p_vertex_order;
     igraph_vector_int_t i_vertex_order;
     int iter = 0;
@@ -347,9 +347,9 @@ igraph_error_t igraph_site_percolation(
     }
 
     // Initialize variables
-    igraph_integer_t number_percolated = igraph_vector_int_size(p_vertex_order);
-    igraph_integer_t biggest = 1; // largest component size so far
-    igraph_integer_t edges_added = 0; // no. of edges added so far
+    igraph_int_t number_percolated = igraph_vector_int_size(p_vertex_order);
+    igraph_int_t biggest = 1; // largest component size so far
+    igraph_int_t edges_added = 0; // no. of edges added so far
 
     igraph_vector_int_t sizes;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, vcount);
@@ -357,7 +357,7 @@ igraph_error_t igraph_site_percolation(
     igraph_vector_int_t links;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&links, vcount);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         VECTOR(sizes)[i] = 0;
         VECTOR(links)[i] = i;
     }
@@ -373,8 +373,8 @@ igraph_error_t igraph_site_percolation(
     }
 
     // Percolation
-    for (igraph_integer_t i = 0; i < number_percolated; i++) {
-        const igraph_integer_t vid = VECTOR(*p_vertex_order)[i];
+    for (igraph_int_t i = 0; i < number_percolated; i++) {
+        const igraph_int_t vid = VECTOR(*p_vertex_order)[i];
         if (vid < 0 || vid >= vcount) {
             IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVVID);
         }

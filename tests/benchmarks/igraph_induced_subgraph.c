@@ -22,21 +22,21 @@
 
 // Function to generate random vertex indices for subgraph extraction
 void generate_random_vertices(igraph_vector_int_t *vertices,
-                              igraph_integer_t graph_size,
-                              igraph_integer_t subset_size) {
+                              igraph_int_t graph_size,
+                              igraph_int_t subset_size) {
     igraph_vector_int_init(vertices, 0);
     igraph_vector_int_resize(vertices, subset_size);
 
     // Create a vector to track used vertices
     igraph_vector_int_t used_vertices;
     igraph_vector_int_init(&used_vertices, graph_size);
-    for (igraph_integer_t i = 0; i < graph_size; i++) {
+    for (igraph_int_t i = 0; i < graph_size; i++) {
         VECTOR(used_vertices)[i] = i;
     }
 
     // Randomly select subset_size unique vertices
-    for (igraph_integer_t i = 0; i < subset_size; i++) {
-        igraph_integer_t index = RNG_INTEGER(0, graph_size - i - 1);
+    for (igraph_int_t i = 0; i < subset_size; i++) {
+        igraph_int_t index = RNG_INTEGER(0, graph_size - i - 1);
         VECTOR(*vertices)[i] = VECTOR(used_vertices)[index];
 
         // Remove the selected vertex from used_vertices
@@ -66,7 +66,7 @@ void run_bench(int i, int n, int m, int subset_percentage) {
     igraph_vector_int_t vertices;
 
     // Calculate subset size based on percentage
-    igraph_integer_t subset_size = (n * subset_percentage) / 100;
+    igraph_int_t subset_size = (n * subset_percentage) / 100;
 
     // Prepare random graph and vertices
     igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);

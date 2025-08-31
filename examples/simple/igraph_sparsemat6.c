@@ -36,9 +36,9 @@ int main(void) {
 #define NUM_NONZEROS 15
 
     igraph_matrix_init(&mat, NROW, NCOL);
-    for (igraph_integer_t i = 0; i < NUM_NONZEROS; i++) {
-        igraph_integer_t r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
-        igraph_integer_t c = igraph_rng_get_integer(igraph_rng_default(), 0, NCOL - 1);
+    for (igraph_int_t i = 0; i < NUM_NONZEROS; i++) {
+        igraph_int_t r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
+        igraph_int_t c = igraph_rng_get_integer(igraph_rng_default(), 0, NCOL - 1);
         igraph_real_t val = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         MATRIX(mat, r, c) = val;
     }

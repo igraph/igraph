@@ -22,8 +22,8 @@
 /* Vertices/edges with the same parity match */
 igraph_bool_t compat_parity(const igraph_t *graph1,
                             const igraph_t *graph2,
-                            const igraph_integer_t g1_num,
-                            const igraph_integer_t g2_num,
+                            const igraph_int_t g1_num,
+                            const igraph_int_t g2_num,
                             void *arg) {
     IGRAPH_UNUSED(graph1);
     IGRAPH_UNUSED(graph2);
@@ -33,8 +33,8 @@ igraph_bool_t compat_parity(const igraph_t *graph1,
 
 igraph_bool_t compat_not_arg(const igraph_t *graph1,
                              const igraph_t *graph2,
-                             const igraph_integer_t g1_num,
-                             const igraph_integer_t g2_num,
+                             const igraph_int_t g1_num,
+                             const igraph_int_t g2_num,
                              void *arg) {
     IGRAPH_UNUSED(graph1);
     IGRAPH_UNUSED(graph2);

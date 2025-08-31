@@ -52,8 +52,8 @@ int main(void) {
     igraph_vector_int_print(&edges);
 
     igraph_real_t total_tree_weight = 0;
-    igraph_integer_t n = igraph_vector_int_size(&edges);
-    for (igraph_integer_t i=0; i < n; i++) {
+    igraph_int_t n = igraph_vector_int_size(&edges);
+    for (igraph_int_t i=0; i < n; i++) {
         total_tree_weight += -VECTOR(eb)[ VECTOR(edges)[i] ];
     }
     printf("\nTotal maximum spanning tree weight: %g\n", total_tree_weight);

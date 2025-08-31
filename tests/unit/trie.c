@@ -30,8 +30,8 @@
 int main(void) {
 
     igraph_trie_t trie;
-    igraph_integer_t id;
-    igraph_integer_t i;
+    igraph_int_t id;
+    igraph_int_t i;
     const char *str;
 
     /* init */

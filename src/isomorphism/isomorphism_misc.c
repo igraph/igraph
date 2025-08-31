@@ -57,10 +57,10 @@ igraph_error_t igraph_simplify_and_colorize(
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t pto = -1, pfrom = -1;
-    igraph_integer_t i;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t pto = -1, pfrom = -1;
+    igraph_int_t i;
 
     IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_FROM));
     IGRAPH_FINALLY(igraph_es_destroy, &es);
@@ -78,9 +78,9 @@ igraph_error_t igraph_simplify_and_colorize(
 
     i = -1;
     for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from = IGRAPH_FROM(graph, edge);
-        igraph_integer_t to   = IGRAPH_TO(graph, edge);
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from = IGRAPH_FROM(graph, edge);
+        igraph_int_t to   = IGRAPH_TO(graph, edge);
 
         if (to == from) {
             VECTOR(*vertex_color)[to]++;

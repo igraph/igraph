@@ -105,16 +105,16 @@ igraph_error_t igraph_i_distances_johnson(
         const igraph_vector_t *weights,
         igraph_neimode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_t newgraph;
     igraph_vector_int_t edges;
     igraph_vector_t newweights;
     igraph_matrix_t bfres;
-    igraph_integer_t i, ptr;
-    igraph_integer_t nr, nc;
+    igraph_int_t i, ptr;
+    igraph_int_t nr, nc;
     igraph_vit_t fromvit;
-    igraph_integer_t no_edges_reserved;
+    igraph_int_t no_edges_reserved;
 
     /* If no weights or no edges, then we can just run the unweighted version */
     if (!weights || no_of_edges == 0) {
@@ -181,8 +181,8 @@ igraph_error_t igraph_i_distances_johnson(
 
     igraph_vector_resize(&newweights, no_of_edges); /* reserved */
     for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t ffrom = IGRAPH_FROM(graph, i);
-        igraph_integer_t tto = IGRAPH_TO(graph, i);
+        igraph_int_t ffrom = IGRAPH_FROM(graph, i);
+        igraph_int_t tto = IGRAPH_TO(graph, i);
         if (mode == IGRAPH_OUT) {
             VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
         } else {
@@ -212,9 +212,9 @@ igraph_error_t igraph_i_distances_johnson(
     IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
 
     for (i = 0; i < nr; i++, IGRAPH_VIT_NEXT(fromvit)) {
-        igraph_integer_t v1 = IGRAPH_VIT_GET(fromvit);
+        igraph_int_t v1 = IGRAPH_VIT_GET(fromvit);
         if (igraph_vs_is_all(&to)) {
-            igraph_integer_t v2;
+            igraph_int_t v2;
             for (v2 = 0; v2 < nc; v2++) {
                 igraph_real_t sub;
                 if (mode == IGRAPH_OUT) {
@@ -226,13 +226,13 @@ igraph_error_t igraph_i_distances_johnson(
                 }
             }
         } else {
-            igraph_integer_t j;
+            igraph_int_t j;
             igraph_vit_t tovit;
             IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
             IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
             for (j = 0, IGRAPH_VIT_RESET(tovit); j < nc; j++, IGRAPH_VIT_NEXT(tovit)) {
                 igraph_real_t sub;
-                igraph_integer_t v2 = IGRAPH_VIT_GET(tovit);
+                igraph_int_t v2 = IGRAPH_VIT_GET(tovit);
                 if (mode == IGRAPH_OUT) {
                     sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
                     MATRIX(*res, i, j) -= sub;

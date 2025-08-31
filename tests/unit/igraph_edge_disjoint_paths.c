@@ -23,7 +23,7 @@
 int main(void) {
 
     igraph_t g;
-    igraph_integer_t value;
+    igraph_int_t value;
 
     igraph_small(&g, 6, IGRAPH_DIRECTED,
                  0,1, 0,2, 1,2, 1,3, 2,4, 3,4, 3,5, 4,5, 3,3, -1);

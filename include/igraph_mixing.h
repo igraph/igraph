@@ -47,14 +47,14 @@ IGRAPH_EXPORT igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_joint_degree_matrix(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_matrix_t *jdm,
-        igraph_integer_t dout, igraph_integer_t din);
+        igraph_int_t dout, igraph_int_t din);
 
 IGRAPH_EXPORT igraph_error_t igraph_joint_degree_distribution(
         const igraph_t *graph, const igraph_vector_t *weights, igraph_matrix_t *p,
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors,
         igraph_bool_t normalized,
-        igraph_integer_t max_from_degree, igraph_integer_t max_to_degree);
+        igraph_int_t max_from_degree, igraph_int_t max_to_degree);
 
 IGRAPH_EXPORT igraph_error_t igraph_joint_type_distribution(
         const igraph_t *graph, const igraph_vector_t *weights,

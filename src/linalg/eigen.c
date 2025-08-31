@@ -673,8 +673,8 @@ typedef struct igraph_i_eml_cmp_t {
 static int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_int_t *aa = (igraph_int_t*) a;
+    igraph_int_t *bb = (igraph_int_t*) b;
     igraph_real_t a_m = VECTOR(*myextra->mag)[*aa];
     igraph_real_t b_m = VECTOR(*myextra->mag)[*bb];
 
@@ -719,8 +719,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
 static int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_int_t *aa = (igraph_int_t*) a;
+    igraph_int_t *bb = (igraph_int_t*) b;
     igraph_real_t a_m = VECTOR(*myextra->mag)[*aa];
     igraph_real_t b_m = VECTOR(*myextra->mag)[*bb];
 
@@ -764,8 +764,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_int_t *aa = (igraph_int_t*) a;
+    igraph_int_t *bb = (igraph_int_t*) b;
     igraph_real_t a_r = VECTOR(*myextra->real)[*aa];
     igraph_real_t b_r = VECTOR(*myextra->real)[*bb];
 
@@ -804,8 +804,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_int_t *aa = (igraph_int_t*) a;
+    igraph_int_t *bb = (igraph_int_t*) b;
     igraph_real_t a_r = VECTOR(*myextra->real)[*aa];
     igraph_real_t b_r = VECTOR(*myextra->real)[*bb];
 
@@ -842,8 +842,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_int_t *aa = (igraph_int_t*) a;
+    igraph_int_t *bb = (igraph_int_t*) b;
     igraph_real_t a_i = VECTOR(*myextra->imag)[*aa];
     igraph_real_t b_i = VECTOR(*myextra->imag)[*bb];
 
@@ -881,8 +881,8 @@ static int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_int_t *aa = (igraph_int_t*) a;
+    igraph_int_t *bb = (igraph_int_t*) b;
     igraph_real_t a_i = VECTOR(*myextra->imag)[*aa];
     igraph_real_t b_i = VECTOR(*myextra->imag)[*bb];
 
@@ -938,7 +938,7 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
     igraph_bool_t hasmag = false;
     int nev;
     int howmany = 0, start = 0;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_i_eigen_matrix_lapack_cmp_t cmpfunc = 0;
     igraph_i_eml_cmp_t vextra;
     void *extra;
@@ -1012,17 +1012,17 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
     if (values) {
         IGRAPH_CHECK(igraph_vector_complex_resize(values, howmany));
         for (i = 0; i < howmany; i++) {
-            igraph_integer_t x = VECTOR(idx)[start + i];
+            igraph_int_t x = VECTOR(idx)[start + i];
             VECTOR(*values)[i] = igraph_complex(VECTOR(*real)[x],
                                                 VECTOR(*imag)[x]);
         }
     }
 
     if (vectors) {
-        igraph_integer_t n = igraph_matrix_nrow(compressed);
+        igraph_int_t n = igraph_matrix_nrow(compressed);
         IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, howmany));
         for (i = 0; i < howmany; i++) {
-            igraph_integer_t j, x = VECTOR(idx)[start + i];
+            igraph_int_t j, x = VECTOR(idx)[start + i];
             if (VECTOR(*imag)[x] == 0) {
                 /* real eigenvalue */
                 for (j = 0; j < n; j++) {
@@ -1058,7 +1058,7 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t 
 
     igraph_vector_t valuesreal, valuesimag;
     igraph_matrix_t vectorsright, *myvectors = vectors ? &vectorsright : 0;
-    igraph_integer_t n = igraph_matrix_nrow(A);
+    igraph_int_t n = igraph_matrix_nrow(A);
     int info = 1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
@@ -1285,14 +1285,14 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
         int n, void *extra) {
     igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
     igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(adjlist, i);
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_int_t nei = VECTOR(*neis)[j];
             to[i] += from[nei];
         }
     }
@@ -1314,7 +1314,7 @@ static igraph_error_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
 
     igraph_adjlist_t adjlist;
     void *extra = (void*) &adjlist;
-    igraph_integer_t n = igraph_vcount(graph);
+    igraph_int_t n = igraph_vcount(graph);
 
     if (!options) {
         IGRAPH_ERROR("`options' must be given for ARPACK algorithm",

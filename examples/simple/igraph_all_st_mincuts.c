@@ -42,7 +42,7 @@ int main(void) {
                           /*source=*/ 0, /*target=*/ 4,
                           /*capacity=*/ 0);
 
-    igraph_integer_t i, e, m, n = igraph_vector_int_list_size(&partitions);
+    igraph_int_t i, e, m, n = igraph_vector_int_list_size(&partitions);
     printf("Found %" IGRAPH_PRId " cuts, value: %g\n", n, value);
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *vec = igraph_vector_int_list_get_ptr(&partitions, i);
@@ -53,7 +53,7 @@ int main(void) {
             printf("Cut %" IGRAPH_PRId ":\n", i);
             m = igraph_vector_int_size(vec2);
             for (e = 0; e < m; e++) {
-                igraph_integer_t from = IGRAPH_FROM(&g, VECTOR(*vec2)[e]), to = IGRAPH_TO(&g, VECTOR(*vec2)[e]);
+                igraph_int_t from = IGRAPH_FROM(&g, VECTOR(*vec2)[e]), to = IGRAPH_TO(&g, VECTOR(*vec2)[e]);
                 printf("  %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n", from, to);
             }
         }

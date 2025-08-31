@@ -25,7 +25,7 @@
 int main(void) {
     igraph_t g;
     igraph_vector_int_list_t cliques;
-    igraph_integer_t no;
+    igraph_int_t no;
 
     /* Initialize the library. */
     igraph_setup();
@@ -42,7 +42,7 @@ int main(void) {
         return 1;
     }
 
-    for (igraph_integer_t i = 0; i < igraph_vector_int_list_size(&cliques); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_int_list_size(&cliques); i++) {
         igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&cliques, i);
         igraph_vector_int_print(v);
     }

@@ -37,13 +37,13 @@
  * \return Error code.
  */
 igraph_error_t igraph_invert_permutation(const igraph_vector_int_t *permutation, igraph_vector_int_t *inverse) {
-    const igraph_integer_t n = igraph_vector_int_size(permutation);
+    const igraph_int_t n = igraph_vector_int_size(permutation);
 
     IGRAPH_CHECK(igraph_vector_int_resize(inverse, n));
     igraph_vector_int_fill(inverse, -1);
 
-    for (igraph_integer_t i = 0; i < n; i++) {
-        igraph_integer_t j = VECTOR(*permutation)[i];
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_int_t j = VECTOR(*permutation)[i];
         if (j < 0 || j >= n) {
             IGRAPH_ERROR("Invalid index in permutation vector.", IGRAPH_EINVAL);
         }
@@ -80,11 +80,11 @@ igraph_error_t igraph_invert_permutation(const igraph_vector_int_t *permutation,
 igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                                        const igraph_vector_int_t *permutation) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t edges;
     igraph_vector_int_t index;
-    igraph_integer_t p;
+    igraph_int_t p;
 
     if (igraph_vector_int_size(permutation) != no_of_nodes) {
         IGRAPH_ERROR("Permute vertices: invalid permutation vector size.", IGRAPH_EINVAL);
@@ -98,7 +98,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     p = 0;
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
         VECTOR(edges)[p++] = VECTOR(index)[ IGRAPH_FROM(graph, i) ];
         VECTOR(edges)[p++] = VECTOR(index)[ IGRAPH_TO(graph, i) ];
     }

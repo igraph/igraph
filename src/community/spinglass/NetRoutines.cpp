@@ -50,20 +50,20 @@ igraph_error_t igraph_i_read_network_spinglass(
     const igraph_t *graph, const igraph_vector_t *weights,
     network *net, igraph_bool_t use_weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     double sum_weight;
 
-    for (igraph_integer_t vid = 0; vid < no_of_nodes; vid++) {
+    for (igraph_int_t vid = 0; vid < no_of_nodes; vid++) {
         char name[SPINGLASS_MAX_NAME_LEN];
         snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", vid+1);
         net->node_list.Push(new NNode(vid, 0, &net->link_list, name));
     }
 
     sum_weight = 0.0;
-    for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
-        igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
-        igraph_integer_t v2 = IGRAPH_TO(graph, eid);
+    for (igraph_int_t eid = 0; eid < no_of_edges; eid++) {
+        igraph_int_t v1 = IGRAPH_FROM(graph, eid);
+        igraph_int_t v2 = IGRAPH_TO(graph, eid);
         igraph_real_t w = use_weights ? VECTOR(*weights)[eid] : 1.0;
 
         NNode *node1 = net->node_list.Get(v1);

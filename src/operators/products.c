@@ -35,12 +35,12 @@ static igraph_error_t cartesian_product(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    const igraph_integer_t vcount1 = igraph_vcount(g1);
-    const igraph_integer_t vcount2 = igraph_vcount(g2);
-    const igraph_integer_t ecount1 = igraph_ecount(g1);
-    const igraph_integer_t ecount2 = igraph_ecount(g2);
-    igraph_integer_t vcount;
-    igraph_integer_t ecount, ecount_double;
+    const igraph_int_t vcount1 = igraph_vcount(g1);
+    const igraph_int_t vcount2 = igraph_vcount(g2);
+    const igraph_int_t ecount1 = igraph_ecount(g1);
+    const igraph_int_t ecount2 = igraph_ecount(g2);
+    igraph_int_t vcount;
+    igraph_int_t ecount, ecount_double;
     igraph_vector_int_t edges;
 
     // New vertex count = vcount1 * vcount2
@@ -48,7 +48,7 @@ static igraph_error_t cartesian_product(igraph_t *res,
 
     {
         // New edge count = vcount1*ecount2 + vcount2*ecount1
-        igraph_integer_t temp;
+        igraph_int_t temp;
         IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
         IGRAPH_SAFE_MULT(vcount2, ecount1, &temp);
         IGRAPH_SAFE_ADD(ecount, temp, &ecount);
@@ -60,29 +60,29 @@ static igraph_error_t cartesian_product(igraph_t *res,
     // Vertex ((i, j)) with i from g1, and j from g2
     //   will have new vertex id: i * vcount2 + j
 
-    igraph_integer_t edge_index = 0;
+    igraph_int_t edge_index = 0;
 
     // Edges from g1
-    for (igraph_integer_t i = 0; i < ecount1; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g1, i);
-        igraph_integer_t to = IGRAPH_TO(g1, i);
+    for (igraph_int_t i = 0; i < ecount1; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g1, i);
+        igraph_int_t to = IGRAPH_TO(g1, i);
 
         // For all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
         //    for all vertex j in g2
-        for (igraph_integer_t j = 0; j < vcount2; ++j) {
+        for (igraph_int_t j = 0; j < vcount2; ++j) {
             VECTOR(edges)[edge_index++] = from * vcount2 + j; // ((from, j))
             VECTOR(edges)[edge_index++] = to * vcount2 + j; // ((to, j))
         }
     }
 
     // Edges from g2
-    for (igraph_integer_t i = 0; i < ecount2; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g2, i);
-        igraph_integer_t to = IGRAPH_TO(g2, i);
+    for (igraph_int_t i = 0; i < ecount2; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g2, i);
+        igraph_int_t to = IGRAPH_TO(g2, i);
 
         // For all edges (from, to) in g2, add edge from (j, from) to (j, to)
         //    for all vertex j in g1
-        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+        for (igraph_int_t j = 0; j < vcount1; ++j) {
             VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
             VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
         }
@@ -106,12 +106,12 @@ static igraph_error_t lexicographic_product(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    const igraph_integer_t vcount1 = igraph_vcount(g1);
-    const igraph_integer_t vcount2 = igraph_vcount(g2);
-    const igraph_integer_t ecount1 = igraph_ecount(g1);
-    const igraph_integer_t ecount2 = igraph_ecount(g2);
-    igraph_integer_t vcount;
-    igraph_integer_t ecount, ecount_double;
+    const igraph_int_t vcount1 = igraph_vcount(g1);
+    const igraph_int_t vcount2 = igraph_vcount(g2);
+    const igraph_int_t ecount1 = igraph_ecount(g1);
+    const igraph_int_t ecount2 = igraph_ecount(g2);
+    igraph_int_t vcount;
+    igraph_int_t ecount, ecount_double;
     igraph_vector_int_t edges;
 
     // New vertex count = vcount1 * vcount2
@@ -119,7 +119,7 @@ static igraph_error_t lexicographic_product(igraph_t *res,
 
     {
         // New edge count = vcount1*ecount2 + (vcount2^2)*ecount1
-        igraph_integer_t temp;
+        igraph_int_t temp;
         IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
         IGRAPH_SAFE_MULT(vcount2, vcount2, &temp);
         IGRAPH_SAFE_MULT(temp, ecount1, &temp);
@@ -132,29 +132,29 @@ static igraph_error_t lexicographic_product(igraph_t *res,
 
     // Vertex ((i, j)) with i from g1, and j from g2
     //   will have new vertex id: i * vcount2 + j
-    igraph_integer_t edge_index = 0;
+    igraph_int_t edge_index = 0;
 
     // edges of form u1=u2 and v1~v2
-    for (igraph_integer_t i = 0; i < ecount2; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g2, i);
-        igraph_integer_t to = IGRAPH_TO(g2, i);
+    for (igraph_int_t i = 0; i < ecount2; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g2, i);
+        igraph_int_t to = IGRAPH_TO(g2, i);
 
         // For all edges (from, to) in g2, add edge from (j, from) to (j, to)
         //    for all vertex j in g1
-        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+        for (igraph_int_t j = 0; j < vcount1; ++j) {
             VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
             VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
         }
     }
 
     // edges of form u1~u2
-    for (igraph_integer_t i = 0; i < ecount1; ++i) {
-        igraph_integer_t from1 = IGRAPH_FROM(g1, i);
-        igraph_integer_t to1 = IGRAPH_TO(g1, i);
+    for (igraph_int_t i = 0; i < ecount1; ++i) {
+        igraph_int_t from1 = IGRAPH_FROM(g1, i);
+        igraph_int_t to1 = IGRAPH_TO(g1, i);
 
         // each vertex pair irrespective of their connectivity
-        for (igraph_integer_t from2 = 0; from2 < vcount2; ++from2) {
-            for (igraph_integer_t to2 = 0; to2 < vcount2; ++to2) {
+        for (igraph_int_t from2 = 0; from2 < vcount2; ++from2) {
+            for (igraph_int_t to2 = 0; to2 < vcount2; ++to2) {
                 // ((from1, from2)) to ((to1, to2))
                 VECTOR(edges)[edge_index++] = from1 * vcount2 + from2; // ((from1, from2))
                 VECTOR(edges)[edge_index++] = to1 * vcount2 + to2; // ((to1, to2))
@@ -180,12 +180,12 @@ static igraph_error_t strong_product(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    const igraph_integer_t vcount1 = igraph_vcount(g1);
-    const igraph_integer_t vcount2 = igraph_vcount(g2);
-    const igraph_integer_t ecount1 = igraph_ecount(g1);
-    const igraph_integer_t ecount2 = igraph_ecount(g2);
-    igraph_integer_t vcount;
-    igraph_integer_t ecount, ecount_double;
+    const igraph_int_t vcount1 = igraph_vcount(g1);
+    const igraph_int_t vcount2 = igraph_vcount(g2);
+    const igraph_int_t ecount1 = igraph_ecount(g1);
+    const igraph_int_t ecount2 = igraph_ecount(g2);
+    igraph_int_t vcount;
+    igraph_int_t ecount, ecount_double;
     igraph_vector_int_t edges;
 
     // New vertex count = vcount1 * vcount2
@@ -194,7 +194,7 @@ static igraph_error_t strong_product(igraph_t *res,
     {
         // New edge count = vcount1*ecount2 + vcount2*ecount1 + 2*e1*e2 for undirected graph
         //                = vcount1*ecount2 + vcount2*ecount1 + e1*e2 for directed graph
-        igraph_integer_t temp;
+        igraph_int_t temp;
         IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
         IGRAPH_SAFE_MULT(vcount2, ecount1, &temp);
         IGRAPH_SAFE_ADD(ecount, temp, &ecount);
@@ -209,18 +209,18 @@ static igraph_error_t strong_product(igraph_t *res,
     IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
 
-    igraph_integer_t edge_index = 0;
+    igraph_int_t edge_index = 0;
     // Strong graph product contains all the edges from both cartesian and tensor product
 
     // Edges of type cartesian products: v1=v2 and u1~u2; v1~v2 and u1=u2
     // v1=v2 and u1~u2
-    for (igraph_integer_t i = 0; i < ecount1; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g1, i);
-        igraph_integer_t to = IGRAPH_TO(g1, i);
+    for (igraph_int_t i = 0; i < ecount1; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g1, i);
+        igraph_int_t to = IGRAPH_TO(g1, i);
 
         // For all edges (from, to) in g1, add edge from ((from, j)) to ((to, j))
         //    for all vertex j in g2
-        for (igraph_integer_t j = 0; j < vcount2; ++j) {
+        for (igraph_int_t j = 0; j < vcount2; ++j) {
             // SAFE MULT and SAFE ADD not needed as < vcount
             VECTOR(edges)[edge_index++] = from * vcount2 + j; // ((from, j))
             VECTOR(edges)[edge_index++] = to * vcount2 + j; // ((to, j))
@@ -228,13 +228,13 @@ static igraph_error_t strong_product(igraph_t *res,
     }
 
     // v1~v2 and u1=u2
-    for (igraph_integer_t i = 0; i < ecount2; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g2, i);
-        igraph_integer_t to = IGRAPH_TO(g2, i);
+    for (igraph_int_t i = 0; i < ecount2; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g2, i);
+        igraph_int_t to = IGRAPH_TO(g2, i);
 
         // For all edges (from, to) in g2, add edge from (j, from) to (j, to)
         //    for all vertex j in g1
-        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+        for (igraph_int_t j = 0; j < vcount1; ++j) {
             VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
             VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
         }
@@ -242,13 +242,13 @@ static igraph_error_t strong_product(igraph_t *res,
 
     // Edges of type tensor product
     // u1 ~ u2 and v1 ~ v2
-    for (igraph_integer_t i = 0; i < ecount1; ++i) {
-        igraph_integer_t from1 = IGRAPH_FROM(g1, i);
-        igraph_integer_t to1 = IGRAPH_TO(g1, i);
+    for (igraph_int_t i = 0; i < ecount1; ++i) {
+        igraph_int_t from1 = IGRAPH_FROM(g1, i);
+        igraph_int_t to1 = IGRAPH_TO(g1, i);
 
-        for (igraph_integer_t j = 0; j < ecount2; ++j) {
-            igraph_integer_t from2 = IGRAPH_FROM(g2, j);
-            igraph_integer_t to2 = IGRAPH_TO(g2, j);
+        for (igraph_int_t j = 0; j < ecount2; ++j) {
+            igraph_int_t from2 = IGRAPH_FROM(g2, j);
+            igraph_int_t to2 = IGRAPH_TO(g2, j);
 
             // Create edge between ((from1, from2)) to ((to1, to2))
             VECTOR(edges)[edge_index++] = from1 * vcount2 + from2; // ((from1, from2))
@@ -281,12 +281,12 @@ static igraph_error_t tensor_product(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    const igraph_integer_t vcount1 = igraph_vcount(g1);
-    const igraph_integer_t vcount2 = igraph_vcount(g2);
-    const igraph_integer_t ecount1 = igraph_ecount(g1);
-    const igraph_integer_t ecount2 = igraph_ecount(g2);
-    igraph_integer_t vcount;
-    igraph_integer_t ecount, ecount_double;
+    const igraph_int_t vcount1 = igraph_vcount(g1);
+    const igraph_int_t vcount2 = igraph_vcount(g2);
+    const igraph_int_t ecount1 = igraph_ecount(g1);
+    const igraph_int_t ecount2 = igraph_ecount(g2);
+    igraph_int_t vcount;
+    igraph_int_t ecount, ecount_double;
     igraph_vector_int_t edges;
 
     IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
@@ -302,15 +302,15 @@ static igraph_error_t tensor_product(igraph_t *res,
     // Vertex ((i, j)) with i from g1, and j from g2
     //   will have new vertex id: i * vcount2 + j
 
-    igraph_integer_t edge_index = 0;
+    igraph_int_t edge_index = 0;
 
-    for (igraph_integer_t i = 0; i < ecount1; ++i) {
-        igraph_integer_t from1 = IGRAPH_FROM(g1, i);
-        igraph_integer_t to1 = IGRAPH_TO(g1, i);
+    for (igraph_int_t i = 0; i < ecount1; ++i) {
+        igraph_int_t from1 = IGRAPH_FROM(g1, i);
+        igraph_int_t to1 = IGRAPH_TO(g1, i);
 
-        for (igraph_integer_t j = 0; j < ecount2; ++j) {
-            igraph_integer_t from2 = IGRAPH_FROM(g2, j);
-            igraph_integer_t to2 = IGRAPH_TO(g2, j);
+        for (igraph_int_t j = 0; j < ecount2; ++j) {
+            igraph_int_t from2 = IGRAPH_FROM(g2, j);
+            igraph_int_t to2 = IGRAPH_TO(g2, j);
 
             // Create edge between ((from1, from2)) to ((to1, to2))
             VECTOR(edges)[edge_index++] = from1 * vcount2 + from2; // ((from1, from2))
@@ -585,7 +585,7 @@ igraph_error_t igraph_product(igraph_t *res,
 igraph_error_t igraph_rooted_product(igraph_t *res,
                                      const igraph_t *g1,
                                      const igraph_t *g2,
-                                     const igraph_integer_t root) {
+                                     const igraph_int_t root) {
 
     const igraph_bool_t directed = igraph_is_directed(g1);
 
@@ -594,17 +594,17 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
                      IGRAPH_EINVAL);
     }
 
-    const igraph_integer_t vcount1 = igraph_vcount(g1);
-    const igraph_integer_t vcount2 = igraph_vcount(g2);
+    const igraph_int_t vcount1 = igraph_vcount(g1);
+    const igraph_int_t vcount2 = igraph_vcount(g2);
 
     if (root < 0 || root >= vcount2) { // root must be in range [0, vcount2-1]
         IGRAPH_ERROR("The given root vertex is not present in the second graph.", IGRAPH_EINVVID);
     }
 
-    const igraph_integer_t ecount1 = igraph_ecount(g1);
-    const igraph_integer_t ecount2 = igraph_ecount(g2);
-    igraph_integer_t vcount;
-    igraph_integer_t ecount, ecount_double;
+    const igraph_int_t ecount1 = igraph_ecount(g1);
+    const igraph_int_t ecount2 = igraph_ecount(g2);
+    igraph_int_t vcount;
+    igraph_int_t ecount, ecount_double;
     igraph_vector_int_t edges;
 
     // New vertex count = vcount1 * vcount2
@@ -620,12 +620,12 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
     // Vertex ((i, j)) with i from g1, and j from g2
     //   will have new vertex id: i * vcount2 + j
 
-    igraph_integer_t edge_index = 0;
+    igraph_int_t edge_index = 0;
 
     // Edges of form ((u, root)) - ((v, root))
-    for (igraph_integer_t i = 0; i < ecount1; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g1, i);
-        igraph_integer_t to = IGRAPH_TO(g1, i);
+    for (igraph_int_t i = 0; i < ecount1; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g1, i);
+        igraph_int_t to = IGRAPH_TO(g1, i);
 
         VECTOR(edges)[edge_index++] = from * vcount2 + root; // ((from, root))
         VECTOR(edges)[edge_index++] = to * vcount2 + root; // ((to, root))
@@ -633,11 +633,11 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
 
     // For all edges (from, to) in g2, add edge from ((j, from)) to ((j, to))
     //    for all vertex j in g1
-    for (igraph_integer_t i = 0; i < ecount2; ++i) {
-        igraph_integer_t from = IGRAPH_FROM(g2, i);
-        igraph_integer_t to = IGRAPH_TO(g2, i);
+    for (igraph_int_t i = 0; i < ecount2; ++i) {
+        igraph_int_t from = IGRAPH_FROM(g2, i);
+        igraph_int_t to = IGRAPH_TO(g2, i);
 
-        for (igraph_integer_t j = 0; j < vcount1; ++j) {
+        for (igraph_int_t j = 0; j < vcount1; ++j) {
             VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
             VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
         }

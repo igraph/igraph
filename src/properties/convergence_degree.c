@@ -70,10 +70,10 @@
  */
 igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                               igraph_vector_t *ins, igraph_vector_t *outs) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i, j, k, n;
-    igraph_integer_t *geodist;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i, j, k, n;
+    igraph_int_t *geodist;
     igraph_vector_int_t *eids;
     igraph_vector_t *ins_p, *outs_p, ins_v, outs_v;
     igraph_dqueue_int_t q;
@@ -104,7 +104,7 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
         igraph_vector_null(outs_p);
     }
 
-    geodist = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    geodist = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     if (geodist == 0) {
         IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
@@ -125,13 +125,13 @@ igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t 
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
             while (!igraph_dqueue_int_empty(&q)) {
-                igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-                igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+                igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+                igraph_int_t actdist = igraph_dqueue_int_pop(&q);
                 IGRAPH_ALLOW_INTERRUPTION();
                 eids = igraph_inclist_get(&inclist, actnode);
                 n = igraph_vector_int_size(eids);
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
+                    igraph_int_t neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
                     if (geodist[neighbor] != 0) {
                         /* we've already seen this node, another shortest path? */
                         if (geodist[neighbor] - 1 == actdist + 1) {

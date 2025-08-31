@@ -22,11 +22,11 @@
 #include <igraph.h>
 
 igraph_error_t bfs_callback(const igraph_t *graph,
-                           igraph_integer_t vid,
-                           igraph_integer_t pred,
-                           igraph_integer_t succ,
-                           igraph_integer_t rank,
-                           igraph_integer_t dist,
+                           igraph_int_t vid,
+                           igraph_int_t pred,
+                           igraph_int_t succ,
+                           igraph_int_t rank,
+                           igraph_int_t dist,
                            void *extra) {
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(pred);

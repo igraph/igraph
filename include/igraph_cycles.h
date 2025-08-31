@@ -44,7 +44,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_int_list_t *result,
-        igraph_integer_t start_vid, igraph_real_t bfs_cutoff);
+        igraph_int_t start_vid, igraph_real_t bfs_cutoff);
 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
         const igraph_t *graph, const igraph_vector_t *weights,
@@ -79,8 +79,8 @@ typedef igraph_error_t igraph_cycle_handler_t(
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length,
+        igraph_int_t min_cycle_length,
+        igraph_int_t max_cycle_length,
         igraph_cycle_handler_t *callback, void *arg);
 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
@@ -88,8 +88,8 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
         igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length);
+        igraph_int_t min_cycle_length,
+        igraph_int_t max_cycle_length);
 
 IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
         const igraph_t *graph, igraph_vector_int_t *result,

@@ -30,13 +30,13 @@
 #include "layout/layout_internal.h"
 
 static igraph_error_t vector_order(igraph_vector_t *v) {
-    const igraph_integer_t n = igraph_vector_size(v);
+    const igraph_int_t n = igraph_vector_size(v);
     igraph_vector_int_t ind;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ind, n);
     IGRAPH_CHECK(igraph_vector_sort_ind(v, &ind, IGRAPH_DESCENDING));
 
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         VECTOR(*v)[i] = VECTOR(ind)[i];
     }
 
@@ -72,19 +72,19 @@ igraph_error_t igraph_layout_merge_dla(
     const igraph_vector_ptr_t *thegraphs, const igraph_matrix_list_t *coords,
     igraph_matrix_t *res
 ) {
-    igraph_integer_t coords_len = igraph_matrix_list_size(coords);
+    igraph_int_t coords_len = igraph_matrix_list_size(coords);
     igraph_vector_t sizes;
     igraph_vector_t x, y, r;
     igraph_vector_t nx, ny, nr;
-    igraph_integer_t allnodes = 0;
-    igraph_integer_t i, j;
-    igraph_integer_t actg;
+    igraph_int_t allnodes = 0;
+    igraph_int_t i, j;
+    igraph_int_t actg;
     igraph_i_layout_mergegrid_t grid;
-    igraph_integer_t jpos = 0;
+    igraph_int_t jpos = 0;
     igraph_real_t minx, maxx, miny, maxy;
     igraph_real_t area = 0;
     igraph_real_t maxr = 0;
-    igraph_integer_t respos;
+    igraph_int_t respos;
 
     /* Graphs are currently not used, only the coordinates */
     IGRAPH_UNUSED(thegraphs);
@@ -99,7 +99,7 @@ igraph_error_t igraph_layout_merge_dla(
 
     for (i = 0; i < coords_len; i++) {
         igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
-        igraph_integer_t size = igraph_matrix_nrow(mat);
+        igraph_int_t size = igraph_matrix_nrow(mat);
 
         if (igraph_matrix_ncol(mat) != 2) {
             IGRAPH_ERROR("igraph_layout_merge_dla works for 2D layouts only",
@@ -160,7 +160,7 @@ igraph_error_t igraph_layout_merge_dla(
     respos = 0;
     for (i = 0; i < coords_len; i++) {
         igraph_matrix_t *mat = igraph_matrix_list_get_ptr(coords, i);
-        igraph_integer_t size = igraph_matrix_nrow(mat);
+        igraph_int_t size = igraph_matrix_nrow(mat);
         igraph_real_t xx = VECTOR(x)[i];
         igraph_real_t yy = VECTOR(y)[i];
         igraph_real_t rr = VECTOR(r)[i] / VECTOR(nr)[i];
@@ -192,8 +192,8 @@ igraph_error_t igraph_layout_merge_dla(
 igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r) {
-    igraph_integer_t nodes = igraph_matrix_nrow(coords);
-    igraph_integer_t i;
+    igraph_int_t nodes = igraph_matrix_nrow(coords);
+    igraph_int_t i;
     igraph_real_t xmin, xmax, ymin, ymax;
 
     xmin = xmax = MATRIX(*coords, 0, 0);
@@ -224,8 +224,8 @@ igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
 igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *z, igraph_real_t *r) {
-    igraph_integer_t nodes = igraph_matrix_nrow(coords);
-    igraph_integer_t i;
+    igraph_int_t nodes = igraph_matrix_nrow(coords);
+    igraph_int_t i;
     igraph_real_t xmin, xmax, ymin, ymax, zmin, zmax;
 
     xmin = xmax = MATRIX(*coords, 0, 0);
@@ -265,10 +265,10 @@ igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
 
 igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                              igraph_integer_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+                              igraph_int_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                               igraph_real_t killr) {
-    igraph_integer_t sp = -1;
+    igraph_int_t sp = -1;
     igraph_real_t angle, len;
 
     /* The graph is not used, only its coordinates */

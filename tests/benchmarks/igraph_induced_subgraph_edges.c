@@ -26,7 +26,7 @@
 
 void unit_test_subgraph_edges(
     const igraph_t *graph, igraph_vector_int_t *vertices,
-    igraph_integer_t induced_subgraph_vertice_count, igraph_integer_t benchmark_count,
+    igraph_int_t induced_subgraph_vertice_count, igraph_int_t benchmark_count,
     const char* bench_message
 ) {
     igraph_vector_int_t edges;

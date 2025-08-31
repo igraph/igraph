@@ -26,17 +26,17 @@ int main(void) {
 
     igraph_t g;
     igraph_vector_int_t v = IGRAPH_VECTOR_NULL;
-    igraph_integer_t edges[] = { 0, 1, 1, 2, 2, 2, 2, 3, 2, 4, 3, 4 };
+    igraph_int_t edges[] = { 0, 1, 1, 2, 2, 2, 2, 3, 2, 4, 3, 4 };
     igraph_vector_int_t v2;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vit_t vit;
     igraph_vs_t vs;
-    igraph_integer_t size;
+    igraph_int_t size;
 
     /* Initialize the library. */
     igraph_setup();
 
-    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(igraph_integer_t));
+    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(igraph_int_t));
     igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
 
     /* Create iterator based on a vector (view) */

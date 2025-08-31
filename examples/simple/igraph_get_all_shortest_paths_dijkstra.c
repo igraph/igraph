@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 void print_and_destroy_items(igraph_vector_int_list_t* vec) {
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Sort the paths in a deterministic manner to avoid problems with
      * different qsort() implementations on different platforms */

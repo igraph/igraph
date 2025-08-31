@@ -46,7 +46,7 @@ void simple_test_case_with_weights_undirected(void) {
     igraph_vector_int_t vector_edges;
     igraph_vector_t vector_weights, vector_actual_results;
 
-    igraph_integer_t real_edges[] = {0,1 , 1,2};
+    igraph_int_t real_edges[] = {0,1 , 1,2};
     igraph_real_t real_weights[] = {3, 5};
 
     printf("\nSimple test case, with weights, undirected\n");
@@ -134,7 +134,7 @@ void advanced_test_case_with_weights(void) {
     igraph_vector_int_t vector_edges;
     igraph_vector_t vector_weights, vector_actual_results;
 
-    igraph_integer_t real_edges[] = {1,0 , 0,5 , 5,6 , 5,4, 4,1 , 1,2 , 2,4 , 4,6 ,
+    igraph_int_t real_edges[] = {1,0 , 0,5 , 5,6 , 5,4, 4,1 , 1,2 , 2,4 , 4,6 ,
                                  2,3 , 3,7 , 7,6 , 6,2};
 
     igraph_real_t real_weights[] = {4, 9, 2, 2, 2, 3, 1, 1, 8, 7, 5, 5};

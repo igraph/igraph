@@ -55,7 +55,7 @@
  * Time complexity: O(|V|+|E|) if \c multiple is true, otherwise not known.
  */
 igraph_error_t igraph_k_regular_game(igraph_t *graph,
-                          igraph_integer_t no_of_nodes, igraph_integer_t k,
+                          igraph_int_t no_of_nodes, igraph_int_t k,
                           igraph_bool_t directed, igraph_bool_t multiple) {
     igraph_vector_int_t degseq;
     igraph_degseq_t mode = multiple ? IGRAPH_DEGSEQ_CONFIGURATION : IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE;

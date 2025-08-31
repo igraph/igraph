@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_integer_t n, igraph_integer_t m, igraph_vector_t *rho, igraph_matrix_t *pref_matrix, igraph_real_t p) {
+void call_and_print(igraph_int_t n, igraph_int_t m, igraph_vector_t *rho, igraph_matrix_t *pref_matrix, igraph_real_t p) {
     igraph_t result;
     igraph_hsbm_game(&result, n, m, rho, pref_matrix, p);
     print_graph_canon(&result);

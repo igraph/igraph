@@ -33,5 +33,5 @@ typedef struct {
     igraph_vector_int_t *vector;
     igraph_vector_t *weights;
     igraph_trie_t *trie;
-    igraph_integer_t actvertex;
+    igraph_int_t actvertex;
 } igraph_i_lgl_parsedata_t;

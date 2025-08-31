@@ -23,7 +23,7 @@
 #include <math.h>
 
 void check_align(const igraph_t *graph) {
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
     igraph_matrix_t layout;
     igraph_bool_t connected;
 

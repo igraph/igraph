@@ -110,7 +110,7 @@ struct igraph_i_graphml_parser_state {
     igraph_vector_int_t edgelist;
     igraph_vector_int_t prev_state_stack;
     unsigned int unknown_depth;
-    igraph_integer_t index;
+    igraph_int_t index;
     igraph_bool_t successful;
     igraph_bool_t edges_directed;
     igraph_trie_t v_attr_ids;
@@ -124,7 +124,7 @@ struct igraph_i_graphml_parser_state {
     igraph_attribute_elemtype_t data_type;
     char *error_message;
     igraph_vector_char_t data_char;
-    igraph_integer_t act_node;
+    igraph_int_t act_node;
     igraph_bool_t ignore_namespaces;
 };
 
@@ -158,7 +158,7 @@ static igraph_error_t igraph_i_graphml_parse_numeric(
 static igraph_error_t igraph_i_graphml_parse_boolean(
     const char* char_data, igraph_bool_t* result, igraph_bool_t default_value
 ) {
-    igraph_integer_t value;
+    igraph_int_t value;
     const char* trimmed;
     size_t trimmed_length;
 
@@ -218,7 +218,7 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     memset(rec, 0, sizeof(igraph_i_graphml_attribute_record_t));
 }
 
-static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, igraph_integer_t index) {
+static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, igraph_int_t index) {
     memset(state, 0, sizeof(struct igraph_i_graphml_parser_state));
 
     state->g = graph;
@@ -387,7 +387,7 @@ static void igraph_i_graphml_sax_handler_start_document(void *state0) {
 }
 
 static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph_i_graphml_parser_state *state) {
-    igraph_integer_t i;
+    igraph_int_t i;
     const char *idstr = "id";
     igraph_bool_t already_has_vertex_id = false, already_has_edge_id = false;
     igraph_attribute_record_list_t vattr, eattr, gattr;
@@ -559,8 +559,8 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     xmlChar *localname;
     igraph_trie_t *trie = NULL;
     igraph_vector_ptr_t *ptrvector = NULL;
-    igraph_integer_t i, n;
-    igraph_integer_t id;
+    igraph_int_t i, n;
+    igraph_int_t id;
     igraph_i_graphml_attribute_record_t *rec = NULL;
     char *attr_name;
     igraph_attribute_type_t igraph_attr_type;
@@ -800,7 +800,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
     igraph_vector_ptr_t *ptrvector = NULL;
     igraph_i_graphml_attribute_record_t *graphmlrec;
     igraph_attribute_record_t *rec;
-    igraph_integer_t recid, id = 0;
+    igraph_int_t recid, id = 0;
     igraph_error_t result = IGRAPH_SUCCESS;
 
     switch (type) {
@@ -945,7 +945,7 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
         int nb_attributes, int nb_defaulted, const xmlChar** attributes) {
     xmlChar** it;
     xmlChar* attr_value = 0;
-    igraph_integer_t id1, id2;
+    igraph_int_t id1, id2;
     int i;
     igraph_bool_t tag_is_unknown = false;
 
@@ -1079,8 +1079,8 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
                     xmlFree(attr_value); attr_value = NULL;
                     IGRAPH_FINALLY_CLEAN(1);
                 } else if (xmlStrEqual(*it, toXmlChar("id"))) {
-                    igraph_integer_t edges = igraph_vector_int_size(&state->edgelist) / 2 + 1;
-                    igraph_integer_t origsize = igraph_strvector_size(&state->edgeids);
+                    igraph_int_t edges = igraph_vector_int_size(&state->edgelist) / 2 + 1;
+                    igraph_int_t origsize = igraph_strvector_size(&state->edgeids);
 
                     attr_value = xmlStrndup(XML_ATTR_VALUE(it));
                     if (attr_value == 0) {
@@ -1368,7 +1368,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler = {
  * \return Error code.
  */
 static igraph_error_t igraph_i_xml_escape(const char *src, char **dest, const char *what) {
-    igraph_integer_t destlen = 0;
+    igraph_int_t destlen = 0;
     const char *s;
     char *d;
     unsigned char ch;
@@ -1467,7 +1467,7 @@ static void igraph_i_libxml_structured_error_handler(void* ctx, const xmlError *
  *
  * \example examples/simple/graphml.c
  */
-igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph_integer_t index) {
+igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph_int_t index) {
 
 #if HAVE_LIBXML == 1
     xmlParserCtxtPtr ctxt;
@@ -1647,11 +1647,11 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
 igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                                igraph_bool_t prefixattr) {
     int ret;
-    igraph_integer_t l, vc;
+    igraph_int_t l, vc;
     igraph_eit_t it;
     igraph_strvector_t gnames, vnames, enames;
     igraph_vector_int_t gtypes, vtypes, etypes;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vector_t numv;
     igraph_strvector_t strv;
     igraph_vector_bool_t boolv;
@@ -1925,9 +1925,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     while (!IGRAPH_EIT_END(it)) {
-        igraph_integer_t from, to;
+        igraph_int_t from, to;
         const char *name; char *name_escaped;
-        igraph_integer_t edge = IGRAPH_EIT_GET(it);
+        igraph_int_t edge = IGRAPH_EIT_GET(it);
         igraph_edge(graph, edge, &from, &to);
         ret = fprintf(outstream, "    <edge source=\"n%" IGRAPH_PRId "\" target=\"n%" IGRAPH_PRId "\">\n",
                       from, to);

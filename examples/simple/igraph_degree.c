@@ -32,7 +32,7 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_t v;
     igraph_vector_int_t seq;
-    igraph_integer_t mdeg;
+    igraph_int_t mdeg;
 
     /* Initialize the library. */
     igraph_setup();

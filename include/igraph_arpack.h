@@ -350,8 +350,8 @@ typedef enum {
 IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
 IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default(void);
 
-IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
-                                             igraph_integer_t maxncv, igraph_integer_t maxldv, igraph_bool_t symm);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_int_t maxn,
+                                             igraph_int_t maxncv, igraph_int_t maxldv, igraph_bool_t symm);
 IGRAPH_EXPORT void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 
 /**
@@ -385,7 +385,7 @@ IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun
                                         igraph_matrix_t *values, igraph_matrix_t *vectors);
 
 IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                               igraph_integer_t nev);
+                                               igraph_int_t nev);
 
 IGRAPH_EXPORT const char* igraph_arpack_error_to_string(igraph_arpack_error_t error);
 IGRAPH_EXPORT igraph_arpack_error_t igraph_arpack_get_last_error(void);

@@ -145,8 +145,8 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
                                const igraph_vector_t *weights) {
     Graph &G = *this;
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
 
     // Avoid warnings with GCC when compiling with LTO.
     IGRAPH_ASSUME(no_of_nodes >= 0);
@@ -160,7 +160,7 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
 
     Edge_list EL;
 
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
         igraph_real_t w = weights ? VECTOR(*weights)[i] : 1.0;
         EL.add(IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i), w);
     }

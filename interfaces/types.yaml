@@ -12,7 +12,7 @@
 
 INTEGER:
     # An ordinary igraph integer
-    CTYPE: igraph_integer_t
+    CTYPE: igraph_int_t
 
 REAL:
     # An ordinary igraph floating-point number
@@ -133,7 +133,7 @@ SPARSEMAT:
 
 EDGE:
     # A single edge index
-    CTYPE: igraph_integer_t
+    CTYPE: igraph_int_t
 
 EDGE_INDICES:
     # An integer vector containing edge indices.
@@ -146,7 +146,7 @@ EDGE_SELECTOR:
 
 VERTEX:
     # A single vertex index
-    CTYPE: igraph_integer_t
+    CTYPE: igraph_int_t
 
 VERTEX_INDICES:
     # An integer vector containing vertex indices.

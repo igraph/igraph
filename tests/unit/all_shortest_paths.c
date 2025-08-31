@@ -25,7 +25,7 @@ int main(void) {
     igraph_vector_int_list_t paths, paths_edge;
     igraph_vector_int_t nrgeo;
     igraph_vector_t weights;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
 
     igraph_vector_int_list_init(&paths, 0);
     igraph_vector_int_list_init(&paths_edge, 0);

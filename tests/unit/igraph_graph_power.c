@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_result(igraph_t *g, igraph_integer_t order, igraph_bool_t directed) {
+void print_result(igraph_t *g, igraph_int_t order, igraph_bool_t directed) {
     igraph_t res;
     igraph_graph_power(g, &res, order, directed);
     print_graph_canon(&res);

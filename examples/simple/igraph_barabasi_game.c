@@ -45,7 +45,7 @@ int main(void) {
 
     igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
-    for (igraph_integer_t i = 0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
             return 4;
         }
@@ -63,7 +63,7 @@ int main(void) {
     }
     igraph_vector_int_init(&v2, 0);
     igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
-    for (igraph_integer_t i = 0; i < igraph_vcount(&g); i++) {
+    for (igraph_int_t i = 0; i < igraph_vcount(&g); i++) {
         if (VECTOR(v3)[i] != VECTOR(v2)[i]) {
             igraph_vector_int_print(&v3);
             printf("\n");
@@ -81,7 +81,7 @@ int main(void) {
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
     igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
-    for (igraph_integer_t i = 0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
             return 7;
         }

@@ -17,8 +17,8 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
-                igraph_integer_t center) {
+void call_and_print(igraph_t *graph, igraph_int_t n, igraph_wheel_mode_t mode,
+                igraph_int_t center) {
 
     IGRAPH_ASSERT(igraph_wheel(graph, n, mode, center) == IGRAPH_SUCCESS);
     print_graph_canon(graph);

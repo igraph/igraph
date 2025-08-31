@@ -48,7 +48,7 @@ class Node {
 public:
 
     bool fixed;   // if true do not change the
-    igraph_integer_t id;
+    igraph_int_t id;
 
     // position of this node
     float x, y;
@@ -57,7 +57,7 @@ public:
 
 public:
 
-    Node( igraph_integer_t node_id ) {
+    Node( igraph_int_t node_id ) {
         x = y = 0.0; fixed = false;
         id = node_id;
     }

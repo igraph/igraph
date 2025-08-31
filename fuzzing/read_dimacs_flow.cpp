@@ -45,7 +45,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     igraph_vector_t capacity;
     IGRAPH_ASSERT(igraph_vector_init(&capacity, 0) == IGRAPH_SUCCESS);
 
-    igraph_integer_t source, target;
+    igraph_int_t source, target;
 
     // Do the fuzzing
     igraph_t g;

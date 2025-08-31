@@ -29,7 +29,7 @@ int main(void) {
 
     igraph_t ring, g;
     igraph_graph_list_t complist;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_graph_list_init(&complist, 0);
 

@@ -25,7 +25,7 @@ int main(void) {
     igraph_t graph, graph_test;
     igraph_vector_int_t shifts;
     igraph_bool_t iso, same;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Testing invalid values */
 

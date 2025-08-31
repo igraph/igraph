@@ -37,28 +37,28 @@ private:
     // Random generator
     KW_RNG::RNG rng;
     // Number of vertices
-    igraph_integer_t n;
+    igraph_int_t n;
     //Number of arcs ( = #edges * 2 )
-    igraph_integer_t a;
+    igraph_int_t a;
     // The degree sequence of the graph
-    igraph_integer_t *deg;
+    igraph_int_t *deg;
     // The array containing all links
-    igraph_integer_t *links;
+    igraph_int_t *links;
     // The array containing pointers to adjacency list of every vertices
-    igraph_integer_t **neigh;
+    igraph_int_t **neigh;
     // Allocate memory according to degree_sequence (for constructor use only!!)
     void alloc(degree_sequence &);
     // Compute #edges
     inline void refresh_nbarcs() {
         a = 0;
-        for (igraph_integer_t* d = deg + n; d != deg; ) {
+        for (igraph_int_t* d = deg + n; d != deg; ) {
             a += *(--d);
         }
     }
     // Build neigh with deg and links
     void compute_neigh();
     // Swap edges. The swap MUST be valid !!!
-    inline void swap_edges(igraph_integer_t from1, igraph_integer_t to1, igraph_integer_t from2, igraph_integer_t to2) {
+    inline void swap_edges(igraph_int_t from1, igraph_int_t to1, igraph_int_t from2, igraph_int_t to2) {
         fast_rpl(neigh[from1], to1, to2);
         fast_rpl(neigh[from2], to2, to1);
         fast_rpl(neigh[to1], from1, from2);
@@ -66,46 +66,46 @@ private:
     }
 
     // Swap edges only if they are simple. return false if unsuccessful.
-    bool swap_edges_simple(igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_integer_t);
+    bool swap_edges_simple(igraph_int_t, igraph_int_t, igraph_int_t, igraph_int_t);
     // Test if vertex is in an isolated component of size<K
-    bool isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited);
+    bool isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited);
     // Pick random edge, and gives a corresponding vertex
-    inline igraph_integer_t pick_random_vertex() {
+    inline igraph_int_t pick_random_vertex() {
         return links[my_random() % a];
     };
     // Pick random neighbour
-    inline igraph_integer_t* random_neighbour(const igraph_integer_t v) {
+    inline igraph_int_t* random_neighbour(const igraph_int_t v) {
         return neigh[v] + (my_random() % deg[v]);
     };
     // Returns complexity of isolation test
-    igraph_integer_t effective_isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited);
+    igraph_int_t effective_isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited);
     // Depth-Exploration. Returns number of steps done. Stops when encounter vertex of degree > dmax.
-    void depth_isolated(igraph_integer_t v, igraph_integer_t &calls, igraph_integer_t &left_to_explore, igraph_integer_t dmax, igraph_integer_t * &Kbuff, bool *visited);
+    void depth_isolated(igraph_int_t v, igraph_int_t &calls, igraph_int_t &left_to_explore, igraph_int_t dmax, igraph_int_t * &Kbuff, bool *visited);
     // breadth-first search. Store the distance (modulo 3)  in dist[]. Returns eplorated component size.
-    igraph_integer_t width_search(unsigned char *dist, igraph_integer_t *buff, igraph_integer_t v0 = 0, igraph_integer_t toclear = -1);
+    igraph_int_t width_search(unsigned char *dist, igraph_int_t *buff, igraph_int_t v0 = 0, igraph_int_t toclear = -1);
     // depth-first search.
-    igraph_integer_t depth_search(bool *visited, igraph_integer_t *buff, igraph_integer_t v0 = 0);
+    igraph_int_t depth_search(bool *visited, igraph_int_t *buff, igraph_int_t v0 = 0);
     // breadth-first search that count the number of shortest paths going from src to each vertex
-    igraph_integer_t breadth_path_search(igraph_integer_t src, igraph_integer_t *buff, double *paths, unsigned char *dist);
+    igraph_int_t breadth_path_search(igraph_int_t src, igraph_int_t *buff, double *paths, unsigned char *dist);
     // Return component indexes where vertices belong to, starting from 0,
     // sorted by size (biggest component has index 0)
-    igraph_integer_t *components(igraph_integer_t *comp = NULL);
+    igraph_int_t *components(igraph_int_t *comp = NULL);
 
 public:
     // neigh[]
-    inline igraph_integer_t** neighbors() {
+    inline igraph_int_t** neighbors() {
         return neigh;
     };
     // deg[]
-    inline igraph_integer_t* degrees() {
+    inline igraph_int_t* degrees() {
         return deg;
     };
     //adjacency list of v
-    inline igraph_integer_t* operator[](const igraph_integer_t v) {
+    inline igraph_int_t* operator[](const igraph_int_t v) {
         return neigh[v];
     };
     //degree of v
-    inline igraph_integer_t degree(const igraph_integer_t v) {
+    inline igraph_int_t degree(const igraph_int_t v) {
         return deg[v];
     };
     // Detach deg[] and neigh[]
@@ -117,27 +117,27 @@ public:
     // Allocate memory for the graph. Create deg and links. No edge is created.
     graph_molloy_opt(degree_sequence &);
     // Create graph from hard copy
-    graph_molloy_opt(igraph_integer_t *);
+    graph_molloy_opt(igraph_int_t *);
     // Create hard copy of graph
-    igraph_integer_t *hard_copy();
+    igraph_int_t *hard_copy();
     // Remove unused edges, updates neigh[], recreate links[]
     void clean();
     // nb arcs
-    inline igraph_integer_t nbarcs() {
+    inline igraph_int_t nbarcs() {
         return a;
     };
     // last degree
-    inline igraph_integer_t last_degree() {
+    inline igraph_int_t last_degree() {
         return deg[n - 1];
     };
     // nb vertices
-    inline igraph_integer_t nbvertices() {
+    inline igraph_int_t nbvertices() {
         return n;
     };
     // nb vertices having degree > 0
-    inline igraph_integer_t nbvertices_real() {
-        igraph_integer_t s = 0;
-        for (igraph_integer_t *d = deg + n; d-- != deg; ) {
+    inline igraph_int_t nbvertices_real() {
+        igraph_int_t s = 0;
+        for (igraph_int_t *d = deg + n; d-- != deg; ) {
             if (*d) {
                 s++;
             }
@@ -145,7 +145,7 @@ public:
         return s;
     };
     // return list of vertices with degree > 0. Compute #vertices, if not given.
-    igraph_integer_t *vertices_real(igraph_integer_t &nb_v);
+    igraph_int_t *vertices_real(igraph_int_t &nb_v);
     // print graph in SUCC_LIST mode, in stdout
     void print(FILE *f = stdout, bool NOZERO = true);
     // Bind the graph avoiding multiple edges or self-edges (return false if fail)
@@ -155,29 +155,29 @@ public:
     // Test if graph is connected
     bool is_connected();
     // Maximum degree
-    igraph_integer_t max_degree();
+    igraph_int_t max_degree();
     // is edge ?
-    inline bool is_edge(const igraph_integer_t u, const igraph_integer_t v) {
+    inline bool is_edge(const igraph_int_t u, const igraph_int_t v) {
         if (deg[v] < deg[u]) {
             return (fast_search(neigh[v], deg[v], u) != NULL);
         } else {
             return (fast_search(neigh[u], deg[u], v) != NULL);
         }
     }
-    // Backup graph [sizeof(igraph_integer_t) bytes per edge]
-    igraph_integer_t* backup(igraph_integer_t *here = NULL);
+    // Backup graph [sizeof(igraph_int_t) bytes per edge]
+    igraph_int_t* backup(igraph_int_t *here = NULL);
     // Restore from backup. Assume that degrees haven't changed
-    void restore(igraph_integer_t* back);
+    void restore(igraph_int_t* back);
     // Resplace with hard backup.
-    void replace(igraph_integer_t* _hardbackup);
+    void replace(igraph_int_t* _hardbackup);
     // Backup degs of graph
-    igraph_integer_t* backup_degs(igraph_integer_t *here = NULL);
+    igraph_int_t* backup_degs(igraph_int_t *here = NULL);
     // Restore degs from neigh[]. Need last degree, though
-    void restore_degs(igraph_integer_t last_degree);
+    void restore_degs(igraph_int_t last_degree);
     // Restore degs[] from backup. Assume that links[] has only been permuted
-    void restore_degs_only(igraph_integer_t* backup_degs);
+    void restore_degs_only(igraph_int_t* backup_degs);
     // Restore degs[] and neigh[]. Assume that links[] has only been permuted
-    void restore_degs_and_neigh(igraph_integer_t* backup_degs);
+    void restore_degs_and_neigh(igraph_int_t* backup_degs);
     // sort adjacency lists
     void sort();
     // count cycles passing through vertex v

@@ -25,21 +25,21 @@
 
 /* Calls igraph_degree_1() separately for each vertex. */
 void deg1(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
-    igraph_integer_t n = igraph_vcount(g);
+    igraph_int_t n = igraph_vcount(g);
     igraph_vector_int_resize(res, n);
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         igraph_degree_1(g, &VECTOR(*res)[i], i, mode, loops);
     }
 }
 
 /* Calls igraph_degree() separately for each vertex, pre-allocates work vector. */
 void degv(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
-    igraph_integer_t n = igraph_vcount(g);
+    igraph_int_t n = igraph_vcount(g);
     igraph_vector_int_t work;
 
     igraph_vector_int_resize(res, n);
     igraph_vector_int_init(&work, 1);
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         igraph_degree(g, &work, igraph_vss_1(i), mode, loops);
     }
     igraph_vector_int_destroy(&work);
@@ -47,9 +47,9 @@ void degv(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, ig
 
 /* Calls igraph_degree() separately for each vertex, allocates a new work vector each time. */
 void degv2(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
-    igraph_integer_t n = igraph_vcount(g);
+    igraph_int_t n = igraph_vcount(g);
 
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         igraph_vector_int_t work;
         igraph_vector_int_init(&work, 1);
         igraph_degree(g, &work, igraph_vss_1(i), mode, loops);

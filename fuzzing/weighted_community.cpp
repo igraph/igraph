@@ -52,7 +52,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_int_t membership, membership2, iv, iv2;
         igraph_vector_t mv, v;
         igraph_real_t m, r;
-        igraph_integer_t i;
+        igraph_int_t i;
         igraph_bool_t b;
 
         /* Limit graph size for the sake of performance. */
@@ -134,7 +134,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             // Compute 'length' vector for community_voronoi()
             igraph_vector_update(&v, &weights);
-            for (igraph_integer_t i=0; i < igraph_vector_size(&v); i++) {
+            for (igraph_int_t i=0; i < igraph_vector_size(&v); i++) {
                 VECTOR(v)[i] = 1 / (1 + VECTOR(v)[i]);
             }
             igraph_community_voronoi(&graph, &membership, &iv, &m, &v, &weights, IGRAPH_OUT, 1.0);

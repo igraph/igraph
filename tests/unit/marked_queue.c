@@ -27,7 +27,7 @@
 
 int main(void) {
     igraph_marked_queue_int_t Q;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_marked_queue_int_init(&Q, 100);
     for (i = 0; i < 50; i++) {

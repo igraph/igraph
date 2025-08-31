@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 void print_and_clear(igraph_graph_list_t *result) {
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_t *g;
     for (i = 0; i < igraph_graph_list_size(result); i++) {
         g = igraph_graph_list_get_ptr(result, i);

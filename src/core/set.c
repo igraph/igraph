@@ -42,12 +42,12 @@
  * Time complexity: operating system dependent, should be around
  * O(n), n is the expected size of the set.
  */
-igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
-    igraph_integer_t alloc_size;
+igraph_error_t igraph_set_init(igraph_set_t *set, igraph_int_t capacity) {
+    igraph_int_t alloc_size;
 
     IGRAPH_ASSERT(capacity >= 0);
     alloc_size = capacity > 0 ? capacity : 1;
-    set->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
+    set->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_int_t);
     if (! set->stor_begin) {
         IGRAPH_ERROR("Cannot initialize set.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
@@ -105,16 +105,16 @@ igraph_bool_t igraph_set_inited(igraph_set_t *set) {
  * Time complexity: operating system dependent, should be around
  * O(n), n is the new allocated size of the set.
  */
-igraph_error_t igraph_set_reserve(igraph_set_t *set, igraph_integer_t capacity) {
-    igraph_integer_t actual_size = igraph_set_size(set);
-    igraph_integer_t *tmp;
+igraph_error_t igraph_set_reserve(igraph_set_t *set, igraph_int_t capacity) {
+    igraph_int_t actual_size = igraph_set_size(set);
+    igraph_int_t *tmp;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     if (capacity <= actual_size) {
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(set->stor_begin, capacity, igraph_integer_t);
+    tmp = IGRAPH_REALLOC(set->stor_begin, capacity, igraph_int_t);
     IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for set.");
 
     set->stor_begin = tmp;
@@ -174,7 +174,7 @@ void igraph_set_clear(igraph_set_t *set) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t igraph_set_size(const igraph_set_t *set) {
+igraph_int_t igraph_set_size(const igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     return set->end - set->stor_begin;
@@ -193,9 +193,9 @@ igraph_integer_t igraph_set_size(const igraph_set_t *set) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
-    igraph_integer_t left, right, middle;
-    igraph_integer_t size;
+igraph_error_t igraph_set_add(igraph_set_t *set, igraph_int_t e) {
+    igraph_int_t left, right, middle;
+    igraph_int_t size;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
 
@@ -226,7 +226,7 @@ igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
     if (left >= size || set->stor_begin[left] != e) {
         /* full, allocate more storage */
         if (set->stor_end == set->end) {
-            igraph_integer_t new_size = size < IGRAPH_INTEGER_MAX/2 ? size * 2 : IGRAPH_INTEGER_MAX;
+            igraph_int_t new_size = size < IGRAPH_INTEGER_MAX/2 ? size * 2 : IGRAPH_INTEGER_MAX;
             if (size == IGRAPH_INTEGER_MAX) {
                 IGRAPH_ERROR("Cannot add to set, already at maximum size.", IGRAPH_EOVERFLOW);
             }
@@ -259,8 +259,8 @@ igraph_error_t igraph_set_add(igraph_set_t *set, igraph_integer_t e) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e) {
-    igraph_integer_t left, right, middle;
+igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_int_t e) {
+    igraph_int_t left, right, middle;
 
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
@@ -296,7 +296,7 @@ igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e) {
  *
  * \param set The set object.
  * \param state Internal state of the iteration.
- *   This should be a pointer to a \type igraph_integer_t variable
+ *   This should be a pointer to a \type igraph_int_t variable
  *   which must be zero for the first invocation.
  *   The object must not be adjusted and its value should
  *   not be used for anything during the iteration.
@@ -305,8 +305,8 @@ igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e) {
  *
  * \return True if there are more elements, false otherwise.
  */
-igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t *state,
-                                 igraph_integer_t *element) {
+igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_int_t *state,
+                                 igraph_int_t *element) {
     IGRAPH_ASSERT(set != 0);
     IGRAPH_ASSERT(set->stor_begin != 0);
     IGRAPH_ASSERT(state != 0);

@@ -30,7 +30,7 @@ int main(void) {
     igraph_vector_t weights;
     igraph_vector_int_t initial;
     igraph_vector_bool_t fixed;
-    igraph_integer_t i, j, k;
+    igraph_int_t i, j, k;
 
     /* Simple triangle graph, the output should be always one community */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,  1,  0,  2,  1,  2, -1);

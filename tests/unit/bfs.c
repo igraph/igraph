@@ -24,11 +24,11 @@
 #include "test_utilities.h"
 
 igraph_error_t bfs_callback(const igraph_t *graph,
-                           igraph_integer_t vid,
-                           igraph_integer_t pred,
-                           igraph_integer_t succ,
-                           igraph_integer_t rank,
-                           igraph_integer_t dist,
+                           igraph_int_t vid,
+                           igraph_int_t pred,
+                           igraph_int_t succ,
+                           igraph_int_t rank,
+                           igraph_int_t dist,
                            void *extra) {
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(pred);
@@ -44,7 +44,7 @@ int main(void) {
 
     igraph_t graph, ring;
     igraph_vector_int_t restricted, order, rank, father, pred, succ, dist, roots;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);

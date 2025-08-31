@@ -27,7 +27,7 @@ int main(void) {
     igraph_vs_t vs;
     igraph_vit_t vit;
     igraph_t g;
-    igraph_integer_t size;
+    igraph_int_t size;
 
     /* Initialize the library. */
     igraph_setup();

@@ -23,7 +23,7 @@
 #define EXPECT_FAIL(expr) IGRAPH_ASSERT((expr) != IGRAPH_SUCCESS)
 
 int main(void) {
-    igraph_integer_t res;
+    igraph_int_t res;
 
     igraph_set_error_handler(igraph_error_handler_printignore);
 

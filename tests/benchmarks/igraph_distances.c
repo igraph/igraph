@@ -20,7 +20,7 @@
 
 #include "bench.h"
 
-void bench_gnp(igraph_integer_t n, igraph_real_t p, igraph_bool_t directed, igraph_real_t negloop, int rep) {
+void bench_gnp(igraph_int_t n, igraph_real_t p, igraph_bool_t directed, igraph_real_t negloop, int rep) {
     igraph_t g;
     igraph_matrix_t res;
     igraph_vector_t weights;
@@ -34,7 +34,7 @@ void bench_gnp(igraph_integer_t n, igraph_real_t p, igraph_bool_t directed, igra
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -88,7 +88,7 @@ void bench_gnp(igraph_integer_t n, igraph_real_t p, igraph_bool_t directed, igra
 
     /* Add a small number of negative weights, rely on luck, as well as tuning 'negloop',
      * to avoid negative loops. */
-    for (igraph_integer_t i=0; i < trunc(negloop * igraph_ecount(&g)); i++) {
+    for (igraph_int_t i=0; i < trunc(negloop * igraph_ecount(&g)); i++) {
         /* For reproducibility, do not write two RNG_...() calls within the same statement,
          * as the C language does not guarantee any evaluation order between them. */
         igraph_real_t w = RNG_UNIF(-negloop, 0);

@@ -48,13 +48,13 @@
  * of shifts.
  */
 
-igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igraph_vector_int_t *shifts, igraph_bool_t directed) {
+igraph_error_t igraph_circulant(igraph_t *graph, igraph_int_t n, const igraph_vector_int_t *shifts, igraph_bool_t directed) {
 
     igraph_vector_int_t edges;
     igraph_vector_bool_t shift_seen;
-    igraph_integer_t i, j;
-    igraph_integer_t limit;
-    igraph_integer_t shift_size = igraph_vector_int_size(shifts);
+    igraph_int_t i, j;
+    igraph_int_t limit;
+    igraph_int_t shift_size = igraph_vector_int_size(shifts);
 
     if (n < 0) {
         IGRAPH_ERRORF("Number of nodes = %" IGRAPH_PRId " must be non-negative.", IGRAPH_EINVAL, n);
@@ -65,7 +65,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     {
-        igraph_integer_t size;
+        igraph_int_t size;
         IGRAPH_SAFE_MULT(n, shift_size, &size);
         IGRAPH_SAFE_MULT(size, 2, &size);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, size));
@@ -76,7 +76,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
 
     for (i = 0; i < shift_size; i++) {
         /* simplify the shift */
-        igraph_integer_t shift = VECTOR(*shifts)[i] % n;
+        igraph_int_t shift = VECTOR(*shifts)[i] % n;
         if (shift < 0) {
             shift += n;
         }

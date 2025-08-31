@@ -34,12 +34,12 @@
 typedef struct igraph_i_forest_fire_data_t {
     igraph_vector_int_t *inneis;
     igraph_vector_int_t *outneis;
-    igraph_integer_t no_of_nodes;
+    igraph_int_t no_of_nodes;
 } igraph_i_forest_fire_data_t;
 
 
 static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
-    for (igraph_integer_t i = 0; i < data->no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < data->no_of_nodes; i++) {
         igraph_vector_int_destroy(data->inneis + i);
         igraph_vector_int_destroy(data->outneis + i);
     }
@@ -103,17 +103,17 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_int_t nodes,
                             igraph_real_t fw_prob, igraph_real_t bw_factor,
-                            igraph_integer_t pambs, igraph_bool_t directed) {
+                            igraph_int_t pambs, igraph_bool_t directed) {
 
     igraph_vector_int_t visited;
-    igraph_integer_t no_of_nodes = nodes, actnode, i;
+    igraph_int_t no_of_nodes = nodes, actnode, i;
     igraph_vector_int_t edges;
     igraph_vector_int_t *inneis, *outneis;
     igraph_i_forest_fire_data_t data;
     igraph_dqueue_int_t neiq;
-    igraph_integer_t ambs = pambs;
+    igraph_int_t ambs = pambs;
     igraph_real_t param_geom_out = 1 - fw_prob;
     igraph_real_t param_geom_in = 1 - fw_prob * bw_factor;
 
@@ -181,29 +181,29 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
         /* Choose ambassador(s) */
         for (i = 0; i < ambs; i++) {
-            igraph_integer_t a = RNG_INTEGER(0, actnode - 1);
+            igraph_int_t a = RNG_INTEGER(0, actnode - 1);
             ADD_EDGE_TO(a);
         }
 
         while (!igraph_dqueue_int_empty(&neiq)) {
-            igraph_integer_t actamb = igraph_dqueue_int_pop(&neiq);
+            igraph_int_t actamb = igraph_dqueue_int_pop(&neiq);
             igraph_vector_int_t *outv = outneis + actamb;
             igraph_vector_int_t *inv = inneis + actamb;
-            igraph_integer_t no_in = igraph_vector_int_size(inv);
-            igraph_integer_t no_out = igraph_vector_int_size(outv);
-            igraph_integer_t neis_out = RNG_GEOM(param_geom_out);
-            igraph_integer_t neis_in = RNG_GEOM(param_geom_in);
+            igraph_int_t no_in = igraph_vector_int_size(inv);
+            igraph_int_t no_out = igraph_vector_int_size(outv);
+            igraph_int_t neis_out = RNG_GEOM(param_geom_out);
+            igraph_int_t neis_in = RNG_GEOM(param_geom_in);
             /* outgoing neighbors */
             if (neis_out >= no_out) {
                 for (i = 0; i < no_out; i++) {
-                    igraph_integer_t nei = VECTOR(*outv)[i];
+                    igraph_int_t nei = VECTOR(*outv)[i];
                     ADD_EDGE_TO(nei);
                 }
             } else {
-                igraph_integer_t oleft = no_out;
+                igraph_int_t oleft = no_out;
                 for (i = 0; i < neis_out && oleft > 0; ) {
-                    igraph_integer_t which = RNG_INTEGER(0, oleft - 1);
-                    igraph_integer_t nei = VECTOR(*outv)[which];
+                    igraph_int_t which = RNG_INTEGER(0, oleft - 1);
+                    igraph_int_t nei = VECTOR(*outv)[which];
                     VECTOR(*outv)[which] = VECTOR(*outv)[oleft - 1];
                     VECTOR(*outv)[oleft - 1] = nei;
                     if (VECTOR(visited)[nei] != actnode + 1) {
@@ -216,14 +216,14 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
             /* incoming neighbors */
             if (neis_in >= no_in) {
                 for (i = 0; i < no_in; i++) {
-                    igraph_integer_t nei = VECTOR(*inv)[i];
+                    igraph_int_t nei = VECTOR(*inv)[i];
                     ADD_EDGE_TO(nei);
                 }
             } else {
-                igraph_integer_t ileft = no_in;
+                igraph_int_t ileft = no_in;
                 for (i = 0; i < neis_in && ileft > 0; ) {
-                    igraph_integer_t which = RNG_INTEGER(0, ileft - 1);
-                    igraph_integer_t nei = VECTOR(*inv)[which];
+                    igraph_int_t which = RNG_INTEGER(0, ileft - 1);
+                    igraph_int_t nei = VECTOR(*inv)[which];
                     VECTOR(*inv)[which] = VECTOR(*inv)[ileft - 1];
                     VECTOR(*inv)[ileft - 1] = nei;
                     if (VECTOR(visited)[nei] != actnode + 1) {

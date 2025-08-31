@@ -27,7 +27,7 @@ int main(void) {
     igraph_sparsemat_t A, B, C, D;
     igraph_t G, H;
     igraph_vector_t vect;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Initialize the library. */
     igraph_setup();

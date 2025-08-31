@@ -290,7 +290,7 @@ igraph_error_t igraph_attribute_record_check_type(
  * \param attr      the attribute record to query
  * \return the number of elements in the value vector of the attribute record
  */
-igraph_integer_t igraph_attribute_record_size(const igraph_attribute_record_t *attr) {
+igraph_int_t igraph_attribute_record_size(const igraph_attribute_record_t *attr) {
     IGRAPH_ASSERT(attr != NULL);
 
     switch (attr->type) {
@@ -326,9 +326,9 @@ igraph_integer_t igraph_attribute_record_size(const igraph_attribute_record_t *a
  *         \c IGRAPH_EINVAL if the type of the attribute record is not specified yet.
  */
 igraph_error_t igraph_attribute_record_resize(
-    igraph_attribute_record_t *attr, igraph_integer_t new_size
+    igraph_attribute_record_t *attr, igraph_int_t new_size
 ) {
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vector_t *vec;
     igraph_vector_bool_t *log;
     igraph_strvector_t *str;
@@ -644,7 +644,7 @@ igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igrap
 }
 
 igraph_error_t igraph_i_attribute_add_vertices(
-    igraph_t *graph, igraph_integer_t nv, const igraph_attribute_record_list_t *attr
+    igraph_t *graph, igraph_int_t nv, const igraph_attribute_record_list_t *attr
 ) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_vertices(graph, nv, attr);
@@ -926,7 +926,7 @@ igraph_error_t igraph_attribute_combination_init(igraph_attribute_combination_t 
                     attribute combination list.
  */
 void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(&comb->list);
+    igraph_int_t i, n = igraph_vector_ptr_size(&comb->list);
     for (i = 0; i < n; i++) {
         igraph_attribute_combination_record_t *rec = VECTOR(comb->list)[i];
         if (rec->name) {
@@ -965,7 +965,7 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
                                      const char *name,
                                      igraph_attribute_combination_type_t type,
                                      igraph_function_pointer_t func) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(&comb->list);
+    igraph_int_t i, n = igraph_vector_ptr_size(&comb->list);
 
     /* Search, in case it is already there */
     for (i = 0; i < n; i++) {
@@ -1025,7 +1025,7 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
  */
 igraph_error_t igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
                                         const char *name) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(&comb->list);
+    igraph_int_t i, n = igraph_vector_ptr_size(&comb->list);
 
     /* Search, in case it is already there */
     for (i = 0; i < n; i++) {
@@ -1055,7 +1055,7 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
                                        const char *name,
                                        igraph_attribute_combination_type_t *type,
                                        igraph_function_pointer_t *func) {
-    igraph_integer_t i, def = -1, len = igraph_vector_ptr_size(&comb->list);
+    igraph_int_t i, def = -1, len = igraph_vector_ptr_size(&comb->list);
 
     for (i = 0; i < len; i++) {
         igraph_attribute_combination_record_t *rec = VECTOR(comb->list)[i];

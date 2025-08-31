@@ -28,7 +28,7 @@ int main(void) {
     igraph_vector_int_t cohesion;
     igraph_vector_int_t parent;
     igraph_t block_tree;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Initialize the library. */
     igraph_setup();

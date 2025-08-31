@@ -26,7 +26,7 @@
 
 int main(void) {
 
-    igraph_integer_t nodes = 10;
+    igraph_int_t nodes = 10;
     igraph_real_t triplets[] = { 1, 0, 1 / 4.0,       0, 1, 1 / 3.0,
                                  2, 0, 1 / 4.0,       0, 2, 1 / 3.0,
                                  3, 0, 1.0,         0, 3, 1 / 3.0,
@@ -39,7 +39,7 @@ int main(void) {
                                };
 
     igraph_sparsemat_t mat;
-    igraph_integer_t i, j, n = sizeof(triplets) / sizeof(triplets[0]);
+    igraph_int_t i, j, n = sizeof(triplets) / sizeof(triplets[0]);
     igraph_eigen_which_t which;
     igraph_vector_complex_t values, values2;
     igraph_matrix_complex_t vectors, vectors2;

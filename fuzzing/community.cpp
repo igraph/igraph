@@ -44,7 +44,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_int_t membership, membership2, iv, iv2;
         igraph_vector_t mv, v;
         igraph_real_t m, r;
-        igraph_integer_t i;
+        igraph_int_t i;
         igraph_bool_t b;
 
         /* Limit graph size for the sake of performance. */
@@ -111,7 +111,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_is_connected(&graph, &b, IGRAPH_WEAK);
             if (b) {
-                igraph_integer_t no_comm = 4;
+                igraph_int_t no_comm = 4;
                 if (no_comm > igraph_vcount(&graph)) {
                     no_comm = igraph_vcount(&graph);
                 }

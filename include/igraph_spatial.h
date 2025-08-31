@@ -47,7 +47,7 @@ IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_t *graph,
     const igraph_matrix_t *points,
     igraph_metric_t metric,
-    igraph_integer_t neighbors,
+    igraph_int_t neighbors,
     igraph_real_t cutoff,
     igraph_bool_t directed);
 

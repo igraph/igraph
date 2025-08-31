@@ -54,7 +54,7 @@ int main(void) {
     // Print the tree, with labels
     igraph_vector_int_t neis;
     igraph_vector_int_init(&neis, 0);
-    for (igraph_integer_t i=0; i < igraph_vcount(&graph)-1; i++) {
+    for (igraph_int_t i=0; i < igraph_vcount(&graph)-1; i++) {
         printf("Vertex # %2" IGRAPH_PRId ", ", (i+igraph_vcount(&graph)));
         igraph_neighbors(
             &dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT,

@@ -38,7 +38,7 @@
 
 static igraph_error_t dot_escape(const char *orig, igraph_vector_char_t* result) {
     /* do we have to escape the string at all? */
-    igraph_integer_t i, j, len = strlen(orig), newlen = 0;
+    igraph_int_t i, j, len = strlen(orig), newlen = 0;
     igraph_bool_t need_quote = false, is_number = true;
 
     /* first, check whether the string is equal to some reserved word, or empty */
@@ -158,8 +158,8 @@ static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x, ig
  * \example examples/simple/dot.c
  */
 igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
     const igraph_bool_t directed = igraph_is_directed(graph);
     const char *edgeop = directed ? "->" : "--";
     igraph_strvector_t gnames, vnames, enames;
@@ -198,7 +198,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     /* Write the graph attributes */
     if (igraph_vector_int_size(&gtypes) > 0) {
         CHECK(fprintf(outstream, "  graph [\n"));
-        for (igraph_integer_t i = 0; i < igraph_vector_int_size(&gtypes); i++) {
+        for (igraph_int_t i = 0; i < igraph_vector_int_size(&gtypes); i++) {
             const char *name;
             name = igraph_strvector_get(&gnames, i);
             IGRAPH_CHECK(dot_escape(name, &buf));
@@ -226,9 +226,9 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
     /* Write the vertices */
     if (igraph_vector_int_size(&vtypes) > 0) {
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " [\n", i));
-            for (igraph_integer_t j = 0; j < igraph_vector_int_size(&vtypes); j++) {
+            for (igraph_int_t j = 0; j < igraph_vector_int_size(&vtypes); j++) {
                 const char *name;
                 name = igraph_strvector_get(&vnames, j);
                 IGRAPH_CHECK(dot_escape(name, &buf));
@@ -254,7 +254,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             CHECK(fprintf(outstream, "  ];\n"));
         }
     } else {
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId ";\n", i));
         }
     }
@@ -262,11 +262,11 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
     /* Write the edges */
     if (igraph_vector_int_size(&etypes) > 0) {
-        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, i);
-            igraph_integer_t to = IGRAPH_TO(graph, i);
+        for (igraph_int_t i = 0; i < no_of_edges; i++) {
+            igraph_int_t from = IGRAPH_FROM(graph, i);
+            igraph_int_t to = IGRAPH_TO(graph, i);
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " %s %" IGRAPH_PRId " [\n", from, edgeop, to));
-            for (igraph_integer_t j = 0; j < igraph_vector_int_size(&etypes); j++) {
+            for (igraph_int_t j = 0; j < igraph_vector_int_size(&etypes); j++) {
                 const char *name;
                 name = igraph_strvector_get(&enames, j);
                 IGRAPH_CHECK(dot_escape(name, &buf));
@@ -295,9 +295,9 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             CHECK(fprintf(outstream, "  ];\n"));
         }
     } else {
-        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, i);
-            igraph_integer_t to = IGRAPH_TO(graph, i);
+        for (igraph_int_t i = 0; i < no_of_edges; i++) {
+            igraph_int_t from = IGRAPH_FROM(graph, i);
+            igraph_int_t to = IGRAPH_TO(graph, i);
             CHECK(fprintf(outstream, "  %" IGRAPH_PRId " %s %" IGRAPH_PRId ";\n", from, edgeop, to));
         }
     }

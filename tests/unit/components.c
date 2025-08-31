@@ -22,7 +22,7 @@
 
 void compute_and_print(const igraph_t *g, igraph_connectedness_t mode) {
     igraph_vector_int_t membership, csize;
-    igraph_integer_t no;
+    igraph_int_t no;
 
     igraph_vector_int_init(&membership, 1);
     igraph_vector_int_init(&csize, 1);

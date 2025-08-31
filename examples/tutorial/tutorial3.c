@@ -5,7 +5,7 @@ int main(void) {
     igraph_vector_int_t v;
     igraph_vector_int_t result;
     igraph_vector_t result_real;
-    igraph_integer_t edges[] = {
+    igraph_int_t edges[] = {
         0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7, 0,8,
         0,10, 0,11, 0,12, 0,13, 0,17, 0,19, 0,21, 0,31,
         1, 2, 1, 3, 1, 7, 1,13, 1,17, 1,19, 1,21, 1,30,

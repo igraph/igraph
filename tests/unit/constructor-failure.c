@@ -33,8 +33,8 @@
  * This macro does not destroy the graph. */
 #define CHECK1(funcall) \
     do { \
-        igraph_integer_t vcount = igraph_vcount(&graph); \
-        igraph_integer_t ecount = igraph_ecount(&graph); \
+        igraph_int_t vcount = igraph_vcount(&graph); \
+        igraph_int_t ecount = igraph_ecount(&graph); \
         igraph_error_handler_t *handler; \
         handler = igraph_set_error_handler(igraph_error_handler_printignore); \
         IGRAPH_ASSERT(funcall != IGRAPH_SUCCESS); \
@@ -58,7 +58,7 @@
 #define CHECK_DESTROY(funcall) \
     do { CHECK1(funcall); CHECK2(funcall); } while (0)
 
-void verify_graph(const igraph_t *graph, igraph_integer_t vcount, igraph_integer_t ecount) {
+void verify_graph(const igraph_t *graph, igraph_int_t vcount, igraph_int_t ecount) {
     IGRAPH_ASSERT(igraph_vector_int_size(&graph->from) == ecount);
     IGRAPH_ASSERT(igraph_vector_int_size(&graph->to) == ecount);
     IGRAPH_ASSERT(igraph_vector_int_size(&graph->oi) == ecount);
@@ -151,7 +151,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vector_all_e(&vec_a1, &nvalues));
     IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2->name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
-    for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
+    for (igraph_int_t i=0; i < igraph_strvector_size(&svalues); ++i) {
         IGRAPH_ASSERT(strcmp(igraph_strvector_get(&vec_a2, i), igraph_strvector_get(&svalues, i)) == 0);
     }
     IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3->name, vs3, &bvalues) == IGRAPH_SUCCESS);
@@ -163,7 +163,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vector_all_e(&vec_a1, &nvalues));
     IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2->name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
-    for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
+    for (igraph_int_t i=0; i < igraph_strvector_size(&svalues); ++i) {
         IGRAPH_ASSERT(strcmp(igraph_strvector_get(&vec_a2, i), igraph_strvector_get(&svalues, i)) == 0);
     }
     IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3->name, vs3, &bvalues) == IGRAPH_SUCCESS);

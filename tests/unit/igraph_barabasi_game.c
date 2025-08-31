@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void run_test(igraph_integer_t n, igraph_bool_t directed, const igraph_vector_int_t *outseq, const igraph_t *start) {
+void run_test(igraph_int_t n, igraph_bool_t directed, const igraph_vector_int_t *outseq, const igraph_t *start) {
     igraph_barabasi_algorithm_t algos[] = { IGRAPH_BARABASI_BAG, IGRAPH_BARABASI_PSUMTREE, IGRAPH_BARABASI_PSUMTREE_MULTIPLE };
     igraph_t g;
     igraph_bool_t simple;

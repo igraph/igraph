@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 void print_sir(igraph_sir_t *sir) {
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     n = igraph_vector_size(&sir->times);
     IGRAPH_ASSERT(n >= 2);
@@ -39,11 +39,11 @@ void print_sir(igraph_sir_t *sir) {
 }
 
 
-void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_integer_t no_sim) {
+void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_int_t no_sim) {
     igraph_vector_ptr_t result;
     igraph_vector_ptr_init(&result, 0);
     IGRAPH_ASSERT(igraph_sir(g, beta, gamma, no_sim, &result) == IGRAPH_SUCCESS);
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&result); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&result); i++) {
         print_sir(VECTOR(result)[i]);
         igraph_sir_destroy(VECTOR(result)[i]);
     }

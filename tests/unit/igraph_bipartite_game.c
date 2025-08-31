@@ -25,11 +25,11 @@ void check_partitions(
     const igraph_vector_bool_t *types,
     igraph_neimode_t mode
 ) {
-    igraph_integer_t m = igraph_ecount(graph);
+    igraph_int_t m = igraph_ecount(graph);
 
     IGRAPH_ASSERT(igraph_vector_bool_size(types) == igraph_vcount(graph));
 
-    for (igraph_integer_t i=0; i < m; i++) {
+    for (igraph_int_t i=0; i < m; i++) {
         switch (mode) {
         case IGRAPH_OUT:
             IGRAPH_ASSERT(VECTOR(*types)[IGRAPH_FROM(graph, i)] == false);
@@ -47,7 +47,7 @@ void check_partitions(
 }
 
 void check_gnm(
-    igraph_integer_t n1, igraph_integer_t n2, igraph_integer_t m,
+    igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
     igraph_bool_t directed, igraph_neimode_t mode, igraph_bool_t multi
 ) {
     igraph_t graph;
@@ -88,7 +88,7 @@ void check_gnm(
 }
 
 void check_iea(
-    igraph_integer_t n1, igraph_integer_t n2, igraph_integer_t m,
+    igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
     igraph_bool_t directed, igraph_neimode_t mode
 ) {
     igraph_t graph;
@@ -123,7 +123,7 @@ void check_iea(
 }
 
 void check_gnp(
-    igraph_integer_t n1, igraph_integer_t n2, igraph_real_t p,
+    igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
     igraph_bool_t directed, igraph_neimode_t mode,
     igraph_bool_t assume_edges
 ) {

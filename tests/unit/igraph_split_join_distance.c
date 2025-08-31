@@ -21,7 +21,7 @@
 
 int main(void) {
     igraph_vector_int_t comm1, comm2;
-    igraph_integer_t distance12, distance21;
+    igraph_int_t distance12, distance21;
 
     printf("No vertices:\n");
     igraph_vector_int_init_int(&comm1, 0);

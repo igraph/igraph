@@ -25,7 +25,7 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_t degree;
     igraph_bool_t tree;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

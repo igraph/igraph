@@ -20,9 +20,9 @@
 
 /* Prints a vector of edge IDs as u--v vertex pairs. */
 void print_edge_vector(const igraph_t *graph, const igraph_vector_int_t *edges) {
-    const igraph_integer_t n = igraph_vector_int_size(edges);
-    for (igraph_integer_t i=0; i < n; i++) {
-        igraph_integer_t edge = VECTOR(*edges)[i];
+    const igraph_int_t n = igraph_vector_int_size(edges);
+    for (igraph_int_t i=0; i < n; i++) {
+        igraph_int_t edge = VECTOR(*edges)[i];
         printf("%" IGRAPH_PRId "--%" IGRAPH_PRId " ", IGRAPH_FROM(graph, edge), IGRAPH_TO(graph, edge));
     }
     printf("\n");
@@ -31,7 +31,7 @@ void print_edge_vector(const igraph_t *graph, const igraph_vector_int_t *edges) 
 int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t component_vertices, component_edges;
-    igraph_integer_t no;
+    igraph_int_t no;
 
     /* Initialize the library. */
     igraph_setup();
@@ -51,7 +51,7 @@ int main(void) {
     igraph_biconnected_components(&graph, &no, NULL, &component_edges, &component_vertices, NULL);
 
     printf("Number of components: %" IGRAPH_PRId "\n", no);
-    for (igraph_integer_t i=0; i < no; i++) {
+    for (igraph_int_t i=0; i < no; i++) {
         printf("\n");
         printf("Component %" IGRAPH_PRId ":\n", i);
         printf("Vertices: ");

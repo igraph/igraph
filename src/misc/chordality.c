@@ -68,17 +68,17 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
                                       igraph_vector_int_t *alpha,
                                       igraph_vector_int_t *alpham1) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t size;
     igraph_vector_int_t head, next, prev; /* doubly linked list with head */
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_adjlist_t adjlist;
 
     /***************/
     /* local j, v; */
     /***************/
 
-    igraph_integer_t j, v;
+    igraph_int_t j, v;
 
     if (no_of_nodes == 0) {
         igraph_vector_int_clear(alpha);
@@ -130,7 +130,7 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
     /**************/
 
     while (i >= 1) {
-        igraph_integer_t x, k, len;
+        igraph_int_t x, k, len;
         igraph_vector_int_t *neis;
 
         /********************************/
@@ -161,16 +161,16 @@ igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
         neis = igraph_adjlist_get(&adjlist, v);
         len = igraph_vector_int_size(neis);
         for (k = 0; k < len; k++) {
-            igraph_integer_t w = VECTOR(*neis)[k];
-            igraph_integer_t ws = VECTOR(size)[w];
+            igraph_int_t w = VECTOR(*neis)[k];
+            igraph_int_t ws = VECTOR(size)[w];
             if (ws >= 0) {
 
                 /******************************/
                 /* delete w from set(size(w)) */
                 /******************************/
 
-                igraph_integer_t nw = VECTOR(next)[w];
-                igraph_integer_t pw = VECTOR(prev)[w];
+                igraph_int_t nw = VECTOR(next)[w];
+                igraph_int_t pw = VECTOR(prev)[w];
                 if (nw != 0) {
                     VECTOR(prev)[nw - 1] = pw;
                 }
@@ -278,11 +278,11 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                       igraph_vector_int_t *fill_in,
                       igraph_t *newgraph) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     const igraph_vector_int_t *my_alpha = alpha, *my_alpham1 = alpham1;
     igraph_vector_int_t v_alpha, v_alpham1;
     igraph_vector_int_t f, index;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_adjlist_t adjlist;
     igraph_vector_int_t mark;
     igraph_bool_t calc_edges = fill_in || newgraph;
@@ -292,7 +292,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     /* local v, w, x */
     /*****************/
 
-    igraph_integer_t v, w, x;
+    igraph_int_t v, w, x;
 
     if (alpha && (igraph_vector_int_size(alpha) != no_of_nodes)) {
         IGRAPH_ERRORF("Alpha vector size (%" IGRAPH_PRId ") not equal to number of nodes (%" IGRAPH_PRId ").",
@@ -320,15 +320,15 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     } else if (alpha && !alpham1) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpham1, no_of_nodes);
         my_alpham1 = &v_alpham1;
-        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
-            igraph_integer_t i = VECTOR(*my_alpha)[v];
+        for (igraph_int_t v = 0; v < no_of_nodes; v++) {
+            igraph_int_t i = VECTOR(*my_alpha)[v];
             VECTOR(*my_alpham1)[i] = v;
         }
     } else if (!alpha && alpham1) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&v_alpha, no_of_nodes);
         my_alpha = &v_alpha;
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t v = VECTOR(*my_alpham1)[i];
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+            igraph_int_t v = VECTOR(*my_alpham1)[i];
             VECTOR(*my_alpha)[v] = i;
         }
     }
@@ -357,7 +357,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis;
-        igraph_integer_t j, len;
+        igraph_int_t j, len;
 
         /**********************************************/
         /* w := alpham1(i); f(w) := w; index(w) := i; */

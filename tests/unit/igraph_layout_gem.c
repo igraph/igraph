@@ -23,7 +23,7 @@ int main(void) {
     igraph_matrix_t res;
     igraph_bool_t use_seed;
     igraph_bool_t do_not_use_seed;
-    igraph_integer_t maxiter;
+    igraph_int_t maxiter;
     igraph_real_t temp_max;
     igraph_real_t temp_min;
     igraph_real_t temp_init;

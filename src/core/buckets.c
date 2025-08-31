@@ -42,7 +42,7 @@
  * _empty() and _popmax() operations.
  */
 
-igraph_error_t igraph_buckets_init(igraph_buckets_t *b, igraph_integer_t bsize, igraph_integer_t size) {
+igraph_error_t igraph_buckets_init(igraph_buckets_t *b, igraph_int_t bsize, igraph_int_t size) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&b->bptr, bsize);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&b->buckets, size);
     b->max = -1; b->no = 0;
@@ -55,10 +55,10 @@ void igraph_buckets_destroy(igraph_buckets_t *b) {
     igraph_vector_int_destroy(&b->buckets);
 }
 
-igraph_integer_t igraph_buckets_popmax(igraph_buckets_t *b) {
+igraph_int_t igraph_buckets_popmax(igraph_buckets_t *b) {
     /* Precondition: there is at least a non-empty bucket */
     /* Search for the highest bucket first */
-    igraph_integer_t max;
+    igraph_int_t max;
     while ( (max = VECTOR(b->bptr)[b->max]) == 0) {
         b->max --;
     }
@@ -68,8 +68,8 @@ igraph_integer_t igraph_buckets_popmax(igraph_buckets_t *b) {
     return max - 1;
 }
 
-igraph_integer_t igraph_buckets_pop(igraph_buckets_t *b, igraph_integer_t bucket) {
-    igraph_integer_t ret = VECTOR(b->bptr)[bucket] - 1;
+igraph_int_t igraph_buckets_pop(igraph_buckets_t *b, igraph_int_t bucket) {
+    igraph_int_t ret = VECTOR(b->bptr)[bucket] - 1;
     VECTOR(b->bptr)[bucket] = VECTOR(b->buckets)[ret];
     b->no--;
     return ret;
@@ -80,12 +80,12 @@ igraph_bool_t igraph_buckets_empty(const igraph_buckets_t *b) {
 }
 
 igraph_bool_t igraph_buckets_empty_bucket(const igraph_buckets_t *b,
-        igraph_integer_t bucket) {
+        igraph_int_t bucket) {
     return VECTOR(b->bptr)[bucket] == 0;
 }
 
-void igraph_buckets_add(igraph_buckets_t *b, igraph_integer_t bucket,
-                        igraph_integer_t elem) {
+void igraph_buckets_add(igraph_buckets_t *b, igraph_int_t bucket,
+                        igraph_int_t elem) {
 
     VECTOR(b->buckets)[elem] = VECTOR(b->bptr)[bucket];
     VECTOR(b->bptr)[bucket] = elem + 1;
@@ -102,7 +102,7 @@ void igraph_buckets_clear(igraph_buckets_t *b) {
     b->no = 0;
 }
 
-igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_integer_t bsize, igraph_integer_t size) {
+igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_int_t bsize, igraph_int_t size) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&b->bptr, bsize);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&b->next, size);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&b->prev, size);
@@ -125,16 +125,16 @@ void igraph_dbuckets_clear(igraph_dbuckets_t *b) {
     b->no = 0;
 }
 
-igraph_integer_t igraph_dbuckets_popmax(igraph_dbuckets_t *b) {
+igraph_int_t igraph_dbuckets_popmax(igraph_dbuckets_t *b) {
     while ( VECTOR(b->bptr)[b->max] == 0) {
         b->max--;
     }
     return igraph_dbuckets_pop(b, b->max);
 }
 
-igraph_integer_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_integer_t bucket) {
-    igraph_integer_t ret = VECTOR(b->bptr)[bucket] - 1;
-    igraph_integer_t next = VECTOR(b->next)[ret];
+igraph_int_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_int_t bucket) {
+    igraph_int_t ret = VECTOR(b->bptr)[bucket] - 1;
+    igraph_int_t next = VECTOR(b->next)[ret];
     VECTOR(b->bptr)[bucket] = next;
     if (next != 0) {
         VECTOR(b->prev)[next - 1] = 0;
@@ -149,13 +149,13 @@ igraph_bool_t igraph_dbuckets_empty(const igraph_dbuckets_t *b) {
 }
 
 igraph_bool_t igraph_dbuckets_empty_bucket(const igraph_dbuckets_t *b,
-        igraph_integer_t bucket) {
+        igraph_int_t bucket) {
     return VECTOR(b->bptr)[bucket] == 0;
 }
 
-void igraph_dbuckets_add(igraph_dbuckets_t *b, igraph_integer_t bucket,
-                         igraph_integer_t elem) {
-    igraph_integer_t oldfirst = VECTOR(b->bptr)[bucket];
+void igraph_dbuckets_add(igraph_dbuckets_t *b, igraph_int_t bucket,
+                         igraph_int_t elem) {
+    igraph_int_t oldfirst = VECTOR(b->bptr)[bucket];
     VECTOR(b->bptr)[bucket] = elem + 1;
     VECTOR(b->next)[elem] = oldfirst;
     if (oldfirst != 0) {
@@ -169,18 +169,18 @@ void igraph_dbuckets_add(igraph_dbuckets_t *b, igraph_integer_t bucket,
 
 /* Remove an arbitrary element */
 
-void igraph_dbuckets_delete(igraph_dbuckets_t *b, igraph_integer_t bucket,
-                            igraph_integer_t elem) {
+void igraph_dbuckets_delete(igraph_dbuckets_t *b, igraph_int_t bucket,
+                            igraph_int_t elem) {
     if (VECTOR(b->bptr)[bucket] == elem + 1) {
         /* First element in bucket */
-        igraph_integer_t next = VECTOR(b->next)[elem];
+        igraph_int_t next = VECTOR(b->next)[elem];
         if (next != 0) {
             VECTOR(b->prev)[next - 1] = 0;
         }
         VECTOR(b->bptr)[bucket] = next;
     } else {
-        igraph_integer_t next = VECTOR(b->next)[elem];
-        igraph_integer_t prev = VECTOR(b->prev)[elem];
+        igraph_int_t next = VECTOR(b->next)[elem];
+        igraph_int_t prev = VECTOR(b->prev)[elem];
         if (next != 0) {
             VECTOR(b->prev)[next - 1] = prev;
         }

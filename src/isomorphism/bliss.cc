@@ -77,8 +77,8 @@ using namespace std;
 namespace { // unnamed namespace
 
 inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
-    igraph_integer_t nof_vertices = igraph_vcount(graph);
-    igraph_integer_t nof_edges = igraph_ecount(graph);
+    igraph_int_t nof_vertices = igraph_vcount(graph);
+    igraph_int_t nof_edges = igraph_ecount(graph);
 
     if (nof_vertices > UINT_MAX || nof_edges > UINT_MAX) {
         throw std::runtime_error("Graph too large for BLISS");
@@ -149,7 +149,7 @@ inline igraph_error_t bliss_set_colors(AbstractGraph *g, const igraph_vector_int
         IGRAPH_ERROR("Invalid vertex color vector length.", IGRAPH_EINVAL);
     }
     for (int i = 0; i < n; ++i) {
-        igraph_integer_t color = VECTOR(*colors)[i];
+        igraph_int_t color = VECTOR(*colors)[i];
         if (color < INT_MIN || color > INT_MAX) {
             IGRAPH_ERRORF("Invalid vertex color index %" IGRAPH_PRId " for vertex %d.", IGRAPH_EOVERFLOW, color, i);
         }
@@ -218,7 +218,7 @@ public:
             throw bad_alloc();
         }
 
-        copy(aut, aut + n, VECTOR(newvector)); // takes care of unsigned int -> igraph_integer_t conversion
+        copy(aut, aut + n, VECTOR(newvector)); // takes care of unsigned int -> igraph_int_t conversion
 
         err = igraph_vector_int_list_push_back(generators, &newvector);
         if (err != IGRAPH_SUCCESS) {
@@ -603,14 +603,14 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
                             igraph_vector_int_t *map21, igraph_bliss_sh_t sh,
                             igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph1);
-    igraph_integer_t no_of_edges = igraph_ecount(graph1);
+    igraph_int_t no_of_nodes = igraph_vcount(graph1);
+    igraph_int_t no_of_edges = igraph_ecount(graph1);
     igraph_vector_int_t perm1, perm2;
     igraph_vector_int_t vmap12, *mymap12 = &vmap12;
     igraph_vector_int_t from, to, index;
     igraph_vector_int_t from2, to2, index2;
     igraph_bool_t directed;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     *iso = 0;
     if (info1) {
@@ -688,7 +688,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         VECTOR(from)[i] = VECTOR(*mymap12)[ IGRAPH_FROM(graph1, i) ];
         VECTOR(to)[i]   = VECTOR(*mymap12)[ IGRAPH_TO  (graph1, i) ];
         if (! directed && VECTOR(from)[i] < VECTOR(to)[i]) {
-            igraph_integer_t tmp = VECTOR(from)[i];
+            igraph_int_t tmp = VECTOR(from)[i];
             VECTOR(from)[i] = VECTOR(to)[i];
             VECTOR(to)[i] = tmp;
         }
@@ -699,7 +699,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     for (i = 0, j = no_of_edges; i < no_of_edges; i++, j++) {
         VECTOR(to2)[i] = VECTOR(from2)[j];
         if (! directed && VECTOR(from2)[i] < VECTOR(to2)[i]) {
-            igraph_integer_t tmp = VECTOR(from2)[i];
+            igraph_int_t tmp = VECTOR(from2)[i];
             VECTOR(from2)[i] = VECTOR(to2)[i];
             VECTOR(to2)[i] = tmp;
         }
@@ -709,8 +709,8 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
 
     *iso = 1;
     for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t i1 = VECTOR(index)[i];
-        igraph_integer_t i2 = VECTOR(index2)[i];
+        igraph_int_t i1 = VECTOR(index)[i];
+        igraph_int_t i2 = VECTOR(index2)[i];
         if (VECTOR(from)[i1] != VECTOR(from2)[i2] ||
             VECTOR(to)[i1] != VECTOR(to2)[i2]) {
             *iso = 0;

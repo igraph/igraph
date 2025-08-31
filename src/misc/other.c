@@ -48,10 +48,10 @@
  */
 
 igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
-                        igraph_integer_t binwidth) {
+                        igraph_int_t binwidth) {
 
     double sum = 0;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Check */
     if (igraph_vector_size(data) < binwidth) {
@@ -101,8 +101,8 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  *         the vector.
  */
 igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
-    igraph_integer_t no_of_vertices = igraph_vector_int_size(path);
-    igraph_integer_t i, j, no_of_items = (no_of_vertices - 1) * 2;
+    igraph_int_t no_of_vertices = igraph_vector_int_size(path);
+    igraph_int_t i, j, no_of_items = (no_of_vertices - 1) * 2;
 
     if (no_of_vertices <= 1) {
         igraph_vector_int_clear(path);
@@ -162,11 +162,11 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
  * Time complexity: O(n) where n is the length of the walk.
  */
 igraph_error_t igraph_vertex_path_from_edge_path(
-   const igraph_t *graph, igraph_integer_t start,
+   const igraph_t *graph, igraph_int_t start,
    const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
    igraph_neimode_t mode
 ) {
-    const igraph_integer_t no_of_edges = igraph_vector_int_size(edge_path);
+    const igraph_int_t no_of_edges = igraph_vector_int_size(edge_path);
 
     igraph_vector_int_clear(vertex_path);
     IGRAPH_CHECK(igraph_vector_int_reserve(vertex_path, no_of_edges + 1));
@@ -181,7 +181,7 @@ igraph_error_t igraph_vertex_path_from_edge_path(
             IGRAPH_ERROR("The path must contain at least one edge in order to "
                          "determine its starting vertex automatically.", IGRAPH_EINVAL);
         }
-        const igraph_integer_t edge = VECTOR(*edge_path)[0];
+        const igraph_int_t edge = VECTOR(*edge_path)[0];
         switch (mode) {
         case IGRAPH_OUT:
             start = IGRAPH_FROM(graph, edge);
@@ -191,9 +191,9 @@ igraph_error_t igraph_vertex_path_from_edge_path(
             break;
         case IGRAPH_ALL:
             if (no_of_edges > 1) {
-                const igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                const igraph_integer_t to = IGRAPH_TO(graph, edge);
-                const igraph_integer_t next_edge = VECTOR(*edge_path)[1];
+                const igraph_int_t from = IGRAPH_FROM(graph, edge);
+                const igraph_int_t to = IGRAPH_TO(graph, edge);
+                const igraph_int_t next_edge = VECTOR(*edge_path)[1];
                 if (to == IGRAPH_FROM(graph, next_edge) || to == IGRAPH_TO(graph, next_edge)) {
                     start = from;
                 } else {
@@ -212,12 +212,12 @@ igraph_error_t igraph_vertex_path_from_edge_path(
         IGRAPH_ERROR("Invalid start vertex.", IGRAPH_EINVVID);
     }
 
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
-        const igraph_integer_t edge = VECTOR(*edge_path)[i];
-        const igraph_integer_t from = IGRAPH_FROM(graph, edge);
-        const igraph_integer_t to = IGRAPH_TO(graph, edge);
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
+        const igraph_int_t edge = VECTOR(*edge_path)[i];
+        const igraph_int_t from = IGRAPH_FROM(graph, edge);
+        const igraph_int_t to = IGRAPH_TO(graph, edge);
         igraph_bool_t next_edge_ok;
-        igraph_integer_t next_start;
+        igraph_int_t next_start;
 
         igraph_vector_int_push_back(vertex_path, start);  /* reserved */
 

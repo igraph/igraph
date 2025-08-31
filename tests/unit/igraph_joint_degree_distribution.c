@@ -22,12 +22,12 @@
 
 /* Check vector equality with tolerances. Consider NaN values equal. */
 igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
-    igraph_integer_t na = igraph_vector_size(a);
-    igraph_integer_t nb = igraph_vector_size(b);
+    igraph_int_t na = igraph_vector_size(a);
+    igraph_int_t nb = igraph_vector_size(b);
     if (na != nb) {
         return false;
     }
-    for (igraph_integer_t i=0; i < na; i++) {
+    for (igraph_int_t i=0; i < na; i++) {
         if (isnan(VECTOR(*a)[i]) && isnan(VECTOR(*b)[i])) {
             continue;
         }
@@ -41,8 +41,8 @@ igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
 /* Compare to igraph_joint_degree_matrix() */
 void check_jdm(const igraph_t *g, const igraph_vector_t *weights) {
     igraph_matrix_t jdm, p;
-    igraph_integer_t vcount = igraph_vcount(g);
-    igraph_integer_t nrow, ncol, n;
+    igraph_int_t vcount = igraph_vcount(g);
+    igraph_int_t nrow, ncol, n;
 
     igraph_matrix_init(&jdm, 0, 0);
     igraph_matrix_init(&p, 0, 0);
@@ -85,7 +85,7 @@ void check_jdm(const igraph_t *g, const igraph_vector_t *weights) {
     n = nrow < ncol ? nrow : ncol;
 
     if (! igraph_is_directed(g)) {
-        for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_int_t i=0; i < n; i++) {
             MATRIX(jdm, i, i) *= 2;
         }
     }
@@ -112,7 +112,7 @@ void check_assort_i(const igraph_t *g, const igraph_vector_t *weights,
                     igraph_neimode_t from_mode, igraph_neimode_t to_mode) {
     igraph_matrix_t p;
     igraph_real_t r1, r2;
-    igraph_integer_t nrow, ncol;
+    igraph_int_t nrow, ncol;
     igraph_vector_t dfrom, dto;
     igraph_vector_t a, b;
     igraph_bool_t directed = igraph_is_directed(g);
@@ -137,8 +137,8 @@ void check_assort_i(const igraph_t *g, const igraph_vector_t *weights,
     igraph_matrix_colsum(&p, &b);
 
     r2 = 0;
-    for (igraph_integer_t i=0; i < nrow; i++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t i=0; i < nrow; i++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             r2 += (MATRIX(p, i, j) - VECTOR(a)[i] * VECTOR(b)[j]) * (igraph_real_t) i * (igraph_real_t) j;
         }
     }
@@ -171,7 +171,7 @@ void check_assort(const igraph_t *g, const igraph_vector_t *weights) {
 
 void check_knnk_i(const igraph_t *g, const igraph_vector_t *weights, igraph_neimode_t from_mode, igraph_neimode_t to_mode) {
     igraph_matrix_t p;
-    igraph_integer_t nrow, ncol;
+    igraph_int_t nrow, ncol;
     igraph_vector_t knnk, knnk2;
     igraph_vector_t q;
 
@@ -189,8 +189,8 @@ void check_knnk_i(const igraph_t *g, const igraph_vector_t *weights, igraph_neim
 
     igraph_vector_init(&knnk2, nrow);
     igraph_matrix_rowsum(&p, &q);
-    for (igraph_integer_t k=0; k < nrow; k++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t k=0; k < nrow; k++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             VECTOR(knnk2)[k] += j * MATRIX(p, k, j);
         }
     }

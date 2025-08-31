@@ -86,7 +86,7 @@ int main(void) {
     igraph_vector_int_resize(&membership, 1);
 
     igraph_lpa_variant_t variants[3] = {IGRAPH_LPA_DOMINANCE, IGRAPH_LPA_RETENTION, IGRAPH_LPA_FAST};
-    for (igraph_integer_t i = 0; i < 3; i++) {
+    for (igraph_int_t i = 0; i < 3; i++) {
         igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, variants[i]);
     }
 

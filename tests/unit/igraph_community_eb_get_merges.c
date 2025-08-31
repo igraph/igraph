@@ -72,28 +72,28 @@ int main(void) {
     {
         printf("Graph with two vertices, one edge:\n");
         igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
-        igraph_integer_t edge_array[] = {0};
+        igraph_int_t edge_array[] = {0};
         igraph_vector_int_view(&edges, edge_array, 1);
         print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, &modularity, &membership);
     }
     {
         printf("Triangle, remove three edges:\n");
         igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
-        igraph_integer_t edge_array[] = {0, 1, 2};
+        igraph_int_t edge_array[] = {0, 1, 2};
         igraph_vector_int_view(&edges, edge_array, 3);
         print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, &modularity, &membership);
     }
     {
         printf("Two connected triangles, remove everything:\n");
         igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 2,3, 3,4, 4,5, 5,3, -1);
-        igraph_integer_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
+        igraph_int_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
         igraph_vector_int_view(&edges, edge_array, 7);
         print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, NULL, &membership);
     }
     {
         printf("Two connected triangles, remove everything, only check merges:\n");
         igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,0, 2,3, 3,4, 4,5, 5,3, -1);
-        igraph_integer_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
+        igraph_int_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
         igraph_vector_int_view(&edges, edge_array, 7);
         print_and_destroy(&g, 1, &edges, NULL, &res, NULL, NULL, NULL);
     }
@@ -103,7 +103,7 @@ int main(void) {
     {
         printf("Check error when edge id is out of bounds.\n");
         igraph_small(&g, 6, IGRAPH_UNDIRECTED, -1);
-        igraph_integer_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
+        igraph_int_t edge_array[] = {3, 0, 1, 2, 4, 5, 6};
         igraph_vector_int_view(&edges, edge_array, 7);
         CHECK_ERROR(igraph_community_eb_get_merges(&g, 1, &edges, NULL, NULL, NULL, NULL, NULL), IGRAPH_EINVEID);
         igraph_destroy(&g);
@@ -111,7 +111,7 @@ int main(void) {
     {
         printf("Check error when too few edges removed.\n");
         igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
-        igraph_integer_t edge_array[] = {0, 1};
+        igraph_int_t edge_array[] = {0, 1};
         igraph_vector_int_view(&edges, edge_array, 2);
         CHECK_ERROR(igraph_community_eb_get_merges(&g, 1, &edges, NULL, NULL, NULL, NULL, NULL), IGRAPH_EINVAL);
         igraph_destroy(&g);

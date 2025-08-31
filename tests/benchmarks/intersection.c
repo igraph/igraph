@@ -20,16 +20,16 @@
 
 #include "bench.h"
 
-void rand_vec(igraph_vector_int_t *v, igraph_integer_t n, igraph_integer_t k) {
+void rand_vec(igraph_vector_int_t *v, igraph_int_t n, igraph_int_t k) {
     igraph_vector_int_resize(v, n);
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         VECTOR(*v)[i] = RNG_INTEGER(0, k);
     }
 }
 
 void run_bench(int i, int n, int r) {
     igraph_vector_int_t a, b;
-    igraph_integer_t na = n, nb = r*n;
+    igraph_int_t na = n, nb = r*n;
     int rep = 300000000 / nb;
     char msg[255];
 
@@ -49,7 +49,7 @@ void run_bench(int i, int n, int r) {
      * This would normally happen due to the use of IGRAPH_FUNCATTR_PURE.
      * ATTENTION! 'volatile', when used this way, may not prevent this optimization
      * with future compiler versions. */
-    volatile igraph_integer_t res;
+    volatile igraph_int_t res;
     BENCH(msg, REPEAT(res = igraph_vector_int_intersection_size_sorted(&a, &b), rep));
     (void) res;  /* silence unused-but-set-variable warning */
 

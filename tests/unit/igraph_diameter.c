@@ -24,11 +24,11 @@ int main(void) {
 
     igraph_t g;
     igraph_real_t result;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
     igraph_vector_int_t path_edge, path_vertex, edge_vec;
     igraph_vector_t weights_vec;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1};
-    igraph_integer_t vec[] = {2,8};
+    igraph_int_t vec[] = {2,8};
     igraph_es_t edge_sele;
 
     printf("diameter of Barabasi graph:\n");
@@ -39,7 +39,7 @@ int main(void) {
                          /*start_from=*/ 0);
     igraph_diameter(&g, NULL, &result, NULL, NULL, NULL, NULL, IGRAPH_UNDIRECTED, 1);
 
-    printf("Diameter: %" IGRAPH_PRId "\n", (igraph_integer_t) result);
+    printf("Diameter: %" IGRAPH_PRId "\n", (igraph_int_t) result);
 
     igraph_destroy(&g);
 

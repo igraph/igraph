@@ -147,7 +147,7 @@ typedef struct {
  */
 static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
                                   const igraph_vector_int_t* membership) {
-    igraph_integer_t i, n, num_layers;
+    igraph_int_t i, n, num_layers;
 
     if (igraph_vector_int_size(membership) == 0) {
         num_layers = 0;
@@ -159,7 +159,7 @@ static igraph_error_t igraph_i_layering_init(igraph_i_layering_t* layering,
 
     n = igraph_vector_int_size(membership);
     for (i = 0; i < n; i++) {
-        igraph_integer_t l = VECTOR(*membership)[i];
+        igraph_int_t l = VECTOR(*membership)[i];
         igraph_vector_int_t* vec = igraph_vector_int_list_get_ptr(&layering->layers, l);
         IGRAPH_CHECK(igraph_vector_int_push_back(vec, i));
     }
@@ -179,7 +179,7 @@ static void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
 /**
  * Returns the number of layers in a layering.
  */
-static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
+static igraph_int_t igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
     return igraph_vector_int_list_size(&layering->layers);
 }
 
@@ -187,7 +187,7 @@ static igraph_integer_t igraph_i_layering_num_layers(const igraph_i_layering_t* 
  * Returns the list of vertices in a given layer
  */
 static igraph_vector_int_t* igraph_i_layering_get(const igraph_i_layering_t* layering,
-                                       igraph_integer_t index) {
+                                       igraph_int_t index) {
     return igraph_vector_int_list_get_ptr(&layering->layers, index);
 }
 
@@ -200,10 +200,10 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
         const igraph_vector_t* weights, igraph_vector_int_t* membership);
 static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* graph,
         igraph_matrix_t* layout, const igraph_i_layering_t* layering,
-        igraph_integer_t maxiter);
+        igraph_int_t maxiter);
 static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* graph,
         igraph_matrix_t* layout, const igraph_i_layering_t* layering,
-        igraph_real_t hgap, igraph_integer_t no_of_real_nodes);
+        igraph_real_t hgap, igraph_int_t no_of_real_nodes);
 
 /**
  * Calculated the median of four numbers (not necessarily sorted).
@@ -279,14 +279,14 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
 igraph_error_t igraph_layout_sugiyama(
     const igraph_t *graph, igraph_matrix_t *res, igraph_matrix_list_t *routing,
     const igraph_vector_int_t* layers, igraph_real_t hgap, igraph_real_t vgap,
-    igraph_integer_t maxiter, const igraph_vector_t *weights
+    igraph_int_t maxiter, const igraph_vector_t *weights
 ) {
-    igraph_integer_t i, j, k, l, nei;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t comp_idx;
+    igraph_int_t i, j, k, l, nei;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t comp_idx;
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t no_of_components;  /* number of components of the original graph */
+    igraph_int_t no_of_components;  /* number of components of the original graph */
     igraph_vector_int_t membership;         /* components of the original graph */
     igraph_vector_int_t layers_own;  /* layer indices after having eliminated empty layers */
     igraph_real_t dx = 0;   /* displacement of the current component on the X axis */
@@ -348,7 +348,7 @@ igraph_error_t igraph_layout_sugiyama(
     for (comp_idx = 0; comp_idx < no_of_components; comp_idx++) {
         /* Extract the edges of the comp_idx'th component and add dummy nodes for edges
          * spanning more than one layer. */
-        igraph_integer_t component_size, next_new_vertex_id;
+        igraph_int_t component_size, next_new_vertex_id;
         igraph_vector_int_t old2new_vertex_ids;
         igraph_vector_int_t new2old_vertex_ids;
         igraph_vector_int_t new_vertex_id_to_edge_id;
@@ -389,7 +389,7 @@ igraph_error_t igraph_layout_sugiyama(
             IGRAPH_CHECK(igraph_incident(graph, &neis, i, IGRAPH_OUT, IGRAPH_LOOPS));
             j = igraph_vector_int_size(&neis);
             for (k = 0; k < j; k++) {
-                igraph_integer_t eid = VECTOR(neis)[k];
+                igraph_int_t eid = VECTOR(neis)[k];
                 if (directed) {
                     nei = IGRAPH_TO(graph, eid);
                 } else {
@@ -439,7 +439,7 @@ igraph_error_t igraph_layout_sugiyama(
             igraph_matrix_t layout;
             igraph_i_layering_t layering;
             igraph_t subgraph;
-            igraph_integer_t eid;
+            igraph_int_t eid;
             igraph_real_t max_x;
             igraph_bool_t flipped;
             igraph_matrix_t *control_points;
@@ -479,7 +479,7 @@ igraph_error_t igraph_layout_sugiyama(
             for (i = 0; i < component_size; i++) {
                 k = VECTOR(new2old_vertex_ids)[i];
                 MATRIX(*res, k, 0) = MATRIX(layout, i, 0) + dx;
-                MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
+                MATRIX(*res, k, 1) = VECTOR(layer_to_y)[(igraph_int_t) MATRIX(layout, i, 1)];
             }
 
             /* Next we arrange the "dummy" vertices that become control points in the
@@ -507,12 +507,12 @@ igraph_error_t igraph_layout_sugiyama(
                     if (flipped) {
                         for (k = j - i - 1; i < j; k--, i++) {
                             MATRIX(*control_points, k, 0) = MATRIX(layout, i, 0) + dx;
-                            MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
+                            MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_int_t) MATRIX(layout, i, 1)];
                         }
                     } else {
                         for (k = 0; i < j; k++, i++) {
                             MATRIX(*control_points, k, 0) = MATRIX(layout, i, 0) + dx;
-                            MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_integer_t) MATRIX(layout, i, 1)];
+                            MATRIX(*control_points, k, 1) = VECTOR(layer_to_y)[(igraph_int_t) MATRIX(layout, i, 1)];
                         }
                     }
                 }
@@ -552,8 +552,8 @@ igraph_error_t igraph_layout_sugiyama(
 
 static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igraph_t* graph,
         const igraph_vector_t* weights, igraph_vector_int_t* membership) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
 
     if (no_of_edges == 0) {
@@ -565,7 +565,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
     if (igraph_is_directed(graph) && no_of_nodes <= 1000) {
         /* Network simplex algorithm of Gansner et al, using the original linear
          * programming formulation */
-        igraph_integer_t i, j;
+        igraph_int_t i, j;
         igraph_vector_t outdegs, indegs;
         igraph_vector_int_t feedback_edges;
         glp_prob *ip;
@@ -593,9 +593,9 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
                                      IGRAPH_IN, IGRAPH_LOOPS, weights));
         j = igraph_vector_int_size(&feedback_edges);
         for (i = 0; i < j; i++) {
-            igraph_integer_t eid = VECTOR(feedback_edges)[i];
-            igraph_integer_t from = IGRAPH_FROM(graph, eid);
-            igraph_integer_t to = IGRAPH_TO(graph, eid);
+            igraph_int_t eid = VECTOR(feedback_edges)[i];
+            igraph_int_t from = IGRAPH_FROM(graph, eid);
+            igraph_int_t to = IGRAPH_TO(graph, eid);
             VECTOR(outdegs)[from] -= weights ? VECTOR(*weights)[eid] : 1;
             VECTOR(indegs)[to] -= weights ? VECTOR(*weights)[eid] : 1;
         }
@@ -676,10 +676,10 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_vertically(const igra
 }
 
 static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igraph_t* graph,
-        const igraph_i_layering_t* layering, igraph_integer_t layer_index,
+        const igraph_i_layering_t* layering, igraph_int_t layer_index,
         igraph_neimode_t direction, const igraph_matrix_t* layout,
         igraph_vector_t* barycenters) {
-    igraph_integer_t i, j, m, n;
+    igraph_int_t i, j, m, n;
     igraph_vector_int_t* layer_members = igraph_i_layering_get(layering, layer_index);
     igraph_vector_int_t neis;
 
@@ -719,11 +719,11 @@ static igraph_error_t igraph_i_layout_sugiyama_calculate_barycenters(const igrap
  */
 static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* graph,
         igraph_matrix_t* layout, const igraph_i_layering_t* layering,
-        igraph_integer_t maxiter) {
-    igraph_integer_t i, n, nei;
-    igraph_integer_t no_of_vertices = igraph_vcount(graph);
-    igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
-    igraph_integer_t iter, layer_index;
+        igraph_int_t maxiter) {
+    igraph_int_t i, n, nei;
+    igraph_int_t no_of_vertices = igraph_vcount(graph);
+    igraph_int_t no_of_layers = igraph_i_layering_num_layers(layering);
+    igraph_int_t iter, layer_index;
     igraph_vector_int_t* layer_members;
     igraph_vector_int_t new_layer_members;
     igraph_vector_int_t neis;
@@ -734,10 +734,10 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     /* The first column of the matrix will serve as the ordering */
     /* Start with a first-seen ordering within each layer */
     {
-        igraph_integer_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_integer_t);
+        igraph_int_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_int_t);
         IGRAPH_CHECK_OOM(xs, "Cannot order nodes horizontally during Sugiyama layout.");
         for (i = 0; i < no_of_vertices; i++) {
-            MATRIX(*layout, i, 0) = xs[(igraph_integer_t)MATRIX(*layout, i, 1)]++;
+            MATRIX(*layout, i, 0) = xs[(igraph_int_t)MATRIX(*layout, i, 1)]++;
         }
         free(xs);
     }
@@ -850,7 +850,7 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
         const igraph_vector_int_t* vertex_to_the_left,
         const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_real_t hgap, igraph_vector_t* xs);
-static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_integer_t v,
+static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_int_t v,
         const igraph_vector_int_t* vertex_to_the_left,
         const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_vector_int_t* sinks, igraph_vector_t* shifts,
@@ -858,12 +858,12 @@ static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_in
 
 static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* graph,
         igraph_matrix_t* layout, const igraph_i_layering_t* layering,
-        igraph_real_t hgap, igraph_integer_t no_of_real_nodes) {
+        igraph_real_t hgap, igraph_int_t no_of_real_nodes) {
 
-    igraph_integer_t i, j, k, l, n;
-    igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i, j, k, l, n;
+    igraph_int_t no_of_layers = igraph_i_layering_num_layers(layering);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t neis1, neis2;
     igraph_vector_t xs[4];
     igraph_vector_int_t roots, align;
@@ -914,14 +914,14 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
          * conflict */
         n = igraph_vector_int_size(&neis1);
         for (j = 0; j < n; j++) {
-            igraph_integer_t u = IGRAPH_FROM(graph, j);
-            igraph_integer_t v = IGRAPH_TO(graph, j);
+            igraph_int_t u = IGRAPH_FROM(graph, j);
+            igraph_int_t v = IGRAPH_TO(graph, j);
             igraph_bool_t j_inner = IS_INNER_SEGMENT(u, v);
             igraph_bool_t crossing;
 
             for (k = j + 1; k < n; k++) {
-                igraph_integer_t w = IGRAPH_FROM(graph, k);
-                igraph_integer_t x = IGRAPH_TO(graph, k);
+                igraph_int_t w = IGRAPH_FROM(graph, k);
+                igraph_int_t x = IGRAPH_TO(graph, k);
                 if (IS_INNER_SEGMENT(w, x) == j_inner) {
                     continue;
                 }
@@ -1052,9 +1052,9 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
         const igraph_vector_bool_t* ignored_edges,
         igraph_bool_t reverse, igraph_bool_t align_right,
         igraph_vector_int_t* roots, igraph_vector_int_t* align) {
-    igraph_integer_t i, j, k, n, di, dj, i_limit, j_limit, r;
-    igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t i, j, k, n, di, dj, i_limit, j_limit, r;
+    igraph_int_t no_of_layers = igraph_i_layering_num_layers(layering);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_neimode_t neimode = (reverse ? IGRAPH_OUT : IGRAPH_IN);
     igraph_vector_int_t neis;
     igraph_vector_t xs;
@@ -1090,9 +1090,9 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
         dj      = align_right ? -1 : 1;
         j_limit = align_right ? -1 : igraph_vector_int_size(layer);
         for (; j != j_limit; j += dj) {
-            igraph_integer_t medians[2];
-            igraph_integer_t vertex = VECTOR(*layer)[j];
-            igraph_integer_t pos;
+            igraph_int_t medians[2];
+            igraph_int_t vertex = VECTOR(*layer)[j];
+            igraph_int_t pos;
 
             if (VECTOR(*align)[vertex] != vertex)
                 /* This vertex is already aligned with some other vertex,
@@ -1144,7 +1144,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
 
             /* Try aligning with the medians */
             for (k = 0; k < 2; k++) {
-                igraph_integer_t eid;
+                igraph_int_t eid;
                 if (medians[k] < 0) {
                     continue;
                 }
@@ -1192,8 +1192,8 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
         const igraph_vector_int_t* vertex_to_the_left,
         const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_real_t hgap, igraph_vector_t* xs) {
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t i;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t shifts, old_xs;
     igraph_vector_int_t sinks;
     igraph_real_t shift;
@@ -1231,7 +1231,7 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
     /* Calculate the absolute coordinates */
     IGRAPH_CHECK(igraph_vector_update(&old_xs, xs));
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t root = VECTOR(*roots)[i];
+        igraph_int_t root = VECTOR(*roots)[i];
         VECTOR(*xs)[i] = VECTOR(old_xs)[root];
         shift = VECTOR(shifts)[VECTOR(sinks)[root]];
         if (shift < IGRAPH_INFINITY) {
@@ -1247,13 +1247,13 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_integer_t v,
+static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_int_t v,
         const igraph_vector_int_t* vertex_to_the_left,
         const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_vector_int_t* sinks, igraph_vector_t* shifts,
         igraph_real_t hgap, igraph_vector_t* xs) {
-    igraph_integer_t u, w;
-    igraph_integer_t u_sink, v_sink;
+    igraph_int_t u, w;
+    igraph_int_t u_sink, v_sink;
 
     if (VECTOR(*xs)[v] >= 0) {
         return;

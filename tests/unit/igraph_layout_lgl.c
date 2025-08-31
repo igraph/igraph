@@ -67,7 +67,7 @@ int main(void) {
 
     printf("Testing k-ary tree (many more times to stress-test igraph_2dgrid_t)\n");
     igraph_kary_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
-    for (igraph_integer_t i = 0; i < 100; i++) {
+    for (igraph_int_t i = 0; i < 100; i++) {
         igraph_matrix_init(&coords, 0, 0);
         vc = igraph_vcount(&g);
         igraph_layout_lgl(&g, &coords,

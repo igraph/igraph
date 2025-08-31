@@ -40,7 +40,7 @@ void weighted_adjacency(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mod
     igraph_destroy(&g);
 }
 
-void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer_t rep) {
+void run_bench(igraph_int_t vcount, igraph_int_t meandeg, igraph_int_t rep) {
     igraph_t g;
     igraph_matrix_t mat;
     igraph_vector_t weights;

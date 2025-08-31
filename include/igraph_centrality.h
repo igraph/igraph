@@ -162,7 +162,7 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_degree(const igraph_t *graph,
                                                igraph_real_t *theoretical_max,
                                                igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
-                                                    igraph_integer_t nodes,
+                                                    igraph_int_t nodes,
                                                     igraph_neimode_t mode,
                                                     igraph_loops_t loops,
                                                     igraph_real_t *res);
@@ -174,7 +174,7 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_betweenness(const igraph_t *g
                                                     igraph_real_t *theoretical_max,
                                                     igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
-                                                         igraph_integer_t nodes,
+                                                         igraph_int_t nodes,
                                                          igraph_bool_t directed,
                                                          igraph_real_t *res);
 
@@ -185,7 +185,7 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_closeness(const igraph_t *gra
                                                   igraph_real_t *theoretical_max,
                                                   igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
-                                                       igraph_integer_t nodes,
+                                                       igraph_int_t nodes,
                                                        igraph_neimode_t mode,
                                                        igraph_real_t *res);
 
@@ -198,7 +198,7 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality(const 
                                                                           igraph_real_t *theoretical_max,
                                                                           igraph_bool_t normalized);
 IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality_tmax(const igraph_t *graph,
-                                                                               igraph_integer_t nodes,
+                                                                               igraph_int_t nodes,
                                                                                igraph_neimode_t mode,
                                                                                igraph_real_t *res);
 

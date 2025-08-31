@@ -49,7 +49,7 @@ void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res,
  *
  * An error is returned if the input is an empty string.
  */
-igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_integer_t *value) {
+igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int_t *value) {
     char buffer[128];
     char *tmp, *end;
     char last_char;
@@ -73,12 +73,12 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
     tmp[length]='\0';
 
     /* To avoid having to choose the appropriate strto?() function based on
-     * the definition of igraph_integer_t, we first use a long long variable
-     * which should be at least as large as igraph_integer_t on any platform. */
+     * the definition of igraph_int_t, we first use a long long variable
+     * which should be at least as large as igraph_int_t on any platform. */
     errno = 0;
     val = strtoll(tmp, &end, 10);
     out_of_range = errno == ERANGE;
-    *value = (igraph_integer_t) val;
+    *value = (igraph_int_t) val;
     last_char = *end;
     if (*value != val) {
         out_of_range = true;
@@ -178,7 +178,7 @@ igraph_error_t igraph_i_fskip_whitespace(FILE *file) {
  * This function assumes that the number is followed by whitespace or the end of the file.
  * If this is not the case, an error will be raised.
  */
-igraph_error_t igraph_i_fget_integer(FILE *file, igraph_integer_t *value) {
+igraph_error_t igraph_i_fget_integer(FILE *file, igraph_int_t *value) {
     /* The value requiring the most characters on 64-bit is -2^63, i.e. "-9223372036854775808".
      * This is 20 characters long, plus one for the null terminator, requiring a buffer of
      * at least 21 characters. We use a slightly larger buffer to allow for leading zeros and

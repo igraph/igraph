@@ -65,16 +65,16 @@
  */
 
 igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
-                      igraph_bool_t use_seed, igraph_integer_t maxiter,
+                      igraph_bool_t use_seed, igraph_int_t maxiter,
                       igraph_real_t temp_max, igraph_real_t temp_min,
                       igraph_real_t temp_init) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
+    igraph_int_t no_nodes = igraph_vcount(graph);
     igraph_vector_int_t perm;
     igraph_vector_t impulse_x, impulse_y, temp, skew_gauge;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t temp_global;
-    igraph_integer_t perm_pointer = 0;
+    igraph_int_t perm_pointer = 0;
     igraph_real_t barycenter_x = 0, barycenter_y = 0;
     igraph_vector_t phi;
     igraph_vector_int_t neis;
@@ -153,7 +153,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     temp_global = temp_init * no_nodes;
 
     while (temp_global > temp_min * no_nodes && maxiter > 0) {
-        igraph_integer_t u, v, nlen, j;
+        igraph_int_t u, v, nlen, j;
         igraph_real_t px, py, pvx, pvy;
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -190,7 +190,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
         ));
         nlen = igraph_vector_int_size(&neis);
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t u = VECTOR(neis)[j];
+            igraph_int_t u = VECTOR(neis)[j];
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t dist2 = dx * dx + dy * dy;

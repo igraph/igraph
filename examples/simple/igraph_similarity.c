@@ -28,7 +28,7 @@ int main(void) {
     igraph_matrix_t m;
     igraph_vector_int_t pairs;
     igraph_vector_t res;
-    igraph_integer_t i, j, n;
+    igraph_int_t i, j, n;
 
     /* Initialize the library. */
     igraph_setup();

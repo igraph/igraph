@@ -45,7 +45,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_graph_list_t gl;
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
-        igraph_integer_t i, i2;
+        igraph_int_t i, i2;
         igraph_bool_t b, b2, loop, multi, graphical;
         igraph_real_t r;
         igraph_t g;

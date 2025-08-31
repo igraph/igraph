@@ -27,7 +27,7 @@ int main(void) {
     igraph_matrix_t mat;
     igraph_vector_t weights;
     igraph_vector_int_t edges;
-    igraph_integer_t n;
+    igraph_int_t n;
 
     /* Initialize the library. */
     igraph_setup();
@@ -53,7 +53,7 @@ int main(void) {
     igraph_get_edgelist(&graph, &edges, 0);
     n = igraph_ecount(&graph);
 
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         printf("%" IGRAPH_PRId " --> %" IGRAPH_PRId ": %g\n",
                VECTOR(edges)[2*i], VECTOR(edges)[2*i + 1], VECTOR(weights)[i]);
     }

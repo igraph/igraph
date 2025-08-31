@@ -33,7 +33,7 @@
 IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                                                    igraph_integer_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+                                                    igraph_int_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                                                     igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                                                     igraph_real_t killr);
 

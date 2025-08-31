@@ -27,8 +27,8 @@ int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t result;
-    igraph_integer_t n;
-    igraph_integer_t alpha;
+    igraph_int_t n;
+    igraph_int_t alpha;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
     /* Initialize the library. */
@@ -45,7 +45,7 @@ int main(void) {
         }
         n = igraph_vector_int_list_size(&result);
         printf("%" IGRAPH_PRId " independent sets found\n", n);
-        for (igraph_integer_t i = 0; i < n; i++) {
+        for (igraph_int_t i = 0; i < n; i++) {
             igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
         }
     }
@@ -55,7 +55,7 @@ int main(void) {
     igraph_maximal_independent_vertex_sets(&g, &result);
     n = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal independent sets found\n", n);
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
     }
 
