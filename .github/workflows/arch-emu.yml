@@ -121,7 +121,8 @@ jobs:
         run: cd build && cmake --build . --target build_tests --parallel
 
       - name: Test
-        run: cd build && ctest --output-on-failure
+        # Need a longer timeout as emulated runs are slow.
+        run: cd build && ctest --output-on-failure --timeout 240
 
       - name: Ccache statistics
         continue-on-error: true
