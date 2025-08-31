@@ -23,6 +23,7 @@
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_graphicality.h"
 #include "igraph_matrix.h"
 #include "igraph_matrix_list.h"
 #include "igraph_random.h"
@@ -121,14 +122,14 @@ IGRAPH_EXPORT igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, 
                                                     igraph_bool_t loops);
 
 IGRAPH_EXPORT igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
-                                      igraph_bool_t loops, igraph_bool_t multiple);
+                                                 igraph_edge_type_sw_t allowed_edge_types);
 IGRAPH_EXPORT igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
                                                igraph_bool_t loops, igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                                              igraph_integer_t size, igraph_integer_t nei,
-                                             igraph_real_t p, igraph_bool_t loops,
-                                             igraph_bool_t multiple);
+                                             igraph_real_t p,
+                                             igraph_edge_type_sw_t allowed_edge_types);
 
 IGRAPH_EXPORT igraph_error_t igraph_lastcit_game(igraph_t *graph,
                                       igraph_integer_t nodes, igraph_integer_t edges_per_node,
@@ -161,12 +162,12 @@ IGRAPH_EXPORT igraph_error_t igraph_simple_interconnected_islands_game(
 
 IGRAPH_EXPORT igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                              const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
-                                             igraph_bool_t loops, igraph_bool_t multiple);
+                                             igraph_edge_type_sw_t allowed_edge_types);
 
 IGRAPH_EXPORT igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                                igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
                                                igraph_real_t exponent_out, igraph_real_t exponent_in,
-                                               igraph_bool_t loops, igraph_bool_t multiple,
+                                               igraph_edge_type_sw_t allowed_edge_types,
                                                igraph_bool_t finite_size_correction);
 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_chung_lu_game(igraph_t *graph,
@@ -184,7 +185,7 @@ IGRAPH_EXPORT igraph_error_t igraph_sbm_game(
         const igraph_matrix_t *pref_matrix,
         const igraph_vector_int_t *block_sizes,
         igraph_bool_t directed,
-        igraph_bool_t loops, igraph_bool_t multiple);
+        igraph_edge_type_sw_t allowed_edge_types);
 
 IGRAPH_EXPORT igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                                    igraph_integer_t m, const igraph_vector_t *rho,

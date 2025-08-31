@@ -20,6 +20,26 @@
 
 #include "misc/graphicality.h"
 
+
+igraph_error_t igraph_i_edge_type_to_loops_multiple(
+    igraph_edge_type_sw_t allowed_edge_types,
+    igraph_bool_t *loops, igraph_bool_t *multiple) {
+
+    *loops = (allowed_edge_types & IGRAPH_LOOPS_SW) ? true : false;
+    *multiple = (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ? true : false;
+
+    if (*loops) {
+        igraph_bool_t multi_loops = (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW);
+        if (*multiple != multi_loops) {
+            IGRAPH_ERROR("Either both multi-edges and multi-loops should be allowed or neither.",
+                         IGRAPH_EINVAL);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
 static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_int_t *degrees, igraph_bool_t *res);
 static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_int_t *degrees, igraph_bool_t *res);
 static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_int_t *degrees, igraph_bool_t *res);

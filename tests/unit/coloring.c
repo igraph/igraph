@@ -104,7 +104,7 @@ void test_graph_large(void) {
     run_tests(&graph, false);
 
     /* graph with loops and parallel edges */
-    igraph_rewire_edges(&graph, 1.0, true, true);
+    igraph_rewire_edges(&graph, 1.0, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
     printf("Testing large graph with loops and multi-edges\n");
     run_tests(&graph, false);
 

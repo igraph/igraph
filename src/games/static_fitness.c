@@ -30,6 +30,7 @@
 
 #include "core/interruption.h"
 #include "core/math.h" /* M_SQRT2 */
+#include "misc/graphicality.h"
 
 /**
  * \ingroup generators
@@ -93,8 +94,8 @@
  * \param fitness_in   If \c NULL, the generated graph will be undirected.
  *                     If not \c NULL, this argument specifies the in-fitness
  *                     of each vertex.
- * \param loops        Whether to allow loop edges in the generated graph.
- * \param multiple     Whether to allow multiple edges in the generated graph.
+ * \param allowed_edge_types Controls whether multi-edges and self-loops
+ *     are allowed in the generated graph. See \ref igraph_edge_type_sw_t.
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid parameter
@@ -108,7 +109,7 @@
  */
 igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
-                               igraph_bool_t loops, igraph_bool_t multiple) {
+                               igraph_edge_type_sw_t allowed_edge_types) {
 
     const igraph_integer_t no_of_nodes = igraph_vector_size(fitness_out);
     const igraph_bool_t directed = (fitness_in != NULL);
@@ -119,7 +120,10 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     igraph_real_t max_no_of_edges;
     igraph_real_t num_steps;
     igraph_integer_t from, to, pos;
+    igraph_bool_t loops, multiple;
     int iter = 0;
+
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     IGRAPH_ASSERT(fitness_out != NULL);
 
@@ -368,8 +372,8 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
  *                     the exponent of the in-degree distribution. If
  *                     non-negative but less than 2, an error will be
  *                     generated.
- * \param loops        Whether to allow loop edges in the generated graph.
- * \param multiple     Whether to allow multiple edges in the generated graph.
+ * \param allowed_edge_types Controls whether multi-edges and self-loops
+ *     are allowed in the generated graph. See \ref igraph_edge_type_sw_t.
  * \param finite_size_correction  Whether to use the proposed finite size
  *                     correction of Cho et al.
  *
@@ -383,7 +387,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
 igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                  igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
                                  igraph_real_t exponent_out, igraph_real_t exponent_in,
-                                 igraph_bool_t loops, igraph_bool_t multiple,
+                                 igraph_edge_type_sw_t allowed_edge_types,
                                  igraph_bool_t finite_size_correction) {
 
     igraph_vector_t fitness_out, fitness_in;
@@ -444,13 +448,13 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         igraph_vector_shuffle(&fitness_in);
 
         IGRAPH_CHECK(igraph_static_fitness_game(graph, no_of_edges,
-                                                &fitness_out, &fitness_in, loops, multiple));
+                                                &fitness_out, &fitness_in, allowed_edge_types));
 
         igraph_vector_destroy(&fitness_in);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         IGRAPH_CHECK(igraph_static_fitness_game(graph, no_of_edges,
-                                                &fitness_out, NULL, loops, multiple));
+                                                &fitness_out, NULL, allowed_edge_types));
     }
 
     igraph_vector_destroy(&fitness_out);

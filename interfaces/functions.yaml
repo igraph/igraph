@@ -340,8 +340,8 @@ igraph_asymmetric_preference_game:
 
 igraph_rewire_edges:
     PARAMS: |-
-        INOUT GRAPH graph, REAL prob, BOOLEAN loops=False,
-        BOOLEAN multiple=False
+        INOUT GRAPH graph, REAL prob,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE
 
 igraph_rewire_directed_edges:
     PARAMS: |-
@@ -351,7 +351,7 @@ igraph_rewire_directed_edges:
 igraph_watts_strogatz_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei,
-        REAL p, BOOLEAN loops=False, BOOLEAN multiple=False
+        REAL p, EDGE_TYPE_SW allowed_edge_types=SIMPLE
 
 igraph_lastcit_game:
     PARAMS: |-
@@ -387,14 +387,14 @@ igraph_chung_lu_game:
 igraph_static_fitness_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_edges, VECTOR fitness_out,
-        OPTIONAL VECTOR fitness_in, BOOLEAN loops=False,
-        BOOLEAN multiple=False
+        OPTIONAL VECTOR fitness_in,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE
 
 igraph_static_power_law_game:
     PARAMS: |-
         OUT GRAPH graph, INTEGER no_of_nodes, INTEGER no_of_edges,
         REAL exponent_out, REAL exponent_in=-1,
-        BOOLEAN loops=False, BOOLEAN multiple=False,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE,
         BOOLEAN finite_size_correction=True
 
 igraph_k_regular_game:
@@ -406,7 +406,7 @@ igraph_sbm_game:
     PARAMS: |-
         OUT GRAPH graph, MATRIX pref_matrix,
         VECTOR_INT block_sizes, BOOLEAN directed=False,
-        BOOLEAN loops=False, BOOLEAN multiple=False
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE
 
 igraph_hsbm_game:
     INTERNAL: true
