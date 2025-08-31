@@ -22,15 +22,15 @@
 
 #include <float.h>
 
-void bench_lune(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_integer_t dimensions, igraph_real_t beta) {
+void bench_lune(igraph_int_t test_nr, igraph_int_t point_count, igraph_int_t dimensions, igraph_real_t beta) {
     igraph_matrix_t points;
     igraph_t g;
     char msg[200];
 
     igraph_matrix_init(&points, point_count, dimensions);
 
-    for (igraph_integer_t point = 0; point < point_count; point++) {
-        for (igraph_integer_t dim = 0; dim < dimensions; dim++) {
+    for (igraph_int_t point = 0; point < point_count; point++) {
+        for (igraph_int_t dim = 0; dim < dimensions; dim++) {
             MATRIX(points, point, dim) = RNG_UNIF01();
         }
     }
@@ -46,15 +46,15 @@ void bench_lune(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_i
 
 }
 
-void bench_circle(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_integer_t dimensions, igraph_real_t beta) {
+void bench_circle(igraph_int_t test_nr, igraph_int_t point_count, igraph_int_t dimensions, igraph_real_t beta) {
     igraph_matrix_t points;
     igraph_t g;
     char msg[200];
 
     igraph_matrix_init(&points, point_count, dimensions);
 
-    for (igraph_integer_t point = 0; point < point_count; point++) {
-        for (igraph_integer_t dim = 0; dim < dimensions; dim++) {
+    for (igraph_int_t point = 0; point < point_count; point++) {
+        for (igraph_int_t dim = 0; dim < dimensions; dim++) {
             MATRIX(points, point, dim) = RNG_UNIF01();
         }
     }
@@ -70,7 +70,7 @@ void bench_circle(igraph_integer_t test_nr, igraph_integer_t point_count, igraph
 
 }
 
-void bench_gabriel(igraph_integer_t test_nr, igraph_integer_t point_count, igraph_integer_t dimensions, igraph_real_t beta_cutoff) {
+void bench_gabriel(igraph_int_t test_nr, igraph_int_t point_count, igraph_int_t dimensions, igraph_real_t beta_cutoff) {
     igraph_matrix_t points;
     igraph_vector_t edge_weights;
     igraph_t g;
@@ -79,8 +79,8 @@ void bench_gabriel(igraph_integer_t test_nr, igraph_integer_t point_count, igrap
     igraph_matrix_init(&points, point_count, dimensions);
     igraph_vector_init(&edge_weights, 0);
 
-    for (igraph_integer_t point = 0; point < point_count; point++) {
-        for (igraph_integer_t dim = 0; dim < dimensions; dim++) {
+    for (igraph_int_t point = 0; point < point_count; point++) {
+        for (igraph_int_t dim = 0; dim < dimensions; dim++) {
             MATRIX(points, point, dim) = RNG_UNIF01();
         }
     }
@@ -99,7 +99,7 @@ void bench_gabriel(igraph_integer_t test_nr, igraph_integer_t point_count, igrap
 }
 
 int main(void) {
-    igraph_integer_t test_nr = 0;
+    igraph_int_t test_nr = 0;
     bench_lune(++test_nr, 100, 2, 2);
     bench_lune(++test_nr, 1000, 2, 2);
     bench_lune(++test_nr, 10000, 2, 2);

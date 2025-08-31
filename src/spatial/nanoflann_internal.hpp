@@ -13,7 +13,7 @@
 
 class ig_point_adaptor {
     const igraph_matrix_t *points;
-    const igraph_integer_t point_count;
+    const igraph_int_t point_count;
 
 public:
     explicit ig_point_adaptor(const igraph_matrix_t *points) :
@@ -35,26 +35,26 @@ public:
 
 
 class GraphBuildingResultSet {
-    igraph_integer_t added_count = 0;
+    igraph_int_t added_count = 0;
     const igraph_real_t max_distance;
-    const igraph_integer_t max_neighbors;
+    const igraph_int_t max_neighbors;
 
 public:
-    igraph_integer_t current_vertex = 0;
-    std::vector<igraph_integer_t> neighbors;
+    igraph_int_t current_vertex = 0;
+    std::vector<igraph_int_t> neighbors;
     std::vector<igraph_real_t> distances;
 
     using DistanceType = igraph_real_t;
-    using IndexType = igraph_integer_t;
+    using IndexType = igraph_int_t;
 
-    GraphBuildingResultSet(const igraph_integer_t max_neighbors, const igraph_real_t max_distance) :
+    GraphBuildingResultSet(const igraph_int_t max_neighbors, const igraph_real_t max_distance) :
         max_distance(max_distance),
         max_neighbors(max_neighbors),
         neighbors(1),
         distances(1) { }
 
-    bool addPoint(const igraph_real_t distance, const igraph_integer_t index) {
-        igraph_integer_t i;
+    bool addPoint(const igraph_real_t distance, const igraph_int_t index) {
+        igraph_int_t i;
 
         if (index == current_vertex) {
             return true;
@@ -86,7 +86,7 @@ public:
         return true;
     }
 
-    void reset(igraph_integer_t current_vertex_) {
+    void reset(igraph_int_t current_vertex_) {
         added_count = 0;
         current_vertex = current_vertex_;
     }
@@ -94,7 +94,7 @@ public:
     // Never called. Necessary to conform to the interface.
     void sort() { }
 
-    igraph_integer_t size() const {
+    igraph_int_t size() const {
         return added_count;
     }
 

@@ -33,11 +33,11 @@
 #define TOLERANCE (128 * DBL_EPSILON)
 
 // Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
-static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_integer_t b,
+static inline igraph_real_t ind_ind_sqr_distance(igraph_int_t a, igraph_int_t b,
                                                  const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
-    igraph_integer_t dims = igraph_matrix_ncol(points);
-    for (igraph_integer_t i = 0; i < dims; i++) {
+    igraph_int_t dims = igraph_matrix_ncol(points);
+    for (igraph_int_t i = 0; i < dims; i++) {
         igraph_real_t temp = MATRIX(*points, a, i) - MATRIX(*points, b, i);
         distance += temp * temp;
     }
@@ -46,18 +46,18 @@ static inline igraph_real_t ind_ind_sqr_distance(igraph_integer_t a, igraph_inte
 
 static inline igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *b) {
     igraph_real_t distance = 0;
-    igraph_integer_t dims = igraph_vector_size(a);
-    for (igraph_integer_t i = 0; i < dims; i++) {
+    igraph_int_t dims = igraph_vector_size(a);
+    for (igraph_int_t i = 0; i < dims; i++) {
         igraph_real_t temp = VECTOR(*a)[i] - VECTOR(*b)[i];
         distance += temp * temp;
     }
     return distance;
 }
 
-static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_integer_t b, const igraph_matrix_t *points) {
+static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_int_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
-    igraph_integer_t dims = igraph_matrix_ncol(points);
-    for (igraph_integer_t i = 0; i < dims; i++) {
+    igraph_int_t dims = igraph_matrix_ncol(points);
+    for (igraph_int_t i = 0; i < dims; i++) {
         igraph_real_t temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
         distance += temp * temp;
     }
@@ -68,14 +68,14 @@ static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igr
 // Used in is_union_empty
 class NeighborCounts {
     const igraph_real_t radius; // L2 search radius
-    const igraph_integer_t a, b; // edge endpoints; excluded from the count
+    const igraph_int_t a, b; // edge endpoints; excluded from the count
     igraph_bool_t short_circuit;
-    igraph_integer_t found;
+    igraph_int_t found;
 
 public:
     // Boilerplate for nanoflann
     using DistanceType = igraph_real_t;
-    NeighborCounts(igraph_real_t radius, igraph_integer_t a, igraph_integer_t b, igraph_bool_t short_circuit)
+    NeighborCounts(igraph_real_t radius, igraph_int_t a, igraph_int_t b, igraph_bool_t short_circuit)
         : radius(radius), a(a), b(b), short_circuit(short_circuit) {
         init();
     }
@@ -104,7 +104,7 @@ public:
 
     // Business logic
     // Add the point if it's close enough
-    bool addPoint(igraph_real_t dist, igraph_integer_t index) {
+    bool addPoint(igraph_real_t dist, igraph_int_t index) {
         if (dist < radius && index != a && index != b) {
             found += 1;
             if (short_circuit) {
@@ -124,7 +124,7 @@ class IntersectionCounts {
     const igraph_real_t radius;                 // Half height of intersection lune
     const igraph_real_t beta_radius;            // Radius of circles
     const igraph_bool_t short_circuit;          // Whether to stop after one point has been found
-    const igraph_integer_t a, b;                // Edge endpoints; excluded from the count.
+    const igraph_int_t a, b;                // Edge endpoints; excluded from the count.
     const igraph_vector_t *a_center, *b_center; // Circle centers.
     const igraph_matrix_t *points;              // List of points, used to test if points are in range
     size_t count;                               // how many are found.
@@ -134,7 +134,7 @@ public:
     IntersectionCounts(
         igraph_real_t radius_, igraph_real_t beta_radius_,
         bool short_circuit_,
-        igraph_integer_t a, igraph_integer_t b, const igraph_vector_t *a_center, const igraph_vector_t *b_center, const igraph_matrix_t *points)
+        igraph_int_t a, igraph_int_t b, const igraph_vector_t *a_center, const igraph_vector_t *b_center, const igraph_matrix_t *points)
         : radius(radius_), beta_radius(beta_radius_),
           short_circuit(short_circuit_),
           a(a), b(b),
@@ -166,7 +166,7 @@ public:
 
     // Business logic is all contained here.
     // Count the point if it is within the radius from both centers, and if it's not one of the endpoints.
-    bool addPoint(igraph_real_t dist, igraph_integer_t index) {
+    bool addPoint(igraph_real_t dist, igraph_int_t index) {
         if (dist < radius && index != a && index != b) {
             igraph_real_t pd1 = vec_ind_sqr_dist(a_center, index, points);
             igraph_real_t pd2 = vec_ind_sqr_dist(b_center, index, points);
@@ -183,10 +183,10 @@ public:
 };
 
 // Shrinks type signatures significantly.
-template<igraph_integer_t Dimension>
+template<igraph_int_t Dimension>
 using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
                     nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
-                    ig_point_adaptor, Dimension, igraph_integer_t >;
+                    ig_point_adaptor, Dimension, igraph_int_t >;
 
 // give a known good superset of edges for a given value of beta.
 // In the case of beta < 1, that is a complete graph, for
@@ -195,8 +195,8 @@ static igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
         const igraph_matrix_t *points,
         igraph_real_t beta) {
 
-    igraph_integer_t num_points = igraph_matrix_nrow(points);
-    igraph_integer_t num_dims   = igraph_matrix_ncol(points);
+    igraph_int_t num_points = igraph_matrix_nrow(points);
+    igraph_int_t num_dims   = igraph_matrix_ncol(points);
 
     if (beta >= 1 && num_points > num_dims) {
         // Large beta and enough points, subset of delaunay.
@@ -205,9 +205,9 @@ static igraph_error_t beta_skeleton_edge_superset(igraph_vector_int_t *edges,
         // Small beta, not subset of Delaunay, give complete graph.
         // Or Delaunay not calculable due to point count
         // TODO: update when/if Delaunay supports small numbers.
-        igraph_integer_t numpoints = igraph_matrix_nrow(points);
-        for (igraph_integer_t a = 0; a < numpoints - 1; a++) {
-            for (igraph_integer_t b = a + 1; b < numpoints; b++) {
+        igraph_int_t numpoints = igraph_matrix_nrow(points);
+        for (igraph_int_t a = 0; a < numpoints - 1; a++) {
+            for (igraph_int_t b = a + 1; b < numpoints; b++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, a));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, b));
             }
@@ -228,7 +228,7 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  * igraph_vector_t *a_center, b_center : Expects an initialized vector of the
  * correct size, will be written to.
  *
- * igraph_integer_t a, b: the indices of the points,
+ * igraph_int_t a, b: the indices of the points,
  *
  * igraph_real_t r: the circles will be constructed with radius r * (distance a-> b)
  *
@@ -238,8 +238,8 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
 typedef void CenterConstructor(
     igraph_vector_t *a_center,
     igraph_vector_t *b_center,
-    igraph_integer_t a,
-    igraph_integer_t b,
+    igraph_int_t a,
+    igraph_int_t b,
     igraph_real_t beta,
     const igraph_matrix_t *points);
 
@@ -249,13 +249,13 @@ typedef void CenterConstructor(
 // formula is a_center = a + (r-1) * (a - b), similar for b_center
 static void construct_lune_centers(igraph_vector_t *a_center,
         igraph_vector_t *b_center,
-        igraph_integer_t a,
-        igraph_integer_t b,
+        igraph_int_t a,
+        igraph_int_t b,
         igraph_real_t r,
         const igraph_matrix_t *points) {
-    igraph_integer_t dims = igraph_matrix_ncol(points);
+    igraph_int_t dims = igraph_matrix_ncol(points);
 
-    for (igraph_integer_t i = 0; i < dims; i++) {
+    for (igraph_int_t i = 0; i < dims; i++) {
         VECTOR(*a_center)[i] = MATRIX(*points, a, i) + (r - 1) * (MATRIX(*points, a, i) - MATRIX(*points, b, i));
         VECTOR(*b_center)[i] = MATRIX(*points, b, i) + (r - 1) * (MATRIX(*points, b, i) - MATRIX(*points, a, i));
     }
@@ -265,10 +265,10 @@ static void construct_lune_centers(igraph_vector_t *a_center,
 // skeletons.
 // Since it relies on a 90-degree rotation around the axis perpendicular
 // to the line AB, it is only well-defined in 2d.
-static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b_center, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
+static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b_center, igraph_int_t a, igraph_int_t b, igraph_real_t r, const igraph_matrix_t *points) {
     igraph_real_t mid[2], perp[2];
 
-    for (igraph_integer_t i = 0; i < 2; i++) {
+    for (igraph_int_t i = 0; i < 2; i++) {
         mid[i]  = (MATRIX(*points, a, i) + MATRIX(*points, b, i)) * 0.5;
         perp[i] = (MATRIX(*points, a, i) - MATRIX(*points, b, i)) * sqrt(r * r - 0.25);
     }
@@ -279,7 +279,7 @@ static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b
     perp[0] = - perp[1];
     perp[1] = temp;
 
-    for (igraph_integer_t i = 0; i < 2; i++) {
+    for (igraph_int_t i = 0; i < 2; i++) {
         VECTOR(*a_center)[i] = mid[i] + perp[i];
         VECTOR(*b_center)[i] = mid[i] - perp[i];
     }
@@ -288,7 +288,7 @@ static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b
 /* -!- Filter interface -!-
  * igraph_bool_t *result        : will be overwritten with the result
  * kdTree <-1> &tree            : used for nanoflann check, should be
- * initialized and filed with points. igraph_integer_t a, b        : the
+ * initialized and filed with points. igraph_int_t a, b        : the
  * endpoints of the edge being evaluated. igraph_real_t beta           :
  * parameter for beta-skeletons. const igraph_matrix_t *points: matrix
  * containing all the points.
@@ -296,8 +296,8 @@ static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b
 typedef igraph_error_t FilterFunc(
     igraph_bool_t *result,
     KDTree<-1> &tree,
-    igraph_integer_t a,
-    igraph_integer_t b,
+    igraph_int_t a,
+    igraph_int_t b,
     const igraph_matrix_t *points,
     igraph_real_t beta
 );
@@ -309,8 +309,8 @@ template<CenterConstructor center_positions, igraph_bool_t is_closed>
 static igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
     KDTree<-1> &tree,
-    igraph_integer_t a,
-    igraph_integer_t b,
+    igraph_int_t a,
+    igraph_int_t b,
     const igraph_matrix_t *points,
     igraph_real_t beta) {
 
@@ -318,7 +318,7 @@ static igraph_error_t is_intersection_empty(
     igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
 
     igraph_vector_t midpoint;
-    igraph_integer_t dims = igraph_matrix_ncol(points);
+    igraph_int_t dims = igraph_matrix_ncol(points);
 
     igraph_vector_t a_center, b_center;
     IGRAPH_VECTOR_INIT_FINALLY(&a_center, dims);
@@ -326,7 +326,7 @@ static igraph_error_t is_intersection_empty(
     center_positions(&a_center, &b_center, a, b, r, points);
 
     IGRAPH_VECTOR_INIT_FINALLY(&midpoint, dims);
-    for (igraph_integer_t i = 0; i < dims; i++) {
+    for (igraph_int_t i = 0; i < dims; i++) {
         VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_center)[i] + VECTOR(b_center)[i]);
     }
 
@@ -353,12 +353,12 @@ template<CenterConstructor center_positions>
 static igraph_error_t is_union_empty(
     igraph_bool_t *result,
     KDTree<-1> &tree,
-    igraph_integer_t a,
-    igraph_integer_t b,
+    igraph_int_t a,
+    igraph_int_t b,
     const igraph_matrix_t *points,
     igraph_real_t beta) {
 
-    igraph_integer_t dims = igraph_matrix_ncol(points);
+    igraph_int_t dims = igraph_matrix_ncol(points);
 
     igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
     igraph_real_t r = calculate_r(beta);
@@ -390,14 +390,14 @@ static igraph_error_t is_union_empty(
 // TODO: specialize for multiple dimensions?
 template<FilterFunc filter>
 static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points, igraph_real_t beta) {
-    igraph_integer_t available_edges = igraph_vector_int_size(edges);
-    igraph_integer_t added_edges = 0;
+    igraph_int_t available_edges = igraph_vector_int_size(edges);
+    igraph_int_t added_edges = 0;
     ig_point_adaptor adaptor(points);
-    igraph_integer_t dim = igraph_matrix_ncol(points);
+    igraph_int_t dim = igraph_matrix_ncol(points);
     KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
     igraph_bool_t result;
-    for (igraph_integer_t i = 0; i * 2  < available_edges; i++) {
+    for (igraph_int_t i = 0; i * 2  < available_edges; i++) {
         filter(&result, tree, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1], points, beta);
         if (result) {
             VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i * 2];
@@ -513,7 +513,7 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 class BetaFinder {
     const igraph_real_t max_beta;
     const igraph_real_t tol;
-    const igraph_integer_t ai, bi;
+    const igraph_int_t ai, bi;
     const igraph_matrix_t *ps;
     const igraph_real_t ab2;
 
@@ -522,8 +522,8 @@ class BetaFinder {
 
 public:
     using DistanceType = igraph_real_t;
-    using IndexType = igraph_integer_t;
-    BetaFinder(igraph_real_t max_beta, igraph_real_t tol, igraph_integer_t v1, igraph_integer_t v2, const igraph_matrix_t *ps) :
+    using IndexType = igraph_int_t;
+    BetaFinder(igraph_real_t max_beta, igraph_real_t tol, igraph_int_t v1, igraph_int_t v2, const igraph_matrix_t *ps) :
         max_beta(max_beta), tol(tol), ai(v1), bi(v2), ps(ps),
         ab2(ind_ind_sqr_distance(ai, bi, ps)) {
         init();
@@ -556,7 +556,7 @@ public:
     // Calculate the beta at which point index would make the edge a-b disappear.
     // If calculated beta is under 1, it would not appear in the gabriel graph, so a 0 is returned
     // which is to be interpreted as the edge being missing.
-    igraph_real_t pointBeta(igraph_integer_t index) const {
+    igraph_real_t pointBeta(igraph_int_t index) const {
         if (index == ai || index == bi) {
             return IGRAPH_INFINITY;
         }
@@ -578,7 +578,7 @@ public:
         return beta < 1 + tol ? 0 : beta;
     }
 
-    bool addPoint(igraph_real_t dist, igraph_integer_t index) {
+    bool addPoint(igraph_real_t dist, igraph_int_t index) {
         if (dist < max_radius) {
             igraph_real_t beta = pointBeta(index);
             if (beta < smallest_beta && beta < max_beta) {
@@ -645,12 +645,12 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     igraph_vector_int_t edges;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    igraph_integer_t dim = igraph_matrix_ncol(points);
-    igraph_integer_t point_count = igraph_matrix_nrow(points);
+    igraph_int_t dim = igraph_matrix_ncol(points);
+    igraph_int_t point_count = igraph_matrix_nrow(points);
     ig_point_adaptor adaptor(points);
 
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));
-    igraph_integer_t edge_count = igraph_vector_int_size(&edges) / 2;
+    igraph_int_t edge_count = igraph_vector_int_size(&edges) / 2;
 
     IGRAPH_CHECK(igraph_vector_resize(weights, edge_count));
 
@@ -660,10 +660,10 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     igraph_vector_t midpoint;
     IGRAPH_VECTOR_INIT_FINALLY(&midpoint, dim);
 
-    for (igraph_integer_t i = 0; i < edge_count; i++) {
+    for (igraph_int_t i = 0; i < edge_count; i++) {
         BetaFinder finder(max_beta, TOLERANCE, VECTOR(edges)[2 * i], VECTOR(edges)[2 * i + 1], points);
 
-        for (igraph_integer_t axis = 0; axis < dim; axis++) {
+        for (igraph_int_t axis = 0; axis < dim; axis++) {
             VECTOR(midpoint)[axis] = 0.5 * (
                                          MATRIX(*points, VECTOR(edges)[2 * i],     axis)
                                          + MATRIX(*points, VECTOR(edges)[2 * i + 1], axis)
@@ -675,8 +675,8 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
     }
 
     // Filter out edges with beta == 0.
-    igraph_integer_t added_edges = 0;
-    for (igraph_integer_t i = 0; i < edge_count; i++) {
+    igraph_int_t added_edges = 0;
+    for (igraph_int_t i = 0; i < edge_count; i++) {
         if (VECTOR(*weights)[i] != 0) {
             VECTOR(*weights)[added_edges] = VECTOR(*weights)[i];
             VECTOR(edges)[added_edges * 2] = VECTOR(edges)[i * 2];

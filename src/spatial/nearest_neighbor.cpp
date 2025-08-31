@@ -37,20 +37,20 @@
 #include <vector>
 
 
-template <typename Metric, igraph_integer_t Dimension>
+template <typename Metric, igraph_int_t Dimension>
 static igraph_error_t neighbor_helper(
         igraph_t *graph,
         const igraph_matrix_t *points,
-        igraph_integer_t k,
+        igraph_int_t k,
         igraph_real_t cutoff,
-        igraph_integer_t dimension,
+        igraph_int_t dimension,
         igraph_bool_t directed) {
 
-    const igraph_integer_t point_count = igraph_matrix_nrow(points);
+    const igraph_int_t point_count = igraph_matrix_nrow(points);
     ig_point_adaptor adaptor(points);
     int iter = 0;
 
-    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, ig_point_adaptor, Dimension, igraph_integer_t>;
+    using kdTree = nanoflann::KDTreeSingleIndexAdaptor<Metric, ig_point_adaptor, Dimension, igraph_int_t>;
     kdTree tree(dimension, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
 
     tree.buildIndex();
@@ -58,16 +58,16 @@ static igraph_error_t neighbor_helper(
     igraph_vector_t current_point;
     IGRAPH_VECTOR_INIT_FINALLY(&current_point, dimension);
 
-    igraph_integer_t neighbor_count = k >= 0 ? k : point_count;
+    igraph_int_t neighbor_count = k >= 0 ? k : point_count;
 
     GraphBuildingResultSet results(neighbor_count, cutoff);
-    std::vector<igraph_integer_t> edges;
-    for (igraph_integer_t i = 0; i < point_count; i++) {
+    std::vector<igraph_int_t> edges;
+    for (igraph_int_t i = 0; i < point_count; i++) {
         results.reset(i);
         IGRAPH_CHECK(igraph_matrix_get_row(points, &current_point, i));
 
         tree.findNeighbors(results, VECTOR(current_point), nanoflann::SearchParameters(0, false));
-        for (igraph_integer_t j = 0; j < results.size(); j++) {
+        for (igraph_int_t j = 0; j < results.size(); j++) {
             edges.push_back(i);
             edges.push_back(results.neighbors[j]);
         }
@@ -99,9 +99,9 @@ template <typename Metric>
 static igraph_error_t dimension_dispatcher(
         igraph_t *graph,
         const igraph_matrix_t *points,
-        igraph_integer_t k,
+        igraph_int_t k,
         igraph_real_t cutoff,
-        igraph_integer_t dimension,
+        igraph_int_t dimension,
         igraph_bool_t directed) {
 
     switch (dimension) {
@@ -144,11 +144,11 @@ static igraph_error_t dimension_dispatcher(
 igraph_error_t igraph_nearest_neighbor_graph(igraph_t *graph,
         const igraph_matrix_t *points,
         igraph_metric_t metric,
-        igraph_integer_t k,
+        igraph_int_t k,
         igraph_real_t cutoff,
         igraph_bool_t directed) {
 
-    const igraph_integer_t dimension = igraph_matrix_ncol(points);
+    const igraph_int_t dimension = igraph_matrix_ncol(points);
 
     // Negative cutoff values signify that no cutoff should be used.
     cutoff = cutoff >= 0 ? cutoff : IGRAPH_INFINITY;
