@@ -68,7 +68,7 @@ static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igr
 // Used in is_union_empty
 class NeighborCounts {
     const igraph_real_t radius; // L2 search radius
-    const igraph_integer_t a, b; // edge endpoits; excluded from the count
+    const igraph_integer_t a, b; // edge endpoints; excluded from the count
     igraph_bool_t short_circuit;
     igraph_integer_t found;
 
@@ -124,7 +124,7 @@ class IntersectionCounts {
     const igraph_real_t radius;                 // Half height of intersection lune
     const igraph_real_t beta_radius;            // Radius of circles
     const igraph_bool_t short_circuit;          // Whether to stop after one point has been found
-    const igraph_integer_t a, b;                // Edge endpoits; excluded from the count.
+    const igraph_integer_t a, b;                // Edge endpoints; excluded from the count.
     const igraph_vector_t *a_centre, *b_centre; // Circle centres.
     const igraph_matrix_t *points;              // List of points, used to test if points are in range
     size_t count;                               // how many are found.
@@ -232,7 +232,7 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  *
  * igraph_real_t r: the circles will be constructed with radius r * (distance a-> b)
  *
- * const igraph_matrix_t *points: point set containing the ponits a and b
+ * const igraph_matrix_t *points: point set containing the points a and b
  */
 
 typedef igraph_error_t CentreConstructor(
@@ -265,8 +265,8 @@ static igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
 
 // construct the centres of the circles for beta < 1, or circle based beta
 // skeletons.
-// Since it relies on a 90 degree rotation around the axis perpendicular
-// to the line AB, it is only well defined in 2d.
+// Since it relies on a 90-degree rotation around the axis perpendicular
+// to the line AB, it is only well-defined in 2d.
 static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
     igraph_real_t mid[2], perp[2];
 
@@ -275,7 +275,7 @@ static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_v
         perp[i] = (MATRIX(*points, a, i) - MATRIX(*points, b, i)) * sqrt(r * r - 0.25);
     }
 
-    // Since this is only well defined for 2d, a manual 90 degree rotation works and is simpler.
+    // Since this is only well-defined for 2d, a manual 90-degree rotation works and is simpler.
     // The rotation being x = -y, y = x, 90 degrees counter-clockwise.
     igraph_real_t temp = perp[0];
     perp[0] = - perp[1];
@@ -512,7 +512,7 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
     return IGRAPH_SUCCESS;
 }
 
-// Derived from code by Szabolcs at github.com/SzHorvat/IGraphM
+// Derived from code by Szabolcs at github.com/szhorvat/IGraphM
 
 class BetaFinder {
     const igraph_real_t max_beta;
@@ -557,7 +557,7 @@ public:
         return (ab2 / 4) * (2 * beta - 1);
     }
 
-    // Calculate the beta at which point index would make the edge a-b diappear.
+    // Calculate the beta at which point index would make the edge a-b disappear.
     // If calculated beta is under 1, it would not appear in the gabriel graph, so a 0 is returned
     // which is to be interpreted as the edge being missing.
     igraph_real_t pointBeta(igraph_integer_t index) const {
