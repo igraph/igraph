@@ -727,6 +727,7 @@ add_legacy_tests(
   igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
+  max_results
 )
 
 # eigen.at
