@@ -104,6 +104,9 @@ int main(void) {
     int i;
     igraph_vector_t weights;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);
 
     for (i = 0; i < 8; i++) {

@@ -27,6 +27,9 @@ int main(void) {
     igraph_t graph;
     igraph_real_t cent;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create an undirected star graph, which is the most centralized graph
      * with several common centrality scores. */
     printf("undirected star graph:\n");

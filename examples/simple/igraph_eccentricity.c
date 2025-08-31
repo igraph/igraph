@@ -23,6 +23,9 @@ int main(void) {
     igraph_t g;
     igraph_vector_t ecc;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_init(&ecc, 0);
 
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);

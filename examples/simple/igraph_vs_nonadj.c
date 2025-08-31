@@ -29,6 +29,9 @@ int main(void) {
     igraph_vit_t vit;
     igraph_integer_t size;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* empty graph, all vertices */
     igraph_empty(&g, 10, IGRAPH_DIRECTED);
     igraph_vs_nonadj(&vs, 0, IGRAPH_ALL);

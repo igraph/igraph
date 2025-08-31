@@ -23,6 +23,9 @@ int main(void) {
     igraph_vector_t eb;
     igraph_vector_int_t edges;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create the vector where the tree edges will be stored. */
     igraph_vector_int_init(&edges, 0);
 

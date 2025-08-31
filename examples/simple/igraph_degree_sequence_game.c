@@ -24,6 +24,9 @@ int main(void) {
     igraph_vector_int_t vec;
     igraph_bool_t is_simple;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Set random seed for reproducibility */
     igraph_rng_seed(igraph_rng_default(), 42);
 

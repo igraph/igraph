@@ -24,10 +24,12 @@
 #include <string.h>
 
 int main(void) {
-
     char tmp[100];
     const char *string;
     int major, minor, subminor;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_version(&string, &major, &minor, &subminor);
     snprintf(tmp, sizeof(tmp), "%i.%i.%i", major, minor, subminor);

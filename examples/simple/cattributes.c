@@ -91,6 +91,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t y;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);
 

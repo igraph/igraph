@@ -24,6 +24,9 @@ int main(void) {
     igraph_vector_int_t membership;
     igraph_real_t modularity;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_famous(&graph, "Zachary"); /* We use Zachary's karate club network. */
 
     /* Label propagation is a stochastic method; the result will depend on the random seed. */

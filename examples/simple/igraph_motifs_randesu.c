@@ -15,6 +15,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t hist;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Compute the 4-motif distritbuion in Zachary's karate club network. */
 
     igraph_famous(&graph, "Zachary");

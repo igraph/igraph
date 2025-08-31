@@ -23,6 +23,9 @@ int main(void) {
     igraph_integer_t eid;
     igraph_vector_int_t hist;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* DIRECTED */
 
     igraph_star(&graph, 10, IGRAPH_STAR_OUT, 0);

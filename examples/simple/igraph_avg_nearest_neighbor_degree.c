@@ -27,6 +27,9 @@ int main(void) {
     igraph_vector_t knn, knnk;
     igraph_vector_t weights;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_famous(&graph, "Zachary");
 
     igraph_vector_init(&knn, 0);

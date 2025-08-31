@@ -25,6 +25,9 @@ int main(void) {
     igraph_vector_t u, v;
     igraph_integer_t i, k, n;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /********************************
      * Example usage
      ********************************/

@@ -26,6 +26,9 @@ int main(void) {
     igraph_t graph, ring;
     igraph_vector_int_t order, rank, father, pred, succ, dist;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a disjoint union of two rings */
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);

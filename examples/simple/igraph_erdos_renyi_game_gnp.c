@@ -22,6 +22,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_t component_sizes;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_rng_seed(igraph_rng_default(), 42); /* make program deterministic */
 
     /* Sample a graph from the Erdős-Rényi G(n,p) model */

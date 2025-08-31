@@ -23,6 +23,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_t res;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Test graph taken from http://en.wikipedia.org/wiki/Topological_sorting
      * @ 05.03.2006 */
     igraph_small(&graph, 8, IGRAPH_DIRECTED,

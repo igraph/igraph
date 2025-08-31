@@ -6,6 +6,9 @@ int main(void){
     igraph_integer_t vcount = 1000;
     igraph_real_t pf = 0.2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Seed random number generator to ensure reproducibility. */
     igraph_rng_seed(igraph_rng_default(), 42);
 

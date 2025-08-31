@@ -30,6 +30,9 @@ int main(void) {
     igraph_t block_tree;
     igraph_integer_t i;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_famous(&g, "zachary");
     igraph_vector_int_list_init(&blocks, 0);
     igraph_vector_int_init(&cohesion, 0);

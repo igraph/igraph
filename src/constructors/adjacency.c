@@ -331,8 +331,6 @@ static igraph_error_t igraph_i_adjacency_min(
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
- *
- * \example examples/simple/igraph_adjacency.c
  */
 igraph_error_t igraph_adjacency(
     igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,

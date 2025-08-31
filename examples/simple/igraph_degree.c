@@ -29,11 +29,13 @@ igraph_bool_t handshaking_lemma(igraph_t *g, igraph_vector_int_t *v) {
 }
 
 int main(void) {
-
     igraph_t g;
     igraph_vector_int_t v;
     igraph_vector_int_t seq;
     igraph_integer_t mdeg;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create graph */
     igraph_vector_int_init(&v, 8);

@@ -24,6 +24,9 @@ int main(void) {
     igraph_t g;
     igraph_bool_t result;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&g, 7, 0, 0, 1, 1, 2, 2, 3, 3, 0, 2, 4, 4, 5, 2, 5, -1);
     igraph_is_biconnected(&g, &result);
     printf("Graph is%sbiconnected.\n", result ? " " : " not ");

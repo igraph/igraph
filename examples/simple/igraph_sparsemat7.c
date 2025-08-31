@@ -32,6 +32,9 @@ int main(void) {
     igraph_sparsemat_t spmat, spmat2;
     igraph_real_t m1, m2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_sparsemat_init(&spmat, DIM1, DIM2, 20);

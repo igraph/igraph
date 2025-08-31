@@ -27,6 +27,9 @@ int main(void) {
     igraph_t g;
     FILE *ifile;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);
 

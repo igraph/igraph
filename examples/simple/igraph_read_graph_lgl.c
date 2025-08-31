@@ -19,9 +19,11 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g;
     FILE *input;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);

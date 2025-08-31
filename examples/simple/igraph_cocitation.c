@@ -23,6 +23,9 @@ int main(void) {
     igraph_t graph;
     igraph_matrix_t matrix;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a small test graph. */
     igraph_small(&graph, 0, IGRAPH_DIRECTED,
                  0, 1, 2, 1, 2, 0, 3, 0,

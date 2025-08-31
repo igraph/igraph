@@ -43,7 +43,6 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
     }
 
     igraph_vector_minmax(&res, &min, &max);
-    igraph_vector_destroy(&res);
 
     success = fabs(min) < 1e-12 && fabs(max) < 1e-12;
 
@@ -56,6 +55,8 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
         igraph_vector_print(&res); printf("\n\n");
     }
 
+    igraph_vector_destroy(&res);
+
     return success;
 }
 
@@ -64,6 +65,9 @@ int main(void) {
     igraph_sparsemat_t A, B, C;
     igraph_vector_t b, x;
     igraph_integer_t i;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* lsolve */
 

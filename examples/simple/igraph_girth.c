@@ -29,6 +29,9 @@ int main(void) {
     igraph_vector_int_t circle;
     igraph_integer_t chord[] = { 0, 50 };
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 1);
     igraph_vector_int_view(&v, chord, sizeof(chord) / sizeof(chord[0]));
     igraph_add_edges(&g, &v, 0);

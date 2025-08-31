@@ -9,6 +9,9 @@ int main(void) {
     igraph_eit_t eit;
     igraph_real_t avg_dist;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Set random seed for reproducible results */
 
     igraph_rng_seed(igraph_rng_default(), 42);

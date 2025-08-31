@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_t g;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Multiple edges */
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, -1);

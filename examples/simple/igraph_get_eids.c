@@ -28,6 +28,9 @@ int main(void) {
     igraph_integer_t r, e, ecount;
     igraph_vector_int_t eids, pairs, path;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
     igraph_vector_int_init(&pairs, edges * 2);

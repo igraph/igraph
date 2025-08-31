@@ -27,6 +27,9 @@ int main(void) {
     igraph_integer_t nb_clusters;
     igraph_real_t quality;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Set default seed to get reproducible results */
     igraph_rng_seed(igraph_rng_default(), 0);
 

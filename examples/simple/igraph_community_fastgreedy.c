@@ -23,6 +23,9 @@ int main(void) {
     igraph_vector_t weights;
     igraph_matrix_int_t merges;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_init_int(&weights, 8, 10, 10, 1, 1, 1, 1, 1, 1);
 

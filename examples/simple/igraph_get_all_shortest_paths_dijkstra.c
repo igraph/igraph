@@ -47,6 +47,9 @@ int main(void) {
     igraph_vector_int_t nrgeo;
     igraph_vs_t vs;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_int_list_init(&vertices, 0);
     igraph_vector_int_list_init(&edges, 0);
     igraph_vs_vector_small(&vs, 1, 3, 4, 5, 2, 1, -1);

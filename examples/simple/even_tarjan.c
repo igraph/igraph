@@ -31,7 +31,8 @@ int main(void) {
     igraph_integer_t i, j, n;
     igraph_maxflow_stats_t stats;
 
-    /* --------------------------------------------------- */
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_famous(&g, "meredith");
     igraph_even_tarjan_reduction(&g, &gbar, /*capacity=*/ NULL);

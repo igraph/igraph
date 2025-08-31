@@ -23,9 +23,11 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t orig, sub, diff;
     igraph_vector_int_t v;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Subtract from itself */
     printf("subtract itself\n");

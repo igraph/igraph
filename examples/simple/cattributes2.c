@@ -23,6 +23,9 @@ int main(void) {
     igraph_vector_t y;
     igraph_warning_handler_t* oldwarnhandler;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);
 

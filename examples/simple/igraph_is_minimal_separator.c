@@ -31,6 +31,9 @@ int main(void) {
     igraph_vector_int_t sep;
     igraph_bool_t result;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Simple star graph, remove the center */
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_is_minimal_separator(&graph, igraph_vss_1(0), &result);

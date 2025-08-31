@@ -23,10 +23,12 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_matrix_t A;
     igraph_matrix_t vectors;
     igraph_vector_t values;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_matrix_init(&A, 2, 2);
     igraph_matrix_init(&vectors, 0, 0);

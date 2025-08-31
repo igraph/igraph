@@ -25,6 +25,9 @@ int main(void) {
     igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0,  1,  0,  2,  0,  3,  0,  4,  0,  5,

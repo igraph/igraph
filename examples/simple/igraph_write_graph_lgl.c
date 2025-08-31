@@ -8,6 +8,9 @@ int main(void) {
     igraph_integer_t i;
     igraph_integer_t vcount, ecount;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_small(&graph, 7, IGRAPH_UNDIRECTED,

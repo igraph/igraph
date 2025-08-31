@@ -24,12 +24,14 @@
 #include <stdio.h>
 
 int main(void) {
-
     igraph_matrix_t A;
     igraph_matrix_t vectors_left, vectors_right;
     igraph_vector_t values_real, values_imag;
     igraph_vector_complex_t values;
     int info = 1;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_matrix_init(&A, 2, 2);
     igraph_matrix_init(&vectors_left, 0, 0);

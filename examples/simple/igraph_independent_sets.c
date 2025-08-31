@@ -31,6 +31,9 @@ int main(void) {
     igraph_integer_t alpha;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_int_list_init(&result, 0);
 
     igraph_kary_tree(&g, 5, 2, IGRAPH_TREE_OUT);

@@ -26,6 +26,9 @@ int main(void) {
     igraph_t graph;
     igraph_bool_t res;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a directed binary tree on 15 nodes,
        with edges pointing towards the root. */
     igraph_kary_tree(&graph, 15, 2, IGRAPH_TREE_IN);

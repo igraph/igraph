@@ -40,6 +40,9 @@ igraph_error_t bfs_callback(const igraph_t *graph,
 int main(void) {
     igraph_t graph, ring;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a disjoint union of two rings */
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);

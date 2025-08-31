@@ -6,6 +6,9 @@ int main(void){
     igraph_integer_t nodes = 500, A = 0, power = 1, m = 1;
     igraph_real_t assortativity;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_rng_seed(igraph_rng_default(), 42);
     printf("Demonstration of difference in assortativities of graphs with the same degree sequence but different linkages:\n\nInitial graph based on the Barabasi-Albert model with %" IGRAPH_PRId " nodes.\n", nodes);
 

@@ -24,6 +24,9 @@ int main(void) {
     igraph_vector_ptr_t glist;
     igraph_integer_t i, n;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&left, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,3, -1);
     igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);
 

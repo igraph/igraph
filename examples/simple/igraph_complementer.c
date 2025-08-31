@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_t g1, g2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* complementer of the empty graph */
     igraph_empty(&g1, 5, IGRAPH_DIRECTED);
     igraph_complementer(&g2, &g1, IGRAPH_LOOPS);

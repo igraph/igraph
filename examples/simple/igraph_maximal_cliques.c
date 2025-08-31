@@ -23,10 +23,12 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g;
     igraph_vector_int_list_t cliques;
     igraph_integer_t no;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&g, 9, IGRAPH_UNDIRECTED,
                  0,1, 0,2, 1,2, 2,3, 3,4, 3, 5, 4,5, 5,6, 6,7, -1);

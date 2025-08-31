@@ -28,6 +28,9 @@ int main(void) {
     igraph_vector_t vector, weights;
     igraph_real_t value;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a star graph, with vertex 0 at the center, and associated edge weights. */
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_vector_init_range(&weights, 1, igraph_ecount(&graph)+1);

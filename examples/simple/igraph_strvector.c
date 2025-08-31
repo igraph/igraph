@@ -34,6 +34,9 @@ int main(void) {
 
     igraph_strvector_t sv1, sv2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     printf("Initializing and setting elements:\n");
     igraph_strvector_init(&sv1, 5);
 

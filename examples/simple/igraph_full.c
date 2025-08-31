@@ -23,6 +23,9 @@ int main(void) {
     igraph_t graph;
     igraph_integer_t n_vertices = 10;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create an undirected complete graph. */
     /* Use IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS instead of true and false for better readability. */
     igraph_full(&graph, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);

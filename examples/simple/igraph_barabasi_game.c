@@ -28,6 +28,9 @@ int main(void) {
     igraph_vector_int_t v;
     igraph_vector_int_t v2, v3;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 0, /*A=*/ 1, 1,
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
     if (igraph_ecount(&g) != 18) {

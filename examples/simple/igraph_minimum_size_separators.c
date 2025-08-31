@@ -23,6 +23,7 @@
 #include <igraph.h>
 
 int main(void) {
+    igraph_setup();
     igraph_t g;
     igraph_vector_int_list_t sep;
 

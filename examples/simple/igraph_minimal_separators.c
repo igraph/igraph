@@ -28,6 +28,9 @@ int main(void) {
     igraph_vector_int_list_t separators;
     igraph_integer_t i, n;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_famous(&graph, "zachary");
     igraph_vector_int_list_init(&separators, 0);
     igraph_all_minimal_st_separators(&graph, &separators);

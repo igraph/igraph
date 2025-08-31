@@ -24,11 +24,15 @@
 #include <string.h>
 
 int main(void) {
+    igraph_setup();
     igraph_t g;
     igraph_vector_t weights;
     igraph_vector_int_t result;
     igraph_bool_t dag;
     igraph_error_t retval;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_init(&result, 0);
 

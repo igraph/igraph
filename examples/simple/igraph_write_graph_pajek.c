@@ -23,9 +23,11 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g;
     igraph_strvector_t names;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 

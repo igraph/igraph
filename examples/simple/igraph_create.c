@@ -27,6 +27,9 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_t v1, v2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* simple use */
     igraph_vector_int_init(&v1, 8);
     VECTOR(v1)[0] = 0;

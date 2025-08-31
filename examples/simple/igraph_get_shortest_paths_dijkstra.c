@@ -33,6 +33,9 @@ int main(void) {
     igraph_vector_t weights_vec;
     igraph_vs_t vs;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_int_list_init(&vecs, 0);
     igraph_vector_int_list_init(&evecs, 0);
     igraph_vector_int_init(&parents, 0);

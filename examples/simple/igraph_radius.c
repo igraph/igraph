@@ -28,6 +28,9 @@ int main(void) {
     igraph_t g;
     igraph_real_t radius;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_radius(&g, NULL, &radius, IGRAPH_OUT);
     if (radius != 1) {

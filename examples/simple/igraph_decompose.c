@@ -13,6 +13,9 @@ int main(void) {
                             };
     igraph_vector_int_t v;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_graph_list_init(&complist, 0);
 
     /* A ring, a single component */

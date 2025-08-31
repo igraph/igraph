@@ -24,9 +24,11 @@
 #include <stdio.h>
 
 int main(void) {
-
     igraph_t g;
     igraph_bool_t simple;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_barabasi_game(/* graph=    */ &g,
                                          /* n=        */ 100,

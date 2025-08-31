@@ -22,6 +22,9 @@
 int main(void) {
     igraph_t graph;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a directed path graph on 10 vertices. */
     igraph_ring(&graph, 10, IGRAPH_DIRECTED, /* mutual= */ 0, /* circular= */ 0);
 

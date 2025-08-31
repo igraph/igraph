@@ -29,6 +29,9 @@ int main(void) {
     igraph_vector_int_list_t cuts;
     igraph_real_t value;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&g, 5, IGRAPH_DIRECTED,
                  0, 1, 1, 2, 2, 3, 3, 4,
                  -1);

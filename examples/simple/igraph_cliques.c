@@ -101,6 +101,9 @@ int main(void) {
     igraph_integer_t i, j, n;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     igraph_vector_int_list_init(&result, 0);

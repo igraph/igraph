@@ -24,6 +24,9 @@ int main(void) {
     igraph_vector_int_t edges;
     igraph_bool_t iso;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     // Heawood graph through LCF notation: [5, -5]^7
     // The number of vertices is normally the number of shifts
     // multiplied by the number of repeats, in this case 2*7 = 14.

@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_dqueue_t q;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* igraph_dqueue_init, igraph_dqueue_destroy, igraph_dqueue_empty */
     igraph_dqueue_init(&q, 5);
     if (!igraph_dqueue_empty(&q)) {

@@ -77,6 +77,9 @@ int main(void) {
     igraph_integer_t i;
     igraph_vs_t vs;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 1);
 
     igraph_vector_int_list_init(&vecs, 0);

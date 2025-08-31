@@ -29,6 +29,9 @@ int main(void) {
     igraph_t g;
     igraph_integer_t size;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
     igraph_vs_range(&vs, 0, 10);
     igraph_vit_create(&g, vs, &vit);

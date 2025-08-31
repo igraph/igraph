@@ -33,6 +33,8 @@ int main(void) {
     igraph_integer_t i, j, nz1, nz2;
     igraph_vector_t sums1, sums2;
 
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

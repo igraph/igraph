@@ -31,6 +31,9 @@ int main(void) {
     FILE *infile;
     igraph_maxflow_stats_t stats;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_init(&capacity, 0);
 
     /***************/

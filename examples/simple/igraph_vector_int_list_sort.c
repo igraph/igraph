@@ -7,6 +7,9 @@ int main(void) {
     igraph_vector_int_list_t cliques;
     igraph_integer_t i, n;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Set a random seed to make the program deterministic */
     igraph_rng_seed(igraph_rng_default(), 31415);
 

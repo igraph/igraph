@@ -28,6 +28,9 @@ int main(void) {
     const char *infilename  = "test.graphml";
     const char *outfilename = "test2.graphml";
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Set up attribute handling, so graph attributes can be imported
      * from the GraphML file. */
     igraph_set_attribute_table(&igraph_cattribute_table);

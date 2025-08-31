@@ -24,6 +24,9 @@ int main(void) {
     igraph_vector_bool_t types;
     igraph_vector_int_t mult1, mult2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_int_init(&mult1, 0);
     igraph_vector_int_init(&mult2, 0);
 

@@ -24,9 +24,11 @@
 #include <stdio.h>
 
 int main(void) {
-
     igraph_t g;
     FILE *ifile;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     ifile = fopen("karate.gml", "r");
     if (ifile == 0) {

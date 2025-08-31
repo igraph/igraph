@@ -3,8 +3,11 @@
 
 int main(void) {
     igraph_integer_t nodes = 120, types = 4;
-
     igraph_matrix_t pref_matrix;
+
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_matrix_init(&pref_matrix, types, types);
 
     igraph_rng_seed(igraph_rng_default(), 42);

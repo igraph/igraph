@@ -33,6 +33,9 @@ int main(void) {
     igraph_vector_int_list_t component_vertices, component_edges;
     igraph_integer_t no;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create an example graph. */
     igraph_small(&graph, 7, IGRAPH_UNDIRECTED,
                  0,1, 1,2, 2,3, 3,0,

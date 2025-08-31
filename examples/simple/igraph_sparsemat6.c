@@ -26,6 +26,9 @@ int main(void) {
     igraph_matrix_t mat, mat2, mat3;
     igraph_sparsemat_t spmat, spmat2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_rng_seed(igraph_rng_default(), 42);
 
 #define NROW 10

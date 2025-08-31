@@ -27,6 +27,9 @@ int main(void) {
     igraph_t g;
     igraph_real_t res;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Trivial cases */
 
     igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 0);

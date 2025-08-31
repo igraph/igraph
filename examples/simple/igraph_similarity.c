@@ -30,6 +30,9 @@ int main(void) {
     igraph_vector_t res;
     igraph_integer_t i, j, n;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&g, 0, IGRAPH_DIRECTED,
                  0, 1, 2, 1, 2, 0, 3, 0,
                  -1);

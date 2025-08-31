@@ -23,6 +23,7 @@
 #include <igraph.h>
 
 int main(void) {
+    igraph_setup();
 
     igraph_t g;
     igraph_real_t flow_value;
@@ -32,6 +33,9 @@ int main(void) {
     igraph_vector_t flow;
     igraph_integer_t i;
     igraph_maxflow_stats_t stats;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&g, 6, IGRAPH_DIRECTED,
                  0, 1, 1, 2, 2, 3, 0, 5, 5, 4, 4, 3, 3, 0, -1);

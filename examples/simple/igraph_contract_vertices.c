@@ -66,6 +66,9 @@ igraph_error_t condensation(const igraph_t *graph, igraph_t *cond) {
 int main(void) {
     igraph_t graph, cond;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a random directed graph with mean degree 2 and compute its condensation. */
     igraph_erdos_renyi_game_gnm(&graph, 100, 200, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     condensation(&graph, &cond);

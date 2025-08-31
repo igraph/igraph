@@ -2,8 +2,10 @@
 
 int main(void) {
     igraph_t graph;
-
     igraph_attribute_combination_t comb;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 

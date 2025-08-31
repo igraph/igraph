@@ -23,8 +23,10 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_atlas(&g, 45);
     igraph_write_graph_edgelist(&g, stdout);

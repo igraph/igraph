@@ -111,6 +111,9 @@ int main(void) {
     igraph_vector_int_t p, q;
     igraph_integer_t i;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Permutation of a matrix */
 
 #define NROW 10

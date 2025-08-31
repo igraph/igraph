@@ -29,6 +29,9 @@ int main(void) {
     igraph_vector_t vect;
     igraph_integer_t i;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create, compress, destroy */
     igraph_sparsemat_init(&A, 100, 20, 50);
     igraph_sparsemat_compress(&A, &B);

@@ -27,6 +27,9 @@ int main(void) {
     igraph_matrix_t res;
     igraph_real_t cutoff;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&graph, 10, IGRAPH_DIRECTED,
                  0, 1, 0, 2, 0, 3,    1, 2, 1, 4, 1, 5,
                  2, 3, 2, 6,          3, 2, 3, 6,

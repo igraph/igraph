@@ -27,6 +27,9 @@ int main(void) {
     igraph_t graph;
     FILE *ifile;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     ifile = fopen("karate.gml", "r");
     if (ifile == 0) {
         return 1;

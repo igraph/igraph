@@ -27,6 +27,9 @@ int main(void) {
     igraph_t g;
     igraph_es_t es;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,3, -1);
 
     igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 3, 2, -1);

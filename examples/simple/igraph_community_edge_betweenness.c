@@ -25,6 +25,9 @@ int main(void) {
     igraph_matrix_int_t merges;
     igraph_vector_int_t bridges;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_small(&graph, 5, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 0, 2, 0, 3, 1, 3, 1, 4,
                  -1);

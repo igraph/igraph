@@ -38,6 +38,9 @@ int main(void) {
     int info;
     int i, j;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Identity matrix, you have to start somewhere */
 
     igraph_matrix_init(&A, DIM, DIM);

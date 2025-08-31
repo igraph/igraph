@@ -28,6 +28,9 @@ int main(void) {
     igraph_vector_int_t v;
     igraph_vector_int_t map1, map2;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_int_init(&map1, 0);
     igraph_vector_int_init(&map2, 0);
 

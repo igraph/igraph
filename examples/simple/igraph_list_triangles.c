@@ -23,6 +23,9 @@ int main(void) {
     igraph_vector_int_t v;
     igraph_matrix_int_t result;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_full(&g, 5, 0, IGRAPH_NO_LOOPS);
 
     printf("Triangles in a full graph of 5 vertices:\n");

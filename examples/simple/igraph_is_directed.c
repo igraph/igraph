@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_t g;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_empty(&g, 0, 0);
     if (igraph_is_directed(&g)) {
         return 1;

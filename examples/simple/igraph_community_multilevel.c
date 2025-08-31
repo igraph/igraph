@@ -47,12 +47,16 @@ void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_in
 }
 
 int main(void) {
+    igraph_setup();
     igraph_t g;
     igraph_vector_t modularity;
     igraph_vector_int_t edges;
     igraph_vector_int_t membership;
     igraph_matrix_int_t memberships;
     igraph_integer_t i, j, k;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_init(&modularity, 0);
     igraph_vector_int_init(&membership, 0);
