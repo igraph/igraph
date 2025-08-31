@@ -1360,8 +1360,9 @@ igraph_maximal_cliques_subset:
 
 igraph_maximal_cliques_callback:
     PARAMS: |-
-        GRAPH graph, CLIQUE_FUNC cliquehandler_fn, OPTIONAL EXTRA arg,
-        INTEGER min_size=0, INTEGER max_size=0
+        GRAPH graph,
+        INTEGER min_size=0, INTEGER max_size=0,
+        CLIQUE_FUNC cliquehandler_fn, OPTIONAL EXTRA arg
 
 igraph_maximal_cliques_count:
     PARAMS: |-

@@ -130,8 +130,8 @@ IGRAPH_EXPORT igraph_error_t igraph_cliques_callback(
 
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_callback(
         const igraph_t *graph,
-        igraph_clique_handler_t *cliquehandler_fn, void *arg,
-        igraph_int_t min_size, igraph_int_t max_size);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_clique_handler_t *cliquehandler_fn, void *arg);
 
 IGRAPH_END_C_DECLS
 

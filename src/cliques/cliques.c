@@ -971,7 +971,7 @@ static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* 
 
 igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_list_t *res) {
     igraph_vector_int_list_clear(res);
-    IGRAPH_CHECK(igraph_maximal_cliques_callback(graph, &igraph_i_largest_cliques_store, (void*)res, 0, 0));
+    IGRAPH_CHECK(igraph_maximal_cliques_callback(graph, 0, 0, &igraph_i_largest_cliques_store, (void *) res));
     return IGRAPH_SUCCESS;
 }
 
@@ -997,7 +997,7 @@ igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_l
  */
 igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_int_t *no) {
     *no = 0;
-    return igraph_maximal_cliques_callback(graph, &igraph_i_maximal_cliques_store_max_size, (void*)no, 0, 0);
+    return igraph_maximal_cliques_callback(graph, 0, 0, &igraph_i_maximal_cliques_store_max_size, (void *) no);
 }
 
 static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
