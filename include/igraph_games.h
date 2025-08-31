@@ -23,6 +23,7 @@
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_graphicality.h"
 #include "igraph_matrix.h"
 #include "igraph_matrix_list.h"
 #include "igraph_random.h"
@@ -184,7 +185,7 @@ IGRAPH_EXPORT igraph_error_t igraph_sbm_game(
         const igraph_matrix_t *pref_matrix,
         const igraph_vector_int_t *block_sizes,
         igraph_bool_t directed,
-        igraph_bool_t loops, igraph_bool_t multiple);
+        igraph_edge_type_sw_t allowed_edge_types);
 
 IGRAPH_EXPORT igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                                    igraph_integer_t m, const igraph_vector_t *rho,
