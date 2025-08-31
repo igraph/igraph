@@ -162,12 +162,12 @@ IGRAPH_EXPORT igraph_error_t igraph_simple_interconnected_islands_game(
 
 IGRAPH_EXPORT igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                              const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
-                                             igraph_bool_t loops, igraph_bool_t multiple);
+                                             igraph_edge_type_sw_t allowed_edge_types);
 
 IGRAPH_EXPORT igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                                igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
                                                igraph_real_t exponent_out, igraph_real_t exponent_in,
-                                               igraph_bool_t loops, igraph_bool_t multiple,
+                                               igraph_edge_type_sw_t allowed_edge_types,
                                                igraph_bool_t finite_size_correction);
 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_chung_lu_game(igraph_t *graph,
