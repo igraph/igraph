@@ -196,7 +196,7 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
+igraph_error_t FUNCTION(igraph_i_maximal_cliques, SUFFIX)(
     const igraph_t *graph,
     RESTYPE,
     igraph_int_t min_size,
