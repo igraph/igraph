@@ -39,7 +39,7 @@ int main(void) {
     igraph_kary_tree(&g, 5, 2, IGRAPH_TREE_OUT);
     for (size_t j = 0; j < sizeof(params) / (2 * sizeof(params[0])); j++) {
         if (params[2 * j + 1] != 0) {
-            igraph_independent_vertex_sets(&g, &result, params[2 * j], params[2 * j + 1]);
+            igraph_independent_vertex_sets(&g, &result, params[2 * j], params[2 * j + 1], IGRAPH_UNLIMITED);
         } else {
             igraph_largest_independent_vertex_sets(&g, &result);
         }

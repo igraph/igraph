@@ -91,7 +91,8 @@ IGRAPH_EXPORT igraph_error_t igraph_weighted_clique_number(
 IGRAPH_EXPORT igraph_error_t igraph_independent_vertex_sets(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_int_t min_size, igraph_int_t max_size);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_largest_independent_vertex_sets(
         const igraph_t *graph,
