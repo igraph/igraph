@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -73,8 +73,8 @@
  * argument.
  */
 igraph_error_t igraph_watts_strogatz_game(
-        igraph_t *graph, igraph_integer_t dim,
-        igraph_integer_t size, igraph_integer_t nei,
+        igraph_t *graph, igraph_int_t dim,
+        igraph_int_t size, igraph_int_t nei,
         igraph_real_t p,
         igraph_edge_type_sw_t allowed_edge_types) {
 

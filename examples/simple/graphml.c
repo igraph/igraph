@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,9 @@ int main(void) {
     igraph_t graph;
     const char *infilename  = "test.graphml";
     const char *outfilename = "test2.graphml";
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Set up attribute handling, so graph attributes can be imported
      * from the GraphML file. */

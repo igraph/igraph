@@ -5,15 +5,15 @@
 #include "test_utilities.h"
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t s1 = igraph_vector_int_size(v1);
-    igraph_integer_t s2 = igraph_vector_int_size(v2);
+    igraph_int_t s1 = igraph_vector_int_size(v1);
+    igraph_int_t s2 = igraph_vector_int_size(v2);
     if (s1 < s2) {
         return -1;
     }
     if (s1 > s2) {
         return 1;
     }
-    for (igraph_integer_t i = 0; i < s1; ++i) {
+    for (igraph_int_t i = 0; i < s1; ++i) {
         if (VECTOR(*v1)[i] < VECTOR(*v2)[i]) {
             return -1;
         }
@@ -26,8 +26,8 @@ int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2
 
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_int_list_t *list) {
-    igraph_integer_t len = igraph_vector_int_list_size(list);
-    for (igraph_integer_t i = 0; i < len; ++i) {
+    igraph_int_t len = igraph_vector_int_list_size(list);
+    for (igraph_int_t i = 0; i < len; ++i) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(list, i));
     }
     igraph_vector_int_list_sort(list, &compare_vectors);
@@ -35,7 +35,7 @@ void canonicalize_list(igraph_vector_int_list_t *list) {
 
 /* Prints a clique vector along with its weight */
 void print_weighted_clique(const igraph_vector_int_t *clique, const igraph_vector_t *vertex_weights) {
-    igraph_integer_t i, n = igraph_vector_int_size(clique);
+    igraph_int_t i, n = igraph_vector_int_size(clique);
     igraph_real_t clique_weight = 0.0;
     for (i = 0; i < n; i++) {
         int v = VECTOR(*clique)[i];
@@ -47,7 +47,7 @@ void print_weighted_clique(const igraph_vector_int_t *clique, const igraph_vecto
 
 /* Prints a clique list and clears it */
 void print_and_clear_weighted_clique_list(igraph_vector_int_list_t *cliques, const igraph_vector_t *vertex_weights) {
-    igraph_integer_t i, count;
+    igraph_int_t i, count;
 
     canonicalize_list(cliques);
 
@@ -63,11 +63,11 @@ void print_and_clear_weighted_clique_list(igraph_vector_int_list_t *cliques, con
 int main(void) {
     igraph_t graph;
 
-    const igraph_integer_t n = 10; /* number of vertices in test graph */
+    const igraph_int_t n = 10; /* number of vertices in test graph */
 
     /* edges of the test graph */
     igraph_vector_int_t edges;
-    igraph_integer_t edge_data[] = {0, 1, 0, 6, 0, 7, 0, 8, 0, 9, 1, 2, 1, 3, 1, 4, 1,
+    igraph_int_t edge_data[] = {0, 1, 0, 6, 0, 7, 0, 8, 0, 9, 1, 2, 1, 3, 1, 4, 1,
                                  6, 1, 7, 1, 8, 1, 9, 2, 3, 2, 5, 2, 6, 2, 7, 2, 9,
                                  3, 5, 3, 6, 3, 7, 3, 9, 4, 5, 4, 6, 4, 7, 4, 9, 5,
                                  8, 6, 7, 6, 8, 7, 8, 8, 9
@@ -79,7 +79,7 @@ int main(void) {
     igraph_real_t vertex_weight_data[] = {3., 2., 3., 5., 2., 3., 1., 3., 5., 5.};
 
     igraph_vector_int_list_t result; /* result clique list */
-    igraph_integer_t count; /* number of cliques found */
+    igraph_int_t count; /* number of cliques found */
 
     igraph_real_t weighted_clique_no;
 

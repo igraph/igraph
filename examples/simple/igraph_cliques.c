@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t s1, s2, i;
+    igraph_int_t s1, s2, i;
 
     s1 = igraph_vector_int_size(v1);
     s2 = igraph_vector_int_size(v2);
@@ -47,15 +47,15 @@ int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2
 
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_int_list_t *list) {
-    igraph_integer_t len = igraph_vector_int_list_size(list);
-    for (igraph_integer_t i = 0; i < len; ++i) {
+    igraph_int_t len = igraph_vector_int_list_size(list);
+    for (igraph_int_t i = 0; i < len; ++i) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(list, i));
     }
     igraph_vector_int_list_sort(list, &compare_vectors);
 }
 
 struct userdata {
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vector_int_list_t *list;
 };
 
@@ -97,9 +97,12 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_list_t result;
     igraph_es_t es;
-    igraph_integer_t omega;
-    igraph_integer_t i, j, n;
+    igraph_int_t omega;
+    igraph_int_t i, j, n;
     const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -30,6 +30,9 @@ int main(void) {
     igraph_real_t weights_data_1[] = { 6, 7, 8, -4, -2, -3, 9, 2, 7 };
     igraph_real_t weights_data_2[] = { 6, 7, 2, -4, -2, -3, 9, 2, 7 };
     igraph_matrix_t res;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Graph with only positive weights */
     igraph_small(&g, 10, IGRAPH_DIRECTED,

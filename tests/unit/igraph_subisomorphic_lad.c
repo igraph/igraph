@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 void test_k_motifs(const igraph_t *graph, const int k, const int class_count, igraph_bool_t directed) {
     igraph_vector_t randesu_counts, lad_counts;
     igraph_bool_t equal;
-    igraph_integer_t i, n;
-    igraph_integer_t vcount;
+    igraph_int_t i, n;
+    igraph_int_t vcount;
     igraph_real_t expected_count;
 
     vcount = igraph_vcount(graph);
@@ -36,7 +36,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
     for (i = 0; i < n; i++) {
         igraph_t pattern;
         igraph_vector_int_list_t maps;
-        igraph_integer_t nAutomorphisms;
+        igraph_int_t nAutomorphisms;
 
         igraph_isoclass_create(&pattern, k, i, directed);
         igraph_vector_int_list_init(&maps, 0);
@@ -87,7 +87,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
 void test_motifs(void) {
     igraph_t graph;
-    igraph_integer_t count;
+    igraph_int_t count;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -106,7 +106,7 @@ void test_motifs(void) {
 
 void test_motifs_undirected(void) {
     igraph_t graph;
-    igraph_integer_t count;
+    igraph_int_t count;
 
     igraph_rng_seed(igraph_rng_default(), 137);
 

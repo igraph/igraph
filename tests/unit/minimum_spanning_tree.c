@@ -4,17 +4,17 @@
 #include "test_utilities.h"
 
 void rand_weights(const igraph_t *graph, igraph_vector_t *weights) {
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_resize(weights, ecount);
-    for (igraph_integer_t i=0; i < ecount; i++) {
+    for (igraph_int_t i=0; i < ecount; i++) {
         VECTOR(*weights)[i] = RNG_UNIF01();
     }
 }
 
 igraph_real_t total_weight(const igraph_vector_int_t *edges, const igraph_vector_t *weights) {
-    const igraph_integer_t n = igraph_vector_int_size(edges);
+    const igraph_int_t n = igraph_vector_int_size(edges);
     igraph_real_t sum = 0;
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         sum += VECTOR(*weights)[ VECTOR(*edges)[i] ];
     }
     return sum;
@@ -33,7 +33,7 @@ int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_vector_int_t edges;
-    igraph_integer_t no_comps, no_nodes;
+    igraph_int_t no_comps, no_nodes;
 
     igraph_rng_seed(igraph_rng_default(), 77685);
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -115,7 +115,7 @@ void test_optional_rngtypes(void) {
         igraph_rngtype_pcg64
     };
     igraph_vector_int_t expected;
-    igraph_integer_t expected_values[1][5] = {
+    igraph_int_t expected_values[1][5] = {
         { 61, 38, 73, 84, 67 }
     };
     int i;

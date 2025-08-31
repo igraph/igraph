@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,8 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_and_destroy(igraph_t *g, igraph_integer_t source, igraph_integer_t target, igraph_vconn_nei_t neighbors) {
-    igraph_integer_t res;
+void print_and_destroy(igraph_t *g, igraph_int_t source, igraph_int_t target, igraph_vconn_nei_t neighbors) {
+    igraph_int_t res;
     igraph_st_vertex_connectivity(g, &res, source, target, neighbors);
     printf("%" IGRAPH_PRId "\n", res);
     igraph_destroy(g);
@@ -27,7 +27,7 @@ void print_and_destroy(igraph_t *g, igraph_integer_t source, igraph_integer_t ta
 
 int main(void) {
     igraph_t g;
-    igraph_integer_t res;
+    igraph_int_t res;
 
     printf("graph with two unconnected vertices: ");
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, -1);

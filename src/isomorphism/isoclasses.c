@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -2547,10 +2547,10 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
  */
-igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
-    igraph_integer_t e;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_int_t *isoclass) {
+    igraph_int_t e;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     unsigned int idx, mul;
     const unsigned int *arr_idx, *arr_code;
     unsigned int code;
@@ -2605,7 +2605,7 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
         code |= arr_idx[idx];
     }
 
-    *isoclass = (igraph_integer_t) arr_code[code];
+    *isoclass = (igraph_int_t) arr_code[code];
 
     return IGRAPH_SUCCESS;
 }
@@ -2637,15 +2637,15 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass
  * and n is the number of vertices in \c vids.
  */
 igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
-                             igraph_integer_t *isoclass) {
-    igraph_integer_t subgraph_size = igraph_vector_int_size(vids);
+                             igraph_int_t *isoclass) {
+    igraph_int_t subgraph_size = igraph_vector_int_size(vids);
     igraph_vector_int_t neis;
 
     unsigned int mul, idx;
     const unsigned int *arr_idx, *arr_code;
     unsigned int code = 0;
 
-    igraph_integer_t i, j, s;
+    igraph_int_t i, j, s;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
@@ -2694,13 +2694,13 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vect
     }
 
     for (i = 0; i < subgraph_size; i++) {
-        igraph_integer_t from = VECTOR(*vids)[i];
+        igraph_int_t from = VECTOR(*vids)[i];
         IGRAPH_CHECK(igraph_neighbors(
             graph, &neis, from, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE
         ));
         s = igraph_vector_int_size(&neis);
         for (j = 0; j < s; j++) {
-            igraph_integer_t nei = VECTOR(neis)[j], to;
+            igraph_int_t nei = VECTOR(neis)[j], to;
             if (igraph_vector_int_search(vids, 0, nei, &to)) {
                 idx = (mul * i + to);
                 code |= arr_idx[idx];
@@ -2747,12 +2747,12 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vect
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph to create.
  */
-igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
-                           igraph_integer_t number, igraph_bool_t directed) {
+igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_int_t size,
+                           igraph_int_t number, igraph_bool_t directed) {
     igraph_vector_int_t edges;
     const unsigned int *classedges;
-    igraph_integer_t graphcount;
-    igraph_integer_t pos;
+    igraph_int_t graphcount;
+    igraph_int_t pos;
     unsigned int power;
     unsigned int code;
 
@@ -2878,7 +2878,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 }
 
 /* https://oeis.org/A000088 */
-static igraph_integer_t undirected_graph_counts[] = {
+static igraph_int_t undirected_graph_counts[] = {
     1, 1, 2, 4, 11, 34, 156, 1044, 12346, 274668, 12005168, 1018997864,
 #if IGRAPH_INTEGER_SIZE == 64
     165091172592, 50502031367952, 29054155657235488
@@ -2886,7 +2886,7 @@ static igraph_integer_t undirected_graph_counts[] = {
 };
 
 /* https://oeis.org/A000273 */
-static igraph_integer_t directed_graph_counts[] = {
+static igraph_int_t directed_graph_counts[] = {
     1, 1, 3, 16, 218, 9608, 1540944, 882033440,
 #if IGRAPH_INTEGER_SIZE == 64
     1793359192848, 13027956824399552
@@ -2903,7 +2903,7 @@ static igraph_integer_t directed_graph_counts[] = {
  * </para><para>
  * This function is meant to be used in conjunction with isoclass and motif finder
  * functions. It will only work for small \p n values for which the result is
- * represetable in an \type igraph_integer_t. For larger \p n values, an overflow
+ * represetable in an \type igraph_int_t. For larger \p n values, an overflow
  * error is raised.
  *
  * \param n The number of vertices.
@@ -2915,17 +2915,17 @@ static igraph_integer_t directed_graph_counts[] = {
  *
  * Time complexity: O(1).
  */
-igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count) {
+igraph_error_t igraph_graph_count(igraph_int_t n, igraph_bool_t directed, igraph_int_t *count) {
     if (n < 0) {
         IGRAPH_ERROR("Graph size must not be negative.", IGRAPH_EINVAL);
     }
     if (directed) {
-        if (n >= (igraph_integer_t) (sizeof directed_graph_counts / sizeof directed_graph_counts[0])) {
+        if (n >= (igraph_int_t) (sizeof directed_graph_counts / sizeof directed_graph_counts[0])) {
             IGRAPH_ERRORF("Graph size of % " IGRAPH_PRId " too large.", IGRAPH_EOVERFLOW, n);
         }
         *count = directed_graph_counts[n];
     } else {
-        if (n >= (igraph_integer_t) (sizeof undirected_graph_counts / sizeof undirected_graph_counts[0])) {
+        if (n >= (igraph_int_t) (sizeof undirected_graph_counts / sizeof undirected_graph_counts[0])) {
             IGRAPH_ERRORF("Graph size of % " IGRAPH_PRId " too large.", IGRAPH_EOVERFLOW, n);
         }
         *count = undirected_graph_counts[n];

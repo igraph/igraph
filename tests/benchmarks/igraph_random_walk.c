@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ int main(void) {
     igraph_vector_int_t vertices;
     igraph_vector_int_t edges;
     igraph_vector_t weights;
-    igraph_integer_t ec, i;
+    igraph_int_t ec, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
     BENCH_INIT();

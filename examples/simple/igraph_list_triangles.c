@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_t v;
     igraph_matrix_int_t result;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_full(&g, 5, 0, IGRAPH_NO_LOOPS);
 

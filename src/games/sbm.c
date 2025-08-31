@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -87,9 +87,9 @@ igraph_error_t igraph_sbm_game(
         IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW); \
     }} while (0)
 
-    const igraph_integer_t n = igraph_vector_int_sum(block_sizes);
-    const igraph_integer_t no_blocks = igraph_matrix_nrow(pref_matrix);
-    igraph_integer_t from, to, fromoff = 0;
+    const igraph_int_t n = igraph_vector_int_sum(block_sizes);
+    const igraph_int_t no_blocks = igraph_matrix_nrow(pref_matrix);
+    igraph_int_t from, to, fromoff = 0;
     igraph_real_t minp, maxp;
     igraph_vector_int_t edges;
     igraph_bool_t loops, multiple;
@@ -140,9 +140,9 @@ igraph_error_t igraph_sbm_game(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     for (from = 0; from < no_blocks; from++) {
-        igraph_integer_t fromsize = VECTOR(*block_sizes)[from];
-        igraph_integer_t start = directed ? 0 : from;
-        igraph_integer_t i, tooff = 0;
+        igraph_int_t fromsize = VECTOR(*block_sizes)[from];
+        igraph_int_t start = directed ? 0 : from;
+        igraph_int_t i, tooff = 0;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -150,7 +150,7 @@ igraph_error_t igraph_sbm_game(
             tooff += VECTOR(*block_sizes)[i];
         }
         for (to = start; to < no_blocks; to++) {
-            igraph_integer_t tosize = VECTOR(*block_sizes)[to];
+            igraph_int_t tosize = VECTOR(*block_sizes)[to];
 
             igraph_real_t prob = MATRIX(*pref_matrix, from, to);
             if (multiple) {
@@ -158,8 +158,8 @@ igraph_error_t igraph_sbm_game(
             }
 
             igraph_real_t maxedges;
-            igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
-            igraph_integer_t vfrom, vto;
+            igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_int_t is not suitable */
+            igraph_int_t vfrom, vto;
 
             if (directed && loops) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
@@ -281,20 +281,20 @@ igraph_error_t igraph_sbm_game(
  * \ref igraph_hsbm_list_game() for a more general version.
  */
 
-igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
-                     igraph_integer_t m, const igraph_vector_t *rho,
+igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
+                     igraph_int_t m, const igraph_vector_t *rho,
                      const igraph_matrix_t *C, igraph_real_t p) {
 
 #define CHECK_MAXEDGES() \
     do {if (maxedges > IGRAPH_MAX_EXACT_REAL) { \
         IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW); \
     }} while (0)
-    igraph_integer_t b, i, k = igraph_vector_size(rho);
+    igraph_int_t b, i, k = igraph_vector_size(rho);
     igraph_vector_t csizes;
     igraph_real_t sq_dbl_epsilon = sqrt(DBL_EPSILON);
-    igraph_integer_t no_blocks = n / m;
+    igraph_int_t no_blocks = n / m;
     igraph_vector_int_t edges;
-    igraph_integer_t offset = 0;
+    igraph_int_t offset = 0;
 
     if (n < 1) {
         IGRAPH_ERROR("`n' must be positive for HSBM", IGRAPH_EINVAL);
@@ -342,25 +342,25 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     /* Block models first */
 
     for (b = 0; b < no_blocks; b++) {
-        igraph_integer_t from, to, fromoff = 0;
+        igraph_int_t from, to, fromoff = 0;
 
         for (from = 0; from < k; from++) {
-            igraph_integer_t fromsize = VECTOR(csizes)[from];
-            igraph_integer_t i, tooff = 0;
+            igraph_int_t fromsize = VECTOR(csizes)[from];
+            igraph_int_t i, tooff = 0;
             for (i = 0; i < from; i++) {
                 tooff += VECTOR(csizes)[i];
             }
             for (to = from; to < k; to++) {
-                igraph_integer_t tosize = VECTOR(csizes)[to];
+                igraph_int_t tosize = VECTOR(csizes)[to];
                 igraph_real_t prob = MATRIX(*C, from, to);
                 igraph_real_t maxedges;
-                igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
+                igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_int_t is not suitable */
                 if (from != to) {
                     maxedges = ((igraph_real_t) fromsize) * tosize;
                     CHECK_MAXEDGES();
                     while (last < maxedges) {
-                        igraph_integer_t vto = floor(last / fromsize);
-                        igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
+                        igraph_int_t vto = floor(last / fromsize);
+                        igraph_int_t vfrom = last - ((igraph_real_t) vto) * fromsize;
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -370,8 +370,8 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                     maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0) / 2.0;
                     CHECK_MAXEDGES();
                     while (last < maxedges) {
-                        igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
-                        igraph_integer_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
+                        igraph_int_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
+                        igraph_int_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -390,11 +390,11 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     /* And now the rest, if not a special case */
 
     if (p == 1) {
-        igraph_integer_t fromoff = 0, tooff = m;
+        igraph_int_t fromoff = 0, tooff = m;
         for (b = 0; b < no_blocks; b++) {
-            igraph_integer_t fromsize = m;
-            igraph_integer_t tosize = n - tooff;
-            igraph_integer_t from, to;
+            igraph_int_t fromsize = m;
+            igraph_int_t tosize = n - tooff;
+            igraph_int_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + from));
@@ -405,16 +405,16 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
             tooff += m;
         }
     } else if (p > 0) {
-        igraph_integer_t fromoff = 0, tooff = m;
+        igraph_int_t fromoff = 0, tooff = m;
         for (b = 0; b < no_blocks; b++) {
-            igraph_integer_t fromsize = m;
-            igraph_integer_t tosize = n - tooff;
+            igraph_int_t fromsize = m;
+            igraph_int_t tosize = n - tooff;
             igraph_real_t maxedges = ((igraph_real_t) fromsize) * tosize;
             CHECK_MAXEDGES();
-            igraph_real_t last = RNG_GEOM(p);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
+            igraph_real_t last = RNG_GEOM(p);  /* RNG_GEOM may return NaN so igraph_int_t is not suitable */
             while (last < maxedges) {
-                igraph_integer_t vto = floor(last / fromsize);
-                igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
+                igraph_int_t vto = floor(last / fromsize);
+                igraph_int_t vfrom = last - ((igraph_real_t) vto) * fromsize;
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                 last += RNG_GEOM(p);
@@ -459,17 +459,17 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
  * \ref igraph_hsbm_game() for a simpler general version.
  */
 
-igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
                           const igraph_vector_int_t *mlist,
                           const igraph_vector_list_t *rholist,
                           const igraph_matrix_list_t *Clist,
                           igraph_real_t p) {
 
-    igraph_integer_t i, no_blocks = igraph_vector_list_size(rholist);
+    igraph_int_t i, no_blocks = igraph_vector_list_size(rholist);
     igraph_real_t sq_dbl_epsilon = sqrt(DBL_EPSILON);
     igraph_vector_int_t edges;
     igraph_vector_t csizes;
-    igraph_integer_t b, offset = 0;
+    igraph_int_t b, offset = 0;
 
     if (n < 1) {
         IGRAPH_ERROR("`n' must be positive for HSBM.", IGRAPH_EINVAL);
@@ -518,7 +518,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     for (i = 0; i < no_blocks; i++) {
         const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
-        igraph_integer_t k = igraph_vector_size(rho);
+        igraph_int_t k = igraph_vector_size(rho);
         if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
             IGRAPH_ERROR("All Bernoulli rate matrix dimensions must match `rho' "
                     "dimensions in HSBM.",
@@ -529,7 +529,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     for (i = 0; i < no_blocks; i++) {
         const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         igraph_real_t m = VECTOR(*mlist)[i];
-        igraph_integer_t j, k = igraph_vector_size(rho);
+        igraph_int_t j, k = igraph_vector_size(rho);
         for (j = 0; j < k; j++) {
             igraph_real_t s = VECTOR(*rho)[j] * m;
             if (fabs(round(s) - s) > sq_dbl_epsilon) {
@@ -544,11 +544,11 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     /* Block models first */
 
     for (b = 0; b < no_blocks; b++) {
-        igraph_integer_t from, to, fromoff = 0;
+        igraph_int_t from, to, fromoff = 0;
         const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, b);
         const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, b);
-        igraph_integer_t m = VECTOR(*mlist)[b];
-        igraph_integer_t k = igraph_vector_size(rho);
+        igraph_int_t m = VECTOR(*mlist)[b];
+        igraph_int_t k = igraph_vector_size(rho);
 
         IGRAPH_CHECK(igraph_vector_resize(&csizes, k));
         for (i = 0; i < k; i++) {
@@ -556,21 +556,21 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
         }
 
         for (from = 0; from < k; from++) {
-            igraph_integer_t fromsize = VECTOR(csizes)[from];
-            igraph_integer_t i, tooff = 0;
+            igraph_int_t fromsize = VECTOR(csizes)[from];
+            igraph_int_t i, tooff = 0;
             for (i = 0; i < from; i++) {
                 tooff += VECTOR(csizes)[i];
             }
             for (to = from; to < k; to++) {
-                igraph_integer_t tosize = VECTOR(csizes)[to];
+                igraph_int_t tosize = VECTOR(csizes)[to];
                 igraph_real_t prob = MATRIX(*C, from, to);
                 igraph_real_t maxedges;
-                igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
+                igraph_real_t last = RNG_GEOM(prob);  /* RNG_GEOM may return NaN so igraph_int_t is not suitable */
                 if (from != to) {
                     maxedges = ((igraph_real_t) fromsize) * tosize;
                     while (last < maxedges) {
-                        igraph_integer_t vto = floor(last / fromsize);
-                        igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
+                        igraph_int_t vto = floor(last / fromsize);
+                        igraph_int_t vfrom = last - ((igraph_real_t) vto) * fromsize;
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -579,8 +579,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                 } else { /* from==to */
                     maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0) / 2.0;
                     while (last < maxedges) {
-                        igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
-                        igraph_integer_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
+                        igraph_int_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
+                        igraph_int_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -599,11 +599,11 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     /* And now the rest, if not a special case */
 
     if (p == 1) {
-        igraph_integer_t fromoff = 0, tooff = VECTOR(*mlist)[0];
+        igraph_int_t fromoff = 0, tooff = VECTOR(*mlist)[0];
         for (b = 0; b < no_blocks; b++) {
-            igraph_integer_t fromsize = VECTOR(*mlist)[b];
-            igraph_integer_t tosize = n - tooff;
-            igraph_integer_t from, to;
+            igraph_int_t fromsize = VECTOR(*mlist)[b];
+            igraph_int_t tosize = n - tooff;
+            igraph_int_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + from));
@@ -616,15 +616,15 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
             }
         }
     } else if (p > 0) {
-        igraph_integer_t fromoff = 0, tooff = VECTOR(*mlist)[0];
+        igraph_int_t fromoff = 0, tooff = VECTOR(*mlist)[0];
         for (b = 0; b < no_blocks; b++) {
-            igraph_integer_t fromsize = VECTOR(*mlist)[b];
-            igraph_integer_t tosize = n - tooff;
+            igraph_int_t fromsize = VECTOR(*mlist)[b];
+            igraph_int_t tosize = n - tooff;
             igraph_real_t maxedges = ((igraph_real_t) fromsize) * tosize;
-            igraph_real_t last = RNG_GEOM(p);  /* RNG_GEOM may return NaN so igraph_integer_t is not suitable */
+            igraph_real_t last = RNG_GEOM(p);  /* RNG_GEOM may return NaN so igraph_int_t is not suitable */
             while (last < maxedges) {
-                igraph_integer_t vto = floor(last / fromsize);
-                igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
+                igraph_int_t vto = floor(last / fromsize);
+                igraph_int_t vfrom = last - ((igraph_real_t) vto) * fromsize;
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                 last += RNG_GEOM(p);

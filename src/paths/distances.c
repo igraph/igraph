@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -36,16 +36,16 @@
  * the single given vertex, -1 is returned in vid_ecc. */
 static igraph_error_t igraph_i_eccentricity_unweighted(
     const igraph_t *graph, igraph_vector_t *res, igraph_vs_t vids,
-    igraph_lazy_adjlist_t *adjlist, igraph_integer_t *vid_ecc,
+    igraph_lazy_adjlist_t *adjlist, igraph_int_t *vid_ecc,
     igraph_bool_t unconn
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
     igraph_vector_int_t counted;
-    igraph_integer_t i, mark = 1;
-    igraph_integer_t min_degree = 0;
+    igraph_int_t i, mark = 1;
+    igraph_int_t min_degree = 0;
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
@@ -61,8 +61,8 @@ static igraph_error_t igraph_i_eccentricity_unweighted(
          !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), mark++, i++) {
 
-        igraph_integer_t source;
-        igraph_integer_t nodes_reached = 1;
+        igraph_int_t source;
+        igraph_int_t nodes_reached = 1;
         source = IGRAPH_VIT_GET(vit);
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
@@ -71,16 +71,16 @@ static igraph_error_t igraph_i_eccentricity_unweighted(
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t act = igraph_dqueue_int_pop(&q);
-            igraph_integer_t dist = igraph_dqueue_int_pop(&q);
+            igraph_int_t act = igraph_dqueue_int_pop(&q);
+            igraph_int_t dist = igraph_dqueue_int_pop(&q);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(adjlist, act);
-            igraph_integer_t j, n;
+            igraph_int_t j, n;
 
             IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
             n = igraph_vector_int_size(neis);
             for (j = 0; j < n; j++) {
-                igraph_integer_t nei = VECTOR(*neis)[j];
+                igraph_int_t nei = VECTOR(*neis)[j];
                 if (VECTOR(counted)[nei] != mark) {
                     VECTOR(counted)[nei] = mark;
                     nodes_reached++;
@@ -128,16 +128,16 @@ static igraph_error_t igraph_i_eccentricity_unweighted(
  */
 static igraph_error_t igraph_i_eccentricity_dijkstra(
     const igraph_t *graph, const igraph_vector_t *weights, igraph_real_t *ecc,
-    igraph_integer_t vid_start, igraph_integer_t *vid_ecc, igraph_bool_t unconn,
+    igraph_int_t vid_start, igraph_int_t *vid_ecc, igraph_bool_t unconn,
     igraph_lazy_inclist_t *inclist
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_2wheap_t Q;
     igraph_vector_t vec_dist;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t degree_ecc, dist;
-    igraph_integer_t degree_i;
+    igraph_int_t degree_i;
     igraph_vector_int_t *neis;
 
     IGRAPH_VECTOR_INIT_FINALLY(&vec_dist, no_of_nodes);
@@ -149,9 +149,9 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
     igraph_2wheap_push_with_index(&Q, vid_start, -1.0);
 
     while (!igraph_2wheap_empty(&Q)) {
-        igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
+        igraph_int_t minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
-        igraph_integer_t nlen;
+        igraph_int_t nlen;
 
         VECTOR(vec_dist)[minnei] = mindist - 1.0;
 
@@ -160,8 +160,8 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            igraph_integer_t edge = VECTOR(*neis)[i];
-            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_int_t edge = VECTOR(*neis)[i];
+            igraph_int_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
             igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
@@ -260,9 +260,9 @@ igraph_error_t igraph_eccentricity(
 ) {
     igraph_lazy_inclist_t inclist;
     igraph_vit_t vit;
-    igraph_integer_t dump;
+    igraph_int_t dump;
     igraph_real_t ecc;
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
 
     if (weights == NULL) {
         igraph_lazy_adjlist_t adjlist;
@@ -346,7 +346,7 @@ igraph_error_t igraph_radius(
     const igraph_t *graph, const igraph_vector_t *weights,
     igraph_real_t *radius, igraph_neimode_t mode
 ) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes == 0) {
         *radius = IGRAPH_NAN;
@@ -363,16 +363,16 @@ igraph_error_t igraph_radius(
 }
 
 static igraph_error_t igraph_i_pseudo_diameter_unweighted(
-    const igraph_t *graph, igraph_real_t *diameter, igraph_integer_t vid_start,
-    igraph_integer_t *from, igraph_integer_t *to,
+    const igraph_t *graph, igraph_real_t *diameter, igraph_int_t vid_start,
+    igraph_int_t *from, igraph_int_t *to,
     igraph_bool_t directed, igraph_bool_t unconn
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
-    igraph_integer_t vid_ecc;
-    igraph_integer_t ito, ifrom;
+    igraph_int_t vid_ecc;
+    igraph_int_t ito, ifrom;
     igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
@@ -440,9 +440,9 @@ static igraph_error_t igraph_i_pseudo_diameter_unweighted(
     } else {
         igraph_vector_t ecc_out;
         igraph_vector_t ecc_in;
-        igraph_integer_t vid_ecc_in;
-        igraph_integer_t vid_ecc_out;
-        igraph_integer_t vid_end;
+        igraph_int_t vid_ecc_in;
+        igraph_int_t vid_ecc_out;
+        igraph_int_t vid_end;
         igraph_bool_t direction;
         igraph_lazy_adjlist_t adjlist_in;
         igraph_lazy_adjlist_t adjlist_out;
@@ -558,17 +558,17 @@ static igraph_error_t igraph_i_pseudo_diameter_unweighted(
 
 static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
     const igraph_t *graph, const igraph_vector_t *weights,
-    igraph_real_t *diameter, igraph_integer_t vid_start,
-    igraph_integer_t *from, igraph_integer_t *to,
+    igraph_real_t *diameter, igraph_int_t vid_start,
+    igraph_int_t *from, igraph_int_t *to,
     igraph_bool_t directed, igraph_bool_t unconn
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_real_t ecc_v;
     igraph_real_t ecc_u;
-    igraph_integer_t vid_ecc;
-    igraph_integer_t ito, ifrom;
+    igraph_int_t vid_ecc;
+    igraph_int_t ito, ifrom;
     igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
@@ -641,9 +641,9 @@ static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
     } else {
         igraph_real_t ecc_out;
         igraph_real_t ecc_in;
-        igraph_integer_t vid_ecc_in;
-        igraph_integer_t vid_ecc_out;
-        igraph_integer_t vid_end;
+        igraph_int_t vid_ecc_in;
+        igraph_int_t vid_ecc_out;
+        igraph_int_t vid_end;
         igraph_bool_t direction;
         igraph_lazy_inclist_t inclist_out;
         igraph_lazy_inclist_t inclist_in;
@@ -784,8 +784,8 @@ static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
  */
 igraph_error_t igraph_pseudo_diameter(
     const igraph_t *graph, const igraph_vector_t *weights,
-    igraph_real_t *diameter, igraph_integer_t vid_start,
-    igraph_integer_t *from, igraph_integer_t *to,
+    igraph_real_t *diameter, igraph_int_t vid_start,
+    igraph_int_t *from, igraph_int_t *to,
     igraph_bool_t directed, igraph_bool_t unconn
 ) {
     if (weights) {
@@ -850,8 +850,8 @@ igraph_error_t igraph_graph_center(
     /* igraph_eccentricity() does not return infinity or NaN, and the null graph
      * case was handled above, therefore calling vector_min() is safe. */
     igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
-    igraph_integer_t n = igraph_vector_size(&ecc);
-    for (igraph_integer_t i = 0; i < n; i++) {
+    igraph_int_t n = igraph_vector_size(&ecc);
+    for (igraph_int_t i = 0; i < n; i++) {
         if (igraph_cmp_epsilon(VECTOR(ecc)[i], min_eccentricity, eps) == 0) {
             IGRAPH_CHECK(igraph_vector_int_push_back(res, i));
         }

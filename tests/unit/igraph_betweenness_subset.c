@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -26,9 +26,9 @@ int main(void) {
     igraph_vector_t bet, bet2, weights;
     igraph_vector_int_t node_vec, source_vec, target_vec;
     igraph_vs_t vs, vs_source, vs_target;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
-    igraph_integer_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
+    igraph_int_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
                                 6, 9, 7, 20, 9, 10, 9, 20, 10, 19,
                                 11, 12, 11, 20, 12, 15, 13, 15,
@@ -115,7 +115,7 @@ int main(void) {
 
     n = igraph_vcount(&g);
     for (i = 0; i < n; i++) {
-        igraph_integer_t expected;
+        igraph_int_t expected;
 
         if (i >= 10911) {
             /* layer 5, in the subset. There are 199 shortest paths that
@@ -147,7 +147,7 @@ int main(void) {
         if (VECTOR(bet)[i] != expected) {
             printf(
                 "Invalid betweenness for vertex %" IGRAPH_PRId ", expected %" IGRAPH_PRId ", got %" IGRAPH_PRId "\n",
-                i, expected, (igraph_integer_t) VECTOR(bet)[i]
+                i, expected, (igraph_int_t) VECTOR(bet)[i]
             );
             break;
         }

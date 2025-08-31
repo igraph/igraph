@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -60,10 +60,10 @@
  *
  * \example examples/simple/igraph_atlas.c
  */
-igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number) {
+igraph_error_t igraph_atlas(igraph_t *graph, igraph_int_t number) {
 
     igraph_vector_int_t v;
-    const igraph_integer_t atlas_size =
+    const igraph_int_t atlas_size =
         sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_i_atlas_edges_pos[0]);
 
     if (number < 0 ||
@@ -74,9 +74,9 @@ igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number) {
                       atlas_size);
     }
 
-    igraph_integer_t pos = igraph_i_atlas_edges_pos[number];
-    igraph_integer_t n = igraph_i_atlas_edges[pos];
-    igraph_integer_t e = igraph_i_atlas_edges[pos + 1];
+    igraph_int_t pos = igraph_i_atlas_edges_pos[number];
+    igraph_int_t n = igraph_i_atlas_edges[pos];
+    igraph_int_t e = igraph_i_atlas_edges[pos + 1];
 
     IGRAPH_CHECK(igraph_create(graph,
                                igraph_vector_int_view(&v, igraph_i_atlas_edges + pos + 2, e * 2),

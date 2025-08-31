@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,13 +20,13 @@
 #include "test_utilities.h"
 
 void call_and_print(
-    igraph_t *graph, igraph_vector_t *weights, igraph_integer_t k,
-    igraph_integer_t from, igraph_integer_t to, igraph_neimode_t mode
+    igraph_t *graph, igraph_vector_t *weights, igraph_int_t k,
+    igraph_int_t from, igraph_int_t to, igraph_neimode_t mode
 ) {
     igraph_vector_int_list_t vertex_paths;
     igraph_vector_int_list_t edge_paths;
     igraph_vector_int_list_t paths_for_verification;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     igraph_vector_int_list_init(&vertex_paths, 0);
     igraph_vector_int_list_init(&edge_paths, 0);

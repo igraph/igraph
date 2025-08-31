@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -61,7 +61,7 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_
  * and initialized to 0. Example:
  *
  * int myiter = 0;
- * for (igraph_integer_t i=0; i < n; i++) {
+ * for (igraph_int_t i=0; i < n; i++) {
  *     // Allow for interruption every 1000th iteration
  *     IGRAPH_ALLOW_INTERRUPTION_LIMITED(myiter, 1000);
  * }

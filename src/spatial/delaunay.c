@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -40,8 +40,8 @@
  * \return Error code.
  */
 igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points) {
-    const igraph_integer_t dim = igraph_matrix_ncol(points);
-    const igraph_integer_t n = igraph_matrix_nrow(points);
+    const igraph_int_t dim = igraph_matrix_ncol(points);
+    const igraph_int_t n = igraph_matrix_nrow(points);
 
     /* Special case: we allow zero columns when there are zero rows, i.e. no points.
      * Some languages cannot represent size-zero matrices and length-zero point
@@ -60,9 +60,9 @@ igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points) {
 // Append an undirected clique of the indices in destination to source.
 // Assumes that source is an initialized vector.
 static igraph_error_t add_clique(igraph_vector_int_t *destination, const igraph_vector_int_t *source) {
-    igraph_integer_t num_points = igraph_vector_int_size(source);
-    for (igraph_integer_t a = 0; a < num_points - 1; a++) {
-        for (igraph_integer_t b = a + 1; b < num_points; b++) {
+    igraph_int_t num_points = igraph_vector_int_size(source);
+    for (igraph_int_t a = 0; a < num_points - 1; a++) {
+        for (igraph_int_t b = a + 1; b < num_points; b++) {
             IGRAPH_CHECK(igraph_vector_int_push_back(destination, VECTOR(*source)[a]));
             IGRAPH_CHECK(igraph_vector_int_push_back(destination, VECTOR(*source)[b]));
         }
@@ -83,7 +83,7 @@ static void destroy_qhull(qhT *qh) {
 /* In the 1D case we simply connect points in sorted order.
  * This function assumes that there is at least one point. */
 static igraph_error_t delaunay_edges_1d(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
-    const igraph_integer_t numpoints = igraph_matrix_nrow(points);
+    const igraph_int_t numpoints = igraph_matrix_nrow(points);
     igraph_vector_t coords;
     igraph_vector_int_t order;
 
@@ -96,9 +96,9 @@ static igraph_error_t delaunay_edges_1d(igraph_vector_int_t *edges, const igraph
 
     IGRAPH_CHECK(igraph_vector_int_resize(edges, 2*(numpoints-1)));
 
-    for (igraph_integer_t i=0; i < numpoints-1; i++) {
-        igraph_integer_t from = VECTOR(order)[i];
-        igraph_integer_t to   = VECTOR(order)[i+1];
+    for (igraph_int_t i=0; i < numpoints-1; i++) {
+        igraph_int_t from = VECTOR(order)[i];
+        igraph_int_t to   = VECTOR(order)[i+1];
         VECTOR(*edges)[2*i] = from;
         VECTOR(*edges)[2*i + 1] = to;
         if (VECTOR(coords)[from] == VECTOR(coords)[to]) {
@@ -113,8 +113,8 @@ static igraph_error_t delaunay_edges_1d(igraph_vector_int_t *edges, const igraph
 }
 
 igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
-    const igraph_integer_t numpoints = igraph_matrix_nrow(points) ;
-    const igraph_integer_t dim = igraph_matrix_ncol(points);
+    const igraph_int_t numpoints = igraph_matrix_nrow(points) ;
+    const igraph_int_t dim = igraph_matrix_ncol(points);
     int exitcode;
     qhT qh_qh; /* Qhull's data structure. First argument of most Qhull calls. */
     qhT *qh = &qh_qh; /* Convenience pointer. */
@@ -139,7 +139,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         IGRAPH_ERRORF("Not enough points to create simplex, need at least %" IGRAPH_PRId ".", IGRAPH_EINVAL, dim);
     }
 
-    /* Prevent overflow in igraph_integer_t -> int conversions below.
+    /* Prevent overflow in igraph_int_t -> int conversions below.
      * Note that Qhull will likely already fail for a much smaller point count. */
     if (numpoints > INT_MAX) {
         IGRAPH_ERROR("Too many points for Qhull.", IGRAPH_EOVERFLOW);
@@ -194,7 +194,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
 
         FORALLfacets {
             if (!facet->upperdelaunay) {
-                igraph_integer_t curr_vert = 0;
+                igraph_int_t curr_vert = 0;
                 FOREACHvertex_(facet->vertices) {
                     VECTOR(simplex)[curr_vert++] = qh_pointid(qh, vertex->point);
                 }
@@ -206,11 +206,11 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
         /* Check if there are any points/vertices that do not appear in the edge list.
          * This happens when there are duplicate points, as Qhull ignores one of them.
          * We raise an error when there are duplicates. */
-        igraph_integer_t edges_size = igraph_vector_int_size(edges);
+        igraph_int_t edges_size = igraph_vector_int_size(edges);
         igraph_bitset_t in_edge_list;
 
         IGRAPH_BITSET_INIT_FINALLY(&in_edge_list, numpoints);
-        for (igraph_integer_t i = 0; i < edges_size; i++) {
+        for (igraph_int_t i = 0; i < edges_size; i++) {
             IGRAPH_BIT_SET(in_edge_list, VECTOR(*edges)[i]);
         }
         if (igraph_bitset_is_any_zero(&in_edge_list)) {
@@ -268,7 +268,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
  */
 igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points) {
     igraph_vector_int_t edges;
-    const igraph_integer_t numpoints = igraph_matrix_nrow(points);
+    const igraph_int_t numpoints = igraph_matrix_nrow(points);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_i_delaunay_edges(&edges, points));

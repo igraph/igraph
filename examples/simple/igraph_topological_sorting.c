@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@
 int main(void) {
     igraph_t graph;
     igraph_vector_int_t res;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Test graph taken from http://en.wikipedia.org/wiki/Topological_sorting
      * @ 05.03.2006 */

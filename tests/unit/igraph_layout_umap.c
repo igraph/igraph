@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 /* Helper function, computes layout span of a subset of vertices */
 igraph_real_t get_layout_span(const igraph_matrix_t *layout, int i_start, int i_end) {
     igraph_real_t dx, dy, dz, xmin, xmax, ymin, ymax, zmin, zmax, spanmax;
-    igraph_integer_t ndim = igraph_matrix_ncol(layout);
+    igraph_int_t ndim = igraph_matrix_ncol(layout);
 
     if (i_start >= i_end)
         return -1;
@@ -62,10 +62,10 @@ void check_graph_largeunion(
 
     /* sizes of the full subgraphs are 50, 70, 90 */
     igraph_real_t distlim;
-    igraph_integer_t nrow = igraph_matrix_nrow(layout);
+    igraph_int_t nrow = igraph_matrix_nrow(layout);
     igraph_error_t err;
     int nerr = 0;
-    igraph_integer_t nvertices = 0;
+    igraph_int_t nvertices = 0;
 
     /* each cluster should occupy no more than say 50% of the layout */
     distlim = 0.2 * get_layout_span(layout, 0, nrow);
@@ -88,10 +88,10 @@ void check_graph_twoclusters_weights(
         const igraph_vector_t *weights,
         const igraph_vector_t *distances) {
     int nerr = 0;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t weight;
-    igraph_integer_t nc = igraph_vector_size(weights);
-    igraph_integer_t nd;
+    igraph_int_t nc = igraph_vector_size(weights);
+    igraph_int_t nd;
 
     if (distances == NULL) {
         for (i = 0; i < nc; i++) {
@@ -129,7 +129,7 @@ void check_graph_twoclusters_weights(
 void check_graph_twoclusters(const igraph_matrix_t *layout) {
     /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
     igraph_real_t xm, ym, zm, dx, dy, dz, dist, distmax;
-    igraph_integer_t ndim = igraph_matrix_ncol(layout);
+    igraph_int_t ndim = igraph_matrix_ncol(layout);
 
     int nerr = 0;
 
@@ -179,9 +179,9 @@ void check_graph_twoclusters(const igraph_matrix_t *layout) {
 
 
 void check_graph_singleton(const igraph_matrix_t *layout) {
-    igraph_integer_t nrows = igraph_matrix_nrow(layout);
-    igraph_integer_t ncols = igraph_matrix_ncol(layout);
-    igraph_integer_t nerr = 0;
+    igraph_int_t nrows = igraph_matrix_nrow(layout);
+    igraph_int_t ncols = igraph_matrix_ncol(layout);
+    igraph_int_t nerr = 0;
 
     if (nrows != 1) {
         printf("Singleton graph layout has %d rows instead of 1.\n", (int)nrows);

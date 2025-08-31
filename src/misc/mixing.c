@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -102,10 +102,10 @@ igraph_error_t igraph_assortativity_nominal(
         igraph_real_t *res,
         igraph_bool_t directed, igraph_bool_t normalized) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_real_t no_of_edges_real = (igraph_real_t) no_of_edges;   /* for divisions */
-    igraph_integer_t no_of_types;
+    igraph_int_t no_of_types;
     igraph_vector_int_t ai, bi, eii;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
 
@@ -135,11 +135,11 @@ igraph_error_t igraph_assortativity_nominal(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&bi, no_of_types);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eii, no_of_types);
 
-    for (igraph_integer_t e = 0; e < no_of_edges; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
-        igraph_integer_t from_type = VECTOR(*types)[from];
-        igraph_integer_t to_type = VECTOR(*types)[to];
+    for (igraph_int_t e = 0; e < no_of_edges; e++) {
+        igraph_int_t from = IGRAPH_FROM(graph, e);
+        igraph_int_t to = IGRAPH_TO(graph, e);
+        igraph_int_t from_type = VECTOR(*types)[from];
+        igraph_int_t to_type = VECTOR(*types)[to];
 
         VECTOR(ai)[from_type] += 1;
         VECTOR(bi)[to_type] += 1;
@@ -155,7 +155,7 @@ igraph_error_t igraph_assortativity_nominal(
         }
     }
 
-    for (igraph_integer_t i = 0; i < no_of_types; i++) {
+    for (igraph_int_t i = 0; i < no_of_types; i++) {
         sumaibi += (VECTOR(ai)[i] / no_of_edges_real) * (VECTOR(bi)[i] / no_of_edges_real);
         sumeii  += (VECTOR(eii)[i] / no_of_edges_real);
     }
@@ -276,8 +276,8 @@ igraph_error_t igraph_assortativity(
         igraph_real_t *res,
         igraph_bool_t directed, igraph_bool_t normalized) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_real_t total_weight;
 
     directed = directed && igraph_is_directed(graph);
@@ -307,9 +307,9 @@ igraph_error_t igraph_assortativity(
         igraph_real_t num1 = 0.0, num2 = 0.0, den1 = 0.0;
 
         if (weights) {
-            for (igraph_integer_t e = 0; e < no_of_edges; e++) {
-                igraph_integer_t from = IGRAPH_FROM(graph, e);
-                igraph_integer_t to = IGRAPH_TO(graph, e);
+            for (igraph_int_t e = 0; e < no_of_edges; e++) {
+                igraph_int_t from = IGRAPH_FROM(graph, e);
+                igraph_int_t to = IGRAPH_TO(graph, e);
                 igraph_real_t from_value = VECTOR(*values)[from];
                 igraph_real_t to_value = VECTOR(*values)[to];
                 igraph_real_t w = VECTOR(*weights)[e];
@@ -321,9 +321,9 @@ igraph_error_t igraph_assortativity(
                 }
             }
         } else {
-            for (igraph_integer_t e = 0; e < no_of_edges; e++) {
-                igraph_integer_t from = IGRAPH_FROM(graph, e);
-                igraph_integer_t to = IGRAPH_TO(graph, e);
+            for (igraph_int_t e = 0; e < no_of_edges; e++) {
+                igraph_int_t from = IGRAPH_FROM(graph, e);
+                igraph_int_t to = IGRAPH_TO(graph, e);
                 igraph_real_t from_value = VECTOR(*values)[from];
                 igraph_real_t to_value = VECTOR(*values)[to];
 
@@ -358,9 +358,9 @@ igraph_error_t igraph_assortativity(
         }
 
         if (weights) {
-            for (igraph_integer_t e = 0; e < no_of_edges; e++) {
-                igraph_integer_t from = IGRAPH_FROM(graph, e);
-                igraph_integer_t to = IGRAPH_TO(graph, e);
+            for (igraph_int_t e = 0; e < no_of_edges; e++) {
+                igraph_int_t from = IGRAPH_FROM(graph, e);
+                igraph_int_t to = IGRAPH_TO(graph, e);
                 igraph_real_t from_value = VECTOR(*values)[from];
                 igraph_real_t to_value = VECTOR(*values_in)[to];
                 igraph_real_t w = VECTOR(*weights)[e];
@@ -374,9 +374,9 @@ igraph_error_t igraph_assortativity(
                 }
             }
         } else {
-            for (igraph_integer_t e = 0; e < no_of_edges; e++) {
-                igraph_integer_t from = IGRAPH_FROM(graph, e);
-                igraph_integer_t to = IGRAPH_TO(graph, e);
+            for (igraph_int_t e = 0; e < no_of_edges; e++) {
+                igraph_int_t from = IGRAPH_FROM(graph, e);
+                igraph_int_t to = IGRAPH_TO(graph, e);
                 igraph_real_t from_value = VECTOR(*values)[from];
                 igraph_real_t to_value = VECTOR(*values_in)[to];
 
@@ -445,7 +445,7 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                 igraph_bool_t directed) {
 
     directed = directed && igraph_is_directed(graph);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     /* This function uses igraph_strength() instead of igraph_degree() in order to obtain
      * a vector of reals instead of a vector of integers. */
@@ -528,16 +528,16 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
 igraph_error_t igraph_joint_degree_matrix(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_matrix_t *jdm,
-        igraph_integer_t max_out_degree, igraph_integer_t max_in_degree) {
+        igraph_int_t max_out_degree, igraph_int_t max_in_degree) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t eit;
-    igraph_integer_t eid;
-    igraph_integer_t v1id;
-    igraph_integer_t v2id;
-    igraph_integer_t v1deg;
-    igraph_integer_t v2deg;
+    igraph_int_t eid;
+    igraph_int_t v1id;
+    igraph_int_t v2id;
+    igraph_int_t v1deg;
+    igraph_int_t v2deg;
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
@@ -586,7 +586,7 @@ igraph_error_t igraph_joint_degree_matrix(
 
     } else {
         igraph_vector_int_t degrees;
-        igraph_integer_t maxdeg;
+        igraph_int_t maxdeg;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
@@ -651,12 +651,12 @@ static igraph_error_t mixing_matrix(
         igraph_matrix_t *p,
         const igraph_vector_int_t *from_types, const igraph_vector_int_t *to_types,
         igraph_bool_t directed_neighbors, igraph_bool_t normalized,
-        igraph_integer_t max_from_type, igraph_integer_t max_to_type,
+        igraph_int_t max_from_type, igraph_int_t max_to_type,
         igraph_bool_t check_types) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nrow, ncol;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t nrow, ncol;
     igraph_real_t sum;
     igraph_bool_t negative_weight;
 
@@ -699,7 +699,7 @@ static igraph_error_t mixing_matrix(
     }
 
     if (check_types && no_of_nodes > 0) {
-        igraph_integer_t min;
+        igraph_int_t min;
 
         min = igraph_vector_int_min(from_types);
         if (min < 0) {
@@ -719,11 +719,11 @@ static igraph_error_t mixing_matrix(
 
     sum = 0;
     negative_weight = false;
-    for (igraph_integer_t eid=0; eid < no_of_edges; eid++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, eid);
-        igraph_integer_t to   = IGRAPH_TO(graph, eid);
-        igraph_integer_t from_type = VECTOR(*from_types)[from];
-        igraph_integer_t to_type   = VECTOR(*to_types)[to];
+    for (igraph_int_t eid=0; eid < no_of_edges; eid++) {
+        igraph_int_t from = IGRAPH_FROM(graph, eid);
+        igraph_int_t to   = IGRAPH_TO(graph, eid);
+        igraph_int_t from_type = VECTOR(*from_types)[from];
+        igraph_int_t to_type   = VECTOR(*to_types)[to];
         igraph_real_t w = weights ? VECTOR(*weights)[eid] : 1;
 
         if (from_type >= nrow || to_type >= ncol) {
@@ -855,9 +855,9 @@ igraph_error_t igraph_joint_degree_distribution(
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors,
         igraph_bool_t normalized,
-        igraph_integer_t max_from_degree, igraph_integer_t max_to_degree) {
+        igraph_int_t max_from_degree, igraph_int_t max_to_degree) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t *deg_from, *deg_to, deg_out, deg_in, deg_all;
 
     /* Make sure directionality parameters are consistent for undirected graphs. */

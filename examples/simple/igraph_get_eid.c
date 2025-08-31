@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,8 +20,11 @@
 
 int main(void) {
     igraph_t graph;
-    igraph_integer_t eid;
+    igraph_int_t eid;
     igraph_vector_int_t hist;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* DIRECTED */
 
@@ -29,7 +32,7 @@ int main(void) {
 
     igraph_vector_int_init(&hist, 9);
 
-    for (igraph_integer_t i = 1; i < 10; i++) {
+    for (igraph_int_t i = 1; i < 10; i++) {
         igraph_get_eid(&graph, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ true);
         VECTOR(hist)[eid] = 1;
     }
@@ -45,7 +48,7 @@ int main(void) {
 
     igraph_vector_int_init(&hist, 9);
 
-    for (igraph_integer_t i = 1; i < 10; i++) {
+    for (igraph_int_t i = 1; i < 10; i++) {
         igraph_get_eid(&graph, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ true);
         VECTOR(hist)[eid] += 1;
         igraph_get_eid(&graph, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ true);

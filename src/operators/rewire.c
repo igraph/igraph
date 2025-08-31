@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -38,10 +38,10 @@
 #define REWIRE_ADJLIST_THRESHOLD 10
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
-igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_bool_t loops, igraph_bool_t use_adjlist) {
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t n, igraph_bool_t loops, igraph_bool_t use_adjlist) {
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
     char message[256];
-    igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
+    igraph_int_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
     igraph_vector_int_t eids;
     igraph_vector_int_t edgevec, alledges;
     const igraph_bool_t directed = igraph_is_directed(graph);
@@ -246,7 +246,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_bool_
  *
  * Time complexity: TODO.
  */
-igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_edge_type_sw_t allowed_edge_types) {
+igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t n, igraph_edge_type_sw_t allowed_edge_types) {
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
 
     if ((allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ||

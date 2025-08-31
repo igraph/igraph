@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -23,9 +23,11 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t orig, sub, diff;
     igraph_vector_int_t v;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Subtract from itself */
     printf("subtract itself\n");

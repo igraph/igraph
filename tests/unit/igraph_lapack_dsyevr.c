@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -25,8 +25,8 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
                        const igraph_matrix_t *vectors, igraph_real_t tol) {
     igraph_vector_t v, y;
     int i, j;
-    igraph_integer_t m = igraph_matrix_ncol(vectors);
-    igraph_integer_t n = igraph_matrix_nrow(A);
+    igraph_int_t m = igraph_matrix_ncol(vectors);
+    igraph_int_t n = igraph_matrix_nrow(A);
 
     if (igraph_matrix_ncol(A) != n)       {
         return 1;

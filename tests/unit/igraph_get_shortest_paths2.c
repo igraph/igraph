@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -25,14 +25,14 @@
 #include "test_utilities.h"
 
 int main(void) {
-    const igraph_integer_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
+    const igraph_int_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
                                     3, 2, 4, 2, 5, 2
                                   };
     igraph_t g;
     igraph_vector_int_t edgev;
     igraph_vector_int_list_t resvertices, resedges;
     igraph_vector_int_t parents, inbound_edges;
-    igraph_integer_t vcount, i;
+    igraph_int_t vcount, i;
 
     igraph_vector_int_view(&edgev, edges, sizeof(edges) / sizeof(edges[0]));
     vcount = igraph_vector_int_max(&edgev) + 1;

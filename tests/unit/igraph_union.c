@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -81,7 +81,7 @@ int main(void) {
 
     printf("\nNon-empty directed graph list 1:\n");
     igraph_vector_ptr_init(&glist, 10);
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = IGRAPH_CALLOC(1, igraph_t);
         igraph_small(VECTOR(glist)[i], 0, IGRAPH_DIRECTED,
                      0, 1, 1, 0, -1);
@@ -89,7 +89,7 @@ int main(void) {
 
     igraph_union_many(&uni, &glist, &edgemaps);
 
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         igraph_destroy(VECTOR(glist)[i]);
         IGRAPH_FREE(VECTOR(glist)[i]);
     }
@@ -102,7 +102,7 @@ int main(void) {
     printf("\nNon-empty directed graph list 2:\n");
 
     igraph_vector_ptr_init(&glist, 10);
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = IGRAPH_CALLOC(1, igraph_t);
         igraph_vector_int_init(&edges, 4);
         VECTOR(edges)[0] = i; VECTOR(edges)[1] = i+1;
@@ -114,7 +114,7 @@ int main(void) {
     igraph_union_many(&uni, &glist, &edgemaps);
     igraph_write_graph_edgelist(&uni, stdout);
 
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         igraph_destroy(VECTOR(glist)[i]);
         IGRAPH_FREE(VECTOR(glist)[i]);
     }
@@ -127,7 +127,7 @@ int main(void) {
     printf("\nUndirected graph list:\n");
 
     igraph_vector_ptr_init(&glist, 10);
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = IGRAPH_CALLOC(1, igraph_t);
         igraph_vector_int_init(&edges, 4);
         VECTOR(edges)[0] = i; VECTOR(edges)[1] = i+1;
@@ -139,7 +139,7 @@ int main(void) {
     igraph_union_many(&uni, &glist, &edgemaps);
     igraph_write_graph_edgelist(&uni, stdout);
 
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         igraph_destroy(VECTOR(glist)[i]);
         IGRAPH_FREE(VECTOR(glist)[i]);
     }

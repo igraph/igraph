@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -55,23 +55,23 @@
 igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
     igraph_vector_int_t degree;
     igraph_vector_int_t edges;
-    igraph_integer_t n;
-    igraph_integer_t i, k;
-    igraph_integer_t u, v; /* vertices */
-    igraph_integer_t ec;
+    igraph_int_t n;
+    igraph_int_t i, k;
+    igraph_int_t u, v; /* vertices */
+    igraph_int_t ec;
 
     IGRAPH_SAFE_ADD(igraph_vector_int_size(prufer), 2, &n);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, n); /* initializes vector to zeros */
     {
-        igraph_integer_t no_of_edges2;
+        igraph_int_t no_of_edges2;
         IGRAPH_SAFE_MULT(n - 1, 2, &no_of_edges2);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
     }
 
     /* build out-degree vector (i.e. number of child vertices) and verify Prufer sequence */
     for (i = 0; i < n - 2; ++i) {
-        igraph_integer_t w = VECTOR(*prufer)[i];
+        igraph_int_t w = VECTOR(*prufer)[i];
         if (w >= n || w < 0) {
             IGRAPH_ERROR("Invalid Prufer sequence.", IGRAPH_EINVAL);
         }

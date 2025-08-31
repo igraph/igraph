@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ IGRAPH_EXPORT igraph_error_t igraph_reachability(
             const igraph_t *graph,
             igraph_vector_int_t *membership,
             igraph_vector_int_t *csize,
-            igraph_integer_t *no_of_components,
+            igraph_int_t *no_of_components,
             igraph_bitset_list_t *reach,
             igraph_neimode_t mode);
 

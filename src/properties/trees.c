@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -58,10 +58,10 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                        igraph_neimode_t mode, const igraph_vector_int_t *roots,
                        igraph_vector_int_t *vertex_index) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_roots = igraph_vector_int_size(roots);
-    igraph_integer_t tree_vertex_count = no_of_nodes;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_roots = igraph_vector_int_size(roots);
+    igraph_int_t tree_vertex_count = no_of_nodes;
 
     igraph_vector_int_t edges;
     igraph_bitset_t seen_vertices;
@@ -70,7 +70,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
 
-    igraph_integer_t v_ptr = no_of_nodes;
+    igraph_int_t v_ptr = no_of_nodes;
 
     if (! igraph_vector_int_isininterval(roots, 0, no_of_nodes-1)) {
         IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVVID);
@@ -87,24 +87,24 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
         IGRAPH_CHECK(igraph_vector_int_range(vertex_index, 0, no_of_nodes));
     }
 
-    for (igraph_integer_t r = 0; r < no_of_roots; r++) {
+    for (igraph_int_t r = 0; r < no_of_roots; r++) {
 
-        igraph_integer_t root = VECTOR(*roots)[r];
+        igraph_int_t root = VECTOR(*roots)[r];
         IGRAPH_BIT_SET(seen_vertices, root);
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, root));
 
         while (!igraph_dqueue_int_empty(&Q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
+            igraph_int_t actnode = igraph_dqueue_int_pop(&Q);
 
             IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode, IGRAPH_LOOPS));
 
-            igraph_integer_t n = igraph_vector_int_size(&neis);
-            for (igraph_integer_t i = 0; i < n; i++) {
+            igraph_int_t n = igraph_vector_int_size(&neis);
+            for (igraph_int_t i = 0; i < n; i++) {
 
-                igraph_integer_t edge = VECTOR(neis)[i];
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to = IGRAPH_TO(graph, edge);
-                igraph_integer_t nei = IGRAPH_OTHER(graph, edge, actnode);
+                igraph_int_t edge = VECTOR(neis)[i];
+                igraph_int_t from = IGRAPH_FROM(graph, edge);
+                igraph_int_t to = IGRAPH_TO(graph, edge);
+                igraph_int_t nei = IGRAPH_OTHER(graph, edge, actnode);
 
                 if (! IGRAPH_BIT_TEST(seen_edges, edge)) {
 
@@ -157,11 +157,11 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 /* igraph_is_tree -- check if a graph is a tree */
 
 /* count the number of vertices reachable from the root */
-static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode, igraph_integer_t *visited_count) {
+static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int_t root, igraph_neimode_t mode, igraph_int_t *visited_count) {
     igraph_stack_int_t stack;
     igraph_bitset_t visited;
     igraph_vector_int_t neighbors;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
 
@@ -176,8 +176,8 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
     IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
 
     while (! igraph_stack_int_empty(&stack)) {
-        igraph_integer_t u;
-        igraph_integer_t ncount;
+        igraph_int_t u;
+        igraph_int_t ncount;
 
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);
@@ -190,7 +190,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
         IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, u, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         ncount = igraph_vector_int_size(&neighbors);
         for (i = 0; i < ncount; ++i) {
-            igraph_integer_t v = VECTOR(neighbors)[i];
+            igraph_int_t v = VECTOR(neighbors)[i];
             if (! IGRAPH_BIT_TEST(visited, v)) {
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
             }
@@ -248,12 +248,12 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  *
  * \example examples/simple/igraph_kary_tree.c
  */
-igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_int_t *root, igraph_neimode_t mode) {
     igraph_bool_t is_tree = false;
     igraph_bool_t treat_as_undirected = !igraph_is_directed(graph) || mode == IGRAPH_ALL;
-    igraph_integer_t iroot = 0;
-    igraph_integer_t visited_count;
-    igraph_integer_t vcount, ecount;
+    igraph_int_t iroot = 0;
+    igraph_int_t visited_count;
+    igraph_int_t vcount, ecount;
 
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
@@ -325,7 +325,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     case IGRAPH_IN:
     case IGRAPH_OUT: {
         igraph_vector_int_t degree;
-        igraph_integer_t i;
+        igraph_int_t i;
 
         IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
@@ -400,11 +400,11 @@ success:
  * including 'root' itself.
  */
 static igraph_error_t igraph_i_is_forest_visitor(
-        const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+        const igraph_t *graph, igraph_int_t root, igraph_neimode_t mode,
         igraph_bitset_t *visited, igraph_stack_int_t *stack, igraph_vector_int_t *neis,
-        igraph_integer_t *visited_count, igraph_bool_t *res)
+        igraph_int_t *visited_count, igraph_bool_t *res)
 {
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_stack_int_clear(stack);
 
@@ -412,8 +412,8 @@ static igraph_error_t igraph_i_is_forest_visitor(
     IGRAPH_CHECK(igraph_stack_int_push(stack, root));
 
     while (! igraph_stack_int_empty(stack)) {
-        igraph_integer_t u;
-        igraph_integer_t ncount;
+        igraph_int_t u;
+        igraph_int_t ncount;
 
         /* Take a vertex from stack and check if it is already visited.
          * If yes, then we found a cycle: the graph is not a forest.
@@ -434,7 +434,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
         ncount = igraph_vector_int_size(neis);
 
         for (i = 0; i < ncount; ++i) {
-            igraph_integer_t v = VECTOR(*neis)[i];
+            igraph_int_t v = VECTOR(*neis)[i];
 
             if (mode == IGRAPH_ALL) {
                 /* In the undirected case, we avoid returning to the predecessor
@@ -586,9 +586,9 @@ static igraph_error_t igraph_i_is_forest(
     igraph_bitset_t visited;
     igraph_vector_int_t neis;
     igraph_stack_int_t stack;
-    igraph_integer_t visited_count = 0;
-    igraph_integer_t vcount, ecount;
-    igraph_integer_t v;
+    igraph_int_t visited_count = 0;
+    igraph_int_t vcount, ecount;
+    igraph_int_t v;
     igraph_bool_t result;
 
     vcount = igraph_vcount(graph);

@@ -29,37 +29,37 @@ namespace gengraph {
 class degree_sequence {
 
 private:
-    igraph_integer_t n;
-    igraph_integer_t *deg;
-    igraph_integer_t total;
+    igraph_int_t n;
+    igraph_int_t *deg;
+    igraph_int_t total;
 
 public :
     // #vertices
-    inline igraph_integer_t size() {
+    inline igraph_int_t size() {
         return n;
     };
-    inline igraph_integer_t sum() {
+    inline igraph_int_t sum() {
         return total;
     };
-    inline igraph_integer_t operator[](igraph_integer_t i) {
+    inline igraph_int_t operator[](igraph_int_t i) {
         return deg[i];
     };
-    inline igraph_integer_t *seq() {
+    inline igraph_int_t *seq() {
         return deg;
     };
-    inline void assign(igraph_integer_t n0, igraph_integer_t* d0) {
+    inline void assign(igraph_int_t n0, igraph_int_t* d0) {
         n = n0;
         deg = d0;
     };
-    inline igraph_integer_t dmax() {
-        igraph_integer_t dm = deg[0];
-        for (igraph_integer_t i = 1; i < n; i++) if (deg[i] > dm) {
+    inline igraph_int_t dmax() {
+        igraph_int_t dm = deg[0];
+        for (igraph_int_t i = 1; i < n; i++) if (deg[i] > dm) {
                 dm = deg[i];
             }
         return dm;
     }
 
-    degree_sequence(igraph_integer_t n, igraph_integer_t *degs);
+    degree_sequence(igraph_int_t n, igraph_int_t *degs);
 
     // igraph constructor
     degree_sequence(const igraph_vector_int_t *out_seq);

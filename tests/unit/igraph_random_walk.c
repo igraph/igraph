@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,8 +20,8 @@
 #include "test_utilities.h"
 
 void random_vertex_walk(igraph_t *graph, igraph_vector_t *weights,
-    igraph_integer_t start, igraph_neimode_t mode,
-    igraph_integer_t steps, igraph_random_walk_stuck_t stuck) {
+    igraph_int_t start, igraph_neimode_t mode,
+    igraph_int_t steps, igraph_random_walk_stuck_t stuck) {
     igraph_vector_int_t vertices;
 
     igraph_vector_int_init(&vertices, 0);
@@ -31,8 +31,8 @@ void random_vertex_walk(igraph_t *graph, igraph_vector_t *weights,
 }
 
 void random_walk(igraph_t *graph, igraph_vector_t *weights,
-    igraph_integer_t start, igraph_neimode_t mode,
-    igraph_integer_t steps, igraph_random_walk_stuck_t stuck) {
+    igraph_int_t start, igraph_neimode_t mode,
+    igraph_int_t steps, igraph_random_walk_stuck_t stuck) {
     igraph_vector_int_t vertices;
     igraph_vector_int_t edges;
 
@@ -48,7 +48,7 @@ int main(void) {
     igraph_t g_1, g_line, g_full, g_loop, g_de_bruijn;
     igraph_vector_int_t vertices, edges;
     igraph_vector_t g_line_weights, g_de_bruijn_weights, error_weights;
-    igraph_integer_t ec, i;
+    igraph_int_t ec, i;
 
     igraph_vector_int_init(&vertices, 0);
     igraph_vector_int_init(&edges, 0);

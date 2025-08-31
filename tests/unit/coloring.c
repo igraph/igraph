@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,10 +22,10 @@
 
 /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
 void verify_coloring(igraph_t *graph, const igraph_vector_int_t *colors) {
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
-    for (igraph_integer_t i = 0; i < no_of_edges; ++i) {
+    for (igraph_int_t i = 0; i < no_of_edges; ++i) {
         if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
             continue;
         }
@@ -35,8 +35,8 @@ void verify_coloring(igraph_t *graph, const igraph_vector_int_t *colors) {
         }
     }
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t color = VECTOR(*colors)[i];
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+        igraph_int_t color = VECTOR(*colors)[i];
         if (color < 0 || color >= no_of_nodes) {
             IGRAPH_FATALF("The vertex %" IGRAPH_PRId " has invalid color %" IGRAPH_PRId "\n", i, color);
         }

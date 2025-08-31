@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_t graph;
     igraph_real_t cent;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create an undirected star graph, which is the most centralized graph
      * with several common centrality scores. */

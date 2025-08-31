@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 void check_radius(const igraph_t *graph, const igraph_vector_int_t *center, igraph_neimode_t mode) {
     igraph_vector_t ecc;
     igraph_real_t radius;
-    igraph_integer_t n = igraph_vector_int_size(center);
+    igraph_int_t n = igraph_vector_int_size(center);
 
     igraph_radius(graph, NULL, &radius, mode);
     printf("Radius: %g\n", radius);
@@ -36,7 +36,7 @@ void check_radius(const igraph_t *graph, const igraph_vector_int_t *center, igra
     } else {
         igraph_vector_init(&ecc, 0);
         igraph_eccentricity(graph, NULL, &ecc, igraph_vss_vector(center), mode);
-        for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_int_t i=0; i < n; i++) {
             IGRAPH_ASSERT(VECTOR(ecc)[i] == radius);
         }
         igraph_vector_destroy(&ecc);
@@ -47,7 +47,7 @@ void check_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights
                            const igraph_vector_int_t *center, igraph_neimode_t mode) {
     igraph_vector_t ecc;
     igraph_real_t radius;
-    igraph_integer_t n = igraph_vector_int_size(center);
+    igraph_int_t n = igraph_vector_int_size(center);
     const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     igraph_radius(graph, weights, &radius, mode);
@@ -59,7 +59,7 @@ void check_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights
     } else {
         igraph_vector_init(&ecc, 0);
         igraph_eccentricity(graph, weights, &ecc, igraph_vss_vector(center), mode);
-        for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_int_t i=0; i < n; i++) {
             IGRAPH_ASSERT(igraph_cmp_epsilon(VECTOR(ecc)[i], radius, eps) == 0);
         }
         igraph_vector_destroy(&ecc);

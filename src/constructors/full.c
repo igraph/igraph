@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -51,11 +51,11 @@
  *
  * \example examples/simple/igraph_full.c
  */
-igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_error_t igraph_full(igraph_t *graph, igraph_int_t n, igraph_bool_t directed,
                 igraph_bool_t loops) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_edges2;
+    igraph_int_t no_of_edges2;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
@@ -68,8 +68,8 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
         IGRAPH_SAFE_MULT(n, n, &no_of_edges2);
         IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
-        for (igraph_integer_t i = 0; i < n; i++) {
-            for (igraph_integer_t j = 0; j < n; j++) {
+        for (igraph_int_t i = 0; i < n; i++) {
+            for (igraph_int_t j = 0; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
                 igraph_vector_int_push_back(&edges, j); /* reserved */
             }
@@ -80,12 +80,12 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
         IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
         IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
-        for (igraph_integer_t i = 0; i < n; i++) {
-            for (igraph_integer_t j = 0; j < i; j++) {
+        for (igraph_int_t i = 0; i < n; i++) {
+            for (igraph_int_t j = 0; j < i; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
                 igraph_vector_int_push_back(&edges, j); /* reserved */
             }
-            for (igraph_integer_t j = i + 1; j < n; j++) {
+            for (igraph_int_t j = i + 1; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
                 igraph_vector_int_push_back(&edges, j); /* reserved */
             }
@@ -96,8 +96,8 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
         IGRAPH_SAFE_ADD(n, 1, &no_of_edges2);
         IGRAPH_SAFE_MULT(n, no_of_edges2, &no_of_edges2);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
-        for (igraph_integer_t i = 0; i < n; i++) {
-            for (igraph_integer_t j = i; j < n; j++) {
+        for (igraph_int_t i = 0; i < n; i++) {
+            for (igraph_int_t j = i; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
                 igraph_vector_int_push_back(&edges, j); /* reserved */
             }
@@ -107,8 +107,8 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
         /* ecount = n * (n - 1) / 2 */
         IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
-        for (igraph_integer_t i = 0; i < n; i++) {
-            for (igraph_integer_t j = i + 1; j < n; j++) {
+        for (igraph_int_t i = 0; i < n; i++) {
+            for (igraph_int_t j = i + 1; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
                 igraph_vector_int_push_back(&edges, j); /* reserved */
             }
@@ -160,7 +160,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     igraph_vector_int_t edges;
     igraph_vector_int_t n_acc;
 
-    igraph_integer_t no_of_types = igraph_vector_int_size(n);
+    igraph_int_t no_of_types = igraph_vector_int_size(n);
 
     if (no_of_types == 0) {
         IGRAPH_CHECK(igraph_empty(graph, 0, directed));
@@ -176,16 +176,16 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, no_of_types+1);
     VECTOR(n_acc)[0] = 0;
-    for (igraph_integer_t i = 1; i < no_of_types+1; i++) {
+    for (igraph_int_t i = 1; i < no_of_types+1; i++) {
         IGRAPH_SAFE_ADD(VECTOR(n_acc)[i-1], VECTOR(*n)[i-1],
                     &VECTOR(n_acc)[i]);
     }
 
-    igraph_integer_t no_of_edges2 = 0;
+    igraph_int_t no_of_edges2 = 0;
 
-    for (igraph_integer_t i = 0; i < no_of_types; i++) {
-        igraph_integer_t v = VECTOR(*n)[i];
-        igraph_integer_t partial_sum = VECTOR(n_acc)[no_of_types] - v;
+    for (igraph_int_t i = 0; i < no_of_types; i++) {
+        igraph_int_t v = VECTOR(*n)[i];
+        igraph_int_t partial_sum = VECTOR(n_acc)[no_of_types] - v;
         IGRAPH_SAFE_MULT(partial_sum, v, &partial_sum);
         IGRAPH_SAFE_ADD(no_of_edges2, partial_sum, &no_of_edges2);
     }
@@ -196,14 +196,14 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
 
-    igraph_integer_t ptr = 0;
+    igraph_int_t ptr = 0;
 
-    for (igraph_integer_t from_type = 0; from_type < no_of_types-1; from_type++) {
-        igraph_integer_t edge_from = VECTOR(n_acc)[from_type];
-        for (igraph_integer_t i = 0; i < VECTOR(*n)[from_type]; i++) {
-            for (igraph_integer_t to_type = from_type+1; to_type < no_of_types; to_type++) {
-                igraph_integer_t edge_to = VECTOR(n_acc)[to_type];
-                for (igraph_integer_t j = 0; j < VECTOR(*n)[to_type]; j++) {
+    for (igraph_int_t from_type = 0; from_type < no_of_types-1; from_type++) {
+        igraph_int_t edge_from = VECTOR(n_acc)[from_type];
+        for (igraph_int_t i = 0; i < VECTOR(*n)[from_type]; i++) {
+            for (igraph_int_t to_type = from_type+1; to_type < no_of_types; to_type++) {
+                igraph_int_t edge_to = VECTOR(n_acc)[to_type];
+                for (igraph_int_t j = 0; j < VECTOR(*n)[to_type]; j++) {
                     if (!directed || mode == IGRAPH_OUT) {
                         VECTOR(edges)[ptr++] = edge_from;
                         VECTOR(edges)[ptr++] = edge_to;
@@ -229,8 +229,8 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     if (types) {
         IGRAPH_CHECK(igraph_vector_int_resize(types, VECTOR(n_acc)[no_of_types]));
         if (VECTOR(n_acc)[no_of_types] > 0) {
-            igraph_integer_t v = 1;
-            for (igraph_integer_t i = 0; i < VECTOR(n_acc)[no_of_types]; i++) {
+            igraph_int_t v = 1;
+            for (igraph_int_t i = 0; i < VECTOR(n_acc)[no_of_types]; i++) {
                 if (i == VECTOR(n_acc)[v]) {
                     v++;
                 }
@@ -280,10 +280,10 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
  */
 igraph_error_t igraph_turan(igraph_t *graph,
                             igraph_vector_int_t *types,
-                            igraph_integer_t n,
-                            igraph_integer_t r) {
-    igraph_integer_t quotient;
-    igraph_integer_t remainder;
+                            igraph_int_t n,
+                            igraph_int_t r) {
+    igraph_int_t quotient;
+    igraph_int_t remainder;
     igraph_vector_int_t subsets;
 
     if (n < 0) {
@@ -312,7 +312,7 @@ igraph_error_t igraph_turan(igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&subsets, r);
 
     igraph_vector_int_fill(&subsets, quotient);
-    for (igraph_integer_t i = 0; i < remainder; i++) {
+    for (igraph_int_t i = 0; i < remainder; i++) {
         VECTOR(subsets)[i]++;
     }
 
@@ -345,23 +345,23 @@ igraph_error_t igraph_turan(igraph_t *graph,
  * Time complexity: O(|V|^2) = O(|E|),
  * where |V| is the number of vertices and |E| is the number of edges.
  */
-igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_full_citation(igraph_t *graph, igraph_int_t n,
                          igraph_bool_t directed) {
     igraph_vector_int_t edges;
-    igraph_integer_t ptr = 0;
+    igraph_int_t ptr = 0;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
 
     {
-        igraph_integer_t no_of_edges2;
+        igraph_int_t no_of_edges2;
         IGRAPH_SAFE_MULT(n, n-1, &no_of_edges2);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
     }
 
-    for (igraph_integer_t i = 1; i < n; i++) {
-        for (igraph_integer_t j = 0; j < i; j++) {
+    for (igraph_int_t i = 1; i < n; i++) {
+        for (igraph_int_t j = 0; j < i; j++) {
             VECTOR(edges)[ptr++] = i;
             VECTOR(edges)[ptr++] = j;
         }

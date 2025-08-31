@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -73,8 +73,8 @@ igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
 
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
     igraph_strvector_destroy(&t->strs);
-    igraph_integer_t children_size = igraph_vector_ptr_size(&t->children);
-    for (igraph_integer_t i = 0; i < children_size; i++) {
+    igraph_int_t children_size = igraph_vector_ptr_size(&t->children);
+    for (igraph_int_t i = 0; i < children_size; i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
         if (child != NULL) {
             igraph_i_trie_destroy_node_helper(child, true);
@@ -124,8 +124,8 @@ static size_t igraph_i_strdiff(const char *str, const char *key) {
  */
 
 static igraph_error_t igraph_i_trie_get_node(
-    igraph_trie_node_t *t, const char *key, igraph_integer_t newvalue,
-    igraph_integer_t *id
+    igraph_trie_node_t *t, const char *key, igraph_int_t newvalue,
+    igraph_int_t *id
 ) {
     assert(key != NULL);
 
@@ -133,8 +133,8 @@ static igraph_error_t igraph_i_trie_get_node(
      * for its existence */
     igraph_bool_t add = (newvalue >= 0);
 
-    igraph_integer_t strs_size = igraph_strvector_size(&t->strs);
-    for (igraph_integer_t i = 0; i < strs_size; i++) {
+    igraph_int_t strs_size = igraph_strvector_size(&t->strs);
+    for (igraph_int_t i = 0; i < strs_size; i++) {
         size_t diff;
         const char *str = igraph_strvector_get(&t->strs, i);
         diff = igraph_i_strdiff(str, key);
@@ -295,7 +295,7 @@ static igraph_error_t igraph_i_trie_get_node(
  * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
-igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_int_t *id) {
     assert(key != NULL);
 
     if (*key == '\0') {
@@ -353,8 +353,8 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
 
 igraph_error_t igraph_trie_get_len(
         igraph_trie_t *t, const char *key,
-        igraph_integer_t length,
-        igraph_integer_t *id) {
+        igraph_int_t length,
+        igraph_int_t *id) {
 
     char *tmp = strndup(key, length);
     IGRAPH_CHECK_OOM(tmp, "Cannot get from trie.");
@@ -380,7 +380,7 @@ igraph_error_t igraph_trie_get_len(
  * \return Error code.
  */
 
-igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_int_t *id) {
     IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, -1, id));
     return IGRAPH_SUCCESS;
 }
@@ -395,7 +395,7 @@ igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integ
  *   reverse lookup, \c NULL is returned.
  */
 
-const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
+const char* igraph_trie_idx(igraph_trie_t *t, igraph_int_t idx) {
     if (! t->storekeys) {
         return NULL;
     }
@@ -410,7 +410,7 @@ const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
  * \return The size of the trie, i.e. one larger than the maximum index.
  */
 
-igraph_integer_t igraph_trie_size(igraph_trie_t *t) {
+igraph_int_t igraph_trie_size(igraph_trie_t *t) {
     return t->maxvalue + 1;
 }
 

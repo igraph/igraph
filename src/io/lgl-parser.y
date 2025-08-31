@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
 
@@ -23,7 +23,7 @@
 %{
 
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
 
@@ -74,7 +74,7 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
 %lex-param { void *scanner }
 
 %union {
-  igraph_integer_t edgenum;
+  igraph_int_t edgenum;
   igraph_real_t weightnum;
 }
 
@@ -115,7 +115,7 @@ edge :   edgeid NEWLINE             {
 
 
 edgeid : ALNUM  {
-  igraph_integer_t trie_id;
+  igraph_int_t trie_id;
   IGRAPH_YY_CHECK(igraph_trie_get_len(context->trie,
     igraph_lgl_yyget_text(scanner),
     igraph_lgl_yyget_leng(scanner),

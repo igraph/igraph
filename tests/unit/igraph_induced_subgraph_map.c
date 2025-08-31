@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -29,7 +29,7 @@ int main(void) {
     igraph_t g, sub;
     igraph_vector_int_t map, invmap;
     igraph_vector_int_t keep;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2012  Tamas Nepusz <ntamas@gmail.com>
 
    This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@ int main(void) {
     igraph_t graph;
     igraph_vector_bool_t types;
     igraph_vector_int_t matching;
-    igraph_integer_t matching_size;
+    igraph_int_t matching_size;
     igraph_real_t matching_weight;
     igraph_bool_t is_matching;
     int i;
@@ -57,7 +57,7 @@ int main(void) {
         return 1;
     }
     if (matching_weight != 6) {
-        printf("matching_weight is %" IGRAPH_PRId ", expected: 6\n", (igraph_integer_t) matching_weight);
+        printf("matching_weight is %" IGRAPH_PRId ", expected: 6\n", (igraph_int_t) matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);

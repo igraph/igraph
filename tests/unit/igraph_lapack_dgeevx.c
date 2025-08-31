@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@ int real_cplx_mult(const igraph_matrix_t *A,
                    igraph_vector_t *res_real,
                    igraph_vector_t *res_imag) {
 
-    igraph_integer_t n = igraph_vector_size(v_real);
-    igraph_integer_t r, c;
+    igraph_int_t n = igraph_vector_size(v_real);
+    igraph_int_t r, c;
 
     if (igraph_matrix_nrow(A) != n ||
         igraph_matrix_ncol(A) != n ||
@@ -61,8 +61,8 @@ int sc_cplx_cplx_mult(igraph_real_t lambda_real,
                       igraph_vector_t *res_real,
                       igraph_vector_t *res_imag) {
 
-    igraph_integer_t r;
-    igraph_integer_t n = igraph_vector_size(v_real);
+    igraph_int_t r;
+    igraph_int_t n = igraph_vector_size(v_real);
 
     if (igraph_vector_size(v_imag) != n) {
         printf("Wrong vector sizes");
@@ -89,11 +89,11 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
                        const igraph_matrix_t *vectors_right,
                        igraph_real_t tol) {
 
-    igraph_integer_t n = igraph_matrix_nrow(A);
+    igraph_int_t n = igraph_matrix_nrow(A);
     igraph_vector_t v_real, v_imag;
     igraph_vector_t AV_real, AV_imag, lv_real, lv_imag;
     igraph_vector_t null;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     if (igraph_matrix_ncol(A)             != n) {
         return 1;
@@ -164,7 +164,7 @@ int main(void) {
     igraph_matrix_t A;
     igraph_matrix_t vectors_left, vectors_right;
     igraph_vector_t values_real, values_imag;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
     int info = 1;
     int ilo, ihi;
     igraph_real_t abnrm;

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2020-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ struct userdata {
 };
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t s1, s2, i;
+    igraph_int_t s1, s2, i;
 
     s1 = igraph_vector_int_size(v1);
     s2 = igraph_vector_int_size(v2);

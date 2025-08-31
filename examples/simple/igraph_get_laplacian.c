@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
     igraph_matrix_t L;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_matrix_init(&L, 1, 1);
     igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);

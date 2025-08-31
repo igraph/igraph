@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,13 +21,13 @@
 #include "test_utilities.h"
 
 igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_vector_int_t *observed) {
-    const igraph_integer_t n = igraph_vector_int_size(expected);
+    const igraph_int_t n = igraph_vector_int_size(expected);
 
     if (igraph_vector_int_size(observed) != n) {
         return false;
     }
 
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         if (VECTOR(*expected)[i] != VECTOR(*observed)[i]) {
             return false;
         }
@@ -42,10 +42,10 @@ int main(void) {
     igraph_vector_int_t degrees, rg_degrees;
     igraph_bool_t is_simple, is_connected;
 
-    const igraph_integer_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
-    const igraph_integer_t inarr[]  = {3, 6, 2, 0, 2, 2, 4, 3, 3, 3};
+    const igraph_int_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
+    const igraph_int_t inarr[]  = {3, 6, 2, 0, 2, 2, 4, 3, 3, 3};
 
-    const igraph_integer_t n = sizeof(outarr) / sizeof(outarr[0]);
+    const igraph_int_t n = sizeof(outarr) / sizeof(outarr[0]);
 
     igraph_rng_seed(igraph_rng_default(), 333);
 

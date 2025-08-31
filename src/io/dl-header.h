@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -43,8 +43,8 @@ typedef struct {
     char errmsg[300];
     igraph_error_t igraph_errno;
     int mode;
-    igraph_integer_t n;
-    igraph_integer_t from, to;
+    igraph_int_t n;
+    igraph_int_t from, to;
     igraph_vector_int_t edges;
     igraph_vector_t weights;
     igraph_strvector_t labels;

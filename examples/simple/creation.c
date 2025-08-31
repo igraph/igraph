@@ -6,6 +6,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a directed graph with no vertices or edges. */
     igraph_empty(&graph, 0, IGRAPH_DIRECTED);
 

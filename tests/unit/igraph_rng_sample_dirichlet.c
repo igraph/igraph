@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void check_result(igraph_matrix_t *res, igraph_integer_t n)
+void check_result(igraph_matrix_t *res, igraph_int_t n)
 {
     igraph_vector_t colsum;
     igraph_vector_init(&colsum, 0);
@@ -27,7 +27,7 @@ void check_result(igraph_matrix_t *res, igraph_integer_t n)
     IGRAPH_ASSERT(igraph_matrix_max(res) <= 1.0);
     igraph_matrix_colsum(res, &colsum);
     IGRAPH_ASSERT(igraph_vector_size(&colsum) == n);
-    for (igraph_integer_t i = 0; i < igraph_vector_size(&colsum); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_size(&colsum); i++) {
         IGRAPH_ASSERT(igraph_almost_equals(VECTOR(colsum)[i], 1, 0.0000001));
     }
     igraph_vector_destroy(&colsum);

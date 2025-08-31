@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 
 int main(void) {
     igraph_bitset_t v1, v2, v3;
-    igraph_integer_t n;
+    igraph_int_t n;
 
     printf("Initialise empty bitset\n");
     n = 0;
@@ -203,7 +203,7 @@ int main(void) {
     print_bitset(&v1);
 
     printf("Popcount: %" IGRAPH_PRId "\n", igraph_bitset_popcount(&v1));
-    for (igraph_integer_t i = 2; i < n; i++) {
+    for (igraph_int_t i = 2; i < n; i++) {
         if (i == 2 || i == 3 || i == 5 || i == 7 || i == 11 || !(i%2 == 0 || i%3 == 0 || i%5 == 0 || i%7 == 0 || i%11 == 0)) {
             IGRAPH_BIT_SET(v1, i);
         }

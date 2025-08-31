@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
 igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
-    igraph_integer_t n, n2;
+    igraph_int_t n, n2;
     const igraph_strvector_t *namevec = 0;
     igraph_attribute_record_list_t name, weight;
     igraph_attribute_record_list_t *pname = NULL;

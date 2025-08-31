@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_t *graph, igraph_integer_t pnode, igraph_neimode_t mode, igraph_loops_t loops) {
+void call_and_print(igraph_t *graph, igraph_int_t pnode, igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_vector_int_t eids;
     igraph_vector_int_init(&eids, 0);
     IGRAPH_ASSERT(igraph_incident(graph, &eids, pnode, mode, loops) == IGRAPH_SUCCESS);

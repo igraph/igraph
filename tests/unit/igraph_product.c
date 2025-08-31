@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -252,17 +252,17 @@ void test_p8_p8_strong(void) {
     igraph_vector_int_t edges;
     igraph_vector_int_init(&edges, 0);
 
-    igraph_integer_t n = 8;  // n x n chessboard
+    igraph_int_t n = 8;  // n x n chessboard
 
-    for (igraph_integer_t i = 0; i < n; i++) {
-        for (igraph_integer_t j = 0; j < n; j++) {
-            igraph_integer_t u = i * n + j;
-            for (igraph_integer_t dx = -1; dx <= 1; dx++) {
-                for (igraph_integer_t dy = -1; dy <= 1; dy++) {
+    for (igraph_int_t i = 0; i < n; i++) {
+        for (igraph_int_t j = 0; j < n; j++) {
+            igraph_int_t u = i * n + j;
+            for (igraph_int_t dx = -1; dx <= 1; dx++) {
+                for (igraph_int_t dy = -1; dy <= 1; dy++) {
                     if (dx == 0 && dy == 0) continue;
-                    igraph_integer_t ni = i + dx, nj = j + dy;
+                    igraph_int_t ni = i + dx, nj = j + dy;
                     if (ni >= 0 && ni < n && nj >= 0 && nj < n) {
-                        igraph_integer_t v = ni * n + nj;
+                        igraph_int_t v = ni * n + nj;
                         // To avoid duplicate edges, only add u < v
                         if (u < v) {
                             igraph_vector_int_push_back(&edges, u);
@@ -329,7 +329,7 @@ int main(void) {
 
     // MODULAR PRODUCT TEST
     test_c4_p2_modular();
-    
+
     VERIFY_FINALLY_STACK();
 
     return 0;

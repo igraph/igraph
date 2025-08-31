@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -36,17 +36,17 @@ IGRAPH_BEGIN_C_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_connected_components(const igraph_t *graph, igraph_vector_int_t *membership,
-                                  igraph_vector_int_t *csize, igraph_integer_t *no,
+                                  igraph_vector_int_t *csize, igraph_int_t *no,
                                   igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                                       igraph_connectedness_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_decompose(const igraph_t *graph, igraph_graph_list_t *components,
                                    igraph_connectedness_t mode,
-                                   igraph_integer_t maxcompno, igraph_integer_t minelements);
+                                   igraph_int_t maxcompno, igraph_int_t minelements);
 IGRAPH_EXPORT igraph_error_t igraph_articulation_points(const igraph_t *graph,
                                              igraph_vector_int_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph,
-                                                igraph_integer_t *no,
+                                                igraph_int_t *no,
                                                 igraph_vector_int_list_t *tree_edges,
                                                 igraph_vector_int_list_t *component_edges,
                                                 igraph_vector_int_list_t *components,

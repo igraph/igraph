@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ void dump_graph(const char* header, const igraph_t* g) {
 }
 
 void dump_vertex_attribute_bool(const char* name, const igraph_t* g) {
-    igraph_integer_t i, n = igraph_vcount(g);
+    igraph_int_t i, n = igraph_vcount(g);
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {
@@ -50,7 +50,7 @@ void dump_vertex_attribute_bool(const char* name, const igraph_t* g) {
 }
 
 void dump_vertex_attribute_numeric(const char* name, const igraph_t* g) {
-    igraph_integer_t i, n = igraph_vcount(g);
+    igraph_int_t i, n = igraph_vcount(g);
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {
@@ -61,7 +61,7 @@ void dump_vertex_attribute_numeric(const char* name, const igraph_t* g) {
 }
 
 void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
-    igraph_integer_t i, n = igraph_vcount(g);
+    igraph_int_t i, n = igraph_vcount(g);
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {

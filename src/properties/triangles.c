@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -79,7 +79,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         igraph_real_t *res,
         igraph_transitivity_mode_t mode) {
 
-    igraph_integer_t i, no_of_nodes = igraph_vcount(graph), nans = 0;
+    igraph_int_t i, no_of_nodes = igraph_vcount(graph), nans = 0;
     igraph_real_t sum = 0.0;
     igraph_vector_t vec;
 
@@ -128,16 +128,16 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
-    igraph_integer_t nodes_to_calc, affected_nodes;
-    igraph_integer_t maxdegree = 0;
-    igraph_integer_t i, j, k, nn;
+    igraph_int_t nodes_to_calc, affected_nodes;
+    igraph_int_t maxdegree = 0;
+    igraph_int_t i, j, k, nn;
     igraph_lazy_adjlist_t adjlist;
     igraph_vector_int_t degree;
     igraph_vector_t indexv, avids, rank, triangles;
     igraph_vector_int_t order;
-    igraph_integer_t *neis;
+    igraph_int_t *neis;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -151,9 +151,9 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&avids, nodes_to_calc));
     k = 0;
     for (i = 0; i < nodes_to_calc; IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t v = IGRAPH_VIT_GET(vit);
+        igraph_int_t v = IGRAPH_VIT_GET(vit);
         igraph_vector_int_t *neis2;
-        igraph_integer_t neilen;
+        igraph_int_t neilen;
         if (VECTOR(indexv)[v] == 0) {
             VECTOR(indexv)[v] = k + 1; k++;
             IGRAPH_CHECK(igraph_vector_push_back(&avids, v));
@@ -164,7 +164,7 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
 
         neilen = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen; j++) {
-            igraph_integer_t nei = VECTOR(*neis2)[j];
+            igraph_int_t nei = VECTOR(*neis2)[j];
             if (VECTOR(indexv)[nei] == 0) {
                 VECTOR(indexv)[nei] = k + 1; k++;
                 IGRAPH_CHECK(igraph_vector_push_back(&avids, nei));
@@ -177,9 +177,9 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, affected_nodes);
     for (i = 0; i < affected_nodes; i++) {
-        igraph_integer_t v = VECTOR(avids)[i];
+        igraph_int_t v = VECTOR(avids)[i];
         igraph_vector_int_t *neis2;
-        igraph_integer_t deg;
+        igraph_int_t deg;
         neis2 = igraph_lazy_adjlist_get(&adjlist, v);
         IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
         VECTOR(degree)[i] = deg = igraph_vector_int_size(neis2);
@@ -195,7 +195,7 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
         VECTOR(rank)[ VECTOR(order)[i] ] = affected_nodes - i - 1;
     }
 
-    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    neis = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     if (neis == 0) {
         IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
@@ -203,11 +203,11 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&triangles, affected_nodes);
     for (nn = affected_nodes - 1; nn >= 0; nn--) {
-        igraph_integer_t node = VECTOR(avids) [ VECTOR(order)[nn] ];
+        igraph_int_t node = VECTOR(avids) [ VECTOR(order)[nn] ];
         igraph_vector_int_t *neis1, *neis2;
-        igraph_integer_t neilen1, neilen2;
-        igraph_integer_t nodeindex = VECTOR(indexv)[node];
-        igraph_integer_t noderank = VECTOR(rank) [nodeindex - 1];
+        igraph_int_t neilen1, neilen2;
+        igraph_int_t nodeindex = VECTOR(indexv)[node];
+        igraph_int_t noderank = VECTOR(rank) [nodeindex - 1];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -216,13 +216,13 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
 
         neilen1 = igraph_vector_int_size(neis1);
         for (i = 0; i < neilen1; i++) {
-            igraph_integer_t nei = VECTOR(*neis1)[i];
+            igraph_int_t nei = VECTOR(*neis1)[i];
             neis[nei] = node + 1;
         }
         for (i = 0; i < neilen1; i++) {
-            igraph_integer_t nei = VECTOR(*neis1)[i];
-            igraph_integer_t neiindex = VECTOR(indexv)[nei];
-            igraph_integer_t neirank = VECTOR(rank)[neiindex - 1];
+            igraph_int_t nei = VECTOR(*neis1)[i];
+            igraph_int_t neiindex = VECTOR(indexv)[nei];
+            igraph_int_t neirank = VECTOR(rank)[neiindex - 1];
 
             /*       fprintf(stderr, "  nei %li (indexv %li, rank %li)\n", nei, */
             /*        neiindex, neirank); */
@@ -231,9 +231,9 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
                 IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
                 neilen2 = igraph_vector_int_size(neis2);
                 for (j = 0; j < neilen2; j++) {
-                    igraph_integer_t nei2 = VECTOR(*neis2)[j];
-                    igraph_integer_t nei2index = VECTOR(indexv)[nei2];
-                    igraph_integer_t nei2rank = VECTOR(rank)[nei2index - 1];
+                    igraph_int_t nei2 = VECTOR(*neis2)[j];
+                    igraph_int_t nei2index = VECTOR(indexv)[nei2];
+                    igraph_int_t nei2rank = VECTOR(rank)[nei2index - 1];
                     /*    fprintf(stderr, "    triple %li %li %li\n", node, nei, nei2); */
                     if (nei2rank < neirank) {
                         continue;
@@ -254,10 +254,10 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     IGRAPH_VIT_RESET(vit);
     for (i = 0; i < nodes_to_calc; i++, IGRAPH_VIT_NEXT(vit)) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
-        igraph_integer_t idx = VECTOR(indexv)[node] - 1;
+        igraph_int_t node = IGRAPH_VIT_GET(vit);
+        igraph_int_t idx = VECTOR(indexv)[node] - 1;
         igraph_vector_int_t *neis2 = igraph_lazy_adjlist_get(&adjlist, node);
-        igraph_integer_t deg;
+        igraph_int_t deg;
 
         IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
 
@@ -288,8 +288,8 @@ static igraph_error_t transitivity_local_undirected2(const igraph_t *graph,
 /* Note: Also used in scan.c */
 igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_int_t *rank) {
-    igraph_integer_t i;
-    igraph_integer_t n = al->length;
+    igraph_int_t i;
+    igraph_int_t n = al->length;
     igraph_vector_int_t mark;
 
     IGRAPH_CHECK(igraph_vector_int_init(&mark, n));
@@ -297,11 +297,11 @@ igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
 
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
-        igraph_integer_t j, l = igraph_vector_int_size(v);
-        igraph_integer_t irank = VECTOR(*rank)[i];
+        igraph_int_t j, l = igraph_vector_int_size(v);
+        igraph_int_t irank = VECTOR(*rank)[i];
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            igraph_integer_t e = VECTOR(*v)[j];
+            igraph_int_t e = VECTOR(*v)[j];
             if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
                 j++;
@@ -379,7 +379,7 @@ igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         return transitivity_local_undirected4(graph, res, mode);
     } else {
         igraph_vit_t vit;
-        igraph_integer_t size;
+        igraph_int_t size;
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         size = IGRAPH_VIT_SIZE(vit);
@@ -409,7 +409,7 @@ static igraph_error_t adjacent_triangles4(const igraph_t *graph,
 static igraph_error_t count_triangles_and_triples(
         const igraph_t *graph, igraph_real_t *triangles, igraph_real_t *connected_triples)
 {
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
     igraph_vector_int_t mark;
     igraph_adjlist_t al;
 
@@ -439,28 +439,28 @@ static igraph_error_t count_triangles_and_triples(
      *
      * Some other functions achieve the same via igraph_i_trans4_al_simplify().
      */
-    for (igraph_integer_t v1 = 0; v1 < vcount; v1++) {
+    for (igraph_int_t v1 = 0; v1 < vcount; v1++) {
         const igraph_vector_int_t *nei1 = igraph_adjlist_get(&al, v1);
-        const igraph_integer_t d1 = igraph_vector_int_size(nei1);
+        const igraph_int_t d1 = igraph_vector_int_size(nei1);
         if (d1 > 1) {
             if (connected_triples) {
                 *connected_triples += (igraph_real_t) d1 * (d1 - 1.0) / 2.0;
             }
 
-            for (igraph_integer_t i=0; i < d1; i++) {
-                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+            for (igraph_int_t i=0; i < d1; i++) {
+                const igraph_int_t v2 = VECTOR(*nei1)[i];
                 if (v2 >= v1) break;
 
                 VECTOR(mark)[v2] = v1+1;
             }
-            for (igraph_integer_t i=0; i < d1; i++) {
-                const igraph_integer_t v2 = VECTOR(*nei1)[i];
+            for (igraph_int_t i=0; i < d1; i++) {
+                const igraph_int_t v2 = VECTOR(*nei1)[i];
                 if (v2 >= v1) break;
 
                 const igraph_vector_int_t *nei2 = igraph_adjlist_get(&al, v2);
-                const igraph_integer_t d2 = igraph_vector_int_size(nei2);
-                for (igraph_integer_t j=0; j < d2; j++) {
-                    const igraph_integer_t v3 = VECTOR(*nei2)[j];
+                const igraph_int_t d2 = igraph_vector_int_size(nei2);
+                for (igraph_int_t j=0; j < d2; j++) {
+                    const igraph_int_t v3 = VECTOR(*nei2)[j];
                     if (v3 >= v2) break;
 
                     if (VECTOR(mark)[v3] == v1+1) {
@@ -639,14 +639,14 @@ static igraph_error_t transitivity_barrat1(
         const igraph_vector_t *weights,
         igraph_transitivity_mode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
-    igraph_integer_t nodes_to_calc;
+    igraph_int_t nodes_to_calc;
     igraph_vector_int_t *adj1, *adj2;
     igraph_vector_int_t neis;
     igraph_vector_t actw;
     igraph_lazy_inclist_t incident;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vector_t strength;
 
     /* Precondition: weight vector is not null, its length equals the number of
@@ -673,8 +673,8 @@ static igraph_error_t transitivity_barrat1(
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
-        igraph_integer_t adjlen1, adjlen2, j, k;
+        igraph_int_t node = IGRAPH_VIT_GET(vit);
+        igraph_int_t adjlen1, adjlen2, j, k;
         igraph_real_t triples, triangles;
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -684,8 +684,8 @@ static igraph_error_t transitivity_barrat1(
         adjlen1 = igraph_vector_int_size(adj1);
         /* Mark the neighbors of the node */
         for (j = 0; j < adjlen1; j++) {
-            igraph_integer_t edge = VECTOR(*adj1)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
+            igraph_int_t edge = VECTOR(*adj1)[j];
+            igraph_int_t nei = IGRAPH_OTHER(graph, edge, node);
             VECTOR(neis)[nei] = i + 1;
             VECTOR(actw)[nei] = VECTOR(*weights)[edge];
         }
@@ -693,15 +693,15 @@ static igraph_error_t transitivity_barrat1(
         triangles = 0.0;
 
         for (j = 0; j < adjlen1; j++) {
-            igraph_integer_t edge1 = VECTOR(*adj1)[j];
+            igraph_int_t edge1 = VECTOR(*adj1)[j];
             igraph_real_t weight1 = VECTOR(*weights)[edge1];
-            igraph_integer_t v = IGRAPH_OTHER(graph, edge1, node);
+            igraph_int_t v = IGRAPH_OTHER(graph, edge1, node);
             adj2 = igraph_lazy_inclist_get(&incident, v);
             IGRAPH_CHECK_OOM(adj2, "Failed to query incident edges.");
             adjlen2 = igraph_vector_int_size(adj2);
             for (k = 0; k < adjlen2; k++) {
-                igraph_integer_t edge2 = VECTOR(*adj2)[k];
-                igraph_integer_t v2 = IGRAPH_OTHER(graph, edge2, v);
+                igraph_int_t edge2 = VECTOR(*adj2)[k];
+                igraph_int_t v2 = IGRAPH_OTHER(graph, edge2, v);
                 if (VECTOR(neis)[v2] == i + 1) {
                     triangles += (VECTOR(actw)[v2] + weight1) / 2.0;
                 }
@@ -730,17 +730,17 @@ static igraph_error_t transitivity_barrat4(
         const igraph_vector_t *weights,
         igraph_transitivity_mode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order;
     igraph_vector_int_t degree;
     igraph_vector_t strength;
     igraph_vector_t rank;
-    igraph_integer_t maxdegree;
+    igraph_int_t maxdegree;
     igraph_inclist_t incident;
     igraph_vector_int_t neis;
     igraph_vector_int_t *adj1, *adj2;
     igraph_vector_t actw;
-    igraph_integer_t i, nn;
+    igraph_int_t i, nn;
 
     /* Precondition: weight vector is not null, its length equals the number of
      * edges, and the graph has at least one vertex. The graph must not have
@@ -776,9 +776,9 @@ static igraph_error_t transitivity_barrat4(
     igraph_vector_null(res);
 
     for (nn = no_of_nodes - 1; nn >= 0; nn--) {
-        igraph_integer_t adjlen1, adjlen2;
+        igraph_int_t adjlen1, adjlen2;
         igraph_real_t triples;
-        igraph_integer_t node = VECTOR(order)[nn];
+        igraph_int_t node = VECTOR(order)[nn];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -787,24 +787,24 @@ static igraph_error_t transitivity_barrat4(
         triples = VECTOR(strength)[node] * (adjlen1 - 1) / 2.0;
         /* Mark the neighbors of the node */
         for (i = 0; i < adjlen1; i++) {
-            igraph_integer_t edge = VECTOR(*adj1)[i];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
+            igraph_int_t edge = VECTOR(*adj1)[i];
+            igraph_int_t nei = IGRAPH_OTHER(graph, edge, node);
             VECTOR(neis)[nei] = node + 1;
             VECTOR(actw)[nei] = VECTOR(*weights)[edge];
         }
 
         for (i = 0; i < adjlen1; i++) {
-            igraph_integer_t edge1 = VECTOR(*adj1)[i];
+            igraph_int_t edge1 = VECTOR(*adj1)[i];
             igraph_real_t weight1 = VECTOR(*weights)[edge1];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge1, node);
-            igraph_integer_t j;
+            igraph_int_t nei = IGRAPH_OTHER(graph, edge1, node);
+            igraph_int_t j;
             if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
                 adj2 = igraph_inclist_get(&incident, nei);
                 adjlen2 = igraph_vector_int_size(adj2);
                 for (j = 0; j < adjlen2; j++) {
-                    igraph_integer_t edge2 = VECTOR(*adj2)[j];
+                    igraph_int_t edge2 = VECTOR(*adj2)[j];
                     igraph_real_t weight2 = VECTOR(*weights)[edge2];
-                    igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge2, nei);
+                    igraph_int_t nei2 = IGRAPH_OTHER(graph, edge2, nei);
                     if (VECTOR(rank)[nei2] < VECTOR(rank)[nei]) {
                         continue;
                     }
@@ -879,8 +879,8 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
                                const igraph_vs_t vids,
                                const igraph_vector_t *weights,
                                igraph_transitivity_mode_t mode) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t has_multiple;
 
     /* Handle fallback to unweighted version and common cases */

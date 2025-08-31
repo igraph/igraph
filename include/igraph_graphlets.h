@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -36,12 +36,12 @@ IGRAPH_EXPORT igraph_error_t igraph_graphlets_project(const igraph_t *graph,
                                            const igraph_vector_t *weights,
                                            const igraph_vector_int_list_t *cliques,
                                            igraph_vector_t *Mu, igraph_bool_t startMu,
-                                           igraph_integer_t niter);
+                                           igraph_int_t niter);
 
 IGRAPH_EXPORT igraph_error_t igraph_graphlets(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    igraph_vector_int_list_t *cliques,
-                                   igraph_vector_t *Mu, igraph_integer_t niter);
+                                   igraph_vector_t *Mu, igraph_int_t niter);
 
 IGRAPH_END_C_DECLS
 

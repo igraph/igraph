@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 /* Basic check: Are means within tol*sigma from the expected value?
  * This is meant to catch gross bugs while changing RNG/sampler code. */
 void stats(void) {
-    igraph_integer_t k;
-    const igraph_integer_t n = 100000;
+    igraph_int_t k;
+    const igraph_int_t n = 100000;
     igraph_real_t m, tm, tsd;
     igraph_real_t tol = 3;
 
@@ -75,7 +75,7 @@ void stats(void) {
     /* Mean of binomially distributed values. */
     {
         igraph_real_t p = 0.33;
-        igraph_integer_t nn = 77;
+        igraph_int_t nn = 77;
         m = 0;
         for (k = 0; k < n; k++) {
             m += RNG_BINOM(nn, p);
@@ -144,7 +144,7 @@ void stats(void) {
  * for some special edge cases. */
 
 void sample(void) {
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t x;
     igraph_bool_t b;
 

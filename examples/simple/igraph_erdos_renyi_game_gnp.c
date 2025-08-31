@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,9 @@
 int main(void) {
     igraph_t graph;
     igraph_vector_int_t component_sizes;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make program deterministic */
 

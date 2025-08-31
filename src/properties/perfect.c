@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -56,10 +56,10 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
 
     igraph_bool_t is_bipartite, is_chordal, iso, is_simple;
     igraph_real_t girth, comp_girth;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t start;
-    igraph_integer_t cycle_len;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t start;
+    igraph_int_t cycle_len;
     igraph_t comp_graph, cycle;
 
     // If the graph is directed return error.
@@ -129,13 +129,13 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
     // If the girth (or the smallest circle in the graph) is bigger than 3 and have odd number of vertices then
     // the graph isn't perfect.
     IGRAPH_CHECK(igraph_girth(graph, &girth, NULL));
-    if ((girth > 3) && (((igraph_integer_t)girth) % 2 == 1)) {
+    if ((girth > 3) && (((igraph_int_t)girth) % 2 == 1)) {
         *perfect = false;
         goto clean1;
     }
 
     IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
-    if ((comp_girth > 3) && (((igraph_integer_t)comp_girth) % 2 == 1)) {
+    if ((comp_girth > 3) && (((igraph_int_t)comp_girth) % 2 == 1)) {
         *perfect = false;
         goto clean1;
     }
@@ -145,7 +145,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
     // Strong perfect graph theorem:
     // A graph is perfect iff neither it or its complement contains an induced odd cycle of length >= 5
     // (i.e. an odd hole). TODO: Find a more efficient way to check for odd holes.
-    start = (igraph_integer_t) (girth < comp_girth ? girth : comp_girth);
+    start = (igraph_int_t) (girth < comp_girth ? girth : comp_girth);
     start = start % 2 == 0 ? start + 1 : start + 2;
     for (cycle_len = start; cycle_len <= no_of_nodes ; cycle_len += 2) {
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -28,8 +28,8 @@
 #include "test_utilities.h"
 
 void print_set(igraph_set_t *set, FILE *f) {
-    igraph_integer_t state = 0;
-    igraph_integer_t element;
+    igraph_int_t state = 0;
+    igraph_int_t element;
     while (igraph_set_iterate(set, &state, &element)) {
         fprintf(f, " %" IGRAPH_PRId , element);
     }
@@ -39,7 +39,7 @@ void print_set(igraph_set_t *set, FILE *f) {
 int main(void) {
 
     igraph_set_t set;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* simple init */
     igraph_set_init(&set, 0);

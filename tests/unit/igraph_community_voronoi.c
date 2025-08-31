@@ -62,9 +62,9 @@ int main(void) {
 
         igraph_edge_betweenness(&graph, NULL, &betw, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED, false);
 
-        igraph_integer_t n = igraph_vector_size(&betw);
+        igraph_int_t n = igraph_vector_size(&betw);
         igraph_vector_init_copy(&ibetw, &betw);
-        for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_int_t i=0; i < n; i++) {
             VECTOR(ibetw)[i] = 1.0 / VECTOR(betw)[i];
         }
 

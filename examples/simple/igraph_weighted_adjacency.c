@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,10 @@ int main(void) {
     igraph_matrix_t mat;
     igraph_vector_t weights;
     igraph_vector_int_t edges;
-    igraph_integer_t n;
+    igraph_int_t n;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* C arrays use row-major storage, while igraph's matrix uses column-major.
      * The matrix 'mat' will be the transpose of 'data'. */
@@ -50,7 +53,7 @@ int main(void) {
     igraph_get_edgelist(&graph, &edges, 0);
     n = igraph_ecount(&graph);
 
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         printf("%" IGRAPH_PRId " --> %" IGRAPH_PRId ": %g\n",
                VECTOR(edges)[2*i], VECTOR(edges)[2*i + 1], VECTOR(weights)[i]);
     }

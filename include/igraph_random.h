@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -68,7 +68,7 @@ IGRAPH_BEGIN_C_DECLS
  * the caller is responsible for ensuring that this is the case. You can always
  * assume that hi > lo. Note that both endpoints are _inclusive_, and you must
  * make sure that your generation scheme works for both 32-bit and 64-bit
- * versions of igraph_integer_t as igraph can be compiled for both cases. If
+ * versions of igraph_int_t as igraph can be compiled for both cases. If
  * you are unsure, leave get_int() unimplemented and igraph will provide its
  * own implementation based on get().
  */
@@ -89,11 +89,11 @@ typedef struct igraph_rng_type_t {
 
     /* Optional generators; defaults are provided by igraph that rely solely
      * on get() */
-    igraph_integer_t (*get_int)(void *state, igraph_integer_t l, igraph_integer_t h);
+    igraph_int_t (*get_int)(void *state, igraph_int_t l, igraph_int_t h);
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
     igraph_real_t (*get_geom)(void *state, igraph_real_t p);
-    igraph_real_t (*get_binom)(void *state, igraph_integer_t n, igraph_real_t p);
+    igraph_real_t (*get_binom)(void *state, igraph_int_t n, igraph_real_t p);
     igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
     igraph_real_t (*get_gamma)(void *state, igraph_real_t shape,
                                igraph_real_t scale);
@@ -112,13 +112,13 @@ IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng
 IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed);
-IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_rng_bits(const igraph_rng_t* rng);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_uint_t igraph_rng_max(const igraph_rng_t *rng);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_rng_name(const igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_bool_t igraph_rng_get_bool(igraph_rng_t *rng) ;
-IGRAPH_EXPORT igraph_integer_t igraph_rng_get_integer(
-    igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
+IGRAPH_EXPORT igraph_int_t igraph_rng_get_integer(
+    igraph_rng_t *rng, igraph_int_t l, igraph_int_t h
 );
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_normal(
     igraph_rng_t *rng, igraph_real_t m, igraph_real_t s
@@ -129,7 +129,7 @@ IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif(
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_binom(
-    igraph_rng_t *rng, igraph_integer_t n, igraph_real_t p
+    igraph_rng_t *rng, igraph_int_t n, igraph_real_t p
 );
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(

@@ -2,12 +2,13 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g1, g2;
     igraph_bool_t iso;
 
-    /* Seed the default random number generator and create a random graph. */
+    /* Initialize the library. */
+    igraph_setup();
 
+    /* Seed the default random number generator and create a random graph. */
     igraph_rng_seed(igraph_rng_default(), 1122);
 
     igraph_erdos_renyi_game_gnp(&g1, 100, 3.0 / 100, /*directed=*/ 0, /*loops=*/ 0);

@@ -168,7 +168,6 @@ add_legacy_tests(
 # structure_generators.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_adjacency
   igraph_atlas
   igraph_barabasi_game
   igraph_barabasi_game2

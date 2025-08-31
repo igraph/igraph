@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2012  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -19,9 +19,11 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g;
     FILE *input;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2020 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -57,11 +57,11 @@
  */
 igraph_error_t igraph_community_fluid_communities(
         const igraph_t *graph,
-        igraph_integer_t no_of_communities,
+        igraph_int_t no_of_communities,
         igraph_vector_int_t *membership) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i, j, k, kv1;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t i, j, k, kv1;
     igraph_adjlist_t al;
     igraph_real_t max_density;
     igraph_bool_t is_simple, is_connected, running;
@@ -146,7 +146,7 @@ igraph_error_t igraph_community_fluid_communities(
     running = true;
     while (running) {
         /* Declarations of variables used inside main loop */
-        igraph_integer_t v1, size, rand_idx;
+        igraph_int_t v1, size, rand_idx;
         igraph_real_t max_count, label_counter_diff;
         igraph_vector_int_t *neis;
         igraph_bool_t same_label_in_dominant;

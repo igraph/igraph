@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ int main(void) {
     igraph_t graph, graph_test;
     igraph_vector_int_t shifts;
     igraph_bool_t iso, same;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Testing invalid values */
 

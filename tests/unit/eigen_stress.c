@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ int main(void) {
 
     igraph_vector_init(&vec, 0);
 
-    for (igraph_integer_t i=0; i < 1252; i++) {
+    for (igraph_int_t i=0; i < 1252; i++) {
         igraph_t g;
         igraph_atlas(&g, i);
 
@@ -59,7 +59,7 @@ int main(void) {
         igraph_destroy(&g);
     }
 
-    for (igraph_integer_t i=3; i < 100; i++) {
+    for (igraph_int_t i=3; i < 100; i++) {
         igraph_t g;
         igraph_ring(&g, i, true, false, true);
         CHECK_PRINT(igraph_eigenvector_centrality(&g, &vec, NULL, IGRAPH_OUT, NULL, NULL));
@@ -82,8 +82,8 @@ int main(void) {
         igraph_destroy(&g);
     }
 
-    for (igraph_integer_t n=4; n <= 7; n++) {
-        for (igraph_integer_t i=0; i < 100; i++) {
+    for (igraph_int_t n=4; n <= 7; n++) {
+        for (igraph_int_t i=0; i < 100; i++) {
             igraph_t g;
 
             igraph_erdos_renyi_game_gnp(&g, n, 0.5, true, true);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -310,7 +310,7 @@ int main(void) {
     printf("Modularity: %g\nTemperature: %g\n", modularity, temperature);
     print_vector_int(&membership);
 
-    const igraph_integer_t half_ec = igraph_ecount(&g) / 2;
+    const igraph_int_t half_ec = igraph_ecount(&g) / 2;
     igraph_vector_range(&weights, -half_ec, igraph_ecount(&g) - half_ec);
     printf("Negative implementation:\n");
     igraph_community_spinglass(&g,

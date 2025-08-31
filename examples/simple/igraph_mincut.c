@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -28,7 +28,7 @@ int print_mincut(const igraph_t *graph, igraph_real_t value,
                  const igraph_vector_int_t *cut,
                  const igraph_vector_t *capacity) {
 
-    igraph_integer_t i, nc = igraph_vector_int_size(cut);
+    igraph_int_t i, nc = igraph_vector_int_size(cut);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     printf("mincut value: %g\n", (double) value);
@@ -38,11 +38,11 @@ int print_mincut(const igraph_t *graph, igraph_real_t value,
     igraph_vector_int_print(partition2);
     printf("edges in the cut: ");
     for (i = 0; i < nc; i++) {
-        igraph_integer_t edge = VECTOR(*cut)[i];
-        igraph_integer_t from = IGRAPH_FROM(graph, edge);
-        igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+        igraph_int_t edge = VECTOR(*cut)[i];
+        igraph_int_t from = IGRAPH_FROM(graph, edge);
+        igraph_int_t to  = IGRAPH_TO  (graph, edge);
         if (!directed && from > to) {
-            igraph_integer_t tmp = from;
+            igraph_int_t tmp = from;
             from = to;
             to = tmp;
         }
@@ -59,6 +59,9 @@ int main(void) {
     igraph_vector_int_t partition, partition2, cut;
     igraph_vector_t weights;
     igraph_real_t value;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_init(&partition, 0);
     igraph_vector_int_init(&partition2, 0);

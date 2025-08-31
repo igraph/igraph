@@ -1,5 +1,5 @@
 /*
-  IGraph library.
+  igraph library.
   Constructing realizations of degree sequences and bi-degree sequences.
   Copyright (C) 2018-2024  The igraph development team <igraph@igraph.org>
 
@@ -34,21 +34,21 @@
 
 // (vertex, degree) pair
 struct vd_pair {
-    igraph_integer_t vertex;
-    igraph_integer_t degree;
+    igraph_int_t vertex;
+    igraph_int_t degree;
 
-    vd_pair(igraph_integer_t vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
+    vd_pair(igraph_int_t vertex, igraph_int_t degree) : vertex(vertex), degree(degree) {}
 };
 
 // (indegree, outdegree)
-typedef std::pair<igraph_integer_t, igraph_integer_t> bidegree;
+typedef std::pair<igraph_int_t, igraph_int_t> bidegree;
 
 // (vertex, bidegree) pair
 struct vbd_pair {
-    igraph_integer_t vertex;
+    igraph_int_t vertex;
     bidegree degree;
 
-    vbd_pair(igraph_integer_t vertex, bidegree degree) : vertex(vertex), degree(degree) {}
+    vbd_pair(igraph_int_t vertex, bidegree degree) : vertex(vertex), degree(degree) {}
 };
 
 // Comparison function for vertex-degree pairs.
@@ -70,13 +70,13 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 // If largest=true, always choose the vertex with the largest remaining degree to connect up next.
 // Otherwise, always choose the one with the smallest remaining degree.
 static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool largest) {
-    igraph_integer_t n = igraph_vector_int_size(deg);
+    igraph_int_t n = igraph_vector_int_size(deg);
 
-    igraph_integer_t ec = 0; // number of edges added so far
+    igraph_int_t ec = 0; // number of edges added so far
 
     std::vector<vd_pair> vertices;
     vertices.reserve(n);
-    for (igraph_integer_t i = 0; i < n; ++i) {
+    for (igraph_int_t i = 0; i < n; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
     }
 
@@ -100,7 +100,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igra
         }
 
         if (largest) {
-            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
+            for (igraph_int_t i = 0; i < vd.degree; ++i) {
                 if (--(vertices[vertices.size() - 1 - i].degree) < 0) {
                     goto fail;
                 }
@@ -111,7 +111,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igra
         } else {
             // this loop can only be reached if all zero-degree nodes have already been removed
             // therefore decrementing remaining degrees is safe
-            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
+            for (igraph_int_t i = 0; i < vd.degree; ++i) {
                 vertices[i].degree--;
 
                 VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
@@ -131,13 +131,13 @@ fail:
 
 // Choose vertices in the order of their IDs.
 static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg, igraph_vector_int_t *edges) {
-    igraph_integer_t n = igraph_vector_int_size(deg);
+    igraph_int_t n = igraph_vector_int_size(deg);
 
-    igraph_integer_t ec = 0; // number of edges added so far
+    igraph_int_t ec = 0; // number of edges added so far
 
     typedef std::list<vd_pair> vlist;
     vlist vertices;
-    for (igraph_integer_t i = 0; i < n; ++i) {
+    for (igraph_int_t i = 0; i < n; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
     }
 
@@ -157,7 +157,7 @@ static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg
             continue;
         }
 
-        igraph_integer_t k;
+        igraph_int_t k;
         vlist::iterator it;
         for (it = vertices.begin(), k = 0;
              k != vd.degree && it != vertices.end();
@@ -215,7 +215,7 @@ static void bubble_up(It first, It last, Compare comp) {
 // If largest=false, and the degree sequence was potentially connected, the resulting
 // graph will be connected.
 static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool loops, bool largest) {
-    igraph_integer_t vcount = igraph_vector_int_size(deg);
+    igraph_int_t vcount = igraph_vector_int_size(deg);
 
     if (vcount == 0) {
         return IGRAPH_SUCCESS;
@@ -223,15 +223,15 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
 
     std::vector<vd_pair> vertices;
     vertices.reserve(vcount);
-    for (igraph_integer_t i = 0; i < vcount; ++i) {
-        igraph_integer_t d = VECTOR(*deg)[i];
+    for (igraph_int_t i = 0; i < vcount; ++i) {
+        igraph_int_t d = VECTOR(*deg)[i];
         vertices.push_back(vd_pair(i, d));
     }
 
     // Initial sort in non-increasing order.
     std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
 
-    igraph_integer_t ec = 0;
+    igraph_int_t ec = 0;
     while (! vertices.empty()) {
         // Remove any zero degrees, and error on negative ones.
 
@@ -247,7 +247,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
         // or throw an error, depending on the 'loops' setting.
         if (vertices.size() == 1) {
             if (loops) {
-                for (igraph_integer_t i = 0; i < w.degree / 2; ++i) {
+                for (igraph_int_t i = 0; i < w.degree / 2; ++i) {
                     VECTOR(*edges)[2 * ec]   = w.vertex;
                     VECTOR(*edges)[2 * ec + 1] = w.vertex;
                     ec++;
@@ -290,7 +290,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
 
 
 static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vector_int_t *deg, igraph_vector_int_t *edges, bool loops) {
-    igraph_integer_t vcount = igraph_vector_int_size(deg);
+    igraph_int_t vcount = igraph_vector_int_size(deg);
 
     if (vcount == 0) {
         return IGRAPH_SUCCESS;
@@ -298,7 +298,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
 
     typedef std::list<vd_pair> vlist;
     vlist vertices;
-    for (igraph_integer_t i = 0; i < vcount; ++i) {
+    for (igraph_int_t i = 0; i < vcount; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
     }
 
@@ -311,7 +311,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
     // Initial sort
     vertices.sort(degree_greater<vd_pair>);
 
-    igraph_integer_t ec = 0;
+    igraph_int_t ec = 0;
     for (const auto &pt : pointers) {
         vd_pair vd = *pt;
         vertices.erase(pt);
@@ -322,7 +322,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
             if (vertices.empty() || uit->degree == 0) {
                 // We are out of non-zero degree vertices to connect to.
                 if (loops) {
-                    for (igraph_integer_t i = 0; i < vd.degree / 2; ++i) {
+                    for (igraph_int_t i = 0; i < vd.degree / 2; ++i) {
                         VECTOR(*edges)[2 * ec]   = vd.vertex;
                         VECTOR(*edges)[2 * ec + 1] = vd.vertex;
                         ec++;
@@ -373,13 +373,13 @@ inline bool is_nonzero_outdeg(const vbd_pair &vd) {
 // If smallest=true, always choose the vertex with "smallest" bi-degree for connecting up next,
 // otherwise choose the "largest" (based on lexicographic bi-degree ordering).
 static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, const igraph_vector_int_t *indeg, igraph_vector_int_t *edges, bool smallest) {
-    igraph_integer_t n = igraph_vector_int_size(indeg); // number of vertices
+    igraph_int_t n = igraph_vector_int_size(indeg); // number of vertices
 
-    igraph_integer_t ec = 0; // number of edges added so far
+    igraph_int_t ec = 0; // number of edges added so far
 
     std::vector<vbd_pair> vertices;
     vertices.reserve(n);
-    for (igraph_integer_t i = 0; i < n; ++i) {
+    for (igraph_int_t i = 0; i < n; ++i) {
         vertices.push_back(vbd_pair(i, bidegree(VECTOR(*indeg)[i], VECTOR(*outdeg)[i])));
     }
 
@@ -409,12 +409,12 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
         }
 
         // are there a sufficient number of other vertices to connect to?
-        if (static_cast<igraph_integer_t>(vertices.size()) - 1 < vdp->degree.second) {
+        if (static_cast<igraph_int_t>(vertices.size()) - 1 < vdp->degree.second) {
             goto fail;
         }
 
         // create the connections
-        igraph_integer_t k = 0;
+        igraph_int_t k = 0;
         for (auto it = vertices.begin();
              k < vdp->degree.second;
              ++it) {
@@ -444,13 +444,13 @@ fail:
 
 // Choose vertices in the order of their IDs.
 static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *outdeg, const igraph_vector_int_t *indeg, igraph_vector_int_t *edges) {
-    igraph_integer_t n = igraph_vector_int_size(indeg); // number of vertices
+    igraph_int_t n = igraph_vector_int_size(indeg); // number of vertices
 
-    igraph_integer_t ec = 0; // number of edges added so far
+    igraph_int_t ec = 0; // number of edges added so far
 
     typedef std::list<vbd_pair> vlist;
     vlist vertices;
-    for (igraph_integer_t i = 0; i < n; ++i) {
+    for (igraph_int_t i = 0; i < n; ++i) {
         vertices.push_back(vbd_pair(i, bidegree(VECTOR(*indeg)[i], VECTOR(*outdeg)[i])));
     }
 
@@ -472,7 +472,7 @@ static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *ou
             continue;
         }
 
-        igraph_integer_t k = 0;
+        igraph_int_t k = 0;
         vlist::iterator it;
         for (it = vertices.begin();
              k != vd.degree.second && it != vertices.end();
@@ -514,8 +514,8 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
     const igraph_vector_int_t *deg,
     igraph_edge_type_sw_t allowed_edge_types,
     igraph_realize_degseq_t method) {
-    igraph_integer_t node_count = igraph_vector_int_size(deg);
-    igraph_integer_t deg_sum;
+    igraph_int_t node_count = igraph_vector_int_size(deg);
+    igraph_int_t deg_sum;
 
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg, &deg_sum));
 
@@ -609,8 +609,8 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
     const igraph_vector_int_t *indeg,
     igraph_edge_type_sw_t allowed_edge_types,
     igraph_realize_degseq_t method) {
-    igraph_integer_t node_count = igraph_vector_int_size(outdeg);
-    igraph_integer_t edge_count, edge_count2, indeg_sum;
+    igraph_int_t node_count = igraph_vector_int_size(outdeg);
+    igraph_int_t edge_count, edge_count2, indeg_sum;
 
     IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outdeg, &edge_count));
 
@@ -814,12 +814,12 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
     const igraph_vector_int_t *degree1, const igraph_vector_int_t *degree2,
     igraph_bool_t multiedges
 ) {
-    igraph_integer_t ec = 0; // The number of edges added so far
-    igraph_integer_t n1 = igraph_vector_int_size(degree1);
-    igraph_integer_t n2 = igraph_vector_int_size(degree2);
+    igraph_int_t ec = 0; // The number of edges added so far
+    igraph_int_t n1 = igraph_vector_int_size(degree1);
+    igraph_int_t n2 = igraph_vector_int_size(degree2);
     igraph_vector_int_t edges;
-    igraph_integer_t ds1_sum;
-    igraph_integer_t ds2_sum;
+    igraph_int_t ds1_sum;
+    igraph_int_t ds2_sum;
 
     std::vector<vd_pair> vertices1;
     std::vector<vd_pair> vertices2;
@@ -843,10 +843,10 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
     vertices1.reserve(n1);
     vertices2.reserve(n2);
 
-    for (igraph_integer_t i = 0; i < n1; i++) {
+    for (igraph_int_t i = 0; i < n1; i++) {
         vertices1.push_back(vd_pair(i, VECTOR(*degree1)[i]));
     }
-    for (igraph_integer_t i = 0; i < n2; i++) {
+    for (igraph_int_t i = 0; i < n2; i++) {
         vertices2.push_back(vd_pair(i + n1, VECTOR(*degree2)[i]));
     }
 
@@ -870,7 +870,7 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(
                 goto fail;
             }
 
-            for (igraph_integer_t i = 0; i < vd_src.degree; i++) {
+            for (igraph_int_t i = 0; i < vd_src.degree; i++) {
                 if ((*dest_vs)[i].degree == 0) {
                     // Not enough non-zero remaining degree vertices in opposite partition.
                     // Not graphical.
@@ -973,12 +973,12 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
 ) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-    igraph_integer_t ec = 0; // The number of edges added so far
-    igraph_integer_t n1 = igraph_vector_int_size(degrees1);
-    igraph_integer_t n2 = igraph_vector_int_size(degrees2);
+    igraph_int_t ec = 0; // The number of edges added so far
+    igraph_int_t n1 = igraph_vector_int_size(degrees1);
+    igraph_int_t n2 = igraph_vector_int_size(degrees2);
     igraph_vector_int_t edges;
-    igraph_integer_t ds1_sum;
-    igraph_integer_t ds2_sum;
+    igraph_int_t ds1_sum;
+    igraph_int_t ds2_sum;
     igraph_bool_t multiedges;
     igraph_bool_t largest;
     std::vector<vd_pair> vertices1;
@@ -1024,10 +1024,10 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
     vertices1.reserve(n1);
     vertices2.reserve(n2);
 
-    for (igraph_integer_t i = 0; i < n1; i++) {
+    for (igraph_int_t i = 0; i < n1; i++) {
         vertices1.push_back(vd_pair(i, VECTOR(*degrees1)[i]));
     }
-    for (igraph_integer_t i = 0; i < n2; i++) {
+    for (igraph_int_t i = 0; i < n2; i++) {
         vertices2.push_back(vd_pair(i + n1, VECTOR(*degrees2)[i]));
     }
 
@@ -1091,7 +1091,7 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(
             if (dest_vs->size() < size_t(vd_src.degree)) {
                 goto fail;
             }
-            for (igraph_integer_t i = 0; i < vd_src.degree; i++) {
+            for (igraph_int_t i = 0; i < vd_src.degree; i++) {
                 // Decrement the degree of the delta largest vertices in the opposite partition
 
                 if ((*dest_vs)[i].degree == 0) {

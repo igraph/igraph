@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -77,7 +77,7 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -107,7 +107,7 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -137,7 +137,7 @@ int main(void) {
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 

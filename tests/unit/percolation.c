@@ -1,5 +1,5 @@
 /*
-    IGraph library.
+    igraph library.
     Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
     This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,8 @@
 
 igraph_error_t percolate_bond(igraph_t *graph, igraph_vector_int_t *edge_indices, igraph_bool_t printing) {
     igraph_vector_int_t giant_size, vertex_count;
-    igraph_integer_t ecount = igraph_ecount(graph);
-    igraph_integer_t number_percolated;
+    igraph_int_t ecount = igraph_ecount(graph);
+    igraph_int_t number_percolated;
 
     if (edge_indices != NULL) {
         number_percolated = igraph_vector_int_size(edge_indices);
@@ -56,15 +56,15 @@ igraph_error_t percolate_bond(igraph_t *graph, igraph_vector_int_t *edge_indices
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_integer_t prev = 0;
-    for (igraph_integer_t i = 0; i < number_percolated; i++) {
+    igraph_int_t prev = 0;
+    for (igraph_int_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(giant_size)[i] > 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(giant_size)[i] >= prev);   // Size of largest component must be nondecreasing.
         IGRAPH_ASSERT(VECTOR(giant_size)[i] <= i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
         prev = VECTOR(giant_size)[i];
     }
     prev = 0;
-    for (igraph_integer_t i = 0; i < number_percolated; i++) {
+    for (igraph_int_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] > 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] >= prev);   // Size of largest component must be nondecreasing.
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] <= 2*i + 2); // Largest component cannot be bigger than a tree with the same number of edges.
@@ -139,8 +139,8 @@ void test_bond(void) {
 
 igraph_error_t percolate_site(igraph_t *graph, igraph_vector_int_t *vert_indices, igraph_bool_t printing) {
     igraph_vector_int_t outputs, edge_counts;
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t number_percolated;
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t number_percolated;
 
     if (vert_indices != NULL) {
         number_percolated = igraph_vector_int_size(vert_indices);
@@ -171,8 +171,8 @@ igraph_error_t percolate_site(igraph_t *graph, igraph_vector_int_t *vert_indices
     }
     igraph_vector_int_destroy(&component_sizes);
     IGRAPH_FINALLY_CLEAN(1);
-    igraph_integer_t prev = 0;
-    for (igraph_integer_t i = 0; i < number_percolated; i++) {
+    igraph_int_t prev = 0;
+    for (igraph_int_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(outputs)[i] <= vcount); //vcount cannot be greater than number of vertices
         IGRAPH_ASSERT(VECTOR(outputs)[i] > 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(outputs)[i] >= prev);   // Size of largest component must be nondecreasing.
@@ -180,7 +180,7 @@ igraph_error_t percolate_site(igraph_t *graph, igraph_vector_int_t *vert_indices
         prev = VECTOR(outputs)[i];
     }
     prev = 0;
-    for (igraph_integer_t i = 0; i < number_percolated; i++) {
+    for (igraph_int_t i = 0; i < number_percolated; i++) {
         IGRAPH_ASSERT(VECTOR(edge_counts)[i] >= 0);      // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(edge_counts)[i] >= prev);   // Size of largest component must be nondecreasing.
         prev = VECTOR(edge_counts)[i];
@@ -272,7 +272,7 @@ void test_site(void) {
 igraph_error_t percolate_edgelist(igraph_vector_int_t *edges, igraph_bool_t printing) {
     igraph_vector_int_t giant_size, vertex_count;
     igraph_t graph;
-    igraph_integer_t ecount;
+    igraph_int_t ecount;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&giant_size, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_count, 0);
@@ -297,8 +297,8 @@ igraph_error_t percolate_edgelist(igraph_vector_int_t *edges, igraph_bool_t prin
         IGRAPH_ASSERT(igraph_vector_int_max(&giant_size) == igraph_vector_int_max(&component_sizes));
     }
 
-    igraph_integer_t prev = 0;
-    for (igraph_integer_t i = 0; i < ecount; i++) {
+    igraph_int_t prev = 0;
+    for (igraph_int_t i = 0; i < ecount; i++) {
         // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(giant_size)[i] > 0);
         // Size of largest component must be nondecreasing.
@@ -309,7 +309,7 @@ igraph_error_t percolate_edgelist(igraph_vector_int_t *edges, igraph_bool_t prin
     }
 
     prev = 0;
-    for (igraph_integer_t i = 0; i < ecount; i++) {
+    for (igraph_int_t i = 0; i < ecount; i++) {
         // Sizes cannot be negative.
         IGRAPH_ASSERT(VECTOR(vertex_count)[i] > 0);
         // Size of largest component must be nondecreasing.

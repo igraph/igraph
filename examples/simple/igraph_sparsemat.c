@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -27,7 +27,10 @@ int main(void) {
     igraph_sparsemat_t A, B, C, D;
     igraph_t G, H;
     igraph_vector_t vect;
-    igraph_integer_t i;
+    igraph_int_t i;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create, compress, destroy */
     igraph_sparsemat_init(&A, 100, 20, 50);

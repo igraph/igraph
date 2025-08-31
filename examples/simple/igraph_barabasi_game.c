@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -28,6 +28,9 @@ int main(void) {
     igraph_vector_int_t v;
     igraph_vector_int_t v2, v3;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 0, /*A=*/ 1, 1,
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
     if (igraph_ecount(&g) != 18) {
@@ -42,7 +45,7 @@ int main(void) {
 
     igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
-    for (igraph_integer_t i = 0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
             return 4;
         }
@@ -60,7 +63,7 @@ int main(void) {
     }
     igraph_vector_int_init(&v2, 0);
     igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
-    for (igraph_integer_t i = 0; i < igraph_vcount(&g); i++) {
+    for (igraph_int_t i = 0; i < igraph_vcount(&g); i++) {
         if (VECTOR(v3)[i] != VECTOR(v2)[i]) {
             igraph_vector_int_print(&v3);
             printf("\n");
@@ -78,7 +81,7 @@ int main(void) {
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);
     igraph_vector_int_init(&v, 0);
     igraph_get_edgelist(&g, &v, 0);
-    for (igraph_integer_t i = 0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i = 0; i < igraph_ecount(&g); i++) {
         if (VECTOR(v)[2 * i] <= VECTOR(v)[2 * i + 1]) {
             return 7;
         }

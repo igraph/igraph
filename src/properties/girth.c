@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -73,17 +73,17 @@
 igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
                  igraph_vector_int_t *circle) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_lazy_adjlist_t adjlist;
-    igraph_integer_t mincirc = IGRAPH_INTEGER_MAX, minvertex = 0;
-    igraph_integer_t node;
+    igraph_int_t mincirc = IGRAPH_INTEGER_MAX, minvertex = 0;
+    igraph_int_t node;
     igraph_bool_t triangle = false;
     igraph_vector_int_t *neis;
     igraph_vector_int_t level;
-    igraph_integer_t stoplevel = no_of_nodes + 1;
+    igraph_int_t stoplevel = no_of_nodes + 1;
     igraph_bool_t anycircle = false;
-    igraph_integer_t t1 = 0, t2 = 0;
+    igraph_int_t t1 = 0, t2 = 0;
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
@@ -111,9 +111,9 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actlevel = VECTOR(level)[actnode];
-            igraph_integer_t i, n;
+            igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_int_t actlevel = VECTOR(level)[actnode];
+            igraph_int_t i, n;
 
             if (actlevel >= stoplevel) {
                 break;
@@ -124,8 +124,8 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
 
             n = igraph_vector_int_size(neis);
             for (i = 0; i < n; i++) {
-                igraph_integer_t nei = VECTOR(*neis)[i];
-                igraph_integer_t neilevel = VECTOR(level)[nei];
+                igraph_int_t nei = VECTOR(*neis)[i];
+                igraph_int_t neilevel = VECTOR(level)[nei];
                 if (neilevel != 0) {
                     if (neilevel == actlevel - 1) {
                         continue;
@@ -172,19 +172,19 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
     if (circle) {
         IGRAPH_CHECK(igraph_vector_int_resize(circle, mincirc));
         if (mincirc != 0) {
-            igraph_integer_t i, n, idx = 0;
+            igraph_int_t i, n, idx = 0;
             igraph_dqueue_int_clear(&q);
             igraph_vector_int_null(&level); /* used for father pointers */
 #define FATHER(x) (VECTOR(level)[(x)])
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, minvertex));
             FATHER(minvertex) = minvertex;
             while (FATHER(t1) == 0 || FATHER(t2) == 0) {
-                igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+                igraph_int_t actnode = igraph_dqueue_int_pop(&q);
                 neis = igraph_lazy_adjlist_get(&adjlist, actnode);
                 IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
                 n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {
-                    igraph_integer_t nei = VECTOR(*neis)[i];
+                    igraph_int_t nei = VECTOR(*neis)[i];
                     if (FATHER(nei) == 0) {
                         FATHER(nei) = actnode + 1;
                         igraph_dqueue_int_push(&q, nei);

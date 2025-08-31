@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_t g;
     igraph_es_t es;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,3, -1);
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include <cmath>
 
 static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
-    igraph_integer_t n = infomap.numLeafNodes();
+    igraph_int_t n = infomap.numLeafNodes();
 
     IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
 
@@ -58,14 +58,14 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
                                       const igraph_vector_t *vertex_weights,
                                       infomap::Network &network) {
 
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
 
     if (vcount > UINT_MAX) {
         IGRAPH_ERROR("Graph has too many vertices for Infomap.", IGRAPH_EINVAL);
     }
 
-    for (igraph_integer_t v = 0; v < vcount; v++) {
+    for (igraph_int_t v = 0; v < vcount; v++) {
         if (vertex_weights) {
             double weight = VECTOR(*vertex_weights)[v];
             if (weight < 0) {
@@ -82,9 +82,9 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
         }
     }
 
-    for (igraph_integer_t e = 0; e < ecount; e++) {
-        igraph_integer_t v1 = IGRAPH_FROM(graph, e);
-        igraph_integer_t v2 = IGRAPH_TO(graph, e);
+    for (igraph_int_t e = 0; e < ecount; e++) {
+        igraph_int_t v1 = IGRAPH_FROM(graph, e);
+        igraph_int_t v2 = IGRAPH_TO(graph, e);
 
         if (edge_weights) {
             double weight = VECTOR(*edge_weights)[e];
@@ -194,7 +194,7 @@ igraph_error_t igraph_community_infomap(
         const igraph_t *graph,
         const igraph_vector_t *edge_weights,
         const igraph_vector_t *vertex_weights,
-        igraph_integer_t nb_trials,
+        igraph_int_t nb_trials,
         igraph_bool_t is_regularized,
         igraph_real_t regularization_strength,
         igraph_vector_int_t *membership,
@@ -204,8 +204,8 @@ igraph_error_t igraph_community_infomap(
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
 
     if (edge_weights) {
         if (igraph_vector_size(edge_weights) != ecount) {

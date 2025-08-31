@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -29,7 +29,7 @@
 void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_real_t resolution) {
 
     igraph_vector_int_t membership;
-    igraph_integer_t nb_clusters = igraph_vcount(graph);
+    igraph_int_t nb_clusters = igraph_vcount(graph);
     igraph_real_t quality, quality2;
 
     /* Initialize with singleton partition. */
@@ -74,7 +74,7 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     const igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_int_t membership;
     igraph_vector_t out_strength, in_strength;
-    igraph_integer_t nb_clusters = igraph_vcount(graph);
+    igraph_int_t nb_clusters = igraph_vcount(graph);
     igraph_real_t quality, quality2;
     const igraph_real_t directed_multiplier = directed ? 1.0 : 2.0;
     igraph_real_t m;

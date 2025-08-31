@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -32,8 +32,8 @@ void test_unweighted(void) {
     igraph_t g;
     igraph_vector_int_t edges;
     igraph_vector_t eb;
-    igraph_integer_t i;
-    igraph_integer_t no_of_edges;
+    igraph_int_t i;
+    igraph_int_t no_of_edges;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -104,8 +104,8 @@ void test_weighted(void) {
     igraph_vector_t eb, lengths;
     igraph_real_t lengths_array[] = { 4, 1, 3, 2, 5, 8, 6, 7 };
 
-    igraph_integer_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };
-    igraph_integer_t edges_array2[] = { 2, 3, 6, 5, 0, 1, 4, 7 };
+    igraph_int_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };
+    igraph_int_t edges_array2[] = { 2, 3, 6, 5, 0, 1, 4, 7 };
     igraph_real_t eb_array1_lo[] = { 4, 5, 3 + 1 / 3.0 - EPS, 4, 2.5, 4, 1, 1 };
     igraph_real_t eb_array1_hi[] = { 4, 5, 3 + 1 / 3.0 + EPS, 4, 2.5, 4, 1, 1 };
     igraph_real_t eb_array2_lo[] = { 4, 5, 3 + 1 / 3.0 - EPS, 6, 1.5, 2, 1, 1 };

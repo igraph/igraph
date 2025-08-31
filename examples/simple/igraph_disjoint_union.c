@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,10 @@
 int main(void) {
     igraph_t left, right, uni;
     igraph_vector_ptr_t glist;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&left, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,3, -1);
     igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);

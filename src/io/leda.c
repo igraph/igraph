@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -64,13 +64,13 @@
 igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                        const char *vertex_attr_name,
                                        const char *edge_attr_name) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
-    igraph_integer_t i = 0;
+    igraph_int_t i = 0;
     igraph_attribute_type_t vertex_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
     igraph_attribute_type_t edge_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
-    igraph_integer_t from, to, rev;
+    igraph_int_t from, to, rev;
 
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
@@ -220,7 +220,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t eid = IGRAPH_EIT_GET(it);
+            igraph_int_t eid = IGRAPH_EIT_GET(it);
             igraph_edge(graph, eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
             if (rev == IGRAPH_EIT_GET(it)) {
@@ -243,7 +243,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t eid = IGRAPH_EIT_GET(it);
+            igraph_int_t eid = IGRAPH_EIT_GET(it);
             const char *str = igraph_strvector_get(&values, eid);
             igraph_edge(graph, eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
@@ -270,7 +270,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                          graph, vertex_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
 
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t eid = IGRAPH_EIT_GET(it);
+            igraph_int_t eid = IGRAPH_EIT_GET(it);
             igraph_edge(graph, eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
             if (rev == IGRAPH_EIT_GET(it)) {

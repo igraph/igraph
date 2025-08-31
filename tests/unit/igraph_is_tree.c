@@ -6,7 +6,7 @@
 int main(void) {
     igraph_t g;
     igraph_bool_t res;
-    igraph_integer_t root;
+    igraph_int_t root;
 
     /* the null graph is not a tree */
     igraph_empty(&g, 0, 0);

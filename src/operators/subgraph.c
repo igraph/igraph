@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -35,8 +35,8 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
         const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
         igraph_vector_int_t *map, igraph_vector_int_t *invmap) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_new_nodes_estimate;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_new_nodes_estimate;
     igraph_vector_int_t delete;
     igraph_bitset_t remain;
     igraph_vit_t vit;
@@ -60,7 +60,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
         IGRAPH_BIT_SET(remain, IGRAPH_VIT_GET(vit));
     }
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (! IGRAPH_BIT_TEST(remain, i)) {
@@ -99,11 +99,11 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
         igraph_bool_t map_is_prepared) {
 
     const igraph_bool_t directed = igraph_is_directed(graph);
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_new_nodes = 0;
-    igraph_integer_t n;
-    igraph_integer_t to;
-    igraph_integer_t eid;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_new_nodes = 0;
+    igraph_int_t n;
+    igraph_int_t to;
+    igraph_int_t eid;
     igraph_vector_int_t vids_old2new, vids_new2old;
     igraph_vector_int_t eids_new2old;
     igraph_vector_int_t vids_vec;
@@ -153,8 +153,8 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
 
     igraph_vector_int_sort(&vids_vec);
     n = igraph_vector_int_size(&vids_vec);
-    for (igraph_integer_t i = 0; i < n; i++) {
-        igraph_integer_t vid = VECTOR(vids_vec)[i];
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_int_t vid = VECTOR(vids_vec)[i];
 
         /* Cater for duplicate vertex IDs in the input vertex selector; we use
          * the first occurrence of each vertex ID and ignore the rest */
@@ -168,9 +168,9 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create the new edge list */
-    for (igraph_integer_t i = 0; i < no_of_new_nodes; i++) {
-        igraph_integer_t old_vid = VECTOR(*my_vids_new2old)[i];
-        igraph_integer_t new_vid = i;
+    for (igraph_int_t i = 0; i < no_of_new_nodes; i++) {
+        igraph_int_t old_vid = VECTOR(*my_vids_new2old)[i];
+        igraph_int_t new_vid = i;
         igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT, IGRAPH_LOOPS));
@@ -178,7 +178,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
 
         if (directed) {
             /* directed graph; this is easier */
-            for (igraph_integer_t j = 0; j < n; j++) {
+            for (igraph_int_t j = 0; j < n; j++) {
                 eid = VECTOR(nei_edges)[j];
 
                 to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
@@ -195,7 +195,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
              * loop edge will appear twice. We use a boolean flag to skip every
              * second loop edge */
             skip_loop_edge = false;
-            for (igraph_integer_t j = 0; j < n; j++) {
+            for (igraph_int_t j = 0; j < n; j++) {
                 eid = VECTOR(nei_edges)[j];
 
                 if (IGRAPH_FROM(graph, eid) != old_vid) {
@@ -326,7 +326,7 @@ static igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
         const igraph_t *graph, const igraph_vs_t vids,
         igraph_subgraph_implementation_t *result) {
     double ratio;
-    igraph_integer_t num_vs;
+    igraph_int_t num_vs;
 
     if (igraph_vs_is_all(&vids)) {
         ratio = 1.0;
@@ -476,13 +476,13 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&incedges, 0);
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        igraph_integer_t v = IGRAPH_VIT_GET(vit);
+        igraph_int_t v = IGRAPH_VIT_GET(vit);
         IGRAPH_CHECK(igraph_incident(graph, &incedges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
 
-        igraph_integer_t d = igraph_vector_int_size(&incedges);
-        for (igraph_integer_t i=0; i < d; i++) {
-            igraph_integer_t e = VECTOR(incedges)[i];
-            igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
+        igraph_int_t d = igraph_vector_int_size(&incedges);
+        for (igraph_int_t i=0; i < d; i++) {
+            igraph_int_t e = VECTOR(incedges)[i];
+            igraph_int_t u = IGRAPH_OTHER(graph, e, v);
             /* The v <= u check avoids adding non-loop edges twice.
              * Loop edges only appear once due to the use of
              * IGRAPH_LOOPS_ONCE in igraph_incident() */
@@ -538,9 +538,9 @@ igraph_error_t igraph_subgraph_from_edges(
     igraph_bool_t delete_vertices
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_edges_to_delete_estimate;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_edges_to_delete_estimate;
     igraph_vector_int_t delete = IGRAPH_VECTOR_NULL;
     igraph_bitset_t vremain, eremain;
     igraph_eit_t eit;
@@ -563,8 +563,8 @@ igraph_error_t igraph_subgraph_from_edges(
 
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
+        igraph_int_t eid = IGRAPH_EIT_GET(eit);
+        igraph_int_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
         IGRAPH_BIT_SET(eremain, eid);
         IGRAPH_BIT_SET(vremain, from);
         IGRAPH_BIT_SET(vremain, to);
@@ -574,7 +574,7 @@ igraph_error_t igraph_subgraph_from_edges(
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Collect the edge IDs to be deleted */
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
         if (! IGRAPH_BIT_TEST(eremain, i)) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
@@ -592,7 +592,7 @@ igraph_error_t igraph_subgraph_from_edges(
     if (delete_vertices) {
         /* Collect the vertex IDs to be deleted */
         igraph_vector_int_clear(&delete);
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             IGRAPH_ALLOW_INTERRUPTION();
             if (! IGRAPH_BIT_TEST(vremain, i)) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));

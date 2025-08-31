@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -26,6 +26,9 @@ int main(void) {
 
     igraph_t g1, g2;
     igraph_vector_int_t v1, v2;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_init(&v1, 8);
     VECTOR(v1)[0] = 0;

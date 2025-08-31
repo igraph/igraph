@@ -1386,7 +1386,7 @@ double dendro::getSplitTotalWeight() const {
 // ***********************************************************************
 
 bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
-    igraph_integer_t size = igraph_hrg_size(hrg);
+    igraph_int_t size = igraph_hrg_size(hrg);
 
     if (size > INT_MAX) {
         throw std::range_error("Hierarchical random graph too large for the HRG module");
@@ -2530,7 +2530,7 @@ void graph::resetLinks() {
 
 // **********************************************************************
 
-void graph::setAdjacencyHistograms(const igraph_integer_t bin_count) {
+void graph::setAdjacencyHistograms(const igraph_int_t bin_count) {
     // For all possible adjacencies, setup an edge histograms
     num_bins = bin_count + 1;
     bin_resolution = 1.0 / (double)(bin_count);

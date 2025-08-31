@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -33,6 +33,9 @@ int main(void) {
                             "edgelist7.dl", "nodelist1.dl", "nodelist2.dl" };
     igraph_t graph;
     FILE *infile;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);

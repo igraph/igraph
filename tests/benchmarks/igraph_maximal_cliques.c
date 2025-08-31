@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 int main(void) {
 
     igraph_t g;
-    igraph_integer_t toremovev[] = {
+    igraph_int_t toremovev[] = {
         2609,  2098, 14517,  7540, 19560,  8855,
         5939, 14947,   441, 16976, 19642,  4188,
         15447, 11837,  2333,  7309, 18539, 14099,

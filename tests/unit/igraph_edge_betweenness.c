@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -28,8 +28,8 @@ void test_bug950(void) {
     igraph_t g;
     igraph_vector_t eb;
     igraph_vector_t weights;
-    igraph_integer_t from, to;
-    igraph_integer_t no_of_edges, i;
+    igraph_int_t from, to;
+    igraph_int_t no_of_edges, i;
 
     igraph_full(&g, 6, 0, 0);
     no_of_edges = igraph_ecount(&g);
@@ -111,7 +111,7 @@ static void test_edge_subset(const igraph_t *g, igraph_es_t eids, const char *de
 
     /* Calculate full edge betweenness for reference */
     igraph_vector_init(&eb_full, 0);
-    igraph_edge_betweenness(g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID), 
+    igraph_edge_betweenness(g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID),
                            IGRAPH_UNDIRECTED, false);
 
     /* Calculate edge betweenness for the subset */
@@ -153,7 +153,7 @@ void test_eids_parameter(void) {
 
     /* Show full edge betweenness for reference */
     igraph_vector_init(&eb_full, 0);
-    igraph_edge_betweenness(&g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID), 
+    igraph_edge_betweenness(&g, NULL, &eb_full, igraph_ess_all(IGRAPH_EDGEORDER_ID),
                            IGRAPH_UNDIRECTED, false);
     printf("Full edge betweenness: ");
     print_vector(&eb_full);

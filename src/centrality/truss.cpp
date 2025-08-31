@@ -47,11 +47,11 @@ using std::unordered_set;
 // So, instead of the triangle specified as vertices [1, 2, 3], return the
 // edges as [1, 2, 1, 3, 2, 3] so that the support can be computed.
 static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igraph_vector_int_t *unpacked_tri) {
-    igraph_integer_t num_triangles = igraph_vector_int_size(tri);
+    igraph_int_t num_triangles = igraph_vector_int_size(tri);
 
     IGRAPH_CHECK(igraph_vector_int_resize(unpacked_tri, 2 * num_triangles));
 
-    for (igraph_integer_t i = 0, j = 0; i < num_triangles; i += 3, j += 6) {
+    for (igraph_int_t i = 0, j = 0; i < num_triangles; i += 3, j += 6) {
         VECTOR(*unpacked_tri)[j]   = VECTOR(*unpacked_tri)[j+2] = VECTOR(*tri)[i];
         VECTOR(*unpacked_tri)[j+1] = VECTOR(*unpacked_tri)[j+4] = VECTOR(*tri)[i+1];
         VECTOR(*unpacked_tri)[j+3] = VECTOR(*unpacked_tri)[j+5] = VECTOR(*tri)[i+2];
@@ -64,8 +64,8 @@ static igraph_error_t igraph_truss_i_unpack(const igraph_vector_int_t *tri, igra
 // Compute the edge support, i.e. number of triangles each edge occurs in.
 // Time complexity: O(m), where m is the number of edges listed in eid.
 static void igraph_truss_i_compute_support(const igraph_vector_int_t *eid, igraph_vector_int_t *support) {
-    igraph_integer_t m = igraph_vector_int_size(eid);
-    for (igraph_integer_t i = 0; i < m; ++i) {
+    igraph_int_t m = igraph_vector_int_size(eid);
+    for (igraph_int_t i = 0; i < m; ++i) {
         VECTOR(*support)[VECTOR(*eid)[i]] += 1;
     }
 }
@@ -81,10 +81,10 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     igraph_vector_bool_t completed;
 
     // C++ data structures
-    vector< unordered_set<igraph_integer_t> > vec;
+    vector< unordered_set<igraph_int_t> > vec;
 
     // Allocate memory for result
-    igraph_integer_t no_of_edges = igraph_vector_int_size(support);
+    igraph_int_t no_of_edges = igraph_vector_int_size(support);
     IGRAPH_CHECK(igraph_vector_int_resize(trussness, no_of_edges));
     if (no_of_edges == 0) {
         return IGRAPH_SUCCESS;
@@ -92,7 +92,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
 
     // Get max possible value = max entry in support.
     // This cannot be computed if there are no edges, hence the above check
-    igraph_integer_t max = igraph_vector_int_max(support);
+    igraph_int_t max = igraph_vector_int_max(support);
 
     // Initialize completed edges.
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&completed, no_of_edges);
@@ -102,7 +102,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     vec.resize(max + 1);
 
     // Add each edge to its appropriate level of support.
-    for (igraph_integer_t i = 0; i < no_of_edges; ++i) {
+    for (igraph_int_t i = 0; i < no_of_edges; ++i) {
         vec[VECTOR(*support)[i]].insert(i);  // insert edge i into its support level
     }
 
@@ -119,18 +119,18 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     IGRAPH_VECTOR_INT_INIT_FINALLY(&commonNeighbors, 0);
 
     // Move through the levels, one level at a time, starting at first level.
-    for (igraph_integer_t level = 1; level <= max; ++level) {
+    for (igraph_int_t level = 1; level <= max; ++level) {
 
         /* Track down edges one at a time */
         while (!vec[level].empty()) {
             IGRAPH_ALLOW_INTERRUPTION();
 
-            igraph_integer_t seed = *vec[level].begin();  // pull out the first edge
+            igraph_int_t seed = *vec[level].begin();  // pull out the first edge
             vec[level].erase(seed);  // remove the first element
 
             /* Find the vertices of this edge */
-            igraph_integer_t fromVertex = IGRAPH_FROM(graph, seed);
-            igraph_integer_t toVertex = IGRAPH_TO(graph, seed);
+            igraph_int_t fromVertex = IGRAPH_FROM(graph, seed);
+            igraph_int_t toVertex = IGRAPH_TO(graph, seed);
 
             /* Find neighbors of both vertices. If they run into each other,
              * there is a triangle. We rely on the neighbor lists being sorted,
@@ -150,10 +150,10 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
             IGRAPH_CHECK(igraph_vector_int_intersect_sorted(q1, q2, &commonNeighbors));
 
             /* Go over the overlapping neighbors and check each */
-            igraph_integer_t ncommon = igraph_vector_int_size(&commonNeighbors);
-            for (igraph_integer_t j = 0; j < ncommon; j++) {
-                igraph_integer_t n = VECTOR(commonNeighbors)[j];  // the common neighbor
-                igraph_integer_t e1, e2;
+            igraph_int_t ncommon = igraph_vector_int_size(&commonNeighbors);
+            for (igraph_int_t j = 0; j < ncommon; j++) {
+                igraph_int_t n = VECTOR(commonNeighbors)[j];  // the common neighbor
+                igraph_int_t e1, e2;
                 IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, /* error= */ true));
                 IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, /* error= */ true));
 
@@ -161,7 +161,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
                 bool e2_complete = VECTOR(completed)[e2];
 
                 if (!e1_complete && !e2_complete) {
-                    igraph_integer_t newLevel;
+                    igraph_int_t newLevel;
 
                     // Demote this edge, if higher than current level.
                     if (VECTOR(*support)[e1] > level) {

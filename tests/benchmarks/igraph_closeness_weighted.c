@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,9 +21,9 @@
 #include "bench.h"
 
 void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
-    const igraph_integer_t n = igraph_ecount(graph);
+    const igraph_int_t n = igraph_ecount(graph);
     igraph_vector_resize(vec, n);
-    for (igraph_integer_t i=0; i < n; ++i) {
+    for (igraph_int_t i=0; i < n; ++i) {
         VECTOR(*vec)[i] = RNG_UNIF(1, 10);
     }
 }

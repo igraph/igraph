@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2010-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 int main(void) {
     igraph_t g;
     igraph_vector_int_list_t res, res_all;
-    igraph_integer_t n;
+    igraph_int_t n;
 
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 2, 5,
@@ -33,7 +33,7 @@ int main(void) {
     igraph_vector_int_list_init(&res, 0);
 
     printf("TEST MINLEN\n\n");
-    for (igraph_integer_t i = 0; i <= 5; i++) {
+    for (igraph_int_t i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, -1, IGRAPH_ALL);
 
         printf("Paths for minlen=%" IGRAPH_PRId ":\n", i);
@@ -41,7 +41,7 @@ int main(void) {
     }
 
     printf("\nTEST MAXLEN\n\n");
-    for (igraph_integer_t i = 0; i <= 5; i++) {
+    for (igraph_int_t i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), -1, i, IGRAPH_ALL);
 
         printf("Paths for maxlen=%" IGRAPH_PRId ":\n", i);
@@ -54,7 +54,7 @@ int main(void) {
 
     n = igraph_vector_int_list_size(&res);
     IGRAPH_ASSERT(igraph_vector_int_list_size(&res_all) == n);
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         IGRAPH_ASSERT(igraph_vector_int_all_e(
                           igraph_vector_int_list_get_ptr(&res, i),
                           igraph_vector_int_list_get_ptr(&res_all, i)));

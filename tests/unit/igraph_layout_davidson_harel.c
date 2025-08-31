@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2014-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -102,7 +102,7 @@ void check_layout_davidson_harel(void) {
     igraph_t g;
     igraph_matrix_t res;
     igraph_bool_t use_seed;
-    igraph_integer_t maxiter, fineiter;
+    igraph_int_t maxiter, fineiter;
     igraph_real_t cool_fact, weight_node_dist, weight_border;
     igraph_real_t weight_edge_lengths, weight_edge_crossings, weight_node_edge_dist;
 

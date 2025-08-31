@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,8 +21,8 @@
 #include "test_utilities.h"
 
 igraph_error_t delaunay(
-        igraph_real_t *points, igraph_integer_t numpoints,
-        igraph_integer_t dimension, igraph_bool_t printing) {
+        igraph_real_t *points, igraph_int_t numpoints,
+        igraph_int_t dimension, igraph_bool_t printing) {
 
     igraph_matrix_t points_mat;
     igraph_t g;

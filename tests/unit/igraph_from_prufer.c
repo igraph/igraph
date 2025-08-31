@@ -7,8 +7,8 @@
 
 int main(void) {
     igraph_t graph;
-    igraph_integer_t prufer1[] = {2, 3, 2, 3};
-    igraph_integer_t prufer2[] = {0, 2, 4, 1, 1, 0};
+    igraph_int_t prufer1[] = {2, 3, 2, 3};
+    igraph_int_t prufer2[] = {0, 2, 4, 1, 1, 0};
     igraph_vector_int_t prufer;
     igraph_bool_t tree;
 

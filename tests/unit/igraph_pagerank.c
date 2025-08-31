@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -322,7 +322,7 @@ int main(void) {
         igraph_vector_int_t edges_to_delete;
         igraph_vector_t res_arpack, res_prpack;
         igraph_vector_t weights;
-        igraph_integer_t i, n;
+        igraph_int_t i, n;
 
         printf("\nLarge test graph, unweighted\n");
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,11 @@ int main(void) {
 
     igraph_t graph;
     igraph_real_t result;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
     igraph_vector_int_t path, path_edge;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_barabasi_game(&graph, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1,
                          IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #include <math.h>
 
 void check_align(const igraph_t *graph) {
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
     igraph_matrix_t layout;
     igraph_bool_t connected;
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,9 +24,9 @@ int main(void) {
 
     igraph_heap_t h_max;
     igraph_heap_min_t h_min;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t list[] = {-2, -9.999, 0, 6, 235, -2, -1000, -1, 4, 2000, 6, 0.5, 1, -9, 10};
-    const igraph_integer_t l_size = sizeof(list) / sizeof(list[0]);
+    const igraph_int_t l_size = sizeof(list) / sizeof(list[0]);
 
     /* max heap init & destroy*/
     printf("Create empty max heap & destroy\n");

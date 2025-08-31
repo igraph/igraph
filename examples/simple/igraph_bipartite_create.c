@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -23,12 +23,14 @@
 #include <igraph.h>
 
 int main(void) {
-
-    igraph_integer_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
+    igraph_int_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
     igraph_t g;
     igraph_vector_bool_t types;
     igraph_vector_int_t edges;
-    igraph_integer_t i;
+    igraph_int_t i;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_view(&edges, edges2, sizeof(edges2) / sizeof(edges2[0]));
     igraph_vector_bool_init(&types, igraph_vector_int_max(&edges) + 1);

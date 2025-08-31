@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,8 +24,11 @@ int main(void) {
     igraph_vector_int_t membership;
     igraph_vector_t vertex_weights;
     igraph_vector_t vertex_out_weights, vertex_in_weights;
-    igraph_integer_t nb_clusters;
+    igraph_int_t nb_clusters;
     igraph_real_t quality;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Set default seed to get reproducible results */
     igraph_rng_seed(igraph_rng_default(), 0);

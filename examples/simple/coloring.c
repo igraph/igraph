@@ -6,6 +6,9 @@ int main(void) {
     igraph_vector_int_t colors;
     igraph_bool_t valid_coloring;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Setting a seed makes the result of erdos_renyi_game_gnm deterministic. */
     igraph_rng_seed(igraph_rng_default(), 42);
 

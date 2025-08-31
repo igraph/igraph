@@ -123,9 +123,9 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
 /* print all graph, edge and vertex attributes of a graph */
 void print_attributes(const igraph_t *g);
 
-void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem);
-void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem);
-void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const igraph_real_t *elem);
+void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_int_t nrow, igraph_int_t ncol, const int *elem);
+void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_int_t nrow, igraph_int_t ncol, const int *elem);
+void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_int_t nrow, igraph_int_t ncol, const igraph_real_t *elem);
 
 void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff);
 void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);

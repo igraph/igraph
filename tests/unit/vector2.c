@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge MA, 02139 USA
 
@@ -29,7 +29,7 @@ int main(void) {
 
     igraph_vector_t v1, v2, v3, v4, v5;
     igraph_real_t min, max;
-    igraph_integer_t imin, imax;
+    igraph_int_t imin, imax;
     int i;
 
     igraph_vector_init_range(&v1, 1, 11);

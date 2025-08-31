@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -28,7 +28,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
                 const igraph_vector_int_list_t *evecs, int error_code) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t i, n = igraph_vector_int_list_size(vecs);
+    igraph_int_t i, n = igraph_vector_int_list_size(vecs);
     if (igraph_vector_int_list_size(evecs) != n) {
         exit(error_code + 1);
     }
@@ -36,7 +36,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *vvec = igraph_vector_int_list_get_ptr(vecs, i);
         igraph_vector_int_t *evec = igraph_vector_int_list_get_ptr(evecs, i);
-        igraph_integer_t j, n2 = igraph_vector_int_size(evec);
+        igraph_int_t j, n2 = igraph_vector_int_size(evec);
         if (igraph_vector_int_size(vvec) == 0 && n2 == 0) {
             continue;
         }
@@ -44,21 +44,21 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
             exit(error_code + 2);
         }
         for (j = 0; j < n2; j++) {
-            igraph_integer_t edge = VECTOR(*evec)[j];
-            igraph_integer_t from = VECTOR(*vvec)[j];
-            igraph_integer_t to = VECTOR(*vvec)[j + 1];
+            igraph_int_t edge = VECTOR(*evec)[j];
+            igraph_int_t from = VECTOR(*vvec)[j];
+            igraph_int_t to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 if (from != IGRAPH_FROM(graph, edge) ||
                     to   != IGRAPH_TO  (graph, edge)) {
                     exit(error_code);
                 }
             } else {
-                igraph_integer_t from2 = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to2 = IGRAPH_TO(graph, edge);
-                igraph_integer_t min1 = from < to ? from : to;
-                igraph_integer_t max1 = from < to ? to : from;
-                igraph_integer_t min2 = from2 < to2 ? from2 : to2;
-                igraph_integer_t max2 = from2 < to2 ? to2 : from2;
+                igraph_int_t from2 = IGRAPH_FROM(graph, edge);
+                igraph_int_t to2 = IGRAPH_TO(graph, edge);
+                igraph_int_t min1 = from < to ? from : to;
+                igraph_int_t max1 = from < to ? to : from;
+                igraph_int_t min2 = from2 < to2 ? from2 : to2;
+                igraph_int_t max2 = from2 < to2 ? to2 : from2;
                 if (min1 != min2 || max1 != max2) {
                     exit(error_code + 3);
                 }
@@ -74,8 +74,11 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;
     igraph_vector_int_t parents, inbound;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vs_t vs;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 1);
 

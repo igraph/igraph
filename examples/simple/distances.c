@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -26,6 +26,9 @@ int main(void) {
     igraph_real_t weights_data[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_matrix_t res;
     igraph_real_t cutoff;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&graph, 10, IGRAPH_DIRECTED,
                  0, 1, 0, 2, 0, 3,    1, 2, 1, 4, 1, 5,
