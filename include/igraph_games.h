@@ -122,14 +122,14 @@ IGRAPH_EXPORT igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, 
                                                     igraph_bool_t loops);
 
 IGRAPH_EXPORT igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
-                                      igraph_bool_t loops, igraph_bool_t multiple);
+                                                 igraph_edge_type_sw_t allowed_edge_types);
 IGRAPH_EXPORT igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
                                                igraph_bool_t loops, igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                                              igraph_integer_t size, igraph_integer_t nei,
-                                             igraph_real_t p, igraph_bool_t loops,
-                                             igraph_bool_t multiple);
+                                             igraph_real_t p,
+                                             igraph_edge_type_sw_t allowed_edge_types);
 
 IGRAPH_EXPORT igraph_error_t igraph_lastcit_game(igraph_t *graph,
                                       igraph_integer_t nodes, igraph_integer_t edges_per_node,
