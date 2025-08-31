@@ -125,7 +125,7 @@ class IntersectionCounts {
     const igraph_real_t beta_radius;            // Radius of circles
     const igraph_bool_t short_circuit;          // Whether to stop after one point has been found
     const igraph_integer_t a, b;                // Edge endpoints; excluded from the count.
-    const igraph_vector_t *a_centre, *b_centre; // Circle centres.
+    const igraph_vector_t *a_center, *b_center; // Circle centers.
     const igraph_matrix_t *points;              // List of points, used to test if points are in range
     size_t count;                               // how many are found.
 public:
@@ -134,11 +134,11 @@ public:
     IntersectionCounts(
         igraph_real_t radius_, igraph_real_t beta_radius_,
         bool short_circuit_,
-        igraph_integer_t a, igraph_integer_t b, const igraph_vector_t *a_centre, const igraph_vector_t *b_centre, const igraph_matrix_t *points)
+        igraph_integer_t a, igraph_integer_t b, const igraph_vector_t *a_center, const igraph_vector_t *b_center, const igraph_matrix_t *points)
         : radius(radius_), beta_radius(beta_radius_),
           short_circuit(short_circuit_),
           a(a), b(b),
-          a_centre(a_centre), b_centre(b_centre), points(points) {
+          a_center(a_center), b_center(b_center), points(points) {
         init();
     }
 
@@ -165,11 +165,11 @@ public:
     }
 
     // Business logic is all contained here.
-    // Count the point if it is within the radius from both centres, and if it's not one of the endpoints.
+    // Count the point if it is within the radius from both centers, and if it's not one of the endpoints.
     bool addPoint(igraph_real_t dist, igraph_integer_t index) {
         if (dist < radius && index != a && index != b) {
-            igraph_real_t pd1 = vec_ind_sqr_dist(a_centre, index, points);
-            igraph_real_t pd2 = vec_ind_sqr_dist(b_centre, index, points);
+            igraph_real_t pd1 = vec_ind_sqr_dist(a_center, index, points);
+            igraph_real_t pd2 = vec_ind_sqr_dist(b_center, index, points);
             if (pd1 < beta_radius && pd2 < beta_radius) {
                 count++;
                 // Stop searching if it only matters to have at least one point.
@@ -224,8 +224,8 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
 }
 
 
-/* -!- centre construction interface -!-
- * igraph_vector_t *a_centre, b_centre : Expects an initialized vector of the
+/* -!- center construction interface -!-
+ * igraph_vector_t *a_center, b_center : Expects an initialized vector of the
  * correct size, will be written to.
  *
  * igraph_integer_t a, b: the indices of the points,
@@ -235,9 +235,9 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  * const igraph_matrix_t *points: point set containing the points a and b
  */
 
-typedef igraph_error_t CentreConstructor(
-    igraph_vector_t *a_centre,
-    igraph_vector_t *b_centre,
+typedef void CenterConstructor(
+    igraph_vector_t *a_center,
+    igraph_vector_t *b_center,
     igraph_integer_t a,
     igraph_integer_t b,
     igraph_real_t beta,
@@ -246,9 +246,9 @@ typedef igraph_error_t CentreConstructor(
 // construct the centers of the points for lune based beta skeletons with beta
 // >= 1. The points lie on the line from a to b, such that the points lie on one
 // of the circles.
-// formula is a_centre = a + (r-1) * (a - b), similar for b_centre
-static igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
-        igraph_vector_t *b_centre,
+// formula is a_center = a + (r-1) * (a - b), similar for b_center
+static void construct_lune_centers(igraph_vector_t *a_center,
+        igraph_vector_t *b_center,
         igraph_integer_t a,
         igraph_integer_t b,
         igraph_real_t r,
@@ -256,18 +256,16 @@ static igraph_error_t construct_lune_centres(igraph_vector_t *a_centre,
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
     for (igraph_integer_t i = 0; i < dims; i++) {
-        VECTOR(*a_centre)[i] = MATRIX(*points, a, i) + (r - 1) * (MATRIX(*points, a, i) - MATRIX(*points, b, i));
-        VECTOR(*b_centre)[i] = MATRIX(*points, b, i) + (r - 1) * (MATRIX(*points, b, i) - MATRIX(*points, a, i));
+        VECTOR(*a_center)[i] = MATRIX(*points, a, i) + (r - 1) * (MATRIX(*points, a, i) - MATRIX(*points, b, i));
+        VECTOR(*b_center)[i] = MATRIX(*points, b, i) + (r - 1) * (MATRIX(*points, b, i) - MATRIX(*points, a, i));
     }
-
-    return IGRAPH_SUCCESS;
 }
 
-// construct the centres of the circles for beta < 1, or circle based beta
+// construct the centers of the circles for beta < 1, or circle based beta
 // skeletons.
 // Since it relies on a 90-degree rotation around the axis perpendicular
 // to the line AB, it is only well-defined in 2d.
-static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_vector_t *b_centre, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
+static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b_center, igraph_integer_t a, igraph_integer_t b, igraph_real_t r, const igraph_matrix_t *points) {
     igraph_real_t mid[2], perp[2];
 
     for (igraph_integer_t i = 0; i < 2; i++) {
@@ -282,11 +280,9 @@ static igraph_error_t construct_perp_centres(igraph_vector_t *a_centre, igraph_v
     perp[1] = temp;
 
     for (igraph_integer_t i = 0; i < 2; i++) {
-        VECTOR(*a_centre)[i] = mid[i] + perp[i];
-        VECTOR(*b_centre)[i] = mid[i] - perp[i];
+        VECTOR(*a_center)[i] = mid[i] + perp[i];
+        VECTOR(*b_center)[i] = mid[i] - perp[i];
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 /* -!- Filter interface -!-
@@ -308,8 +304,8 @@ typedef igraph_error_t FilterFunc(
 
 
 // Test whether the intersection of the two circles as generated
-// by centre_positions is empty of points except for a and b.
-template<CentreConstructor centre_positions, igraph_bool_t is_closed>
+// by center_positions is empty of points except for a and b.
+template<CenterConstructor center_positions, igraph_bool_t is_closed>
 static igraph_error_t is_intersection_empty(
     igraph_bool_t *result,
     KDTree<-1> &tree,
@@ -324,36 +320,36 @@ static igraph_error_t is_intersection_empty(
     igraph_vector_t midpoint;
     igraph_integer_t dims = igraph_matrix_ncol(points);
 
-    igraph_vector_t a_centre, b_centre;
-    IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
-    IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
-    IGRAPH_CHECK(centre_positions(&a_centre, &b_centre, a, b, r, points));
+    igraph_vector_t a_center, b_center;
+    IGRAPH_VECTOR_INIT_FINALLY(&a_center, dims);
+    IGRAPH_VECTOR_INIT_FINALLY(&b_center, dims);
+    center_positions(&a_center, &b_center, a, b, r, points);
 
     IGRAPH_VECTOR_INIT_FINALLY(&midpoint, dims);
     for (igraph_integer_t i = 0; i < dims; i++) {
-        VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_centre)[i] + VECTOR(b_centre)[i]);
+        VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_center)[i] + VECTOR(b_center)[i]);
     }
 
     // squared half-height of lune
-    igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_centre);
+    igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_center);
     igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
-    IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, &a_centre, &b_centre, points);
+    IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, &a_center, &b_center, points);
 
     tree.findNeighbors(intersections, VECTOR(midpoint));
 
     *result = intersections.size() == 0;
 
     igraph_vector_destroy(&midpoint);
-    igraph_vector_destroy(&a_centre);
-    igraph_vector_destroy(&b_centre);
+    igraph_vector_destroy(&a_center);
+    igraph_vector_destroy(&b_center);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
 
-// Test whether the union of the circles given by centre_positions
+// Test whether the union of the circles given by center_positions
 //  is empty of other points except for a and b.
-template<CentreConstructor centre_positions>
+template<CenterConstructor center_positions>
 static igraph_error_t is_union_empty(
     igraph_bool_t *result,
     KDTree<-1> &tree,
@@ -366,25 +362,25 @@ static igraph_error_t is_union_empty(
 
     igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
     igraph_real_t r = calculate_r(beta);
-    igraph_vector_t a_centre, b_centre;
+    igraph_vector_t a_center, b_center;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&a_centre, dims);
-    IGRAPH_VECTOR_INIT_FINALLY(&b_centre, dims);
-    IGRAPH_CHECK(centre_positions(&a_centre, &b_centre, a, b, r, points));
+    IGRAPH_VECTOR_INIT_FINALLY(&a_center, dims);
+    IGRAPH_VECTOR_INIT_FINALLY(&b_center, dims);
+    center_positions(&a_center, &b_center, a, b, r, points);
 
     NeighborCounts neighbor_search(sqr_dist * r * r * (1 + TOLERANCE), a, b, true);
 
-    tree.findNeighbors(neighbor_search, VECTOR(a_centre));
+    tree.findNeighbors(neighbor_search, VECTOR(a_center));
 
     if (neighbor_search.size() > 0) {
         *result = false;
     } else {
         neighbor_search.clear();
-        tree.findNeighbors(neighbor_search, VECTOR(b_centre));
+        tree.findNeighbors(neighbor_search, VECTOR(b_center));
         *result = neighbor_search.size() == 0;
     }
-    igraph_vector_destroy(&a_centre);
-    igraph_vector_destroy(&b_centre);
+    igraph_vector_destroy(&a_center);
+    igraph_vector_destroy(&b_center);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
@@ -448,13 +444,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true>> (&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true>> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -497,9 +493,9 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centres>> (&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centers>> (&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centres, true>> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true>> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -735,7 +731,7 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, true>> (&potential_edges, points, 1)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true>> (&potential_edges, points, 1)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
@@ -785,7 +781,7 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centres, false>>(&potential_edges, points, 2)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, false>>(&potential_edges, points, 2)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
