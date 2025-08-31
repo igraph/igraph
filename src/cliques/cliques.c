@@ -298,15 +298,19 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * Time complexity: Exponential
  *
  */
-igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
-                            const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res,
-                            igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
+igraph_error_t igraph_weighted_cliques(
+        const igraph_t *graph, const igraph_vector_t *vertex_weights,
+        igraph_vector_int_list_t *res,
+        igraph_bool_t maximal,
+        igraph_real_t min_weight, igraph_real_t max_weight,
+        igraph_int_t max_results) {
+
     if (vertex_weights) {
-        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal, -1);
+        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal, max_results);
     } else if (maximal) {
-        return igraph_maximal_cliques(graph, res, min_weight, max_weight, IGRAPH_UNLIMITED);
+        return igraph_maximal_cliques(graph, res, min_weight, max_weight, max_results);
     } else {
-        return igraph_cliques(graph, res, min_weight, max_weight, IGRAPH_UNLIMITED);
+        return igraph_cliques(graph, res, min_weight, max_weight, max_results);
     }
 }
 

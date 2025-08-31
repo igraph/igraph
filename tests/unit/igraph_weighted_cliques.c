@@ -96,7 +96,7 @@ int main(void) {
 
 
     /* all weighted cliques above weight 6 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 6, 0, /* maximal= */ false);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, /* maximal= */ false, 6, 0, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " weighted cliques found above weight 6\n", count);
@@ -104,7 +104,7 @@ int main(void) {
 
 
     /* all weighted cliques between weights 5 and 10 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 5, 10, /* maximal= */ false);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, /* maximal= */ false, 5, 10, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " weighted cliques found between weights 5 and 10\n", count);
@@ -112,7 +112,7 @@ int main(void) {
 
 
     /* maximal weighted cliques above weight 7 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 7, 0, /* maximal= */ true);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, /* maximal= */ true, 7, 0, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal weighted cliques found above weight 7\n", count);
@@ -120,7 +120,7 @@ int main(void) {
 
 
     /* maximal weighed cliques beteen weights 5 and 10 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 5, 10, /* maximal= */ true);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, /* maximal= */ true, 5, 10, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal weighted cliques found between weights 5 and 10\n", count);
@@ -142,14 +142,14 @@ int main(void) {
     printf("\nUnweighted case:\n");
 
     /* test fallback to unweighted variants: all cliques */
-    igraph_weighted_cliques(&graph, NULL, &result, 4, 5, /* maximal= */ false);
+    igraph_weighted_cliques(&graph, NULL, &result, /* maximal= */ false, 4, 5, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " unweighted cliques found between sizes 4 and 5\n", count);
     print_and_clear_weighted_clique_list(&result, 0);
 
     /* test fallback to unweighted variants: maximal cliques */
-    igraph_weighted_cliques(&graph, NULL, &result, 4, 5, /* maximal= */ true);
+    igraph_weighted_cliques(&graph, NULL, &result, /* maximal= */ true, 4, 5, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " unweighted maximal cliques found between sizes 4 and 5\n", count);
@@ -172,14 +172,14 @@ int main(void) {
     igraph_vector_fill(&vertex_weights, 1);
 
     /* test unit weights: all cliques */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 4, 5, /* maximal= */ false);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, /* maximal= */ false, 4, 5, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " cliques with unit weights found between sizes 4 and 5\n", count);
     print_and_clear_weighted_clique_list(&result, 0);
 
     /* test unit weights: maximal cliques */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 4, 5, /* maximal= */ true);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, /* maximal= */ true, 4, 5, IGRAPH_UNLIMITED);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal cliques with unit weights between sizes 4 and 5\n", count);
