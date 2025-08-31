@@ -26,8 +26,11 @@ void call_and_print(
         igraph_bool_t loops, igraph_bool_t multiple) {
 
     igraph_t result;
+    igraph_edge_type_sw_t allowed_edge_types = IGRAPH_SIMPLE_SW;
+    if (loops) allowed_edge_types |= IGRAPH_LOOPS_SW;
+    if (multiple) allowed_edge_types |= IGRAPH_MULTI_SW;
 
-    IGRAPH_ASSERT(igraph_sbm_game(&result, pref_matrix, block_sizes, directed, loops, multiple) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_sbm_game(&result, pref_matrix, block_sizes, directed, allowed_edge_types) == IGRAPH_SUCCESS);
     print_graph_canon(&result);
     printf("\n");
 
@@ -115,7 +118,7 @@ int main(void) {
         igraph_matrix_fill(&pref_matrix_2, 100);
 
         for (int i=0; i < trials; i++) {
-            igraph_sbm_game(&result, &pref_matrix_2, &block_sizes_2, IGRAPH_UNDIRECTED, false, true);
+            igraph_sbm_game(&result, &pref_matrix_2, &block_sizes_2, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW);
             mean_ecount += igraph_ecount(&result);
             igraph_destroy(&result);
         }
@@ -133,19 +136,19 @@ int main(void) {
     /* Verify validation */
 
     printf("Check for nonsquare matrix error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_nonsq, &block_sizes_3, false, false, false), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_nonsq, &block_sizes_3, false, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
 
     printf("Check for preference matrix probability out of range error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_oor, &block_sizes_3, false, false, false), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_oor, &block_sizes_3, false, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
 
     printf("Check for nonsymmetric preference matrix for undirected graph error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_nsym, &block_sizes_3, false, false, false), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_nsym, &block_sizes_3, false, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
 
     printf("Check for incorrect block size vector error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_1, true, false, false), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_1, true, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
 
     printf("Check for negative block size error handling.\n");
-    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_neg, true, false, false), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_sbm_game(&result, &pref_matrix_3, &block_sizes_neg, true, IGRAPH_SIMPLE_SW), IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&pref_matrix_0);
     igraph_matrix_destroy(&pref_matrix_1);

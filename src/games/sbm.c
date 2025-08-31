@@ -25,6 +25,7 @@
 
 #include "core/interruption.h"
 #include "math/safe_intop.h"
+#include "misc/graphicality.h"
 
 #include <float.h>      /* for DBL_EPSILON */
 #include <math.h>       /* for sqrt and floor */
@@ -62,8 +63,8 @@
  *     vertices in each group.
  * \param directed Boolean, whether to create a directed graph. If
  *     this argument is \c false, then \p pref_matrix must be symmetric.
- * \param loops Boolean, whether to create self-loops.
- * \param multiple Whether to generate multi-edges.
+ * \param allowed_edge_types Controls whether multi-edges and self-loops
+ *     are generated. See \ref igraph_edge_type_sw_t.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|+k^2), where |V| is the number of
@@ -79,7 +80,7 @@ igraph_error_t igraph_sbm_game(
         const igraph_matrix_t *pref_matrix,
         const igraph_vector_int_t *block_sizes,
         igraph_bool_t directed,
-        igraph_bool_t loops, igraph_bool_t multiple) {
+        igraph_edge_type_sw_t allowed_edge_types) {
 
 #define CHECK_MAXEDGES() \
     do {if (maxedges > IGRAPH_MAX_EXACT_REAL) { \
@@ -91,6 +92,9 @@ igraph_error_t igraph_sbm_game(
     igraph_integer_t from, to, fromoff = 0;
     igraph_real_t minp, maxp;
     igraph_vector_int_t edges;
+    igraph_bool_t loops, multiple;
+
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     /* ------------------------------------------------------------ */
     /* Check arguments                                              */
