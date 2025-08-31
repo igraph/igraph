@@ -589,8 +589,10 @@ typedef struct igraph_i_max_ind_vsets_data_t {
     igraph_set_t* buckets;               /* Bucket array */
     /* The IS value for each node. Still to be explained :) */
     igraph_int_t* IS;
-    igraph_int_t largest_set_size;   /* Size of the largest set encountered */
+    igraph_int_t largest_set_size;       /* Size of the largest set encountered */
     igraph_bool_t keep_only_largest;     /* True if we keep only the largest sets */
+    igraph_int_t min_size, max_size;
+    igraph_int_t max_results;
 } igraph_i_max_ind_vsets_data_t;
 
 static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
@@ -603,6 +605,10 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
     igraph_int_t it_state;
+
+    if (clqdata->max_results == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_ALLOW_INTERRUPTION();
 
@@ -625,8 +631,11 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
              * Instead of copying the vector contents, we add an empty vector to
              * the list, then swap it with the vector to-be-added in O(1) time. */
             if (!clqdata->keep_only_largest) {
-                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
-                igraph_vector_int_swap(newvec, &vec);
+                if (clqdata->min_size <= size && size <= clqdata->max_size) {
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                    igraph_vector_int_swap(newvec, &vec);
+                    if (clqdata->max_results >= 0) --(clqdata->max_results);
+                }
             } else {
                 if (size > clqdata->largest_set_size) {
                     /* We are keeping only the largest sets, and we've found one that's
@@ -790,6 +799,12 @@ static void free_set_array(igraph_set_t *array, igraph_int_t n) {
  * \param graph The input graph.
  * \param res Pointer to an initialized list of integer vectors. The cliques
  *   will be stored here as vectors of vertex IDs.
+ * \param min_size Integer specifying the minimum size of the sets to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer specifying the maximum size of the sets to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many independent vertex sets will be recorded.
+ *    If negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques(), \ref
@@ -797,8 +812,12 @@ static void free_set_array(igraph_set_t *array, igraph_int_t n) {
  *
  * Time complexity: TODO.
  */
-igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
-        igraph_vector_int_list_t *res) {
+igraph_error_t igraph_maximal_independent_vertex_sets(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *res,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+
     igraph_i_max_ind_vsets_data_t clqdata;
     igraph_int_t no_of_nodes = igraph_vcount(graph);
 
@@ -808,6 +827,18 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = false;
+
+    if (max_size <= 0) {
+        max_size = IGRAPH_INTEGER_MAX;
+    }
+
+    if (max_results < 0) {
+        max_results = IGRAPH_INTEGER_MAX;
+    }
+
+    clqdata.min_size = min_size;
+    clqdata.max_size = max_size;
+    clqdata.max_results = max_results;
 
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
@@ -881,6 +912,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_int_t *n
 
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = false;
+    clqdata.max_results = IGRAPH_INTEGER_MAX;
 
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
@@ -1033,6 +1065,9 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
 
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = keep_only_largest;
+    clqdata.min_size = 0;
+    clqdata.max_size = IGRAPH_INTEGER_MAX;
+    clqdata.max_results = IGRAPH_INTEGER_MAX;
 
     if (complementer) {
         IGRAPH_CHECK(igraph_adjlist_init_complementer(graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS));
