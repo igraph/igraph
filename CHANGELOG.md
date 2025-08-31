@@ -118,7 +118,8 @@ This section gives detailed on breaking changes you need to consider when updati
 
 #### Cliques and independent sets
 
- - `igraph_cliques()`, `igraph_weighed_cliques()`, `igraph_maximal_cliques()`, `igraph_maximal_cliques_file()`, and `igraph_maximal_cliques_subset()` received a `max_results` parameter to limit the number of returned results. Pass `1` to return a single result, or `IGRAPH_UNLIMITED` to return all results.
+ - `igraph_cliques()`, `igraph_weighed_cliques()`, `igraph_maximal_cliques()`, `igraph_maximal_cliques_file()`, `igraph_maximal_cliques_subset()`, `igraph_independent_sets()` and `igraph_maximal_independent_sets()` received a `max_results` parameter to limit the number of returned results. Pass `1` to return a single result, or `IGRAPH_UNLIMITED` to return all results.
+ - `igraph_maximal_independent_sets()` received `min_size` and `max_size` parameters that control the range of independent set sizes that are returned.
  - `igraph_weighted_cliques()` had its parameter ordering standardized: the `igraph_bool_t maximal` parameter now comes before the `min_weight` / `max_weight` parameters.
  - `igraph_maximal_cliques_callback()` had its parameter ordering standardized: the `igraph_clique_handler_t *cliquehandler_fn, void *arg` parameter pair now comes at the end, making this function consistent with `igraph_cliques_callback()`.
 
