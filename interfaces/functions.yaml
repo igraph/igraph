@@ -1404,8 +1404,9 @@ igraph_is_independent_vertex_set:
 
 igraph_independent_vertex_sets:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES_LIST res, INTEGER min_size=0,
-        INTEGER max_size=0
+        GRAPH graph, OUT VERTEX_INDICES_LIST res, 
+        INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: res ON graph
 
 igraph_largest_independent_vertex_sets:
@@ -1413,7 +1414,10 @@ igraph_largest_independent_vertex_sets:
     DEPS: res ON graph
 
 igraph_maximal_independent_vertex_sets:
-    PARAMS: GRAPH graph, OUT VERTEX_INDICES_LIST res
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_INDICES_LIST res,
+        INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: res ON graph
 
 igraph_independence_number:
