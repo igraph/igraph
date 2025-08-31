@@ -1325,8 +1325,9 @@ igraph_is_clique:
 
 igraph_cliques:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES_LIST res, INTEGER min_size=0,
-        INTEGER max_size=0
+        GRAPH graph, OUT VERTEX_INDICES_LIST res, 
+        INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: res ON graph
 
 igraph_cliques_callback:
@@ -1343,13 +1344,18 @@ igraph_largest_cliques:
     DEPS: res ON graph
 
 igraph_maximal_cliques:
-    PARAMS: GRAPH graph, OUT VERTEX_INDICES_LIST res, INTEGER min_size=0, INTEGER max_size=0
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_INDICES_LIST res, 
+        INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: res ON graph
 
 igraph_maximal_cliques_subset:
     PARAMS: |-
         GRAPH graph, VERTEX_INDICES subset, PRIMARY OUT VERTEX_INDICES_LIST res,
-        OUT INTEGER no, OPTIONAL OUTFILE outfile, INTEGER min_size=0, INTEGER max_size=0
+        OUT INTEGER no, OPTIONAL OUTFILE outfile,
+        INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: subset ON graph, res ON graph
 
 igraph_maximal_cliques_callback:
@@ -1363,7 +1369,9 @@ igraph_maximal_cliques_count:
 
 igraph_maximal_cliques_file:
     PARAMS: |-
-        GRAPH graph, OUTFILE res, INTEGER min_size=0, INTEGER max_size=0
+        GRAPH graph, OUTFILE res,
+        INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
+        INTEGER max_results=UNLIMITED
 
 igraph_maximal_cliques_hist:
     PARAMS: |-
@@ -1375,7 +1383,9 @@ igraph_clique_number:
 igraph_weighted_cliques:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_WEIGHTS vertex_weights, OUT VERTEX_INDICES_LIST res,
-        REAL min_weight=0, REAL max_weight=0, BOOLEAN maximal=False
+        BOOLEAN maximal=False,
+        REAL min_weight=UNLIMITED, REAL max_weight=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: vertex_weights ON graph, res ON graph
 
 igraph_largest_weighted_cliques:
