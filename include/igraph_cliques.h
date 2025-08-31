@@ -33,12 +33,14 @@ IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques(
         const igraph_t *graph, igraph_vector_int_list_t *res,
-        igraph_int_t min_size, igraph_int_t max_size);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_file(
         const igraph_t *graph,
         FILE *outfile,
-        igraph_int_t min_size, igraph_int_t max_size);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_count(
         const igraph_t *graph,
@@ -48,7 +50,8 @@ IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_count(
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_subset(
         const igraph_t *graph, const igraph_vector_int_t *subset,
         igraph_vector_int_list_t *res, igraph_int_t *no, FILE *outfile,
-        igraph_int_t min_size, igraph_int_t max_size);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_hist(
         const igraph_t *graph,
