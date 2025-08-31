@@ -133,7 +133,6 @@ This section gives detailed on breaking changes you need to consider when updati
 ### Added
 
  - `igraph_setup()` performs all initialization tasks that are recommended before using the igraph library. Right now this function only initializes igraph's internal random number generator with a practically random seed, but it may also perform other tasks in the future. It is recommended to call this function before using any other function from the library (although most of the functions will work fine now even if this function is not called).
- - `igraph_int_t` may now be used as an alias to `igraph_integer_t`.
  - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to uniformly sample G(n,m) graphs with multi-edges.
  - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to uniformly sample bipartite G(n,m) graphs with multi-edges.
  - `igraph_iea_game()` samples random multigraphs through independent edge assignment.
@@ -821,7 +820,7 @@ Some of the highlights are:
  - `igraph_degree_sequence_game()` now takes degree sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.
  - `igraph_degseq_t`, used by `igraph_degree_sequence_game()`, uses new names for its constants. The old names are deprecated, but retained for compatibility.  See `igraph_constants.h` to see which new name corresponds to which old one.
  - `igraph_delete_vertices_idx()` now uses `igraph_vector_int_t` vectors to return the mapping and the inverse mapping of old vertex IDs to new ones.
- - `igraph_deterministic_optimal_imitation()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_int_t`.
+ - `igraph_deterministic_optimal_imitation()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_integer_t`.
  - `igraph_dfs()` now takes an `igraph_vector_int_t` for its `order`, `order_out`, `father` and `dist` arguments instead of an `igraph_vector_t`. Furthermore, these vectors will contain -2 for vertices that have not been visited; in earlier versions, they used to contain NaN instead. Note that -1 is still used in the `father` vector to indicate the root of a DFS tree.
  - `igraph_diameter()` and `igraph_diameter_dijkstra()` now use `igraph_vector_int_t` vectors to return the list of vertex and edge IDs in the diameter.
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its `dom` and `leftout` arguments instead of an `igraph_vector_t`.
@@ -888,7 +887,7 @@ Some of the highlights are:
  - The `res` parameter in `igraph_maximal_independent_vertex_sets()` is now an `igraph_vector_int_list_t`.
  - `igraph_maximum_cardinality_search()` now uses an `igraph_vector_int_t` for its `alpha` and `alpham1` arguments.
  - `igraph_mincut()` now uses an `igraph_vector_int_t` for its `cut`, `partition` and `partition2` parameters.
- - `igraph_moran_process()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_int_t`.
+ - `igraph_moran_process()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_integer_t`.
  - Motif callbacks of type `igraph_motifs_handler_t` now take an `igraph_vector_int_t` with the vertex IDs instead of an `igraph_vector_t`, and use `igraph_integer_t` for the isoclass parameter.
  - Motif functions now use `igraph_integer_t` instead of `int` for their `size` parameter.
  - `igraph_neighborhood_size()` now uses an `igraph_vector_int_t` for its `res` parameter.
@@ -906,7 +905,7 @@ Some of the highlights are:
  - `igraph_reindex_membership()` now uses an `igraph_vector_int_t` for its `new_to_old` parameter.
  - `igraph_rng_seed()` now requires an `igraph_uint_t` as its seed arguments. RNG implementations are free to use only the lower bits of the seed if they do not support 64-bit seeds.
  - `igraph_rngtype_rand` (i.e. the RNG that is based on BSD `rand()`) was removed due to poor statistical properties that sometimes resulted in weird artifacts like all-even "random" numbers when igraph's usage patterns happened to line up with the shortcomings of the `rand()` generator in a certain way.
- - `igraph_roulette_wheel_imitation()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_int_t`.
+ - `igraph_roulette_wheel_imitation()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_integer_t`.
  - `igraph_similarity_dice_pairs()` now uses an `igraph_vector_int_t` for its `pairs` parameter.
  - `igraph_similarity_jaccard_pairs()` now uses an `igraph_vector_int_t` for its `pairs` parameter.
  - `igraph_simple_interconnected_islands_game()` does not generate multi-edges between islands any more.
@@ -917,7 +916,7 @@ Some of the highlights are:
  - `igraph_sparsemat_is_symmetric()` now returns an error code and the result itself is provided in an output argument.
  - The `values` argument of `igraph_sparsemat_transpose()` was removed; now the function always copies the values over to the transposed matrix.
  - `igraph_spmatrix_t` and related functions were removed as they mostly duplicated functionality that was already present in `igraph_sparsemat_t`.  Functions that used `igraph_spmatrix_t` in the library now use `igraph_sparsemat_t`.
- - `igraph_stochastic_imitation()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_int_t`.
+ - `igraph_stochastic_imitation()` now expects the list of strategies in an `igraph_vector_int_t` instead of an `igraph_integer_t`.
  - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its `cut`, `partition` and `partition2` parameters.
  - `igraph_st_vertex_connectivity()` now ignores edges between source and target for `IGRAPH_VCONN_NEI_IGNORE`
  - `igraph_strvector_get()` now returns strings in the return value, not in an output argument.
