@@ -101,7 +101,7 @@ static igraph_error_t igraph_i_cliquer_cliques_user_data_init(
     igraph_vector_int_list_t* result
 ) {
     data->result = result;
-    data->max_results = -1;
+    data->max_results = IGRAPH_UNLIMITED;
     igraph_vector_int_list_clear(result);
     return igraph_vector_int_init(&data->clique, 0);
 }
@@ -147,7 +147,7 @@ igraph_error_t igraph_i_cliquer_cliques(
     igraph_int_t vcount = igraph_vcount(graph);
     igraph_i_cliquer_cliques_user_data_t data;
 
-    if (vcount == 0) {
+    if (vcount == 0 || max_results == 0) {
         igraph_vector_int_list_clear(res);
         return IGRAPH_SUCCESS;
     }
@@ -172,10 +172,6 @@ igraph_error_t igraph_i_cliquer_cliques(
     IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
 
     data.max_results = max_results;
-
-    if (max_results == 0) {
-        return IGRAPH_SUCCESS;
-    }
 
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
@@ -352,7 +348,7 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
     igraph_int_t vcount = igraph_vcount(graph);
     igraph_i_cliquer_cliques_user_data_t data;
 
-    if (vcount == 0) {
+    if (vcount == 0 || max_results == 0) {
         igraph_vector_int_list_clear(res);
         return IGRAPH_SUCCESS;
     }
@@ -382,10 +378,6 @@ igraph_error_t igraph_i_weighted_cliques(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_cliquer_cliques_user_data_init(&data, res));
     IGRAPH_FINALLY(igraph_i_cliquer_cliques_user_data_destroy, &data);
     data.max_results = max_results;
-
-    if (max_results == 0) {
-        return IGRAPH_SUCCESS;
-    }
 
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
@@ -465,7 +457,7 @@ igraph_error_t igraph_i_weighted_clique_number(const igraph_t *graph,
 
     IGRAPH_CHECK(set_weights(vertex_weights, g));
 
-    igraph_cliquer_opt.user_function = check_interruption_callback;
+    igraph_cliquer_opt.user_function = &check_interruption_callback;
 
     IGRAPH_CHECK(clique_max_weight(g, &igraph_cliquer_opt, &res_int));
 
