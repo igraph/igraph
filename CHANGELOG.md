@@ -69,7 +69,11 @@ This section gives detailed on breaking changes you need to consider when updati
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`, `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` no longer interprets an empty `outseq` vector as a missing out-degree sequence. Pass `NULL` if you don't wish to specify an out-degree sequence.
  - `igraph_degree_sequence_game()` no longer interprets an empty in-degree vector as a request for generating undirected graphs. To generate undirected graphs, pass `NULL` for in-degrees.
  - `igraph_lcf()` was renamed to `igraph_lcf_small()` and `igraph_lcf_vector()` was renamed to `igraph_lcf()`. Now `igraph_lcf()` takes shifts as a vector input, while `igraph_lcf_small()` accepts a shorthand notation where shifts are given as a variable number of function arguments.
- - `igraph_sbm_game()` gained a `multiple` parameter and now supports generating multigraph with prescribed expected edge multiplicities. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
+ - `igraph_sbm_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `igraph_bool_t loops` and supports generating graphs with mutli-edges. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
+ - `igraph_rewire_edges()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
+ - `igraph_watts_strogatz_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
+ - `igraph_static_fitness_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
+ - `igraph_static_power_law_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 
 #### Shortest paths
 
