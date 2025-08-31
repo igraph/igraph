@@ -52,9 +52,16 @@ int main(void) {
     igraph_destroy(&g);
 
     igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_OUT);
-    igraph_maximal_independent_vertex_sets(&g, &result);
+    igraph_maximal_independent_vertex_sets(&g, &result, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
     n = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal independent sets found\n", n);
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
+    }
+
+    igraph_maximal_independent_vertex_sets(&g, &result, 4, 5, IGRAPH_UNLIMITED);
+    n = igraph_vector_int_list_size(&result);
+    printf("%" IGRAPH_PRId " maximal independent sets between sizes 4 and 5 found\n", n);
     for (igraph_int_t i = 0; i < n; i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&result, i));
     }
