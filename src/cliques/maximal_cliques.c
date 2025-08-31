@@ -377,8 +377,9 @@ igraph_error_t igraph_i_maximal_cliques(
 igraph_error_t igraph_maximal_cliques(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_int_t min_size, igraph_int_t max_size) {
-    return igraph_i_maximal_cliques(graph, res, min_size, max_size, IGRAPH_UNLIMITED);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+    return igraph_i_maximal_cliques(graph, res, min_size, max_size, max_results);
 }
 
 
@@ -462,8 +463,9 @@ igraph_error_t igraph_i_maximal_cliques_file(
 igraph_error_t igraph_maximal_cliques_file(
         const igraph_t *graph,
         FILE *outfile,
-        igraph_int_t min_size, igraph_int_t max_size) {
-    return igraph_i_maximal_cliques_file(graph, outfile, min_size, max_size, IGRAPH_UNLIMITED);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+    return igraph_i_maximal_cliques_file(graph, outfile, min_size, max_size, max_results);
 }
 
 
@@ -512,8 +514,9 @@ igraph_error_t igraph_i_maximal_cliques_subset(
 igraph_error_t igraph_maximal_cliques_subset(
         const igraph_t *graph, const igraph_vector_int_t *subset,
         igraph_vector_int_list_t *res, igraph_int_t *no, FILE *outfile,
-        igraph_int_t min_size, igraph_int_t max_size) {
-    return igraph_i_maximal_cliques_subset(graph, subset, res, no, outfile, min_size, max_size, IGRAPH_UNLIMITED);
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+    return igraph_i_maximal_cliques_subset(graph, subset, res, no, outfile, min_size, max_size, max_results);
 }
 
 

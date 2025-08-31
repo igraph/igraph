@@ -328,7 +328,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_subgraph_from_edges(graph, &subg, igraph_ess_vector(&subv), /*delete_vertices=*/ 0));
     IGRAPH_FINALLY(igraph_destroy, &subg);
-    IGRAPH_CHECK(igraph_maximal_cliques(&subg, &mycliques, /*min_size=*/ 0, /*max_size=*/ 0));
+    IGRAPH_CHECK(igraph_maximal_cliques(&subg, &mycliques, /*min_size=*/ 0, /*max_size=*/ 0, IGRAPH_UNLIMITED));
     igraph_destroy(&subg);
     igraph_vector_int_destroy(&subv);
     IGRAPH_FINALLY_CLEAN(2);

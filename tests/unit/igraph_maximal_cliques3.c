@@ -48,7 +48,8 @@ int main(void) {
     igraph_vector_int_list_init(&cliques, 0);
 
     igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 15,
-                           /*max_size=*/ 0);
+                           /*max_size=*/ IGRAPH_UNLIMITED,
+                           IGRAPH_UNLIMITED);
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);

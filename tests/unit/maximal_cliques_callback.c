@@ -85,7 +85,7 @@ int main(void) {
                  -1);
 
     igraph_vector_int_list_init(&list, 0);
-    igraph_maximal_cliques(&graph, &list, 0, 0);
+    igraph_maximal_cliques(&graph, &list, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
 
     ud.i = 0;
     ud.list = &list;
