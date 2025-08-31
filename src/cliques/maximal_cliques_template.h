@@ -137,15 +137,16 @@
 #endif
 
 static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
-    igraph_vector_int_t *PX, igraph_int_t PS, igraph_int_t PE,
-    igraph_int_t XS, igraph_int_t XE, igraph_int_t oldPS, igraph_int_t oldXE,
-    igraph_vector_int_t *R,
-    igraph_vector_int_t *pos,
-    igraph_adjlist_t *adjlist,
-    RESTYPE,
-    igraph_vector_int_t *nextv,
-    igraph_vector_int_t *H,
-    igraph_int_t min_size, igraph_int_t max_size) {
+        igraph_vector_int_t *PX, igraph_int_t PS, igraph_int_t PE,
+        igraph_int_t XS, igraph_int_t XE, igraph_int_t oldPS, igraph_int_t oldXE,
+        igraph_vector_int_t *R,
+        igraph_vector_int_t *pos,
+        igraph_adjlist_t *adjlist,
+        RESTYPE,
+        igraph_vector_int_t *nextv,
+        igraph_vector_int_t *H,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results, igraph_int_t *result_count) {
 
     igraph_error_t err;
 
@@ -156,6 +157,10 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
         igraph_int_t clsize = igraph_vector_int_size(R);
         if (min_size <= clsize && (clsize <= max_size || max_size <= 0)) {
             RECORD;
+            *result_count += 1;
+            if (max_results >= 0 && *result_count == max_results) {
+                return IGRAPH_STOP;
+            }
         }
     } else if (PS <= PE) {
         /* Select a pivot element */
@@ -174,7 +179,8 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
             err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
                       PX, newPS, PE, XS, newXE, PS, XE, R,
                       pos, adjlist, RESNAME, nextv, H,
-                      min_size, max_size);
+                      min_size, max_size,
+                      max_results, result_count);
 
             if (err == IGRAPH_STOP) {
                 return err;
@@ -200,7 +206,8 @@ igraph_error_t FUNCTION(igraph_i_maximal_cliques, SUFFIX)(
     const igraph_t *graph,
     RESTYPE,
     igraph_int_t min_size,
-    igraph_int_t max_size) {
+    igraph_int_t max_size,
+    igraph_int_t max_results) {
 
     /* Implementation details. TODO */
 
@@ -211,6 +218,7 @@ igraph_error_t FUNCTION(igraph_i_maximal_cliques, SUFFIX)(
     igraph_vector_int_t rank; /* TODO: this is not needed */
     igraph_int_t i, ii, nn;
     igraph_adjlist_t adjlist, fulladjlist;
+    igraph_int_t result_count = 0;
     igraph_real_t pgreset = round(no_of_nodes / 100.0), pg = pgreset, pgc = 0;
     igraph_error_t err;
 
@@ -218,6 +226,12 @@ igraph_error_t FUNCTION(igraph_i_maximal_cliques, SUFFIX)(
 
     if (igraph_is_directed(graph)) {
         IGRAPH_WARNING("Edge directions are ignored for maximal clique calculations.");
+    }
+
+    PREPARE;
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
@@ -244,8 +258,6 @@ igraph_error_t FUNCTION(igraph_i_maximal_cliques, SUFFIX)(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&H, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&pos, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nextv, 100);
-
-    PREPARE;
 
     FOR_LOOP_OVER_VERTICES {
         igraph_int_t v;
@@ -329,8 +341,8 @@ igraph_error_t FUNCTION(igraph_i_maximal_cliques, SUFFIX)(
 
         err = FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
                 &PX, PS, PE, XS, XE, PS, XE, &R, &pos,
-                &adjlist, RESNAME, &nextv, &H, min_size,
-                max_size);
+                &adjlist, RESNAME, &nextv, &H,
+                min_size, max_size, max_results, &result_count);
         if (err == IGRAPH_STOP) {
             break;
         } else {
