@@ -14,12 +14,12 @@ The three version parts are available at compile time as the macros `IGRAPH_VERS
 
 The majority of public, documented functions are considered to be part of the _stable programming interface_, but there are some notable exceptions:
 
-- **Experimental functions** may change at any time without notice.  These are clearly marked in their documentation ([example](https://igraph.org/c/html/0.10.13/igraph-Generators.html#igraph_chung_lu_game)).  They are also marked in igraph's header files with the `IGRAPH_EXPERIMENTAL` macro.  Most newly added functions start out as _experimental_, and stay in this state until we are confident in their design, typically for one or two minor releases.  User feedback about experimental functions is particularly welcome.  We make the effort to avoid changes to experimental functions in patch releases, but do not guarantee this.
+- **Experimental functions** may change at any time without notice.  These are clearly marked in their documentation ([example](https://igraph.org/c/html/0.10.13/igraph-Generators.html#igraph_chung_lu_game)).  They are also marked in igraph's header files with the `IGRAPH_EXPERIMENTAL` macro ([example](https://github.com/igraph/igraph/blob/3629c46b2784cb10fc27fc6e9fab4404a13d031c/include/igraph_cycles.h#L49-L53)).  Most newly added functions start out as _experimental_, and stay in this state until we are confident in their design, typically for one or two minor releases.  User feedback about experimental functions is particularly welcome.  We make the effort to avoid changes to experimental functions in patch releases, but do not guarantee this.
 - **Internal and undocumented functions** are not part of the stable programming interface, not even if they are present in public headers.  They may change at any time. The names of internal functions usually start with the prefix `igraph_i_` (capitalized for macros), while public functions start with `igraph_`.
 
 ## Symbol lifecycle
 
-Most new symbols start out as _experimental_ in minor releases.  Eventually, their API is declared stable, and the experimental marker is removed from their documentation in an upcoming minor release.
+Most new symbols start out as _experimental_ in minor releases.  Eventually, their API is declared stable, and the experimental marker is removed from their declaration and documentation in an upcoming minor release.
 
 Symbols go through a deprecation phase before they are removed.  Deprecated symbols are marked in their documentation ([example](https://igraph.org/c/html/0.10.13/igraph-Structural.html#igraph_clusters)), and functions are prefixed with `IGRAPH_DEPRECATED` in the public headers ([example](https://github.com/igraph/igraph/blob/997f59ad742892fff199824a248fab382b40f526/include/igraph_components.h#L45-L47)). With GCC-compatible compilers, use the `-Wdeprecated` flag to get a warning for the use of deprecated functions, but keep in mind that deprecation warnings are not supported for all symbol types (e.g. macros) with all compilers.  The ultimate reference for deprecations is the [changelog][1].
 
@@ -45,11 +45,11 @@ Software that does not use experimental functions from igraph can safely link to
 
 The high-level interfaces of igraph do use both experimental and internal functions. Each high-level interface release is only guaranteed to be compatible with one specific release of C/igraph. As of this writing, this is a concern only for the Python interface, as the other interfaces (R and Mathematica) cannot link dynamically to C/igraph.
 
-We provide the `IGRAPH_WARN_EXPERIMENTAL` compile-time macro to help maintainers in determining whether a piece of software uses experimental igraph functions or not. Compilers that support `__attribute__((__warning(...)))` clauses will issue a warning when `IGRAPH_WARN_EXPERIMENTAL` is defined at compile-time and an experimental function is used somewhere in the code.
+We provide the `IGRAPH_WARN_EXPERIMENTAL` compile-time macro to help maintainers in determining whether a piece of software uses experimental igraph functions or not. Compilers that support `__attribute__((__warning(...)))` clauses will issue a warning when `IGRAPH_WARN_EXPERIMENTAL` is defined to a non-zero value at compile-time and an experimental function is used somewhere in the code.
 
 ## Notes
 
-For the purposes of this document, "API compatibility" means that the same sources can be compiled with different igraph versions of igraph headers.  "ABI compatibility" means that a program that only uses stable API can be linked to a different version of the igraph shared library than what it was compiled with.
+For the purposes of this document, "API compatibility" means that the same sources can be compiled using headers from different igraph versions.  "ABI compatibility" means that a program that only uses stable API can be linked to a different version of the igraph shared library than what it was compiled with.
 
 We strive to maintain both API and ABI compatibility.
 

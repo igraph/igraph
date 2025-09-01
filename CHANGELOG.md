@@ -2,6 +2,8 @@
 
 ## [develop]
 
+Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence. There is an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
+
 ### Breaking changes
 
 This section gives detailed on breaking changes you need to consider when updating code written for igraph 0.10.x.
