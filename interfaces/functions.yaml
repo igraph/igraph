@@ -472,7 +472,7 @@ igraph_closeness_cutoff:
         OPTIONAL OUT BOOLEAN all_reachable,
         VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, OPTIONAL EDGE_WEIGHTS weights,
-        BOOLEAN normalized=False, REAL cutoff=-1
+        BOOLEAN normalized=False, REAL cutoff=UNLIMITED
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_distances:
@@ -484,7 +484,7 @@ igraph_distances:
 igraph_distances_cutoff:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT MATRIX res,
-        VERTEX_SELECTOR from=ALL, VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT, REAL cutoff=-1
+        VERTEX_SELECTOR from=ALL, VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT, REAL cutoff=UNLIMITED
     DEPS: weights ON graph, from ON graph, to ON graph
 
 igraph_get_shortest_path:
@@ -541,7 +541,7 @@ igraph_distances_dijkstra:
 igraph_distances_dijkstra_cutoff:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, OPTIONAL EDGE_WEIGHTS weights, NEIMODE mode=OUT, REAL cutoff=-1
+        VERTEX_SELECTOR to=ALL, OPTIONAL EDGE_WEIGHTS weights, NEIMODE mode=OUT, REAL cutoff=UNLIMITED
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_shortest_paths_dijkstra:
@@ -603,7 +603,7 @@ igraph_voronoi:
 igraph_get_all_simple_paths:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES_LIST res, VERTEX from,
-        VERTEX_SELECTOR to=ALL, INTEGER minlen=-1, INTEGER maxlen=-1, NEIMODE mode=OUT
+        VERTEX_SELECTOR to=ALL, INTEGER minlen=UNLIMITED, INTEGER maxlen=UNLIMITED, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, res ON graph
 
 igraph_get_k_shortest_paths:
@@ -665,7 +665,7 @@ igraph_betweenness_cutoff:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VERTEX_QTY res,
         VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True, BOOLEAN normalized=False,
-        REAL cutoff=-1
+        REAL cutoff=UNLIMITED
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_betweenness_subset:
@@ -685,7 +685,7 @@ igraph_edge_betweenness:
 igraph_edge_betweenness_cutoff:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
-        BOOLEAN directed=True, BOOLEAN normalized=False, REAL cutoff=-1
+        BOOLEAN directed=True, BOOLEAN normalized=False, REAL cutoff=UNLIMITED
     DEPS: eids ON graph, weights ON graph, res ON graph eids
 
 igraph_edge_betweenness_subset:
@@ -706,7 +706,7 @@ igraph_harmonic_centrality_cutoff:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, OPTIONAL EDGE_WEIGHTS weights, BOOLEAN normalized=False,
-        REAL cutoff=-1
+        REAL cutoff=UNLIMITED
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_pagerank:
@@ -1043,7 +1043,7 @@ igraph_joint_degree_matrix:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT MATRIX jdm,
-        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1
+        INTEGER max_out_degree=UNLIMITED, INTEGER max_in_degree=UNLIMITED
     DEPS: weights ON graph
 
 igraph_joint_degree_distribution:
@@ -1053,7 +1053,7 @@ igraph_joint_degree_distribution:
         NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
         BOOLEAN directed_neighbors=True,
         BOOLEAN normalized=True,
-        INTEGER max_from_degree=-1, INTEGER max_to_degree=-1
+        INTEGER max_from_degree=UNLIMITED, INTEGER max_to_degree=UNLIMITED
     DEPS: weights ON graph
 
 igraph_joint_type_distribution:
@@ -1271,7 +1271,7 @@ igraph_is_connected:
 igraph_decompose:
     PARAMS: |-
         GRAPH graph, OUT GRAPH_LIST components, CONNECTEDNESS mode=WEAK,
-        INTEGER maxcompno=-1, INTEGER minelements=1
+        INTEGER maxcompno=UNLIMITED, INTEGER minelements=1
 
 igraph_articulation_points:
     PARAMS: GRAPH graph, OUT VERTEX_INDICES res
@@ -2610,13 +2610,13 @@ igraph_simple_cycles:
     PARAMS: |-
         GRAPH graph,
         OPTIONAL OUT VERTEX_INDICES_LIST vertices, OPTIONAL OUT EDGE_INDICES_LIST edges,
-        NEIMODE mode=OUT, INTEGER min_cycle_length=-1, INTEGER max_cycle_length=-1
+        NEIMODE mode=OUT, INTEGER min_cycle_length=UNLIMITED, INTEGER max_cycle_length=UNLIMITED
     DEPS: vertices ON graph, edges ON graph
 
 igraph_simple_cycles_callback:
     PARAMS: |-
         GRAPH graph,
-        NEIMODE mode=OUT, INTEGER min_cycle_length=-1, INTEGER max_cycle_length=-1,
+        NEIMODE mode=OUT, INTEGER min_cycle_length=UNLIMITED, INTEGER max_cycle_length=UNLIMITED,
         CYCLE_FUNC cycle_handler, OPTIONAL EXTRA arg
 
 #######################################
@@ -2643,14 +2643,14 @@ igraph_fundamental_cycles:
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT EDGE_INDICES_LIST basis,
         OPTIONAL VERTEX start,
-        REAL bfs_cutoff=-1
+        REAL bfs_cutoff=UNLIMITED
     DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
         OUT EDGE_INDICES_LIST basis,
-        REAL bfs_cutoff=-1,
+        REAL bfs_cutoff=UNLIMITED,
         BOOLEAN complete=True, BOOLEAN use_cycle_order=True
     DEPS: weights ON graph, basis ON graph
 
