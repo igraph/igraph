@@ -108,7 +108,7 @@
 
   <xi:include href="generators.xml"/>
 
-  <xi:include href="spatialgames.xml"/>
+  <xi:include href="processes.xml"/>
 
   <xi:include href="iterators.xml"/>
 

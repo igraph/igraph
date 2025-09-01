@@ -4,8 +4,8 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<chapter id="igraph-Spatial-Games">
-<title>Games on graphs</title>
+<chapter id="igraph-Processes">
+<title>Processes on graphs</title>
 
 <section id="epidemic-models"><title>Epidemic models</title>
 <!-- doxrox-include igraph_sir -->

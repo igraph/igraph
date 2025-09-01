@@ -49,7 +49,7 @@ set(
   separators.xxml
   sparsemat.xxml
   spatial.xxml
-  spatialgames.xxml
+  processes.xxml
   stack.xxml
   status.xxml
   structural.xxml
