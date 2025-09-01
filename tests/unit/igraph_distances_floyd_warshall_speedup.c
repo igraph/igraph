@@ -109,7 +109,7 @@ int main(void) {
     igraph_destroy(&g);
 
     /* Unweighted directed - larger graph */
-    igraph_erdos_renyi_game_gnp(&g, 100, 0.1, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnp(&g, 100, 0.1, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW);
     igraph_distances_floyd_warshall(&g, &d, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE);
     igraph_distances_dijkstra(&g, &d2, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT);
     IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));

@@ -27,6 +27,7 @@
 
 #include "core/interruption.h"
 #include "math/safe_intop.h"
+#include "misc/graphicality.h"
 #include "random/random_internal.h"
 
 /**
@@ -177,8 +178,8 @@ static igraph_error_t gnp_large(
  *    When multi-edges are disallowed, this is equivalent to the probability
  *    of having a connection between any two vertices.
  * \param directed Whether to generate a directed graph.
- * \param loops Whether to generate self-loops.
- * \param multiple Whether to generate multi-edges.
+ * \param allowed_edge_types Controls whether multi-edges and self-loops
+ *     are generated. See \ref igraph_edge_type_sw_t.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -196,9 +197,11 @@ static igraph_error_t gnp_large(
  * \example examples/simple/igraph_erdos_renyi_game_gnp.c
  */
 igraph_error_t igraph_erdos_renyi_game_gnp(
-    igraph_t *graph, igraph_int_t n, igraph_real_t p,
-    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple
-) {
+        igraph_t *graph,
+        igraph_int_t n, igraph_real_t p,
+        igraph_bool_t directed,
+        igraph_edge_type_sw_t allowed_edge_types) {
+
     /* This function uses doubles in its `s` vector, and for `maxedges` and `last`.
      * This is because on a system with 32-bit ints, maxedges will be larger than
      * IGRAPH_INTEGER_MAX and this will cause overflows when calculating `from` and `to`
@@ -208,11 +211,14 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
+    igraph_bool_t loops, multiple;
     int iter = 0;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices for G(n,p) model.", IGRAPH_EINVAL);
     }
+
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     if (multiple) {
         if (p < 0.0) {
@@ -725,9 +731,8 @@ static igraph_error_t gnm_simple(
  * \param n The number of vertices in the graph.
  * \param m The number of edges in the graph.
  * \param directed Whether to generate a directed graph.
- * \param loops Whether to generate self-loops.
- * \param multiple Whether it is allowed to generate more than one edge between
- *    the same pair of vertices.
+ * \param allowed_edge_types Controls whether multi-edges and self-loops
+ *     are generated. See \ref igraph_edge_type_sw_t.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -747,8 +752,12 @@ static igraph_error_t gnm_simple(
  * \example examples/simple/igraph_erdos_renyi_game_gnm.c
  */
 igraph_error_t igraph_erdos_renyi_game_gnm(
-    igraph_t *graph, igraph_int_t n, igraph_int_t m,
-    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple) {
+        igraph_t *graph,
+        igraph_int_t n, igraph_int_t m,
+        igraph_bool_t directed,
+        igraph_edge_type_sw_t allowed_edge_types) {
+
+    igraph_bool_t loops, multiple;
 
     /* The multigraph implementation relies on the below checks to avoid overflow. */
     if (n < 0 || n > IGRAPH_VCOUNT_MAX) {
@@ -757,6 +766,8 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Invalid number of edges for G(n,m) model.", IGRAPH_EINVAL);
     }
+
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     /* Special cases of "too many edges" that also apply to multigraphs:
      *  - The null graph cannot have edges.
