@@ -26,6 +26,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "internal/utils.h"
 #include "math/safe_intop.h"
 #include "misc/graphicality.h"
 #include "random/random_internal.h"
@@ -433,7 +434,6 @@ igraph_error_t igraph_iea_game(
     return IGRAPH_SUCCESS;
 }
 
-
 /* Uniform sampling of multigraphs from G(n,m) */
 static igraph_error_t gnm_multi(
         igraph_t *graph,
@@ -630,7 +630,8 @@ static igraph_error_t gnm_multi(
 static igraph_error_t gnm_simple(
         igraph_t *graph,
         igraph_int_t n, igraph_int_t m,
-        igraph_bool_t directed, igraph_bool_t loops) {
+        igraph_bool_t directed, igraph_bool_t loops,
+        igraph_bool_t edge_labeled) {
 
     /* This function uses doubles in its `s` vector, and for `maxedges` and `last`.
      * This is because on a system with 32-bit ints, maxedges will be larger than
@@ -711,7 +712,13 @@ static igraph_error_t gnm_simple(
 
         igraph_vector_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
+
+        if (edge_labeled) {
+            IGRAPH_CHECK(igraph_i_vector_int_shuffle_pairs(&edges));
+        }
+
         IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
         igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -733,6 +740,9 @@ static igraph_error_t gnm_simple(
  * \param directed Whether to generate a directed graph.
  * \param allowed_edge_types Controls whether multi-edges and self-loops
  *     are generated. See \ref igraph_edge_type_sw_t.
+ * \param edge_labeled If true, the sampling is done unformly from the set
+ *     of ordered edge lists. See \ref igraph_iea_game() for more information.
+ *     Set this to \c false to select the classic Erdős-Rényi model.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -755,7 +765,8 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         igraph_t *graph,
         igraph_int_t n, igraph_int_t m,
         igraph_bool_t directed,
-        igraph_edge_type_sw_t allowed_edge_types) {
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_bool_t edge_labeled) {
 
     igraph_bool_t loops, multiple;
 
@@ -783,9 +794,17 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         return igraph_empty(graph, n, directed);
     }
 
-    if (multiple) {
-        return gnm_multi(graph, n, m, directed, loops);
+    if (edge_labeled) {
+        if (multiple) {
+            return igraph_iea_game(graph, n, m, directed, loops);
+        } else {
+            return gnm_simple(graph, n, m, directed, loops, /*edge_labeled=*/ true);
+        }
     } else {
-        return gnm_simple(graph, n, m, directed, loops);
+        if (multiple) {
+            return gnm_multi(graph, n, m, directed, loops);
+        } else {
+            return gnm_simple(graph, n, m, directed, loops, /*edge_labeled=*/ false);
+        }
     }
 }

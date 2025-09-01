@@ -445,7 +445,7 @@ int main(void) {
 
     igraph_full(&g_full, 500, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_ring(&g_ring, 50000, IGRAPH_UNDIRECTED, /* mutual */ 0, /*circular*/ 0);
-    igraph_erdos_renyi_game_gnm(&g_er, 2000, 20000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g_er, 2000, 20000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
     printf("Select all vertices:\n\n");
     printf("Full graph:\n");

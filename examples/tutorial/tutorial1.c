@@ -13,8 +13,8 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_erdos_renyi_game_gnm(
-        &graph, num_vertices, num_edges,
-        IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+            &graph, num_vertices, num_edges,
+            IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
     igraph_diameter(
         &graph, /* weights = */ NULL,

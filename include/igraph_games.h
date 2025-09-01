@@ -48,8 +48,9 @@ IGRAPH_EXPORT igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_int_t 
                                        const igraph_t *start_from);
 IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_int_t n, igraph_real_t p,
                                                          igraph_bool_t directed, igraph_edge_type_sw_t allowed_edge_types);
-IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_int_t n, igraph_int_t m,
-                                              igraph_bool_t directed, igraph_edge_type_sw_t allowed_edge_types);
+IGRAPH_EXPORT igraph_error_t
+igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_int_t n, igraph_int_t m, igraph_bool_t directed,
+                            igraph_edge_type_sw_t allowed_edge_types, igraph_bool_t edge_labeled);
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_iea_game(igraph_t *graph,
                                              igraph_int_t n, igraph_int_t m,
                                              igraph_bool_t directed, igraph_bool_t loops);

@@ -29,7 +29,7 @@ int test_no_multiple(void) {
 
     /* null graph */
 
-    igraph_erdos_renyi_game_gnm(&g, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     IGRAPH_ASSERT(igraph_ecount(&g) == 0);
@@ -39,7 +39,7 @@ int test_no_multiple(void) {
 
     /* singleton */
 
-    igraph_erdos_renyi_game_gnm(&g, 1, 0, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g, 1, 0, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 1);
     IGRAPH_ASSERT(igraph_ecount(&g) == 0);
@@ -49,7 +49,7 @@ int test_no_multiple(void) {
 
     /* singleton with loop */
 
-    igraph_erdos_renyi_game_gnm(&g, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW);
+    igraph_erdos_renyi_game_gnm(&g, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW, false);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 1);
     IGRAPH_ASSERT(igraph_ecount(&g) == 1);
@@ -57,7 +57,7 @@ int test_no_multiple(void) {
 
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1, 1, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW);
+    igraph_erdos_renyi_game_gnm(&g, 1, 1, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, false);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 1);
     IGRAPH_ASSERT(igraph_ecount(&g) == 1);
@@ -67,7 +67,7 @@ int test_no_multiple(void) {
 
 
     /* directed with loops */
-    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 10 - 1, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW);
+    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 10 - 1, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 10);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 10 - 1);
     IGRAPH_ASSERT(igraph_is_directed(&g));
@@ -80,7 +80,7 @@ int test_no_multiple(void) {
     igraph_destroy(&g);
 
     /* directed without loops */
-    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 9 - 1, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 9 - 1, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 10);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 - 1);
     IGRAPH_ASSERT(igraph_is_directed(&g));
@@ -88,7 +88,7 @@ int test_no_multiple(void) {
     igraph_destroy(&g);
 
     /* undirected with loops */
-    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 11 / 2 - 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW);
+    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 11 / 2 - 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 10);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 11 / 2 - 1);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
@@ -101,7 +101,7 @@ int test_no_multiple(void) {
     igraph_destroy(&g);
 
     /* undirected without loops */
-    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 9 / 2 - 1, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g, 10, 10 * 9 / 2 - 1, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 10);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 / 2 - 1);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
@@ -110,26 +110,26 @@ int test_no_multiple(void) {
 
 
     /* Create a couple of large graphs too */
-    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_is_simple(&g, &simple, IGRAPH_DIRECTED); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_is_simple(&g, &simple, IGRAPH_DIRECTED); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW);
+    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_has_multiple(&g, &has_multi); IGRAPH_ASSERT(! has_multi);
     igraph_simplify(&g, false, true, /*edge_comb=*/ NULL);  /* only remove loops */
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW);
+    igraph_erdos_renyi_game_gnm(&g, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_has_multiple(&g, &has_multi); IGRAPH_ASSERT(! has_multi);
@@ -146,7 +146,7 @@ int test_multiple(void) {
 
     /* null graph */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 0);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 0);
     print_graph(&graph1);
@@ -155,26 +155,26 @@ int test_multiple(void) {
     /* null graph with more than zero edges is invalid */
 
     CHECK_ERROR(
-        igraph_erdos_renyi_game_gnm(&graph1, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW),
+            igraph_erdos_renyi_game_gnm(&graph1, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false),
         IGRAPH_EINVAL
     );
 
     /* singleton with no loops and more than zero edges is invalid */
 
     CHECK_ERROR(
-        igraph_erdos_renyi_game_gnm(&graph1, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW),
+            igraph_erdos_renyi_game_gnm(&graph1, 1, 1, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false),
         IGRAPH_EINVAL
     );
 
     /* singleton with multiple loops */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 1, 2, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW); /* undirected with loops */
+    igraph_erdos_renyi_game_gnm(&graph1, 1, 2, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false); /* undirected with loops */
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 1);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 2);
     print_graph(&graph1);
     igraph_destroy(&graph1);
 
-    igraph_erdos_renyi_game_gnm(&graph1, 1, 3, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW); /* undirected with loops */
+    igraph_erdos_renyi_game_gnm(&graph1, 1, 3, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false); /* undirected with loops */
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 1);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 3);
     print_graph(&graph1);
@@ -182,7 +182,7 @@ int test_multiple(void) {
 
     /* directed with loops */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 10, 560, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 10, 560, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 10);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 560);
     IGRAPH_ASSERT(igraph_is_directed(&graph1));
@@ -192,7 +192,7 @@ int test_multiple(void) {
 
     /* directed without loops */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 10, 890, IGRAPH_DIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 10, 890, IGRAPH_DIRECTED, IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 10);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 890);
     IGRAPH_ASSERT(igraph_is_directed(&graph1));
@@ -203,7 +203,7 @@ int test_multiple(void) {
 
     /* undirected with loops */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 10, 540, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 10, 540, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 10);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 540);
     IGRAPH_ASSERT(!igraph_is_directed(&graph1));
@@ -213,7 +213,7 @@ int test_multiple(void) {
 
     /* undirected without loops */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 10, 440, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 10, 440, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 10);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 440);
     IGRAPH_ASSERT(!igraph_is_directed(&graph1));
@@ -228,24 +228,24 @@ int test_multiple(void) {
 
     /* large graphs */
 
-    igraph_erdos_renyi_game_gnm(&graph1, 1000, 200000, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 1000, 200000, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 1000);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 200000);
     igraph_has_loop(&graph1, &has_loop); IGRAPH_ASSERT(! has_loop);
     igraph_destroy(&graph1);
 
-    igraph_erdos_renyi_game_gnm(&graph1, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 200000);
     igraph_has_loop(&graph1, &has_loop); IGRAPH_ASSERT(! has_loop);
     igraph_destroy(&graph1);
 
-    igraph_erdos_renyi_game_gnm(&graph1, 100000, 200000, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 100000, 200000, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 200000);
     igraph_destroy(&graph1);
 
-    igraph_erdos_renyi_game_gnm(&graph1, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph1, 100000, 200000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 200000);
     igraph_destroy(&graph1);
