@@ -47,10 +47,10 @@
  *   they are found.
  * \param from The start vertex.
  * \param to The target vertices.
- * \param minlen Minimum length of paths that is considered. If negative,
- *   no lower bound is used on the path lengths.
- * \param maxlen Maximum length of paths that is considered. If negative,
- *   no upper bound is used on the path lengths.
+ * \param minlen Minimum length of paths that is considered. If negative
+ *   or \ref IGRAPH_UNLIMITED, no lower bound is used on the path lengths.
+ * \param maxlen Maximum length of paths that is considered. If negative
+ *   or \ref IGRAPH_UNLIMITED, no upper bound is used on the path lengths.
  * \param mode The type of paths to be used for the calculation in directed
  *   graphs. Possible values:
  *        \clist

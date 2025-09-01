@@ -512,11 +512,11 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * \param jdm A pointer to an initialized matrix that will be resized. The values
  *        will be written here.
  * \param max_out_degree Number of rows in the result, i.e. the largest (out-)degree
- *        to consider. If negative, the largest (out-)degree of the graph will
- *        be used.
+ *        to consider. If negative or \ref IGRAPH_UNLIMITED, the largest (out-)degree
+ *        of the graph will be used.
  * \param max_in_degree Number of columns in the result, i.e. the largest (in-)degree
- *        to consider. If negative, the largest (in-)degree of the graph will
- *        be used.
+ *        to consider. If negative or \ref IGRAPH_UNLIMITED, the largest (in-)degree
+ *        of the graph will be used.
  * \return Error code.
  *
  * \sa \ref igraph_joint_degree_distribution() to count ordered vertex pairs instead of
@@ -834,12 +834,12 @@ static igraph_error_t mixing_matrix(
  * \param normalized Whether to normalize the matrix so that entries sum to 1.0.
  *    If false, matrix entries will be connection counts. Normalization is not
  *    meaningful if some edge weights are negative.
- * \param max_from_degree The largest source vertex degree to consider. If negative,
- *    the largest source degree will be used. The row count of the result matrix
- *    is one larger than this value.
- * \param max_to_degree The largest target vertex degree to consider. If negative,
- *    the largest target degree will be used. The column count of the result matrix
- *    is one larger than this value.
+ * \param max_from_degree The largest source vertex degree to consider. If
+ *    negative or \ref IGRAPH_UNLIMITED, the largest source degree will be used.
+ *    The row count of the result matrix is one larger than this value.
+ * \param max_to_degree The largest target vertex degree to consider. If
+ *    negative or \ref IGRAPH_UNLIMITED, the largest target degree will be used.
+ *    The column count of the result matrix is one larger than this value.
  * \return Error code.
  *
  * \sa \ref igraph_joint_degree_matrix() for computing the joint degree matrix;
