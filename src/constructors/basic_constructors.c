@@ -23,16 +23,6 @@
 
 #include "igraph_interface.h"
 
-/**
- * \section about_generators
- *
- * <para>Graph generators create graphs.</para>
- *
- * <para>Almost all functions which create graph objects are documented
- * here. The exceptions are \ref igraph_induced_subgraph() and alike, these
- * create graphs based on another graph.</para>
- */
-
 
 /**
  * \ingroup generators
@@ -61,7 +51,7 @@
  * \example examples/simple/igraph_create.c
  */
 igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
-                  igraph_int_t n, igraph_bool_t directed) {
+                             igraph_int_t n, igraph_bool_t directed) {
     igraph_bool_t has_edges = igraph_vector_int_size(edges) > 0;
     igraph_int_t max;
 

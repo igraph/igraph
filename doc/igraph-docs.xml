@@ -106,19 +106,21 @@
 
   <xi:include href="random.xml"/>
 
+  <xi:include href="iterators.xml"/>
+
+  <xi:include href="attributes.xml"/>
+
   <xi:include href="generators.xml"/>
+
+  <xi:include href="games.xml"/>
 
   <xi:include href="bipartite.xml"/>
 
   <xi:include href="spatial.xml"/>
 
-  <xi:include href="iterators.xml"/>
-
-  <xi:include href="attributes.xml"/>
+  <xi:include href="operators.xml"/>
 
   <xi:include href="visitors.xml"/>
-
-  <xi:include href="operators.xml"/>
 
   <xi:include href="structural.xml"/>
 

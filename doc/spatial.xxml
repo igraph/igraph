@@ -11,7 +11,7 @@
 <!-- doxrox-include igraph_metric_t -->
 </section>
 
-<section id="spatial-constructors"><title>Spatial graph generators</title>
+<section id="spatial-generators"><title>Spatial graph generators</title>
 <!-- doxrox-include igraph_delaunay_graph -->
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
 </section>

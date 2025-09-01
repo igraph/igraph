@@ -29,17 +29,6 @@
 #include "math/safe_intop.h"
 #include "random/random_internal.h"
 
-/**
- * \section about_games
- *
- * <para>Games are random graph generators, i.e. they generate a different
- * graph every time they are called. igraph includes many such generators.
- * Some implement stochastic graph construction processes inspired by real-world
- * mechanics, such as preferential attachment, while others are designed to
- * produce graphs with certain used properties (e.g. fixed number of edges,
- * fixed degrees, etc.)</para>
- */
-
 /* This implementation is used only with very large vertex counts, above
  * sqrt(MAX_EXACT_REAL) ~ 100 million, when the default implementation would
  * fail due to overflow. While this version avoids overflow and uses less memory,

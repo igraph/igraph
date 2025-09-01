@@ -30,6 +30,7 @@ set(
   error.xxml
   flows.xxml
   foreign.xxml
+  games.xxml
   generators.xxml
   graphlets.xxml
   heap.xxml
