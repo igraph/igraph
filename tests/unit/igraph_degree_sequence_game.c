@@ -117,7 +117,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&rg, 2000, 2000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnm(&rg, 2000, 2000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
     igraph_degree(&rg, &rg_degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
 
     igraph_degree_sequence_game(&g, &rg_degrees, NULL, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE);

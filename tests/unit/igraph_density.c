@@ -192,19 +192,19 @@ int main(void) {
     igraph_set_attribute_table(&igraph_cattribute_table);
     igraph_rng_seed(igraph_rng_default(), 1234);
 
-    igraph_erdos_renyi_game_gnm(&g, 10, 30, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&g, 10, 30, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     test_weighted_density(&g, IGRAPH_LOOPS);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 9, 30, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&g, 9, 30, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false);
     test_weighted_density(&g, IGRAPH_LOOPS);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 8, 30, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&g, 8, 30, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     test_weighted_density(&g, IGRAPH_LOOPS);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 7, 30, IGRAPH_DIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&g, 7, 30, IGRAPH_DIRECTED, IGRAPH_MULTI_SW, false);
     test_weighted_density(&g, IGRAPH_LOOPS);
     igraph_destroy(&g);
 

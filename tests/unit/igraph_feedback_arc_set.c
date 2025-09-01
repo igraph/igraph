@@ -121,7 +121,7 @@ void test_undirected(void) {
     igraph_destroy(&graph);
 
     /* Random graph */
-    igraph_erdos_renyi_game_gnm(&graph, 20, 40, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph, 20, 40, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_APPROX_EADES);
     check_fas(&graph, &result);
     igraph_destroy(&graph);
@@ -215,7 +215,7 @@ void test_directed(void) {
     igraph_destroy(&graph);
 
     /* Acyclic graph */
-    igraph_erdos_renyi_game_gnm(&graph, 20, 30, IGRAPH_DIRECTED, IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph, 20, 30, IGRAPH_DIRECTED, IGRAPH_MULTI_SW, false);
     igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_ACYCLIC);
     compare_methods(&graph, NULL);
     rand_weights(&graph, &weights);
@@ -224,7 +224,7 @@ void test_directed(void) {
 
     /* Several random graphs */
     for (igraph_int_t m=10; m <= 60; m += 10) {
-        igraph_erdos_renyi_game_gnm(&graph, 20, m, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+        igraph_erdos_renyi_game_gnm(&graph, 20, m, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
         compare_methods(&graph, NULL);
         rand_weights(&graph, &weights);
         compare_methods(&graph, &weights);
@@ -234,7 +234,7 @@ void test_directed(void) {
     /* Stress test CG method.
      * This should run in a reasonable amount of time. */
 
-    igraph_erdos_renyi_game_gnm(&graph, 200, 400, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&graph, 200, 400, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, false);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_CG);
     igraph_destroy(&graph);
 

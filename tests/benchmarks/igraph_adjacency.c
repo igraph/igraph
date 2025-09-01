@@ -55,7 +55,8 @@ void run_bench(igraph_int_t vcount, igraph_int_t meandeg, igraph_int_t rep) {
 
     igraph_matrix_init(&mat, 0, 0);
 
-    igraph_erdos_renyi_game_gnm(&g, vcount, meandeg * vcount / 2, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
+    igraph_erdos_renyi_game_gnm(&g, vcount, meandeg * vcount / 2, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW,
+                                false);
     igraph_get_adjacency(&g, &mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
 
     igraph_vector_init(&weights, igraph_ecount(&g));

@@ -110,32 +110,32 @@ int main(void) {
     run_bench(&g, &weights, 1, "PA");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 500, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 500, false, false, false);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 60000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 1000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 1000, false, false, false);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 30000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 3000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 3000, false, false, false);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 10000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 10000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 10000, false, false, false);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 3000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 30000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 30000, false, false, false);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 1000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 100000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 100000, false, false, false);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 300, "G(n,m)");
     igraph_destroy(&g);
