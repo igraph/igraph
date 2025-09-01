@@ -5,13 +5,13 @@
 ]>
 
 <chapter id="igraph-Spatial">
-<title>Spatial operations</title>
+<title>Spatial graphs</title>
 
-<section id="spatial-helpers"><title>Convenience functions</title>
+<section id="spatial-helpers"><title>Metrics</title>
 <!-- doxrox-include igraph_metric_t -->
 </section>
 
-<section id="spatial-constructors"><title>Spatial constructors</title>
+<section id="spatial-constructors"><title>Spatial graph generators</title>
 <!-- doxrox-include igraph_delaunay_graph -->
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
 </section>

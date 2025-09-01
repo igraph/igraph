@@ -17,7 +17,6 @@ set(
 set(
   DOXROX_SOURCES
   adjlist.xxml
-  arpack.xxml
   attributes.xxml
   basicigraph.xxml
   bipartite.xxml
@@ -38,18 +37,19 @@ set(
   isomorphism.xxml
   iterators.xxml
   layout.xxml
+  linalg.xxml
   matrix.xxml
   memory.xxml
   motifs.xxml
   nongraph.xxml
   operators.xxml
   progress.xxml
+  processes.xxml
   psumtree.xxml
   random.xxml
   separators.xxml
   sparsemat.xxml
   spatial.xxml
-  processes.xxml
   stack.xxml
   status.xxml
   structural.xxml
