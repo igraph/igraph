@@ -29,10 +29,12 @@ IGRAPH_BEGIN_C_DECLS
 
 /**
  * \define IGRAPH_UNLIMITED
+ * \brief Constant for "do not limit results".
  *
- * A constant signifying that no limitation should be used with various cutoff
- * or size limit parameters, such as maximum clique size, maximum path length,
- * etc. Currently defined to <code>-1</code>
+ * A constant signifying that no limitation should be used with various cutoff,
+ * size limit or result set size parameters, such as maximum clique size,
+ * number of cliques returned, maximum path length, etc. Currently defined to
+ * <code>-1</code>.
  */
 #define IGRAPH_UNLIMITED (-1)
 

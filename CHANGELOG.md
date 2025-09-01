@@ -156,6 +156,7 @@ This section gives detailed on breaking changes you need to consider when updati
  - `igraph_spatial_edge_lengths()` computes edges lengths based on spatial vertex coordinates (experimental function).
  - `igraph_community_leiden_simple()` is a simplified interface to `igraph_community_leiden()` that allows selecting the objective function to maximize directly.
  - `igraph_vector_difference_and_intersection_sorted()` calculates the intersection and the differences of two vectors simultaneously.
+ - `IGRAPH_UNLIMITED`, defined to `-1`, is a convenience constant for use with various "size limit" parameters, such as number of cliques returns, maximum path length, etc. It indicates that no limit should be used.
 
 ### Changed
 

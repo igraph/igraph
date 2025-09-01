@@ -300,8 +300,8 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  *        reachable within the cutoff is returned. If false, the inverse
  *        of the sum of distances is returned.
  * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact closeness will be calculated (no upper
- *        limit on path lengths).
+ *        If negative or \ref IGRAPH_UNLIMITED, the exact closeness will be
+ *        calculated (no upper limit on path lengths).
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM

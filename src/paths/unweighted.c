@@ -61,8 +61,8 @@
  *        \endclist
  * \param cutoff The maximal length of paths that will be considered.
  *    When the distance of two vertices is greater than this value,
- *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs are
- *    treated as infinity.
+ *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs and
+ *    \ref IGRAPH_UNLIMITED are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM

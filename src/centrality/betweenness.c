@@ -533,8 +533,8 @@ igraph_error_t igraph_betweenness(
  *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
  *        in undirected graphs the number of unordered vertex pairs is used.
  * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact betweenness will be calculated, and
- *        there will be no upper limit on path lengths.
+ *        If negative or \ref IGRAPH_UNLIMITED, the exact betweenness will be
+ *        calculated, and there will be no upper limit on path lengths.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids.
@@ -799,8 +799,8 @@ igraph_error_t igraph_edge_betweenness(
  *        vertex pairs. In directed graphs, the number of ordered vertex pairs,
  *        in undirected graphs the number of unordered vertex pairs is used.
  * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact betweenness will be calculated (no
- *        upper limit on path lengths).
+ *        If negative of \ref IGRAPH_UNLIMITED, the exact betweenness will be
+ *        calculated (no upper limit on path lengths).
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
