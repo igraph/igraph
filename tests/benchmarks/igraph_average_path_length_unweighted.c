@@ -69,7 +69,7 @@ int main(void) {
 
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 10000, 12000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 10000, 12000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW);
     igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
 
     BENCH(" 7 Erdos-Renyi n=10000 m=12000 average_path_length directed",

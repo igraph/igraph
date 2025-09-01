@@ -42,7 +42,7 @@ int main(void) {
 #define DENS 0.5
 #define REP 1000
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW);
     igraph_vector_int_resize(&membership, igraph_vcount(&g));
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));

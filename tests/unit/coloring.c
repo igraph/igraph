@@ -99,7 +99,7 @@ void test_graph_large(void) {
     igraph_t graph;
 
     /* simple large undirected graph */
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
     printf("Testing large simple graph\n");
     run_tests(&graph, false);
 

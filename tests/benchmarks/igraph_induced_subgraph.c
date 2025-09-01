@@ -69,7 +69,7 @@ void run_bench(int i, int n, int m, int subset_percentage) {
     igraph_int_t subset_size = (n * subset_percentage) / 100;
 
     // Prepare random graph and vertices
-    igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
     generate_random_vertices(&vertices, n, subset_size);
 
     char msg[255];

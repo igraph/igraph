@@ -31,7 +31,7 @@ int main(void) {
 
     /* IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS are both equivalent to 0/FALSE, but
        communicate intent better in this context. */
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
 
     /* As with all igraph functions, the vector in which the result is returned must
        be initialized in advance. */

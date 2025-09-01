@@ -45,7 +45,7 @@
               REPEAT(igraph_is_graphical(&deg, NULL, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW, &graphical), 100); \
               ); \
         \
-        igraph_erdos_renyi_game_gnp(&graph, N, 12.0/N, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE); \
+        igraph_erdos_renyi_game_gnp(&graph, N, 12.0/N, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW); \
         igraph_degree(&graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS); \
         igraph_destroy(&graph); \
         \
@@ -91,7 +91,7 @@ do { \
               REPEAT(igraph_is_graphical(&outdeg, &indeg, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW, &graphical), REP); \
               ); \
         \
-        igraph_erdos_renyi_game_gnp(&graph, N, 12.0/N, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE); \
+        igraph_erdos_renyi_game_gnp(&graph, N, 12.0/N, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW); \
         igraph_degree(&graph, &outdeg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS); \
         igraph_degree(&graph, &indeg, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS); \
         igraph_destroy(&graph); \

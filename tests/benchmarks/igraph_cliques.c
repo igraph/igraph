@@ -30,14 +30,14 @@ int main(void) {
 
     igraph_vector_int_list_init(&res, 0);
 
-    igraph_erdos_renyi_game_gnm(&g, 100, 3000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 100, 3000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
     BENCH(" 1 Cliques in random graph with 100 vertices and 3000 edges",
           igraph_cliques(&g, &res, /* min_size= */ 0, /* max_size= */ 0, -1);
          );
     igraph_destroy(&g);
     igraph_vector_int_list_clear(&res);
 
-    igraph_erdos_renyi_game_gnm(&g, 200, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 200, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
     BENCH(" 2 Cliques in random graph with 200 vertices and 10000 edges, up to size 5",
           igraph_cliques(&g, &res, /* min_size= */ 0, /* max_size= */ 5, -1);
          );

@@ -1,6 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2008-2024  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2008-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,14 +42,14 @@ int main(void) {
         igraph_vector_int_clear(&path);
         igraph_vector_int_clear(&eids);
 
-        igraph_erdos_renyi_game_gnp(&g, nodes, p, /*directed=*/ false, /*loops=*/ false, /*multiple=*/ false);
+        igraph_erdos_renyi_game_gnp(&g, nodes, p, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
         ecount = igraph_ecount(&g);
         for (e = 0; e < edges; e++) {
             igraph_int_t edge = RNG_INTEGER(0, ecount - 1);
             VECTOR(pairs)[2 * e] = IGRAPH_FROM(&g, edge);
             VECTOR(pairs)[2 * e + 1] = IGRAPH_TO(&g, edge);
         }
-        igraph_get_eids(&g, &eids, &pairs, /* directed= */ false, /*error=*/ true);
+        igraph_get_eids(&g, &eids, &pairs, IGRAPH_UNDIRECTED, /*error=*/ true);
         for (e = 0; e < edges; e++) {
             igraph_int_t edge = VECTOR(eids)[e];
             igraph_int_t from1 = VECTOR(pairs)[2 * e];
