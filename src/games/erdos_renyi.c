@@ -620,43 +620,11 @@ static igraph_error_t gnm_multi(
     return IGRAPH_SUCCESS;
 }
 
-/**
- * \ingroup generators
- * \function igraph_erdos_renyi_game_gnm
- * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
- *
- * In the <code>G(n, m)</code> Erdős-Rényi model, a graph with \p n vertices
- * and \p m edges is generated uniformly at random.
- *
- * \param graph Pointer to an uninitialized graph object.
- * \param n The number of vertices in the graph.
- * \param m The number of edges in the graph.
- * \param directed Whether to generate a directed graph.
- * \param loops Whether to generate self-loops.
- * \param multiple Whether it is allowed to generate more than one edge between
- *    the same pair of vertices.
- * \return Error code:
- *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
- *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
- *
- * Time complexity: O(|V|+|E|), the
- * number of vertices plus the number of edges in the graph.
- *
- * \sa \ref igraph_erdos_renyi_game_gnp() to sample from the related
- * <code>G(n, p)</code> model, which constrains the \em expected edge count;
- * \ref igraph_iea_game() to generate multigraph by assigning edges to vertex
- * pairs uniformly and independently;
- * \ref igraph_degree_sequence_game() to constrain the degree sequence;
- * \ref igraph_bipartite_game_gnm() for the bipartite version of this model;
- * \ref igraph_barabasi_game() and \ref igraph_growing_random_game() for other
- * commonly used random graph models.
- *
- * \example examples/simple/igraph_erdos_renyi_game_gnm.c
- */
-igraph_error_t igraph_erdos_renyi_game_gnm(
-    igraph_t *graph, igraph_int_t n, igraph_int_t m,
-    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple
-) {
+/* Uniform sampling of simple graphs (with loops) from G(n,m) */
+static igraph_error_t gnm_simple(
+        igraph_t *graph,
+        igraph_int_t n, igraph_int_t m,
+        igraph_bool_t directed, igraph_bool_t loops) {
 
     /* This function uses doubles in its `s` vector, and for `maxedges` and `last`.
      * This is because on a system with 32-bit ints, maxedges will be larger than
@@ -668,31 +636,6 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
     int iter = 0;
 
-    /* The multigraph implementation relies on the below checks to avoid overflow. */
-    if (n < 0 || n > IGRAPH_VCOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of vertices for G(n,m) model.", IGRAPH_EINVAL);
-    }
-    if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges for G(n,m) model.", IGRAPH_EINVAL);
-    }
-
-    /* Special cases of "too many edges" that also apply to multigraphs:
-     *  - The null graph cannot have edges.
-     *  - The singleton graph canot have edges unless loops are allowed.
-     */
-    if (m > 0 && ((n == 0) || (!loops && n == 1))) {
-        IGRAPH_ERROR(
-            "Too many edges requested compared to the number of vertices for G(n,m) model.",
-             IGRAPH_EINVAL);
-    }
-
-    if (m == 0) {
-        return igraph_empty(graph, n, directed);
-    }
-
-    if (multiple) {
-        return gnm_multi(graph, n, m, directed, loops);
-    }
 
     igraph_real_t maxedges = n;
     if (directed && loops) {
@@ -707,8 +650,8 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 
     if (m > maxedges) {
         IGRAPH_ERROR(
-            "Too many edges requested compared to the number of vertices for G(n,m) model.",
-            IGRAPH_EINVAL);
+                "Too many edges requested compared to the number of vertices for G(n,m) model.",
+                IGRAPH_EINVAL);
     }
 
     if (maxedges == m) {
@@ -768,4 +711,70 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     }
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_erdos_renyi_game_gnm
+ * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
+ *
+ * In the <code>G(n, m)</code> Erdős-Rényi model, a graph with \p n vertices
+ * and \p m edges is generated uniformly at random.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param m The number of edges in the graph.
+ * \param directed Whether to generate a directed graph.
+ * \param loops Whether to generate self-loops.
+ * \param multiple Whether it is allowed to generate more than one edge between
+ *    the same pair of vertices.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
+ *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_erdos_renyi_game_gnp() to sample from the related
+ * <code>G(n, p)</code> model, which constrains the \em expected edge count;
+ * \ref igraph_iea_game() to generate multigraph by assigning edges to vertex
+ * pairs uniformly and independently;
+ * \ref igraph_degree_sequence_game() to constrain the degree sequence;
+ * \ref igraph_bipartite_game_gnm() for the bipartite version of this model;
+ * \ref igraph_barabasi_game() and \ref igraph_growing_random_game() for other
+ * commonly used random graph models.
+ *
+ * \example examples/simple/igraph_erdos_renyi_game_gnm.c
+ */
+igraph_error_t igraph_erdos_renyi_game_gnm(
+    igraph_t *graph, igraph_int_t n, igraph_int_t m,
+    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple) {
+
+    /* The multigraph implementation relies on the below checks to avoid overflow. */
+    if (n < 0 || n > IGRAPH_VCOUNT_MAX) {
+        IGRAPH_ERROR("Invalid number of vertices for G(n,m) model.", IGRAPH_EINVAL);
+    }
+    if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Invalid number of edges for G(n,m) model.", IGRAPH_EINVAL);
+    }
+
+    /* Special cases of "too many edges" that also apply to multigraphs:
+     *  - The null graph cannot have edges.
+     *  - The singleton graph cannot have edges unless loops are allowed.
+     */
+    if (m > 0 && ((n == 0) || (!loops && n == 1))) {
+        IGRAPH_ERROR(
+            "Too many edges requested compared to the number of vertices for G(n,m) model.",
+             IGRAPH_EINVAL);
+    }
+
+    if (m == 0) {
+        return igraph_empty(graph, n, directed);
+    }
+
+    if (multiple) {
+        return gnm_multi(graph, n, m, directed, loops);
+    } else {
+        return gnm_simple(graph, n, m, directed, loops);
+    }
 }
