@@ -29,7 +29,38 @@
 #include "math/safe_intop.h"
 #include "random/random_internal.h"
 
-/* This implementation is used only with very large vertex counts, above
+/**
+ * \section about_erdos_renyi
+ *
+ * <para>
+ * There are two classic random graph models referred to as the Erdős-Rényi
+ * random graph, or sometimes simply \em the random graph. Both fix the vertex
+ * count n, but while the G(n,m) model prescribes precisely m edges, the G(n,p)
+ * model connects all vertex pairs independently with probability p. While
+ * these models look superficially different, when n is large they behave in
+ * a similar manner. G(n,m) graphs have a density of exactly
+ * <code>p = m / m_max</code>, while G(n,p) graphs have <code>m = p m_max</code>
+ * edges on \em average, where \c m_max is the number of vertex pairs. Indeed,
+ * these two models turns out to be two sides of the same coin: both can be
+ * understood as maximum entropy models with a constraint on the number of
+ * edges. The G(n,m) is obtained from a sharp constraint, while G(n,p) from
+ * an average constraint (soft constraint).
+ * </para>
+ *
+ * <para>
+ * The maximum entropy framework allows for rigorous generalizations of these
+ * models to various scenarios, of which igraph supports many, such as models
+ * defined over directed graphs, bipartite graphs, multigraphs, or even over
+ * edge-labelled graphs. Constraining edge counts between various subsets of
+ * vertices yields further families of related models, such as
+ * \ref igraph_sbm_game() (given connection probabilities between categories)
+ * or \ref igraph_degree_sequence_game() (given incident edge counts, i.e.
+ * degrees, for each vertex).
+ * </para>
+ */
+
+
+/* This G(n,p) implementation is used only with very large vertex counts, above
  * sqrt(MAX_EXACT_REAL) ~ 100 million, when the default implementation would
  * fail due to overflow. While this version avoids overflow and uses less memory,
  * it is also slower than the default implementation.
