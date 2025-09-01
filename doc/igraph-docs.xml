@@ -146,13 +146,13 @@
 
   <xi:include href="embedding.xml"/>
 
-  <xi:include href="linalg.xml"/>
+  <xi:include href="layout.xml"/>
 
   <xi:include href="processes.xml"/>
 
-  <xi:include href="layout.xml"/>
-
   <xi:include href="foreign.xml"/>
+
+  <xi:include href="linalg.xml"/>
 
   <xi:include href="nongraph.xml"/>
 
