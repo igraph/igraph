@@ -63,6 +63,7 @@ igraph_neighbors:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES neis, VERTEX vid, NEIMODE mode=ALL,
         LOOPS loops=TWICE, BOOLEAN multiple=True
+    DEPS: vid ON graph, neis ON graph
     FLAGS: no_rng
 
 igraph_is_directed:
@@ -90,23 +91,26 @@ igraph_get_eid:
     PARAMS: |-
         GRAPH graph, OUT EDGE eid, VERTEX from, VERTEX to,
         BOOLEAN directed=True, BOOLEAN error=True
+    DEPS: eid ON graph, from ON graph, to ON graph
     FLAGS: no_rng
 
 igraph_get_eids:
     PARAMS: |-
         GRAPH graph, OUT EDGE_INDICES eids, VERTEX_INDEX_PAIRS pairs,
         BOOLEAN directed=True, BOOLEAN error=True
-    DEPS: pairs ON graph
+    DEPS: eids ON graph, pairs ON graph
     FLAGS: no_rng
 
 igraph_get_all_eids_between:
     PARAMS: |-
         GRAPH graph, OUT EDGE_INDICES eids, VERTEX from, VERTEX to,
         BOOLEAN directed=True
+    DEPS: eids ON graph, from ON graph, to ON graph
     FLAGS: no_rng
 
 igraph_incident:
     PARAMS: GRAPH graph, OUT EDGE_INDICES eids, VERTEX vid, NEIMODE mode=ALL, LOOPS loops=TWICE
+    DEPS: eids ON graph, vid ON graph
     FLAGS: no_rng
 
 igraph_is_same_graph:
@@ -1092,7 +1096,7 @@ igraph_pseudo_diameter:
         OUT REAL diameter, VERTEX start_vid,
         OPTIONAL OUT INTEGER from, OPTIONAL OUT INTEGER to,
         BOOLEAN directed=True, BOOLEAN unconnected=True
-    DEPS: weights ON graph
+    DEPS: weights ON graph, start_vid ON graph
 
 igraph_diversity:
     PARAMS: |-
@@ -1155,6 +1159,7 @@ igraph_bfs:
         OUT VECTOR_INT parents,
         OUT VECTOR_INT pred, OUT VECTOR_INT succ,
         OUT VECTOR_INT dist, OPTIONAL BFS_FUNC callback, OPTIONAL EXTRA extra
+    DEPS: root ON graph, roots ON graph, restricted ON graph, order ON graph
 
 igraph_bfs_simple:
     PARAMS: |-
@@ -1163,6 +1168,7 @@ igraph_bfs_simple:
         OUT VERTEX_INDICES order,
         OUT VECTOR_INT layers,
         OUT VECTOR_INT parents
+    DEPS: root ON graph, order ON graph
 
 igraph_dfs:
     PARAMS: |-
@@ -1170,6 +1176,7 @@ igraph_dfs:
         OUT VERTEX_INDICES order, OUT VERTEX_INDICES order_out,
         OUT VECTOR_INT father, OUT VECTOR_INT dist,
         OPTIONAL DFS_FUNC in_callback, OPTIONAL DFS_FUNC out_callback, OPTIONAL EXTRA extra
+    DEPS: root ON graph, order ON graph, order_out ON graph
 
 #######################################
 # Bipartite graphs
@@ -1477,11 +1484,13 @@ igraph_layout_reingold_tilford:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT,
         OPTIONAL VERTEX_INDICES roots, OPTIONAL VECTOR_INT rootlevel
+    DEPS: roots ON graph
 
 igraph_layout_reingold_tilford_circular:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT,
         OPTIONAL VERTEX_INDICES roots, OPTIONAL VECTOR_INT rootlevel
+    DEPS: roots ON graph
 
 igraph_roots_for_tree_layout:
     PARAMS: |-
