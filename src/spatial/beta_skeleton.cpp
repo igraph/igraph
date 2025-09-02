@@ -27,7 +27,6 @@
 #include "core/exceptions.h"
 #include "spatial/nanoflann_internal.hpp"
 #include "spatial/spatial_internal.h"
-
 #include <cfloat>
 
 #define TOLERANCE (128 * DBL_EPSILON)
@@ -321,7 +320,7 @@ static void construct_perp_centers(std::vector<igraph_real_t> &a_centre,
  * containing all the points.
  */
 typedef bool FilterFunc(
-    KDTree < -1 > &tree,
+    const KDTree < -1 > &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -333,7 +332,7 @@ typedef bool FilterFunc(
 // by center_positions is empty of points except for a and b.
 template<CenterConstructor center_positions, igraph_bool_t is_closed>
 static bool is_intersection_empty(
-    KDTree < -1 > &tree,
+    const KDTree < -1 > &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -365,7 +364,7 @@ static bool is_intersection_empty(
 //  is empty of other points except for a and b.
 template<CenterConstructor center_positions>
 static bool is_union_empty(
-    KDTree < -1 > &tree,
+    const KDTree < -1 > &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
