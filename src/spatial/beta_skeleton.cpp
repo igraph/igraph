@@ -34,7 +34,7 @@
 
 // Some methods to get distances between two vectors, including when one or both are embedded in a matrix.
 static inline igraph_real_t ind_ind_sqr_distance(igraph_int_t a, igraph_int_t b,
-                                                 const igraph_matrix_t *points) {
+        const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_int_t dims = igraph_matrix_ncol(points);
     for (igraph_int_t i = 0; i < dims; i++) {
@@ -54,11 +54,30 @@ static inline igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igr
     return distance;
 }
 
+static inline igraph_real_t vec_vec_sqr_dist(const std::vector<igraph_real_t> &a, const std::vector<igraph_real_t> &b) {
+    igraph_real_t distance = 0;
+    igraph_int_t dims = a.size();
+    for (igraph_int_t i = 0; i < dims; i++) {
+        igraph_real_t temp = a[i] - b[i];
+        distance += temp * temp;
+    }
+    return distance;
+}
+
 static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_int_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_int_t dims = igraph_matrix_ncol(points);
     for (igraph_int_t i = 0; i < dims; i++) {
         igraph_real_t temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
+        distance += temp * temp;
+    }
+    return distance;
+}
+static inline igraph_real_t vec_ind_sqr_dist(const std::vector<igraph_real_t> &a, const igraph_int_t b, const igraph_matrix_t *points) {
+    igraph_real_t distance = 0;
+    igraph_int_t dims = igraph_matrix_ncol(points);
+    for (igraph_int_t i = 0; i < dims; i++) {
+        igraph_real_t temp = a[i] - MATRIX(*points, b, i);
         distance += temp * temp;
     }
     return distance;
@@ -121,20 +140,20 @@ public:
 // Used in is_intersection_empty.
 // Adapted from code by Szabolcs at https://github.com/szhorvat/IGraphM.
 class IntersectionCounts {
-    const igraph_real_t radius;                 // Half height of intersection lune
-    const igraph_real_t beta_radius;            // Radius of circles
-    const igraph_bool_t short_circuit;          // Whether to stop after one point has been found
-    const igraph_int_t a, b;                // Edge endpoints; excluded from the count.
-    const igraph_vector_t *a_center, *b_center; // Circle centers.
-    const igraph_matrix_t *points;              // List of points, used to test if points are in range
-    size_t count;                               // how many are found.
+    const igraph_real_t radius;                            // Half height of intersection lune
+    const igraph_real_t beta_radius;                       // Radius of circles
+    const igraph_bool_t short_circuit;                     // Whether to stop after one point has been found
+    const igraph_int_t a, b;                               // Edge endpoints; excluded from the count.
+    const std::vector<igraph_real_t> &a_center, &b_center; // Circle centers.
+    const igraph_matrix_t *points;                         // List of points, used to test if points are in range
+    size_t count;                                          // how many are found.
 public:
     // Boilerplate for nanoflann
     using DistanceType = igraph_real_t;
     IntersectionCounts(
         igraph_real_t radius_, igraph_real_t beta_radius_,
         bool short_circuit_,
-        igraph_int_t a, igraph_int_t b, const igraph_vector_t *a_center, const igraph_vector_t *b_center, const igraph_matrix_t *points)
+        igraph_int_t a, igraph_int_t b, const std::vector<igraph_real_t> &a_center, const std::vector<igraph_real_t> &b_center, const igraph_matrix_t *points)
         : radius(radius_), beta_radius(beta_radius_),
           short_circuit(short_circuit_),
           a(a), b(b),
@@ -184,9 +203,9 @@ public:
 
 // Shrinks type signatures significantly.
 template<igraph_int_t Dimension>
-using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
-                    nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
-                    ig_point_adaptor, Dimension, igraph_int_t >;
+using KDTree = nanoflann::KDTreeSingleIndexAdaptor <
+               nanoflann::L2_Adaptor<igraph_real_t, ig_point_adaptor>,
+               ig_point_adaptor, Dimension, igraph_int_t >;
 
 // give a known good superset of edges for a given value of beta.
 // In the case of beta < 1, that is a complete graph, for
@@ -236,8 +255,8 @@ static inline igraph_real_t calculate_r(igraph_real_t beta) {
  */
 
 typedef void CenterConstructor(
-    igraph_vector_t *a_center,
-    igraph_vector_t *b_center,
+    std::vector<igraph_real_t> &a_centre,
+    std::vector<igraph_real_t> &b_centre,
     igraph_int_t a,
     igraph_int_t b,
     igraph_real_t beta,
@@ -247,17 +266,18 @@ typedef void CenterConstructor(
 // >= 1. The points lie on the line from a to b, such that the points lie on one
 // of the circles.
 // formula is a_center = a + (r-1) * (a - b), similar for b_center
-static void construct_lune_centers(igraph_vector_t *a_center,
-        igraph_vector_t *b_center,
-        igraph_int_t a,
-        igraph_int_t b,
-        igraph_real_t r,
-        const igraph_matrix_t *points) {
+static void construct_lune_centers(std::vector<igraph_real_t> &a_centre,
+                                   std::vector<igraph_real_t> &b_centre,
+                                   igraph_int_t a,
+                                   igraph_int_t b,
+                                   igraph_real_t r,
+                                   const igraph_matrix_t *points) {
     igraph_int_t dims = igraph_matrix_ncol(points);
-
+    a_centre.resize(dims);
+    b_centre.resize(dims);
     for (igraph_int_t i = 0; i < dims; i++) {
-        VECTOR(*a_center)[i] = MATRIX(*points, a, i) + (r - 1) * (MATRIX(*points, a, i) - MATRIX(*points, b, i));
-        VECTOR(*b_center)[i] = MATRIX(*points, b, i) + (r - 1) * (MATRIX(*points, b, i) - MATRIX(*points, a, i));
+        a_centre[i] = MATRIX(*points, a, i) + (r - 1) * (MATRIX(*points, a, i) - MATRIX(*points, b, i));
+        b_centre[i] = MATRIX(*points, b, i) + (r - 1) * (MATRIX(*points, b, i) - MATRIX(*points, a, i));
     }
 }
 
@@ -265,7 +285,12 @@ static void construct_lune_centers(igraph_vector_t *a_center,
 // skeletons.
 // Since it relies on a 90-degree rotation around the axis perpendicular
 // to the line AB, it is only well-defined in 2d.
-static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b_center, igraph_int_t a, igraph_int_t b, igraph_real_t r, const igraph_matrix_t *points) {
+static void construct_perp_centers(std::vector<igraph_real_t> &a_centre,
+                                   std::vector<igraph_real_t> &b_centre,
+                                   igraph_int_t a,
+                                   igraph_int_t b,
+                                   igraph_real_t r,
+                                   const igraph_matrix_t *points) {
     igraph_real_t mid[2], perp[2];
 
     for (igraph_int_t i = 0; i < 2; i++) {
@@ -279,9 +304,11 @@ static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b
     perp[0] = - perp[1];
     perp[1] = temp;
 
+    a_centre.resize(2);
+    b_centre.resize(2);
     for (igraph_int_t i = 0; i < 2; i++) {
-        VECTOR(*a_center)[i] = mid[i] + perp[i];
-        VECTOR(*b_center)[i] = mid[i] - perp[i];
+        a_centre[i] = mid[i] + perp[i];
+        b_centre[i] = mid[i] - perp[i];
     }
 }
 
@@ -293,9 +320,8 @@ static void construct_perp_centers(igraph_vector_t *a_center, igraph_vector_t *b
  * parameter for beta-skeletons. const igraph_matrix_t *points: matrix
  * containing all the points.
  */
-typedef igraph_error_t FilterFunc(
-    igraph_bool_t *result,
-    KDTree<-1> &tree,
+typedef bool FilterFunc(
+    KDTree < -1 > &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -306,9 +332,8 @@ typedef igraph_error_t FilterFunc(
 // Test whether the intersection of the two circles as generated
 // by center_positions is empty of points except for a and b.
 template<CenterConstructor center_positions, igraph_bool_t is_closed>
-static igraph_error_t is_intersection_empty(
-    igraph_bool_t *result,
-    KDTree<-1> &tree,
+static bool is_intersection_empty(
+    KDTree < -1 > &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -317,42 +342,30 @@ static igraph_error_t is_intersection_empty(
     igraph_real_t r = calculate_r(beta);
     igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
 
-    igraph_vector_t midpoint;
+    std::vector<igraph_real_t> midpoint;
     igraph_int_t dims = igraph_matrix_ncol(points);
 
-    igraph_vector_t a_center, b_center;
-    IGRAPH_VECTOR_INIT_FINALLY(&a_center, dims);
-    IGRAPH_VECTOR_INIT_FINALLY(&b_center, dims);
-    center_positions(&a_center, &b_center, a, b, r, points);
+    std::vector<igraph_real_t> a_centre, b_centre;
+    center_positions(a_centre, b_centre, a, b, r, points);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&midpoint, dims);
+    midpoint.resize(dims);
     for (igraph_int_t i = 0; i < dims; i++) {
-        VECTOR(midpoint)[i] =  0.5 * (VECTOR(a_center)[i] + VECTOR(b_center)[i]);
+        midpoint[i] =  0.5 * (a_centre[i] + b_centre[i]);
     }
-
     // squared half-height of lune
-    igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(&midpoint, &a_center);
+    igraph_real_t lune_height = sqr_dist - vec_vec_sqr_dist(midpoint, a_centre);
     igraph_real_t tol = is_closed ? 1 + TOLERANCE : 1 - TOLERANCE;
-    IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, &a_center, &b_center, points);
+    IntersectionCounts intersections(lune_height * tol * tol, sqr_dist * r * r * tol * tol, true, a, b, a_centre, b_centre, points);
 
-    tree.findNeighbors(intersections, VECTOR(midpoint));
-
-    *result = intersections.size() == 0;
-
-    igraph_vector_destroy(&midpoint);
-    igraph_vector_destroy(&a_center);
-    igraph_vector_destroy(&b_center);
-    IGRAPH_FINALLY_CLEAN(3);
-
-    return IGRAPH_SUCCESS;
+    tree.findNeighbors(intersections, midpoint.data());
+    return intersections.size() == 0;
 }
 
 // Test whether the union of the circles given by center_positions
 //  is empty of other points except for a and b.
 template<CenterConstructor center_positions>
-static igraph_error_t is_union_empty(
-    igraph_bool_t *result,
-    KDTree<-1> &tree,
+static bool is_union_empty(
+    KDTree < -1 > &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -362,27 +375,21 @@ static igraph_error_t is_union_empty(
 
     igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
     igraph_real_t r = calculate_r(beta);
-    igraph_vector_t a_center, b_center;
+    std::vector<igraph_real_t> a_centre, b_centre;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&a_center, dims);
-    IGRAPH_VECTOR_INIT_FINALLY(&b_center, dims);
-    center_positions(&a_center, &b_center, a, b, r, points);
+    center_positions(a_centre, b_centre, a, b, r, points);
 
     NeighborCounts neighbor_search(sqr_dist * r * r * (1 + TOLERANCE), a, b, true);
 
-    tree.findNeighbors(neighbor_search, VECTOR(a_center));
+    tree.findNeighbors(neighbor_search, a_centre.data());
 
     if (neighbor_search.size() > 0) {
-        *result = false;
+        return false;
     } else {
         neighbor_search.clear();
-        tree.findNeighbors(neighbor_search, VECTOR(b_center));
-        *result = neighbor_search.size() == 0;
+        tree.findNeighbors(neighbor_search, b_centre.data());
+        return neighbor_search.size() == 0;
     }
-    igraph_vector_destroy(&a_center);
-    igraph_vector_destroy(&b_center);
-    IGRAPH_FINALLY_CLEAN(2);
-    return IGRAPH_SUCCESS;
 }
 
 // Iterate through the edges given, applying the provided filter.
@@ -394,12 +401,10 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
     igraph_int_t added_edges = 0;
     ig_point_adaptor adaptor(points);
     igraph_int_t dim = igraph_matrix_ncol(points);
-    KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
-    igraph_bool_t result;
     for (igraph_int_t i = 0; i * 2  < available_edges; i++) {
-        filter(&result, tree, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1], points, beta);
-        if (result) {
+        if (filter(tree, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1], points, beta)) {
             VECTOR(*edges)[added_edges * 2]     = VECTOR(*edges)[i * 2];
             VECTOR(*edges)[added_edges * 2 + 1] = VECTOR(*edges)[i * 2 + 1];
             added_edges += 1;
@@ -444,13 +449,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true>> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true >> (&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true>> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true >> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -493,9 +498,9 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centers>> (&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centers >> (&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true>> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true >> (&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -635,10 +640,10 @@ public:
  * Time complexity: TODO
  */
 igraph_error_t igraph_beta_weighted_gabriel_graph(
-        igraph_t *graph,
-        igraph_vector_t *weights,
-        const igraph_matrix_t *points,
-        igraph_real_t max_beta) {
+    igraph_t *graph,
+    igraph_vector_t *weights,
+    const igraph_matrix_t *points,
+    igraph_real_t max_beta) {
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
@@ -654,7 +659,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
 
     IGRAPH_CHECK(igraph_vector_resize(weights, edge_count));
 
-    KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
 
     igraph_vector_t midpoint;
@@ -731,7 +736,7 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true>> (&potential_edges, points, 1)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true >> (&potential_edges, points, 1)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
@@ -781,7 +786,7 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, false>>(&potential_edges, points, 2)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, false >> (&potential_edges, points, 2)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
