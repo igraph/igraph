@@ -370,8 +370,6 @@ static bool is_union_empty(
     const igraph_matrix_t *points,
     igraph_real_t beta) {
 
-    igraph_int_t dims = igraph_matrix_ncol(points);
-
     igraph_real_t sqr_dist = ind_ind_sqr_distance(a, b, points);
     igraph_real_t r = calculate_r(beta);
     std::vector<igraph_real_t> a_centre, b_centre;
