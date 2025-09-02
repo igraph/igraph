@@ -124,7 +124,7 @@ void check_iea(
 
 void check_gnp(
     igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
-    igraph_bool_t directed, igraph_neimode_t mode,
+    igraph_bool_t directed, igraph_neimode_t mode, igraph_bool_t multiple,
     igraph_bool_t assume_edges
 ) {
     igraph_t graph;
@@ -137,7 +137,7 @@ void check_gnp(
     }
 
     igraph_vector_bool_init(&types, 0);
-    igraph_bipartite_game_gnp(&graph, &types, n1, n2, p, directed, mode);
+    igraph_bipartite_game_gnp(&graph, &types, n1, n2, p, directed, mode, multiple);
 
     /* check correct vertex and edge count, directedness */
     IGRAPH_ASSERT(igraph_is_directed(&graph) == directed);
@@ -160,7 +160,7 @@ void check_gnp(
 
     /* no multi-edges unless explicitly allowed */
     igraph_has_multiple(&graph, &has_multi);
-    IGRAPH_ASSERT(! has_multi);
+    if (!multiple) IGRAPH_ASSERT(! has_multi);
 
     /* redundant with the next check, but also tests is_bipartite() */
     igraph_is_bipartite(&graph, &bipartite, NULL);
@@ -280,18 +280,28 @@ int main(void) {
 
     /* UNDIRECTED */
 
-    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, false);
-    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, false);
-    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, true);
-    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, true);
+    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, false);
+    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, false);
+    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, false);
+    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, false);
+
+    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, true);
+    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, true);
+    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, true);
+    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, true);
 
     /* DIRECTED */
 
     for (size_t i=0; i < sizeof(modes) / sizeof(modes[0]); i++) {
-        check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, modes[i], false);
-        check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, modes[i], false);
-        check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, modes[i], true);
-        check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, modes[i], true);
+        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, false);
+        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, false);
+        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, false);
+        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, false);
+
+        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, true);
+        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, true);
+        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, true);
+        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, true);
     }
 
     VERIFY_FINALLY_STACK();
@@ -310,9 +320,9 @@ int main(void) {
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, 10, -1, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
 
-    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, -1, 10, 0.1, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, -1, 0.9, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, 1.1, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, -1, 10, 0.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, -1, 0.9, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, 1.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();
 
