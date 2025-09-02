@@ -50,8 +50,8 @@ public:
     GraphBuildingResultSet(const igraph_int_t max_neighbors, const igraph_real_t max_distance) :
         max_distance(max_distance),
         max_neighbors(max_neighbors),
-        neighbors(1),
-        distances(1) { }
+        neighbors(0),
+        distances(0) { }
 
     bool addPoint(const igraph_real_t distance, const igraph_int_t index) {
         igraph_int_t i;
@@ -64,26 +64,29 @@ public:
             // TODO: Stabilize result in case of multiple points at exactly the same distance?
             // See NANOFLANN_FIRST_MATCH in RKNNResultSet in nanoflann.hpp for reference.
             if (distances[i - 1] > distance) {
-                if (i < max_neighbors) {
-                    distances[i] = distances[i - 1];
-                    neighbors[i] = neighbors[i - 1];
-                }
+                registerPoint(i, neighbors[i - 1], distances[i - 1]);
             } else {
                 break;
             }
         }
         if (i < max_neighbors) {
-            neighbors[i] = index;
-            distances[i] = distance;
+            registerPoint(i, index, distance);
         }
         if (added_count != max_neighbors) {
             added_count++;
-            if (added_count >= neighbors.size()) {
-                neighbors.push_back(0); // always keep space to add new point.
-                distances.push_back(0);
-            }
         }
         return true;
+    }
+
+    void registerPoint(igraph_int_t where, igraph_int_t index, igraph_real_t distance) {
+        if (neighbors.size() == where) {
+            neighbors.push_back(index);
+            distances.push_back(distance);
+        } else  {
+            neighbors[where] = index;
+            distances[where] = distance;
+        }
+
     }
 
     void reset(igraph_int_t current_vertex_) {
