@@ -125,6 +125,38 @@ static igraph_error_t gnp_large(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t gnp_edge_labeled(
+        igraph_t *graph,
+        igraph_int_t n, igraph_real_t p,
+        igraph_bool_t directed,
+        igraph_bool_t loops, igraph_bool_t multiple) {
+
+    if (multiple) {
+        igraph_real_t maxedges = n;
+
+        if (directed && loops) {
+            maxedges *= n;
+        } else if (directed && !loops) {
+            maxedges *= (n - 1);
+        } else if (!directed && loops) {
+            maxedges *= (n + 1) / 2.0;
+        } else {
+            maxedges *= (n - 1) / 2.0;
+        }
+
+        igraph_real_t m;
+        do {
+            m = RNG_GEOM( 1.0 / (1.0 + maxedges * p) );
+        } while (m > (igraph_real_t) IGRAPH_INTEGER_MAX);
+
+        return igraph_iea_game(graph, n, m, directed, loops);
+
+    } else {
+        IGRAPH_ERROR("The edge-labeled G(n,p) model is not yet implemented for graphs without multi-edges.",
+                     IGRAPH_UNIMPLEMENTED);
+    }
+}
+
 /**
  * \ingroup generators
  * \function igraph_erdos_renyi_game_gnp
@@ -181,6 +213,9 @@ static igraph_error_t gnp_large(
  * \param directed Whether to generate a directed graph.
  * \param allowed_edge_types Controls whether multi-edges and self-loops
  *     are generated. See \ref igraph_edge_type_sw_t.
+ * \param edge_labeled If true, the model is defined over the set of ordered
+ *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
+ *     \c false to select the classic Erdős-Rényi model.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -201,7 +236,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         igraph_t *graph,
         igraph_int_t n, igraph_real_t p,
         igraph_bool_t directed,
-        igraph_edge_type_sw_t allowed_edge_types) {
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_bool_t edge_labeled) {
 
     /* This function uses doubles in its `s` vector, and for `maxedges` and `last`.
      * This is because on a system with 32-bit ints, maxedges will be larger than
@@ -235,6 +271,10 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         if (p < 0.0 || p > 1.0) {
             IGRAPH_ERROR("Invalid probability given for G(n,p) model.", IGRAPH_EINVAL);
         }
+    }
+
+    if (edge_labeled) {
+        return gnp_edge_labeled(graph, n, p, directed, loops, multiple);
     }
 
     if (p == 0.0 || no_of_nodes == 0) {
@@ -740,7 +780,7 @@ static igraph_error_t gnm_simple(
  * \param directed Whether to generate a directed graph.
  * \param allowed_edge_types Controls whether multi-edges and self-loops
  *     are generated. See \ref igraph_edge_type_sw_t.
- * \param edge_labeled If true, the sampling is done unformly from the set
+ * \param edge_labeled If true, the sampling is done uniformly from the set
  *     of ordered edge lists. See \ref igraph_iea_game() for more information.
  *     Set this to \c false to select the classic Erdős-Rényi model.
  * \return Error code:

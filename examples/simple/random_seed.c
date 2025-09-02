@@ -11,14 +11,14 @@ int main(void) {
     /* Seed the default random number generator and create a random graph. */
     igraph_rng_seed(igraph_rng_default(), 1122);
 
-    igraph_erdos_renyi_game_gnp(&g1, 100, 3.0 / 100, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnp(&g1, 100, 3.0 / 100, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
     /* Seed the generator with the same seed again,
      * and create a graph with the same method. */
 
     igraph_rng_seed(igraph_rng_default(), 1122);
 
-    igraph_erdos_renyi_game_gnp(&g2, 100, 3.0 / 100, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+    igraph_erdos_renyi_game_gnp(&g2, 100, 3.0 / 100, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
     /* The two graphs will be identical. */
 

@@ -72,7 +72,7 @@ void stress_test(void) {
             igraph_t g;
             igraph_bool_t simple;
 
-            igraph_erdos_renyi_game_gnp(&g, size, 0.5, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW);
+            igraph_erdos_renyi_game_gnp(&g, size, 0.5, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
 
             igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
             if (! simple) {
@@ -91,7 +91,7 @@ void stress_test(void) {
             igraph_t g;
             igraph_bool_t simple;
 
-            igraph_erdos_renyi_game_gnp(&g, size, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW);
+            igraph_erdos_renyi_game_gnp(&g, size, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
 
             igraph_is_simple(&g, &simple, IGRAPH_DIRECTED);
             if (! simple) {
@@ -121,7 +121,7 @@ void check_gnp(
     if (loops) allowed_edge_types |= IGRAPH_LOOPS_SW;
     if (multiple) allowed_edge_types |= IGRAPH_MULTI_SW;
 
-    igraph_erdos_renyi_game_gnp(&graph, n, p, directed, allowed_edge_types);
+    igraph_erdos_renyi_game_gnp(&graph, n, p, directed, allowed_edge_types, false);
 
     IGRAPH_ASSERT(igraph_is_directed(&graph) == directed);
     IGRAPH_ASSERT(igraph_vcount(&graph) == n);
