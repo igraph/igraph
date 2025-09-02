@@ -129,7 +129,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     /* Special cases */
 
     if (corr == 0) {
-        return igraph_erdos_renyi_game_gnp(new_graph, no_of_nodes, p, directed, IGRAPH_SIMPLE_SW);
+        return igraph_erdos_renyi_game_gnp(new_graph, no_of_nodes, p, directed, IGRAPH_SIMPLE_SW, false);
     }
     if (corr == 1) {
         /* We don't copy, because we don't need the attributes.... */
@@ -311,7 +311,7 @@ igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                                 igraph_bool_t directed,
                                 const igraph_vector_int_t *permutation) {
 
-    IGRAPH_CHECK(igraph_erdos_renyi_game_gnp(graph1, n, p, directed, IGRAPH_SIMPLE_SW));
+    IGRAPH_CHECK(igraph_erdos_renyi_game_gnp(graph1, n, p, directed, IGRAPH_SIMPLE_SW, false));
     IGRAPH_CHECK(igraph_correlated_game(graph1, graph2, corr, p, permutation));
     return IGRAPH_SUCCESS;
 }
