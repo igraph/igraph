@@ -436,6 +436,10 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  *     graph. Each row is a point, dimensionality is inferred from the column count.
  *
  * \return Error code.
+ *
+ * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * and d is the dimensionality of the point set.
+ *
  */
 igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
@@ -482,6 +486,10 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  *    create the graph. Each row is a point.
  * \param beta A positive real value used to parameterize the graph.
  * \return Error code.
+ *
+ * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * and d is the dimensionality of the point set.
+ *
  */
 igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_t *points, igraph_real_t beta) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
@@ -634,7 +642,11 @@ public:
  * to generate a graph with a given value of beta; \ref igraph_gabriel_graph()
  * to only generate a Gabriel graph, without edge weights.
  *
- * Time complexity: TODO
+ *
+ * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * and d is the dimensionality of the point set. Though large values of max_beta
+ * can cause long run times if there are edges that disappear only at large betas.
+ *
  */
 igraph_error_t igraph_beta_weighted_gabriel_graph(
     igraph_t *graph,
@@ -724,6 +736,10 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  * \sa The Gabriel graph is a special case of
  *     \ref igraph_lune_beta_skeleton() and \ref igraph_circle_beta_skeleton()
  *     where <code>β = 1</code>.
+ *
+ * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * and d is the dimensionality of the point set.
+ *
  */
 igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *points) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
@@ -774,6 +790,10 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
  *
  * \sa \ref igraph_lune_beta_skeleton() to compute the lune based β-skeleton
  * for <code>β = 2</code> or other β values.
+ *
+ * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * and d is the dimensionality of the point set.
+ *
  */
 igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_matrix_t *points) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
