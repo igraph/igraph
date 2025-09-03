@@ -28,6 +28,8 @@
 #include <utility>
 #include <stack>
 
+#include <iostream>
+
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
 
@@ -76,6 +78,10 @@ struct BNode {
     std::stack<vd_pair> nodes;
     igraph_integer_t next; // next bucket (higher degree)
     igraph_integer_t prev; // prev bucket (lower degree)
+
+    igraph_bool_t is_empty() {
+        return count == 0;
+    }
 };
 
 struct HavelHakimiList {
@@ -141,7 +147,7 @@ struct HavelHakimiList {
 
     bool get_max_node(vd_pair& max_node) {
         igraph_integer_t max_bucket = get_max_bucket();
-        while (buckets[max_bucket].nodes.empty()) {
+        while (buckets[max_bucket].is_empty()) {
             remove_bucket(max_bucket);
             max_bucket = get_max_bucket();
             if (max_bucket == -1) return false;
@@ -152,7 +158,7 @@ struct HavelHakimiList {
 
     void remove_max_node() {
         igraph_integer_t max_bucket = get_max_bucket();
-        while (buckets[max_bucket].nodes.empty()) {
+        while (buckets[max_bucket].is_empty()) {
             remove_bucket(max_bucket);
             max_bucket = get_max_bucket();
         }
@@ -163,7 +169,7 @@ struct HavelHakimiList {
 
     bool get_min_node(vd_pair& min_node) {
         igraph_integer_t min_bucket = get_min_bucket();
-        while (buckets[min_bucket].nodes.empty()) {
+        while (buckets[min_bucket].is_empty()) {
             remove_bucket(min_bucket);
             min_bucket = get_min_bucket();
             if (min_bucket == -1) return false;
@@ -174,13 +180,25 @@ struct HavelHakimiList {
 
     void remove_min_node() {
         igraph_integer_t min_bucket = get_min_bucket();
-        while (buckets[min_bucket].nodes.empty()) {
+        while (buckets[min_bucket].is_empty()) {
             remove_bucket(min_bucket);
             min_bucket = get_min_bucket();
         }
         vd_pair min_node = buckets[min_bucket].nodes.top();
         buckets[min_bucket].nodes.pop();
         buckets[min_node.degree].count--;
+    }
+
+    igraph_integer_t get_next_smallest(igraph_integer_t degree) {
+        if (degree <= get_min_bucket()) return 0;
+
+        igraph_integer_t prev_deg = buckets[degree].prev;
+
+        if (prev_deg <= 0) return 0;
+        if (buckets[prev_deg].is_empty()) {
+            prev_deg = buckets[degree].prev = get_next_smallest(prev_deg);
+        }
+        return prev_deg;
     }
 
     // Given degree of selected "hub" node, returns degree many "spoke" nodes to connect to
@@ -197,7 +215,7 @@ struct HavelHakimiList {
         while (num_nodes < degree && curr > 0) {
             num_nodes += buckets[curr].count;
             buckets_req.push(curr);
-            curr = buckets[curr].prev; // gets next smallest NON-EMPTY bucket
+            curr = get_next_smallest(curr); // gets next smallest NON-EMPTY bucket
         }
         if (num_nodes < degree) { // not enough spokes for hub degree
             IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
