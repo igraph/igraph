@@ -446,13 +446,13 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     // determine filter required based on beta.
     if (beta >= 1) {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true>>(&potential_edges, points, beta)));
     } else {
         if (igraph_matrix_ncol(points) != 2) {
             IGRAPH_ERROR("Beta skeletons with beta < 1 are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true>>(&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -495,9 +495,9 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));
     if (beta >= 1) {
-        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centers >> (&potential_edges, points, beta));
+        IGRAPH_CHECK(filter_edges<is_union_empty<construct_perp_centers>>(&potential_edges, points, beta));
     } else {
-        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true >> (&potential_edges, points, beta)));
+        IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_perp_centers, true>>(&potential_edges, points, beta)));
     }
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
@@ -733,7 +733,7 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true >> (&potential_edges, points, 1)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, true>>(&potential_edges, points, 1)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
@@ -783,7 +783,7 @@ igraph_error_t igraph_relative_neighborhood_graph(igraph_t *graph, const igraph_
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, 1));
 
-    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, false >> (&potential_edges, points, 2)));
+    IGRAPH_CHECK((filter_edges<is_intersection_empty<construct_lune_centers, false>>(&potential_edges, points, 2)));
 
     IGRAPH_CHECK(igraph_create(graph, &potential_edges, igraph_matrix_nrow(points), false));
 
