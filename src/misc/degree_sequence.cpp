@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <utility>
 #include <stack>
-
 #include <iostream>
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
@@ -79,9 +78,7 @@ struct BNode {
     igraph_integer_t next; // next bucket (higher degree)
     igraph_integer_t prev; // prev bucket (lower degree)
 
-    igraph_bool_t is_empty() {
-        return count == 0;
-    }
+    igraph_bool_t is_empty() { return count == 0; }
 };
 
 struct HavelHakimiList {
@@ -109,32 +106,21 @@ struct HavelHakimiList {
             buckets[degree].count++;
         }
 
-        for (igraph_integer_t i = 1; i < n_nodes; i++) {
-            if (buckets[i].is_empty()) remove_bucket(i);
+        // remove empty buckets on initialization
+        for (igraph_integer_t d = 1; d < n_buckets - 1; d++) {
+            if (buckets[d].is_empty()) remove_bucket(d);
         }
     }
 
     // ----- O(1) convenience functions ----- //
-    const BNode & head() const { return buckets.front(); }
-    const BNode & tail() const { return buckets.back(); }
+    // const BNode & head() const { return buckets.front(); }
+    // const BNode & tail() const { return buckets.back(); }
 
-    igraph_integer_t get_max_bucket() { 
-        igraph_integer_t max_bucket = tail().prev;
-        while (max_bucket != 0 && buckets[max_bucket].is_empty()) {
-            remove_bucket(max_bucket);
-            max_bucket = tail().prev;
-        }
-        return max_bucket;
-    }
+    igraph_integer_t max_sentinel() const { return n_buckets - 1; }
+    igraph_integer_t min_sentinel() const { return 0; }
 
-    igraph_integer_t get_min_bucket() {
-        igraph_integer_t min_bucket = head().next;
-        while (min_bucket != n_buckets - 1 && buckets[min_bucket].is_empty()) {
-            remove_bucket(min_bucket);
-            min_bucket = head().next;
-        }
-        return min_bucket;
-    }
+    igraph_integer_t get_max_bucket() const { return buckets[max_sentinel()].prev; }
+    igraph_integer_t get_min_bucket() const { return buckets[min_sentinel()].next; }
 
     void remove_bucket(igraph_integer_t degree) { // assuming sentinel nodes
         igraph_integer_t& prev_idx = buckets[degree].prev;
@@ -167,15 +153,21 @@ struct HavelHakimiList {
 
     bool get_max_node(vd_pair& max_node) {
         igraph_integer_t max_bucket = get_max_bucket();
-        if (max_bucket == 0) return false;
-
+        while (buckets[max_bucket].is_empty()) {
+            remove_bucket(max_bucket);
+            max_bucket = get_max_bucket();
+            if (max_bucket == -1) return false;
+        }
         max_node = buckets[max_bucket].nodes.top();
         return true;
     }
 
     void remove_max_node() {
         igraph_integer_t max_bucket = get_max_bucket();
-        IGRAPH_ASSERT(max_bucket != 0);
+        while (buckets[max_bucket].is_empty()) {
+            remove_bucket(max_bucket);
+            max_bucket = get_max_bucket();
+        }
         vd_pair max_node = buckets[max_bucket].nodes.top();
         buckets[max_bucket].nodes.pop();
         buckets[max_node.degree].count--;
@@ -183,30 +175,36 @@ struct HavelHakimiList {
 
     bool get_min_node(vd_pair& min_node) {
         igraph_integer_t min_bucket = get_min_bucket();
-        if (min_bucket == n_buckets - 1) return false;
-        
+        while (buckets[min_bucket].is_empty()) {
+            remove_bucket(min_bucket);
+            min_bucket = get_min_bucket();
+            if (min_bucket == -1) return false;
+        }
         min_node = buckets[min_bucket].nodes.top();
         return true;
     }
 
     void remove_min_node() {
         igraph_integer_t min_bucket = get_min_bucket();
-        IGRAPH_ASSERT(min_bucket != n_buckets-1);
+        while (buckets[min_bucket].is_empty()) {
+            remove_bucket(min_bucket);
+            min_bucket = get_min_bucket();
+        }
         vd_pair min_node = buckets[min_bucket].nodes.top();
         buckets[min_bucket].nodes.pop();
         buckets[min_node.degree].count--;
     }
 
-    igraph_integer_t get_next_smallest(igraph_integer_t degree) {
-        if (degree <= get_min_bucket()) return 0;
+    igraph_integer_t get_prev(igraph_integer_t degree) {
 
-        igraph_integer_t prev_deg = buckets[degree].prev;
-
-        if (prev_deg <= 0) return 0;
-        if (buckets[prev_deg].is_empty()) {
-            prev_deg = buckets[degree].prev = get_next_smallest(prev_deg);
+        igraph_integer_t prev_bucket = buckets[degree].prev;
+        if (prev_bucket > 0 && buckets[prev_bucket].is_empty()) {
+            prev_bucket = get_prev(prev_bucket);
+            buckets[degree].prev = prev_bucket;
         }
-        return prev_deg;
+
+        std::cout << "get_prev(" << degree << ") -> " << prev_bucket << std::endl;
+        return prev_bucket;
     }
 
     // Given degree of selected "hub" node, returns degree many "spoke" nodes to connect to
@@ -215,16 +213,18 @@ struct HavelHakimiList {
                               igraph_vector_int_t& spokes) {
         std::stack<igraph_integer_t> buckets_req; // stack of needed degree buckets
         igraph_integer_t num_nodes = 0;
-        igraph_integer_t curr = get_max_bucket(); // starts with max_bucket
-        // std::cout << "max bucket: " << curr << std::endl;
+        igraph_integer_t curr = get_max_bucket(); // TODO: REVISIT
 
         igraph_vector_int_clear(&spokes);
         IGRAPH_CHECK(igraph_vector_int_reserve(&spokes, degree));
 
         while (num_nodes < degree && curr > 0) {
+
+            std::cout << "curr = " << curr << std::endl;
+
             num_nodes += buckets[curr].count;
             buckets_req.push(curr);
-            curr = get_next_smallest(curr); // gets next smallest NON-EMPTY bucket
+            curr = get_prev(curr); // gets next smallest NON-EMPTY bucket
         }
         if (num_nodes < degree) { // not enough spokes for hub degree
             IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
@@ -344,6 +344,8 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&spokes, 0);
 
     for (igraph_integer_t i = 0; i < n_nodes; i++) {
+        igraph_vector_int_print(&seq);
+
         // hub node selection
         vd_pair hub;
         if (method == IGRAPH_REALIZE_DEGSEQ_SMALLEST) {
@@ -359,15 +361,16 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
             hub = vd_pair{i, degree};
             vault.buckets[degree].count--;
         }
-        // igraph_vector_int_print(&seq);
         VECTOR(seq)[hub.vertex] = 0;
 
-        // std::cout << "hub: " << hub.vertex << " degree: " << hub.degree << std::endl;
+        std::cout << "hub: " << hub.vertex
+                  << ", degree: " << hub.degree << std::endl;
 
         // spoke nodes selection
         IGRAPH_CHECK(vault.get_spokes(hub.degree, seq, spokes));
-        // igraph_vector_int_print(&spokes);
-        // std::cout<< "\n";
+
+        igraph_vector_int_print(&spokes);
+        std::cout << "\n";
 
         igraph_integer_t n_spokes = igraph_vector_int_size(&spokes);
         for (igraph_integer_t j = 0; j < n_spokes; j++) {
