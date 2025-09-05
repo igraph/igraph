@@ -69,7 +69,7 @@ IGRAPH_EXPORT igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph
                                               igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
                                                 igraph_int_t order, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t n, igraph_edge_type_sw_t allowed_edge_types);
+IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t *successful_swaps, igraph_int_t n, igraph_edge_type_sw_t allowed_edge_types);
 IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
                                              igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
                                              const igraph_attribute_combination_t *edge_comb);
