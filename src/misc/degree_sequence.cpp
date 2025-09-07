@@ -110,13 +110,20 @@ struct HavelHakimiList {
     const BNode & head() const { return buckets.front(); }
     const BNode & tail() const { return buckets.back(); }
 
-    igraph_integer_t get_max_bucket() {
-        igraph_integer_t curr = tail().prev;
+    igraph_integer_t get_prev(igraph_integer_t degree) {
+        igraph_integer_t curr = buckets[degree].prev;
+        // might need to add a check to make sure degree > 0
         while (curr > 0 && buckets[curr].is_empty()) {
             remove_bucket(curr);
-            curr = tail().prev;
+            curr = buckets[degree].prev;
         }
         return curr;
+    }
+
+    igraph_integer_t get_max_bucket() {
+        // TODO: either change get_prev to take a BNode, or change
+        // head()/tail() to return integers
+        return get_prev(n_buckets - 1); 
     }
 
     igraph_integer_t get_min_bucket() {
@@ -199,7 +206,7 @@ struct HavelHakimiList {
         while (num_nodes < degree && curr > 0) {
             num_nodes += buckets[curr].count;
             buckets_req.push(curr);
-            curr = buckets[curr].prev; // gets next smallest NON-EMPTY bucket
+            curr = get_prev(curr); // gets next smallest NON-EMPTY bucket
         }
         if (num_nodes < degree) { // not enough spokes for hub degree
             IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
