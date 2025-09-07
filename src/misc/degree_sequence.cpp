@@ -123,7 +123,7 @@ struct HavelHakimiList {
     igraph_integer_t get_max_bucket() {
         // TODO: either change get_prev to take a BNode, or change
         // head()/tail() to return integers
-        return get_prev(n_buckets - 1); 
+        return get_prev(n_buckets - 1);
     }
 
     igraph_integer_t get_min_bucket() {
@@ -213,7 +213,7 @@ struct HavelHakimiList {
         }
 
         igraph_integer_t num_skip = num_nodes - degree;
-        while (!buckets_req.empty()) { // starting from smallest degree
+        while (!buckets_req.empty()) { // starting from the smallest degree
             igraph_integer_t bucket = buckets_req.top();
             buckets_req.pop();
 
@@ -340,6 +340,10 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
             igraph_integer_t degree = VECTOR(seq)[i];
             hub = vd_pair{i, degree};
             vault.buckets[degree].count--;
+        } else {
+            // The fatal error is effectively an assertion that this line
+            // should not be reachable:
+            IGRAPH_FATAL("Invalid degree sequence realization method.");
         }
         VECTOR(seq)[hub.vertex] = 0;
 
