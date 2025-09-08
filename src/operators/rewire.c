@@ -38,7 +38,7 @@
 #define REWIRE_ADJLIST_THRESHOLD 10
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
-igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t *successful_swaps, igraph_int_t n, igraph_bool_t loops, igraph_bool_t use_adjlist) {
+igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t n, igraph_bool_t loops, igraph_bool_t use_adjlist, igraph_rewiring_stats_t *stats) {
     const igraph_int_t no_of_edges = igraph_ecount(graph);
     char message[256];
     igraph_int_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
@@ -184,8 +184,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t *successful_swaps, 
         num_swaps++;
     }
 
-    if (successful_swaps) {
-        *successful_swaps = num_successful_swaps;
+    if (stats) {
+        stats->successful_swaps = num_successful_swaps;
     }
 
     if (use_adjlist) {
@@ -228,7 +228,6 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t *successful_swaps, 
  * constraints specified by \p mode.
  *
  * \param graph The graph object to be rewired.
- * \param successful_swaps Number of successful rewiring trials (successful swaps).
  * \param n Number of rewiring trials to perform.
  * \param allowed_edge_types The types of edges that rewiring may create in the graph.
  *    See \ref igraph_edge_type_sw_t for details.
@@ -240,6 +239,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t *successful_swaps, 
  *      single self-loops are allowed, but not multi-edges.
  *    \endclist
  *    Multigraphs are not yet supported.
+ * \param stats Counts of the number of different operations
+ *        performed by the algorithm are stored here.
  *
  * \return Error code:
  *         \clist
@@ -251,7 +252,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t *successful_swaps, 
  *
  * Time complexity: TODO.
  */
-igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t *successful_swaps, igraph_int_t n, igraph_edge_type_sw_t allowed_edge_types) {
+igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t n, igraph_edge_type_sw_t allowed_edge_types, igraph_rewiring_stats_t *stats) {
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
 
     if ((allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ||
@@ -259,5 +260,5 @@ igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t *successful_swaps, ig
         IGRAPH_ERROR("Rewiring multigraphs is not yet implemented.", IGRAPH_UNIMPLEMENTED);
     }
 
-    return igraph_i_rewire(graph, successful_swaps, n, allowed_edge_types & IGRAPH_LOOPS_SW, use_adjlist);
+    return igraph_i_rewire(graph, n, allowed_edge_types & IGRAPH_LOOPS_SW, use_adjlist, stats);
 }

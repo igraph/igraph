@@ -29,7 +29,7 @@ void bench(const char *name, igraph_t *graph, int rep) {
              "%s, |V|=%6" IGRAPH_PRId ", |E|=%6" IGRAPH_PRId ", %6" IGRAPH_PRId " swaps, %dx",
              name, vcount, ecount, trials, rep);
 
-    BENCH(msg, REPEAT(igraph_rewire(graph, NULL, trials, IGRAPH_SIMPLE_SW), rep));
+    BENCH(msg, REPEAT(igraph_rewire(graph, trials, IGRAPH_SIMPLE_SW, NULL), rep));
 }
 
 void bench_er(igraph_int_t n, igraph_int_t m, int rep) {
