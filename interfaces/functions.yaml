@@ -90,7 +90,7 @@ igraph_get_all_eids_between:
 
 igraph_incident:
     PARAMS: GRAPH graph, OUT EDGE_INDICES eids, VERTEX vid, NEIMODE mode=ALL
-    DEPS: vid ON graph
+    DEPS: vid ON graph, neis ON graph
 
 igraph_is_same_graph:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN res
