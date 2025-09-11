@@ -989,6 +989,10 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
     const igraph_int_t maxn =
         (IGRAPH_INTEGER_SIZE - 1) - (igraph_int_t) ceil(log2(IGRAPH_INTEGER_SIZE));
 
+    if (n < 0) {
+        IGRAPH_ERROR("Hypercube dimension must not be negative.", IGRAPH_EINVAL);
+    }
+
     if (n > maxn) {
         IGRAPH_ERRORF("The requested hypercube graph dimension (%" IGRAPH_PRId
                       ") is too high. It must be no greater than %" IGRAPH_PRId ".",

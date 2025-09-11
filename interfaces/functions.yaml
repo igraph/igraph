@@ -1303,7 +1303,7 @@ igraph_is_biconnected:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_count_reachable:
-    PARAMS: GRAPH graph, OUT VECTOR_INT counts, NEIMODE mode
+    PARAMS: GRAPH graph, OUT VECTOR_INT counts, NEIMODE mode=OUT
 
 #######################################
 # Percolation
@@ -2122,7 +2122,7 @@ igraph_compose:
 
 igraph_induced_subgraph_map:
     PARAMS: |-
-        GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl,
+        GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO,
         OPTIONAL OUT INDEX_VECTOR map, OPTIONAL OUT INDEX_VECTOR invmap
     DEPS: vids ON graph
 
