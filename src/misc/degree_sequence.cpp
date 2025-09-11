@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <utility>
 #include <stack>
+#include <cassert>
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
@@ -81,7 +82,7 @@ struct BNode {
 };
 
 struct HavelHakimiList {
-    igraph_integer_t n_buckets;
+    igraph_integer_t n_buckets; // no of buckets, INCLUDING sentinels
     std::vector<BNode> buckets;
 
     // Given degree sequence, sets up linked list of BNodes (degree buckets)
@@ -110,6 +111,8 @@ struct HavelHakimiList {
     const BNode & head() const { return buckets.front(); }
     const BNode & tail() const { return buckets.back(); }
 
+    // gets the largest non-empty bucket below 'degree',
+    // or 0 if one does not exist
     igraph_integer_t get_prev(igraph_integer_t degree) {
         igraph_integer_t curr = buckets[degree].prev;
         // might need to add a check to make sure degree > 0
@@ -120,12 +123,16 @@ struct HavelHakimiList {
         return curr;
     }
 
+    // returns max degree non-empty bucket,
+    // or 0 (sentinel) if all buckets are empty
     igraph_integer_t get_max_bucket() {
         // TODO: either change get_prev to take a BNode, or change
         // head()/tail() to return integers
         return get_prev(n_buckets - 1);
     }
 
+    // returns min degree non-empty bucket,
+    // or n_buckets - 1 (sentinel) if all buckets are empty
     igraph_integer_t get_min_bucket() {
         igraph_integer_t curr = head().next;
         while (curr < n_buckets - 1 && buckets[curr].is_empty()) {
@@ -135,7 +142,10 @@ struct HavelHakimiList {
         return curr;
     }
 
-    void remove_bucket(igraph_integer_t degree) { // assuming sentinel nodes
+    void remove_bucket(igraph_integer_t degree) {
+        // bounds check and prevent accidental removal of sentinels
+        assert(0 < degree && degree < n_buckets - 1);
+
         igraph_integer_t& prev_idx = buckets[degree].prev;
         igraph_integer_t& next_idx = buckets[degree].next;
         if (prev_idx != -1) buckets[prev_idx].next = next_idx;
@@ -145,7 +155,9 @@ struct HavelHakimiList {
         next_idx = -1;
     }
 
-    void insert_bucket(igraph_integer_t degree) { // assuming sentinel nodes
+    void insert_bucket(igraph_integer_t degree) {
+        assert(0 < degree && degree < n_buckets - 1);
+
         igraph_integer_t& prev_idx = buckets[degree].prev;
         igraph_integer_t& next_idx = buckets[degree].next;
 
