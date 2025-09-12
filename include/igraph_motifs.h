@@ -61,9 +61,9 @@ IGRAPH_BEGIN_C_DECLS
  */
 
 typedef igraph_error_t igraph_motifs_handler_t(const igraph_t *graph,
-        igraph_vector_int_t *vids,
+        const igraph_vector_int_t *vids,
         igraph_int_t isoclass,
-        void* extra);
+        void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                                         igraph_int_t size, const igraph_vector_t *cut_prob);

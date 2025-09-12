@@ -39,7 +39,9 @@
  */
 static igraph_error_t igraph_i_motifs_randesu_update_hist(
         const igraph_t *graph,
-        igraph_vector_int_t *vids, igraph_int_t isoclass, void* extra) {
+        const igraph_vector_int_t *vids,
+        igraph_int_t isoclass, void* extra) {
+
     igraph_vector_t *hist = (igraph_vector_t*)extra;
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(vids);
     VECTOR(*hist)[isoclass]++;
@@ -236,9 +238,10 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
  * \example examples/simple/igraph_motifs_randesu.c
  */
 
-igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_int_t size,
-                                   const igraph_vector_t *cut_prob, igraph_motifs_handler_t *callback,
-                                   void* extra) {
+igraph_error_t igraph_motifs_randesu_callback(
+        const igraph_t *graph,
+        igraph_int_t size, const igraph_vector_t *cut_prob,
+        igraph_motifs_handler_t *callback, void* extra) {
 
     igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_adjlist_t allneis, alloutneis;

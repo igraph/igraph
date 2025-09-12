@@ -24,7 +24,7 @@
 
 #include "test_utilities.h"
 
-igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
+igraph_error_t print_motif(const igraph_t *graph, const igraph_vector_int_t *vids,
                           igraph_int_t isoclass, void* extra) {
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(extra);
