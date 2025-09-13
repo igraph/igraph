@@ -78,7 +78,7 @@ struct BNode {
     igraph_integer_t next; // next bucket (higher degree)
     igraph_integer_t prev; // prev bucket (lower degree)
 
-    igraph_bool_t is_empty() { return count == 0; }
+    bool is_empty() const { return count == 0; }
 };
 
 struct HavelHakimiList {
