@@ -1008,6 +1008,450 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path);
+static igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching);
+static void igraph_i_maximum_matching_get_tree_path(igraph_integer_t *current, igraph_vector_bool_t *f_is_root, igraph_vector_int_t *contraction,
+        igraph_vector_int_t *distance, igraph_vector_int_t *f_parent, igraph_vector_int_list_t *b_lists, igraph_vector_int_t *path);
+
+/**
+ * \function igraph_maximum_matching
+ * \brief Calculates a maximum matching in a graph.
+ *
+ * A matching in a graph is a set of edges such that no endpoints are shared.
+ * The size (or cardinality) of a matching is the number of edges.
+ * A matching is a maximum matching if there exists no other matching with
+ * larger cardinality. For weighted graphs, a maximum matching is a matching
+ * whose edges have the largest possible total weight among all possible
+ * matchings.
+ *
+ * </para><para>
+ * Currently maximum weight matchings are not supported.
+ *
+ * </para><para>
+ * Maximum matchings are found by repeatedly finding augmenting paths, then augmenting matching with it.
+ * Odd length cycles are handled by discovering them as blossoms, then contracting all vertices in blossom
+ * to single vertex and restarting search for augmenting path.
+ *
+ * </para><para>
+ * References:
+ * Edmonds J: Paths, trees, and Flowers. Canadian Journal of Mathematics. 17 (1965), 449–467. doi:10.4153/cjm-1965-045-4
+ *
+ * \param graph The input graph. It can be directed but the edge directions
+ *              will be ignored.
+ * \param matching_size The size of the matching (i.e. the number of matched
+ *                      vertex pairs will be returned here). It may be \c NULL
+ *                      if you don't need this.
+ * \param matching_weight The weight of the matching if the edges are weighted,
+ *                        or the size of the matching again if the edges are
+ *                        unweighted. It may be \c NULL if you don't need this.
+ * \param matching The matching itself. It must be a vector where element i
+ *                 contains the ID of the vertex that vertex i is matched to,
+ *                 or -1 if vertex i is unmatched.
+ * \param weights A null pointer (=no edge weights), or a vector giving the
+ *                weights of the edges.
+ * \param eps A small real number used in equality tests in the weighted
+ *            matching algorithm. Two real numbers are considered
+ *            equal in the algorithm if their difference is smaller than
+ *            \c eps. This is required to avoid the accumulation of numerical
+ *            errors. It is advised to pass a value derived from the
+ *            \c DBL_EPSILON constant in \c float.h here. If you are
+ *            running the algorithm with no \c weights vector, this argument
+ *            is ignored.
+ * \return Error code.
+ *
+ * Time complexity: O(|E| |V|^2) for unweighted graphs.
+ *
+ * \example examples/simple/igraph_maximum_matching.c
+ */
+igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
+                                       igraph_real_t *matching_weight, igraph_vector_int_t *matching,
+                                       const igraph_vector_t *weights, igraph_real_t eps) {
+    // input validation
+    if (weights && igraph_vector_size(weights) < igraph_ecount(graph)) {
+        IGRAPH_ERROR("weights vector too short", IGRAPH_EINVAL);
+    }
+
+    // delegate to correct subroutine
+    if (weights != NULL) {
+        return IGRAPH_UNIMPLEMENTED;
+    } else {
+        IGRAPH_CHECK(igraph_maximum_matching_unweighted(graph, matching_size, matching));
+    }
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_maximum_matching_unweighted(const igraph_t *graph, igraph_integer_t *matching_size, igraph_vector_int_t *matching) {
+    igraph_integer_t n = igraph_vcount(graph);
+    igraph_integer_t v, w, x;
+    *matching_size = 0;
+    igraph_vector_int_resize(matching, n);
+    igraph_vector_int_fill(matching, -1);
+
+    // find an augmenting path
+    igraph_vector_int_t path;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
+    igraph_i_maximum_matching_find_aug_path(graph, matching, &path);
+#ifdef MATCHING_DEBUG
+    debug("Path:");
+    igraph_vector_int_print(&path);
+#endif
+
+    // augment matching along path
+    // repeat until no augmenting path is found
+    while (igraph_vector_int_size(&path) != 0) {
+        //augment
+        for (igraph_integer_t i = 0; i + 2 < igraph_vector_int_size(&path); i = i + 2) {
+            // next edges of path are {v,w} and {w,x}
+            v = VECTOR(path)[i];
+            w = VECTOR(path)[i + 1];
+            x = VECTOR(path)[i + 2];
+            VECTOR(*matching)[v] = w;
+            VECTOR(*matching)[w] = v;
+        }
+
+        // last edge of path is {v,w}
+        v = VECTOR(path)[igraph_vector_int_size(&path) - 2];
+        w = VECTOR(path)[igraph_vector_int_size(&path) - 1];
+        VECTOR(*matching)[v] = w;
+        VECTOR(*matching)[w] = v;
+
+        *matching_size = *matching_size + 1;
+
+#ifdef MATCHING_DEBUG
+        debug("Matching:");
+        igraph_vector_int_print(matching);
+#endif
+
+        igraph_i_maximum_matching_find_aug_path(graph, matching, &path);
+#ifdef MATCHING_DEBUG
+        debug("Path:");
+        igraph_vector_int_print(&path);
+#endif
+    }
+#ifdef MATCHING_DEBUG
+    debug("Matching:");
+    igraph_vector_int_print(matching);
+#endif
+
+    igraph_vector_int_destroy(&path);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_i_maximum_matching_find_aug_path(const igraph_t *graph, igraph_vector_int_t *matching, igraph_vector_int_t *path) {
+    igraph_integer_t n = igraph_vcount(graph);
+    igraph_integer_t v, v_contraction, w, w_contraction, x, blossom_root, current;
+    igraph_bool_t finished, path_found, contracted;
+
+    // Forest F built using set of vectors
+    igraph_vector_int_t f_parent;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&f_parent, n);
+    igraph_vector_bool_t f_is_root;
+    IGRAPH_CHECK(igraph_vector_bool_init(&f_is_root, n));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &f_is_root);
+
+    // root vector updated whenever vertex is added to F
+    igraph_vector_int_t root;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&root, n);
+
+    // distance from root vector updated whenever vertex is added to F
+    igraph_vector_int_t distance;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&distance, n);
+
+    // contraction vector updated with blossoms saying what vertex a vertex has been contracted to
+    igraph_vector_int_t contraction;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&contraction, n);
+    // set each vector to be contracted to itself to start
+    for (igraph_integer_t i = 0; i < n; i++) {
+        VECTOR(contraction)[i] = i;
+    }
+
+    igraph_vector_int_t neighbors;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, n);
+
+    // queue of vertices with distance(v, root(v)) even
+    igraph_dqueue_int_t queue;
+    IGRAPH_CHECK(igraph_dqueue_int_init(&queue, n));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &queue);
+
+    // vertex mark vector
+    igraph_vector_bool_t v_mark;
+    IGRAPH_CHECK(igraph_vector_bool_init(&v_mark, n));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &v_mark);
+
+    // edge mark matrix
+    igraph_matrix_bool_t e_mark;
+    IGRAPH_CHECK(igraph_matrix_bool_init(&e_mark, n, n));
+    IGRAPH_FINALLY(igraph_matrix_bool_destroy, &e_mark);
+
+    // blossom mark vector, used to find the root of a blossom
+    igraph_vector_bool_t b_mark;
+    IGRAPH_CHECK(igraph_vector_bool_init(&b_mark, n));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &b_mark);
+
+    // blossom vertex lists, list of vertices in a blossom, from one peak, to root of blossom, to other peak
+    igraph_vector_int_list_t b_lists;
+    IGRAPH_CHECK(igraph_vector_int_list_init(&b_lists, n));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, &b_lists);
+    for (igraph_integer_t i = 0; i < n; i++) {
+        IGRAPH_CHECK(igraph_vector_int_reserve(igraph_vector_int_list_get_ptr(&b_lists, i), n));
+    }
+
+    igraph_vector_int_t temp_list;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&temp_list, n);
+
+    // initalize P to empty path
+    igraph_vector_int_resize(path, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(path, n)); //prevent resizing of path during algorithm
+
+
+    finished = false;
+    path_found = false;
+    while (!finished && !path_found) {
+        contracted = false;
+
+        // initialize empty forest F
+        for (igraph_integer_t i = 0; i < n; i++) {
+            VECTOR(f_parent)[i] = -1;
+            VECTOR(f_is_root)[i] = false;
+        }
+        // unmark all vertices and edges in G, mark all edges of matching
+        igraph_vector_bool_fill(&v_mark, false);
+        igraph_matrix_bool_fill(&e_mark, false);
+        igraph_vector_bool_fill(&b_mark, false);
+
+        igraph_vector_int_fill(&distance, 0);
+        for (igraph_integer_t i = 0; i < n; i++) {
+            VECTOR(root)[i] = i;
+        }
+
+        // clear queue
+        igraph_dqueue_int_clear(&queue);
+        // for each exposed vertex v
+        for (igraph_integer_t i = 0; i < n; i++) {
+            if (VECTOR(*matching)[i] == -1) {
+                // create singleton tree in F
+                VECTOR(f_is_root)[i] = true;
+                // add v to queue
+                igraph_dqueue_int_push(&queue, i);
+            }
+        }
+        if (igraph_dqueue_int_empty(&queue)) {
+            finished = true;
+        }
+        // while there is an unmarked vertex v in F with distance(v, root(v)) even and not contracted and not path_found
+        // that is, loop over all unmarked vertices with even distance to an exposed vertex
+        while (!igraph_dqueue_int_empty(&queue) && !path_found && !contracted) {
+            v = igraph_dqueue_int_pop(&queue);
+            v_contraction = VECTOR(contraction)[v];
+
+#ifdef MATCHING_DEBUG
+            debug("Currently searching for path from vertex %" IGRAPH_PRId "\n", v);
+#endif
+
+            // flag finished, this and flags in forest expansion and blossom contraction steps are tug of warring,
+            // meaning if we hit a vertex with no unmarked edges coming off, and can't find a new vertex, and can't find a blossom, we quit.
+            finished = true;
+
+            // while there exists an unmarked edge e = {v, w} and we haven't contracted and have't found path
+            // that is, test all unmarked edges from v
+            IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, v, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+
+            // if there are no such edges
+            while (igraph_vector_int_size(&neighbors) != 0 && !contracted && !path_found) {
+                w = igraph_vector_int_pop_back(&neighbors);
+                w_contraction = VECTOR(contraction)[w];
+#ifdef MATCHING_DEBUG
+                debug("Currently considering edge %" IGRAPH_PRId ",%" IGRAPH_PRId "\n", v, w);
+#endif
+
+                // check if w is marked, move on to another neighbor if yes
+                if (!MATRIX(e_mark, v, w)) {
+                    // if w is not in F
+                    if (VECTOR(f_parent)[w] == -1 && !VECTOR(f_is_root)[w]) {
+                        // unflag finished
+                        finished = false;
+
+                        // expand F
+#ifdef MATCHING_DEBUG
+                        debug("Expanding forest\n");
+#endif
+                        // w is matched, so add e and w's matched edge to F
+                        // x is vertex matched to w
+                        x = VECTOR(*matching)[w];
+
+                        // add edges {v,w} and {w,x} to tree of v in F
+                        VECTOR(f_parent)[w] = v;
+                        VECTOR(f_parent)[x] = w;
+
+                        // add x to queue
+                        igraph_dqueue_int_push(&queue, x);
+
+                        // distance(w) = distance(v) + 1
+                        VECTOR(distance)[w] = VECTOR(distance)[v] + 1;
+                        // distance(x) = distance(v) + 2
+                        VECTOR(distance)[x] = VECTOR(distance)[v] + 2;
+
+                        // root(w) = root(v)
+                        VECTOR(root)[w] = VECTOR(root)[v];
+                        // root(x) = root(v)
+                        VECTOR(root)[x] = VECTOR(root)[v];
+                    }
+                    // else
+                    else {
+                        // if distance(w_contraction, root(w)) is even, also ensure both v and w aren't the same contracted vertex
+                        if (VECTOR(distance)[w_contraction] % 2 == 0 && w_contraction != VECTOR(contraction)[v]) {
+                            // if root(v) != root(w)
+                            if (VECTOR(root)[v] != VECTOR(root)[w]) {
+                                // we found an augmenting path
+                                // P = path (root(v) -> ... -> v) -> (w -> ... -> root(w))
+                                // Complicated by blossoms, must decide which way to go around the blossom
+                                current = v;
+                                igraph_i_maximum_matching_get_tree_path(&current, &f_is_root, &contraction, &distance, &f_parent, &b_lists, path);
+                                igraph_vector_int_push_back(path, current);
+                                igraph_vector_int_reverse(path);
+                                current = w;
+                                igraph_i_maximum_matching_get_tree_path(&current, &f_is_root, &contraction, &distance, &f_parent, &b_lists, path);
+                                igraph_vector_int_push_back(path, current);
+                                // flag path_found
+                                path_found = true;
+                            }
+                            // else
+                            else {
+                                debug("Contracting blossom\n");
+                                // Contract a blossom
+                                // flag contracted
+                                contracted = true;
+
+                                // unflag finished
+                                finished = false;
+
+                                // B is blossom formed by e and edges on the path v -> w in T
+                                // find by traversing back v -> root(v) blossom marking each vertex,
+                                // then traverse w -> root(w) and first blossom marked is blossom root
+                                // then continue to root(w), removing marks instead
+                                current = v;
+                                VECTOR(b_mark)[current] = true;
+                                while (current != -1 && !VECTOR(f_is_root)[current]) {
+                                    current = VECTOR(f_parent)[current];
+                                    VECTOR(b_mark)[current] = true;
+                                }
+                                current = w;
+                                blossom_root = -1;
+                                if (VECTOR(b_mark)[current]) {
+                                    blossom_root = current;
+                                    debug("found blossom root\n");
+                                } else {
+                                    VECTOR(b_mark)[current] = true;
+                                }
+                                while (!VECTOR(f_is_root)[current]) {
+                                    current = VECTOR(f_parent)[current];
+                                    if (blossom_root == -1) {
+                                        if (VECTOR(b_mark)[current]) {
+                                            blossom_root = current;
+                                            debug("found blossom root\n");
+                                        } else {
+                                            VECTOR(b_mark)[current] = true;
+                                        }
+                                    } else {
+                                        VECTOR(b_mark)[current] = false;
+                                    }
+                                }
+                                igraph_vector_int_t *list = igraph_vector_int_list_get_ptr(&b_lists, blossom_root);
+
+                                // mark all vertices in B as contracted to blossom root
+                                // do by traversing again, but stopping when blossom marks stop
+                                current = v;
+                                while (current != -1 && VECTOR(b_mark)[current]) {
+                                    VECTOR(contraction)[current] = blossom_root;
+                                    VECTOR(b_mark)[current] = false;
+                                    igraph_vector_int_push_back(list, current);
+                                    current = VECTOR(f_parent)[current];
+                                }
+                                current = w;
+                                igraph_vector_int_resize(&temp_list, 0);
+                                while (current != -1 && VECTOR(b_mark)[current]) {
+                                    VECTOR(contraction)[current] = blossom_root;
+                                    VECTOR(b_mark)[current] = false;
+                                    igraph_vector_int_push_back(&temp_list, current);
+                                    current = VECTOR(f_parent)[current];
+                                }
+                                igraph_vector_int_reverse(&temp_list);
+                                igraph_vector_int_append(list, &temp_list);
+                            }
+                        }
+                    }
+                    // mark edge e
+                    MATRIX(e_mark, v, w) = true;
+                }
+            }
+            // mark vertex v
+            VECTOR(v_mark)[v] = true;
+        }
+    }
+    //destroy memory things at end
+    igraph_vector_int_destroy(&f_parent);
+    igraph_vector_bool_destroy(&f_is_root);
+    igraph_vector_int_destroy(&root);
+    igraph_vector_int_destroy(&distance);
+    igraph_vector_int_destroy(&contraction);
+    igraph_vector_int_destroy(&neighbors);
+    igraph_dqueue_int_destroy(&queue);
+    igraph_vector_bool_destroy(&v_mark);
+    igraph_vector_bool_destroy(&b_mark);
+    igraph_matrix_bool_destroy(&e_mark);
+    igraph_vector_int_list_destroy(&b_lists);
+    igraph_vector_int_destroy(&temp_list);
+    IGRAPH_FINALLY_CLEAN(12);
+
+    return IGRAPH_SUCCESS;
+}
+
+void igraph_i_maximum_matching_get_tree_path(igraph_integer_t *current, igraph_vector_bool_t *f_is_root, igraph_vector_int_t *contraction,
+        igraph_vector_int_t *distance, igraph_vector_int_t *f_parent, igraph_vector_int_list_t *b_lists, igraph_vector_int_t *path) {
+    while (*current != -1 && !VECTOR(*f_is_root)[*current]) {
+        // if current has been contracted
+        if (*current != VECTOR(*contraction)[*current]) {
+            // if entering on even distance vertex
+            if (VECTOR(*distance)[*current] % 2 == 0) {
+                // follow parents out of blossom
+                while (*current != -1 && *current != VECTOR(*contraction)[*current]) {
+                    igraph_vector_int_push_back(path, *current);
+                    *current = VECTOR(*f_parent)[*current];
+                }
+            }
+            // else entering on odd distance vertex
+            else {
+                // use blossom edge list to find our way around the other side of it
+                // find current in the edge list
+                igraph_integer_t pos = 0;
+                igraph_vector_int_t *list = igraph_vector_int_list_get_ptr(b_lists, VECTOR(*contraction)[*current]);
+                igraph_integer_t length = igraph_vector_int_size(list);
+                while (VECTOR(*list)[pos % length] != *current) {
+                    pos++;
+                }
+                // determine direction to follow edge list
+                igraph_integer_t dir;
+                if (VECTOR(*f_parent)[*current] == VECTOR(*list)[(pos + 1) % length]) {
+                    dir = 1;
+                } else {
+                    dir = -1;
+                }
+                // follow edge list
+                while (*current != -1 && *current != VECTOR(*contraction)[*current]) {
+                    igraph_vector_int_push_back(path, *current);
+                    pos++;
+                    *current = VECTOR(*list)[pos % length];
+                }
+            }
+        } else {
+            igraph_vector_int_push_back(path, *current);
+            *current = VECTOR(*f_parent)[*current];
+        }
+    }
+}
+
 #ifdef MATCHING_DEBUG
     #undef MATCHING_DEBUG
 #endif
