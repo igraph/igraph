@@ -120,8 +120,8 @@ struct HavelHakimiList {
     // gets the largest non-empty bucket below 'degree',
     // or 0 if one does not exist
     igraph_integer_t get_prev(igraph_integer_t degree) {
+        assert(0 < degree && degree < n_buckets - 1);
         igraph_integer_t curr = buckets[degree].prev;
-        // might need to add a check to make sure degree > 0
         while (curr > 0 && buckets[curr].is_empty()) {
             remove_bucket(curr);
             curr = buckets[degree].prev;
@@ -344,7 +344,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *degseq,
     HavelHakimiList vault(&seq);
 
     igraph_integer_t n_edges_added = 0;
-    igraph_vector_int_t spokes; // TODO: allocate spokes vector once
+    igraph_vector_int_t spokes;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&spokes, 0);
 
     for (igraph_integer_t i = 0; i < n_nodes; i++) {
