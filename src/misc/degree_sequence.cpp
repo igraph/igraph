@@ -93,11 +93,17 @@ struct HavelHakimiList {
     {
         igraph_integer_t n_nodes = igraph_vector_int_size(degseq);
         for (igraph_integer_t i = 0; i <= n_nodes; i++) {
-            if (i == 0) buckets[i].prev = -1;
-            else buckets[i].prev = i - 1;
+            if (i == 0) {
+                buckets[i].prev = -1;
+            } else {
+                buckets[i].prev = i - 1;
+            }
 
-            if (i == n_nodes) buckets[i].next = -1;
-            else buckets[i].next = i + 1;
+            if (i == n_nodes) {
+                buckets[i].next = -1;
+            } else {
+                buckets[i].next = i + 1;
+            }
         }
 
         for (igraph_integer_t i = 0; i < n_nodes; i++) {
@@ -146,8 +152,8 @@ struct HavelHakimiList {
         // bounds check and prevent accidental removal of sentinels
         assert(0 < degree && degree < n_buckets - 1);
 
-        igraph_integer_t& prev_idx = buckets[degree].prev;
-        igraph_integer_t& next_idx = buckets[degree].next;
+        igraph_integer_t &prev_idx = buckets[degree].prev;
+        igraph_integer_t &next_idx = buckets[degree].next;
         if (prev_idx != -1) buckets[prev_idx].next = next_idx;
         if (next_idx != -1) buckets[next_idx].prev = prev_idx;
 
@@ -158,8 +164,8 @@ struct HavelHakimiList {
     void insert_bucket(igraph_integer_t degree) {
         assert(0 < degree && degree < n_buckets - 1);
 
-        igraph_integer_t& prev_idx = buckets[degree].prev;
-        igraph_integer_t& next_idx = buckets[degree].next;
+        igraph_integer_t &prev_idx = buckets[degree].prev;
+        igraph_integer_t &next_idx = buckets[degree].next;
 
         if (prev_idx == -1 && next_idx == -1) {
             next_idx = degree + 1;
@@ -176,9 +182,11 @@ struct HavelHakimiList {
         buckets[node.degree].count++;
     }
 
-    bool get_max_node(vd_pair& max_node) {
+    bool get_max_node(vd_pair &max_node) {
         igraph_integer_t max_bucket = get_max_bucket();
-        if (max_bucket <= 0) return false;
+        if (max_bucket <= 0) {
+            return false;
+        }
         max_node = buckets[max_bucket].nodes.top();
         return true;
     }
@@ -190,9 +198,11 @@ struct HavelHakimiList {
         buckets[max_bucket].count--;
     }
 
-    bool get_min_node(vd_pair& min_node) {
+    bool get_min_node(vd_pair &min_node) {
         igraph_integer_t min_bucket = get_min_bucket();
-        if (min_bucket >= n_buckets - 1) return false;
+        if (min_bucket >= n_buckets - 1) {
+            return false;
+        }
         min_node = buckets[min_bucket].nodes.top();
         return true;
     }
@@ -206,8 +216,8 @@ struct HavelHakimiList {
 
     // Given degree of selected "hub" node, returns degree many "spoke" nodes to connect to
     // amortized O(alpha(n))
-    igraph_error_t get_spokes(igraph_integer_t degree, const igraph_vector_int_t& seq,
-                              igraph_vector_int_t& spokes) {
+    igraph_error_t get_spokes(igraph_integer_t degree, const igraph_vector_int_t &seq,
+                              igraph_vector_int_t &spokes) {
         std::stack<igraph_integer_t> buckets_req; // stack of needed degree buckets
         igraph_integer_t num_nodes = 0;
         igraph_integer_t curr = get_max_bucket(); // starts with max_bucket
