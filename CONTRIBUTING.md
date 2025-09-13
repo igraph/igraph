@@ -99,12 +99,12 @@ to convince the project's developers of the merits of this feature.
 _**Note:** The wiki has a lot of useful information for newcomers, as well as a
 [quick start guide](https://github.com/igraph/igraph/wiki/Quickstart-for-new-contributors)!_
 
-Good pull requests - patches, improvements, new features - are a fantastic help.
+Good pull requests—patches, improvements, new features—are a fantastic help.
 They should remain focused in scope and avoid containing unrelated commits.
 Please also take a look at our [tips on writing igraph code](#tips) before
 getting your hands dirty.
 
-**Please ask first** before embarking on any significant pull request (e.g.
+**Please ask first before embarking on any significant pull request** (e.g.
 implementing features, refactoring code, porting to a different language),
 otherwise you risk spending a lot of time working on something that the
 project's developers might not want to merge into the project.
