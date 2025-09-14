@@ -42,6 +42,7 @@ This section gives detailed on breaking changes you need to consider when updati
  - `igraph_vector_swap_elements()` no longer returns an error code.
  - `igraph_vector_list_swap_elements()` and `igraph_graph_list_swap_elements()` no longer return an error code.
  - `igraph_matrix_copy_to()` gained an `igraph_matrix_storage_t storage` parameter that specifies whether the data should be written in column-major or row-major format.
+ - `igraph_vector_view()`, `igraph_matrix_view()`, `igraph_matrix_view_from_vector()`, and `igraph_vector_ptr_view()` now return their result as a return value instead of an output parameter. This allows assigning the value to a `const` variable without triggering warnings with modern compilers.
 
 #### Attribute handling
 
