@@ -39,8 +39,8 @@ int main(void) {
     b = IGRAPH_MALLOC(0);
     IGRAPH_ASSERT(b);
 
-    IGRAPH_FREE(a);
-    IGRAPH_ASSERT(!a);
+    IGRAPH_FREE(b);
+    IGRAPH_ASSERT(!b);
 
     /* Functions */
 
