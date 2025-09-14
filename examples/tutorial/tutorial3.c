@@ -2,10 +2,9 @@
 
 int main(void) {
     igraph_t graph;
-    igraph_vector_int_t v;
     igraph_vector_int_t result;
     igraph_vector_t result_real;
-    igraph_int_t edges[] = {
+    igraph_int_t edges_array[] = {
         0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7, 0,8,
         0,10, 0,11, 0,12, 0,13, 0,17, 0,19, 0,21, 0,31,
         1, 2, 1, 3, 1, 7, 1,13, 1,17, 1,19, 1,21, 1,30,
@@ -18,12 +17,13 @@ int main(void) {
         28,31, 28,33, 29,32, 29,33, 30,32, 30,33, 31,32,
         31,33, 32,33
     };
+    igraph_vector_int_t edges =
+        igraph_vector_int_view(edges_array, sizeof(edges_array) / sizeof(edges_array[0]));
 
     /* Initialize the library. */
     igraph_setup();
 
-    igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0]));
-    igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
+    igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED);
 
     igraph_vector_int_init(&result, 0);
     igraph_vector_init(&result_real, 0);

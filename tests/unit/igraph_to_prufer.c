@@ -33,7 +33,7 @@ igraph_bool_t test_from_prufer_back_to_prufer(void) {
 
     igraph_bool_t success = 0;
 
-    igraph_vector_int_view(&expected_prufer, prufer, 4);
+    expected_prufer = igraph_vector_int_view(prufer, 4);
     igraph_from_prufer(&graph, &expected_prufer);
 
     igraph_vector_int_init(&output_prufer, 4);
@@ -55,7 +55,7 @@ igraph_bool_t test_from_prufer_back_to_prufer_with_resize(void) {
 
     igraph_bool_t success;
 
-    igraph_vector_int_view(&expected_prufer, prufer, 6);
+    expected_prufer = igraph_vector_int_view(prufer, 6);
     igraph_from_prufer(&graph, &expected_prufer);
 
     igraph_vector_int_init(&output_prufer, 0);
@@ -77,7 +77,7 @@ igraph_bool_t test_from_prufer_back_to_prufer_with_resize2(void) {
 
     igraph_bool_t success;
 
-    igraph_vector_int_view(&expected_prufer, prufer, 5);
+    expected_prufer = igraph_vector_int_view(prufer, 5);
     igraph_from_prufer(&graph, &expected_prufer);
 
     igraph_vector_int_init(&output_prufer, 0);

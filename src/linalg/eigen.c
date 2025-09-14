@@ -481,9 +481,8 @@ static igraph_error_t igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
         IGRAPH_CHECK(igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
                                                data->A, from, /*beta=*/ 0.0, to));
     } else { /* data->sA */
-        igraph_vector_t vto, vfrom;
-        igraph_vector_view(&vto, to, n);
-        igraph_vector_view(&vfrom, from, n);
+        const igraph_vector_t vfrom = igraph_vector_view(from, n);
+        igraph_vector_t vto = igraph_vector_view(to, n);
         igraph_vector_null(&vto);
         igraph_sparsemat_gaxpy(data->sA, &vfrom, &vto);
     }

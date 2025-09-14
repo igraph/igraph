@@ -80,9 +80,8 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector) 
 /* Vector views          */
 /*-----------------------*/
 
-IGRAPH_EXPORT const TYPE(igraph_vector) *FUNCTION(igraph_vector, view)(const TYPE(igraph_vector) *v,
-                                                                       const BASE *data,
-                                                                       igraph_int_t length);
+IGRAPH_EXPORT TYPE(igraph_vector) FUNCTION(igraph_vector, view)(const BASE *data,
+                                                                igraph_int_t length);
 
 /*-----------------------*/
 /* Copying vectors       */

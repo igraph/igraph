@@ -543,7 +543,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
         }
 
-        igraph_vector_view(&start_vec, storage.resid, options->n);
+        start_vec = igraph_vector_view(storage.resid, options->n);
         igraph_vector_shuffle(&start_vec);
 
         {
@@ -599,10 +599,9 @@ igraph_error_t igraph_community_leading_eigenvector(
         /* ---------------------------------------------------------------*/
 
         if (callback) {
-            igraph_vector_t vv;
+            const igraph_vector_t vv = igraph_vector_view(storage.v, size);;
             igraph_error_t ret;
 
-            igraph_vector_view(&vv, storage.v, size);
             IGRAPH_CHECK_CALLBACK(
                         callback(
                             mymembership, comm, storage.d[0], &vv, arpcb1,

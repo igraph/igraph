@@ -290,13 +290,13 @@ int test_caching(void) {
     igraph_full(&g_multi, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
     igraph_full(&g_multi_and_loop, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
 
-    igraph_vector_int_view(&edge, vloop, 2);
+    edge = igraph_vector_int_view(vloop, 2);
     igraph_add_edges(&g_loop, &edge, NULL);
     igraph_add_edges(&g_multiloop, &edge, NULL);
     igraph_add_edges(&g_multiloop, &edge, NULL);
     igraph_add_edges(&g_multi_and_loop, &edge, NULL);
 
-    igraph_vector_int_view(&edge, vmult, 2);
+    edge = igraph_vector_int_view(vmult, 2);
 
     igraph_add_edges(&g_multi, &edge, NULL);
     igraph_add_edges(&g_multi_and_loop, &edge, NULL);

@@ -24,17 +24,18 @@ int main(void) {
                                  { 2.0,   0,   0, 1.0 },
                                  {   0,   0, 1.5,   0 },
                                  {   0, 1.0,   0,   0 } };
-    igraph_matrix_t mat;
+
+    /* C arrays use row-major storage, while igraph's matrix uses column-major.
+     * The matrix 'mat' will be the transpose of 'data'. */
+    const igraph_matrix_t mat =
+        igraph_matrix_view(*data, sizeof(data[0]) / sizeof(data[0][0]),
+                                  sizeof(data) / sizeof(data[0]));
     igraph_vector_t weights;
     igraph_vector_int_t edges;
     igraph_int_t n;
 
     /* Initialize the library. */
-    igraph_setup();
-
-    /* C arrays use row-major storage, while igraph's matrix uses column-major.
-     * The matrix 'mat' will be the transpose of 'data'. */
-    igraph_matrix_view(&mat, *data, sizeof(data[0]) / sizeof(data[0][0]), sizeof(data) / sizeof(data[0]));
+    igraph_setup(); 
 
     /* Initialize vector into which weights will be written. */
     igraph_vector_init(&weights, 0);

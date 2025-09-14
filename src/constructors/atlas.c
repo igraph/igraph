@@ -62,7 +62,6 @@
  */
 igraph_error_t igraph_atlas(igraph_t *graph, igraph_int_t number) {
 
-    igraph_vector_int_t v;
     const igraph_int_t atlas_size =
         sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_i_atlas_edges_pos[0]);
 
@@ -77,9 +76,10 @@ igraph_error_t igraph_atlas(igraph_t *graph, igraph_int_t number) {
     igraph_int_t pos = igraph_i_atlas_edges_pos[number];
     igraph_int_t n = igraph_i_atlas_edges[pos];
     igraph_int_t e = igraph_i_atlas_edges[pos + 1];
+    const igraph_vector_int_t edges = igraph_vector_int_view(igraph_i_atlas_edges + pos + 2, e * 2);
 
     IGRAPH_CHECK(igraph_create(graph,
-                               igraph_vector_int_view(&v, igraph_i_atlas_edges + pos + 2, e * 2),
+                               &edges,
                                n,
                                IGRAPH_UNDIRECTED));
 

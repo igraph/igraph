@@ -75,7 +75,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(
     igraph_error_t ret;
 
     if (al->adjs[no].stor_begin == NULL) {
-        igraph_vector_int_view(&al->adjs[no], al->data + al->next_data, al->data_length - al->next_data);
+        al->adjs[no] = igraph_vector_int_view(al->data + al->next_data, al->data_length - al->next_data);
         /* igraph_neighbors calls a resize. Since we're handling our own
          * vectors, we can't have our stor_begin be realloced. A realloc should only
          * happen when the vector is too small to handle the neighbors, which

@@ -48,7 +48,6 @@ void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
 int main(void) {
 
     igraph_t graph;
-    igraph_vector_int_t v;
     igraph_vector_int_t trussness;
 
     /* Create actual graph */
@@ -56,9 +55,8 @@ int main(void) {
       1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 3,6, 3,11,
       4,5, 4,6, 5,6, 5,7, 5,8, 5,9, 6,7, 6,10, 6,11,
       7,8, 7,9, 8,9, 8,10 };
-    igraph_int_t n = sizeof(edges) / sizeof(edges[0]);
+    const igraph_vector_int_t v = igraph_vector_int_view(edges, sizeof(edges) / sizeof(edges[0]));
 
-    igraph_vector_int_view(&v, edges, n);
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
     /* Compute the trussness of the edges. */

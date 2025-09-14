@@ -132,7 +132,7 @@ int main(void) {
     /* Same ring, but with weights */
 
     printf("Astar, weighted, no heuristic:\n");
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
+    weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
                                        &weights_vec, IGRAPH_OUT,
@@ -145,7 +145,7 @@ int main(void) {
     igraph_destroy(&g);
 
     printf("Astar, unweighted, lattice with manhattan distance heuristic:\n");
-    igraph_vector_int_view(&dimvector, dims, sizeof(dims)/sizeof(dims[0]));
+    dimvector = igraph_vector_int_view(dims, sizeof(dims)/sizeof(dims[0]));
 
     igraph_square_lattice(&g, &dimvector, /*nei*/ 1, IGRAPH_UNDIRECTED, /*mutual*/ false, /*periodic*/NULL);
 

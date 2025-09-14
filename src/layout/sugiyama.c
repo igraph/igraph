@@ -211,8 +211,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
 static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
         igraph_real_t x2, igraph_real_t x3, igraph_real_t x4) {
     igraph_real_t arr[4] = { x1, x2, x3, x4 };
-    igraph_vector_t vec;
-    igraph_vector_view(&vec, arr, 4);
+    igraph_vector_t vec = igraph_vector_view(arr, 4);
     igraph_vector_sort(&vec);
     return (arr[1] + arr[2]) / 2.0;
 }

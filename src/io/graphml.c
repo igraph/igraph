@@ -778,7 +778,8 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
 static igraph_error_t igraph_i_graphml_append_to_data_char(
     struct igraph_i_graphml_parser_state *state, const xmlChar *data, int len
 ) {
-    igraph_vector_char_t data_vec;
+    const igraph_vector_char_t data_vec =
+        igraph_vector_char_view((char *) data, len);
 
     if (!state->successful) {
         return IGRAPH_SUCCESS;
@@ -787,7 +788,7 @@ static igraph_error_t igraph_i_graphml_append_to_data_char(
     IGRAPH_STATIC_ASSERT(sizeof(char) == sizeof(xmlChar));
     IGRAPH_CHECK(igraph_vector_char_append(
         &state->data_char,
-        igraph_vector_char_view(&data_vec, (char *) data, len)
+        &data_vec
     ));
 
     return IGRAPH_SUCCESS;

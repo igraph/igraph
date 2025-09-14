@@ -43,7 +43,7 @@ igraph_bool_t vec_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
 /* This is a trivial implementation of ECC for k=3 using igraph_list_triangles() */
 void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igraph_bool_t normalize) {
     igraph_vector_int_t triangles_vec, eids;
-    igraph_matrix_int_t triangles;
+
 
     igraph_vector_resize(res, igraph_ecount(g));
     igraph_vector_null(res);
@@ -51,7 +51,7 @@ void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igr
     igraph_vector_int_init(&triangles_vec, 0);
     igraph_list_triangles(g, &triangles_vec);
 
-    igraph_matrix_int_view_from_vector(&triangles, &triangles_vec, 3);
+    const igraph_matrix_int_t triangles = igraph_matrix_int_view_from_vector(&triangles_vec, 3);
 
     igraph_vector_int_init(&eids, 0);
 

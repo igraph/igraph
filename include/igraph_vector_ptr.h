@@ -49,8 +49,7 @@ typedef struct s_vector_ptr {
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_int_t size);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_array(igraph_vector_ptr_t* v, void *const *data, igraph_int_t length);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
-IGRAPH_EXPORT const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
-                                                                 void *const *data, igraph_int_t length);
+IGRAPH_EXPORT igraph_vector_ptr_t igraph_vector_ptr_view (void *const *data, igraph_int_t length);
 IGRAPH_EXPORT void igraph_vector_ptr_destroy(igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_free_all(igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v);

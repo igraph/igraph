@@ -21,7 +21,6 @@
 int main(void) {
     igraph_t g;
     igraph_vector_int_t v;
-    igraph_matrix_int_t result;
 
     /* Initialize the library. */
     igraph_setup();
@@ -31,8 +30,10 @@ int main(void) {
     printf("Triangles in a full graph of 5 vertices:\n");
     igraph_vector_int_init(&v, 0);
     igraph_list_triangles(&g, &v);
-    igraph_matrix_int_view_from_vector(&result, &v, /* nrow = */ 3);
+
+    const igraph_matrix_int_t result = igraph_matrix_int_view_from_vector(&v, /* nrow = */ 3);
     igraph_matrix_int_print(&result);
+
     igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
 

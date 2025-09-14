@@ -84,12 +84,11 @@ static void destroy_qhull(qhT *qh) {
  * This function assumes that there is at least one point. */
 static igraph_error_t delaunay_edges_1d(igraph_vector_int_t *edges, const igraph_matrix_t *points) {
     const igraph_int_t numpoints = igraph_matrix_nrow(points);
-    igraph_vector_t coords;
+    const igraph_vector_t coords = igraph_vector_view(&MATRIX(*points, 0, 0), numpoints);
     igraph_vector_int_t order;
 
     IGRAPH_ASSERT(igraph_matrix_ncol(points) == 1);
 
-    igraph_vector_view(&coords, &MATRIX(*points, 0, 0), numpoints);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, numpoints);
 
     IGRAPH_CHECK(igraph_vector_sort_ind(&coords, &order, IGRAPH_ASCENDING));
