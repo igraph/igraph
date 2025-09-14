@@ -3202,6 +3202,9 @@ igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_integer_t nzm
                           igraph_integer_t *p, igraph_integer_t *i, igraph_real_t *x, igraph_integer_t nz) {
 
     A->cs = IGRAPH_CALLOC(1, cs_igraph);
+
+    IGRAPH_CHECK_OOM(A->cs, "Insufficient memory to create sparsemat view.");
+
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
