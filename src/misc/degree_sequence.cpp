@@ -120,7 +120,7 @@ struct HavelHakimiList {
     // gets the largest non-empty bucket below 'degree',
     // or 0 if one does not exist
     igraph_integer_t get_prev(igraph_integer_t degree) {
-        assert(0 < degree && degree < n_buckets - 1);
+        assert(0 < degree && degree <= n_buckets - 1); // upper sentinel allowed as input
         igraph_integer_t curr = buckets[degree].prev;
         while (curr > 0 && buckets[curr].is_empty()) {
             remove_bucket(curr);
