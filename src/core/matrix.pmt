@@ -84,35 +84,33 @@ igraph_error_t FUNCTION(igraph_matrix, init)(
  *
  * </para><para>
  * Since this function creates a view into an existing array, you must \em not
- * destroy the \c igraph_matrix_t object when you are done with it. Similarly,
+ * destroy the \type igraph_matrix_t object when you are done with it. Similarly,
  * you must \em not call any function on it that may attempt to modify the size
  * of the matrix. Modifying an element in the matrix will modify the underlying
  * array as the two share the same memory block.
  *
- * \param m Pointer to a not yet initialized matrix object where the view will
- *        be created.
- * \param data The array that the matrix provides a view into.
+ * \param data The raw array that the matrix provides a view into.
  * \param nrow The number of rows in the matrix.
  * \param ncol The number of columns in the matrix.
- * \return Pointer to the matrix object, the same as the \p m parameter, for
- *         convenience.
+ * \return The matrix object providing the view into the array.
  *
  * Time complexity: O(1).
  */
 
-const TYPE(igraph_matrix)* FUNCTION(igraph_matrix, view)(
-        const TYPE(igraph_matrix) *m, const BASE *data,
+TYPE(igraph_matrix) FUNCTION(igraph_matrix, view)(
+        const BASE *data,
         igraph_int_t nrow, igraph_int_t ncol) {
+
     /* temporarily cast away the constness */
-    TYPE(igraph_matrix) *m2 = (TYPE(igraph_matrix)*)m;
+    TYPE(igraph_matrix) m;
 
     /* No overflow checking, as this function does not return igraph_error_t.
      * It is the caller's resposibility to ensure that the size of 'data'
      * matches nrow*ncol, which also implies that nrow*ncol does not overflow. */
 
-    FUNCTION(igraph_vector, view)(&m2->data, data, ncol * nrow);
-    m2->nrow = nrow;
-    m2->ncol = ncol;
+    m.data = FUNCTION(igraph_vector, view)(data, ncol * nrow);
+    m.nrow = nrow;
+    m.ncol = ncol;
 
     return m;
 }
@@ -141,33 +139,24 @@ const TYPE(igraph_matrix)* FUNCTION(igraph_matrix, view)(
  * block of the vector, and the matrix view will not be informed about the
  * re-allocation so it will point to an invalid memory area afterwards.
  *
- * \param m Pointer to a not yet initialized matrix object where the view will
- *        be created.
  * \param v The vector that the matrix will provide a view into.
  * \param nrow The number of rows in the matrix. The number of columns will be
  *        derived implicitly from the size of the vector. If the number of
  *        items in the vector is not divisible by the number of rows, the
  *        last few elements of the vector will not be covered by the view.
- * \return Error code.
+ * \return The matrix object providing the view into the vector.
  *
  * Time complexity: O(1).
  */
 
-const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
-    const TYPE(igraph_matrix) *m, const TYPE(igraph_vector) *v,
+TYPE(igraph_matrix) FUNCTION(igraph_matrix, view_from_vector)(
+    const TYPE(igraph_vector) *v,
     igraph_int_t nrow
 ) {
-    /* temporarily cast away the constness */
-    TYPE(igraph_matrix) *m2 = (TYPE(igraph_matrix)*)m;
-
     igraph_int_t size = FUNCTION(igraph_vector, size)(v);
     igraph_int_t ncol = nrow > 0 ? size / nrow : 0;
 
-    FUNCTION(igraph_vector, view)(&m2->data, VECTOR(*v), ncol * nrow);
-    m2->nrow = nrow;
-    m2->ncol = ncol;
-
-    return m;
+    return FUNCTION(igraph_matrix, view)(VECTOR(*v), nrow, ncol);
 }
 
 /**
@@ -367,8 +356,7 @@ static void FUNCTION(igraph_i, transpose_copy)(
  */
 void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to, igraph_matrix_storage_t storage) {
     if (storage == IGRAPH_ROW_MAJOR) {
-        TYPE(igraph_vector) dst;
-        FUNCTION(igraph_vector, view)(&dst, to, m->nrow * m->ncol);
+        TYPE(igraph_vector) dst = FUNCTION(igraph_vector, view)(to, m->nrow * m->ncol);
         FUNCTION(igraph_i, transpose_copy)(&dst, &m->data, m->nrow, m->ncol);
     } else if (storage == IGRAPH_COLUMN_MAJOR) {
         FUNCTION(igraph_vector, copy_to)(&m->data, to);
@@ -516,12 +504,12 @@ igraph_error_t FUNCTION(igraph_matrix, init_array)(
         TYPE(igraph_matrix) *m, const BASE *data,
         igraph_int_t nrow, igraph_int_t ncol,
         igraph_matrix_storage_t storage) {
-    igraph_int_t length;
-    TYPE(igraph_vector) v;
 
+    igraph_int_t length;
     IGRAPH_SAFE_MULT(nrow, ncol, &length);
     IGRAPH_CHECK(FUNCTION(igraph_matrix, init)(m, nrow, ncol));
-    FUNCTION(igraph_vector, view)(&v, data, length);
+    const TYPE(igraph_vector) v = FUNCTION(igraph_vector, view)(data, length);
+
     if (storage == IGRAPH_COLUMN_MAJOR) {
         IGRAPH_CHECK(FUNCTION(igraph_vector, update)(&m->data, &v));
     } else if (storage == IGRAPH_ROW_MAJOR) {

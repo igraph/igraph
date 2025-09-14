@@ -155,25 +155,36 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector) *v, igraph_int_
  * \function igraph_vector_view
  * \brief Handle a regular C array as a \type igraph_vector_t.
  *
+ * This function lets you treat an existing C array as an \ref igraph_vector_t.
+ *
  * </para><para>
- * This is a special \type igraph_vector_t constructor. It allows to
- * handle a regular C array as a \type igraph_vector_t temporarily.
- * Be sure that you \em don't ever call the destructor (\ref
- * igraph_vector_destroy()) on objects created by this constructor.
- * \param v Pointer to an uninitialized \type igraph_vector_t object.
- * \param data Pointer, the C array. It may not be \c NULL, except
- *     when \p length is zero.
+ * Since this function creates a view into an existing array, you must \em not
+ * destroy the \c igraph_vector_t object when you are done with it. Similarly,
+ * you must \em not call any function on it that may attempt to modify the size
+ * of the vector. Modifying an element in the vector will modify the underlying
+ * array as the two share the same memory block.
+ *
+ * </para><para>
+ * Typical usage pattern:
+ *
+ * <programlisting>
+ * igraph_real_t array[] = { 1.0, 1.5, 2.0 };
+ * const igraph_vector_t v = igraph_vector_view(array, sizeof(array) / sizeof(array[0]));
+ * printf("The sum of vector elements is %g.\n", igraph_vector_sum(&amp;v));
+ * </programlisting>
+ *
+ * \param data The raw array that the vector provides a view into.
  * \param length The length of the C array.
- * \return Pointer to the vector object, the same as the
- *     \p v parameter, for convenience.
+ * \return The vector object providing the view into the array.
  *
  * Time complexity: O(1)
  */
 
-const TYPE(igraph_vector)* FUNCTION(igraph_vector, view)(const TYPE(igraph_vector) *v,
+TYPE(igraph_vector) FUNCTION(igraph_vector, view)(
         const BASE *data, igraph_int_t length) {
+
     static const BASE dummy = ZERO;
-    TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
+    TYPE(igraph_vector) v;
 
     /* When the length is zero, we allow 'data' to be NULL.
      * An igraph_vector_t may never contain a NULL pointer,
@@ -184,9 +195,9 @@ const TYPE(igraph_vector)* FUNCTION(igraph_vector, view)(const TYPE(igraph_vecto
         IGRAPH_ASSERT(data != NULL);
     }
 
-    v2->stor_begin = (BASE*)data;
-    v2->stor_end = (BASE*)data + length;
-    v2->end = v2->stor_end;
+    v.stor_begin = (BASE*)data;
+    v.stor_end = (BASE*)data + length;
+    v.end = v.stor_end;
     return v;
 }
 

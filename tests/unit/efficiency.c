@@ -23,7 +23,6 @@
 int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* weights_array) {
     igraph_real_t eff;
     igraph_vector_t eff_vec;
-    igraph_vector_t weights;
 
     printf("###### Testing graph: %s ######\n\n", name);
 
@@ -68,7 +67,7 @@ int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* wei
     print_vector(&eff_vec);
 
     if (weights_array) {
-        igraph_vector_view(&weights, weights_array, igraph_ecount(graph));
+        const igraph_vector_t weights = igraph_vector_view(weights_array, igraph_ecount(graph));
         printf("\nWEIGHTED CASE:\n\n");
 
         igraph_global_efficiency(graph, &weights, &eff, IGRAPH_UNDIRECTED);

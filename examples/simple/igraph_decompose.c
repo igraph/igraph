@@ -7,11 +7,6 @@ int main(void) {
     igraph_t ring, g, *component;
     igraph_graph_list_t complist;
     igraph_int_t i;
-    igraph_int_t edges[] = { 0, 1, 1, 2, 2, 0,
-                              3, 4, 4, 5, 5, 6,
-                              8, 9, 9, 10
-                            };
-    igraph_vector_int_t v;
 
     /* Initialize the library. */
     igraph_setup();
@@ -37,9 +32,11 @@ int main(void) {
     igraph_graph_list_clear(&complist);
 
     /* A toy graph, three components maximum, with at least 2 vertices each */
-    igraph_create(&g,
-                  igraph_vector_int_view(&v, edges, sizeof(edges) / sizeof(edges[0])),
-                  0, IGRAPH_DIRECTED);
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 1, 1, 2, 2, 0,
+                 3, 4, 4, 5, 5, 6,
+                 8, 9, 9, 10,
+                 -1);
     igraph_decompose(&g, &complist, IGRAPH_WEAK, 3, 2);
     for (i = 0; i < igraph_graph_list_size(&complist); i++) {
         component = igraph_graph_list_get_ptr(&complist, i);

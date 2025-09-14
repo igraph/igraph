@@ -729,9 +729,8 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
         IGRAPH_CHECK(igraph_matrix_resize(Y, vc, no));
         for (i = 0; i < no; i++) {
             igraph_real_t norm;
-            igraph_vector_t v;
+            igraph_vector_t v = igraph_vector_view(&MATRIX(*Y, 0, i), vc);
             callback_right(&MATRIX(*Y, 0, i), &MATRIX(*X, 0, i), (int) vc, &data);
-            igraph_vector_view(&v, &MATRIX(*Y, 0, i), vc);
             norm = 1.0 / igraph_blas_dnrm2(&v);
             igraph_vector_scale(&v, norm);
         }

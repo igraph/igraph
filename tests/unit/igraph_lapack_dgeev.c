@@ -126,14 +126,14 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
 
     for (i = 0; i < n; i++) {
         if (VECTOR(*values_imag)[i] == 0.0) {
-            igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i), n);
-            igraph_vector_view(&v_imag, VECTOR(null), n);
+            v_real = igraph_vector_view(&MATRIX(*vectors_right, 0, i), n);
+            v_imag = igraph_vector_view(VECTOR(null), n);
         } else if (VECTOR(*values_imag)[i] > 0.0) {
-            igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i), n);
-            igraph_vector_view(&v_imag, &MATRIX(*vectors_right, 0, i + 1), n);
+            v_real = igraph_vector_view(&MATRIX(*vectors_right, 0, i), n);
+            v_imag = igraph_vector_view(&MATRIX(*vectors_right, 0, i + 1), n);
         } else if (VECTOR(*values_imag)[i] < 0.0) {
-            igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i - 1), n);
-            igraph_vector_view(&v_imag, &MATRIX(*vectors_right, 0, i), n);
+            v_real = igraph_vector_view(&MATRIX(*vectors_right, 0, i - 1), n);
+            v_imag = igraph_vector_view(&MATRIX(*vectors_right, 0, i), n);
             igraph_vector_scale(&v_imag, -1.0);
         }
         real_cplx_mult(A, &v_real, &v_imag, &AV_real, &AV_imag);

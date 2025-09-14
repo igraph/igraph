@@ -122,10 +122,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     size_t coord_count = Size / sizeof(double);
     igraph_real_t *coords = (igraph_real_t *) Data;
 
-    igraph_matrix_view(&points1d, coords, coord_count / 1, 1);
-    igraph_matrix_view(&points2d, coords, coord_count / 2, 2);
-    igraph_matrix_view(&points3d, coords, coord_count / 3, 3);
-    igraph_matrix_view(&points4d, coords, coord_count / 4, 4);
+    points1d = igraph_matrix_view(coords, coord_count / 1, 1);
+    points2d = igraph_matrix_view(coords, coord_count / 2, 2);
+    points3d = igraph_matrix_view(coords, coord_count / 3, 3);
+    points4d = igraph_matrix_view(coords, coord_count / 4, 4);
 
     {
         igraph_vector_int_t iv;

@@ -131,7 +131,7 @@ int check_lattice(const lat_test_t *test) {
     int ret;
 
     /* Create lattice */
-    igraph_vector_int_view(&dimvector, test->dimedges, test->dim);
+    dimvector = igraph_vector_int_view(test->dimedges, test->dim);
     igraph_vector_bool_init(&periodic, test->dim);
     igraph_vector_bool_fill(&periodic, test->periodic);
     igraph_square_lattice(
@@ -147,7 +147,7 @@ int check_lattice(const lat_test_t *test) {
     }
 
     /* Check that it is isomorphic to the stored graph */
-    igraph_vector_int_view(&otheredges, test->dimedges + test->dim, test->m * 2);
+    otheredges = igraph_vector_int_view(test->dimedges + test->dim, test->m * 2);
     igraph_create(&othergraph, &otheredges, igraph_vector_int_prod(&dimvector),
                   test->directed);
     igraph_isomorphic(&graph, &othergraph, &iso);

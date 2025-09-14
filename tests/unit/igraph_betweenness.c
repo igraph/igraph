@@ -121,9 +121,9 @@ int main(void) {
 
     printf("\nNon-trivial weighted graph\n");
     printf("==========================================================\n");
-    igraph_vector_int_view(&edges, nontriv, sizeof(nontriv) / sizeof(nontriv[0]));
+    edges = igraph_vector_int_view(nontriv, sizeof(nontriv) / sizeof(nontriv[0]));
     igraph_create(&g, &edges, 0, /* directed= */ 0);
-    igraph_vector_view(&weights, nontriv_weights,
+    weights = igraph_vector_view(nontriv_weights,
                        sizeof(nontriv_weights) / sizeof(nontriv_weights[0]));
     igraph_vector_init(&bet, 0);
 

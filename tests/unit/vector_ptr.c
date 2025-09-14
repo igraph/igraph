@@ -187,7 +187,7 @@ int main(void) {
 
     /* igraph_vector_ptr_view */
     ptr = (void**) malloc(5 * sizeof(void*));
-    igraph_vector_ptr_view(&v3, ptr, 5);
+    v3 = igraph_vector_ptr_view(ptr, 5);
     ptr[0] = &d1;
     ptr[1] = &d2;
     ptr[2] = &d3;

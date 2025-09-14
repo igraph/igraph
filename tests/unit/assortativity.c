@@ -345,7 +345,7 @@ int main(void) {
                  114, 53, 114, 49, 114, 73, 114, 46, 114, 67, 114, 58, 114, 15, 114, 104, 114,
                  -1);
     igraph_simplify(&g, /*remove_multiple=*/ true, /*remove_loops=*/ true, /*edge_comb=*/ NULL);
-    igraph_vector_int_view(&types, football_types, sizeof(football_types) / sizeof(football_types[0]));
+    types = igraph_vector_int_view(football_types, sizeof(football_types) / sizeof(football_types[0]));
     igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ true);
     printf("%g\n", assort);
 

@@ -253,10 +253,10 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
     igraph_int_t no_of_nodes = data[0];
     igraph_int_t no_of_edges = data[1];
     igraph_bool_t directed = (igraph_bool_t) data[2];
-    igraph_vector_int_t edges;
+    const igraph_vector_int_t edges = igraph_vector_int_view(data + 3, 2 * no_of_edges);
 
-    igraph_vector_int_view(&edges, data + 3, 2 * no_of_edges);
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+
     return IGRAPH_SUCCESS;
 }
 

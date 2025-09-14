@@ -52,10 +52,10 @@ void simple_test_case_with_weights_undirected(void) {
     printf("\nSimple test case, with weights, undirected\n");
 
     igraph_vector_init(&vector_actual_results, 0);
-    igraph_vector_int_view(&vector_edges, real_edges, sizeof(real_edges)/sizeof(real_edges[0]));
+    vector_edges = igraph_vector_int_view(real_edges, sizeof(real_edges)/sizeof(real_edges[0]));
     igraph_create(&g, &vector_edges, /*number of vertices*/ 2, IGRAPH_DIRECTED);
 
-    igraph_vector_view(&vector_weights, real_weights, sizeof(real_weights)/sizeof(real_weights[0]));
+    vector_weights = igraph_vector_view(real_weights, sizeof(real_weights)/sizeof(real_weights[0]));
 
     /* NOT NORMALISED TEST BELOW */
 
@@ -143,10 +143,10 @@ void advanced_test_case_with_weights(void) {
 
 
     igraph_vector_init(&vector_actual_results, 0);
-    igraph_vector_int_view(&vector_edges, real_edges, sizeof(real_edges) / sizeof(real_edges[0]));
+    vector_edges = igraph_vector_int_view(real_edges, sizeof(real_edges) / sizeof(real_edges[0]));
     igraph_create(&g, &vector_edges, /*number of vertices*/ 2, IGRAPH_DIRECTED);
 
-    igraph_vector_view(&vector_weights, real_weights, sizeof(real_weights) / sizeof(real_weights[0]));
+    vector_weights = igraph_vector_view(real_weights, sizeof(real_weights) / sizeof(real_weights[0]));
 
     /* TEST FOR UNDIRECTED GRAPH */
 

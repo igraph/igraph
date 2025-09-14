@@ -38,8 +38,6 @@ igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_
 
 int main(void) {
     igraph_t g, rg;
-    igraph_vector_int_t outdeg, indeg, empty;
-    igraph_vector_int_t degrees, rg_degrees;
     igraph_bool_t is_simple, is_connected;
 
     const igraph_int_t outarr[] = {2, 3, 2, 3, 3, 3, 3, 1, 4, 4};
@@ -47,10 +45,13 @@ int main(void) {
 
     const igraph_int_t n = sizeof(outarr) / sizeof(outarr[0]);
 
-    igraph_rng_seed(igraph_rng_default(), 333);
+    const igraph_vector_int_t outdeg = igraph_vector_int_view(outarr, n);
+    const igraph_vector_int_t indeg = igraph_vector_int_view(inarr,  n);
 
-    igraph_vector_int_view(&outdeg, outarr, n);
-    igraph_vector_int_view(&indeg,  inarr,  n);
+    igraph_vector_int_t empty;
+    igraph_vector_int_t degrees, rg_degrees;
+
+    igraph_rng_seed(igraph_rng_default(), 333);
 
     igraph_vector_int_init(&empty, 0);
 

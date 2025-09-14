@@ -22,8 +22,9 @@
 int main(void) {
 
     igraph_t graph;
-    igraph_vector_t weights;
     igraph_real_t weights_data[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
+    const igraph_vector_t weights =
+        igraph_vector_view(weights_data, sizeof(weights_data) / sizeof(weights_data[0]));
     igraph_matrix_t res;
     igraph_real_t cutoff;
 
@@ -52,9 +53,6 @@ int main(void) {
     igraph_matrix_print(&res);
 
     printf("\nWeighted distances:\n\n");
-
-    igraph_vector_view(&weights, weights_data,
-                       sizeof(weights_data) / sizeof(weights_data[0]));
 
     igraph_distances(&graph, &weights, &res, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT);
     igraph_matrix_print(&res);

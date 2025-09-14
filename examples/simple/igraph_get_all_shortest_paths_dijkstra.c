@@ -42,8 +42,7 @@ int main(void) {
     igraph_vector_int_list_t vertices, edges;
 
     igraph_real_t weights[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
-
-    igraph_vector_t weights_vec;
+    const igraph_vector_t weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_vector_int_t nrgeo;
     igraph_vs_t vs;
 
@@ -63,7 +62,6 @@ int main(void) {
                  2, 1,
                  -1);
 
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
                 /*vertices=*/ &vertices, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,

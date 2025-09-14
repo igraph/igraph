@@ -116,7 +116,7 @@ int main(void) {
     igraph_vector_int_t parents, inbound;
     igraph_int_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
-    igraph_vector_t weights_vec;
+    const igraph_vector_t weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_vs_t vs;
 
     /* Simple ring graph without weights */
@@ -145,7 +145,6 @@ int main(void) {
 
     /* Same ring, but with weights */
 
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        &weights_vec, IGRAPH_OUT,

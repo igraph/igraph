@@ -1379,11 +1379,12 @@ static igraph_error_t igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
                                               int n,
                                               void *extra) {
     igraph_sparsemat_t *A = extra;
-    igraph_vector_t vto, vfrom;
-    igraph_vector_view(&vto, to, n);
-    igraph_vector_view(&vfrom, from, n);
+    const igraph_vector_t vfrom = igraph_vector_view(from, n);
+    igraph_vector_t vto = igraph_vector_view(to, n);
+
     igraph_vector_null(&vto);
     IGRAPH_CHECK(igraph_sparsemat_gaxpy(A, &vfrom, &vto));
+
     return IGRAPH_SUCCESS;
 }
 
@@ -1400,10 +1401,8 @@ static igraph_error_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
                                            void *extra) {
 
     igraph_i_sparsemat_arpack_rssolve_data_t *data = extra;
-    igraph_vector_t vfrom, vto;
-
-    igraph_vector_view(&vfrom, from, n);
-    igraph_vector_view(&vto, to, n);
+    const igraph_vector_t vfrom = igraph_vector_view(from, n);
+    igraph_vector_t vto = igraph_vector_view(to, n);
 
     if (data->method == IGRAPH_SPARSEMAT_SOLVE_LU) {
         IGRAPH_CHECK(igraph_sparsemat_luresol(data->dis, data->din, &vfrom,

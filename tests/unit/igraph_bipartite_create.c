@@ -19,13 +19,13 @@
 #include "test_utilities.h"
 
 int main(void) {
-    igraph_int_t edges3[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };
-    igraph_vector_int_t edges;
+    igraph_int_t edges_array[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };
+    const igraph_vector_int_t edges =
+        igraph_vector_int_view(edges_array, sizeof(edges_array) / sizeof(edges_array[0]));;
     igraph_vector_bool_t types;
     igraph_t g;
     igraph_int_t i;
 
-    igraph_vector_int_view(&edges, edges3, sizeof(edges3) / sizeof(edges3[0]));
     igraph_vector_bool_init(&types, igraph_vector_int_max(&edges) + 1);
     for (i = 0; i < igraph_vector_bool_size(&types); i++) {
         VECTOR(types)[i] = i % 2;

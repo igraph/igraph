@@ -103,14 +103,14 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_int_t size)
 /**
  */
 
-const igraph_vector_ptr_t *igraph_vector_ptr_view(
-    const igraph_vector_ptr_t *v, void *const *data, igraph_int_t length
+igraph_vector_ptr_t igraph_vector_ptr_view(
+    void *const *data, igraph_int_t length
 ) {
-    igraph_vector_ptr_t *v2 = (igraph_vector_ptr_t*) v;
-    v2->stor_begin = (void **)data;
-    v2->stor_end = (void**)data + length;
-    v2->end = v2->stor_end;
-    v2->item_destructor = 0;
+    igraph_vector_ptr_t v;
+    v.stor_begin = (void **)data;
+    v.stor_end = (void**)data + length;
+    v.end = v.stor_end;
+    v.item_destructor = 0;
     return v;
 }
 
