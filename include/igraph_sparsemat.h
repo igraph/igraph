@@ -259,9 +259,6 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_dense_multiply(const igraph_matrix
                                                   const igraph_sparsemat_t *B,
                                                   igraph_matrix_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_int_t nzmax, igraph_int_t m, igraph_int_t n,
-                                        igraph_int_t *p, igraph_int_t *i, igraph_real_t *x, igraph_int_t nz);
-
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
                                         igraph_sparsemat_t *sorted);
 
