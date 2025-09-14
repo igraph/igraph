@@ -132,6 +132,7 @@ This section gives detailed on breaking changes you need to consider when updati
  - `igraph_minimum_spanning_tree()` takes a new `method` parameter that controls the algorithm used for finding the spanning tree. Kruskal's algorithm was added.
  - The deprecated `igraph_rng_get_dirichlet()` function was removed.
  - `igraph_motifs_randesu_no()` and `igraph_motifs_randesu_estimate()` now take an `igraph_real_t` as their `result` argument to prevent overflows when igraph is compiled with 32-bit integers.
+ - The `igraph_motifs_handler_t` callback type now takes a `const igraph_vector_int_t *vids` parameter. Previously this was not formally `const`, even though it was not allowed to modify `vids`. This affects uses of `igraph_motifs_randesu_callback()`. 
  - The experimental functions `igraph_fundamental_cycles()` and `igraph_minimum_cycle_basis()` now use the type `igraph_real_t` for their `bfs_cutoff` parameter, and had their `weights` parameter moved to the 2nd position.
  - `igraph_rewire()` now takes an `igraph_edge_type_sw_t` parameter to specify whether to create self-loops. The `igraph_rewiring_t` enum type was removed. Instead of the old `IGRAPH_REWIRING_SIMPLE`, use `IGRAPH_SIMPLE_SW`. Instead of the old `IGRAPH_REWIRING_SIMPLE_LOOPS`, use `IGRAPH_LOOPS_SW`.
 
