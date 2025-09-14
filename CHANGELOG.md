@@ -261,6 +261,7 @@ This section gives detailed on breaking changes you need to consider when updati
  - The widest path functions `igraph_widest_path_widths_floyd_warshall()`, `igraph_widest_path_widths_dijkstra()`, `igraph_get_widest_paths()`, and `igraph_get_widest_path()` incorrectly ignored edges with positive infinite width. Now they ignore edges with negative infinite width.
  - `igraph_cliques_callback()` would sometimes fail to respect a request to stop (i.e. returning `IGRAPH_STOP`) from the callback. This is now corrected.
  - `igraph_hypercube()` now validates the hypercube dimension and prevents negative values.
+ - `igraph_sparsemat_view()` checks for out-of-memory conditions.
 
 ### Deprecated
 
