@@ -41,6 +41,7 @@
 
  - Documentation improvements, including a new glossary.
  - Simple cycle search (`igraph_simple_cycles()` and `igraph_simple_cycles_callback()`) is sped up by skipping cycle search from some redundant start vertices. Thanks to Tim Bernhard @GenieTim for contributing this improvement in #2714!
+ - `igraph_realize_degree_sequence()` is significantly sped up for simple undirected graphs, and now has near-linear complexity for this case. Thanks to Zara Zong @ minifinity for implementing this in #2786!
 
 ## [0.10.16] - 2025-06-10
 
