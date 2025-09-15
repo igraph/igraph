@@ -25,6 +25,9 @@ jobs:
   alpine:
     runs-on: ubuntu-latest
 
+    # Do not run in forks
+    if: github.repository == 'igraph/igraph'
+
     defaults:
       run:
         # Use emulated shell as default
