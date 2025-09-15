@@ -162,7 +162,7 @@ struct HavelHakimiList {
     }
 
     void insert_bucket(igraph_integer_t degree) {
-        assert(0 < degree && degree < n_buckets - 1);
+        assert(0 <= degree && degree < n_buckets - 1); // can insert into zero-degree bucket
 
         igraph_integer_t &prev_idx = buckets[degree].prev;
         igraph_integer_t &next_idx = buckets[degree].next;
