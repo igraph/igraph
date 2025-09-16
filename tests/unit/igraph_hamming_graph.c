@@ -1,21 +1,17 @@
 #include <igraph.h>
-#include <stdio.h>
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
-    igraph_error_t ret;
 
-    // Build Hamming graph H(3,2) → 8 vertices, 12 edges
-    ret = igraph_hamming_graph(&g, 3, 2);
-    if (ret) {
-        fprintf(stderr, "igraph_hamming_graph failed!\n");
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_hamming_graph(&g, 3, 2) == IGRAPH_SUCCESS);
 
+    /* Print something simple and stable to compare in the .out file */
     printf("H(3,2):\n");
     printf("  Vertices: IGRAPH_PRId \n", (igraph_integer_t ) igraph_vcount(&g));
     printf("  Edges: IGRAPH_PRId \n", (igraph_integer_t ) igraph_ecount(&g));
 
     igraph_destroy(&g);
+    VERIFY_FINALLY_STACK();
     return 0;
 }
