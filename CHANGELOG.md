@@ -155,6 +155,10 @@ This section gives detailed on breaking changes you need to consider when updati
  - `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_volume()` and `igraph_rng_sample_sphere_surface()` samples vectors from a Dirichlet distribution or from the volume or surface of a sphere while allowing the user to specify the random number generator to use.
  - `igraph_nearest_neighbor_graph()` computes a neighborhood graph of spatial points based on a neighbor count, cutoff distance, and chosen metric (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2788!
  - `igraph_delaunay_graph()` computes a Delaunay graph of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2806!
+ - `igraph_gabriel_graph()` computes the Gabriel graph of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827!
+ - `igraph_relative_neighborhood_graph()` computes the relative neighborhood graph of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827!
+ - `igraph_lune_beta_skeleton()` and `igraph_circle_beta_skeleton()` compute the lune and circle based β-skeletons of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827!
+ - `igraph_beta_weighted_gabriel_graph()` computes a Gabriel graph of a spatial point set, along with a threshold β value for each edge, at which the edge ceases to be part of the lune-based β-skeleton (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827! 
  - `igraph_spatial_edge_lengths()` computes edges lengths based on spatial vertex coordinates (experimental function).
  - `igraph_community_leiden_simple()` is a simplified interface to `igraph_community_leiden()` that allows selecting the objective function to maximize directly.
  - `igraph_vector_difference_and_intersection_sorted()` calculates the intersection and the differences of two vectors simultaneously.
