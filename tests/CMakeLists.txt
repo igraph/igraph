@@ -930,6 +930,7 @@ add_legacy_tests(
 # spatial
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  beta_skeletons
   igraph_delaunay_graph
   igraph_nearest_neighbor_graph
   igraph_spatial_edge_lengths
@@ -1007,6 +1008,7 @@ add_benchmarks(
   graphicality
   igraph_adjacency
   igraph_average_path_length_unweighted
+  beta_skeletons
   igraph_betweenness
   igraph_betweenness_weighted
   igraph_cliques
