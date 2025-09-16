@@ -20,11 +20,11 @@
 #include "test_utilities.h"
 
 igraph_bool_t veclist_is_equal(const igraph_vector_int_list_t *a, const igraph_vector_int_list_t *b) {
-    igraph_integer_t n = igraph_vector_int_list_size(a);
+    igraph_int_t n = igraph_vector_int_list_size(a);
     if (igraph_vector_int_list_size(b) != n) {
         return false;
     }
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         if (!igraph_vector_int_is_equal(igraph_vector_int_list_get_ptr(a, i),
                                         igraph_vector_int_list_get_ptr(b, i))) {
             return false;
@@ -37,7 +37,7 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t results_full, results_limited;
     igraph_vector_t vertex_weights;
-    igraph_integer_t max_results;
+    igraph_int_t max_results;
 
     igraph_vector_int_list_init(&results_full, 0);
     igraph_vector_int_list_init(&results_limited, 0);

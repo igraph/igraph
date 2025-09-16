@@ -39,12 +39,12 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
 
     igraph_vector_init(&y, n);
 
-    for (igraph_integer_t i = 0; i < m; i++) {
+    for (igraph_int_t i = 0; i < m; i++) {
         const igraph_vector_t v = igraph_vector_view(&MATRIX(*vectors, 0, i), n);
         igraph_vector_update(&y, &v);
         igraph_blas_dgemv(/*transpose=*/ 0, /*alpha=*/ 1.0, A, &v,
                                          /*beta=*/ -VECTOR(*values)[i], &y);
-        for (igraph_integer_t j = 0; j < n; j++) {
+        for (igraph_int_t j = 0; j < n; j++) {
             if (fabs(VECTOR(y)[j]) > tol) {
                 printf("Matrix:\n");
                 igraph_matrix_print(A);
