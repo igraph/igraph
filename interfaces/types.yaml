@@ -640,6 +640,11 @@ PLFIT:
     CTYPE: igraph_plfit_result_t
     FLAGS: BY_REF
 
+REWIRING_STATS:
+    # Structure storing statistics about degree-preserving edge rewiring
+    CTYPE: igraph_rewiring_stats_t
+    FLAGS: BY_REF
+
 VERTEX_ATTRIBUTE_COMBINATION:
     # Structure specifying how the attributes of vertices should be combined
     # during graph operations that may merge multiple vertices into a single one

@@ -755,7 +755,7 @@ igraph_rewire:
     PARAMS: INOUT GRAPH rewire, INTEGER n, EDGE_TYPE_SW allowed_edge_types=SIMPLE
 
 igraph_induced_subgraph:
-    PARAMS: GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO
+    PARAMS: GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO, OPTIONAL OUT REWIRING_STATS stats
     DEPS: vids ON graph
 
 igraph_subgraph_from_edges:
