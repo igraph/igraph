@@ -107,6 +107,7 @@ This section gives detailed on breaking changes you need to consider when updati
  - `igraph_subisomorphic_lad()` does not have a CPU time limit parameter any more. If you wish to stop the calculation from another thread or a higher level interface, use igraph's interruption mechanism.
  - The semantics of the `igraph_permute_vertices()` permutation argument has changed: the i-th element of the vector now contains the index of the _original_ vertex that will be mapped to the i-th vertex in the new graph. This is now consistent with how other igraph functions treat permutations and vertex index vectors; for instance, you can now pass the result of `igraph_topological_sorting()` directly to `igraph_permute_vertices()` to obtain a new graph where the vertices are sorted topologically.
  - As a consequence to the change in the semantics of the `igraph_permute_vertices()` permutation argument, the semantics of the permutations returned from `igraph_canonical_permutation()` and `igraph_canonical_permutation_bliss()` have also been inverted to maintain the invariant that the output of these functions can be fed into `igraph_permute_vertices()` directly.
+ - `igraph_isoclass_subgraph()` now takes a parameter of type `igraph_vs_t vids` instead of `igraph_vector_int_t vids`. Apply `igraph_vss_vector()` to the vector of vertex IDs to convert it to an `igraph_vs_t`.
 
 #### Centralities
 
