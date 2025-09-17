@@ -26,7 +26,7 @@ int main(void){
         printf("Assortativity before rewiring = %g\n", assortativity);
 
         /* Randomize the graph while preserving the degrees. */
-        igraph_rewire(&g, 20 * igraph_ecount(&g), IGRAPH_SIMPLE_SW);
+        igraph_rewire(&g, 20 * igraph_ecount(&g), IGRAPH_SIMPLE_SW, NULL);
 
         /* Re-compute assortativity. Did it change? */
         igraph_assortativity_degree(&g, &assortativity, /* ignore edge directions */ IGRAPH_UNDIRECTED);

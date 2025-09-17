@@ -752,7 +752,7 @@ igraph_personalized_pagerank_vs:
         options ON algo
 
 igraph_rewire:
-    PARAMS: INOUT GRAPH rewire, INTEGER n, EDGE_TYPE_SW allowed_edge_types=SIMPLE
+    PARAMS: INOUT GRAPH rewire, INTEGER n, EDGE_TYPE_SW allowed_edge_types=SIMPLE, OPTIONAL OUT REWIRING_STATS stats
 
 igraph_induced_subgraph:
     PARAMS: GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO
