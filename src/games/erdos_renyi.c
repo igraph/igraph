@@ -261,12 +261,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         if (p < 0.0) {
             IGRAPH_ERROR("Invalid expected edge multiplicity given for G(n,p) multigraph model.", IGRAPH_EINVAL);
         }
-
-        /* Convert the expected edge count to the appropriate probability parameter
-         * of the geometric distribution when sampling lengths of runs of 0s in the
-         * adjacency matrix. */
-        p = p / (1 + p);
-
     } else {
         if (p < 0.0 || p > 1.0) {
             IGRAPH_ERROR("Invalid probability given for G(n,p) model.", IGRAPH_EINVAL);
@@ -275,6 +269,13 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
     if (edge_labeled) {
         return gnp_edge_labeled(graph, n, p, directed, loops, multiple);
+    }
+
+    if (multiple) {
+        /* Convert the expected edge count to the appropriate probability parameter
+         * of the geometric distribution when sampling lengths of runs of 0s in the
+         * adjacency matrix. */
+        p = p / (1 + p);
     }
 
     if (p == 0.0 || no_of_nodes == 0) {
