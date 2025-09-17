@@ -2319,7 +2319,7 @@ igraph_count_automorphisms:
     DEPS: colors ON graph
 
 igraph_isoclass_subgraph:
-    PARAMS: GRAPH graph, VECTOR_INT vids, OUT INTEGER isoclass
+    PARAMS: GRAPH graph, VERTEX_SELECTOR vids, OUT INTEGER isoclass
     DEPS: vids ON graph
 
 igraph_isoclass_create:

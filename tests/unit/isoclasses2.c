@@ -126,7 +126,7 @@ void random_subgraph_test(void) {
             igraph_bool_t iso;
 
             igraph_random_sample(&vids, 0, igraph_vcount(&graph) - 1, size);
-            igraph_isoclass_subgraph(&graph, &vids, &class);
+            igraph_isoclass_subgraph(&graph, igraph_vss_vector(&vids), &class);
             igraph_isoclass_create(&sg1, size, class, igraph_is_directed(&graph));
             igraph_induced_subgraph(&graph, &sg2, igraph_vss_vector(&vids), IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
 
@@ -151,7 +151,7 @@ void random_subgraph_test(void) {
             igraph_bool_t iso;
 
             igraph_random_sample(&vids, 0, igraph_vcount(&graph) - 1, size);
-            igraph_isoclass_subgraph(&graph, &vids, &class);
+            igraph_isoclass_subgraph(&graph, igraph_vss_vector(&vids), &class);
             igraph_isoclass_create(&sg1, size, class, igraph_is_directed(&graph));
             igraph_induced_subgraph(&graph, &sg2, igraph_vss_vector(&vids), IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
 

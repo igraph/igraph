@@ -2625,8 +2625,7 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_int_t *isoclass) {
  * Multi-edges and self-loops are ignored by this function.
  *
  * \param graph The graph object.
- * \param vids A vector containing the vertex IDs to be considered as
- *        a subgraph. Each vertex ID should be included at most once.
+ * \param vids The vertices of the subgraph. Each vertex must be included at most once.
  * \param isoclass Pointer to an integer, this will be set to the
  *        isomorphism class.
  * \return Error code.
@@ -2636,16 +2635,18 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_int_t *isoclass) {
  * Time complexity: O((d+n)*n), d is the average degree in the network,
  * and n is the number of vertices in \c vids.
  */
-igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
+igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vs_t vids,
                              igraph_int_t *isoclass) {
-    igraph_int_t subgraph_size = igraph_vector_int_size(vids);
-    igraph_vector_int_t neis;
+    igraph_int_t subgraph_size;
+    igraph_vector_int_t vertices, neis;
 
     unsigned int mul, idx;
     const unsigned int *arr_idx, *arr_code;
     unsigned int code = 0;
 
-    igraph_int_t i, j, s;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertices, 0);
+    IGRAPH_CHECK(igraph_vs_as_vector(graph, vids, &vertices));
+    subgraph_size = igraph_vector_int_size(&vertices);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
@@ -2693,15 +2694,15 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vect
         }
     }
 
-    for (i = 0; i < subgraph_size; i++) {
-        igraph_int_t from = VECTOR(*vids)[i];
+    for (igraph_int_t i = 0; i < subgraph_size; i++) {
+        igraph_int_t from = VECTOR(vertices)[i];
         IGRAPH_CHECK(igraph_neighbors(
             graph, &neis, from, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE
         ));
-        s = igraph_vector_int_size(&neis);
-        for (j = 0; j < s; j++) {
+        const igraph_int_t s = igraph_vector_int_size(&neis);
+        for (igraph_int_t j = 0; j < s; j++) {
             igraph_int_t nei = VECTOR(neis)[j], to;
-            if (igraph_vector_int_search(vids, 0, nei, &to)) {
+            if (igraph_vector_int_search(&vertices, 0, nei, &to)) {
                 idx = (mul * i + to);
                 code |= arr_idx[idx];
             }
@@ -2710,7 +2711,8 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vect
 
     *isoclass = arr_code[code];
     igraph_vector_int_destroy(&neis);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_destroy(&vertices);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
