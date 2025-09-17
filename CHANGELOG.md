@@ -72,6 +72,10 @@ This section gives detailed on breaking changes you need to consider when updati
 
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`, `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` no longer interprets an empty `outseq` vector as a missing out-degree sequence. Pass `NULL` if you don't wish to specify an out-degree sequence.
  - `igraph_degree_sequence_game()` no longer interprets an empty in-degree vector as a request for generating undirected graphs. To generate undirected graphs, pass `NULL` for in-degrees.
+ - `igraph_erdos_renyi_game_gnm()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`, and can uniformly sample multigraphs. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists (equivalent to `igraph_iea_game()` for multigraphs). 
+ - `igraph_erdos_renyi_game_gnp()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists.
+ - `igraph_bipartite_game_gnm()` gained an `igraph_edge_type_sw_t allowed_edge_types` parameter, and can uniformly sample multigraphs. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists (equivalent to `igraph_bipartite_iea_game()` for multigraphs). 
+ - `igraph_bipartite_game_gnp()` gained an `igraph_edge_type_sw_t allowed_edge_types` parameter, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists.
  - `igraph_lcf()` was renamed to `igraph_lcf_small()` and `igraph_lcf_vector()` was renamed to `igraph_lcf()`. Now `igraph_lcf()` takes shifts as a vector input, while `igraph_lcf_small()` accepts a shorthand notation where shifts are given as a variable number of function arguments.
  - `igraph_sbm_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `igraph_bool_t loops` and supports generating graphs with multi-edges. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
  - `igraph_rewire_edges()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
@@ -148,10 +152,6 @@ This section gives detailed on breaking changes you need to consider when updati
 ### Added
 
  - `igraph_setup()` performs all initialization tasks that are recommended before using the igraph library. Right now this function only initializes igraph's internal random number generator with a practically random seed, but it may also perform other tasks in the future. It is recommended to call this function before using any other function from the library (although most of the functions will work fine now even if this function is not called).
- - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to uniformly sample G(n,m) graphs with multi-edges.
- - `igraph_erdos_renyi_game_gnp()` gained a `multiple` Boolean argument, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity.
- - `igraph_bipartite_game_gnm()` gained a `multiple` Boolean argument to uniformly sample bipartite G(n,m) graphs with multi-edges.
- - `igraph_bipartite_game_gnp()` gained a `multiple` Boolean argument, and can now sample bipartite multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity.
  - `igraph_iea_game()` samples random multigraphs through independent edge assignment.
  - `igraph_bipartite_iea_game()` samples random bipartite multigraph through independent edge assignment.
  - `igraph_weighted_biadjacency()` creates a weighted graph from a bipartite adjacency matrix.
