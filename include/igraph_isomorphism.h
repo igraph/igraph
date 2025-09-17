@@ -22,6 +22,7 @@
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_iterators.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
@@ -269,7 +270,7 @@ IGRAPH_EXPORT igraph_error_t igraph_automorphism_group_bliss(
 
 /* Functions for small graphs (<= 4 vertices for directed graphs, <= 6 for undirected graphs) */
 IGRAPH_EXPORT igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_int_t *isoclass);
-IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
+IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vs_t vids,
                                            igraph_int_t *isoclass);
 IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_int_t size,
                                          igraph_int_t number, igraph_bool_t directed);
