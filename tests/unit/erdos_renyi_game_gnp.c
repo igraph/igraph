@@ -22,21 +22,21 @@
 
 /* Helper functions for hypothesis testing for binomial and negative binomial distr. */
 
-igraph_real_t log_binom_prob(igraph_integer_t n, igraph_real_t p, igraph_integer_t k) {
+igraph_real_t log_binom_prob(igraph_int_t n, igraph_real_t p, igraph_int_t k) {
     return lgamma(1+n) - lgamma(1+k) - lgamma(1 - k + n) +
            k * log(p) + (n-k) * log(1-p);
 }
 
-igraph_real_t log_neg_binom_prob(igraph_integer_t n, igraph_real_t p, igraph_integer_t k) {
+igraph_real_t log_neg_binom_prob(igraph_int_t n, igraph_real_t p, igraph_int_t k) {
     return lgamma(k + n) - lgamma(1+k) - lgamma(n) +
            k * log(1-p) + n * log(p);
 }
 
-igraph_real_t binom_test(igraph_integer_t n, igraph_real_t p, igraph_integer_t k0) {
+igraph_real_t binom_test(igraph_int_t n, igraph_real_t p, igraph_int_t k0) {
     igraph_real_t res = 0;
     igraph_real_t lP0 = log_binom_prob(n, p, k0);
     igraph_real_t last_lP = -IGRAPH_INFINITY;
-    for (igraph_integer_t k=0; k < n; k++) {
+    for (igraph_int_t k=0; k < n; k++) {
         igraph_real_t lP = log_binom_prob(n, p, k);
         if (lP <= lP0) {
             res += exp(lP);
@@ -48,11 +48,11 @@ igraph_real_t binom_test(igraph_integer_t n, igraph_real_t p, igraph_integer_t k
     return res;
 }
 
-igraph_real_t neg_binom_test(igraph_integer_t n, igraph_real_t p, igraph_integer_t k0) {
+igraph_real_t neg_binom_test(igraph_int_t n, igraph_real_t p, igraph_int_t k0) {
     igraph_real_t res = 0;
     igraph_real_t lP0 = log_neg_binom_prob(n, p, k0);
     igraph_real_t last_lP = -IGRAPH_INFINITY;
-    for (igraph_integer_t k=0; ; k++) {
+    for (igraph_int_t k=0; ; k++) {
         igraph_real_t lP = log_neg_binom_prob(n, p, k);
         if (lP <= lP0) {
             res += exp(lP);
@@ -109,7 +109,7 @@ void stress_test(void) {
 }
 
 void check_gnp(
-        igraph_integer_t n, igraph_real_t p,
+        igraph_int_t n, igraph_real_t p,
         igraph_bool_t directed,
         igraph_bool_t loops, igraph_bool_t multiple) {
 
@@ -194,7 +194,7 @@ void check_gnp(
 }
 
 /* Check all parameter combinations */
-void check_all_gnp(igraph_integer_t n, igraph_real_t p) {
+void check_all_gnp(igraph_int_t n, igraph_real_t p) {
 
     if (p <= 1) {
         check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
