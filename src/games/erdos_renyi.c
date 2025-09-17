@@ -701,7 +701,8 @@ static igraph_error_t gnm_simple(
                 IGRAPH_EINVAL);
     }
 
-    if (maxedges == m) {
+    if (maxedges == m && ! edge_labeled) {
+        /* TODO: Cannot use igraph_full() when edge_labeled as we must shuffle edges. */
         IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
     } else {
         igraph_int_t slen;
