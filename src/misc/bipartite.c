@@ -1269,17 +1269,17 @@ static igraph_error_t bipartite_gnm_simple(
 
         for (igraph_int_t i = 0; i < m; i++) {
             if (!directed || mode != IGRAPH_ALL) {
-                to = floor(VECTOR(s)[i] / n1_real);
+                to = trunc(VECTOR(s)[i] / n1_real);
                 from = VECTOR(s)[i] - to * n1_real;
                 to += n1;
             } else {
                 igraph_real_t n1n2 = n1_real * n2_real;
                 if (VECTOR(s)[i] < n1n2) {
-                    to = floor(VECTOR(s)[i] / n1_real);
+                    to = trunc(VECTOR(s)[i] / n1_real);
                     from = VECTOR(s)[i] - to * n1_real;
                     to += n1;
                 } else {
-                    to = floor((VECTOR(s)[i] - n1n2) / n2_real);
+                    to = trunc((VECTOR(s)[i] - n1n2) / n2_real);
                     from = VECTOR(s)[i] - n1n2 - to * n2_real;
                     from += n1;
                 }

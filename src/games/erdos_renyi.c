@@ -338,7 +338,7 @@ static igraph_error_t gnm_simple(
         slen = igraph_vector_size(&s);
         if (directed && loops) {
             for (igraph_int_t i = 0; i < slen; i++) {
-                igraph_int_t to = floor(VECTOR(s)[i] / n_real);
+                igraph_int_t to = trunc(VECTOR(s)[i] / n_real);
                 igraph_int_t from = VECTOR(s)[i] - to * n_real;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
@@ -346,7 +346,7 @@ static igraph_error_t gnm_simple(
             }
         } else if (directed && !loops) {
             for (igraph_int_t i = 0; i < slen; i++) {
-                igraph_int_t from = floor(VECTOR(s)[i] / (n_real - 1));
+                igraph_int_t from = trunc(VECTOR(s)[i] / (n_real - 1));
                 igraph_int_t to = VECTOR(s)[i] - from * (n_real - 1);
                 if (from == to) {
                     to = n - 1;
@@ -357,7 +357,7 @@ static igraph_error_t gnm_simple(
             }
         } else if (!directed && loops) {
             for (igraph_int_t i = 0; i < slen; i++) {
-                igraph_int_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
+                igraph_int_t to = trunc((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
                 igraph_int_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
@@ -365,7 +365,7 @@ static igraph_error_t gnm_simple(
             }
         } else { /* !directed && !loops */
             for (igraph_int_t i = 0; i < slen; i++) {
-                igraph_int_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
+                igraph_int_t to = trunc((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
                 igraph_int_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
@@ -801,7 +801,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         iter = 0;
         if (directed && loops) {
             for (igraph_int_t i = 0; i < ecount; i++) {
-                igraph_int_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
+                igraph_int_t to = trunc(VECTOR(s)[i] / no_of_nodes_real);
                 igraph_int_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
@@ -809,7 +809,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             }
         } else if (directed && !loops) {
             for (igraph_int_t i = 0; i < ecount; i++) {
-                igraph_int_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
+                igraph_int_t to = trunc(VECTOR(s)[i] / no_of_nodes_real);
                 igraph_int_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 if (from == to) {
                     to = no_of_nodes - 1;
@@ -820,7 +820,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             }
         } else if (!directed && loops) {
             for (igraph_int_t i = 0; i < ecount; i++) {
-                igraph_int_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
+                igraph_int_t to = trunc((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
                 igraph_int_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
@@ -828,7 +828,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             }
         } else { /* !directed && !loops */
             for (igraph_int_t i = 0; i < ecount; i++) {
-                igraph_int_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
+                igraph_int_t to = trunc((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
                 igraph_int_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
