@@ -184,10 +184,6 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t n, igraph_bool_t lo
         num_swaps++;
     }
 
-    if (stats) {
-        stats->successful_swaps = num_successful_swaps;
-    }
-
     if (use_adjlist) {
         /* Replace graph edges with the adjlist current state */
         IGRAPH_CHECK(igraph_delete_edges(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID)));
@@ -205,6 +201,11 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t n, igraph_bool_t lo
 
     igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(use_adjlist ? 3 : 2);
+
+    if (stats) {
+        memset(stats, 0, sizeof(igraph_rewiring_stats_t));
+        stats->successful_swaps = num_successful_swaps;
+    }
 
     return IGRAPH_SUCCESS;
 }
