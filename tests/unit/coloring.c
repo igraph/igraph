@@ -196,11 +196,12 @@ void test_wheel_graph(void) {
 void test_bipartite_graph(void) {
     igraph_t graph_1, graph_2;
 
-    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
+    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, false);
     printf("Testing complete bipartite graph\n");
     run_tests(&graph_1, false);
 
-    igraph_bipartite_game_gnm(&graph_2, 0, 100, 100, 10000 - 100, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
+    igraph_bipartite_game_gnm(&graph_2, 0, 100, 100, 10000 - 100, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+                              false);
     printf("Testing large bipartite graph\n");
     run_tests(&graph_2, false);
 
