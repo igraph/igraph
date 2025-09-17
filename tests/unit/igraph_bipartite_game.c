@@ -60,7 +60,7 @@ void check_gnm(
     }
 
     igraph_vector_bool_init(&types, 0);
-    igraph_bipartite_game_gnm(&graph, &types, n1, n2, m, directed, mode, multi, false);
+    igraph_bipartite_game_gnm(&graph, &types, n1, n2, m, directed, mode, multi ? IGRAPH_MULTI_SW : IGRAPH_SIMPLE_SW, false);
 
     /* check correct vertex and edge count, directedness */
     IGRAPH_ASSERT(igraph_is_directed(&graph) == directed);
@@ -137,7 +137,7 @@ void check_gnp(
     }
 
     igraph_vector_bool_init(&types, 0);
-    igraph_bipartite_game_gnp(&graph, &types, n1, n2, p, directed, mode, multiple, false);
+    igraph_bipartite_game_gnp(&graph, &types, n1, n2, p, directed, mode, multiple ? IGRAPH_MULTI_SW : IGRAPH_SIMPLE_SW, false);
 
     /* check correct vertex and edge count, directedness */
     IGRAPH_ASSERT(igraph_is_directed(&graph) == directed);
@@ -306,16 +306,16 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, false), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_MULTI_SW, false), IGRAPH_EINVAL);
 
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 201, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 201, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
 
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, -1, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, -1, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
 
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
@@ -324,11 +324,11 @@ int main(void) {
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_bipartite_iea_game(&graph, NULL, 10, -1, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
 
-    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, -1, 10, 0.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, -1, 10, 0.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, -1, 0.9, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, -1, 0.9, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, 1.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE,
+    CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, 10, 1.1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
                                           false), IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();

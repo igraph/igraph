@@ -23,6 +23,7 @@
 #include "igraph_datatype.h"
 #include "igraph_constants.h"
 #include "igraph_error.h"
+#include "igraph_graphicality.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
@@ -90,14 +91,14 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnp(
         igraph_vector_bool_t *types,
         igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
         igraph_bool_t directed, igraph_neimode_t mode,
-        igraph_bool_t multiple, igraph_bool_t edge_labeled);
+        igraph_edge_type_sw_t allowed_edge_types, igraph_bool_t edge_labeled);
 
 IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnm(
         igraph_t *graph,
         igraph_vector_bool_t *types,
         igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
         igraph_bool_t directed, igraph_neimode_t mode,
-        igraph_bool_t multiple, igraph_bool_t edge_labeled);
+        igraph_edge_type_sw_t allowed_edge_types, igraph_bool_t edge_labeled);
 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_bipartite_iea_game(
     igraph_t *graph, igraph_vector_bool_t *types,

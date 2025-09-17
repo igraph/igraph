@@ -31,8 +31,9 @@
 #include "core/interruption.h"
 #include "graph/attributes.h"
 #include "internal/utils.h"
-#include "random/random_internal.h"
 #include "math/safe_intop.h"
+#include "misc/graphicality.h"
+#include "random/random_internal.h"
 
 /**
  * \section about_bipartite Bipartite networks in igraph
@@ -1337,8 +1338,13 @@ static igraph_error_t bipartite_gnm_simple(
  *     \c IGRAPH_ALL, then each edge direction is considered
  *     independently and mutual edges might be generated. This
  *     argument is ignored for undirected graphs.
- * \param multiple Boolean, whether it is allowed to generate more
- *     than one edge between the same pair of vertices.
+* \param allowed_edge_types The types of edges to allow in the graph.
+ *        \clist
+ *          \cli IGRAPH_SIMPLE_SW
+ *          simple graph (i.e. no multi-edges allowed).
+ *          \cli IGRAPH_MULTI_SW
+ *          multi-edges are allowed
+ *        \endclist
  * \param edge_labeled If true, the model is defined over the set of ordered
  *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
  *     \c false to select the classic bipartite Erdős-Rényi model.
@@ -1357,9 +1363,11 @@ igraph_error_t igraph_bipartite_game_gnm(
         igraph_vector_bool_t *types,
         igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
         igraph_bool_t directed, igraph_neimode_t mode,
-        igraph_bool_t multiple, igraph_bool_t edge_labeled) {
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_bool_t edge_labeled) {
 
     igraph_int_t n;
+    igraph_bool_t loops, multiple;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,m) model.", IGRAPH_EINVAL);
@@ -1370,6 +1378,9 @@ igraph_error_t igraph_bipartite_game_gnm(
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Invalid mode for bipartite G(n,m) model.", IGRAPH_EINVAL);
     }
+
+    /* Bipartite graphs cannot have self-loops. We ignore them. */
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     IGRAPH_SAFE_ADD(n1, n2, &n); /* overflow check */
 
@@ -1465,7 +1476,7 @@ igraph_error_t igraph_bipartite_iea_game(
 
     return igraph_bipartite_game_gnm(
         graph, types, n1, n2, m, directed, mode,
-        /*multiple=*/ true, /*edge_labeled=*/ true);
+        IGRAPH_MULTI_SW, /*edge_labeled=*/ true);
 }
 
 
@@ -1607,7 +1618,13 @@ static igraph_error_t gnp_bipartite_large(
  *     \c IGRAPH_ALL, then each edge direction is considered
  *     independently and mutual edges might be generated. This
  *     argument is ignored for undirected graphs.
- * \param multiple Whether to generate multi-edges.
+* \param allowed_edge_types The types of edges to allow in the graph.
+ *        \clist
+ *          \cli IGRAPH_SIMPLE_SW
+ *          simple graph (i.e. no multi-edges allowed).
+ *          \cli IGRAPH_MULTI_SW
+ *          multi-edges are allowed
+ *        \endclist
  * \param edge_labeled If true, the model is defined over the set of ordered
  *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
  *     \c false to select the classic bipartite Erdős-Rényi model.
@@ -1625,17 +1642,22 @@ igraph_error_t igraph_bipartite_game_gnp(
         igraph_vector_bool_t *types,
         igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
         igraph_bool_t directed, igraph_neimode_t mode,
-        igraph_bool_t multiple, igraph_bool_t edge_labeled) {
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_bool_t edge_labeled) {
 
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_int_t n;
     igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
+    igraph_bool_t loops, multiple;
     int iter = 0;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,p) model.", IGRAPH_EINVAL);
     }
+
+    /* Bipartite graphs cannot have self-loops. We ignore them. */
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     if (multiple) {
         if (p < 0.0) {
