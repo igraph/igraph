@@ -52,7 +52,7 @@ void bench(const igraph_t *graph, const char *what, int rep) {
 
 void bench_gnm(igraph_int_t n, igraph_int_t m, int rep) {
     igraph_t graph;
-    igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, false);
+    igraph_erdos_renyi_game_gnm(&graph, n, m, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
     bench(&graph, "G(n,m)", rep);
     igraph_destroy(&graph);
 }
