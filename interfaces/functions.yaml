@@ -607,7 +607,9 @@ igraph_voronoi:
 igraph_get_all_simple_paths:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES_LIST res, VERTEX from,
-        VERTEX_SELECTOR to=ALL, INTEGER minlen=UNLIMITED, INTEGER maxlen=UNLIMITED, NEIMODE mode=OUT
+        VERTEX_SELECTOR to=ALL,  NEIMODE mode=OUT,
+        INTEGER minlen=UNLIMITED, INTEGER maxlen=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: from ON graph, to ON graph, res ON graph
 
 igraph_get_k_shortest_paths:

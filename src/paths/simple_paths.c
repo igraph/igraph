@@ -47,10 +47,6 @@
  *   they are found.
  * \param from The start vertex.
  * \param to The target vertices.
- * \param minlen Minimum length of paths that is considered. If negative
- *   or \ref IGRAPH_UNLIMITED, no lower bound is used on the path lengths.
- * \param maxlen Maximum length of paths that is considered. If negative
- *   or \ref IGRAPH_UNLIMITED, no upper bound is used on the path lengths.
  * \param mode The type of paths to be used for the calculation in directed
  *   graphs. Possible values:
  *        \clist
@@ -62,6 +58,12 @@
  *          the directed graph is considered as an undirected one for
  *          the computation.
  *        \endclist
+ * \param minlen Minimum length of paths that is considered. If negative
+ *   or \ref IGRAPH_UNLIMITED, no lower bound is used on the path lengths.
+ * \param maxlen Maximum length of paths that is considered. If negative
+ *   or \ref IGRAPH_UNLIMITED, no upper bound is used on the path lengths.
+ * \param max_results At most this many paths will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_get_k_shortest_paths()
@@ -73,11 +75,10 @@
 igraph_error_t igraph_get_all_simple_paths(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_int_t from,
-        const igraph_vs_t to,
-        igraph_int_t minlen,
-        igraph_int_t maxlen,
-        igraph_neimode_t mode) {
+        igraph_int_t from, const igraph_vs_t to,
+        igraph_neimode_t mode,
+        igraph_int_t minlen, igraph_int_t maxlen,
+        igraph_int_t max_results) {
 
     const igraph_int_t vcount = igraph_vcount(graph);
     const igraph_bool_t toall = igraph_vs_is_all(&to);
@@ -91,6 +92,12 @@ igraph_error_t igraph_get_all_simple_paths(
 
     if (from < 0 || from >= vcount) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
+    }
+
+    igraph_vector_int_list_clear(res);
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     if (!toall) {
@@ -112,8 +119,6 @@ igraph_error_t igraph_get_all_simple_paths(
     ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, vcount);
-
-    igraph_vector_int_list_clear(res);
 
     igraph_vector_int_clear(&stack);
     igraph_vector_int_clear(&dist);
@@ -152,6 +157,9 @@ igraph_error_t igraph_get_all_simple_paths(
             if (toall || IGRAPH_BIT_TEST(markto, nei)) {
                 if (curdist + 1 >= minlen) {
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &stack));
+                    if (max_results >= 0 && igraph_vector_int_list_size(res) == max_results) {
+                        break;
+                    }
                 }
             }
         } else {

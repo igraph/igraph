@@ -225,13 +225,10 @@ IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(
     igraph_bool_t directed, igraph_bool_t unconn
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
-                                                         igraph_vector_int_list_t *res,
-                                                         igraph_int_t from,
-                                                         igraph_vs_t to,
-                                                         igraph_int_t minlen,
-                                                         igraph_int_t maxlen,
-                                                         igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t
+igraph_get_all_simple_paths(const igraph_t *graph, igraph_vector_int_list_t *res, igraph_int_t from,
+                            const igraph_vs_t to, igraph_neimode_t mode, igraph_int_t minlen,
+                            igraph_int_t maxlen, igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph,
                                      const igraph_vector_t *weights,
