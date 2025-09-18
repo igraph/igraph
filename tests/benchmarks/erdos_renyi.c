@@ -22,13 +22,13 @@
 
 void gnp(igraph_int_t n, igraph_real_t p, igraph_bool_t directed, igraph_edge_type_sw_t allowed_edge_types) {
     igraph_t g;
-    igraph_erdos_renyi_game_gnp(&g, n, p, directed, allowed_edge_types, false);
+    igraph_erdos_renyi_game_gnp(&g, n, p, directed, allowed_edge_types, IGRAPH_EDGE_UNLABELED);
     igraph_destroy(&g);
 }
 
 void gnm(igraph_int_t n, igraph_real_t meandeg, igraph_bool_t directed, igraph_edge_type_sw_t allowed_edge_types) {
     igraph_t g;
-    igraph_erdos_renyi_game_gnm(&g, n, round(directed ? n * meandeg : 0.5 * n * meandeg), directed, allowed_edge_types, false);
+    igraph_erdos_renyi_game_gnm(&g, n, round(directed ? n * meandeg : 0.5 * n * meandeg), directed, allowed_edge_types, IGRAPH_EDGE_UNLABELED);
     igraph_destroy(&g);
 }
 
