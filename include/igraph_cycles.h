@@ -85,11 +85,10 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
 
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
-        igraph_vector_int_list_t *vertices,
-        igraph_vector_int_list_t *edges,
+        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
         igraph_neimode_t mode,
-        igraph_int_t min_cycle_length,
-        igraph_int_t max_cycle_length);
+        igraph_int_t min_cycle_length, igraph_int_t max_cycle_length,
+        igraph_int_t max_results);
 
 IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
         const igraph_t *graph, igraph_vector_int_t *result,

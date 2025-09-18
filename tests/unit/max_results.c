@@ -162,6 +162,35 @@ int main(void) {
     igraph_vector_int_list_resize(&results_full, max_results);
     IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
 
+    /* Simple cycles */
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 0;
+    igraph_simple_cycles(&graph, NULL, &results_full, IGRAPH_ALL, IGRAPH_UNLIMITED, 3, IGRAPH_UNLIMITED);
+    igraph_simple_cycles(&graph, NULL, &results_limited, IGRAPH_ALL, IGRAPH_UNLIMITED, 3, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 3;
+    igraph_simple_cycles(&graph, NULL, &results_full, IGRAPH_ALL, IGRAPH_UNLIMITED, 4, IGRAPH_UNLIMITED);
+    igraph_simple_cycles(&graph, NULL, &results_limited, IGRAPH_ALL, IGRAPH_UNLIMITED, 4, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 8;
+    igraph_simple_cycles(&graph, NULL, &results_full, IGRAPH_ALL, 5, 5, IGRAPH_UNLIMITED);
+    igraph_simple_cycles(&graph, NULL, &results_limited, IGRAPH_ALL, 5, 5, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
     igraph_vector_destroy(&vertex_weights);
     igraph_destroy(&graph);
     igraph_vector_int_list_destroy(&results_limited);

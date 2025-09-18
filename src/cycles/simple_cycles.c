@@ -80,6 +80,10 @@ typedef struct {
     igraph_vector_int_list_t *vertices;
     /* the edges in the cycle */
     igraph_vector_int_list_t *edges;
+    /* number of cycles found so far */
+    igraph_int_t cycle_count;
+    /* how many cycles to record at most? */
+    igraph_int_t max_results;
 } simple_cycle_results_t;
 
 /**
@@ -291,9 +295,11 @@ static igraph_error_t simple_cycles_circuit(
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
-    IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
-    IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+    if (! state->stop_search) {
+        IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
+        IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
+        IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+    }
 
     igraph_stack_int_destroy(&neigh_iteration_progress);
     igraph_stack_int_destroy(&v_stack);
@@ -393,8 +399,8 @@ static igraph_error_t append_simple_cycle_result(
         const igraph_vector_int_t *edges,
         void *arg) {
 
-    simple_cycle_results_t *res_list =
-        (simple_cycle_results_t *)arg;
+    simple_cycle_results_t *res_list = (simple_cycle_results_t *) arg;
+
     if (res_list->vertices != NULL) {
         // copy output: from stack to vector. No need to reverse because
         // we were putting vertices in the stack in reverse order anyway.
@@ -415,7 +421,13 @@ static igraph_error_t append_simple_cycle_result(
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return IGRAPH_SUCCESS;
+    res_list->cycle_count++;
+
+    if (res_list->max_results >= 0 && res_list->cycle_count == res_list->max_results) {
+        return IGRAPH_STOP;
+    } else {
+        return IGRAPH_SUCCESS;
+    }
 }
 
 /**
@@ -596,6 +608,8 @@ igraph_error_t igraph_simple_cycles_callback(
  *   Pass a negative value to search for all cycles.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
+ * \param max_results At most this many cycles will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_simple_cycles_callback() to call a function for each found
@@ -607,21 +621,26 @@ igraph_error_t igraph_simple_cycles_callback(
  */
 igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
-        igraph_vector_int_list_t *vertices,
-        igraph_vector_int_list_t *edges,
+        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
         igraph_neimode_t mode,
-        igraph_int_t min_cycle_length,
-        igraph_int_t max_cycle_length) {
+        igraph_int_t min_cycle_length, igraph_int_t max_cycle_length,
+        igraph_int_t max_results) {
 
     simple_cycle_results_t result_list;
     result_list.vertices = vertices;
     result_list.edges = edges;
+    result_list.cycle_count = 0;
+    result_list.max_results = max_results;
 
     if (vertices) {
         igraph_vector_int_list_clear(vertices);
     }
     if (edges) {
         igraph_vector_int_list_clear(edges);
+    }
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_simple_cycles_callback(graph, mode, min_cycle_length, max_cycle_length,

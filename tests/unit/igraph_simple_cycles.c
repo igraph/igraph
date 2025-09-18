@@ -27,7 +27,7 @@ void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_int_t
     igraph_vector_int_list_init(&results_v, 0);
     igraph_vector_int_list_init(&results_e, 0);
 
-    igraph_simple_cycles(graph, &results_v, &results_e, mode, 0, max_cycle_length);
+    igraph_simple_cycles(graph, &results_v, &results_e, mode, 0, max_cycle_length, IGRAPH_UNLIMITED);
 
     printf("Finished search, found %" IGRAPH_PRId
            " cycles, expected %" IGRAPH_PRId " cycles."
@@ -449,19 +449,19 @@ int main(void) {
                      -1);
 
         // Check that passing NULL vector lists doesn't crash.
-        igraph_simple_cycles(&g, NULL, NULL, IGRAPH_ALL, -1, -1);
+        igraph_simple_cycles(&g, NULL, NULL, IGRAPH_ALL, -1, -1, IGRAPH_UNLIMITED);
 
         // Test limit on minimum cycle size.
-        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, -1, -1);
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, -1, -1, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
 
-        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 1, -1);
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 1, -1, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
 
-        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, 2, -1);
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, 2, -1, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 2);
 
-        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 2, 3);
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 2, 3, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 1);
 
         igraph_destroy(&g);
