@@ -111,7 +111,8 @@ void stress_test(void) {
 void check_gnp(
         igraph_int_t n, igraph_real_t p,
         igraph_bool_t directed,
-        igraph_bool_t loops, igraph_bool_t multiple) {
+        igraph_bool_t loops, igraph_bool_t multiple,
+        igraph_bool_t edge_labeled) {
 
     igraph_t graph;
     igraph_bool_t has_loop, has_multi;
@@ -121,7 +122,7 @@ void check_gnp(
     if (loops) allowed_edge_types |= IGRAPH_LOOPS_SW;
     if (multiple) allowed_edge_types |= IGRAPH_MULTI_SW;
 
-    igraph_erdos_renyi_game_gnp(&graph, n, p, directed, allowed_edge_types, false);
+    igraph_erdos_renyi_game_gnp(&graph, n, p, directed, allowed_edge_types, edge_labeled);
 
     IGRAPH_ASSERT(igraph_is_directed(&graph) == directed);
     IGRAPH_ASSERT(igraph_vcount(&graph) == n);
@@ -155,7 +156,7 @@ void check_gnp(
         igraph_real_t m = complete_ecount * p;
         igraph_real_t sd = multiple ? sqrt(m * (1+p)) : sqrt(m * (1-p));
         igraph_real_t dev = (m - igraph_ecount(&graph)) / sd;
-        igraph_bool_t do_test = m < 10000;
+        igraph_bool_t do_test = m < 10000 && ! edge_labeled;
 
         if (do_test) {
             if (multiple) {
@@ -182,7 +183,7 @@ void check_gnp(
         /* Failure is unlikely, but possible. If it happens, check manually. */
         if (do_test) {
             IGRAPH_ASSERT(pval > 0.01);
-        } else {
+        } else if (!edge_labeled) {
             /* If the graph is too large for the exact test to run efficiently,
              * use a normal approximation, even though this is inaccurate with
              * small p. */
@@ -197,16 +198,21 @@ void check_gnp(
 void check_all_gnp(igraph_int_t n, igraph_real_t p) {
 
     if (p <= 1) {
-        check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
-        check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
-        check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
-        check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+        check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+        check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+        check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+        check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED);
     }
 
-    check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
-    check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
-    check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
-    check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+    check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+    check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+    check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED);
+
+    check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED);
+    check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED);
+    check_gnp(n, p, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED);
+    check_gnp(n, p, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED);
 }
 
 void test_examples(void) {
