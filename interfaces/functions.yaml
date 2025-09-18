@@ -2619,7 +2619,8 @@ igraph_simple_cycles:
     PARAMS: |-
         GRAPH graph,
         OPTIONAL OUT VERTEX_INDICES_LIST vertices, OPTIONAL OUT EDGE_INDICES_LIST edges,
-        NEIMODE mode=OUT, INTEGER min_cycle_length=UNLIMITED, INTEGER max_cycle_length=UNLIMITED
+        NEIMODE mode=OUT, INTEGER min_cycle_length=UNLIMITED, INTEGER max_cycle_length=UNLIMITED,
+        INTEGER max_results=UNLIMITED
     DEPS: vertices ON graph, edges ON graph
 
 igraph_simple_cycles_callback:
