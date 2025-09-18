@@ -125,6 +125,7 @@ void check_iea(
 void check_gnp(
     igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
     igraph_bool_t directed, igraph_neimode_t mode, igraph_bool_t multiple,
+    igraph_bool_t edge_labeled,
     igraph_bool_t assume_edges
 ) {
     igraph_t graph;
@@ -137,7 +138,7 @@ void check_gnp(
     }
 
     igraph_vector_bool_init(&types, 0);
-    igraph_bipartite_game_gnp(&graph, &types, n1, n2, p, directed, mode, multiple ? IGRAPH_MULTI_SW : IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
+    igraph_bipartite_game_gnp(&graph, &types, n1, n2, p, directed, mode, multiple ? IGRAPH_MULTI_SW : IGRAPH_SIMPLE_SW, edge_labeled);
 
     /* check correct vertex and edge count, directedness */
     IGRAPH_ASSERT(igraph_is_directed(&graph) == directed);
@@ -280,28 +281,36 @@ int main(void) {
 
     /* UNDIRECTED */
 
-    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, false);
-    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, false);
-    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, false);
-    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, false);
+    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+    check_gnp(0, 0, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, false);
+    check_gnp(2, 3, 0, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, false);
 
-    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, true);
-    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, true);
-    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, true);
-    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, true);
+    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+    check_gnp(8, 15, 0.8, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, true);
+    check_gnp(6, 3, 1, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, true);
 
     /* DIRECTED */
 
     for (size_t i=0; i < sizeof(modes) / sizeof(modes[0]); i++) {
-        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, false);
-        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, false);
-        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, false);
-        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, false);
+        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, false);
+        check_gnp(0, 0, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, false);
+        check_gnp(2, 3, 0, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, false);
 
-        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, true);
-        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, true);
-        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, true);
-        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, true);
+        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_NO_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_UNLABELED, true);
+        check_gnp(8, 15, 0.8, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, true);
+        check_gnp(6, 3, 1, IGRAPH_DIRECTED, modes[i], IGRAPH_MULTIPLE, IGRAPH_EDGE_LABELED, true);
     }
 
     VERIFY_FINALLY_STACK();
