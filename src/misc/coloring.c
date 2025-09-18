@@ -324,6 +324,8 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
  * \return Error code.
  *
  * Time complexity: O(|E|), linear in the number of edges.
+ *
+ * \example examples/simple/coloring.c
  */
 igraph_error_t igraph_is_vertex_coloring(
         const igraph_t *graph,
