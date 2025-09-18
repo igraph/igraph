@@ -406,6 +406,8 @@ static igraph_error_t gnm_simple(
  * \param edge_labeled If true, the sampling is done uniformly from the set
  *     of ordered edge lists. See \ref igraph_iea_game() for more information.
  *     Set this to \c false to select the classic Erdős-Rényi model.
+ *     The constants \c IGRAPH_EDGE_UNLABELED and \c IGRAPH_EDGE_LABELED
+ *     may be used instead of \c false and \c true for better readability.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -692,6 +694,8 @@ static igraph_error_t gnp_edge_labeled(
  * \param edge_labeled If true, the model is defined over the set of ordered
  *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
  *     \c false to select the classic Erdős-Rényi model.
+ *     The constants \c IGRAPH_EDGE_UNLABELED and \c IGRAPH_EDGE_LABELED
+ *     may be used instead of \c false and \c true for better readability.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.

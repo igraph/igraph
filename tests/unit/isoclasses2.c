@@ -70,7 +70,7 @@ void random_test(void) {
             igraph_int_t class;
             igraph_bool_t iso;
 
-            igraph_erdos_renyi_game_gnp(&g1, size, 0.5, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
+            igraph_erdos_renyi_game_gnp(&g1, size, 0.5, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
             igraph_isoclass(&g1, &class);
             igraph_isoclass_create(&g2, size, class, IGRAPH_DIRECTED);
@@ -90,7 +90,7 @@ void random_test(void) {
             igraph_int_t class;
             igraph_bool_t iso;
 
-            igraph_erdos_renyi_game_gnp(&g1, size, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+            igraph_erdos_renyi_game_gnp(&g1, size, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
             igraph_isoclass(&g1, &class);
             igraph_isoclass_create(&g2, size, class, IGRAPH_UNDIRECTED);
@@ -117,7 +117,7 @@ void random_subgraph_test(void) {
 
     /* Directed */
 
-    igraph_erdos_renyi_game_gnp(&graph, 40, 0.5, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnp(&graph, 40, 0.5, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     for (size=3; size <= 4; size++) {
         for (i=0; i < 100; ++i) {
@@ -142,7 +142,7 @@ void random_subgraph_test(void) {
 
     /* Undirected */
 
-    igraph_erdos_renyi_game_gnp(&graph, 60, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnp(&graph, 60, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     for (size=3; size <= 6; size++) {
         for (i=0; i < 100; ++i) {

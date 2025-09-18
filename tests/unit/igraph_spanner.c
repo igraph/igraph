@@ -124,7 +124,7 @@ int main(void) {
 
     /* Random Erdos-Renyi graph */
     printf("Random Erdos-Renyi graph\n");
-    igraph_erdos_renyi_game_gnp(&graph, 200, 0.25, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnp(&graph, 200, 0.25, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (igraph_int_t i = 0; i < no_of_edges; i++) {
@@ -162,7 +162,7 @@ int main(void) {
     /* Error conditions */
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    igraph_erdos_renyi_game_gnp(&graph, 200, 0.9, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnp(&graph, 200, 0.9, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (igraph_int_t i = 0; i < no_of_edges; i++) {

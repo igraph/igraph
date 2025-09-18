@@ -110,32 +110,32 @@ int main(void) {
     run_bench(&g, &weights, 1, "PA");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 500, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 500, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 60000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 1000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 1000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 30000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 3000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 3000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 10000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 3000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 30000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 30000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 1000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 100000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 100000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 300, "G(n,m)");
     igraph_destroy(&g);

@@ -86,7 +86,7 @@ int main(void) {
         for (igraph_int_t i=0; i < 100; i++) {
             igraph_t g;
 
-            igraph_erdos_renyi_game_gnp(&g, n, 0.5, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, false);
+            igraph_erdos_renyi_game_gnp(&g, n, 0.5, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
 
             CHECK_PRINT(igraph_eigenvector_centrality(&g, &vec, &val, IGRAPH_OUT, NULL, NULL));
             CHECK_PRINT(igraph_eigenvector_centrality(&g, &vec, &val, IGRAPH_IN, NULL, NULL));

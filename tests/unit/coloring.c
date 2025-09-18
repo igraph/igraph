@@ -99,7 +99,7 @@ void test_graph_large(void) {
     igraph_t graph;
 
     /* simple large undirected graph */
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     printf("Testing large simple graph\n");
     run_tests(&graph, false);
 
@@ -196,7 +196,7 @@ void test_wheel_graph(void) {
 void test_bipartite_graph(void) {
     igraph_t graph_1, graph_2;
 
-    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW, false);
+    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     printf("Testing complete bipartite graph\n");
     run_tests(&graph_1, false);
 

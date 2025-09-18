@@ -67,7 +67,7 @@ int main(void) {
 #define SS 100
 #define SREP 1000
 
-    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_resize(&ecc, igraph_ecount(&g));
 
     BENCH_BLOCK()
@@ -88,7 +88,7 @@ int main(void) {
 #define SS 100
 #define SREP 1000
 
-    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_resize(&ecc, igraph_ecount(&g));
 
     BENCH_BLOCK()
@@ -109,7 +109,7 @@ int main(void) {
 #define SS 100
 #define SREP 1000
 
-    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_resize(&ecc, igraph_ecount(&g));
 
     BENCH_BLOCK()
@@ -130,7 +130,7 @@ int main(void) {
 #define SS 100
 #define SREP 1000
 
-    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, VCOUNT, ECOUNT, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_resize(&ecc, igraph_ecount(&g));
 
     BENCH_BLOCK()

@@ -443,7 +443,7 @@ int main(void) {
     igraph_destroy(&g);
 
     printf("\nRandom graph tests:\n");
-    igraph_erdos_renyi_game_gnm(&g, 10000, 49994999, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+    igraph_erdos_renyi_game_gnm(&g, 10000, 49994999, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     do_benchmarks(" rg - ", &g, 1);
     igraph_destroy(&g);
 

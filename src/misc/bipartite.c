@@ -1348,6 +1348,8 @@ static igraph_error_t bipartite_gnm_simple(
  * \param edge_labeled If true, the model is defined over the set of ordered
  *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
  *     \c false to select the classic bipartite Erdős-Rényi model.
+ *     The constants \c IGRAPH_EDGE_UNLABELED and \c IGRAPH_EDGE_LABELED
+ *     may be used instead of \c false and \c true for better readability.
  * \return Error code.
  *
  * \sa \ref igraph_erdos_renyi_game_gnm() for the unipartite version,
@@ -1476,7 +1478,7 @@ igraph_error_t igraph_bipartite_iea_game(
 
     return igraph_bipartite_game_gnm(
         graph, types, n1, n2, m, directed, mode,
-        IGRAPH_MULTI_SW, /*edge_labeled=*/ true);
+        IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
 }
 
 
@@ -1628,6 +1630,8 @@ static igraph_error_t gnp_bipartite_large(
  * \param edge_labeled If true, the model is defined over the set of ordered
  *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
  *     \c false to select the classic bipartite Erdős-Rényi model.
+ *     The constants \c IGRAPH_EDGE_UNLABELED and \c IGRAPH_EDGE_LABELED
+ *     may be used instead of \c false and \c true for better readability.
  * \return Error code.
  *
  * \sa \ref igraph_erdos_renyi_game_gnp() for the unipartite version,

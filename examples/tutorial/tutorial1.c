@@ -14,7 +14,7 @@ int main(void) {
 
     igraph_erdos_renyi_game_gnm(
             &graph, num_vertices, num_edges,
-            IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, false);
+            IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     igraph_diameter(
         &graph, /* weights = */ NULL,

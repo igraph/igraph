@@ -45,6 +45,7 @@ IGRAPH_BEGIN_C_DECLS
 /* These constants are meant to be used for sake of readability */
 enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
 enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
+enum { IGRAPH_EDGE_UNLABELED = 0, IGRAPH_EDGE_LABELED = 1 };
 
 /**
  * \typedef igraph_loops_t

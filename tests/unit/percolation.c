@@ -88,7 +88,7 @@ void test_bond(void) {
     igraph_full(&k_3, 3, false, false);
     igraph_small(&c_4, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 0, -1);
     igraph_famous(&karate, "Zachary");
-    igraph_erdos_renyi_game_gnp(&random, 100, 0.01, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false);
+    igraph_erdos_renyi_game_gnp(&random, 100, 0.01, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     printf("# Bond percolation test suite\n");
     printf("Null graph, no provided edge order.\n");
     percolate_bond(&null_graph, NULL, true);
@@ -204,7 +204,7 @@ void test_site(void) {
     igraph_full(&k_5, 5, false, false);
     igraph_small(&c_4, 4, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 0, -1);
     igraph_famous(&karate, "Zachary");
-    igraph_erdos_renyi_game_gnp(&random, 100, 0.01, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, false);
+    igraph_erdos_renyi_game_gnp(&random, 100, 0.01, IGRAPH_UNDIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     printf("# Site percolation test suite\n");
     printf("Null graph, no provided vertex order.\n");
     percolate_site(&null_graph, NULL, true);
