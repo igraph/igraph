@@ -76,7 +76,7 @@ int main(void) {
             igraph_vector_size(&weights), igraph_vcount(&karate),
             igraph_vector_int_size(&parents)
         );
-        abort();
+        IGRAPH_FATAL("Vector length mismatch.");
     }
 
     n = igraph_vector_int_size(&parents);
@@ -84,7 +84,7 @@ int main(void) {
         if (VECTOR(parents)[i] < -1 || VECTOR(parents)[i] >= igraph_vcount(&karate) + igraph_vector_size(&weights)) {
             fprintf(stderr, "Invalid parents vector:\n");
             igraph_vector_int_fprint(&parents, stderr);
-            abort();
+            IGRAPH_FATAL("Invalid parents vector.");
         }
     }
 

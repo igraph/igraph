@@ -45,10 +45,8 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     if ((!igraph_vector_int_all_e(&indegree_before, &indegree_after)) ||
         (!igraph_vector_int_all_e(&outdegree_before, &outdegree_after))) {
 
-        printf("%s: graph degrees changed. Rewired graph is below.\n", description);
         print_graph(&g);
-
-        abort();
+        IGRAPH_FATALF("%s: graph degrees changed. Rewired graph is above.\n", description);
     }
 
     igraph_destroy(&g);

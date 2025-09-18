@@ -189,7 +189,7 @@ int main(void) {
     if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
         printf("Regular: VECTOR(values)[0] numerical precision is only %g, should be %g",
                fabs((double)VECTOR(values)[0] - DIM), EPS);
-        abort();
+        IGRAPH_FATAL("Precision lower than expected.");
     }
 
     IGRAPH_ASSERT( fabs(fabs(MATRIX(vectors, DIM - 1, 0)) - 1.0) < EPS);
@@ -208,7 +208,7 @@ int main(void) {
     if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
         printf("Shift and invert, LU: VECTOR(values)[0] numerical precision is only %g, should be %g",
                fabs((double)VECTOR(values)[0] - DIM), EPS);
-        abort();
+        IGRAPH_FATAL("Precision lower than expected.");
     }
     igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
                                     &values, /*vectors=*/ &vectors,
@@ -216,7 +216,7 @@ int main(void) {
     if ( fabs(VECTOR(values)[0] - DIM) > EPS ) {
         printf("Shift and invert, QR: VECTOR(values)[0] numerical precision is only %g, should be %g",
                fabs((double)VECTOR(values)[0] - DIM), EPS);
-        abort();
+        IGRAPH_FATAL("Precision lower than expected.");
     }
 
     IGRAPH_ASSERT( fabs(fabs(MATRIX(vectors, DIM - 1, 0)) - 1.0) < EPS);
