@@ -33,6 +33,8 @@
 #include "misc/graphicality.h"
 #include "operators/rewire_internal.h"
 
+#include <string.h> /* memset */
+
 /* Threshold that defines when to switch over to using adjacency lists during
  * rewiring */
 #define REWIRE_ADJLIST_THRESHOLD 10
