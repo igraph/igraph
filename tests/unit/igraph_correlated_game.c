@@ -26,11 +26,19 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 9275);
 
     igraph_erdos_renyi_game_gnp(&g1, 10, 0.3, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
+
     igraph_correlated_game(&g1, &g2, 0.9, 0.3, /* permutation=*/ NULL);
-
     IGRAPH_ASSERT(igraph_vcount(&g1) == igraph_vcount(&g2));
-
     igraph_destroy(&g2);
+
+    igraph_correlated_game(&g1, &g2, 0.0, 0.3, /* permutation=*/ NULL);
+    IGRAPH_ASSERT(igraph_vcount(&g1) == igraph_vcount(&g2));
+    igraph_destroy(&g2);
+
+    igraph_correlated_game(&g1, &g2, 1.0, 0.3, /* permutation=*/ NULL);
+    IGRAPH_ASSERT(igraph_vcount(&g1) == igraph_vcount(&g2));
+    igraph_destroy(&g2);
+
     igraph_destroy(&g1);
 
     VERIFY_FINALLY_STACK();
