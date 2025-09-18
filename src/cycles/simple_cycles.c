@@ -291,9 +291,11 @@ static igraph_error_t simple_cycles_circuit(
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
-    IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
-    IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+    if (! state->stop_search) {
+        IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
+        IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
+        IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+    }
 
     igraph_stack_int_destroy(&neigh_iteration_progress);
     igraph_stack_int_destroy(&v_stack);

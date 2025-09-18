@@ -31,6 +31,7 @@
  - `igraph_cliques_callback()` would sometimes fail to respect a request to stop (i.e. returning `IGRAPH_STOP`) from the callback. This is now corrected.
  - `igraph_hypercube()` now validates the hypercube dimension and prevents negative values.
  - `igraph_sparsemat_view()` checks for out-of-memory conditions.
+ - Fix assertion error when stopping search early in `igraph_simple_cycles_callback()` by returning `IGRAPH_STOP` from the callback.
 
 ### Deprecated
 
