@@ -37,9 +37,12 @@ int main() {
     // const igraph_int_t N = N1*N2;
 
     // Set whether the graph is directed,
-    // and whether it can potentially have self-loops.
+    // and whether it can potentially have self-loops and/or multi-edges.
     const bool directed = true;
     const bool loops = true;
+    
+    igraph_edge_type_sw_t allowed_edge_types = IGRAPH_MULTI_SW;
+    if (loops) allowed_edge_types |= IGRAPH_LOOPS_SW;
 
     // Use std::map, NOT std::unordered_map, so that the matrices are always
     // printed in the same order. This helps detect consistent patterns which
@@ -52,8 +55,8 @@ int main() {
     const int samples = 1'000'000; // number of graphs to generate
     for (int iter = 0; iter < samples; iter++) {
 
-        igraph_erdos_renyi_game_gnm(&g, N, M, directed, loops, IGRAPH_MULTIPLE); // unipartite
-        // igraph_bipartite_game_gnm(&g, NULL, N1, N2, M, directed, IGRAPH_ALL, IGRAPH_MULTIPLE); // bipartite
+        igraph_erdos_renyi_game_gnm(&g, N, M, directed, allowed_edge_types, IGRAPH_EDGE_UNLABELED); // unipartite
+        // igraph_bipartite_game_gnm(&g, NULL, N1, N2, M, directed, IGRAPH_ALL, allowed_edge_types, IGRAPH_EDGE_UNLABELED); // bipartite
 
         igraph_get_adjacency(&g, &am, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_TWICE);
 

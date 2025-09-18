@@ -30,9 +30,8 @@ int main(void) {
     /* Sample a graph from the Erdős-Rényi G(n,p) model */
 
     igraph_erdos_renyi_game_gnp(
-        &graph, /* n= */ 100, /* p= */ 0.01,
-        IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS
-    );
+            &graph, /* n= */ 100, /* p= */ 0.01,
+            IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     /* Compute the fraction of vertices contained within the largest connected component */
 

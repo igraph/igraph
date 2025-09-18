@@ -80,7 +80,7 @@ int main(void) {
 
     igraph_vector_int_init_range(&perm, 0, NODES);
     igraph_vector_int_init(&inv_perm, NODES);
-    igraph_erdos_renyi_game_gnm(&g, NODES, NODES, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, NODES, NODES, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_full(&cli, CLIQUE_SIZE, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     for (i = 0; i < NO_CLIQUES; i++) {

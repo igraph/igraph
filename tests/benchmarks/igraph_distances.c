@@ -30,7 +30,7 @@ void bench_gnp(igraph_int_t n, igraph_real_t p, igraph_bool_t directed, igraph_r
     igraph_vector_init(&weights, 0);
 
     /* IGRAPH_NO_LOOPS, as loops are not allowed with negative weights. */
-    igraph_erdos_renyi_game_gnp(&g, n, p, directed, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, n, p, directed, IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     igraph_matrix_resize(&res, igraph_vcount(&g), igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 

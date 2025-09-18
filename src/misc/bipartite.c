@@ -30,8 +30,10 @@
 
 #include "core/interruption.h"
 #include "graph/attributes.h"
-#include "random/random_internal.h"
+#include "internal/utils.h"
 #include "math/safe_intop.h"
+#include "misc/graphicality.h"
+#include "random/random_internal.h"
 
 /**
  * \section about_bipartite Bipartite networks in igraph
@@ -1087,321 +1089,15 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/* This implementation is used only with very large vertex counts, when the
- * default implementation would fail due to overflow. While this version
- * avoids overflow and uses less memory, it is also slower than the default
- * implementation. */
-static igraph_error_t gnp_bipartite_large(
+
+static igraph_error_t bipartite_iea_game(
         igraph_t *graph,
         igraph_int_t n1, igraph_int_t n2,
-        igraph_real_t p,
-        igraph_bool_t directed, igraph_neimode_t mode,
-        igraph_int_t ecount_estimate) {
-
-    igraph_vector_int_t edges;
-    int iter = 0;
-
-    /* Necessitated by floating point arithmetic used in the implementation. */
-    if (n1 >= IGRAPH_MAX_EXACT_REAL || n2 >= IGRAPH_MAX_EXACT_REAL) {
-        IGRAPH_ERROR("Number of vertices is too large.", IGRAPH_EOVERFLOW);
-    }
-
-    if (ecount_estimate > IGRAPH_ECOUNT_MAX) {
-        ecount_estimate = IGRAPH_ECOUNT_MAX;
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount_estimate));
-
-    for (igraph_int_t i = 0; i < n1; i++) {
-        igraph_int_t j = 0;
-
-        while (true) {
-            igraph_real_t gap = RNG_GEOM(p);
-
-            if (gap >= n2 - j) {
-                break;
-            }
-
-            j += gap;
-
-            if (!directed) {
-                /* Undirected graph */
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
-            } else if (mode == IGRAPH_IN) {
-                /* Incoming edges */
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-            } else if (mode == IGRAPH_OUT) {
-                /* Outgoing edges */
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
-            } else {
-                /* Both directions for IGRAPH_ALL */
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-            }
-
-            j++;
-
-            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-        }
-    }
-
-    /* n1 + n2 has already been checked for overflow in the caller function. */
-    IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
-
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_bipartite_game_gnp
- * \brief Generates a random bipartite graph with a fixed connection probability.
- *
- * In the <code>G(n1, n2, p)</code> model, every possible edge between the \p n1
- * bottom vertices and \p n2 top vertices is realized independently with
- * probability \p p.
- *
- * \param graph Pointer to an uninitialized igraph graph, the result
- *    is stored here.
- * \param types Pointer to an initialized boolean vector, or a null
- *    pointer. If not \c NULL, then the vertex types are stored
- *    here. Bottom vertices come first, \p n1 of them, then \p n2 top
- *    vertices.
- * \param n1 The number of bottom vertices.
- * \param n2 The number of top vertices.
- * \param p The connection probability.
- * \param directed Boolean, whether to generate a directed graph. See
- *     also the \p mode argument.
- * \param mode Specifies how to direct the edges in directed
- *     graphs. If it is \c IGRAPH_OUT, then directed edges point from
- *     bottom vertices to top vertices. If it is \c IGRAPH_IN, edges
- *     point from top vertices to bottom vertices. \c IGRAPH_OUT and
- *     \c IGRAPH_IN do not generate mutual edges. If this argument is
- *     \c IGRAPH_ALL, then each edge direction is considered
- *     independently and mutual edges might be generated. This
- *     argument is ignored for undirected graphs.
- * \return Error code.
- *
- * \sa \ref igraph_erdos_renyi_game_gnp() for the unipartite version,
- * \ref igraph_bipartite_game_gnm() for the <code>G(n1, n2, m)</code> model.
- *
- * Time complexity: O(|V|+|E|), linear in the number of vertices and
- * edges.
- */
-
-igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
-                                         igraph_int_t n1, igraph_int_t n2,
-                                         igraph_real_t p, igraph_bool_t directed,
-                                         igraph_neimode_t mode) {
-
-    igraph_vector_int_t edges;
-    igraph_vector_t s;
-    igraph_int_t n;
-    igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
-    int iter = 0;
-
-    if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,p) model.", IGRAPH_EINVAL);
-    }
-
-    if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid connection probability for bipartite G(n,p) model.", IGRAPH_EINVAL);
-    }
-
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode for bipartite G(n,p) model.", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_SAFE_ADD(n1, n2, &n);
-
-    if (types) {
-        IGRAPH_CHECK(igraph_vector_bool_resize(types, n));
-        igraph_vector_bool_null(types);
-        for (igraph_int_t i = n1; i < n; i++) {
-            VECTOR(*types)[i] = true;
-        }
-    }
-
-    if (p == 0 || n1 == 0 || n2 == 0) {
-        IGRAPH_CHECK(igraph_empty(graph, n, directed));
-    } else if (p == 1.0) {
-        IGRAPH_CHECK(igraph_full_bipartite(graph, types, n1, n2, directed, mode));
-    } else {
-
-        igraph_int_t to, from, slen;
-        igraph_real_t maxedges, last;
-        igraph_int_t ecount_estimate;
-
-        if (!directed || mode != IGRAPH_ALL) {
-            maxedges = n1_real * n2_real;
-        } else {
-            maxedges = 2.0 * n1_real * n2_real;
-        }
-
-        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &ecount_estimate));
-
-        if (maxedges > IGRAPH_MAX_EXACT_REAL) {
-            /* Use a slightly slower, but overflow-free implementation. */
-            return gnp_bipartite_large(graph, n1, n2, p, directed, mode, ecount_estimate);
-        }
-
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, ecount_estimate));
-
-        last = RNG_GEOM(p);
-        while (last < maxedges) {
-            IGRAPH_CHECK(igraph_vector_push_back(&s, last));
-            last += RNG_GEOM(p);
-            last += 1;
-            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-        }
-
-        slen = igraph_vector_size(&s);
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, slen * 2));
-
-        for (igraph_int_t i = 0; i < slen; i++) {
-            if (!directed || mode != IGRAPH_ALL) {
-                to = trunc(VECTOR(s)[i] / n1_real);
-                from = VECTOR(s)[i] - to * n1_real;
-                to += n1;
-            } else {
-                igraph_real_t n1n2 = n1_real * n2_real;
-                if (VECTOR(s)[i] < n1n2) {
-                    to = trunc(VECTOR(s)[i] / n1_real);
-                    from = VECTOR(s)[i] - to * n1_real;
-                    to += n1;
-                } else {
-                    to = trunc((VECTOR(s)[i] - n1n2) / n2_real);
-                    from = VECTOR(s)[i] - n1n2 - to * n2_real;
-                    from += n1;
-                }
-            }
-
-            if (mode != IGRAPH_IN) {
-                igraph_vector_int_push_back(&edges, from); /* reserved */
-                igraph_vector_int_push_back(&edges, to); /* reserved */
-            } else {
-                igraph_vector_int_push_back(&edges, to); /* reserved */
-                igraph_vector_int_push_back(&edges, from); /* reserved */
-            }
-
-            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
-        }
-
-        igraph_vector_destroy(&s);
-        IGRAPH_FINALLY_CLEAN(1);
-
-        IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-        igraph_vector_int_destroy(&edges);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_bipartite_iea_game
- * \brief Generates a random bipartite multigraph through independent edge assignment.
- *
- * \experimental
- *
- * This model generates random multigraphs with \p n1 bottom vertices,
- * \p n2 top vertices and \p m edges through independent edge assignment (IEA).
- * Each of the \p m edges is assigned uniformly at random to a vertex pair,
- * independently of each other.
- *
- * </para><para>
- * This model does not sample multigraphs uniformly. Undirected graphs are
- * generated with probability proportional to
- *
- * </para><para>
- * <code>(prod_(i&lt;j) A_ij !)^(-1)</code>,
- *
- * </para><para>
- * where \c A denotes the adjacency matrix. The corresponding  expression for
- * directed graphs is
- *
- * </para><para>
- * <code>(prod_(i,j) A_ij !)^(-1)</code>.
- *
- * </para><para>
- * Thus the probability of all simple graphs (which only have 0s and 1s in the
- * adjacency matrix) is the same, while that of non-simple ones depends on
- * their edge and self-loop multiplicities.
- *
- * \param graph Pointer to an uninitialized igraph graph, the result
- *    is stored here.
- * \param types Pointer to an initialized boolean vector, or a \c NULL
- *    pointer. If not \c NULL, then the vertex types are stored
- *    here. Bottom vertices come first, \p n1 of them, then \p n2 top
- *    vertices.
- * \param n1 The number of bottom vertices.
- * \param n2 The number of top vertices.
- * \param m The number of edges.
- * \param directed Whether to generate a directed graph. See
- *     also the \p mode argument.
- * \param mode Specifies how to direct the edges in directed
- *     graphs. If it is \c IGRAPH_OUT, then directed edges point from
- *     bottom vertices to top vertices. If it is \c IGRAPH_IN, edges
- *     point from top vertices to bottom vertices. \c IGRAPH_OUT and
- *     \c IGRAPH_IN do not generate mutual edges. If this argument is
- *     \c IGRAPH_ALL, then each edge direction is considered
- *     independently and mutual edges might be generated. This
- *     argument is ignored for undirected graphs.
- * \return Error code.
- *
- * \sa \ref igraph_iea_game() for the unipartite version;
- * \ref igraph_bipartite_game_gnm() to uniformly sample bipartite graphs
- * with a given number of vertices and edges.
- *
- * Time complexity: O(|V|+|E|), linear in the number of vertices and
- * edges.
- */
-
-igraph_error_t igraph_bipartite_iea_game(
-        igraph_t *graph, igraph_vector_bool_t *types,
-        igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
+        igraph_int_t m,
         igraph_bool_t directed, igraph_neimode_t mode) {
 
-    igraph_int_t n;
     igraph_vector_int_t edges;
-
-    if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices for bipartite IEA model.", IGRAPH_EINVAL);
-    }
-    if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Invalid number of edges for bipartite IEA model.", IGRAPH_EINVAL);
-    }
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode for bipartite IEA model.", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_SAFE_ADD(n1, n2, &n);
-
-    if (types) {
-        igraph_int_t i;
-        IGRAPH_CHECK(igraph_vector_bool_resize(types, n));
-        igraph_vector_bool_null(types);
-        for (i = n1; i < n; i++) {
-            VECTOR(*types)[i] = true;
-        }
-    }
-
-    if (m == 0 || n1 == 0 || n2 == 0) {
-        if (m > 0) {
-            IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
-        }
-        IGRAPH_CHECK(igraph_empty(graph, n, directed));
-        return IGRAPH_SUCCESS;
-    }
+    igraph_int_t n = n1 + n2; /* overflow checked by caller */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
@@ -1433,20 +1129,19 @@ igraph_error_t igraph_bipartite_iea_game(
 
 static igraph_error_t bipartite_gnm_multi(
         igraph_t *graph,
-        igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
+        igraph_int_t n1, igraph_int_t n2,
+        igraph_int_t m,
         igraph_bool_t directed, igraph_neimode_t mode) {
 
     /* See igraph_erdos_renyi_game_gnm() for how the sampling works. */
 
     igraph_vector_int_t edges;
-    igraph_int_t n;
     igraph_int_t nrow, ncol;
     igraph_int_t last;
     igraph_int_t offset1 = 0, offset2 = n1;
+    igraph_int_t n = n1 + n2; /* overflow checked by caller */
 
-    IGRAPH_SAFE_ADD(n1, n2, &n);
-
-    /* The larger partition is associated with collumns, the smaller
+    /* The larger partition is associated with columns, the smaller
      * with rows. This setup helps avoid integer overflow. We swap
      * n1 and n2 so that n1 is smaller. */
     if (n1 > n2) {
@@ -1537,6 +1232,86 @@ static igraph_error_t bipartite_gnm_multi(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t bipartite_gnm_simple(
+        igraph_t *graph,
+        igraph_int_t n1, igraph_int_t n2,
+        igraph_int_t m,
+        igraph_bool_t directed, igraph_neimode_t mode,
+        igraph_bool_t edge_labeled) {
+
+    igraph_vector_int_t edges;
+    igraph_vector_t s;
+    igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
+    igraph_int_t n = n1 + n2; /* overflow checked by caller */
+    igraph_real_t maxedges;
+    int iter = 0;
+
+    if (!directed || mode != IGRAPH_ALL) {
+        maxedges = n1_real * n2_real;
+    } else {
+        maxedges = 2.0 * n1_real * n2_real;
+    }
+
+    if (m > maxedges) {
+        IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
+    }
+
+    if (maxedges == m && ! edge_labeled) {
+        /* TODO: Cannot use igraph_full_bipartite() when edge_labeled as we must shuffle edges. */
+        IGRAPH_CHECK(igraph_full_bipartite(graph, NULL, n1, n2, directed, mode));
+    } else {
+        igraph_int_t to, from;
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+        IGRAPH_CHECK(igraph_i_random_sample_real(&s, 0, maxedges - 1, m));
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
+
+        for (igraph_int_t i = 0; i < m; i++) {
+            if (!directed || mode != IGRAPH_ALL) {
+                to = trunc(VECTOR(s)[i] / n1_real);
+                from = VECTOR(s)[i] - to * n1_real;
+                to += n1;
+            } else {
+                igraph_real_t n1n2 = n1_real * n2_real;
+                if (VECTOR(s)[i] < n1n2) {
+                    to = trunc(VECTOR(s)[i] / n1_real);
+                    from = VECTOR(s)[i] - to * n1_real;
+                    to += n1;
+                } else {
+                    to = trunc((VECTOR(s)[i] - n1n2) / n2_real);
+                    from = VECTOR(s)[i] - n1n2 - to * n2_real;
+                    from += n1;
+                }
+            }
+
+            if (mode != IGRAPH_IN) {
+                igraph_vector_int_push_back(&edges, from); /* reserved */
+                igraph_vector_int_push_back(&edges, to); /* reserved */
+            } else {
+                igraph_vector_int_push_back(&edges, to); /* reserved */
+                igraph_vector_int_push_back(&edges, from); /* reserved */
+            }
+
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+
+        igraph_vector_destroy(&s);
+        IGRAPH_FINALLY_CLEAN(1);
+
+        if (edge_labeled) {
+            IGRAPH_CHECK(igraph_i_vector_int_shuffle_pairs(&edges));
+        }
+
+        IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
+        igraph_vector_int_destroy(&edges);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_bipartite_game_gnm
  * \brief Generate a random bipartite graph with a fixed number of edges.
@@ -1563,8 +1338,18 @@ static igraph_error_t bipartite_gnm_multi(
  *     \c IGRAPH_ALL, then each edge direction is considered
  *     independently and mutual edges might be generated. This
  *     argument is ignored for undirected graphs.
- * \param multiple Boolean, whether it is allowed to generate more
- *     than one edge between the same pair of vertices.
+* \param allowed_edge_types The types of edges to allow in the graph.
+ *        \clist
+ *          \cli IGRAPH_SIMPLE_SW
+ *          simple graph (i.e. no multi-edges allowed).
+ *          \cli IGRAPH_MULTI_SW
+ *          multi-edges are allowed
+ *        \endclist
+ * \param edge_labeled If true, the model is defined over the set of ordered
+ *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
+ *     \c false to select the classic bipartite Erdős-Rényi model.
+ *     The constants \c IGRAPH_EDGE_UNLABELED and \c IGRAPH_EDGE_LABELED
+ *     may be used instead of \c false and \c true for better readability.
  * \return Error code.
  *
  * \sa \ref igraph_erdos_renyi_game_gnm() for the unipartite version,
@@ -1575,15 +1360,16 @@ static igraph_error_t bipartite_gnm_multi(
  * edges.
  */
 
-igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
-                              igraph_int_t n1, igraph_int_t n2,
-                              igraph_int_t m, igraph_bool_t directed,
-                              igraph_neimode_t mode, igraph_bool_t multiple) {
-    igraph_vector_int_t edges;
-    igraph_vector_t s;
+igraph_error_t igraph_bipartite_game_gnm(
+        igraph_t *graph,
+        igraph_vector_bool_t *types,
+        igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
+        igraph_bool_t directed, igraph_neimode_t mode,
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_bool_t edge_labeled) {
+
     igraph_int_t n;
-    igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
-    int iter = 0;
+    igraph_bool_t loops, multiple;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,m) model.", IGRAPH_EINVAL);
@@ -1595,13 +1381,15 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_ERROR("Invalid mode for bipartite G(n,m) model.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_SAFE_ADD(n1, n2, &n);
+    /* Bipartite graphs cannot have self-loops. We ignore them. */
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
+
+    IGRAPH_SAFE_ADD(n1, n2, &n); /* overflow check */
 
     if (types) {
-        igraph_int_t i;
         IGRAPH_CHECK(igraph_vector_bool_resize(types, n));
         igraph_vector_bool_null(types);
-        for (i = n1; i < n; i++) {
+        for (igraph_int_t i = n1; i < n; i++) {
             VECTOR(*types)[i] = true;
         }
     }
@@ -1610,13 +1398,320 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
         if (m > 0) {
             IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
         }
-        IGRAPH_CHECK(igraph_empty(graph, n, directed));
+        return igraph_empty(graph, n, directed);
     } else if (multiple) {
-        IGRAPH_CHECK(bipartite_gnm_multi(graph, n1, n2, m, directed, mode));
+        if (edge_labeled) {
+            return bipartite_iea_game(graph, n1, n2, m, directed, mode);
+        } else {
+            return bipartite_gnm_multi(graph, n1, n2, m, directed, mode);
+        }
+    } else {
+        return bipartite_gnm_simple(graph, n1, n2, m, directed, mode, edge_labeled);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_bipartite_iea_game
+ * \brief Generates a random bipartite multigraph through independent edge assignment.
+ *
+ * \experimental
+ *
+ * This model generates random multigraphs with \p n1 bottom vertices,
+ * \p n2 top vertices and \p m edges through independent edge assignment (IEA).
+ * Each of the \p m edges is assigned uniformly at random to a vertex pair,
+ * independently of each other.
+ *
+ * </para><para>
+ * This model does not sample multigraphs uniformly. Undirected graphs are
+ * generated with probability proportional to
+ *
+ * </para><para>
+ * <code>(prod_(i&lt;j) A_ij !)^(-1)</code>,
+ *
+ * </para><para>
+ * where \c A denotes the adjacency matrix. The corresponding  expression for
+ * directed graphs is
+ *
+ * </para><para>
+ * <code>(prod_(i,j) A_ij !)^(-1)</code>.
+ *
+ * </para><para>
+ * Thus the probability of all simple graphs (which only have 0s and 1s in the
+ * adjacency matrix) is the same, while that of non-simple ones depends on
+ * their edge and self-loop multiplicities.
+ *
+ * \param graph Pointer to an uninitialized igraph graph, the result
+ *    is stored here.
+ * \param types Pointer to an initialized boolean vector, or a \c NULL
+ *    pointer. If not \c NULL, then the vertex types are stored
+ *    here. Bottom vertices come first, \p n1 of them, then \p n2 top
+ *    vertices.
+ * \param n1 The number of bottom vertices.
+ * \param n2 The number of top vertices.
+ * \param m The number of edges.
+ * \param directed Whether to generate a directed graph. See
+ *     also the \p mode argument.
+ * \param mode Specifies how to direct the edges in directed
+ *     graphs. If it is \c IGRAPH_OUT, then directed edges point from
+ *     bottom vertices to top vertices. If it is \c IGRAPH_IN, edges
+ *     point from top vertices to bottom vertices. \c IGRAPH_OUT and
+ *     \c IGRAPH_IN do not generate mutual edges. If this argument is
+ *     \c IGRAPH_ALL, then each edge direction is considered
+ *     independently and mutual edges might be generated. This
+ *     argument is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * \sa \ref igraph_iea_game() for the unipartite version;
+ * \ref igraph_bipartite_game_gnm() to uniformly sample bipartite graphs
+ * with a given number of vertices and edges.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
+igraph_error_t igraph_bipartite_iea_game(
+        igraph_t *graph, igraph_vector_bool_t *types,
+        igraph_int_t n1, igraph_int_t n2, igraph_int_t m,
+        igraph_bool_t directed, igraph_neimode_t mode) {
+
+    return igraph_bipartite_game_gnm(
+        graph, types, n1, n2, m, directed, mode,
+        IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
+}
+
+
+static igraph_error_t bipartite_gnp_edge_labeled(
+        igraph_t *graph,
+        igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
+        igraph_bool_t directed, igraph_neimode_t mode,
+        igraph_bool_t multiple) {
+
+    if (multiple) {
+        igraph_real_t maxedges;
+
+        if (!directed || mode != IGRAPH_ALL) {
+            maxedges = (igraph_real_t) n1 * (igraph_real_t) n2;
+        } else {
+            maxedges = 2.0 * (igraph_real_t) n1 * (igraph_real_t) n2;
+        }
+
+        igraph_real_t m;
+        do {
+            m = RNG_GEOM( 1.0 / (1.0 + maxedges * p) );
+        } while (m > (igraph_real_t) IGRAPH_INTEGER_MAX);
+
+        return bipartite_iea_game(graph, n1, n2, m, directed, mode);
+    } else {
+        IGRAPH_ERROR("The edge-labeled bipartite G(n,p) model is not yet implemented for graphs without multi-edges.",
+                     IGRAPH_UNIMPLEMENTED);
+    }
+}
+
+/* This implementation is used only with very large vertex counts, when the
+ * default implementation would fail due to overflow. While this version
+ * avoids overflow and uses less memory, it is also slower than the default
+ * implementation.
+ *
+ * This function expects that when multiple=true, the p parameter has already
+ * been transformed by p = p / (1 + p). This is currently done by the caller.
+ */
+static igraph_error_t gnp_bipartite_large(
+        igraph_t *graph,
+        igraph_int_t n1, igraph_int_t n2,
+        igraph_real_t p,
+        igraph_bool_t directed, igraph_neimode_t mode,
+        igraph_bool_t multiple,
+        igraph_int_t ecount_estimate) {
+
+    igraph_vector_int_t edges;
+    int iter = 0;
+
+    /* Necessitated by floating point arithmetic used in the implementation. */
+    if (n1 >= IGRAPH_MAX_EXACT_REAL || n2 >= IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Number of vertices is too large.", IGRAPH_EOVERFLOW);
+    }
+
+    if (ecount_estimate > IGRAPH_ECOUNT_MAX) {
+        ecount_estimate = IGRAPH_ECOUNT_MAX;
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount_estimate));
+
+    for (igraph_int_t i = 0; i < n1; i++) {
+        igraph_int_t j = 0;
+
+        while (true) {
+            igraph_real_t gap = RNG_GEOM(p);
+
+            if (gap >= n2 - j) {
+                break;
+            }
+
+            j += gap;
+
+            if (!directed) {
+                /* Undirected graph */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+            } else if (mode == IGRAPH_IN) {
+                /* Incoming edges */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            } else if (mode == IGRAPH_OUT) {
+                /* Outgoing edges */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+            } else {
+                /* Both directions for IGRAPH_ALL */
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j + n1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            }
+
+            j += ! multiple; /* 1 for simple graph, 0 for multigraph */
+
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
+    }
+
+    /* n1 + n2 has already been checked for overflow in the caller function. */
+    IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_bipartite_game_gnp
+ * \brief Generates a random bipartite graph with a fixed connection probability.
+ *
+ * In the <code>G(n1, n2, p)</code> model, every possible edge between the \p n1
+ * bottom vertices and \p n2 top vertices is realized independently with
+ * probability \p p. This is equivalent to a maximum entropy model with
+ * a constraint on the \em expected total edge count. This view allows
+ * a multigraph extension, in which case \p is interpreted as the expected
+ * number of edges between any vertex pair. See \ref igraph_erdos_renyi_game_gnp()
+ * for more details.
+ *
+ * \param graph Pointer to an uninitialized igraph graph, the result
+ *    is stored here.
+ * \param types Pointer to an initialized boolean vector, or a null
+ *    pointer. If not \c NULL, then the vertex types are stored
+ *    here. Bottom vertices come first, \p n1 of them, then \p n2 top
+ *    vertices.
+ * \param n1 The number of bottom vertices.
+ * \param n2 The number of top vertices.
+ * \param p The expected number of edges between any vertex pair.
+ *    When multi-edges are disallowed, this is equivalent to the probability
+ *    of having a connection between any two vertices.
+ * \param directed Whether to generate a directed graph. See also
+ *     the \p mode argument.
+ * \param mode Specifies how to direct the edges in directed
+ *     graphs. If it is \c IGRAPH_OUT, then directed edges point from
+ *     bottom vertices to top vertices. If it is \c IGRAPH_IN, edges
+ *     point from top vertices to bottom vertices. \c IGRAPH_OUT and
+ *     \c IGRAPH_IN do not generate mutual edges. If this argument is
+ *     \c IGRAPH_ALL, then each edge direction is considered
+ *     independently and mutual edges might be generated. This
+ *     argument is ignored for undirected graphs.
+* \param allowed_edge_types The types of edges to allow in the graph.
+ *        \clist
+ *          \cli IGRAPH_SIMPLE_SW
+ *          simple graph (i.e. no multi-edges allowed).
+ *          \cli IGRAPH_MULTI_SW
+ *          multi-edges are allowed
+ *        \endclist
+ * \param edge_labeled If true, the model is defined over the set of ordered
+ *     edge lists, i.e. over the set of edge-labeled graphs. Set it to
+ *     \c false to select the classic bipartite Erdős-Rényi model.
+ *     The constants \c IGRAPH_EDGE_UNLABELED and \c IGRAPH_EDGE_LABELED
+ *     may be used instead of \c false and \c true for better readability.
+ * \return Error code.
+ *
+ * \sa \ref igraph_erdos_renyi_game_gnp() for the unipartite version,
+ * \ref igraph_bipartite_game_gnm() for the <code>G(n1, n2, m)</code> model.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
+igraph_error_t igraph_bipartite_game_gnp(
+        igraph_t *graph,
+        igraph_vector_bool_t *types,
+        igraph_int_t n1, igraph_int_t n2, igraph_real_t p,
+        igraph_bool_t directed, igraph_neimode_t mode,
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_bool_t edge_labeled) {
+
+    igraph_vector_int_t edges;
+    igraph_vector_t s;
+    igraph_int_t n;
+    igraph_real_t n1_real = (igraph_real_t) n1, n2_real = (igraph_real_t) n2; /* for floating-point operations */
+    igraph_bool_t loops, multiple;
+    int iter = 0;
+
+    if (n1 < 0 || n2 < 0) {
+        IGRAPH_ERROR("Invalid number of vertices for bipartite G(n,p) model.", IGRAPH_EINVAL);
+    }
+
+    /* Bipartite graphs cannot have self-loops. We ignore them. */
+    IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
+
+    if (multiple) {
+        if (p < 0.0) {
+            IGRAPH_ERROR(
+                "Invalid expected edge multiplicity given for "
+                "bipartite G(n,p) multigraph model.",
+                IGRAPH_EINVAL);
+        }
+    } else {
+        if (p < 0.0 || p > 1.0) {
+            IGRAPH_ERROR(
+                "Invalid connection probability given for bipartite G(n,p) model.",
+                IGRAPH_EINVAL);
+        }
+    }
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for bipartite G(n,p) model.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_SAFE_ADD(n1, n2, &n);
+
+    if (types) {
+        IGRAPH_CHECK(igraph_vector_bool_resize(types, n));
+        igraph_vector_bool_null(types);
+        for (igraph_int_t i = n1; i < n; i++) {
+            VECTOR(*types)[i] = true;
+        }
+    }
+
+    if (edge_labeled) {
+        return bipartite_gnp_edge_labeled(graph, n1, n2, p, directed, mode, multiple);
+    }
+
+    if (multiple) {
+        /* Convert the expected edge count to the appropriate probability parameter
+         * of the geometric distribution when sampling lengths of runs of 0s in the
+         * adjacency matrix. */
+        p = p / (1 + p);
+    }
+
+    if (p == 0 || n1 == 0 || n2 == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, n, directed));
+    } else if (p == 1.0) {
+        IGRAPH_CHECK(igraph_full_bipartite(graph, types, n1, n2, directed, mode));
     } else {
 
-        igraph_int_t i;
-        igraph_real_t maxedges;
+        igraph_int_t to, from, slen;
+        igraph_real_t maxedges, last;
+        igraph_int_t ecount_estimate;
 
         if (!directed || mode != IGRAPH_ALL) {
             maxedges = n1_real * n2_real;
@@ -1624,56 +1719,63 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
             maxedges = 2.0 * n1_real * n2_real;
         }
 
-        if (m > maxedges) {
-            IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &ecount_estimate));
+
+        if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+            /* Use a slightly slower, but overflow-free implementation. */
+            return gnp_bipartite_large(graph, n1, n2, p, directed, mode, multiple, ecount_estimate);
         }
 
-        if (maxedges == m) {
-            IGRAPH_CHECK(igraph_full_bipartite(graph, types, n1, n2, directed, mode));
-        } else {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+        IGRAPH_CHECK(igraph_vector_reserve(&s, ecount_estimate));
 
-            igraph_int_t to, from;
+        last = RNG_GEOM(p);
+        while (last < maxedges) {
+            IGRAPH_CHECK(igraph_vector_push_back(&s, last));
+            last += RNG_GEOM(p);
+            last += ! multiple; /* 1 for simple graph, 0 for multigraph */
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
+        }
 
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-            IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-            IGRAPH_CHECK(igraph_i_random_sample_real(&s, 0, maxedges - 1, m));
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
+        slen = igraph_vector_size(&s);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, slen * 2));
 
-            for (i = 0; i < m; i++) {
-                if (!directed || mode != IGRAPH_ALL) {
-                    to = floor(VECTOR(s)[i] / n1_real);
+        for (igraph_int_t i = 0; i < slen; i++) {
+            if (!directed || mode != IGRAPH_ALL) {
+                to = trunc(VECTOR(s)[i] / n1_real);
+                from = VECTOR(s)[i] - to * n1_real;
+                to += n1;
+            } else {
+                igraph_real_t n1n2 = n1_real * n2_real;
+                if (VECTOR(s)[i] < n1n2) {
+                    to = trunc(VECTOR(s)[i] / n1_real);
                     from = VECTOR(s)[i] - to * n1_real;
                     to += n1;
                 } else {
-                    igraph_real_t n1n2 = n1_real * n2_real;
-                    if (VECTOR(s)[i] < n1n2) {
-                        to = floor(VECTOR(s)[i] / n1_real);
-                        from = VECTOR(s)[i] - to * n1_real;
-                        to += n1;
-                    } else {
-                        to = floor((VECTOR(s)[i] - n1n2) / n2_real);
-                        from = VECTOR(s)[i] - n1n2 - to * n2_real;
-                        from += n1;
-                    }
+                    to = trunc((VECTOR(s)[i] - n1n2) / n2_real);
+                    from = VECTOR(s)[i] - n1n2 - to * n2_real;
+                    from += n1;
                 }
-
-                if (mode != IGRAPH_IN) {
-                    igraph_vector_int_push_back(&edges, from); /* reserved */
-                    igraph_vector_int_push_back(&edges, to); /* reserved */
-                } else {
-                    igraph_vector_int_push_back(&edges, to); /* reserved */
-                    igraph_vector_int_push_back(&edges, from); /* reserved */
-                }
-
-                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
 
-            igraph_vector_destroy(&s);
-            IGRAPH_FINALLY_CLEAN(1);
-            IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-            igraph_vector_int_destroy(&edges);
-            IGRAPH_FINALLY_CLEAN(1);
+            if (mode != IGRAPH_IN) {
+                igraph_vector_int_push_back(&edges, from); /* reserved */
+                igraph_vector_int_push_back(&edges, to); /* reserved */
+            } else {
+                igraph_vector_int_push_back(&edges, to); /* reserved */
+                igraph_vector_int_push_back(&edges, from); /* reserved */
+            }
+
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
+
+        igraph_vector_destroy(&s);
+        IGRAPH_FINALLY_CLEAN(1);
+
+        IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+        igraph_vector_int_destroy(&edges);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     return IGRAPH_SUCCESS;

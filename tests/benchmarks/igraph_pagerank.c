@@ -54,7 +54,7 @@ int main(void) {
     );
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 100, 1000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 100, 1000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     BENCH(" 5 PageRank, GNM(100,1000), PRPACK, 1000x",
           REPEAT(igraph_pagerank(&graph, NULL, &res, NULL, 0.85, IGRAPH_DIRECTED, igraph_vss_all(),
                                  IGRAPH_PAGERANK_ALGO_PRPACK, NULL), 1000)
@@ -65,7 +65,7 @@ int main(void) {
     );
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 200, 4000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 200, 4000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     BENCH(" 7 PageRank, GNM(200,4000), PRPACK, 1000x",
           REPEAT(igraph_pagerank(&graph, NULL, &res, NULL, 0.85, IGRAPH_DIRECTED, igraph_vss_all(),
                                  IGRAPH_PAGERANK_ALGO_PRPACK, NULL), 1000)
@@ -76,7 +76,7 @@ int main(void) {
     );
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 10000, 20000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 10000, 20000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     BENCH(" 9 PageRank, GNM(10000,20000), PRPACK, 100x",
           REPEAT(igraph_pagerank(&graph, NULL, &res, NULL, 0.85, IGRAPH_DIRECTED, igraph_vss_all(),
                                  IGRAPH_PAGERANK_ALGO_PRPACK, NULL), 100)
@@ -87,7 +87,7 @@ int main(void) {
     );
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 100000, 100000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 100000, 100000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     BENCH("11 PageRank, GNM(100000,100000), PRPACK, 10x",
           REPEAT(igraph_pagerank(&graph, NULL, &res, NULL, 0.85, IGRAPH_DIRECTED, igraph_vss_all(),
                                  IGRAPH_PAGERANK_ALGO_PRPACK, NULL), 10)
@@ -98,7 +98,7 @@ int main(void) {
     );
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 100000, 500000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 100000, 500000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     BENCH("13 PageRank, GNM(100000,500000), PRPACK, 10x",
           REPEAT(igraph_pagerank(&graph, NULL, &res, NULL, 0.85, IGRAPH_DIRECTED, igraph_vss_all(),
                                  IGRAPH_PAGERANK_ALGO_PRPACK, NULL), 10)

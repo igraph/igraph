@@ -274,10 +274,16 @@ igraph_barabasi_game:
         OPTIONAL GRAPH start_from
 
 igraph_erdos_renyi_game_gnp:
-    PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE,
+        BOOLEAN edge_labeled=False
 
 igraph_erdos_renyi_game_gnm:
-    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False, BOOLEAN multiple=False
+    PARAMS: |-
+        OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE,
+        BOOLEAN edge_labeled=False
 
 igraph_iea_game:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False
@@ -1232,14 +1238,16 @@ igraph_is_bipartite:
 igraph_bipartite_game_gnp:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
-        INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed=False,
-        NEIMODE mode=ALL
+        INTEGER n1, INTEGER n2, REAL p, 
+        BOOLEAN directed=False, NEIMODE mode=ALL,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE, BOOLEAN edge_labeled=False
 
 igraph_bipartite_game_gnm:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
-        INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed=False,
-        NEIMODE mode=ALL, BOOLEAN multiple=False
+        INTEGER n1, INTEGER n2, INTEGER m, 
+        BOOLEAN directed=False, NEIMODE mode=ALL, 
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE, BOOLEAN edge_labeled=False
 
 igraph_bipartite_iea_game:
     PARAMS: |-

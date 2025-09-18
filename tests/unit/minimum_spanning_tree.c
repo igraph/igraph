@@ -40,7 +40,7 @@ int main(void) {
     igraph_vector_init(&weights, 0);
     igraph_vector_int_init(&edges, 0);
 
-    igraph_erdos_renyi_game_gnm(&g, 50, 100, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 50, 100, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
 
     igraph_connected_components(&g, NULL, NULL, &no_comps, IGRAPH_WEAK);

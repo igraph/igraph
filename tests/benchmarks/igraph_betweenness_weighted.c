@@ -109,7 +109,7 @@ int main(void) {
 #define NAME "GNM(3000,10000)"
 #define REP 1
 
-    igraph_erdos_renyi_game_gnm(&graph, 3000, 10000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 3000, 10000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
 
     BENCH(" 9 Betweenness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
           REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
@@ -137,7 +137,7 @@ int main(void) {
 #define NAME "GNM(3000,30000)"
 #define REP 1
 
-    igraph_erdos_renyi_game_gnm(&graph, 3000, 30000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 3000, 30000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
 
     BENCH("13 Betweenness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
           REPEAT(igraph_betweenness(&graph, NULL, &betweenness, igraph_vss_all(), IGRAPH_DIRECTED, false), REP)
