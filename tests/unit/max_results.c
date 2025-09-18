@@ -191,6 +191,44 @@ int main(void) {
     igraph_vector_int_list_resize(&results_full, max_results);
     IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
 
+    /* Simple paths */
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 0;
+    igraph_get_all_simple_paths(&graph, &results_full, 0, igraph_vss_1(4), IGRAPH_ALL, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
+    igraph_get_all_simple_paths(&graph, &results_limited, 0, igraph_vss_1(4), IGRAPH_ALL, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 5;
+    igraph_get_all_simple_paths(&graph, &results_full, 0, igraph_vss_1(4), IGRAPH_ALL, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
+    igraph_get_all_simple_paths(&graph, &results_limited, 0, igraph_vss_1(4), IGRAPH_ALL, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 4;
+    igraph_get_all_simple_paths(&graph, &results_full, 0, igraph_vss_1(4), IGRAPH_ALL, 3, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
+    igraph_get_all_simple_paths(&graph, &results_limited, 0, igraph_vss_1(4), IGRAPH_ALL, 3, IGRAPH_UNLIMITED, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
+    igraph_vector_int_list_clear(&results_full);
+    igraph_vector_int_list_clear(&results_limited);
+    max_results = 3;
+    igraph_get_all_simple_paths(&graph, &results_full, 0, igraph_vss_1(4), IGRAPH_ALL, 3, 4, IGRAPH_UNLIMITED);
+    igraph_get_all_simple_paths(&graph, &results_limited, 0, igraph_vss_1(4), IGRAPH_ALL, 3, 4, max_results);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_limited) == max_results);
+    igraph_vector_int_list_resize(&results_full, max_results);
+    IGRAPH_ASSERT(veclist_is_equal(&results_limited, &results_full));
+
     igraph_vector_destroy(&vertex_weights);
     igraph_destroy(&graph);
     igraph_vector_int_list_destroy(&results_limited);
