@@ -25,7 +25,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <time.h>
 
 IGRAPH_BEGIN_C_DECLS
 

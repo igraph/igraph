@@ -20,7 +20,6 @@
 #define IGRAPH_OPERATORS_H
 
 #include "igraph_decls.h"
-
 #include "igraph_attributes.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"

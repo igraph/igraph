@@ -20,7 +20,6 @@
 #define IGRAPH_HRG_H
 
 #include "igraph_decls.h"
-
 #include "igraph_datatype.h"
 #include "igraph_error.h"
 #include "igraph_graph_list.h"

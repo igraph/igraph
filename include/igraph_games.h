@@ -26,7 +26,6 @@
 #include "igraph_graphicality.h"
 #include "igraph_matrix.h"
 #include "igraph_matrix_list.h"
-#include "igraph_random.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
