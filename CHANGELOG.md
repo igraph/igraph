@@ -4,20 +4,29 @@
 
 Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence, as well as adding new features that required API-breaking changes. There is an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
 
+### Highlights
+
+- A more consistant and more predictable API.
+- Explicit versioning policy.
+- Several random graph generators, including the Erdős-Rényi generators, can now produce graphs with multi-edges.
+- Several functions that can generate a large number of results (cliques, cycles, etc.) now have a feature to limit the number of returned results, or to return a single result only.
+- Functionality for generating several kinds of spatial networks.
+
 ### Breaking changes
 
-This section gives detailed on breaking changes you need to consider when updating code written for igraph 0.10.x.
+This section lists API-breaking changes in this version, and provides guidance on adapting code written for igraph 0.10.x.
 
 #### General changes
 
 - igraph now requires a C++ compiler that supports the C++14 standard.
-- `igraph_setup()` is now recommended to be called before using the library. This function may gain essential functions in the future. See below for details.
+- `igraph_setup()` is now recommended to be called before using the library. This function may gain essential functions in the future. See the "Added" section below for details.
 - `igraph_integer_t` was renamed to `igraph_int_t`, but `igraph_integer_t` is kept as an alias and it will remain available for at least the next major version. Library headers and source code uses `igraph_int_t` from now on.
-- `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
-- Interruption handlers do not take a `void*` argument any more; this is relevant to maintainers of higher-level interfaces only.
+- `igraph_rng_set_default()` now returns a pointer to the previous default RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` object must continue to exist for as long as it is used as the default RNG.
+- Interruption handlers do not take a `void *` argument any more; this is relevant to maintainers of higher-level interfaces only.
 - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
 - `igraph_status()`, `igraph_statusf()` and their macro versions (`IGRAPH_STATUS()` and `IGRAPH_STATUSF()`) do not convert error codes to `IGRAPH_INTERRUPTED` any more. Any error code returned from the status handler function is forwarded intact to the caller. If you want to trigger the interruption of the current calculation from the status handler without reporting an error, report `IGRAPH_INTERRUPTED` explicitly. It is the responsibility of higher-level interfaces to handle this error code appropriately.
 - The `RNG_BEGIN()` and `RNG_END()` macros were removed. You are now responsible for seeding the RNG before using any igraph function that may use random numbers by calling `igraph_rng_seed(igraph_rng_default(), ...)`, or by simply ensuring that `igraph_setup()` was called before the first use of the library.
+- Projects that depend on igraph must only include the `<igraph.h>` header. While an igraph installation includes several sub-headers, these are for organizational purposes only, and their contents may change without notice. Only `#include <igraph.h>` is supported.
 
 #### Error codes
 
@@ -33,7 +42,7 @@ This section gives detailed on breaking changes you need to consider when updati
 
 #### Core data structures
 
-- `igraph_strvector_push_back_len()` now takes a length parameter of `size_t` instead of `igraph_integer_t`.
+- `igraph_strvector_push_back_len()` now takes a length parameter of `size_t` instead of `igraph_int_t`.
 - `igraph_strvector_print()` no longer takes a file parameter. Use `igraph_strvector_fprint()` to print to a file.
 - `igraph_vector_reverse()` no longer returns an error code.
 - `igraph_vector_shuffle()` no longer returns an error code.
@@ -54,17 +63,17 @@ This section gives detailed on breaking changes you need to consider when updati
 
 #### Core graph manipulation
 
-- `igraph_delete_vertices_map()` (formerly called `igraph_delete_vertices_idx()`) and `igraph_induced_subgraph_map()` now use `-1` to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. (Note that the inverse map always behaved this way, this change makes the two mappings consistent).
-- `igraph_edges()` gained a new `bycol` argument that determines the order in which the edges are returned. `bycol = false` reproduces the existing behaviour, while `bycol = true` returns the edges suitable for a matrix stored in column-wise order.
-- `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()`.
-- `igraph_incident()` and `igraph_es_incident()` gained an extra arguments to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`.
-- `igraph_multiple_t` was removed from the public API as it is essentially a boolean. The symbolic constants `IGRAPH_MULTIPLE` and `IGRAPH_NO_MULTIPLE` were kept to improve readability of code written directly in C.
+- `igraph_delete_vertices_map()` (formerly called `igraph_delete_vertices_idx()`) and `igraph_induced_subgraph_map()` now use `-1` to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. Note that the inverse map always behaved this way, this change makes the two mappings consistent.
+- `igraph_edges()` gained a new `igraph_bool_t bycol` argument that determines the order in which the edges are returned. `bycol = false` reproduces the existing behaviour, while `bycol = true` returns the edges suitable for a matrix stored in column-wise order.
+- `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments, `igraph_loops_t loops` and `igraph_bool_t multiple` to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()`. Use `loops = IGRAPH_LOOPS_TWICE` and `multiple = true` to reproduce the previous behavior.
+- `igraph_incident()` and `igraph_es_incident()` gained an extra `igraph_loops_t loops` argument to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`. Use `loop = IGRAPH_LOOPS_TWICW` to reproduce the previous behavior.
+- The `igraph_multiple_t` enum type was removed from the public API as it was essentially a Boolean. The symbolic constants `IGRAPH_MULTIPLE` (same as `true`) and `IGRAPH_NO_MULTIPLE` (same as `false`) were kept to improve readability of code written directly in C.
 
 #### Basic graph properties
 
 - `igraph_density()` now takes an optional `weights` parameter.
 - `igraph_is_simple()` gained an extra `igraph_bool_t` argument that decides whether edge directions should be considered. Directed graphs with a mutual edge pair are treated as non-simple if this argument is set to `IGRAPH_UNDIRECTED` (which treats the graph as if it was undirected).
-- The type of the `loops` argument of `igraph_adjlist_init_complementer()`, `igraph_centralization_degree()`, `igraph_centralization_degree_tmax()`, `igraph_degree()`, `igraph_maxdegree()`, `igraph_sort_vertex_ids_by_degree()` and `igraph_strength()` was changed to `igraph_loops_t` from `igraph_bool_t`, allowing finer-grained control about how loop edges are treated.
+- The type of the `loops` argument of `igraph_adjlist_init_complementer()`, `igraph_centralization_degree()`, `igraph_centralization_degree_tmax()`, `igraph_degree()`, `igraph_maxdegree()`, `igraph_sort_vertex_ids_by_degree()` and `igraph_strength()` was changed to `igraph_loops_t` from `igraph_bool_t`, allowing finer-grained control about how loop edges are treated. Pass `IGRAPH_LOOPS_TWICE` and `IGRAPH_NO_LOOPS` to reproduce the previous behaviour of `true` and `false`.
 - `igraph_get_biadjacency()` now takes a `weights` parameter, and can optionally create weighted biadjacency matrices.
 - `igraph_adjacency()` now treats `IGRAPH_LOOPS_TWICE` as `IGRAPH_LOOPS_ONCE` when the mode is `IGRAPH_ADJ_DIRECTED`, `IGRAPH_ADJ_UPPER` or `IGRAPH_ADJ_LOWER`. For directed graphs, this is for the sake of consistency with the rest of the library where `IGRAPH_LOOPS_TWICE` is considered for undirected graphs only. For the "upper" and "lower" modes, double-counting the diagonal makes no sense because the double-counting artifact appears when you add the _transpose_ of an upper (or lower) diagonal matrix on top of the matrix itself. See Github issue #2501 for more context.
 
@@ -72,13 +81,15 @@ This section gives detailed on breaking changes you need to consider when updati
 
 - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`, `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` no longer interprets an empty `outseq` vector as a missing out-degree sequence. Pass `NULL` if you don't wish to specify an out-degree sequence.
 - `igraph_degree_sequence_game()` no longer interprets an empty in-degree vector as a request for generating undirected graphs. To generate undirected graphs, pass `NULL` for in-degrees.
-- `igraph_erdos_renyi_game_gnm()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`, and can uniformly sample multigraphs. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists (equivalent to `igraph_iea_game()` for multigraphs).
-- `igraph_erdos_renyi_game_gnp()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists.
-- `igraph_bipartite_game_gnm()` gained an `igraph_edge_type_sw_t allowed_edge_types` parameter, and can uniformly sample multigraphs. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists (equivalent to `igraph_bipartite_iea_game()` for multigraphs).
+- `igraph_erdos_renyi_game_gnm()` uses a `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `igraph_bool_t loops`, and can now uniformly sample not only simple graphs but also multigraphs. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists (equivalent to `igraph_iea_game()` for multigraphs).
+- `igraph_erdos_renyi_game_gnp()` uses a `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `igraph_bool_t loops`, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists.
+- `igraph_bipartite_game_gnm()` gained an `igraph_edge_type_sw_t allowed_edge_types` parameter, and can now uniformly sample not only simple graphs but also multigraphs. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists (equivalent to `igraph_bipartite_iea_game()` for multigraphs).
 - `igraph_bipartite_game_gnp()` gained an `igraph_edge_type_sw_t allowed_edge_types` parameter, and can now sample multigraphs from a maximum entropy model with a prescribed _expected_ edge multiplicity. It also gained an `edge_labeled` Boolean parameter which controls whether to sample from the set of ordered edge lists.
 - `igraph_lcf()` was renamed to `igraph_lcf_small()` and `igraph_lcf_vector()` was renamed to `igraph_lcf()`. Now `igraph_lcf()` takes shifts as a vector input, while `igraph_lcf_small()` accepts a shorthand notation where shifts are given as a variable number of function arguments.
-- `igraph_sbm_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `igraph_bool_t loops` and supports generating graphs with multi-edges. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
+- `igraph_sbm_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `igraph_bool_t loops` and now supports generating graphs with multi-edges. The parameter determining the total number of vertices (`n`) was removed as it was redundant.
 - `igraph_rewire_edges()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
+- `igraph_rewire()` now takes an `igraph_edge_type_sw_t allowed_edge_types` parameter to specify whether to create self-loops. The `igraph_rewiring_t` enum type was removed. Instead of the old `IGRAPH_REWIRING_SIMPLE`, use `IGRAPH_SIMPLE_SW`. Instead of the old `IGRAPH_REWIRING_SIMPLE_LOOPS`, use `IGRAPH_LOOPS_SW`.
+- `igraph_rewire()` now takes an optional `igraph_rewiring_stats_t *` output argument. You can pass the appropriate struct there to find out the number of successful swaps during the rewiring operation.
 - `igraph_watts_strogatz_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_static_fitness_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_static_power_law_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
@@ -119,7 +130,7 @@ This section gives detailed on breaking changes you need to consider when updati
 
 #### Centralities
 
-- All betweenness functions got `normalized` parameter to support normalizing the result by the number of vertex pairs in the graph. At the same time, parameter ordering was standardized. The following functions are affected: `igraph_betweenness()`, `igraph_betweenness_cutoff()`, `igraph_edge_betweenness()`, `igraph_edge_betweenness_cutoff()`, `igraph_betweenness_subset()`, `igraph_edge_betweenness_subset()`.
+- All betweenness functions got a `normalized` parameter to support normalizing the result by the number of vertex pairs in the graph. At the same time, their parameter ordering was standardized. The following functions are affected: `igraph_betweenness()`, `igraph_betweenness_cutoff()`, `igraph_edge_betweenness()`, `igraph_edge_betweenness_cutoff()`, `igraph_betweenness_subset()`, `igraph_edge_betweenness_subset()`.
 - `igraph_edge_betweenness()` and `igraph_edge_betweenness_cutoff()` now have an `eids` parameter to return only a subset of results. This makes their interface consistent with other betweenness functions.
 - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` now use a `mode` parameter with possible values `IGRAPH_OUT`, `IGRAPH_IN` or `IGRAPH_ALL` to control how edge directions are considered. Previously they used a boolean `directed` parameter.
 - `igraph_eigenvector_centrality()`, `igraph_centralization_eigenvector_centrality()` and `igraph_centralization_eigenvector_centrality_tmax()` no longer have a `scale` parameter. The result is now always scaled so that the largest centrality value is 1.
@@ -144,8 +155,6 @@ This section gives detailed on breaking changes you need to consider when updati
 - `igraph_motifs_randesu_no()` and `igraph_motifs_randesu_estimate()` now take an `igraph_real_t` as their `result` argument to prevent overflows when igraph is compiled with 32-bit integers.
 - The `igraph_motifs_handler_t` callback type now takes a `const igraph_vector_int_t *vids` parameter. Previously this was not formally `const`, even though it was not allowed to modify `vids`. This affects uses of `igraph_motifs_randesu_callback()`.
 - The experimental functions `igraph_fundamental_cycles()` and `igraph_minimum_cycle_basis()` now use the type `igraph_real_t` for their `bfs_cutoff` parameter, and had their `weights` parameter moved to the 2nd position.
-- `igraph_rewire()` now takes an `igraph_edge_type_sw_t` parameter to specify whether to create self-loops. The `igraph_rewiring_t` enum type was removed. Instead of the old `IGRAPH_REWIRING_SIMPLE`, use `IGRAPH_SIMPLE_SW`. Instead of the old `IGRAPH_REWIRING_SIMPLE_LOOPS`, use `IGRAPH_LOOPS_SW`.
-- `igraph_rewire()` now takes an optional `igraph_rewiring_stats_t*` output argument. You can pass the appropriate struct there to find out the number of successful swaps during the rewiring operation.
 
 #### Foreign formats
 
@@ -170,7 +179,7 @@ This section gives detailed on breaking changes you need to consider when updati
 - `igraph_spatial_edge_lengths()` computes edges lengths based on spatial vertex coordinates (experimental function).
 - `igraph_community_leiden_simple()` is a simplified interface to `igraph_community_leiden()` that allows selecting the objective function to maximize directly.
 - `igraph_vector_difference_and_intersection_sorted()` calculates the intersection and the differences of two vectors simultaneously.
-- `IGRAPH_UNLIMITED`, defined to `-1`, is a convenience constant for use with various "size limit" parameters, such as number of cliques returns, maximum path length, etc. It indicates that no limit should be used.
+- `IGRAPH_UNLIMITED`, defined to `-1`, is a convenience constant for use with various "size limit" parameters, such as number of cliques returned, maximum path length, number of results returned, etc. It indicates that no limit should be used.
 
 ### Changed
 
