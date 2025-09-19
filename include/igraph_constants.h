@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,21 +27,83 @@ IGRAPH_BEGIN_C_DECLS
 /* Constants                                          */
 /* -------------------------------------------------- */
 
+/**
+ * \define IGRAPH_UNLIMITED
+ * \brief Constant for "do not limit results".
+ *
+ * A constant signifying that no limitation should be used with various cutoff,
+ * size limit or result set size parameters, such as minimum or maximum clique
+ * size, number of results returned, cutoff for path lengths, etc. Currently
+ * defined to <code>-1</code>.
+ */
+#define IGRAPH_UNLIMITED (-1)
+/* Note to maintainers: IGRAPH_UNLIMITED is intended to support readability
+ * when *negative* parameter values indicate "no limit". Do not test
+ * directly against IGRAPH_UNLIMITED in implementations, test for negative
+ * values instead. */
+
 /* These constants are meant to be used for sake of readability */
 enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
 enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
+enum { IGRAPH_EDGE_UNLABELED = 0, IGRAPH_EDGE_LABELED = 1 };
 
-/* Note for the enum below: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
+/**
+ * \typedef igraph_loops_t
+ * \brief How to interpret self-loops in undirected graphs?
+ *
+ * Controls the interpretation of self-loops in undirected graphs, typically
+ * in the context of adjacency matrices or degrees.
+ *
+ * </para><para>These constants are also used to improve readability in
+ * boolean contexts, with \c IGRAPH_NO_LOOPS, equivalent to \c false,
+ * signifying that loops should be ignored and \c IGRAPH_LOOPS, equivalent
+ * to \c true, that loops should be considered.
+ *
+ * \enumval IGRAPH_NO_LOOPS Self-loops are ignored.
+ * \enumval IGRAPH_LOOPS_TWICE Self-loops are considered, and counted twice
+ *    in undirected graphs. For example, a self-loop contributes two to the
+ *    degree of a vertex and to diagonal entries of adjacency matrices. This
+ *    is the standard interpretation in graph theory, thus \c IGRAPH_LOOPS
+ *    serves as an alias for this option.
+ * \enumval IGRAPH_LOOPS_ONCE Self-loops are considered, and counted only
+ *    once in undirected graphs.
+ */
+typedef enum {
+    IGRAPH_NO_LOOPS = 0,
+    IGRAPH_LOOPS_TWICE = 1,
+    IGRAPH_LOOPS_ONCE = 2,
+    IGRAPH_LOOPS = IGRAPH_LOOPS_TWICE
+} igraph_loops_t;
+/* Note for the enum above: yes, IGRAPH_LOOPS_TWICE is 1, and IGRAPH_LOOPS_ONCE
  * is 2. This is intentional, for the sake of backwards compatibility with
  * earlier versions where we only had IGRAPH_LOOPS and it meant
  * IGRAPH_LOOPS_TWICE */
-typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1, IGRAPH_LOOPS_TWICE = 1, IGRAPH_LOOPS_ONCE = 2 } igraph_loops_t;
 
 typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
-/* Do not renumber the following values! Some internal code treats them as bitmasks
+/**
+ * \typedef igraph_neimode_t
+ * \brief How to interpret edge directions in directed graphs?
+ *
+ * These "neighbor mode" constants are typically used to specify the treatment
+ * of edge directions in directed graphs, or which vertices to consider as
+ * adjacent to (i.e. neighbor of) a vertex. It is typically ignored in undirected
+ * graphs.
+ *
+ * \enumval IGRAPH_OUT Follow edge directions in directed graphs, or consider
+ *    out-neighbors of vertices.
+ * \enumval IGRAPH_IN Follow edges in the reverse direction in directed graphs,
+ *    or consider in-neighbors of vertices.
+ * \enumval IGRAPH_ALL Ignore edge directions in directed graphs, or consider
+ *    all neighbours (both out and in-neighbors) of vertices.
+ */
+typedef enum {
+    IGRAPH_OUT = 1,
+    IGRAPH_IN = 2,
+    IGRAPH_ALL = 3
+} igraph_neimode_t;
+/* Do not renumber the vaues above! Some internal code treats them as bitmasks
  * and assumes that IGRAPH_ALL == IGRAPH_IN | IGRAPH_OUT and IGRAPH_IN & IGRAPH_OUT == 0. */
-typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
 
 /* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
 #define IGRAPH_REVERSE_MODE(mode) \
@@ -206,9 +268,9 @@ typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
  * \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
  */
 typedef enum {
-    IGRAPH_LPA_DOMINANCE = 0, // Sample from dominant labels, check for dominance after each iteration
-    IGRAPH_LPA_RETENTION,     // Keep current label if among dominant labels, only check if labels changed
-    IGRAPH_LPA_FAST           // Sample from dominant labels, only check neighbors
+    IGRAPH_LPA_DOMINANCE = 0, /* Sample from dominant labels, check for dominance after each iteration. */
+    IGRAPH_LPA_RETENTION,     /* Keep current label if among dominant labels, only check if labels changed. */
+    IGRAPH_LPA_FAST           /* Sample from dominant labels, only check neighbors. */
 } igraph_lpa_variant_t;
 
 IGRAPH_END_C_DECLS

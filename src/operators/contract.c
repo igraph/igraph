@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -63,12 +63,12 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
                              const igraph_vector_int_t *mapping,
                              const igraph_attribute_combination_t *vertex_comb) {
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t vattr = vertex_comb && igraph_has_attribute_table();
     igraph_t res;
-    igraph_integer_t last;
-    igraph_integer_t no_new_vertices;
+    igraph_int_t last;
+    igraph_int_t no_new_vertices;
 
     if (igraph_vector_int_size(mapping) != no_of_nodes) {
         IGRAPH_ERRORF("Mapping vector length (%" IGRAPH_PRId ") "
@@ -87,12 +87,12 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
         last = -1;
     }
 
-    for (igraph_integer_t edge = 0; edge < no_of_edges; edge++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, edge);
-        igraph_integer_t to = IGRAPH_TO(graph, edge);
+    for (igraph_int_t edge = 0; edge < no_of_edges; edge++) {
+        igraph_int_t from = IGRAPH_FROM(graph, edge);
+        igraph_int_t to = IGRAPH_TO(graph, edge);
 
-        igraph_integer_t nfrom = VECTOR(*mapping)[from];
-        igraph_integer_t nto = VECTOR(*mapping)[to];
+        igraph_int_t nfrom = VECTOR(*mapping)[from];
+        igraph_int_t nto = VECTOR(*mapping)[to];
 
         igraph_vector_int_push_back(&edges, nfrom);
         igraph_vector_int_push_back(&edges, nto);
@@ -124,8 +124,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&merges, no_new_vertices);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, no_new_vertices);
 
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t to = VECTOR(*mapping)[i];
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+            igraph_int_t to = VECTOR(*mapping)[i];
             igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&merges, to);
             VECTOR(sizes)[to] += 1;
             IGRAPH_CHECK(igraph_vector_int_push_back(v, i));

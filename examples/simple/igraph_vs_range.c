@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -27,7 +27,10 @@ int main(void) {
     igraph_vs_t vs;
     igraph_vit_t vit;
     igraph_t g;
-    igraph_integer_t size;
+    igraph_int_t size;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
     igraph_vs_range(&vs, 0, 10);

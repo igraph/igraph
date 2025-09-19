@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -35,13 +35,13 @@
 static igraph_error_t layout_reingold_tilford_unreachable(
     const igraph_t *graph,
     igraph_neimode_t mode,
-    igraph_integer_t real_root,
-    igraph_integer_t no_of_nodes,
+    igraph_int_t real_root,
+    igraph_int_t no_of_nodes,
     igraph_vector_int_t *pnewedges) {
 
-    igraph_integer_t no_of_newedges;
+    igraph_int_t no_of_newedges;
     igraph_vector_bool_t visited;
-    igraph_integer_t i, j, n;
+    igraph_int_t i, j, n;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
@@ -59,12 +59,12 @@ static igraph_error_t layout_reingold_tilford_unreachable(
     /* start from real_root and go BFS */
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, real_root));
     while (!igraph_dqueue_int_empty(&q)) {
-        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+        igraph_int_t actnode = igraph_dqueue_int_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
         VECTOR(visited)[actnode] = true;
         for (j = 0; j < n; j++) {
-            igraph_integer_t neighbor = VECTOR(*neis)[j];
+            igraph_int_t neighbor = VECTOR(*neis)[j];
             if (!VECTOR(visited)[neighbor]) {
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
             }
@@ -105,26 +105,26 @@ static igraph_error_t layout_reingold_tilford_unreachable(
 
 /* Internal structure for Reingold-Tilford layout */
 struct reingold_tilford_vertex {
-    igraph_integer_t parent;        /* Parent node index */
-    igraph_integer_t level;         /* Level of the node */
+    igraph_int_t parent;        /* Parent node index */
+    igraph_int_t level;         /* Level of the node */
     igraph_real_t offset;     /* X offset from parent node */
-    igraph_integer_t left_contour;  /* Next left node of the contour
+    igraph_int_t left_contour;  /* Next left node of the contour
               of the subtree rooted at this node */
-    igraph_integer_t right_contour; /* Next right node of the contour
+    igraph_int_t right_contour; /* Next right node of the contour
               of the subtree rooted at this node */
     igraph_real_t offset_to_left_contour;  /* X offset when following the left contour */
     igraph_real_t offset_to_right_contour;  /* X offset when following the right contour */
-    igraph_integer_t left_extreme;  /* Leftmost node on the deepest layer of the subtree rooted at this node */
-    igraph_integer_t right_extreme; /* Rightmost node on the deepest layer of the subtree rooted at this node */
+    igraph_int_t left_extreme;  /* Leftmost node on the deepest layer of the subtree rooted at this node */
+    igraph_int_t right_extreme; /* Rightmost node on the deepest layer of the subtree rooted at this node */
     igraph_real_t offset_to_left_extreme;  /* X offset when jumping to the left extreme node */
     igraph_real_t offset_to_right_extreme;  /* X offset when jumping to the right extreme node */
 };
 
 static void layout_reingold_tilford_postorder(struct reingold_tilford_vertex *vdata,
-                                                      igraph_integer_t node, igraph_integer_t vcount);
+                                                      igraph_int_t node, igraph_int_t vcount);
 static void layout_reingold_tilford_calc_coords(struct reingold_tilford_vertex *vdata,
-                                                        igraph_matrix_t *res, igraph_integer_t node,
-                                                        igraph_integer_t vcount, igraph_real_t xpos);
+                                                        igraph_matrix_t *res, igraph_int_t node,
+                                                        igraph_int_t vcount, igraph_real_t xpos);
 
 /* uncomment the next line for debugging the Reingold-Tilford layout */
 /* #define LAYOUT_RT_DEBUG 1 */
@@ -132,9 +132,9 @@ static void layout_reingold_tilford_calc_coords(struct reingold_tilford_vertex *
 static igraph_error_t layout_reingold_tilford(const igraph_t *graph,
                                             igraph_matrix_t *res,
                                             igraph_neimode_t mode,
-                                            igraph_integer_t root) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i, n, j;
+                                            igraph_int_t root) {
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t i, n, j;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
@@ -173,13 +173,13 @@ static igraph_error_t layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, root));
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
     while (!igraph_dqueue_int_empty(&q)) {
-        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-        igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+        igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+        igraph_int_t actdist = igraph_dqueue_int_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
 
         for (j = 0; j < n; j++) {
-            igraph_integer_t neighbor = VECTOR(*neis)[j];
+            igraph_int_t neighbor = VECTOR(*neis)[j];
             if (vdata[neighbor].parent >= 0) {
                 continue;
             }
@@ -228,11 +228,11 @@ static igraph_error_t layout_reingold_tilford(const igraph_t *graph,
 
 static void layout_reingold_tilford_calc_coords(
         struct reingold_tilford_vertex *vdata,
-        igraph_matrix_t *res, igraph_integer_t node,
-        igraph_integer_t vcount, igraph_real_t xpos) {
+        igraph_matrix_t *res, igraph_int_t node,
+        igraph_int_t vcount, igraph_real_t xpos) {
 
     MATRIX(*res, node, 0) = xpos;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -245,9 +245,9 @@ static void layout_reingold_tilford_calc_coords(
 
 static void layout_reingold_tilford_postorder(
         struct reingold_tilford_vertex *vdata,
-        igraph_integer_t node, igraph_integer_t vcount) {
+        igraph_int_t node, igraph_int_t vcount) {
 
-    igraph_integer_t childcount, leftroot, leftrootidx;
+    igraph_int_t childcount, leftroot, leftrootidx;
     const igraph_real_t minsep = 1;
     igraph_real_t avg;
 
@@ -257,7 +257,7 @@ static void layout_reingold_tilford_postorder(
 
     /* Check whether this node is a leaf node */
     childcount = 0;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -285,7 +285,7 @@ static void layout_reingold_tilford_postorder(
 #ifdef LAYOUT_RT_DEBUG
     printf("Visited node %" IGRAPH_PRId " and arranged its subtrees\n", node);
 #endif
-    for (igraph_integer_t i = 0, j = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0, j = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -293,7 +293,7 @@ static void layout_reingold_tilford_postorder(
             if (leftroot >= 0) {
                 /* Now we will follow the right contour of leftroot and the
                  * left contour of the subtree rooted at i */
-                igraph_integer_t lnode, rnode, auxnode;
+                igraph_int_t lnode, rnode, auxnode;
                 igraph_real_t loffset, roffset, rootsep, newoffset;
 
 #ifdef LAYOUT_RT_DEBUG
@@ -432,7 +432,7 @@ static void layout_reingold_tilford_postorder(
     vdata[node].offset_to_right_contour -= avg;
     vdata[node].offset_to_left_extreme -= avg;
     vdata[node].offset_to_right_extreme -= avg;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -448,7 +448,7 @@ static void layout_reingold_tilford_postorder(
 static igraph_error_t layout_reingold_tilford_cluster_degrees_directed(
         const igraph_t *graph,
         const igraph_vector_int_t *membership,
-        igraph_integer_t no_comps,
+        igraph_int_t no_comps,
         igraph_neimode_t mode,
         igraph_vector_int_t *degrees) {
 
@@ -465,15 +465,15 @@ static igraph_error_t layout_reingold_tilford_cluster_degrees_directed(
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
+        igraph_int_t eid = IGRAPH_EIT_GET(eit);
 
-        igraph_integer_t from = IGRAPH_FROM(graph, eid);
-        igraph_integer_t to   = IGRAPH_TO(graph, eid);
+        igraph_int_t from = IGRAPH_FROM(graph, eid);
+        igraph_int_t to   = IGRAPH_TO(graph, eid);
 
-        igraph_integer_t from_cl = VECTOR(*membership)[from];
-        igraph_integer_t to_cl   = VECTOR(*membership)[to];
+        igraph_int_t from_cl = VECTOR(*membership)[from];
+        igraph_int_t to_cl   = VECTOR(*membership)[to];
 
-        igraph_integer_t cl = mode == IGRAPH_OUT ? from_cl : to_cl;
+        igraph_int_t cl = mode == IGRAPH_OUT ? from_cl : to_cl;
 
         if (from_cl != to_cl) {
             VECTOR(*degrees)[cl] += 1;
@@ -539,10 +539,10 @@ igraph_error_t igraph_roots_for_tree_layout(
         igraph_vector_int_t *roots,
         igraph_root_choice_t heuristic) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order, membership;
-    igraph_integer_t no_comps;
-    igraph_integer_t i, j;
+    igraph_int_t no_comps;
+    igraph_int_t i, j;
     igraph_bool_t use_eccentricity;
 
     switch (heuristic) {
@@ -611,8 +611,8 @@ igraph_error_t igraph_roots_for_tree_layout(
          * and record largest degree node in each strongly-connected component
          * which has no incoming (outgoing) edges. */
         for (i = 0; i < no_of_nodes; ++i) {
-            igraph_integer_t v  = VECTOR(order)[i];
-            igraph_integer_t cl = VECTOR(membership)[v];
+            igraph_int_t v  = VECTOR(order)[i];
+            igraph_int_t cl = VECTOR(membership)[v];
             if (VECTOR(cluster_degrees)[cl] == 0 && VECTOR(*roots)[cl] == -1) {
                 VECTOR(*roots)[cl] = v;
             }
@@ -637,11 +637,11 @@ igraph_error_t igraph_roots_for_tree_layout(
          * Select the highest degree node from each component.
          */
 
-        igraph_integer_t no_seen = 0;
+        igraph_int_t no_seen = 0;
 
         for (i=0; i < no_of_nodes; ++i) {
-            igraph_integer_t v  = VECTOR(order)[i];
-            igraph_integer_t cl = VECTOR(membership)[v];
+            igraph_int_t v  = VECTOR(order)[i];
+            igraph_int_t cl = VECTOR(membership)[v];
             if (VECTOR(*roots)[cl] == -1) {
                 no_seen += 1;
                 VECTOR(*roots)[cl] = v;
@@ -716,9 +716,9 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                                    const igraph_vector_int_t *roots,
                                    const igraph_vector_int_t *rootlevel) {
 
-    const igraph_integer_t no_of_nodes_orig = igraph_vcount(graph);
-    igraph_integer_t no_of_nodes = no_of_nodes_orig;
-    igraph_integer_t real_root;
+    const igraph_int_t no_of_nodes_orig = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = no_of_nodes_orig;
+    igraph_int_t real_root;
     igraph_t extended;
     const igraph_t *pextended = graph;
     igraph_vector_int_t myroots;
@@ -760,7 +760,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         /* ----------------------------------------------------------------------- */
         /* Many roots were given to us, check 'rootlevel' */
 
-        igraph_integer_t plus_levels = 0;
+        igraph_int_t plus_levels = 0;
 
         if (igraph_vector_int_size(roots) != igraph_vector_int_size(rootlevel)) {
             IGRAPH_ERROR("Reingold-Tilford: 'roots' and 'rootlevel' lengths differ",
@@ -768,13 +768,13 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         }
 
         /* count the rootlevels that are not zero */
-        for (igraph_integer_t i = 0; i < igraph_vector_int_size(roots); i++) {
+        for (igraph_int_t i = 0; i < igraph_vector_int_size(roots); i++) {
             plus_levels += VECTOR(*rootlevel)[i];
         }
 
         /* make copy of graph, add vertices/edges */
         if (plus_levels != 0) {
-            igraph_integer_t edgeptr = 0;
+            igraph_int_t edgeptr = 0;
 
             pextended = &extended;
             IGRAPH_CHECK(igraph_copy(&extended, graph));
@@ -783,10 +783,10 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
             IGRAPH_CHECK(igraph_vector_int_resize(&newedges, plus_levels * 2));
 
-            for (igraph_integer_t i = 0; i < igraph_vector_int_size(roots); i++) {
-                igraph_integer_t rl = VECTOR(*rootlevel)[i];
-                igraph_integer_t rn = VECTOR(*roots)[i];
-                igraph_integer_t j;
+            for (igraph_int_t i = 0; i < igraph_vector_int_size(roots); i++) {
+                igraph_int_t rl = VECTOR(*rootlevel)[i];
+                igraph_int_t rn = VECTOR(*roots)[i];
+                igraph_int_t j;
 
                 /* zero-level roots don't get anything special */
                 if (rl == 0) {
@@ -858,7 +858,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
         /* else, we need to make real_root */
     } else {
-        igraph_integer_t no_of_newedges;
+        igraph_int_t no_of_newedges;
 
         /* Make copy of the graph unless it exists already */
         if (pextended == graph) {
@@ -875,7 +875,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         /* add edges from the roots to real_root */
         no_of_newedges = igraph_vector_int_size(proots);
         IGRAPH_CHECK(igraph_vector_int_resize(&newedges, no_of_newedges * 2));
-        for (igraph_integer_t i = 0; i < no_of_newedges; i++) {
+        for (igraph_int_t i = 0; i < no_of_newedges; i++) {
             VECTOR(newedges)[2 * i] = no_of_nodes - 1;
             VECTOR(newedges)[2 * i + 1] = VECTOR(*proots)[i];
         }
@@ -909,7 +909,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
             IGRAPH_CHECK(igraph_matrix_remove_row(res, no_of_nodes_orig));
         } else {
             igraph_matrix_t tmp;
-            igraph_integer_t i;
+            igraph_int_t i;
             IGRAPH_MATRIX_INIT_FINALLY(&tmp, no_of_nodes_orig, 2);
             for (i = 0; i < no_of_nodes_orig; i++) {
                 MATRIX(tmp, i, 0) = MATRIX(*res, i, 0);
@@ -975,7 +975,7 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         const igraph_vector_int_t *roots,
         const igraph_vector_int_t *rootlevel) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t ratio;
     igraph_real_t minx, maxx;
 
@@ -988,7 +988,7 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
     ratio = 2 * M_PI * (no_of_nodes - 1.0) / no_of_nodes;
 
     minx = maxx = MATRIX(*res, 0, 0);
-    for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 1; i < no_of_nodes; i++) {
         if (MATRIX(*res, i, 0) > maxx) {
             maxx = MATRIX(*res, i, 0);
         }
@@ -999,7 +999,7 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
     if (maxx > minx) {
         ratio /= (maxx - minx);
     }
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         igraph_real_t phi = (MATRIX(*res, i, 0) - minx) * ratio;
         igraph_real_t r = MATRIX(*res, i, 1);
         MATRIX(*res, i, 0) = r * cos(phi);

@@ -5,17 +5,20 @@
 int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t cliques;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Set a random seed to make the program deterministic */
     igraph_rng_seed(igraph_rng_default(), 31415);
 
     /* Create a random graph with a given number of vertices and edges */
-    igraph_erdos_renyi_game_gnm(&graph, 15, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 15, 80, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
-    /* Find all maximal cliques in the graph */
+    /* Find all maximal cliques in the graph. IGRAPH_UNLIMITED signifies no limit on the clique sizes. */
     igraph_vector_int_list_init(&cliques, 0);
-    igraph_maximal_cliques(&graph, &cliques, -1, -1);
+    igraph_maximal_cliques(&graph, &cliques, /* min_size */ IGRAPH_UNLIMITED, /* max_size */ IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
 
     /* Print the cliques in lexicographical order */
     printf("Maximal cliques in lexicographical order:\n");

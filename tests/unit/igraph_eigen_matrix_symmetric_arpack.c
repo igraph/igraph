@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge MA, 02139 USA
 
@@ -31,7 +31,7 @@ int check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
 
     int i, n = igraph_matrix_nrow(A);
     int ne = igraph_matrix_ncol(vectors);
-    igraph_vector_t v, lhs, rhs;
+    igraph_vector_t lhs, rhs;
 
     if (ne != igraph_vector_size(values)) {
         printf("'values' and 'vectors' sizes do not match\n");
@@ -42,7 +42,7 @@ int check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
     igraph_vector_init(&rhs, n);
 
     for (i = 0; i < ne; i++) {
-        igraph_vector_view(&v, &MATRIX(*vectors, 0, i), n);
+        const igraph_vector_t v = igraph_vector_view(&MATRIX(*vectors, 0, i), n);
         igraph_blas_dgemv(/*transpose=*/ 0, /*alpha=*/ 1, A, &v,
                                          /*beta=*/ 0, &lhs);
         igraph_vector_update(&rhs, &v);

@@ -1,5 +1,5 @@
 /*
-  IGraph library.
+  igraph library.
   Copyright (C) 2005-2024 The igraph development team <igraph@igraph.org>
 
   This program is free software; you can redistribute it and/or modify it under
@@ -57,12 +57,12 @@ igraph_error_t igraph_topological_sorting(
     /* Note: This function ignores self-loops, there it cannot
      * use the IGRAPH_PROP_IS_DAG property cache entry. */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
     igraph_vector_int_t neis;
     igraph_dqueue_int_t sources;
     igraph_neimode_t deg_mode;
-    igraph_integer_t node, i, j;
+    igraph_int_t node, i, j;
 
     if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
         IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs.",
@@ -130,7 +130,7 @@ igraph_error_t igraph_topological_sorting(
  * A directed acyclic graph (DAG) is a directed graph with no cycles.
  *
  * </para><para>
- * This function returns false for undirected graphs.
+ * This function returns \c false for undirected graphs.
  *
  * </para><para>
  * The return value of this function is cached in the graph itself; calling
@@ -149,7 +149,7 @@ igraph_error_t igraph_topological_sorting(
  *     sorting of a DAG.
  */
 igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
     igraph_vector_int_t neis;
     igraph_dqueue_int_t sources;
@@ -167,10 +167,10 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 
     IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
 
-    igraph_integer_t vertices_left = no_of_nodes;
+    igraph_int_t vertices_left = no_of_nodes;
 
     /* Do we have nodes with no incoming edges? */
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(degrees)[i] == 0) {
             IGRAPH_CHECK(igraph_dqueue_int_push(&sources, i));
         }
@@ -178,15 +178,15 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 
     /* Take all nodes with no incoming edges and remove them */
     while (!igraph_dqueue_int_empty(&sources)) {
-        igraph_integer_t node = igraph_dqueue_int_pop(&sources);
+        igraph_int_t node = igraph_dqueue_int_pop(&sources);
         /* Exclude the node from further source searches */
         VECTOR(degrees)[node] = -1;
         vertices_left--;
         /* Get the neighbors and decrease their degrees by one */
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
-        igraph_integer_t n = igraph_vector_int_size(&neis);
-        for (igraph_integer_t i = 0; i < n; i++) {
-            igraph_integer_t nei = VECTOR(neis)[i];
+        igraph_int_t n = igraph_vector_int_size(&neis);
+        for (igraph_int_t i = 0; i < n; i++) {
+            igraph_int_t nei = VECTOR(neis)[i];
             if (nei == node) {
                 /* Found a self-loop, graph is not a DAG */
                 *res = false;

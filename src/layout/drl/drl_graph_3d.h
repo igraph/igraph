@@ -45,7 +45,7 @@ namespace drl3d {
 
 // layout schedule information
 struct layout_schedule {
-    igraph_integer_t iterations;
+    igraph_int_t iterations;
     float temperature;
     float attraction;
     float damping_mult;
@@ -74,13 +74,13 @@ private:
     // Methods
     int ReCompute ( );
     void update_nodes ( );
-    float Compute_Node_Energy ( igraph_integer_t node_ind );
-    void Solve_Analytic ( igraph_integer_t node_ind, float &pos_x, float &pos_y, float &pos_z );
-    void get_positions ( std::vector<igraph_integer_t> &node_indices, float return_positions[3 * MAX_PROCS] );
-    void update_density ( std::vector<igraph_integer_t> &node_indices,
+    float Compute_Node_Energy ( igraph_int_t node_ind );
+    void Solve_Analytic ( igraph_int_t node_ind, float &pos_x, float &pos_y, float &pos_z );
+    void get_positions ( std::vector<igraph_int_t> &node_indices, float return_positions[3 * MAX_PROCS] );
+    void update_density ( std::vector<igraph_int_t> &node_indices,
                           float old_positions[3 * MAX_PROCS],
                           float new_positions[3 * MAX_PROCS] );
-    void update_node_pos ( igraph_integer_t node_ind,
+    void update_node_pos ( igraph_int_t node_ind,
                            float old_positions[3 * MAX_PROCS],
                            float new_positions[3 * MAX_PROCS] );
 
@@ -88,10 +88,10 @@ private:
     int myid, num_procs;
 
     // graph decomposition information
-    igraph_integer_t num_nodes;                  // number of nodes in graph
+    igraph_int_t num_nodes;                  // number of nodes in graph
     float highest_sim;              // highest sim for normalization
-    std::map <igraph_integer_t, igraph_integer_t> id_catalog;      // id_catalog[file id] = internal id
-    std::map <igraph_integer_t, std::map <igraph_integer_t, float> > neighbors;     // neighbors of nodes on this proc.
+    std::map <igraph_int_t, igraph_int_t> id_catalog;      // id_catalog[file id] = internal id
+    std::map <igraph_int_t, std::map <igraph_int_t, float> > neighbors;     // neighbors of nodes on this proc.
 
     // graph layout information
     std::vector<Node> positions;
@@ -99,7 +99,7 @@ private:
 
     // original VxOrd information
     int STAGE;
-    igraph_integer_t iterations;
+    igraph_int_t iterations;
     float temperature, attraction, damping_mult;
     float min_edges, CUT_END, cut_length_end, cut_off_length, cut_rate;
     bool first_add, fine_first_add, fineDensity;
@@ -115,9 +115,9 @@ private:
     time_t start_time, stop_time;
 
     // online clustering information
-    igraph_integer_t real_iterations;    // number of iterations to hold .real input fixed
-    igraph_integer_t tot_iterations;
-    igraph_integer_t tot_expected_iterations; // for progress bar
+    igraph_int_t real_iterations;    // number of iterations to hold .real input fixed
+    igraph_int_t tot_iterations;
+    igraph_int_t tot_expected_iterations; // for progress bar
     bool real_fixed;
 };
 

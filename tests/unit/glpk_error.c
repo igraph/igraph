@@ -53,7 +53,7 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_vector_int_init(&res, 0);
-    igraph_erdos_renyi_game_gnm(&graph, 100, 200, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 100, 200, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     igraph_set_interruption_handler(interruption_handler);
     ehandler = igraph_set_error_handler(igraph_error_handler_printignore);

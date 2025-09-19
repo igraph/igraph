@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include <cmath>
 
 static igraph_error_t infomap_get_membership(infomap::InfomapBase &infomap, igraph_vector_int_t *membership) {
-    igraph_integer_t n = infomap.numLeafNodes();
+    igraph_int_t n = infomap.numLeafNodes();
 
     IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
 
@@ -58,14 +58,14 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
                                       const igraph_vector_t *vertex_weights,
                                       infomap::Network &network) {
 
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
 
     if (vcount > UINT_MAX) {
         IGRAPH_ERROR("Graph has too many vertices for Infomap.", IGRAPH_EINVAL);
     }
 
-    for (igraph_integer_t v = 0; v < vcount; v++) {
+    for (igraph_int_t v = 0; v < vcount; v++) {
         if (vertex_weights) {
             double weight = VECTOR(*vertex_weights)[v];
             if (weight < 0) {
@@ -82,9 +82,9 @@ static igraph_error_t convert_igraph_to_infomap(const igraph_t *graph,
         }
     }
 
-    for (igraph_integer_t e = 0; e < ecount; e++) {
-        igraph_integer_t v1 = IGRAPH_FROM(graph, e);
-        igraph_integer_t v2 = IGRAPH_TO(graph, e);
+    for (igraph_int_t e = 0; e < ecount; e++) {
+        igraph_int_t v1 = IGRAPH_FROM(graph, e);
+        igraph_int_t v2 = IGRAPH_TO(graph, e);
 
         if (edge_weights) {
             double weight = VECTOR(*edge_weights)[e];
@@ -125,7 +125,8 @@ static bool infomap_allow_interruption() {
  * either chooses out-edges to follow with probabilities proportional to edge
  * weights, or teleports to a random vertex with probability 0.15. Vertex weights
  * can be given to control the probability of choosing different vertices as
- * the target of the teleportation.
+ * the target of the teleportation. In addition, Infomap can be regularized to
+ * account for potential missing links.
  *
  * </para><para>
  * As of igraph 1.0, the Infomap library written by Daniel Edler, Anton Holmgren
@@ -150,6 +151,11 @@ static bool infomap_allow_interruption() {
  * Eur. Phys. J. Special Topics 178, 13 (2009).
  * https://dx.doi.org/10.1140/epjst/e2010-01179-1, https://arxiv.org/abs/0906.1405
  *
+ * </para><para>
+ * Smiljanić, Jelena, Daniel Edler, and Martin Rosvall: Mapping Flows on
+ * Sparse Networks with Missing Links. Phys Rev E 102 (1–1): 012302 (2020).
+ * https://doi.org/10.1103/PhysRevE.102.012302, https://arxiv.org/abs/2106.14798
+ *
  * \param graph The input graph. Edge directions are taken into account.
  * \param edge_weights Numeric vector giving the weights of the edges.
  *     The random walker will favour edges with high weights over
@@ -165,6 +171,12 @@ static bool infomap_allow_interruption() {
  *     equal weights. Weights are expected to be positive.
  * \param nb_trials The number of attempts to partition the network
  *     (can be any integer value equal to or larger than 1).
+ * \param is_regularized If true, adds a fully connected Bayesian prior network
+ *     to avoid overfitting due to missing links.
+ * \param regularization_strength Adjust relative strength of the Bayesian prior
+ *     network used for regularization. This multiplies the default strength, a
+ *     parameter of 1 hence uses the default regularization strength. Ignored
+ *     when \p is_regularized is set to \c false.
  * \param membership Pointer to a vector. The membership vector is
  *     stored here. \c NULL means that the caller is not interested in the
  *     membership vector.
@@ -182,7 +194,9 @@ igraph_error_t igraph_community_infomap(
         const igraph_t *graph,
         const igraph_vector_t *edge_weights,
         const igraph_vector_t *vertex_weights,
-        igraph_integer_t nb_trials,
+        igraph_int_t nb_trials,
+        igraph_bool_t is_regularized,
+        igraph_real_t regularization_strength,
         igraph_vector_int_t *membership,
         igraph_real_t *codelength) {
 
@@ -190,8 +204,8 @@ igraph_error_t igraph_community_infomap(
     IGRAPH_ERROR("Infomap is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
 
     if (edge_weights) {
         if (igraph_vector_size(edge_weights) != ecount) {
@@ -235,6 +249,8 @@ igraph_error_t igraph_community_infomap(
     conf.silent = true;
     conf.directed = igraph_is_directed(graph);
     conf.interruptionHandler = &infomap_allow_interruption;
+    conf.regularized = is_regularized;
+    conf.regularizationStrength = regularization_strength;
 
     infomap::InfomapBase infomap(conf);
 

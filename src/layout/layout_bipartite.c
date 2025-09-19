@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -50,9 +50,9 @@
 igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                             const igraph_vector_bool_t *types,
                             igraph_matrix_t *res, igraph_real_t hgap,
-                            igraph_real_t vgap, igraph_integer_t maxiter) {
+                            igraph_real_t vgap, igraph_int_t maxiter) {
 
-    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
+    igraph_int_t i, no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
@@ -68,9 +68,8 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
         VECTOR(layers)[i] = VECTOR(*types)[i] ? 0 : 1;
     }
 
-    IGRAPH_CHECK(igraph_layout_sugiyama(graph, res, /*extd_graph=*/ 0,
-                                        /*extd_to_orig_eids=*/ 0, &layers, hgap,
-                                        vgap, maxiter, /*weights=*/ 0));
+    IGRAPH_CHECK(igraph_layout_sugiyama(graph, res, /* routing= */ 0,
+                                        &layers, hgap, vgap, maxiter, /* weights= */ 0));
 
     igraph_vector_int_destroy(&layers);
     IGRAPH_FINALLY_CLEAN(1);

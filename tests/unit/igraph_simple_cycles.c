@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,14 +20,14 @@
 
 #include "test_utilities.h"
 
-void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_integer_t expected, igraph_integer_t max_cycle_length) {
+void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_int_t expected, igraph_int_t max_cycle_length) {
     igraph_vector_int_list_t results_v;
     igraph_vector_int_list_t results_e;
 
     igraph_vector_int_list_init(&results_v, 0);
     igraph_vector_int_list_init(&results_e, 0);
 
-    igraph_simple_cycles(graph, &results_v, &results_e, mode, 0, max_cycle_length);
+    igraph_simple_cycles(graph, &results_v, &results_e, mode, 0, max_cycle_length, IGRAPH_UNLIMITED);
 
     printf("Finished search, found %" IGRAPH_PRId
            " cycles, expected %" IGRAPH_PRId " cycles."
@@ -45,7 +45,7 @@ void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_integ
     IGRAPH_ASSERT(igraph_vector_int_list_size(&results_v) == expected);
     IGRAPH_ASSERT(igraph_vector_int_list_size(&results_e) == expected);
 
-    for (igraph_integer_t i = 0; i < expected; i++) {
+    for (igraph_int_t i = 0; i < expected; i++) {
         igraph_vector_int_t *vertices, *edges;
 
         vertices = igraph_vector_int_list_get_ptr(&results_v, i);
@@ -60,7 +60,7 @@ void check_cycles_max(const igraph_t *graph, igraph_neimode_t mode, igraph_integ
     igraph_vector_int_list_destroy(&results_e);
 }
 
-void check_cycles(const igraph_t *graph, igraph_neimode_t mode, igraph_integer_t expected) {
+void check_cycles(const igraph_t *graph, igraph_neimode_t mode, igraph_int_t expected) {
     check_cycles_max(graph, mode, expected, -1);
 }
 
@@ -449,19 +449,19 @@ int main(void) {
                      -1);
 
         // Check that passing NULL vector lists doesn't crash.
-        igraph_simple_cycles(&g, NULL, NULL, IGRAPH_ALL, -1, -1);
+        igraph_simple_cycles(&g, NULL, NULL, IGRAPH_ALL, -1, -1, IGRAPH_UNLIMITED);
 
         // Test limit on minimum cycle size.
-        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, -1, -1);
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, -1, -1, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
 
-        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 1, -1);
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 1, -1, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 3);
 
-        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, 2, -1);
+        igraph_simple_cycles(&g, &v, NULL, IGRAPH_ALL, 2, -1, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 2);
 
-        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 2, 3);
+        igraph_simple_cycles(&g, NULL, &v, IGRAPH_ALL, 2, 3, IGRAPH_UNLIMITED);
         IGRAPH_ASSERT(igraph_vector_int_list_size(&v) == 1);
 
         igraph_destroy(&g);

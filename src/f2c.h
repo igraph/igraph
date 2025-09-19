@@ -144,7 +144,7 @@ union Multitype {   /* for multiple entry points */
 
 typedef union Multitype Multitype;
 
-/*typedef igraph_integer_t Long;*/  /* No longer used; formerly in Namelist */
+/*typedef igraph_int_t Long;*/  /* No longer used; formerly in Namelist */
 
 struct Vardesc {    /* for Namelist */
     char *name;

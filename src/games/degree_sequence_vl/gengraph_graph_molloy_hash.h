@@ -47,27 +47,27 @@ class graph_molloy_hash {
 
 private:
     // Number of vertices
-    igraph_integer_t n;
+    igraph_int_t n;
     //Number of arcs ( = #edges * 2 )
-    igraph_integer_t a;
+    igraph_int_t a;
     //Total size of links[]
-    igraph_integer_t size;
+    igraph_int_t size;
     // The degree sequence of the graph
-    igraph_integer_t *deg;
+    igraph_int_t *deg;
     // The array containing all links
-    igraph_integer_t *links;
+    igraph_int_t *links;
     // The array containing pointers to adjacency list of every vertices
-    igraph_integer_t **neigh;
+    igraph_int_t **neigh;
     // Counts total size
     void compute_size();
     // Build neigh with deg and links
     void compute_neigh();
     // Allocate memory according to degree_sequence (for constructor use only!!)
-    igraph_integer_t alloc(degree_sequence &);
+    igraph_int_t alloc(degree_sequence &);
     // Add edge (u,v). Return FALSE if vertex a is already full.
     // WARNING : only to be used by havelhakimi(), restore() or constructors
-    inline bool add_edge(igraph_integer_t u, igraph_integer_t v, igraph_integer_t *realdeg) {
-        igraph_integer_t deg_u = realdeg[u];
+    inline bool add_edge(igraph_int_t u, igraph_int_t v, igraph_int_t *realdeg) {
+        igraph_int_t deg_u = realdeg[u];
         if (deg_u == deg[u]) {
             return false;
         }
@@ -75,7 +75,7 @@ private:
         assert(fast_search(neigh[u], (u == n - 1 ? links + size : neigh[u + 1]) - neigh[u], v) == NULL);
         assert(fast_search(neigh[v], (v == n - 1 ? links + size : neigh[v + 1]) - neigh[v], u) == NULL);
         assert(deg[u] < deg_u);
-        igraph_integer_t deg_v = realdeg[v];
+        igraph_int_t deg_v = realdeg[v];
         if (IS_HASH(deg_u)) {
             *H_add(neigh[u], HASH_EXPAND(deg_u), v) = v;
         } else {
@@ -94,39 +94,39 @@ private:
         return true;
     }
     // Swap edges
-    inline void swap_edges(igraph_integer_t from1, igraph_integer_t to1, igraph_integer_t from2, igraph_integer_t to2) {
+    inline void swap_edges(igraph_int_t from1, igraph_int_t to1, igraph_int_t from2, igraph_int_t to2) {
         H_rpl(neigh[from1], deg[from1], to1, to2);
         H_rpl(neigh[from2], deg[from2], to2, to1);
         H_rpl(neigh[to1], deg[to1], from1, from2);
         H_rpl(neigh[to2], deg[to2], from2, from1);
     }
-    // Backup graph [sizeof(igraph_integer_t) bytes per edge]
-    igraph_integer_t* backup();
+    // Backup graph [sizeof(igraph_int_t) bytes per edge]
+    igraph_int_t* backup();
     // Test if vertex is in an isolated component of size<K
-    bool isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited);
+    bool isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited);
     // Pick random edge, and gives a corresponding vertex
-    inline igraph_integer_t pick_random_vertex() {
-        igraph_integer_t v;
+    inline igraph_int_t pick_random_vertex() {
+        igraph_int_t v;
         do {
             v = links[my_random() % size];
         } while (v == HASH_NONE);
         return v;
     }
     // Pick random neighbour
-    inline igraph_integer_t* random_neighbour(igraph_integer_t v) {
+    inline igraph_int_t* random_neighbour(igraph_int_t v) {
         return H_random(neigh[v], deg[v]);
     }
     // Depth-first search.
-    igraph_integer_t depth_search(bool *visited, igraph_integer_t *buff, igraph_integer_t v0 = 0);
+    igraph_int_t depth_search(bool *visited, igraph_int_t *buff, igraph_int_t v0 = 0);
     // Returns complexity of isolation test
-    igraph_integer_t effective_isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited);
+    igraph_int_t effective_isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited);
     // Depth-Exploration. Returns number of steps done. Stops when encounter vertex of degree > dmax.
-    void depth_isolated(igraph_integer_t v, igraph_integer_t &calls, igraph_integer_t &left_to_explore, igraph_integer_t dmax, igraph_integer_t * &Kbuff, bool *visited);
+    void depth_isolated(igraph_int_t v, igraph_int_t &calls, igraph_int_t &left_to_explore, igraph_int_t dmax, igraph_int_t * &Kbuff, bool *visited);
 
 
 public:
     //degree of v
-    inline igraph_integer_t degree(igraph_integer_t v) {
+    inline igraph_int_t degree(igraph_int_t v) {
         return deg[v];
     };
     // For debug purposes : verify validity of the graph (symetry, simplicity)
@@ -136,19 +136,19 @@ public:
     // Allocate memory for the graph. Create deg and links. No edge is created.
     graph_molloy_hash(degree_sequence &);
     // Create graph from hard copy
-    graph_molloy_hash(igraph_integer_t *);
+    graph_molloy_hash(igraph_int_t *);
     // Create hard copy of graph
-    igraph_integer_t *hard_copy();
+    igraph_int_t *hard_copy();
     // Restore from backup
-    void restore(igraph_integer_t* back);
+    void restore(igraph_int_t* back);
     //Clear hash tables
     void init();
     // nb arcs
-    inline igraph_integer_t nbarcs() {
+    inline igraph_int_t nbarcs() {
         return a;
     };
     // nb vertices
-    inline igraph_integer_t nbvertices() {
+    inline igraph_int_t nbvertices() {
         return n;
     };
     // print graph in SUCC_LIST mode, in stdout
@@ -157,7 +157,7 @@ public:
     // Test if graph is connected
     bool is_connected();
     // is edge ?
-    inline bool is_edge(igraph_integer_t u, igraph_integer_t v) {
+    inline bool is_edge(igraph_int_t u, igraph_int_t v) {
         assert(H_is(neigh[u], deg[u], v) == (fast_search(neigh[u], HASH_SIZE(deg[u]), v) != NULL));
         assert(H_is(neigh[v], deg[v], u) == (fast_search(neigh[v], HASH_SIZE(deg[v]), u) != NULL));
         assert(H_is(neigh[u], deg[u], v) == H_is(neigh[v], deg[v], u));
@@ -168,19 +168,19 @@ public:
         }
     }
     // Random edge swap ATTEMPT. Return 1 if attempt was a succes, 0 otherwise
-    int random_edge_swap(igraph_integer_t K = 0, igraph_integer_t *Kbuff = NULL, bool *visited = NULL);
+    int random_edge_swap(igraph_int_t K = 0, igraph_int_t *Kbuff = NULL, bool *visited = NULL);
     // Connected Shuffle
-    igraph_integer_t shuffle(igraph_integer_t, igraph_integer_t, int type);
+    igraph_int_t shuffle(igraph_int_t, igraph_int_t, int type);
     // Optimal window for the gkantsidis heuristics
-    igraph_integer_t optimal_window();
+    igraph_int_t optimal_window();
     // Average unitary cost per post-validated edge swap, for some window
-    double average_cost(igraph_integer_t T, igraph_integer_t *back, double min_cost);
+    double average_cost(igraph_int_t T, igraph_int_t *back, double min_cost);
     // Get caracteristic K
     double eval_K(int quality = 100);
     // Get effective K
-    double effective_K(igraph_integer_t K, int quality = 10000);
+    double effective_K(igraph_int_t K, int quality = 10000);
     // Try to shuffle T times. Return true if at the end, the graph was still connected.
-    bool try_shuffle(igraph_integer_t T, igraph_integer_t K, igraph_integer_t *back = NULL);
+    bool try_shuffle(igraph_int_t T, igraph_int_t K, igraph_int_t *back = NULL);
 };
 
 } // namespace gengraph

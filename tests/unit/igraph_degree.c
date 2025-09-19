@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 #include "test_utilities.h"
 
 void all_degs(const igraph_t *g, igraph_vector_int_t *res, igraph_neimode_t mode, igraph_loops_t loops) {
-    igraph_integer_t n = igraph_vcount(g);
+    igraph_int_t n = igraph_vcount(g);
     igraph_vector_int_resize(res, n);
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         igraph_degree_1(g, &VECTOR(*res)[i], i, mode, loops);
     }
 }

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -19,6 +19,26 @@
 #include "igraph_graphicality.h"
 
 #include "misc/graphicality.h"
+
+
+igraph_error_t igraph_i_edge_type_to_loops_multiple(
+    igraph_edge_type_sw_t allowed_edge_types,
+    igraph_bool_t *loops, igraph_bool_t *multiple) {
+
+    *loops = (allowed_edge_types & IGRAPH_LOOPS_SW) ? true : false;
+    *multiple = (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ? true : false;
+
+    if (*loops) {
+        igraph_bool_t multi_loops = (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW);
+        if (*multiple != multi_loops) {
+            IGRAPH_ERROR("Either both multi-edges and multi-loops should be allowed or neither.",
+                         IGRAPH_EINVAL);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 
 static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_int_t *degrees, igraph_bool_t *res);
 static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_int_t *degrees, igraph_bool_t *res);
@@ -87,7 +107,8 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  *     undirected graphs or the out-degree sequence for directed graphs.
  * \param in_degrees A vector of integers specifying the in-degree sequence for
  *     directed graphs. For undirected graphs, it must be \c NULL.
- * \param allowed_edge_types The types of edges to allow in the graph:
+ * \param allowed_edge_types The types of edges to allow in the graph. See
+ *     \ref igraph_edge_type_sw_t for details.
  *     \clist
  *     \cli IGRAPH_SIMPLE_SW
  *       simple graphs (i.e. no self-loops or multi-edges allowed).
@@ -236,12 +257,12 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * These conditions are valid regardless of whether multi-edges are allowed between distinct vertices.
  */
 static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_int_t *degrees, igraph_bool_t *res) {
-    igraph_integer_t sum_parity = 0; /* 0 if the degree sum is even, 1 if it is odd */
-    igraph_integer_t n = igraph_vector_int_size(degrees);
-    igraph_integer_t i;
+    igraph_int_t sum_parity = 0; /* 0 if the degree sum is even, 1 if it is odd */
+    igraph_int_t n = igraph_vector_int_size(degrees);
+    igraph_int_t i;
 
     for (i = 0; i < n; ++i) {
-        igraph_integer_t d = VECTOR(*degrees)[i];
+        igraph_int_t d = VECTOR(*degrees)[i];
 
         if (d < 0) {
             *res = false;
@@ -262,9 +283,9 @@ static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_
  *  - The sum of degrees must be no smaller than 2*d_max.
  */
 static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_int_t *degrees, igraph_bool_t *res) {
-    igraph_integer_t i;
-    igraph_integer_t n = igraph_vector_int_size(degrees);
-    igraph_integer_t dsum, dmax;
+    igraph_int_t i;
+    igraph_int_t n = igraph_vector_int_size(degrees);
+    igraph_int_t dsum, dmax;
 
     /* Zero-length sequences are considered graphical. */
     if (n == 0) {
@@ -274,7 +295,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igra
 
     dsum = 0; dmax = 0;
     for (i = 0; i < n; ++i) {
-        igraph_integer_t d = VECTOR(*degrees)[i];
+        igraph_int_t d = VECTOR(*degrees)[i];
 
         if (d < 0) {
             *res = false;
@@ -299,7 +320,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igra
  */
 static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_int_t *degrees, igraph_bool_t *res) {
     igraph_vector_int_t num_degs;
-    igraph_integer_t w, b, s, c, n, k, wd, kd;
+    igraph_int_t w, b, s, c, n, k, wd, kd;
 
     n = igraph_vector_int_size(degrees);
 
@@ -341,8 +362,8 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_degs, n+2);
 
-    for (igraph_integer_t i = 0; i < n; ++i) {
-        igraph_integer_t degree = VECTOR(*degrees)[i];
+    for (igraph_int_t i = 0; i < n; ++i) {
+        igraph_int_t degree = VECTOR(*degrees)[i];
 
         /* Negative degrees are already checked in igraph_i_is_graphical_undirected_multi_loops() */
         if (degree > n+1) {
@@ -354,7 +375,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
     }
 
     /* Convert num_degs to a cumulative sum array. */
-    for (igraph_integer_t d = n; d >= 0; --d) {
+    for (igraph_int_t d = n; d >= 0; --d) {
         VECTOR(num_degs)[d] += VECTOR(num_degs)[d+1];
     }
 
@@ -400,12 +421,12 @@ undirected_loopy_simple_finish:
  */
 static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vector_int_t *degrees, igraph_bool_t *res) {
     igraph_vector_int_t num_degs; /* num_degs[d] is the # of vertices with degree d */
-    const igraph_integer_t p = igraph_vector_int_size(degrees);
-    igraph_integer_t dmin, dmax, dsum;
-    igraph_integer_t n; /* number of non-zero degrees */
-    igraph_integer_t k, sum_deg, sum_ni, sum_ini;
-    igraph_integer_t i, dk;
-    igraph_integer_t zverovich_bound;
+    const igraph_int_t p = igraph_vector_int_size(degrees);
+    igraph_int_t dmin, dmax, dsum;
+    igraph_int_t n; /* number of non-zero degrees */
+    igraph_int_t k, sum_deg, sum_ni, sum_ini;
+    igraph_int_t i, dk;
+    igraph_int_t zverovich_bound;
 
     if (p == 0) {
         *res = true;
@@ -426,7 +447,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
 
     dmin = p; dmax = 0; dsum = 0; n = 0;
     for (i = 0; i < p; ++i) {
-        igraph_integer_t d = VECTOR(*degrees)[i];
+        igraph_int_t d = VECTOR(*degrees)[i];
 
         if (d < 0 || d >= p) {
             *res = false;
@@ -482,7 +503,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
 
     k = 0; sum_deg = 0; sum_ni = 0; sum_ini = 0;
     for (dk = dmax; dk >= dmin; --dk) {
-        igraph_integer_t run_size, v;
+        igraph_int_t run_size, v;
 
         if (dk < k+1) {
             *res = true;
@@ -524,16 +545,16 @@ finish:
  *  - The sum of in- and out-degrees must be the same.
  */
 static igraph_error_t igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
-    igraph_integer_t sumdiff; /* difference between sum of in- and out-degrees */
-    igraph_integer_t n = igraph_vector_int_size(out_degrees);
-    igraph_integer_t i;
+    igraph_int_t sumdiff; /* difference between sum of in- and out-degrees */
+    igraph_int_t n = igraph_vector_int_size(out_degrees);
+    igraph_int_t i;
 
     IGRAPH_ASSERT(igraph_vector_int_size(in_degrees) == n);
 
     sumdiff = 0;
     for (i = 0; i < n; ++i) {
-        igraph_integer_t dout = VECTOR(*out_degrees)[i];
-        igraph_integer_t din  = VECTOR(*in_degrees)[i];
+        igraph_int_t dout = VECTOR(*out_degrees)[i];
+        igraph_int_t din  = VECTOR(*in_degrees)[i];
 
         if (dout < 0 || din < 0) {
             *res = false;
@@ -556,17 +577,17 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_multi(const igraph_ve
  *    where d_max is the largest total degree.
  */
 static igraph_error_t igraph_i_is_graphical_directed_loopless_multi(const igraph_vector_int_t *out_degrees, const igraph_vector_int_t *in_degrees, igraph_bool_t *res) {
-    igraph_integer_t i, sumin, sumout, dmax;
-    igraph_integer_t n = igraph_vector_int_size(out_degrees);
+    igraph_int_t i, sumin, sumout, dmax;
+    igraph_int_t n = igraph_vector_int_size(out_degrees);
 
     IGRAPH_ASSERT(igraph_vector_int_size(in_degrees) == n);
 
     sumin = 0; sumout = 0;
     dmax = 0;
     for (i = 0; i < n; ++i) {
-        igraph_integer_t dout = VECTOR(*out_degrees)[i];
-        igraph_integer_t din  = VECTOR(*in_degrees)[i];
-        igraph_integer_t d = dout + din;
+        igraph_int_t dout = VECTOR(*out_degrees)[i];
+        igraph_int_t din  = VECTOR(*in_degrees)[i];
+        igraph_int_t d = dout + din;
 
         if (dout < 0 || din < 0) {
             *res = false;
@@ -604,7 +625,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     igraph_vector_int_t in_degree_cumcounts, in_degree_counts;
     igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
     igraph_vector_int_t left_pq, right_pq;
-    igraph_integer_t lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
+    igraph_int_t lhs, rhs, left_pq_size, right_pq_size, left_i, right_i, left_sum, right_sum;
 
     /* The conditions from the loopy multigraph case are necessary here as well. */
     IGRAPH_CHECK(igraph_i_is_graphical_directed_loopy_multi(out_degrees, in_degrees, res));
@@ -612,7 +633,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         return IGRAPH_SUCCESS;
     }
 
-    const igraph_integer_t vcount = igraph_vector_int_size(out_degrees);
+    const igraph_int_t vcount = igraph_vector_int_size(out_degrees);
     if (vcount == 0) {
         *res = true;
         return IGRAPH_SUCCESS;
@@ -622,9 +643,9 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_cumcounts, vcount+1);
 
     /* Compute in_degree_cumcounts[d+1] to be the no. of in-degrees == d */
-    for (igraph_integer_t v = 0; v < vcount; v++) {
-        igraph_integer_t indeg = VECTOR(*in_degrees)[v];
-        igraph_integer_t outdeg = VECTOR(*out_degrees)[v];
+    for (igraph_int_t v = 0; v < vcount; v++) {
+        igraph_int_t indeg = VECTOR(*in_degrees)[v];
+        igraph_int_t outdeg = VECTOR(*out_degrees)[v];
         if (indeg >= vcount || outdeg >= vcount) {
             *res = false;
             igraph_vector_int_destroy(&in_degree_cumcounts);
@@ -635,7 +656,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     }
 
     /* Compute in_degree_cumcounts[d] to be the no. of in-degrees < d */
-    for (igraph_integer_t indeg = 0; indeg < vcount; indeg++) {
+    for (igraph_int_t indeg = 0; indeg < vcount; indeg++) {
         VECTOR(in_degree_cumcounts)[indeg+1] += VECTOR(in_degree_cumcounts)[indeg];
     }
 
@@ -646,10 +667,10 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
      * with in-degree d that were already placed. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degree_counts, vcount);
 
-    for (igraph_integer_t v = 0; v < vcount; v++) {
-        igraph_integer_t outdeg = VECTOR(*out_degrees)[v];
-        igraph_integer_t indeg  = VECTOR(*in_degrees)[v];
-        igraph_integer_t idx = VECTOR(in_degree_cumcounts)[indeg] + VECTOR(in_degree_counts)[indeg];
+    for (igraph_int_t v = 0; v < vcount; v++) {
+        igraph_int_t outdeg = VECTOR(*out_degrees)[v];
+        igraph_int_t indeg  = VECTOR(*in_degrees)[v];
+        igraph_int_t idx = VECTOR(in_degree_cumcounts)[indeg] + VECTOR(in_degree_counts)[indeg];
         VECTOR(sorted_out_degrees)[vcount - idx - 1] = outdeg;
         VECTOR(sorted_in_degrees)[vcount - idx - 1] = indeg;
         VECTOR(in_degree_counts)[indeg]++;
@@ -680,14 +701,14 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     right_i = 0;
     left_sum = 0;
     right_sum = 0;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         VECTOR(right_pq)[OUTDEGREE(i)]++;
     }
 
     *res = true;
     lhs = 0;
     rhs = 0;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         lhs += INDEGREE(i);
 
         /* It is enough to check for indexes where the in-degree is about to
@@ -755,13 +776,13 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
  *  - Sum of degrees must be the same in the two partitions.
  */
 static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_int_t *degrees1, const igraph_vector_int_t *degrees2, igraph_bool_t *res) {
-    igraph_integer_t i;
-    igraph_integer_t sum1, sum2;
-    igraph_integer_t n1 = igraph_vector_int_size(degrees1), n2 = igraph_vector_int_size(degrees2);
+    igraph_int_t i;
+    igraph_int_t sum1, sum2;
+    igraph_int_t n1 = igraph_vector_int_size(degrees1), n2 = igraph_vector_int_size(degrees2);
 
     sum1 = 0;
     for (i = 0; i < n1; ++i) {
-        igraph_integer_t d = VECTOR(*degrees1)[i];
+        igraph_int_t d = VECTOR(*degrees1)[i];
 
         if (d < 0) {
             *res = false;
@@ -773,7 +794,7 @@ static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_int_t *d
 
     sum2 = 0;
     for (i = 0; i < n2; ++i) {
-        igraph_integer_t d = VECTOR(*degrees2)[i];
+        igraph_int_t d = VECTOR(*degrees2)[i];
 
         if (d < 0) {
             *res = false;
@@ -795,10 +816,10 @@ static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_int_t *d
  *  - Use the Gale-Ryser theorem.
  */
 static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *degrees1, const igraph_vector_int_t *degrees2, igraph_bool_t *res) {
-    igraph_integer_t n1 = igraph_vector_int_size(degrees1), n2 = igraph_vector_int_size(degrees2);
+    igraph_int_t n1 = igraph_vector_int_size(degrees1), n2 = igraph_vector_int_size(degrees2);
     igraph_vector_int_t deg_freq1, deg_freq2;
-    igraph_integer_t lhs_sum, partial_rhs_sum, partial_rhs_count;
-    igraph_integer_t a, b, k;
+    igraph_int_t lhs_sum, partial_rhs_sum, partial_rhs_count;
+    igraph_int_t a, b, k;
 
     if (n1 == 0 && n2 == 0) {
         *res = true;
@@ -814,7 +835,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
     /* Ensure that degrees1 is the shorter vector as a minor optimization: */
     if (n2 < n1) {
         const igraph_vector_int_t *tmp;
-        igraph_integer_t n;
+        igraph_int_t n;
 
         tmp = degrees1;
         degrees1 = degrees2;
@@ -830,16 +851,16 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_freq1, n2+1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_freq2, n1+1);
 
-    for (igraph_integer_t i = 0; i < n1; ++i) {
-        igraph_integer_t degree = VECTOR(*degrees1)[i];
+    for (igraph_int_t i = 0; i < n1; ++i) {
+        igraph_int_t degree = VECTOR(*degrees1)[i];
         if (degree > n2) {
             *res = false;
             goto bigraphical_simple_done;
         }
         ++VECTOR(deg_freq1)[degree];
     }
-    for (igraph_integer_t i = 0; i < n2; ++i) {
-        igraph_integer_t degree = VECTOR(*degrees2)[i];
+    for (igraph_int_t i = 0; i < n2; ++i) {
+        igraph_int_t degree = VECTOR(*degrees2)[i];
         if (degree > n1) {
             *res = false;
             goto bigraphical_simple_done;
@@ -879,12 +900,12 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
     b = 0; /* index in deg_freq2 */
     k = -1;
     for (a = n2; a >= 0; --a) {
-        igraph_integer_t acount = VECTOR(deg_freq1)[a];
+        igraph_int_t acount = VECTOR(deg_freq1)[a];
         lhs_sum += a * acount;
         k += acount;
 
         while (b <= k + 1) {
-            igraph_integer_t bcount = VECTOR(deg_freq2)[b];
+            igraph_int_t bcount = VECTOR(deg_freq2)[b];
             partial_rhs_sum += b * bcount;
             partial_rhs_count += bcount;
 

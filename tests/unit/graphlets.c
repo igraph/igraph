@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ void test_graphlets_candidate_basis_simple(void) {
     igraph_vector_int_list_t cliques;
     igraph_vector_t thresholds;
     igraph_vector_t weights;
-    igraph_integer_t eid;
+    igraph_int_t eid;
 
     igraph_full(&g, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_int_list_init(&cliques, 0);
@@ -77,7 +77,7 @@ void test_graphlets_filtering(void) {
     igraph_small(&g, 5, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4, -1);
     igraph_vector_int_list_init(&cliques, 0);
     igraph_vector_init(&thresholds, 0);
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
+    weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
 
     igraph_graphlets_candidate_basis(&g, &weights_vec, &cliques, &thresholds);
     print_cliques_and_thresholds(&cliques, &thresholds);
@@ -104,7 +104,7 @@ void test_zachary_random_weights(void) {
     igraph_famous(&g, "zachary");
     igraph_vector_int_list_init(&cliques, 0);
     igraph_vector_init(&thresholds, 0);
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
+    weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
 
     igraph_graphlets_candidate_basis(&g, &weights_vec, &cliques, &thresholds);
     print_cliques_and_thresholds(&cliques, &thresholds);
@@ -127,7 +127,7 @@ void test_projection(void) {
     igraph_small(&g, 5, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4, -1);
     igraph_vector_int_list_init(&cliques, 0);
     igraph_vector_init(&mu, 0);
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
+    weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
 
     igraph_graphlets(&g, &weights_vec, &cliques, &mu, 1000);
     print_cliques_and_mu(&cliques, &mu);

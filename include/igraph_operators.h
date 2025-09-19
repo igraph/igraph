@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 #define IGRAPH_OPERATORS_H
 
 #include "igraph_decls.h"
-
 #include "igraph_attributes.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
@@ -36,7 +35,25 @@ IGRAPH_BEGIN_C_DECLS
 /* Graph operators                                    */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
+/**
+ * \typedef igraph_rewiring_stats_t
+ * \brief Data structure holding statistics from graph rewiring.
+ *
+ * \param successful_swaps Number of successful rewiring trials (successful swaps).
+ */
+
+typedef struct {
+    igraph_int_t successful_swaps;
+
+    /* unused members added at the end to allow us to extend the stats in the future
+     * without breaking ABI compatibility. Do not use these fields in your own code */
+
+    igraph_int_t unused1_;
+    igraph_int_t unused2_;
+    igraph_int_t unused3_;
+} igraph_rewiring_stats_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_add_edge(igraph_t *graph, igraph_int_t from, igraph_int_t to);
 IGRAPH_EXPORT igraph_error_t igraph_disjoint_union(igraph_t *res,
                                         const igraph_t *left, const igraph_t *right);
 IGRAPH_EXPORT igraph_error_t igraph_disjoint_union_many(igraph_t *res,
@@ -65,11 +82,12 @@ IGRAPH_EXPORT igraph_error_t igraph_contract_vertices(igraph_t *graph,
                                            const igraph_attribute_combination_t *vertex_comb);
 IGRAPH_EXPORT igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                                           const igraph_vector_int_t *permutation);
-IGRAPH_EXPORT igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
+IGRAPH_EXPORT igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_int_t order,
                                               igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
-                                                igraph_integer_t order, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_edge_type_sw_t allowed_edge_types);
+                                                igraph_int_t order, igraph_bool_t directed);
+IGRAPH_EXPORT igraph_error_t igraph_rewire(igraph_t *graph, igraph_int_t n, igraph_edge_type_sw_t allowed_edge_types,
+                                        igraph_rewiring_stats_t *stats);
 IGRAPH_EXPORT igraph_error_t igraph_simplify(igraph_t *graph,
                                              igraph_bool_t remove_multiple, igraph_bool_t remove_loops,
                                              const igraph_attribute_combination_t *edge_comb);
@@ -85,19 +103,19 @@ IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_edges(
 IGRAPH_EXPORT igraph_error_t igraph_subgraph_from_edges(const igraph_t *graph, igraph_t *res,
                                         igraph_es_t eids, igraph_bool_t delete_vertices);
 IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, igraph_es_t eids);
-IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_product(igraph_t *res,
                                             const igraph_t *g1,
                                             const igraph_t *g2,
                                             igraph_product_t type);
-IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t *res,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t *res,
                                                    const igraph_t *g1,
                                                    const igraph_t *g2,
-                                                   const igraph_integer_t root);
+                                                   const igraph_int_t root);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_int_t k);
 IGRAPH_EXPORT igraph_error_t igraph_corona_product(igraph_t *res,
                                                    const igraph_t *g1,
                                                    const igraph_t *g2,
                                                    const igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k);
 
 IGRAPH_END_C_DECLS
 

@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -59,10 +59,9 @@ int main(void) {
         igraph_matrix_complex_t p;
         igraph_real_t r_e[] = {1, 2, 3, 4};
         igraph_real_t theta_e[] = {0, .5 * M_PI, M_PI, 1.5 * M_PI};
-        igraph_matrix_t r;
-        igraph_matrix_t theta;
-        igraph_matrix_view(&r, r_e, 2, 2);
-        igraph_matrix_view(&theta, theta_e, 2, 2);
+        const igraph_matrix_t r = igraph_matrix_view(r_e, 2, 2);
+        const igraph_matrix_t theta = igraph_matrix_view(theta_e, 2, 2);
+
         igraph_matrix_complex_create_polar(&p, &r, &theta);
         print_matrix_complex_round(&p);
         igraph_matrix_complex_destroy(&p);
@@ -74,8 +73,8 @@ int main(void) {
         igraph_real_t e3[] = {1, 2, 3};
         igraph_real_t e4[] = {5, 6, 7, 8};
         printf("Check if unequal number of imaginary and real rows is handled correctly.\n");
-        igraph_matrix_view(&real, e3, 1, 2);
-        igraph_matrix_view(&imag, e4, 2, 2);
+        const igraph_matrix_t real = igraph_matrix_view(e3, 1, 2);
+        const igraph_matrix_t imag = igraph_matrix_view(e4, 2, 2);
         CHECK_ERROR(igraph_matrix_complex_create(&c, &real, &imag), IGRAPH_EINVAL);
         CHECK_ERROR(igraph_matrix_complex_create_polar(&c, &real, &imag), IGRAPH_EINVAL);
     }
@@ -83,8 +82,8 @@ int main(void) {
         igraph_real_t e3[] = {1, 2, 3};
         igraph_real_t e4[] = {5, 6, 7, 8};
         printf("Check if unequal number of imaginary and real columns is handled correctly.\n");
-        igraph_matrix_view(&real, e3, 2, 1);
-        igraph_matrix_view(&imag, e4, 2, 2);
+        const igraph_matrix_t real = igraph_matrix_view(e3, 2, 1);
+        const igraph_matrix_t imag = igraph_matrix_view(e4, 2, 2);
         CHECK_ERROR(igraph_matrix_complex_create(&c, &real, &imag), IGRAPH_EINVAL);
         CHECK_ERROR(igraph_matrix_complex_create_polar(&c, &real, &imag), IGRAPH_EINVAL);
     }

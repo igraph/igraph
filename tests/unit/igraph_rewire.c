@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
     igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
 
-    igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_LOOPS_SW : IGRAPH_SIMPLE_SW, use_adjlist);
+    igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_LOOPS_SW : IGRAPH_SIMPLE_SW, use_adjlist, NULL);
 
     igraph_vector_int_init(&indegree_after, 0);
     igraph_vector_int_init(&outdegree_after, 0);
@@ -44,10 +44,8 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     if ((!igraph_vector_int_all_e(&indegree_before, &indegree_after)) ||
         (!igraph_vector_int_all_e(&outdegree_before, &outdegree_after))) {
 
-        printf("%s: graph degrees changed. Rewired graph is below.\n", description);
         print_graph(&g);
-
-        abort();
+        IGRAPH_FATALF("%s: graph degrees changed. Rewired graph is above.\n", description);
     }
 
     igraph_destroy(&g);
@@ -65,7 +63,7 @@ int main(void) {
     {
         igraph_t graph;
         igraph_cycle_graph(&graph, 12, IGRAPH_UNDIRECTED, /* mutual= */ false);
-        igraph_rewire(&graph, 50, IGRAPH_SIMPLE_SW);
+        igraph_rewire(&graph, 50, IGRAPH_SIMPLE_SW, NULL);
         igraph_destroy(&graph);
     }
 

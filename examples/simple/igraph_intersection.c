@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -23,9 +23,9 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, l = igraph_vector_size(v);
+    igraph_int_t i, l = igraph_vector_size(v);
     for (i = 0; i < l; i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t) VECTOR(*v)[i]);
+        printf(" %" IGRAPH_PRId "", (igraph_int_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
@@ -37,6 +37,9 @@ int main(void) {
     igraph_vector_ptr_t glist;
     igraph_t g1, g2, g3;
     igraph_vector_int_t edge_map1, edge_map2;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, -1);
     igraph_create(&left, &v, 0, IGRAPH_DIRECTED);

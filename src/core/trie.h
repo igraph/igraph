@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@ typedef struct s_igraph_trie_node {
 
 typedef struct s_igraph_trie {
     igraph_trie_node_t node;
-    igraph_integer_t maxvalue;
+    igraph_int_t maxvalue;
     igraph_bool_t storekeys;
     igraph_strvector_t keys;
 } igraph_trie_t;
@@ -57,12 +57,12 @@ typedef struct s_igraph_trie {
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
 IGRAPH_PRIVATE_EXPORT void igraph_trie_destroy(igraph_trie_t *t);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_integer_t length,
-                                           igraph_integer_t *id);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_trie_size(igraph_trie_t *t);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_int_t *id);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_int_t *id);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_int_t length,
+                                           igraph_int_t *id);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE const char* igraph_trie_idx(igraph_trie_t *t, igraph_int_t idx);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_trie_size(igraph_trie_t *t);
 
 const igraph_strvector_t* igraph_i_trie_borrow_keys(igraph_trie_t *t);
 

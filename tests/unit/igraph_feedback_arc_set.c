@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ void check_fas(const igraph_t *graph, const igraph_vector_int_t *fas) {
     IGRAPH_ASSERT(is_acyclic);
 
     if (! igraph_is_directed(graph)) {
-        igraph_integer_t comp_no;
+        igraph_int_t comp_no;
         igraph_connected_components(graph, NULL, NULL, &comp_no, IGRAPH_WEAK);
         IGRAPH_ASSERT(igraph_ecount(graph) - igraph_vector_int_size(fas) == igraph_vcount(graph) - comp_no);
     }
@@ -40,12 +40,12 @@ void check_fas(const igraph_t *graph, const igraph_vector_int_t *fas) {
 }
 
 igraph_real_t weight(const igraph_vector_t *weights, const igraph_vector_int_t *fas) {
-    const igraph_integer_t size = igraph_vector_int_size(fas);
+    const igraph_int_t size = igraph_vector_int_size(fas);
     if (!weights) {
         return (igraph_real_t) size;
     } else {
         igraph_real_t total = 0;
-        for (igraph_integer_t i=0; i < size; i++) {
+        for (igraph_int_t i=0; i < size; i++) {
             total += VECTOR(*weights)[ VECTOR(*fas)[i] ];
         }
         return total;
@@ -79,9 +79,9 @@ void compare_methods(const igraph_t *graph, const igraph_vector_t *weights) {
 }
 
 void rand_weights(const igraph_t *graph, igraph_vector_t *weights) {
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_resize(weights, ecount);
-    for (igraph_integer_t i=0; i < ecount; i++) {
+    for (igraph_int_t i=0; i < ecount; i++) {
         VECTOR(*weights)[i] = RNG_UNIF01();
     }
 }
@@ -121,7 +121,7 @@ void test_undirected(void) {
     igraph_destroy(&graph);
 
     /* Random graph */
-    igraph_erdos_renyi_game_gnm(&graph, 20, 40, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 20, 40, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_APPROX_EADES);
     check_fas(&graph, &result);
     igraph_destroy(&graph);
@@ -215,7 +215,7 @@ void test_directed(void) {
     igraph_destroy(&graph);
 
     /* Acyclic graph */
-    igraph_erdos_renyi_game_gnm(&graph, 20, 30, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 20, 30, IGRAPH_DIRECTED, IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_ACYCLIC);
     compare_methods(&graph, NULL);
     rand_weights(&graph, &weights);
@@ -223,8 +223,8 @@ void test_directed(void) {
     igraph_destroy(&graph);
 
     /* Several random graphs */
-    for (igraph_integer_t m=10; m <= 60; m += 10) {
-        igraph_erdos_renyi_game_gnm(&graph, 20, m, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    for (igraph_int_t m=10; m <= 60; m += 10) {
+        igraph_erdos_renyi_game_gnm(&graph, 20, m, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
         compare_methods(&graph, NULL);
         rand_weights(&graph, &weights);
         compare_methods(&graph, &weights);
@@ -234,7 +234,7 @@ void test_directed(void) {
     /* Stress test CG method.
      * This should run in a reasonable amount of time. */
 
-    igraph_erdos_renyi_game_gnm(&graph, 200, 400, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 200, 400, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_EXACT_IP_CG);
     igraph_destroy(&graph);
 

@@ -79,7 +79,6 @@ add_legacy_tests(
   igraph_sparsemat_minmax
   igraph_sparsemat_nonzero_storage
   igraph_sparsemat_normalize
-  igraph_sparsemat_view
   igraph_sparsemat_which_minmax
   igraph_strvector
   igraph_vector_floor
@@ -168,7 +167,6 @@ add_legacy_tests(
 # structure_generators.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_adjacency
   igraph_atlas
   igraph_barabasi_game
   igraph_barabasi_game2
@@ -729,6 +727,7 @@ add_legacy_tests(
   igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
+  max_results
 )
 
 # eigen.at
@@ -932,7 +931,10 @@ add_legacy_tests(
 # spatial
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  beta_skeletons
+  igraph_delaunay_graph
   igraph_nearest_neighbor_graph
+  igraph_spatial_edge_lengths
 )
 
 
@@ -1007,6 +1009,7 @@ add_benchmarks(
   graphicality
   igraph_adjacency
   igraph_average_path_length_unweighted
+  beta_skeletons
   igraph_betweenness
   igraph_betweenness_weighted
   igraph_cliques
@@ -1015,6 +1018,7 @@ add_benchmarks(
   igraph_decompose
   igraph_degree
   igraph_degree_sequence_game
+  igraph_delaunay_graph
   igraph_distances
   igraph_ecc
   igraph_induced_subgraph
@@ -1029,6 +1033,8 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_realize_degree_sequence
+  igraph_rewire
   igraph_strength
   igraph_transitivity
   igraph_tree_game

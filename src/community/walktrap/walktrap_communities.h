@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
 
@@ -123,7 +123,7 @@ public:
 class Communities {
 private:
     igraph_matrix_int_t *merges;
-    igraph_integer_t mergeidx;
+    igraph_int_t mergeidx;
     igraph_vector_t *modularity;
 
 public:

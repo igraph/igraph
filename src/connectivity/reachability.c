@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,6 @@
  * \ingroup structural
  * \function igraph_reachability
  * \brief Calculates which vertices are reachable from each vertex in the graph.
- *
- * \experimental
  *
  * The resulting list will contain one bitset for each strongly connected component.
  * The bitset for component i will have its j-th bit set, if vertex j is reachable
@@ -67,7 +65,7 @@
  * |C| is the number of strongly connected components (at most |V|),
  * |V| is the number of vertices, and
  * |E| is the number of edges respectively,
- * and w is the bit width of \type igraph_integer_t, typically the
+ * and w is the bit width of \type igraph_int_t, typically the
  * word size of the machine (32 or 64).
  */
 
@@ -75,12 +73,12 @@ igraph_error_t igraph_reachability(
         const igraph_t *graph,
         igraph_vector_int_t *membership,
         igraph_vector_int_t *csize,
-        igraph_integer_t *no_of_components,
+        igraph_int_t *no_of_components,
         igraph_bitset_list_t *reach,
         igraph_neimode_t mode) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_comps;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_comps;
     igraph_adjlist_t adjlist, dag;
 
     if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
@@ -101,10 +99,10 @@ igraph_error_t igraph_reachability(
 
     IGRAPH_CHECK(igraph_bitset_list_resize(reach, no_of_comps));
 
-    for (igraph_integer_t comp = 0; comp < no_of_comps; comp++) {
+    for (igraph_int_t comp = 0; comp < no_of_comps; comp++) {
         IGRAPH_CHECK(igraph_bitset_resize(igraph_bitset_list_get_ptr(reach, comp), no_of_nodes));
     }
-    for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+    for (igraph_int_t v = 0; v < no_of_nodes; v++) {
         IGRAPH_BIT_SET(*igraph_bitset_list_get_ptr(reach, VECTOR(*membership)[v]), v);
     }
 
@@ -118,12 +116,12 @@ igraph_error_t igraph_reachability(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&dag, no_of_comps));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &dag);
 
-    for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+    for (igraph_int_t v = 0; v < no_of_nodes; v++) {
         const igraph_vector_int_t *neighbours = igraph_adjlist_get(&adjlist, v);
         igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, VECTOR(*membership)[v]);
-        const igraph_integer_t n = igraph_vector_int_size(neighbours);
-        for (igraph_integer_t i = 0; i < n; i++) {
-            igraph_integer_t w = VECTOR(*neighbours)[i];
+        const igraph_int_t n = igraph_vector_int_size(neighbours);
+        for (igraph_int_t i = 0; i < n; i++) {
+            igraph_int_t w = VECTOR(*neighbours)[i];
             if (VECTOR(*membership)[v] != VECTOR(*membership)[w]) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(dag_neighbours, VECTOR(*membership)[w]));
             }
@@ -132,12 +130,12 @@ igraph_error_t igraph_reachability(
 
     /* Iterate through strongly connected components in reverser topological order,
      * exploiting the fact that they are indexed in topological order. */
-    for (igraph_integer_t i = 0; i < no_of_comps; i++) {
-        const igraph_integer_t comp = mode == IGRAPH_IN ? i : no_of_comps - i - 1;
+    for (igraph_int_t i = 0; i < no_of_comps; i++) {
+        const igraph_int_t comp = mode == IGRAPH_IN ? i : no_of_comps - i - 1;
         const igraph_vector_int_t *dag_neighbours = igraph_adjlist_get(&dag, comp);
         igraph_bitset_t *from_bitset = igraph_bitset_list_get_ptr(reach, comp);
-        const igraph_integer_t n = igraph_vector_int_size(dag_neighbours);
-        for (igraph_integer_t j = 0; j < n; j++) {
+        const igraph_int_t n = igraph_vector_int_size(dag_neighbours);
+        for (igraph_int_t j = 0; j < n; j++) {
             const igraph_bitset_t *to_bitset = igraph_bitset_list_get_ptr(reach, VECTOR(*dag_neighbours)[j]);
             igraph_bitset_or(from_bitset, from_bitset, to_bitset);
         }
@@ -155,8 +153,6 @@ igraph_error_t igraph_reachability(
  * \ingroup structural
  * \function igraph_count_reachable
  * \brief The number of vertices reachable from each vertex in the graph.
- *
- * \experimental
  *
  * \param graph The graph object to analyze.
  * \param counts Integer vector. <code>counts[v]</code> will store the number
@@ -176,7 +172,7 @@ igraph_error_t igraph_reachability(
  * |C| is the number of strongly connected components (at most |V|),
  * |V| is the number of vertices, and
  * |E| is the number of edges respectively,
- * and w is the bit width of \type igraph_integer_t, typically the
+ * and w is the bit width of \type igraph_int_t, typically the
  * word size of the machine (32 or 64).
  */
 
@@ -185,7 +181,7 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
                                       igraph_neimode_t mode) {
 
     igraph_vector_int_t membership;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_bitset_list_t reach;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
@@ -194,7 +190,7 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
     IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, mode));
 
     IGRAPH_CHECK(igraph_vector_int_resize(counts, igraph_vcount(graph)));
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         VECTOR(*counts)[i] = igraph_bitset_popcount(igraph_bitset_list_get_ptr(&reach, VECTOR(membership)[i]));
     }
 
@@ -227,7 +223,7 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
  * |E| is the number of edges, respectively.
  */
 igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closure) {
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     const igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_int_t membership, edges;
     igraph_bitset_list_t reach;
@@ -238,9 +234,9 @@ igraph_error_t igraph_transitive_closure(const igraph_t *graph, igraph_t *closur
     IGRAPH_CHECK(igraph_reachability(graph, &membership, NULL, NULL, &reach, IGRAPH_OUT));
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+    for (igraph_int_t u = 0; u < no_of_nodes; u++) {
         const igraph_bitset_t *row = igraph_bitset_list_get_ptr(&reach, VECTOR(membership)[u]);
-        for (igraph_integer_t v = directed ? 0 : u + 1; v < no_of_nodes; v++) {
+        for (igraph_int_t v = directed ? 0 : u + 1; v < no_of_nodes; v++) {
             if (u != v && IGRAPH_BIT_TEST(*row, v)) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, u));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v));

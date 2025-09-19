@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
                  const igraph_vector_int_list_t *paths,
                  const igraph_vector_int_t *nrgeo) {
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
     igraph_vector_int_t nrgeo2, *path;
     igraph_vit_t vit;
 
@@ -48,7 +48,7 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
 
     igraph_vit_create(graph, vs, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+        igraph_int_t node = IGRAPH_VIT_GET(vit);
         if (VECTOR(*nrgeo)[node] - VECTOR(nrgeo2)[node]) {
             printf("nrgeo[%" IGRAPH_PRId "] invalid, observed = %" IGRAPH_PRId ", expected = %" IGRAPH_PRId "\n",
                    node, VECTOR(*nrgeo)[node], VECTOR(nrgeo2)[node]);
@@ -60,7 +60,7 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
 }
 
 void print_and_destroy_items(igraph_vector_int_list_t* vec) {
-    igraph_integer_t i;
+    igraph_int_t i;
 
     for (i = 0; i < igraph_vector_int_list_size(vec); i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(vec, i));
@@ -76,7 +76,7 @@ int main(void) {
 
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
-    igraph_integer_t dim[] = { 4, 4 };
+    igraph_int_t dim[] = { 4, 4 };
 
     igraph_vector_t weights_vec;
     igraph_vector_int_t nrgeo;
@@ -104,7 +104,7 @@ int main(void) {
 
     /* Same ring, but with weights */
 
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
+    weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
                 /*vertices=*/ &vertices, /*edges=*/ NULL, /*nrgeo=*/ &nrgeo,
@@ -135,7 +135,7 @@ int main(void) {
                  2, 1,
                  -1);
 
-    igraph_vector_view(&weights_vec, weights2, sizeof(weights2) / sizeof(weights2[0]));
+    weights_vec = igraph_vector_view(weights2, sizeof(weights2) / sizeof(weights2[0]));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
                 /*vertices=*/ &vertices, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,
@@ -155,7 +155,7 @@ int main(void) {
     igraph_destroy(&g);
 
     /* Regular lattice with some heavyweight edges */
-    igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(dim[0]));
+    dim_vec = igraph_vector_int_view(dim, sizeof(dim) / sizeof(dim[0]));
     igraph_square_lattice(&g, &dim_vec, 1, 0, 0, 0);
     igraph_vs_vector_small(&vs, 3, 12, 15, -1);
     igraph_vector_init(&weights_vec, 24);

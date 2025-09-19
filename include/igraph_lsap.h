@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2014-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
+IGRAPH_EXPORT igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_int_t n,
                       igraph_vector_int_t *p);
 
 IGRAPH_END_C_DECLS

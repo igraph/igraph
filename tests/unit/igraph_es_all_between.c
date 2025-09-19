@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -29,7 +29,7 @@ igraph_error_t test_directed(void) {
     igraph_t g;
     igraph_es_t es;
     igraph_eit_t eit;
-    igraph_integer_t size;
+    igraph_int_t size;
 
     IGRAPH_CHECK(igraph_small(&g, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 3, 1, 2, 3, 4, 1, 2, 4, 0, -1));
     IGRAPH_CHECK(igraph_add_edge(&g, 1, 2));
@@ -45,8 +45,8 @@ igraph_error_t test_directed(void) {
     IGRAPH_CHECK(igraph_es_size(&g, &es, &size));
     IGRAPH_ASSERT(size == 1);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         IGRAPH_CHECK(igraph_edge(&g, edge, &from, &to));
         IGRAPH_ASSERT(from == 0);
         IGRAPH_ASSERT(to == 1);
@@ -72,8 +72,8 @@ igraph_error_t test_directed(void) {
     IGRAPH_CHECK(igraph_es_size(&g, &es, &size));
     IGRAPH_ASSERT(size == 8);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         IGRAPH_CHECK(igraph_edge(&g, edge, &from, &to));
         IGRAPH_ASSERT(from == 1);
         IGRAPH_ASSERT(to == 2);
@@ -90,8 +90,8 @@ igraph_error_t test_directed(void) {
     IGRAPH_CHECK(igraph_es_size(&g, &es, &size));
     IGRAPH_ASSERT(size == 2);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         IGRAPH_CHECK(igraph_edge(&g, edge, &from, &to));
         IGRAPH_ASSERT(from == 3);
         IGRAPH_ASSERT(to == 4);
@@ -113,7 +113,7 @@ igraph_error_t test_undirected(void) {
     igraph_t g;
     igraph_es_t es;
     igraph_eit_t eit;
-    igraph_integer_t size;
+    igraph_int_t size;
 
     IGRAPH_CHECK(igraph_small(&g, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 1, 2, 3, 4, 1, 2, 4, 0, -1));
     IGRAPH_CHECK(igraph_add_edge(&g, 1, 2));
@@ -129,8 +129,8 @@ igraph_error_t test_undirected(void) {
     IGRAPH_CHECK(igraph_es_size(&g, &es, &size));
     IGRAPH_ASSERT(size == 1);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         IGRAPH_CHECK(igraph_edge(&g, edge, &from, &to));
         IGRAPH_ASSERT(from == 0);
         IGRAPH_ASSERT(to == 1);
@@ -156,8 +156,8 @@ igraph_error_t test_undirected(void) {
     IGRAPH_CHECK(igraph_es_size(&g, &es, &size));
     IGRAPH_ASSERT(size == 8);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         IGRAPH_CHECK(igraph_edge(&g, edge, &from, &to));
         IGRAPH_ASSERT(from == 1);
         IGRAPH_ASSERT(to == 2);
@@ -174,8 +174,8 @@ igraph_error_t test_undirected(void) {
     IGRAPH_CHECK(igraph_es_size(&g, &es, &size));
     IGRAPH_ASSERT(size == 2);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         IGRAPH_CHECK(igraph_edge(&g, edge, &from, &to));
         IGRAPH_ASSERT(from == 3);
         IGRAPH_ASSERT(to == 4);

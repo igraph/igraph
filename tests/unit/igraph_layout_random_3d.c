@@ -1,6 +1,6 @@
 /*
-   IGraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   igraph library.
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 int main(void) {
     igraph_t g;
     igraph_matrix_t result;
+    igraph_real_t min, max;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -29,7 +30,8 @@ int main(void) {
     igraph_small(&g, 0, 0, -1);
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_random_3d(&g, &result) == IGRAPH_SUCCESS);
-    print_matrix(&result);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&result) == 0);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&result) == 3);
     igraph_destroy(&g);
     igraph_matrix_destroy(&result);
 
@@ -37,7 +39,11 @@ int main(void) {
     igraph_small(&g, 1, 0, -1);
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_random_3d(&g, &result) == IGRAPH_SUCCESS);
-    print_matrix(&result);
+    igraph_matrix_minmax(&result, &min, &max);
+    IGRAPH_ASSERT(-1 <= min);
+    IGRAPH_ASSERT(max <= 1);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&result) == 1);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&result) == 3);
     igraph_destroy(&g);
     igraph_matrix_destroy(&result);
 
@@ -45,7 +51,11 @@ int main(void) {
     igraph_small(&g, 10, 0, 0,1, 0,1, 0,1, 2,2, 2,2, 2,2, 3,4, -1);
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_random_3d(&g, &result) == IGRAPH_SUCCESS);
-    print_matrix(&result);
+    igraph_matrix_minmax(&result, &min, &max);
+    IGRAPH_ASSERT(-1 <= min);
+    IGRAPH_ASSERT(max <= 1);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&result) == 10);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&result) == 3);
     igraph_destroy(&g);
     igraph_matrix_destroy(&result);
 

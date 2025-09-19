@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -127,7 +127,7 @@ static const char *igraph_i_error_strings[] = {
     /* 36 */ NULL, // "Unknown ARPACK error",
     /* ARPACK error codes end here */
 
-    /* 37 */ "Negative loop detected while calculating shortest paths",
+    /* 37 */ "Negative cycle detected while calculating shortest paths",
     /* 38 */ "Internal error, likely a bug in igraph",
 
     /* More ARPACK error codes moved to igraph_arpack_error_t in arpack.c from version 1.0 */

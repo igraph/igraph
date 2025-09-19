@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -16,16 +16,16 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_structural.h"
-#include "misc/feedback_arc_set.h"
+#include "igraph_cycles.h"
+#include "cycles/feedback_sets.h"
 
 #include "igraph_bitset.h"
 #include "igraph_components.h"
-#include "igraph_cycles.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_stack.h"
+#include "igraph_structural.h"
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 #include "igraph_visitor.h"
@@ -51,14 +51,14 @@ static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
                                           igraph_neimode_t mode,
                                           const igraph_bitset_t *removed) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_stack_int_t stack;
     igraph_vector_int_t inc;
     igraph_vector_int_t vpath, epath;
     igraph_vector_char_t seen; /* 0 = unseen, 1 = acestor of current, 2 = seen, non-ancestor */
-    igraph_integer_t ea, va;
-    igraph_integer_t depth;
+    igraph_int_t ea, va;
+    igraph_int_t depth;
 
     if (vertices) {
         igraph_vector_int_clear(vertices);
@@ -97,7 +97,7 @@ static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
     IGRAPH_VECTOR_CHAR_INIT_FINALLY(&seen, vcount);
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, 200);
 
-    for (igraph_integer_t v=0; v < vcount; v++) {
+    for (igraph_int_t v=0; v < vcount; v++) {
         if (VECTOR(seen)[v]) {
             continue;
         }
@@ -106,7 +106,7 @@ static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
         IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
 
         while (! igraph_stack_int_empty(&stack)) {
-            igraph_integer_t x = igraph_stack_int_pop(&stack);
+            igraph_int_t x = igraph_stack_int_pop(&stack);
             if (x == -1) {
                 PATH_POP();
                 continue;
@@ -125,10 +125,10 @@ static igraph_error_t igraph_i_find_cycle(const igraph_t *graph,
 
             IGRAPH_CHECK(igraph_stack_int_push(&stack, -1));
             IGRAPH_CHECK(igraph_incident(graph, &inc, va, mode, IGRAPH_LOOPS));
-            igraph_integer_t n = igraph_vector_int_size(&inc);
-            for (igraph_integer_t i=0; i < n; i++) {
-                igraph_integer_t eb = VECTOR(inc)[i];
-                igraph_integer_t vb = IGRAPH_OTHER(graph, eb, va);
+            igraph_int_t n = igraph_vector_int_size(&inc);
+            for (igraph_int_t i=0; i < n; i++) {
+                igraph_int_t eb = VECTOR(inc)[i];
+                igraph_int_t vb = IGRAPH_OTHER(graph, eb, va);
                 if (eb == ea) continue;
                 if (VECTOR(seen)[vb] == 2) continue;
                 if (removed && IGRAPH_BIT_TEST(*removed, eb)) continue;
@@ -149,7 +149,7 @@ finish:
     depth = igraph_vector_int_size(&vpath);
 
     if (depth > 0) {
-        igraph_integer_t i = depth;
+        igraph_int_t i = depth;
         while (VECTOR(vpath)[i-1] != va) i--;
         for (; i < depth; i++) {
             if (vertices) {
@@ -184,8 +184,6 @@ finish:
 /**
  * \function igraph_find_cycle
  * \brief Finds a single cycle in the graph.
- *
- * \experimental
  *
  * This function returns a cycle of the graph, if there is one. If the graph
  * is acyclic, it returns empty vectors.
@@ -385,8 +383,6 @@ igraph_error_t igraph_feedback_arc_set(
  * \function igraph_feedback_vertex_set
  * \brief Feedback vertex set of a graph.
  *
- * \experimental
- *
  * A feedback vertex set is a set of vertices whose removal makes the graph
  * acyclic. Finding a \em minimum feedback vertex set is an NP-complete
  * problem, both on directed and undirected graphs.
@@ -436,8 +432,8 @@ igraph_error_t igraph_feedback_vertex_set(
 igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights, igraph_vector_int_t *layering) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t edges;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
@@ -464,7 +460,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
 
     if (result) {
         igraph_vector_int_clear(result);
-        for (igraph_integer_t i = 0, j = 0; i < no_of_edges; i++) {
+        for (igraph_int_t i = 0, j = 0; i < no_of_edges; i++) {
             if (i == VECTOR(edges)[j]) {
                 j++;
                 continue;
@@ -515,16 +511,16 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
  */
 igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_int_t *result,
                                     const igraph_vector_t *weights, igraph_vector_int_t *layers) {
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nodes_left;
-    igraph_integer_t neis_size;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t nodes_left;
+    igraph_int_t neis_size;
     igraph_dqueue_int_t sources, sinks;
     igraph_vector_int_t neis;
     igraph_vector_int_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
     igraph_vector_int_t ordering;
-    igraph_integer_t order_next_pos = 0, order_next_neg = -1;
+    igraph_int_t order_next_pos = 0, order_next_neg = -1;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ordering, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
@@ -543,7 +539,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
         IGRAPH_CHECK(igraph_strength(graph, &instrengths, igraph_vss_all(), IGRAPH_IN, IGRAPH_NO_LOOPS, weights));
         IGRAPH_CHECK(igraph_strength(graph, &outstrengths, igraph_vss_all(), IGRAPH_OUT, IGRAPH_NO_LOOPS, weights));
     } else {
-        for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+        for (igraph_int_t u = 0; u < no_of_nodes; u++) {
             VECTOR(instrengths)[u] = VECTOR(indegrees)[u];
             VECTOR(outstrengths)[u] = VECTOR(outdegrees)[u];
         }
@@ -551,7 +547,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
     /* Find initial sources and sinks */
     nodes_left = no_of_nodes;
-    for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+    for (igraph_int_t u = 0; u < no_of_nodes; u++) {
         if (VECTOR(indegrees)[u] == 0) {
             if (VECTOR(outdegrees)[u] == 0) {
                 /* Isolated vertex, we simply ignore it */
@@ -573,7 +569,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         /* (1) Remove the sources one by one */
         while (!igraph_dqueue_int_empty(&sources)) {
-            const igraph_integer_t u = igraph_dqueue_int_pop(&sources);
+            const igraph_int_t u = igraph_dqueue_int_pop(&sources);
             /* Add the node to the ordering */
             VECTOR(ordering)[u] = order_next_pos++;
             /* Exclude the node from further searches */
@@ -581,9 +577,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Get the neighbors and decrease their degrees */
             IGRAPH_CHECK(igraph_incident(graph, &neis, u, IGRAPH_OUT, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
-            for (igraph_integer_t i = 0; i < neis_size; i++) {
-                const igraph_integer_t eid = VECTOR(neis)[i];
-                const igraph_integer_t w = IGRAPH_TO(graph, eid);
+            for (igraph_int_t i = 0; i < neis_size; i++) {
+                const igraph_int_t eid = VECTOR(neis)[i];
+                const igraph_int_t w = IGRAPH_TO(graph, eid);
                 if (VECTOR(indegrees)[w] <= 0) {
                     /* Already removed, continue */
                     continue;
@@ -599,7 +595,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         /* (2) Remove the sinks one by one */
         while (!igraph_dqueue_int_empty(&sinks)) {
-            const igraph_integer_t u = igraph_dqueue_int_pop(&sinks);
+            const igraph_int_t u = igraph_dqueue_int_pop(&sinks);
             /* Maybe the vertex became sink and source at the same time, hence it
              * was already removed in the previous iteration. Check it. */
             if (VECTOR(indegrees)[u] < 0) {
@@ -612,9 +608,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Get the neighbors and decrease their degrees */
             IGRAPH_CHECK(igraph_incident(graph, &neis, u, IGRAPH_IN, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
-            for (igraph_integer_t i = 0; i < neis_size; i++) {
-                const igraph_integer_t eid = VECTOR(neis)[i];
-                const igraph_integer_t w = IGRAPH_FROM(graph, eid);
+            for (igraph_int_t i = 0; i < neis_size; i++) {
+                const igraph_int_t eid = VECTOR(neis)[i];
+                const igraph_int_t w = IGRAPH_FROM(graph, eid);
                 if (VECTOR(outdegrees)[w] <= 0) {
                     /* Already removed, continue */
                     continue;
@@ -630,9 +626,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         /* (3) No more sources or sinks. Find the node with the largest
          * difference between its out-strength and in-strength */
-        igraph_integer_t v = -1;
+        igraph_int_t v = -1;
         igraph_real_t maxdiff = -IGRAPH_INFINITY;
-        for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+        for (igraph_int_t u = 0; u < no_of_nodes; u++) {
             if (VECTOR(outdegrees)[u] < 0) {
                 continue;
             }
@@ -648,9 +644,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Remove outgoing edges */
             IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_OUT, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
-            for (igraph_integer_t i = 0; i < neis_size; i++) {
-                const igraph_integer_t eid = VECTOR(neis)[i];
-                const igraph_integer_t w = IGRAPH_TO(graph, eid);
+            for (igraph_int_t i = 0; i < neis_size; i++) {
+                const igraph_int_t eid = VECTOR(neis)[i];
+                const igraph_int_t w = IGRAPH_TO(graph, eid);
                 if (VECTOR(indegrees)[w] <= 0) {
                     /* Already removed, continue */
                     continue;
@@ -664,9 +660,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
             /* Remove incoming edges */
             IGRAPH_CHECK(igraph_incident(graph, &neis, v, IGRAPH_IN, IGRAPH_LOOPS));
             neis_size = igraph_vector_int_size(&neis);
-            for (igraph_integer_t i = 0; i < neis_size; i++) {
-                const igraph_integer_t eid = VECTOR(neis)[i];
-                const igraph_integer_t w = IGRAPH_FROM(graph, eid);
+            for (igraph_int_t i = 0; i < neis_size; i++) {
+                const igraph_int_t eid = VECTOR(neis)[i];
+                const igraph_int_t w = IGRAPH_FROM(graph, eid);
                 if (VECTOR(outdegrees)[w] <= 0) {
                     /* Already removed, continue */
                     continue;
@@ -693,7 +689,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     IGRAPH_FINALLY_CLEAN(6);
 
     /* Tidy up the ordering */
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(ordering)[i] < 0) {
             VECTOR(ordering)[i] += no_of_nodes;
         }
@@ -702,9 +698,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     /* Find the feedback edges based on the ordering */
     if (result) {
         igraph_vector_int_clear(result);
-        for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, eid);
-            igraph_integer_t to = IGRAPH_TO(graph, eid);
+        for (igraph_int_t eid = 0; eid < no_of_edges; eid++) {
+            igraph_int_t from = IGRAPH_FROM(graph, eid);
+            igraph_int_t to = IGRAPH_TO(graph, eid);
             if (from == to || VECTOR(ordering)[from] > VECTOR(ordering)[to]) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(result, eid));
             }
@@ -722,14 +718,14 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 
         IGRAPH_CHECK(igraph_vector_int_sort_ind(&ordering, &ranks, IGRAPH_ASCENDING));
 
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t from = VECTOR(ranks)[i];
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+            igraph_int_t from = VECTOR(ranks)[i];
             IGRAPH_CHECK(igraph_neighbors(
                 graph, &neis, from, IGRAPH_OUT, IGRAPH_LOOPS, IGRAPH_MULTIPLE
             ));
             neis_size = igraph_vector_int_size(&neis);
-            for (igraph_integer_t j = 0; j < neis_size; j++) {
-                igraph_integer_t to = VECTOR(neis)[j];
+            for (igraph_int_t j = 0; j < neis_size; j++) {
+                igraph_int_t to = VECTOR(neis)[j];
                 if (from == to) {
                     continue;
                 }
@@ -766,13 +762,13 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
-    const igraph_integer_t no_of_vertices = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_components;
+    const igraph_int_t no_of_vertices = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_components;
     igraph_vector_int_t membership, *vec;
     igraph_vector_int_t ordering, vertex_remapping;
     igraph_vector_int_list_t vertices_by_components, edges_by_components;
-    igraph_integer_t i, j, k, l, m, n, from, to, no_of_rows, n_choose_2;
+    igraph_int_t i, j, k, l, m, n, from, to, no_of_rows, n_choose_2;
     igraph_real_t weight;
     glp_prob *ip;
     glp_iocp parm;
@@ -893,8 +889,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip_ti(
                  */
 
                 /* res = n * (n - 1) * (n - 2) / 3 */
-                igraph_integer_t mod = n % 3;
-                igraph_integer_t res = n / 3; /* same as (n - mod) / 3 */
+                igraph_int_t mod = n % 3;
+                igraph_int_t res = n / 3; /* same as (n - mod) / 3 */
 
                 mod = (mod + 1) % 3;
                 IGRAPH_SAFE_MULT(res, n - mod, &res);
@@ -1088,7 +1084,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
 #ifndef HAVE_GLPK
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_bool_t is_dag;
     igraph_bitset_t removed;
     igraph_vector_int_t cycle;
@@ -1179,7 +1175,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip_cg(
         igraph_bitset_null(&removed);
         for (int j=1; j <= var_count; j++) {
             if (glp_mip_col_val(ip, j) > 0) {
-                igraph_integer_t i = VAR_TO_ID(j);
+                igraph_int_t i = VAR_TO_ID(j);
                 IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
                 IGRAPH_BIT_SET(removed, i);
             }
@@ -1205,8 +1201,8 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
     IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_bool_t is_acyclic;
     igraph_bitset_t removed;
     igraph_vector_int_t cycle;
@@ -1275,9 +1271,9 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
         while (true) {
             for (int i=0; i < cycle_size; i++) {
                 IGRAPH_CHECK(igraph_incident(graph, &incident, VECTOR(cycle)[i], IGRAPH_ALL, IGRAPH_LOOPS));
-                const igraph_integer_t incident_size = igraph_vector_int_size(&incident);
-                for (igraph_integer_t j = 0; j < incident_size; j++) {
-                    igraph_integer_t eid = VECTOR(incident)[j];
+                const igraph_int_t incident_size = igraph_vector_int_size(&incident);
+                for (igraph_int_t j = 0; j < incident_size; j++) {
+                    igraph_int_t eid = VECTOR(incident)[j];
                     IGRAPH_BIT_SET(removed, eid);
                 }
             }
@@ -1301,14 +1297,14 @@ igraph_error_t igraph_i_feedback_vertex_set_ip_cg(
 
         for (int j=1; j <= var_count; j++) {
             if (glp_mip_col_val(ip, j) > 0) {
-                igraph_integer_t i = VAR_TO_ID(j);
+                igraph_int_t i = VAR_TO_ID(j);
                 IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
 
                 IGRAPH_CHECK(igraph_incident(graph, &incident, i, IGRAPH_ALL, IGRAPH_LOOPS));
 
-                const igraph_integer_t incident_size = igraph_vector_int_size(&incident);
-                for (igraph_integer_t k = 0; k < incident_size; k++) {
-                    igraph_integer_t eid = VECTOR(incident)[k];
+                const igraph_int_t incident_size = igraph_vector_int_size(&incident);
+                for (igraph_int_t k = 0; k < incident_size; k++) {
+                    igraph_int_t eid = VECTOR(incident)[k];
                     IGRAPH_BIT_SET(removed, eid);
                 }
             }

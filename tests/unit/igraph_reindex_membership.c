@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,26 +20,26 @@
 
 #include "test_utilities.h"
 
-void check(igraph_integer_t n, igraph_integer_t type_index_count, igraph_integer_t type_count) {
+void check(igraph_int_t n, igraph_int_t type_index_count, igraph_int_t type_count) {
     igraph_vector_int_t membership;
     igraph_vector_int_t mapping;
     igraph_vector_int_t new_to_old;
-    igraph_integer_t nb_clusters;
+    igraph_int_t nb_clusters;
 
     igraph_vector_int_init(&new_to_old, 0);
 
     igraph_vector_int_init(&mapping, type_count);
-    for (igraph_integer_t i=0; i < type_count; i++) {
+    for (igraph_int_t i=0; i < type_count; i++) {
         VECTOR(mapping)[i] = RNG_INTEGER(0, type_index_count-1);
     }
 
     igraph_vector_int_init(&membership, n);
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         VECTOR(membership)[i] = VECTOR(mapping)[ RNG_INTEGER(0, type_count-1) ];
     }
 
-    igraph_integer_t min_original_type = n > 0 ? igraph_vector_int_min(&membership) : 0;
-    igraph_integer_t max_original_type = n > 0 ? igraph_vector_int_max(&membership) : 0;
+    igraph_int_t min_original_type = n > 0 ? igraph_vector_int_min(&membership) : 0;
+    igraph_int_t max_original_type = n > 0 ? igraph_vector_int_max(&membership) : 0;
 
     printf("Old: "); print_vector_int(&membership);
     igraph_reindex_membership(&membership, &new_to_old, &nb_clusters);

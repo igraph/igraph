@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -63,7 +63,7 @@
     #define EQ(a,b) ((a && b) || (!a && !b))
 
 #elif defined(BASE_INT)
-    #define BASE igraph_integer_t
+    #define BASE igraph_int_t
     #define BASE_VECTOR igraph_vector_int_t
     #define BASE_MATRIX igraph_matrix_int_t
     #define SHORT int

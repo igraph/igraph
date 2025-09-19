@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,11 +24,11 @@
 void test_undirected(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
-    igraph_vector_t weights;
+    const igraph_vector_t weights =
+        igraph_vector_view(weights_array, sizeof(weights_array) / sizeof(weights_array[0]));
     igraph_matrix_t m;
 
     igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 3, 2, 2, 0, 1, -1);
-    igraph_vector_view(&weights, weights_array, igraph_ecount(&graph));
 
     igraph_matrix_init(&m, 2, 2);
 
@@ -131,11 +131,11 @@ void test_undirected(void) {
 void test_directed(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
-    igraph_vector_t weights;
+    const igraph_vector_t weights =
+        igraph_vector_view(weights_array, sizeof(weights_array) / sizeof(weights_array[0]));
     igraph_matrix_t m;
 
     igraph_small(&graph, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 3, 2, 2, 0, 1, -1);
-    igraph_vector_view(&weights, weights_array, igraph_ecount(&graph));
 
     igraph_matrix_init(&m, 2, 2);
 

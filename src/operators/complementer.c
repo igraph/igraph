@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2020 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -50,11 +50,11 @@
 igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
                         igraph_bool_t loops) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t edges;
     igraph_vector_int_t neis;
-    igraph_integer_t i, j;
-    igraph_integer_t zero = 0, *limit;
+    igraph_int_t i, j;
+    igraph_int_t zero = 0, *limit;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);

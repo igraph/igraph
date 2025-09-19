@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -56,15 +56,15 @@
 
 struct HUGE_INDEX {
     unsigned int field_index;
-    igraph_integer_t in_field_index;
+    igraph_int_t in_field_index;
 };
 
 template <class DATA>
 class HugeArray {
-    igraph_integer_t size = 2;
+    igraph_int_t size = 2;
     unsigned int highest_field_index = 0;
-    const igraph_integer_t max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
-    igraph_integer_t max_index = 0;
+    const igraph_int_t max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
+    igraph_int_t max_index = 0;
     DATA *data;
     DATA *fields[32];
 public:
@@ -72,11 +72,11 @@ public:
     HugeArray(const HugeArray &) = delete;
     HugeArray & operator = (const HugeArray &) = delete;
     ~HugeArray();
-    HUGE_INDEX get_huge_index(igraph_integer_t) const;
-    DATA &Set(igraph_integer_t index);
-    DATA Get(igraph_integer_t index) { return Set(index); }
-    DATA &operator[](igraph_integer_t index) { return Set(index); }
-    igraph_integer_t Size() const { return max_index; }
+    HUGE_INDEX get_huge_index(igraph_int_t) const;
+    DATA &Set(igraph_int_t index);
+    DATA Get(igraph_int_t index) { return Set(index); }
+    DATA &operator[](igraph_int_t index) { return Set(index); }
+    igraph_int_t Size() const { return max_index; }
 } ;
 
 //###############################################################################################
@@ -92,11 +92,11 @@ class DLItem {
     friend class DLList_Iter<L_DATA>;
 
     L_DATA  item;
-    igraph_integer_t index;
+    igraph_int_t index;
     DLItem *previous;
     DLItem *next;
-    DLItem(L_DATA i, igraph_integer_t ind);
-    DLItem(L_DATA i, igraph_integer_t ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n);
+    DLItem(L_DATA i, igraph_int_t ind);
+    DLItem(L_DATA i, igraph_int_t ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n);
 public:
     void del() {
         delete item;
@@ -109,7 +109,7 @@ class DLList {
 protected:
     DLItem<L_DATA> *head;
     DLItem<L_DATA> *tail;
-    igraph_integer_t number_of_items = 0;
+    igraph_int_t number_of_items = 0;
     virtual DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
     virtual L_DATA pDelete(DLItem<L_DATA>*);
 public:
@@ -117,14 +117,14 @@ public:
     DLList(const DLList &) = delete;
     DLList & operator = (const DLList &) = delete;
     virtual ~DLList();
-    igraph_integer_t Size() const {
+    igraph_int_t Size() const {
         return number_of_items;
     }
     int fDelete(L_DATA);
     virtual L_DATA Push(L_DATA);
     virtual L_DATA Pop();
-    virtual L_DATA Get(igraph_integer_t);
-    igraph_integer_t Is_In_List(L_DATA);
+    virtual L_DATA Get(igraph_int_t);
+    igraph_int_t Is_In_List(L_DATA);
     void delete_items();
 };
 
@@ -133,13 +133,13 @@ class DL_Indexed_List : public DLList<L_DATA> {
     DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*) final;
     L_DATA pDelete(DLItem<L_DATA>*) final;
     HugeArray<DLItem<L_DATA>*> array;
-    igraph_integer_t last_index = 0;
+    igraph_int_t last_index = 0;
 
 public:
     DL_Indexed_List() = default;
     L_DATA Push(L_DATA) final;
     L_DATA Pop() final;
-    L_DATA Get(igraph_integer_t) final;
+    L_DATA Get(igraph_int_t) final;
 };
 
 //#####################################################################################################
@@ -165,9 +165,9 @@ public:
 class NLink;
 
 class NNode {
-    igraph_integer_t index;
-    igraph_integer_t cluster_index;
-    igraph_integer_t marker = 0;
+    igraph_int_t index;
+    igraph_int_t cluster_index;
+    igraph_int_t marker = 0;
     double weight = 0.0;
 
     DLList<NNode*> neighbours;    //list with pointers to neighbours
@@ -175,7 +175,7 @@ class NNode {
     DLList<NLink*> *global_link_list;
     char name[SPINGLASS_MAX_NAME_LEN];
 public :
-    NNode(igraph_integer_t ind, igraph_integer_t c_ind, DLList<NLink *> *ll, const char *n) :
+    NNode(igraph_int_t ind, igraph_int_t c_ind, DLList<NLink *> *ll, const char *n) :
             index(ind), cluster_index(c_ind), global_link_list(ll)
     {
         strcpy(name, n);
@@ -184,22 +184,22 @@ public :
     NNode &operator=(const NNode &) = delete;
     ~NNode() { Disconnect_From_All(); }
 
-    igraph_integer_t Get_Index() const {
+    igraph_int_t Get_Index() const {
         return index;
     }
-    igraph_integer_t Get_ClusterIndex() const {
+    igraph_int_t Get_ClusterIndex() const {
         return cluster_index;
     }
-    igraph_integer_t Get_Marker() const {
+    igraph_int_t Get_Marker() const {
         return marker;
     }
-    void Set_Marker(igraph_integer_t m) {
+    void Set_Marker(igraph_int_t m) {
         marker = m;
     }
-    void Set_ClusterIndex(igraph_integer_t ci) {
+    void Set_ClusterIndex(igraph_int_t ci) {
         cluster_index = ci;
     }
-    igraph_integer_t Get_Degree() const {
+    igraph_int_t Get_Degree() const {
         return (neighbours.Size());
     }
     const char *Get_Name() {
@@ -221,8 +221,8 @@ public :
     const DLList<NLink*> *Get_Links() const {
         return &n_links;
     }
-    igraph_integer_t Disconnect_From(NNode*);
-    igraph_integer_t Disconnect_From_All();
+    igraph_int_t Disconnect_From(NNode*);
+    igraph_int_t Disconnect_From_All();
     NLink *Get_LinkToNeighbour(const NNode *neighbour);
 };
 
@@ -298,10 +298,10 @@ template <class DATA> HugeArray<DATA>::~HugeArray() {
 }
 
 template <class DATA>
-HUGE_INDEX HugeArray<DATA>::get_huge_index(igraph_integer_t index) const {
+HUGE_INDEX HugeArray<DATA>::get_huge_index(igraph_int_t index) const {
     HUGE_INDEX h_index;
     unsigned int shift_index = 0;
-    igraph_integer_t help_index;
+    igraph_int_t help_index;
     help_index = index;
     if (index < 2) {
         h_index.field_index = 0;
@@ -314,19 +314,19 @@ HUGE_INDEX HugeArray<DATA>::get_huge_index(igraph_integer_t index) const {
         shift_index++;
     }
     h_index.field_index = 31 - shift_index;   // das hoechste  besetzte Bit im Index
-    help_index = igraph_integer_t(1) << h_index.field_index;  // in help_index wird das hoechste besetzte Bit von Index gesetzt
+    help_index = igraph_int_t(1) << h_index.field_index;  // in help_index wird das hoechste besetzte Bit von Index gesetzt
     h_index.in_field_index = (index ^ help_index); // index XOR help_index, womit alle bits unter dem hoechsten erhalten bleiben
     return h_index;
 }
 
 template <class DATA>
-DATA &HugeArray<DATA>::Set(igraph_integer_t index) {
-    igraph_integer_t data_size;
+DATA &HugeArray<DATA>::Set(igraph_int_t index) {
+    igraph_int_t data_size;
     while (size < index + 1) {
         highest_field_index++;
-        data_size = igraph_integer_t(1) << highest_field_index;
+        data_size = igraph_int_t(1) << highest_field_index;
         data = new DATA[data_size];
-        for (igraph_integer_t i = 0; i < data_size; i++) {
+        for (igraph_int_t i = 0; i < data_size; i++) {
             data[i] = 0;
         }
         size = size + data_size; //overflow noch abfangen
@@ -343,11 +343,11 @@ DATA &HugeArray<DATA>::Set(igraph_integer_t index) {
 
 //###############################################################################
 template <class L_DATA>
-DLItem<L_DATA>::DLItem(L_DATA i, igraph_integer_t ind) :
+DLItem<L_DATA>::DLItem(L_DATA i, igraph_int_t ind) :
     item(i), index(ind), previous(nullptr), next(nullptr) { }
 
 template <class L_DATA>
-DLItem<L_DATA>::DLItem(L_DATA i, igraph_integer_t ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n) :
+DLItem<L_DATA>::DLItem(L_DATA i, igraph_int_t ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n) :
     item(i), index(ind), previous(p), next(n) { }
 
 //######################################################################################################################
@@ -434,7 +434,7 @@ L_DATA DLList<L_DATA>::Pop() {
 
 
 template <class L_DATA>
-L_DATA DLList<L_DATA>::Get(igraph_integer_t pos) {
+L_DATA DLList<L_DATA>::Get(igraph_int_t pos) {
     if ((pos < 1) || (pos > (number_of_items + 1))) {
         return 0;
     }
@@ -447,9 +447,9 @@ L_DATA DLList<L_DATA>::Get(igraph_integer_t pos) {
 
 //gibt Index des gesuchte Listenelement zurueck, besser waere eigentlich zeiger
 template <class L_DATA>
-igraph_integer_t DLList<L_DATA>::Is_In_List(L_DATA data) {
+igraph_int_t DLList<L_DATA>::Is_In_List(L_DATA data) {
     DLItem<L_DATA> *cur = head, *next;
-    igraph_integer_t pos = 0;
+    igraph_int_t pos = 0;
     while (cur) {
         next = cur->next;
         if (cur->item == data) {
@@ -500,7 +500,7 @@ L_DATA DL_Indexed_List<L_DATA>::Pop() {
 }
 
 template <class L_DATA>
-L_DATA DL_Indexed_List<L_DATA>::Get(igraph_integer_t pos) {
+L_DATA DL_Indexed_List<L_DATA>::Get(igraph_int_t pos) {
     if (pos > this->number_of_items - 1) {
         return 0;
     }

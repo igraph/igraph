@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 void check_assort(const igraph_t *g, const igraph_vector_t *weights, const igraph_vector_int_t *types) {
     igraph_vector_t a, b;
     igraph_matrix_t p;
-    igraph_integer_t n;
+    igraph_int_t n;
     igraph_real_t c1, c2, q1, q2;
 
     igraph_vector_init(&a, 0);
@@ -41,7 +41,7 @@ void check_assort(const igraph_t *g, const igraph_vector_t *weights, const igrap
     IGRAPH_ASSERT(igraph_matrix_ncol(&p) == n);
 
     c1 = c2 = 0;
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         c1 += MATRIX(p, i, i);
         c2 += VECTOR(a)[i] * VECTOR(b)[i];
     }
@@ -53,7 +53,7 @@ void check_assort(const igraph_t *g, const igraph_vector_t *weights, const igrap
 
     if (! weights) {
         q1 /= 1 - c2;
-        igraph_assortativity_nominal(g, types, &q2, /*directed*/ true, /*normalized*/ true);
+        igraph_assortativity_nominal(g, NULL, types, &q2, /*directed*/ true, /*normalized*/ true);
         // printf("Normalized nominal assortativity: %g == %g\n", q1, q2);
         IGRAPH_ASSERT(igraph_almost_equals(q1, q2, 1e-14));
     }

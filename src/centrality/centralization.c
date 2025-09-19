@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -81,7 +81,7 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
                                     igraph_real_t theoretical_max,
                                     igraph_bool_t normalized) {
 
-    igraph_integer_t no_of_nodes = igraph_vector_size(scores);
+    igraph_int_t no_of_nodes = igraph_vector_size(scores);
     igraph_real_t cent;
 
     if (no_of_nodes != 0) {
@@ -216,7 +216,7 @@ igraph_error_t igraph_centralization_degree(
  */
 
 igraph_error_t igraph_centralization_degree_tmax(
-    const igraph_t *graph, igraph_integer_t nodes, igraph_neimode_t mode,
+    const igraph_t *graph, igraph_int_t nodes, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_real_t *res
 ) {
 
@@ -322,7 +322,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
     }
 
-    IGRAPH_CHECK(igraph_betweenness(graph, scores, igraph_vss_all(), directed, /*weights=*/ 0));
+    IGRAPH_CHECK(igraph_betweenness(graph, /*weights=*/ 0, scores, igraph_vss_all(), directed, false));
 
     IGRAPH_CHECK(igraph_centralization_betweenness_tmax(graph, 0, directed, tmax));
 
@@ -376,7 +376,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  */
 
 igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
-        igraph_integer_t nodes,
+        igraph_int_t nodes,
         igraph_bool_t directed,
         igraph_real_t *res) {
     igraph_real_t real_nodes;
@@ -517,7 +517,7 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
  */
 
 igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
-        igraph_integer_t nodes,
+        igraph_int_t nodes,
         igraph_neimode_t mode,
         igraph_real_t *res) {
     igraph_real_t real_nodes;
@@ -688,7 +688,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
 
 igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     const igraph_t *graph,
-    igraph_integer_t nodes,
+    igraph_int_t nodes,
     igraph_neimode_t mode,
     igraph_real_t *res) {
 

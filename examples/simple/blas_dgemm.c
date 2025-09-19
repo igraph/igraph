@@ -3,6 +3,9 @@
 int main(void) {
     igraph_matrix_t a, b, c;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_matrix_init(&a, 2, 2);
     MATRIX(a, 0, 0) = 1;
     MATRIX(a, 0, 1) = 2;

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -28,8 +28,8 @@ int real_cplx_mult(const igraph_matrix_t *A,
                    igraph_vector_t *res_real,
                    igraph_vector_t *res_imag) {
 
-    igraph_integer_t n = igraph_vector_size(v_real);
-    igraph_integer_t r, c;
+    igraph_int_t n = igraph_vector_size(v_real);
+    igraph_int_t r, c;
 
     if (igraph_matrix_nrow(A) != n ||
         igraph_matrix_ncol(A) != n ||
@@ -62,8 +62,8 @@ int sc_cplx_cplx_mult(igraph_real_t lambda_real,
                       igraph_vector_t *res_real,
                       igraph_vector_t *res_imag) {
 
-    igraph_integer_t r;
-    igraph_integer_t n = igraph_vector_size(v_real);
+    igraph_int_t r;
+    igraph_int_t n = igraph_vector_size(v_real);
 
     if (igraph_vector_size(v_imag) != n) {
         printf("Wrong vector sizes");
@@ -126,14 +126,14 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
 
     for (i = 0; i < n; i++) {
         if (VECTOR(*values_imag)[i] == 0.0) {
-            igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i), n);
-            igraph_vector_view(&v_imag, VECTOR(null), n);
+            v_real = igraph_vector_view(&MATRIX(*vectors_right, 0, i), n);
+            v_imag = igraph_vector_view(VECTOR(null), n);
         } else if (VECTOR(*values_imag)[i] > 0.0) {
-            igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i), n);
-            igraph_vector_view(&v_imag, &MATRIX(*vectors_right, 0, i + 1), n);
+            v_real = igraph_vector_view(&MATRIX(*vectors_right, 0, i), n);
+            v_imag = igraph_vector_view(&MATRIX(*vectors_right, 0, i + 1), n);
         } else if (VECTOR(*values_imag)[i] < 0.0) {
-            igraph_vector_view(&v_real, &MATRIX(*vectors_right, 0, i - 1), n);
-            igraph_vector_view(&v_imag, &MATRIX(*vectors_right, 0, i), n);
+            v_real = igraph_vector_view(&MATRIX(*vectors_right, 0, i - 1), n);
+            v_imag = igraph_vector_view(&MATRIX(*vectors_right, 0, i), n);
             igraph_vector_scale(&v_imag, -1.0);
         }
         real_cplx_mult(A, &v_real, &v_imag, &AV_real, &AV_imag);

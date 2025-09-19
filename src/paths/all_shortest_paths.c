@@ -1,6 +1,6 @@
 /*
-   IGraph library.
-   Copyright (C) 2005-2021 The igraph development team
+   igraph library.
+   Copyright (C) 2005-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_paths.h"
@@ -26,14 +23,9 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+#include "paths/paths_internal.h"
 
 #include <string.h>  /* memset */
-
-static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
-    const igraph_t *graph, igraph_vector_int_list_t *vertices,
-    igraph_vector_int_list_t *edges, igraph_vector_int_t *nrgeo,
-    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode
-);
 
 /**
  * \function igraph_get_all_shortest_paths
@@ -98,13 +90,15 @@ static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
  * Time complexity: O(|V|+|E|) for most graphs, O(|V|^2) in the worst
  * case.
  */
-
 igraph_error_t igraph_get_all_shortest_paths(
-    const igraph_t *graph, const igraph_vector_t *weights,
-    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
-    igraph_vector_int_t *nrgeo,
-    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode
-) {
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_vector_int_t *nrgeo,
+        igraph_int_t from, const igraph_vs_t to,
+        igraph_neimode_t mode) {
+
     if (weights == NULL) {
         /* Unweighted version */
         return igraph_i_get_all_shortest_paths_unweighted(
@@ -118,13 +112,16 @@ igraph_error_t igraph_get_all_shortest_paths(
     }
 }
 
-static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
-    const igraph_t *graph, igraph_vector_int_list_t *vertices,
-    igraph_vector_int_list_t *edges, igraph_vector_int_t *nrgeo,
-    igraph_integer_t from, const igraph_vs_t to, igraph_neimode_t mode
-) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t *geodist;
+igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_vector_int_t *nrgeo,
+        igraph_int_t from, const igraph_vs_t to,
+        igraph_neimode_t mode) {
+
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t *geodist;
     igraph_vector_int_list_t paths;
     igraph_vector_int_list_t path_edge;
     igraph_dqueue_int_t q;
@@ -133,8 +130,8 @@ static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
     igraph_vector_int_t neis;
     igraph_vector_int_t ptrlist;
     igraph_vector_int_t ptrhead;
-    igraph_integer_t n;
-    igraph_integer_t to_reach, reached = 0, maxdist = 0;
+    igraph_int_t n;
+    igraph_int_t to_reach, reached = 0, maxdist = 0;
 
     igraph_vit_t vit;
 
@@ -170,7 +167,7 @@ static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
      * is in the target vertex sequence. Otherwise it is
      * one larger than the length of the shortest path from the
      * source */
-    geodist = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    geodist = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(geodist, "Insufficient memory for calculating shortest paths.");
     IGRAPH_FINALLY(igraph_free, geodist);
     /* dequeue to store the BFS queue -- odd elements are the vertex indices,
@@ -212,8 +209,8 @@ static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, from));
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
     while (!igraph_dqueue_int_empty(&q)) {
-        igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-        igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+        igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+        igraph_int_t actdist = igraph_dqueue_int_pop(&q);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -240,9 +237,9 @@ static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
         }
 
         n = igraph_vector_int_size(&neis);
-        for (igraph_integer_t j = 0; j < n; j++) {
-            igraph_integer_t neighbor;
-            igraph_integer_t parentptr;
+        for (igraph_int_t j = 0; j < n; j++) {
+            igraph_int_t neighbor;
+            igraph_int_t parentptr;
 
             if (edges) {
                 /* user needs the edge-paths, so 'neis' contains edge IDs, we need to resolve
@@ -318,8 +315,8 @@ static igraph_error_t igraph_i_get_all_shortest_paths_unweighted(
         igraph_vector_int_list_clear(edges);
     }
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t parentptr = VECTOR(ptrhead)[i];
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+        igraph_int_t parentptr = VECTOR(ptrhead)[i];
 
         IGRAPH_ALLOW_INTERRUPTION();
 

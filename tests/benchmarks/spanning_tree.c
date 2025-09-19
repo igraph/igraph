@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,8 @@
 
 void run_bench(const igraph_t *graph, const igraph_vector_t *weights, int rep, const char *name) {
     igraph_vector_int_t edges;
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     char msg[128];
 
     igraph_vector_int_init(&edges, vcount - 1);
@@ -49,9 +49,9 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights, int rep, c
 }
 
 void rand_weights(const igraph_t *graph, igraph_vector_t *weights) {
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_resize(weights, ecount);
-    for (igraph_integer_t i=0; i < ecount; i++) {
+    for (igraph_int_t i=0; i < ecount; i++) {
         VECTOR(*weights)[i] = RNG_UNIF01();
     }
 }
@@ -110,32 +110,32 @@ int main(void) {
     run_bench(&g, &weights, 1, "PA");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 500, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 500, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 60000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 1000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 1000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 30000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 3000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 3000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 10000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 10000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 3000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 30000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 30000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 1000, "G(n,m)");
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 1000, 100000, false, false, true);
+    igraph_erdos_renyi_game_gnm(&g, 1000, 100000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     rand_weights(&g, &weights);
     run_bench(&g, &weights, 300, "G(n,m)");
     igraph_destroy(&g);

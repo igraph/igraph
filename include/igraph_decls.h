@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2016-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -76,3 +76,12 @@
 /* Used instead of IGRAPH_EXPORT with functions that need to be tested,
  * but are not part of the public API. */
 #define IGRAPH_PRIVATE_EXPORT IGRAPH_EXPORT
+
+/* Marks experimental functions. If IGRAPH_WARN_EXPERIMENTAL is defined to a
+ * nonzero value, supported compilers will emit a warning when these functions
+ * are used. */
+#if defined(__GNUC__) && IGRAPH_WARN_EXPERIMENTAL
+#define IGRAPH_EXPERIMENTAL __attribute__((__warning__("Experimental function.")))
+#else
+#define IGRAPH_EXPERIMENTAL /* empty */
+#endif

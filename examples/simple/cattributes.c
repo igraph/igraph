@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 void print_attributes(const igraph_t *g) {
     igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     igraph_vector_int_init(&gtypes, 0);
     igraph_vector_int_init(&vtypes, 0);
@@ -90,6 +90,9 @@ void print_attributes(const igraph_t *g) {
 int main(void) {
     igraph_t graph;
     igraph_vector_t y;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);

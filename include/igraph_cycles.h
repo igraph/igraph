@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -41,20 +41,16 @@ IGRAPH_EXPORT igraph_error_t igraph_is_dag(const igraph_t *graph, igraph_bool_t 
 /* Cycle bases                                        */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(
-        const igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_fundamental_cycles(
+        const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_int_list_t *result,
-        igraph_integer_t start_vid,
-        igraph_integer_t bfs_cutoff,
-        const igraph_vector_t *weights);
+        igraph_int_t start_vid, igraph_real_t bfs_cutoff);
 
-IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
-        const igraph_t *graph,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
+        const igraph_t *graph, const igraph_vector_t *weights,
         igraph_vector_int_list_t *result,
-        igraph_integer_t bfs_cutoff,
-        igraph_bool_t complete,
-        igraph_bool_t use_cycle_order,
-        const igraph_vector_t *weights);
+        igraph_real_t bfs_cutoff,
+        igraph_bool_t complete, igraph_bool_t use_cycle_order);
 
 IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
         const igraph_t *graph,
@@ -80,20 +76,27 @@ typedef igraph_error_t igraph_cycle_handler_t(
         const igraph_vector_int_t *edges,
         void *arg);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length,
+        igraph_int_t min_cycle_length,
+        igraph_int_t max_cycle_length,
         igraph_cycle_handler_t *callback, void *arg);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
-        igraph_vector_int_list_t *vertices,
-        igraph_vector_int_list_t *edges,
+        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
         igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length);
+        igraph_int_t min_cycle_length, igraph_int_t max_cycle_length,
+        igraph_int_t max_results);
+
+IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+IGRAPH_EXPORT igraph_error_t igraph_feedback_vertex_set(
+        const igraph_t *graph, igraph_vector_int_t *result,
+        const igraph_vector_t *vertex_weights, igraph_fvs_algorithm_t algo);
 
 IGRAPH_END_C_DECLS
 

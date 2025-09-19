@@ -5,7 +5,7 @@ When performing a code review, keep in mind the following.
 
 ## Coding standards
 
- - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases. Such special cases are:
+ - Check that all values of integer type are represented as `igraph_int_t`, except in justified special cases. Such special cases are:
     * The interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED`, typically called `iter`, which should be an `int`.
     * When interfacing with a library that uses a different type. Before passing igraph data to this library, it must be checked that the values will not overflow.
 
@@ -21,6 +21,11 @@ When performing a code review, keep in mind the following.
     * Next come private igraph headers (those in subdirectories of `/src`), ordered alphabetically.
     * Next come headers of igraph's dependencies, if any are used.
     * Standard C library headers must come last.
+
+ - Check that all newly added public and private functions follow these conventions:
+    * Public functions must have a name starting with `igraph_`.
+    * Private functions that can be used from multiple translation units must have a name starting with `igraph_i_`, and must be included in a private header.
+    * Private functions that are local to their translation unit must be marked as `static` and should not use the above two prefixes in their name.
 
  - Public igraph functions that are written in C++ (i.e. defined in `.cpp` files) must catch all exceptions before returning. This can be done using the `IGRAPH_HANDLE_EXCEPTIONS_BEGIN;` and `IGRAPH_HANDLE_EXCEPTIONS_END;` macros.
 
@@ -50,18 +55,19 @@ When performing a code review, keep in mind the following.
 
  - Check that integer overflow checks are performed when there is a risk of overflow. `math/safe_intop.h` contains helper macros and functions for overflow-safe arithmetic.
 
+ - Check that edge and vertex weights, as well as spatial coordinates, are protected against invalid values such as NaN, or that there is a comment explaining why such a check is not present.
+
 ## Testing
 
  - Check that all newly added public functions have tests. If they do not, include a link in your response to the testing guide in our wiki at https://github.com/igraph/igraph/wiki/How-to-write-unit-tests%3F. Check that edge cases, such as the null graph and singleton graph (i.e. graphs with 0 and 1 vertices) are included in tests when relevant.
 
- - Check that all newly added public and private functions follow these conventions:
-    * Public functions must have a name starting with `igraph_`.
-    * Private functions that can be used from multiple translation units must have a name starting with `igraph_i_`, and must be included in a private header.
-    * Private functions that are local to their translation unit must be marked as `static` and should not use the above two prefixes in their name.
-
- - Tests for public igraph functions must only include the main igraph header `<igraph.h>`, not any of igraph's sub-headers such as `igraph_interface.h`.
+ - Tests for public igraph functions must only include the main igraph header `<igraph.h>` (with angle brackets), not any of igraph's sub-headers such as `"igraph_interface.h"`.
 
  - Tests must contain `#include "test_utilities.h"` at the top. Whenever possible, tests should use the helper functions in this header (such as `print_vector()`) for printing output. Tests must use the `VERIFY_FINALLY_STACK();` macro to check the consistency of igraph's "finally stack". This macro is typically called before the `main()` function returns.
+
+ - Ensure that important edge cases are tested. What these are differs from situation to situation, but typical cases are making sure that graphs with zero vertices (null graph) or zero edges (empty graph) are handled well.
+
+ - It is not necessary to use `IGRAPH_CHECK`, `IGRAPH_FINALLY` and related functions in tests. Do not suggest using these.
 
 ## Documentation and error messages
 

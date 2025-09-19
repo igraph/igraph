@@ -1,6 +1,6 @@
 /*
-   IGraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+   igraph library.
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,20 +16,19 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef IGRAPH_ORDER_CYCLE_H
-#define IGRAPH_ORDER_CYCLE_H
+#ifndef IGRAPH_SPATIAL_INTERNAL_H
+#define IGRAPH_SPATIAL_INTERNAL_H
 
 #include "igraph_decls.h"
-#include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
+#include "igraph_matrix.h"
 
 IGRAPH_BEGIN_C_DECLS
 
-igraph_error_t igraph_i_order_cycle(
-        const igraph_t *graph,
-        const igraph_vector_int_t *cycle,
-        igraph_vector_int_t *res);
+igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_matrix_t *points);
+igraph_error_t igraph_i_check_spatial_points(const igraph_matrix_t *points);
 
 IGRAPH_END_C_DECLS
 
-#endif /* IGRAPH_ORDER_CYCLE_H */
+#endif /* IGRAPH_SPATIAL_INTERNAL_H */

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -60,8 +60,8 @@
  *    the same as the \p order argument of \ref igraph_connect_neighborhood().
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive).
- * \param loops Whether to generate loop edges.
- * \param multiple Whether to allow multiple edges in the generated graph.
+ * \param allowed_edge_types Controls whether multi-edges and self-loops
+ *     are allowed in the generated graph. See \ref igraph_edge_type_sw_t.
  * \return Error code.
  *
  * \sa \ref igraph_square_lattice(), \ref igraph_connect_neighborhood() and
@@ -72,10 +72,11 @@
  * vertices and edges, d is the average degree, o is the \p nei
  * argument.
  */
-igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
-                               igraph_integer_t size, igraph_integer_t nei,
-                               igraph_real_t p, igraph_bool_t loops,
-                               igraph_bool_t multiple) {
+igraph_error_t igraph_watts_strogatz_game(
+        igraph_t *graph, igraph_int_t dim,
+        igraph_int_t size, igraph_int_t nei,
+        igraph_real_t p,
+        igraph_edge_type_sw_t allowed_edge_types) {
 
     igraph_vector_int_t dimvector;
     igraph_vector_bool_t periodic;
@@ -110,7 +111,7 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 
     /* Rewire the edges then */
 
-    IGRAPH_CHECK(igraph_rewire_edges(graph, p, loops, multiple));
+    IGRAPH_CHECK(igraph_rewire_edges(graph, p, allowed_edge_types));
 
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;

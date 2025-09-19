@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2014-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -47,10 +47,6 @@
  *   they are found.
  * \param from The start vertex.
  * \param to The target vertices.
- * \param minlen Minimum length of paths that is considered. If negative,
- *   no lower bound is used on the path lengths.
- * \param maxlen Maximum length of paths that is considered. If negative,
- *   no upper bound is used on the path lengths.
  * \param mode The type of paths to be used for the calculation in directed
  *   graphs. Possible values:
  *        \clist
@@ -62,6 +58,12 @@
  *          the directed graph is considered as an undirected one for
  *          the computation.
  *        \endclist
+ * \param minlen Minimum length of paths that is considered. If negative
+ *   or \ref IGRAPH_UNLIMITED, no lower bound is used on the path lengths.
+ * \param maxlen Maximum length of paths that is considered. If negative
+ *   or \ref IGRAPH_UNLIMITED, no upper bound is used on the path lengths.
+ * \param max_results At most this many paths will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_get_k_shortest_paths()
@@ -73,13 +75,12 @@
 igraph_error_t igraph_get_all_simple_paths(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_integer_t from,
-        const igraph_vs_t to,
-        igraph_integer_t minlen,
-        igraph_integer_t maxlen,
-        igraph_neimode_t mode) {
+        igraph_int_t from, const igraph_vs_t to,
+        igraph_neimode_t mode,
+        igraph_int_t minlen, igraph_int_t maxlen,
+        igraph_int_t max_results) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
     const igraph_bool_t toall = igraph_vs_is_all(&to);
     igraph_vit_t vit;
     igraph_lazy_adjlist_t adjlist;
@@ -91,6 +92,12 @@ igraph_error_t igraph_get_all_simple_paths(
 
     if (from < 0 || from >= vcount) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
+    }
+
+    igraph_vector_int_list_clear(res);
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     if (!toall) {
@@ -113,25 +120,23 @@ igraph_error_t igraph_get_all_simple_paths(
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, vcount);
 
-    igraph_vector_int_list_clear(res);
-
     igraph_vector_int_clear(&stack);
     igraph_vector_int_clear(&dist);
     igraph_vector_int_push_back(&stack, from);
     igraph_vector_int_push_back(&dist, 0);
     IGRAPH_BIT_SET(added, from);
     while (!igraph_vector_int_empty(&stack)) {
-        const igraph_integer_t act = igraph_vector_int_tail(&stack);
-        const igraph_integer_t curdist = igraph_vector_int_tail(&dist);
+        const igraph_int_t act = igraph_vector_int_tail(&stack);
+        const igraph_int_t curdist = igraph_vector_int_tail(&dist);
 
         const igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
         IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
-        const igraph_integer_t n = igraph_vector_int_size(neis);
-        igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
+        const igraph_int_t n = igraph_vector_int_size(neis);
+        igraph_int_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
-        igraph_integer_t nei;
+        igraph_int_t nei;
 
         within_dist = (curdist < maxlen || maxlen < 0);
         if (within_dist) {
@@ -152,11 +157,14 @@ igraph_error_t igraph_get_all_simple_paths(
             if (toall || IGRAPH_BIT_TEST(markto, nei)) {
                 if (curdist + 1 >= minlen) {
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &stack));
+                    if (max_results >= 0 && igraph_vector_int_list_size(res) == max_results) {
+                        break;
+                    }
                 }
             }
         } else {
             /* There is no such neighbor, finished with the subtree */
-            igraph_integer_t up = igraph_vector_int_pop_back(&stack);
+            igraph_int_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
             IGRAPH_BIT_CLEAR(added, up);
             VECTOR(nptr)[up] = 0;

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -77,7 +77,7 @@ int main(void) {
     m = 2;
     igraph_vector_int_resize(&membership, 1);
 
-    igraph_community_infomap(&g, NULL, NULL, 3, &membership, &m);
+    igraph_community_infomap(&g, NULL, NULL, 3, false, 0, &membership, &m);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
 
@@ -86,7 +86,7 @@ int main(void) {
     igraph_vector_int_resize(&membership, 1);
 
     igraph_lpa_variant_t variants[3] = {IGRAPH_LPA_DOMINANCE, IGRAPH_LPA_RETENTION, IGRAPH_LPA_FAST};
-    for (igraph_integer_t i = 0; i < 3; i++) {
+    for (igraph_int_t i = 0; i < 3; i++) {
         igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, variants[i]);
     }
 

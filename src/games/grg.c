@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -53,11 +53,11 @@
  *
  * \example examples/simple/igraph_grg_game.c
  */
-igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_error_t igraph_grg_game(igraph_t *graph, igraph_int_t nodes,
                     igraph_real_t radius, igraph_bool_t torus,
                     igraph_vector_t *x, igraph_vector_t *y) {
 
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vector_t myx, myy, *xx = &myx, *yy = &myy;
     igraph_vector_int_t edges;
     igraph_real_t r2;
@@ -100,7 +100,7 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
         for (i = 0; i < nodes; i++) {
             igraph_real_t xx1 = VECTOR(*xx)[i];
             igraph_real_t yy1 = VECTOR(*yy)[i];
-            igraph_integer_t j = i + 1;
+            igraph_int_t j = i + 1;
             igraph_real_t dx, dy;
 
             IGRAPH_ALLOW_INTERRUPTION();
@@ -119,7 +119,7 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
         for (i = 0; i < nodes; i++) {
             igraph_real_t xx1 = VECTOR(*xx)[i];
             igraph_real_t yy1 = VECTOR(*yy)[i];
-            igraph_integer_t j = i + 1;
+            igraph_int_t j = i + 1;
             igraph_real_t dx, dy;
 
             IGRAPH_ALLOW_INTERRUPTION();

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -22,16 +22,6 @@
 #include "igraph_constructors.h"
 
 #include "igraph_interface.h"
-
-/**
- * \section about_generators
- *
- * <para>Graph generators create graphs.</para>
- *
- * <para>Almost all functions which create graph objects are documented
- * here. The exceptions are \ref igraph_induced_subgraph() and alike, these
- * create graphs based on another graph.</para>
- */
 
 
 /**
@@ -61,9 +51,9 @@
  * \example examples/simple/igraph_create.c
  */
 igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
-                  igraph_integer_t n, igraph_bool_t directed) {
+                             igraph_int_t n, igraph_bool_t directed) {
     igraph_bool_t has_edges = igraph_vector_int_size(edges) > 0;
-    igraph_integer_t max;
+    igraph_int_t max;
 
     if (igraph_vector_int_size(edges) % 2 != 0) {
         IGRAPH_ERROR("Invalid (odd) edges vector.", IGRAPH_EINVAL);
@@ -130,7 +120,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  * \example examples/simple/igraph_small.c
  */
 
-igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_error_t igraph_small(igraph_t *graph, igraph_int_t n, igraph_bool_t directed,
                             int first, ...) {
     igraph_vector_int_t edges;
     va_list ap;

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -55,11 +55,11 @@
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
-igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_integer_t n, igraph_integer_t k) {
+igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_int_t n, igraph_int_t k) {
     /* This is a generalized Petersen graph constructor */
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes, no_of_edges2;
-    igraph_integer_t i;
+    igraph_int_t no_of_nodes, no_of_edges2;
+    igraph_int_t i;
 
     if (n < 3) {
         IGRAPH_ERRORF("n = %" IGRAPH_PRId " must be at least 3.", IGRAPH_EINVAL, n);

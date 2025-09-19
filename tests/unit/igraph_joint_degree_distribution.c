@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,12 +22,12 @@
 
 /* Check vector equality with tolerances. Consider NaN values equal. */
 igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
-    igraph_integer_t na = igraph_vector_size(a);
-    igraph_integer_t nb = igraph_vector_size(b);
+    igraph_int_t na = igraph_vector_size(a);
+    igraph_int_t nb = igraph_vector_size(b);
     if (na != nb) {
         return false;
     }
-    for (igraph_integer_t i=0; i < na; i++) {
+    for (igraph_int_t i=0; i < na; i++) {
         if (isnan(VECTOR(*a)[i]) && isnan(VECTOR(*b)[i])) {
             continue;
         }
@@ -41,8 +41,8 @@ igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
 /* Compare to igraph_joint_degree_matrix() */
 void check_jdm(const igraph_t *g, const igraph_vector_t *weights) {
     igraph_matrix_t jdm, p;
-    igraph_integer_t vcount = igraph_vcount(g);
-    igraph_integer_t nrow, ncol, n;
+    igraph_int_t vcount = igraph_vcount(g);
+    igraph_int_t nrow, ncol, n;
 
     igraph_matrix_init(&jdm, 0, 0);
     igraph_matrix_init(&p, 0, 0);
@@ -85,7 +85,7 @@ void check_jdm(const igraph_t *g, const igraph_vector_t *weights) {
     n = nrow < ncol ? nrow : ncol;
 
     if (! igraph_is_directed(g)) {
-        for (igraph_integer_t i=0; i < n; i++) {
+        for (igraph_int_t i=0; i < n; i++) {
             MATRIX(jdm, i, i) *= 2;
         }
     }
@@ -108,10 +108,11 @@ void check_jdm(const igraph_t *g, const igraph_vector_t *weights) {
     igraph_matrix_destroy(&jdm);
 }
 
-void check_assort_i(const igraph_t *g, igraph_neimode_t from_mode, igraph_neimode_t to_mode) {
+void check_assort_i(const igraph_t *g, const igraph_vector_t *weights,
+                    igraph_neimode_t from_mode, igraph_neimode_t to_mode) {
     igraph_matrix_t p;
     igraph_real_t r1, r2;
-    igraph_integer_t nrow, ncol;
+    igraph_int_t nrow, ncol;
     igraph_vector_t dfrom, dto;
     igraph_vector_t a, b;
     igraph_bool_t directed = igraph_is_directed(g);
@@ -125,19 +126,19 @@ void check_assort_i(const igraph_t *g, igraph_neimode_t from_mode, igraph_neimod
     igraph_strength(g, &dto, igraph_vss_all(), to_mode, IGRAPH_LOOPS, NULL);
 
     igraph_matrix_init(&p, 0, 0);
-    igraph_joint_degree_distribution(g, NULL, &p, from_mode, to_mode, true, /*normalized*/ true, -1, -1);
+    igraph_joint_degree_distribution(g, weights, &p, from_mode, to_mode, true, /*normalized*/ true, -1, -1);
 
     nrow = igraph_matrix_nrow(&p);
     ncol = igraph_matrix_ncol(&p);
 
-    igraph_assortativity(g, &dfrom, directed ? &dto : NULL, &r1, IGRAPH_DIRECTED, /*normalized*/ false);
+    igraph_assortativity(g, weights, &dfrom, directed ? &dto : NULL, &r1, IGRAPH_DIRECTED, /*normalized*/ false);
 
     igraph_matrix_rowsum(&p, &a);
     igraph_matrix_colsum(&p, &b);
 
     r2 = 0;
-    for (igraph_integer_t i=0; i < nrow; i++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t i=0; i < nrow; i++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             r2 += (MATRIX(p, i, j) - VECTOR(a)[i] * VECTOR(b)[j]) * (igraph_real_t) i * (igraph_real_t) j;
         }
     }
@@ -153,24 +154,24 @@ void check_assort_i(const igraph_t *g, igraph_neimode_t from_mode, igraph_neimod
 }
 
 /* Compare to igraph_assortativity() */
-void check_assort(const igraph_t *g) {
+void check_assort(const igraph_t *g, const igraph_vector_t *weights) {
     if (igraph_is_directed(g)) {
-        check_assort_i(g, IGRAPH_OUT, IGRAPH_IN);
-        check_assort_i(g, IGRAPH_IN, IGRAPH_OUT);
-        check_assort_i(g, IGRAPH_OUT, IGRAPH_OUT);
-        check_assort_i(g, IGRAPH_IN, IGRAPH_IN);
-        check_assort_i(g, IGRAPH_ALL, IGRAPH_IN);
-        check_assort_i(g, IGRAPH_ALL, IGRAPH_OUT);
-        check_assort_i(g, IGRAPH_OUT, IGRAPH_ALL);
-        check_assort_i(g, IGRAPH_IN, IGRAPH_ALL);
+        check_assort_i(g, weights, IGRAPH_OUT, IGRAPH_IN);
+        check_assort_i(g, weights, IGRAPH_IN, IGRAPH_OUT);
+        check_assort_i(g, weights, IGRAPH_OUT, IGRAPH_OUT);
+        check_assort_i(g, weights, IGRAPH_IN, IGRAPH_IN);
+        check_assort_i(g, weights, IGRAPH_ALL, IGRAPH_IN);
+        check_assort_i(g, weights, IGRAPH_ALL, IGRAPH_OUT);
+        check_assort_i(g, weights, IGRAPH_OUT, IGRAPH_ALL);
+        check_assort_i(g, weights, IGRAPH_IN, IGRAPH_ALL);
     } else {
-        check_assort_i(g, IGRAPH_ALL, IGRAPH_ALL);
+        check_assort_i(g, weights, IGRAPH_ALL, IGRAPH_ALL);
     }
 }
 
 void check_knnk_i(const igraph_t *g, const igraph_vector_t *weights, igraph_neimode_t from_mode, igraph_neimode_t to_mode) {
     igraph_matrix_t p;
-    igraph_integer_t nrow, ncol;
+    igraph_int_t nrow, ncol;
     igraph_vector_t knnk, knnk2;
     igraph_vector_t q;
 
@@ -188,8 +189,8 @@ void check_knnk_i(const igraph_t *g, const igraph_vector_t *weights, igraph_neim
 
     igraph_vector_init(&knnk2, nrow);
     igraph_matrix_rowsum(&p, &q);
-    for (igraph_integer_t k=0; k < nrow; k++) {
-        for (igraph_integer_t j=0; j < ncol; j++) {
+    for (igraph_int_t k=0; k < nrow; k++) {
+        for (igraph_int_t j=0; j < ncol; j++) {
             VECTOR(knnk2)[k] += j * MATRIX(p, k, j);
         }
     }
@@ -248,17 +249,18 @@ int main(void) {
 
     igraph_small(&dg, 2, IGRAPH_DIRECTED, 0,0, 0,1, 0,1, 1,0, -1);
     check_jdm(&dg, NULL);
-    check_assort(&dg);
+    check_assort(&dg, NULL);
     check_knnk(&dg, NULL);
     igraph_destroy(&dg);
 
-    igraph_erdos_renyi_game_gnm(&dg, 10, 30, IGRAPH_DIRECTED, /*loops*/ true, /* multiple */ false);
+    igraph_erdos_renyi_game_gnm(&dg, 10, 30, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     check_jdm(&dg, NULL);
-    check_assort(&dg);
+    check_assort(&dg, NULL);
     check_knnk(&dg, NULL);
 
     igraph_vector_init_range(&weights, 0, igraph_ecount(&dg));
     check_jdm(&dg, &weights);
+    check_assort(&dg, &weights);
     check_knnk(&dg, &weights);
     igraph_vector_destroy(&weights);
 
@@ -282,17 +284,18 @@ int main(void) {
 
     igraph_small(&ug, 2, IGRAPH_UNDIRECTED, 0,1, 0,1, 1,1, -1);
     check_jdm(&ug, NULL);
-    check_assort(&ug);
+    check_assort(&ug, NULL);
     check_knnk(&ug, NULL);
     igraph_destroy(&ug);
 
-    igraph_erdos_renyi_game_gnm(&ug, 10, 30, IGRAPH_UNDIRECTED, /*loops*/ true, /* multiple */ false);
+    igraph_erdos_renyi_game_gnm(&ug, 10, 30, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     check_jdm(&ug, NULL);
-    check_assort(&ug);
+    check_assort(&ug, NULL);
     check_knnk(&ug, NULL);
 
     igraph_vector_init_range(&weights, 0, igraph_ecount(&ug));
     check_jdm(&ug, &weights);
+    check_assort(&ug, &weights);
     check_knnk(&ug, &weights);
     igraph_vector_destroy(&weights);
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,9 @@ int main(void) {
     igraph_t g;
     igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,

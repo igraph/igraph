@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2020-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@ struct userdata {
 };
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t s1, s2, i;
+    igraph_int_t s1, s2, i;
 
     s1 = igraph_vector_int_size(v1);
     s2 = igraph_vector_int_size(v2);
@@ -85,16 +85,16 @@ int main(void) {
                  -1);
 
     igraph_vector_int_list_init(&list, 0);
-    igraph_maximal_cliques(&graph, &list, 0, 0);
+    igraph_maximal_cliques(&graph, &list, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED, IGRAPH_UNLIMITED);
 
     ud.i = 0;
     ud.list = &list;
 
     /* Check that the callback function finds the same cliques as igraph_maximal_cliques() */
-    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, &handler, (void *) &ud, 0, 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, 0, 0, &handler, (void *) &ud) == IGRAPH_SUCCESS);
 
     /* Check that the search can be stopped correctly */
-    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, &handler_stop, NULL, 0, 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_maximal_cliques_callback(&graph, 0, 0, &handler_stop, NULL) == IGRAPH_SUCCESS);
 
     igraph_vector_int_list_destroy(&list);
 

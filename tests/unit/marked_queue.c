@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -27,7 +27,7 @@
 
 int main(void) {
     igraph_marked_queue_int_t Q;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     igraph_marked_queue_int_init(&Q, 100);
     for (i = 0; i < 50; i++) {

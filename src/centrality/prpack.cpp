@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
                                           const igraph_vector_t *weights) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
+    igraph_int_t i, no_of_nodes = igraph_vcount(graph);
 
     double *u = nullptr;
     std::unique_ptr<double[]> v;
@@ -112,7 +112,7 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
         igraph_vit_t vit;
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-        igraph_integer_t nodes_to_calc = IGRAPH_VIT_SIZE(vit);
+        igraph_int_t nodes_to_calc = IGRAPH_VIT_SIZE(vit);
         IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), i++) {

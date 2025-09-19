@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -86,16 +86,16 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  */
 
 igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
-                      igraph_integer_t maxit, igraph_real_t maxdelta,
+                      igraph_int_t maxit, igraph_real_t maxdelta,
                       igraph_real_t area, igraph_real_t coolexp,
                       igraph_real_t repulserad, igraph_real_t cellsize,
-                      igraph_integer_t proot) {
+                      igraph_int_t proot) {
 
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t root;
-    igraph_integer_t no_of_layers, actlayer = 0;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t root;
+    igraph_int_t no_of_layers, actlayer = 0;
     igraph_vector_int_t vids;
     igraph_vector_int_t layers;
     igraph_vector_int_t parents;
@@ -201,15 +201,15 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     for (actlayer = 1; actlayer < no_of_layers; actlayer++) {
 
         igraph_real_t c = 1;
-        igraph_integer_t i, j;
+        igraph_int_t i, j;
         igraph_real_t massx, massy;
         igraph_real_t px, py;
         igraph_real_t sx, sy;
 
-        igraph_integer_t it = 0;
+        igraph_int_t it = 0;
         igraph_real_t epsilon = 10e-6;
         igraph_real_t maxchange = epsilon + 1;
-        /* igraph_integer_t pairs; */
+        /* igraph_int_t pairs; */
         igraph_real_t sconst = sqrt(area / M_PI) / H_n;
         igraph_2dgrid_iterator_t vidit;
 
@@ -223,8 +223,8 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         for (i = VECTOR(layers)[actlayer - 1];
              i < VECTOR(layers)[actlayer]; i++) {
 
-            igraph_integer_t vid = VECTOR(vids)[i];
-            igraph_integer_t par = VECTOR(parents)[vid];
+            igraph_int_t vid = VECTOR(vids)[i];
+            igraph_int_t par = VECTOR(parents)[vid];
 
             if (par < 0) {
                 if (par == -1) {
@@ -271,13 +271,13 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
         for (j = VECTOR(layers)[actlayer];
              j < VECTOR(layers)[actlayer + 1]; j++) {
-            igraph_integer_t vid = VECTOR(vids)[j];
-            igraph_integer_t k;
+            igraph_int_t vid = VECTOR(vids)[j];
+            igraph_int_t k;
             IGRAPH_ALLOW_INTERRUPTION();
             IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL, IGRAPH_LOOPS));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
-                igraph_integer_t eid = VECTOR(eids)[k];
-                igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
+                igraph_int_t eid = VECTOR(eids)[k];
+                igraph_int_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
                     (to   != vid && igraph_2dgrid_in(&grid, to))) {
                     igraph_vector_int_push_back(&edges, eid);
@@ -291,9 +291,9 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
         maxchange = epsilon + 1;
         while (it < maxit && maxchange > epsilon) {
-            igraph_integer_t jj;
+            igraph_int_t jj;
             igraph_real_t t = maxdelta * pow((maxit - it) / (igraph_real_t) maxit, coolexp);
-            igraph_integer_t vid, nei;
+            igraph_int_t vid, nei;
 
             IGRAPH_PROGRESS("Large graph layout",
                             100.0 * ((actlayer - 1.0) / (no_of_layers - 1.0) + (it) / (maxit * (no_of_layers - 1.0))),
@@ -306,8 +306,8 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             /* attractive "forces" along the edges */
             for (jj = 0; jj < igraph_vector_int_size(&edges); jj++) {
-                igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(edges)[jj]);
-                igraph_integer_t to = IGRAPH_TO(graph, VECTOR(edges)[jj]);
+                igraph_int_t from = IGRAPH_FROM(graph, VECTOR(edges)[jj]);
+                igraph_int_t to = IGRAPH_TO(graph, VECTOR(edges)[jj]);
                 igraph_real_t xd, yd, dist, force;
                 IGRAPH_ALLOW_INTERRUPTION();
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
@@ -353,7 +353,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             /* apply the changes */
             for (jj = 0; jj < VECTOR(layers)[actlayer + 1]; jj++) {
-                igraph_integer_t vvid = VECTOR(vids)[jj];
+                igraph_int_t vvid = VECTOR(vids)[jj];
                 igraph_real_t fx = VECTOR(forcex)[vvid];
                 igraph_real_t fy = VECTOR(forcey)[vvid];
                 igraph_real_t ded = sqrt(fx*fx + fy*fy);

@@ -12,7 +12,7 @@
 
 INTEGER:
     # An ordinary igraph integer
-    CTYPE: igraph_integer_t
+    CTYPE: igraph_int_t
 
 REAL:
     # An ordinary igraph floating-point number
@@ -133,7 +133,7 @@ SPARSEMAT:
 
 EDGE:
     # A single edge index
-    CTYPE: igraph_integer_t
+    CTYPE: igraph_int_t
 
 EDGE_INDICES:
     # An integer vector containing edge indices.
@@ -146,7 +146,7 @@ EDGE_SELECTOR:
 
 VERTEX:
     # A single vertex index
-    CTYPE: igraph_integer_t
+    CTYPE: igraph_int_t
 
 VERTEX_INDICES:
     # An integer vector containing vertex indices.
@@ -360,6 +360,12 @@ LAYOUT_GRID:
     # layout algorithm that supports it (typically the Fruchterman-Reingold
     # layout)
     CTYPE: igraph_layout_grid_t
+    FLAGS: ENUM
+
+LEIDEN_OBJECTIVE:
+    # The objective function to maximize with the Leiden community detection
+    # method.
+    CTYPE: igraph_leiden_objective_t
     FLAGS: ENUM
 
 LOOPS:
@@ -632,6 +638,11 @@ PAGERANKOPT:
 PLFIT:
     # Structure representing the result of a power-law fitting algorithms
     CTYPE: igraph_plfit_result_t
+    FLAGS: BY_REF
+
+REWIRING_STATS:
+    # Structure storing statistics about degree-preserving edge rewiring
+    CTYPE: igraph_rewiring_stats_t
     FLAGS: BY_REF
 
 VERTEX_ATTRIBUTE_COMBINATION:

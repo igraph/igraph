@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge MA, 02139 USA
 
@@ -26,8 +26,11 @@ int main(void) {
     igraph_t g;
     igraph_matrix_int_t merges;
     igraph_vector_t modularity;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t i;
+    igraph_int_t no_of_nodes;
+    igraph_int_t i;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -23,7 +23,7 @@
 #include <igraph.h>
 
 void print_maps(igraph_vector_int_t *map, igraph_vector_int_list_t *maps) {
-    igraph_integer_t n, i;
+    igraph_int_t n, i;
     igraph_vector_int_print(map);
     n = igraph_vector_int_list_size(maps);
     for (i = 0; i < n; i++) {
@@ -38,7 +38,7 @@ int main(void) {
     igraph_bool_t iso;
     igraph_vector_int_t map;
     igraph_vector_int_list_t maps;
-    igraph_integer_t i;
+    igraph_int_t i;
     int domainsvec[] = { 0, 2, 8, -1,
                          4, 5, 6, 7, -1,
                          1, 3, 5, 6, 7, 8, -1,
@@ -47,6 +47,9 @@ int main(void) {
                        };
     igraph_vector_int_list_t domains;
     igraph_vector_int_t v;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&target, 9, IGRAPH_UNDIRECTED,
                  0, 1, 0, 4, 0, 6,

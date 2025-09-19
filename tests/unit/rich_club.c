@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -63,11 +63,11 @@ void undirected_no_loop_graph(void) {
     igraph_t graph;
     igraph_vector_t result;
     igraph_vector_int_t vertex_order;
-    const igraph_integer_t vcount = 7;
+    const igraph_int_t vcount = 7;
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (igraph_integer_t i = 0; i < vcount; i++){
+    for (igraph_int_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_UNDIRECTED,
@@ -93,11 +93,11 @@ void directed_no_loop_graph(void) {
     igraph_t graph;
     igraph_vector_t result;
     igraph_vector_int_t vertex_order;
-    const igraph_integer_t vcount = 7;
+    const igraph_int_t vcount = 7;
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (igraph_integer_t i = 0; i < vcount; i++){
+    for (igraph_int_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_DIRECTED,
@@ -123,11 +123,11 @@ void undirected_loop_graph(void) {
     igraph_t graph;
     igraph_vector_t result;
     igraph_vector_int_t vertex_order;
-    const igraph_integer_t vcount = 7;
+    const igraph_int_t vcount = 7;
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (igraph_integer_t i = 0; i < vcount; i++){
+    for (igraph_int_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_UNDIRECTED,
@@ -153,11 +153,11 @@ void directed_loop_graph(void) {
     igraph_t graph;
     igraph_vector_t result;
     igraph_vector_int_t vertex_order;
-    const igraph_integer_t vcount = 7;
+    const igraph_int_t vcount = 7;
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (igraph_integer_t i = 0; i < vcount; i++){
+    for (igraph_int_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
     igraph_small(&graph, vcount, IGRAPH_DIRECTED,
@@ -184,19 +184,19 @@ void weighted_graph(void) {
     igraph_t graph;
     igraph_vector_t result, weights;
     igraph_vector_int_t vertex_order;
-    const igraph_integer_t vcount = 7;
+    const igraph_int_t vcount = 7;
 
     igraph_small(&graph, vcount, IGRAPH_UNDIRECTED,
                  0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1);
 
     igraph_vector_init(&result, vcount);
     igraph_vector_int_init(&vertex_order, vcount);
-    for (igraph_integer_t i = 0; i < vcount; i++){
+    for (igraph_int_t i = 0; i < vcount; i++){
         VECTOR(vertex_order)[i] = i;
     }
 
     igraph_vector_init(&weights, igraph_ecount(&graph));
-    for (igraph_integer_t i = 0; i < igraph_ecount(&graph); i++) {
+    for (igraph_int_t i = 0; i < igraph_ecount(&graph); i++) {
         // all "edges" have weight 2, output should be double of Test 3a
         VECTOR(weights)[i] = 2;
     }
@@ -234,7 +234,7 @@ void error_checks(void) {
     igraph_t graph;
     igraph_vector_t result, weights;
     igraph_vector_int_t vertex_order;
-    const igraph_integer_t vcount = 7;
+    const igraph_int_t vcount = 7;
 
     igraph_small(&graph, vcount, IGRAPH_UNDIRECTED,
                  0,3, 1,3, 2,3, 4,3, 5,3, 5,6, 1,2, 2,5, -1); // 8 edges

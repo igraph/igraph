@@ -30,8 +30,8 @@
 /* COLORED_NEIGHBORS: Choose vertices based on the number of already coloured neighbours. */
 
 static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
-    igraph_integer_t i, vertex, maxdeg;
-    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_int_t i, vertex, maxdeg;
+    igraph_int_t vc = igraph_vcount(graph);
     igraph_2wheap_t cn; /* indexed heap storing number of already coloured neighbours */
     igraph_vector_int_t neighbors, nei_colors;
 
@@ -80,14 +80,14 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
      * Colors will be decremented to start at 0 later. */
     while (true) {
         IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_ALL, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
-        igraph_integer_t nei_count = igraph_vector_int_size(&neighbors);
+        igraph_int_t nei_count = igraph_vector_int_size(&neighbors);
 
         /* Colour current vertex by finding the smallest available non-0 color.
          * Note that self-loops are effectively skipped as they merely prevent
          * the current vertex from being colored with the color value it presently
          * has, which is 0 (meaning uncolored). */
         {
-            igraph_integer_t col;
+            igraph_int_t col;
 
             IGRAPH_CHECK(igraph_vector_int_resize(&nei_colors, nei_count));
             for (i = 0; i < nei_count; ++i) {
@@ -109,7 +109,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
 
         /* increment number of coloured neighbours for each neighbour of vertex */
         for (i = 0; i < nei_count; ++i) {
-            igraph_integer_t idx = VECTOR(neighbors)[i];
+            igraph_int_t idx = VECTOR(neighbors)[i];
             if (igraph_2wheap_has_elem(&cn, idx)) {
                 igraph_2wheap_modify(&cn, idx, igraph_2wheap_get(&cn, idx) + 1);
             }
@@ -140,8 +140,8 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
 /* DSATUR: Choose vertices based on the number of adjacent colours, i.e. "saturation degree" */
 
 typedef struct {
-    igraph_integer_t saturation_degree; /* number of colors used by neighbors */
-    igraph_integer_t edge_degree; /* degree in the subgraph induced by uncolored vertices */
+    igraph_int_t saturation_degree; /* number of colors used by neighbors */
+    igraph_int_t edge_degree; /* degree in the subgraph induced by uncolored vertices */
 } dsatur_t;
 
 static int dsatur_t_compare(const void *left, const void *right) {
@@ -160,13 +160,13 @@ static int dsatur_t_compare(const void *left, const void *right) {
 }
 
 static igraph_bool_t dsatur_is_color_used_by_neighbour(
-    const igraph_vector_int_t *colors, igraph_integer_t color,
+    const igraph_vector_int_t *colors, igraph_int_t color,
     const igraph_vector_int_t *neighbors
 ) {
-    igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
+    igraph_int_t nei_count = igraph_vector_int_size(neighbors);
 
-    for (igraph_integer_t i=0; i < nei_count; i++) {
-        igraph_integer_t nei = VECTOR(*neighbors)[i];
+    for (igraph_int_t i=0; i < nei_count; i++) {
+        igraph_int_t nei = VECTOR(*neighbors)[i];
         if (VECTOR(*colors)[nei] == color) {
             return true;
         }
@@ -178,12 +178,12 @@ static igraph_bool_t dsatur_is_color_used_by_neighbour(
 static void dsatur_update_heap(
     const igraph_adjlist_t *adjlist, igraph_gen2wheap_t *node_degrees_heap,
     const igraph_vector_int_t *neighbors, const igraph_vector_int_t *colors,
-    igraph_integer_t color
+    igraph_int_t color
 ) {
     igraph_gen2wheap_delete_max(node_degrees_heap);
-    igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
-    for (igraph_integer_t i=0; i < nei_count; i++) {
-        igraph_integer_t nei = VECTOR(*neighbors)[i];
+    igraph_int_t nei_count = igraph_vector_int_size(neighbors);
+    for (igraph_int_t i=0; i < nei_count; i++) {
+        igraph_int_t nei = VECTOR(*neighbors)[i];
         if (!igraph_gen2wheap_has_elem(node_degrees_heap, nei)) {
             continue;
         }
@@ -196,10 +196,10 @@ static void dsatur_update_heap(
     }
 }
 
-static igraph_integer_t dsatur_get_first_viable_color(const igraph_vector_int_t *used_colors_sorted) {
-    igraph_integer_t color_count = igraph_vector_int_size(used_colors_sorted);
-    igraph_integer_t i = 0;
-    igraph_integer_t col = 0;
+static igraph_int_t dsatur_get_first_viable_color(const igraph_vector_int_t *used_colors_sorted) {
+    igraph_int_t color_count = igraph_vector_int_size(used_colors_sorted);
+    igraph_int_t i = 0;
+    igraph_int_t col = 0;
     while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
         while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
             i++;
@@ -212,7 +212,7 @@ static igraph_integer_t dsatur_get_first_viable_color(const igraph_vector_int_t 
 static igraph_error_t igraph_i_vertex_coloring_dsatur(
     const igraph_t *graph, igraph_vector_int_t *colors
 ) {
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vcount));
 
     if (vcount == 0) {
@@ -236,7 +236,7 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
     IGRAPH_CHECK(igraph_gen2wheap_init(&node_degrees_heap, dsatur_t_compare, sizeof(dsatur_t), vcount));
     IGRAPH_FINALLY(igraph_gen2wheap_destroy, &node_degrees_heap);
 
-    for (igraph_integer_t vertex = 0; vertex < vcount; vertex++) {
+    for (igraph_int_t vertex = 0; vertex < vcount; vertex++) {
         dsatur_t dsatur;
         dsatur.saturation_degree = 0;
         dsatur.edge_degree = igraph_vector_int_size(igraph_adjlist_get(&adjlist, vertex));
@@ -247,18 +247,18 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&used_colors_sorted, 0);
 
     while (! igraph_gen2wheap_empty(&node_degrees_heap)) {
-        igraph_integer_t node_to_color = igraph_gen2wheap_max_index(&node_degrees_heap);
+        igraph_int_t node_to_color = igraph_gen2wheap_max_index(&node_degrees_heap);
         igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, node_to_color);
-        igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
+        igraph_int_t nei_count = igraph_vector_int_size(neighbors);
         igraph_vector_int_clear(&used_colors_sorted);
-        for (igraph_integer_t i=0; i < nei_count; i++) {
-            igraph_integer_t nei = VECTOR(*neighbors)[i];
+        for (igraph_int_t i=0; i < nei_count; i++) {
+            igraph_int_t nei = VECTOR(*neighbors)[i];
             if (VECTOR(*colors)[nei] != -1) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&used_colors_sorted, VECTOR(*colors)[nei]));
             }
         }
         igraph_vector_int_sort(&used_colors_sorted);
-        igraph_integer_t color = dsatur_get_first_viable_color(&used_colors_sorted);
+        igraph_int_t color = dsatur_get_first_viable_color(&used_colors_sorted);
         dsatur_update_heap(&adjlist, &node_degrees_heap, neighbors, colors, color);
         VECTOR(*colors)[node_to_color] = color;
 
@@ -314,8 +314,6 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
  * \function igraph_is_vertex_coloring
  * \brief Checks whether a vertex coloring is valid.
  *
- * \experimental
- *
  * This function checks whether the given vertex type/color assignment is a valid
  * vertex coloring, i.e., no two adjacent vertices have the same color.
  * Self-loops are ignored.
@@ -326,14 +324,16 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
  * \return Error code.
  *
  * Time complexity: O(|E|), linear in the number of edges.
+ *
+ * \example examples/simple/coloring.c
  */
 igraph_error_t igraph_is_vertex_coloring(
         const igraph_t *graph,
         const igraph_vector_int_t *types,
         igraph_bool_t *res) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     int iter = 0;
 
     if (igraph_vector_int_size(types) != vcount) {
@@ -342,9 +342,9 @@ igraph_error_t igraph_is_vertex_coloring(
 
     *res = true;
 
-    for (igraph_integer_t e = 0; e < ecount; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
+    for (igraph_int_t e = 0; e < ecount; e++) {
+        igraph_int_t from = IGRAPH_FROM(graph, e);
+        igraph_int_t to = IGRAPH_TO(graph, e);
 
         /* Skip self-loops */
         if (from == to) {
@@ -365,8 +365,6 @@ igraph_error_t igraph_is_vertex_coloring(
 /**
  * \function igraph_is_bipartite_coloring
  * \brief Checks whether a bipartite vertex coloring is valid.
- *
- * \experimental
  *
  * This function checks whether the given vertex type assignment is a valid
  * bipartite coloring, i.e., no two adjacent vertices have the same type.
@@ -393,8 +391,8 @@ igraph_error_t igraph_is_bipartite_coloring(
         igraph_bool_t *res,
         igraph_neimode_t *mode) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     int iter = 0;
 
     if (igraph_vector_bool_size(types) != vcount) {
@@ -410,9 +408,9 @@ igraph_error_t igraph_is_bipartite_coloring(
     igraph_bool_t has_false_to_true = false;
     igraph_bool_t has_true_to_false = false;
 
-    for (igraph_integer_t e = 0; e < ecount; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
+    for (igraph_int_t e = 0; e < ecount; e++) {
+        igraph_int_t from = IGRAPH_FROM(graph, e);
+        igraph_int_t to = IGRAPH_TO(graph, e);
 
         /* Skip self-loops */
         if (from == to) {
@@ -458,8 +456,6 @@ igraph_error_t igraph_is_bipartite_coloring(
  * \function igraph_is_edge_coloring
  * \brief Checks whether an edge coloring is valid.
  *
- * \experimental
- *
  * This function checks whether the given edge color assignment is a valid
  * edge coloring, i.e., no two adjacent edges have the same color.
  *
@@ -479,8 +475,8 @@ igraph_error_t igraph_is_edge_coloring(
         const igraph_vector_int_t *types,
         igraph_bool_t *res) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_int_t edges, edge_colors;
     int iter = 0;
 
@@ -495,7 +491,7 @@ igraph_error_t igraph_is_edge_coloring(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_colors, 0);
 
     /* For each vertex, check that all incident edges have different colors */
-    for (igraph_integer_t v = 0; v < vcount; v++) {
+    for (igraph_int_t v = 0; v < vcount; v++) {
         IGRAPH_CHECK(igraph_incident(graph, &edges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
 
         /* Get sorted edge color list */
@@ -503,8 +499,8 @@ igraph_error_t igraph_is_edge_coloring(
         igraph_vector_int_sort(&edge_colors);
 
         /* Look for consecutive duplicates in edge color list */
-        igraph_integer_t edge_color_count = igraph_vector_int_size(&edge_colors);
-        for (igraph_integer_t i = 0; i < edge_color_count - 1; i++) {
+        igraph_int_t edge_color_count = igraph_vector_int_size(&edge_colors);
+        for (igraph_int_t i = 0; i < edge_color_count - 1; i++) {
             if (VECTOR(edge_colors)[i] == VECTOR(edge_colors)[i + 1]) {
                 *res = false;
                 goto done;

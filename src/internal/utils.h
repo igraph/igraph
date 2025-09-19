@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -28,5 +28,12 @@ igraph_error_t igraph_i_matrix_subset_vertices(
         const igraph_t *graph,
         igraph_vs_t from,
         igraph_vs_t to);
+
+void igraph_i_simplify_edge_list(
+        igraph_vector_int_t *edges,
+        igraph_bool_t self_loops, igraph_bool_t multi_edges,
+        igraph_bool_t directed);
+
+igraph_error_t igraph_i_vector_int_shuffle_pairs(igraph_vector_int_t *pairs);
 
 #endif /* IGRAPH_INTERNAL_UTILS_H */

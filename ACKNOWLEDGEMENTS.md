@@ -50,6 +50,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 #### [bliss 0.75](https://users.aalto.fi/~tjunttil/bliss/)
 
 Copyright (c) 2003-2021 Tommi Junttila.
@@ -92,6 +93,7 @@ License: [GNU GPLv2][gpl2] or later
 Copyright (C) 2010-2011 Tamás Nepusz.
 
 License: [GNU GPLv2][gpl2] or later
+
 
 #### DrL
 
@@ -220,9 +222,9 @@ use or performance of this software.
 
 #### [SuiteSparse](http://www.suitesparse.com)
 
- * CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2017, Timothy A. Davis.
+CXSPARSE: a Concise Sparse Matrix package - Extended. Copyright (c) 2006-2017, Timothy A. Davis.
 
-   License: [GNU LGPLv2.1][lgpl2] or later
+License: [GNU LGPLv2.1][lgpl2] or later
 
 
 #### [Infomap](https://www.mapequation.org/)
@@ -257,8 +259,34 @@ Copyright (C) 1998-2012 Daniel Veillard.
 License: [MIT license][mit]
 
 
+#### [nanoflann](https://github.com/jlblancoc/nanoflann)
+
+Copyright 2008-2009  Marius Muja (mariusm@cs.ubc.ca).
+Copyright 2008-2009  David G. Lowe (lowe@cs.ubc.ca).
+Copyright 2011 Jose L. Blanco (joseluisblancoc@gmail.com).
+
+License: [BSD license][bsd]
+
+
+#### [Qhull](http://www.qhull.org/)
+
+Qhull, Copyright (c) 1993-2020
+
+C.B. Barber, Arlington, MA 
+
+and
+
+The National Science and Technology Research Center for
+Computation and Visualization of Geometric Structures
+(The Geometry Center)
+University of Minnesota
+
+License: [Qhull license][qhull]
+
+
  [bsd]:   https://opensource.org/license/BSD-2-Clause
  [mit]:   https://opensource.org/licenses/mit-license.html
+ [qhull]: http://www.qhull.org/COPYING.txt
  [gpl2]:  https://www.gnu.org/licenses/gpl-2.0.html
  [lgpl2]: https://www.gnu.org/licenses/lgpl-2.1.html
  [gpl3]:  https://www.gnu.org/licenses/gpl-3.0.html

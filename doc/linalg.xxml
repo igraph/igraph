@@ -6,7 +6,7 @@
 'http://www.w3.org/2001/XInclude'" >
 ]>
 
-<chapter id="igraph-Arpack">
+<chapter id="igraph-Linalg">
 <title>Using BLAS, LAPACK and ARPACK for igraph matrices and graphs</title>
 
 <section id="about-blas">

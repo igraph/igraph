@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -79,7 +79,7 @@ int main(void) {
     igraph_community_spinglass(&graph, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
     check(&membership);
 
-    igraph_community_infomap(&graph, NULL, NULL, 1, &membership, NULL);
+    igraph_community_infomap(&graph, NULL, NULL, 1, false, 0, &membership, NULL);
     check(&membership);
 
     igraph_destroy(&graph);

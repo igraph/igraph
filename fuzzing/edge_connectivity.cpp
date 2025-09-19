@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
 
     if (! igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED)) {
-        igraph_integer_t conn;
+        igraph_int_t conn;
 
         /* Enable connectivity checks in order to try to force the fuzzer
          * to find connected graphs. Disconnected graphs result in low coverage. */

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -46,11 +46,11 @@
  * d1 is the (out-)degree of \p v1 and d2 is the (in-)degree of \p v2.
  */
 igraph_error_t igraph_are_adjacent(const igraph_t *graph,
-                         igraph_integer_t v1, igraph_integer_t v2,
+                         igraph_int_t v1, igraph_int_t v2,
                          igraph_bool_t *res) {
 
-    igraph_integer_t nov = igraph_vcount(graph);
-    igraph_integer_t eid = -1;
+    igraph_int_t nov = igraph_vcount(graph);
+    igraph_int_t eid = -1;
 
     if (v1 < 0 || v2 < 0 || v1 > nov - 1 || v2 > nov - 1) {
         IGRAPH_ERROR("Invalid vertex ID when checking if two vertices are connected.", IGRAPH_EINVVID);

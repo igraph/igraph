@@ -107,40 +107,41 @@ value—these functions can never encounter an error.
 
 <section id="basic-data-types"><title>Atomic data types</title>
 
-<indexterm><primary>igraph_integer_t</primary></indexterm>
+<indexterm><primary>igraph_int_t</primary></indexterm>
 
 <para>
 &igraph; introduces a few aliases to standard C data types that are then used
 throughout the library. The most important of these types is
-<type>igraph_integer_t</type>, which is an alias to either a 32-bit or a 64-bit
+<type>igraph_int_t</type>, which is an alias to either a 32-bit or a 64-bit
 <emphasis>signed</emphasis> integer, depending on whether &igraph; was compiled
-in 32-bit or 64-bit mode. The size of <type>igraph_integer_t</type> also
+in 32-bit or 64-bit mode. The size of <type>igraph_int_t</type> also
 influences the maximum number of vertices that an &igraph; graph can represent
 as the number of vertices is stored in a variable of type
-<type>igraph_integer_t</type>.
+<type>igraph_int_t</type>.
 </para>
 
 <para>
-Since igraph 1.0, the alias <type>igraph_int_t</type> may be used interchangeably
-with <type>igraph_integer_t</type>.
+Before igraph 1.0, <type>igraph_int_t</type> was called <type>igraph_integer_t</type>.
+This is still available as an alias to <type>igraph_int_t</type> and will remain
+accessible until at least version 2.0 of the library.
 </para>
 
-<para>Since the size of a variable of type <type>igraph_integer_t</type> may
+<para>Since the size of a variable of type <type>igraph_int_t</type> may
 change depending on how &igraph; is compiled, you cannot simply use
 <code>%d</code> or <code>%ld</code> as a placeholder for &igraph; integers in
 <code>printf</code> format strings. &igraph; provides the
 <code>IGRAPH_PRId</code> macro, which maps to <code>d</code>, <code>ld</code>
-or <code>lld</code> depending on the size of <type>igraph_integer_t</type>, and
+or <code>lld</code> depending on the size of <type>igraph_int_t</type>, and
 you must use this macro in <code>printf</code> format strings to avoid compiler
 warnings.
 </para>
 
 <indexterm><primary>igraph_uint_t</primary></indexterm>
 
-<para>Similarly to how <type>igraph_integer_t</type> maps to the standard size
+<para>Similarly to how <type>igraph_int_t</type> maps to the standard size
 signed integer in the library, <type>igraph_uint_t</type> maps to a 32-bit or
 a 64-bit <emphasis>unsigned</emphasis> integer. It is guaranteed that the size of
-<type>igraph_integer_t</type> is the same as the size of <type>igraph_uint_t</type>.
+<type>igraph_int_t</type> is the same as the size of <type>igraph_uint_t</type>.
 &igraph; provides <code>IGRAPH_PRIu</code> as a format string placeholder for
 variables of type <type>igraph_uint_t</type>.
 </para>
@@ -166,7 +167,7 @@ value. For printing purposes, you can treat it as an integer and use
 <indexterm><primary>IGRAPH_UINT_MAX</primary></indexterm>
 <indexterm><primary>IGRAPH_UINT_MIN</primary></indexterm>
 <para>
-Upper and lower limits of <type>igraph_integer_t</type> and
+Upper and lower limits of <type>igraph_int_t</type> and
 <type>igraph_uint_t</type> are provided by the constants named
 <constant>IGRAPH_INTEGER_MIN</constant>, <constant>IGRAPH_INTEGER_MAX</constant>,
 <constant>IGRAPH_UINT_MIN</constant> and <constant>IGRAPH_UINT_MAX</constant>.
@@ -231,6 +232,7 @@ initialization steps.
 <section id="misc-helper-functions"><title>Miscellaneous macros and helper functions</title>
 <!-- doxrox-include IGRAPH_VCOUNT_MAX -->
 <!-- doxrox-include IGRAPH_ECOUNT_MAX -->
+<!-- doxrox-include IGRAPH_UNLIMITED -->
 <!-- doxrox-include igraph_expand_path_to_pairs -->
 <!-- doxrox-include igraph_invalidate_cache -->
 <!-- doxrox-include igraph_is_same_graph -->

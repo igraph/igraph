@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge MA, 02139 USA
 
@@ -187,7 +187,7 @@ int main(void) {
 
     /* igraph_vector_ptr_view */
     ptr = (void**) malloc(5 * sizeof(void*));
-    igraph_vector_ptr_view(&v3, ptr, 5);
+    v3 = igraph_vector_ptr_view(ptr, 5);
     ptr[0] = &d1;
     ptr[1] = &d2;
     ptr[2] = &d3;

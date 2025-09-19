@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -28,7 +28,7 @@ int check_projection(const igraph_t *graph,
                      const igraph_vector_bool_t *types,
                      const igraph_t *proj1,
                      const igraph_t *proj2) {
-    igraph_integer_t vcount1, ecount1, vcount2, ecount2;
+    igraph_int_t vcount1, ecount1, vcount2, ecount2;
     igraph_bipartite_projection_size(graph, types, &vcount1, &ecount1,
                                      &vcount2, &ecount2);
     if (proj1 && igraph_vcount(proj1) != vcount1) {
@@ -51,7 +51,7 @@ int main(void) {
     igraph_t g, p1, p2, full, ring;
     igraph_vector_bool_t types;
     igraph_bool_t iso;
-    igraph_integer_t i, m2 = 0, w, f, t;
+    igraph_int_t i, m2 = 0, w, f, t;
     igraph_vector_int_t mult1, mult2;
 
     /*******************************************************/

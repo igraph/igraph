@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -25,6 +25,9 @@
 int main(void) {
 
     igraph_dqueue_t q;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* igraph_dqueue_init, igraph_dqueue_destroy, igraph_dqueue_empty */
     igraph_dqueue_init(&q, 5);

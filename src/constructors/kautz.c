@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -58,19 +58,19 @@
  * like O(|V|+|E|). |V| is the number of vertices, |E| is the number
  * of edges and \c m and \c n are the corresponding arguments.
  */
-igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
+igraph_error_t igraph_kautz(igraph_t *graph, igraph_int_t m, igraph_int_t n) {
 
     /* m+1 - number of symbols */
     /* n+1 - length of strings */
 
-    igraph_integer_t no_of_nodes, no_of_edges;
-    igraph_integer_t allstrings;
-    igraph_integer_t i, j, idx = 0;
+    igraph_int_t no_of_nodes, no_of_edges;
+    igraph_int_t allstrings;
+    igraph_int_t i, j, idx = 0;
     igraph_vector_int_t edges;
     igraph_vector_int_t digits, table;
     igraph_vector_int_t index1, index2;
-    igraph_integer_t actb = 0;
-    igraph_integer_t actvalue = 0;
+    igraph_int_t actb = 0;
+    igraph_int_t actvalue = 0;
     int iter = 0;
 
     if (m < 0 || n < 0) {
@@ -88,7 +88,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     /* no_of_nodes = ((m + 1) * pow(m, n)) */
     {
         igraph_real_t m_to_pow_n_real = pow(m, n);
-        igraph_integer_t m_to_pow_n = m_to_pow_n_real;
+        igraph_int_t m_to_pow_n = m_to_pow_n_real;
         if (m_to_pow_n != m_to_pow_n_real) {
             IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
                           m, n);
@@ -128,7 +128,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     while (true) {
         /* at the beginning of the loop, 0:actb contain the valid prefix */
         /* we might need to fill it to get a valid string */
-        igraph_integer_t z = 0;
+        igraph_int_t z = 0;
         if (VECTOR(digits)[actb] == 0) {
             z = 1;
         }
@@ -152,7 +152,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         /* not yet, we need a valid prefix now */
         while (true) {
             /* try to increase digits at position actb */
-            igraph_integer_t next = VECTOR(digits)[actb] + 1;
+            igraph_int_t next = VECTOR(digits)[actb] + 1;
             if (actb != 0 && VECTOR(digits)[actb - 1] == next) {
                 next++;
             }
@@ -170,18 +170,18 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     }
 
     {
-        igraph_integer_t no_of_edges2;
+        igraph_int_t no_of_edges2;
         IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges2);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
     }
 
     /* Now come the edges at last */
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t fromvalue = VECTOR(index2)[i];
-        igraph_integer_t lastdigit = fromvalue % (m + 1);
-        igraph_integer_t basis = (fromvalue * (m + 1)) % allstrings;
+        igraph_int_t fromvalue = VECTOR(index2)[i];
+        igraph_int_t lastdigit = fromvalue % (m + 1);
+        igraph_int_t basis = (fromvalue * (m + 1)) % allstrings;
         for (j = 0; j <= m; j++) {
-            igraph_integer_t tovalue, to;
+            igraph_int_t tovalue, to;
             if (j == lastdigit) {
                 continue;
             }

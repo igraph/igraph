@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Games">
+<title>Stochastic graph generators ("games")</title>
+
+<para>"Games" are random graph generators, i.e. they generate a different
+graph every time they are called. igraph includes many such generators.
+Some implement stochastic graph construction processes inspired by real-world
+mechanics, such as preferential attachment, while others are designed to
+produce graphs with certain used properties (e.g. fixed number of edges,
+fixed degrees, etc.)</para>
+
+<section id="erdos-renyi-games"><title>The Erdős-Rényi and related models</title>
+<!-- doxrox-include about_erdos_renyi -->
+
+<!-- doxrox-include igraph_erdos_renyi_game_gnm -->
+<!-- doxrox-include igraph_erdos_renyi_game_gnp -->
+<!-- doxrox-include igraph_iea_game -->
+<!-- doxrox-include igraph_sbm_game -->
+<!-- doxrox-include igraph_hsbm_game -->
+<!-- doxrox-include igraph_hsbm_list_game -->
+<!-- doxrox-include igraph_preference_game -->
+<!-- doxrox-include igraph_asymmetric_preference_game -->
+<!-- doxrox-include igraph_correlated_game -->
+<!-- doxrox-include igraph_correlated_pair_game -->
+</section>
+
+<section id="preferential-attachment-games"><title>Preferential attachment and related models</title>
+<para>Preferential attachment models are growing random graphs where vertices are added iteratively,
+and connected to previously added vertices based on dynamically changing vertex properties, such as
+degree or time since the vertex was added.</para>
+
+<!-- doxrox-include igraph_barabasi_game -->
+<!-- doxrox-include igraph_barabasi_aging_game -->
+<!-- doxrox-include igraph_recent_degree_game -->
+<!-- doxrox-include igraph_recent_degree_aging_game -->
+<!-- doxrox-include igraph_lastcit_game -->
+</section>
+
+<section id="growing-random-games"><title>Growing random graph models</title>
+<para>In growing random graphs, vertices are added iteratively, and connected based on various rules.
+Preferential attachment models are documented <link linkend="preferential-attachment-games">in their
+own section</link>.
+</para>
+
+<!-- doxrox-include igraph_growing_random_game -->
+<!-- doxrox-include igraph_callaway_traits_game -->
+<!-- doxrox-include igraph_establishment_game -->
+<!-- doxrox-include igraph_cited_type_game -->
+<!-- doxrox-include igraph_citing_cited_type_game -->
+<!-- doxrox-include igraph_forest_fire_game -->
+</section>
+
+<section id="degree-constrained-games"><title>Degree-constrained models</title>
+<para>Random graph models with hard or soft degree constraints.</para>
+<!-- doxrox-include igraph_degree_sequence_game -->
+<!-- doxrox-include igraph_k_regular_game -->
+<!-- doxrox-include igraph_rewire -->
+<!-- doxrox-include igraph_chung_lu_game -->
+<!-- doxrox-include igraph_static_fitness_game -->
+<!-- doxrox-include igraph_static_power_law_game -->
+</section>
+
+<section id="edge-rewiring-games"><title>Edge rewiring models</title>
+<!-- doxrox-include igraph_watts_strogatz_game -->
+<!-- doxrox-include igraph_rewire_edges -->
+<!-- doxrox-include igraph_rewire_directed_edges -->
+</section>
+
+<section id="other-random-games"><title>Other random graphs</title>
+<!-- doxrox-include igraph_grg_game -->
+<!-- doxrox-include igraph_dot_product_game -->
+<!-- doxrox-include igraph_simple_interconnected_islands_game -->
+<!-- doxrox-include igraph_tree_game -->
+</section>
+
+<section id="generator-types-and-constants"><title>Common types and constants</title>
+<!-- doxrox-include igraph_edge_type_sw_t -->
+</section>
+
+</chapter>

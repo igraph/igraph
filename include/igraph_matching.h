@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2012-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
                                              igraph_bool_t* result);
 
 IGRAPH_EXPORT igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* graph,
-                                                    const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+                                                    const igraph_vector_bool_t* types, igraph_int_t* matching_size,
                                                     igraph_real_t* matching_weight, igraph_vector_int_t* matching,
                                                     const igraph_vector_t* weights, igraph_real_t eps);
 

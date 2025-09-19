@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 
 int main(void) {
     int *a;
+    char *b;
 
     /* Macros */
 
@@ -33,15 +34,17 @@ int main(void) {
     IGRAPH_FREE(a);
     IGRAPH_ASSERT(!a); /* IGRAPH_FREE(a) sets 'a' to NULL */
 
-    a = IGRAPH_MALLOC(0);
-    IGRAPH_ASSERT(a);
+    /* We use type 'char' to work around warnings from some moderns compilers such as Clang 22:
+     * error: allocation of insufficient size '1' for type 'int' with size '4' [-Werror,-Walloc-size] */
+    b = IGRAPH_MALLOC(0);
+    IGRAPH_ASSERT(b);
 
-    IGRAPH_FREE(a);
-    IGRAPH_ASSERT(!a);
+    IGRAPH_FREE(b);
+    IGRAPH_ASSERT(!b);
 
     /* Functions */
 
-    a = igraph_calloc(0, sizeof(int));
+    a = igraph_calloc(0, sizeof(*a));
     IGRAPH_ASSERT(a);
 
     a = igraph_realloc(a, 0);

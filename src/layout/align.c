@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -30,8 +30,6 @@
  * \function igraph_layout_align
  * \brief Aligns a graph layout with the coordinate axes.
  *
- * \experimental
- *
  * This function centers a vertex layout on the coordinate system origin and
  * rotates the layout to achieve a visually pleasing alignment with the coordinate
  * axes. Doing this is particularly useful with force-directed layouts such as
@@ -47,9 +45,9 @@
  */
 
 igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layout) {
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
-    const igraph_integer_t dim = igraph_matrix_ncol(layout);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
+    const igraph_int_t dim = igraph_matrix_ncol(layout);
     igraph_matrix_t M, Q; /* nematic tensor */
     igraph_real_t norm2_sum; /* sum of squared norms of alignment vectors */
     igraph_matrix_t R; /* rotation matrix consisting of Q's eigenvectors */
@@ -114,8 +112,8 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         IGRAPH_CHECK(igraph_matrix_colsum(layout, &center));
         igraph_vector_scale(&center, 1.0 / vcount);
 
-        for (igraph_integer_t j=0; j < dim; j++) {
-            for (igraph_integer_t i=0; i < vcount; i++) {
+        for (igraph_int_t j=0; j < dim; j++) {
+            for (igraph_int_t i=0; i < vcount; i++) {
                 MATRIX(*layout, i, j) -= VECTOR(center)[j];
             }
         }
@@ -138,18 +136,18 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         IGRAPH_VECTOR_INIT_FINALLY(&edge_vec, dim);
 
         norm2_sum = 0;
-        for (igraph_integer_t eid=0; eid < ecount; eid++) {
-            const igraph_integer_t from = IGRAPH_FROM(graph, eid);
-            const igraph_integer_t to   = IGRAPH_TO(graph, eid);
+        for (igraph_int_t eid=0; eid < ecount; eid++) {
+            const igraph_int_t from = IGRAPH_FROM(graph, eid);
+            const igraph_int_t to   = IGRAPH_TO(graph, eid);
 
             if (from == to) continue; /* skip self-loops */
 
-            for (igraph_integer_t i=0; i < dim; i++) {
+            for (igraph_int_t i=0; i < dim; i++) {
                 VECTOR(edge_vec)[i] = MATRIX(*layout, from, i) - MATRIX(*layout, to, i);
             }
 
-            for (igraph_integer_t i=0; i < dim; i++) {
-                for (igraph_integer_t j=0; j < dim; j++) {
+            for (igraph_int_t i=0; i < dim; i++) {
+                for (igraph_int_t j=0; j < dim; j++) {
                     igraph_real_t m = VECTOR(edge_vec)[i] * VECTOR(edge_vec)[j];
                     MATRIX(M, i, j) += m;
                     if (i == j) {
@@ -178,9 +176,9 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
      * to compute M_ij. Note that the layout has already been centered. */
     if (norm2_sum == 0) {
         /* If norm2_sum == 0 then M is also all-zero, no need to null it explicitly. */
-        for (igraph_integer_t vid=0; vid < vcount; vid++) {
-            for (igraph_integer_t i=0; i < dim; i++) {
-                for (igraph_integer_t j=0; j < dim; j++) {
+        for (igraph_int_t vid=0; vid < vcount; vid++) {
+            for (igraph_int_t i=0; i < dim; i++) {
+                for (igraph_int_t j=0; j < dim; j++) {
                     igraph_real_t m = MATRIX(*layout, vid, i) * MATRIX(*layout, vid, j);
                     MATRIX(M, i, j) += m;
                     if (i == j) {
@@ -218,7 +216,7 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
          * Q_ij = M_ij / norm2 - delta_ij / d. */
         IGRAPH_CHECK(igraph_matrix_update(&Q, &M));
         igraph_matrix_scale(&Q, 1.0 / norm2_sum);
-        for (igraph_integer_t i=0; i < dim; i++) {
+        for (igraph_int_t i=0; i < dim; i++) {
             MATRIX(Q, i, i) -= 1.0 / dim;
         }
 
@@ -239,7 +237,7 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         /* Compute the matrix norm, i.e. the largest eigenvalue magnitude,
          * to determine if the nematic tensor Q is close to zero. */
         igraph_real_t matrix_norm = 0;
-        for (igraph_integer_t i=0; i < dim; i++) {
+        for (igraph_int_t i=0; i < dim; i++) {
             igraph_real_t magnitude = fabs(VECTOR(lambda)[i]);
             if (magnitude > matrix_norm) {
                 matrix_norm = magnitude;
@@ -285,9 +283,9 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         IGRAPH_VECTOR_INIT_FINALLY(&extent, dim);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&permutation, dim);
 
-        for (igraph_integer_t j=0; j < dim; j++) {
+        for (igraph_int_t j=0; j < dim; j++) {
             igraph_real_t min = IGRAPH_INFINITY, max = -IGRAPH_INFINITY;
-            for (igraph_integer_t i=0; i < vcount; i++) {
+            for (igraph_int_t i=0; i < vcount; i++) {
                 igraph_real_t c = MATRIX(temp_layout, i, j);
                 if (c < min) min = c;
                 if (c > max) max = c;
@@ -296,8 +294,8 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
         }
         IGRAPH_CHECK(igraph_vector_sort_ind(&extent, &permutation, IGRAPH_DESCENDING));
 
-        for (igraph_integer_t j=0; j < dim; j++) {
-            for (igraph_integer_t i=0; i < vcount; i++) {
+        for (igraph_int_t j=0; j < dim; j++) {
+            for (igraph_int_t i=0; i < vcount; i++) {
                 MATRIX(*layout, i, j) = MATRIX(temp_layout, i, VECTOR(permutation)[j]);
             }
         }

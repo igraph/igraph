@@ -1,6 +1,6 @@
 /*
-   IGraph library.
-   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+   igraph library.
+   Copyright (C) 2021-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "igraph_interface.h"
 
 #include "core/interruption.h"
-#include "misc/order_cycle.h"
+#include "cycles/order_cycle.h"
 
 /**** Fundamental cycles *****/
 
@@ -46,13 +46,13 @@ static igraph_error_t
 igraph_i_fundamental_cycles_bfs(
         const igraph_t *graph,
         igraph_vector_int_list_t *result,
-        igraph_integer_t start_vid,
-        igraph_integer_t bfs_cutoff,
+        igraph_int_t start_vid,
+        igraph_int_t bfs_cutoff,
         const igraph_inclist_t *inclist,
         igraph_vector_int_t *visited,
-        igraph_integer_t mark /* mark used in 'visited' */) {
+        igraph_int_t mark /* mark used in 'visited' */) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vector_int_t pred_edge;
     igraph_vector_int_t u_back, v_back;
@@ -77,18 +77,18 @@ igraph_i_fundamental_cycles_bfs(
     VECTOR(pred_edge)[start_vid] = -1; /* non-valid predecessor edge id for root vertex */
 
     while (! igraph_dqueue_int_empty(&q)) {
-        igraph_integer_t v = igraph_dqueue_int_pop(&q);
-        igraph_integer_t vdist = igraph_dqueue_int_pop(&q);
+        igraph_int_t v = igraph_dqueue_int_pop(&q);
+        igraph_int_t vdist = igraph_dqueue_int_pop(&q);
 
         igraph_vector_int_t *incs = igraph_inclist_get(inclist, v);
-        igraph_integer_t n = igraph_vector_int_size(incs);
-        igraph_integer_t i, j;
+        igraph_int_t n = igraph_vector_int_size(incs);
+        igraph_int_t i, j;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         for (i=0; i < n; ++i) {
-            igraph_integer_t e = VECTOR(*incs)[i];
-            igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
+            igraph_int_t e = VECTOR(*incs)[i];
+            igraph_int_t u = IGRAPH_OTHER(graph, e, v);
 
             if (e == VECTOR(pred_edge)[v]) {
                 /* do not follow the edge through which we came to v */
@@ -106,13 +106,13 @@ igraph_i_fundamental_cycles_bfs(
                  * that the distance of u from the start vertex is either the
                  * same as that of v, or one greater. */
 
-                igraph_integer_t up = u, vp = v;
-                igraph_integer_t u_back_len, v_back_len;
+                igraph_int_t up = u, vp = v;
+                igraph_int_t u_back_len, v_back_len;
                 igraph_vector_int_t cycle;
 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&v_back, e));
                 for (;;) {
-                    igraph_integer_t upe, vpe;
+                    igraph_int_t upe, vpe;
 
                     if (up == vp) {
                         break;
@@ -187,6 +187,7 @@ igraph_i_fundamental_cycles_bfs(
  * Edge directions are ignored. Multi-edges and self-loops are supported.
  *
  * \param graph The graph object.
+ * \param weights Currently unused.
  * \param result An initialized integer vector list. The result will be stored here,
  *   each vector containing the edge IDs of a basis element.
  * \param start_vid If negative, a complete fundamental cycle basis is returned.
@@ -196,23 +197,21 @@ igraph_i_fundamental_cycles_bfs(
  * \param bfs_cutoff If negative, a complete cycle basis is returned. Otherwise, only
  *   cycles of length <code>2*bfs_cutoff + 1</code> or shorter are included. \p bfs_cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
- * \param weights Currently unused.
  * \return Error code.
  *
  * \sa \ref igraph_minimum_cycle_basis()
  *
  * Time complexity: O(|V| + |E|).
  */
-igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
-                                         igraph_vector_int_list_t *result,
-                                         igraph_integer_t start_vid,
-                                         igraph_integer_t bfs_cutoff,
-                                         const igraph_vector_t *weights) {
+igraph_error_t igraph_fundamental_cycles(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_int_list_t *result,
+        igraph_int_t start_vid, igraph_real_t bfs_cutoff) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t estimated_rank;
-    igraph_integer_t i;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t estimated_rank;
+    igraph_int_t i;
     igraph_inclist_t inclist;
     igraph_vector_int_t visited; /* see comments before igraph_i_fundamental_cycles_bfs() */
 
@@ -264,7 +263,7 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
  * order for equal length ones. Lexicographic order helps keep row insertion into the reduced matrix
  * efficient during Gaussian elimination, by ensuring that insertions usually happen near the end. */
 static int cycle_cmp(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
+    igraph_int_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
 
     if (n1 < n2) {
         return -1;
@@ -277,9 +276,9 @@ static int cycle_cmp(const igraph_vector_int_t *v1, const igraph_vector_int_t *v
 
 /* Adding cycle vectors produces the symmetric difference of the corresponding edge sets. */
 static igraph_error_t cycle_add(const igraph_vector_int_t *a, const igraph_vector_int_t *b, igraph_vector_int_t *res) {
-    igraph_integer_t na = igraph_vector_int_size(a), nb = igraph_vector_int_size(b);
-    const igraph_integer_t *pa = VECTOR(*a), *pb = VECTOR(*b);
-    const igraph_integer_t *pa_end = pa + na, *pb_end = pb + nb;
+    igraph_int_t na = igraph_vector_int_size(a), nb = igraph_vector_int_size(b);
+    const igraph_int_t *pa = VECTOR(*a), *pb = VECTOR(*b);
+    const igraph_int_t *pa_end = pa + na, *pb_end = pb + nb;
 
     igraph_vector_int_clear(res);
     for (;;) {
@@ -324,8 +323,8 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
                                            const igraph_vector_int_t *cycle,
                                            igraph_bool_t *independent) {
 
-    const igraph_integer_t nrow = igraph_vector_int_list_size(reduced_matrix);
-    igraph_integer_t i;
+    const igraph_int_t nrow = igraph_vector_int_list_size(reduced_matrix);
+    igraph_int_t i;
 
     igraph_vector_int_t work, tmp;
 
@@ -390,6 +389,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * https://doi.org/10.1137%2F0216026
  *
  * \param graph The graph object.
+ * \param weights Currently unused.
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
  * \param bfs_cutoff If negative, an exact minimum cycle basis is returned. Otherwise
@@ -407,23 +407,21 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   performance cost. If false, no guarantees are given about the ordering
  *   of edge IDs within cycles. This parameter exists solely to control
  *   performance tradeoffs.
- * \param weights Currently unused.
  * \return Error code.
  *
  * \sa \ref igraph_fundamental_cycles()
  *
  * Time complexity: TODO.
  */
-igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
-                                          igraph_vector_int_list_t *result,
-                                          igraph_integer_t bfs_cutoff,
-                                          igraph_bool_t complete,
-                                          igraph_bool_t use_cycle_order,
-                                          const igraph_vector_t *weights) {
+igraph_error_t igraph_minimum_cycle_basis(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_int_list_t *result,
+        igraph_real_t bfs_cutoff,
+        igraph_bool_t complete, igraph_bool_t use_cycle_order) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    const igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t rank;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t rank;
     igraph_vector_int_list_t candidates;
 
     IGRAPH_UNUSED(weights);
@@ -433,8 +431,8 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         igraph_inclist_t inclist;
         igraph_vector_int_t visited; /* visited[v] % 3 is zero for unvisited vertices, see igraph_i_fundamental_cycles_bfs() */
         igraph_vector_int_t degrees;
-        igraph_integer_t no_of_comps;
-        igraph_integer_t mark;
+        igraph_int_t no_of_comps;
+        igraph_int_t mark;
 
         /* We use the degrees to avoid doing a BFS from vertices with d < 3, except in special cases.
          * Degrees cannot be computed from the inclist because there we use IGRAPH_LOOPS_ONCE. */
@@ -454,8 +452,8 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_list_reserve(&candidates, rank));
 
         mark = 0;
-        for (igraph_integer_t i=0; i < no_of_nodes; ++i) {
-            igraph_integer_t degree = VECTOR(degrees)[i];
+        for (igraph_int_t i=0; i < no_of_nodes; ++i) {
+            igraph_int_t degree = VECTOR(degrees)[i];
             igraph_bool_t vis = VECTOR(visited)[i] % 3 != 0; /* was vertex i visited already? */
 
             /* Generally, we only need to run a BFS from vertices of degree 3 or greater.
@@ -483,9 +481,9 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
 
     /* Sort candidates by size (= weight) and remove duplicates. */
     {
-        igraph_integer_t cand_count = igraph_vector_int_list_size(&candidates);
+        igraph_int_t cand_count = igraph_vector_int_list_size(&candidates);
 
-        for (igraph_integer_t i=0; i < cand_count; ++i) {
+        for (igraph_int_t i=0; i < cand_count; ++i) {
             igraph_vector_int_sort(igraph_vector_int_list_get_ptr(&candidates, i));
         }
         igraph_vector_int_list_sort(&candidates, &cycle_cmp);
@@ -498,13 +496,13 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     /* Find a complete basis, starting with smallest elements. */
     /* This is typically the slowest part of the algorithm. */
     {
-        igraph_integer_t cand_len = igraph_vector_int_list_size(&candidates);
+        igraph_int_t cand_len = igraph_vector_int_list_size(&candidates);
         igraph_vector_int_list_t reduced_matrix;
         igraph_bool_t independent;
 
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&reduced_matrix, 0);
 
-        for (igraph_integer_t i=0; i < cand_len; ++i) {
+        for (igraph_int_t i=0; i < cand_len; ++i) {
             const igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(&candidates, i);
 
             IGRAPH_ALLOW_INTERRUPTION();
@@ -528,10 +526,10 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     if (use_cycle_order) {
-        igraph_integer_t result_size = igraph_vector_int_list_size(result);
+        igraph_int_t result_size = igraph_vector_int_list_size(result);
         igraph_vector_int_t tmp;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
-        for (igraph_integer_t i=0; i < result_size; ++i) {
+        for (igraph_int_t i=0; i < result_size; ++i) {
             igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(result, i);
             IGRAPH_CHECK(igraph_vector_int_update(&tmp, cycle));
             IGRAPH_CHECK(igraph_i_order_cycle(graph, &tmp, cycle));

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -42,48 +42,70 @@
  * \p loops parameter.
  *
  * </para><para>
- * Note that density is ill-defined for graphs which have multiple edges
- * between some pairs of vertices. Consider calling \ref igraph_simplify()
- * on such graphs. This function does not check whether the graph has
- * parallel edges. The result it returns for such graphs is not meaningful.
+ * The classic definition of the density is formulated for unweighted
+ * graphs without multi-edges. This function allows multigraphs and
+ * weighted graphs as well. In this case, it computes the ratio of the
+ * total edge weight to the largest possible number of adjacent vertex
+ * pairs the graph could have. This value may be larger than 1.
+ *
+ * </para><para>
+ * If you need the density concept for simple graphs, make sure to
+ * eliminate any multi-edges appropriately. This can be done using
+ * \ref igraph_simplify().
  *
  * \param graph The input graph object. It must not have parallel edges.
  * \param res Pointer to a real number, the result will be stored here.
+ * \param weights Vector of edge weights. Pass \c NULL to to perform
+ *   an unweighted density calculation.
  * \param loops Boolean constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
  *   necessarily mean that the graph really contains any loops). If
  *   this is \c false then the result is only correct if the graph does not
- *   contain loops.
+ *   contain loops. This function does not check if loops are actually
+ *   present.
  * \return Error code.
  *
  * Time complexity: O(1).
  */
-igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
-                   igraph_bool_t loops) {
+igraph_error_t igraph_density(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_real_t *res,
+        igraph_bool_t loops) {
 
-    igraph_real_t no_of_nodes = (igraph_real_t) igraph_vcount(graph);
-    igraph_real_t no_of_edges = (igraph_real_t) igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_bool_t directed = igraph_is_directed(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
+    const igraph_real_t vcount = (igraph_real_t) igraph_vcount(graph); /* note real type */
+    igraph_real_t total_weight;
 
-    if (no_of_nodes == 0) {
+    if (vcount == 0) {
         *res = IGRAPH_NAN;
         return IGRAPH_SUCCESS;
     }
 
+    if (weights) {
+        if (igraph_vector_size(weights) != ecount) {
+            IGRAPH_ERROR("Weight vector length does not match edge count.", IGRAPH_EINVAL);
+        }
+        total_weight = igraph_vector_sum(weights);
+    } else {
+        total_weight = ecount;
+    }
+
     if (!loops) {
-        if (no_of_nodes == 1) {
+        if (vcount == 1) {
             *res = IGRAPH_NAN;
         } else if (directed) {
-            *res = no_of_edges / no_of_nodes / (no_of_nodes - 1);
+            *res = total_weight / vcount / (vcount - 1);
         } else {
-            *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes - 1);
+            *res = total_weight / vcount * 2.0 / (vcount - 1);
         }
     } else {
         if (directed) {
-            *res = no_of_edges / no_of_nodes / no_of_nodes;
+            *res = total_weight / vcount / vcount;
         } else {
-            *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes + 1);
+            *res = total_weight / vcount * 2.0 / (vcount + 1);
         }
     }
 
@@ -110,8 +132,8 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
                                   igraph_bool_t loops) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (no_of_nodes == 0) {
@@ -120,7 +142,7 @@ igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
     }
 
     if (! loops) {
-        igraph_integer_t loop_count;
+        igraph_int_t loop_count;
         IGRAPH_CHECK(igraph_count_loops(graph, &loop_count));
         no_of_edges -= loop_count;
     }
@@ -171,8 +193,8 @@ igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
 igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t k, i;
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t k, i;
     igraph_vector_int_t incident;
     igraph_bool_t has_multiple;
     igraph_vit_t vit;
@@ -213,7 +235,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         igraph_real_t d;
-        igraph_integer_t v = IGRAPH_VIT_GET(vit);
+        igraph_int_t v = IGRAPH_VIT_GET(vit);
 
         IGRAPH_CHECK(igraph_incident(graph, &incident, v, IGRAPH_ALL, IGRAPH_LOOPS));
         k = igraph_vector_int_size(&incident); /* degree */
@@ -304,9 +326,9 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                        igraph_bool_t ignore_loops,
                        igraph_reciprocity_t mode) {
 
-    igraph_integer_t nonrec = 0, rec = 0, loops = 0;
+    igraph_int_t nonrec = 0, rec = 0, loops = 0;
     igraph_vector_int_t inneis, outneis;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_RECIPROCITY_DEFAULT &&
         mode != IGRAPH_RECIPROCITY_RATIO) {
@@ -322,8 +344,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&inneis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&outneis, 0);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t ip, op, indeg, outdeg;
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+        igraph_int_t ip, op, indeg, outdeg;
         IGRAPH_CHECK(igraph_neighbors(
             graph, &inneis, i, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE
         ));

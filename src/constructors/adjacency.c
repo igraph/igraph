@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@ static igraph_error_t igraph_i_adjacency_min(
 );
 
 static igraph_error_t igraph_i_adjust_loop_edge_count(
-    igraph_integer_t* count, igraph_loops_t loops
+    igraph_int_t* count, igraph_loops_t loops
 ) {
     /* The compiler should be smart enough to figure out that this can be
      * inlined */
@@ -77,7 +77,7 @@ static igraph_error_t igraph_i_adjacency_directed_or_plus(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_adjacency_t mode, igraph_loops_t loops
 ) {
-    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    const igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
     /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
      * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
@@ -85,13 +85,13 @@ static igraph_error_t igraph_i_adjacency_directed_or_plus(
         loops = IGRAPH_LOOPS_ONCE;
     }
 
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t M = MATRIX(*adjmatrix, i, j);
+    for (igraph_int_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+            igraph_int_t M = MATRIX(*adjmatrix, i, j);
             if (i == j) {
                 IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
             }
-            for (igraph_integer_t k = 0; k < M; k++) {
+            for (igraph_int_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -106,8 +106,8 @@ static igraph_error_t igraph_i_adjacency_max(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M1, M2;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t i, j, k, M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
         /* do the loops first */
@@ -155,8 +155,8 @@ static igraph_error_t igraph_i_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t M;
+    const igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t M;
 
     /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
      * for loops to appear twice in the adjacency matrix when the lower triangle
@@ -169,10 +169,10 @@ static igraph_error_t igraph_i_adjacency_upper(
         loops = IGRAPH_LOOPS_ONCE;
     }
 
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-        for (igraph_integer_t i = 0; i < j; i++) {
+    for (igraph_int_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_int_t i = 0; i < j; i++) {
             M = MATRIX(*adjmatrix, i, j);
-            for (igraph_integer_t k = 0; k < M; k++) {
+            for (igraph_int_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -182,7 +182,7 @@ static igraph_error_t igraph_i_adjacency_upper(
         M = MATRIX(*adjmatrix, j, j);
         if (M) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (igraph_integer_t k = 0; k < M; k++) {
+            for (igraph_int_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -196,8 +196,8 @@ static igraph_error_t igraph_i_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t M;
+    const igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t M;
 
     /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
      * for loops to appear twice in the adjacency matrix when the lower triangle
@@ -210,20 +210,20 @@ static igraph_error_t igraph_i_adjacency_lower(
         loops = IGRAPH_LOOPS_ONCE;
     }
 
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+    for (igraph_int_t j = 0; j < no_of_nodes; j++) {
         /* do the loops first */
         M = MATRIX(*adjmatrix, j, j);
         if (M) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
-            for (igraph_integer_t k = 0; k < M; k++) {
+            for (igraph_int_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
         }
 
-        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+        for (igraph_int_t i = j+1; i < no_of_nodes; i++) {
             M = MATRIX(*adjmatrix, i, j);
-            for (igraph_integer_t k = 0; k < M; k++) {
+            for (igraph_int_t k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
             }
@@ -237,8 +237,8 @@ static igraph_error_t igraph_i_adjacency_min(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k, M1, M2;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t i, j, k, M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
         /* do the loops first */
@@ -310,9 +310,9 @@ static igraph_error_t igraph_i_adjacency_min(
  *          An undirected graph will be created. Only the lower left triangle
  *          (including the diagonal) is used for the number of edges.
  *       \endclist
- * \param loops Constant to specify how the diagonal of the matrix should be
- *        treated when creating loop edges. Ignored for modes
- *        \c IGRAPH_ADJ_DIRECTED, \c IGRAPH_ADJ_UPPER and \c IGRAPH_ADJ_LOWER.
+ * \param loops Constant of type \ref igraph_loops_t to specify how the diagonal
+ *        of the matrix should be treated when creating loop edges. Ignored for
+ *        modes \c IGRAPH_ADJ_DIRECTED, \c IGRAPH_ADJ_UPPER and \c IGRAPH_ADJ_LOWER.
  *        \clist
  *        \cli IGRAPH_NO_LOOPS
  *          Ignore the diagonal of the input matrix and do not create loops.
@@ -331,8 +331,6 @@ static igraph_error_t igraph_i_adjacency_min(
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
- *
- * \example examples/simple/igraph_adjacency.c
  */
 igraph_error_t igraph_adjacency(
     igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
@@ -340,7 +338,7 @@ igraph_error_t igraph_adjacency(
 ) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
@@ -447,7 +445,7 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
     igraph_loops_t loops
 ) {
 
-    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    const igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
     /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
      * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
@@ -455,8 +453,8 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
         loops = IGRAPH_LOOPS_ONCE;
     }
 
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
                 if (i == j) {
@@ -482,8 +480,8 @@ static igraph_error_t igraph_i_weighted_adjacency_plus(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t i, j;
     igraph_real_t M;
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -517,8 +515,8 @@ static igraph_error_t igraph_i_weighted_adjacency_max(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t i, j;
     igraph_real_t M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -559,8 +557,8 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     /* We do not use igraph_matrix_is_symmetric() for this check, as we need to
      * allow symmetric matrices with NaN values. igraph_matrix_is_symmetric()
      * returns false for these as NaN != NaN. */
-    const igraph_integer_t n = igraph_matrix_nrow(adjmatrix);
-    for (igraph_integer_t i=0; i < n; i++) {
+    const igraph_int_t n = igraph_matrix_nrow(adjmatrix);
+    for (igraph_int_t i=0; i < n; i++) {
         /* do the loops first */
         if (loops) {
             igraph_real_t M = MATRIX(*adjmatrix, i, i);
@@ -572,7 +570,7 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
             }
         }
 
-        for (igraph_integer_t j=0; j < i; j++) {
+        for (igraph_int_t j=0; j < i; j++) {
             igraph_real_t M1 = MATRIX(*adjmatrix, i, j);
             igraph_real_t M2 = MATRIX(*adjmatrix, j, i);
             if (IGRAPH_UNLIKELY(M1 != M2 && ! (isnan(M1) && isnan(M2)))) {
@@ -598,7 +596,7 @@ static igraph_error_t igraph_i_weighted_adjacency_upper(
     igraph_loops_t loops
 ) {
 
-    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    const igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
     /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
@@ -612,8 +610,8 @@ static igraph_error_t igraph_i_weighted_adjacency_upper(
         loops = IGRAPH_LOOPS_ONCE;
     }
 
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-        for (igraph_integer_t i = 0; i < j; i++) {
+    for (igraph_int_t j = 0; j < no_of_nodes; j++) {
+        for (igraph_int_t i = 0; i < j; i++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
@@ -643,7 +641,7 @@ static igraph_error_t igraph_i_weighted_adjacency_lower(
     igraph_loops_t loops
 ) {
 
-    const igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    const igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_real_t M;
 
     /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
@@ -657,7 +655,7 @@ static igraph_error_t igraph_i_weighted_adjacency_lower(
         loops = IGRAPH_LOOPS_ONCE;
     }
 
-    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+    for (igraph_int_t j = 0; j < no_of_nodes; j++) {
         /* do the loops first */
         if (loops) {
             M = MATRIX(*adjmatrix, j, j);
@@ -669,7 +667,7 @@ static igraph_error_t igraph_i_weighted_adjacency_lower(
             }
         }
 
-        for (igraph_integer_t i = j+1; i < no_of_nodes; i++) {
+        for (igraph_int_t i = j+1; i < no_of_nodes; i++) {
             M = MATRIX(*adjmatrix, i, j);
             if (M != 0.0) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
@@ -688,8 +686,8 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
     igraph_loops_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
+    igraph_int_t i, j;
     igraph_real_t M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -790,7 +788,7 @@ igraph_error_t igraph_weighted_adjacency(
 ) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes;
+    igraph_int_t no_of_nodes;
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
@@ -884,15 +882,15 @@ igraph_error_t igraph_weighted_adjacency(
 igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                    igraph_neimode_t mode, igraph_bool_t duplicate) {
 
-    const igraph_integer_t no_of_nodes = igraph_adjlist_size(adjlist);
-    igraph_integer_t no_of_edges = 0;
+    const igraph_int_t no_of_nodes = igraph_adjlist_size(adjlist);
+    igraph_int_t no_of_edges = 0;
 
     igraph_vector_int_t edges;
-    igraph_integer_t edgeptr = 0;
+    igraph_int_t edgeptr = 0;
 
     duplicate = duplicate && (mode == IGRAPH_ALL); /* only duplicate if undirected */
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         no_of_edges += igraph_vector_int_size(igraph_adjlist_get(adjlist, i));
     }
 
@@ -902,13 +900,13 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * no_of_edges);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, i);
-        const igraph_integer_t n = igraph_vector_int_size(neis);
-        igraph_integer_t loops = 0;
+        const igraph_int_t n = igraph_vector_int_size(neis);
+        igraph_int_t loops = 0;
 
-        for (igraph_integer_t j = 0; j < n; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+        for (igraph_int_t j = 0; j < n; j++) {
+            igraph_int_t nei = VECTOR(*neis)[j];
             if (nei == i) {
                 loops++;
             } else {
@@ -935,7 +933,7 @@ igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
             IGRAPH_ERROR("Invalid adjacency list, most probably not correctly"
                          " duplicated edges for an undirected graph.", IGRAPH_EINVAL);
         }
-        for (igraph_integer_t j = 0; j < loops; j++) {
+        for (igraph_int_t j = 0; j < loops; j++) {
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = i;
         }
@@ -967,13 +965,13 @@ static igraph_error_t igraph_i_sparse_adjacency_directed_or_plus(
     }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
-        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t multi = igraph_sparsemat_iterator_get(&it);
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         }
-        for (igraph_integer_t count = 0; count < multi; count++) {
+        for (igraph_int_t count = 0; count < multi; count++) {
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
@@ -990,19 +988,19 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to < from) {
             continue;
         }
-        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_int_t multi = igraph_sparsemat_iterator_get(&it);
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         } else {
             other = igraph_sparsemat_get(adjmatrix, to, from);
             multi = multi > other ? multi : other;
         }
-        for (igraph_integer_t count = 0; count < multi; count++) {
+        for (igraph_int_t count = 0; count < multi; count++) {
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
@@ -1020,19 +1018,19 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to < from) {
             continue;
         }
-        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_int_t multi = igraph_sparsemat_iterator_get(&it);
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         } else {
             other = igraph_sparsemat_get(adjmatrix, to, from);
             multi = multi < other ? multi : other;
         }
-        for (igraph_integer_t count = 0; count < multi; count++) {
+        for (igraph_int_t count = 0; count < multi; count++) {
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
@@ -1060,16 +1058,16 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to < from) {
             continue;
         }
-        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_int_t multi = igraph_sparsemat_iterator_get(&it);
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         }
-        for (igraph_integer_t count = 0; count < multi; count++) {
+        for (igraph_int_t count = 0; count < multi; count++) {
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
@@ -1097,16 +1095,16 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to > from) {
             continue;
         }
-        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_int_t multi = igraph_sparsemat_iterator_get(&it);
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         }
-        for (igraph_integer_t count = 0; count < multi; count++) {
+        for (igraph_int_t count = 0; count < multi; count++) {
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
@@ -1147,9 +1145,9 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
         igraph_adjacency_t mode, igraph_loops_t loops) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
-    igraph_integer_t no_of_nonzeros = igraph_sparsemat_count_nonzero(adjmatrix);
-    igraph_integer_t approx_no_of_edges;
+    igraph_int_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
+    igraph_int_t no_of_nonzeros = igraph_sparsemat_count_nonzero(adjmatrix);
+    igraph_int_t approx_no_of_edges;
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
@@ -1225,12 +1223,12 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
 ) {
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
-    igraph_integer_t e = 0;
+    igraph_int_t e = 0;
     igraph_real_t other;
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to < from) {
             continue;
         }
@@ -1258,13 +1256,13 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
-    igraph_integer_t e = 0;
+    igraph_int_t e = 0;
     igraph_real_t other;
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to < from) {
             continue;
         }
@@ -1292,13 +1290,13 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
-    igraph_integer_t e = 0;
+    igraph_int_t e = 0;
     igraph_real_t other;
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         if (to < from) {
             continue;
         }
@@ -1327,7 +1325,7 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
 ) {
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
-    igraph_integer_t e = 0;
+    igraph_int_t e = 0;
 
     /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
      * for loops to appear twice in the adjacency matrix when the lower triangle
@@ -1341,8 +1339,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
     }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
         if (to < from) {
             continue;
@@ -1368,7 +1366,7 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
 ) {
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
-    igraph_integer_t e = 0;
+    igraph_int_t e = 0;
 
     /* IGRAPH_LOOPS_TWICE is treated as IGRAPH_LOOPS_ONCE -- it makes no sense
      * for loops to appear twice in the adjacency matrix when the lower triangle
@@ -1382,8 +1380,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
     }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
         if (to > from) {
             continue;
@@ -1426,7 +1424,7 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
 ) {
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
-    igraph_integer_t e = 0;
+    igraph_int_t e = 0;
 
     /* For sake of consistency with the rest of the library, IGRAPH_LOOPS_TWICE
      * is treated as IGRAPH_LOOPS_ONCE for directed graphs */
@@ -1435,8 +1433,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
     }
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_int_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_int_t to = igraph_sparsemat_iterator_col(&it);
         igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
         if (to == from) {
             igraph_i_adjust_loop_edge_weight(&weight, loops);
@@ -1472,8 +1470,8 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
-    igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
+    igraph_int_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
+    igraph_int_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed form.", IGRAPH_EINVAL);

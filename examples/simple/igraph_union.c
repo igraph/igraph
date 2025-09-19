@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@
 int main(void) {
     igraph_t left, right, uni;
     igraph_vector_int_t edge_map1, edge_map2;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_init(&edge_map1, 0);
     igraph_vector_int_init(&edge_map2, 0);

@@ -106,31 +106,33 @@
 
   <xi:include href="random.xml"/>
 
-  <xi:include href="generators.xml"/>
-
-  <xi:include href="spatialgames.xml"/>
-
   <xi:include href="iterators.xml"/>
 
   <xi:include href="attributes.xml"/>
+
+  <xi:include href="generators.xml"/>
+
+  <xi:include href="games.xml"/>
+
+  <xi:include href="bipartite.xml"/>
+
+  <xi:include href="spatial.xml"/>
+
+  <xi:include href="operators.xml"/>
+
+  <xi:include href="visitors.xml"/>
 
   <xi:include href="structural.xml"/>
 
   <xi:include href="cycles.xml"/>
 
-  <xi:include href="visitors.xml"/>
-
   <xi:include href="cliques.xml"/>
+
+  <xi:include href="motifs.xml"/>
 
   <xi:include href="isomorphism.xml"/>
 
   <xi:include href="coloring.xml"/>
-
-  <xi:include href="motifs.xml"/>
-
-  <xi:include href="layout.xml"/>
-
-  <xi:include href="foreign.xml"/>
 
   <xi:include href="flows.xml"/>
 
@@ -144,13 +146,15 @@
 
   <xi:include href="embedding.xml"/>
 
-  <xi:include href="operators.xml"/>
+  <xi:include href="layout.xml"/>
 
-  <xi:include href="arpack.xml"/>
+  <xi:include href="processes.xml"/>
 
-  <xi:include href="bipartite.xml"/>
+  <xi:include href="foreign.xml"/>
 
-  <xi:include href="spatial.xml"/>
+  <xi:include href="linalg.xml"/>
+
+  <xi:include href="nongraph.xml"/>
 
   <chapter id="igraph-Advanced">
     <title>Advanced igraph programming</title>
@@ -158,8 +162,6 @@
     <xi:include href="progress.xml" />
     <xi:include href="status.xml" />
   </chapter>
-
-  <xi:include href="nongraph.xml"/>
 
   <xi:include href="glossary.xml"/>
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ int main(void) {
         igraph_square_lattice(&graph, &dims, 1, IGRAPH_UNDIRECTED, 0, &periodic);
         igraph_vector_int_destroy(&dims);
         igraph_vector_bool_destroy(&periodic);
-        igraph_rewire(&graph, 100, IGRAPH_SIMPLE_SW);
+        igraph_rewire(&graph, 100, IGRAPH_SIMPLE_SW, NULL);
         igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
     }
 
@@ -69,7 +69,7 @@ int main(void) {
 
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnm(&graph, 10000, 12000, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 10000, 12000, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
     igraph_matrix_resize(&mat, igraph_vcount(&graph), igraph_vcount(&graph)); /* preallocate matrix */
 
     BENCH(" 7 Erdos-Renyi n=10000 m=12000 average_path_length directed",

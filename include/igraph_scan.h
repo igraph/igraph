@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -44,13 +44,13 @@ IGRAPH_EXPORT igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us,
                                                   const igraph_vector_t *weights,
                                                   igraph_neimode_t mode);
 
-IGRAPH_EXPORT igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_t k,
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_int_t k,
                                              igraph_vector_t *res,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
-                                                  igraph_integer_t k, igraph_vector_t *res,
+                                                  igraph_int_t k, igraph_vector_t *res,
                                                   const igraph_vector_t *weights_them,
                                                   igraph_neimode_t mode);
 

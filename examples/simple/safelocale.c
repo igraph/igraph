@@ -10,6 +10,9 @@ int main(void) {
     igraph_t graph;
     igraph_safelocale_t loc;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Attempt to set a locale that uses a decimal comma. Locale names
      * differ between platforms, and not all locales are available,
      * so the locale change may not be successful. */

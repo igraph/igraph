@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,8 @@
 /**
  * \function igraph_mycielskian
  * \brief Generate the Mycielskian of a graph with \p k iterations.
+ *
+ * \experimental
  *
  * The Mycielskian of a graph is a larger graph formed using a construction due
  * to Jan Mycielski that increases the chromatic number by one while preserving
@@ -92,9 +94,9 @@
  * Time complexity: O(|V| 2^k + |E| 3^k) where |V| and |E| are the vertex and
  * edge counts, respectively.
  */
-igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_integer_t k) {
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_int_t k) {
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_int_t edges;
 
     if (k < 0) {
@@ -126,10 +128,10 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
     /* Compute the number of vertices and edges. Since these are exponential in k,
      * overflow checks are important. */
 
-    igraph_integer_t new_vcount = vcount;
-    igraph_integer_t new_ecount = ecount;
+    igraph_int_t new_vcount = vcount;
+    igraph_int_t new_ecount = ecount;
 
-    for (igraph_integer_t i = 0; i < k; i++) {
+    for (igraph_int_t i = 0; i < k; i++) {
         // new edges = 3 * old edges + old vertices
         IGRAPH_SAFE_MULT(new_ecount, 3, &new_ecount);
         IGRAPH_SAFE_ADD(new_ecount, new_vcount, &new_ecount);
@@ -141,18 +143,18 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
 
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, new_ecount * 2));
 
-    igraph_integer_t edge_index = 2 * ecount;  // Current last edge index in edge vector
-    igraph_integer_t offset = vcount;          // Tracks where new vertices start
+    igraph_int_t edge_index = 2 * ecount;  // Current last edge index in edge vector
+    igraph_int_t offset = vcount;          // Tracks where new vertices start
 
-    for (igraph_integer_t i = 0; i < k; i++) {
-        igraph_integer_t prev_vcount = offset;  // Number of vertices before this step
-        igraph_integer_t w = offset * 2;        // The new 'w' node index
-        igraph_integer_t last_edge_index = edge_index;  // Mark where edges before this step end
+    for (igraph_int_t i = 0; i < k; i++) {
+        igraph_int_t prev_vcount = offset;  // Number of vertices before this step
+        igraph_int_t w = offset * 2;        // The new 'w' node index
+        igraph_int_t last_edge_index = edge_index;  // Mark where edges before this step end
 
         // For each edge before this step, add two new edges
-        for (igraph_integer_t j = 0; j < last_edge_index; j += 2) {
-            igraph_integer_t v1 = VECTOR(edges)[j];
-            igraph_integer_t v2 = VECTOR(edges)[j + 1];
+        for (igraph_int_t j = 0; j < last_edge_index; j += 2) {
+            igraph_int_t v1 = VECTOR(edges)[j];
+            igraph_int_t v2 = VECTOR(edges)[j + 1];
 
             VECTOR(edges)[edge_index++] = v1;
             VECTOR(edges)[edge_index++] = offset + v2;
@@ -162,7 +164,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
         }
 
         // Add edges connecting each `ui` to `w` (forming a star)
-        for (igraph_integer_t j = prev_vcount; j < w; j++) {
+        for (igraph_int_t j = prev_vcount; j < w; j++) {
             VECTOR(edges)[edge_index++] = j;
             VECTOR(edges)[edge_index++] = w;
         }
@@ -216,7 +218,7 @@ igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_i
  *
  * Time complexity: O(3^k), i.e. exponential in \p k.
  */
-igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_integer_t k) {
+igraph_error_t igraph_mycielski_graph(igraph_t *graph, igraph_int_t k) {
     igraph_t g;
 
     if (k < 0) {

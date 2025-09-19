@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ igraph_bool_t is_minimal_sep(const igraph_t *graph, const igraph_vector_int_t *S
     igraph_is_separator(graph, igraph_vss_vector(S), &res);
 
     if (res) {
-        for (igraph_integer_t i=0; i < igraph_vector_int_size(S); i++) {
+        for (igraph_int_t i=0; i < igraph_vector_int_size(S); i++) {
             igraph_bool_t sep;
             igraph_vector_int_t S2;
             igraph_vector_int_init_copy(&S2, S);
@@ -274,7 +274,7 @@ int main(void) {
     igraph_vector_int_list_t separators;
     igraph_vector_int_list_init(&separators, 0);
     igraph_all_minimal_st_separators(&graph, &separators);
-    for (igraph_integer_t i=0; i < igraph_vector_int_list_size(&separators); i++) {
+    for (igraph_int_t i=0; i < igraph_vector_int_list_size(&separators); i++) {
         const igraph_vector_int_t *sep = igraph_vector_int_list_get_ptr(&separators, i);
         igraph_is_separator(&graph, igraph_vss_vector(sep), &is_sep);
         IGRAPH_ASSERT(is_sep);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -29,7 +29,7 @@ int main(void) {
     FILE *f;
     igraph_matrix_t coords;
     igraph_vector_int_t roots;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     f = fopen("igraph_layout_reingold_tilford_bug_879.in", "r");
     IGRAPH_ASSERT(f != NULL);

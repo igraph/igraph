@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -26,7 +26,7 @@
 
 int main(void) {
     igraph_matrix_t m, m1;
-    igraph_integer_t i, j, k;
+    igraph_int_t i, j, k;
     igraph_real_t arr[] = { 1, 2, 11, 12, 21, 22 };
 
     /* igraph_matrix_init, igraph_matrix_destroy */

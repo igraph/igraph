@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -28,18 +28,17 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPORT igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
-                                               const igraph_vector_int_t *types,
-                                               igraph_real_t *res,
-                                               igraph_bool_t directed,
-                                               igraph_bool_t normalized);
+IGRAPH_EXPORT igraph_error_t igraph_assortativity_nominal(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        const igraph_vector_int_t *types,
+        igraph_real_t *res,
+        igraph_bool_t directed, igraph_bool_t normalized);
 
-IGRAPH_EXPORT igraph_error_t igraph_assortativity(const igraph_t *graph,
-                                       const igraph_vector_t *values,
-                                       const igraph_vector_t *values_in,
-                                       igraph_real_t *res,
-                                       igraph_bool_t directed,
-                                       igraph_bool_t normalized);
+IGRAPH_EXPORT igraph_error_t igraph_assortativity(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        const igraph_vector_t *values, const igraph_vector_t *values_in,
+        igraph_real_t *res,
+        igraph_bool_t directed, igraph_bool_t normalized);
 
 IGRAPH_EXPORT igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                               igraph_real_t *res,
@@ -48,14 +47,14 @@ IGRAPH_EXPORT igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_joint_degree_matrix(
         const igraph_t *graph, const igraph_vector_t *weights,
         igraph_matrix_t *jdm,
-        igraph_integer_t dout, igraph_integer_t din);
+        igraph_int_t dout, igraph_int_t din);
 
 IGRAPH_EXPORT igraph_error_t igraph_joint_degree_distribution(
         const igraph_t *graph, const igraph_vector_t *weights, igraph_matrix_t *p,
         igraph_neimode_t from_mode, igraph_neimode_t to_mode,
         igraph_bool_t directed_neighbors,
         igraph_bool_t normalized,
-        igraph_integer_t max_from_degree, igraph_integer_t max_to_degree);
+        igraph_int_t max_from_degree, igraph_int_t max_to_degree);
 
 IGRAPH_EXPORT igraph_error_t igraph_joint_type_distribution(
         const igraph_t *graph, const igraph_vector_t *weights,

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 void print_and_destroy_items(igraph_vector_int_list_t* vec) {
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* Sort the paths in a deterministic manner to avoid problems with
      * different qsort() implementations on different platforms */
@@ -42,10 +42,12 @@ int main(void) {
     igraph_vector_int_list_t vertices, edges;
 
     igraph_real_t weights[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
-
-    igraph_vector_t weights_vec;
+    const igraph_vector_t weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_vector_int_t nrgeo;
     igraph_vs_t vs;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_list_init(&vertices, 0);
     igraph_vector_int_list_init(&edges, 0);
@@ -60,7 +62,6 @@ int main(void) {
                  2, 1,
                  -1);
 
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_all_shortest_paths_dijkstra(
                 &g,
                 /*vertices=*/ &vertices, /*edges=*/ &edges, /*nrgeo=*/ &nrgeo,

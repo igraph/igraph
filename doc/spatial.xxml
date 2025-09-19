@@ -5,14 +5,24 @@
 ]>
 
 <chapter id="igraph-Spatial">
-<title>Spatial operations</title>
+<title>Spatial graphs</title>
 
-<section id="spatial-helpers"><title>Convenience functions</title>
+<section id="spatial-helpers"><title>Metrics</title>
 <!-- doxrox-include igraph_metric_t -->
 </section>
 
-<section id="spatial-constructors"><title>Spatial constructors</title>
+<section id="spatial-generators"><title>Spatial graph generators</title>
+<!-- doxrox-include igraph_delaunay_graph -->
 <!-- doxrox-include igraph_nearest_neighbor_graph -->
+<!-- doxrox-include igraph_gabriel_graph -->
+<!-- doxrox-include igraph_relative_neighborhood_graph -->
+<!-- doxrox-include igraph_lune_beta_skeleton -->
+<!-- doxrox-include igraph_circle_beta_skeleton -->
+<!-- doxrox-include igraph_beta_weighted_gabriel_graph -->
+</section>
+
+<section id="spatial-properties"><title>Properties of spatial graphs</title>
+<!-- doxrox-include igraph_spatial_edge_lengths -->
 </section>
 
 <section id="nongraph-spatial"><title>Non-graph related spatial processing</title>

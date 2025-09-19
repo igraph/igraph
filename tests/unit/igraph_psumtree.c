@@ -1,6 +1,6 @@
 
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -28,7 +28,7 @@
 int main(void) {
     igraph_psumtree_t tree;
     igraph_vector_t vec;
-    igraph_integer_t i, idx;
+    igraph_int_t i, idx;
     igraph_real_t sum;
 
     igraph_rng_seed(igraph_rng_default(), 42);

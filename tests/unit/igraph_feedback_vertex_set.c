@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -34,12 +34,12 @@ void check_fvs(const igraph_t *graph, const igraph_vector_int_t *fvs) {
 }
 
 igraph_real_t weight(const igraph_vector_t *weights, const igraph_vector_int_t *fvs) {
-    const igraph_integer_t size = igraph_vector_int_size(fvs);
+    const igraph_int_t size = igraph_vector_int_size(fvs);
     if (!weights) {
         return (igraph_real_t) size;
     } else {
         igraph_real_t total = 0;
-        for (igraph_integer_t i=0; i < size; i++) {
+        for (igraph_int_t i=0; i < size; i++) {
             total += VECTOR(*weights)[ VECTOR(*fvs)[i] ];
         }
         return total;
@@ -59,9 +59,9 @@ void compare_methods(const igraph_t *graph, const igraph_vector_t *weights) {
 }
 
 void rand_weights(const igraph_t *graph, igraph_vector_t *weights) {
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_resize(weights, ecount);
-    for (igraph_integer_t i=0; i < ecount; i++) {
+    for (igraph_int_t i=0; i < ecount; i++) {
         VECTOR(*weights)[i] = RNG_UNIF01();
     }
 }
@@ -127,7 +127,7 @@ void test_undirected(void) {
     igraph_destroy(&graph);
 
     /* Random graph */
-    igraph_erdos_renyi_game_gnm(&graph, 10, 20, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 10, 20, IGRAPH_UNDIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     igraph_feedback_vertex_set(&graph, &result, NULL, IGRAPH_FVS_EXACT_IP);
     check_fvs(&graph, &result);
     igraph_destroy(&graph);
@@ -189,7 +189,7 @@ void test_directed(void) {
     igraph_destroy(&graph);
 
     /* Random graph */
-    igraph_erdos_renyi_game_gnm(&graph, 10, 20, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 10, 20, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_EDGE_UNLABELED);
     igraph_feedback_vertex_set(&graph, &result, NULL, IGRAPH_FVS_EXACT_IP);
     check_fvs(&graph, &result);
     igraph_destroy(&graph);

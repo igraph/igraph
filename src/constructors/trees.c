@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -72,7 +72,7 @@ igraph_error_t igraph_tree_from_parent_vector(
         const igraph_vector_int_t *parents,
         igraph_tree_mode_t type) {
 
-    const igraph_integer_t no_of_nodes = igraph_vector_int_size(parents);
+    const igraph_int_t no_of_nodes = igraph_vector_int_size(parents);
     igraph_vector_int_t seen;
     igraph_vector_int_t edges;
     igraph_bool_t directed, intree;
@@ -102,14 +102,14 @@ igraph_error_t igraph_tree_from_parent_vector(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes > 1024 ? 2048 : 2*(no_of_nodes-1));
     igraph_vector_int_clear(&edges);
 
-    igraph_integer_t c=1;
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_integer_t v = i;
+    igraph_int_t c=1;
+    for (igraph_int_t i=0; i < no_of_nodes; i++) {
+        igraph_int_t v = i;
 
         if (VECTOR(seen)[v]) continue;
 
         while (true) {
-            igraph_integer_t u;
+            igraph_int_t u;
 
             VECTOR(seen)[v] = c; /* mark v as seen in the current round */
             u = VECTOR(*parents)[v];

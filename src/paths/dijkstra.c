@@ -1,6 +1,6 @@
 /*
-   IGraph library.
-   Copyright (C) 2005-2021 The igraph development team
+   igraph library.
+   Copyright (C) 2005-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_paths.h"
@@ -30,8 +27,39 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+#include "paths/paths_internal.h"
 
 #include <string.h>   /* memset */
+
+igraph_error_t igraph_i_validate_distance_weights(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_bool_t *negative_weights) {
+
+    const igraph_int_t ecount = igraph_ecount(graph);
+
+    *negative_weights = false;
+
+    if (weights) {
+        if (igraph_vector_size(weights) != ecount) {
+            IGRAPH_ERRORF("Edge weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                          IGRAPH_EINVAL,
+                          igraph_vector_size(weights), ecount);
+        }
+
+        if (ecount > 0) {
+            igraph_real_t min = igraph_vector_min(weights);
+            if (min < 0) {
+                *negative_weights = true;
+            }
+            if (isnan(min)) {
+                IGRAPH_ERROR("Edge weights must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \function igraph_distances_dijkstra_cutoff
@@ -62,8 +90,8 @@
  *    for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
  *    When the distance of two vertices is greater than this value,
- *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs are
- *    treated as infinity.
+ *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs and
+ *    \ref IGRAPH_UNLIMITED are treated as infinity.
  * \return Error code.
  *
  * Time complexity: at most O(s |E| log|V| + |V|), where |V| is the number of
@@ -76,7 +104,27 @@
  *
  * \example examples/simple/distances.c
  */
-igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
+igraph_error_t igraph_distances_dijkstra_cutoff(
+        const igraph_t *graph,
+        igraph_matrix_t *res,
+        const igraph_vs_t from,
+        const igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode,
+        igraph_real_t cutoff) {
+
+    igraph_bool_t negative_weights;
+    IGRAPH_CHECK(igraph_i_validate_distance_weights(graph, weights, &negative_weights));
+    if (negative_weights) {
+        IGRAPH_ERRORF("Edge weights must not be negative when using Dijkstra's algorithm, got %g.",
+                      IGRAPH_EINVAL,
+                      igraph_vector_min(weights));
+    }
+    return igraph_i_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, cutoff);
+}
+
+
+igraph_error_t igraph_i_distances_dijkstra_cutoff(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
@@ -96,33 +144,17 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
          maximum heap and we need a minimum heap.
     */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_2wheap_t Q;
     igraph_vit_t fromvit, tovit;
-    igraph_integer_t no_of_from, no_of_to;
+    igraph_int_t no_of_from, no_of_to;
     igraph_lazy_inclist_t inclist;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
     igraph_bool_t all_to;
     igraph_vector_int_t indexv;
 
     if (!weights) {
-        return igraph_distances_cutoff(graph, NULL, res, from, to, mode, cutoff);
-    }
-
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
-                      IGRAPH_EINVAL,
-                      igraph_vector_size(weights), no_of_edges);
-    }
-
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (min < 0) {
-            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
-        } else if (isnan(min)) {
-            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
-        }
+        return igraph_i_distances_unweighted_cutoff(graph, res, from, to, mode, cutoff);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
@@ -150,7 +182,7 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
          * map a target vertex to its column in the distance matrix. The mapping
          * is constructed by the loop below */
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
-            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
+            igraph_int_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
                 IGRAPH_ERROR("Target vertex list must not have any duplicates.",
                              IGRAPH_EINVAL);
@@ -166,8 +198,8 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
          !IGRAPH_VIT_END(fromvit);
          IGRAPH_VIT_NEXT(fromvit), i++) {
 
-        igraph_integer_t reached = 0;
-        igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
+        igraph_int_t reached = 0;
+        igraph_int_t source = IGRAPH_VIT_GET(fromvit);
 
         igraph_2wheap_clear(&Q);
 
@@ -178,10 +210,10 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
         igraph_2wheap_push_with_index(&Q, source, -0.0);
 
         while (!igraph_2wheap_empty(&Q)) {
-            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
+            igraph_int_t minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
             igraph_vector_int_t *neis;
-            igraph_integer_t nlen;
+            igraph_int_t nlen;
 
             if (cutoff >= 0 && mindist > cutoff) {
                 continue;
@@ -205,7 +237,7 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
             IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                igraph_integer_t edge = VECTOR(*neis)[j];
+                igraph_int_t edge = VECTOR(*neis)[j];
                 igraph_real_t weight = VECTOR(*weights)[edge];
 
                 /* Optimization: do not follow infinite-weight edges. */
@@ -213,7 +245,7 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
                     continue;
                 }
 
-                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_int_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + weight;
 
                 if (! igraph_2wheap_has_elem(&Q, tto)) {
@@ -280,19 +312,21 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
  * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_distances() for a (slightly) faster unweighted
- * version or \ref igraph_distances_bellman_ford() for a weighted
+ * \sa \ref igraph_distances() for a non-algorithm-specific interface
+ * or \ref igraph_distances_bellman_ford() for a weighted
  * variant that works in the presence of negative edge weights (but no
  * negative loops)
  *
  * \example examples/simple/distances.c
  */
-igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
-                                         igraph_matrix_t *res,
-                                         const igraph_vs_t from,
-                                         const igraph_vs_t to,
-                                         const igraph_vector_t *weights,
-                                         igraph_neimode_t mode) {
+igraph_error_t igraph_distances_dijkstra(
+        const igraph_t *graph,
+        igraph_matrix_t *res,
+        const igraph_vs_t from,
+        const igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode) {
+
     return igraph_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, -1);
 }
 
@@ -369,23 +403,43 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
  * vertices and |E| is the number of edges
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path lengths but
- * not the paths themselves; \ref igraph_get_shortest_paths() if all edge
- * weights are equal; \ref igraph_get_all_shortest_paths() to find all
- * shortest paths between (source, target) pairs;
- * \ref igraph_get_shortest_paths_bellman_ford() if some edge weights are
- * negative.
+ * not the paths themselves; \ref igraph_get_all_shortest_paths_dijkstra() to
+ * find all shortest paths between (source, target) pairs;
+ * \ref igraph_get_shortest_paths() for a non-algorithm-specific interface.
  *
  * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
  */
-igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
-                                       igraph_vector_int_list_t *vertices,
-                                       igraph_vector_int_list_t *edges,
-                                       igraph_integer_t from,
-                                       igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode,
-                                       igraph_vector_int_t *parents,
-                                       igraph_vector_int_t *inbound_edges) {
+igraph_error_t igraph_get_shortest_paths_dijkstra(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_int_t from,
+        igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode,
+        igraph_vector_int_t *parents,
+        igraph_vector_int_t *inbound_edges) {
+
+    igraph_bool_t negative_weights;
+    IGRAPH_CHECK(igraph_i_validate_distance_weights(graph, weights, &negative_weights));
+    if (negative_weights) {
+        IGRAPH_ERRORF("Edge weights must not be negative when using Dijkstra's algorithm, got %g.",
+                      IGRAPH_EINVAL,
+                      igraph_vector_min(weights));
+    }
+    return igraph_i_get_shortest_paths_dijkstra(graph, vertices, edges, from, to, weights, mode, parents, inbound_edges);
+}
+
+
+igraph_error_t igraph_i_get_shortest_paths_dijkstra(const igraph_t *graph,
+                                                  igraph_vector_int_list_t *vertices,
+                                                  igraph_vector_int_list_t *edges,
+                                                  igraph_int_t from,
+                                                  igraph_vs_t to,
+                                                  const igraph_vector_t *weights,
+                                                  igraph_neimode_t mode,
+                                                  igraph_vector_int_t *parents,
+                                                  igraph_vector_int_t *inbound_edges) {
     /* Implementation details. This is the basic Dijkstra algorithm,
        with a binary heap. The heap is indexed, i.e. it stores not only
        the distances, but also which vertex they belong to. The other
@@ -405,36 +459,21 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
          edge ID + 1 is stored, zero means unreachable vertices.
     */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists;
-    igraph_integer_t *parent_eids;
+    igraph_int_t *parent_eids;
     igraph_bool_t *is_target;
-    igraph_integer_t i, to_reach;
+    igraph_int_t i, to_reach;
 
     if (!weights) {
-        return igraph_get_shortest_paths(graph, NULL, vertices, edges, from, to, mode,
-                                         parents, inbound_edges);
+        return igraph_i_get_shortest_paths_unweighted(graph, vertices, edges, from, to, mode, parents, inbound_edges);
     }
 
     if (from < 0 || from >= no_of_nodes) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
-    }
-
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
-    }
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (min < 0) {
-            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
-        }
-        else if (isnan(min)) {
-            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
-        }
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
@@ -455,7 +494,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
     igraph_vector_fill(&dists, -1.0);
 
-    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for shortest paths with Dijkstra's algorithm.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
 
@@ -478,7 +517,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_2wheap_push_with_index(&Q, from, 0);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
-        igraph_integer_t nlen, minnei = igraph_2wheap_max_index(&Q);
+        igraph_int_t nlen, minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
         igraph_vector_int_t *neis;
 
@@ -494,8 +533,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            igraph_integer_t edge = VECTOR(*neis)[i];
-            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_int_t edge = VECTOR(*neis)[i];
+            igraph_int_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(dists)[tto];
             if (curdist < 0) {
@@ -552,8 +591,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-            igraph_integer_t node = IGRAPH_VIT_GET(vit);
-            igraph_integer_t size, act, edge;
+            igraph_int_t node = IGRAPH_VIT_GET(vit);
+            igraph_int_t size, act, edge;
             igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
                 vvec = igraph_vector_int_list_get_ptr(vertices, i);
@@ -650,8 +689,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
                                       igraph_vector_int_t *vertices,
                                       igraph_vector_int_t *edges,
-                                      igraph_integer_t from,
-                                      igraph_integer_t to,
+                                      igraph_int_t from,
+                                      igraph_int_t to,
                                       const igraph_vector_t *weights,
                                       igraph_neimode_t mode) {
 
@@ -759,15 +798,14 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
         igraph_vector_int_t *nrgeo,
-        igraph_integer_t from, igraph_vs_t to,
+        igraph_int_t from, igraph_vs_t to,
         const igraph_vector_t *weights,
         igraph_neimode_t mode) {
-    /* Implementation details: see igraph_get_shortest_paths_dijkstra,
-       it's basically the same.
-    */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    /* Implementation details: see igraph_get_shortest_paths_dijkstra(),
+     * it's basically the same. */
+
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
@@ -775,35 +813,31 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_int_t index;
     igraph_vector_int_t order;
     igraph_vector_ptr_t parents, parents_edge;
+    igraph_bool_t negative_weights;
 
     unsigned char *is_target; /* uses more than two discrete values, can't be 'bool' */
-    igraph_integer_t i, n, to_reach;
+    igraph_int_t i, n, to_reach;
     igraph_bool_t free_vertices = false;
     int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (!weights) {
-        return igraph_get_all_shortest_paths(graph, NULL, vertices, edges, nrgeo, from, to, mode);
+        return igraph_i_get_all_shortest_paths_unweighted(graph, vertices, edges, nrgeo, from, to, mode);
     }
 
     if (from < 0 || from >= no_of_nodes) {
         IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
 
+    IGRAPH_CHECK(igraph_i_validate_distance_weights(graph, weights, &negative_weights));
+    if (negative_weights) {
+        IGRAPH_ERRORF("Edge weights must not be negative when using Dijkstra's algorithm, got %g.",
+                      IGRAPH_EINVAL,
+                      igraph_vector_min(weights));
+    }
+
     if (vertices == NULL && nrgeo == NULL && edges == NULL) {
         return IGRAPH_SUCCESS;
-    }
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
-    }
-    if (no_of_edges > 0) {
-        igraph_real_t min = igraph_vector_min(weights);
-        if (min < 0) {
-            IGRAPH_ERRORF("Edge weights must not be negative, got %g.", IGRAPH_EINVAL, min);
-        }
-        else if (isnan(min)) {
-            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
-        }
     }
 
     /* parents stores a vector for each vertex, listing the parent vertices
@@ -878,7 +912,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_2wheap_push_with_index(&Q, from, 0.0);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
-        igraph_integer_t nlen, minnei = igraph_2wheap_max_index(&Q);
+        igraph_int_t nlen, minnei = igraph_2wheap_max_index(&Q);
         igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
         igraph_vector_int_t *neis;
 
@@ -897,8 +931,8 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
-            igraph_integer_t edge = VECTOR(*neis)[i];
-            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_int_t edge = VECTOR(*neis)[i];
+            igraph_int_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = VECTOR(dists)[tto];
             igraph_vector_int_t *parent_vec, *parent_edge_vec;
@@ -975,7 +1009,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         VECTOR(*nrgeo)[from] = 1;
         n = igraph_vector_int_size(&order);
         for (i = 1; i < n; i++) {
-            igraph_integer_t node, j, k;
+            igraph_int_t node, j, k;
             igraph_vector_int_t *parent_vec;
 
             node = VECTOR(order)[i];
@@ -992,7 +1026,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         igraph_vector_int_t *path, *parent_vec, *parent_edge_vec;
         igraph_vector_t *paths_index;
         igraph_stack_int_t stack;
-        igraph_integer_t j, node;
+        igraph_int_t j, node;
 
         /* a shortest path from the starting vertex to vertex i can be
          * obtained by calculating the shortest paths from the "parents"
@@ -1028,7 +1062,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
             while (!igraph_stack_int_empty(&stack)) {
                 /* For each parent of node i, get its parents */
-                igraph_integer_t el = igraph_stack_int_pop(&stack);
+                igraph_int_t el = igraph_stack_int_pop(&stack);
                 parent_vec = (igraph_vector_int_t*) VECTOR(parents)[el];
                 i = igraph_vector_int_size(parent_vec);
 
@@ -1085,7 +1119,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         VECTOR(*paths_index)[from] = 1;
 
         for (i = 1; i < n; i++) {
-            igraph_integer_t m, path_count;
+            igraph_int_t m, path_count;
             igraph_vector_int_t *parent_path, *parent_path_edge;
 
             node = VECTOR(order)[i];
@@ -1118,9 +1152,9 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             for (j = 0; j < m; j++) {
                 /* for each parent, copy the shortest paths leading to that parent
                  * and add the current vertex in the end */
-                igraph_integer_t parent_node = VECTOR(*parent_vec)[j];
-                igraph_integer_t parent_edge = VECTOR(*parent_edge_vec)[j];
-                igraph_integer_t parent_path_idx = VECTOR(*paths_index)[parent_node] - 1;
+                igraph_int_t parent_node = VECTOR(*parent_vec)[j];
+                igraph_int_t parent_edge = VECTOR(*parent_edge_vec)[j];
+                igraph_int_t parent_path_idx = VECTOR(*paths_index)[parent_node] - 1;
                 /*
                 printf("  Considering parent: %ld\n", parent_node);
                 printf("  Paths to parent start at index %ld in vertices\n", parent_path_idx);
@@ -1156,7 +1190,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         n = igraph_vector_int_list_size(vertices);
         i = 0;
         while (i < n) {
-            igraph_integer_t tmp;
+            igraph_int_t tmp;
             path = igraph_vector_int_list_get_ptr(vertices, i);
             tmp = igraph_vector_int_tail(path);
             if (is_target[tmp] == 1) {

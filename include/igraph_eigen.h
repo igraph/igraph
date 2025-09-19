@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #define IGRAPH_EIGEN_H
 
 #include "igraph_decls.h"
+#include "igraph_datatype.h"
 #include "igraph_arpack.h"
 #include "igraph_error.h"
 #include "igraph_lapack.h"

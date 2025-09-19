@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -112,8 +112,8 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     igraph_vector_int_t edges;
     igraph_vector_t ws;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t no_predefined = 0;
+    igraph_int_t no_of_nodes;
+    igraph_int_t no_predefined = 0;
     igraph_attribute_record_list_t name, weight;
     igraph_attribute_record_list_t *pname = NULL, *pweight = NULL;
     igraph_attribute_record_t *namerec, *weightrec;
@@ -127,7 +127,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     /* Add the predefined names, if any */
     if (predefnames != 0) {
-        igraph_integer_t i, id, n;
+        igraph_int_t i, id, n;
         const char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
@@ -340,7 +340,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     if (names == NULL && weights == NULL) {
         /* No names, no weights */
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t from, to;
+            igraph_int_t from, to;
             int ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
             ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n", from, to);
@@ -358,8 +358,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                      igraph_vss_all(),
                      &nvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
+            igraph_int_t edge = IGRAPH_EIT_GET(it);
+            igraph_int_t from, to;
             int ret = 0;
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
@@ -383,8 +383,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
+            igraph_int_t edge = IGRAPH_EIT_GET(it);
+            igraph_int_t from, to;
             int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
             ret1 = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " ", from, to);
@@ -411,8 +411,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                      igraph_vss_all(),
                      &nvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
+            igraph_int_t edge = IGRAPH_EIT_GET(it);
+            igraph_int_t from, to;
             int ret = 0, ret2 = 0;
             const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);

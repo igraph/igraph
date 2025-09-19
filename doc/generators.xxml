@@ -5,18 +5,36 @@
 ]>
 
 <chapter id="igraph-Generators">
-<title>Graph generators</title>
+<title>Deterministic graph generators</title>
 
-<!-- doxrox-include about_generators -->
+<section id="about-generators"><title>About generators</title>
+<para>
+Most functions that create graphs in a deterministic manner are documented here. See also
+<link linkend="igraph-Games">stochastic generators</link>, 
+<link linkend="spatial-generators">spatial graph generators</link>,
+<link linkend="create-two-mode-networks">bipartite graph generators</link>,
+and <link linkend="igraph-Operators">operators that transform graphs</link>.
+</para>
+</section>
 
-<section id="deterministic-graph-generators"><title>Deterministic graph generators</title>
+<section><title id="basic-generators">Basic graph creation</title>
 <!-- doxrox-include igraph_create -->
 <!-- doxrox-include igraph_small -->
+</section>
+
+<section id="adjacency-generators"><title>Graphs from adjacency matrices and adjacency lists</title>
+<para>These functions create graphs from weighted or unweighted adjacency matrices, or an adjacency list.</para>
+
 <!-- doxrox-include igraph_adjacency -->
 <!-- doxrox-include igraph_weighted_adjacency -->
 <!-- doxrox-include igraph_sparse_adjacency -->
 <!-- doxrox-include igraph_sparse_weighted_adjacency -->
 <!-- doxrox-include igraph_adjlist -->
+</section>
+
+<section id="regular-structre-generators"><title>Regular structures</title>
+<para>These functions produce various basic regular graph structures, such as paths, cycles or lattices.</para>
+
 <!-- doxrox-include igraph_star -->
 <!-- doxrox-include igraph_wheel -->
 <!-- doxrox-include igraph_hypercube -->
@@ -26,65 +44,50 @@
 <!-- doxrox-include igraph_ring -->
 <!-- doxrox-include igraph_path_graph -->
 <!-- doxrox-include igraph_cycle_graph -->
+<!-- doxrox-include igraph_lcf -->
+<!-- doxrox-include igraph_lcf_small -->
+<!-- doxrox-include igraph_circulant -->
+<!-- doxrox-include igraph_extended_chordal_ring -->
+</section>
+
+<section id="tree-generators"><title>Tree generators</title>
+<para>These functions generate tree graphs.</para>
+
 <!-- doxrox-include igraph_kary_tree -->
 <!-- doxrox-include igraph_symmetric_tree -->
 <!-- doxrox-include igraph_regular_tree -->
 <!-- doxrox-include igraph_tree_from_parent_vector -->
+<!-- doxrox-include igraph_from_prufer -->
+</section>
+
+<section id="degree-graph-generators"><title>Graphs with given degrees</title>
+<para>These functions generate graphs with the specified degrees.</para>
+
+<!-- doxrox-include igraph_realize_degree_sequence -->
+<!-- doxrox-include igraph_realize_bipartite_degree_sequence -->
+</section>
+
+<section id="complete-graph-generators"><title>Complete graphs</title>
+<para>These functions produce single and multipartite complete graphs, as well as related graphs.</para>
+
 <!-- doxrox-include igraph_full -->
 <!-- doxrox-include igraph_full_citation -->
 <!-- doxrox-include igraph_full_multipartite -->
 <!-- doxrox-include igraph_turan -->
-<!-- doxrox-include igraph_realize_degree_sequence -->
-<!-- doxrox-include igraph_realize_bipartite_degree_sequence -->
-<!-- doxrox-include igraph_famous -->
-<!-- doxrox-include igraph_lcf -->
-<!-- doxrox-include igraph_lcf_small -->
-<!-- doxrox-include igraph_mycielski_graph -->
-<!-- doxrox-include igraph_from_prufer -->
-<!-- doxrox-include igraph_atlas -->
-<!-- doxrox-include igraph_de_bruijn -->
-<!-- doxrox-include igraph_kautz -->
-<!-- doxrox-include igraph_circulant -->
-<!-- doxrox-include igraph_generalized_petersen -->
-<!-- doxrox-include igraph_extended_chordal_ring -->
 </section>
 
-<section id="games-randomized-graph-generators"><title>Games: Randomized graph generators</title>
-<!-- doxrox-include about_games -->
-<!-- doxrox-include igraph_grg_game -->
-<!-- doxrox-include igraph_barabasi_game -->
-<!-- doxrox-include igraph_erdos_renyi_game_gnm -->
-<!-- doxrox-include igraph_erdos_renyi_game_gnp -->
-<!-- doxrox-include igraph_iea_game -->
-<!-- doxrox-include igraph_watts_strogatz_game -->
-<!-- doxrox-include igraph_rewire_edges -->
-<!-- doxrox-include igraph_rewire_directed_edges -->
-<!-- doxrox-include igraph_degree_sequence_game -->
-<!-- doxrox-include igraph_k_regular_game -->
-<!-- doxrox-include igraph_static_fitness_game -->
-<!-- doxrox-include igraph_static_power_law_game -->
-<!-- doxrox-include igraph_chung_lu_game -->
-<!-- doxrox-include igraph_forest_fire_game -->
-<!-- doxrox-include igraph_rewire -->
-<!-- doxrox-include igraph_growing_random_game -->
-<!-- doxrox-include igraph_callaway_traits_game -->
-<!-- doxrox-include igraph_establishment_game -->
-<!-- doxrox-include igraph_preference_game -->
-<!-- doxrox-include igraph_asymmetric_preference_game -->
-<!-- doxrox-include igraph_recent_degree_game -->
-<!-- doxrox-include igraph_barabasi_aging_game -->
-<!-- doxrox-include igraph_recent_degree_aging_game -->
-<!-- doxrox-include igraph_lastcit_game -->
-<!-- doxrox-include igraph_cited_type_game -->
-<!-- doxrox-include igraph_citing_cited_type_game -->
-<!-- doxrox-include igraph_sbm_game -->
-<!-- doxrox-include igraph_hsbm_game -->
-<!-- doxrox-include igraph_hsbm_list_game -->
-<!-- doxrox-include igraph_dot_product_game -->
-<!-- doxrox-include igraph_tree_game -->
-<!-- doxrox-include igraph_correlated_game -->
-<!-- doxrox-include igraph_correlated_pair_game -->
-<!-- doxrox-include igraph_simple_interconnected_islands_game -->
+<section id="pre-defined-generators"><title>Pre-defined graphs</title>
+<para>These functions return graphs from various graph collections.</para>
+
+<!-- doxrox-include igraph_famous -->
+<!-- doxrox-include igraph_atlas -->
+</section>
+
+<section id="other-generators"><title>Other well-known graphs from graph theory</title>
+<!-- doxrox-include igraph_de_bruijn -->
+<!-- doxrox-include igraph_kautz -->
+<!-- doxrox-include igraph_generalized_petersen -->
+<!-- doxrox-include igraph_mycielski_graph -->
 </section>
 
 </chapter>

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,9 @@
 
 int main(void) {
     igraph_t graph;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create a directed path graph on 10 vertices. */
     igraph_ring(&graph, 10, IGRAPH_DIRECTED, /* mutual= */ 0, /* circular= */ 0);

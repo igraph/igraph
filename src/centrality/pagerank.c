@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -66,7 +66,7 @@ static igraph_error_t pagerank_operator_unweighted(igraph_real_t *to, const igra
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
     igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
     igraph_real_t fact = 1 - data->damping;
 
@@ -92,7 +92,7 @@ static igraph_error_t pagerank_operator_unweighted(igraph_real_t *to, const igra
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_int_t nei = VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -129,7 +129,7 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
     igraph_vector_t *outdegree = data->outdegree;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
     igraph_vector_int_t *neis;
     igraph_real_t fact = 1 - data->damping;
@@ -159,8 +159,8 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_int_t edge = VECTOR(*neis)[j];
+            igraph_int_t nei = IGRAPH_OTHER(graph, edge, i);
             to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -235,8 +235,9 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  * https://doi.org/10.1016/S0169-7552(98)00110-X
  *
  * \param graph The graph object.
- * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param weights Optional edge weights. May be a \c NULL pointer,
+ *    meaning unweighted edges, or a vector of non-negative values
+ *    of the same length as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
@@ -244,16 +245,15 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
+ * \param directed Boolean, whether to consider the directedness of
+ *    the edges. This is ignored for undirected graphs.
  * \param vids The vertex IDs for which the PageRank is returned. This parameter
  *    is only for convenience. Computing PageRank for fewer than all vertices will
  *    not speed up the calculation.
- * \param directed Boolean, whether to consider the directedness of
- *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper).
- *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
- * \param weights Optional edge weights. May be a \c NULL pointer,
- *    meaning unweighted edges, or a vector of non-negative values
- *    of the same length as the number of edges.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the function
  *    overwrites the <code>n</code> (number of vertices), <code>nev</code> (1),
@@ -274,15 +274,21 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  *
  * \example examples/simple/igraph_pagerank.c
  */
-
-igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
-                    igraph_vector_t *vector,
-                    igraph_real_t *value, const igraph_vs_t vids,
-                    igraph_bool_t directed, igraph_real_t damping,
-                    const igraph_vector_t *weights, igraph_arpack_options_t *options) {
-    return igraph_personalized_pagerank(graph, algo, vector, value, vids,
-                                        directed, damping, NULL, weights,
-                                        options);
+igraph_error_t igraph_pagerank(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *vector, igraph_real_t *value,
+        igraph_real_t damping, igraph_bool_t directed,
+        igraph_vs_t vids,
+        igraph_pagerank_algo_t algo,
+        igraph_arpack_options_t *options) {
+    return igraph_personalized_pagerank(
+            graph, weights,
+            vector, value,
+            NULL,
+            damping, directed,
+            vids,
+            algo,
+            options);
 }
 
 /**
@@ -311,8 +317,9 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * does not result in any performance increase at all.
  *
  * \param graph The graph object.
- * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param weights Optional edge weights, it is either a null pointer,
+ *    then the edges are not weighted, or a vector of the same length
+ *    as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
@@ -320,19 +327,18 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned. This parameter
- *    is only for convenience. Computing PageRank for fewer than all vertices will
- *    not speed up the calculation.
- * \param directed Boolean, whether to consider the directedness of
- *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper).
- *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset_vids IDs of the vertices used when resetting the random walk.
  *    The walk will be restarted from a vertex in this set, chosen uniformly at
  *    random. Duplicate vertices are allowed.
- * \param weights Optional edge weights, it is either a null pointer,
- *    then the edges are not weighted, or a vector of the same length
- *    as the number of edges.
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
+ * \param directed Boolean, whether to consider the directedness of
+ *    the edges. This is ignored for undirected graphs.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the function
  *    overwrites the <code>n</code> (number of vertices), <code>nev</code> (1),
@@ -351,14 +357,15 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  *
  * \sa \ref igraph_pagerank() for the non-personalized implementation.
  */
+igraph_error_t igraph_personalized_pagerank_vs(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *vector, igraph_real_t *value,
+        igraph_vs_t reset_vids,
+        igraph_real_t damping, igraph_bool_t directed,
+        igraph_vs_t vids,
+        igraph_pagerank_algo_t algo,
+        igraph_arpack_options_t *options) {
 
-igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
-                                    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
-                                    igraph_real_t *value, const igraph_vs_t vids,
-                                    igraph_bool_t directed, igraph_real_t damping,
-                                    igraph_vs_t reset_vids,
-                                    const igraph_vector_t *weights,
-                                    igraph_arpack_options_t *options) {
     igraph_vector_t reset;
     igraph_vit_t vit;
 
@@ -375,9 +382,9 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_personalized_pagerank(
-            graph, algo, vector,
-            value, vids, directed,
-            damping, &reset, weights,
+            graph, weights, vector,
+            value, &reset,
+            damping, directed, vids, algo,
             options));
 
     igraph_vector_destroy(&reset);
@@ -406,8 +413,9 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * does not result in any performance increase at all.
  *
  * \param graph The graph object.
- * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ * \param weights Optional edge weights. May be a \c NULL pointer,
+ *    meaning unweighted edges, or a vector of non-negative values
+ *    of the same length as the number of edges.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
@@ -415,20 +423,19 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned. This parameter
- *    is only for convenience. Computing PageRank for fewer than all vertices will
- *    not speed up the calculation.
- * \param directed Boolean, whether to consider the directedness of
- *    the edges. This is ignored for undirected graphs.
- * \param damping The damping factor ("d" in the original paper).
- *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
  * \param reset The probability distribution over the vertices used when
  *    resetting the random walk. It is either a \c NULL pointer (denoting
  *    a uniform choice that results in the original PageRank measure)
  *    or a vector of the same length as the number of vertices.
- * \param weights Optional edge weights. May be a \c NULL pointer,
- *    meaning unweighted edges, or a vector of non-negative values
- *    of the same length as the number of edges.
+ * \param damping The damping factor ("d" in the original paper).
+ *    Must be a probability in the range [0, 1]. A commonly used value is 0.85.
+ * \param directed Boolean, whether to consider the directedness of
+ *    the edges. This is ignored for undirected graphs.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the function
  *    overwrites the <code>n</code> (number of vertices), <code>nev</code> (1),
@@ -448,13 +455,14 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \ref igraph_personalized_pagerank_vs() for a personalized implementation
  * with resetting to specific vertices.
  */
-igraph_error_t igraph_personalized_pagerank(const igraph_t *graph,
-                                 igraph_pagerank_algo_t algo, igraph_vector_t *vector,
-                                 igraph_real_t *value, const igraph_vs_t vids,
-                                 igraph_bool_t directed, igraph_real_t damping,
-                                 const igraph_vector_t *reset,
-                                 const igraph_vector_t *weights,
-                                 igraph_arpack_options_t *options) {
+igraph_error_t igraph_personalized_pagerank(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *vector, igraph_real_t *value,
+        const igraph_vector_t *reset,
+        igraph_real_t damping, igraph_bool_t directed,
+        igraph_vs_t vids,
+        igraph_pagerank_algo_t algo,
+        igraph_arpack_options_t *options) {
 
     if (damping < 0.0 || damping > 1.0) {
         IGRAPH_ERROR("The PageRank damping factor must be in the range [0,1].", IGRAPH_EINVAL);
@@ -493,9 +501,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_vector_t tmp;
     igraph_vector_t normalized_reset;
 
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
 
     igraph_real_t reset_sum; /* used only when reset != NULL */
 
@@ -679,7 +687,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
     if (vector) {
         igraph_vit_t vit;
-        igraph_integer_t nodes_to_calc;
+        igraph_int_t nodes_to_calc;
         igraph_real_t sum = 0;
 
         for (i = 0; i < no_of_nodes; i++) {

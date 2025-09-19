@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -30,7 +30,7 @@ int main(void) {
     igraph_t g;
     igraph_es_t es;
     igraph_eit_t eit;
-    igraph_integer_t size;
+    igraph_int_t size;
 
     /* DIRECTED */
 
@@ -39,8 +39,8 @@ int main(void) {
     igraph_eit_create(&g, es, &eit);
     igraph_es_size(&g, &es, &size);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         igraph_edge(&g, edge, &from, &to);
         IGRAPH_EIT_NEXT(eit);
         size--;
@@ -58,8 +58,8 @@ int main(void) {
                          0, 1, 2, 3, 4, 3, 2, 3, 4, 5, 6, 5, 4, 5, 6, 7, 8, 9, 0, 1, 0, 9, -1);
     igraph_eit_create(&g, es, &eit);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_int_t edge = IGRAPH_EIT_GET(eit);
+        igraph_int_t from, to;
         igraph_edge(&g, edge, &from, &to);
         IGRAPH_EIT_NEXT(eit);
     }

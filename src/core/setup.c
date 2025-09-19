@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -65,4 +65,3 @@ igraph_error_t igraph_setup(void) {
     IGRAPH_CHECK(setup_rng());
     return IGRAPH_SUCCESS;
 }
-

@@ -3,7 +3,7 @@
  * here:
  * 
  * - Dependency on SuiteSparse_long was removed
- * - CXSparse is configured to use igraph_integer_t as cs_long_t
+ * - CXSparse is configured to use igraph_int_t as cs_long_t
  * - CXSparse function prefix is set to cs_igraph instead of cs_igraph
  * - Unneeded CXSparse function variants are removed
  *
@@ -61,7 +61,7 @@ extern "C" {
 #define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2016"
 #define CXSPARSE
 
-#define cs_long_t       igraph_integer_t
+#define cs_long_t       igraph_int_t
 #define cs_long_t_id    "%" IGRAPH_PRId
 #define cs_long_t_max   IGRAPH_INTEGER_MAX
 

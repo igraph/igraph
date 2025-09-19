@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -204,7 +204,7 @@ int test_continuous(void) {
                       10.02810932, 3.38695326, 6.82841534, 2.13556915, 1.19152238
                     };
 
-    igraph_vector_view(&vector, data, sizeof(data) / sizeof(data[0]));
+    vector = igraph_vector_view(data, sizeof(data) / sizeof(data[0]));
 
     /* determining xmin and alpha */
     if (igraph_power_law_fit(&vector, &result, -1, 0)) {
@@ -269,7 +269,7 @@ int test_discrete(void) {
                       3, 2, 1, 1, 1, 2
                     };
 
-    igraph_vector_view(&vector, data, sizeof(data) / sizeof(data[0]));
+    vector = igraph_vector_view(data, sizeof(data) / sizeof(data[0]));
 
     /* determining xmin and alpha */
     if (igraph_power_law_fit(&vector, &result, -1, 0)) {

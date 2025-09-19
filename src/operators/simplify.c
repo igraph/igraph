@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2020 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -56,16 +56,16 @@ igraph_error_t igraph_simplify(igraph_t *graph,
                                const igraph_attribute_combination_t *edge_comb) {
 
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t edge;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t edge;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
-    igraph_integer_t from, to, pfrom = -1, pto = -2;
+    igraph_int_t from, to, pfrom = -1, pto = -2;
     igraph_t res;
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_int_t mergeinto;
-    igraph_integer_t actedge;
+    igraph_int_t actedge;
 
     /* if we already know there are no multi-edges, they don't need to be removed */
     if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&

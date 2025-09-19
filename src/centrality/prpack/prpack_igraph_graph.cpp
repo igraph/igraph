@@ -14,8 +14,8 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         const igraph_t *g, const igraph_vector_t *weights, bool directed) {
 
     const bool treat_as_directed = igraph_is_directed(g) && directed;
-    const igraph_integer_t vcount = igraph_vcount(g);
-    const igraph_integer_t ecount = igraph_ecount(g);
+    const igraph_int_t vcount = igraph_vcount(g);
+    const igraph_int_t ecount = igraph_ecount(g);
     double *p_weight;
     int *p_head;
 
@@ -62,7 +62,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         IGRAPH_CHECK(igraph_eit_create(g, igraph_ess_all(IGRAPH_EDGEORDER_TO), &eit));
         IGRAPH_FINALLY(igraph_eit_destroy, &eit);
         while (!IGRAPH_EIT_END(eit)) {
-            igraph_integer_t eid = IGRAPH_EIT_GET(eit);
+            igraph_int_t eid = IGRAPH_EIT_GET(eit);
             IGRAPH_EIT_NEXT(eit);
 
             // Handle the weight

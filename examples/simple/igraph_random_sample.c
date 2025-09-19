@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,11 @@
 int main(void) {
     igraph_vector_int_t V;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_vector_int_init(&V, 0);
-
     igraph_random_sample(&V, 0, 100, 5);
-
     igraph_vector_int_print(&V);
-
     igraph_vector_int_destroy(&V);
 }

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -101,7 +101,7 @@ int main(void) {
     printf("\n\nKarate club, betweenness weighted.\n");
 
     igraph_vector_init(&weights, 0);
-    igraph_edge_betweenness(&g, &weights, IGRAPH_UNDIRECTED, NULL);
+    igraph_edge_betweenness(&g, NULL, &weights, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED, false);
 
     printf("\nTiebreaking: 'first'\n");
     igraph_voronoi(&g, &membership, &distances, &generators, &weights, IGRAPH_ALL, IGRAPH_VORONOI_FIRST);

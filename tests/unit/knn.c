@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -26,12 +26,12 @@
 
 /* Check vector equality with tolerances. Consider NaN values equal. */
 igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
-    igraph_integer_t na = igraph_vector_size(a);
-    igraph_integer_t nb = igraph_vector_size(b);
+    igraph_int_t na = igraph_vector_size(a);
+    igraph_int_t nb = igraph_vector_size(b);
     if (na != nb) {
         return false;
     }
-    for (igraph_integer_t i=0; i < na; i++) {
+    for (igraph_int_t i=0; i < na; i++) {
         if (isnan(VECTOR(*a)[i]) && isnan(VECTOR(*b)[i])) {
             continue;
         }

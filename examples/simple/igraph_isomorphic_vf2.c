@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -25,13 +25,14 @@
 #include <stdlib.h>
 
 int main(void) {
+    igraph_setup();
 
     igraph_t ring1, ring2;
     igraph_vector_int_t color1, color2;
     igraph_vector_int_t perm;
     igraph_bool_t iso;
-    igraph_integer_t count;
-    igraph_integer_t i;
+    igraph_int_t count;
+    igraph_int_t i;
 
     igraph_rng_seed(igraph_rng_default(), 12345);
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -31,7 +31,7 @@ int main(void) {
 
     igraph_vector_t elems;
     igraph_2wheap_t Q;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_real_t prev = IGRAPH_INFINITY;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
@@ -57,7 +57,7 @@ int main(void) {
     /*****/
 
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        igraph_integer_t j;
+        igraph_int_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 2;
@@ -90,7 +90,7 @@ int main(void) {
     }
     prev = IGRAPH_INFINITY;
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        igraph_integer_t j;
+        igraph_int_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 7;
