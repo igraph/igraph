@@ -43,6 +43,10 @@ IGRAPH_EXPORT igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* g
                                                     igraph_real_t* matching_weight, igraph_vector_int_t* matching,
                                                     const igraph_vector_t* weights, igraph_real_t eps);
 
+IGRAPH_EXPORT igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
+                            igraph_real_t *matching_weight, igraph_vector_int_t *matching,
+                            const igraph_vector_t *weights, igraph_real_t eps);
+
 IGRAPH_END_C_DECLS
 
 #endif
