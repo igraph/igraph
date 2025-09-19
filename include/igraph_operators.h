@@ -46,8 +46,11 @@ typedef struct {
     igraph_int_t successful_swaps;
 
     /* unused members added at the end to allow us to extend the stats in the future
-     * without breaking ABI compatibility. Do not use this field in your own code */
-    igraph_int_t _unused[7];
+     * without breaking ABI compatibility. Do not use these fields in your own code */
+
+    igraph_int_t unused1_;
+    igraph_int_t unused2_;
+    igraph_int_t unused3_;
 } igraph_rewiring_stats_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_add_edge(igraph_t *graph, igraph_int_t from, igraph_int_t to);
