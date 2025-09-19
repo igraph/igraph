@@ -134,7 +134,7 @@ igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_g
     if (corr == 0) {
         return igraph_erdos_renyi_game_gnp(new_graph, no_of_nodes, p, directed, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     }
-    if (corr == 1) {        
+    if (corr == 1) {
         /* We don't copy, because we don't need the attributes.... */
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
         IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ false));
