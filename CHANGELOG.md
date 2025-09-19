@@ -2,11 +2,11 @@
 
 ## [main]
 
-Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence, as well as adding new features that required API-breaking changes. There is an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
+Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence, as well as adding new features that required API-breaking changes. There is now an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
 
 ### Highlights
 
-- A more consistant and more predictable API.
+- A more consistent and more predictable API.
 - Explicit versioning policy.
 - Several random graph generators, including the Erdős-Rényi generators, can now produce graphs with multi-edges.
 - Several functions that can generate a large number of results (cliques, cycles, etc.) now have a feature to limit the number of returned results, or to return a single result only.
@@ -22,7 +22,7 @@ This section lists API-breaking changes in this version, and provides guidance o
 - `igraph_setup()` is now recommended to be called before using the library. This function may gain essential functions in the future. See the "Added" section below for details.
 - `igraph_integer_t` was renamed to `igraph_int_t`, but `igraph_integer_t` is kept as an alias and it will remain available for at least the next major version. Library headers and source code uses `igraph_int_t` from now on.
 - `igraph_rng_set_default()` now returns a pointer to the previous default RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` object must continue to exist for as long as it is used as the default RNG.
-- Interruption handlers do not take a `void *` argument any more; this is relevant to maintainers of higher-level interfaces only.
+- Interruption handlers do not take a `void *` argument anymore; this is relevant to maintainers of higher-level interfaces only.
 - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
 - `igraph_status()`, `igraph_statusf()` and their macro versions (`IGRAPH_STATUS()` and `IGRAPH_STATUSF()`) do not convert error codes to `IGRAPH_INTERRUPTED` any more. Any error code returned from the status handler function is forwarded intact to the caller. If you want to trigger the interruption of the current calculation from the status handler without reporting an error, report `IGRAPH_INTERRUPTED` explicitly. It is the responsibility of higher-level interfaces to handle this error code appropriately.
 - The `RNG_BEGIN()` and `RNG_END()` macros were removed. You are now responsible for seeding the RNG before using any igraph function that may use random numbers by calling `igraph_rng_seed(igraph_rng_default(), ...)`, or by simply ensuring that `igraph_setup()` was called before the first use of the library.
@@ -66,7 +66,7 @@ This section lists API-breaking changes in this version, and provides guidance o
 - `igraph_delete_vertices_map()` (formerly called `igraph_delete_vertices_idx()`) and `igraph_induced_subgraph_map()` now use `-1` to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. Note that the inverse map always behaved this way, this change makes the two mappings consistent.
 - `igraph_edges()` gained a new `igraph_bool_t bycol` argument that determines the order in which the edges are returned. `bycol = false` reproduces the existing behaviour, while `bycol = true` returns the edges suitable for a matrix stored in column-wise order.
 - `igraph_neighbors()` and `igraph_vs_adj()` gained two extra arguments, `igraph_loops_t loops` and `igraph_bool_t multiple` to specify what to do with loop and multiple edges. This makes their interfaces consistent with `igraph_adjlist_init()`. Use `loops = IGRAPH_LOOPS_TWICE` and `multiple = true` to reproduce the previous behavior.
-- `igraph_incident()` and `igraph_es_incident()` gained an extra `igraph_loops_t loops` argument to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`. Use `loop = IGRAPH_LOOPS_TWICW` to reproduce the previous behavior.
+- `igraph_incident()` and `igraph_es_incident()` gained an extra `igraph_loops_t loops` argument to specify what to do with loop edges. This makes their interfaces consistent with `igraph_inclist_init()`. Use `loops = IGRAPH_LOOPS_TWICE` to reproduce the previous behavior.
 - The `igraph_multiple_t` enum type was removed from the public API as it was essentially a Boolean. The symbolic constants `IGRAPH_MULTIPLE` (same as `true`) and `IGRAPH_NO_MULTIPLE` (same as `false`) were kept to improve readability of code written directly in C.
 
 #### Basic graph properties
@@ -176,7 +176,7 @@ This section lists API-breaking changes in this version, and provides guidance o
 - `igraph_relative_neighborhood_graph()` computes the relative neighborhood graph of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827!
 - `igraph_lune_beta_skeleton()` and `igraph_circle_beta_skeleton()` compute the lune and circle based β-skeletons of a spatial point set (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827!
 - `igraph_beta_weighted_gabriel_graph()` computes a Gabriel graph of a spatial point set, along with a threshold β value for each edge, at which the edge ceases to be part of the lune-based β-skeleton (experimental function). Thanks to Arnór Friðriksson @Zepeacedust for implementing this in #2827!
-- `igraph_spatial_edge_lengths()` computes edges lengths based on spatial vertex coordinates (experimental function).
+- `igraph_spatial_edge_lengths()` computes edge lengths based on spatial vertex coordinates (experimental function).
 - `igraph_community_leiden_simple()` is a simplified interface to `igraph_community_leiden()` that allows selecting the objective function to maximize directly.
 - `igraph_vector_difference_and_intersection_sorted()` calculates the intersection and the differences of two vectors simultaneously.
 - `IGRAPH_UNLIMITED`, defined to `-1`, is a convenience constant for use with various "size limit" parameters, such as number of cliques returned, maximum path length, number of results returned, etc. It indicates that no limit should be used.
@@ -252,7 +252,8 @@ This section lists API-breaking changes in this version, and provides guidance o
 
 ### Other
 
-- Documentation improvements.
+- The documentation was reorganized.
+- Various documentation improvements.
 - Improved performance when creating graphs from dense adjacency matrices (`igraph_adjacency()` and `igraph_weighted_adjacency()`).
 
 ## [0.10.17] - 2025-09-19
