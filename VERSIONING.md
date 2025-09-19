@@ -55,4 +55,4 @@ We strive to maintain both API and ABI compatibility.
 
 However, it must be pointed out that we do not support manipulating the same in-memory igraph data structures with different igraph versions (for example, if two libraries that exchange data are each statically linked to different igraph versions).
 
- [1]: https://github.com/igraph/igraph/blob/master/CHANGELOG.md
+ [1]: https://github.com/igraph/igraph/blob/main/CHANGELOG.md

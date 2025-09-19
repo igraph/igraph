@@ -32,6 +32,7 @@ experienced with C, you can contribute in a number of ways:
   adhere to our [Code of Conduct](https://igraph.org/code-of-conduct.html).
 
 <a name="bugs"></a>
+
 ## Bug reports
 
 A bug is a _demonstrable problem_ that is caused by the code in the repository.
@@ -53,7 +54,7 @@ Guidelines for bug reports:
    reported.
 
 3. **Check if the issue has been fixed** &mdash; try to reproduce it using the
-   latest `master` or development branch in the repository.
+   latest `main` or development branch in the repository.
 
 4. **Isolate the problem** &mdash; create a [short, self-contained, correct
    example](http://sscce.org/).
@@ -127,7 +128,7 @@ Follow the following steps if you would like to make a new pull request:
    ```
 
 2. Please checkout the section on [branching](#branching) to see whether you
-   need to branch off from the `master` branch or the `develop` branch.
+   need to branch off from the `main` branch or the `develop` branch.
 
    If you cloned a while ago, get the latest changes from upstream:
 
@@ -180,9 +181,10 @@ owner to license your work under the same license as that used by the project,
 see also [Legal Stuff](#legal).
 
 <a name="branching"></a>
+
 ### Branching
 
-In short, always ask whether your contribution should target the `master` or
+In short, always ask whether your contribution should target the `main` or
 `develop` branch _before_ starting any work. Read on for more details on how
 this is decided.
 
@@ -191,30 +193,30 @@ currently still in the development release (0.x), which in principle is a mark
 that the public API is not yet stable. Regardless, we try to maintain semantic
 versioning also for the development releases. We do so as follows. Any released
 minor version (0.x.z) will be API backwards-compatible with any previous release
-of the *same* minor version (0.x.y, with y < z). This means that *if* there is
+of the _same_ minor version (0.x.y, with y < z). This means that _if_ there is
 an API incompatible change, we will increase the minor version. For example,
 release 0.8.1 is API backwards-compatible with release 0.8.0, while release
 0.9.0 might be API incompatible with version 0.8.1. Note that this only concerns
-the *public* API, internal functions may change also within a minor version.
+the _public_ API, internal functions may change also within a minor version.
 
 There will always be two versions of `igraph`: the most recent released version,
 and the next upcoming minor release, which is by definition not yet released.
-The most recent release version is in the `master` branch, while the next
+The most recent release version is in the `main` branch, while the next
 upcoming minor release is in the `develop` branch. If you make a change that is
 API incompatible with the most recent release, it **must** be merged to
 the `develop` branch. If the change is API backwards-compatible, it **can** be
-merged to the `master` branch. It is possible that you build on recent
+merged to the `main` branch. It is possible that you build on recent
 improvements in the `develop` branch, in which case your change should of course
 target the `develop` branch. If you only add new functionality, but do not
 change anything of the existing API, this should be backwards-compatible, and
-can be merged in the `master` branch.
+can be merged in the `main` branch.
 
 When you make a new pull request, please specify the correct target branch. The
 maintainers of `igraph` may decide to retarget your pull request to the correct
 branch. Retargeting you pull request may result in merge conflicts, so it is
 always good to decide **before** starting to work on something whether you
-should start from the `master` branch or from the `develop` branch. In most
-cases, changes in the `master` branch will also be merged to the `develop`
+should start from the `main` branch or from the `develop` branch. In most
+cases, changes in the `main` branch will also be merged to the `develop`
 branch by the maintainers.
 
 <a name="tips"></a>
