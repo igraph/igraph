@@ -69,8 +69,8 @@ static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
  * Sample a new graph by perturbing the adjacency matrix of a
  * given simple graph and shuffling its vertices.
  *
- * \param old_graph The original graph, it must be simple.
- * \param new_graph The new graph will be stored here.
+ * \param new_graph The new graph to initialize based on an existing graph.
+ * \param old_graph The original graph, which must be a simple graph.
  * \param corr A value in the unit interval [0,1], the target Pearson
  *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
@@ -84,7 +84,7 @@ static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
  * \sa \ref igraph_correlated_pair_game() for generating a pair
  * of correlated random graphs in one go.
  */
-igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
+igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_graph,
                            igraph_real_t corr, igraph_real_t p,
                            const igraph_vector_int_t *permutation) {
 
@@ -311,6 +311,6 @@ igraph_error_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                                 const igraph_vector_int_t *permutation) {
 
     IGRAPH_CHECK(igraph_erdos_renyi_game_gnp(graph1, n, p, directed, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED));
-    IGRAPH_CHECK(igraph_correlated_game(graph1, graph2, corr, p, permutation));
+    IGRAPH_CHECK(igraph_correlated_game(graph2, graph1, corr, p, permutation));
     return IGRAPH_SUCCESS;
 }

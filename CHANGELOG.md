@@ -82,6 +82,7 @@ This section gives detailed on breaking changes you need to consider when updati
 - `igraph_watts_strogatz_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_static_fitness_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_static_power_law_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
+- `igraph_correlated_game()` now takes the graph being constructed as the _first_ argument to remain consistent with other graph constructors. Earlier versions used to take the original graph as the first argument.
 
 #### Paths and cycles
 

@@ -209,7 +209,7 @@ IGRAPH_EXPORT igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t
                                         const igraph_matrix_list_t *Clist,
                                         igraph_real_t p);
 
-IGRAPH_EXPORT igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
+IGRAPH_EXPORT igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_graph,
                                          igraph_real_t corr, igraph_real_t p,
                                          const igraph_vector_int_t *permutation);
 
