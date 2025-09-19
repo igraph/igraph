@@ -1,5 +1,7 @@
 # igraph C library changelog
 
+## [main]
+
 ## [1.0.0]
 
 Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence, as well as adding new features that required API-breaking changes. There is now an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
