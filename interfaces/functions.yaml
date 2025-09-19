@@ -432,7 +432,7 @@ igraph_hsbm_list_game:
 
 igraph_correlated_game:
     PARAMS: |-
-        GRAPH old_graph, OUT GRAPH new_graph,
+        OUT GRAPH new_graph, GRAPH old_graph,
         REAL corr, REAL p=edge_density(old.graph), OPTIONAL INDEX_VECTOR permutation
 
 igraph_correlated_pair_game:
@@ -1238,15 +1238,15 @@ igraph_is_bipartite:
 igraph_bipartite_game_gnp:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
-        INTEGER n1, INTEGER n2, REAL p, 
+        INTEGER n1, INTEGER n2, REAL p,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         EDGE_TYPE_SW allowed_edge_types=SIMPLE, BOOLEAN edge_labeled=False
 
 igraph_bipartite_game_gnm:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
-        INTEGER n1, INTEGER n2, INTEGER m, 
-        BOOLEAN directed=False, NEIMODE mode=ALL, 
+        INTEGER n1, INTEGER n2, INTEGER m,
+        BOOLEAN directed=False, NEIMODE mode=ALL,
         EDGE_TYPE_SW allowed_edge_types=SIMPLE, BOOLEAN edge_labeled=False
 
 igraph_bipartite_iea_game:
@@ -1342,7 +1342,7 @@ igraph_is_clique:
 
 igraph_cliques:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES_LIST res, 
+        GRAPH graph, OUT VERTEX_INDICES_LIST res,
         INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
         INTEGER max_results=UNLIMITED
     DEPS: res ON graph
@@ -1362,7 +1362,7 @@ igraph_largest_cliques:
 
 igraph_maximal_cliques:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES_LIST res, 
+        GRAPH graph, OUT VERTEX_INDICES_LIST res,
         INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
         INTEGER max_results=UNLIMITED
     DEPS: res ON graph
@@ -1421,7 +1421,7 @@ igraph_is_independent_vertex_set:
 
 igraph_independent_vertex_sets:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_INDICES_LIST res, 
+        GRAPH graph, OUT VERTEX_INDICES_LIST res,
         INTEGER min_size=UNLIMITED, INTEGER max_size=UNLIMITED,
         INTEGER max_results=UNLIMITED
     DEPS: res ON graph
