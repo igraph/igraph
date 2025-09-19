@@ -83,7 +83,7 @@ This section gives detailed on breaking changes you need to consider when updati
 - `igraph_static_fitness_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_static_power_law_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_correlated_game()` now takes the graph being constructed as the _first_ argument to remain consistent with other graph constructors. Earlier versions used to take the original graph as the first argument.
-- The semantics of the `permutation` argument of `igraph_correlated_game()` and `igraph_correlated_pair_game()` was changed to be consistent with `igraph_permute_vertices()`. If you used permutation vectors for these function calls in your code, you need to invert the vectors first before passing them to `igraph_correlated_game()` or `igraph_correlated_pair_game()` to obtain the same results.
+- The semantics of the `permutation` argument of `igraph_correlated_game()` and `igraph_correlated_pair_game()` has changed: the i-th element of the vector now contains the index of the _original_ vertex that will be mapped to the i-th vertex in the new graph. This is consistent with how `igraph_permute_vertices()` operates (which has also changed in igraph 1.0).
 
 #### Paths and cycles
 
@@ -194,6 +194,7 @@ This section gives detailed on breaking changes you need to consider when updati
 ### Fixed
 
 - `igraph_community_spinglass_single()` now uses `igraph_real_t` for its `inner_links` and `outer_links` output parameters, as these return not simply edge counts, but the sum of the weights of some edges. Thus these results are no longer incorrectly rounded.
+- `igraph_correlated_game()` and `igraph_correlated_pair_game()` validate their `permutation` argument.
 
 ### Removed
 
