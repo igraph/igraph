@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [master]
+## [main]
 
 Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence, as well as adding new features that required API-breaking changes. There is an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
 
@@ -245,8 +245,6 @@ This section gives detailed on breaking changes you need to consider when updati
 
 - Documentation improvements.
 - Improved performance when creating graphs from dense adjacency matrices (`igraph_adjacency()` and `igraph_weighted_adjacency()`).
-
-## [master]
 
 ## [0.10.17] - 2025-09-19
 
@@ -1772,7 +1770,7 @@ Some of the highlights are:
 - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
 - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.17..master
+[main]: https://github.com/igraph/igraph/compare/0.10.17..main
 [0.10.17]: https://github.com/igraph/igraph/compare/0.10.16..0.10.17
 [0.10.16]: https://github.com/igraph/igraph/compare/0.10.15..0.10.16
 [0.10.15]: https://github.com/igraph/igraph/compare/0.10.13..0.10.15
