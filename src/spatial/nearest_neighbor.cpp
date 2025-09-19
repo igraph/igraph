@@ -122,7 +122,7 @@ static igraph_error_t dimension_dispatcher(
  * \brief Computes the nearest neighbor graph for a spatial point set.
  *
  * \experimental
- * 
+ *
  * This function constructs the \p k nearest neighbor graph of a given point
  * set. Each point is connected to at most \p k spatial neighbors within a
  * radius of \p cutoff.

@@ -40,7 +40,7 @@ int main() {
     // and whether it can potentially have self-loops and/or multi-edges.
     const bool directed = true;
     const bool loops = true;
-    
+
     igraph_edge_type_sw_t allowed_edge_types = IGRAPH_MULTI_SW;
     if (loops) allowed_edge_types |= IGRAPH_LOOPS_SW;
 
