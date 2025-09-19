@@ -24,6 +24,7 @@
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
+#include "igraph_isomorphism.h"
 #include "igraph_qsort.h"
 #include "igraph_random.h"
 #include "igraph_structural.h"
@@ -77,8 +78,10 @@ static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
  * \param p The probability of an edge between two vertices. It must in the
  *        open (0,1) interval. Typically, the density of \p old_graph.
  * \param permutation A permutation to apply to the vertices of the
- *        generated graph. It can also be a null pointer, in which case
- *        the vertices will not be permuted.
+ *        generated graph. The i-th element of the permutation vector
+ *        encodes the index of the vertex in the \em original graph that will
+ *        become the i-th vertex in the generated graph. It can also be a null
+ *        pointer, in which case the vertices will not be permuted.
  * \return Error code
  *
  * \sa \ref igraph_correlated_pair_game() for generating a pair
@@ -99,6 +102,7 @@ igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_g
     const igraph_real_t p_add = ((1 - q) * (p / (1 - p)));
     igraph_vector_t add, delete;
     igraph_vector_int_t edges, newedges;
+    igraph_vector_int_t inverted_permutation;
     igraph_real_t last;
     igraph_int_t p_e = 0, p_a = 0, p_d = 0;
     igraph_int_t no_add, no_del;
@@ -136,10 +140,17 @@ igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_g
         IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ false));
         if (permutation) {
             const igraph_int_t newec = igraph_vector_int_size(&edges);
+
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&inverted_permutation, no_of_nodes);
+            IGRAPH_CHECK(igraph_invert_permutation(permutation, &inverted_permutation));
+
             for (igraph_int_t i = 0; i < newec; i++) {
                 igraph_int_t tmp = VECTOR(edges)[i];
-                VECTOR(edges)[i] = VECTOR(*permutation)[tmp];
+                VECTOR(edges)[i] = VECTOR(inverted_permutation)[tmp];
             }
+
+            igraph_vector_int_destroy(&inverted_permutation);
+            IGRAPH_FINALLY_CLEAN(1);
         }
         IGRAPH_CHECK(igraph_create(new_graph, &edges, no_of_nodes, directed));
         igraph_vector_int_destroy(&edges);
@@ -260,10 +271,17 @@ igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_g
 
     if (permutation) {
         igraph_int_t newec = igraph_vector_int_size(&newedges);
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&inverted_permutation, no_of_nodes);
+        IGRAPH_CHECK(igraph_invert_permutation(permutation, &inverted_permutation));
+
         for (igraph_int_t i = 0; i < newec; i++) {
             igraph_int_t tmp = VECTOR(newedges)[i];
-            VECTOR(newedges)[i] = VECTOR(*permutation)[tmp];
+            VECTOR(newedges)[i] = VECTOR(inverted_permutation)[tmp];
         }
+
+        igraph_vector_int_destroy(&inverted_permutation);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     IGRAPH_CHECK(igraph_create(new_graph, &newedges, no_of_nodes, directed));
@@ -298,8 +316,10 @@ igraph_error_t igraph_correlated_game(igraph_t *new_graph, const igraph_t *old_g
  *        vertices, it must in the open (0,1) interval.
  * \param directed Whether to generate directed graphs.
  * \param permutation A permutation to apply to the vertices of the
- *        second graph. It can also be a null pointer, in which case
- *        the vertices will not be permuted.
+ *        second graph. The i-th element of the permutation vector
+ *        encodes the index of the vertex in the \em first graph that will
+ *        become the i-th vertex in the second graph. It can also be a null
+ *        pointer, in which case the vertices will not be permuted.
  * \return Error code
  *
  * \sa \ref igraph_correlated_game() for generating a correlated pair

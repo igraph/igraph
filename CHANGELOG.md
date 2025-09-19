@@ -83,6 +83,7 @@ This section gives detailed on breaking changes you need to consider when updati
 - `igraph_static_fitness_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_static_power_law_game()` uses an `igraph_edge_type_sw_t allowed_edge_types` parameter instead of `loops` and `multiple`.
 - `igraph_correlated_game()` now takes the graph being constructed as the _first_ argument to remain consistent with other graph constructors. Earlier versions used to take the original graph as the first argument.
+- The semantics of the `permutation` argument of `igraph_correlated_game()` and `igraph_correlated_pair_game()` was changed to be consistent with `igraph_permute_vertices()`. If you used permutation vectors for these function calls in your code, you need to invert the vectors first before passing them to `igraph_correlated_game()` or `igraph_correlated_pair_game()` to obtain the same results.
 
 #### Paths and cycles
 
