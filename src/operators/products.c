@@ -701,7 +701,7 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
 igraph_error_t igraph_corona_product(igraph_t *res,
                                      const igraph_t *g1,
                                      const igraph_t *g2,
-                                     const igraph_neimode_t mode) {
+                                     igraph_neimode_t mode) {
 
     const igraph_bool_t directed = igraph_is_directed(g1);
 
