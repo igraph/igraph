@@ -302,6 +302,7 @@ add_legacy_tests(
   igraph_closeness
   igraph_constraint
   igraph_convergence_degree
+  igraph_corona_product
   igraph_count_multiple
   igraph_density
   igraph_diameter
