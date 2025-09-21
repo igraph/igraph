@@ -35,7 +35,7 @@ int main(void) {
     igraph_int_t n;
 
     /* Initialize the library. */
-    igraph_setup(); 
+    igraph_setup();
 
     /* Initialize vector into which weights will be written. */
     igraph_vector_init(&weights, 0);

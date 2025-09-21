@@ -10,7 +10,7 @@
 <section id="about-generators"><title>About generators</title>
 <para>
 Most functions that create graphs in a deterministic manner are documented here. See also
-<link linkend="igraph-Games">stochastic generators</link>, 
+<link linkend="igraph-Games">stochastic generators</link>,
 <link linkend="spatial-generators">spatial graph generators</link>,
 <link linkend="create-two-mode-networks">bipartite graph generators</link>,
 and <link linkend="igraph-Operators">operators that transform graphs</link>.

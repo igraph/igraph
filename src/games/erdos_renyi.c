@@ -849,4 +849,3 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
     return IGRAPH_SUCCESS;
 }
-
