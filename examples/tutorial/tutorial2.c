@@ -27,7 +27,7 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_vector_int_init(&edges, 20);
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&edges); i++) {
+    for (igraph_int_t i = 0; i < igraph_vector_int_size(&edges); i++) {
         VECTOR(edges)[i] = RNG_INTEGER(0, igraph_vcount(&graph) - 1);
     }
 

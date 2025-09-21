@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -25,7 +25,7 @@
 
 int main(void) {
     igraph_t g;
-    igraph_integer_t n_vertices = 10;
+    igraph_int_t n_vertices = 10;
 
     printf("Null graph\n");
     igraph_full(&g, 0, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);

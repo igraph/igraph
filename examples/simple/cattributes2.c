@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2007-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@ int main(void) {
     igraph_t g;
     igraph_vector_t y;
     igraph_warning_handler_t* oldwarnhandler;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);

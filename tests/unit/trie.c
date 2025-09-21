@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -30,8 +30,8 @@
 int main(void) {
 
     igraph_trie_t trie;
-    igraph_integer_t id;
-    igraph_integer_t i;
+    igraph_int_t id;
+    igraph_int_t i;
     const char *str;
 
     /* init */

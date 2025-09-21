@@ -5,7 +5,7 @@ When performing a code review, keep in mind the following.
 
 ## Coding standards
 
- - Check that all values of integer type are represented as `igraph_integer_t`, except in justified special cases. Such special cases are:
+ - Check that all values of integer type are represented as `igraph_int_t`, except in justified special cases. Such special cases are:
     * The interruption counter used with `IGRAPH_ALLOW_INTERRUPTION_LIMITED`, typically called `iter`, which should be an `int`.
     * When interfacing with a library that uses a different type. Before passing igraph data to this library, it must be checked that the values will not overflow.
 

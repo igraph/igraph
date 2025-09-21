@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@
 
 static void igraph_i_2dgrid_which(
     igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
-    igraph_integer_t *x, igraph_integer_t *y
+    igraph_int_t *x, igraph_int_t *y
 ) {
     if (xc <= grid->minx) {
         *x = 0;
@@ -48,7 +48,7 @@ static void igraph_i_2dgrid_which(
 igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
                        igraph_real_t minx, igraph_real_t maxx, igraph_real_t deltax,
                        igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay) {
-    igraph_integer_t no_of_points;
+    igraph_int_t no_of_points;
 
     IGRAPH_ASSERT(minx <= maxx);
     IGRAPH_ASSERT(miny <= maxy);
@@ -91,10 +91,10 @@ void igraph_2dgrid_destroy(igraph_2dgrid_t *grid) {
     igraph_vector_int_destroy(&grid->prev);
 }
 
-void igraph_2dgrid_add(igraph_2dgrid_t *grid, igraph_integer_t elem,
+void igraph_2dgrid_add(igraph_2dgrid_t *grid, igraph_int_t elem,
                        igraph_real_t xc, igraph_real_t yc) {
-    igraph_integer_t x, y;
-    igraph_integer_t first;
+    igraph_int_t x, y;
+    igraph_int_t first;
 
     MATRIX(*grid->coords, elem, 0) = xc;
     MATRIX(*grid->coords, elem, 1) = yc;
@@ -114,9 +114,9 @@ void igraph_2dgrid_add(igraph_2dgrid_t *grid, igraph_integer_t elem,
     grid->vertices += 1;
 }
 
-void igraph_2dgrid_add2(igraph_2dgrid_t *grid, igraph_integer_t elem) {
-    igraph_integer_t x, y;
-    igraph_integer_t first;
+void igraph_2dgrid_add2(igraph_2dgrid_t *grid, igraph_int_t elem) {
+    igraph_int_t x, y;
+    igraph_int_t first;
     igraph_real_t xc, yc;
 
     xc = MATRIX(*grid->coords, elem, 0);
@@ -137,13 +137,13 @@ void igraph_2dgrid_add2(igraph_2dgrid_t *grid, igraph_integer_t elem) {
     grid->vertices += 1;
 }
 
-void igraph_2dgrid_move(igraph_2dgrid_t *grid, igraph_integer_t elem,
+void igraph_2dgrid_move(igraph_2dgrid_t *grid, igraph_int_t elem,
                         igraph_real_t xc, igraph_real_t yc) {
-    igraph_integer_t oldx, oldy;
-    igraph_integer_t newx, newy;
+    igraph_int_t oldx, oldy;
+    igraph_int_t newx, newy;
     igraph_real_t oldxc = MATRIX(*grid->coords, elem, 0);
     igraph_real_t oldyc = MATRIX(*grid->coords, elem, 1);
-    igraph_integer_t first;
+    igraph_int_t first;
 
     xc = oldxc + xc; yc = oldyc + yc;
 
@@ -186,12 +186,12 @@ void igraph_2dgrid_getcenter(const igraph_2dgrid_t *grid,
     *massy = (grid->massy) / (grid->vertices);
 }
 
-igraph_bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, igraph_integer_t elem) {
+igraph_bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, igraph_int_t elem) {
     return VECTOR(grid->next)[elem] != -1;
 }
 
 igraph_real_t igraph_2dgrid_sq_dist(const igraph_2dgrid_t *grid,
-                                    igraph_integer_t e1, igraph_integer_t e2) {
+                                    igraph_int_t e1, igraph_int_t e2) {
     igraph_real_t x = MATRIX(*grid->coords, e1, 0) - MATRIX(*grid->coords, e2, 0);
     igraph_real_t y = MATRIX(*grid->coords, e1, 1) - MATRIX(*grid->coords, e2, 1);
 
@@ -210,9 +210,9 @@ void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it) {
     }
 }
 
-igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
+igraph_int_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
                                     igraph_2dgrid_iterator_t *it) {
-    igraph_integer_t ret = it->vid;
+    igraph_int_t ret = it->vid;
 
     if (ret == 0) {
         return 0;
@@ -259,9 +259,9 @@ igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
     return ret;
 }
 
-igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
+igraph_int_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
                                         igraph_2dgrid_iterator_t *it) {
-    igraph_integer_t ret = it->nei;
+    igraph_int_t ret = it->nei;
 
     if (it->nei != 0) {
         it->nei = VECTOR(grid->next) [ ret - 1 ];

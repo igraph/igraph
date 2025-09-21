@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -41,7 +41,7 @@ int main(void) {
     igraph_vector_int_t membership;
     igraph_matrix_t modmat;
     igraph_real_t modularity, test_modularity;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     printf("No vertices:\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);

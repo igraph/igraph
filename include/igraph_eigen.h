@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #define IGRAPH_EIGEN_H
 
 #include "igraph_decls.h"
+#include "igraph_datatype.h"
 #include "igraph_arpack.h"
 #include "igraph_error.h"
 #include "igraph_lapack.h"
@@ -27,28 +28,29 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-typedef enum { IGRAPH_EIGEN_AUTO = 0,
-               IGRAPH_EIGEN_LAPACK,
-               IGRAPH_EIGEN_ARPACK,
-               IGRAPH_EIGEN_COMP_AUTO,
-               IGRAPH_EIGEN_COMP_LAPACK,
-               IGRAPH_EIGEN_COMP_ARPACK
-             } igraph_eigen_algorithm_t;
+typedef enum {
+    IGRAPH_EIGEN_AUTO = 0,
+    IGRAPH_EIGEN_LAPACK,
+    IGRAPH_EIGEN_ARPACK,
+    IGRAPH_EIGEN_COMP_AUTO,
+    IGRAPH_EIGEN_COMP_LAPACK,
+    IGRAPH_EIGEN_COMP_ARPACK
+} igraph_eigen_algorithm_t;
 
-typedef enum { IGRAPH_EIGEN_LM = 0,
-               IGRAPH_EIGEN_SM, /* 1 */
-               IGRAPH_EIGEN_LA, /* 2 */
-               IGRAPH_EIGEN_SA, /* 3 */
-               IGRAPH_EIGEN_BE, /* 4 */
-               IGRAPH_EIGEN_LR, /* 5 */
-               IGRAPH_EIGEN_SR, /* 6 */
-               IGRAPH_EIGEN_LI, /* 7 */
-               IGRAPH_EIGEN_SI, /* 8 */
-               IGRAPH_EIGEN_ALL, /* 9 */
-               IGRAPH_EIGEN_INTERVAL, /* 10 */
-               IGRAPH_EIGEN_SELECT
-             }  /* 11 */
-igraph_eigen_which_position_t;
+typedef enum {
+    IGRAPH_EIGEN_LM = 0,
+    IGRAPH_EIGEN_SM, /* 1 */
+    IGRAPH_EIGEN_LA, /* 2 */
+    IGRAPH_EIGEN_SA, /* 3 */
+    IGRAPH_EIGEN_BE, /* 4 */
+    IGRAPH_EIGEN_LR, /* 5 */
+    IGRAPH_EIGEN_SR, /* 6 */
+    IGRAPH_EIGEN_LI, /* 7 */
+    IGRAPH_EIGEN_SI, /* 8 */
+    IGRAPH_EIGEN_ALL, /* 9 */
+    IGRAPH_EIGEN_INTERVAL, /* 10 */
+    IGRAPH_EIGEN_SELECT /* 11 */
+} igraph_eigen_which_position_t;
 
 typedef struct igraph_eigen_which_t {
     igraph_eigen_which_position_t pos;

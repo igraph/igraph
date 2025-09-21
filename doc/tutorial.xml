@@ -35,11 +35,11 @@ before use.
 </para></listitem>
 <listitem><para>
 Third, <command>igraph</command> uses the
-<type>igraph_integer_t</type> type for integers instead of
+<type>igraph_int_t</type> type for integers instead of
 <type>int</type> or <type>long int</type>, and it also uses the
 <type>igraph_real_t</type> type for real numbers instead of
 <type>double</type>. Depending on how <command>igraph</command> was compiled, and whether you are
-using a 32-bit or 64-bit system, <type>igraph_integer_t</type> may be a 32-bit
+using a 32-bit or 64-bit system, <type>igraph_int_t</type> may be a 32-bit
 or 64-bit integer.
 </para></listitem>
 <listitem><para>
@@ -235,7 +235,7 @@ on them. A vector can be indexed by the
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). The elements of a vector are of type <type>igraph_real_t</type>
 for <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>,
-and of type <type>igraph_integer_t</type> for <type>igraph_vector_int_t</type>.
+and of type <type>igraph_int_t</type> for <type>igraph_vector_int_t</type>.
 As you might expect, <type>igraph_vector_bool_t</type> holds
 <type>igraph_bool_t</type> values. Vectors can be resized and most <command>igraph</command>
 functions returning the result in a vector automatically resize it to the size they need.
@@ -306,7 +306,7 @@ it to be able to hold the result.
 </para>
 
 <para>
-Notice that in order to print values of type <type>igraph_integer_t</type>,
+Notice that in order to print values of type <type>igraph_int_t</type>,
 we used the <constant>IGRAPH_PRId</constant> format macro constant. This
 macro is similar to the standard <constant>PRI</constant> constants defined
 in <code>stdint.h</code>, and expands to the correct <code>printf</code>

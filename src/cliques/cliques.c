@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2023 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -28,23 +28,23 @@
 #include "core/set.h"
 
 static igraph_error_t igraph_i_find_k_indsets(
-        igraph_integer_t size,
-        const igraph_integer_t *member_storage,
-        igraph_integer_t **new_member_storage,
-        igraph_integer_t old_count,
-        igraph_integer_t *new_count,
+        igraph_int_t size,
+        const igraph_int_t *member_storage,
+        igraph_int_t **new_member_storage,
+        igraph_int_t old_count,
+        igraph_int_t *new_count,
         igraph_lazy_adjlist_t *al) {
 
-    igraph_integer_t l, m, n, new_member_storage_size;
-    const igraph_integer_t *c1, *c2;
+    igraph_int_t l, m, n, new_member_storage_size;
+    const igraph_int_t *c1, *c2;
     const igraph_vector_int_t *neis;
-    igraph_integer_t v1, v2;
+    igraph_int_t v1, v2;
     igraph_bool_t ok;
 
     /* Allocate the storage */
     *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                          (size_t) (size * old_count),
-                                         igraph_integer_t);
+                                         igraph_int_t);
     IGRAPH_CHECK_OOM(*new_member_storage, "Insufficient memory for independent vertex sets.");
 
     new_member_storage_size = size * old_count;
@@ -53,8 +53,8 @@ static igraph_error_t igraph_i_find_k_indsets(
     m = n = 0;
 
     /* Now consider all pairs of i-1-indsets and see if they can be merged */
-    for (igraph_integer_t j = 0; j < old_count; j++) {
-        for (igraph_integer_t k = j + 1; k < old_count; k++) {
+    for (igraph_int_t j = 0; j < old_count; j++) {
+        for (igraph_int_t k = j + 1; k < old_count; k++) {
             IGRAPH_ALLOW_INTERRUPTION();
 
             /* Since indsets are represented by their vertex indices in increasing
@@ -137,7 +137,7 @@ static igraph_error_t igraph_i_find_k_indsets(
                 IGRAPH_FINALLY_CLEAN(1);
                 *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                                         (size_t) new_member_storage_size * 2,
-                                                        igraph_integer_t);
+                                                        igraph_int_t);
                 IGRAPH_CHECK_OOM(*new_member_storage, "Insufficient memory to find independent vertex sets.");
                 new_member_storage_size *= 2;
                 IGRAPH_FINALLY(igraph_free, *new_member_storage);
@@ -174,6 +174,8 @@ static igraph_error_t igraph_i_find_k_indsets(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many cliques will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_largest_cliques() and \ref igraph_clique_number().
@@ -182,9 +184,11 @@ static igraph_error_t igraph_i_find_k_indsets(
  *
  * \example examples/simple/igraph_cliques.c
  */
-igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_int_list_t *res,
-                   igraph_integer_t min_size, igraph_integer_t max_size) {
-    return igraph_i_cliquer_cliques(graph, res, min_size, max_size);
+igraph_error_t igraph_cliques(
+        const igraph_t *graph, igraph_vector_int_list_t *res,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+    return igraph_i_cliquer_cliques(graph, res, min_size, max_size, max_results);
 }
 
 
@@ -216,7 +220,7 @@ igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_int_list_t *r
  *
  */
 igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
-                            igraph_integer_t min_size, igraph_integer_t max_size) {
+                            igraph_int_t min_size, igraph_int_t max_size) {
     return igraph_i_cliquer_histogram(graph, hist, min_size, max_size);
 }
 
@@ -253,7 +257,7 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  *
  */
 igraph_error_t igraph_cliques_callback(const igraph_t *graph,
-                            igraph_integer_t min_size, igraph_integer_t max_size,
+                            igraph_int_t min_size, igraph_int_t max_size,
                             igraph_clique_handler_t *cliquehandler_fn, void *arg) {
     return igraph_i_cliquer_callback(graph, min_size, max_size, cliquehandler_fn, arg);
 }
@@ -282,11 +286,13 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  *   here to make each vertex have a weight of 1.
  * \param res Pointer to an initialized list of integer vectors. The cliques
  *   will be stored here as vectors of vertex IDs.
+ * \param maximal If true, only maximal cliques will be returned
  * \param min_weight Integer specifying the minimum weight of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_weight Integer specifying the maximum weight of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
- * \param maximal If true, only maximal cliques will be returned
+ * \param max_results At most this many cliques will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
@@ -294,15 +300,19 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * Time complexity: Exponential
  *
  */
-igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
-                            const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res,
-                            igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
+igraph_error_t igraph_weighted_cliques(
+        const igraph_t *graph, const igraph_vector_t *vertex_weights,
+        igraph_vector_int_list_t *res,
+        igraph_bool_t maximal,
+        igraph_real_t min_weight, igraph_real_t max_weight,
+        igraph_int_t max_results) {
+
     if (vertex_weights) {
-        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
+        return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal, max_results);
     } else if (maximal) {
-        return igraph_maximal_cliques(graph, res, min_weight, max_weight);
+        return igraph_maximal_cliques(graph, res, min_weight, max_weight, max_results);
     } else {
-        return igraph_cliques(graph, res, min_weight, max_weight);
+        return igraph_cliques(graph, res, min_weight, max_weight, max_results);
     }
 }
 
@@ -377,7 +387,7 @@ igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
     if (vertex_weights) {
         return igraph_i_weighted_clique_number(graph, vertex_weights, res);
     } else {
-        igraph_integer_t res_int;
+        igraph_int_t res_int;
         IGRAPH_CHECK(igraph_clique_number(graph, &res_int));
         if (res) {
             *res = res_int;
@@ -389,7 +399,7 @@ igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
 static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_integer_t *clique_number,
+        igraph_int_t *clique_number,
         igraph_bool_t keep_only_largest,
         igraph_bool_t complementer);
 
@@ -419,6 +429,8 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the sets to be
  *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many independent vertex sets will be recorded.
+ *    If negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_largest_independent_vertex_sets(),
@@ -428,15 +440,16 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * \example examples/simple/igraph_independent_sets.c
  */
-igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
-                                   igraph_vector_int_list_t *res,
-                                   igraph_integer_t min_size,
-                                   igraph_integer_t max_size) {
-    igraph_integer_t no_of_nodes;
+igraph_error_t igraph_independent_vertex_sets(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *res,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+
+    igraph_int_t no_of_nodes;
     igraph_vector_int_t *indset;
-    igraph_integer_t *member_storage, *new_member_storage, *c1;
-    igraph_vector_int_t new_member_storage_view;
-    igraph_integer_t indset_count, old_indset_count;
+    igraph_int_t *member_storage, *new_member_storage, *c1;
+    igraph_int_t indset_count, old_indset_count;
     igraph_lazy_adjlist_t al;
 
     if (igraph_is_directed(graph)) {
@@ -451,38 +464,48 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     if (max_size > no_of_nodes || max_size <= 0) {
         max_size = no_of_nodes;
     }
+    if (max_results < 0) {
+        max_results = IGRAPH_INTEGER_MAX;
+    }
 
     igraph_vector_int_list_clear(res);
+
+    /* Add size-1 indsets if requested */
+    if (min_size <= 1) {
+        igraph_int_t max_singletons_to_add =
+                (max_results > no_of_nodes) ? no_of_nodes : max_results;
+        IGRAPH_CHECK(igraph_vector_int_list_resize(res, max_singletons_to_add));
+        for (igraph_int_t i = 0; i < max_singletons_to_add; i++) {
+            indset = igraph_vector_int_list_get_ptr(res, i);
+            IGRAPH_CHECK(igraph_vector_int_push_back(indset, i));
+            --max_results;
+        }
+    }
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
 
     /* Will be resized later, if needed. */
-    member_storage = IGRAPH_CALLOC(1, igraph_integer_t);
+    member_storage = IGRAPH_CALLOC(1, igraph_int_t);
     IGRAPH_CHECK_OOM(member_storage, "Insufficient memory for independent vertex set calculation.");
     IGRAPH_FINALLY(igraph_free, member_storage);
 
     /* Find all 1-cliques: every vertex will be a clique */
-    new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(new_member_storage, "Insufficient memory for independent vertex set calculation.");
     IGRAPH_FINALLY(igraph_free, new_member_storage);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         new_member_storage[i] = i;
     }
     indset_count = no_of_nodes;
     old_indset_count = 0;
 
-    /* Add size 1 indsets if requested */
-    if (min_size <= 1) {
-        IGRAPH_CHECK(igraph_vector_int_list_resize(res, no_of_nodes));
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-            indset = igraph_vector_int_list_get_ptr(res, i);
-            IGRAPH_CHECK(igraph_vector_int_push_back(indset, i));
-        }
-    }
-
-    for (igraph_integer_t i = 2; i <= max_size && indset_count > 1; i++) {
+    for (igraph_int_t i = 2; i <= max_size && indset_count > 1; i++) {
 
         /* Here new_member_storage contains the independent vertex sets found in
            the previous iteration. Save this into member_storage, might be needed later  */
@@ -507,14 +530,20 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
         /* Add the cliques just found to the result if requested */
         if (i >= min_size && i <= max_size) {
-            for (igraph_integer_t j = 0, k = 0; j < indset_count; j++, k += i) {
-                igraph_vector_int_view(&new_member_storage_view, new_member_storage + k, i);
+            for (igraph_int_t j = 0, k = 0; j < indset_count; j++, k += i) {
+                const igraph_vector_int_t new_member_storage_view =
+                    igraph_vector_int_view(new_member_storage + k, i);
+
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &new_member_storage_view));
+                if (--max_results == 0) {
+                    goto done;
+                }
             }
         }
 
     } /* i <= max_size && clique_count != 0 */
 
+done:
     IGRAPH_FREE(new_member_storage);
     IGRAPH_FREE(member_storage);
     igraph_lazy_adjlist_destroy(&al);
@@ -555,31 +584,37 @@ igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
 }
 
 typedef struct igraph_i_max_ind_vsets_data_t {
-    igraph_integer_t matrix_size;
+    igraph_int_t matrix_size;
     igraph_adjlist_t adj_list;           /* Adjacency list of the graph */
     igraph_vector_int_t deg;             /* Degrees of individual nodes */
     igraph_set_t* buckets;               /* Bucket array */
     /* The IS value for each node. Still to be explained :) */
-    igraph_integer_t* IS;
-    igraph_integer_t largest_set_size;   /* Size of the largest set encountered */
+    igraph_int_t* IS;
+    igraph_int_t largest_set_size;       /* Size of the largest set encountered */
     igraph_bool_t keep_only_largest;     /* True if we keep only the largest sets */
+    igraph_int_t min_size, max_size;
+    igraph_int_t max_results;
 } igraph_i_max_ind_vsets_data_t;
 
 static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
         igraph_i_max_ind_vsets_data_t *clqdata,
-        igraph_integer_t level) {
+        igraph_int_t level) {
 
-    igraph_integer_t v1, v2, v3, c, j, k;
+    igraph_int_t v1, v2, v3, c, j, k;
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
-    igraph_integer_t it_state;
+    igraph_int_t it_state;
+
+    if (clqdata->max_results == 0) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_ALLOW_INTERRUPTION();
 
     if (level >= clqdata->matrix_size - 1) {
-        igraph_integer_t size = 0;
+        igraph_int_t size = 0;
 
         if (res) {
             igraph_vector_int_t vec, *newvec;
@@ -597,8 +632,11 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
              * Instead of copying the vector contents, we add an empty vector to
              * the list, then swap it with the vector to-be-added in O(1) time. */
             if (!clqdata->keep_only_largest) {
-                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
-                igraph_vector_int_swap(newvec, &vec);
+                if (clqdata->min_size <= size && size <= clqdata->max_size) {
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                    igraph_vector_int_swap(newvec, &vec);
+                    if (clqdata->max_results >= 0) --(clqdata->max_results);
+                }
             } else {
                 if (size > clqdata->largest_set_size) {
                     /* We are keeping only the largest sets, and we've found one that's
@@ -721,7 +759,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
  * Should probably be replaced with a proper igraph_vector_ptr_t.
  */
 static void free_set_array_incomplete(igraph_set_t *array) {
-    igraph_integer_t i = 0;
+    igraph_int_t i = 0;
     while (igraph_set_inited(array + i)) {
         igraph_set_destroy(array + i);
         i++;
@@ -729,8 +767,8 @@ static void free_set_array_incomplete(igraph_set_t *array) {
     IGRAPH_FREE(array);
 }
 
-static void free_set_array(igraph_set_t *array, igraph_integer_t n) {
-    for (igraph_integer_t i=0; i < n; i++) {
+static void free_set_array(igraph_set_t *array, igraph_int_t n) {
+    for (igraph_int_t i=0; i < n; i++) {
         igraph_set_destroy(&array[i]);
     }
     IGRAPH_FREE(array);
@@ -762,6 +800,12 @@ static void free_set_array(igraph_set_t *array, igraph_integer_t n) {
  * \param graph The input graph.
  * \param res Pointer to an initialized list of integer vectors. The cliques
  *   will be stored here as vectors of vertex IDs.
+ * \param min_size Integer specifying the minimum size of the sets to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer specifying the maximum size of the sets to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \param max_results At most this many independent vertex sets will be recorded.
+ *    If negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques(), \ref
@@ -769,10 +813,14 @@ static void free_set_array(igraph_set_t *array, igraph_integer_t n) {
  *
  * Time complexity: TODO.
  */
-igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
-        igraph_vector_int_list_t *res) {
+igraph_error_t igraph_maximal_independent_vertex_sets(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *res,
+        igraph_int_t min_size, igraph_int_t max_size,
+        igraph_int_t max_results) {
+
     igraph_i_max_ind_vsets_data_t clqdata;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
         IGRAPH_WARNING("Edge directions are ignored during independent vertex set calculations.");
@@ -781,17 +829,29 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = false;
 
+    if (max_size <= 0) {
+        max_size = IGRAPH_INTEGER_MAX;
+    }
+
+    if (max_results < 0) {
+        max_results = IGRAPH_INTEGER_MAX;
+    }
+
+    clqdata.min_size = min_size;
+    clqdata.max_size = max_size;
+    clqdata.max_results = max_results;
+
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(clqdata.IS, "Insufficient memory for maximal independent vertex sets.");
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
@@ -799,7 +859,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     IGRAPH_CHECK_OOM(clqdata.buckets, "Insufficient memory for maximal independent vertex sets.");
     IGRAPH_FINALLY(free_set_array_incomplete, clqdata.buckets);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
     }
 
@@ -836,16 +896,16 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
  *
  * \param graph The input graph.
  * \param no The independence number will be returned to the \c
- *   igraph_integer_t pointed by this variable.
+ *   igraph_int_t pointed by this variable.
  * \return Error code.
  *
  * \sa \ref igraph_independent_vertex_sets().
  *
  * Time complexity: TODO.
  */
-igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
+igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_int_t *no) {
     igraph_i_max_ind_vsets_data_t clqdata;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
         IGRAPH_WARNING("Edge directions are ignored during independence number calculations.");
@@ -853,18 +913,19 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = false;
+    clqdata.max_results = IGRAPH_INTEGER_MAX;
 
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(clqdata.IS, "Insufficient memory for independence number calculation.");
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
@@ -872,7 +933,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     IGRAPH_CHECK_OOM(clqdata.buckets, "Insufficient memory for independence number calculation.");
     IGRAPH_FINALLY(free_set_array_incomplete, clqdata.buckets);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
     }
 
@@ -896,7 +957,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
 /*************************************************************************/
 
 static igraph_error_t igraph_i_maximal_cliques_store_max_size(const igraph_vector_int_t* clique, void* data) {
-    igraph_integer_t* result = (igraph_integer_t*)data;
+    igraph_int_t* result = (igraph_int_t*)data;
     if (*result < igraph_vector_int_size(clique)) {
         *result = igraph_vector_int_size(clique);
     }
@@ -905,7 +966,7 @@ static igraph_error_t igraph_i_maximal_cliques_store_max_size(const igraph_vecto
 
 static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* clique, void* data) {
     igraph_vector_int_list_t* result = (igraph_vector_int_list_t*)data;
-    igraph_integer_t n;
+    igraph_int_t n;
 
     /* Is the current clique at least as large as the others that we have found? */
     if (!igraph_vector_int_list_empty(result)) {
@@ -961,7 +1022,7 @@ static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* 
 
 igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_list_t *res) {
     igraph_vector_int_list_clear(res);
-    IGRAPH_CHECK(igraph_maximal_cliques_callback(graph, &igraph_i_largest_cliques_store, (void*)res, 0, 0));
+    IGRAPH_CHECK(igraph_maximal_cliques_callback(graph, 0, 0, &igraph_i_largest_cliques_store, (void *) res));
     return IGRAPH_SUCCESS;
 }
 
@@ -977,7 +1038,7 @@ igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_l
  * track of the size of the largest clique that was found.
  *
  * \param graph The input graph.
- * \param no The clique number will be returned to the \c igraph_integer_t
+ * \param no The clique number will be returned to the \c igraph_int_t
  *   pointed by this variable.
  * \return Error code.
  *
@@ -985,19 +1046,19 @@ igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_l
  *
  * Time complexity: O(3^(|V|/3)) worst case.
  */
-igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
+igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_int_t *no) {
     *no = 0;
-    return igraph_maximal_cliques_callback(graph, &igraph_i_maximal_cliques_store_max_size, (void*)no, 0, 0);
+    return igraph_maximal_cliques_callback(graph, 0, 0, &igraph_i_maximal_cliques_store_max_size, (void *) no);
 }
 
 static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
         igraph_vector_int_list_t *res,
-        igraph_integer_t *clique_number,
+        igraph_int_t *clique_number,
         igraph_bool_t keep_only_largest,
         igraph_bool_t complementer) {
 
     igraph_i_max_ind_vsets_data_t clqdata;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
         IGRAPH_WARNING("Edge directions are ignored for largest independent vertex set or clique calculations.");
@@ -1005,6 +1066,9 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
 
     clqdata.matrix_size = no_of_nodes;
     clqdata.keep_only_largest = keep_only_largest;
+    clqdata.min_size = 0;
+    clqdata.max_size = IGRAPH_INTEGER_MAX;
+    clqdata.max_results = IGRAPH_INTEGER_MAX;
 
     if (complementer) {
         IGRAPH_CHECK(igraph_adjlist_init_complementer(graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_NO_LOOPS));
@@ -1015,12 +1079,12 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     }
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     IGRAPH_CHECK_OOM(clqdata.IS, "Insufficient memory for largest independent sets or cliques.");
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
@@ -1028,7 +1092,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     IGRAPH_CHECK_OOM(clqdata.buckets, "Insufficient memory for largest independent sets or cliques.");
     IGRAPH_FINALLY(free_set_array_incomplete, clqdata.buckets);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
     }
 

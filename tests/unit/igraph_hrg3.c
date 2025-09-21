@@ -1,6 +1,6 @@
 /* -*- mode: C++ -*-  */
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -30,7 +30,7 @@ int main(void) {
     igraph_t karate;
     igraph_vector_int_t edges;
     igraph_vector_t prob;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

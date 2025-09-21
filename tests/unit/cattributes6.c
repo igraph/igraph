@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -34,7 +34,7 @@ static void check_vector_queries(const igraph_t *g) {
     igraph_vector_bool_t bvec;
     igraph_strvector_t vnames, enames;
     igraph_vector_int_t vtypes, etypes;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     igraph_vector_int_init(&vtypes, 0);
     igraph_vector_int_init(&etypes, 0);
@@ -122,7 +122,7 @@ int main(void) {
 
     igraph_t g, g2;
     FILE *ifile;
-    igraph_integer_t i;
+    igraph_int_t i;
     igraph_vector_t y;
     igraph_strvector_t name;
     igraph_vector_bool_t type;

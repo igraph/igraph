@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ int main(void) {
 #define N 10000000
 
     igraph_vector_int_resize(&vec, N);
-    for (igraph_integer_t i=0; i < N; i++) {
+    for (igraph_int_t i=0; i < N; i++) {
         VECTOR(vec)[i] = RNG_INTEGER(0, N-1);
     }
     BENCH("Sort vector of length " IGRAPH_I_STRINGIFY(N), igraph_vector_int_sort(&vec));
@@ -43,7 +43,7 @@ int main(void) {
 #define N 1000000
 
     igraph_vector_int_resize(&vec, N);
-    for (igraph_integer_t i=0; i < N; i++) {
+    for (igraph_int_t i=0; i < N; i++) {
         VECTOR(vec)[i] = RNG_INTEGER(0, N-1);
     }
     BENCH("Sort vector of length " IGRAPH_I_STRINGIFY(N), igraph_vector_int_sort(&vec));
@@ -52,7 +52,7 @@ int main(void) {
 #define N 100000
 
     igraph_vector_int_resize(&vec, N);
-    for (igraph_integer_t i=0; i < N; i++) {
+    for (igraph_int_t i=0; i < N; i++) {
         VECTOR(vec)[i] = RNG_INTEGER(0, N-1);
     }
     BENCH("Sort vector of length " IGRAPH_I_STRINGIFY(N), igraph_vector_int_sort(&vec));

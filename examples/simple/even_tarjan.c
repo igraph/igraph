@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -26,12 +26,13 @@
 int main(void) {
 
     igraph_t g, gbar;
-    igraph_integer_t k1, k2 = INT_MAX;
+    igraph_int_t k1, k2 = INT_MAX;
     igraph_real_t tmpk;
-    igraph_integer_t i, j, n;
+    igraph_int_t i, j, n;
     igraph_maxflow_stats_t stats;
 
-    /* --------------------------------------------------- */
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_famous(&g, "meredith");
     igraph_even_tarjan_reduction(&g, &gbar, /*capacity=*/ NULL);

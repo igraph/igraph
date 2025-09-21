@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
-                    igraph_integer_t sample_size, igraph_vector_int_t *parsample) {
+                    igraph_int_t sample_size, igraph_vector_int_t *parsample) {
     igraph_real_t estimate;
     IGRAPH_ASSERT(igraph_motifs_randesu_estimate(graph, &estimate, size, cut_prob, sample_size, parsample) == IGRAPH_SUCCESS);
     printf("Estimate: %g\n\n", estimate);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
     igraph_matrix_int_t merges;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_matrix_int_init(&merges, 0, 0);
     igraph_vector_init_int(&weights, 8, 10, 10, 1, 1, 1, 1, 1, 1);

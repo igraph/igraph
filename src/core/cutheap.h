@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -34,18 +34,18 @@ typedef struct igraph_i_cutheap_t {
     igraph_vector_t heap;
     igraph_vector_int_t index;
     igraph_vector_t hptr;
-    igraph_integer_t dnodes;
+    igraph_int_t dnodes;
 } igraph_i_cutheap_t;
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_int_t nodes);
 IGRAPH_PRIVATE_EXPORT void igraph_i_cutheap_destroy(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_cutheap_empty(igraph_i_cutheap_t *ch);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch);
 IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch);
-IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
-IGRAPH_PRIVATE_EXPORT void igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index, igraph_real_t add);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_integer_t vertex);
+IGRAPH_PRIVATE_EXPORT igraph_int_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
+IGRAPH_PRIVATE_EXPORT void igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_int_t index, igraph_real_t add);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_int_t vertex);
 
 IGRAPH_END_C_DECLS
 

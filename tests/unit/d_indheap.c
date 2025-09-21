@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -29,7 +29,7 @@
 int main(void) {
 
     igraph_d_indheap_t h;
-    igraph_integer_t idx1, idx2;
+    igraph_int_t idx1, idx2;
 
     /* igraph_d_indheap_init, igraph_d_indheap_destroy */
     igraph_d_indheap_init(&h, 0);
@@ -67,8 +67,8 @@ int main(void) {
 
     /* igraph_d_indheap_max, igraph_d_indheap_delete_max */
     while (!igraph_d_indheap_empty(&h)) {
-        printf("% " IGRAPH_PRId , (igraph_integer_t)igraph_d_indheap_max(&h));
-        printf("% " IGRAPH_PRId "\n", (igraph_integer_t)igraph_d_indheap_delete_max(&h));
+        printf("% " IGRAPH_PRId , (igraph_int_t)igraph_d_indheap_max(&h));
+        printf("% " IGRAPH_PRId "\n", (igraph_int_t)igraph_d_indheap_delete_max(&h));
     }
 
     /* igraph_d_indheap_reserve */

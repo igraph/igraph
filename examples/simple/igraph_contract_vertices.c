@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -66,8 +66,11 @@ igraph_error_t condensation(const igraph_t *graph, igraph_t *cond) {
 int main(void) {
     igraph_t graph, cond;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a random directed graph with mean degree 2 and compute its condensation. */
-    igraph_erdos_renyi_game_gnm(&graph, 100, 200, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 100, 200, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     condensation(&graph, &cond);
 
     printf("Number of vertices in the condensation: %" IGRAPH_PRId "\n", igraph_vcount(&cond));

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -51,8 +51,8 @@ igraph_error_t igraph_convex_hull_2d(
         igraph_vector_int_t *resverts,
         igraph_matrix_t *rescoords)
 {
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
+    igraph_int_t no_of_nodes;
+    igraph_int_t i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
     igraph_vector_t angles;
     igraph_vector_int_t order, stack;
     igraph_real_t px, py, cp;

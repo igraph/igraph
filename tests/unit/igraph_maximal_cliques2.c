@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -25,7 +25,7 @@
 #include "test_utilities.h"
 
 void sort_cliques(igraph_vector_int_list_t *cliques) {
-    igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
+    igraph_int_t i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(cliques, i));
     }
@@ -41,7 +41,7 @@ void print_and_destroy(igraph_vector_int_list_t *cliques) {
 int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t cliques;
-    igraph_integer_t no;
+    igraph_int_t no;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -49,8 +49,9 @@ int main(void) {
                 /*mutual=*/ 0, /*circular=*/ 1);
     igraph_vector_int_list_init(&cliques, 0);
 
-    igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 0,
-                           /*max_size=*/ 0);
+    igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ IGRAPH_UNLIMITED,
+                           /*max_size=*/ IGRAPH_UNLIMITED,
+                           IGRAPH_UNLIMITED);
     igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 0,
                                  /*max_size=*/ 0 /*no limit*/);
     IGRAPH_ASSERT(no == igraph_vector_int_list_size(&cliques));
@@ -61,12 +62,13 @@ int main(void) {
     printf("---\n");
     /* ----------------------------------------------------------- */
 
-    igraph_erdos_renyi_game_gnp(&graph, 50, 0.5, /*directed=*/ 0, /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&graph, 50, 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     igraph_vector_int_list_init(&cliques, 0);
 
     igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 8,
-                           /*max_size=*/ 0);
+                           /*max_size=*/ IGRAPH_UNLIMITED,
+                           IGRAPH_UNLIMITED);
     igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 8,
                                  /*max_size=*/ 0 /*no limit*/);
     IGRAPH_ASSERT(no == igraph_vector_int_list_size(&cliques));

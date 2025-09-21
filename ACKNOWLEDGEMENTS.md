@@ -272,7 +272,7 @@ License: [BSD license][bsd]
 
 Qhull, Copyright (c) 1993-2020
 
-C.B. Barber, Arlington, MA 
+C.B. Barber, Arlington, MA
 
 and
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ int main(void) {
 #define N 6000
 #define M 2000000
 
-    igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_init(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
@@ -119,7 +119,7 @@ int main(void) {
 #define N 1000000
 #define M 10000000
 
-    igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_init(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
@@ -158,7 +158,7 @@ int main(void) {
 
     printf("\n");
 
-    igraph_erdos_renyi_game_gnm(&g, 500, 2000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 500, 2000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_resize(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
@@ -203,7 +203,7 @@ int main(void) {
 
     printf("\n");
 
-    igraph_erdos_renyi_game_gnm(&g, 50, 300, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 50, 300, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_resize(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 

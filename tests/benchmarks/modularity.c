@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ void run_bench(int n) {
 
     igraph_matrix_init(&modmat, n, n);
 
-    igraph_erdos_renyi_game_gnm(&graph, n, 10*n, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, n, 10 * n, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "G(n,m),   directed, n = %5d, m = %7" IGRAPH_PRId ", %dx", n, igraph_ecount(&graph), rep);
@@ -43,7 +43,7 @@ void run_bench(int n) {
 
     igraph_destroy(&graph);
 
-    igraph_erdos_renyi_game_gnp(&graph, n, 0.1, IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnp(&graph, n, 0.1, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW, IGRAPH_EDGE_UNLABELED);
 
     snprintf(msg, sizeof(msg) / sizeof(msg[0]),
              "G(n,p),   directed, n = %5d, m = %7" IGRAPH_PRId ", %dx", n, igraph_ecount(&graph), rep);

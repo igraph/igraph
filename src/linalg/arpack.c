@@ -1,6 +1,6 @@
 /* vim:set ts=4 sw=4 sts=4 noet: */
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -183,8 +183,8 @@ igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
  * Time complexity: O(maxncv*(maxldv+maxn)).
  */
 
-igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
-                               igraph_integer_t maxncv, igraph_integer_t maxldv,
+igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_int_t maxn,
+                               igraph_int_t maxncv, igraph_int_t maxldv,
                                igraph_bool_t symm) {
 
     /* TODO: check arguments */
@@ -1406,12 +1406,12 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  */
 
 igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                 igraph_integer_t nev) {
+                                 igraph_int_t nev) {
 
-    igraph_integer_t nodes = igraph_matrix_nrow(vectors);
-    igraph_integer_t no_evs = igraph_matrix_nrow(values);
-    igraph_integer_t i, j;
-    igraph_integer_t new_vector_pos, vector_pos;
+    igraph_int_t nodes = igraph_matrix_nrow(vectors);
+    igraph_int_t no_evs = igraph_matrix_nrow(values);
+    igraph_int_t i, j;
+    igraph_int_t new_vector_pos, vector_pos;
     igraph_matrix_t new_vectors;
 
     /* Error checks */

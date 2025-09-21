@@ -1,5 +1,5 @@
 /*
-  IGraph library.
+  igraph library.
   Copyright (C) 2024 The igraph development team <igraph@igraph.org>
 
   This program is free software; you can redistribute it and/or modify it under
@@ -42,9 +42,9 @@
 
 igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
-    igraph_integer_t complete_ecount;
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
+    igraph_int_t complete_ecount;
     igraph_bool_t simple, directed = igraph_is_directed(graph);
     igraph_vector_int_t neighbours;
     int iter = 0;
@@ -127,7 +127,7 @@ igraph_error_t igraph_is_complete(const igraph_t *graph, igraph_bool_t *res) {
     /* Allocate memory for vector of size v */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbours, vcount);
 
-    for (igraph_integer_t i = 0; i < vcount; ++i) {
+    for (igraph_int_t i = 0; i < vcount; ++i) {
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 8);
 
         IGRAPH_CHECK(igraph_neighbors(
@@ -160,7 +160,7 @@ static igraph_error_t is_clique(const igraph_t *graph, igraph_vs_t candidate,
                                 igraph_bool_t directed, igraph_bool_t *res,
                                 igraph_bool_t independent_set) {
     igraph_vector_int_t vids;
-    igraph_integer_t n; /* clique size */
+    igraph_int_t n; /* clique size */
     igraph_bool_t result = true; /* be optimistic */
     int iter = 0;
 
@@ -172,14 +172,14 @@ static igraph_error_t is_clique(const igraph_t *graph, igraph_vs_t candidate,
 
     n = igraph_vector_int_size(&vids);
 
-    for (igraph_integer_t i = 0; i < n; i++) {
-        igraph_integer_t u = VECTOR(vids)[i];
-        for (igraph_integer_t j = directed ? 0 : i+1; j < n; j++) {
-            igraph_integer_t v = VECTOR(vids)[j];
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_int_t u = VECTOR(vids)[i];
+        for (igraph_int_t j = directed ? 0 : i+1; j < n; j++) {
+            igraph_int_t v = VECTOR(vids)[j];
             /* Compare u and v for equality instead of i and j in case
              * the vertex list contained duplicates. */
             if (u != v) {
-                igraph_integer_t eid;
+                igraph_int_t eid;
                 IGRAPH_CHECK(igraph_get_eid(graph, &eid, u, v, directed, false));
                 if (independent_set) {
                     if (eid != -1) {
@@ -269,7 +269,7 @@ igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs
 
     /* Note: igraph_count_loops() already makes use of the cache. */
     if (igraph_vs_is_all(&candidate)) {
-        igraph_integer_t loop_count;
+        igraph_int_t loop_count;
         igraph_count_loops(graph, &loop_count);
         *res = (igraph_ecount(graph) - loop_count) == 0;
         return IGRAPH_SUCCESS;

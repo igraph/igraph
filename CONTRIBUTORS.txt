@@ -74,6 +74,11 @@ Lucas Lopes Felipe (@lucaslopes)
 Sarah Rashidi (@its-serah)
 Zara Zong (@minifinity)
 Arnór Friðriksson (@Zepeacedust)
+Varun Rajesh (@VRajesh7649)
+Steve Sajeev (@stevesajeev1)
+Rohith Sudheer (@RohithS98)
+Grisha (@GrishaVar)
+Michael Antonov (@Antonov548)
 
 This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
 

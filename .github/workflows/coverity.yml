@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v5
       with:
         fetch-depth: 0
-        ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref_name }}
+        ref: ${{ github.event_name == 'schedule' && 'main' || github.ref_name }}
 
     - name: Create build environment
       run: cmake -E make_directory ${{github.workspace}}/build

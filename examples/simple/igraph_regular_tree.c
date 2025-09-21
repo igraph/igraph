@@ -6,6 +6,9 @@ int main(void) {
     igraph_vector_t eccentricity;
     igraph_bool_t is_tree;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a Bethe lattice with 5 levels, i.e. height 4. */
     igraph_regular_tree(&tree, 4, 3, IGRAPH_TREE_UNDIRECTED);
 

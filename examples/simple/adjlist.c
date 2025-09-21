@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -23,10 +23,12 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g, g2;
     igraph_adjlist_t adjlist;
     igraph_bool_t iso;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create a directed out-tree, convert it into an adjacency list
      * representation, then reconstruct the graph from the tree and check

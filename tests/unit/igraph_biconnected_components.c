@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@ int main(void) {
     igraph_t g;
     igraph_vector_int_list_t result;
     igraph_vector_int_t ap;
-    igraph_integer_t no;
+    igraph_int_t no;
 
     igraph_vector_int_list_init(&result, 0);
     igraph_vector_int_init(&ap, 0);

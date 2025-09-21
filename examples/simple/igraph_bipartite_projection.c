@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,9 @@ int main(void) {
     igraph_t g, p1, p2;
     igraph_vector_bool_t types;
     igraph_vector_int_t mult1, mult2;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_int_init(&mult1, 0);
     igraph_vector_int_init(&mult2, 0);

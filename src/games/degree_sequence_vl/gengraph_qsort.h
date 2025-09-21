@@ -30,8 +30,8 @@ namespace gengraph {
 
 //___________________________________________________________________________
 // check if every element is zero
-inline bool check_zero(igraph_integer_t *mem, igraph_integer_t n) {
-    for (igraph_integer_t *v = mem + n; v != mem; ) {
+inline bool check_zero(igraph_int_t *mem, igraph_int_t n) {
+    for (igraph_int_t *v = mem + n; v != mem; ) {
         if (*(--v) != 0) {
             return false;
         }
@@ -42,7 +42,7 @@ inline bool check_zero(igraph_integer_t *mem, igraph_integer_t n) {
 //___________________________________________________________________________
 //  Sort simple integer arrays in ASCENDING order
 //___________________________________________________________________________
-inline igraph_integer_t med3(igraph_integer_t a, igraph_integer_t b, igraph_integer_t c) {
+inline igraph_int_t med3(igraph_int_t a, igraph_int_t b, igraph_int_t c) {
     if (a < b) {
         if (c < b) {
             return (a < c) ? c : a;
@@ -58,13 +58,13 @@ inline igraph_integer_t med3(igraph_integer_t a, igraph_integer_t b, igraph_inte
     }
 }
 
-inline void isort(igraph_integer_t *v, igraph_integer_t t) {
+inline void isort(igraph_int_t *v, igraph_int_t t) {
     if (t < 2) {
         return;
     }
-    for (igraph_integer_t i = 1; i < t; i++) {
-        igraph_integer_t *w = v + i;
-        igraph_integer_t tmp = *w;
+    for (igraph_int_t i = 1; i < t; i++) {
+        igraph_int_t *w = v + i;
+        igraph_int_t tmp = *w;
         while (w != v && *(w - 1) > tmp) {
             *w = *(w - 1);
             w--;
@@ -73,9 +73,9 @@ inline void isort(igraph_integer_t *v, igraph_integer_t t) {
     }
 }
 
-inline igraph_integer_t partitionne(igraph_integer_t *v, igraph_integer_t t, igraph_integer_t p) {
-    igraph_integer_t i = 0;
-    igraph_integer_t j = t - 1;
+inline igraph_int_t partitionne(igraph_int_t *v, igraph_int_t t, igraph_int_t p) {
+    igraph_int_t i = 0;
+    igraph_int_t j = t - 1;
     while (i < j) {
         while (i <= j && v[i] < p) {
             i++;
@@ -84,7 +84,7 @@ inline igraph_integer_t partitionne(igraph_integer_t *v, igraph_integer_t t, igr
             j--;
         }
         if (i < j) {
-            igraph_integer_t tmp = v[i];
+            igraph_int_t tmp = v[i];
             v[i++] = v[j];
             v[j--] = tmp;
         }
@@ -96,22 +96,22 @@ inline igraph_integer_t partitionne(igraph_integer_t *v, igraph_integer_t t, igr
     return i;
 }
 
-inline void qsort(igraph_integer_t *v, igraph_integer_t t) {
+inline void qsort(igraph_int_t *v, igraph_int_t t) {
     if (t < 15) {
         isort(v, t);
     } else {
-        igraph_integer_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
+        igraph_int_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
         qsort(v, x);
         qsort(v + x, t - x);
     }
 }
 
-inline igraph_integer_t qsort_median(igraph_integer_t *v, igraph_integer_t t, igraph_integer_t pos) {
+inline igraph_int_t qsort_median(igraph_int_t *v, igraph_int_t t, igraph_int_t pos) {
     if (t < 10) {
         isort(v, t);
         return v[pos];
     }
-    igraph_integer_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
+    igraph_int_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
     if (pos < x) {
         return qsort_median(v, x, pos);
     } else {
@@ -119,7 +119,7 @@ inline igraph_integer_t qsort_median(igraph_integer_t *v, igraph_integer_t t, ig
     }
 }
 
-inline igraph_integer_t qsort_median(igraph_integer_t *v, igraph_integer_t t) {
+inline igraph_int_t qsort_median(igraph_int_t *v, igraph_int_t t) {
     return qsort_median(v, t, t / 2);
 }
 
@@ -142,11 +142,11 @@ inline double med3(double a, double b, double c) {
     }
 }
 
-inline void isort(double *v, igraph_integer_t t) {
+inline void isort(double *v, igraph_int_t t) {
     if (t < 2) {
         return;
     }
-    for (igraph_integer_t i = 1; i < t; i++) {
+    for (igraph_int_t i = 1; i < t; i++) {
         double *w = v + i;
         double tmp = *w;
         while (w != v && *(w - 1) > tmp) {
@@ -157,9 +157,9 @@ inline void isort(double *v, igraph_integer_t t) {
     }
 }
 
-inline igraph_integer_t partitionne(double *v, igraph_integer_t t, double p) {
-    igraph_integer_t i = 0;
-    igraph_integer_t j = t - 1;
+inline igraph_int_t partitionne(double *v, igraph_int_t t, double p) {
+    igraph_int_t i = 0;
+    igraph_int_t j = t - 1;
     while (i < j) {
         while (i <= j && v[i] < p) {
             i++;
@@ -180,22 +180,22 @@ inline igraph_integer_t partitionne(double *v, igraph_integer_t t, double p) {
     return i;
 }
 
-inline void qsort(double *v, igraph_integer_t t) {
+inline void qsort(double *v, igraph_int_t t) {
     if (t < 15) {
         isort(v, t);
     } else {
-        igraph_integer_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
+        igraph_int_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
         qsort(v, x);
         qsort(v + x, t - x);
     }
 }
 
-inline double qsort_median(double *v, igraph_integer_t t, igraph_integer_t pos) {
+inline double qsort_median(double *v, igraph_int_t t, igraph_int_t pos) {
     if (t < 10) {
         isort(v, t);
         return v[pos];
     }
-    igraph_integer_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
+    igraph_int_t x = partitionne(v, t, med3(v[t >> 1], v[(t >> 2) + 2], v[t - (t >> 1) - 2]));
     if (pos < x) {
         return qsort_median(v, x, pos);
     } else {
@@ -203,20 +203,20 @@ inline double qsort_median(double *v, igraph_integer_t t, igraph_integer_t pos) 
     }
 }
 
-inline double qsort_median(double *v, igraph_integer_t t) {
+inline double qsort_median(double *v, igraph_int_t t) {
     return qsort_median(v, t, t / 2);
 }
 
 //___________________________________________________________________________
 // Sort integer arrays according to value stored in mem[], in ASCENDING order
-inline void isort(igraph_integer_t *mem, igraph_integer_t *v, igraph_integer_t t) {
+inline void isort(igraph_int_t *mem, igraph_int_t *v, igraph_int_t t) {
     if (t < 2) {
         return;
     }
-    for (igraph_integer_t i = 1; i < t; i++) {
-        igraph_integer_t vtmp = v[i];
-        igraph_integer_t tmp = mem[vtmp];
-        igraph_integer_t j;
+    for (igraph_int_t i = 1; i < t; i++) {
+        igraph_int_t vtmp = v[i];
+        igraph_int_t tmp = mem[vtmp];
+        igraph_int_t j;
         for (j = i; j > 0 && tmp < mem[v[j - 1]]; j--) {
             v[j] = v[j - 1];
         }
@@ -224,13 +224,13 @@ inline void isort(igraph_integer_t *mem, igraph_integer_t *v, igraph_integer_t t
     }
 }
 
-inline void qsort(igraph_integer_t *mem, igraph_integer_t *v, igraph_integer_t t) {
+inline void qsort(igraph_int_t *mem, igraph_int_t *v, igraph_int_t t) {
     if (t < 15) {
         isort(mem, v, t);
     } else {
-        igraph_integer_t p = med3(mem[v[t >> 1]], mem[v[(t >> 2) + 3]], mem[v[t - (t >> 1) - 3]]);
-        igraph_integer_t i = 0;
-        igraph_integer_t j = t - 1;
+        igraph_int_t p = med3(mem[v[t >> 1]], mem[v[(t >> 2) + 3]], mem[v[t - (t >> 1) - 3]]);
+        igraph_int_t i = 0;
+        igraph_int_t j = t - 1;
         while (i < j) {
             while (i <= j && mem[v[i]] < p) {
                 i++;
@@ -239,7 +239,7 @@ inline void qsort(igraph_integer_t *mem, igraph_integer_t *v, igraph_integer_t t
                 j--;
             }
             if (i < j) {
-                igraph_integer_t tmp = v[i];
+                igraph_int_t tmp = v[i];
                 v[i++] = v[j];
                 v[j--] = tmp;
             }
@@ -254,13 +254,13 @@ inline void qsort(igraph_integer_t *mem, igraph_integer_t *v, igraph_integer_t t
 }
 
 //Box-Sort 1..n according to value stored in mem[], in DESCENDING order.
-inline igraph_integer_t *pre_boxsort(igraph_integer_t *mem, igraph_integer_t n, igraph_integer_t &offset) {
-    igraph_integer_t *yo;
+inline igraph_int_t *pre_boxsort(igraph_int_t *mem, igraph_int_t n, igraph_int_t &offset) {
+    igraph_int_t *yo;
     // maximum and minimum
-    igraph_integer_t mx = mem[0];
-    igraph_integer_t mn = mem[0];
+    igraph_int_t mx = mem[0];
+    igraph_int_t mn = mem[0];
     for (yo = mem + n - 1; yo != mem; yo--) {
-        igraph_integer_t x = *yo;
+        igraph_int_t x = *yo;
         if (x > mx) {
             mx = x;
         }
@@ -269,12 +269,12 @@ inline igraph_integer_t *pre_boxsort(igraph_integer_t *mem, igraph_integer_t n, 
         }
     }
     // box
-    igraph_integer_t c = mx - mn + 1;
-    igraph_integer_t *box = new igraph_integer_t[c];
+    igraph_int_t c = mx - mn + 1;
+    igraph_int_t *box = new igraph_int_t[c];
     for (yo = box + c; yo != box; * (--yo) = 0) { }
     for (yo = mem + n; yo != mem; box[*(--yo) - mn]++) { }
     // cumul sum
-    igraph_integer_t sum = 0;
+    igraph_int_t sum = 0;
     for (yo = box + c; yo != box; ) {
         sum += *(--yo);
         *yo = sum;
@@ -283,16 +283,16 @@ inline igraph_integer_t *pre_boxsort(igraph_integer_t *mem, igraph_integer_t n, 
     return box;
 }
 
-inline igraph_integer_t *boxsort(igraph_integer_t *mem, igraph_integer_t n, igraph_integer_t *buff = NULL) {
-    igraph_integer_t i;
+inline igraph_int_t *boxsort(igraph_int_t *mem, igraph_int_t n, igraph_int_t *buff = NULL) {
+    igraph_int_t i;
     if (n <= 0) {
         return buff;
     }
-    igraph_integer_t offset = 0;
-    igraph_integer_t *box = pre_boxsort(mem, n, offset);
+    igraph_int_t offset = 0;
+    igraph_int_t *box = pre_boxsort(mem, n, offset);
     // sort
     if (buff == NULL) {
-        buff = new igraph_integer_t[n];
+        buff = new igraph_int_t[n];
     }
     for (i = 0; i < n; i++) {
         buff[--box[mem[i] - offset]] = i;

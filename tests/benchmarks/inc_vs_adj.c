@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,16 +21,16 @@
 #include "bench.h"
 
 typedef struct igraph_incadjlist_inter_t {
-    igraph_integer_t length;
+    igraph_int_t length;
     igraph_vector_int_t *incadjs;
 } igraph_incadjlist_inter_t;
 
-#define igraph_incadjlist_inter_get(il,no) (&(il)->incadjs[(igraph_integer_t)(no)])
-#define igraph_incadjlist_sep_get_inc(il,no) (&(il)->incs[(igraph_integer_t)(no)])
-#define igraph_incadjlist_sep_get_adj(il,no) (&(il)->adjs[(igraph_integer_t)(no)])
+#define igraph_incadjlist_inter_get(il,no) (&(il)->incadjs[(igraph_int_t)(no)])
+#define igraph_incadjlist_sep_get_inc(il,no) (&(il)->incs[(igraph_int_t)(no)])
+#define igraph_incadjlist_sep_get_adj(il,no) (&(il)->adjs[(igraph_int_t)(no)])
 
 void igraph_incadjlist_inter_destroy(igraph_incadjlist_inter_t *il) {
-    igraph_integer_t i;
+    igraph_int_t i;
     for (i = 0; i < il->length; i++) {
         /* This works if some igraph_vector_int_t's contain NULL,
            because igraph_vector_int_destroy can handle this. */
@@ -42,7 +42,7 @@ void igraph_incadjlist_inter_destroy(igraph_incadjlist_inter_t *il) {
 igraph_error_t igraph_incadjlist_inter_init(const igraph_t *graph,
                         igraph_incadjlist_inter_t *il,
                         igraph_neimode_t mode) {
-    igraph_integer_t i, j, n;
+    igraph_int_t i, j, n;
     igraph_vector_int_t tmp;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
@@ -86,13 +86,13 @@ igraph_error_t igraph_incadjlist_inter_init(const igraph_t *graph,
 
 
 typedef struct igraph_incadjlist_sep_t {
-    igraph_integer_t length;
+    igraph_int_t length;
     igraph_vector_int_t *incs;
     igraph_vector_int_t *adjs;
 } igraph_incadjlist_sep_t;
 
 void igraph_incadjlist_sep_destroy(igraph_incadjlist_sep_t *il) {
-    igraph_integer_t i;
+    igraph_int_t i;
     for (i = 0; i < il->length; i++) {
         /* This works if some igraph_vector_int_t's contain NULL,
            because igraph_vector_int_destroy can handle this. */
@@ -106,7 +106,7 @@ void igraph_incadjlist_sep_destroy(igraph_incadjlist_sep_t *il) {
 igraph_error_t igraph_incadjlist_sep_init(const igraph_t *graph,
                         igraph_incadjlist_sep_t *il,
                         igraph_neimode_t mode) {
-    igraph_integer_t i, j, n;
+    igraph_int_t i, j, n;
     igraph_vector_int_t tmp;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
@@ -161,22 +161,22 @@ igraph_error_t igraph_incadjlist_sep_init(const igraph_t *graph,
  * from optimizing away the entire side-effects-free function. We use XOR
  * instead of e.g. addition in order to prevent triggering undefined behaviour. */
 
-igraph_integer_t test_direct(igraph_t *g)
+igraph_int_t test_direct(igraph_t *g)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
-    igraph_integer_t ecount = igraph_ecount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
+    igraph_int_t ecount = igraph_ecount(g);
 
-    igraph_integer_t ei = 0;
-    igraph_integer_t eo = 0;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    igraph_int_t ei = 0;
+    igraph_int_t eo = 0;
+    for (igraph_int_t i = 0; i < vcount; i++) {
         while (ei < ecount && VECTOR(g->from)[VECTOR(g->oi)[ei]] == i) {
-            igraph_integer_t neighbor = VECTOR(g->to)[VECTOR(g->oi)[ei]];
+            igraph_int_t neighbor = VECTOR(g->to)[VECTOR(g->oi)[ei]];
             dummy ^= neighbor ^ VECTOR(g->oi)[ei];
             ei++;
         }
         while (eo < ecount && VECTOR(g->to)[VECTOR(g->ii)[eo]] == i) {
-            igraph_integer_t neighbor = VECTOR(g->from)[VECTOR(g->ii)[eo]];
+            igraph_int_t neighbor = VECTOR(g->from)[VECTOR(g->ii)[eo]];
             dummy ^= neighbor ^ VECTOR(g->ii)[eo] ;
             eo++;
         }
@@ -184,119 +184,119 @@ igraph_integer_t test_direct(igraph_t *g)
     return dummy;
 }
 
-igraph_integer_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
+igraph_int_t test_adj(igraph_t *g, igraph_adjlist_t *adj)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_adjlist_get(adj, i);
-        igraph_integer_t nneis = igraph_vector_int_size(neis);
+        igraph_int_t nneis = igraph_vector_int_size(neis);
         for (int j = 0; j < nneis; j++) {
-            igraph_integer_t neighbor = VECTOR(*neis)[j];
+            igraph_int_t neighbor = VECTOR(*neis)[j];
             dummy ^= neighbor;
         }
     }
     return dummy;
 }
 
-igraph_integer_t test_inc_adj(igraph_t *g, igraph_inclist_t *inc, igraph_adjlist_t *adj)
+igraph_int_t test_inc_adj(igraph_t *g, igraph_inclist_t *inc, igraph_adjlist_t *adj)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *adjs = igraph_adjlist_get(adj, i);
         igraph_vector_int_t *incs = igraph_inclist_get(inc, i);
-        igraph_integer_t nneis = igraph_vector_int_size(adjs);
+        igraph_int_t nneis = igraph_vector_int_size(adjs);
         for (int j = 0; j < nneis; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t neighbor = VECTOR(*adjs)[j];
+            igraph_int_t edge = VECTOR(*incs)[j];
+            igraph_int_t neighbor = VECTOR(*adjs)[j];
             dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
 }
 
-igraph_integer_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
+igraph_int_t test_inc_other(igraph_t *g, igraph_inclist_t *inc)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
-        igraph_integer_t nneis = igraph_vector_int_size(neis);
-        for (igraph_integer_t j = 0; j < nneis; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t neighbor = IGRAPH_OTHER(g, edge, i);
+        igraph_int_t nneis = igraph_vector_int_size(neis);
+        for (igraph_int_t j = 0; j < nneis; j++) {
+            igraph_int_t edge = VECTOR(*neis)[j];
+            igraph_int_t neighbor = IGRAPH_OTHER(g, edge, i);
             dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
 }
 
-igraph_integer_t test_incadj_sep(igraph_t *g, igraph_incadjlist_sep_t *inc)
+igraph_int_t test_incadj_sep(igraph_t *g, igraph_incadjlist_sep_t *inc)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *incs = igraph_incadjlist_sep_get_inc(inc, i);
         igraph_vector_int_t *adjs = igraph_incadjlist_sep_get_adj(inc, i);
-        igraph_integer_t nneis = igraph_vector_int_size(incs);
-        for (igraph_integer_t j = 0; j < nneis; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t neighbor = VECTOR(*adjs)[j];
+        igraph_int_t nneis = igraph_vector_int_size(incs);
+        for (igraph_int_t j = 0; j < nneis; j++) {
+            igraph_int_t edge = VECTOR(*incs)[j];
+            igraph_int_t neighbor = VECTOR(*adjs)[j];
             dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
 }
 
-igraph_integer_t test_incadj_inter(igraph_t *g, igraph_incadjlist_inter_t *inc)
+igraph_int_t test_incadj_inter(igraph_t *g, igraph_incadjlist_inter_t *inc)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *ias = igraph_incadjlist_inter_get(inc, i);
-        igraph_integer_t nneis = igraph_vector_int_size(ias) / 2;
-        for (igraph_integer_t j = 0; j < nneis; j++) {
-            igraph_integer_t edge = VECTOR(*ias)[j * 2];
-            igraph_integer_t neighbor = VECTOR(*ias)[j * 2 + 1];
+        igraph_int_t nneis = igraph_vector_int_size(ias) / 2;
+        for (igraph_int_t j = 0; j < nneis; j++) {
+            igraph_int_t edge = VECTOR(*ias)[j * 2];
+            igraph_int_t neighbor = VECTOR(*ias)[j * 2 + 1];
             dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
 }
 
-igraph_integer_t test_inc_to(igraph_t *g, igraph_inclist_t *inc)
+igraph_int_t test_inc_to(igraph_t *g, igraph_inclist_t *inc)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
-        igraph_integer_t nneis = igraph_vector_int_size(neis);
-        for (igraph_integer_t j = 0; j < nneis; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t neighbor = IGRAPH_TO(g, edge);
+        igraph_int_t nneis = igraph_vector_int_size(neis);
+        for (igraph_int_t j = 0; j < nneis; j++) {
+            igraph_int_t edge = VECTOR(*neis)[j];
+            igraph_int_t neighbor = IGRAPH_TO(g, edge);
             dummy ^= neighbor ^ edge;
         }
     }
     return dummy;
 }
 
-igraph_integer_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
+igraph_int_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
 {
-    igraph_integer_t dummy = 0;
-    igraph_integer_t vcount = igraph_vcount(g);
+    igraph_int_t dummy = 0;
+    igraph_int_t vcount = igraph_vcount(g);
 
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         igraph_vector_int_t *neis = igraph_inclist_get(inc, i);
-        igraph_integer_t nneis = igraph_vector_int_size(neis);
-        for (igraph_integer_t j = 0; j < nneis; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
+        igraph_int_t nneis = igraph_vector_int_size(neis);
+        for (igraph_int_t j = 0; j < nneis; j++) {
+            igraph_int_t edge = VECTOR(*neis)[j];
             dummy ^= edge;
         }
     }
@@ -306,7 +306,7 @@ igraph_integer_t test_inc_nop(igraph_t *g, igraph_inclist_t *inc)
 /* Used to prevent optimizing away the result.
  * This must be a global variable to prevent "variable set but not used"
  * warnings from some compilers. */
-volatile igraph_integer_t result;
+volatile igraph_int_t result;
 
 void do_benchmarks(char *name, igraph_t *g, int repeat) {
     igraph_adjlist_t adj;
@@ -443,7 +443,7 @@ int main(void) {
     igraph_destroy(&g);
 
     printf("\nRandom graph tests:\n");
-    igraph_erdos_renyi_game_gnm(&g, 10000, 49994999, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 10000, 49994999, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     do_benchmarks(" rg - ", &g, 1);
     igraph_destroy(&g);
 

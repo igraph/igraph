@@ -167,7 +167,7 @@ igraph_error_t igraph_i_degree_sequence_game_vl(igraph_t *graph,
                          IGRAPH_EINVAL);
         }
 
-        igraph_integer_t *hc = g->hard_copy();
+        igraph_int_t *hc = g->hard_copy();
         delete g;
         graph_molloy_hash *gh = new graph_molloy_hash(hc);
         delete [] hc;

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -25,7 +25,7 @@
 #define BATCH_MARKER -1
 
 igraph_error_t igraph_marked_queue_int_init(igraph_marked_queue_int_t *q,
-                             igraph_integer_t size) {
+                             igraph_int_t size) {
     IGRAPH_CHECK(igraph_dqueue_int_init(&q->Q, 0));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q->Q);
     IGRAPH_CHECK(igraph_vector_int_init(&q->set, size));
@@ -54,16 +54,16 @@ igraph_bool_t igraph_marked_queue_int_empty(const igraph_marked_queue_int_t *q) 
     return q->size == 0;
 }
 
-igraph_integer_t igraph_marked_queue_int_size(const igraph_marked_queue_int_t *q) {
+igraph_int_t igraph_marked_queue_int_size(const igraph_marked_queue_int_t *q) {
     return q->size;
 }
 
 igraph_bool_t igraph_marked_queue_int_iselement(const igraph_marked_queue_int_t *q,
-        igraph_integer_t elem) {
+        igraph_int_t elem) {
     return (VECTOR(q->set)[elem] == q->mark);
 }
 
-igraph_error_t igraph_marked_queue_int_push(igraph_marked_queue_int_t *q, igraph_integer_t elem) {
+igraph_error_t igraph_marked_queue_int_push(igraph_marked_queue_int_t *q, igraph_int_t elem) {
     if (VECTOR(q->set)[elem] != q->mark) {
         IGRAPH_CHECK(igraph_dqueue_int_push(&q->Q, elem));
         VECTOR(q->set)[elem] = q->mark;
@@ -78,8 +78,8 @@ igraph_error_t igraph_marked_queue_int_start_batch(igraph_marked_queue_int_t *q)
 }
 
 void igraph_marked_queue_int_pop_back_batch(igraph_marked_queue_int_t *q) {
-    igraph_integer_t size = igraph_dqueue_int_size(&q->Q);
-    igraph_integer_t elem;
+    igraph_int_t size = igraph_dqueue_int_size(&q->Q);
+    igraph_int_t elem;
     while (size > 0 &&
            (elem = igraph_dqueue_int_pop_back(&q->Q)) != BATCH_MARKER) {
         VECTOR(q->set)[elem] = 0;
@@ -102,10 +102,10 @@ igraph_error_t igraph_marked_queue_int_fprint(const igraph_marked_queue_int_t *q
 
 igraph_error_t igraph_marked_queue_int_as_vector(const igraph_marked_queue_int_t *q,
                                              igraph_vector_int_t *vec) {
-    igraph_integer_t i, p, n = igraph_dqueue_int_size(&q->Q);
+    igraph_int_t i, p, n = igraph_dqueue_int_size(&q->Q);
     IGRAPH_CHECK(igraph_vector_int_resize(vec, q->size));
     for (i = 0, p = 0; i < n; i++) {
-        igraph_integer_t e = igraph_dqueue_int_get(&q->Q, i);
+        igraph_int_t e = igraph_dqueue_int_get(&q->Q, i);
         if (e != BATCH_MARKER) {
             VECTOR(*vec)[p++] = e;
         }

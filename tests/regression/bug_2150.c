@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ int main(void) {
     igraph_vector_init_int(&w, 3, 1, 2, 3);
     igraph_vector_int_list_init(&res, 0);
 
-    igraph_weighted_cliques(&graph, &w, &res, 1, 3, false);
+    igraph_weighted_cliques(&graph, &w, &res, false, 1, 3, IGRAPH_UNLIMITED);
 
     igraph_vector_int_list_destroy(&res);
     igraph_vector_destroy(&w);

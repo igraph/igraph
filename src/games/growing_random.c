@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -52,16 +52,16 @@
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
  */
-igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
-                               igraph_integer_t m, igraph_bool_t directed,
+igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_int_t n,
+                               igraph_int_t m, igraph_bool_t directed,
                                igraph_bool_t citation) {
 
-    igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_neighbors = m;
-    igraph_integer_t no_of_edges;
+    igraph_int_t no_of_nodes = n;
+    igraph_int_t no_of_neighbors = m;
+    igraph_int_t no_of_edges;
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
 
-    igraph_integer_t resp = 0;
+    igraph_int_t resp = 0;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
@@ -82,15 +82,15 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
-    for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
-        for (igraph_integer_t j = 0; j < no_of_neighbors; j++) {
+    for (igraph_int_t i = 1; i < no_of_nodes; i++) {
+        for (igraph_int_t j = 0; j < no_of_neighbors; j++) {
             if (citation) {
-                igraph_integer_t to = RNG_INTEGER(0, i - 1);
+                igraph_int_t to = RNG_INTEGER(0, i - 1);
                 VECTOR(edges)[resp++] = i;
                 VECTOR(edges)[resp++] = to;
             } else {
-                igraph_integer_t from = RNG_INTEGER(0, i);
-                igraph_integer_t to = RNG_INTEGER(1, i);
+                igraph_int_t from = RNG_INTEGER(0, i);
+                igraph_int_t to = RNG_INTEGER(1, i);
                 VECTOR(edges)[resp++] = from;
                 VECTOR(edges)[resp++] = to;
             }

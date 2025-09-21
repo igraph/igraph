@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,11 +22,11 @@
 /* Compare vector for equality, allowing for NaN elements.
  * Note that NaN != NaN, thus we cannot use vector_all_e(). */
 igraph_bool_t vec_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
-    igraph_integer_t n = igraph_vector_size(v1);
+    igraph_int_t n = igraph_vector_size(v1);
 
     if (igraph_vector_size(v2) != n) return false;
 
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         igraph_real_t x1 = VECTOR(*v1)[i], x2 = VECTOR(*v2)[i];
 
         if (isnan(x1)) {
@@ -43,7 +43,7 @@ igraph_bool_t vec_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
 /* This is a trivial implementation of ECC for k=3 using igraph_list_triangles() */
 void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igraph_bool_t normalize) {
     igraph_vector_int_t triangles_vec, eids;
-    igraph_matrix_int_t triangles;
+
 
     igraph_vector_resize(res, igraph_ecount(g));
     igraph_vector_null(res);
@@ -51,13 +51,13 @@ void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igr
     igraph_vector_int_init(&triangles_vec, 0);
     igraph_list_triangles(g, &triangles_vec);
 
-    igraph_matrix_int_view_from_vector(&triangles, &triangles_vec, 3);
+    const igraph_matrix_int_t triangles = igraph_matrix_int_view_from_vector(&triangles_vec, 3);
 
     igraph_vector_int_init(&eids, 0);
 
-    for (igraph_integer_t i=0; i < igraph_matrix_int_ncol(&triangles); i++) {
-        igraph_integer_t u, v, w;
-        igraph_integer_t ec;
+    for (igraph_int_t i=0; i < igraph_matrix_int_ncol(&triangles); i++) {
+        igraph_int_t u, v, w;
+        igraph_int_t ec;
 
         u = MATRIX(triangles, 0, i);
         v = MATRIX(triangles, 1, i);
@@ -65,19 +65,19 @@ void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igr
 
         igraph_get_all_eids_between(g, &eids, u, v, IGRAPH_UNDIRECTED);
         ec = igraph_vector_int_size(&eids);
-        for (igraph_integer_t j=0; j < ec; j++) {
+        for (igraph_int_t j=0; j < ec; j++) {
             VECTOR(*res)[ VECTOR(eids)[j] ] += 1;
         }
 
         igraph_get_all_eids_between(g, &eids, v, w, IGRAPH_UNDIRECTED);
         ec = igraph_vector_int_size(&eids);
-        for (igraph_integer_t j=0; j < ec; j++) {
+        for (igraph_int_t j=0; j < ec; j++) {
             VECTOR(*res)[ VECTOR(eids)[j] ] += 1;
         }
 
         igraph_get_all_eids_between(g, &eids, w, u, IGRAPH_UNDIRECTED);
         ec = igraph_vector_int_size(&eids);
-        for (igraph_integer_t j=0; j < ec; j++) {
+        for (igraph_int_t j=0; j < ec; j++) {
             VECTOR(*res)[ VECTOR(eids)[j] ] += 1;
         }
     }
@@ -86,13 +86,13 @@ void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igr
     igraph_vector_int_init(&degree, 0);
     igraph_degree(g, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
 
-    for (igraph_integer_t e=0; e < igraph_ecount(g); e++) {
-        igraph_integer_t v1 = IGRAPH_FROM(g, e), v2 = IGRAPH_TO(g, e);
+    for (igraph_int_t e=0; e < igraph_ecount(g); e++) {
+        igraph_int_t v1 = IGRAPH_FROM(g, e), v2 = IGRAPH_TO(g, e);
         igraph_real_t s;
         if (v1 == v2) {
             s = 0.0;
         } else {
-            igraph_integer_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
+            igraph_int_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
             s = (d1 < d2 ? d1 : d2) - 1.0;
         }
         if (offset) VECTOR(*res)[e] += 1;
@@ -185,7 +185,7 @@ int main(void) {
         igraph_vector_int_t deg;
         printf("\nGraph with large degrees:\n");
         igraph_vector_int_init_range(&deg, 0, 30);
-        for (igraph_integer_t i=0; i < igraph_vector_int_size(&deg); i++) {
+        for (igraph_int_t i=0; i < igraph_vector_int_size(&deg); i++) {
             VECTOR(deg)[i] /= 2;
             VECTOR(deg)[i] += 1;
         }

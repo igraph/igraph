@@ -33,4 +33,9 @@
 2 3 4
 2 3 9
 2 4 7 8
+4 maximal independent sets between sizes 4 and 5 found
+0 3 4 5 6
+0 3 5 6 9
+1 2 7 8 9
+2 4 7 8
 alpha=6

@@ -3,8 +3,11 @@
 
 int main(void){
     igraph_t g;
-    igraph_integer_t vcount = 1000;
+    igraph_int_t vcount = 1000;
     igraph_real_t pf = 0.2;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Seed random number generator to ensure reproducibility. */
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -23,7 +26,7 @@ int main(void){
         printf("Assortativity before rewiring = %g\n", assortativity);
 
         /* Randomize the graph while preserving the degrees. */
-        igraph_rewire(&g, 20 * igraph_ecount(&g), IGRAPH_SIMPLE_SW);
+        igraph_rewire(&g, 20 * igraph_ecount(&g), IGRAPH_SIMPLE_SW, NULL);
 
         /* Re-compute assortativity. Did it change? */
         igraph_assortativity_degree(&g, &assortativity, /* ignore edge directions */ IGRAPH_UNDIRECTED);

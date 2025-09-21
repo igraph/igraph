@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 int main(void) {
     igraph_t g;
-    igraph_integer_t eid;
+    igraph_int_t eid;
 
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
 

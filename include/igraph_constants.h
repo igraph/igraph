@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -29,16 +29,23 @@ IGRAPH_BEGIN_C_DECLS
 
 /**
  * \define IGRAPH_UNLIMITED
+ * \brief Constant for "do not limit results".
  *
- * A constant signifying that no limitation should be used with various cutoff
- * or size limit parameters, such as maximum clique size, maximum path length,
- * etc. Currently defined to <code>-1</code>
+ * A constant signifying that no limitation should be used with various cutoff,
+ * size limit or result set size parameters, such as minimum or maximum clique
+ * size, number of results returned, cutoff for path lengths, etc. Currently
+ * defined to <code>-1</code>.
  */
 #define IGRAPH_UNLIMITED (-1)
+/* Note to maintainers: IGRAPH_UNLIMITED is intended to support readability
+ * when *negative* parameter values indicate "no limit". Do not test
+ * directly against IGRAPH_UNLIMITED in implementations, test for negative
+ * values instead. */
 
 /* These constants are meant to be used for sake of readability */
 enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 };
 enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 };
+enum { IGRAPH_EDGE_UNLABELED = 0, IGRAPH_EDGE_LABELED = 1 };
 
 /**
  * \typedef igraph_loops_t
@@ -261,9 +268,9 @@ typedef enum { IGRAPH_PRODUCT_CARTESIAN = 0,
  * \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
  */
 typedef enum {
-    IGRAPH_LPA_DOMINANCE = 0, // Sample from dominant labels, check for dominance after each iteration
-    IGRAPH_LPA_RETENTION,     // Keep current label if among dominant labels, only check if labels changed
-    IGRAPH_LPA_FAST           // Sample from dominant labels, only check neighbors
+    IGRAPH_LPA_DOMINANCE = 0, /* Sample from dominant labels, check for dominance after each iteration. */
+    IGRAPH_LPA_RETENTION,     /* Keep current label if among dominant labels, only check if labels changed. */
+    IGRAPH_LPA_FAST           /* Sample from dominant labels, only check neighbors. */
 } igraph_lpa_variant_t;
 
 IGRAPH_END_C_DECLS

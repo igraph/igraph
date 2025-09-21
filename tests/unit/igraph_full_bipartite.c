@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -21,11 +21,11 @@
 #include "test_utilities.h"
 
 void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
-                          igraph_integer_t n1, igraph_integer_t n2,
+                          igraph_int_t n1, igraph_int_t n2,
                           igraph_bool_t directed, igraph_neimode_t mode) {
-    igraph_integer_t vcount = igraph_vcount(g);
-    igraph_integer_t ecount = igraph_ecount(g);
-    igraph_integer_t expected_ecount;
+    igraph_int_t vcount = igraph_vcount(g);
+    igraph_int_t ecount = igraph_ecount(g);
+    igraph_int_t expected_ecount;
     igraph_bool_t bipartite;
 
     /* Check vertex count */
@@ -42,10 +42,10 @@ void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
     if (types) {
         IGRAPH_ASSERT(igraph_vector_bool_size(types) == vcount);
         /* First n1 vertices should be false (type 0), rest should be true (type 1) */
-        for (igraph_integer_t i = 0; i < n1; i++) {
+        for (igraph_int_t i = 0; i < n1; i++) {
             IGRAPH_ASSERT(VECTOR(*types)[i] == false);
         }
-        for (igraph_integer_t i = n1; i < vcount; i++) {
+        for (igraph_int_t i = n1; i < vcount; i++) {
             IGRAPH_ASSERT(VECTOR(*types)[i] == true);
         }
     }
@@ -61,9 +61,9 @@ void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
     IGRAPH_ASSERT(ecount == expected_ecount);
 
     /* Check that edges are only between different partitions */
-    for (igraph_integer_t i = 0; i < ecount; i++) {
-        igraph_integer_t from = IGRAPH_FROM(g, i);
-        igraph_integer_t to = IGRAPH_TO(g, i);
+    for (igraph_int_t i = 0; i < ecount; i++) {
+        igraph_int_t from = IGRAPH_FROM(g, i);
+        igraph_int_t to = IGRAPH_TO(g, i);
 
         if (types) {
             IGRAPH_ASSERT(VECTOR(*types)[from] != VECTOR(*types)[to]);
@@ -84,7 +84,7 @@ void check_full_bipartite(const igraph_t *g, const igraph_vector_bool_t *types,
 int main(void) {
     igraph_t graph;
     igraph_vector_bool_t types;
-    igraph_integer_t n1, n2;
+    igraph_int_t n1, n2;
 
     igraph_vector_bool_init(&types, 0);
 

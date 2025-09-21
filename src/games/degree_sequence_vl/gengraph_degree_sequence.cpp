@@ -33,11 +33,11 @@ using namespace std;
 
 namespace gengraph {
 
-// shuffle an igraph_integer_t[] randomly
-void random_permute(igraph_integer_t *a, igraph_integer_t n);
+// shuffle an igraph_int_t[] randomly
+void random_permute(igraph_int_t *a, igraph_int_t n);
 
 // sort an array of positive integers in time & place O(n + max)
-void cumul_sort(igraph_integer_t *q, igraph_integer_t n);
+void cumul_sort(igraph_int_t *q, igraph_int_t n);
 
 
 degree_sequence::~degree_sequence() {
@@ -46,13 +46,13 @@ degree_sequence::~degree_sequence() {
 
 void degree_sequence::compute_total() {
     total = 0;
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         total += deg[i];
     }
 }
 
 degree_sequence::
-degree_sequence(igraph_integer_t n0, igraph_integer_t *degs) {
+degree_sequence(igraph_int_t n0, igraph_int_t *degs) {
     deg = degs;
     n = n0;
     compute_total();
@@ -71,11 +71,11 @@ degree_sequence(const igraph_vector_int_t *out_seq) {
 
 bool degree_sequence::havelhakimi() {
 
-    igraph_integer_t i;
-    igraph_integer_t dm = dmax() + 1;
+    igraph_int_t i;
+    igraph_int_t dm = dmax() + 1;
     // Sort vertices using basket-sort, in descending degrees
-    igraph_integer_t *nb = new igraph_integer_t[dm];
-    igraph_integer_t *sorted = new igraph_integer_t[n];
+    igraph_int_t *nb = new igraph_int_t[dm];
+    igraph_int_t *sorted = new igraph_int_t[n];
     // init basket
     for (i = 0; i < dm; i++) {
         nb[i] = 0;
@@ -85,9 +85,9 @@ bool degree_sequence::havelhakimi() {
         nb[deg[i]]++;
     }
     // cumul
-    igraph_integer_t c = 0;
+    igraph_int_t c = 0;
     for (i = dm - 1; i >= 0; i--) {
-        igraph_integer_t t = nb[i];
+        igraph_int_t t = nb[i];
         nb[i] = c;
         c += t;
     }
@@ -97,8 +97,8 @@ bool degree_sequence::havelhakimi() {
     }
 
 // Binding process starts
-    igraph_integer_t first = 0;  // vertex with biggest residual degree
-    igraph_integer_t d = dm - 1; // maximum residual degree available
+    igraph_int_t first = 0;  // vertex with biggest residual degree
+    igraph_int_t d = dm - 1; // maximum residual degree available
 
     for (c = total / 2; c > 0; ) {
         // We design by 'v' the vertex of highest degree (indexed by first)
@@ -107,14 +107,14 @@ bool degree_sequence::havelhakimi() {
             d--;
         }
         // store it in dv
-        igraph_integer_t dv = d;
+        igraph_int_t dv = d;
         // bind it !
         c -= dv;
-        igraph_integer_t dc = d;         // residual degree of vertices we bind to
-        igraph_integer_t fc = ++first;   // position of the first vertex with degree dc
+        igraph_int_t dc = d;         // residual degree of vertices we bind to
+        igraph_int_t fc = ++first;   // position of the first vertex with degree dc
 
         while (dv > 0 && dc > 0) {
-            igraph_integer_t lc = nb[dc];
+            igraph_int_t lc = nb[dc];
             if (lc != fc) {
                 while (dv > 0 && lc > fc) {
                     // binds v with sorted[--lc]

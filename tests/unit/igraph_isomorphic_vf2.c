@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,8 +23,8 @@ int main(void) {
     igraph_vector_int_t color1, color2;
     igraph_vector_int_t perm;
     igraph_bool_t iso;
-    igraph_integer_t count;
-    igraph_integer_t i;
+    igraph_int_t count;
+    igraph_int_t i;
 
     igraph_rng_seed(igraph_rng_default(), 12345);
 

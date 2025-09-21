@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,22 +27,22 @@ void gsummary(const igraph_t *g) {
 }
 
 void show_results(const igraph_vector_int_t *membership, igraph_real_t codelength) {
-    const igraph_integer_t n = igraph_vector_int_size(membership);
+    const igraph_int_t n = igraph_vector_int_size(membership);
     printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n",
            codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership: ");
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i]);
     }
     printf("\n");
 }
 
 void show_results_lite(igraph_vector_int_t * membership, igraph_real_t codelength) {
-    const igraph_integer_t n = igraph_vector_int_size(membership);
+    const igraph_int_t n = igraph_vector_int_size(membership);
     printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n",
            codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership (every 100th vertex): ");
-    for (igraph_integer_t i = 0; i < n; i += 100) {
+    for (igraph_int_t i = 0; i < n; i += 100) {
         printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
     }
     printf("\n");
@@ -55,8 +55,8 @@ igraph_real_t infomap_weighted_test(const igraph_t *graph, const igraph_vector_t
     igraph_vector_int_init(&membership, 0);
 
     igraph_community_infomap(graph, /*edge_weights=*/ weights, /*vertex_weights=*/ NULL,
-                             /*nb_trials=*/5, 
-                             is_regularized, /* regularization_strength */ 1, 
+                             /*nb_trials=*/5,
+                             is_regularized, /* regularization_strength */ 1,
                              &membership, &codelength);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == igraph_vcount(graph));
@@ -112,7 +112,7 @@ int main(void) {
     printf("\n# Zachary Karate club\n");
     igraph_famous(&g, "Zachary");
     infomap_test(&g, /*smoke_test=*/ false, false);
-    
+
     printf("\n# Zachary Karate club, but regularized\n");
     infomap_test(&g, /*smoke_test=*/ false, true);
     igraph_destroy(&g);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2008-2021  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -29,7 +29,7 @@ int main(void) {
     igraph_vector_int_t edges;
     igraph_real_t cutoff = 0.0;
 
-    igraph_integer_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
+    igraph_int_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
                                 6, 9, 7, 20, 9, 10, 9, 20, 10, 19,
                                 11, 12, 11, 20, 12, 15, 13, 15,
@@ -121,9 +121,9 @@ int main(void) {
 
     printf("\nNon-trivial weighted graph\n");
     printf("==========================================================\n");
-    igraph_vector_int_view(&edges, nontriv, sizeof(nontriv) / sizeof(nontriv[0]));
+    edges = igraph_vector_int_view(nontriv, sizeof(nontriv) / sizeof(nontriv[0]));
     igraph_create(&g, &edges, 0, /* directed= */ 0);
-    igraph_vector_view(&weights, nontriv_weights,
+    weights = igraph_vector_view(nontriv_weights,
                        sizeof(nontriv_weights) / sizeof(nontriv_weights[0]));
     igraph_vector_init(&bet, 0);
 

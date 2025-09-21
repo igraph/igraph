@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 #include "bench.h"
 
-void bench_pointcloud(const char *message, igraph_metric_t metric, igraph_integer_t point_count, igraph_integer_t dimensions, igraph_integer_t neighbors, igraph_real_t cutoff) {
+void bench_pointcloud(const char *message, igraph_metric_t metric, igraph_int_t point_count, igraph_int_t dimensions, igraph_int_t neighbors, igraph_real_t cutoff) {
     igraph_matrix_t points;
     igraph_t g;
     char msg[200];
@@ -28,8 +28,8 @@ void bench_pointcloud(const char *message, igraph_metric_t metric, igraph_intege
 
     igraph_matrix_init(&points, point_count, dimensions);
 
-    for (igraph_integer_t point = 0; point < point_count; point++) {
-        for (igraph_integer_t dim = 0; dim < dimensions; dim++) {
+    for (igraph_int_t point = 0; point < point_count; point++) {
+        for (igraph_int_t dim = 0; dim < dimensions; dim++) {
             MATRIX(points, point, dim) = RNG_UNIF01();
         }
     }

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -196,7 +196,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
                                     igraph_bool_t loops,
                                     igraph_chung_lu_t variant) {
 
-    const igraph_integer_t no_of_nodes = igraph_vector_size(out_weights);
+    const igraph_int_t no_of_nodes = igraph_vector_size(out_weights);
     const igraph_bool_t directed = in_weights != NULL;
     igraph_vector_int_t edges, idx;
     igraph_real_t wsum = igraph_vector_sum(out_weights);
@@ -234,12 +234,12 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_sort_ind(in_weights, &idx, IGRAPH_DESCENDING));
 
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_integer_t vi, vj;
+    for (igraph_int_t i=0; i < no_of_nodes; i++) {
+        igraph_int_t vi, vj;
         igraph_real_t wi, wj;
         igraph_real_t p, q;
 
-        igraph_integer_t j = directed ? 0 : i;
+        igraph_int_t j = directed ? 0 : i;
 
         vi = VECTOR(idx)[i];
         wi = VECTOR(*out_weights)[vi];
@@ -256,7 +256,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
             /* This formulation not only terminates the loop when necessary,
              * but also protects against overflow when 'p' is very small
              * and 'gap' becomes very large, perhaps larger than representable
-             * in an igraph_integer_t. */
+             * in an igraph_int_t. */
             if (gap >= no_of_nodes-j) {
                 break;
             }

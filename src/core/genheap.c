@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -50,9 +50,9 @@ static void swapfunc(char * restrict a, char * restrict b, size_t es) {
 }
 
 static void igraph_i_gen2wheap_switch(igraph_gen2wheap_t *h,
-                                      igraph_integer_t e1, igraph_integer_t e2) {
+                                      igraph_int_t e1, igraph_int_t e2) {
     if (e1 != e2) {
-        igraph_integer_t tmp1, tmp2;
+        igraph_int_t tmp1, tmp2;
 
         swapfunc(ELEM(h, e1), ELEM(h, e2), h->item_size);
 
@@ -68,7 +68,7 @@ static void igraph_i_gen2wheap_switch(igraph_gen2wheap_t *h,
 }
 
 static void igraph_i_gen2wheap_shift_up(igraph_gen2wheap_t *h,
-                                        igraph_integer_t elem) {
+                                        igraph_int_t elem) {
     if (elem == 0 || h->cmp(ELEM(h, elem), ELEM(h, PARENT(elem))) < 0) {
         /* at the top */
     } else {
@@ -78,8 +78,8 @@ static void igraph_i_gen2wheap_shift_up(igraph_gen2wheap_t *h,
 }
 
 static void igraph_i_gen2wheap_sink(igraph_gen2wheap_t *h,
-                                    igraph_integer_t head) {
-    igraph_integer_t size = igraph_gen2wheap_size(h);
+                                    igraph_int_t head) {
+    igraph_int_t size = igraph_gen2wheap_size(h);
     if (LEFTCHILD(head) >= size) {
         /* no subtrees */
     } else if (RIGHTCHILD(head) == size ||
@@ -109,7 +109,7 @@ static void igraph_i_gen2wheap_sink(igraph_gen2wheap_t *h,
 igraph_error_t igraph_gen2wheap_init(
         igraph_gen2wheap_t *h,
         int (*cmp)(const void *, const void *),
-        size_t item_size, igraph_integer_t max_size
+        size_t item_size, igraph_int_t max_size
 ) {
     /* TODO: Currently, storage is allocated for the maximum number of elements
      * right from the start. This is sufficient for the only use case as of this
@@ -142,7 +142,7 @@ void igraph_gen2wheap_destroy(igraph_gen2wheap_t *h) {
 /**
  * Returns the current number of elements in the two-way heap.
  */
-igraph_integer_t igraph_gen2wheap_size(const igraph_gen2wheap_t *h) {
+igraph_int_t igraph_gen2wheap_size(const igraph_gen2wheap_t *h) {
     return igraph_vector_int_size(&h->index);
 }
 
@@ -168,9 +168,9 @@ igraph_bool_t igraph_gen2wheap_empty(const igraph_gen2wheap_t *h) {
  * the same index.
  */
 igraph_error_t igraph_gen2wheap_push_with_index(igraph_gen2wheap_t *h,
-                                                igraph_integer_t idx, const void *elem) {
+                                                igraph_int_t idx, const void *elem) {
 
-    igraph_integer_t size = igraph_vector_int_size(&h->index);
+    igraph_int_t size = igraph_vector_int_size(&h->index);
 
     if (size > IGRAPH_INTEGER_MAX - 2) {
         /* to allow size+2 below */
@@ -192,7 +192,7 @@ igraph_error_t igraph_gen2wheap_push_with_index(igraph_gen2wheap_t *h,
  * is also one larger than the maximum allowed index that can be passed to
  * \c igraph_gen2wheap_push_with_index .
  */
-igraph_integer_t igraph_gen2wheap_max_size(const igraph_gen2wheap_t *h) {
+igraph_int_t igraph_gen2wheap_max_size(const igraph_gen2wheap_t *h) {
     return h->max_size;
 }
 
@@ -207,7 +207,7 @@ const void *igraph_gen2wheap_max(const igraph_gen2wheap_t *h) {
  * Returns the index that was associated to the largest element in the heap
  * when it was pushed to the heap.
  */
-igraph_integer_t igraph_gen2wheap_max_index(const igraph_gen2wheap_t *h) {
+igraph_int_t igraph_gen2wheap_max_index(const igraph_gen2wheap_t *h) {
     return VECTOR(h->index)[0];
 }
 
@@ -215,7 +215,7 @@ igraph_integer_t igraph_gen2wheap_max_index(const igraph_gen2wheap_t *h) {
  * Returns whether the heap contains an element with the given index, even if
  * it was deactivated earlier.
  */
-igraph_bool_t igraph_gen2wheap_has_elem(const igraph_gen2wheap_t *h, igraph_integer_t idx) {
+igraph_bool_t igraph_gen2wheap_has_elem(const igraph_gen2wheap_t *h, igraph_int_t idx) {
     return VECTOR(h->index2)[idx] != 0;
 }
 
@@ -223,15 +223,15 @@ igraph_bool_t igraph_gen2wheap_has_elem(const igraph_gen2wheap_t *h, igraph_inte
  * Returns whether the heap contains an element with the given index \em and it
  * has not been deactivated yet.
  */
-igraph_bool_t igraph_gen2wheap_has_active(const igraph_gen2wheap_t *h, igraph_integer_t idx) {
+igraph_bool_t igraph_gen2wheap_has_active(const igraph_gen2wheap_t *h, igraph_int_t idx) {
     return VECTOR(h->index2)[idx] > 1;
 }
 
 /**
  * Returns a pointer to the item at the given index in the two-way heap.
  */
-const void *igraph_gen2wheap_get(const igraph_gen2wheap_t *h, igraph_integer_t idx) {
-    igraph_integer_t i = VECTOR(h->index2)[idx] - 2;
+const void *igraph_gen2wheap_get(const igraph_gen2wheap_t *h, igraph_int_t idx) {
+    igraph_int_t i = VECTOR(h->index2)[idx] - 2;
     return ELEM(h, i);
 }
 
@@ -242,7 +242,7 @@ const void *igraph_gen2wheap_get(const igraph_gen2wheap_t *h, igraph_integer_t i
  * that remain in the heap.
  */
 void igraph_gen2wheap_delete_max(igraph_gen2wheap_t *h) {
-    igraph_integer_t tmpidx = VECTOR(h->index)[0];
+    igraph_int_t tmpidx = VECTOR(h->index)[0];
     igraph_i_gen2wheap_switch(h, 0, igraph_gen2wheap_size(h) - 1);
     igraph_vector_int_pop_back(&h->index);
     VECTOR(h->index2)[tmpidx] = 0;
@@ -256,7 +256,7 @@ void igraph_gen2wheap_delete_max(igraph_gen2wheap_t *h) {
  * that remain in the heap.
  */
 void igraph_gen2wheap_deactivate_max(igraph_gen2wheap_t *h) {
-    igraph_integer_t tmpidx = VECTOR(h->index)[0];
+    igraph_int_t tmpidx = VECTOR(h->index)[0];
     igraph_i_gen2wheap_switch(h, 0, igraph_gen2wheap_size(h) - 1);
     igraph_vector_int_pop_back(&h->index);
     VECTOR(h->index2)[tmpidx] = 1;
@@ -266,9 +266,9 @@ void igraph_gen2wheap_deactivate_max(igraph_gen2wheap_t *h) {
 /**
  * Modifies the value associated to the given index in the two-way heap.
  */
-void igraph_gen2wheap_modify(igraph_gen2wheap_t *h, igraph_integer_t idx, const void *elem) {
+void igraph_gen2wheap_modify(igraph_gen2wheap_t *h, igraph_int_t idx, const void *elem) {
 
-    igraph_integer_t pos = VECTOR(h->index2)[idx] - 2;
+    igraph_int_t pos = VECTOR(h->index2)[idx] - 2;
 
     memcpy(ELEM(h, pos), elem, h->item_size);
     igraph_i_gen2wheap_sink(h, pos);
@@ -279,8 +279,8 @@ void igraph_gen2wheap_modify(igraph_gen2wheap_t *h, igraph_integer_t idx, const 
  * Checks that the heap is in a consistent state
  */
 igraph_error_t igraph_gen2wheap_check(const igraph_gen2wheap_t *h) {
-    igraph_integer_t size = igraph_gen2wheap_size(h);
-    igraph_integer_t i;
+    igraph_int_t size = igraph_gen2wheap_size(h);
+    igraph_int_t i;
     igraph_bool_t error = false;
 
     /* Check the heap property */

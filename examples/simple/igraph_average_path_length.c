@@ -5,6 +5,9 @@ int main(void) {
     igraph_t graph;
     igraph_real_t result;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a random preferential attachment graph. */
     igraph_barabasi_game(&graph, 30, /*power=*/ 1, 30, NULL, /*outpref=*/ false, /*A=*/ 1,
                          IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG,

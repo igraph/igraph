@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021-2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     igraph_vector_t capacity;
     IGRAPH_ASSERT(igraph_vector_init(&capacity, 0) == IGRAPH_SUCCESS);
 
-    igraph_integer_t source, target;
+    igraph_int_t source, target;
 
     // Do the fuzzing
     igraph_t g;

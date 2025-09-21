@@ -1,6 +1,6 @@
 /* vim:set ts=4 sts=4 sw=4 et: */
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_int_t *memberships, igraph_vector_t *modularity, FILE* f) {
-    igraph_integer_t i, j, no_of_nodes = igraph_vcount(g);
+    igraph_int_t i, j, no_of_nodes = igraph_vcount(g);
 
     j = igraph_vector_which_max(modularity);
     for (i = 0; i < igraph_vector_int_size(membership); i++) {
@@ -47,12 +47,16 @@ void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_in
 }
 
 int main(void) {
+    igraph_setup();
     igraph_t g;
     igraph_vector_t modularity;
     igraph_vector_int_t edges;
     igraph_vector_int_t membership;
     igraph_matrix_int_t memberships;
-    igraph_integer_t i, j, k;
+    igraph_int_t i, j, k;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_vector_init(&modularity, 0);
     igraph_vector_int_init(&membership, 0);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@ void bench(int m, int n, int rep) {
     igraph_matrix_t mat;
 
     igraph_matrix_init(&mat, m, n);
-    for (igraph_integer_t j=0; j < n; j++) {
-        for (igraph_integer_t i=0; i < m; i++) {
+    for (igraph_int_t j=0; j < n; j++) {
+        for (igraph_int_t i=0; i < m; i++) {
             MATRIX(mat, i, j) = RNG_UNIF(-1, 1);
         }
     }

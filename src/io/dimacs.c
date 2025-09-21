@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -107,16 +107,16 @@ igraph_error_t igraph_read_graph_dimacs_flow(
         igraph_t *graph, FILE *instream,
         igraph_strvector_t *problem,
         igraph_vector_int_t *label,
-        igraph_integer_t *source,
-        igraph_integer_t *target,
+        igraph_int_t *source,
+        igraph_int_t *target,
         igraph_vector_t *capacity,
         igraph_bool_t directed) {
 
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes = -1;
-    igraph_integer_t no_of_edges = -1;
-    igraph_integer_t tsource = -1;
-    igraph_integer_t ttarget = -1;
+    igraph_int_t no_of_nodes = -1;
+    igraph_int_t no_of_edges = -1;
+    igraph_int_t tsource = -1;
+    igraph_int_t ttarget = -1;
     char prob[21];
     enum {
         PROBLEM_NONE,
@@ -141,8 +141,8 @@ igraph_error_t igraph_read_graph_dimacs_flow(
         }
         EXPECT(read, 1);
         switch (str[0]) {
-            igraph_integer_t tmp, tmp2;
-            igraph_integer_t from, to;
+            igraph_int_t tmp, tmp2;
+            igraph_int_t from, to;
             igraph_real_t cap;
 
         case 'c':
@@ -312,13 +312,13 @@ igraph_error_t igraph_read_graph_dimacs_flow(
  * \sa \ref igraph_read_graph_dimacs_flow()
  */
 igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *graph, FILE *outstream,
-                              igraph_integer_t source, igraph_integer_t target,
+                              igraph_int_t source, igraph_int_t target,
                               const igraph_vector_t *capacity) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
-    igraph_integer_t i = 0;
+    igraph_int_t i = 0;
     int ret, ret1, ret2, ret3;
 
     if (igraph_vector_size(capacity) != no_of_edges) {
@@ -342,7 +342,7 @@ igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *graph, FILE *outst
     }
 
     while (!IGRAPH_EIT_END(it)) {
-        igraph_integer_t from, to;
+        igraph_int_t from, to;
         igraph_real_t cap;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
         cap = VECTOR(*capacity)[i++];

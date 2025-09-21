@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -24,8 +24,8 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights,
                const char *name, int rep) {
     igraph_vector_int_t membership;
     igraph_vector_t vertex_weight;
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     char msg[256], msg2[128];
 
     igraph_vector_int_init(&membership, vcount);
@@ -52,9 +52,9 @@ void run_bench(const igraph_t *graph, const igraph_vector_t *weights,
 }
 
 void rand_weights(const igraph_t *graph, igraph_vector_t *weights) {
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     igraph_vector_resize(weights, ecount);
-    for (igraph_integer_t i=0; i < ecount; i++) {
+    for (igraph_int_t i=0; i < ecount; i++) {
         VECTOR(*weights)[i] = RNG_UNIF01();
     }
 }

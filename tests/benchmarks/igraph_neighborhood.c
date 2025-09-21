@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,11 +22,11 @@
 
 typedef struct igraph_lazy_adjlist2_t {
     const igraph_t *graph;
-    igraph_integer_t length;
-    igraph_integer_t data_length;
+    igraph_int_t length;
+    igraph_int_t data_length;
     igraph_vector_int_t *adjs;
-    igraph_integer_t *data;
-    igraph_integer_t next_data;
+    igraph_int_t *data;
+    igraph_int_t next_data;
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_bool_t multiple;
@@ -53,7 +53,7 @@ igraph_error_t igraph_lazy_adjlist2_init(const igraph_t *graph,
     al->length = igraph_vcount(graph);
     al->data_length = igraph_ecount(graph) * 2;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    al->data = IGRAPH_CALLOC(al->data_length, igraph_integer_t);
+    al->data = IGRAPH_CALLOC(al->data_length, igraph_int_t);
     al->next_data = 0;
 
     if (al->adjs == NULL || al->data == NULL) {
@@ -69,13 +69,13 @@ void igraph_lazy_adjlist2_destroy(igraph_lazy_adjlist2_t *al) {
 }
 
 igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(
-    igraph_lazy_adjlist2_t *al, igraph_integer_t pno
+    igraph_lazy_adjlist2_t *al, igraph_int_t pno
 ) {
-    igraph_integer_t no = pno;
+    igraph_int_t no = pno;
     igraph_error_t ret;
 
     if (al->adjs[no].stor_begin == NULL) {
-        igraph_vector_int_view(&al->adjs[no], al->data + al->next_data, al->data_length - al->next_data);
+        al->adjs[no] = igraph_vector_int_view(al->data + al->next_data, al->data_length - al->next_data);
         /* igraph_neighbors calls a resize. Since we're handling our own
          * vectors, we can't have our stor_begin be realloced. A realloc should only
          * happen when the vector is too small to handle the neighbors, which
@@ -94,14 +94,14 @@ igraph_vector_int_t *igraph_i_lazy_adjlist2_get_real(
 }
 
 igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_int_list_t *res,
-                        igraph_vs_t vids, igraph_integer_t order,
-                        igraph_neimode_t mode, igraph_integer_t mindist) {
+                        igraph_vs_t vids, igraph_int_t order,
+                        igraph_neimode_t mode, igraph_int_t mindist) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
-    igraph_integer_t i, j;
-    igraph_integer_t *added;
+    igraph_int_t i, j;
+    igraph_int_t *added;
     igraph_vector_int_t *neis;
     igraph_vector_int_t tmp;
     igraph_lazy_adjlist2_t adjlist2;
@@ -115,7 +115,7 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
                      IGRAPH_EINVAL);
     }
 
-    added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    added = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -134,7 +134,7 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
     }
     IGRAPH_FINALLY(igraph_lazy_adjlist2_destroy, &adjlist2);
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+        igraph_int_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_int_clear(&tmp);
         if (mindist == 0) {
@@ -146,16 +146,16 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            igraph_integer_t n;
+            igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_int_t actdist = igraph_dqueue_int_pop(&q);
+            igraph_int_t n;
             neis = igraph_i_lazy_adjlist2_get_real(&adjlist2, actnode);
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
                 /* we add them to the q */
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(*neis)[j];
+                    igraph_int_t nei = VECTOR(*neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
@@ -168,7 +168,7 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
             } else {
                 /* we just count them but don't add them to q */
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(*neis)[j];
+                    igraph_int_t nei = VECTOR(*neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -194,14 +194,14 @@ igraph_error_t igraph_neighborhood_adjl2(const igraph_t *graph, igraph_vector_in
 }
 
 igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int_list_t *res,
-                        igraph_vs_t vids, igraph_integer_t order,
-                        igraph_neimode_t mode, igraph_integer_t mindist) {
+                        igraph_vs_t vids, igraph_int_t order,
+                        igraph_neimode_t mode, igraph_int_t mindist) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
-    igraph_integer_t i, j;
-    igraph_integer_t *added;
+    igraph_int_t i, j;
+    igraph_int_t *added;
     igraph_vector_int_t *neis;
     igraph_vector_int_t tmp;
     igraph_lazy_adjlist_t adjlist;
@@ -215,7 +215,7 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
                      IGRAPH_EINVAL);
     }
 
-    added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    added = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -234,7 +234,7 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
     }
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+        igraph_int_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_int_clear(&tmp);
         if (mindist == 0) {
@@ -246,16 +246,16 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            igraph_integer_t n;
+            igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_int_t actdist = igraph_dqueue_int_pop(&q);
+            igraph_int_t n;
             neis = igraph_lazy_adjlist_get(&adjlist, actnode);
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
                 /* we add them to the q */
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(*neis)[j];
+                    igraph_int_t nei = VECTOR(*neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
@@ -268,7 +268,7 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
             } else {
                 /* we just count them but don't add them to q */
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(*neis)[j];
+                    igraph_int_t nei = VECTOR(*neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -294,14 +294,14 @@ igraph_error_t igraph_neighborhood_adjl(const igraph_t *graph, igraph_vector_int
 }
 
 igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_list_t *res,
-                        igraph_vs_t vids, igraph_integer_t order,
-                        igraph_neimode_t mode, igraph_integer_t mindist) {
+                        igraph_vs_t vids, igraph_int_t order,
+                        igraph_neimode_t mode, igraph_int_t mindist) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vit_t vit;
-    igraph_integer_t i, j;
-    igraph_integer_t *added;
+    igraph_int_t i, j;
+    igraph_int_t *added;
     igraph_vector_int_t *neis;
     igraph_vector_int_t tmp;
     igraph_adjlist_t adjlist;
@@ -315,7 +315,7 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
                      IGRAPH_EINVAL);
     }
 
-    added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    added = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
     }
@@ -334,7 +334,7 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
     }
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+        igraph_int_t node = IGRAPH_VIT_GET(vit);
         added[node] = i + 1;
         igraph_vector_int_clear(&tmp);
         if (mindist == 0) {
@@ -346,16 +346,16 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            igraph_integer_t n;
+            igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_int_t actdist = igraph_dqueue_int_pop(&q);
+            igraph_int_t n;
             neis = igraph_adjlist_get(&adjlist, actnode);
             n = igraph_vector_int_size(neis);
 
             if (actdist < order - 1) {
                 /* we add them to the q */
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(*neis)[j];
+                    igraph_int_t nei = VECTOR(*neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
@@ -368,7 +368,7 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
             } else {
                 /* we just count them but don't add them to q */
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(*neis)[j];
+                    igraph_int_t nei = VECTOR(*neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (actdist + 1 >= mindist) {
@@ -393,7 +393,7 @@ igraph_error_t igraph_neighborhood_adj(const igraph_t *graph, igraph_vector_int_
     return IGRAPH_SUCCESS;
 }
 
-void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
+void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_int_t repeat)
 {
     igraph_vector_int_list_t result_orig;
     igraph_vector_int_list_t result_adj;
@@ -405,7 +405,7 @@ void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
     igraph_vector_int_list_init(&result_adjl, 0);
     igraph_vector_int_list_init(&result_adjl2, 0);
 
-    for (igraph_integer_t order = 1; order <= 3; order++) {
+    for (igraph_int_t order = 1; order <= 3; order++) {
         printf("order %" IGRAPH_PRId ":\n", order);
         BENCH("Original function:",
                 REPEAT(igraph_neighborhood(g, &result_orig, vids, order,
@@ -422,7 +422,7 @@ void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
         BENCH("Using adjlist:",
                 REPEAT(igraph_neighborhood_adj(g, &result_adj, vids, order,
                         /*mode*/ IGRAPH_ALL, /*mindist*/ 0), repeat));
-        for (igraph_integer_t i = 0; i <= order; i++) {
+        for (igraph_int_t i = 0; i <= order; i++) {
             IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_orig)[i], &VECTOR(result_adj)[i]));
             IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_adj)[i], &VECTOR(result_adjl)[i]));
             IGRAPH_ASSERT(!igraph_vector_int_lex_cmp(&VECTOR(result_adjl)[i], &VECTOR(result_adjl2)[i]));
@@ -445,7 +445,7 @@ int main(void) {
 
     igraph_full(&g_full, 500, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_ring(&g_ring, 50000, IGRAPH_UNDIRECTED, /* mutual */ 0, /*circular*/ 0);
-    igraph_erdos_renyi_game_gnm(&g_er, 2000, 20000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g_er, 2000, 20000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     printf("Select all vertices:\n\n");
     printf("Full graph:\n");

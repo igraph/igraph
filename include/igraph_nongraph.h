@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,6 @@
 
 #include "igraph_decls.h"
 #include "igraph_error.h"
-#include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -77,9 +76,9 @@ typedef struct igraph_plfit_result_t {
 } igraph_plfit_result_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
-                                      igraph_integer_t binwidth);
-IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l, igraph_integer_t h,
-                                       igraph_integer_t length);
+                                      igraph_int_t binwidth);
+IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_int_t l, igraph_int_t h,
+                                       igraph_int_t length);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST igraph_bool_t igraph_almost_equals(double a, double b, double eps);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_CONST int igraph_cmp_epsilon(double a, double b, double eps);
 

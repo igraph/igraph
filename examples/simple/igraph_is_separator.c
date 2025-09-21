@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -30,6 +30,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_t sep;
     igraph_bool_t result;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Simple star graph, remove the center */
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);

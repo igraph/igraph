@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -33,8 +33,8 @@ IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_all_st_cuts_pivot(
    const igraph_t *graph, const igraph_marked_queue_int_t *S,
-   const igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
-   igraph_integer_t *v, igraph_vector_int_t *Isv, void *arg);
+   const igraph_estack_t *T, igraph_int_t source, igraph_int_t target,
+   igraph_int_t *v, igraph_vector_int_t *Isv, void *arg);
 
 igraph_error_t igraph_i_split_vertices(const igraph_t* graph, igraph_t* result);
 

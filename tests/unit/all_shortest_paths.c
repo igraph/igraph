@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ int main(void) {
     igraph_vector_int_list_t paths, paths_edge;
     igraph_vector_int_t nrgeo;
     igraph_vector_t weights;
-    igraph_integer_t from, to;
+    igraph_int_t from, to;
 
     igraph_vector_int_list_init(&paths, 0);
     igraph_vector_int_list_init(&paths_edge, 0);
@@ -139,7 +139,7 @@ int main(void) {
     from = 6;
     printf("From: %" IGRAPH_PRId ", to: all.\n", from);
 
-    igraph_vector_view(&weights, weights_raw, sizeof(weights_raw) / sizeof(igraph_real_t));
+    weights = igraph_vector_view(weights_raw, sizeof(weights_raw) / sizeof(igraph_real_t));
     igraph_get_all_shortest_paths(&graph, &weights, &paths, &paths_edge, &nrgeo, from, igraph_vss_all(), IGRAPH_ALL);
 
     printf("Vertex paths:\n");

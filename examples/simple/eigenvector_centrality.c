@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -27,6 +27,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t vector, weights;
     igraph_real_t value;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create a star graph, with vertex 0 at the center, and associated edge weights. */
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 
 typedef struct igraph_gen2wheap_t {
     /** Maximum number of items in the heap */
-    igraph_integer_t max_size;
+    igraph_int_t max_size;
 
     /** The size of an individual item */
     size_t item_size;
@@ -53,21 +53,21 @@ typedef struct igraph_gen2wheap_t {
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_gen2wheap_init(
         igraph_gen2wheap_t *h,
         int (*cmp)(const void *, const void *),
-        size_t item_size, igraph_integer_t max_size
+        size_t item_size, igraph_int_t max_size
 );
 IGRAPH_PRIVATE_EXPORT void igraph_gen2wheap_destroy(igraph_gen2wheap_t *h);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gen2wheap_size(const igraph_gen2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gen2wheap_size(const igraph_gen2wheap_t *h);
 IGRAPH_PRIVATE_EXPORT void igraph_gen2wheap_clear(igraph_gen2wheap_t *h);
 IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_gen2wheap_empty(const igraph_gen2wheap_t *h);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_gen2wheap_push_with_index(igraph_gen2wheap_t *h,
-                                                                      igraph_integer_t idx, const void *elem);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gen2wheap_max_size(const igraph_gen2wheap_t *h);
+                                                                      igraph_int_t idx, const void *elem);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gen2wheap_max_size(const igraph_gen2wheap_t *h);
 IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE const void *igraph_gen2wheap_max(const igraph_gen2wheap_t *h);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_gen2wheap_max_index(const igraph_gen2wheap_t *h);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_gen2wheap_has_elem(const igraph_gen2wheap_t *h, igraph_integer_t idx);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_gen2wheap_has_active(const igraph_gen2wheap_t *h, igraph_integer_t idx);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE const void *igraph_gen2wheap_get(const igraph_gen2wheap_t *h, igraph_integer_t idx);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_gen2wheap_max_index(const igraph_gen2wheap_t *h);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_gen2wheap_has_elem(const igraph_gen2wheap_t *h, igraph_int_t idx);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_gen2wheap_has_active(const igraph_gen2wheap_t *h, igraph_int_t idx);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE const void *igraph_gen2wheap_get(const igraph_gen2wheap_t *h, igraph_int_t idx);
 IGRAPH_PRIVATE_EXPORT void igraph_gen2wheap_delete_max(igraph_gen2wheap_t *h);
 IGRAPH_PRIVATE_EXPORT void igraph_gen2wheap_deactivate_max(igraph_gen2wheap_t *h);
-IGRAPH_PRIVATE_EXPORT void igraph_gen2wheap_modify(igraph_gen2wheap_t *h, igraph_integer_t idx, const void *elem);
+IGRAPH_PRIVATE_EXPORT void igraph_gen2wheap_modify(igraph_gen2wheap_t *h, igraph_int_t idx, const void *elem);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_gen2wheap_check(const igraph_gen2wheap_t *h);

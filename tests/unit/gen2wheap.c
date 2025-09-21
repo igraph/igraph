@@ -23,10 +23,10 @@ void intpair_print(const intpair_t *p) {
 }
 
 int main(void) {
-    igraph_integer_t n;
+    igraph_int_t n;
     igraph_vector_int_t idx;
     igraph_gen2wheap_t h;
-    igraph_integer_t i;
+    igraph_int_t i;
     intpair_t p;
 
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -40,7 +40,7 @@ int main(void) {
     igraph_vector_int_shuffle(&idx);
 
     for (i=0; i < n; i++) {
-        igraph_integer_t j = VECTOR(idx)[i];
+        igraph_int_t j = VECTOR(idx)[i];
         p.x = RNG_INTEGER(1, 10);
         p.y = RNG_INTEGER(1, 10);
         printf("Adding %2" IGRAPH_PRId ": ", j);
@@ -69,7 +69,7 @@ int main(void) {
     printf("\n");
 
     n=5;
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         p.x = RNG_INTEGER(1, 10);
         p.y = RNG_INTEGER(1, 10);
         printf("Adding %2" IGRAPH_PRId ": ", i);

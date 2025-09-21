@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership;
     igraph_real_t modularity;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_famous(&graph, "Zachary"); /* We use Zachary's karate club network. */
 

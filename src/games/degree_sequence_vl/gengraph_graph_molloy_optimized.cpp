@@ -37,17 +37,17 @@ using namespace std;
 
 namespace gengraph {
 
-igraph_integer_t graph_molloy_opt::max_degree() {
-    igraph_integer_t m = 0;
-    for (igraph_integer_t k = 0; k < n; k++) if (deg[k] > m) {
+igraph_int_t graph_molloy_opt::max_degree() {
+    igraph_int_t m = 0;
+    for (igraph_int_t k = 0; k < n; k++) if (deg[k] > m) {
             m = deg[k];
         }
     return m;
 }
 
 void graph_molloy_opt::compute_neigh() {
-    igraph_integer_t *p = links;
-    for (igraph_integer_t i = 0; i < n; i++) {
+    igraph_int_t *p = links;
+    for (igraph_int_t i = 0; i < n; i++) {
         neigh[i] = p;
         p += deg[i];
     }
@@ -57,12 +57,12 @@ void graph_molloy_opt::alloc(degree_sequence &degs) {
     n = degs.size();
     a = degs.sum();
     assert(a % 2 == 0);
-    deg = new igraph_integer_t[n + a];
-    for (igraph_integer_t i = 0; i < n; i++) {
+    deg = new igraph_int_t[n + a];
+    for (igraph_int_t i = 0; i < n; i++) {
         deg[i] = degs[i];
     }
     links = deg + n;
-    neigh = new igraph_integer_t*[n];
+    neigh = new igraph_int_t*[n];
     compute_neigh();
 }
 
@@ -119,7 +119,7 @@ graph_molloy_opt::graph_molloy_opt(degree_sequence &degs) {
 //   if(VERBOSE()) fprintf(stderr,"done\n");
 // }
 
-graph_molloy_opt::graph_molloy_opt(igraph_integer_t *svg) {
+graph_molloy_opt::graph_molloy_opt(igraph_int_t *svg) {
     // Read n
     n = *(svg++);
     // Read a
@@ -148,14 +148,14 @@ graph_molloy_opt::~graph_molloy_opt() {
     detach();
 }
 
-igraph_integer_t* graph_molloy_opt::backup(igraph_integer_t *b) {
+igraph_int_t* graph_molloy_opt::backup(igraph_int_t *b) {
     if (b == NULL) {
-        b = new igraph_integer_t[a / 2];
+        b = new igraph_int_t[a / 2];
     }
-    igraph_integer_t *c = b;
-    for (igraph_integer_t i = 0; i < n; i++) {
-        igraph_integer_t *p = neigh[i];
-        for (igraph_integer_t d = deg[i]; d--; p++) {
+    igraph_int_t *c = b;
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_int_t *p = neigh[i];
+        for (igraph_int_t d = deg[i]; d--; p++) {
             assert(*p != i);
             if (*p >= i) {
                 *(c++) = *p;
@@ -166,15 +166,15 @@ igraph_integer_t* graph_molloy_opt::backup(igraph_integer_t *b) {
     return b;
 }
 
-igraph_integer_t *graph_molloy_opt::hard_copy() {
-    igraph_integer_t *hc = new igraph_integer_t[2 + n + a / 2]; // to store n,a,deg[] and links[]
+igraph_int_t *graph_molloy_opt::hard_copy() {
+    igraph_int_t *hc = new igraph_int_t[2 + n + a / 2]; // to store n,a,deg[] and links[]
     hc[0] = n;
     hc[1] = a;
-    memcpy(hc + 2, deg, sizeof(igraph_integer_t)*n);
-    igraph_integer_t *c = hc + 2 + n;
-    for (igraph_integer_t i = 0; i < n; i++) {
-        igraph_integer_t *p = neigh[i];
-        for (igraph_integer_t d = deg[i]; d--; p++) {
+    memcpy(hc + 2, deg, sizeof(igraph_int_t)*n);
+    igraph_int_t *c = hc + 2 + n;
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_int_t *p = neigh[i];
+        for (igraph_int_t d = deg[i]; d--; p++) {
             assert(*p != i);
             if (*p >= i) {
                 *(c++) = *p;
@@ -185,15 +185,15 @@ igraph_integer_t *graph_molloy_opt::hard_copy() {
     return hc;
 }
 
-void graph_molloy_opt::restore(igraph_integer_t* b) {
-    igraph_integer_t i;
+void graph_molloy_opt::restore(igraph_int_t* b) {
+    igraph_int_t i;
     for (i = 0; i < n; i++) {
         deg[i] = 0;
     }
-    igraph_integer_t *p = links;
+    igraph_int_t *p = links;
     for (i = 0; i < n - 1; i++) {
         p += deg[i];
-        deg[i] = igraph_integer_t(neigh[i + 1] - neigh[i]);
+        deg[i] = igraph_int_t(neigh[i + 1] - neigh[i]);
         assert((neigh[i] + deg[i]) == neigh[i + 1]);
         while (p != neigh[i + 1]) {
             // b points to the current 'j'
@@ -203,95 +203,95 @@ void graph_molloy_opt::restore(igraph_integer_t* b) {
     }
 }
 
-igraph_integer_t* graph_molloy_opt::backup_degs(igraph_integer_t *b) {
+igraph_int_t* graph_molloy_opt::backup_degs(igraph_int_t *b) {
     if (b == NULL) {
-        b = new igraph_integer_t[n];
+        b = new igraph_int_t[n];
     }
-    memcpy(b, deg, sizeof(igraph_integer_t)*n);
+    memcpy(b, deg, sizeof(igraph_int_t)*n);
     return b;
 }
 
-void graph_molloy_opt::restore_degs_only(igraph_integer_t *b) {
-    memcpy(deg, b, sizeof(igraph_integer_t)*n);
+void graph_molloy_opt::restore_degs_only(igraph_int_t *b) {
+    memcpy(deg, b, sizeof(igraph_int_t)*n);
     refresh_nbarcs();
 }
 
-void graph_molloy_opt::restore_degs_and_neigh(igraph_integer_t *b) {
+void graph_molloy_opt::restore_degs_and_neigh(igraph_int_t *b) {
     restore_degs_only(b);
     compute_neigh();
 }
 
-void graph_molloy_opt::restore_degs(igraph_integer_t last_degree) {
+void graph_molloy_opt::restore_degs(igraph_int_t last_degree) {
     a = last_degree;
     deg[n - 1] = last_degree;
-    for (igraph_integer_t i = n - 2; i >= 0; i--) {
-        a += (deg[i] = igraph_integer_t(neigh[i + 1] - neigh[i]));
+    for (igraph_int_t i = n - 2; i >= 0; i--) {
+        a += (deg[i] = igraph_int_t(neigh[i + 1] - neigh[i]));
     }
     refresh_nbarcs();
 }
 
 void graph_molloy_opt::clean() {
-    igraph_integer_t *b = hard_copy();
+    igraph_int_t *b = hard_copy();
     replace(b);
     delete[] b;
 }
 
-void graph_molloy_opt::replace(igraph_integer_t *_hardcopy) {
+void graph_molloy_opt::replace(igraph_int_t *_hardcopy) {
     delete[] deg;
     n = *(_hardcopy++);
     a = *(_hardcopy++);
-    deg = new igraph_integer_t[a + n];
-    memcpy(deg, _hardcopy, sizeof(igraph_integer_t)*n);
+    deg = new igraph_int_t[a + n];
+    memcpy(deg, _hardcopy, sizeof(igraph_int_t)*n);
     links = deg + n;
     compute_neigh();
     restore(_hardcopy + n);
 }
 
-igraph_integer_t* graph_molloy_opt::components(igraph_integer_t *comp) {
-    igraph_integer_t i;
+igraph_int_t* graph_molloy_opt::components(igraph_int_t *comp) {
+    igraph_int_t i;
     // breadth-first search buffer
-    igraph_integer_t *buff = new igraph_integer_t[n];
+    igraph_int_t *buff = new igraph_int_t[n];
     // comp[i] will contain the index of the component that contains vertex i
     if (comp == NULL) {
-        comp = new igraph_integer_t[n];
+        comp = new igraph_int_t[n];
     }
-    memset(comp, 0, sizeof(igraph_integer_t)*n);
+    memset(comp, 0, sizeof(igraph_int_t)*n);
     // current component index
-    igraph_integer_t curr_comp = 0;
+    igraph_int_t curr_comp = 0;
     // loop over all non-visited vertices...
-    for (igraph_integer_t v0 = 0; v0 < n; v0++) if (comp[v0] == 0) {
+    for (igraph_int_t v0 = 0; v0 < n; v0++) if (comp[v0] == 0) {
             curr_comp++;
             // initiate breadth-first search
-            igraph_integer_t *to_visit = buff;
-            igraph_integer_t *visited = buff;
+            igraph_int_t *to_visit = buff;
+            igraph_int_t *visited = buff;
             *(to_visit++) = v0;
             comp[v0] = curr_comp;
             // breadth-first search
             while (visited != to_visit) {
-                igraph_integer_t v = *(visited++);
-                igraph_integer_t d = deg[v];
-                for (igraph_integer_t *w = neigh[v]; d--; w++) if (comp[*w] == 0) {
+                igraph_int_t v = *(visited++);
+                igraph_int_t d = deg[v];
+                for (igraph_int_t *w = neigh[v]; d--; w++) if (comp[*w] == 0) {
                         comp[*w] = curr_comp;
                         *(to_visit++) = *w;
                     }
             }
         }
     // compute component sizes and store them in buff[]
-    igraph_integer_t nb_comp = 0;
-    memset(buff, 0, sizeof(igraph_integer_t)*n);
+    igraph_int_t nb_comp = 0;
+    memset(buff, 0, sizeof(igraph_int_t)*n);
     for (i = 0; i < n; i++)
         if (buff[comp[i] - 1]++ == 0 && comp[i] > nb_comp) {
             nb_comp = comp[i];
         }
     // box-sort sizes
-    igraph_integer_t offset = 0;
-    igraph_integer_t *box = pre_boxsort(buff, nb_comp, offset);
+    igraph_int_t offset = 0;
+    igraph_int_t *box = pre_boxsort(buff, nb_comp, offset);
     for (i = nb_comp - 1; i >= 0; i--) {
         buff[i] = --box[buff[i] - offset];
     }
     delete[] box;
     // reassign component indexes
-    for (igraph_integer_t *c = comp + n; comp != c--; *c = buff[*c - 1]) { }
+    for (igraph_int_t *c = comp + n; comp != c--; *c = buff[*c - 1]) { }
     // clean.. at last!
     delete[] buff;
     return comp;
@@ -299,11 +299,11 @@ igraph_integer_t* graph_molloy_opt::components(igraph_integer_t *comp) {
 
 bool graph_molloy_opt::havelhakimi() {
 
-    igraph_integer_t i;
-    igraph_integer_t dmax = max_degree() + 1;
+    igraph_int_t i;
+    igraph_int_t dmax = max_degree() + 1;
     // Sort vertices using basket-sort, in descending degrees
-    igraph_integer_t *nb = new igraph_integer_t[dmax];
-    igraph_integer_t *sorted = new igraph_integer_t[n];
+    igraph_int_t *nb = new igraph_int_t[dmax];
+    igraph_int_t *sorted = new igraph_int_t[n];
     // init basket
     for (i = 0; i < dmax; i++) {
         nb[i] = 0;
@@ -313,7 +313,7 @@ bool graph_molloy_opt::havelhakimi() {
         nb[deg[i]]++;
     }
     // cumul
-    igraph_integer_t c = 0;
+    igraph_int_t c = 0;
     for (i = dmax - 1; i >= 0; i--) {
         c += nb[i];
         nb[i] = -nb[i] + c;
@@ -324,30 +324,30 @@ bool graph_molloy_opt::havelhakimi() {
     }
 
 // Binding process starts
-    igraph_integer_t first = 0;  // vertex with biggest residual degree
-    igraph_integer_t d = dmax - 1; // maximum residual degree available
+    igraph_int_t first = 0;  // vertex with biggest residual degree
+    igraph_int_t d = dmax - 1; // maximum residual degree available
 
     for (c = a / 2; c > 0; ) {
         // pick a vertex. we could pick any, but here we pick the one with biggest degree
-        igraph_integer_t v = sorted[first];
+        igraph_int_t v = sorted[first];
         // look for current degree of v
         while (nb[d] <= first) {
             d--;
         }
         // store it in dv
-        igraph_integer_t dv = d;
+        igraph_int_t dv = d;
         // bind it !
         c -= dv;
-        igraph_integer_t dc = d;         // residual degree of vertices we bind to
-        igraph_integer_t fc = ++first;   // position of the first vertex with degree dc
+        igraph_int_t dc = d;         // residual degree of vertices we bind to
+        igraph_int_t fc = ++first;   // position of the first vertex with degree dc
 
         while (dv > 0 && dc > 0) {
-            igraph_integer_t lc = nb[dc];
+            igraph_int_t lc = nb[dc];
             if (lc != fc) {
                 while (dv > 0 && lc > fc) {
                     // binds v with sorted[--lc]
                     dv--;
-                    igraph_integer_t w = sorted[--lc];
+                    igraph_int_t w = sorted[--lc];
                     *(neigh[v]++) = w;
                     *(neigh[w]++) = v;
                 }
@@ -381,16 +381,16 @@ bool graph_molloy_opt::havelhakimi() {
 
 bool graph_molloy_opt::is_connected() {
     bool *visited = new bool[n];
-    for (igraph_integer_t i = n; i > 0; visited[--i] = false) { }
-    igraph_integer_t *to_visit = new igraph_integer_t[n];
-    igraph_integer_t *stop = to_visit;
-    igraph_integer_t left = n - 1;
+    for (igraph_int_t i = n; i > 0; visited[--i] = false) { }
+    igraph_int_t *to_visit = new igraph_int_t[n];
+    igraph_int_t *stop = to_visit;
+    igraph_int_t left = n - 1;
     *(to_visit++) = 0;
     visited[0] = true;
     while (left > 0 && to_visit != stop) {
-        igraph_integer_t v = *(--to_visit);
-        igraph_integer_t *w = neigh[v];
-        for (igraph_integer_t k = deg[v]; k--; w++) {
+        igraph_int_t v = *(--to_visit);
+        igraph_int_t *w = neigh[v];
+        for (igraph_int_t k = deg[v]; k--; w++) {
             if (!visited[*w]) {
                 visited[*w] = true;
                 left--;
@@ -411,13 +411,13 @@ bool graph_molloy_opt::make_connected() {
         // fprintf(stderr,"\ngraph::make_connected() failed : #edges < #vertices-1\n");
         return false;
     }
-    igraph_integer_t i;
+    igraph_int_t i;
 
 // Data struct for the visit :
 // - buff[] contains vertices to visit
 // - dist[V] is V's distance modulo 4 to the root of its comp, or -1 if it hasn't been visited yet
 #define MC_BUFF_SIZE (n+2)
-    igraph_integer_t *buff = new igraph_integer_t[MC_BUFF_SIZE];
+    igraph_int_t *buff = new igraph_int_t[MC_BUFF_SIZE];
     unsigned char * dist  = new unsigned char[n];
 #define NOT_VISITED 255
 #define FORBIDDEN   254
@@ -426,17 +426,17 @@ bool graph_molloy_opt::make_connected() {
 // Data struct to store components : either surplus trees or surplus edges are stored at buff[]'s end
 // - A Tree is coded by one of its vertices
 // - An edge (a,b) is coded by the TWO ints a and b
-    igraph_integer_t *ffub = buff + MC_BUFF_SIZE;
+    igraph_int_t *ffub = buff + MC_BUFF_SIZE;
     edge *edges = (edge *) ffub;
-    igraph_integer_t *trees = ffub;
-    igraph_integer_t *min_ffub = buff + 1 + (MC_BUFF_SIZE % 2 ? 0 : 1);
+    igraph_int_t *trees = ffub;
+    igraph_int_t *min_ffub = buff + 1 + (MC_BUFF_SIZE % 2 ? 0 : 1);
 
 // There will be only one "fatty" component, and trees.
     edge fatty_edge = { -1, -1 };
     bool enough_edges = false;
 
     // start main loop
-    for (igraph_integer_t v0 = 0; v0 < n; v0++) if (dist[v0] == NOT_VISITED) {
+    for (igraph_int_t v0 = 0; v0 < n; v0++) if (dist[v0] == NOT_VISITED) {
             // is v0 an isolated vertex?
             if (deg[v0] == 0) {
                 delete[] dist;
@@ -445,20 +445,20 @@ bool graph_molloy_opt::make_connected() {
                 return false;
             }
             dist[v0] = 0; // root
-            igraph_integer_t *to_visit = buff;
-            igraph_integer_t *current  = buff;
+            igraph_int_t *to_visit = buff;
+            igraph_int_t *current  = buff;
             *(to_visit++) = v0;
 
             // explore component connected to v0
             bool is_a_tree = true;
             while (current != to_visit) {
-                igraph_integer_t v = *(current++);
+                igraph_int_t v = *(current++);
                 unsigned char current_dist = dist[v];
                 unsigned char next_dist = (current_dist + 1) & 0x03;
                 //unsigned char prev_dist = (current_dist-1) & 0x03;
-                igraph_integer_t* ww = neigh[v];
-                igraph_integer_t w;
-                for (igraph_integer_t k = deg[v]; k--; ww++) {
+                igraph_int_t* ww = neigh[v];
+                igraph_int_t w;
+                for (igraph_int_t k = deg[v]; k--; ww++) {
                     if (dist[w = *ww] == NOT_VISITED) {
                         // we didn't visit *w yet
                         dist[w] = next_dist;
@@ -539,7 +539,7 @@ bool graph_molloy_opt::make_connected() {
     return (trees == ffub || ((trees + 1) == ffub && fatty_edge.from < 0));
 }
 
-bool graph_molloy_opt::swap_edges_simple(igraph_integer_t from1, igraph_integer_t to1, igraph_integer_t from2, igraph_integer_t to2) {
+bool graph_molloy_opt::swap_edges_simple(igraph_int_t from1, igraph_int_t to1, igraph_int_t from2, igraph_int_t to2) {
     if (from1 == to1 || from1 == from2 || from1 == to2 || to1 == from2 || to1 == to2 || from2 == to2) {
         return false;
     }
@@ -551,7 +551,7 @@ bool graph_molloy_opt::swap_edges_simple(igraph_integer_t from1, igraph_integer_
 }
 
 void graph_molloy_opt::print(FILE *f, bool NOZERO) {
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
     for (i = 0; i < n; i++) {
         if (!NOZERO || deg[i] > 0) {
             fprintf(f, "%" IGRAPH_PRId, i);
@@ -563,14 +563,14 @@ void graph_molloy_opt::print(FILE *f, bool NOZERO) {
     }
 }
 
-igraph_integer_t graph_molloy_opt::effective_isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited) {
-    igraph_integer_t i;
+igraph_int_t graph_molloy_opt::effective_isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited) {
+    igraph_int_t i;
     for (i = 0; i < K; i++) {
         Kbuff[i] = -1;
     }
-    igraph_integer_t count = 0;
-    igraph_integer_t left = K;
-    igraph_integer_t *KB = Kbuff;
+    igraph_int_t count = 0;
+    igraph_int_t left = K;
+    igraph_int_t *KB = Kbuff;
     //yapido = (my_random()%1000 == 0);
     depth_isolated(v, count, left, K, KB, visited);
     while (KB-- != Kbuff) {
@@ -580,7 +580,7 @@ igraph_integer_t graph_molloy_opt::effective_isolated(igraph_integer_t v, igraph
     return count;
 }
 
-void graph_molloy_opt::depth_isolated(igraph_integer_t v, igraph_integer_t &calls, igraph_integer_t &left_to_explore, igraph_integer_t dmax, igraph_integer_t * &Kbuff, bool *visited) {
+void graph_molloy_opt::depth_isolated(igraph_int_t v, igraph_int_t &calls, igraph_int_t &left_to_explore, igraph_int_t dmax, igraph_int_t * &Kbuff, bool *visited) {
     if (left_to_explore == 0) {
         return;
     }
@@ -595,10 +595,10 @@ void graph_molloy_opt::depth_isolated(igraph_integer_t v, igraph_integer_t &call
     *(Kbuff++) = v;
     visited[v] = true;
     calls++;
-    igraph_integer_t *w = neigh[v];
+    igraph_int_t *w = neigh[v];
     qsort(deg, w, deg[v]);
     w += deg[v];
-    for (igraph_integer_t i = deg[v]; i--; ) {
+    for (igraph_int_t i = deg[v]; i--; ) {
         if (visited[*--w]) {
             calls++;
         } else {
@@ -610,19 +610,19 @@ void graph_molloy_opt::depth_isolated(igraph_integer_t v, igraph_integer_t &call
     }
 }
 
-igraph_integer_t graph_molloy_opt::depth_search(bool *visited, igraph_integer_t *buff, igraph_integer_t v0) {
-    for (igraph_integer_t i = 0; i < n; i++) {
+igraph_int_t graph_molloy_opt::depth_search(bool *visited, igraph_int_t *buff, igraph_int_t v0) {
+    for (igraph_int_t i = 0; i < n; i++) {
         visited[i] = false;
     }
-    igraph_integer_t *to_visit = buff;
-    igraph_integer_t nb_visited = 1;
+    igraph_int_t *to_visit = buff;
+    igraph_int_t nb_visited = 1;
     visited[v0] = true;
     *(to_visit++) = v0;
     while (to_visit != buff && nb_visited < n) {
-        igraph_integer_t v = *(--to_visit);
-        igraph_integer_t *ww = neigh[v];
-        igraph_integer_t w;
-        for (igraph_integer_t k = deg[v]; k--; ww++) if (!visited[w = *ww]) {
+        igraph_int_t v = *(--to_visit);
+        igraph_int_t *ww = neigh[v];
+        igraph_int_t w;
+        for (igraph_int_t k = deg[v]; k--; ww++) if (!visited[w = *ww]) {
                 visited[w] = true;
                 nb_visited++;
                 *(to_visit++) = w;
@@ -631,23 +631,23 @@ igraph_integer_t graph_molloy_opt::depth_search(bool *visited, igraph_integer_t 
     return nb_visited;
 }
 
-igraph_integer_t graph_molloy_opt::width_search(unsigned char *dist, igraph_integer_t *buff, igraph_integer_t v0, igraph_integer_t toclear) {
-    if (toclear >= 0) for (igraph_integer_t i = 0; i < toclear; i++) {
+igraph_int_t graph_molloy_opt::width_search(unsigned char *dist, igraph_int_t *buff, igraph_int_t v0, igraph_int_t toclear) {
+    if (toclear >= 0) for (igraph_int_t i = 0; i < toclear; i++) {
             dist[buff[i]] = 0;
-        } else for (igraph_integer_t i = 0; i < n; i++) {
+        } else for (igraph_int_t i = 0; i < n; i++) {
             dist[i] = 0;
         }
-    igraph_integer_t *to_visit = buff;
-    igraph_integer_t *to_add = buff;
-    igraph_integer_t nb_visited = 1;
+    igraph_int_t *to_visit = buff;
+    igraph_int_t *to_add = buff;
+    igraph_int_t nb_visited = 1;
     dist[v0] = 1;
     *(to_add++) = v0;
     while (to_visit != to_add && nb_visited < n) {
-        igraph_integer_t v = *(to_visit++);
-        igraph_integer_t *ww = neigh[v];
-        igraph_integer_t w;
+        igraph_int_t v = *(to_visit++);
+        igraph_int_t *ww = neigh[v];
+        igraph_int_t w;
         unsigned char d = next_dist(dist[v]);
-        for (igraph_integer_t k = deg[v]; k--; ww++) if (dist[w = *ww] == 0) {
+        for (igraph_int_t k = deg[v]; k--; ww++) if (dist[w = *ww] == 0) {
                 dist[w] = d;
                 nb_visited++;
                 *(to_add++) = w;
@@ -657,25 +657,25 @@ igraph_integer_t graph_molloy_opt::width_search(unsigned char *dist, igraph_inte
 }
 
 // dist[] MUST be full of zeros !!!!
-igraph_integer_t graph_molloy_opt::breadth_path_search(igraph_integer_t src, igraph_integer_t *buff, double *paths, unsigned char *dist) {
+igraph_int_t graph_molloy_opt::breadth_path_search(igraph_int_t src, igraph_int_t *buff, double *paths, unsigned char *dist) {
     unsigned char last_dist = 0;
     unsigned char curr_dist = 1;
-    igraph_integer_t *to_visit = buff;
-    igraph_integer_t *visited  = buff;
+    igraph_int_t *to_visit = buff;
+    igraph_int_t *visited  = buff;
     *(to_visit++) = src;
     paths[src] = 1.0;
     dist[src]  = curr_dist;
-    igraph_integer_t nb_visited = 1;
+    igraph_int_t nb_visited = 1;
     while (visited != to_visit) {
-        igraph_integer_t v = *(visited++);
+        igraph_int_t v = *(visited++);
         if (last_dist == (curr_dist = dist[v])) {
             break;
         }
         unsigned char nd = next_dist(curr_dist);
-        igraph_integer_t *ww = neigh[v];
+        igraph_int_t *ww = neigh[v];
         double p = paths[v];
-        for (igraph_integer_t k = deg[v]; k--;) {
-            igraph_integer_t w = *(ww++);
+        for (igraph_int_t k = deg[v]; k--;) {
+            igraph_int_t w = *(ww++);
             unsigned char d = dist[w];
             if (d == 0) {
                 // not visited yet !
@@ -697,8 +697,8 @@ igraph_integer_t graph_molloy_opt::breadth_path_search(igraph_integer_t src, igr
     return nb_visited;
 }
 
-igraph_integer_t *graph_molloy_opt::vertices_real(igraph_integer_t &nb_v) {
-    igraph_integer_t *yo;
+igraph_int_t *graph_molloy_opt::vertices_real(igraph_int_t &nb_v) {
+    igraph_int_t *yo;
     if (nb_v < 0) {
         nb_v = 0;
         for (yo = deg; yo != deg + n; ) if (*(yo++) > 0) {
@@ -709,9 +709,9 @@ igraph_integer_t *graph_molloy_opt::vertices_real(igraph_integer_t &nb_v) {
         IGRAPH_WARNING("graph is empty");
         return NULL;
     }
-    igraph_integer_t *buff = new igraph_integer_t[nb_v];
+    igraph_int_t *buff = new igraph_int_t[nb_v];
     yo = buff;
-    for (igraph_integer_t i = 0; i < n; i++) if (deg[i] > 0) {
+    for (igraph_int_t i = 0; i < n; i++) if (deg[i] > 0) {
             *(yo++) = i;
         }
     if (yo != buff + nb_v) {
@@ -723,7 +723,7 @@ igraph_integer_t *graph_molloy_opt::vertices_real(igraph_integer_t &nb_v) {
     }
 }
 
-bool graph_molloy_opt::isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited) {
+bool graph_molloy_opt::isolated(igraph_int_t v, igraph_int_t K, igraph_int_t *Kbuff, bool *visited) {
     if (K < 2) {
         return false;
     }
@@ -732,17 +732,17 @@ bool graph_molloy_opt::isolated(igraph_integer_t v, igraph_integer_t K, igraph_i
         return false;
     }
 #endif //OPT_ISOLATED
-    igraph_integer_t *seen  = Kbuff;
-    igraph_integer_t *known = Kbuff;
-    igraph_integer_t *max   = Kbuff + (K - 1);
+    igraph_int_t *seen  = Kbuff;
+    igraph_int_t *known = Kbuff;
+    igraph_int_t *max   = Kbuff + (K - 1);
     *(known++) = v;
     visited[v] = true;
     bool is_isolated = true;
 
     while (known != seen) {
         v = *(seen++);
-        igraph_integer_t *w = neigh[v];
-        for (igraph_integer_t d = deg[v]; d--; w++) if (!visited[*w]) {
+        igraph_int_t *w = neigh[v];
+        for (igraph_int_t d = deg[v]; d--; w++) if (!visited[*w]) {
 #ifdef OPT_ISOLATED
                 if (K <= deg[*w] + 1 || known == max) {
 #else //OPT_ISOLATED
@@ -776,7 +776,7 @@ void graph_molloy_opt::sort() {
 bool graph_molloy_opt::verify(int mode) {
     IGRAPH_UNUSED(mode);
 #ifndef NDEBUG
-    igraph_integer_t i, j, k;
+    igraph_int_t i, j, k;
     assert(neigh[0] == links);
     // verify edges count
     if ((mode & VERIFY_NOARCS) == 0) {
@@ -800,8 +800,8 @@ bool graph_molloy_opt::verify(int mode) {
 //    assert(neigh[i][j]!=neigh[i][k]);
     // verify symmetry
     for (i = 0; i < n; i++) for (j = 0; j < deg[i]; j++) {
-            igraph_integer_t v = neigh[i][j];
-            igraph_integer_t nb = 0;
+            igraph_int_t v = neigh[i][j];
+            igraph_int_t nb = 0;
             for (k = 0; k < deg[v]; k++) if (neigh[v][k] == i) {
                     nb++;
                 }

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -37,6 +37,9 @@ int main(void) {
     igraph_matrix_t A, B, RHS;
     int info;
     int i, j;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Identity matrix, you have to start somewhere */
 

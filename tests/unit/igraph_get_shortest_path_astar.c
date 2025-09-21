@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ int check_edges(const igraph_t *graph, const igraph_vector_int_t *vertices,
 
     igraph_bool_t directed = igraph_is_directed(graph);
 
-    igraph_integer_t j, n2 = igraph_vector_int_size(edges);
+    igraph_int_t j, n2 = igraph_vector_int_size(edges);
     if (igraph_vector_int_size(vertices) == 0 && n2 == 0) {
         return 0;
     }
@@ -33,21 +33,21 @@ int check_edges(const igraph_t *graph, const igraph_vector_int_t *vertices,
         exit(error_code + 2);
     }
     for (j = 0; j < n2; j++) {
-        igraph_integer_t edge = VECTOR(*edges)[j];
-        igraph_integer_t from = VECTOR(*vertices)[j];
-        igraph_integer_t to = VECTOR(*vertices)[j + 1];
+        igraph_int_t edge = VECTOR(*edges)[j];
+        igraph_int_t from = VECTOR(*vertices)[j];
+        igraph_int_t to = VECTOR(*vertices)[j + 1];
         if (directed) {
             if (from != IGRAPH_FROM(graph, edge) ||
                 to   != IGRAPH_TO  (graph, edge)) {
                 exit(error_code);
             }
         } else {
-            igraph_integer_t from2 = IGRAPH_FROM(graph, edge);
-            igraph_integer_t to2 = IGRAPH_TO(graph, edge);
-            igraph_integer_t min1 = from < to ? from : to;
-            igraph_integer_t max1 = from < to ? to : from;
-            igraph_integer_t min2 = from2 < to2 ? from2 : to2;
-            igraph_integer_t max2 = from2 < to2 ? to2 : from2;
+            igraph_int_t from2 = IGRAPH_FROM(graph, edge);
+            igraph_int_t to2 = IGRAPH_TO(graph, edge);
+            igraph_int_t min1 = from < to ? from : to;
+            igraph_int_t max1 = from < to ? to : from;
+            igraph_int_t min2 = from2 < to2 ? from2 : to2;
+            igraph_int_t max2 = from2 < to2 ? to2 : from2;
             if (min1 != min2 || max1 != max2) {
                 exit(error_code + 3);
             }
@@ -57,7 +57,7 @@ int check_edges(const igraph_t *graph, const igraph_vector_int_t *vertices,
     return 0;
 }
 
-igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
+igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_int_t source_id, igraph_int_t target_id, void *extra) {
     IGRAPH_UNUSED(target_id);
     IGRAPH_UNUSED(extra);
     int x[4];
@@ -74,7 +74,7 @@ struct xyt {
     igraph_vector_t y;
 };
 
-igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
+igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_int_t source_id, igraph_int_t target_id, void *extra) {
     struct xyt *xyp = extra;
     igraph_real_t xt, xf, yt, yf;
     xt = VECTOR(xyp->x)[target_id];
@@ -93,7 +93,7 @@ int main(void) {
     igraph_vector_t weights_vec;
     struct xyt xy;
     igraph_vector_int_t dimvector;
-    igraph_integer_t dims[] = {LENGTH, LENGTH, LENGTH, LENGTH};
+    igraph_int_t dims[] = {LENGTH, LENGTH, LENGTH, LENGTH};
 
     //set seed for grg random graph generation
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -132,7 +132,7 @@ int main(void) {
     /* Same ring, but with weights */
 
     printf("Astar, weighted, no heuristic:\n");
-    igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
+    weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
                                        &weights_vec, IGRAPH_OUT,
@@ -145,7 +145,7 @@ int main(void) {
     igraph_destroy(&g);
 
     printf("Astar, unweighted, lattice with manhattan distance heuristic:\n");
-    igraph_vector_int_view(&dimvector, dims, sizeof(dims)/sizeof(dims[0]));
+    dimvector = igraph_vector_int_view(dims, sizeof(dims)/sizeof(dims[0]));
 
     igraph_square_lattice(&g, &dimvector, /*nei*/ 1, IGRAPH_UNDIRECTED, /*mutual*/ false, /*periodic*/NULL);
 

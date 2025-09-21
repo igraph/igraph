@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ int main(void) {
     printf("Graph with no vertices:\n");
     {
         igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
-        igraph_vector_int_view(&mapping, NULL, 0);
+        mapping = igraph_vector_int_view(NULL, 0);
         igraph_contract_vertices(&g, &mapping, &comb);
         igraph_destroy(&g);
     }
@@ -50,9 +50,9 @@ int main(void) {
         igraph_vector_t reals_edges;
         igraph_vector_bool_t bools;
 
-        igraph_vector_view(&reals, real_numbers, 6);
-        igraph_vector_view(&reals_edges, real_numbers_edges, 8);
-        igraph_vector_bool_view(&bools, booleans, 6);
+        reals = igraph_vector_view(real_numbers, 6);
+        reals_edges = igraph_vector_view(real_numbers_edges, 8);
+        bools = igraph_vector_bool_view(booleans, 6);
 
         SETVABV(&g, "ab", &bools);
         SETVANV(&g, "an", &reals);
@@ -66,36 +66,36 @@ int main(void) {
 
         {
             printf("No contraction:\n");
-            igraph_integer_t mappings[6] = {0, 1, 2, 3, 4, 5};
-            igraph_vector_int_view(&mapping, mappings, 6);
+            igraph_int_t mappings[6] = {0, 1, 2, 3, 4, 5};
+            mapping = igraph_vector_int_view(mappings, 6);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 5 into 4:\n");
-            igraph_integer_t mappings[6] = {0, 1, 2, 3, 4, 4};
-            igraph_vector_int_view(&mapping, mappings, 6);
+            igraph_int_t mappings[6] = {0, 1, 2, 3, 4, 4};
+            mapping = igraph_vector_int_view(mappings, 6);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 4 into 3:\n");
-            igraph_integer_t mappings[5] = {0, 1, 2, 3, 3};
-            igraph_vector_int_view(&mapping, mappings, 5);
+            igraph_int_t mappings[5] = {0, 1, 2, 3, 3};
+            mapping = igraph_vector_int_view(mappings, 5);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 3 into 2:\n");
-            igraph_integer_t mappings[4] = {0, 1, 2, 2};
-            igraph_vector_int_view(&mapping, mappings, 4);
+            igraph_int_t mappings[4] = {0, 1, 2, 2};
+            mapping = igraph_vector_int_view(mappings, 4);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
         {
             printf("Contract 2 into 0:\n");
-            igraph_integer_t mappings[3] = {0, 1, 0};
-            igraph_vector_int_view(&mapping, mappings, 3);
+            igraph_int_t mappings[3] = {0, 1, 0};
+            mapping = igraph_vector_int_view(mappings, 3);
             igraph_contract_vertices(&g, &mapping, &comb);
             print_attributes(&g);
         }
@@ -105,8 +105,8 @@ int main(void) {
 
     {
         printf("Check incorrect mapping size error.\n");
-        igraph_integer_t mappings[3] = {0, 1, 0};
-        igraph_vector_int_view(&mapping, mappings, 3);
+        igraph_int_t mappings[3] = {0, 1, 0};
+        mapping = igraph_vector_int_view(mappings, 3);
         CHECK_ERROR(igraph_contract_vertices(&g, &mapping, &comb), IGRAPH_EINVAL);
     }
 

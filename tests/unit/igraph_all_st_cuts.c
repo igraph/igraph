@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -30,10 +30,10 @@
 #include "test_utilities.h"
 
 int test_all_st_cuts(const igraph_t *graph,
-                     igraph_integer_t source,
-                     igraph_integer_t target) {
+                     igraph_int_t source,
+                     igraph_int_t target) {
     igraph_vector_int_list_t cuts, partition1s;
-    igraph_integer_t n, i;
+    igraph_int_t n, i;
 
     igraph_vector_int_list_init(&cuts, 0);
     igraph_vector_int_list_init(&partition1s, 0);
@@ -59,11 +59,11 @@ int test_all_st_cuts(const igraph_t *graph,
 int main(void) {
     igraph_t g;
     igraph_vector_int_list_t cuts, partition1s;
-    igraph_integer_t i, n;
+    igraph_int_t i, n;
 
     igraph_marked_queue_int_t S;
     igraph_estack_t T;
-    igraph_integer_t v;
+    igraph_int_t v;
     igraph_vector_int_t Isv;
 
     /* ----------------------------------------------------------- */

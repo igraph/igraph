@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2021 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -49,16 +49,16 @@
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
  */
-igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_lcf(igraph_t *graph, igraph_int_t n,
                           const igraph_vector_int_t *shifts,
-                          igraph_integer_t repeats) {
+                          igraph_int_t repeats) {
 
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_shifts = igraph_vector_int_size(shifts);
-    igraph_integer_t ptr = 0, sptr = 0;
-    igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges;
-    igraph_integer_t no_of_edges2;
+    igraph_int_t no_of_shifts = igraph_vector_int_size(shifts);
+    igraph_int_t ptr = 0, sptr = 0;
+    igraph_int_t no_of_nodes = n;
+    igraph_int_t no_of_edges;
+    igraph_int_t no_of_edges2;
 
     if (repeats < 0) {
         IGRAPH_ERROR("Number of repeats must not be negative.", IGRAPH_EINVAL);
@@ -73,7 +73,7 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
 
     if (no_of_nodes > 0) {
         /* Create a ring first */
-        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             VECTOR(edges)[ptr++] = i;
             VECTOR(edges)[ptr++] = i + 1;
         }
@@ -82,9 +82,9 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
 
     /* Then add the rest */
     while (ptr < 2 * no_of_edges) {
-        igraph_integer_t sh = VECTOR(*shifts)[sptr % no_of_shifts];
-        igraph_integer_t from = sptr % no_of_nodes;
-        igraph_integer_t to = (no_of_nodes + sptr + sh) % no_of_nodes;
+        igraph_int_t sh = VECTOR(*shifts)[sptr % no_of_shifts];
+        igraph_int_t from = sptr % no_of_nodes;
+        igraph_int_t to = (no_of_nodes + sptr + sh) % no_of_nodes;
         VECTOR(edges)[ptr++] = from;
         VECTOR(edges)[ptr++] = to;
         sptr++;
@@ -121,9 +121,9 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n,
  *
  * \example examples/simple/igraph_lcf.c
  */
-igraph_error_t igraph_lcf_small(igraph_t *graph, igraph_integer_t n, ...) {
+igraph_error_t igraph_lcf_small(igraph_t *graph, igraph_int_t n, ...) {
     igraph_vector_int_t shifts;
-    igraph_integer_t repeats;
+    igraph_int_t repeats;
     va_list ap;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&shifts, 0);

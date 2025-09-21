@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     };
     igraph_bliss_sh_t heur;
 
-    const igraph_integer_t max_vcount  = 64;
+    const igraph_int_t max_vcount  = 64;
 
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 

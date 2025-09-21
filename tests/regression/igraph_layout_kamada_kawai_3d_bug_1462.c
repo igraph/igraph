@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ void snap_to_zero(igraph_real_t* value) {
 int main(void) {
     igraph_t graph;
     igraph_matrix_t layout;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     if (igraph_empty(&graph, 2, 0)) {
         return 1;

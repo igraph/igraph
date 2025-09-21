@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,9 @@ int main(void) {
 
     igraph_t g, g2;
     igraph_attribute_combination_t comb;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 

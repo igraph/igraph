@@ -1,5 +1,5 @@
 /*
-  IGraph library.
+  igraph library.
   Copyright (C) 2024 The igraph development team <igraph@igraph.org>
 
   This program is free software; you can redistribute it and/or modify it under
@@ -59,16 +59,16 @@ static igraph_error_t check_singleton(void)
 /* - Removing an edge */
 /* - Checking that it is not complete anymore */
 /* - Then doing the same for multiple graphs */
-static igraph_error_t check(const igraph_bool_t directed, const igraph_integer_t vertices)
+static igraph_error_t check(const igraph_bool_t directed, const igraph_int_t vertices)
 {
     igraph_t simple, multiple;
     igraph_bool_t complete = false;
-    igraph_integer_t eid = -1;
-    igraph_integer_t size = -1;
+    igraph_int_t eid = -1;
+    igraph_int_t size = -1;
     igraph_es_t es;
     igraph_vector_bool_t mutuals;
     igraph_vector_int_t toadd;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     /* generic, simple graph */
     igraph_full(&simple, vertices, directed, false);

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2015-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,22 +21,15 @@
 #include "test_utilities.h"
 
 int main(void) {
-    /* this is a directed graph with 10 vertices and 20 edges: */
-    igraph_integer_t vc = 10, ec = 20;
-    igraph_integer_t edge_data[] = {
-        0, 2, 1, 4, 2, 5, 2, 7, 3, 7, 3, 8, 4, 2, 5, 8, 6, 0, 6, 1, 6, 2, 7,
-        0, 8, 0, 8, 2, 8, 3, 8, 5, 9, 2, 9, 3, 9, 4, 9, 5
-    };
-
-    igraph_vector_int_t edges;
     igraph_vector_t tri;
     igraph_t graph;
 
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
-    igraph_vector_int_view(&edges, edge_data, 2 * ec);
-
-    igraph_create(&graph, &edges, vc, 1 /* directed=true */);
+    igraph_small(&graph, 10, IGRAPH_DIRECTED,
+                 0, 2, 1, 4, 2, 5, 2, 7, 3, 7, 3, 8, 4, 2, 5, 8, 6, 0, 6, 1, 6, 2, 7,
+                 0, 8, 0, 8, 2, 8, 3, 8, 5, 9, 2, 9, 3, 9, 4, 9, 5,
+                 -1);
 
     igraph_vector_init(&tri, 0);
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022 The igraph development team
 
    it under the terms of the GNU General Public License as published by
@@ -20,22 +20,22 @@
 #include "math/safe_intop.h"
 
 /* Use IGRAPH_SAFE_ADD() instead unless there is a need to intercept errors. */
-igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res) {
+igraph_error_t igraph_i_safe_add(igraph_int_t a, igraph_int_t b, igraph_int_t *res) {
     IGRAPH_SAFE_ADD(a, b, res);
     return IGRAPH_SUCCESS;
 }
 
 /* Use IGRAPH_SAFE_MULT() instead unless there is a need to intercept errors. */
-igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res) {
+igraph_error_t igraph_i_safe_mult(igraph_int_t a, igraph_int_t b, igraph_int_t *res) {
     IGRAPH_SAFE_MULT(a, b, res);
     return IGRAPH_SUCCESS;
 }
 
 /* Overflow-safe sum of integer vector elements. */
-igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res) {
-    const igraph_integer_t n = igraph_vector_int_size(vec);
-    igraph_integer_t sum = 0;
-    for (igraph_integer_t i=0; i < n; ++i) {
+igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_int_t *res) {
+    const igraph_int_t n = igraph_vector_int_size(vec);
+    igraph_int_t sum = 0;
+    for (igraph_int_t i=0; i < n; ++i) {
         IGRAPH_SAFE_ADD(sum, VECTOR(*vec)[i], &sum);
     }
     *res = sum;
@@ -43,10 +43,10 @@ igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igra
 }
 
 /* Overflow-safe product of integer vector elements. */
-igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_integer_t *res) {
-    const igraph_integer_t n = igraph_vector_int_size(vec);
-    igraph_integer_t prod = 1;
-    for (igraph_integer_t i=0; i < n; ++i) {
+igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_int_t *res) {
+    const igraph_int_t n = igraph_vector_int_size(vec);
+    igraph_int_t prod = 1;
+    for (igraph_int_t i=0; i < n; ++i) {
         IGRAPH_SAFE_MULT(prod, VECTOR(*vec)[i], &prod);
     }
     *res = prod;
@@ -59,7 +59,7 @@ igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igr
  *  This function must not be called with negative input.
  *  Based on https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
  */
-igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res) {
+igraph_error_t igraph_i_safe_next_pow_2(igraph_int_t k, igraph_int_t *res) {
     IGRAPH_ASSERT(k >= 0);
     if (k == 0) {
         *res = 0;
@@ -93,18 +93,18 @@ igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *re
  * Computes 2^k as an integer, with overflow check.
  * This function must not be called with negative input.
  */
-igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
+igraph_error_t igraph_i_safe_exp2(igraph_int_t k, igraph_int_t *res) {
     IGRAPH_ASSERT(k >= 0);
     if (k > IGRAPH_INTEGER_SIZE-2) {
         IGRAPH_ERRORF("Overflow when raising 2 to power %" IGRAPH_PRId ".",
                       IGRAPH_EOVERFLOW, k);
     }
-    *res = (igraph_integer_t) 1 << k;
+    *res = (igraph_int_t) 1 << k;
     return IGRAPH_SUCCESS;
 }
 
 /**
- * Checks if an igraph_real_t with no fractional part is representable as an igraph_integer_t.
+ * Checks if an igraph_real_t with no fractional part is representable as an igraph_int_t.
  * Avoids invoking undefined behaviour.
  * Must not be called with an input that has a non-zero fractional part.
  */
@@ -129,13 +129,13 @@ igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value) {
 }
 
 /**
- * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * Converts an igraph_real_t into an igraph_int_t with range checks to
  * protect from undefined behaviour. The input value is assumed to have no
  * fractional part.
  */
-static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_integer_t *result) {
+static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_int_t *result) {
     if (igraph_i_is_real_representable_as_integer(value)) {
-        *result = (igraph_integer_t) value;
+        *result = (igraph_int_t) value;
         return IGRAPH_SUCCESS;
     } else if (isnan(value)) {
         IGRAPH_ERROR("NaN cannot be converted to an integer.", IGRAPH_EINVAL);
@@ -146,41 +146,41 @@ static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_inte
 }
 
 /**
- * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * Converts an igraph_real_t into an igraph_int_t with range checks to
  * protect from undefined behaviour. The input value is converted into an
  * integer with ceil().
  */
-igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t *result) {
+igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_int_t *result) {
     return igraph_i_safe_real_to_int(ceil(value), result);
 }
 
 /**
- * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * Converts an igraph_real_t into an igraph_int_t with range checks to
  * protect from undefined behaviour. The input value is converted into an
  * integer with floor().
  */
-igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t *result) {
+igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_int_t *result) {
     return igraph_i_safe_real_to_int(floor(value), result);
 }
 
 /**
- * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * Converts an igraph_real_t into an igraph_int_t with range checks to
  * protect from undefined behaviour. The input value is converted into an
  * integer with round().
  *
  * This is typically the slowest of this set of functions.
  */
-igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result) {
+igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_int_t* result) {
     return igraph_i_safe_real_to_int(round(value), result);
 }
 
 /**
- * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * Converts an igraph_real_t into an igraph_int_t with range checks to
  * protect from undefined behaviour. The input value is converted into an
  * integer with trunc().
  *
 * This is typically the fastest of this set of functions.
  */
-igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result) {
+igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_int_t* result) {
     return igraph_i_safe_real_to_int(trunc(value), result);
 }

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,11 @@
 #include <igraph.h>
 
 int main(void) {
-
     igraph_t g;
     igraph_vector_int_t vids, layers, parents;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 0);
 

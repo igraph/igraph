@@ -18,7 +18,6 @@
 <!-- doxrox-include igraph_sparsemat_init_eye -->
 <!-- doxrox-include igraph_sparsemat_realloc -->
 <!-- doxrox-include igraph_sparsemat_destroy -->
-<!-- doxrox-include igraph_sparsemat_view -->
 </section>
 
 <section id="query-properties-of-a-sparse-matrix"><title>Query properties of a sparse matrix</title>

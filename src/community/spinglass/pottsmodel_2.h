@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -68,39 +68,39 @@ public:
 class PottsModel {
 private:
     //these lists are needed to keep track of spin states for parallel update mode
-    DL_Indexed_List<igraph_integer_t*> new_spins;
-    DL_Indexed_List<igraph_integer_t*> previous_spins;
+    DL_Indexed_List<igraph_int_t*> new_spins;
+    DL_Indexed_List<igraph_int_t*> previous_spins;
 
     HugeArray<HugeArray<double>*> correlation;
     network *net;
-    igraph_integer_t q;
+    igraph_int_t q;
     unsigned int operation_mode;
     SimpleMatrix Qmatrix;
     double* Qa;
     double* weights;
     double total_degree_sum;
-    igraph_integer_t num_of_nodes;
-    igraph_integer_t num_of_links;
-    igraph_integer_t k_max = 0;
+    igraph_int_t num_of_nodes;
+    igraph_int_t num_of_links;
+    igraph_int_t k_max = 0;
     double acceptance = 0;
     double* neighbours;
     double* color_field;
 public:
-    PottsModel(network *net, igraph_integer_t q, int norm_by_degree);
+    PottsModel(network *net, igraph_int_t q, int norm_by_degree);
     ~PottsModel();
 
-    igraph_integer_t assign_initial_conf(igraph_integer_t spin);
+    igraph_int_t assign_initial_conf(igraph_int_t spin);
 
     double initialize_Qmatrix();
     double calculate_Q();
 
     double FindStartTemp(double gamma, double prob,  double ts);
-    igraph_integer_t HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
+    igraph_int_t HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
     double HeatBathLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
-    igraph_integer_t HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
+    igraph_int_t HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
     double HeatBathLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
 
-    igraph_integer_t WriteClusters(igraph_real_t *modularity,
+    igraph_int_t WriteClusters(igraph_real_t *modularity,
                                    igraph_real_t *temperature,
                                    igraph_vector_int_t *csize, igraph_vector_int_t *membership,
                                    double kT, double gamma) const;
@@ -119,10 +119,10 @@ private:
     HugeArray<HugeArray<double>*> correlation;
     network *net;
 
-    igraph_integer_t q; //number of communities
+    igraph_int_t q; //number of communities
     double m_p; //number of positive ties (or sum of degrees), this equals the number of edges only if it is undirected and each edge has a weight of 1
     double m_n; //number of negative ties (or sum of degrees)
-    igraph_integer_t num_nodes; //number of nodes
+    igraph_int_t num_nodes; //number of nodes
     bool is_directed;
 
     bool is_init = false;
@@ -137,19 +137,19 @@ private:
     double *degree_community_pos_out = nullptr; //Positive sum of outegree for communities
     double *degree_community_neg_out = nullptr; //Negative sum of outdegree for communities
 
-    igraph_integer_t *csize = nullptr; //The number of nodes in each community
-    igraph_integer_t *spin = nullptr; //The membership of each node
+    igraph_int_t *csize = nullptr; //The number of nodes in each community
+    igraph_int_t *spin = nullptr; //The membership of each node
 
     double *neighbours = nullptr; //Array of neighbours of a vertex in each community
     double *weights = nullptr; //Weights of all possible transitions to another community
 
 public:
-    PottsModelN(network *n, igraph_integer_t num_communities, bool directed);
+    PottsModelN(network *n, igraph_int_t num_communities, bool directed);
     ~PottsModelN();
     void assign_initial_conf(bool init_spins);
     double FindStartTemp(double gamma, double lambda, double ts);
     double HeatBathLookup(double gamma, double lambda, double t, unsigned int max_sweeps);
-    igraph_integer_t WriteClusters(igraph_real_t *modularity,
+    igraph_int_t WriteClusters(igraph_real_t *modularity,
                        igraph_real_t *temperature,
                        igraph_vector_int_t *community_size,
                        igraph_vector_int_t *membership,

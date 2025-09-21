@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -25,7 +25,7 @@
 #include "test_utilities.h"
 
 void sort_cliques(igraph_vector_int_list_t *cliques) {
-    igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
+    igraph_int_t i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(cliques, i));
     }
@@ -42,10 +42,10 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t cliques, cl1, cl2;
     igraph_vector_int_t v1, v2;
-    igraph_integer_t n, n1, n2;
+    igraph_int_t n, n1, n2;
 
     igraph_rng_seed(igraph_rng_default(), 42);
-    igraph_erdos_renyi_game_gnp(&graph, /*n=*/ 100, /*p=*/ 0.5, /*directed=*/ 0, /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&graph, /*n=*/ 100, /*p=*/ 0.5, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     igraph_vector_int_list_init(&cliques, 0);
     igraph_vector_int_list_init(&cl1, 0);
@@ -53,14 +53,17 @@ int main(void) {
 
     igraph_maximal_cliques_subset(&graph, /*subset=*/ 0,
                                   &cliques, &n, /*outfile=*/ 0,
-                                  /*min_size=*/ 9, /*max_size=*/ 0);
+                                  /*min_size=*/ 9, /*max_size=*/ IGRAPH_UNLIMITED,
+                                  IGRAPH_UNLIMITED);
 
     igraph_vector_int_init_range(&v1,  0, 13);
     igraph_vector_int_init_range(&v2, 13, 100);
     igraph_maximal_cliques_subset(&graph, &v1, &cl1, &n1, /*outfile=*/ 0,
-                                  /*min_size=*/ 9, /*max_size=*/ 0);
+                                  /*min_size=*/ 9, /*max_size=*/ IGRAPH_UNLIMITED,
+                                  IGRAPH_UNLIMITED);
     igraph_maximal_cliques_subset(&graph, &v2, &cl2, &n2, /*outfile=*/ 0,
-                                  /*min_size=*/ 9, /*max_size=*/ 0);
+                                  /*min_size=*/ 9, /*max_size=*/ IGRAPH_UNLIMITED,
+                                  IGRAPH_UNLIMITED);
 
     igraph_vector_int_destroy(&v1);
     igraph_vector_int_destroy(&v2);

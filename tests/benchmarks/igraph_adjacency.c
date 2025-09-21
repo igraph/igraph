@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ void weighted_adjacency(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mod
     igraph_destroy(&g);
 }
 
-void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer_t rep) {
+void run_bench(igraph_int_t vcount, igraph_int_t meandeg, igraph_int_t rep) {
     igraph_t g;
     igraph_matrix_t mat;
     igraph_vector_t weights;
@@ -55,7 +55,8 @@ void run_bench(igraph_integer_t vcount, igraph_integer_t meandeg, igraph_integer
 
     igraph_matrix_init(&mat, 0, 0);
 
-    igraph_erdos_renyi_game_gnm(&g, vcount, meandeg * vcount / 2, IGRAPH_DIRECTED, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, vcount, meandeg * vcount / 2, IGRAPH_DIRECTED, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW,
+                                false);
     igraph_get_adjacency(&g, &mat, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
 
     igraph_vector_init(&weights, igraph_ecount(&g));

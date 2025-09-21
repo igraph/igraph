@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -33,7 +33,7 @@ int main(void) {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_ring(&graph, 10, IGRAPH_UNDIRECTED, /*mutual=*/ false, /*circular=*/ true);
-    igraph_vector_bool_view(&type, typev, sizeof(typev) / sizeof(typev[0]));
+    type = igraph_vector_bool_view(typev, sizeof(typev) / sizeof(typev[0]));
     SETVABV(&graph, "type", &type);
 
     igraph_write_graph_pajek(&graph, stdout);

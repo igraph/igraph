@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -139,8 +139,8 @@ int doit(int which) {
     printf("Random triplet matrix\n");
     igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ M, /*nzmax=*/ NZ + 5);
     for (i = 0; i < NZ; i++) {
-        igraph_integer_t r = RNG_INTEGER(0, N-1);
-        igraph_integer_t c = RNG_INTEGER(0, M-1);
+        igraph_int_t r = RNG_INTEGER(0, N-1);
+        igraph_int_t c = RNG_INTEGER(0, M-1);
         igraph_real_t x = RNG_INTEGER(-10, 10);
         IGRAPH_ASSERT(x >= -10 && x <= 10);
         igraph_sparsemat_entry(&A, r, c, x);

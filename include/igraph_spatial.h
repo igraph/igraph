@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,31 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_delaunay_graph(igraph_t *graph, const igraph_matrix_t *points);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_delaunay_graph(
+        igraph_t *graph,
+        const igraph_matrix_t *points);
+
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_lune_beta_skeleton(
+        igraph_t *graph,
+        const igraph_matrix_t *points,
+        igraph_real_t beta);
+
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_circle_beta_skeleton(
+        igraph_t *graph,
+        const igraph_matrix_t *points,
+        igraph_real_t beta);
+
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_beta_weighted_gabriel_graph(
+        igraph_t *graph,
+        igraph_vector_t *weights,
+        const igraph_matrix_t *points,
+        igraph_real_t max_beta);
+
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_gabriel_graph(
+        igraph_t *graph, const igraph_matrix_t *points);
+
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_relative_neighborhood_graph(
+        igraph_t *graph, const igraph_matrix_t *points);
 
 /**
  * \typedef igraph_metric_t
@@ -43,11 +67,11 @@ typedef enum {
     IGRAPH_METRIC_L1 = IGRAPH_METRIC_MANHATTAN
 } igraph_metric_t;
 
-IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_nearest_neighbor_graph(
     igraph_t *graph,
     const igraph_matrix_t *points,
     igraph_metric_t metric,
-    igraph_integer_t neighbors,
+    igraph_int_t neighbors,
     igraph_real_t cutoff,
     igraph_bool_t directed);
 

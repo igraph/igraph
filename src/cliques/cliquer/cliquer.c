@@ -376,9 +376,14 @@ static igraph_error_t unweighted_clique_search_all(
 				maximal,g,opts,&r);
 		SET_DEL_ELEMENT(current_clique,v);
 		count+=r;
-		if (retval) {
-			/* Abort. */
-			break;
+		if (retval != IGRAPH_SUCCESS) {
+                        /* Abort. */
+                        /* This is from a top-level call to sub_unweighted_all(),
+                         * transform IGRAPH_STOP to success. */
+                        if (retval == IGRAPH_STOP) {
+                                retval = IGRAPH_SUCCESS;
+                        }
+                        break;
 		}
 
 #if 0
@@ -453,9 +458,9 @@ static igraph_error_t sub_unweighted_all(int *table, int size, int min_size, int
 			/* We've found one.  Store it. */
 			count++;
 			retval = store_clique(current_clique, g, opts);
-			if (retval) {
+			if (retval != IGRAPH_SUCCESS) {
 				*num_found = count;
-				return retval == IGRAPH_STOP ? IGRAPH_SUCCESS : retval;
+				return retval;
 			}
 		}
 		if (max_size <= 0) {
@@ -506,11 +511,12 @@ static igraph_error_t sub_unweighted_all(int *table, int size, int min_size, int
 		retval = sub_unweighted_all(newtable,p1-newtable,
 				     min_size-1,max_size-1,maximal,g,opts,&n);
 		SET_DEL_ELEMENT(current_clique,v);
-		count += n;
-		if (retval || n < 0) {
+                count += n;
+		if (retval != IGRAPH_SUCCESS || n < 0) {
+                        /* This is from a recursive call to sub_unweighted_all(),
+                         * pass through IGRAPH_STOP unaltered. */
 			break;
 		}
-		count+=n;
 	}
 	temp_list[temp_count++]=newtable;
 
@@ -650,7 +656,12 @@ static igraph_error_t weighted_clique_search_single(int *table, int min_weight,
 					       min_w,max_weight,FALSE,
 					       g,&localopts, &search_weight);
 		SET_DEL_ELEMENT(current_clique,v);
-		if (retval || search_weight < 0) {
+                if (retval != IGRAPH_SUCCESS || search_weight < 0) {
+                        /* This is from a top-level call to sub_weighted_all(),
+                         * transform IGRAPH_STOP to success. */
+                        if (retval == IGRAPH_STOP) {
+                            retval = IGRAPH_SUCCESS;
+                        }
 			break;
 		}
 
@@ -761,8 +772,13 @@ static igraph_error_t weighted_clique_search_all(int *table, int start,
 				   min_weight,max_weight,maximal,g,opts,&j);
 		SET_DEL_ELEMENT(current_clique,v);
 
-		if (retval || j < 0) {
+                if (retval != IGRAPH_SUCCESS || j < 0) {
 			/* Abort. */
+                        /* This is from a top-level call to sub_weighted_all(),
+                         * transform IGRAPH_STOP to success. */
+                        if (retval == IGRAPH_STOP) {
+                                retval = IGRAPH_SUCCESS;
+                        }
 			break;
 		}
 
@@ -854,7 +870,7 @@ static igraph_error_t sub_weighted_all(int *table, int size, int weight,
 			retval = store_clique(current_clique,g,opts);
 			if (retval) {
 				*weight_found = -1;
-				return retval == IGRAPH_STOP ? IGRAPH_SUCCESS : retval;
+                                return retval;
 			}
 		}
 		if (current_weight >= max_weight) {
@@ -929,8 +945,10 @@ static igraph_error_t sub_weighted_all(int *table, int size, int weight,
 					   min_weight,max_weight,maximal,
 					   g,opts, &prune_low);
 		SET_DEL_ELEMENT(current_clique,v);
-		if (retval || (prune_low<0) || (prune_low>=prune_high)) {
+                if (retval != IGRAPH_SUCCESS || (prune_low<0) || (prune_low>=prune_high)) {
 			/* Impossible to find larger clique. */
+                        /* This is from a recursive call to sub_weighted_all(),
+                         * pass through IGRAPH_STOP unaltered. */
 			break;
 		}
 	}

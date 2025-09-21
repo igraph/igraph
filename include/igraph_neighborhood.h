@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -29,15 +29,15 @@
 IGRAPH_BEGIN_C_DECLS
 
 IGRAPH_EXPORT igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int_t *res,
-                                           igraph_vs_t vids, igraph_integer_t order,
-                                           igraph_neimode_t mode, igraph_integer_t mindist);
+                                           igraph_vs_t vids, igraph_int_t order,
+                                           igraph_neimode_t mode, igraph_int_t mindist);
 IGRAPH_EXPORT igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list_t *res,
-                                      igraph_vs_t vids, igraph_integer_t order,
-                                      igraph_neimode_t mode, igraph_integer_t mindist);
+                                      igraph_vs_t vids, igraph_int_t order,
+                                      igraph_neimode_t mode, igraph_int_t mindist);
 IGRAPH_EXPORT igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_list_t *res,
-                                             igraph_vs_t vids, igraph_integer_t order,
+                                             igraph_vs_t vids, igraph_int_t order,
                                              igraph_neimode_t mode,
-                                             igraph_integer_t mindist);
+                                             igraph_int_t mindist);
 
 IGRAPH_END_C_DECLS
 

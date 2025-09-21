@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,8 +22,8 @@
 #include <stdlib.h>
 
 void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch, igraph_vector_t *weights) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_t spanner_graph;
     igraph_vector_t spanner_weights;
     igraph_matrix_t res_spanner, res_graph;
@@ -63,8 +63,8 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
     igraph_matrix_init(&res_graph, 0, 0);
     igraph_distances(graph, weights, &res_graph, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
     igraph_distances(&spanner_graph, &spanner_weights, &res_spanner, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
-    for (igraph_integer_t x = 0; x < no_of_nodes; x++) {
-        for (igraph_integer_t y = 0; y < no_of_nodes; y++) {
+    for (igraph_int_t x = 0; x < no_of_nodes; x++) {
+        for (igraph_int_t y = 0; y < no_of_nodes; y++) {
             if (x == y) {
                 continue;
             }
@@ -83,7 +83,7 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
     igraph_vector_int_t spanner;
-    igraph_integer_t no_of_edges;
+    igraph_int_t no_of_edges;
 
     /* Initialize attribute handler; we will use edge attributes in test_spanner() */
     igraph_set_attribute_table(&igraph_cattribute_table);
@@ -124,10 +124,10 @@ int main(void) {
 
     /* Random Erdos-Renyi graph */
     printf("Random Erdos-Renyi graph\n");
-    igraph_erdos_renyi_game_gnp(&graph, 200, 0.25, IGRAPH_UNDIRECTED, 0);
+    igraph_erdos_renyi_game_gnp(&graph, 200, 0.25, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
         VECTOR(weights)[i] = generated_number;
     }
@@ -162,10 +162,10 @@ int main(void) {
     /* Error conditions */
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    igraph_erdos_renyi_game_gnp(&graph, 200, 0.9, IGRAPH_UNDIRECTED, 0);
+    igraph_erdos_renyi_game_gnp(&graph, 200, 0.9, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    for (igraph_int_t i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
         VECTOR(weights)[i] = generated_number;
     }

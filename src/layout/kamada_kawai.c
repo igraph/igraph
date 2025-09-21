@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2003-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -103,19 +103,19 @@
  */
 
 igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
-                               igraph_bool_t use_seed, igraph_integer_t maxiter,
+                               igraph_bool_t use_seed, igraph_int_t maxiter,
                                igraph_real_t epsilon, igraph_real_t kkconst,
                                const igraph_vector_t *weights,
                                const igraph_vector_t *minx, const igraph_vector_t *maxx,
                                const igraph_vector_t *miny, const igraph_vector_t *maxy) {
 
-    igraph_integer_t vcount = igraph_vcount(graph);
-    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t ecount = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(vcount);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
     igraph_vector_t D1, D2;
-    igraph_integer_t m;
+    igraph_int_t m;
 
     if (maxiter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -183,8 +183,8 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
     /* Find largest finite distance */
     max_dij = 0.0;
-    for (igraph_integer_t j = 0; j < vcount; j++) {
-        for (igraph_integer_t i = j + 1; i < vcount; i++) {
+    for (igraph_int_t j = 0; j < vcount; j++) {
+        for (igraph_int_t i = j + 1; i < vcount; i++) {
             if (!isfinite(MATRIX(dij, i, j))) {
                 continue;
             }
@@ -196,8 +196,8 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
     /* Replace infinite distances by the largest finite distance,
      * effectively making the graph connected. */
-    for (igraph_integer_t j = 0; j < vcount; j++) {
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t j = 0; j < vcount; j++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             if (MATRIX(dij, i, j) > max_dij) {
                 MATRIX(dij, i, j) = max_dij;
             }
@@ -205,8 +205,8 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     }
 
     L = L0 / max_dij;
-    for (igraph_integer_t j = 0; j < vcount; j++) {
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t j = 0; j < vcount; j++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             if (i == j) {
                 continue;
             }
@@ -219,7 +219,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     /* Initialize delta */
     IGRAPH_VECTOR_INIT_FINALLY(&D1, vcount);
     IGRAPH_VECTOR_INIT_FINALLY(&D2, vcount);
-    for (igraph_integer_t i = 0; i < vcount; i++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
         for (m = 0; m < vcount; m++) {
             igraph_real_t dx, dy, mi_dist;
             if (i == m) {
@@ -233,7 +233,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
         }
     }
 
-    for (igraph_integer_t j = 0; j < maxiter; j++) {
+    for (igraph_int_t j = 0; j < maxiter; j++) {
         igraph_real_t myD1, myD2, A, B, C;
         igraph_real_t max_delta, delta_x, delta_y;
         igraph_real_t old_x, old_y, new_x, new_y;
@@ -244,7 +244,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
         /* Select maximal delta */
         m = 0; max_delta = -1;
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             igraph_real_t delta = (VECTOR(D1)[i] * VECTOR(D1)[i] +
                                    VECTOR(D2)[i] * VECTOR(D2)[i]);
             if (delta > max_delta) {
@@ -258,7 +258,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
         old_y = MATRIX(*res, m, 1);
 
         /* Calculate D1 and D2, A, B, C */
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             igraph_real_t dx, dy, dist, den;
             if (i == m) {
                 continue;
@@ -313,7 +313,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
         /* Update delta, only with/for the affected node */
         VECTOR(D1)[m] = VECTOR(D2)[m] = 0.0;
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             igraph_real_t old_dx, old_dy, new_dx, new_dy, new_mi_dist, old_mi_dist;
             if (i == m) {
                 continue;
@@ -412,20 +412,20 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  */
 
 igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
-                                  igraph_bool_t use_seed, igraph_integer_t maxiter,
+                                  igraph_bool_t use_seed, igraph_int_t maxiter,
                                   igraph_real_t epsilon, igraph_real_t kkconst,
                                   const igraph_vector_t *weights,
                                   const igraph_vector_t *minx, const igraph_vector_t *maxx,
                                   const igraph_vector_t *miny, const igraph_vector_t *maxy,
                                   const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    const igraph_integer_t vcount = igraph_vcount(graph);
-    const igraph_integer_t ecount = igraph_ecount(graph);
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(vcount);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
     igraph_vector_t D1, D2, D3;
-    igraph_integer_t m;
+    igraph_int_t m;
 
     if (maxiter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -499,8 +499,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
                  igraph_vss_all(), weights, IGRAPH_ALL));
 
     max_dij = 0.0;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
-        for (igraph_integer_t j = i + 1; j < vcount; j++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
+        for (igraph_int_t j = i + 1; j < vcount; j++) {
             if (!isfinite(MATRIX(dij, i, j))) {
                 continue;
             }
@@ -509,8 +509,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
             }
         }
     }
-    for (igraph_integer_t i = 0; i < vcount; i++) {
-        for (igraph_integer_t j = 0; j < vcount; j++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
+        for (igraph_int_t j = 0; j < vcount; j++) {
             if (MATRIX(dij, i, j) > max_dij) {
                 MATRIX(dij, i, j) = max_dij;
             }
@@ -518,8 +518,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     }
 
     L = L0 / max_dij;
-    for (igraph_integer_t i = 0; i < vcount; i++) {
-        for (igraph_integer_t j = 0; j < vcount; j++) {
+    for (igraph_int_t i = 0; i < vcount; i++) {
+        for (igraph_int_t j = 0; j < vcount; j++) {
             igraph_real_t tmp = MATRIX(dij, i, j) * MATRIX(dij, i, j);
             if (i == j) {
                 continue;
@@ -536,7 +536,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     for (m = 0; m < vcount; m++) {
         igraph_real_t dx, dy, dz, mi_dist;
         igraph_real_t myD1 = 0.0, myD2 = 0.0, myD3 = 0.0;
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             if (i == m) {
                 continue;
             }
@@ -553,7 +553,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         VECTOR(D3)[m] = myD3;
     }
 
-    for (igraph_integer_t j = 0; j < maxiter; j++) {
+    for (igraph_int_t j = 0; j < maxiter; j++) {
 
         igraph_real_t Ax = 0.0, Ay = 0.0, Az = 0.0;
         igraph_real_t Axx = 0.0, Axy = 0.0, Axz = 0.0, Ayy = 0.0, Ayz = 0.0, Azz = 0.0;
@@ -564,7 +564,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
 
         /* Select maximal delta */
         m = 0; max_delta = -1;
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             igraph_real_t delta = (VECTOR(D1)[i] * VECTOR(D1)[i] +
                                    VECTOR(D2)[i] * VECTOR(D2)[i] +
                                    VECTOR(D3)[i] * VECTOR(D3)[i]);
@@ -580,7 +580,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         old_z = MATRIX(*res, m, 2);
 
         /* Calculate D1, D2 and D3, and other coefficients */
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             igraph_real_t dx, dy, dz, dist, den, k_mi, l_mi;
             if (i == m) {
                 continue;
@@ -646,7 +646,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
 
         /* Update delta, only with/for the affected node */
         VECTOR(D1)[m] = VECTOR(D2)[m] = VECTOR(D3)[m] = 0.0;
-        for (igraph_integer_t i = 0; i < vcount; i++) {
+        for (igraph_int_t i = 0; i < vcount; i++) {
             igraph_real_t old_dx, old_dy, old_dz, old_mi_dist, new_dx, new_dy, new_dz, new_mi_dist;
             if (i == m) {
                 continue;

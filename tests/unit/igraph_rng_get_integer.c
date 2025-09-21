@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -54,9 +54,9 @@ void simple_tests(void) {
 }
 
 void generate_random_vector(
-    igraph_rng_t* rng, igraph_vector_int_t* numbers, igraph_integer_t lo, igraph_integer_t hi
+    igraph_rng_t* rng, igraph_vector_int_t* numbers, igraph_int_t lo, igraph_int_t hi
 ) {
-    igraph_integer_t i, n = igraph_vector_int_size(numbers);
+    igraph_int_t i, n = igraph_vector_int_size(numbers);
 
     for (i = 0; i < n; i++) {
         VECTOR(*numbers)[i] = igraph_rng_get_integer(rng, lo, hi);
@@ -67,8 +67,8 @@ void generate_random_vector(
 
 /* Checks whether a given vector of numbers contains all numbers between `lo'
  * and `hi' */
-void check_occurrences(const igraph_vector_int_t* numbers, igraph_integer_t lo, igraph_integer_t hi) {
-    igraph_integer_t i;
+void check_occurrences(const igraph_vector_int_t* numbers, igraph_int_t lo, igraph_int_t hi) {
+    igraph_int_t i;
 
     for (i = lo; i <= hi; i++) {
         IGRAPH_ASSERT(igraph_vector_int_contains(numbers, i));
@@ -84,7 +84,7 @@ void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits
     n = igraph_vector_int_size(numbers);
 
     for (j = 0; j < 4; j++) {
-        mask = ((igraph_integer_t) 1 << (j + 1)) - 1;
+        mask = ((igraph_int_t) 1 << (j + 1)) - 1;
         igraph_vector_bool_init(&seen, mask + 1);
         for (i = 0; i < num_bits - j; i++, mask <<= 1) {
             still_needed = ((igraph_uint_t) 1 << (j + 1));
@@ -140,7 +140,7 @@ void stress_tests(void) {
         &igraph_rngtype_pcg64,
     };
     igraph_vector_int_t numbers;
-    const igraph_integer_t N = 1000;
+    const igraph_int_t N = 1000;
 
     igraph_vector_int_init(&numbers, N);
 
@@ -179,7 +179,7 @@ void stress_tests(void) {
 
         /* Test integer generation in [0; IGRAPH_INTEGER_MAX] */
         generate_random_vector(&rng, &numbers, 0, IGRAPH_INTEGER_MAX);
-        check_consecutive_bits(&numbers, sizeof(igraph_integer_t) * 8 - 1);
+        check_consecutive_bits(&numbers, sizeof(igraph_int_t) * 8 - 1);
 
         /* Test integer generation in [-5; IGRAPH_INTEGER_MAX-5] */
         generate_random_vector(&rng, &numbers, -5, IGRAPH_INTEGER_MAX-5);
@@ -192,7 +192,7 @@ void stress_tests(void) {
 
         /* Test integer generation in [IGRAPH_INTEGER_MIN; IGRAPH_INTEGER_MAX] */
         generate_random_vector(&rng, &numbers, IGRAPH_INTEGER_MIN, IGRAPH_INTEGER_MAX);
-        check_consecutive_bits(&numbers, sizeof(igraph_integer_t) * 8);
+        check_consecutive_bits(&numbers, sizeof(igraph_int_t) * 8);
 
         igraph_rng_destroy(&rng);
     }

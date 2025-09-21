@@ -312,6 +312,7 @@ add_library(
   misc/sir.c
   misc/spanning_trees.c
 
+  spatial/beta_skeleton.cpp
   spatial/delaunay.c
   spatial/convex_hull.c
   spatial/edge_lengths.c
@@ -341,8 +342,8 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.1.10")
-set_target_properties(igraph PROPERTIES SOVERSION 3)
+set_target_properties(igraph PROPERTIES VERSION "4.0.0")
+set_target_properties(igraph PROPERTIES SOVERSION 4)
 
 # Add extra compiler definitions if needed
 target_compile_definitions(

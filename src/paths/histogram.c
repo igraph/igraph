@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -54,14 +54,14 @@
 igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
                             igraph_real_t *unconnected, igraph_bool_t directed) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t already_added;
-    igraph_integer_t nodes_reached;
+    igraph_int_t nodes_reached;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
     igraph_adjlist_t allneis;
     igraph_real_t unconn = 0;
-    igraph_integer_t ressize;
+    igraph_int_t ressize;
 
     if (! igraph_is_directed(graph)) {
         directed = false;
@@ -78,7 +78,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
     igraph_vector_clear(res);
     ressize = 0;
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         nodes_reached = 1;      /* itself */
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
@@ -89,13 +89,13 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+            igraph_int_t actnode = igraph_dqueue_int_pop(&q);
+            igraph_int_t actdist = igraph_dqueue_int_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
-            const igraph_integer_t n = igraph_vector_int_size(neis);
-            for (igraph_integer_t j = 0; j < n; j++) {
-                igraph_integer_t neighbor = VECTOR(*neis)[j];
+            const igraph_int_t n = igraph_vector_int_size(neis);
+            for (igraph_int_t j = 0; j < n; j++) {
+                igraph_int_t neighbor = VECTOR(*neis)[j];
                 if (VECTOR(already_added)[neighbor] == i + 1) {
                     continue;
                 }
@@ -122,7 +122,7 @@ igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *r
 
     /* count every pair only once for an undirected graph */
     if (!directed) {
-        for (igraph_integer_t i = 0; i < ressize; i++) {
+        for (igraph_int_t i = 0; i < ressize; i++) {
             VECTOR(*res)[i] /= 2;
         }
         unconn /= 2;

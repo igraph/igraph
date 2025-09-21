@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -65,7 +65,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_destroy(&g);
 
         if (igraph_vcount(&graph) >= 2) {
-            igraph_get_all_simple_paths(&graph, &ivl1, 0, igraph_vss_1(1), -1, 5, IGRAPH_ALL);
+            igraph_get_all_simple_paths(&graph, &ivl1, 0, igraph_vss_1(1), IGRAPH_ALL, -1, 5, IGRAPH_UNLIMITED);
         }
 
         if (igraph_vcount(&graph) >= 1) {

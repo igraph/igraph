@@ -1,6 +1,6 @@
 /* -*- mode: C++ -*-  */
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -133,7 +133,7 @@ public:
     // clear all links from graph
     void resetLinks();
     // allocate edge histograms
-    void setAdjacencyHistograms(igraph_integer_t);
+    void setAdjacencyHistograms(igraph_int_t);
     // set name of vertex i
     bool setName(int, const std::string &);
 

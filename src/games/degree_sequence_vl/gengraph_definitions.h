@@ -82,8 +82,8 @@ double my_random01(); // (0,1]
 
 //Edge type
 typedef struct {
-    igraph_integer_t from;
-    igraph_integer_t to;
+    igraph_int_t from;
+    igraph_int_t to;
 } edge;
 
 // Tag Int
@@ -105,15 +105,15 @@ inline double logp(double x) {
 
 
 //Fast search or replace
-inline igraph_integer_t* fast_rpl(igraph_integer_t *m, igraph_integer_t a, igraph_integer_t b) {
+inline igraph_int_t* fast_rpl(igraph_int_t *m, igraph_int_t a, igraph_int_t b) {
     while (*m != a) {
         m++;
     }
     *m = b;
     return m;
 }
-inline igraph_integer_t* fast_search(igraph_integer_t *m, igraph_integer_t size, igraph_integer_t a) {
-    igraph_integer_t *p = m + size;
+inline igraph_int_t* fast_search(igraph_int_t *m, igraph_int_t size, igraph_int_t a) {
+    igraph_int_t *p = m + size;
     while (m != p--) {
         if (*p == a) {
             return p;

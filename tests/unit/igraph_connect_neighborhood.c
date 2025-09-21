@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_and_destroy(igraph_t *g, igraph_integer_t order, igraph_neimode_t mode) {
+void print_and_destroy(igraph_t *g, igraph_int_t order, igraph_neimode_t mode) {
     igraph_connect_neighborhood(g, order, mode);
     print_graph_canon(g);
     igraph_destroy(g);

@@ -7,6 +7,9 @@ int main(void) {
     igraph_vector_t pagerank;
     igraph_real_t value;
 
+    /* Initialize the library. */
+    igraph_setup();
+
     /* Create a directed graph */
     igraph_kautz(&graph, 2, 3);
 

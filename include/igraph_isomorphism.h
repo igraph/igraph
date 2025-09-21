@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
+#include "igraph_iterators.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
@@ -111,8 +112,8 @@ typedef igraph_error_t igraph_isohandler_t(const igraph_vector_int_t *map12,
 
 typedef igraph_bool_t igraph_isocompat_t(const igraph_t *graph1,
         const igraph_t *graph2,
-        const igraph_integer_t g1_num,
-        const igraph_integer_t g2_num,
+        const igraph_int_t g1_num,
+        const igraph_int_t g2_num,
         void *arg);
 
 IGRAPH_EXPORT igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
@@ -131,7 +132,7 @@ IGRAPH_EXPORT igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph
                                                 const igraph_vector_int_t *vertex_color2,
                                                 const igraph_vector_int_t *edge_color1,
                                                 const igraph_vector_int_t *edge_color2,
-                                                igraph_integer_t *count,
+                                                igraph_int_t *count,
                                                 igraph_isocompat_t *node_compat_fn,
                                                 igraph_isocompat_t *edge_compat_fn,
                                                 void *arg);
@@ -169,7 +170,7 @@ IGRAPH_EXPORT igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *gr
                                                    const igraph_vector_int_t *vertex_color2,
                                                    const igraph_vector_int_t *edge_color1,
                                                    const igraph_vector_int_t *edge_color2,
-                                                   igraph_integer_t *count,
+                                                   igraph_int_t *count,
                                                    igraph_isocompat_t *node_compat_fn,
                                                    igraph_isocompat_t *edge_compat_fn,
                                                    void *arg);
@@ -268,13 +269,13 @@ IGRAPH_EXPORT igraph_error_t igraph_automorphism_group_bliss(
 );
 
 /* Functions for small graphs (<= 4 vertices for directed graphs, <= 6 for undirected graphs) */
-IGRAPH_EXPORT igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass);
-IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
-                                           igraph_integer_t *isoclass);
-IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
-                                         igraph_integer_t number, igraph_bool_t directed);
+IGRAPH_EXPORT igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_int_t *isoclass);
+IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vs_t vids,
+                                           igraph_int_t *isoclass);
+IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_int_t size,
+                                         igraph_int_t number, igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count);
+IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_int_t n, igraph_bool_t directed, igraph_int_t *count);
 
 IGRAPH_END_C_DECLS
 

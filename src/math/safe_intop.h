@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2020 The igraph development team
 
    it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ IGRAPH_BEGIN_C_DECLS
 
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
-        igraph_integer_t _safe_a = (a), _safe_b = (b); \
-        igraph_integer_t _safe_sum; \
+        igraph_int_t _safe_a = (a), _safe_b = (b); \
+        igraph_int_t _safe_sum; \
         if (__builtin_add_overflow(_safe_a, _safe_b, &_safe_sum)) { \
             IGRAPH_ERRORF("Overflow when adding %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
         } \
@@ -55,8 +55,8 @@ IGRAPH_BEGIN_C_DECLS
 
 #define IGRAPH_SAFE_MULT(a, b, res) \
     do { \
-        igraph_integer_t _safe_a = (a), _safe_b = (b); \
-        igraph_integer_t _safe_prod; \
+        igraph_int_t _safe_a = (a), _safe_b = (b); \
+        igraph_int_t _safe_prod; \
         if (__builtin_mul_overflow(_safe_a, _safe_b, &_safe_prod)) { \
             IGRAPH_ERRORF("Overflow when multiplying %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
         } \
@@ -67,8 +67,8 @@ IGRAPH_BEGIN_C_DECLS
 
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
-        igraph_integer_t _safe_a = (a), _safe_b = (b); \
-        igraph_integer_t _safe_sum; \
+        igraph_int_t _safe_a = (a), _safe_b = (b); \
+        igraph_int_t _safe_sum; \
         if (((_safe_b > 0) && (_safe_a > (IGRAPH_INTEGER_MAX - _safe_b))) || \
             ((_safe_b < 0) && (_safe_a < (IGRAPH_INTEGER_MIN - _safe_b)))) { \
             IGRAPH_ERRORF("Overflow when adding %" IGRAPH_PRId " and %" IGRAPH_PRId ".", IGRAPH_EOVERFLOW, _safe_a, _safe_b); \
@@ -79,8 +79,8 @@ IGRAPH_BEGIN_C_DECLS
 
 #define IGRAPH_SAFE_MULT(a, b, res) \
     do { \
-        igraph_integer_t _safe_a = (a), _safe_b = (b); \
-        igraph_integer_t _safe_prod; \
+        igraph_int_t _safe_a = (a), _safe_b = (b); \
+        igraph_int_t _safe_prod; \
         int err=0; \
         if (_safe_a > 0) {  /* _safe_a is positive */ \
             if (_safe_b > 0) {  /* _safe_a and _safe_b are positive */ \
@@ -115,24 +115,24 @@ IGRAPH_BEGIN_C_DECLS
 /* Overflow-safe calculation of "n choose 2" = n*(n-1) / 2, assuming that n >= 0. */
 #define IGRAPH_SAFE_N_CHOOSE_2(n, res) \
     do { \
-        igraph_integer_t _safe_n = (n); \
+        igraph_int_t _safe_n = (n); \
         if (_safe_n % 2 == 0) IGRAPH_SAFE_MULT(_safe_n / 2, _safe_n - 1, res); \
         else IGRAPH_SAFE_MULT(_safe_n, (_safe_n - 1) / 2, res); \
     } while (0)
 
 IGRAPH_FUNCATTR_CONST igraph_bool_t igraph_i_is_real_representable_as_integer(igraph_real_t value);
 
-igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result);
-igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result);
-igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result);
-igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result);
+igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_int_t* result);
+igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_int_t* result);
+igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_int_t* result);
+igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_int_t* result);
 
-igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res);
-igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
-igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res);
-igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_integer_t *res);
+igraph_error_t igraph_i_safe_next_pow_2(igraph_int_t k, igraph_int_t *res);
+igraph_error_t igraph_i_safe_exp2(igraph_int_t k, igraph_int_t *res);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_int_t a, igraph_int_t b, igraph_int_t *res);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_int_t a, igraph_int_t b, igraph_int_t *res);
+igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_int_t *res);
+igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igraph_int_t *res);
 
 IGRAPH_END_C_DECLS
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,9 @@ int main(void) {
     igraph_vector_int_t outdeg, indeg;
     igraph_vector_int_t vec;
     igraph_bool_t is_simple;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Set random seed for reproducibility */
     igraph_rng_seed(igraph_rng_default(), 42);

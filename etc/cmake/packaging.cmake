@@ -31,7 +31,7 @@ endif()
 #############################################################################
 
 # Set source package name and format
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "igraph-${CMAKE_PROJECT_VERSION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "igraph-${PACKAGE_VERSION}")
 set(CPACK_SOURCE_GENERATOR "TGZ")
 
 # Declare what to include in the source tarball. Unfortunately we can only

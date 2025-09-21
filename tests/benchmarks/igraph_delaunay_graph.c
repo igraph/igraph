@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,15 +21,15 @@
 
 #include "bench.h"
 
-void bench_delaunay(const char *message, igraph_integer_t point_count, igraph_integer_t dimensions) {
+void bench_delaunay(const char *message, igraph_int_t point_count, igraph_int_t dimensions) {
     igraph_matrix_t points;
     igraph_t g;
     char msg[200];
 
     igraph_matrix_init(&points, point_count, dimensions);
 
-    for (igraph_integer_t point = 0; point < point_count; point++) {
-        for (igraph_integer_t dim = 0; dim < dimensions; dim++) {
+    for (igraph_int_t point = 0; point < point_count; point++) {
+        for (igraph_int_t dim = 0; dim < dimensions; dim++) {
             MATRIX(points, point, dim) = RNG_UNIF01();
         }
     }
@@ -49,11 +49,16 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 20250814);
 
     bench_delaunay(" 1", 1000000, 1);
-    bench_delaunay(" 1", 100000, 2);
-    bench_delaunay(" 2", 10000, 3);
-    bench_delaunay(" 3", 2000, 4);
-    bench_delaunay(" 4", 500, 5);
-    bench_delaunay(" 5", 200, 6);
+    bench_delaunay(" 2", 100000, 2);
+    bench_delaunay(" 3", 10000, 2);
+    bench_delaunay(" 4", 1000, 2);
+    bench_delaunay(" 5", 100, 2);
+    bench_delaunay(" 6", 10000, 3);
+    bench_delaunay(" 7", 1000, 3);
+    bench_delaunay(" 8", 100, 3);
+    bench_delaunay(" 9", 2000, 4);
+    bench_delaunay("10", 500, 5);
+    bench_delaunay("11", 200, 6);
 
     return 0;
 }

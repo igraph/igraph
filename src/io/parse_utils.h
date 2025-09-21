@@ -32,10 +32,10 @@ void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res,
 
 igraph_error_t igraph_i_fskip_whitespace(FILE *file);
 
-igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_integer_t *value);
+igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int_t *value);
 igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t *value);
 
-igraph_error_t igraph_i_fget_integer(FILE *file, igraph_integer_t *value);
+igraph_error_t igraph_i_fget_integer(FILE *file, igraph_int_t *value);
 igraph_error_t igraph_i_fget_real(FILE *file, igraph_real_t *value);
 
 #endif /* IGRAPH_PARSE_UTILS_H */

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -170,7 +170,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     igraph_vector_t weights;
     igraph_vector_int_t degrees;
     igraph_neimode_t mode0 = IGRAPH_REVERSE_MODE(mode);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Invalid mode for inverse log weighted similarity.", IGRAPH_EINVMODE);
@@ -179,7 +179,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, IGRAPH_LOOPS));
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         VECTOR(weights)[i] = VECTOR(degrees)[i];
         if (VECTOR(weights)[i] > 1) {
             VECTOR(weights)[i] = 1.0 / log(VECTOR(weights)[i]);
@@ -199,9 +199,9 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
 
-    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_vids;
-    igraph_integer_t i;
+    const igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_vids;
+    igraph_int_t i;
     igraph_vector_int_t neis;
     igraph_vector_int_t vid_reverse_index;
     igraph_vit_t vit;
@@ -216,7 +216,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
     igraph_vector_int_fill(&vid_reverse_index, -1);
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t v = IGRAPH_VIT_GET(vit);
+        igraph_int_t v = IGRAPH_VIT_GET(vit);
         if (v < 0 || v >= no_of_nodes) {
             IGRAPH_ERROR("Invalid vertex ID in vertex selector.", IGRAPH_EINVVID);
         }
@@ -229,20 +229,20 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* The result */
 
-    for (igraph_integer_t from = 0; from < no_of_nodes; from++) {
+    for (igraph_int_t from = 0; from < no_of_nodes; from++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         const igraph_real_t weight = weights ? VECTOR(*weights)[from] : 1;
 
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
-        const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        const igraph_int_t nei_count = igraph_vector_int_size(&neis);
 
         for (i = 0; i < nei_count - 1; i++) {
-            igraph_integer_t u = VECTOR(neis)[i];
-            igraph_integer_t k = VECTOR(vid_reverse_index)[u];
-            for (igraph_integer_t j = i + 1; j < nei_count; j++) {
-                igraph_integer_t v = VECTOR(neis)[j];
-                igraph_integer_t l = VECTOR(vid_reverse_index)[v];
+            igraph_int_t u = VECTOR(neis)[i];
+            igraph_int_t k = VECTOR(vid_reverse_index)[u];
+            for (igraph_int_t j = i + 1; j < nei_count; j++) {
+                igraph_int_t v = VECTOR(neis)[j];
+                igraph_int_t l = VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
                     MATRIX(*res, k, v) += weight;
                 }
@@ -265,10 +265,10 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
 static igraph_error_t igraph_i_neisets_intersect(
     const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
-    igraph_integer_t *len_union, igraph_integer_t *len_intersection
+    igraph_int_t *len_union, igraph_int_t *len_intersection
 ) {
     /* ASSERT: v1 and v2 are sorted */
-    igraph_integer_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
+    igraph_int_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
     *len_intersection = igraph_vector_int_intersection_size_sorted(v1, v2);
     *len_union = n1 + n2 - *len_intersection;
     return IGRAPH_SUCCESS;
@@ -328,10 +328,10 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
                               const igraph_vs_t from, const igraph_vs_t to, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_vit_t vit_from, vit_to;
-    igraph_integer_t i, j;
-    igraph_integer_t len_union, len_intersection;
+    igraph_int_t i, j;
+    igraph_int_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
-    igraph_integer_t k;
+    igraph_int_t k;
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &vit_from));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit_from);
@@ -439,13 +439,13 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
  */
 igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                     const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t al;
-    igraph_integer_t u, v;
-    igraph_integer_t len_union, len_intersection;
+    igraph_int_t u, v;
+    igraph_int_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
 
-    igraph_integer_t k = igraph_vector_int_size(pairs);
+    igraph_int_t k = igraph_vector_int_size(pairs);
     if (k % 2 != 0) {
         IGRAPH_ERROR("Number of elements in `pairs' must be even.", IGRAPH_EINVAL);
     }
@@ -463,8 +463,8 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
         igraph_bitset_t seen;
         IGRAPH_BITSET_INIT_FINALLY(&seen, no_of_nodes);
 
-        for (igraph_integer_t i = 0; i < k; i++) {
-            igraph_integer_t j = VECTOR(*pairs)[i];
+        for (igraph_int_t i = 0; i < k; i++) {
+            igraph_int_t j = VECTOR(*pairs)[i];
             if (IGRAPH_BIT_TEST(seen, j)) {
                 continue;
             }
@@ -480,7 +480,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    for (igraph_integer_t i = 0, j = 0; i < k; i += 2, j++) {
+    for (igraph_int_t i = 0, j = 0; i < k; i += 2, j++) {
         u = VECTOR(*pairs)[i];
         v = VECTOR(*pairs)[i + 1];
 
@@ -628,10 +628,10 @@ igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *re
 
     IGRAPH_CHECK(igraph_similarity_jaccard(graph, res, vit_from, vit_to, mode, loops));
 
-    igraph_integer_t nr = igraph_matrix_nrow(res);
-    igraph_integer_t nc = igraph_matrix_ncol(res);
-    for (igraph_integer_t i = 0; i < nr; i++) {
-        for (igraph_integer_t j = 0; j < nc; j++) {
+    igraph_int_t nr = igraph_matrix_nrow(res);
+    igraph_int_t nc = igraph_matrix_ncol(res);
+    for (igraph_int_t i = 0; i < nr; i++) {
+        for (igraph_int_t j = 0; j < nc; j++) {
             igraph_real_t x = MATRIX(*res, i, j);
             MATRIX(*res, i, j) = 2 * x / (1 + x);
         }
@@ -694,8 +694,8 @@ igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector
                                  const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
 
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, pairs, mode, loops));
-    igraph_integer_t n = igraph_vector_size(res);
-    for (igraph_integer_t i = 0; i < n; i++) {
+    igraph_int_t n = igraph_vector_size(res);
+    for (igraph_int_t i = 0; i < n; i++) {
         igraph_real_t x = VECTOR(*res)[i];
         VECTOR(*res)[i] = 2 * x / (1 + x);
     }
@@ -757,8 +757,8 @@ igraph_error_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t 
                               const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
 
     IGRAPH_CHECK(igraph_similarity_jaccard_es(graph, res, es, mode, loops));
-    igraph_integer_t n = igraph_vector_size(res);
-    for (igraph_integer_t i = 0; i < n; i++) {
+    igraph_int_t n = igraph_vector_size(res);
+    for (igraph_int_t i = 0; i < n; i++) {
         igraph_real_t x = VECTOR(*res)[i];
         VECTOR(*res)[i] = 2 * x / (1 + x);
     }

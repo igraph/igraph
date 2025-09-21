@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -36,13 +36,13 @@ IGRAPH_BEGIN_C_DECLS
 
 typedef struct igraph_fixed_vectorlist_t {
     igraph_vector_int_list_t vecs;
-    igraph_integer_t length;
+    igraph_int_t length;
 } igraph_fixed_vectorlist_t;
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l);
 igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_int_t *from,
-                                    igraph_integer_t size);
+                                    igraph_int_t size);
 
 IGRAPH_END_C_DECLS
 

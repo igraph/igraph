@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -30,8 +30,8 @@ igraph_bool_t is_forest(const igraph_t *graph) {
 
     igraph_decompose(graph, &components, IGRAPH_WEAK, -1, 0);
 
-    igraph_integer_t n = igraph_graph_list_size(&components);
-    for (igraph_integer_t i=0; i < n; ++i) {
+    igraph_int_t n = igraph_graph_list_size(&components);
+    for (igraph_int_t i=0; i < n; ++i) {
         igraph_is_tree(igraph_graph_list_get_ptr(&components, i), &res, NULL, IGRAPH_ALL);
 
         if (! res) {
@@ -47,10 +47,10 @@ igraph_bool_t is_forest(const igraph_t *graph) {
 /* This test generates 'trials' random graphs, allowing self-loops and
  * multi-edges, and exercises the forest detection function on each. */
 int main(void) {
-    const igraph_integer_t n = 100; /* vertex count */
-    const igraph_integer_t m = n / 2; /* edge count */
-    const igraph_integer_t trials = 300;
-    igraph_integer_t true_count;
+    const igraph_int_t n = 100; /* vertex count */
+    const igraph_int_t m = n / 2; /* edge count */
+    const igraph_int_t trials = 300;
+    igraph_int_t true_count;
     igraph_bool_t res1, res2;
     igraph_vector_int_t edges;
 
@@ -59,10 +59,10 @@ int main(void) {
     igraph_vector_int_init(&edges, 2 * m);
 
     true_count = 0;
-    for (igraph_integer_t k = 0; k < trials; ++k) {
+    for (igraph_int_t k = 0; k < trials; ++k) {
         igraph_t graph;
 
-        for (igraph_integer_t i = 0; i < 2 * m; ++i) {
+        for (igraph_int_t i = 0; i < 2 * m; ++i) {
             VECTOR(edges)[i] = RNG_INTEGER(0, n - 1);
         }
 

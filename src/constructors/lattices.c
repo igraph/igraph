@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -88,10 +88,10 @@ static igraph_error_t triangular_lattice(
     igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t lex_ordering,
     const igraph_vector_int_t *row_lengths_vector, const igraph_vector_int_t *row_start_vector) {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t row_count = igraph_vector_int_size(row_lengths_vector);
-    igraph_integer_t no_of_nodes;
+    igraph_int_t row_count = igraph_vector_int_size(row_lengths_vector);
+    igraph_int_t no_of_nodes;
     igraph_vector_int_t row_lengths_prefix_sum_vector;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     if (igraph_vector_int_size(row_lengths_vector) != igraph_vector_int_size(row_start_vector)) {
         IGRAPH_ERRORF(
@@ -122,8 +122,8 @@ static igraph_error_t triangular_lattice(
     COMPUTE_NUMBER_OF_VERTICES();
 
     /* computing the number of edges in the constructed triangular lattice */
-    igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
-    igraph_integer_t multiplier = mutual && directed ? 4 : 2;
+    igraph_int_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
+    igraph_int_t multiplier = mutual && directed ? 4 : 2;
     for (j = 0; j < row_count - 1; j++) {
         IGRAPH_SAFE_ADD(no_of_edges2, VECTOR(*row_lengths_vector)[j] - 1, &no_of_edges2);
         IGRAPH_SAFE_ADD(no_of_edges2, MIN(ROW_END(j), ROW_END((j + 1))) - MAX(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1]) + 1,
@@ -135,7 +135,7 @@ static igraph_error_t triangular_lattice(
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
 
     /* constructing the edge array */
-    igraph_integer_t k;
+    igraph_int_t k;
     for (j = 0; j < row_count; j++) {
         IGRAPH_ALLOW_INTERRUPTION();
         for (i = 0; i < VECTOR(*row_lengths_vector)[j]; i++) {
@@ -157,11 +157,11 @@ static igraph_error_t triangular_lattice(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t triangular_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual) {
-    igraph_integer_t row_count = size;
+static igraph_error_t triangular_lattice_triangle_shape(igraph_t *graph, igraph_int_t size, igraph_bool_t directed, igraph_bool_t mutual) {
+    igraph_int_t row_count = size;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
@@ -181,12 +181,12 @@ static igraph_error_t triangular_lattice_triangle_shape(igraph_t *graph, igraph_
 }
 
 static igraph_error_t triangular_lattice_rectangle_shape(
-    igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
+    igraph_t *graph, igraph_int_t size_x, igraph_int_t size_y,
     igraph_bool_t directed, igraph_bool_t mutual) {
-    igraph_integer_t row_count = size_x;
+    igraph_int_t row_count = size_x;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
@@ -206,21 +206,21 @@ static igraph_error_t triangular_lattice_rectangle_shape(
 }
 
 static igraph_error_t triangular_lattice_hex_shape(
-    igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
-    igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual) {
-    igraph_integer_t row_count = size_y + size_z - 1;
+    igraph_t *graph, igraph_int_t size_x, igraph_int_t size_y,
+    igraph_int_t size_z, igraph_bool_t directed, igraph_bool_t mutual) {
+    igraph_int_t row_count = size_y + size_z - 1;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
 
-    igraph_integer_t row_length = size_x;
-    igraph_integer_t row_start = size_y - 1;
-    igraph_integer_t first_threshold = MIN(size_y - 1, size_z - 1);
-    igraph_integer_t second_threshold = MAX(size_y - 1, size_z - 1);
-    igraph_integer_t sgn_flag = size_y < size_z ? 0 : -1;
+    igraph_int_t row_length = size_x;
+    igraph_int_t row_start = size_y - 1;
+    igraph_int_t first_threshold = MIN(size_y - 1, size_z - 1);
+    igraph_int_t second_threshold = MAX(size_y - 1, size_z - 1);
+    igraph_int_t sgn_flag = size_y < size_z ? 0 : -1;
 
     for (i = 0; i < row_count; i++) {
         VECTOR(row_lengths_vector)[i] = row_length;
@@ -290,7 +290,7 @@ static igraph_error_t triangular_lattice_hex_shape(
 igraph_error_t igraph_triangular_lattice(
         igraph_t *graph, const igraph_vector_int_t *dims,
         igraph_bool_t directed, igraph_bool_t mutual) {
-    igraph_integer_t num_dims = igraph_vector_int_size(dims);
+    igraph_int_t num_dims = igraph_vector_int_size(dims);
     if (igraph_vector_int_any_smaller(dims, 0)) {
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
     }
@@ -352,10 +352,10 @@ static igraph_error_t hexagonal_lattice(
     const igraph_vector_int_t *row_lengths_vector, const igraph_vector_int_t *row_start_vector
 ) {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t row_count = igraph_vector_int_size(row_lengths_vector);
-    igraph_integer_t no_of_nodes;
+    igraph_int_t row_count = igraph_vector_int_size(row_lengths_vector);
+    igraph_int_t no_of_nodes;
     igraph_vector_int_t row_lengths_prefix_sum_vector;
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
     igraph_bool_t lex_ordering = false;
 
     if (igraph_vector_int_size(row_lengths_vector) != igraph_vector_int_size(row_start_vector)) {
@@ -382,8 +382,8 @@ static igraph_error_t hexagonal_lattice(
     COMPUTE_NUMBER_OF_VERTICES();
 
     /* computing the number of edges in the constructed hex lattice */
-    igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
-    igraph_integer_t multiplier = mutual && directed ? 4 : 2, low, high;
+    igraph_int_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
+    igraph_int_t multiplier = mutual && directed ? 4 : 2, low, high;
     for (j = 0; j < row_count - 1; j++) {
         IGRAPH_SAFE_ADD(no_of_edges2, VECTOR(*row_lengths_vector)[j] - 1, &no_of_edges2);
         low = MAX((VECTOR(*row_start_vector)[j] - 1), (VECTOR(*row_start_vector)[j + 1]));
@@ -396,7 +396,7 @@ static igraph_error_t hexagonal_lattice(
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
 
     /* constructing the edge array */
-    igraph_integer_t k;
+    igraph_int_t k;
     for (j = 0; j < row_count; j++) {
         IGRAPH_ALLOW_INTERRUPTION();
         for (i = 0; i < VECTOR(*row_lengths_vector)[j]; i++) {
@@ -417,12 +417,12 @@ static igraph_error_t hexagonal_lattice(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t hexagonal_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual) {
-    igraph_integer_t row_count;
+static igraph_error_t hexagonal_lattice_triangle_shape(igraph_t *graph, igraph_int_t size, igraph_bool_t directed, igraph_bool_t mutual) {
+    igraph_int_t row_count;
     IGRAPH_SAFE_ADD(size, 2, &row_count);
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count - 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count - 1);
@@ -442,17 +442,17 @@ static igraph_error_t hexagonal_lattice_triangle_shape(igraph_t *graph, igraph_i
 }
 
 static igraph_error_t hexagonal_lattice_rectangle_shape(
-    igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
+    igraph_t *graph, igraph_int_t size_x, igraph_int_t size_y,
     igraph_bool_t directed, igraph_bool_t mutual
 ) {
-    igraph_integer_t row_count;
+    igraph_int_t row_count;
     IGRAPH_SAFE_ADD(size_x, 1, &row_count);
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_integer_t actual_size_y;
+    igraph_int_t actual_size_y;
     IGRAPH_SAFE_ADD(size_y, 1, &actual_size_y);
     IGRAPH_SAFE_MULT(actual_size_y, 2, &actual_size_y);
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
@@ -477,26 +477,26 @@ static igraph_error_t hexagonal_lattice_rectangle_shape(
 }
 
 static igraph_error_t hexagonal_lattice_hex_shape(
-    igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
-    igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual
+    igraph_t *graph, igraph_int_t size_x, igraph_int_t size_y,
+    igraph_int_t size_z, igraph_bool_t directed, igraph_bool_t mutual
 ) {
-    igraph_integer_t row_count = size_y + size_z;
+    igraph_int_t row_count = size_y + size_z;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_integer_t i;
+    igraph_int_t i;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
 
-    igraph_integer_t row_length;
+    igraph_int_t row_length;
     IGRAPH_SAFE_MULT(size_x, 2, &row_length);
     IGRAPH_SAFE_ADD(row_length, 1, &row_length);
-    igraph_integer_t row_start;
+    igraph_int_t row_start;
     IGRAPH_SAFE_MULT(size_y, 2, &row_start);
     IGRAPH_SAFE_ADD(row_start, -1, &row_start);
-    igraph_integer_t first_threshold = MIN(size_y - 1, size_z - 1);
-    igraph_integer_t second_threshold = MAX(size_y - 1, size_z - 1);
-    igraph_integer_t sgn_flag = size_y < size_z ? 0 : -2;
+    igraph_int_t first_threshold = MIN(size_y - 1, size_z - 1);
+    igraph_int_t second_threshold = MAX(size_y - 1, size_z - 1);
+    igraph_int_t sgn_flag = size_y < size_z ? 0 : -2;
 
     for (i = 0; i < row_count; i++) {
         VECTOR(row_lengths_vector)[i] = row_length;
@@ -572,7 +572,7 @@ static igraph_error_t hexagonal_lattice_hex_shape(
 igraph_error_t igraph_hexagonal_lattice(
         igraph_t *graph, const igraph_vector_int_t *dims,
         igraph_bool_t directed, igraph_bool_t mutual) {
-    igraph_integer_t num_dims = igraph_vector_int_size(dims);
+    igraph_int_t num_dims = igraph_vector_int_size(dims);
     if (igraph_vector_int_any_smaller(dims, 0)) {
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
     }

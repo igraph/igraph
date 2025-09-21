@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -24,10 +24,12 @@
 #include <string.h>
 
 int main(void) {
-
     char tmp[100];
     const char *string;
     int major, minor, subminor;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_version(&string, &major, &minor, &subminor);
     snprintf(tmp, sizeof(tmp), "%i.%i.%i", major, minor, subminor);

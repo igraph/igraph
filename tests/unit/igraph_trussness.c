@@ -32,11 +32,11 @@
 #include "test_utilities.h"
 
 void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
-    igraph_integer_t i, n = igraph_vector_int_size(trussness);
+    igraph_int_t i, n = igraph_vector_int_size(trussness);
 
     printf("fromNode, toNode, trussness\n");
     for (i=0; i < n; i++) {
-        igraph_integer_t from, to;
+        igraph_int_t from, to;
         igraph_edge(graph, i, &from, &to);
         printf("%" IGRAPH_PRId ", %" IGRAPH_PRId ", %" IGRAPH_PRId "\n", from, to, VECTOR(*trussness)[i]);
     }
@@ -48,17 +48,15 @@ void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
 int main(void) {
 
     igraph_t graph;
-    igraph_vector_int_t v;
     igraph_vector_int_t trussness;
 
     /* Create actual graph */
-    igraph_integer_t edges[] = { 0,1, 0,2, 0,3, 0,4,
+    igraph_int_t edges[] = { 0,1, 0,2, 0,3, 0,4,
       1,2, 1,3, 1,4, 2,3, 2,4, 3,4, 3,6, 3,11,
       4,5, 4,6, 5,6, 5,7, 5,8, 5,9, 6,7, 6,10, 6,11,
       7,8, 7,9, 8,9, 8,10 };
-    igraph_integer_t n = sizeof(edges) / sizeof(edges[0]);
+    const igraph_vector_int_t v = igraph_vector_int_view(edges, sizeof(edges) / sizeof(edges[0]));
 
-    igraph_vector_int_view(&v, edges, n);
     igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
 
     /* Compute the trussness of the edges. */

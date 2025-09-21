@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,10 +22,10 @@
 
 /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
 void verify_coloring(igraph_t *graph, const igraph_vector_int_t *colors) {
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
 
-    for (igraph_integer_t i = 0; i < no_of_edges; ++i) {
+    for (igraph_int_t i = 0; i < no_of_edges; ++i) {
         if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
             continue;
         }
@@ -35,8 +35,8 @@ void verify_coloring(igraph_t *graph, const igraph_vector_int_t *colors) {
         }
     }
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t color = VECTOR(*colors)[i];
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
+        igraph_int_t color = VECTOR(*colors)[i];
         if (color < 0 || color >= no_of_nodes) {
             IGRAPH_FATALF("The vertex %" IGRAPH_PRId " has invalid color %" IGRAPH_PRId "\n", i, color);
         }
@@ -99,12 +99,12 @@ void test_graph_large(void) {
     igraph_t graph;
 
     /* simple large undirected graph */
-    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     printf("Testing large simple graph\n");
     run_tests(&graph, false);
 
     /* graph with loops and parallel edges */
-    igraph_rewire_edges(&graph, 1.0, true, true);
+    igraph_rewire_edges(&graph, 1.0, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW);
     printf("Testing large graph with loops and multi-edges\n");
     run_tests(&graph, false);
 
@@ -196,11 +196,12 @@ void test_wheel_graph(void) {
 void test_bipartite_graph(void) {
     igraph_t graph_1, graph_2;
 
-    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
+    igraph_bipartite_game_gnm(&graph_1, 0, 100, 100, 10000, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     printf("Testing complete bipartite graph\n");
     run_tests(&graph_1, false);
 
-    igraph_bipartite_game_gnm(&graph_2, 0, 100, 100, 10000 - 100, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE);
+    igraph_bipartite_game_gnm(&graph_2, 0, 100, 100, 10000 - 100, IGRAPH_UNDIRECTED, IGRAPH_ALL, IGRAPH_SIMPLE_SW,
+                              false);
     printf("Testing large bipartite graph\n");
     run_tests(&graph_2, false);
 

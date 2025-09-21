@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,9 @@
 
 int main(void) {
     igraph_t graph;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create an undirected 6-star, with the 0th node as the centre. */
     igraph_star(&graph, 7, IGRAPH_STAR_UNDIRECTED, 0);

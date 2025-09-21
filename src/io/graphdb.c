@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2005-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -109,7 +109,7 @@ static igraph_error_t handle_input_error(FILE *instream) {
 igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
                               igraph_bool_t directed) {
 
-    const igraph_integer_t nodes = igraph_i_read_graph_graphdb_getword(instream);
+    const igraph_int_t nodes = igraph_i_read_graph_graphdb_getword(instream);
     if (nodes < 0) {
         IGRAPH_CHECK(handle_input_error(instream));
     }
@@ -118,13 +118,13 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 100);
     igraph_vector_int_clear(&edges);
 
-    for (igraph_integer_t i = 0; i < nodes; i++) {
-        igraph_integer_t len = igraph_i_read_graph_graphdb_getword(instream);
+    for (igraph_int_t i = 0; i < nodes; i++) {
+        igraph_int_t len = igraph_i_read_graph_graphdb_getword(instream);
         if (len < 0) {
             IGRAPH_CHECK(handle_input_error(instream));
         }
-        for (igraph_integer_t j = 0; j < len; j++) {
-            igraph_integer_t to = igraph_i_read_graph_graphdb_getword(instream);
+        for (igraph_int_t j = 0; j < len; j++) {
+            igraph_int_t to = igraph_i_read_graph_graphdb_getword(instream);
             if (to < 0) {
                 IGRAPH_CHECK(handle_input_error(instream));
             }

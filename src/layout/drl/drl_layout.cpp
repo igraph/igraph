@@ -458,7 +458,7 @@ igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     if (weights) {
-        igraph_integer_t no_of_edges = igraph_ecount(graph);
+        igraph_int_t no_of_edges = igraph_ecount(graph);
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Length of weight vector does not match number of edges.", IGRAPH_EINVAL);
         }

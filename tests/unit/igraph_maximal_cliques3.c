@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge MA, 02139 USA
 
@@ -25,7 +25,7 @@
 #include "test_utilities.h"
 
 void sort_cliques(igraph_vector_int_list_t *cliques) {
-    igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
+    igraph_int_t i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(cliques, i));
     }
@@ -43,12 +43,13 @@ int main(void) {
     igraph_vector_int_list_t cliques;
 
     igraph_rng_seed(igraph_rng_default(), 41);
-    igraph_erdos_renyi_game_gnp(&graph, 100, 0.7, /*directed=*/ 0, /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&graph, 100, 0.7, IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     igraph_vector_int_list_init(&cliques, 0);
 
     igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 15,
-                           /*max_size=*/ 0);
+                           /*max_size=*/ IGRAPH_UNLIMITED,
+                           IGRAPH_UNLIMITED);
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);

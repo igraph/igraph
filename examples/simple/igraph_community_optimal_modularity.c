@@ -1,4 +1,4 @@
-/* IGraph library.
+/* igraph library.
    Copyright (C) 2010-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,9 @@ int main(void) {
     igraph_real_t modularity;
     igraph_error_handler_t *handler;
     igraph_error_t errcode;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&graph, 9, IGRAPH_UNDIRECTED,
                  0, 3, 0, 4, 0, 1, 0, 2, 0, 5, 0, 6, 1, 3, 3, 5, 4, 7, 7, 8, 2, 4, 1, 2, 6, 8,

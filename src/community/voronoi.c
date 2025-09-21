@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -43,8 +43,8 @@
  * Time complexity: TODO.
  */
 static igraph_error_t igraph_i_local_relative_density(const igraph_t *graph, igraph_vector_t *res, igraph_vs_t vs) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t vs_size;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t vs_size;
     igraph_vector_int_t nei_mask; /* which nodes are in the local neighbourhood? */
     igraph_vector_int_t nei_done; /* which local nodes have already been processed? -- avoids duplicate processing in multigraphs */
     igraph_lazy_adjlist_t al;
@@ -63,17 +63,17 @@ static igraph_error_t igraph_i_local_relative_density(const igraph_t *graph, igr
 
     IGRAPH_CHECK(igraph_vector_resize(res, vs_size));
 
-    for (igraph_integer_t i=0; ! IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        igraph_integer_t w = IGRAPH_VIT_GET(vit);
-        igraph_integer_t int_count = 0, ext_count = 0;
+    for (igraph_int_t i=0; ! IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+        igraph_int_t w = IGRAPH_VIT_GET(vit);
+        igraph_int_t int_count = 0, ext_count = 0;
 
         igraph_vector_int_t *w_neis = igraph_lazy_adjlist_get(&al, w);
         IGRAPH_CHECK_OOM(w_neis, "Cannot calculate local relative density.");
 
-        igraph_integer_t dw = igraph_vector_int_size(w_neis);
+        igraph_int_t dw = igraph_vector_int_size(w_neis);
 
         /* mark neighbours of w, as well as w itself */
-        for (igraph_integer_t j=0; j < dw; ++j) {
+        for (igraph_int_t j=0; j < dw; ++j) {
             VECTOR(nei_mask)[ VECTOR(*w_neis)[j] ] = i + 1;
         }
         VECTOR(nei_mask)[w] = i + 1;
@@ -82,8 +82,8 @@ static igraph_error_t igraph_i_local_relative_density(const igraph_t *graph, igr
         int_count += dw;
         VECTOR(nei_done)[w] = i + 1;
 
-        for (igraph_integer_t j=0; j < dw; ++j) {
-            igraph_integer_t v = VECTOR(*w_neis)[j];
+        for (igraph_int_t j=0; j < dw; ++j) {
+            igraph_int_t v = VECTOR(*w_neis)[j];
 
             if (VECTOR(nei_done)[v] == i + 1) {
                 continue;
@@ -94,10 +94,10 @@ static igraph_error_t igraph_i_local_relative_density(const igraph_t *graph, igr
             igraph_vector_int_t *v_neis = igraph_lazy_adjlist_get(&al, v);
             IGRAPH_CHECK_OOM(v_neis, "Cannot calculate local relative density.");
 
-            igraph_integer_t dv = igraph_vector_int_size(v_neis);
+            igraph_int_t dv = igraph_vector_int_size(v_neis);
 
-            for (igraph_integer_t k=0; k < dv; ++k) {
-                igraph_integer_t u = VECTOR(*v_neis)[k];
+            for (igraph_int_t k=0; k < dv; ++k) {
+                igraph_int_t u = VECTOR(*v_neis)[k];
 
                 if (VECTOR(nei_mask)[u] == i + 1) {
                     int_count += 1;
@@ -160,10 +160,10 @@ static igraph_error_t choose_generators(
         igraph_neimode_t mode,
         igraph_real_t r) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t ord;
     igraph_bitset_t excluded;
-    igraph_integer_t excluded_count;
+    igraph_int_t excluded_count;
     igraph_inclist_t il;
     igraph_2wheap_t q;
     igraph_real_t radius_max;
@@ -186,8 +186,8 @@ static igraph_error_t choose_generators(
 
     radius_max = -IGRAPH_INFINITY;
     igraph_vector_int_clear(generators);
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_integer_t g = VECTOR(ord)[i];
+    for (igraph_int_t i=0; i < no_of_nodes; i++) {
+        igraph_int_t g = VECTOR(ord)[i];
 
         if (IGRAPH_BIT_TEST(excluded, g)) continue;
 
@@ -196,7 +196,7 @@ static igraph_error_t choose_generators(
         igraph_2wheap_clear(&q);
         IGRAPH_CHECK(igraph_2wheap_push_with_index(&q, g, -0.0));
         while (!igraph_2wheap_empty(&q)) {
-            igraph_integer_t vid = igraph_2wheap_max_index(&q);
+            igraph_int_t vid = igraph_2wheap_max_index(&q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&q);
 
             /* Exceeded cutoff distance, do not search further along this path. */
@@ -215,9 +215,9 @@ static igraph_error_t choose_generators(
             }
 
             igraph_vector_int_t *inc_edges = igraph_inclist_get(&il, vid);
-            igraph_integer_t inc_count = igraph_vector_int_size(inc_edges);
-            for (igraph_integer_t j=0; j < inc_count; j++) {
-                igraph_integer_t edge = VECTOR(*inc_edges)[j];
+            igraph_int_t inc_count = igraph_vector_int_size(inc_edges);
+            for (igraph_int_t j=0; j < inc_count; j++) {
+                igraph_int_t edge = VECTOR(*inc_edges)[j];
                 igraph_real_t weight = VECTOR(*lengths)[edge];
 
                 /* Optimization: do not follow infinite-length edges. */
@@ -225,7 +225,7 @@ static igraph_error_t choose_generators(
                     continue;
                 }
 
-                igraph_integer_t to = IGRAPH_OTHER(graph, edge, vid);
+                igraph_int_t to = IGRAPH_OTHER(graph, edge, vid);
                 igraph_real_t altdist = mindist + weight;
 
                 if (!igraph_2wheap_has_elem(&q, to)) {
@@ -516,8 +516,8 @@ igraph_error_t igraph_community_voronoi(
         const igraph_vector_t *lengths, const igraph_vector_t *weights,
         igraph_neimode_t mode, igraph_real_t r) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t local_rel_dens;
     igraph_vector_t lengths2; /* lengths2 = lengths / ecc */
     igraph_vector_int_t imembership, igenerators;
@@ -594,7 +594,7 @@ igraph_error_t igraph_community_voronoi(
     IGRAPH_CHECK(igraph_ecc(graph, &lengths2, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, true, true));
 
     /* Note: ECC is never NaN but it may be Inf */
-    for (igraph_integer_t i=0; i < no_of_edges; i++) {
+    for (igraph_int_t i=0; i < no_of_edges; i++) {
         VECTOR(lengths2)[i] = 1 / (VECTOR(lengths2)[i]);
     }
     if (lengths) {

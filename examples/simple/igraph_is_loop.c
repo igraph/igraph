@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 void analyze_loops(const igraph_t *graph) {
     igraph_vector_bool_t is_loop;
     igraph_bool_t has_loop;
-    igraph_integer_t loop_count;
+    igraph_int_t loop_count;
 
     igraph_has_loop(graph, &has_loop);
     printf("Has loops? %s\n", has_loop ? "Yes" : "No");
@@ -38,8 +38,10 @@ void analyze_loops(const igraph_t *graph) {
 }
 
 int main(void) {
-
     igraph_t graph;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     igraph_small(&graph, 0, IGRAPH_DIRECTED,
                  0,1, 1,2, 2,1, 0,1, 1,0, 3,4, 11,10, -1);

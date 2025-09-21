@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2006-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -22,6 +22,9 @@ int main(void) {
     igraph_t graph;
     igraph_vector_t eb;
     igraph_vector_int_t edges;
+
+    /* Initialize the library. */
+    igraph_setup();
 
     /* Create the vector where the tree edges will be stored. */
     igraph_vector_int_init(&edges, 0);
@@ -49,8 +52,8 @@ int main(void) {
     igraph_vector_int_print(&edges);
 
     igraph_real_t total_tree_weight = 0;
-    igraph_integer_t n = igraph_vector_int_size(&edges);
-    for (igraph_integer_t i=0; i < n; i++) {
+    igraph_int_t n = igraph_vector_int_size(&edges);
+    for (igraph_int_t i=0; i < n; i++) {
         total_tree_weight += -VECTOR(eb)[ VECTOR(edges)[i] ];
     }
     printf("\nTotal maximum spanning tree weight: %g\n", total_tree_weight);

@@ -1,8 +1,8 @@
 #include <igraph.h>
 
 int main(void) {
-    igraph_integer_t num_vertices = 1000;
-    igraph_integer_t num_edges = 1000;
+    igraph_int_t num_vertices = 1000;
+    igraph_int_t num_edges = 1000;
     igraph_real_t diameter, mean_degree;
     igraph_t graph;
 
@@ -13,8 +13,8 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_erdos_renyi_game_gnm(
-        &graph, num_vertices, num_edges,
-        IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+            &graph, num_vertices, num_edges,
+            IGRAPH_UNDIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
 
     igraph_diameter(
         &graph, /* weights = */ NULL,

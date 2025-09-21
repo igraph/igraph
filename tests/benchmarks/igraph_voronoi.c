@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -42,12 +42,12 @@ int main(void) {
 #define DENS 0.5
 #define REP 1000
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_int_resize(&membership, igraph_vcount(&g));
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -72,12 +72,12 @@ int main(void) {
 #define DENS 0.1
 #define REP 1000
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_int_resize(&membership, igraph_vcount(&g));
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -102,12 +102,12 @@ int main(void) {
 #define DENS 0.01
 #define REP 100
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_int_resize(&membership, igraph_vcount(&g));
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 
@@ -132,12 +132,12 @@ int main(void) {
 #define DENS 0.0001
 #define REP 1
 
-    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(&g, VCOUNT, DENS, IGRAPH_DIRECTED, IGRAPH_SIMPLE_SW, IGRAPH_EDGE_UNLABELED);
     igraph_vector_int_resize(&membership, igraph_vcount(&g));
     igraph_vector_resize(&distances, igraph_vcount(&g));
     igraph_vector_resize(&weights, igraph_ecount(&g));
 
-    for (igraph_integer_t i=0; i < igraph_ecount(&g); i++) {
+    for (igraph_int_t i=0; i < igraph_ecount(&g); i++) {
         VECTOR(weights)[i] = RNG_EXP(1);
     }
 

@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -28,67 +28,67 @@ int main(void) {
     igraph_real_t basic_small[3] = {0, -5, -2};
 
     printf("Checking if vector is equal to itself:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, basic, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(basic, 3);
     result_bool = igraph_vector_is_equal(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if vector is equal to other vector:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, nan, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(nan, 3);
     result_bool = igraph_vector_is_equal(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are less than its own elements:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, basic, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(basic, 3);
     result_bool = igraph_vector_all_l(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are less than vector with nan:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, nan, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(nan, 3);
     result_bool = igraph_vector_all_l(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are less than vector with smaller elements:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, basic_small, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(basic_small, 3);
     result_bool = igraph_vector_all_l(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are less than vector with larger elements:\n");
-    igraph_vector_view(&v, basic_small, 3);
-    igraph_vector_view(&v2, basic, 3);
+    v = igraph_vector_view(basic_small, 3);
+    v2 = igraph_vector_view(basic, 3);
     result_bool = igraph_vector_all_l(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are greater than its own elements:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, basic, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(basic, 3);
     result_bool = igraph_vector_all_g(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are greater than vector with nan:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, nan, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(nan, 3);
     result_bool = igraph_vector_all_g(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are greater than vector with smaller elements:\n");
-    igraph_vector_view(&v, basic, 3);
-    igraph_vector_view(&v2, basic_small, 3);
+    v = igraph_vector_view(basic, 3);
+    v2 = igraph_vector_view(basic_small, 3);
     result_bool = igraph_vector_all_g(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking if all elements of vector are greater than vector with larger elements:\n");
-    igraph_vector_view(&v, basic_small, 3);
-    igraph_vector_view(&v2, basic, 3);
+    v = igraph_vector_view(basic_small, 3);
+    v2 = igraph_vector_view(basic, 3);
     result_bool = igraph_vector_all_g(&v, &v2);
     printf("%d\n", result_bool);
 
     printf("Checking vector_printf without nans:\n");
-    igraph_vector_view(&v, basic, 3);
+    v = igraph_vector_view(basic, 3);
     igraph_vector_printf(&v, "--%4g--");
 
     VERIFY_FINALLY_STACK();

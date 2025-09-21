@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -130,14 +130,14 @@ using namespace igraph::walktrap;
 
 igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
-                              igraph_integer_t steps,
+                              igraph_int_t steps,
                               igraph_matrix_int_t *merges,
                               igraph_vector_t *modularity,
                               igraph_vector_int_t *membership) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t comp_count;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t comp_count;
     igraph_matrix_int_t imerges, *pmerges = merges;
     igraph_vector_t imodularity, *pmodularity = modularity;
 
@@ -205,7 +205,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
     );
 
     if (membership) {
-        igraph_integer_t m;
+        igraph_int_t m;
         m = no_of_nodes > 0 ? igraph_vector_which_max(pmodularity) : 0;
         IGRAPH_CHECK(igraph_community_to_membership(pmerges, no_of_nodes,
                     /*steps=*/ m,

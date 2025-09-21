@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2025  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
@@ -45,10 +45,10 @@
  * igraph_rng_sample_dirichlet() for other similar samplers.
  */
 igraph_error_t igraph_rng_sample_sphere_surface(
-    igraph_rng_t* rng, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_rng_t* rng, igraph_int_t dim, igraph_int_t n, igraph_real_t radius,
     igraph_bool_t positive, igraph_matrix_t *res
 ) {
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     if (dim < 2) {
         IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
@@ -108,11 +108,11 @@ igraph_error_t igraph_rng_sample_sphere_surface(
  * igraph_rng_sample_dirichlet() for other similar samplers.
  */
 igraph_error_t igraph_rng_sample_sphere_volume(
-    igraph_rng_t* rng, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius,
+    igraph_rng_t* rng, igraph_int_t dim, igraph_int_t n, igraph_real_t radius,
     igraph_bool_t positive, igraph_matrix_t *res
 ) {
 
-    igraph_integer_t i, j;
+    igraph_int_t i, j;
 
     /* Arguments are checked by the following call */
 
@@ -151,12 +151,12 @@ igraph_error_t igraph_rng_sample_sphere_volume(
  * latent vectors.
  */
 igraph_error_t igraph_rng_sample_dirichlet(
-    igraph_rng_t* rng, igraph_integer_t n, const igraph_vector_t *alpha,
+    igraph_rng_t* rng, igraph_int_t n, const igraph_vector_t *alpha,
     igraph_matrix_t *res
 ) {
 
-    igraph_integer_t len = igraph_vector_size(alpha);
-    igraph_integer_t i, j;
+    igraph_int_t len = igraph_vector_size(alpha);
+    igraph_int_t i, j;
     igraph_real_t sum, num;
 
     if (n < 0) {

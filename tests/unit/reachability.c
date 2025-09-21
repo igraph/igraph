@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 void compute_and_print(const igraph_t *g, igraph_neimode_t mode) {
     igraph_vector_int_t membership, csize, reach_counts;
     igraph_bitset_list_t reach;
-    igraph_integer_t no_of_nodes, no_of_components;
+    igraph_int_t no_of_nodes, no_of_components;
 
     no_of_nodes = igraph_vcount(g);
 

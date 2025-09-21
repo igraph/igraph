@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_integer_t n, igraph_vector_int_t *mlist, igraph_vector_list_t *rholist, igraph_matrix_list_t *pref_matrix_list, igraph_real_t p) {
+void call_and_print(igraph_int_t n, igraph_vector_int_t *mlist, igraph_vector_list_t *rholist, igraph_matrix_list_t *pref_matrix_list, igraph_real_t p) {
     igraph_t result;
     igraph_hsbm_list_game(&result, n, mlist, rholist, pref_matrix_list, p);
     print_graph_canon(&result);

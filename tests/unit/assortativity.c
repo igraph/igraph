@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2009-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -269,7 +269,7 @@ int main(void) {
     /*------------------*/
     /* Football network */
 
-    igraph_integer_t football_types[] = {
+    igraph_int_t football_types[] = {
         7, 0, 2, 3, 7, 3, 2, 8, 8, 7, 3, 10, 6, 2, 6, 2, 7, 9, 6, 1, 9, 8, 8, 7, 10, 0, 6, 9,
         11, 1, 1, 6, 2, 0, 6, 1, 5, 0, 6, 2, 3, 7, 5, 6, 4, 0, 11, 2, 4, 11, 10, 8, 3, 11, 6,
         1, 9, 4, 11, 10, 2, 6, 9, 10, 2, 9, 4, 11, 8, 10, 9, 6, 3, 11, 3, 4, 9, 8, 8, 1, 5, 3,
@@ -345,7 +345,7 @@ int main(void) {
                  114, 53, 114, 49, 114, 73, 114, 46, 114, 67, 114, 58, 114, 15, 114, 104, 114,
                  -1);
     igraph_simplify(&g, /*remove_multiple=*/ true, /*remove_loops=*/ true, /*edge_comb=*/ NULL);
-    igraph_vector_int_view(&types, football_types, sizeof(football_types) / sizeof(football_types[0]));
+    types = igraph_vector_int_view(football_types, sizeof(football_types) / sizeof(football_types[0]));
     igraph_assortativity_nominal(&g, NULL, &types, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ true);
     printf("%g\n", assort);
 

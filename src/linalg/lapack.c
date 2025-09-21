@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -37,11 +37,11 @@
 static igraph_error_t igraph_vector_int_update_from_fortran(
     igraph_vector_int_t* vec, const igraph_vector_fortran_int_t* fortran_vec
 ) {
-    igraph_integer_t size = igraph_vector_fortran_int_size(fortran_vec);
+    igraph_int_t size = igraph_vector_fortran_int_size(fortran_vec);
 
     IGRAPH_CHECK(igraph_vector_int_resize(vec, size));
 
-    for (igraph_integer_t i = 0; i < size; i++) {
+    for (igraph_int_t i = 0; i < size; i++) {
         VECTOR(*vec)[i] = VECTOR(*fortran_vec)[i];
     }
 
@@ -52,7 +52,7 @@ static igraph_error_t igraph_vector_int_update_from_fortran(
 static igraph_error_t igraph_vector_int_copy_to_fortran(
     const igraph_vector_int_t* vec, igraph_vector_fortran_int_t* fortran_vec
 ) {
-    igraph_integer_t i, size = igraph_vector_int_size(vec);
+    igraph_int_t i, size = igraph_vector_int_size(vec);
 
     IGRAPH_CHECK(igraph_vector_fortran_int_resize(fortran_vec, size));
 

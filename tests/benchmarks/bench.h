@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2013-2024  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ static inline void igraph_get_cpu_time(double *data) {
 
 #define REPEAT(CODE, N) \
     do { \
-        igraph_integer_t rep_i; \
+        igraph_int_t rep_i; \
         for (rep_i=0; rep_i < N; ++rep_i) { CODE; } \
     } while (0)
 

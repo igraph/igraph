@@ -2,17 +2,20 @@
 #include <stdio.h>
 
 int main(void) {
-    igraph_integer_t nodes = 120, types = 4;
-
+    igraph_int_t nodes = 120, types = 4;
     igraph_matrix_t pref_matrix;
+
+    /* Initialize the library. */
+    igraph_setup();
+
     igraph_matrix_init(&pref_matrix, types, types);
 
     igraph_rng_seed(igraph_rng_default(), 42);
     printf("Randomly generated graph with %" IGRAPH_PRId " nodes and %" IGRAPH_PRId " vertex types\n\n", nodes, types);
 
     /* Generate preference matrix giving connection probabilities for different vertex types */
-    for (igraph_integer_t i = 0; i < types; i++) {
-        for (igraph_integer_t j = 0; j < types; j++) {
+    for (igraph_int_t i = 0; i < types; i++) {
+        for (igraph_int_t j = 0; j < types; j++) {
             MATRIX(pref_matrix, i, j) = (i == j ? 0.1: 0.01);
         }
     }
@@ -31,7 +34,7 @@ int main(void) {
         printf("Assortativity before rewiring = %g\n", assortativity);
 
         /* Rewire graph */
-        igraph_rewire(&g, 10 * igraph_ecount(&g), IGRAPH_SIMPLE_SW);
+        igraph_rewire(&g, 10 * igraph_ecount(&g), IGRAPH_SIMPLE_SW, NULL);
 
         igraph_assortativity_nominal(&g, NULL, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
         printf("Assortativity after rewiring = %g\n\n", assortativity);

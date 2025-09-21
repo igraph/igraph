@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -28,10 +28,10 @@ void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
 
 igraph_error_t igraph_fixed_vectorlist_convert(
     igraph_fixed_vectorlist_t *l, const igraph_vector_int_t *from,
-    igraph_integer_t size
+    igraph_int_t size
 ) {
     igraph_vector_int_t sizes;
-    igraph_integer_t i, no = igraph_vector_int_size(from), to;
+    igraph_int_t i, no = igraph_vector_int_size(from), to;
 
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&l->vecs, size);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, size);

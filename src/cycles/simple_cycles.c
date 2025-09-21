@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2024-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -41,7 +41,7 @@
  */
 typedef struct {
     /* Number of vertices in the graph */
-    igraph_integer_t N;
+    igraph_int_t N;
 
     /* The incidence list of the graph */
     igraph_inclist_t IK;
@@ -80,6 +80,10 @@ typedef struct {
     igraph_vector_int_list_t *vertices;
     /* the edges in the cycle */
     igraph_vector_int_list_t *edges;
+    /* number of cycles found so far */
+    igraph_int_t cycle_count;
+    /* how many cycles to record at most? */
+    igraph_int_t max_results;
 } simple_cycle_results_t;
 
 /**
@@ -87,7 +91,7 @@ typedef struct {
  */
 static igraph_error_t simple_cycles_unblock(
         simple_cycle_search_state_t *state,
-        igraph_integer_t u) {
+        igraph_int_t u) {
 
     // TODO: introduce stack for w & neis in order to reduce the number of
     // iterations.
@@ -99,13 +103,13 @@ static igraph_error_t simple_cycles_unblock(
 
     while (igraph_stack_int_size(&u_stack) > 0) {
         igraph_bool_t recurse_deeper = false;
-        const igraph_integer_t current_u = igraph_stack_int_top(&u_stack);
+        const igraph_int_t current_u = igraph_stack_int_top(&u_stack);
 
         IGRAPH_BIT_CLEAR(state->v_blocked, current_u);
 
         neis = igraph_adjlist_get(&state->B, current_u);
         while (!igraph_vector_int_empty(neis) && !recurse_deeper) {
-            const igraph_integer_t w = igraph_vector_int_pop_back(neis);
+            const igraph_int_t w = igraph_vector_int_pop_back(neis);
             if (IGRAPH_BIT_TEST(state->v_blocked, w)) {
                 IGRAPH_CHECK(igraph_stack_int_push(&u_stack, w));
                 recurse_deeper = true;
@@ -135,17 +139,17 @@ static igraph_error_t simple_cycles_unblock(
  */
 static igraph_error_t simple_cycles_circuit(
         simple_cycle_search_state_t *state,
-        igraph_integer_t V,
-        igraph_integer_t max_cycle_length,
-        igraph_integer_t min_cycle_length,
+        igraph_int_t V,
+        igraph_int_t max_cycle_length,
+        igraph_int_t min_cycle_length,
         igraph_cycle_handler_t *callback,
         void *arg) {
 
     const igraph_vector_int_t *neighbors;
     const igraph_vector_int_t *incident_edges;
-    igraph_integer_t num_neighbors;
-    igraph_integer_t S = V;  // start
-    igraph_integer_t E = -1; // edge start
+    igraph_int_t num_neighbors;
+    igraph_int_t S = V;  // start
+    igraph_int_t E = -1; // edge start
 
     igraph_bool_t local_found = false;
     igraph_bool_t loop_length_stop = false;
@@ -171,7 +175,7 @@ static igraph_error_t simple_cycles_circuit(
         IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) ==
                       igraph_stack_int_size(&e_stack));
 
-        igraph_integer_t i0 = 0;
+        igraph_int_t i0 = 0;
         if (recurse_deeper) {
             // stack v & e
             IGRAPH_CHECK(igraph_vector_int_push_back(&state->vertex_stack, V));
@@ -196,9 +200,9 @@ static igraph_error_t simple_cycles_circuit(
         incident_edges = igraph_inclist_get(&state->IK, V);
         num_neighbors = igraph_vector_int_size(neighbors);
         IGRAPH_ASSERT(igraph_vector_int_size(incident_edges) == num_neighbors);
-        for (igraph_integer_t i = i0; i < num_neighbors; ++i) {
-            igraph_integer_t W = VECTOR(*neighbors)[i];
-            igraph_integer_t WE = VECTOR(*incident_edges)[i];
+        for (igraph_int_t i = i0; i < num_neighbors; ++i) {
+            igraph_int_t W = VECTOR(*neighbors)[i];
+            igraph_int_t WE = VECTOR(*incident_edges)[i];
 
             if (W == S) {
                 igraph_error_t ret;
@@ -267,8 +271,8 @@ static igraph_error_t simple_cycles_circuit(
             if (local_found || loop_length_stop) {
                 IGRAPH_CHECK(simple_cycles_unblock(state, V));
             } else {
-                for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
-                    const igraph_integer_t W = VECTOR(*neighbors)[i];
+                for (igraph_int_t i = 0; i < num_neighbors; ++i) {
+                    const igraph_int_t W = VECTOR(*neighbors)[i];
                     if (!igraph_vector_int_contains(igraph_adjlist_get(&state->B, W), V)) {
                         IGRAPH_CHECK(
                             igraph_vector_int_push_back(igraph_adjlist_get(&state->B, W), V));
@@ -291,9 +295,11 @@ static igraph_error_t simple_cycles_circuit(
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
-    IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
-    IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+    if (! state->stop_search) {
+        IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) == 0);
+        IGRAPH_ASSERT(igraph_stack_int_size(&e_stack) == 0);
+        IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) == 0);
+    }
 
     igraph_stack_int_destroy(&neigh_iteration_progress);
     igraph_stack_int_destroy(&v_stack);
@@ -393,8 +399,8 @@ static igraph_error_t append_simple_cycle_result(
         const igraph_vector_int_t *edges,
         void *arg) {
 
-    simple_cycle_results_t *res_list =
-        (simple_cycle_results_t *)arg;
+    simple_cycle_results_t *res_list = (simple_cycle_results_t *) arg;
+
     if (res_list->vertices != NULL) {
         // copy output: from stack to vector. No need to reverse because
         // we were putting vertices in the stack in reverse order anyway.
@@ -415,7 +421,13 @@ static igraph_error_t append_simple_cycle_result(
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return IGRAPH_SUCCESS;
+    res_list->cycle_count++;
+
+    if (res_list->max_results >= 0 && res_list->cycle_count == res_list->max_results) {
+        return IGRAPH_STOP;
+    } else {
+        return IGRAPH_SUCCESS;
+    }
 }
 
 /**
@@ -438,14 +450,14 @@ static igraph_error_t append_simple_cycle_result(
  */
 static igraph_error_t simple_cycles_search_callback_from_one_vertex(
         simple_cycle_search_state_t *state,
-        igraph_integer_t s,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length,
+        igraph_int_t s,
+        igraph_int_t min_cycle_length,
+        igraph_int_t max_cycle_length,
         igraph_cycle_handler_t *callback,
         void *arg) {
 
     // L3:
-    for (igraph_integer_t i = s; i < state->N; ++i) {
+    for (igraph_int_t i = s; i < state->N; ++i) {
         IGRAPH_BIT_CLEAR(state->v_blocked, i);
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
@@ -453,11 +465,11 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
     IGRAPH_CHECK(simple_cycles_circuit(state, s, max_cycle_length,
                  min_cycle_length, callback, arg));
 
-    for (igraph_integer_t i = 0; i < state->N; ++i) {
+    for (igraph_int_t i = 0; i < state->N; ++i) {
         // We want to remove the vertex with value s, not at position s.
         // It's fine to use binary search since we never add to, only remove from
         // an already sorted adjacency list.
-        igraph_integer_t pos;
+        igraph_int_t pos;
         if (igraph_vector_int_binsearch(igraph_adjlist_get(&state->AK, i), s,
                                         &pos)) {
             igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
@@ -513,8 +525,8 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
 igraph_error_t igraph_simple_cycles_callback(
         const igraph_t *graph,
         igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length,
+        igraph_int_t min_cycle_length,
+        igraph_int_t max_cycle_length,
         igraph_cycle_handler_t *callback,
         void *arg) {
 
@@ -536,13 +548,13 @@ igraph_error_t igraph_simple_cycles_callback(
     //
     // Thus, we iterate over the vertices, and check if they can be skipped as
     // a starting point according to the rules laid out above.
-    for (igraph_integer_t i = 0; i < state.N; i++) {
+    for (igraph_int_t i = 0; i < state.N; i++) {
         // Check if the vertex is a candidate for a cycle.
         // Note that we call igraph_degree_1() here instead of retrieving the
         // neighbor count from igraph_adjlist_get(&state.AK, i) because:
         //  - we need to the undirected degree in all cases, and
         //  - our algorithm modifies the adjlist state.AK
-        igraph_integer_t degree;
+        igraph_int_t degree;
         IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
         if (degree < 3 && IGRAPH_BIT_TEST(state.v_visited, i)) {
             continue;
@@ -596,6 +608,8 @@ igraph_error_t igraph_simple_cycles_callback(
  *   Pass a negative value to search for all cycles.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value to search for all cycles.
+ * \param max_results At most this many cycles will be recorded. If
+ *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_simple_cycles_callback() to call a function for each found
@@ -607,21 +621,26 @@ igraph_error_t igraph_simple_cycles_callback(
  */
 igraph_error_t igraph_simple_cycles(
         const igraph_t *graph,
-        igraph_vector_int_list_t *vertices,
-        igraph_vector_int_list_t *edges,
+        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
         igraph_neimode_t mode,
-        igraph_integer_t min_cycle_length,
-        igraph_integer_t max_cycle_length) {
+        igraph_int_t min_cycle_length, igraph_int_t max_cycle_length,
+        igraph_int_t max_results) {
 
     simple_cycle_results_t result_list;
     result_list.vertices = vertices;
     result_list.edges = edges;
+    result_list.cycle_count = 0;
+    result_list.max_results = max_results;
 
     if (vertices) {
         igraph_vector_int_list_clear(vertices);
     }
     if (edges) {
         igraph_vector_int_list_clear(edges);
+    }
+
+    if (max_results == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_simple_cycles_callback(graph, mode, min_cycle_length, max_cycle_length,

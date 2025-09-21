@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -69,8 +69,8 @@
 
 igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *m,
                                igraph_matrix_t *real) {
-    igraph_integer_t nrow = igraph_matrix_complex_nrow(m);
-    igraph_integer_t ncol = igraph_matrix_complex_ncol(m);
+    igraph_int_t nrow = igraph_matrix_complex_nrow(m);
+    igraph_int_t ncol = igraph_matrix_complex_ncol(m);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_real(&m->data, &real->data));
     return IGRAPH_SUCCESS;
@@ -92,8 +92,8 @@ igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *m,
 
 igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *m,
                                igraph_matrix_t *imag) {
-    igraph_integer_t nrow = igraph_matrix_complex_nrow(m);
-    igraph_integer_t ncol = igraph_matrix_complex_ncol(m);
+    igraph_int_t nrow = igraph_matrix_complex_nrow(m);
+    igraph_int_t ncol = igraph_matrix_complex_ncol(m);
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_imag(&m->data, &imag->data));
     return IGRAPH_SUCCESS;
@@ -117,8 +117,8 @@ igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *m,
 igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *m,
                                    igraph_matrix_t *real,
                                    igraph_matrix_t *imag) {
-    igraph_integer_t nrow = igraph_matrix_complex_nrow(m);
-    igraph_integer_t ncol = igraph_matrix_complex_ncol(m);
+    igraph_int_t nrow = igraph_matrix_complex_nrow(m);
+    igraph_int_t ncol = igraph_matrix_complex_ncol(m);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
     IGRAPH_CHECK(igraph_vector_complex_realimag(&m->data, &real->data,
@@ -144,10 +144,10 @@ igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *m,
 igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
                                  const igraph_matrix_t *real,
                                  const igraph_matrix_t *imag) {
-    igraph_integer_t nrowr = igraph_matrix_nrow(real);
-    igraph_integer_t ncolr = igraph_matrix_ncol(real);
-    igraph_integer_t nrowi = igraph_matrix_nrow(imag);
-    igraph_integer_t ncoli = igraph_matrix_ncol(imag);
+    igraph_int_t nrowr = igraph_matrix_nrow(real);
+    igraph_int_t ncolr = igraph_matrix_ncol(real);
+    igraph_int_t nrowi = igraph_matrix_nrow(imag);
+    igraph_int_t ncoli = igraph_matrix_ncol(imag);
 
     if (nrowr != nrowi || ncolr != ncoli) {
         IGRAPH_ERRORF("Dimensions of real (%" IGRAPH_PRId " by %" IGRAPH_PRId ") and "
@@ -157,7 +157,7 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
 
     IGRAPH_CHECK(igraph_matrix_complex_init(m, nrowr, ncolr));
 
-    for (igraph_integer_t i = 0; i < nrowr * ncolr; i++) {
+    for (igraph_int_t i = 0; i < nrowr * ncolr; i++) {
         VECTOR(m->data)[i] = igraph_complex(VECTOR(real->data)[i], VECTOR(imag->data)[i]);
     }
 
@@ -182,10 +182,10 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
 igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
                                        const igraph_matrix_t *r,
                                        const igraph_matrix_t *theta) {
-    igraph_integer_t nrowr = igraph_matrix_nrow(r);
-    igraph_integer_t ncolr = igraph_matrix_ncol(r);
-    igraph_integer_t nrowt = igraph_matrix_nrow(theta);
-    igraph_integer_t ncolt = igraph_matrix_ncol(theta);
+    igraph_int_t nrowr = igraph_matrix_nrow(r);
+    igraph_int_t ncolr = igraph_matrix_ncol(r);
+    igraph_int_t nrowt = igraph_matrix_nrow(theta);
+    igraph_int_t ncolt = igraph_matrix_ncol(theta);
 
     if (nrowr != nrowt || ncolr != ncolt) {
         IGRAPH_ERRORF("Dimensions of magnitude (%" IGRAPH_PRId " by %" IGRAPH_PRId ") and "
@@ -195,7 +195,7 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
 
     IGRAPH_CHECK(igraph_matrix_complex_init(m, nrowr, ncolr));
 
-    for (igraph_integer_t i = 0; i < nrowr * ncolr; i++) {
+    for (igraph_int_t i = 0; i < nrowr * ncolr; i++) {
         VECTOR(m->data)[i] = igraph_complex_polar(VECTOR(r->data)[i], VECTOR(theta->data)[i]);
     }
     return IGRAPH_SUCCESS;

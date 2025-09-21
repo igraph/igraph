@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
 
@@ -35,14 +35,14 @@ typedef struct igraph_estack_t {
 } igraph_estack_t;
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_init(
-    igraph_estack_t *s, igraph_integer_t setsize, igraph_integer_t stacksize);
+    igraph_estack_t *s, igraph_int_t setsize, igraph_int_t stacksize);
 IGRAPH_PRIVATE_EXPORT void igraph_estack_destroy(igraph_estack_t *s);
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_push(igraph_estack_t *s, igraph_integer_t elem);
-IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_estack_pop(igraph_estack_t *s);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_push(igraph_estack_t *s, igraph_int_t elem);
+IGRAPH_PRIVATE_EXPORT igraph_int_t igraph_estack_pop(igraph_estack_t *s);
 IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_estack_iselement(const igraph_estack_t *s,
-                                                            igraph_integer_t elem);
-IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_estack_size(const igraph_estack_t *s);
+                                                            igraph_int_t elem);
+IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_estack_size(const igraph_estack_t *s);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_estack_print(const igraph_estack_t *s);
 

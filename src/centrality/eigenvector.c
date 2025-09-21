@@ -1,5 +1,5 @@
 /*
-   IGraph library.
+   igraph library.
    Copyright (C) 2007-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
@@ -35,14 +35,14 @@ static igraph_error_t adjmat_mul_unweighted(igraph_real_t *to, const igraph_real
                                            int n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(adjlist, i);
         nlen = igraph_vector_int_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_int_t nei = VECTOR(*neis)[j];
             to[i] += from[nei];
         }
     }
@@ -65,15 +65,15 @@ static igraph_error_t adjmat_mul_weighted(igraph_real_t *to, const igraph_real_t
     const igraph_inclist_t *inclist = data->inclist;
     const igraph_vector_t *weights = data->weights;
     igraph_vector_int_t *edges;
-    igraph_integer_t i, j, nlen;
+    igraph_int_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         edges = igraph_inclist_get(inclist, i);
         nlen = igraph_vector_int_size(edges);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*edges)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_int_t edge = VECTOR(*edges)[j];
+            igraph_int_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
         }
@@ -94,9 +94,9 @@ static void warn_zero_entries(const igraph_vector_t *evcent) {
      * nonzero values.
      * See https://github.com/igraph/igraph/pull/2592 */
     const igraph_real_t tol = 10 * DBL_EPSILON;
-    const igraph_integer_t n = igraph_vector_size(evcent);
+    const igraph_int_t n = igraph_vector_size(evcent);
 
-    for (igraph_integer_t i=0; i < n; i++) {
+    for (igraph_int_t i=0; i < n; i++) {
         igraph_real_t x = VECTOR(*evcent)[i];
         if (-tol < x && x < tol) {
             IGRAPH_WARNING("Some eigenvector centralities are nearly zero, indicating that the graph may not be (strongly) connected. "
@@ -114,9 +114,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     igraph_vector_t values;
     igraph_matrix_t vectors;
     igraph_vector_t degree;
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t i;
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t negative_weights = false;
 
     if (no_of_nodes > INT_MAX) {
@@ -192,7 +192,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         } else {
             /* When negative weights are present, a zero strength may occur even
              * if the degree is not zero, and some edges have non-zero weight. */
-            igraph_integer_t deg;
+            igraph_int_t deg;
             IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, IGRAPH_ALL, IGRAPH_LOOPS));
             MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
@@ -291,8 +291,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_matrix_t vectors;
     igraph_vector_t indegree;
     igraph_bool_t dag;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_int_t no_of_nodes = igraph_vcount(graph);
+    igraph_int_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t negative_weights = false;
 
     mode = IGRAPH_REVERSE_MODE(mode);
@@ -382,7 +382,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                     graph, vector, igraph_vss_all(), IGRAPH_REVERSE_MODE(mode),
                     IGRAPH_LOOPS, weights
                 ));
-                for (igraph_integer_t i=0; i < no_of_nodes; i++) {
+                for (igraph_int_t i=0; i < no_of_nodes; i++) {
                     if (VECTOR(*vector)[i] == 0) {
                         VECTOR(*vector)[i] = 1;
                     } else {
@@ -416,7 +416,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
                                  mode, IGRAPH_LOOPS, weights));
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
             /* Note: Keep random perturbation non-negative. */
             MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(0, 1e-4);
@@ -426,7 +426,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         } else {
             /* When negative weights are present, a zero in-strength may occur even
              * if the in-degree is not zero, and some in-edges have non-zero weight. */
-            igraph_integer_t deg;
+            igraph_int_t deg;
             IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, mode, IGRAPH_LOOPS));
             MATRIX(vectors, i, 0) = deg == 0 ? 0.0 : 1.0;
         }
@@ -476,7 +476,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             igraph_vector_fill(vector, 0);
             MATRIX(values, 0, 0) = 0;
         } else {
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (igraph_int_t i = 0; i < no_of_nodes; i++) {
                 VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
             }
 
@@ -486,7 +486,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
         if (! negative_weights) {
-            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            for (igraph_int_t i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(*vector)[i] < 0) {
                     VECTOR(*vector)[i] = 0;
                 }
