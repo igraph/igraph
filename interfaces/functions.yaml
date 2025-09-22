@@ -141,11 +141,13 @@ igraph_sparse_weighted_adjacency:
     PARAMS: |-
         OUT GRAPH graph, INOUT SPARSEMAT adjmatrix, ADJACENCY_MODE mode=DIRECTED,
         OUT EDGE_WEIGHTS weights, LOOPS loops=ONCE
+    DEPS: weights ON graph
 
 igraph_weighted_adjacency:
     PARAMS: |-
         OUT GRAPH graph, MATRIX adjmatrix, ADJACENCY_MODE mode=DIRECTED,
         OUT EDGE_WEIGHTS weights, LOOPS loops=ONCE
+    DEPS: weights ON graph
 
 igraph_star:
     PARAMS: OUT GRAPH graph, INTEGER n, STAR_MODE mode=OUT, INTEGER center=0
@@ -829,6 +831,7 @@ igraph_maxdegree:
 
 igraph_density:
     PARAMS: GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, OUT REAL res, BOOLEAN loops=False
+    DEPS: weights ON graph
 
 igraph_mean_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN loops=True
@@ -919,6 +922,7 @@ igraph_hub_and_authority_scores:
         GRAPH graph, OUT ALL_VERTEX_QTY hub_vector, OUT ALL_VERTEX_QTY authority_vector,
         OUT REAL value, OPTIONAL EDGE_WEIGHTS weights,
         INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
+    DEPS: weights ON graph, hub_vector ON graph, authority_vector ON graph
 
 igraph_unfold_tree:
     PARAMS: |-
@@ -1547,11 +1551,13 @@ igraph_layout_drl:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         DRL_OPTIONS options=drl_defaults$default, OPTIONAL EDGE_WEIGHTS weights
+    DEPS: weights ON graph
 
 igraph_layout_drl_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
         DRL_OPTIONS options=drl_defaults$default, OPTIONAL EDGE_WEIGHTS weights
+    DEPS: weights ON graph
 
 igraph_layout_merge_dla:
     PARAMS: GRAPH_PTR_LIST graphs, MATRIX_LIST coords, OUT MATRIX res
@@ -1761,6 +1767,7 @@ igraph_community_leading_eigenvector:
         OPTIONAL OUT VECTOR_INT history,
         OPTIONAL LEVC_FUNC callback,
         OPTIONAL EXTRA callback_extra
+    DEPS: weights ON graph
 
 igraph_community_fluid_communities:
     PARAMS: |-
