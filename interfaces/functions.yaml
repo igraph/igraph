@@ -2726,6 +2726,22 @@ igraph_nearest_neighbor_graph:
 igraph_delaunay_graph:
     PARAMS: OUT GRAPH graph, MATRIX points
 
+igraph_gabriel_graph:
+    PARAMS: OUT GRAPH graph, MATRIX points
+
+igraph_relative_neighborhood_graph:
+    PARAMS: OUT GRAPH graph, MATRIX points
+
+igraph_lune_beta_skeleton:
+    PARAMS: OUT GRAPH graph, MATRIX points, REAL beta=1
+
+igraph_circle_beta_skeleton:
+    PARAMS: OUT GRAPH graph, MATRIX points, REAL beta=1
+
+igraph_beta_weighted_gabriel_graph:
+    PARAMS: OUT GRAPH graph, OUT EDGE_WEIGHTS weights, MATRIX points, REAL max_beta=UNLIMITED
+    DEPS: weights ON graph
+
 igraph_spatial_edge_lengths:
     PARAMS: GRAPH graph, OUT EDGE_LENGTHS lengths, MATRIX points, METRIC METRIC
     DEPS: lengths ON graph
