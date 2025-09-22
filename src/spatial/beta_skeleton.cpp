@@ -320,7 +320,7 @@ static void construct_perp_centers(std::vector<igraph_real_t> &a_centre,
  * containing all the points.
  */
 typedef bool FilterFunc(
-    const KDTree < -1 > &tree,
+    const KDTree<-1> &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -332,7 +332,7 @@ typedef bool FilterFunc(
 // by center_positions is empty of points except for a and b.
 template<CenterConstructor center_positions, igraph_bool_t is_closed>
 static bool is_intersection_empty(
-    const KDTree < -1 > &tree,
+    const KDTree<-1> &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -364,7 +364,7 @@ static bool is_intersection_empty(
 //  is empty of other points except for a and b.
 template<CenterConstructor center_positions>
 static bool is_union_empty(
-    const KDTree < -1 > &tree,
+    const KDTree<-1> &tree,
     igraph_int_t a,
     igraph_int_t b,
     const igraph_matrix_t *points,
@@ -398,7 +398,7 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
     igraph_int_t added_edges = 0;
     ig_point_adaptor adaptor(points);
     igraph_int_t dim = igraph_matrix_ncol(points);
-    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
     for (igraph_int_t i = 0; i * 2  < available_edges; i++) {
         if (filter(tree, VECTOR(*edges)[2 * i], VECTOR(*edges)[2 * i + 1], points, beta)) {
@@ -668,7 +668,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
 
     IGRAPH_CHECK(igraph_vector_resize(weights, edge_count));
 
-    KDTree < -1 > tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    KDTree<-1> tree(dim, adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(10));
     tree.buildIndex();
 
     igraph_vector_t midpoint;
