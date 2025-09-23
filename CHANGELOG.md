@@ -2,6 +2,10 @@
 
 ## [main]
 
+### Other
+
+- Documentation improvements.
+
 ## [1.0.0]
 
 Nearly twenty years after the first igraph release, igraph 1.0 has finally arrived. This release focuses on providing a stable and more consistent interface that users and downstream maintainers can rely on with confidence, as well as adding new features that required API-breaking changes. There is now an official versioning policy, see [`VERSIONING.md`](VERSIONING.md).
@@ -102,7 +106,6 @@ This section lists API-breaking changes in this version, and provides guidance o
 
 - `igraph_distances()`, `igraph_distances_cutoff()`, `igraph_get_shortest_path()`, `igraph_get_shortest_paths()` and `igraph_get_all_shortest_paths()` gained a `weights` argument. The functions now automatically select the appropriate implementation (unweighted, Dijkstra, Bellman-Ford or Johnson) algorithm based on whether weights are present and whether there are negative weights or not. You can still call the individual methods by their more specific names.
 - `igraph_distances_johnson()` now takes an `igraph_neimode_t mode` parameter to determine in which direction paths should be followed.
-- `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices to create vertex pairs of, instead of one.
 - The weighted variants of `igraph_diameter()`, `igraph_pseudo_diameter()`, `igraph_radius()`, `igraph_graph_center()`, `igraph_eccentricity()` and `igraph_average_path_length()` were merged into the undirected ones by adding a new argument named `weights` in the second position.
 - The `weights` parameter of `igraph_average_path_length()`, `igraph_global_efficiency()`, `igraph_local_efficiency()` and `igraph_average_local_efficiency()` were moved to the second position, after the `graph` itself, for consistency with other functions.
 - `igraph_get_all_simple_paths()` returns its results in an integer vector list (`igraph_vector_int_list_t`) instead of a single integer vector.
@@ -152,8 +155,8 @@ This section lists API-breaking changes in this version, and provides guidance o
 
 #### Other network analysis
 
+- `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices (`to` and `from` parameters) to create vertex pairs of, instead of one. Pass the same vertex set to both parameters to recover the previous behaviour.
 - `igraph_minimum_spanning_tree()` takes a new `method` parameter that controls the algorithm used for finding the spanning tree. Kruskal's algorithm was added.
-- The deprecated `igraph_rng_get_dirichlet()` function was removed.
 - `igraph_motifs_randesu_no()` and `igraph_motifs_randesu_estimate()` now take an `igraph_real_t` as their `result` argument to prevent overflows when igraph is compiled with 32-bit integers.
 - The `igraph_motifs_handler_t` callback type now takes a `const igraph_vector_int_t *vids` parameter. Previously this was not formally `const`, even though it was not allowed to modify `vids`. This affects uses of `igraph_motifs_randesu_callback()`.
 - The experimental functions `igraph_fundamental_cycles()` and `igraph_minimum_cycle_basis()` now use the type `igraph_real_t` for their `bfs_cutoff` parameter, and had their `weights` parameter moved to the 2nd position.
@@ -241,6 +244,7 @@ This section lists API-breaking changes in this version, and provides guidance o
 - The deprecated `igraph_vector_copy()` and `igraph_matrix_copy()` were removed. Use `igraph_vector_init_copy()` and `igraph_matrix_init_copy()` instead.
 - The deprecated `igraph_vector_e()`, `igraph_vector_e_ptr()`, `igraph_matrix_e()` and `igraph_matrix_e_ptr()` were removed. Use the alternatives ending in `_get()` and `_get_ptr()` instead.
 - The deprecated `igraph_vector_move_interval2()` was removed.
+- The deprecated `igraph_rng_get_dirichlet()` function was removed.
 - The deprecated `igraph_zeroin()` was removed.
 - The deprecated `igraph_deterministic_optimal_imitation()`, `igraph_moran_process()`, `igraph_roulette_wheel_imitation()` and `igraph_stochastic_imitation()` functions were removed.
 - `igraph_sample_dirichlet()`, `igraph_sample_sphere_surface()` and `igraph_sample_sphere_volume()` were removed in favour of `igraph_rng_sample_dirichlet()`, `igraph_rng_sample_sphere_surface()` and `igraph_rng_sample_sphere_volume()`, which allow the user to specify the random number generator to use.
