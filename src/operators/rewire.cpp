@@ -61,8 +61,12 @@ struct AdjList {
     }
 
     // function: has_edge()
+    bool has_edge(igraph_int_t n1, igraph_int_t n2) {
+        return adjlist[n1].find(n2) != adjlist[n1].end();
+    }
 
     // function: replace_edge()
+    // make sure to delete keys that go to 0, has_edge() depends on it
 };
 
 // function to pick random edges
