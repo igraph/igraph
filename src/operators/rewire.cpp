@@ -27,24 +27,52 @@
 #include "core/exceptions.h"
 #include "operators/rewire_internal.h"
 
+#include <vector>
+#include <unordered_map>
+
 struct Edge {
-    igraph_integer_t id;
-    igraph_integer_t from;
-    igraph_integer_t to;
+    igraph_int_t id;
+    igraph_int_t from;
+    igraph_int_t to;
 
     bool operator==(const Edge& other) const {
         return from == other.from && to == other.to;
     }
 };
 
+struct AdjList {
+    using NeighborMap = std::unordered_map<igraph_int_t, igraph_int_t>;
+    std::vector<NeighborMap> adjlist;
+    igraph_int_t n_nodes;
+    igraph_int_t n_edges;
+
+    explicit AdjList(const igraph_t *graph, igraph_vector_int_t edgelist): 
+        n_nodes(igraph_vcount(graph)), adjlist(n_nodes) 
+    {
+        // put edges into adjlist
+        n_edges = igraph_ecount(graph);
+        for (igraph_int_t i = 0; i < n_edges; i++) {
+            igraph_int_t n1 = VECTOR(edgelist)[2 * i];
+            igraph_int_t n2 = VECTOR(edgelist)[2 * i + 1];
+
+            adjlist[n1][n2]++;
+            adjlist[n2][n1]++;
+        }
+    }
+
+    // function: has_edge()
+
+    // function: replace_edge()
+};
+
 // function to pick random edges
-Edge get_random_edge(const igraph_vector_int_t& edgelist, igraph_integer_t n_edges) {
+Edge get_random_edge(const igraph_vector_int_t& edgelist, igraph_int_t n_edges) {
     // get random edge
-    igraph_integer_t eid = RNG_INTEGER(0, n_edges - 1); // high inclusive
+    igraph_int_t eid = RNG_INTEGER(0, n_edges - 1); // high inclusive
 
     // get endpoints of edge
-    igraph_integer_t from = VECTOR(edgelist)[2 * eid];
-    igraph_integer_t to = VECTOR(edgelist)[2 * eid + 1];
+    igraph_int_t from = VECTOR(edgelist)[2 * eid];
+    igraph_int_t to = VECTOR(edgelist)[2 * eid + 1];
 
     return Edge{eid, from, to};
 }
@@ -68,14 +96,14 @@ igraph_bool_t can_rewire(Edge e1, Edge e2, igraph_adjlist_t& adjlist) {
 
 // attempts to perform one rewiring
 igraph_error_t rewire_once(igraph_vector_int_t& edgelist, igraph_adjlist_t& adjlist, 
-                          igraph_integer_t n_edges) {
+                          igraph_int_t n_edges) {
     // pick edges from EDGELIST
     Edge e1 = get_random_edge(edgelist, n_edges);
     Edge e2 = get_random_edge(edgelist, n_edges);
 
     // with .5 probability, flip edge 2 (SIMPLE GRAPHS)
     if (RNG_BOOL()) {
-        igraph_integer_t temp = e2.from; e2.from = e2.to; e2.to = temp;
+        igraph_int_t temp = e2.from; e2.from = e2.to; e2.to = temp;
     }
     
     if (can_rewire(e1, e2, adjlist)) {
@@ -94,10 +122,10 @@ igraph_error_t rewire_once(igraph_vector_int_t& edgelist, igraph_adjlist_t& adjl
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_integer_t n, 
+igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_int_t n, 
                                igraph_edge_type_sw_t allowed_edge_types) {
 
-    const igraph_integer_t n_edges = igraph_ecount(graph);
+    const igraph_int_t n_edges = igraph_ecount(graph);
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
@@ -112,7 +140,7 @@ igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_integer_t n,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    for (igraph_integer_t i = 0; i < n; i++) {
+    for (igraph_int_t i = 0; i < n; i++) {
         // TODO: keep track of % successful rewirings
         IGRAPH_CHECK(rewire_once(edgelist, adjlist, n_edges));
     }
