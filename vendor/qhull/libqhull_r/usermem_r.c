@@ -20,6 +20,8 @@
 
 #include "libqhull_r.h"
 
+#include "igraph_error.h"
+
 #include <stdarg.h>
 #include <stdlib.h>
 
@@ -38,7 +40,10 @@
     To replace qh_exit with 'throw', see libqhullcpp/usermem_r-cpp.cpp
 */
 void qh_exit(int exitcode) {
-    exit(exitcode);
+    /* exit(exitcode); */
+    /* This code is not reachable. We comment out exit() to ensure
+     * that the igraph shared library does not reference it. */
+    IGRAPH_FATALF("Qhull called exit() with exit code %d.", exitcode);
 } /* exit */
 
 /*-<a                             href="qh-user_r.htm#TOC"
