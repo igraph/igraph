@@ -10,6 +10,8 @@
 #include "ProgramInterface.h"
 #include "../utils/Log.h"
 
+#include "igraph_error.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <map>
@@ -45,6 +47,9 @@ ProgramInterface::ProgramInterface(std::string name, std::string shortDescriptio
   addOptionArgument(m_printJsonParameters, "print-json-parameters", "Print Infomap parameters in JSON.", "About").setHidden(true);
 }
 
+/* Modification for igraph: Disable functions that call forbidden
+ * functions such as exit(). */
+#if 0
 void ProgramInterface::exitWithUsage(bool showAdvanced) const
 {
   Log() << "Name:\n";
@@ -125,9 +130,16 @@ void ProgramInterface::exitWithVersionInformation() const
   Log() << "See www.mapequation.org for terms of use.\n";
   std::exit(0);
 }
+#endif
 
 void ProgramInterface::exitWithError(const std::string& message) const
 {
+    /* Modification for igraph: This function must never be called
+     * when using Infomap through igraph. The function is disabled
+     * to eliminate forbidden references to exit() and std::cerr. */
+    IGRAPH_FATALF("Infomap called exitWithError() with message '%s'.",
+                  message.c_str());
+#if 0
   Log() << m_programName << " version " << m_programVersion;
 #ifdef _OPENMP
   Log() << " compiled with OpenMP";
@@ -142,6 +154,7 @@ void ProgramInterface::exitWithError(const std::string& message) const
     Log() << " [options]";
   Log() << ". Run with option '-h' for more information.\n";
   std::exit(1);
+#endif
 }
 
 std::string toJson(const std::string& key, const std::string& value)
@@ -178,6 +191,9 @@ std::string toJson(const Option& opt)
                    << " }";
 }
 
+/* Modification for igraph: Disable functions that call forbidden
+ * functions such as exit(). */
+#if 0
 void ProgramInterface::exitWithJsonParameters() const
 {
   Log() << "{\n  \"parameters\": [\n";
@@ -197,6 +213,7 @@ void ProgramInterface::exitWithJsonParameters() const
 
   std::exit(0);
 }
+#endif
 
 void ProgramInterface::parseArgs(const std::string& args)
 {
@@ -298,12 +315,16 @@ void ProgramInterface::parseArgs(const std::string& args)
           }
         }
       }
+    /* Modification for igraph: Disable calls to functions that
+     * needed to be removed because they referenced exit().  */
+#if 0
       if (m_displayHelp > 0)
         exitWithUsage(m_displayHelp > 1);
       if (m_displayVersion)
         exitWithVersionInformation();
       if (m_printJsonParameters)
         exitWithJsonParameters();
+#endif
     }
   } catch (std::exception& e) {
     exitWithError(e.what());

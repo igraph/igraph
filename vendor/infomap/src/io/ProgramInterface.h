@@ -392,10 +392,16 @@ public:
   unsigned int numRequiredArguments() const { return m_nonOptionArguments.size() - m_numOptionalNonOptionArguments; }
 
 private:
+/* Modification for igraph: Disable functions that call forbidden
+ * functions such as exit(). */
+#if 0
   void exitWithUsage(bool showAdvanced) const;
   void exitWithVersionInformation() const;
+#endif
   void exitWithError(const std::string& message) const;
+#if 0
   void exitWithJsonParameters() const;
+#endif
 
   std::deque<std::unique_ptr<Option>> m_optionArguments;
   std::deque<std::unique_ptr<TargetBase>> m_nonOptionArguments;
