@@ -2,6 +2,10 @@
 
 ## [main]
 
+### Fixed
+
+ - Eliminated references to `exit()` from the igraph shared library. These were accidentally introduces into igraph 1.0.0 through Qhull and Infomap.
+
 ### Other
 
 - Documentation improvements.
