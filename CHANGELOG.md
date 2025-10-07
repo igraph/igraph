@@ -5,6 +5,7 @@
 ### Fixed
 
  - Eliminated references to `exit()` from the igraph shared library. These were accidentally introduces into igraph 1.0.0 through Qhull and Infomap.
+ - Eliminated references to `std::cout` from the igraph shared library, as required by CRAN.
 
 ### Other
 
