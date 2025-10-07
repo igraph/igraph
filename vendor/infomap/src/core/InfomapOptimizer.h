@@ -89,11 +89,13 @@ protected:
 
   bool restoreConsolidatedOptimizationPointIfNoImprovement(bool forceRestore = false) override;
 
+#if 0
   // ===================================================
   // Debug: *
   // ===================================================
 
   void printDebug() override { m_objective.printDebug(); }
+#endif
 
   // ===================================================
   // Protected members

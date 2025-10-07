@@ -469,11 +469,14 @@ public:
   std::string writeClu(const std::string& filename = "", bool states = false, int moduleIndexLevel = 1) { return infomap::writeClu(*this, m_network, filename, states, moduleIndexLevel); }
 
 private:
+
+#if 0
   // ===================================================
   // Debug: *
   // ===================================================
 
   void printDebug() const { return m_optimizer->printDebug(); }
+#endif
 
   // ===================================================
   // Members

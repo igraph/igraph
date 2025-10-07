@@ -94,11 +94,13 @@ protected:
 
   virtual bool restoreConsolidatedOptimizationPointIfNoImprovement(bool forceRestore = false) = 0;
 
+#if 0
   // ===================================================
   // Debug: *
   // ===================================================
 
   virtual void printDebug() = 0;
+#endif
 
 private:
 
