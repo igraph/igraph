@@ -436,6 +436,7 @@ void MemMapEquation::consolidateModules(std::vector<InfoNode*>& modules)
   }
 }
 
+#if 0
 // ===================================================
 // Debug
 // ===================================================
@@ -445,5 +446,6 @@ void MemMapEquation::printDebug() const
   std::cout << "MemMapEquation::m_numPhysicalNodes: " << m_numPhysicalNodes << "\n";
   Base::printDebug();
 }
+#endif
 
 } // namespace infomap

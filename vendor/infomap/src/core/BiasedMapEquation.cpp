@@ -225,6 +225,7 @@ void BiasedMapEquation::consolidateModules(std::vector<InfoNode*>& modules)
   currentNumModules = numModules;
 }
 
+#if 0
 // ===================================================
 // Debug
 // ===================================================
@@ -234,5 +235,6 @@ void BiasedMapEquation::printDebug() const
   std::cout << "BiasedMapEquation\n";
   Base::printDebug();
 }
+#endif
 
 } // namespace infomap

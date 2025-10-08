@@ -39,15 +39,19 @@ public:
   template <typename T>
   Log& operator<<(const T& data)
   {
+#if 0
     if (m_visible)
       m_ostream << data;
+#endif
     return *this;
   }
 
   Log& operator<<(ostreamFuncPtr f)
   {
+#if 0
     if (m_visible)
       m_ostream << f;
+#endif
     return *this;
   }
 
@@ -69,18 +73,21 @@ public:
 
   static bool isSilent() { return s_silent; }
 
-  static std::streamsize precision() { return std::cout.precision(); }
+  /* precision() is patched in igraph to avoid references to std::cout */
+  static std::streamsize precision() { return 6; }
 
-  static std::streamsize precision(std::streamsize precision)
+  static std::streamsize precision(std::streamsize)
   {
-    return std::cout.precision(precision);
+    return precision();
   }
 
 private:
   unsigned int m_level;
   unsigned int m_maxLevel;
   bool m_visible;
+#if 0
   std::ostream& m_ostream = std::cout;
+#endif
 
   static unsigned int s_verboseLevel;
   static bool s_silent;

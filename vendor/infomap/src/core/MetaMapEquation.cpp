@@ -256,6 +256,7 @@ void MetaMapEquation::consolidateModules(std::vector<InfoNode*>& modules)
   }
 }
 
+#if 0
 // ===================================================
 // Debug
 // ===================================================
@@ -265,5 +266,6 @@ void MetaMapEquation::printDebug() const
   std::cout << "MetaMapEquation\n";
   Base::printDebug();
 }
+#endif
 
 } // namespace infomap

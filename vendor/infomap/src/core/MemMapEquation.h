@@ -89,11 +89,13 @@ public:
 
   void consolidateModules(std::vector<InfoNode*>& modules) override;
 
+#if 0
   // ===================================================
   // Debug
   // ===================================================
 
   void printDebug() const override;
+#endif
 
 private:
   // ===================================================

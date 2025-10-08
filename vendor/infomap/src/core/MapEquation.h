@@ -136,12 +136,14 @@ public:
   // Debug
   // ===================================================
 
+#if 0
   virtual void printDebug() const
   {
     std::cout << "(enterFlow_log_enterFlow: " << enterFlow_log_enterFlow << ", "
               << "enter_log_enter: " << enter_log_enter << ", "
               << "exitNetworkFlow_log_exitNetworkFlow: " << exitNetworkFlow_log_exitNetworkFlow << ") ";
   }
+#endif
 
 protected:
   // ===================================================
