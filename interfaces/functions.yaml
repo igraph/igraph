@@ -1777,7 +1777,7 @@ igraph_community_label_propagation:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, NEIMODE mode=ALL,
         OPTIONAL EDGE_WEIGHTS weights, OPTIONAL INDEX_VECTOR initial,
-        OPTIONAL VECTOR_BOOL fixed, IN LPA_VARIANT lpa_variant
+        OPTIONAL VECTOR_BOOL fixed, LPA_VARIANT lpa_variant=DOMINANCE
     DEPS: weights ON graph
 
 igraph_community_multilevel:
