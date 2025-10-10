@@ -900,8 +900,8 @@ igraph_count_multiple:
     DEPS: es ON graph
 
 igraph_girth:
-    PARAMS: GRAPH graph, OUT REAL girth, OUT VERTEX_INDICES circle
-    DEPS: circle ON graph
+    PARAMS: GRAPH graph, OUT REAL girth, OUT VERTEX_INDICES cycle
+    DEPS: cycle ON graph
 
 igraph_is_perfect:
     PARAMS: GRAPH graph, OUT BOOLEAN res

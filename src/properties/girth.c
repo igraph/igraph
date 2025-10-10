@@ -58,9 +58,9 @@
  * \param graph The input graph. Edge directions will be ignored.
  * \param girth Pointer to an \c igraph_real_t, if not \c NULL then the result
  *     will be stored here.
- * \param circle Pointer to an initialized vector, the vertex IDs in
- *     the shortest circle will be stored here. If \c NULL then it is
- *     ignored.
+ * \param cycle Pointer to an initialized vector, the vertex IDs in
+ *     the shortest cycle of length at least 3 will be stored here.
+ *     If \c NULL then it is ignored.
  * \return Error code.
  *
  * Time complexity: O((|V|+|E|)^2), |V| is the number of vertices, |E|
@@ -70,8 +70,9 @@
  *
  * \example examples/simple/igraph_girth.c
  */
-igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
-                 igraph_vector_int_t *circle) {
+igraph_error_t igraph_girth(const igraph_t *graph,
+                            igraph_real_t *girth,
+                            igraph_vector_int_t *cycle) {
 
     igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -169,8 +170,8 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
     }
 
     /* Store the actual circle, if needed */
-    if (circle) {
-        IGRAPH_CHECK(igraph_vector_int_resize(circle, mincirc));
+    if (cycle) {
+        IGRAPH_CHECK(igraph_vector_int_resize(cycle, mincirc));
         if (mincirc != 0) {
             igraph_int_t i, n, idx = 0;
             igraph_dqueue_int_clear(&q);
@@ -193,13 +194,13 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
             }  /* while q !empty */
             /* Ok, now use FATHER to create the path */
             while (t1 != minvertex) {
-                VECTOR(*circle)[idx++] = t1;
+                VECTOR(*cycle)[idx++] = t1;
                 t1 = FATHER(t1) - 1;
             }
-            VECTOR(*circle)[idx] = minvertex;
+            VECTOR(*cycle)[idx] = minvertex;
             idx = mincirc - 1;
             while (t2 != minvertex) {
-                VECTOR(*circle)[idx--] = t2;
+                VECTOR(*cycle)[idx--] = t2;
                 t2 = FATHER(t2) - 1;
             }
         } /* anycircle */
