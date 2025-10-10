@@ -149,7 +149,7 @@ igraph_error_t igraph_girth(const igraph_t *graph,
                         }
                     }
                 } else {
-                    igraph_dqueue_int_push(&q, nei);
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
                     VECTOR(level)[nei] = actlevel + 1;
                 }
             }
@@ -188,7 +188,7 @@ igraph_error_t igraph_girth(const igraph_t *graph,
                     igraph_int_t nei = VECTOR(*neis)[i];
                     if (PARENT(nei) == 0) {
                         PARENT(nei) = actnode + 1;
-                        igraph_dqueue_int_push(&q, nei);
+                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
                     }
                 }
             }  /* while q !empty */
