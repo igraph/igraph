@@ -176,18 +176,18 @@ igraph_error_t igraph_girth(const igraph_t *graph,
             igraph_int_t i, n, idx = 0;
             igraph_dqueue_int_clear(&q);
             igraph_vector_int_null(&level); /* used for father pointers */
-#define FATHER(x) (VECTOR(level)[(x)])
+#define PARENT(x) (VECTOR(level)[(x)])
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, minvertex));
-            FATHER(minvertex) = minvertex;
-            while (FATHER(t1) == 0 || FATHER(t2) == 0) {
+            PARENT(minvertex) = minvertex;
+            while (PARENT(t1) == 0 || PARENT(t2) == 0) {
                 igraph_int_t actnode = igraph_dqueue_int_pop(&q);
                 neis = igraph_lazy_adjlist_get(&adjlist, actnode);
                 IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
                 n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {
                     igraph_int_t nei = VECTOR(*neis)[i];
-                    if (FATHER(nei) == 0) {
-                        FATHER(nei) = actnode + 1;
+                    if (PARENT(nei) == 0) {
+                        PARENT(nei) = actnode + 1;
                         igraph_dqueue_int_push(&q, nei);
                     }
                 }
@@ -195,17 +195,17 @@ igraph_error_t igraph_girth(const igraph_t *graph,
             /* Ok, now use FATHER to create the path */
             while (t1 != minvertex) {
                 VECTOR(*cycle)[idx++] = t1;
-                t1 = FATHER(t1) - 1;
+                t1 = PARENT(t1) - 1;
             }
             VECTOR(*cycle)[idx] = minvertex;
             idx = mincirc - 1;
             while (t2 != minvertex) {
                 VECTOR(*cycle)[idx--] = t2;
-                t2 = FATHER(t2) - 1;
+                t2 = PARENT(t2) - 1;
             }
         } /* anycircle */
     } /* circle */
-#undef FATHER
+#undef PARENT
 
     igraph_vector_int_destroy(&level);
     igraph_dqueue_int_destroy(&q);
