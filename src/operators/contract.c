@@ -94,8 +94,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
         igraph_int_t nfrom = VECTOR(*mapping)[from];
         igraph_int_t nto = VECTOR(*mapping)[to];
 
-        igraph_vector_int_push_back(&edges, nfrom);
-        igraph_vector_int_push_back(&edges, nto);
+        igraph_vector_int_push_back(&edges, nfrom); /* reserved */
+        igraph_vector_int_push_back(&edges, nto); /* reserved */
 
         if (nfrom > last) {
             last = nfrom;

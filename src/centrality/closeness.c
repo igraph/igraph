@@ -190,7 +190,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
         igraph_int_t source = IGRAPH_VIT_GET(vit);
         igraph_2wheap_clear(&Q);
-        igraph_2wheap_push_with_index(&Q, source, -1.0);
+        igraph_2wheap_push_with_index(&Q, source, -1.0); /* reserved */
         VECTOR(which)[source] = i + 1;
         VECTOR(dist)[source] = 1.0;     /* actual distance is zero but we need to store distance + 1 */
         nodes_reached = 0;
@@ -600,7 +600,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
 
         igraph_int_t source = IGRAPH_VIT_GET(vit);
         igraph_2wheap_clear(&Q);
-        igraph_2wheap_push_with_index(&Q, source, -1.0);
+        igraph_2wheap_push_with_index(&Q, source, -1.0); /* reserved */
         VECTOR(which)[source] = i + 1;
         VECTOR(dist)[source] = 1.0;     /* actual distance is zero but we need to store distance + 1 */
 

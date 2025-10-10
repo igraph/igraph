@@ -246,7 +246,7 @@ static igraph_error_t sspf_weighted(
     IGRAPH_CHECK(igraph_2wheap_init(&queue, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &queue);
 
-    igraph_2wheap_push_with_index(&queue, source, -1.0);
+    igraph_2wheap_push_with_index(&queue, source, -1.0); /* reserved */
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 
@@ -355,7 +355,7 @@ static igraph_error_t sspf_weighted_edge(
     IGRAPH_CHECK(igraph_2wheap_init(&queue, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &queue);
 
-    igraph_2wheap_push_with_index(&queue, source, -1.0);
+    igraph_2wheap_push_with_index(&queue, source, -1.0); /* reserved */
     VECTOR(*dist)[source] = 1.0;
     nrgeo[source] = 1;
 

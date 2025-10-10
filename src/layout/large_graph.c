@@ -280,7 +280,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_int_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
                     (to   != vid && igraph_2dgrid_in(&grid, to))) {
-                    igraph_vector_int_push_back(&edges, eid);
+                    igraph_vector_int_push_back(&edges, eid); /* reserved */
                 }
             }
         }

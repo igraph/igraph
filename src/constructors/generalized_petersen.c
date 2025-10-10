@@ -78,12 +78,12 @@ igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_int_t n, igra
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
 
     for (i = 0; i < n; i++) {
-        igraph_vector_int_push_back(&edges, i);
-        igraph_vector_int_push_back(&edges, (i + 1) % n);
-        igraph_vector_int_push_back(&edges, i);
-        igraph_vector_int_push_back(&edges, i + n);
-        igraph_vector_int_push_back(&edges, i + n);
-        igraph_vector_int_push_back(&edges, ((i + k) % n) + n);
+        igraph_vector_int_push_back(&edges, i); /* reserved */
+        igraph_vector_int_push_back(&edges, (i + 1) % n); /* reserved */
+        igraph_vector_int_push_back(&edges, i); /* reserved */
+        igraph_vector_int_push_back(&edges, i + n); /* reserved */
+        igraph_vector_int_push_back(&edges, i + n); /* reserved */
+        igraph_vector_int_push_back(&edges, ((i + k) % n) + n); /* reserved */
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));

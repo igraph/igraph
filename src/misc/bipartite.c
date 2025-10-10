@@ -210,7 +210,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
             VECTOR(vertex_index)[i] = remaining_nodes++;
-            igraph_vector_int_push_back(&vertex_perm, i);
+            igraph_vector_int_push_back(&vertex_perm, i); /* reserved */
         }
     }
 
@@ -1111,11 +1111,11 @@ static igraph_error_t bipartite_iea_game(
         /* flip unconditionally for IGRAPH_IN,
          * or with probability 0.5 for IGRAPH_ALL */
         if (mode == IGRAPH_IN || (mode == IGRAPH_ALL && RNG_BOOL())) {
-            igraph_vector_int_push_back(&edges, to);
-            igraph_vector_int_push_back(&edges, from);
+            igraph_vector_int_push_back(&edges, to); /* reserved */
+            igraph_vector_int_push_back(&edges, from); /* reserved */
         } else {
-            igraph_vector_int_push_back(&edges, from);
-            igraph_vector_int_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from); /* reserved */
+            igraph_vector_int_push_back(&edges, to); /* reserved */
         }
 
     }

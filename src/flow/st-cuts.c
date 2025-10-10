@@ -1179,8 +1179,8 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
             for (j = 0; j < n; j++) {
                 igraph_int_t nei = VECTOR(neis)[j];
                 /* If connected to node that is connected to node that is minimal,
-                * this node is also connected to node that is minimal.
-                */
+                 * this node is also connected to node that is minimal.
+                 */
                 if (IGRAPH_BIT_TEST(connected_to_minimal, nei)) {
                     IGRAPH_BIT_SET(connected_to_minimal, i);
                     break;
@@ -1188,15 +1188,15 @@ static igraph_error_t igraph_i_all_st_mincuts_minimal(const igraph_t *residual,
             }
 
             /* If this node is not connected to node that is minimal, and this node
-            * is minimal and active itself, set it as a minimal node.
-            */
+             * is minimal and active itself, set it as a minimal node.
+             */
             if (!IGRAPH_BIT_TEST(connected_to_minimal, i) && IGRAPH_BIT_TEST(*active, i)) {
 
-                igraph_vector_int_push_back(minimal, i);
+                IGRAPH_CHECK(igraph_vector_int_push_back(minimal, i));
                 /* Also mark this node as connected to minimal, to make sure that
-                * any descendants will be marked as being connected to a minimal
-                * node.
-                */
+                 * any descendants will be marked as being connected to a minimal
+                 * node.
+                 */
                 IGRAPH_BIT_SET(connected_to_minimal, i);
             }
         }

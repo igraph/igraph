@@ -177,7 +177,7 @@ static igraph_error_t fast_heur_undirected(
             igraph_vector_int_clear(&stubs);
             for (i = 0; i < no_of_nodes; i++) {
                 for (j = 0; j < VECTOR(residual_degrees)[i]; j++) {
-                    igraph_vector_int_push_back(&stubs, i);
+                    igraph_vector_int_push_back(&stubs, i); /* reserved */
                 }
             }
 
@@ -323,10 +323,10 @@ static igraph_error_t fast_heur_directed(
             igraph_vector_int_clear(&in_stubs);
             for (i = 0; i < no_of_nodes; i++) {
                 for (j = 0; j < VECTOR(residual_out_degrees)[i]; j++) {
-                    igraph_vector_int_push_back(&out_stubs, i);
+                    igraph_vector_int_push_back(&out_stubs, i); /* reserved */
                 }
                 for (j = 0; j < VECTOR(residual_in_degrees)[i]; j++) {
-                    igraph_vector_int_push_back(&in_stubs, i);
+                    igraph_vector_int_push_back(&in_stubs, i); /* reserved */
                 }
             }
 

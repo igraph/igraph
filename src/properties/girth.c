@@ -175,7 +175,7 @@ igraph_error_t igraph_girth(const igraph_t *graph,
         if (mincirc != 0) {
             igraph_int_t i, n, idx = 0;
             igraph_dqueue_int_clear(&q);
-            igraph_vector_int_null(&level); /* used for father pointers */
+            igraph_vector_int_null(&level); /* used for parent pointers */
 #define PARENT(x) (VECTOR(level)[(x)])
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, minvertex));
             PARENT(minvertex) = minvertex;
@@ -192,7 +192,7 @@ igraph_error_t igraph_girth(const igraph_t *graph,
                     }
                 }
             }  /* while q !empty */
-            /* Ok, now use FATHER to create the path */
+            /* Ok, now use PARENT to create the path */
             while (t1 != minvertex) {
                 VECTOR(*cycle)[idx++] = t1;
                 t1 = PARENT(t1) - 1;

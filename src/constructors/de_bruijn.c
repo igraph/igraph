@@ -98,8 +98,8 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_int_t m, igraph_int_t n)
     for (i = 0; i < no_of_nodes; i++) {
         igraph_int_t basis = (i * m) % no_of_nodes;
         for (j = 0; j < m; j++) {
-            igraph_vector_int_push_back(&edges, i);
-            igraph_vector_int_push_back(&edges, basis + j);
+            igraph_vector_int_push_back(&edges, i); /* reserved */
+            igraph_vector_int_push_back(&edges, basis + j); /* reserved */
         }
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }

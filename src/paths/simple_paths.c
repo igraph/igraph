@@ -122,8 +122,8 @@ igraph_error_t igraph_get_all_simple_paths(
 
     igraph_vector_int_clear(&stack);
     igraph_vector_int_clear(&dist);
-    igraph_vector_int_push_back(&stack, from);
-    igraph_vector_int_push_back(&dist, 0);
+    igraph_vector_int_push_back(&stack, from); /* reserved enough for initial push */
+    igraph_vector_int_push_back(&dist, 0); /* reserved enough for initial push */
     IGRAPH_BIT_SET(added, from);
     while (!igraph_vector_int_empty(&stack)) {
         const igraph_int_t act = igraph_vector_int_tail(&stack);

@@ -233,8 +233,8 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
         igraph_vector_int_t *tmp = igraph_adjlist_get(&al, i);
         for (igraph_int_t j = 0; j < igraph_vector_int_size(tmp); j++) {
             if (dir || i < VECTOR(*tmp)[j]) {
-                igraph_vector_int_push_back(&edges, i);
-                igraph_vector_int_push_back(&edges, VECTOR(*tmp)[j]);
+                igraph_vector_int_push_back(&edges, i); /* initial space reserved */
+                igraph_vector_int_push_back(&edges, VECTOR(*tmp)[j]); /* initial space reserved */
             }
         }
     }
