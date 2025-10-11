@@ -197,21 +197,18 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     }
 
     if (membership || csize) {
-        /* it can never happen that csize != NULL and membership == NULL; we have
-         * handled that case above */
+        /* It can never happen that csize != NULL and membership == NULL; we have
+         * handled that case above. Thus we skip if (membership) checks, which
+         * would confuse static analysers in this context. */
         for (igraph_int_t i = 0; i < no_of_nodes; i++) {
             const igraph_int_t c = VECTOR(*membership)[i];
             if (c != 0) {
-                if (membership) {
-                    VECTOR(*membership)[i] = c - 1;
-                }
+                VECTOR(*membership)[i] = c - 1;
             } else {
                 if (csize) {
                     VECTOR(*csize)[found] += 1;
                 }
-                if (membership) {
-                    VECTOR(*membership)[i] = found;
-                }
+                VECTOR(*membership)[i] = found;
                 found++;
             }
         }
