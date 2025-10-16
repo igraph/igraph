@@ -30,6 +30,10 @@
 #include <vector>
 #include <unordered_map>
 
+// TODO: fix current test errors
+// after that replace with custom adjlist and see if it works
+// ONLY HANDLE SIMPLE, UNDIRECTED right now
+
 struct Edge {
     igraph_int_t id;
     igraph_int_t from;
@@ -42,12 +46,12 @@ struct Edge {
 
 struct AdjList {
     using NeighborMap = std::unordered_map<igraph_int_t, igraph_int_t>;
-    std::vector<NeighborMap> adjlist;
     igraph_int_t n_nodes;
     igraph_int_t n_edges;
+    std::vector<NeighborMap> adjlist;
 
-    explicit AdjList(const igraph_t *graph, igraph_vector_int_t edgelist): 
-        n_nodes(igraph_vcount(graph)), adjlist(n_nodes) 
+    explicit AdjList(const igraph_t *graph, const igraph_vector_int_t& edgelist)
+        : n_nodes(igraph_vcount(graph)), adjlist(n_nodes)
     {
         // put edges into adjlist
         n_edges = igraph_ecount(graph);
@@ -55,17 +59,40 @@ struct AdjList {
             igraph_int_t n1 = VECTOR(edgelist)[2 * i];
             igraph_int_t n2 = VECTOR(edgelist)[2 * i + 1];
 
-            adjlist[n1][n2]++;
-            adjlist[n2][n1]++;
+            // undirected implementation
+            // TODO: if we have loops later this needs to change (double counts self loops) 
+            add_edge(n1, n2);
+        }
+    }
+
+    void add_edge(igraph_int_t n1, igraph_int_t n2) {
+        adjlist[n1][n2]++;
+        adjlist[n2][n1]++;
+    }
+
+    void remove_edge(igraph_int_t n1, igraph_int_t n2) {
+        adjlist[n1][n2]--;
+        adjlist[n2][n1]--;
+
+        if (adjlist[n1][n2] <= 0) { // should be symmetrical
+            adjlist[n1].erase(n2);  // should be O(1) average
+            adjlist[n2].erase(n1);
         }
     }
 
     // function: has_edge()
     bool has_edge(igraph_int_t n1, igraph_int_t n2) {
+        // TODO: maybe add a check that what's found does not have edge <= 0
+        // for robustness
         return adjlist[n1].find(n2) != adjlist[n1].end();
     }
 
     // function: replace_edge()
+    // undirected only
+    void replace_edge(igraph_int_t from, igraph_int_t old_to, igraph_int_t new_to) {
+        remove_edge(from, old_to);
+        add_edge(from, new_to);
+    }
     // make sure to delete keys that go to 0, has_edge() depends on it
 };
 
@@ -84,22 +111,22 @@ Edge get_random_edge(const igraph_vector_int_t& edgelist, igraph_int_t n_edges) 
 // TODO: update when expanding beyond simple graphs
 // does not destroy, but also does not create, multiedges
 // loops later
-igraph_bool_t can_rewire(Edge e1, Edge e2, igraph_adjlist_t& adjlist) {
+igraph_bool_t can_rewire(Edge e1, Edge e2, AdjList& adjlist) {
     if (e1.from == e2.to || e1.to == e2.from) return false; // loop
     // TODO: discussed rewiring anyway, but then adjlist_replace_edge throws error because
     // edge already exists
     else if (e1.from == e2.from || e1.to == e2.to) return false; // no effect
     // TODO: specifically stop rewiring if we picked the EXACT same edge?
     
-    // check if resulting multiedge
-    // TODO: add graph type later
-    if (igraph_adjlist_has_edge(&adjlist, e1.from, e2.to, false)) return false;
-    if (igraph_adjlist_has_edge(&adjlist, e2.from, e1.to, false)) return false;
+    // check if results multiedge
+    if (adjlist.has_edge(e1.from, e2.to)) return false;
+    if (adjlist.has_edge(e2.from, e1.to)) return false;
+
     return true;
 }
 
 // attempts to perform one rewiring
-igraph_error_t rewire_once(igraph_vector_int_t& edgelist, igraph_adjlist_t& adjlist, 
+igraph_error_t rewire_once(igraph_vector_int_t& edgelist, AdjList& adjlist, 
                           igraph_int_t n_edges) {
     // pick edges from EDGELIST
     Edge e1 = get_random_edge(edgelist, n_edges);
@@ -118,8 +145,9 @@ igraph_error_t rewire_once(igraph_vector_int_t& edgelist, igraph_adjlist_t& adjl
 
         // update adjlist
         // TODO: same thing with directed param
-        IGRAPH_CHECK(igraph_adjlist_replace_edge(&adjlist, e1.from, e1.to, e2.to, false));
-        IGRAPH_CHECK(igraph_adjlist_replace_edge(&adjlist, e2.from, e2.to, e1.to, false));
+        adjlist.replace_edge(e1.from, e1.to, e2.to);
+        adjlist.replace_edge(e2.from, e2.to, e1.to);
+
     } else {
         // TODO: track failures/no effects too
     }
@@ -139,10 +167,7 @@ igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_int_t n,
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, /*bycol=*/ false));
 
     // set up adjlist
-    igraph_adjlist_t adjlist;
-    // TODO: for now, simple graphs only. loops and multi parameters reconsider once ready
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    AdjList adjlist(graph, edgelist);
 
     for (igraph_int_t i = 0; i < n; i++) {
         // TODO: keep track of % successful rewirings
@@ -154,9 +179,8 @@ igraph_error_t igraph_rewire_2(igraph_t *graph, igraph_int_t n,
     IGRAPH_CHECK(igraph_add_edges(graph, &edgelist, 0));
 
     // free memory and stuff
-    igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&edgelist);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
 
