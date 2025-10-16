@@ -25,7 +25,7 @@ jobs:
   alpine:
     runs-on: ubuntu-latest
 
-    # Do not run in forks
+    # Do not run in forks (necessary because of scheduled runs)
     if: github.repository == 'igraph/igraph'
 
     defaults:

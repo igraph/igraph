@@ -8,10 +8,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ main, develop ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ master, develop ]
+    branches: [ main, develop ]
   schedule:
     - cron: '24 13 * * 4'
 
@@ -23,6 +23,9 @@ jobs:
       actions: read
       contents: read
       security-events: write
+
+    # Do not run in forks
+    if: github.repository == 'igraph/igraph'
 
     strategy:
       fail-fast: false
