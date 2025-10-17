@@ -67,7 +67,7 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
         return;
     }
 
-    const igraph_int_t max_zero_cnt = (igraph_int_t) frac*n;
+    const igraph_int_t max_zero_cnt = ((igraph_int_t) (frac*n));
     igraph_int_t zero_cnt = 0;
 
     for (igraph_int_t i=0; i < n; i++) {
