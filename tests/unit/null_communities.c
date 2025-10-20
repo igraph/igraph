@@ -1,6 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,12 +74,22 @@ int main(void) {
 
     /* InfoMAP */
 
-    m = 2;
-    igraph_vector_int_resize(&membership, 1);
+    {
+        igraph_error_t ret;
+        igraph_error_handler_t *handler;
 
-    igraph_community_infomap(&g, NULL, NULL, 3, false, 0, &membership, &m);
+        m = 2;
+        igraph_vector_int_resize(&membership, 1);
 
-    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
+        handler = igraph_set_error_handler(igraph_error_handler_ignore);
+        ret = igraph_community_infomap(&g, NULL, NULL, 3, false, 0, &membership, &m);
+        igraph_set_error_handler(handler);
+
+        if (ret != IGRAPH_UNIMPLEMENTED) {
+            IGRAPH_ASSERT(ret == IGRAPH_SUCCESS);
+            IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
+        }
+    }
 
     /* Label propagation */
 

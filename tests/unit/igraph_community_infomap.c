@@ -85,6 +85,8 @@ int main(void) {
     igraph_vector_t weights;
     igraph_real_t codelength;
     FILE *wikt;
+    igraph_error_handler_t *handler;
+    igraph_error_t errcode;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -95,6 +97,16 @@ int main(void) {
                  3, 4, 4, 5, 5, 3,
                  0, 5,
                  -1);
+
+    /* Test for Infomap availability before proceeding with tests. */
+    handler = igraph_set_error_handler(&igraph_error_handler_printignore);
+    errcode = igraph_community_infomap(&g, NULL, NULL, 1, false, 0, NULL, NULL);
+    if (errcode == IGRAPH_UNIMPLEMENTED) {
+        igraph_destroy(&g);
+        return 77; /* skip test */
+    }
+    igraph_set_error_handler(handler);
+
     infomap_test(&g, /*smoke_test=*/ false, false);
     igraph_destroy(&g);
 

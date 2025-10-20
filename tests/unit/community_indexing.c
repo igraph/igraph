@@ -1,6 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2025  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -79,8 +79,13 @@ int main(void) {
     igraph_community_spinglass(&graph, NULL, &m, NULL, &membership, NULL, 5, false, 1.0, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
     check(&membership);
 
-    igraph_community_infomap(&graph, NULL, NULL, 1, false, 0, &membership, NULL);
-    check(&membership);
+    handler = igraph_set_error_handler(&igraph_error_handler_ignore);
+    ret = igraph_community_infomap(&graph, NULL, NULL, 1, false, 0, &membership, NULL);
+    igraph_set_error_handler(handler);
+    if (ret != IGRAPH_UNIMPLEMENTED) {
+        IGRAPH_ASSERT(ret == IGRAPH_SUCCESS);
+        check(&membership);
+    }
 
     igraph_destroy(&graph);
 

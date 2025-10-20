@@ -7,6 +7,7 @@
  - Eliminated references to `exit()` from the igraph shared library. These were accidentally introduces into igraph 1.0.0 through Qhull and Infomap.
  - Eliminated references to `std::cout` from the igraph shared library, as required by CRAN.
  - Fixed a bug in `igraph_hub_and_authority_scores()` that printed a warning about zero entries in the result even when the number of zeros was below the threshold used in the corresponding checks.
+ - Fixed compilation and tests when Infomap support is disabled.
 
 ### Other
 
