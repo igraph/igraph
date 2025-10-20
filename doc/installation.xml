@@ -397,6 +397,15 @@ pacman -S \
       </listitem>
       <listitem>
         <para>
+          <literal>IGRAPH_INFOMAP_SUPPORT</literal>: whether to enable
+          the Infomap community detection algorithm. The Infomap library
+          is licensed under the GPLv3+. Compiling it into igraph causes
+          GPLv3+ to apply to the resulting binary, instead of igraph's
+          GPLv2+ license.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
           <literal>IGRAPH_OPENMP_SUPPORT</literal>: whether to use OpenMP
           parallelization to accelerate certain functions such as PageRank
           calculation. Compiler support is required.
