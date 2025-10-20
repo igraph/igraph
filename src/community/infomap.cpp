@@ -183,6 +183,7 @@ static bool infomap_allow_interruption() {
  * \param codelength Pointer to a real. If not \c NULL the code length of the
  *     partition is stored here.
  * \return Error code.
+ *         When Infomap is not available, \c IGRAPH_UNIMPLEMENTED is returned.
  *
  * \sa \ref igraph_community_spinglass(), \ref
  * igraph_community_edge_betweenness(), \ref igraph_community_walktrap().
