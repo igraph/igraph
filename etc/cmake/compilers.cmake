@@ -8,6 +8,17 @@ include(CheckCCompilerFlag)
 #  - https://www.gnu.org/software/libc/manual/html_node/Feature-Test-Macros.html
 add_compile_definitions(_POSIX_C_SOURCE=200809L)
 
+# On some Apple systems, with some compilers, defining _POSIX_C_SOURCE causes compilation
+# failures when including C++ headers. Defining _DARWIN_C_SOURCE explicitly usually fixes
+# this. Refs: https://trac.macports.org/ticket/60655 and https://trac.macports.org/ticket/73145
+# This is claimed to be due to _POSIX_C_SOURCE disabling APIs that C++ headers rely on
+# on some systems. _DARWIN_C_SOURCE re-enables these APIs, but _GNU_SOURCE alone does not 
+# necessarily do so. Using different global defined for C and C++ is problematic with CMake,
+# so instead of restricting _POSIX_C_SOURCE to C, we define _DARWIN_C_SOURCE.
+if(APPLE)
+  add_compile_definitions(_DARWIN_C_SOURCE)
+endif()
+
 if(MSVC)
   add_compile_options(/FS)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS) # necessary to compile for UWP
