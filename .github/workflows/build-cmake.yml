@@ -79,7 +79,7 @@ jobs:
 
       - name: Generate Artifacts upon Failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: failure-${{ matrix.arch }}-${{ matrix.shared_libs }}
           path: |
