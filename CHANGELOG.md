@@ -124,7 +124,7 @@ This section lists API-breaking changes in this version, and provides guidance o
 
 - `igraph_community_edge_betweenness()` now takes both a `weights` and a `lengths` parameter. Edge weights (interpreted as connection strengths) are used to divide betweenness scores before selecting them for removal as well as for the modularity computation. Edge lengths are used for defining shortest path lengths during the betweenness computation. This fixes issues #2229 and #1040.
 - `igraph_community_infomap()` now supports regularization and gained the `is_regularized` and `regularization_strength` parameters.
-- `igraph_community_label_propagation()` changed signature to allow specification of label propagation algorithm (LPA) variants. A new fast label propagation variant was added.
+- `igraph_community_label_propagation()` gained the `igraph_lpa_variant_t lpa_variant` parameter to allow specification of label propagation algorithm (LPA) variants. A new fast label propagation variant was added. Set `lpa_variant=DOMINANCE` to select the algorithm used up to igraph 0.10.
 - `igraph_community_leiden()` now takes two `vertex_out_weights` and `vertex_in_weights` parameters in order to support directed graphs, instead of the previous single `node_weights` parameter. To obtain the old behavior for undirected graphs, pass the vertex weights as `vertex_out_weights` and set `vertex_in_weights` to `NULL`.
 - The `history` parameter of `igraph_community_leading_eigenvector()` is now a pointer to an `igraph_vector_int_t` instead of an `igraph_vector_t`.
 - `igraph_community_optimal_modularity()` now takes a `resolution` parameter and its `weight` parameter was moved to the second place.
