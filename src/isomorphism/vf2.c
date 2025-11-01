@@ -139,8 +139,9 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
     const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
     igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
+    igraph_isohandler_t *isohandler_fn, void *iso_extra,
+    igraph_isocompat_t *node_compat_fn, void *node_extra,
+    igraph_isocompat_t *edge_compat_fn, void *edge_extra
 ) {
 
     igraph_int_t no_of_nodes = igraph_vcount(graph1);
@@ -449,7 +450,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
             if (vertex_color1 && VECTOR(*vertex_color1)[cand1] != VECTOR(*vertex_color2)[cand2]) {
                 end = true;
             }
-            if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, arg)) {
+            if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, node_extra)) {
                 end = true;
             }
 
@@ -471,8 +472,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
                         }
-                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
-                                                              eid1, eid2, arg)) {
+                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2, eid1, eid2, edge_extra)) {
                             end = true;
                         }
                     }
@@ -503,8 +503,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
                         }
-                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
-                                                              eid1, eid2, arg)) {
+                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2, eid1, eid2, edge_extra)) {
                             end = true;
                         }
                     }
@@ -535,8 +534,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
                         }
-                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
-                                                              eid1, eid2, arg)) {
+                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2, eid1, eid2, edge_extra)) {
                             end = true;
                         }
                     }
@@ -567,8 +565,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
                         }
-                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
-                                                              eid1, eid2, arg)) {
+                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2, eid1, eid2, edge_extra)) {
                             end = true;
                         }
                     }
@@ -663,7 +660,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
         if (matched_nodes == no_of_nodes && isohandler_fn) {
             igraph_error_t ret;
-            IGRAPH_CHECK_CALLBACK(isohandler_fn(core_1, core_2, arg), &ret);
+            IGRAPH_CHECK_CALLBACK(isohandler_fn(core_1, core_2, iso_extra), &ret);
             if (ret == IGRAPH_STOP) {
                 break;
             }
@@ -698,7 +695,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
 typedef struct {
     igraph_isocompat_t *node_compat_fn, *edge_compat_fn;
-    void *arg, *carg;
+    void *arg, *node_extra, *edge_extra;
 } igraph_i_iso_cb_data_t;
 
 static igraph_bool_t igraph_i_isocompat_node_cb(
@@ -708,7 +705,7 @@ static igraph_bool_t igraph_i_isocompat_node_cb(
         const igraph_int_t g2_num,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
-    return data->node_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
+    return data->node_compat_fn(graph1, graph2, g1_num, g2_num, data->node_extra);
 }
 
 static igraph_bool_t igraph_i_isocompat_edge_cb(
@@ -718,7 +715,7 @@ static igraph_bool_t igraph_i_isocompat_edge_cb(
         const igraph_int_t g2_num,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
-    return data->edge_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
+    return data->edge_compat_fn(graph1, graph2, g1_num, g2_num, data->edge_extra);
 }
 
 static igraph_error_t igraph_i_isomorphic_vf2_cb(
@@ -771,11 +768,11 @@ static igraph_error_t igraph_i_isomorphic_vf2_cb(
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.
+ * \param node_extra Extra argument to supply to the \p node_compat_fn function.
  * \param edge_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two edges are compatible.
- * \param arg Extra argument to supply to functions \p node_compat_fn
- *   and \p edge_compat_fn.
+ * \param edge_extra Extra argument to supply to the \p edge_compat_fn function.
  * \return Error code.
  *
  * \sa \ref igraph_subisomorphic_vf2(),
@@ -795,10 +792,11 @@ igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *gra
                           igraph_bool_t *iso, igraph_vector_int_t *map12,
                           igraph_vector_int_t *map21,
                           igraph_isocompat_t *node_compat_fn,
+                          void *node_extra,
                           igraph_isocompat_t *edge_compat_fn,
-                          void *arg) {
+                          void *edge_extra) {
 
-    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, iso, arg };
+    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, iso, node_extra, edge_extra };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
     *iso = false;
@@ -806,8 +804,9 @@ igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *gra
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  map12, map21,
-                 (igraph_isohandler_t*) igraph_i_isomorphic_vf2_cb,
-                 ncb, ecb, &data));
+                 (igraph_isohandler_t*) igraph_i_isomorphic_vf2_cb, &data,
+                 ncb, &data,
+                 ecb, &data));
     if (! *iso) {
         if (map12) {
             igraph_vector_int_clear(map12);
@@ -876,11 +875,12 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
                                   const igraph_vector_int_t *edge_color2,
                                   igraph_int_t *count,
                                   igraph_isocompat_t *node_compat_fn,
+                                  void *node_extra,
                                   igraph_isocompat_t *edge_compat_fn,
-                                  void *arg) {
+                                  void *edge_extra) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn,
-                                    count, arg
+                                    count, node_extra, edge_extra
                                   };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
@@ -889,8 +889,9 @@ igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igrap
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  0, 0,
-                 (igraph_isohandler_t*) igraph_i_count_isomorphisms_vf2_cb,
-                 ncb, ecb, &data));
+                 (igraph_isohandler_t*) igraph_i_count_isomorphisms_vf2_cb, &data,
+                 ncb, &data,
+                 ecb, &data));
     return IGRAPH_SUCCESS;
 }
 
@@ -952,10 +953,11 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
                                 const igraph_vector_int_t *edge_color2,
                                 igraph_vector_int_list_t *maps,
                                 igraph_isocompat_t *node_compat_fn,
+                                void *node_extra,
                                 igraph_isocompat_t *edge_compat_fn,
-                                void *arg) {
+                                void *edge_extra) {
 
-    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, arg };
+    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, node_extra, edge_extra };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : NULL;
 
@@ -964,8 +966,9 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  NULL, NULL,
-                 (igraph_isohandler_t*) igraph_i_store_mapping_vf2_cb,
-                 ncb, ecb, &data));
+                 (igraph_isohandler_t*) igraph_i_store_mapping_vf2_cb, &data,
+                 ncb, &data,
+                 ecb, &data));
     return IGRAPH_SUCCESS;
 }
 
@@ -1025,8 +1028,9 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
     const igraph_vector_int_t *vertex_color1, const igraph_vector_int_t *vertex_color2,
     const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
     igraph_vector_int_t *map12, igraph_vector_int_t *map21,
-    igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
+    igraph_isohandler_t *isohandler_fn, void *iso_extra,
+    igraph_isocompat_t *node_compat_fn, void *node_extra,
+    igraph_isocompat_t *edge_compat_fn, void *edge_extra
 ) {
 
     igraph_int_t no_of_nodes1 = igraph_vcount(graph1),
@@ -1306,7 +1310,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             if (vertex_color1 && VECTOR(*vertex_color1)[cand1] != VECTOR(*vertex_color2)[cand2]) {
                 end = true;
             }
-            if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, arg)) {
+            if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, node_extra)) {
                 end = true;
             }
 
@@ -1352,8 +1356,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
                         }
-                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
-                                                              eid1, eid2, arg)) {
+                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2, eid1, eid2, edge_extra)) {
                             end = true;
                         }
                     }
@@ -1384,8 +1387,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
                         }
-                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
-                                                              eid1, eid2, arg)) {
+                        if (edge_compat_fn && !edge_compat_fn(graph1, graph2, eid1, eid2, edge_extra)) {
                             end = true;
                         }
                     }
@@ -1480,7 +1482,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
         if (matched_nodes == no_of_nodes2 && isohandler_fn) {
             igraph_error_t ret;
-            IGRAPH_CHECK_CALLBACK(isohandler_fn(core_1, core_2, arg), &ret);
+            IGRAPH_CHECK_CALLBACK(isohandler_fn(core_1, core_2, iso_extra), &ret);
             if (ret == IGRAPH_STOP) {
                 break;
             }
@@ -1575,10 +1577,11 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
                              igraph_bool_t *iso, igraph_vector_int_t *map12,
                              igraph_vector_int_t *map21,
                              igraph_isocompat_t *node_compat_fn,
+                             void *node_extra,
                              igraph_isocompat_t *edge_compat_fn,
-                             void *arg) {
+                             void *edge_extra) {
 
-    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, iso, arg };
+    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, iso, node_extra, edge_extra };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
 
@@ -1587,8 +1590,9 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  map12, map21,
-                 (igraph_isohandler_t *) igraph_i_subisomorphic_vf2_cb,
-                 ncb, ecb, &data));
+                 (igraph_isohandler_t *) igraph_i_subisomorphic_vf2_cb, &data,
+                 ncb, &data,
+                 ecb, &data));
     if (! *iso) {
         if (map12) {
             igraph_vector_int_clear(map12);
@@ -1656,11 +1660,12 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
                                      const igraph_vector_int_t *edge_color2,
                                      igraph_int_t *count,
                                      igraph_isocompat_t *node_compat_fn,
+                                     void *node_extra,
                                      igraph_isocompat_t *edge_compat_fn,
-                                     void *arg) {
+                                     void *edge_extra) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn,
-                                    count, arg
+                                    count, node_extra, edge_extra
                                   };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
@@ -1669,8 +1674,9 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  0, 0,
-                 (igraph_isohandler_t*) igraph_i_count_subisomorphisms_vf2_cb,
-                 ncb, ecb, &data));
+                 (igraph_isohandler_t*) igraph_i_count_subisomorphisms_vf2_cb, &data,
+                 ncb, &data,
+                 ecb, &data));
     return IGRAPH_SUCCESS;
 }
 
@@ -1722,10 +1728,11 @@ igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                                    const igraph_vector_int_t *edge_color2,
                                    igraph_vector_int_list_t *maps,
                                    igraph_isocompat_t *node_compat_fn,
+                                   void *node_extra,
                                    igraph_isocompat_t *edge_compat_fn,
-                                   void *arg) {
+                                   void *edge_extra) {
 
-    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, arg };
+    igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, node_extra, edge_extra };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : NULL;
 
@@ -1734,8 +1741,9 @@ igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
                  NULL, NULL,
-                 (igraph_isohandler_t*) igraph_i_store_mapping_vf2_cb,
-                 ncb, ecb, &data));
+                 (igraph_isohandler_t*) igraph_i_store_mapping_vf2_cb, &data,
+                 ncb, &data,
+                 ecb, &data));
 
     return IGRAPH_SUCCESS;
 }

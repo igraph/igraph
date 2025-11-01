@@ -43,7 +43,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
         igraph_subisomorphic_lad(&pattern, graph, NULL, NULL, NULL, &maps, /* induced = */ true);
 
-        igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
+        igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL, NULL);
 
         VECTOR(lad_counts)[i] = igraph_vector_int_list_size(&maps) / nAutomorphisms;
 

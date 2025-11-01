@@ -496,7 +496,8 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                             /*order=*/ &vertex,
                             /*order_out=*/ NULL, /*parents=*/ &parent,
                             /*dist=*/ NULL, /*in_callback=*/ NULL,
-                            /*out_callback=*/ NULL, /*extra=*/ NULL));
+                            /*in_extra=*/ NULL,
+                            /*out_callback=*/ NULL, /*out_extra=*/ NULL));
 
     for (igraph_int_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(vertex)[i] >= 0) {
@@ -701,8 +702,9 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
                             /*order_out=*/ NULL, /*parents=*/ NULL,
                             /*dist=*/ NULL,
                             /*in_callback=*/ igraph_i_all_st_cuts_minimal_dfs_incb,
+                            /*in_extra=*/ &data,
                             /*out_callback=*/ igraph_i_all_st_cuts_minimal_dfs_outcb,
-                            /*extra=*/ &data));
+                            /*out_extra=*/ &data));
 
     igraph_vector_int_clear(minimal);
     for (i = 0; i < no_of_nodes; i++) {
@@ -843,8 +845,8 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
                                 /*unreachable=*/ false, /*order=*/ &Nuv,
                                 /*order_out=*/ NULL, /*parents=*/ NULL, /*dist=*/ NULL,
-                                /*in_callback=*/ NULL, /*out_callback=*/ NULL,
-                                /*extra=*/ NULL));
+                                /*in_callback=*/ NULL, /*in_extra=*/ NULL,
+                                /*out_callback=*/ NULL, /*out_extra=*/ NULL));
         /* Remove the negative values from the end of the vector */
         for (nuvsize = 0; nuvsize < Sbar_size; nuvsize++) {
             igraph_int_t t = VECTOR(Nuv)[nuvsize];

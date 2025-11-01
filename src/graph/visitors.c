@@ -466,10 +466,11 @@ igraph_error_t igraph_bfs_simple(
  * \param in_callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_dfshandler_t. This function
  *        will be called, whenever a new vertex is discovered.
+ * \param in_extra Extra argument to pass to the \p in_callback function.
  * \param out_callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_dfshandler_t. This function
  *        will be called, whenever the subtree of a vertex is completed.
- * \param extra Extra argument to pass to the callback function(s).
+ * \param out_extra Extra argument to pass to the \p out_callback function.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -481,8 +482,9 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root,
                igraph_vector_int_t *order,
                igraph_vector_int_t *order_out, igraph_vector_int_t *parents,
                igraph_vector_int_t *dist, igraph_dfshandler_t *in_callback,
+               void *in_extra,
                igraph_dfshandler_t *out_callback,
-               void *extra) {
+               void *out_extra) {
 
     const igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t adjlist;
@@ -547,7 +549,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root,
         VECTOR(*dist)[root] = 0;
     }
     if (in_callback) {
-        IGRAPH_CHECK_CALLBACK(in_callback(graph, root, 0, extra), &ret);
+        IGRAPH_CHECK_CALLBACK(in_callback(graph, root, 0, in_extra), &ret);
         if (ret == IGRAPH_STOP) {
             FREE_ALL();
             return IGRAPH_SUCCESS;
@@ -578,7 +580,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root,
             }
 
             if (in_callback) {
-                IGRAPH_CHECK_CALLBACK(in_callback(graph, actroot, 0, extra), &ret);
+                IGRAPH_CHECK_CALLBACK(in_callback(graph, actroot, 0, in_extra), &ret);
                 if (ret == IGRAPH_STOP) {
                     FREE_ALL();
                     return IGRAPH_SUCCESS;
@@ -622,7 +624,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root,
 
                 if (in_callback) {
                     IGRAPH_CHECK_CALLBACK(
-                        in_callback(graph, nei, act_dist, extra),
+                        in_callback(graph, nei, act_dist, in_extra),
                         &ret
                     );
                     if (ret == IGRAPH_STOP) {
@@ -641,7 +643,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root,
 
                 if (out_callback) {
                     IGRAPH_CHECK_CALLBACK(
-                        out_callback(graph, actvect, act_dist, extra),
+                        out_callback(graph, actvect, act_dist, out_extra),
                         &ret
                     );
 

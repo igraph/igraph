@@ -68,7 +68,7 @@ void test3(void) {
             igraph_isomorphic_vf2(
                 igraph_graph_list_get_ptr(&graphs3, i),
                 igraph_graph_list_get_ptr(&graphs3, j),
-                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
+                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL, NULL
             );
             if (iso) {
                 printf("VF2 failure, 3 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. VF2 reports otherwise.\n", i, j);
@@ -112,7 +112,7 @@ void test4(void) {
             igraph_isomorphic_vf2(
                 igraph_graph_list_get_ptr(&graphs4, i),
                 igraph_graph_list_get_ptr(&graphs4, j),
-                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
+                NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL, NULL
             );
             if (iso) {
                 printf("VF2 failure, 4 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. VF2 reports otherwise.\n", i, j);
