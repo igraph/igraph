@@ -435,7 +435,7 @@ igraph_hsbm_list_game:
 igraph_correlated_game:
     PARAMS: |-
         OUT GRAPH new_graph, GRAPH old_graph,
-        REAL corr, REAL p=edge_density(old.graph), OPTIONAL INDEX_VECTOR permutation
+        REAL corr, REAL p=edge_density(old_graph), OPTIONAL INDEX_VECTOR permutation
 
 igraph_correlated_pair_game:
     PARAMS: |-
