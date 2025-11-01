@@ -126,8 +126,9 @@ IGRAPH_EXPORT igraph_error_t igraph_dfs(const igraph_t *graph, igraph_int_t root
                              igraph_vector_int_t *order,
                              igraph_vector_int_t *order_out, igraph_vector_int_t *parents,
                              igraph_vector_int_t *dist, igraph_dfshandler_t *in_callback,
+                             void *in_extra,
                              igraph_dfshandler_t *out_callback,
-                             void *extra);
+                             void *out_extra);
 
 IGRAPH_END_C_DECLS
 

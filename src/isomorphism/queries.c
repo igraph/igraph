@@ -129,7 +129,7 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
         IGRAPH_CHECK(igraph_simplify_and_colorize(graph2, &r2, &vc2, &ec2));
         IGRAPH_FINALLY(igraph_destroy, &r2);
         IGRAPH_CHECK(igraph_isomorphic_vf2(&r1, &r2, &vc1, &vc2, &ec1, &ec2, iso,
-                NULL, NULL, NULL, NULL, NULL));
+                NULL, NULL, NULL, NULL, NULL, NULL));
         igraph_destroy(&r2);
         igraph_destroy(&r1);
         igraph_vector_int_destroy(&ec2);
@@ -211,5 +211,5 @@ igraph_error_t igraph_i_isomorphic_small(
 igraph_error_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                          igraph_bool_t *iso) {
 
-    return igraph_subisomorphic_vf2(graph1, graph2, NULL, NULL, NULL, NULL, iso, NULL, NULL, NULL, NULL, NULL);
+    return igraph_subisomorphic_vf2(graph1, graph2, NULL, NULL, NULL, NULL, iso, NULL, NULL, NULL, NULL, NULL, NULL);
 }
