@@ -54,19 +54,20 @@ void check_print_destroy(igraph_t *g1,
                          igraph_vector_int_t *edge_color1,
                          igraph_vector_int_t *edge_color2,
                          igraph_isocompat_t *node_compat_fn,
+                         void *node_extra,
                          igraph_isocompat_t *edge_compat_fn,
-                         void *arg,
+                         void *edge_extra,
                          int error) {
     igraph_vector_int_list_t maps;
     igraph_vector_int_list_init(&maps, 0);
-    IGRAPH_ASSERT(igraph_get_isomorphisms_vf2(g1, g2, vertex_color1, vertex_color2, edge_color1, edge_color2, &maps, node_compat_fn, edge_compat_fn, arg) == error);
+    IGRAPH_ASSERT(igraph_get_isomorphisms_vf2(g1, g2, vertex_color1, vertex_color2, edge_color1, edge_color2, &maps, node_compat_fn, node_extra, edge_compat_fn, edge_extra) == error);
     print_and_destroy_maps(&maps);
     printf("\n");
 
 }
 
 void check_print_destroy_simple(igraph_t *g1, igraph_t *g2) {
-    check_print_destroy(g1, g2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    check_print_destroy(g1, g2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 }
 
 int main(void) {
@@ -99,31 +100,31 @@ int main(void) {
     check_print_destroy_simple(&cycle_dir, &cycle_dir);
 
     printf("Two cycles where node parity should be equal:\n");
-    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, &compat_parity, NULL, NULL, IGRAPH_SUCCESS);
+    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, &compat_parity, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
     printf("Two cycles where edge parity should be equal:\n");
-    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, NULL, &compat_parity, NULL, IGRAPH_SUCCESS);
+    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, NULL, NULL, &compat_parity, NULL, IGRAPH_SUCCESS);
 
     printf("Two cycles with only one vertex coloring:\n");
-    check_print_destroy(&cycle, &cycle, &coloring, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    check_print_destroy(&cycle, &cycle, &coloring, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
     printf("Two cycles with vertex coloring:\n");
-    check_print_destroy(&cycle, &cycle, &coloring, &coloring, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    check_print_destroy(&cycle, &cycle, &coloring, &coloring, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
     printf("Two cycles with edge coloring:\n");
-    check_print_destroy(&cycle, &cycle, NULL, NULL, &coloring, &coloring, NULL, NULL, NULL, IGRAPH_SUCCESS);
+    check_print_destroy(&cycle, &cycle, NULL, NULL, &coloring, &coloring, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 
     printf("Two cycles where node of graph 1 should not be 3 higher than node of graph 2:\n");
-    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, &compat_not_arg, NULL, &three, IGRAPH_SUCCESS);
+    check_print_destroy(&cycle, &cycle, NULL, NULL, NULL, NULL, &compat_not_arg, &three, NULL, NULL, IGRAPH_SUCCESS);
 
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Two cycles with different directedness:\n");
-    check_print_destroy(&cycle, &cycle_dir, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
+    check_print_destroy(&cycle, &cycle_dir, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
 
     printf("Graph with loop edges:\n");
-    check_print_destroy(&cycle, &cycle_loop, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
+    check_print_destroy(&cycle, &cycle_loop, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

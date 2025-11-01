@@ -62,22 +62,22 @@ int match_rings(void) {
 
     igraph_isomorphic_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
                           &iso, /*map12=*/ 0, /*map21=*/ 0,
-                          /*node_compat_fn=*/ 0, /*edge_compat_fn=*/ 0,
-                          /*arg=*/ 0);
+                          /*node_compat_fn=*/ 0, /*node_extra=*/ 0, 
+                          /*edge_compat_fn=*/ 0, /*edge_extra=*/ 0);
     if (!iso) {
         exit(1);
     }
 
     igraph_isomorphic_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
                           &iso, /*map12=*/ 0, /*map21=*/ 0,
-                          compat_parity, /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                          compat_parity, /*node_extra=*/ 0, /*edge_compat_fn=*/ 0, /*edge_extra=*/ 0);
     if (!iso) {
         exit(2);
     }
 
     igraph_isomorphic_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
                           &iso, /*map12=*/ 0, /*map21=*/ 0,
-                          compat_not0, /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                          compat_not0, /*node_extra=*/ 0, /*edge_compat_fn=*/ 0, /*edge_extra=*/ 0);
     if (iso) {
         exit(3);
     }
@@ -86,14 +86,14 @@ int match_rings(void) {
 
     igraph_isomorphic_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
                           &iso, /*map12=*/ 0, /*map21=*/ 0,
-                          /*node_compat_fn=*/ 0, compat_parity, /*arg=*/ 0);
+                          /*node_compat_fn=*/ 0, /*node_extra=*/ 0, compat_parity, /*edge_extra=*/ 0);
     if (!iso) {
         exit(4);
     }
 
     igraph_isomorphic_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
                           &iso, /*map12=*/ 0, /*map21=*/ 0,
-                          /*node_compat_fn=*/ 0, compat_not0, /*arg=*/ 0);
+                          /*node_compat_fn=*/ 0, /*node_extra=*/ 0, compat_not0, /*edge_extra=*/ 0);
     if (iso) {
         exit(5);
     }
@@ -101,24 +101,24 @@ int match_rings(void) {
     /* ------- */
 
     igraph_count_isomorphisms_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
-                                  &count, /*node_compat_fn=*/ 0,
-                                  /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                                  &count, /*node_compat_fn=*/ 0, /*node_extra=*/ 0, 
+                                  /*edge_compat_fn=*/ 0, /*edge_extra=*/ 0);
 
     if (count != 20) {
         exit(6);
     }
 
     igraph_count_isomorphisms_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
-                                  &count, compat_parity, /*edge_compat_fn=*/ 0,
-                                  /*arg=*/ 0);
+                                  &count, compat_parity, /*node_extra=*/ 0,
+                                  /*edge_compat_fn=*/ 0, /*edge_extra=*/ 0);
 
     if (count != 10) {
         exit(7);
     }
 
     igraph_count_isomorphisms_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
-                                  &count, compat_not0, /*edge_compat_fn=*/ 0,
-                                  /*arg=*/ 0);
+                                  &count, compat_not0, /*node_extra=*/ 0,
+                                  /*edge_compat_fn=*/ 0, /*edge_extra=*/ 0);
 
     if (count != 0) {
         exit(8);
@@ -127,16 +127,16 @@ int match_rings(void) {
     /* ------- */
 
     igraph_count_isomorphisms_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
-                                  &count, /*node_compat_fn=*/ 0, compat_parity,
-                                  /*arg=*/ 0);
+                                  &count, /*node_compat_fn=*/ compat_parity, /*node_extra=*/ 0, 
+                                  /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
 
     if (count != 10) {
         exit(9);
     }
 
     igraph_count_isomorphisms_vf2(&r1, &r2, /*colors(4x)*/ 0, 0, 0, 0,
-                                  &count, /*node_compat_fn=*/ 0, compat_not0,
-                                  /*arg=*/ 0);
+                                  &count, /*node_compat_fn=*/ compat_not0, /*node_extra=*/ 0, 
+                                  /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
 
     if (count != 0) {
         exit(10);
@@ -156,24 +156,24 @@ int match_rings_open_closed(void) {
 
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
-                             /*node_compat_fn=*/ 0, /*edge_compat_fn=*/ 0,
-                             /*arg=*/ 0);
+                             /*node_compat_fn=*/ 0, /*node_extra=*/ 0, 
+                             /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
     if (!iso) {
         exit(31);
     }
 
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
-                             compat_parity, /*edge_compat_fn=*/ 0,
-                             /*arg=*/ 0);
+                             compat_parity, /*node_extra=*/ 0, 
+                             /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
     if (!iso) {
         exit(32);
     }
 
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
-                             compat_not0, /*edge_compat_fn=*/ 0,
-                             /*arg=*/ 0);
+                             compat_not0, /*node_extra=*/ 0, 
+                             /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
     if (iso) {
         exit(33);
     }
@@ -182,16 +182,16 @@ int match_rings_open_closed(void) {
 
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
-                             /*node_compat_fn=*/ 0, compat_parity,
-                             /*arg=*/ 0);
+                             /*node_compat_fn=*/ compat_parity, /*node_extra=*/ 0, 
+                             /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
     if (!iso) {
         exit(34);
     }
 
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
-                             /*node_compat_fn=*/ 0, compat_not0,
-                             /*arg=*/ 0);
+                             /*node_compat_fn=*/ compat_not0, /*node_extra=*/ 0, 
+                             /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
     if (!iso) {
         exit(35);
     }
@@ -199,24 +199,24 @@ int match_rings_open_closed(void) {
     /* ------- */
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
-                                     &count, /*node_compat_fn=*/ 0,
-                                     /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                                     &count, /*node_compat_fn=*/ 0, /*node_extra=*/ 0, 
+                                     /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
 
     if (count != 20) {
         exit(36);
     }
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
-                                     &count, compat_parity,
-                                     /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                                     &count, compat_parity, /*node_extra=*/ 0, 
+                                     /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
 
     if (count != 10) {
         exit(37);
     }
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
-                                     &count, compat_not0, /*edge_compat_fn=*/ 0,
-                                     /*arg=*/ 0);
+                                     &count, compat_not0, /*node_extra=*/ 0,
+                                     /*edge_compat_fn*/ 0, /*edge_extra=*/ 0);
 
     if (count != 0) {
         exit(38);
@@ -226,15 +226,15 @@ int match_rings_open_closed(void) {
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                                      &count, /*node_compat_fn=*/ 0,
-                                     compat_parity, /*arg=*/ 0);
+                                     /*node_extra=*/ 0, compat_parity, /*edge_extra=*/ 0);
 
     if (count != 10) {
         exit(39);
     }
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
-                                     &count, /*node_compat_fn=*/ 0, compat_not0,
-                                     /*arg=*/ 0);
+                                     &count, /*node_compat_fn=*/ 0, /*node_extra=*/ 0, compat_not0,
+                                     /*edge_extra=*/ 0);
 
     if (count != 2) {
         exit(40);
