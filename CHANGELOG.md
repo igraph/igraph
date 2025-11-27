@@ -9,6 +9,7 @@
  - Fixed a bug in `igraph_hub_and_authority_scores()` that printed a warning about zero entries in the result even when the number of zeros was below the threshold used in the corresponding checks.
  - Fixed compilation and tests when Infomap support is disabled.
  - Fixed rare compilation issues on some Apple systems with some non-standard compilers due to incompatibilities between defining the `_POSIX_C_SOURCE` feature test macro and standard C++ headers. Now `_DARWIN_C_SOURCE` is defined when compiling igraph on Apple systems.
+ - Fixed inconsistent libf2c prototypes for `s_copy()` and `s_cat()`. This restores compatibility with emscripten.
 
 ### Other
 
