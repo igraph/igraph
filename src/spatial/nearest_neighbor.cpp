@@ -78,7 +78,7 @@ static igraph_error_t neighbor_helper(
     IGRAPH_FINALLY_CLEAN(1);
 
     // Overflow check, ensures that edges.size() is not too large for igraph vectors.
-    if (edges.size() > IGRAPH_INTEGER_MAX) {
+    if (edges.size() > (size_t) IGRAPH_INTEGER_MAX) {
         IGRAPH_ERROR("Too many edges.", IGRAPH_EOVERFLOW);
     }
 
