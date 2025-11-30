@@ -122,7 +122,7 @@ static void igraph_i_attribute_record_destroy_values(igraph_attribute_record_t *
  * Time complexity: O(1).
  */
 igraph_error_t igraph_attribute_record_init(
-    igraph_attribute_record_t *attr, const char* name, igraph_attribute_type_t type
+    igraph_attribute_record_t *attr, const char *name, igraph_attribute_type_t type
 ) {
     attr->name = NULL;
     attr->type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
@@ -130,7 +130,9 @@ igraph_error_t igraph_attribute_record_init(
     attr->default_value.string = NULL;
 
     IGRAPH_CHECK(igraph_attribute_record_set_name(attr, name));
+    IGRAPH_FINALLY(igraph_free, attr->name);
     IGRAPH_CHECK(igraph_attribute_record_set_type(attr, type));
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -477,9 +479,9 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_record_set_default_string(
  *         \c IGRAPH_ENOMEM if there is not enough memory.
  */
 igraph_error_t igraph_attribute_record_set_name(
-    igraph_attribute_record_t *attr, const char* name
+    igraph_attribute_record_t *attr, const char *name
 ) {
-    char* new_name;
+    char *new_name;
 
     IGRAPH_ASSERT(attr != NULL);
 
@@ -535,14 +537,14 @@ static void igraph_i_attribute_record_set_type(
 igraph_error_t igraph_attribute_record_set_type(
     igraph_attribute_record_t *attr, igraph_attribute_type_t type
 ) {
-    void* ptr;
+    void *ptr;
 
     IGRAPH_ASSERT(attr != NULL);
 
     if (attr->type != type) {
         switch (type) {
             case IGRAPH_ATTRIBUTE_NUMERIC: {
-                igraph_vector_t* vec = IGRAPH_CALLOC(1, igraph_vector_t);
+                igraph_vector_t *vec = IGRAPH_CALLOC(1, igraph_vector_t);
                 IGRAPH_CHECK_OOM(vec, "Insufficient memory for attribute record.");
                 IGRAPH_FINALLY(igraph_free, vec);
                 IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
@@ -551,17 +553,16 @@ igraph_error_t igraph_attribute_record_set_type(
             break;
 
             case IGRAPH_ATTRIBUTE_STRING: {
-                igraph_strvector_t* strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
+                igraph_strvector_t *strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
                 IGRAPH_CHECK_OOM(strvec, "Insufficient memory for attribute record.");
                 IGRAPH_FINALLY(igraph_free, strvec);
-                IGRAPH_CHECK(igraph_strvector_init(strvec, 0));
-                IGRAPH_FINALLY(igraph_strvector_destroy, strvec);
+                IGRAPH_STRVECTOR_INIT_FINALLY(strvec, 0);
                 ptr = strvec;
             }
             break;
 
             case IGRAPH_ATTRIBUTE_BOOLEAN: {
-                igraph_vector_bool_t* boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
+                igraph_vector_bool_t *boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                 IGRAPH_CHECK_OOM(boolvec, "Insufficient memory for attribute record.");
                 IGRAPH_FINALLY(igraph_free, boolvec);
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(boolvec, 0);
@@ -570,7 +571,7 @@ igraph_error_t igraph_attribute_record_set_type(
             break;
 
             default:
-                IGRAPH_ERRORF("Unsupported attribute type: %d", IGRAPH_EINVAL, (int) type);
+                IGRAPH_FATALF("Unsupported attribute type: %d.", (int) type);
         }
 
         igraph_i_attribute_record_set_type(attr, type, ptr);
