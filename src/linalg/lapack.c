@@ -29,7 +29,7 @@
 #include "igraph_pmt.h"
 #include "igraph_vector_type.h"
 #include "igraph_vector_pmt.h"
-#include "../core/vector.pmt"
+#include "core/vector.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_FORTRAN_INT
 

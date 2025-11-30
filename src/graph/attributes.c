@@ -585,7 +585,7 @@ igraph_error_t igraph_attribute_record_set_type(
 #define BASE_ATTRIBUTE_RECORD
 #define CUSTOM_INIT_DESTROY
 #include "igraph_pmt.h"
-#include "../core/typed_list.pmt"
+#include "core/typed_list.pmt"
 #include "igraph_pmt_off.h"
 #undef CUSTOM_INIT_DESTROY
 #undef BASE_ATTRIBUTE_RECORD
