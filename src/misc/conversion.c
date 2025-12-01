@@ -146,7 +146,7 @@ igraph_error_t igraph_get_adjacency(
             }
         }
     } else {
-        IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid adjacency matrix type requested.", IGRAPH_EINVAL);
     }
 
     /* Erase the diagonal if we don't need loop edges */
@@ -293,7 +293,7 @@ igraph_error_t igraph_get_adjacency_sparse(
             }
         }
     } else {
-        IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid adjacency matrix type requested.", IGRAPH_EINVAL);
     }
 
     return IGRAPH_SUCCESS;
@@ -506,7 +506,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
     if (mode != IGRAPH_TO_UNDIRECTED_EACH &&
         mode != IGRAPH_TO_UNDIRECTED_COLLAPSE &&
         mode != IGRAPH_TO_UNDIRECTED_MUTUAL) {
-        IGRAPH_ERROR("Cannot undirect graph, invalid mode", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot undirect graph, invalid mode.", IGRAPH_EINVAL);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -922,11 +922,11 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
     IGRAPH_CHECK(igraph_is_tree(graph, &is_tree, NULL, IGRAPH_ALL));
 
     if (!is_tree) {
-        IGRAPH_ERROR("The graph must be a tree", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The graph must be a tree.", IGRAPH_EINVAL);
     }
 
     if (n < 2) {
-        IGRAPH_ERROR("The tree must have at least 2 vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The tree must have at least 2 vertices.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(prufer, n - 2));

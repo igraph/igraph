@@ -94,7 +94,7 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
         break;
 
     default:
-        IGRAPH_ERRORF("Unknown error code returned from plfit (%d)", IGRAPH_FAILURE, code);
+        IGRAPH_ERRORF("Unknown error code returned from plfit (%d).", IGRAPH_FAILURE, code);
         break;
     }
 

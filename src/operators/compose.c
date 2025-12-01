@@ -78,7 +78,7 @@ igraph_error_t igraph_compose(igraph_t *res,
     igraph_vector_int_t neis1, neis2;
 
     if (directed != igraph_is_directed(g2)) {
-        IGRAPH_ERROR("Cannot compose directed and undirected graph",
+        IGRAPH_ERROR("Cannot compose directed and undirected graph.",
                      IGRAPH_EINVAL);
     }
 

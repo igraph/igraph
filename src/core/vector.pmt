@@ -141,9 +141,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector) *v, igraph_int_
      * This simplifies freeing partially initialized data structures,
      * such as adjacency lists, when an error occurs mid-initialization. */
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
-    if (v->stor_begin == NULL) {
-        IGRAPH_ERROR("Cannot initialize vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(v->stor_begin, "Insufficient memory to initialize vector.");
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
 
@@ -1053,9 +1051,7 @@ igraph_error_t FUNCTION(igraph_vector, sort_ind)(
         return IGRAPH_SUCCESS;
     }
     vind = IGRAPH_CALLOC(n, BASE*);
-    if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vind, "Insufficient memory to sort vector.");
     for (i = 0; i < n; i++) {
         vind[i] = &VECTOR(*v)[i];
     }
@@ -3454,9 +3450,7 @@ igraph_error_t FUNCTION(igraph_vector, index_in_place)(TYPE(igraph_vector) *v,
     igraph_int_t i, n = igraph_vector_int_size(idx);
 
     tmp = IGRAPH_CALLOC(n, BASE);
-    if (!tmp) {
-        IGRAPH_ERROR("Cannot index vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Insufficient memory to index vector.");
 
     for (i = 0; i < n; i++) {
         tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ];

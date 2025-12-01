@@ -676,7 +676,7 @@ igraph_error_t FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
     igraph_int_t nrow = FUNCTION(igraph_matrix, nrow)(m);
 
     if (index >= m->ncol) {
-        IGRAPH_ERROR("Index out of range for selecting matrix column", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Index out of range for selecting matrix column.", IGRAPH_EINVAL);
     }
     IGRAPH_CHECK(FUNCTION(igraph_vector, get_interval)(&m->data, res,
                  nrow * index, nrow * (index + 1)));
@@ -1010,7 +1010,7 @@ igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
     igraph_int_t torows = to->nrow, fromrows = from->nrow;
     igraph_int_t offset, c, r, index, offset2;
     if (tocols != fromcols) {
-        IGRAPH_ERROR("Cannot do rbind, number of columns do not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot do rbind, number of columns do not match.", IGRAPH_EINVAL);
     }
 
     igraph_int_t new_size; /* new_size = tocols * (fromrows + torows) */
@@ -1057,7 +1057,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
     igraph_int_t tocols = to->ncol, fromcols = from->ncol;
     igraph_int_t torows = to->nrow, fromrows = from->nrow;
     if (torows != fromrows) {
-        IGRAPH_ERROR("Cannot do rbind, number of rows do not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot do rbind, number of rows do not match.", IGRAPH_EINVAL);
     }
 
     igraph_int_t new_tocols;
@@ -1114,7 +1114,7 @@ igraph_error_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
     igraph_int_t i, j;
 
     if (index >= rows) {
-        IGRAPH_ERROR("Index out of range for selecting matrix row", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Index out of range for selecting matrix row.", IGRAPH_EINVAL);
     }
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, cols));
 
@@ -1207,7 +1207,7 @@ igraph_error_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
     const igraph_int_t n = nrow * ncol;
 
     if (i >= nrow || j >= nrow) {
-        IGRAPH_ERROR("Cannot swap rows, index out of range", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot swap rows, index out of range.", IGRAPH_EINVAL);
     }
     if (i == j) {
         return IGRAPH_SUCCESS;
@@ -1282,7 +1282,7 @@ void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
 igraph_error_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
                                  const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
-        IGRAPH_ERROR("Cannot add non-conformant matrices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot add non-conformant matrices.", IGRAPH_EINVAL);
     }
     return FUNCTION(igraph_vector, add)(&m1->data, &m2->data);
 }
@@ -1303,7 +1303,7 @@ igraph_error_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
 igraph_error_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
                                  const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
-        IGRAPH_ERROR("Cannot subtract non-conformant matrices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot subtract non-conformant matrices.", IGRAPH_EINVAL);
     }
     return FUNCTION(igraph_vector, sub)(&m1->data, &m2->data);
 }
@@ -1695,7 +1695,7 @@ igraph_error_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, igrap
 
     igraph_int_t c, r, index = row + 1, leap = 1, n = m->nrow * m->ncol;
     if (row >= m->nrow) {
-        IGRAPH_ERROR("Cannot remove row, index out of range", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot remove row, index out of range.", IGRAPH_EINVAL);
     }
 
     for (c = 0; c < m->ncol; c++) {
