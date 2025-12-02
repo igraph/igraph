@@ -105,6 +105,7 @@ add_library(
   constructors/de_bruijn.c
   constructors/famous.c
   constructors/full.c
+  constructors/hamming.c
   constructors/generalized_petersen.c
   constructors/kautz.c
   constructors/lattices.c
