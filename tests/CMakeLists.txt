@@ -533,6 +533,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   foreign_empty
   gml
+  igraph_from_nauty
+  igraph_to_nauty
   igraph_read_graph_graphdb
   igraph_read_graph_graphml
   igraph_write_graph_leda
