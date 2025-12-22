@@ -341,7 +341,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "4.0.0")
+set_target_properties(igraph PROPERTIES VERSION "4.0.1")
 set_target_properties(igraph PROPERTIES SOVERSION 4)
 
 # Add extra compiler definitions if needed
