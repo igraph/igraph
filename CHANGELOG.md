@@ -14,7 +14,7 @@
 ### Other
 
 - Documentation improvements.
-- nanoflann was updated to version 1.8.0
+- nanoflann was updated to version 1.9.0
 
 ## [1.0.0]
 
