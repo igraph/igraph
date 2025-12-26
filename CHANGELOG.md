@@ -1,5 +1,7 @@
 # igraph C library changelog
 
+## [main]
+
 ## [1.0.1]
 
 ### Fixed
