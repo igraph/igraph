@@ -130,8 +130,6 @@ struct HavelHakimiList {
     // returns max degree non-empty bucket,
     // or 0 (sentinel) if all buckets are empty
     igraph_int_t get_max_bucket() {
-        // TODO: either change get_prev to take a BNode, or change
-        // head()/tail() to return integers
         return get_prev(n_buckets - 1);
     }
 
