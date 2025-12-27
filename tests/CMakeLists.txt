@@ -905,11 +905,13 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_maximum_bipartite_matching
+  igraph_maximum_matching
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_maximum_bipartite_matching
+  igraph_maximum_matching
 )
 
 # embedding.at
