@@ -1,6 +1,23 @@
+/*
+   igraph library.
+   Copyright (C) 2025  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "igraph_operators.h"
 #include "igraph_vector_list.h"
-// ... other includes ...
 
 /**
  * \function igraph_groups_to_membership
@@ -40,14 +57,14 @@ igraph_error_t igraph_groups_to_membership(
     igraph_vector_int_t *membership) {
 
     // Input validation
-    if (vcount < 0){
-        IGRAPH_ERRORF("Vertex count (%" IGRAPH_PRId ") must be non-negative.", 
-            IGRAPH_EINVAL, vcount);
+    if (vcount < 0) {
+        IGRAPH_ERRORF("Vertex count (%" IGRAPH_PRId ") must be non-negative.",
+                      IGRAPH_EINVAL, vcount);
     }
-    if (groups == NULL){
+    if (groups == NULL) {
         IGRAPH_ERROR("Groups list must not be NULL.", IGRAPH_EINVAL);
     }
-    if (membership == NULL){
+    if (membership == NULL) {
         IGRAPH_ERROR("Membership vector must not be NULL.", IGRAPH_EINVAL);
     }
 
@@ -62,21 +79,21 @@ igraph_error_t igraph_groups_to_membership(
     // Process each group
     igraph_int_t num_groups = igraph_vector_int_list_size(groups);
     igraph_int_t next_group_idx = 0;
-    for (igraph_int_t i = 0; i < num_groups; i++){
+    for (igraph_int_t i = 0; i < num_groups; i++) {
         const igraph_vector_int_t *current_group = igraph_vector_int_list_get_ptr(groups, i);
 
         // Process each vertex in the group
-        for (igraph_int_t j = 0; j < igraph_vector_int_size(current_group); j++){
+        for (igraph_int_t j = 0; j < igraph_vector_int_size(current_group); j++) {
             igraph_int_t vertex = VECTOR(*current_group)[j];
 
             // Validate vertex index and check for duplicates
-            if (vertex < 0 || vertex >= vcount){
-                IGRAPH_ERRORF("Invalid vertex index (%" IGRAPH_PRId ") in group %" IGRAPH_PRId ".", 
-                    IGRAPH_EINVAL, vertex, i);
+            if (vertex < 0 || vertex >= vcount) {
+                IGRAPH_ERRORF("Invalid vertex index (%" IGRAPH_PRId ") in group %" IGRAPH_PRId ".",
+                              IGRAPH_EINVAL, vertex, i);
             }
-            if (VECTOR(seen)[vertex]){
-                IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " appears multiple times in groups.", 
-                    IGRAPH_EINVAL, vertex);
+            if (VECTOR(seen)[vertex]) {
+                IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " appears multiple times in groups.",
+                              IGRAPH_EINVAL, vertex);
             }
             VECTOR(*membership)[vertex] = i;
             VECTOR(seen)[vertex] = true;
@@ -87,8 +104,8 @@ igraph_error_t igraph_groups_to_membership(
     }
 
     // Process vertices that were not in any group (singletons)
-    for (igraph_int_t i = 0; i < vcount; i++){
-        if (VECTOR(*membership)[i] == -1){
+    for (igraph_int_t i = 0; i < vcount; i++) {
+        if (VECTOR(*membership)[i] == -1) {
             VECTOR(*membership)[i] = next_group_idx;
             next_group_idx++;
         }
@@ -101,8 +118,33 @@ igraph_error_t igraph_groups_to_membership(
 
 /**
  * \function igraph_membership_to_groups
- * \brief Convert membership vector to groups.
- * ...
+ * \brief Convert a membership vector to a list of groups.
+ * \experimental
+ *
+ * This function creates a list of groups from a membership vector.
+ * Each group will contain the vertex indices that have the same
+ * membership value.
+ *
+ * </para><para>
+ * The groups are created in order of increasing membership value,
+ * and each vertex index appears in exactly one group corresponding
+ * to its membership value.
+ *
+ * \param membership A membership vector, where each element
+ *        indicates the group index of the corresponding vertex.
+ * \param groups Pointer to an initialized vector list. The groups
+ *        will be stored here, with each vector containing the
+ *        vertex indices belonging to that group.
+ * \return Error code:
+ *         \clist
+ *           \cli IGRAPH_UNIMPLEMENTED
+ *                This function is declared but not yet implemented.
+ *         \endclist
+ *
+ * Time complexity: O(|V| + |G|), where |V| is the number of vertices
+ * and |G| is the number of distinct groups (bounded by |V|).
+ *
+ * \sa \ref igraph_groups_to_membership() for the inverse operation.
  */
 igraph_error_t igraph_membership_to_groups(
     const igraph_vector_int_t *membership,
