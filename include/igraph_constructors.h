@@ -52,6 +52,9 @@ IGRAPH_EXPORT igraph_error_t igraph_wheel(igraph_t *graph, igraph_int_t n, igrap
                               igraph_int_t center);
 IGRAPH_EXPORT igraph_error_t igraph_hypercube(igraph_t *graph,
                                               igraph_int_t n, igraph_bool_t directed);
+                                              
+IGRAPH_EXPORT igraph_error_t igraph_hamming_graph(igraph_t *graph, igraph_int_t d, igraph_int_t q);
+
 IGRAPH_EXPORT igraph_error_t igraph_square_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_int_t nei,
                                  igraph_bool_t directed, igraph_bool_t mutual, const igraph_vector_bool_t *circular);
 IGRAPH_EXPORT igraph_error_t igraph_ring(igraph_t *graph, igraph_int_t n, igraph_bool_t directed,

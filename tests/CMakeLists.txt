@@ -83,6 +83,7 @@ add_legacy_tests(
   igraph_strvector
   igraph_vector_floor
   igraph_vector_lex_cmp
+  igraph_hamming_graph
   matrix
   matrix2
   matrix3
@@ -1065,3 +1066,5 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   percolation
 )
+
+
