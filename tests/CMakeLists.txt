@@ -588,6 +588,7 @@ add_legacy_tests(
   igraph_connect_neighborhood
   igraph_disjoint_union
   igraph_graph_power
+  igraph_groups_to_membership
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
