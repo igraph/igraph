@@ -761,6 +761,46 @@ igraph_personalized_pagerank_vs:
         vids ON graph, weights ON graph, vector ON graph vids,
         options ON algo
 
+igraph_linkrank:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL EDGEWEIGHTS weights,
+        OUT VECTOR vector, OUT REAL value,
+        BOOLEAN directed=True,
+        REAL damping=0.85,
+        PAGERANKALGO algo=PRPACK,
+        OPTIONAL INOUT PAGERANKOPT options
+    DEPS: |-
+        weights ON graph, vector ON graph,
+        options ON algo
+
+igraph_personalized_linkrank:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL EDGEWEIGHTS weights,
+        OUT VECTOR vector, OUT REAL value,
+        BOOLEAN directed=True,
+        REAL damping=0.85, OPTIONAL VECTOR personalized,
+        PAGERANKALGO algo=PRPACK,
+        OPTIONAL INOUT PAGERANKOPT options
+    DEPS: |-
+        weights ON graph, vector ON graph,
+        options ON algo
+
+igraph_personalized_linkrank_vs:
+    PARAMS: |-
+        GRAPH graph, 
+        OPTIONAL EDGEWEIGHTS weights,
+        PRIMARY OUT VECTOR vector, OUT REAL value,
+        BOOLEAN directed=True,
+        REAL damping=0.85,
+        VERTEX_SELECTOR reset_vids,
+        PAGERANKALGO algo=PRPACK,
+        OPTIONAL INOUT PAGERANKOPT options
+    DEPS: |-
+        weights ON graph, vector ON graph,
+        options ON algo
+
 igraph_rewire:
     PARAMS: INOUT GRAPH rewire, INTEGER n, EDGE_TYPE_SW allowed_edge_types=SIMPLE, OPTIONAL OUT REWIRING_STATS stats
 
