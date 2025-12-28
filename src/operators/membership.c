@@ -78,7 +78,7 @@ igraph_error_t igraph_groups_to_membership(
 
     // Process each group
     igraph_int_t num_groups = igraph_vector_int_list_size(groups);
-    igraph_int_t next_group_idx = 0;
+    igraph_int_t next_group_idx = num_groups;
     for (igraph_int_t i = 0; i < num_groups; i++) {
         const igraph_vector_int_t *current_group = igraph_vector_int_list_get_ptr(groups, i);
 
@@ -98,9 +98,6 @@ igraph_error_t igraph_groups_to_membership(
             VECTOR(*membership)[vertex] = i;
             VECTOR(seen)[vertex] = true;
         }
-
-        // Update next group index
-        next_group_idx = i + 1;
     }
 
     // Process vertices that were not in any group (singletons)
