@@ -822,7 +822,8 @@ igraph_error_t igraph_delete_vertices_map(
  * \return Number of vertices.
  *
  * \remark
- * The graph pointer must be non-NULL and refer to a properly initialized graph object. Behavior is undefined otherwise.
+ * The graph pointer must be non-NULL and refer to a properly initialized
+ * graph object. Behavior is undefined otherwise.
  *
  * Time complexity: O(1)
  */
