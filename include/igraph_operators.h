@@ -112,7 +112,13 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t 
                                                    const igraph_t *g2,
                                                    igraph_int_t root);
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_int_t k);
-
+IGRAPH_EXPORT igraph_error_t igraph_groups_to_membership(
+    igraph_integer_t vcount,
+    const igraph_vector_int_list_t *groups,
+    igraph_vector_int_t *membership);
+IGRAPH_EXPORT igraph_error_t igraph_membership_to_groups(
+    const igraph_vector_int_t *membership,
+    igraph_vector_int_list_t *groups);
 IGRAPH_END_C_DECLS
 
 #endif

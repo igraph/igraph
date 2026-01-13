@@ -243,6 +243,7 @@ add_library(
   operators/disjoint_union.c
   operators/intersection.c
   operators/join.c
+  operators/membership.c
   operators/misc_internal.c
   operators/permute.c
   operators/products.c
