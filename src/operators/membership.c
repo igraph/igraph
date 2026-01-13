@@ -56,7 +56,7 @@ igraph_error_t igraph_groups_to_membership(
     const igraph_vector_int_list_t *groups,
     igraph_vector_int_t *membership) {
 
-    // Input validation
+    /* Input validation */
     if (vcount < 0) {
         IGRAPH_ERRORF("Vertex count (%" IGRAPH_PRId ") must be non-negative.",
                       IGRAPH_EINVAL, vcount);
@@ -69,24 +69,24 @@ igraph_error_t igraph_groups_to_membership(
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(membership, vcount));
-    igraph_vector_int_fill(membership, -1); // Initialize with -1 to indicate no group
+    igraph_vector_int_fill(membership, -1); /* Initialize with -1 to indicate no group */
 
-    // Track seen vertices
+    /* Track seen vertices */
     igraph_vector_bool_t seen;
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, vcount);
     igraph_vector_bool_fill(&seen, false);
 
-    // Process each group
+    /* Process each group */
     igraph_int_t num_groups = igraph_vector_int_list_size(groups);
     igraph_int_t next_group_idx = num_groups;
     for (igraph_int_t i = 0; i < num_groups; i++) {
         const igraph_vector_int_t *current_group = igraph_vector_int_list_get_ptr(groups, i);
 
-        // Process each vertex in the group
+        /* Process each vertex in the group */
         for (igraph_int_t j = 0; j < igraph_vector_int_size(current_group); j++) {
             igraph_int_t vertex = VECTOR(*current_group)[j];
 
-            // Validate vertex index and check for duplicates
+            /* Validate vertex index and check for duplicates */
             if (vertex < 0 || vertex >= vcount) {
                 IGRAPH_ERRORF("Invalid vertex index (%" IGRAPH_PRId ") in group %" IGRAPH_PRId ".",
                               IGRAPH_EINVAL, vertex, i);
@@ -100,7 +100,7 @@ igraph_error_t igraph_groups_to_membership(
         }
     }
 
-    // Process vertices that were not in any group (singletons)
+    /* Process vertices that were not in any group (singletons) */
     for (igraph_int_t i = 0; i < vcount; i++) {
         if (VECTOR(*membership)[i] == -1) {
             VECTOR(*membership)[i] = next_group_idx;
@@ -134,8 +134,8 @@ igraph_error_t igraph_groups_to_membership(
  *        vertex indices belonging to that group.
  * \return Error code:
  *         \clist
- *           \cli IGRAPH_UNIMPLEMENTED
- *                This function is declared but not yet implemented.
+ *           \cli IGRAPH_EINVAL
+ *                Invalid membership value (negative or out of bounds).
  *         \endclist
  *
  * Time complexity: O(|V| + |G|), where |V| is the number of vertices
@@ -146,5 +146,54 @@ igraph_error_t igraph_groups_to_membership(
 igraph_error_t igraph_membership_to_groups(
     const igraph_vector_int_t *membership,
     igraph_vector_int_list_t *groups) {
-    IGRAPH_ERROR("Function not yet implemented.", IGRAPH_UNIMPLEMENTED);
+
+    /* Input validation */
+    if (membership == NULL) {
+        IGRAPH_ERROR("Membership vector must not be NULL.", IGRAPH_EINVAL);
+    }
+    if (groups == NULL) {
+        IGRAPH_ERROR("Groups list must not be NULL.", IGRAPH_EINVAL);
+    }
+
+    /* Return empty list for groups if vertex count is zero */
+    igraph_int_t vcount = igraph_vector_int_size(membership);
+    if (vcount == 0) {
+        IGRAPH_CHECK(igraph_vector_int_list_resize(groups, 0));
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Initialize groups list */
+    igraph_int_t num_groups = igraph_vector_int_max(membership) + 1;
+    IGRAPH_CHECK(igraph_vector_int_list_resize(groups, num_groups));
+
+    /* Count and allocate groups */
+    igraph_vector_int_t group_sizes;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&group_sizes, num_groups);
+    igraph_vector_int_fill(&group_sizes, 0);
+
+    for (igraph_int_t i = 0; i < vcount; i++) {
+        igraph_int_t group_idx = VECTOR(*membership)[i];
+        if (group_idx < 0 || group_idx >= num_groups) {
+            IGRAPH_ERRORF("Invalid membership value (%" IGRAPH_PRId ") for vertex %" IGRAPH_PRId ".",
+                          IGRAPH_EINVAL, group_idx, i);
+        }
+        VECTOR(group_sizes)[group_idx]++;
+    }
+
+    /* Pre-allocate space for each group */
+    for (igraph_int_t i = 0; i < num_groups; i++) {
+        igraph_vector_int_t *group = igraph_vector_int_list_get_ptr(groups, i);
+        IGRAPH_CHECK(igraph_vector_int_reserve(group, VECTOR(group_sizes)[i]));
+    }
+
+    /* Populate each group */
+    for (igraph_int_t i = 0; i < vcount; i++) {
+        igraph_int_t group_idx = VECTOR(*membership)[i];
+        igraph_vector_int_t *group = igraph_vector_int_list_get_ptr(groups, group_idx);
+        IGRAPH_CHECK(igraph_vector_int_push_back(group, i));
+    }
+
+    IGRAPH_VECTOR_INT_DESTROY(&group_sizes);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
 }
