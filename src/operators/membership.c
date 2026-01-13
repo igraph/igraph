@@ -193,7 +193,7 @@ igraph_error_t igraph_membership_to_groups(
         IGRAPH_CHECK(igraph_vector_int_push_back(group, i));
     }
 
-    IGRAPH_VECTOR_INT_DESTROY(&group_sizes);
+    igraph_vector_int_destroy(&group_sizes);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
