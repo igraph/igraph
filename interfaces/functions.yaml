@@ -1086,6 +1086,15 @@ igraph_contract_vertices:
         INOUT GRAPH graph, INDEX_VECTOR mapping,
         VERTEX_ATTRIBUTE_COMBINATION vertex_attr_comb=Default
 
+igraph_groups_to_membership:
+    PARAMS: |-
+        INTEGER vcount, VECTOR_INT_LIST groups,
+        OUT INDEX_VECTOR membership
+
+igraph_membership_to_groups:
+    PARAMS: |-
+        INDEX_VECTOR membership, OUT VECTOR_INT_LIST groups
+
 igraph_eccentricity:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights,
