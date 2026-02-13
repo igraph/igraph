@@ -38,6 +38,7 @@ and <link linkend="igraph-Operators">operators that transform graphs</link>.
 <!-- doxrox-include igraph_star -->
 <!-- doxrox-include igraph_wheel -->
 <!-- doxrox-include igraph_hypercube -->
+<!-- doxrox-include igraph_hamming -->
 <!-- doxrox-include igraph_square_lattice -->
 <!-- doxrox-include igraph_triangular_lattice -->
 <!-- doxrox-include igraph_hexagonal_lattice -->

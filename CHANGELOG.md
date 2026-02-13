@@ -4,6 +4,10 @@
 
 ## [1.0.1]
 
+### Added
+
+- `igraph_hamming()` creates a hamming graph (experimental function).
+
 ### Fixed
 
 - Eliminated references to `exit()` from the igraph shared library. These were accidentally introduced into igraph 1.0.0 through Qhull and Infomap.

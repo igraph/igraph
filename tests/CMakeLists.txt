@@ -232,6 +232,7 @@ add_legacy_tests(
   igraph_recent_degree_game
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
+  igraph_hamming
   igraph_square_lattice
   igraph_static_power_law_game
   igraph_tree_from_parent_vector

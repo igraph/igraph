@@ -1030,3 +1030,69 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_hamming
+ * \brief The d-dimensional hamming graph over a q-sized alphabet.
+ *
+ * A Hamming graph H(d, q) has \c q^d vertices corresponding to all
+ * strings of length \c d over an alphabet of size \c q.
+ * Two vertices are adjacent if they differ in exactly one position.
+ *
+ * \param graph An uninitialized graph object.
+ * \param d The dimension of the hamming graph.
+ * \param q The alphabet size of the hamming graph.
+ * \param directed Whether the graph should be directed. Edges will point
+ *    from lower index vertices towards higher index ones.
+ * \return Error code.
+ *
+ * \sa \ref igraph_hypercube()
+ *
+ * Time complexity: O(dq^d) or worse
+ */
+igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t d, igraph_int_t q,
+                              igraph_bool_t directed) {
+    if (d <= 0 || q <= 0) {
+        IGRAPH_ERROR("d and q must be greater than zero.", IGRAPH_EINVAL);
+    }
+
+    const igraph_int_t vcount = (igraph_int_t) pow(q, d);
+    const igraph_int_t ecount = (igraph_int_t) vcount * (q-1) * d / 2;
+    igraph_vector_int_t edges;
+    igraph_int_t p;
+    int iter = 0;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*ecount);
+
+    p = 0;
+    for (igraph_int_t v=0; v < vcount; v++) {
+        // selector for digits of v
+        igraph_int_t pos = 1;
+        for (igraph_int_t i=0; i < d; i++) {
+            // select current digit of v
+            const igraph_int_t dig = (v / pos) % q;
+            // calculate quotients of pos to be
+            // added to v without altering any
+            // other digits of v
+            igraph_int_t j = q - dig;
+            while (--j > 0) {
+                // this verifies that edges always
+                // point from lower index vertices
+                // towards higher index ones
+                const igraph_int_t u = v + (j * pos);
+                VECTOR(edges)[p++] = v;
+                VECTOR(edges)[p++] = u;
+            }
+            // select next digit
+            pos *= q;
+        }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 16);
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, directed));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
