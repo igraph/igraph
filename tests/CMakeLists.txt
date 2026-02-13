@@ -1021,6 +1021,7 @@ add_benchmarks(
   igraph_delaunay_graph
   igraph_distances
   igraph_ecc
+  igraph_hamming
   igraph_induced_subgraph
   igraph_induced_subgraph_edges
   igraph_layout_umap
