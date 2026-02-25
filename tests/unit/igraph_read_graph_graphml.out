@@ -12,6 +12,9 @@ Directed: 0
 4 5
 Vertex attribute 'gender': true true false true false false
 Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow' 'turquoise'
+Vertex attribute 'id': 'n0' 'n1' 'n2' 'n3' 'n4' 'n5'
+Edge attribute 'weight': 1 1 2 NaN NaN NaN 1.1
+Edge attribute 'id': 'e0' 'e1' 'e2' 'e3' 'e4' 'e5' 'e6'
 Warning: Unknown attribute key 'd3' in a <data> tag, ignoring attribute.
 Undirected graph:
 Vertices: 6
@@ -26,6 +29,9 @@ Directed: 0
 4 5
 Vertex attribute 'gender': true true false true false false
 Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow' 'turquoise'
+Vertex attribute 'id': 'n0' 'n1' 'n2' 'n3' 'n4' 'n5'
+Edge attribute 'weight': 1 1 2 NaN NaN NaN 1.1
+Edge attribute 'id': 'e0' 'e1' 'e2' 'e3' 'e4' 'e5' 'e6'
 Graph with default attributes:
 Vertices: 3
 Edges: 2
@@ -36,6 +42,8 @@ Vertex attribute 'type': false true true
 Vertex attribute 'gender': 'male' 'female' 'male'
 Vertex attribute 'age': 30 20 20
 Vertex attribute 'retired': false false false
+Vertex attribute 'id': 'p1' 'o1' 'o2'
+Edge attribute 'id': 'e1' 'e2'
 Graph with namespace:
 Vertices: 3
 Edges: 2
@@ -59,6 +67,12 @@ Directed: 0
 Vertex attribute 'type': true false true true true
 Vertex attribute 'name': 'spam' '  ' '  ham' 'bacon  ' '  eggs '
 Vertex attribute 'weight': 1 NaN 3 4 5
+Vertex attribute 'id': 'n0' 'n1' 'n2' 'n3' 'n4'
+Edge attribute 'id':Warning: Edge attribute 'id' does not exist, returning default string attribute value.
+ ''Warning: Edge attribute 'id' does not exist, returning default string attribute value.
+ ''Warning: Edge attribute 'id' does not exist, returning default string attribute value.
+ ''Warning: Edge attribute 'id' does not exist, returning default string attribute value.
+ ''
 Graph from yEd:
 Vertices: 3
 Edges: 2
