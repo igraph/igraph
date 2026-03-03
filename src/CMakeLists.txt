@@ -265,7 +265,9 @@ add_library(
   paths/random_walk.c
   paths/shortest_paths.c
   paths/simple_paths.c
+  paths/steiner.cpp
   paths/sparsifier.c
+  paths/steiner.cpp
   paths/unweighted.c
   paths/voronoi.c
   paths/widest_paths.c
