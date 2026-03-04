@@ -65,9 +65,33 @@ int main(void) {
     igraph_destroy(&g2);
     igraph_destroy(&g3);
 
-    CHECK_ERROR(igraph_hamming(&g1, 0, 0, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_hamming(&g1, 0, 10, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_hamming(&g1, 10, 0, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
+    /* Test edge cases with n==0 or q==0 */
+
+    igraph_empty(&g2, 1, IGRAPH_UNDIRECTED); /* singleton */
+    igraph_empty(&g3, 0, IGRAPH_UNDIRECTED); /* null graph */
+
+    igraph_hamming(&g1, 0, 0, IGRAPH_UNDIRECTED);
+    igraph_isomorphic(&g1, &g2, &iso);
+    IGRAPH_ASSERT(iso);
+    igraph_destroy(&g1);
+
+    igraph_hamming(&g1, 0, 2, IGRAPH_UNDIRECTED);
+    igraph_isomorphic(&g1, &g2, &iso);
+    IGRAPH_ASSERT(iso);
+    igraph_destroy(&g1);
+
+    igraph_hamming(&g1, 1, 0, IGRAPH_UNDIRECTED);
+    igraph_isomorphic(&g1, &g3, &iso);
+    IGRAPH_ASSERT(iso);
+    igraph_destroy(&g1);
+
+    igraph_destroy(&g3);
+    igraph_destroy(&g2);
+
+
+    CHECK_ERROR(igraph_hamming(&g1, -1, 0, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_hamming(&g1, -1, 10, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_hamming(&g1, 10, -1, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
 
     VERIFY_FINALLY_STACK();
 

@@ -1054,8 +1054,24 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  */
 igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
                               igraph_bool_t directed) {
-    if (n <= 0 || q <= 0) {
-        IGRAPH_ERROR("d and q must be greater than zero.", IGRAPH_EINVAL);
+
+
+    if (n < 0) {
+        IGRAPH_ERROR("The dimension parameter of the Hamming graph must not be negative.", IGRAPH_EINVAL);
+    }
+
+    if (q < 0) {
+        IGRAPH_ERROR("The alphabet size of the Hamming graph must not be negative.", IGRAPH_EINVAL);
+    }
+
+    /* Singleton for the zero-dimensional case, even if q == 0. */
+    if (n == 0) {
+        return igraph_empty(graph, 1, directed);
+    }
+
+    /* Null graph for an empty alphabet, unless n == 0. */
+    if (q == 0) {
+        return igraph_empty(graph, 0, directed);
     }
 
     const igraph_int_t vcount = (igraph_int_t) pow(q, n);
