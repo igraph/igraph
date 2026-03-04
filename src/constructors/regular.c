@@ -1040,12 +1040,17 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  * \experimental
  *
  * A Hamming graph <code>H(n, q)</code> has \c q^n vertices corresponding to all
- * strings of length \c d over an alphabet of size \c q.
+ * strings of length \c n over an alphabet of size \c q.
  * Two vertices are adjacent if they differ in exactly one position.
  * In the edge case where <code>n = 0</code>, the singleton graph is returned.
  * If <code>n > 0</code> and <code>q = 0</code>, the null graph is returned.
  * The <code>H(n,q)</code> graph can be thought of as the Cartesian graph product
  * of \c n complete graphs of size \c q.
+ *
+ * </para><para>
+ * If using the alphabet <code>0, 1, ..., q-1</code>, then the vertex
+ * corresponding to the string <code>(x_0, x_1, ..., x_(n-1))<code>
+ * will have a zero-based vertex ID of </code>sum_i x_i n^i</code>.
  *
  * </para><para>
  * <code>H(n, q)</code> has <code>q^n</code> vertices and
