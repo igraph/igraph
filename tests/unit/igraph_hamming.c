@@ -20,6 +20,34 @@
 
 #include "test_utilities.h"
 
+/*
+ * This is an alternative Hamming graph generator based on the fact that
+ * the Hamming graph H(n,q) is, equivalently, the cartesian product of n
+ * copies of complete graphs K(q).
+ */
+igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q) {
+    igraph_t full;
+
+    if (n < 0 || q < 0) {
+        IGRAPH_ERROR("n and q must not be negative.", IGRAPH_EINVAL);
+    }
+
+    igraph_full(&full, q, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_empty(graph, 1, IGRAPH_UNDIRECTED);
+
+    for (igraph_int_t i = 0; i < n; i++) {
+        igraph_t temp;
+        igraph_product(&temp, graph, &full, IGRAPH_PRODUCT_CARTESIAN);
+        igraph_destroy(graph);
+        igraph_copy(graph, &temp);
+        igraph_destroy(&temp);
+    }
+
+    igraph_destroy(&full);
+
+    return IGRAPH_SUCCESS;
+}
+
 int main(void) {
     igraph_t g1, g2, g3;
     igraph_bool_t iso;
@@ -88,6 +116,17 @@ int main(void) {
     igraph_destroy(&g3);
     igraph_destroy(&g2);
 
+    /* Compare to the implementation in terms of the graph product of cliques. */
+    for (igraph_int_t n = 0; n < 4; n++) {
+        for (igraph_int_t q = 0; q < 4; q++) {
+            igraph_hamming(&g1, n, q, IGRAPH_UNDIRECTED);
+            cartesian_hamming(&g2, n, q);
+            igraph_isomorphic(&g1, &g2, &iso);
+            IGRAPH_ASSERT(iso);
+            igraph_destroy(&g2);
+            igraph_destroy(&g1);
+        }
+    }
 
     CHECK_ERROR(igraph_hamming(&g1, -1, 0, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_hamming(&g1, -1, 10, IGRAPH_UNDIRECTED), IGRAPH_EINVAL);
