@@ -27,6 +27,8 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
+#include <math.h> /* pow() */
+
 /**
  * \ingroup generators
  * \function igraph_star
@@ -1019,6 +1021,125 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
                 VECTOR(edges)[p++] = u;
             }
             bit <<= 1;
+        }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 16);
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, directed));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_hamming
+ * \brief The d-dimensional Hamming graph over a q-sized alphabet.
+ *
+ * \experimental
+ *
+ * A Hamming graph <code>H(n, q)</code> has \c q^n vertices corresponding to all
+ * strings of length \c n over an alphabet of size \c q.
+ * Two vertices are adjacent if they differ in exactly one position.
+ * In the edge case where <code>n = 0</code>, the singleton graph is returned.
+ * If <code>n > 0</code> and <code>q = 0</code>, the null graph is returned.
+ * The <code>H(n,q)</code> graph can be thought of as the Cartesian graph product
+ * of \c n complete graphs of size \c q.
+ *
+ * </para><para>
+ * If using the alphabet <code>0, 1, ..., q-1</code>, then the vertex
+ * corresponding to the string <code>(x_0, x_1, ..., x_(n-1))</code>
+ * will have a zero-based vertex ID of <code>sum_i x_i n^i</code>.
+ *
+ * </para><para>
+ * <code>H(n, q)</code> has <code>q^n</code> vertices and
+ * <code>q^n (q-1) n / 2</code> edges.
+ *
+ * \param graph An uninitialized graph object.
+ * \param n The dimension of the Hamming graph.
+ * \param q The alphabet size of the Hamming graph.
+ * \param directed Whether the graph should be directed. Edges will point
+ *    from lower index vertices towards higher index ones.
+ * \return Error code.
+ *
+ * \sa \ref igraph_hypercube()
+ *
+ * Time complexity: O(n q^(n+1)).
+ */
+igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
+                              igraph_bool_t directed) {
+
+
+    if (n < 0) {
+        IGRAPH_ERROR("The dimension parameter of the Hamming graph must not be negative.", IGRAPH_EINVAL);
+    }
+
+    if (q < 0) {
+        IGRAPH_ERROR("The alphabet size of the Hamming graph must not be negative.", IGRAPH_EINVAL);
+    }
+
+    /* Singleton for the zero-dimensional case, even if q == 0. */
+    if (n == 0) {
+        return igraph_empty(graph, 1, directed);
+    }
+
+    /* Null graph for an empty alphabet, unless n == 0. */
+    if (q == 0) {
+        return igraph_empty(graph, 0, directed);
+    }
+
+    igraph_int_t vcount, ecount;
+    igraph_vector_int_t edges;
+    igraph_int_t p;
+    int iter = 0;
+
+    /* Overflow-safe calculation of vertex and edge counts.
+     * vcount = q^n
+     * ecount = vcount * (q - 1) * n / 2
+     */
+    {
+        /* vcount = q^n */
+        igraph_real_t q_to_pow_n_real = pow(q, n);
+        igraph_int_t q_to_pow_n = (igraph_int_t) q_to_pow_n_real;
+        if (q_to_pow_n_real != q_to_pow_n) {
+            IGRAPH_ERRORF("Parameters H(%"IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Hamming graph.",
+                          IGRAPH_EOVERFLOW,
+                          n, q);
+        }
+        vcount = q_to_pow_n;
+
+        /* (q-1) * n < q^n, so it cannot overflow at this point. */
+        if (q % 2 == 0) {
+            IGRAPH_SAFE_MULT(vcount / 2, (q-1) * n, &ecount);
+        } else {
+            IGRAPH_SAFE_MULT(vcount, (q-1) / 2 * n, &ecount);
+        }
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*ecount);
+
+    p = 0;
+    for (igraph_int_t v=0; v < vcount; v++) {
+        /* Selector for digits of v */
+        igraph_int_t pos = 1;
+        for (igraph_int_t i=0; i < n; i++) {
+            /* Select current digit of v */
+            const igraph_int_t dig = (v / pos) % q;
+            /* Calculate quotients of pos to be
+             * added to v without altering any
+             * other digits of v. */
+            igraph_int_t j = q - dig;
+            while (--j > 0) {
+                /* This ensures that edges always
+                 * point from lower index vertices
+                 * towards higher index ones. */
+                const igraph_int_t u = v + (j * pos);
+                VECTOR(edges)[p++] = v;
+                VECTOR(edges)[p++] = u;
+            }
+            /* Select next digit. */
+            pos *= q;
         }
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 16);
     }

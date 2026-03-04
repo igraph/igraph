@@ -2,6 +2,10 @@
 
 ## [main]
 
+### Added
+
+- `igraph_hamming()` creates a Hamming graph (experimental function). Thanks to Gulshan Kumar @zxawry for contributing this functionality in #2890!
+
 ## [1.0.1]
 
 ### Fixed
