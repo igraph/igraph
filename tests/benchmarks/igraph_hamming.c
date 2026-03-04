@@ -43,8 +43,8 @@
     } while (0)
 
 /*
- * This is an alternative hamming graph generator based on the fact that
- * the hamming graph H(d,q) is, equivalently, the cartesian product of d
+ * This is an alternative Hamming graph generator based on the fact that
+ * the Hamming graph H(d,q) is, equivalently, the cartesian product of d
  * copies of complete graphs K(q).
  */
 igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t d, igraph_int_t q,

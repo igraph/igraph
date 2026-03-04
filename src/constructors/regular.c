@@ -1033,15 +1033,15 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
 
 /**
  * \function igraph_hamming
- * \brief The d-dimensional hamming graph over a q-sized alphabet.
+ * \brief The d-dimensional Hamming graph over a q-sized alphabet.
  *
  * A Hamming graph H(d, q) has \c q^d vertices corresponding to all
  * strings of length \c d over an alphabet of size \c q.
  * Two vertices are adjacent if they differ in exactly one position.
  *
  * \param graph An uninitialized graph object.
- * \param d The dimension of the hamming graph.
- * \param q The alphabet size of the hamming graph.
+ * \param d The dimension of the Hamming graph.
+ * \param q The alphabet size of the Hamming graph.
  * \param directed Whether the graph should be directed. Edges will point
  *    from lower index vertices towards higher index ones.
  * \return Error code.
