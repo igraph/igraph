@@ -1115,24 +1115,24 @@ igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
 
     p = 0;
     for (igraph_int_t v=0; v < vcount; v++) {
-        // selector for digits of v
+        /* Selector for digits of v */
         igraph_int_t pos = 1;
         for (igraph_int_t i=0; i < n; i++) {
-            // select current digit of v
+            /* Select current digit of v */
             const igraph_int_t dig = (v / pos) % q;
-            // calculate quotients of pos to be
-            // added to v without altering any
-            // other digits of v
+            /* Calculate quotients of pos to be
+             * added to v without altering any
+             * other digits of v. */
             igraph_int_t j = q - dig;
             while (--j > 0) {
-                // this verifies that edges always
-                // point from lower index vertices
-                // towards higher index ones
+                /* This ensures that edges always
+                 * point from lower index vertices
+                 * towards higher index ones. */
                 const igraph_int_t u = v + (j * pos);
                 VECTOR(edges)[p++] = v;
                 VECTOR(edges)[p++] = u;
             }
-            // select next digit
+            /* Select next digit. */
             pos *= q;
         }
         IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 16);
