@@ -51,6 +51,8 @@ igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q
                               igraph_bool_t directed) {
     igraph_t full;
 
+    IGRAPH_UNUSED(directed);
+
     if (n <= 0 || q <= 0) {
         IGRAPH_ERROR("n and q must be greater than zero.", IGRAPH_EINVAL);
     }
@@ -77,6 +79,8 @@ igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q
 igraph_error_t lattice_rook(igraph_t *graph, igraph_int_t q,
                               igraph_bool_t directed) {
     igraph_t full;
+
+    IGRAPH_UNUSED(directed);
 
     if (q <= 0) {
         IGRAPH_ERROR("q must be greater than zero.", IGRAPH_EINVAL);
