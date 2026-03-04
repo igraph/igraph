@@ -1049,8 +1049,8 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  *
  * </para><para>
  * If using the alphabet <code>0, 1, ..., q-1</code>, then the vertex
- * corresponding to the string <code>(x_0, x_1, ..., x_(n-1))<code>
- * will have a zero-based vertex ID of </code>sum_i x_i n^i</code>.
+ * corresponding to the string <code>(x_0, x_1, ..., x_(n-1))</code>
+ * will have a zero-based vertex ID of <code>sum_i x_i n^i</code>.
  *
  * </para><para>
  * <code>H(n, q)</code> has <code>q^n</code> vertices and
@@ -1109,6 +1109,7 @@ igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
         }
         vcount = q_to_pow_n;
 
+        /* (q-1) * n < q^n, so it cannot overflow at this point. */
         if (q % 2 == 0) {
             IGRAPH_SAFE_MULT(vcount / 2, (q-1) * n, &ecount);
         } else {
