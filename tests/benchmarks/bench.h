@@ -19,11 +19,12 @@
 #ifndef IGRAPH_BENCH_H
 #define IGRAPH_BENCH_H
 
+#include <stdio.h>        /* printf */
 #include <sys/resource.h> /* getrusage */
 #include <sys/time.h>     /* gettimeofday */
 #include <unistd.h>       /* sleep */
 
-static inline void igraph_get_cpu_time(double *data) {
+static inline void bench_get_cpu_time(double *data) {
 
     struct rusage self;
     struct timeval real;
@@ -42,16 +43,16 @@ static inline void igraph_get_cpu_time(double *data) {
 
 #define REPEAT(CODE, N) \
     do { \
-        igraph_int_t rep_i; \
+        long long rep_i; \
         for (rep_i=0; rep_i < N; ++rep_i) { CODE; } \
     } while (0)
 
 #define BENCH(NAME, ...)    do { \
         double start[3], stop[3]; \
         double r, u, s; \
-        igraph_get_cpu_time(start); \
+        bench_get_cpu_time(start); \
         { __VA_ARGS__; } \
-        igraph_get_cpu_time(stop); \
+        bench_get_cpu_time(stop); \
         r = 1e-3 * round(1e3 * (stop[0] - start[0])); \
         u = 1e-3 * round(1e3 * (stop[1] - start[1])); \
         s = 1e-3 * round(1e3 * (stop[2] - start[2])); \
