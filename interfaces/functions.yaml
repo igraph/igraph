@@ -159,7 +159,7 @@ igraph_hypercube:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False
 
 igraph_hamming:
-    PARAMS: OUT GRAPH graph, INTEGER d, INTEGER q, BOOLEAN directed=False
+    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER q, BOOLEAN directed=False
 
 igraph_square_lattice:
     PARAMS: |-

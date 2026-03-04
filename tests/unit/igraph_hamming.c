@@ -28,7 +28,7 @@ int main(void) {
     igraph_t g1, g2, g3;
     igraph_bool_t iso;
 
-    /* Compare H_d_1 to the singleton graph K_1. */
+    /* Compare H_n_1 to the singleton graph K_1. */
     igraph_hamming(&g1, 3, 1, IGRAPH_UNDIRECTED); // d = 3
     IGRAPH_ASSERT(igraph_vcount(&g1) == 1);
     IGRAPH_ASSERT(igraph_ecount(&g1) == 0);
@@ -43,7 +43,7 @@ int main(void) {
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
-    /* Compare H_d_2 to the hypercube graph Q_d. */
+    /* Compare H_n_2 to the hypercube graph Q_n. */
     /* undirected */
     igraph_hypercube(&g2, 10, IGRAPH_UNDIRECTED);
     igraph_hamming(&g1, 10, 2, IGRAPH_UNDIRECTED);

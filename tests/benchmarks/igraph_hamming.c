@@ -20,11 +20,11 @@
 
 #include "bench.h"
 
-#define BENCH_BLOCK(G, D, Q, TEXT1, CODE1, TEXT2, CODE2) \
+#define BENCH_BLOCK(G, N, Q, TEXT1, CODE1, TEXT2, CODE2) \
     do { \
         char msg[128]; \
-        const igraph_int_t vcount = pow(Q, D); \
-        const igraph_int_t ecount = (vcount * (Q - 1) * D) / 2; \
+        const igraph_int_t vcount = pow(Q, N); \
+        const igraph_int_t ecount = (vcount * (Q - 1) * N) / 2; \
         snprintf(msg, sizeof(msg) / sizeof(msg[0]), \
              " 1 %s: vcount=%" IGRAPH_PRId ", ecount=%" IGRAPH_PRId "", \
              TEXT1, vcount, ecount); \
@@ -44,21 +44,21 @@
 
 /*
  * This is an alternative Hamming graph generator based on the fact that
- * the Hamming graph H(d,q) is, equivalently, the cartesian product of d
+ * the Hamming graph H(n,q) is, equivalently, the cartesian product of n
  * copies of complete graphs K(q).
  */
-igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t d, igraph_int_t q,
+igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
                               igraph_bool_t directed) {
     igraph_t full;
 
-    if (d <= 0 || q <= 0) {
-        IGRAPH_ERROR("d and q must be greater than zero.", IGRAPH_EINVAL);
+    if (n <= 0 || q <= 0) {
+        IGRAPH_ERROR("n and q must be greater than zero.", IGRAPH_EINVAL);
     }
 
     igraph_full(&full, q, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_copy(graph, &full);
 
-    for (igraph_int_t i = 1; i < d; i++) {
+    for (igraph_int_t i = 1; i < n; i++) {
         igraph_t temp;
         igraph_product(&temp, graph, &full, IGRAPH_PRODUCT_CARTESIAN);
         igraph_destroy(graph);
@@ -72,7 +72,7 @@ igraph_error_t cartesian_hamming(igraph_t *graph, igraph_int_t d, igraph_int_t q
 }
 
 /*
- * This is a rook graph generator as a special case of cartesian_hamming for d = 2.
+ * This is a rook graph generator as a special case of cartesian_hamming for n = 2.
  */
 igraph_error_t lattice_rook(igraph_t *graph, igraph_int_t q,
                               igraph_bool_t directed) {
@@ -106,23 +106,23 @@ int main(void) {
 
     /* Compare H_d_2 to the hypercube graph Q_d. */
     d = 22, q = 2; // q must be 2
-    printf("Compare H(d,2) and Q(d) for d=%"IGRAPH_PRId"\n", d);
+    printf("Compare H(n,2) and Q(n) for n=%"IGRAPH_PRId"\n", d);
     BENCH_BLOCK(g, d, q,
               "HAMMING   ", igraph_hamming(&g, d, q, IGRAPH_UNDIRECTED),
               "HYPERCUBE ", igraph_hypercube(&g, d, IGRAPH_UNDIRECTED)
              );
 
     /* Compare H_2_q to the lattice(rook) graph L_q_q. */
-    d = 2, q = 300; // d must be 2
+    d = 2, q = 300; // n must be 2
     printf("Compare H(2,q) and L(q,q) for q=%"IGRAPH_PRId"\n", q);
     BENCH_BLOCK(g, d, q,
               "HAMMING  ", igraph_hamming(&g, d, q, IGRAPH_UNDIRECTED),
               "ROOK     ", lattice_rook(&g, q, IGRAPH_UNDIRECTED)
              );
 
-    /* Compare H_d_q to d cartesian products of K_q. */
+    /* Compare H_n_q to d cartesian products of K_q. */
     d = 9, q = 5;
-    printf("Compare H(d,q) and K(q)^d for d=%"IGRAPH_PRId" and q=%"IGRAPH_PRId"\n", d, q);
+    printf("Compare H(n,q) and K(q)^n for n=%"IGRAPH_PRId" and q=%"IGRAPH_PRId"\n", d, q);
     BENCH_BLOCK(g, d, q,
               "HAMMING   ", igraph_hamming(&g, d, q, IGRAPH_UNDIRECTED),
               "CARTESIAN ", cartesian_hamming(&g, d, q, IGRAPH_UNDIRECTED)

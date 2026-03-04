@@ -1035,12 +1035,12 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  * \function igraph_hamming
  * \brief The d-dimensional Hamming graph over a q-sized alphabet.
  *
- * A Hamming graph H(d, q) has \c q^d vertices corresponding to all
+ * A Hamming graph <code>H(n, q)</code> has \c q^n vertices corresponding to all
  * strings of length \c d over an alphabet of size \c q.
  * Two vertices are adjacent if they differ in exactly one position.
  *
  * \param graph An uninitialized graph object.
- * \param d The dimension of the Hamming graph.
+ * \param n The dimension of the Hamming graph.
  * \param q The alphabet size of the Hamming graph.
  * \param directed Whether the graph should be directed. Edges will point
  *    from lower index vertices towards higher index ones.
@@ -1050,14 +1050,14 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  *
  * Time complexity: O(dq^d) or worse
  */
-igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t d, igraph_int_t q,
+igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
                               igraph_bool_t directed) {
-    if (d <= 0 || q <= 0) {
+    if (n <= 0 || q <= 0) {
         IGRAPH_ERROR("d and q must be greater than zero.", IGRAPH_EINVAL);
     }
 
-    const igraph_int_t vcount = (igraph_int_t) pow(q, d);
-    const igraph_int_t ecount = (igraph_int_t) vcount * (q-1) * d / 2;
+    const igraph_int_t vcount = (igraph_int_t) pow(q, n);
+    const igraph_int_t ecount = (igraph_int_t) vcount * (q-1) * n / 2;
     igraph_vector_int_t edges;
     igraph_int_t p;
     int iter = 0;
@@ -1068,7 +1068,7 @@ igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t d, igraph_int_t q,
     for (igraph_int_t v=0; v < vcount; v++) {
         // selector for digits of v
         igraph_int_t pos = 1;
-        for (igraph_int_t i=0; i < d; i++) {
+        for (igraph_int_t i=0; i < n; i++) {
             // select current digit of v
             const igraph_int_t dig = (v / pos) % q;
             // calculate quotients of pos to be
