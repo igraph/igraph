@@ -27,6 +27,8 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
+#include <math.h> /* pow() */
+
 /**
  * \ingroup generators
  * \function igraph_star
@@ -1074,11 +1076,32 @@ igraph_error_t igraph_hamming(igraph_t *graph, igraph_int_t n, igraph_int_t q,
         return igraph_empty(graph, 0, directed);
     }
 
-    const igraph_int_t vcount = (igraph_int_t) pow(q, n);
-    const igraph_int_t ecount = (igraph_int_t) vcount * (q-1) * n / 2;
+    igraph_int_t vcount, ecount;
     igraph_vector_int_t edges;
     igraph_int_t p;
     int iter = 0;
+
+    /* Overflow-safe calculation of vertex and edge counts.
+     * vcount = q^n
+     * ecount = vcount * (q - 1) * n / 2
+     */
+    {
+        /* vcount = q^n */
+        igraph_real_t q_to_pow_n_real = pow(q, n);
+        igraph_int_t q_to_pow_n = (igraph_int_t) q_to_pow_n_real;
+        if (q_to_pow_n_real != q_to_pow_n) {
+            IGRAPH_ERRORF("Parameters H(%"IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Hamming graph.",
+                          IGRAPH_EOVERFLOW,
+                          n, q);
+        }
+        vcount = q_to_pow_n;
+
+        if (q % 2 == 0) {
+            IGRAPH_SAFE_MULT(vcount / 2, (q-1) * n, &ecount);
+        } else {
+            IGRAPH_SAFE_MULT(vcount, (q-1) / 2 * n, &ecount);
+        }
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*ecount);
 
