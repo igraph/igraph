@@ -1035,6 +1035,8 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  * \function igraph_hamming
  * \brief The d-dimensional Hamming graph over a q-sized alphabet.
  *
+ * \experimental
+ *
  * A Hamming graph <code>H(n, q)</code> has \c q^n vertices corresponding to all
  * strings of length \c d over an alphabet of size \c q.
  * Two vertices are adjacent if they differ in exactly one position.
