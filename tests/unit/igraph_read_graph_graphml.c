@@ -70,6 +70,27 @@ void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
     printf("\n");
 }
 
+void dump_edge_attribute_numeric(const char* name, const igraph_t* g) {
+    igraph_int_t i, n = igraph_ecount(g);
+
+    printf("Edge attribute '%s':", name);
+    for (i = 0; i < n; i++) {
+        printf(" ");
+        igraph_real_printf_precise(EAN(g, name, i));
+    }
+    printf("\n");
+}
+
+void dump_edge_attribute_string(const char* name, const igraph_t* g) {
+    igraph_int_t i, n = igraph_ecount(g);
+
+    printf("Edge attribute '%s':", name);
+    for (i = 0; i < n; i++) {
+        printf(" '%s'", EAS(g, name, i));
+    }
+    printf("\n");
+}
+
 int main(void) {
     igraph_t g;
     igraph_error_handler_t* oldhandler;
@@ -110,6 +131,9 @@ int main(void) {
     dump_graph("Directed graph:\n", &g);
     dump_vertex_attribute_bool("gender", &g);
     dump_vertex_attribute_string("color", &g);
+    dump_vertex_attribute_string("id", &g);
+    dump_edge_attribute_numeric("weight", &g);
+    dump_edge_attribute_string("id", &g);
     igraph_destroy(&g);
 
     /* The same with undirected graph */
@@ -123,6 +147,9 @@ int main(void) {
     dump_graph("Undirected graph:\n", &g);
     dump_vertex_attribute_bool("gender", &g);
     dump_vertex_attribute_string("color", &g);
+    dump_vertex_attribute_string("id", &g);
+    dump_edge_attribute_numeric("weight", &g);
+    dump_edge_attribute_string("id", &g);
     igraph_destroy(&g);
 
     /* Test a GraphML file with default attributes */
@@ -138,6 +165,8 @@ int main(void) {
     dump_vertex_attribute_string("gender", &g);
     dump_vertex_attribute_numeric("age", &g);
     dump_vertex_attribute_bool("retired", &g);
+    dump_vertex_attribute_string("id", &g);
+    dump_edge_attribute_string("id", &g);
     igraph_destroy(&g);
 
     /* Test a GraphML file with namespaces */
@@ -175,6 +204,8 @@ int main(void) {
     dump_vertex_attribute_bool("type", &g);
     dump_vertex_attribute_string("name", &g);
     dump_vertex_attribute_numeric("weight", &g);
+    dump_vertex_attribute_string("id", &g);
+    dump_edge_attribute_string("id", &g);
     igraph_destroy(&g);
 
     /* Test a GraphML file from yEd -- we should be able to parse the nodes and
