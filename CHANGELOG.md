@@ -6,6 +6,10 @@
 
 - `igraph_hamming()` creates a Hamming graph (experimental function). Thanks to @zxawry for contributing this functionality in #2890!
 
+### Fixed
+
+- `igraph_read_graph_graphml()` imported the edge IDs incorrectly from GraphML files. This bug was introduced in 1.0.0. Thanks to @zxawry for the fix (PR #2894)!
+
 ## [1.0.1]
 
 ### Fixed
