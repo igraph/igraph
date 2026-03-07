@@ -1,0 +1,18 @@
+Null graph: yes
+Singleton with loop: yes
+C_3:  no
+C_4: yes
+K4:  no
+K4:  no
+Directed K4:  no
+Directed K4:  no
+Tree: yes
+Tree: yes
+Extremal + 1 on 4 vertices:  no
+Extremal + 1 on 4 vertices:  no
+Directed with mutual, no triangles, high edge count: yes
+Directed with mutual, no triangles, high edge count: yes
+Directed without mutual, triangles, high edge count:  no
+Directed without mutual, triangles, high edge count:  no
+Non-simple, no triangle, high edge count: yes
+Non-simple, no triangle, high edge count: yes

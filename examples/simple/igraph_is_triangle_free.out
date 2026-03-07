@@ -1,0 +1,10 @@
+Is the null graph triangle-free? Yes.
+Is C_4 triangle-free? Yes.
+Is K_4 triangle-free? No.
+Is K_{3,5} triangle-free? Yes.
+Is a tree triangle-free? Yes.
+Is the M_4 Mycielski graph triangle-free? Yes.
+Is Frucht graph triangle-free? No.
+Is Coxeter graph triangle-free? Yes.
+Is the (2,3) Kautz graph triangle-free when ignoring edge directions? No.
+Is the Q_4 hypercube triangle-free? Yes.
