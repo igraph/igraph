@@ -2045,6 +2045,9 @@ igraph_count_adjacent_triangles:
 igraph_count_triangles:
     PARAMS: GRAPH graph, OUT REAL res
 
+igraph_is_triangle_free:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
+
 igraph_local_scan_0:
     PARAMS: |-
         GRAPH graph, OUT VECTOR res, OPTIONAL EDGE_WEIGHTS weights,

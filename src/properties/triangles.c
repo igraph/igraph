@@ -1,7 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2005-2026  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_transitivity.h"
@@ -495,7 +491,8 @@ static igraph_error_t count_triangles_and_triples(
  *         temporary data.
  *
  * \sa \ref igraph_list_triangles(), \ref igraph_count_adjacent_triangles(),
- * \ref igraph_transitivity_undirected().
+ * \ref igraph_transitivity_undirected(); Use \ref igraph_is_triangle_free()
+ * to efficiently check for the presence of triangles.
  *
  * Time complexity: O(|V|*d^2), |V| is the number of vertices in
  * the graph, d is the average node degree.
@@ -920,4 +917,177 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     } else {
         return transitivity_barrat1(graph, res, vids, weights, mode);
     }
+}
+
+
+/**
+ * \function igraph_is_triangle_free
+ * \brief Is the graph triangle-free?
+ *
+ * \experimental
+ *
+ * Checks if the graph lacks any triangles, i.e. 3-cycles. Triangle-free graphs
+ * are relevant in multiple areas of graph theory.
+ *
+ * \param graph The graph to check. Edge directions, multi-edges and self-loops
+ *    are ignored.
+ * \param res Pointer to a Boolean that will be set to \c true if the graph has
+ *    no triangles and \c false otherwise.
+ * \return Error code.
+ *
+ * Time complexity: O(sum_i d_i^2) where d_i are the vertex degrees.
+ *
+ * \sa \ref igraph_count_triangles() to count triangles;
+ * \ref igraph_count_adjacent_triangles() to count triangles per vertex;
+ * \ref igraph_girth() to find the length of the smallest cycle.
+ */
+igraph_error_t igraph_is_triangle_free(const igraph_t *graph, igraph_bool_t *res) {
+    const igraph_int_t vcount = igraph_vcount(graph);
+    const igraph_int_t ecount = igraph_ecount(graph);
+
+    /* Can't have triangles without at least 3 vertices and at least 3 edges. */
+    if (vcount < 3 || ecount < 3) {
+        *res = true;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Attempt using Mantel's theorem:
+     *
+     * If ecount > vcount^2 / 4, the graph has a triangle.
+     *
+     * This calculation needs to be made with care to avoid integer overflow
+     * or false positives due to rounding errors. Note that in igraph, 2*ecount
+     * never overflows.
+     *
+     * However, Mantel's condition is valid only for simple graphs. If it holds,
+     * we will check if the graph is already known to be simple from the property
+     * cache.
+     *
+     * If the graph is not known to be simple from the cache, it is not worth
+     * calling igraph_is_simple(). When Mantel's condition holds, the graph is
+     * so dense that starting to look for triangles directly is likely to
+     * short-circuit quickly.
+     */
+    if (IGRAPH_INTEGER_MAX / vcount >= vcount/2 && /* avoid overflow */
+        2*ecount > (vcount / 2) * vcount /* Mantel */) {
+        igraph_bool_t known_simple = true;
+
+        if (! igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {
+            known_simple = false;
+        }
+
+        if (known_simple && igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+            known_simple = false;
+        }
+
+        if (known_simple && ! igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI)) {
+            known_simple = false;
+        }
+
+        if (known_simple && igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+            known_simple = false;
+        }
+
+        /* Edge directions are ignored, thus for directed graphs we must also check that
+         * there are no mutual edges. */
+        if (igraph_is_directed(graph)) {
+            if (known_simple && ! igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+                known_simple = false;
+            }
+
+            if (known_simple && igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+                known_simple = false;
+            }
+        }
+
+        if (known_simple) {
+            *res = false;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    /* Acyclic graphs are triangle-free. Check if the graph is known to be acyclic. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST))
+    {
+        *res = true;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* Look for triangles directly, working with the adjacency list of the
+     * underlying simple graph. */
+
+    igraph_lazy_adjlist_t al;
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
+
+    for (igraph_int_t u=0; u < vcount; u++) {
+        igraph_vector_int_t *uneis;
+        igraph_int_t du;
+
+        uneis = igraph_lazy_adjlist_get(&al, u);
+        IGRAPH_CHECK_OOM(uneis, "Insufficient memory for checking for triangles.");
+
+        du = igraph_vector_int_size(uneis);
+
+        if (du < 2) continue;
+
+        for (igraph_int_t i = 0; i < du; i++) {
+            igraph_vector_int_t *vneis;
+            igraph_int_t dv;
+            igraph_int_t v = VECTOR(*uneis)[i];
+
+            /* Avoid duplicate checks for the u-v edge. */
+            if (v < u) continue;
+
+            vneis = igraph_lazy_adjlist_get(&al, v);
+            IGRAPH_CHECK_OOM(vneis, "Insufficient memory for checking for triangles.");
+
+            dv = igraph_vector_int_size(vneis);
+
+            if (dv < 2) continue;
+
+            /* In a simple triangle-free graph, the degree sum of an edge's
+             * endpoints is no greater than the vertex count. If it is, their
+             * neighbor sets must intersect. */
+            if (du + dv > vcount) {
+                *res = false;
+                goto cleanup;
+            }
+
+            /* Exploit that the neighbor lists are sorted and check for an
+             * intersection. */
+            {
+                igraph_int_t ju = 0, jv = 0;
+                while (ju < du && jv < dv) {
+                    igraph_int_t wu = VECTOR(*uneis)[ju];
+                    igraph_int_t wv = VECTOR(*vneis)[jv];
+
+                    if (wu == wv) {
+                        *res = false;
+                        goto cleanup;
+                    } else if (wu < wv) {
+                        ju++;
+                    } else /* wv < wu */ {
+                        jv++;
+                    }
+                }
+            }
+        }
+    }
+
+    *res = true;
+
+cleanup:
+
+    igraph_lazy_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* Opportunity to set cache: If triangles exist, the graph is not acyclic. */
+    if (! *res) {
+        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_IS_FOREST, false);
+    }
+
+    return IGRAPH_SUCCESS;
 }
