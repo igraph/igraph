@@ -43,6 +43,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_int_list_t ivl1;
         igraph_vector_t v1, v2;
         igraph_vector_int_t iv1, iv2;
+        igraph_real_t r1;
+        igraph_bool_t b1;
+        igraph_int_t i1, i2;
         igraph_t g;
 
         igraph_vector_int_list_init(&ivl1, 0);
@@ -52,11 +55,40 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_int_init(&iv2, 0);
 
         igraph_minimum_cycle_basis(&graph, NULL, &ivl1, -1, true, true);
+
+        /* Count triangles in the minimum cycle basis. */
+        i1 = igraph_vector_int_list_size(&ivl1);
+        i2 = 0;
+        for (igraph_int_t i=0; i < i1; i++) {
+            if (igraph_vector_int_size(igraph_vector_int_list_get_ptr(&ivl1, i)) == 3) {
+                i2++;
+            }
+        }
+
         igraph_fundamental_cycles(&graph, NULL, &ivl1, -1, -1);
 
         igraph_motifs_randesu(&graph, &v1, 3, NULL);
 
         igraph_list_triangles(&graph, &iv1);
+
+        igraph_count_triangles(&graph, &r1);
+
+        /* Cross-check direct triangle count to list of triangles. */
+        IGRAPH_ASSERT(igraph_vector_int_size(&iv1) == 3*r1);
+
+        /* Cross-check direct triangle count with 3-motifs that include a triangle. */
+        IGRAPH_ASSERT(
+            VECTOR(v1)[7] + VECTOR(v1)[8] +
+            VECTOR(v1)[11] + VECTOR(v1)[12] +
+            VECTOR(v1)[13] + VECTOR(v1)[14] + VECTOR(v1)[15] == r1);
+
+        /* The number of triangles in the minimum cycle basis is no greater than the total.
+         * Example when not all triangles are part of the basis: K_4 graph.
+         */
+        IGRAPH_ASSERT(i2 <= r1);
+
+        igraph_is_triangle_free(&graph, &b1);
+        IGRAPH_ASSERT((!b1) == (!!r1));
 
         igraph_ecc(&graph, &v1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
 

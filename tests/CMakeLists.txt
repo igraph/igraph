@@ -267,6 +267,7 @@ add_examples(
   igraph_has_multiple
   igraph_is_loop
   igraph_is_multiple
+  igraph_is_triangle_free
   igraph_list_triangles
   igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
@@ -338,6 +339,7 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_is_triangle_free
   igraph_joint_degree_distribution
   igraph_joint_type_distribution
   igraph_is_acyclic
