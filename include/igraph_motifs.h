@@ -93,6 +93,8 @@ IGRAPH_EXPORT igraph_error_t igraph_list_triangles(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res);
 
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_is_triangle_free(const igraph_t *graph, igraph_bool_t *res);
+
 IGRAPH_END_C_DECLS
 
 #endif
