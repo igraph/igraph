@@ -222,8 +222,12 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
     }
     if (has_multiple) {
-        /* If we have found at least one multiedge above, set the cache to true */
-        igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, true);
+        /* If we have found at least one multiedge above, set the cache to true,
+         * except when treating a directed graph as undirected. In that case, mutual
+         * edges would also look like multi-edges in this check. */
+        if (! igraph_is_directed(graph) || mode != IGRAPH_ALL) {
+            igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, true);
+        }
     } else if (multiple == IGRAPH_NO_MULTIPLE) {
         /* If we explicitly _checked_ for multi-edges (to remove them) and
          * haven't found one, set the cache to false. This is the only case
