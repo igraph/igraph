@@ -19,8 +19,10 @@
 #include "igraph_interface.h"
 
 #include "graph/caching.h"
+#include "internal/hacks.h" /* IGRAPH_STATIC_ASSERT */
 
 #include <assert.h>
+#include <string.h> /* memset */
 
 /****** Strictly internal functions ******/
 

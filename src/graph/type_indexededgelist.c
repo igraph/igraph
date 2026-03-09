@@ -29,6 +29,8 @@
 #include "graph/internal.h"
 #include "math/safe_intop.h"
 
+#include <string.h> /* memset */
+
 /* Internal functions */
 
 static igraph_error_t igraph_i_create_start_vectors(

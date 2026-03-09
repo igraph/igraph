@@ -24,10 +24,6 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
-#include "internal/hacks.h"
-
-#include <string.h> /* memset */
-
 IGRAPH_BEGIN_C_DECLS
 
 struct igraph_i_property_cache_t {
