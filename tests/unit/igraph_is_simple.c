@@ -53,7 +53,7 @@ void check_simple(const igraph_t *graph,
     IGRAPH_ASSERT( (!simple) == (!expected_undirected) );
 
     /* Reset the cache, run adjlist constructor (which does set the cache)
-     * and try again. This is meant to verify that adjlist construcors,
+     * and try again. This is meant to verify that adjlist constructors,
      * which are used particularly frequently, do not corrupt the cache. */
 
     /* Undirected adjlist for directed graph. */
