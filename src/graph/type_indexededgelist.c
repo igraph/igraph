@@ -892,6 +892,7 @@ igraph_error_t igraph_neighbors(
     const igraph_t *graph, igraph_vector_int_t *neis, igraph_int_t pnode,
     igraph_neimode_t mode, igraph_loops_t loops, igraph_bool_t multiple
 ) {
+
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                          \
     if (should_filter_duplicates) {                                               \
         if (vertex == pnode) {                                                    \
@@ -926,7 +927,6 @@ igraph_error_t igraph_neighbors(
         }                                                                         \
     }
 
-
     igraph_int_t length = 0, idx = 0;
     igraph_int_t i, j;
 
@@ -940,6 +940,9 @@ igraph_error_t igraph_neighbors(
      * twice, this flag should become true only if we processed both endpoints
      * for a loop edge */
     igraph_bool_t seen_loop = false;
+
+    /* normalize Boolean value to enable == comparisons below and in DEDUPLICATE_IF_NEEDED */
+    multiple = !!multiple;
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
         IGRAPH_ERRORF("Vertex %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVVID, node);

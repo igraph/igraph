@@ -153,9 +153,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
 igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode, igraph_loops_t loops,
                         igraph_bool_t multiple) {
+
     igraph_int_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
     int iter = 0;
+
+    multiple = !!multiple; /* normalize Boolean value to enable == comparisons below */
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
@@ -863,8 +866,11 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     if (has_multiple == NULL) {
         has_multiple = &dummy2;
     }
+
     igraph_int_t i, p = 0;
     igraph_int_t n = igraph_vector_int_size(v);
+
+    multiple = !!multiple; /* normalize Boolean value to enable == comparisons below */
 
     if (
         multiple == IGRAPH_MULTIPLE &&
