@@ -328,6 +328,7 @@ add_legacy_tests(
   igraph_get_shortest_paths_dijkstra
   igraph_graph_center
   igraph_has_mutual
+  igraph_is_acyclic
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
@@ -338,9 +339,9 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_is_simple
   igraph_joint_degree_distribution
   igraph_joint_type_distribution
-  igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
