@@ -60,7 +60,7 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res, igrap
     igraph_bool_t has_loop, has_multi;
 
     /* Will we need to check mutual edges explicitly? */
-    igraph_bool_t need_to_check_mutual = directed == IGRAPH_UNDIRECTED && igraph_is_directed(graph);
+    igraph_bool_t need_to_check_mutual = (! directed) && igraph_is_directed(graph);
 
     known_loop  = igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP);
     if (known_loop) {
