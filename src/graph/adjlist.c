@@ -209,19 +209,19 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
 
         /* Attention: This function will only set values for has_loops and has_multiple
-         * if it finds loops/multi-edges. Otherwise they are left at their original value. */
+         * if it finds loops/multi-edges. Otherwise, they are left at their original value. */
         IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
             &al->adjs[i], i, mode, loops, multiple, &has_loops, &has_multiple
         ));
     }
     if (has_loops) {
-        /* If we have found at least one loop above, set the cache to true */
+        /* If we have found at least one loop above, set the cache to true. */
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, true);
     } else if (loops == IGRAPH_NO_LOOPS) {
         /* If we explicitly _checked_ for loops (to remove them) and haven't
          * found one, set the cache to false. This is the only case when a
          * definite "no" from has_loops really means that there are no loops at
-         * all */
+         * all. */
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_LOOP, false);
     }
     if (has_multiple) {
@@ -235,7 +235,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         /* If we explicitly _checked_ for multi-edges (to remove them) and
          * haven't found one, set the cache to false. This is the only case
          * when a definite "no" from has_multiple really means that there are
-         * no multi-edges at all all */
+         * no multi-edges at all. */
         igraph_i_property_cache_set_bool_checked(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
