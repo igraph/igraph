@@ -510,6 +510,35 @@ In- and out-edges, loops listed twice: {
 
 ============================================================
 
+Regression test for eliminating mutual edges from directed graphs with mode=IGRAPH_ALL and multiple=IGRAPH_NO_MULTIPLE
+
+: {
+  0: ( 1 )
+  1: ( 0 2 )
+  2: ( 1 )
+}
+
+: {
+  0: ( 1 )
+  1: ( 0 2 )
+  2: ( 1 )
+}
+
+Populating cache ...
+: {
+  0: ( 1 )
+  1: ( 0 2 )
+  2: ( 1 )
+}
+
+: {
+  0: ( 1 )
+  1: ( 0 2 )
+  2: ( 1 )
+}
+
+============================================================
+
 graph: simple, loop: 0 multi: 0, mode: 0
 loop cached: 0
 multi cached: 0

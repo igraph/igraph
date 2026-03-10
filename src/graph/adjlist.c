@@ -180,7 +180,17 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
     /* if we already know there are no multi-edges, they don't need to be removed */
     if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
         !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
-        multiple = IGRAPH_MULTIPLE;
+
+        /* special case: if the graph is directed, but we are ignoring edge directions,
+         * mutual edges also act as multi-edges */
+        if (igraph_is_directed(graph) && mode == IGRAPH_ALL) {
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL) &&
+                !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+                multiple = IGRAPH_MULTIPLE;
+            }
+        } else {
+            multiple = IGRAPH_MULTIPLE;
+        }
     }
 
     /* if we already know there are no loops, they don't need to be removed */
@@ -1069,7 +1079,17 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
     /* if we already know there are no multi-edges, they don't need to be removed */
     if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
         !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
-        multiple = IGRAPH_MULTIPLE;
+
+        /* special case: if the graph is directed, but we are ignoring edge directions,
+         * mutual edges also act as multi-edges */
+        if (igraph_is_directed(graph) && mode == IGRAPH_ALL) {
+            if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL) &&
+                !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+                multiple = IGRAPH_MULTIPLE;
+            }
+        } else {
+            multiple = IGRAPH_MULTIPLE;
+        }
     }
 
     /* if we already know there are no loops, they don't need to be removed */
@@ -1096,7 +1116,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjlist_destroy
- * \brief Deallocate a lazt adjacency list.
+ * \brief Deallocate a lazy adjacency list.
  *
  * Free all allocated memory for a lazy adjacency list.
  * \param al The adjacency list to deallocate.

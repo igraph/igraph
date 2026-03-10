@@ -106,7 +106,6 @@ edges: {
 0 1
 0 2
 1 2
-1 2
 }
 
 Directed graph with loops and multiple edges, order 0:
