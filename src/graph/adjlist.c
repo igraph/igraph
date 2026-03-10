@@ -1096,7 +1096,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjlist_destroy
- * \brief Deallocate a lazt adjacency list.
+ * \brief Deallocate a lazy adjacency list.
  *
  * Free all allocated memory for a lazy adjacency list.
  * \param al The adjacency list to deallocate.
