@@ -272,6 +272,37 @@ int test_multiedge_elimination_for_directed_graph(void) {
     return 0;
 }
 
+/* regression test for the issue fixed by PR #2899; see changelog */
+int regression_2899(void) {
+    igraph_t g;
+    igraph_adjlist_t adjlist;
+    igraph_lazy_adjlist_t lazy_adjlist;
+    igraph_bool_t is_simple;
+
+    printf("Regression test for eliminating mutual edges from directed graphs"
+           " with mode=IGRAPH_ALL and multiple=IGRAPH_NO_MULTIPLE\n\n");
+
+    igraph_small(&g, 3, IGRAPH_DIRECTED,
+        0,1, 1,0,
+            1,2,
+            -1);
+
+    TEST_ADJLIST("", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+
+    printf("Populating cache ...\n");
+    igraph_is_simple(&g, &is_simple, IGRAPH_UNDIRECTED);
+
+    TEST_ADJLIST("", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    TEST_LAZY_ADJLIST("", IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+
+    printf("============================================================\n\n");
+
+    igraph_destroy(&g);
+
+    return 0;
+}
+
 int test_caching(void) {
     igraph_t g_simple, g_loop, g_multiloop, g_multi, g_multi_and_loop;
     char *g_desc[] = {"simple", "loop", "multiloop", "multi", "multi and loop"};
@@ -339,6 +370,8 @@ int main(void) {
     RUN_TEST(test_loop_elimination_for_directed_graph);
     RUN_TEST(test_multiedge_elimination_for_undirected_graph);
     RUN_TEST(test_multiedge_elimination_for_directed_graph);
+
+    RUN_TEST(regression_2899);
 
     RUN_TEST(test_caching);
 
