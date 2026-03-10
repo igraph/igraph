@@ -1,6 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021-2026  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ int test_simple_trees(void) {
     /* Directed, out */
     igraph_kary_tree(&g, 42, 3, IGRAPH_TREE_OUT);
     igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
-    igraph_adjlist(&g2, &adjlist, IGRAPH_OUT, /*duplicate=*/ 0);
+    igraph_adjlist(&g2, &adjlist, IGRAPH_OUT, /*duplicate=*/ false);
     igraph_isomorphic(&g, &g2, &iso);
     IGRAPH_ASSERT(iso);
     igraph_adjlist_destroy(&adjlist);
@@ -38,7 +38,7 @@ int test_simple_trees(void) {
     /* Directed, in */
     igraph_kary_tree(&g, 42, 3, IGRAPH_TREE_OUT);
     igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
-    igraph_adjlist(&g2, &adjlist, IGRAPH_IN, /*duplicate=*/ 0);
+    igraph_adjlist(&g2, &adjlist, IGRAPH_IN, /*duplicate=*/ false);
     igraph_isomorphic(&g, &g2, &iso);
     IGRAPH_ASSERT(iso);
     igraph_adjlist_destroy(&adjlist);
@@ -48,7 +48,7 @@ int test_simple_trees(void) {
     /* Undirected */
     igraph_kary_tree(&g, 42, 3, IGRAPH_TREE_UNDIRECTED);
     igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
-    igraph_adjlist(&g2, &adjlist, IGRAPH_ALL, /*duplicate=*/ 1);
+    igraph_adjlist(&g2, &adjlist, IGRAPH_ALL, /*duplicate=*/ true);
     igraph_isomorphic(&g, &g2, &iso);
     IGRAPH_ASSERT(iso);
     igraph_adjlist_destroy(&adjlist);
@@ -80,7 +80,7 @@ int test_loop_elimination_for_undirected_graph(void) {
     igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
-        &g, 5, /* directed = */ 0,
+        &g, 5, IGRAPH_UNDIRECTED,
         0, 1, 0, 3,
         1, 2,
         2, 2, 2, 3,
@@ -120,7 +120,7 @@ int test_loop_elimination_for_directed_graph(void) {
     igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
-        &g, 5, /* directed = */ 1,
+        &g, 5, IGRAPH_DIRECTED,
         0, 1, 0, 3,
         1, 2,
         2, 2, 2, 3,
@@ -176,7 +176,7 @@ int test_multiedge_elimination_for_undirected_graph(void) {
     igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
-        &g, 5, /* directed = */ 0,
+        &g, 5, IGRAPH_UNDIRECTED,
         0, 1, 0, 3, 0, 8,
         1, 2,
         2, 2, 2, 3,
@@ -219,7 +219,7 @@ int test_multiedge_elimination_for_directed_graph(void) {
     igraph_lazy_adjlist_t lazy_adjlist;
 
     igraph_small(
-        &g, 5, /* directed = */ 1,
+        &g, 5, IGRAPH_DIRECTED,
         0, 1, 0, 3, 0, 8,
         1, 2,
         2, 2, 2, 3,
@@ -284,11 +284,11 @@ int test_caching(void) {
     igraph_int_t vloop[] = {0,0};
     igraph_int_t vmult[] = {0,1};
 
-    igraph_full(&g_simple, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
-    igraph_full(&g_loop, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
-    igraph_full(&g_multiloop, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
-    igraph_full(&g_multi, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
-    igraph_full(&g_multi_and_loop, 5, IGRAPH_UNDIRECTED, /*loops*/ 0);
+    igraph_full(&g_simple, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_full(&g_loop, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_full(&g_multiloop, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_full(&g_multi, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_full(&g_multi_and_loop, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     edge = igraph_vector_int_view(vloop, 2);
     igraph_add_edges(&g_loop, &edge, NULL);
