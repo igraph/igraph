@@ -38,36 +38,61 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     /* Directed */
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
-        igraph_bool_t bres, bres2, bres3;
+        igraph_bool_t has_loop, has_multi, has_mutual, is_simple, is_complete;
+        igraph_bool_t is_connected, is_dag, is_forest, is_tree, has_eulerian_path, has_eulerian_cycles;
+        igraph_int_t ecount, vcount;
         igraph_real_t r;
 
-        igraph_has_multiple(&graph, &bres);
-        igraph_has_loop(&graph, &bres2);
-        igraph_has_mutual(&graph, &bres3, false);
+        vcount = igraph_vcount(&graph);
+        ecount = igraph_ecount(&graph);
+
+        igraph_has_multiple(&graph, &has_multi);
+        igraph_has_loop(&graph, &has_loop);
+        igraph_has_mutual(&graph, &has_mutual, false);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_simple(&graph, &bres3, IGRAPH_DIRECTED);
+        igraph_is_simple(&graph, &is_simple, IGRAPH_DIRECTED);
         igraph_invalidate_cache(&graph);
 
-        IGRAPH_ASSERT((bres || bres2) == !bres3);
+        IGRAPH_ASSERT((has_multi || has_loop) == !is_simple);
 
-        igraph_is_complete(&graph, &bres);
+        igraph_is_complete(&graph, &is_complete);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_connected(&graph, &bres, IGRAPH_STRONG);
+        IGRAPH_ASSERT(!is_complete || ecount >= vcount*(vcount-1));
+
+        igraph_is_connected(&graph, &is_connected, IGRAPH_STRONG);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_dag(&graph, &bres);
+        IGRAPH_ASSERT(!is_connected || ecount >= vcount || vcount <= 1);
+        IGRAPH_ASSERT(!is_complete || is_connected || vcount == 0);
+
+        igraph_is_dag(&graph, &is_dag);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_forest(&graph, &bres, NULL, IGRAPH_OUT);
+        IGRAPH_ASSERT(!is_complete || !is_dag || vcount <= 1);
+        IGRAPH_ASSERT(!is_connected || !is_dag || vcount == 1);
+
+        igraph_is_forest(&graph, &is_forest, NULL, IGRAPH_OUT);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_tree(&graph, &bres, NULL, IGRAPH_OUT);
+        IGRAPH_ASSERT(!is_forest || is_dag);
+        IGRAPH_ASSERT(!is_forest || !is_connected || vcount == 1);
+
+        igraph_is_tree(&graph, &is_tree, NULL, IGRAPH_OUT);
         igraph_invalidate_cache(&graph);
 
-        igraph_is_eulerian(&graph, &bres, &bres2);
+        IGRAPH_ASSERT(!is_tree || is_forest);
+        IGRAPH_ASSERT(!is_tree || ecount >= vcount-1);
+
+        igraph_is_eulerian(&graph, &has_eulerian_path, &has_eulerian_cycles);
         igraph_invalidate_cache(&graph);
+
+        IGRAPH_ASSERT(!has_eulerian_cycles || has_eulerian_path);
+
+        igraph_density(&graph, NULL, &r, false);
+
+        IGRAPH_ASSERT(!is_complete || r >= 1 || vcount <= 1);
 
         igraph_density(&graph, NULL, &r, true);
 

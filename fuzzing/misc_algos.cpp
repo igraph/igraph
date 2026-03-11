@@ -114,7 +114,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_reverse_edges(&graph, igraph_ess_vector(&iv2));
         }
 
+        i1 = igraph_vcount(&graph);
+        i2 = igraph_ecount(&graph);
         igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL);
+        IGRAPH_ASSERT(igraph_vcount(&graph) == i1);
+        IGRAPH_ASSERT(igraph_ecount(&graph) <= i2);
+        IGRAPH_ASSERT(! igraph_is_directed(&graph));
 
         igraph_vector_resize(&v2, 4);
         igraph_vector_null(&v2);
