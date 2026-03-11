@@ -568,6 +568,7 @@ add_legacy_tests(
   igraph_power_law_fit
   overflow
   prop_caching
+  prop_caching_adjlist
   zapsmall
 )
 # igraph_power_law_fit() output is only deterministic when running with 1 thread
