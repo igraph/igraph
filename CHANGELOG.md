@@ -5,6 +5,7 @@
 ### Added
 
 - `igraph_hamming()` creates a Hamming graph (experimental function). Thanks to @zxawry for contributing this functionality in #2890!
+- `igraph_is_triangle_free()` determines whether a graph contains no triangles (experimental function).
 
 ### Fixed
 
