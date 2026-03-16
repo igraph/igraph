@@ -340,8 +340,9 @@ static void calculate_force_node_to_tree(
     igraph_real_t dx = point->coord[0] - node->center[0];
     igraph_real_t dy = point->coord[1] - node->center[1];
     igraph_real_t dz = (tree->dim == 3) ? (point->coord[2] - node->center[2]) : 0.0;
+
+    /* Calculate purely the squared distance. No sqrt() needed here! */
     igraph_real_t dist_sq = dx*dx + dy*dy + dz*dz;
-    igraph_real_t dist = sqrt(dist_sq);
 
     if (node->is_leaf) {
         for (igraph_integer_t i = 0; i < node->point_count; i++) {
@@ -358,8 +359,15 @@ static void calculate_force_node_to_tree(
             }
         }
     } else {
-        /* Multipole Acceptance Criterion (MAC) */
-        if (dist > 0 && node->size < tree->bh_theta * dist) {
+        /* Corrected Multipole Acceptance Criterion (MAC)
+         * Formula: (size / dist) < theta => size < theta * dist
+         * Optimized for squared space: size^2 < theta^2 * dist^2
+         */
+        igraph_real_t size_sq = node->size * node->size;
+        igraph_real_t theta_sq = tree->bh_theta * tree->bh_theta;
+
+        if (dist_sq > 0 && size_sq < (theta_sq * dist_sq)) {
+            /* Treat this macroscopic node as a single pseudo-point */
             igraph_bh_point_t pseudo_point;
             pseudo_point.id = -1;
             pseudo_point.mass = node->mass;
@@ -376,6 +384,7 @@ static void calculate_force_node_to_tree(
                 force[2] += f[2];
             }
         } else {
+            /* Node is too close or too large; recurse into children */
             int n_children = IGRAPH_BH_CHILDREN_COUNT(tree->dim);
             for (int i = 0; i < n_children; i++) {
                 calculate_force_node_to_tree(
