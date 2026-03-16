@@ -359,7 +359,7 @@ static void calculate_force_node_to_tree(
         }
     } else {
         /* Multipole Acceptance Criterion (MAC) */
-        if (dist > 0 && tree->bh_theta * node->size < dist) {
+        if (dist > 0 && node->size < tree->bh_theta * dist) {
             igraph_bh_point_t pseudo_point;
             pseudo_point.id = -1;
             pseudo_point.mass = node->mass;
