@@ -23,48 +23,58 @@
 #include "test_utilities.h"
 #include "core/barnes_hut.h"
 
-/* --- Force Callbacks for Testing --- */
+/* --- Physics Plugins (Kernels) for Testing --- */
 
-/* Simple repulsive force: Inverse square law F = m1*m2 / d^2 */
-static void test_repulsive_force(
+/* Simple repulsive force: Inverse square law F = (m1*m2) / d^2 */
+static void test_repulsion_kernel(
     const igraph_bh_point_t *p1,
     const igraph_bh_point_t *p2,
-    igraph_real_t *force,
+    igraph_real_t dx,
+    igraph_real_t dy,
+    igraph_real_t dz,
+    igraph_real_t dist_sq,
+    igraph_real_t force[3],
     void *user_data
 ) {
     IGRAPH_UNUSED(user_data);
-    igraph_real_t dx = p1->coord[0] - p2->coord[0];
-    igraph_real_t dy = p1->coord[1] - p2->coord[1];
-    igraph_real_t dz = p1->coord[2] - p2->coord[2]; // Will be 0.0 in 2D
 
-    igraph_real_t dist_sq = dx*dx + dy*dy + dz*dz;
-    if (dist_sq < 1e-6) return; // Avoid division by zero
+    /* Layout-specific jitter / collision safety */
+    if (dist_sq < 1e-6) return;
 
     igraph_real_t dist = sqrt(dist_sq);
     igraph_real_t f = (p1->mass * p2->mass) / dist_sq;
 
-    force[0] += f * (dx / dist);
-    force[1] += f * (dy / dist);
-    force[2] += f * (dz / dist);
+    /* Apply the scalar to the directional vector */
+    force[0] = f * (dx / dist);
+    force[1] = f * (dy / dist);
+    force[2] = f * (dz / dist);
 }
 
-/* Simple attractive force: Hooke's Law (springs) F = k * d */
-static void test_attractive_force(
+/* Simple attractive force: Hooke's Law (springs) F = weight * d */
+static void test_attraction_kernel(
     const igraph_bh_point_t *p1,
     const igraph_bh_point_t *p2,
-    igraph_real_t *force,
+    igraph_real_t dx,
+    igraph_real_t dy,
+    igraph_real_t dz,
+    igraph_real_t dist_sq,
+    igraph_real_t weight,
+    igraph_real_t force_p1[3],
+    igraph_real_t force_p2[3],
     void *user_data
 ) {
     IGRAPH_UNUSED(user_data);
-    // Vector pointing from p1 to p2
-    igraph_real_t dx = p2->coord[0] - p1->coord[0];
-    igraph_real_t dy = p2->coord[1] - p1->coord[1];
-    igraph_real_t dz = p2->coord[2] - p1->coord[2];
+    IGRAPH_UNUSED(dist_sq); /* F = k * d can be optimized to just use the raw directional vector directly */
 
-    // F = 1.0 * distance vector
-    force[0] += dx;
-    force[1] += dy;
-    force[2] += dz;
+    /* Spring pulls p1 toward p2, so the direction is -dx, -dy, -dz */
+    force_p1[0] = -dx * weight;
+    force_p1[1] = -dy * weight;
+    force_p1[2] = -dz * weight;
+
+    /* Newton's Third Law (Symmetric application) */
+    force_p2[0] = dx * weight;
+    force_p2[1] = dy * weight;
+    force_p2[2] = dz * weight;
 }
 
 
@@ -111,9 +121,9 @@ int test_2d_tree_build(void) {
 
     /* Place 4 points nicely in 4 separate quadrants to force a clean split */
     igraph_matrix_init(&coords, 4, 2);
-    MATRIX(coords, 0, 0) = 0.0; MATRIX(coords, 0, 1) = 0.0;
+    MATRIX(coords, 0, 0) = 0.0;  MATRIX(coords, 0, 1) = 0.0;
     MATRIX(coords, 1, 0) = 10.0; MATRIX(coords, 1, 1) = 0.0;
-    MATRIX(coords, 2, 0) = 0.0; MATRIX(coords, 2, 1) = 10.0;
+    MATRIX(coords, 2, 0) = 0.0;  MATRIX(coords, 2, 1) = 10.0;
     MATRIX(coords, 3, 0) = 10.0; MATRIX(coords, 3, 1) = 10.0;
 
     IGRAPH_ASSERT(igraph_bh_tree_init(&tree, 2, 0.5, 10, 1) == IGRAPH_SUCCESS);
@@ -175,7 +185,7 @@ int test_repulsive_force_calculation(void) {
     IGRAPH_ASSERT(igraph_bh_tree_init(&tree, 2, 0.6, 10, 1) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_bh_tree_build(&tree, &coords, NULL) == IGRAPH_SUCCESS);
 
-    IGRAPH_ASSERT(igraph_bh_calculate_repulsive_forces(&tree, &forces, test_repulsive_force, NULL) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_bh_apply_repulsion_from_tree(&tree, &forces, test_repulsion_kernel, NULL) == IGRAPH_SUCCESS);
 
     /* * Distance is 2.0. Inverse square law gives f = 1 / (2^2) = 0.25
      * Point 0 is at -1.0, so it gets pushed away in the negative X direction.
@@ -220,8 +230,8 @@ int test_attractive_force_calculation(void) {
     IGRAPH_ASSERT(igraph_bh_tree_init(&tree, 2, 0.6, 10, 1) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_bh_tree_build(&tree, &coords, NULL) == IGRAPH_SUCCESS);
 
-    IGRAPH_ASSERT(igraph_bh_calculate_attractive_forces(
-        &tree, &from, &to, &weights, &forces, test_attractive_force, NULL
+    IGRAPH_ASSERT(igraph_bh_apply_attraction_from_edges(
+        &tree, &from, &to, &weights, &forces, test_attraction_kernel, NULL
     ) == IGRAPH_SUCCESS);
 
     /*

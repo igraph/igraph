@@ -1,6 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2013-2024  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2013-2026  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,29 +21,31 @@
 #include "core/barnes_hut.h"
 
 
-
 /* * Dummy force calculation for benchmarking.
- * We use a simple inverse distance approximation to simulate math overhead
- * without triggering NaNs on identically placed floating point numbers.
+ * We use a simple inverse distance approximation to simulate math overhead.
+ * The geometry (dx, dy, dz, dist_sq) is now pre-calculated by the BH Engine.
  */
-static void bench_repulsive_force(
+static void bench_repulsion_kernel(
     const igraph_bh_point_t *p1,
     const igraph_bh_point_t *p2,
-    igraph_real_t *force,
+    igraph_real_t dx,
+    igraph_real_t dy,
+    igraph_real_t dz,
+    igraph_real_t dist_sq,
+    igraph_real_t force[3],
     void *user_data
 ) {
+    IGRAPH_UNUSED(p1);
+    IGRAPH_UNUSED(p2);
     IGRAPH_UNUSED(user_data);
-    igraph_real_t dx = p1->coord[0] - p2->coord[0];
-    igraph_real_t dy = p1->coord[1] - p2->coord[1];
-    igraph_real_t dz = p1->coord[2] - p2->coord[2];
 
-    /* Add a tiny epsilon to prevent division by zero */
-    igraph_real_t dist_sq = dx*dx + dy*dy + dz*dz + 1e-6;
+    /* Add a tiny epsilon to simulate the old benchmark math overhead */
+    dist_sq += 1e-6;
     igraph_real_t f = 1.0 / dist_sq;
 
-    force[0] += f * dx;
-    force[1] += f * dy;
-    force[2] += f * dz;
+    force[0] = f * dx;
+    force[1] = f * dy;
+    force[2] = f * dz;
 }
 
 /* * Used to prevent aggressive compiler optimizations from removing
@@ -111,7 +113,7 @@ void do_benchmarks(const char *name, igraph_integer_t n_points, igraph_integer_t
     BENCH("4 repulsive forces (theta = 0.6, cap = 1)",
           REPEAT(
               do {
-                  igraph_bh_calculate_repulsive_forces(&tree, &forces, bench_repulsive_force, NULL);
+                  igraph_bh_apply_repulsion_from_tree(&tree, &forces, bench_repulsion_kernel, NULL);
                   dummy_sum += MATRIX(forces, 0, 0); /* Force evaluation */
               } while (0),
           repeat);
@@ -128,7 +130,7 @@ void do_benchmarks(const char *name, igraph_integer_t n_points, igraph_integer_t
     BENCH("5 repulsive forces (theta = 0.8, cap = 1)",
           REPEAT(
               do {
-                  igraph_bh_calculate_repulsive_forces(&tree, &forces, bench_repulsive_force, NULL);
+                  igraph_bh_apply_repulsion_from_tree(&tree, &forces, bench_repulsion_kernel, NULL);
                   dummy_sum += MATRIX(forces, 0, 0);
               } while (0),
           repeat);
@@ -142,7 +144,7 @@ void do_benchmarks(const char *name, igraph_integer_t n_points, igraph_integer_t
     BENCH("6 repulsive forces (theta = 0.6, cap = 8)",
           REPEAT(
               do {
-                  igraph_bh_calculate_repulsive_forces(&tree, &forces, bench_repulsive_force, NULL);
+                  igraph_bh_apply_repulsion_from_tree(&tree, &forces, bench_repulsion_kernel, NULL);
                   dummy_sum += MATRIX(forces, 0, 0);
               } while (0),
           repeat);

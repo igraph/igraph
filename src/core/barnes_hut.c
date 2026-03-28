@@ -110,6 +110,8 @@ static igraph_error_t build_bh_node_recursive(
     tree->nodes[node_idx].is_leaf = 0;
 
     int n_children = IGRAPH_BH_CHILDREN_COUNT(tree->dim);
+
+    /* Partition points physically by geometric quadrants */
     igraph_integer_t *counts = IGRAPH_CALLOC(n_children, igraph_integer_t);
     if (!counts) {
         IGRAPH_ERROR("Memory allocation failed for Barnes-Hut counts.", IGRAPH_ENOMEM);
@@ -324,12 +326,12 @@ igraph_error_t igraph_bh_tree_build(
     return IGRAPH_SUCCESS;
 }
 
-static void calculate_force_node_to_tree(
+static void bh_traverse_tree_for_repulsion(
     const igraph_bh_tree_t *tree,
     igraph_integer_t node_idx,
     const igraph_bh_point_t *point,
     igraph_real_t *force,
-    igraph_bh_force_func_t force_func,
+    igraph_bh_repulsion_kernel_t kernel,
     void *user_data
 ) {
     const igraph_bh_node_t *node = &tree->nodes[node_idx];
@@ -348,57 +350,50 @@ static void calculate_force_node_to_tree(
         for (igraph_integer_t i = 0; i < node->point_count; i++) {
             igraph_integer_t pid = tree->point_indices[node->data.first_point_idx + i];
             const igraph_bh_point_t *other = &tree->points[pid];
+
             if (other->id != point->id) {
+                igraph_real_t l_dx = point->coord[0] - other->coord[0];
+                igraph_real_t l_dy = point->coord[1] - other->coord[1];
+                igraph_real_t l_dz = (tree->dim == 3) ? (point->coord[2] - other->coord[2]) : 0.0;
+                igraph_real_t l_dist_sq = l_dx*l_dx + l_dy*l_dy + l_dz*l_dz;
+
                 igraph_real_t f[3] = {0, 0, 0};
-                force_func(point, other, f, user_data);
-                force[0] += f[0];
-                force[1] += f[1];
-                if (tree->dim == 3) {
-                    force[2] += f[2];
-                }
+                kernel(point, other, l_dx, l_dy, l_dz, l_dist_sq, f, user_data);
+
+                force[0] += f[0]; force[1] += f[1];
+                if (tree->dim == 3) force[2] += f[2];
             }
         }
     } else {
-        /* Corrected Multipole Acceptance Criterion (MAC)
-         * Formula: (size / dist) < theta => size < theta * dist
-         * Optimized for squared space: size^2 < theta^2 * dist^2
-         */
-        igraph_real_t size_sq = node->size * node->size;
-        igraph_real_t theta_sq = tree->bh_theta * tree->bh_theta;
-
-        if (dist_sq > 0 && size_sq < (theta_sq * dist_sq)) {
-            /* Treat this macroscopic node as a single pseudo-point */
-            igraph_bh_point_t pseudo_point;
-            pseudo_point.id = -1;
-            pseudo_point.mass = node->mass;
-            pseudo_point.coord[0] = node->center[0];
-            pseudo_point.coord[1] = node->center[1];
-            pseudo_point.coord[2] = node->center[2];
-            pseudo_point.data = NULL;
+        /* Multipole Acceptance Criterion (MAC) */
+        if (dist_sq > 0 && (node->size * node->size) < (tree->bh_theta * tree->bh_theta * dist_sq)) {
+            igraph_bh_point_t pseudo;
+            pseudo.id = -1;
+            pseudo.mass = node->mass;
+            pseudo.coord[0] = node->center[0];
+            pseudo.coord[1] = node->center[1];
+            pseudo.coord[2] = node->center[2];
+            pseudo.data = NULL;
 
             igraph_real_t f[3] = {0, 0, 0};
-            force_func(point, &pseudo_point, f, user_data);
-            force[0] += f[0];
-            force[1] += f[1];
-            if (tree->dim == 3) {
-                force[2] += f[2];
-            }
+            kernel(point, &pseudo, dx, dy, dz, dist_sq, f, user_data);
+
+            force[0] += f[0]; force[1] += f[1];
+            if (tree->dim == 3) force[2] += f[2];
         } else {
             /* Node is too close or too large; recurse into children */
             int n_children = IGRAPH_BH_CHILDREN_COUNT(tree->dim);
             for (int i = 0; i < n_children; i++) {
-                calculate_force_node_to_tree(
-                    tree, node->data.first_child_idx + i, point, force, force_func, user_data
-                );
+                bh_traverse_tree_for_repulsion(tree, node->data.first_child_idx + i, point, force, kernel, user_data);
             }
         }
     }
 }
 
-igraph_error_t igraph_bh_calculate_repulsive_forces(
+igraph_error_t igraph_bh_apply_repulsion_from_tree(
     const igraph_bh_tree_t *tree,
     igraph_matrix_t *forces,
-    igraph_bh_force_func_t force_func,
+    igraph_bh_repulsion_kernel_t kernel,
     void *user_data
 ) {
     if (!tree || tree->point_count == 0 || tree->node_count == 0) {
@@ -410,26 +405,26 @@ igraph_error_t igraph_bh_calculate_repulsive_forces(
     for (igraph_integer_t i = 0; i < n; i++) {
         igraph_real_t force[3] = {0, 0, 0};
 
-        /* The root is always at index 0 in the flat array */
-        calculate_force_node_to_tree(tree, 0, &tree->points[i], force, force_func, user_data);
+        /* The root is always at index 0 */
+        bh_traverse_tree_for_repulsion(tree, 0, &tree->points[i], force, kernel, user_data);
 
-        MATRIX(*forces, i, 0) = force[0];
-        MATRIX(*forces, i, 1) = force[1];
+        MATRIX(*forces, i, 0) += force[0];
+        MATRIX(*forces, i, 1) += force[1];
         if (tree->dim == 3) {
-            MATRIX(*forces, i, 2) = force[2];
+            MATRIX(*forces, i, 2) += force[2];
         }
     }
 
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_bh_calculate_attractive_forces(
+igraph_error_t igraph_bh_apply_attraction_from_edges(
     const igraph_bh_tree_t *tree,
     const igraph_vector_int_t *from,
     const igraph_vector_int_t *to,
     const igraph_vector_t *weights,
     igraph_matrix_t *forces,
-    igraph_bh_force_func_t force_func,
+    igraph_bh_attraction_kernel_t kernel,
     void *user_data
 ) {
     if (!from || !to || igraph_vector_int_size(from) == 0) {
@@ -439,32 +434,34 @@ igraph_error_t igraph_bh_calculate_attractive_forces(
     igraph_integer_t n_edges = igraph_vector_int_size(from);
 
     for (igraph_integer_t e = 0; e < n_edges; e++) {
-        igraph_integer_t from_idx = VECTOR(*from)[e];
-        igraph_integer_t to_idx = VECTOR(*to)[e];
+        igraph_integer_t u = VECTOR(*from)[e];
+        igraph_integer_t v = VECTOR(*to)[e];
+
+        if (u == v) continue; /* Safely ignore self-loops */
+
         igraph_real_t w = weights ? VECTOR(*weights)[e] : 1.0;
+        const igraph_bh_point_t *p1 = &tree->points[u];
+        const igraph_bh_point_t *p2 = &tree->points[v];
 
-        igraph_bh_point_t *p1 = &tree->points[from_idx];
-        igraph_bh_point_t *p2 = &tree->points[to_idx];
+        igraph_real_t dx = p1->coord[0] - p2->coord[0];
+        igraph_real_t dy = p1->coord[1] - p2->coord[1];
+        igraph_real_t dz = (tree->dim == 3) ? (p1->coord[2] - p2->coord[2]) : 0.0;
+        igraph_real_t dist_sq = dx*dx + dy*dy + dz*dz;
 
-        igraph_real_t f[3] = {0, 0, 0};
-        force_func(p1, p2, f, user_data);
+        igraph_real_t f1[3] = {0, 0, 0};
+        igraph_real_t f2[3] = {0, 0, 0};
 
-        f[0] *= w;
-        f[1] *= w;
+        kernel(p1, p2, dx, dy, dz, dist_sq, w, f1, f2, user_data);
+
+        /* Blindly accumulate the forces directed by the layout plugin */
+        MATRIX(*forces, u, 0) += f1[0];
+        MATRIX(*forces, u, 1) += f1[1];
+        MATRIX(*forces, v, 0) += f2[0];
+        MATRIX(*forces, v, 1) += f2[1];
+
         if (tree->dim == 3) {
-            f[2] *= w;
-        }
-
-        MATRIX(*forces, from_idx, 0) += f[0];
-        MATRIX(*forces, from_idx, 1) += f[1];
-        if (tree->dim == 3) {
-            MATRIX(*forces, from_idx, 2) += f[2];
-        }
-
-        MATRIX(*forces, to_idx, 0) -= f[0];
-        MATRIX(*forces, to_idx, 1) -= f[1];
-        if (tree->dim == 3) {
-            MATRIX(*forces, to_idx, 2) -= f[2];
+            MATRIX(*forces, u, 2) += f1[2];
+            MATRIX(*forces, v, 2) += f2[2];
         }
     }
 

@@ -61,17 +61,46 @@ typedef struct {
     igraph_real_t bh_theta;              /* Barnes-Hut MAC threshold */
 } igraph_bh_tree_t;
 
-/* Callback for calculating pairwise forces */
-typedef void (*igraph_bh_force_func_t)(
+/* =========================================================================
+ * PHYSICS PLUGINS (CALLBACK KERNELS)
+ * ========================================================================= */
+
+/**
+ * @brief Repulsion Kernel (O(N log N) Spatial Domain)
+ * Computes the force exerted ON p1 BY p2 (which may be a macroscopic pseudo-node).
+ */
+typedef void (*igraph_bh_repulsion_kernel_t)(
     const igraph_bh_point_t *p1,
     const igraph_bh_point_t *p2,
-    igraph_real_t *force,
-    void *user_data
+    igraph_real_t dx,       /* Pre-computed: p1->coord - p2->coord */
+    igraph_real_t dy,
+    igraph_real_t dz,
+    igraph_real_t dist_sq,  /* Pre-computed, guaranteed > 0 by BH Engine */
+    igraph_real_t force[3], /* OUTPUT: The force vector to apply to p1 */
+    void *user_data         /* Context for layout hyperparameters */
 );
 
 /**
- * Initialize the tree parameters. Does NOT allocate point/node memory yet.
+ * @brief Attraction Kernel (O(E) Topological Domain)
+ * Computes the forces exerted across a specific directed/undirected edge.
  */
+typedef void (*igraph_bh_attraction_kernel_t)(
+    const igraph_bh_point_t *p1,    /* Source */
+    const igraph_bh_point_t *p2,    /* Target */
+    igraph_real_t dx,               /* Pre-computed: p1->coord - p2->coord */
+    igraph_real_t dy,
+    igraph_real_t dz,
+    igraph_real_t dist_sq,          /* Pre-computed, guaranteed > 0 by BH Engine */
+    igraph_real_t weight,           /* The edge weight */
+    igraph_real_t force_p1[3],      /* OUTPUT: Force applied to p1 */
+    igraph_real_t force_p2[3],      /* OUTPUT: Force applied to p2 */
+    void *user_data                 /* Context for layout hyperparameters */
+);
+
+/* =========================================================================
+ * LIFECYCLE & ITERATORS
+ * ========================================================================= */
+
 igraph_error_t igraph_bh_tree_init(
     igraph_bh_tree_t *tree,
     igraph_integer_t dim,
@@ -91,20 +120,22 @@ igraph_error_t igraph_bh_tree_build(
     const igraph_vector_t *masses
 );
 
-igraph_error_t igraph_bh_calculate_repulsive_forces(
+/* Applies the repulsion kernel using the O(N log N) spatial tree */
+igraph_error_t igraph_bh_apply_repulsion_from_tree(
     const igraph_bh_tree_t *tree,
     igraph_matrix_t *forces,
-    igraph_bh_force_func_t force_func,
+    igraph_bh_repulsion_kernel_t kernel,
     void *user_data
 );
 
-igraph_error_t igraph_bh_calculate_attractive_forces(
-    const igraph_bh_tree_t *tree,
+/* Applies the attraction kernel using the O(E) topological edge list */
+igraph_error_t igraph_bh_apply_attraction_from_edges(
+    const igraph_bh_tree_t *tree, /* Passed so callbacks can access point attributes (mass, id) */
     const igraph_vector_int_t *from,
     const igraph_vector_int_t *to,
     const igraph_vector_t *weights,
     igraph_matrix_t *forces,
-    igraph_bh_force_func_t force_func,
+    igraph_bh_attraction_kernel_t kernel,
     void *user_data
 );
 
