@@ -36,7 +36,7 @@
 #define DRL_VERSION "3.2 5/5/2006"
 
 // compile time parameters for MPI message passing
-#define MAX_PROCS 256      // maximum number of processors
+#define MAX_PROCS 1      // maximum number of processors
 #define MAX_FILE_NAME 250   // max length of filename
 #define MAX_INT_LENGTH 4   // max length of integer suffix of intermediate .coord file
 

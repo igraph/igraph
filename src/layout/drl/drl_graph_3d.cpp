@@ -467,8 +467,8 @@ int graph::ReCompute( ) {
 void graph::update_nodes ( ) {
 
     vector<igraph_int_t> node_indices;           // node list of nodes currently being updated
-    float old_positions[2 * MAX_PROCS]; // positions before update
-    float new_positions[2 * MAX_PROCS]; // positions after update
+    float old_positions[3 * MAX_PROCS]; // positions before update
+    float new_positions[3 * MAX_PROCS]; // positions after update
 
     bool all_fixed;                     // check if all nodes are fixed
 
