@@ -130,7 +130,13 @@ igraph_error_t igraph_small(igraph_t *graph, igraph_int_t n, igraph_bool_t direc
     va_start(ap, first);
     int num = first;
     while (num != -1) {
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, num));
+        igraph_error_t err;
+
+        err = igraph_vector_int_push_back(&edges, num);
+        if (err != IGRAPH_SUCCESS) {
+            va_end(ap);
+            IGRAPH_ERROR("", err);
+        }
         num = va_arg(ap, int);
     }
     va_end(ap);
