@@ -12,6 +12,39 @@ variables:
   CTEST_PARALLEL_LEVEL: 4
 
 jobs:
+
+  # Windows jobs take much longer to finish. We declare them first to increase the likelihood
+  # that they are started first. When the total number of jobs running at the same time is limited,
+  # this reduces the time it takes for the full set of jobs to complete.
+  - job: windows_static
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+
+  - job: windows_shared
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+        parameters:
+          build_shared: true
+          vsver: "14.4" # latest VS2022
+          vcpkg_target_triplet: x64-windows
+
+  - job: windows_static_32
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+        parameters:
+          vcpkg_target_triplet: x86-windows-static-md
+          arch: x86
+          vsver: "14.4"
+
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
     steps:
@@ -127,35 +160,6 @@ jobs:
         parameters:
           int_blas: false
           int_lapack: false
-
-  - job: windows_static
-    pool:
-      vmImage: windows-latest
-
-    steps:
-      - template: .azure/build-win.yml
-
-  - job: windows_shared
-    pool:
-      vmImage: windows-latest
-
-    steps:
-      - template: .azure/build-win.yml
-        parameters:
-          build_shared: true
-          vsver: "14.4" # latest VS2022
-          vcpkg_target_triplet: x64-windows
-
-  - job: windows_static_32
-    pool:
-      vmImage: windows-latest
-
-    steps:
-      - template: .azure/build-win.yml
-        parameters:
-          vcpkg_target_triplet: x86-windows-static-md
-          arch: x86
-          vsver: "14.4"
 
   - job: documentation
     steps:
