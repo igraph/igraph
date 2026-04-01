@@ -146,6 +146,17 @@ jobs:
           vsver: "14.4" # latest VS2022
           vcpkg_target_triplet: x64-windows
 
+  - job: windows_static_32
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+        parameters:
+          vcpkg_target_triplet: x86-windows-static-md
+          arch: x86
+          vsver: "14.4"
+
   - job: documentation
     steps:
       - script: |
