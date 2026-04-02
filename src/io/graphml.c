@@ -1929,7 +1929,8 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         igraph_int_t from, to;
         const char *name; char *name_escaped;
         igraph_int_t edge = IGRAPH_EIT_GET(it);
-        igraph_edge(graph, edge, &from, &to);
+
+        IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
         ret = fprintf(outstream, "    <edge source=\"n%" IGRAPH_PRId "\" target=\"n%" IGRAPH_PRId "\">\n",
                       from, to);
         if (ret < 0) {
