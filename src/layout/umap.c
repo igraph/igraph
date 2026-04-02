@@ -1132,9 +1132,9 @@ static igraph_error_t igraph_i_layout_umap(
 
         /* Skip spectral embedding for now (see #1971), initialize at random */
         if (ndim == 2) {
-            igraph_layout_random(graph, res);
+            IGRAPH_CHECK(igraph_layout_random(graph, res));
         } else {
-            igraph_layout_random_3d(graph, res);
+            IGRAPH_CHECK(igraph_layout_random_3d(graph, res));
         }
     }
 

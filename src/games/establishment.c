@@ -154,7 +154,7 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_int_t nodes,
 
     for (i = k; i < nodes; i++) {
         igraph_int_t type1 = VECTOR(*nodetypes)[i];
-        igraph_random_sample(&potneis, 0, i - 1, k);
+        IGRAPH_CHECK(igraph_random_sample(&potneis, 0, i - 1, k));
         for (j = 0; j < k; j++) {
             igraph_int_t type2 = VECTOR(*nodetypes)[VECTOR(potneis)[j]];
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {

@@ -51,7 +51,7 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     }
 
     if (!use_seed) {
-        igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
+        IGRAPH_CHECK(igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy));
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, vcount);
@@ -181,7 +181,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
     const igraph_real_t cellsize = 2.0;
 
     if (!use_seed) {
-        igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
+        IGRAPH_CHECK(igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy));
     }
 
     /* make grid */
@@ -541,7 +541,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     }
 
     if (!use_seed) {
-        igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz);
+        IGRAPH_CHECK(igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz));
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, vcount);
