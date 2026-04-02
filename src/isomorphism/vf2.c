@@ -463,10 +463,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_int_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, node, cand1, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
-                        igraph_get_eid(graph2, &eid2, node2, cand2, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
+                        IGRAPH_CHECK(igraph_get_eid(graph1, &eid1, node, cand1, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
+                        IGRAPH_CHECK(igraph_get_eid(graph2, &eid2, node2, cand2, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
@@ -495,10 +495,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_int_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, cand1, node, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
-                        igraph_get_eid(graph2, &eid2, cand2, node2, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
+                        IGRAPH_CHECK(igraph_get_eid(graph1, &eid1, cand1, node, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
+                        IGRAPH_CHECK(igraph_get_eid(graph2, &eid2, cand2, node2, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
@@ -527,10 +527,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_int_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
-                        igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
+                        IGRAPH_CHECK(igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
+                        IGRAPH_CHECK(igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
@@ -559,10 +559,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_int_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
-                        igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
+                        IGRAPH_CHECK(igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
+                        IGRAPH_CHECK(igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
@@ -1344,10 +1344,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_int_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
-                        igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
+                        IGRAPH_CHECK(igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
+                        IGRAPH_CHECK(igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;
@@ -1376,10 +1376,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_int_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
-                        igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
-                                       /*error=*/ true);
+                        IGRAPH_CHECK(igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
+                        IGRAPH_CHECK(igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
+                                                    /*error=*/ true));
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
                             end = true;

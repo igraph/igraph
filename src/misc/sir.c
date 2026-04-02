@@ -211,7 +211,7 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
             tt = igraph_rng_get_exp(igraph_rng_default(), psum);
             r = RNG_UNIF(0, psum);
 
-            igraph_psumtree_search(&tree, &vchange, r);
+            IGRAPH_CHECK(igraph_psumtree_search(&tree, &vchange, r));
             neis = igraph_adjlist_get(&adjlist, vchange);
             neilen = igraph_vector_int_size(neis);
 
