@@ -89,7 +89,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_int_t nodes,
                            igraph_bool_t directed,
                            igraph_bool_t loops) {
 
-    igraph_int_t i, j, no_reserved_edges;
+    igraph_int_t i, j;
+    igraph_int_t estimated_ecount, ecount;
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_vector_int_t* nodetypes;
@@ -226,7 +227,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_int_t nodes,
     for (i = 0; i < types; i++) {
         for (j = 0; j < types; j++) {
             /* Generating the random subgraph between vertices of type i and j */
-            igraph_int_t k, l, l_x2;
+            igraph_int_t k;
             igraph_real_t p, last;
             igraph_vector_int_t *v1, *v2;
             igraph_int_t v1_size, v2_size;
@@ -262,8 +263,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_int_t nodes,
                 IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
             }
 
-            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &no_reserved_edges));
-            IGRAPH_CHECK(igraph_vector_reserve(&s, no_reserved_edges));
+            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &estimated_ecount));
+            IGRAPH_CHECK(igraph_vector_reserve(&s, estimated_ecount));
 
             last = RNG_GEOM(p);
             while (last < maxedges) {
@@ -271,52 +272,54 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_int_t nodes,
                 last += RNG_GEOM(p);
                 last += 1;
             }
-            l = igraph_vector_size(&s);
+            ecount = igraph_vector_size(&s);
 
-            IGRAPH_SAFE_MULT(l, 2, &l_x2);
-            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
+            /* 2*ECOUNT_MAX never overflows. */
+            if (ecount > IGRAPH_ECOUNT_MAX) {
+                IGRAPH_ERROR("Too many edges in preference game.", IGRAPH_EOVERFLOW);
+            }
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount));
 
             if (i != j) {
                 /* Generating the subgraph between vertices of type i and j */
-                for (k = 0; k < l; k++) {
+                for (k = 0; k < ecount; k++) {
                     igraph_int_t to = floor(VECTOR(s)[k] / v1_size);
                     igraph_int_t from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
-                    igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                    igraph_vector_int_push_back(&edges, VECTOR(*v2)[to]);
+                    igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                    igraph_vector_int_push_back(&edges, VECTOR(*v2)[to]); /* reserved */
                 }
             } else {
                 /* Generating the subgraph among vertices of type i */
                 if (directed && loops) {
-                    for (k = 0; k < l; k++) {
+                    for (k = 0; k < ecount; k++) {
                         igraph_int_t to = floor(VECTOR(s)[k] / v1_size);
                         igraph_int_t from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]);
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]); /* reserved */
                     }
                 } else if (directed && !loops) {
-                    for (k = 0; k < l; k++) {
+                    for (k = 0; k < ecount; k++) {
                         igraph_int_t to = floor(VECTOR(s)[k] / v1_size);
                         igraph_int_t from = (VECTOR(s)[k] - ((igraph_real_t)to) * v1_size);
                         if (from == to) {
                             to = v1_size - 1;
                         }
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]);
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]); /* reserved */
                     }
                 } else if (!directed && loops) {
-                    for (k = 0; k < l; k++) {
+                    for (k = 0; k < ecount; k++) {
                         igraph_int_t to = floor((sqrt(8 * VECTOR(s)[k] + 1) - 1) / 2);
                         igraph_int_t from = (VECTOR(s)[k] - (((igraph_real_t)to) * (to + 1)) / 2);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]);
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]); /* reserved */
                     }
                 } else {
-                    for (k = 0; k < l; k++) {
+                    for (k = 0; k < ecount; k++) {
                         igraph_int_t to = floor((sqrt(8 * VECTOR(s)[k] + 1) + 1) / 2);
                         igraph_int_t from = (VECTOR(s)[k] - (((igraph_real_t)to) * (to - 1)) / 2);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]);
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                        igraph_vector_int_push_back(&edges, VECTOR(*v1)[to]); /* reserved */
                     }
                 }
             }
@@ -387,7 +390,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_int_t n
                                       igraph_vector_int_t *node_type_in_vec,
                                       igraph_bool_t loops) {
 
-    igraph_int_t i, j, k, no_reserved_edges;
+    igraph_int_t i, j, k;
+    igraph_int_t estimated_ecount, ecount;
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_vector_t cumdist;
@@ -506,9 +510,10 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_int_t n
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&intersect, 0);
+
     for (i = 0; i < no_out_types; i++) {
         for (j = 0; j < no_in_types; j++) {
-            igraph_int_t kk, l, l_x2;
+            igraph_int_t kk;
             igraph_int_t c = 0;
             igraph_real_t p, last;
             igraph_vector_int_t *v1, *v2;
@@ -536,8 +541,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_int_t n
             p = MATRIX(*pref_matrix, i, j);
             igraph_vector_clear(&s);
 
-            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &no_reserved_edges));
-            IGRAPH_CHECK(igraph_vector_reserve(&s, no_reserved_edges));
+            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &estimated_ecount));
+            IGRAPH_CHECK(igraph_vector_reserve(&s, estimated_ecount));
 
             last = RNG_GEOM(p);
             while (last < maxedges) {
@@ -545,15 +550,16 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_int_t n
                 last += RNG_GEOM(p);
                 last += 1;
             }
-            l = igraph_vector_size(&s);
+            ecount = igraph_vector_size(&s);
 
-            IGRAPH_SAFE_MULT(l, 2, &l_x2);
-            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
-
+            /* 2*ECOUNT_MAX never overflows. */
+            if (ecount > IGRAPH_ECOUNT_MAX) {
+                IGRAPH_ERROR("Too many edges in asymmetric preference game.", IGRAPH_EOVERFLOW);
+            }
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2*ecount));
 
             if (!loops && c > 0) {
-                for (kk = 0; kk < l; kk++) {
+                for (kk = 0; kk < ecount; kk++) {
                     igraph_int_t to = floor(VECTOR(s)[kk] / v1_size);
                     igraph_int_t from = (VECTOR(s)[kk] - ((igraph_real_t) to) * v1_size);
                     if (VECTOR(*v1)[from] == VECTOR(*v2)[to]) {
@@ -571,15 +577,15 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_int_t n
                             }
                         }
                     }
-                    igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                    igraph_vector_int_push_back(&edges, VECTOR(*v2)[to]);
+                    igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                    igraph_vector_int_push_back(&edges, VECTOR(*v2)[to]); /* reserved */
                 }
             } else {
-                for (kk = 0; kk < l; kk++) {
+                for (kk = 0; kk < ecount; kk++) {
                     igraph_int_t to = floor(VECTOR(s)[kk] / v1_size);
                     igraph_int_t from = (VECTOR(s)[kk] - ((igraph_real_t)to) * v1_size);
-                    igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]);
-                    igraph_vector_int_push_back(&edges, VECTOR(*v2)[to]);
+                    igraph_vector_int_push_back(&edges, VECTOR(*v1)[from]); /* reserved */
+                    igraph_vector_int_push_back(&edges, VECTOR(*v2)[to]); /* reserved */
                 }
             }
         }

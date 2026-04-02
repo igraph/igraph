@@ -90,8 +90,8 @@ igraph_error_t igraph_simplify_and_colorize(
         if (to == pto && from == pfrom) {
             VECTOR(*edge_color)[i]++;
         } else {
-            igraph_vector_int_push_back(&edges, from);
-            igraph_vector_int_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from); /* reserved */
+            igraph_vector_int_push_back(&edges, to); /* reserved */
             i++;
             VECTOR(*edge_color)[i] = 1;
         }
