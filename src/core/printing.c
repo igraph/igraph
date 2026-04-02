@@ -189,7 +189,7 @@ int igraph_complex_printf(igraph_complex_t val) {
         } \
         cnt += res; \
         /* remember that 'size' is unsigned, can't check if size - res < 0! */ \
-        if (size > res) size -= res; \
+        if (size > (size_t) res) size -= res; \
         else size = 0; \
         if (size == 0) str = NULL; else str += res; \
     } while (0)

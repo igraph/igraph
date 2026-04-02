@@ -314,8 +314,8 @@ igraph_error_t igraph_i_distances_floyd_warshall(
     }
 
     for (igraph_int_t e = 0; e < no_of_edges; e++) {
-        igraph_int_t from = IGRAPH_FROM(graph, e);
-        igraph_int_t to = IGRAPH_TO(graph, e);
+        igraph_int_t s = IGRAPH_FROM(graph, e);
+        igraph_int_t t = IGRAPH_TO(graph, e);
         igraph_real_t w = weights ? VECTOR(*weights)[e] : 1;
 
         if (w < 0) {
@@ -323,7 +323,7 @@ igraph_error_t igraph_i_distances_floyd_warshall(
                 IGRAPH_ERRORF("Negative edge weight (%g) found in undirected graph "
                               "while calculating distances with Floyd-Warshall.",
                               IGRAPH_ENEGCYCLE, w);
-            } else if (to == from) {
+            } else if (t == s) {
                 IGRAPH_ERRORF("Self-loop with negative weight (%g) found "
                               "while calculating distances with Floyd-Warshall.",
                               IGRAPH_ENEGCYCLE, w);
@@ -333,11 +333,11 @@ igraph_error_t igraph_i_distances_floyd_warshall(
             continue;
         }
 
-        if (out && MATRIX(*res, from, to) > w) {
-            MATRIX(*res, from, to) = w;
+        if (out && MATRIX(*res, s, t) > w) {
+            MATRIX(*res, s, t) = w;
         }
-        if (in  && MATRIX(*res, to, from) > w) {
-            MATRIX(*res, to, from) = w;
+        if (in  && MATRIX(*res, t, s) > w) {
+            MATRIX(*res, t, s) = w;
         }
     }
 
