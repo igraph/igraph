@@ -189,16 +189,18 @@ igraph_error_t igraph_layout_merge_dla(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
-                              igraph_real_t *x, igraph_real_t *y,
-                              igraph_real_t *r) {
+void igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
+                               igraph_real_t *x, igraph_real_t *y,
+                               igraph_real_t *r) {
+
     igraph_int_t nodes = igraph_matrix_nrow(coords);
-    igraph_int_t i;
     igraph_real_t xmin, xmax, ymin, ymax;
+
+    IGRAPH_ASSERT(igraph_matrix_ncol(coords) == 2);
 
     xmin = xmax = MATRIX(*coords, 0, 0);
     ymin = ymax = MATRIX(*coords, 0, 1);
-    for (i = 1; i < nodes; i++) {
+    for (igraph_int_t i = 1; i < nodes; i++) {
 
         if (MATRIX(*coords, i, 0) < xmin) {
             xmin = MATRIX(*coords, i, 0);
@@ -217,21 +219,20 @@ igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
     *x = (xmin + xmax) / 2;
     *y = (ymin + ymax) / 2;
     *r = sqrt((xmax - xmin)*(xmax - xmin) +  (ymax - ymin)*(ymax - ymin)) / 2;
-
-    return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
-                              igraph_real_t *x, igraph_real_t *y,
-                              igraph_real_t *z, igraph_real_t *r) {
+void igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
+                               igraph_real_t *x, igraph_real_t *y,
+                               igraph_real_t *z, igraph_real_t *r) {
     igraph_int_t nodes = igraph_matrix_nrow(coords);
-    igraph_int_t i;
     igraph_real_t xmin, xmax, ymin, ymax, zmin, zmax;
+
+    IGRAPH_ASSERT(igraph_matrix_ncol(coords) == 3);
 
     xmin = xmax = MATRIX(*coords, 0, 0);
     ymin = ymax = MATRIX(*coords, 0, 1);
     zmin = zmax = MATRIX(*coords, 0, 2);
-    for (i = 1; i < nodes; i++) {
+    for (igraph_int_t i = 1; i < nodes; i++) {
 
         if (MATRIX(*coords, i, 0) < xmin) {
             xmin = MATRIX(*coords, i, 0);
@@ -258,16 +259,14 @@ igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
     *z = (zmin + zmax) / 2;
     *r = sqrt( (xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) +
                (zmax - zmin) * (zmax - zmin) ) / 2;
-
-    return IGRAPH_SUCCESS;
 }
 
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
 
-igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                              igraph_int_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
-                              igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
-                              igraph_real_t killr) {
+void igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
+                               igraph_int_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
+                               igraph_real_t killr) {
     igraph_int_t sp = -1;
     igraph_real_t angle, len;
 
@@ -296,6 +295,4 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
             }
         }
     }
-
-    return IGRAPH_SUCCESS;
 }
