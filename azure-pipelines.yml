@@ -58,6 +58,7 @@ jobs:
           vsver: "14.4" # VS2022 required for reliable ASan support
           build_type: RelWithDebInfo
           extra_cmake_args: "-DUSE_SANITIZER=Address"
+          extra_ctest_args: "--timeout 120" # ASan instrumentation slows tests down; double the default timeout
           use_ccache: false # ccache is not compatible with MSVC ASan instrumented builds
 
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
