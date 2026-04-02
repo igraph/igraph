@@ -1380,7 +1380,7 @@ static igraph_error_t igraph_i_mincut_undirected(
         igraph_vector_int_clear(neis2);  /* TODO: free it */
 
         /* Remove the deleted vertex from the heap entirely */
-        igraph_i_cutheap_reset_undefine(&heap, last);
+        IGRAPH_CHECK(igraph_i_cutheap_reset_undefine(&heap, last));
     }
 
     *res = mincut;

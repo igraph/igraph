@@ -65,7 +65,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t n, igraph_bool_t lo
         IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&alledges, no_of_edges * 2);
-        igraph_get_edgelist(graph, &alledges, /*bycol=*/ false);
+        IGRAPH_CHECK(igraph_get_edgelist(graph, &alledges, /*bycol=*/ false));
     } else {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edgevec, 4);
         es = igraph_ess_vector(&eids);

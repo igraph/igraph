@@ -1698,10 +1698,10 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     IGRAPH_VECTOR_INT_INIT_FINALLY(&gtypes, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&etypes, 0);
-    igraph_i_attribute_get_info(graph,
+    IGRAPH_CHECK(igraph_i_attribute_get_info(graph,
                                 &gnames, &gtypes,
                                 &vnames, &vtypes,
-                                &enames, &etypes);
+                                &enames, &etypes));
 
     /* graph attributes */
     for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
