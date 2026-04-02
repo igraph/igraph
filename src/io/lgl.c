@@ -312,7 +312,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         while (!IGRAPH_EIT_END(it)) {
             igraph_int_t from, to;
             int ret;
-            igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to));
             if (from == actvertex) {
                 ret = fprintf(outstream, "%" IGRAPH_PRId "\n", to);
             } else {
@@ -336,7 +337,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_int_t from, to;
             int ret = 0;
             const char *str1, *str2;
-            igraph_edge(graph, edge, &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
             str2 = igraph_strvector_get(&nvec, to);
             IGRAPH_CHECK(check_name(str2));
 
@@ -366,7 +368,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_int_t edge = IGRAPH_EIT_GET(it);
             igraph_int_t from, to;
             int ret1, ret2, ret3;
-            igraph_edge(graph, edge, &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
             if (from == actvertex) {
                 ret1 = fprintf(outstream, "%" IGRAPH_PRId " ", to);
             } else {
@@ -399,7 +402,8 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_int_t from, to;
             int ret = 0, ret2;
             const char *str1, *str2;
-            igraph_edge(graph, edge, &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
             str2 = igraph_strvector_get(&nvec, to);
             IGRAPH_CHECK(check_name(str2));
 

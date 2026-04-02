@@ -342,7 +342,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
         while (!IGRAPH_EIT_END(it)) {
             igraph_int_t from, to;
             int ret;
-            igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to));
             ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n", from, to);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
@@ -362,7 +363,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_int_t from, to;
             int ret = 0;
             const char *str1, *str2;
-            igraph_edge(graph, edge, &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
             str1 = igraph_strvector_get(&nvec, from);
             IGRAPH_CHECK(check_name(str1));
             str2 = igraph_strvector_get(&nvec, to);
@@ -386,7 +388,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_int_t edge = IGRAPH_EIT_GET(it);
             igraph_int_t from, to;
             int ret1, ret2, ret3;
-            igraph_edge(graph, edge, &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
             ret1 = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId " ", from, to);
             ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
             ret3 = fputc('\n', outstream);
@@ -415,7 +418,8 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_int_t from, to;
             int ret = 0, ret2 = 0;
             const char *str1, *str2;
-            igraph_edge(graph, edge, &from, &to);
+
+            IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
             str1 = igraph_strvector_get(&nvec, from);
             IGRAPH_CHECK(check_name(str1));
             str2 = igraph_strvector_get(&nvec, to);
