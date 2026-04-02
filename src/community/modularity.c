@@ -203,7 +203,8 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
     }
 
     if (!use_directed) {
-        /* Graph is undirected, simply add vectors */
+        /* Graph is undirected, simply add vectors.
+         * Vectors are the same size, calls below can't fail. */
         igraph_vector_add(&k_out, &k_in);
         igraph_vector_update(&k_in, &k_out);
     }

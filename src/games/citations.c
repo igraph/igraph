@@ -169,7 +169,7 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
                  * we choose one uniformly to connect to. */
                 to = RNG_INTEGER(0, i-1);
             } else {
-                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+                IGRAPH_CHECK(igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum)));
             }
             igraph_vector_int_push_back(&edges, i);  /* reserved */
             igraph_vector_int_push_back(&edges, to); /* reserved */
@@ -469,7 +469,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_int_t nodes
                  * we choose one uniformly to connect to. */
                 to = RNG_INTEGER(0, i-1);
             } else {
-                igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
+                IGRAPH_CHECK(igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum)));
             }
             igraph_vector_int_push_back(&edges, i);  /* reserved */
             igraph_vector_int_push_back(&edges, to); /* reserved */
