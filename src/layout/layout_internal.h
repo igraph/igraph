@@ -32,17 +32,18 @@
 
 IGRAPH_BEGIN_C_DECLS
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                                                    igraph_int_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
-                                                    igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
-                                                    igraph_real_t killr);
+IGRAPH_PRIVATE_EXPORT void igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
+                                                     igraph_int_t actg, igraph_real_t *x, igraph_real_t *y,
+                                                     igraph_real_t r,
+                                                     igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
+                                                     igraph_real_t killr);
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
-                                                    igraph_real_t *y, igraph_real_t *r);
+IGRAPH_PRIVATE_EXPORT void igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
+                                                     igraph_real_t *y, igraph_real_t *r);
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
-                                                    igraph_real_t *y, igraph_real_t *z,
-                                                    igraph_real_t *r);
+IGRAPH_PRIVATE_EXPORT void igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
+                                                     igraph_real_t *y, igraph_real_t *z,
+                                                     igraph_real_t *r);
 
 IGRAPH_PRIVATE_EXPORT IGRAPH_FUNCATTR_CONST igraph_real_t igraph_i_layout_point_segment_dist2(
     igraph_real_t v_x, igraph_real_t v_y,
