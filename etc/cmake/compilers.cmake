@@ -62,6 +62,7 @@ macro(use_all_warnings TARGET_NAME)
       /wd4221 # nonstandard extension used: '...': cannot be initialized using address of automatic variable '...'
       /wd4127 # conditional expression is constant
       /wd4702 # unreachable code
+      /wd4200 # nonstandard extension used: zero-sized array in struct/union; this is issued incorrectly for arr[] as well, not just arr[0]
     )
   else()
     # Notes:
