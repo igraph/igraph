@@ -12,6 +12,9 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_rewire(
     igraph_t *graph, igraph_int_t n, igraph_bool_t loops,
     igraph_bool_t use_adjlist, igraph_rewiring_stats_t *stats);
 
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_rewire_2(
+    igraph_t *graph, igraph_integer_t n, igraph_edge_type_sw_t allowed_edge_types);
+
 IGRAPH_END_C_DECLS
 
 #endif
