@@ -39,23 +39,32 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
+        const igraph_int_t vcount = igraph_vcount(&graph);
         igraph_vector_t v;
         igraph_vector_int_t iv;
         igraph_bool_t b;
         igraph_real_t r;
 
         /* Limit graph size for the sake of performance. */
-        if (igraph_vcount(&graph) <= 64) {
+        if (vcount <= 64) {
             igraph_vector_init(&v, 0);
             igraph_vector_int_init(&iv, 0);
 
             igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)/2));
+
             igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)));
+
             igraph_edge_betweenness_cutoff(&graph, NULL, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
                                            false, 4);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)/2));
+
             igraph_edge_betweenness_cutoff(&graph, NULL, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
                                            false, 3);
-            if (igraph_vcount(&graph) >= 10) {
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)));
+
+            if (vcount >= 10) {
                 igraph_betweenness_subset(&graph, NULL, &v,
                                           igraph_vss_range(0,5), igraph_vss_range(5,10),
                                           igraph_vss_all(), IGRAPH_DIRECTED, false);
@@ -73,8 +82,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_transitivity_local_undirected(&graph, &v, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
             igraph_transitivity_avglocal_undirected(&graph, &r, IGRAPH_TRANSITIVITY_ZERO);
             igraph_count_adjacent_triangles(&graph, &v, igraph_vss_all());
+
             igraph_pagerank(&graph, NULL, &v, &r, 0.6, IGRAPH_DIRECTED, igraph_vss_all(), IGRAPH_PAGERANK_ALGO_PRPACK,
                             NULL);
+            IGRAPH_ASSERT(vcount == 0 || igraph_almost_equals(igraph_vector_sum(&v), 1.0, 1e-10));
+
             igraph_constraint(&graph, &v, igraph_vss_all(), NULL);
             igraph_spanner(&graph, &iv, 2.34, NULL);
 
