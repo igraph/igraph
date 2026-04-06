@@ -60,11 +60,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_init(&v, 0);
             igraph_vector_int_init(&iv, 0);
 
-            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_ALL, false, 4);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)/2));
+            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)/2));
 
-            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_IN, false, 5);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)));
+            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
 
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
                                            false, 4);

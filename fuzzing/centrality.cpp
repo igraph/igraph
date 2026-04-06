@@ -40,7 +40,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         const igraph_int_t vcount = igraph_vcount(&graph);
-        igraph_vector_t v;
+        igraph_vector_t v, v2;
         igraph_vector_int_t iv;
         igraph_bool_t b;
         igraph_real_t r;
@@ -48,21 +48,38 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         /* Limit graph size for the sake of performance. */
         if (vcount <= 64) {
             igraph_vector_init(&v, 0);
+            igraph_vector_init(&v2, 0);
             igraph_vector_int_init(&iv, 0);
 
+            igraph_betweenness(&graph, NULL, &v2, igraph_vss_all(), IGRAPH_UNDIRECTED, false);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v2, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)/2));
+
             igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)/2));
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)/2));
+            IGRAPH_ASSERT(igraph_vector_all_le(&v, &v2));
+
+            igraph_betweenness(&graph, NULL, &v2, igraph_vss_all(), IGRAPH_DIRECTED, false);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v2, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
 
             igraph_betweenness_cutoff(&graph, NULL, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)));
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
+            IGRAPH_ASSERT(igraph_vector_all_le(&v, &v2));
+
+            igraph_edge_betweenness(&graph, NULL, &v2, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED, false);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v2, 0, vcount*(vcount-1)/2));
 
             igraph_edge_betweenness_cutoff(&graph, NULL, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
                                            false, 4);
             IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)/2));
+            IGRAPH_ASSERT(igraph_vector_all_le(&v, &v2));
+
+            igraph_edge_betweenness(&graph, NULL, &v2, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED, false);
+            IGRAPH_ASSERT(igraph_vector_isininterval(&v2, 0, vcount*(vcount-1)));
 
             igraph_edge_betweenness_cutoff(&graph, NULL, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
                                            false, 3);
             IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)));
+            IGRAPH_ASSERT(igraph_vector_all_le(&v, &v2));
 
             if (vcount >= 10) {
                 igraph_betweenness_subset(&graph, NULL, &v,
@@ -95,6 +112,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_trussness(&graph, &iv);
 
             igraph_vector_int_destroy(&iv);
+            igraph_vector_destroy(&v2);
             igraph_vector_destroy(&v);
         }
 
