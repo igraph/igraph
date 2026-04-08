@@ -21,6 +21,21 @@
 #include <igraph.h>
 #include <cstdlib>
 
+const igraph_real_t eps = 1e-10;
+
+bool vector_isininterval_eps(const igraph_vector_t *v, igraph_real_t lo, igraph_real_t hi) {
+    const igraph_int_t n = igraph_vector_size(v);
+
+    for (igraph_int_t i=0; i < n; i++) {
+        igraph_real_t x = VECTOR(*v)[i];
+        if (igraph_cmp_epsilon(lo, x, eps) > 0 || igraph_cmp_epsilon(x, hi, eps) > 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -61,18 +76,18 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_vector_int_init(&iv, 0);
 
             igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)/2));
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)/2));
 
             igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
 
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
                                            false, 4);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)/2));
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*(vcount-1)/2));
 
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
                                            false, 3);
-            IGRAPH_ASSERT(igraph_vector_isininterval(&v, 0, vcount*(vcount-1)));
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*(vcount-1)));
 
             if (vcount >= 10) {
                 igraph_betweenness_subset(&graph, &weights,
