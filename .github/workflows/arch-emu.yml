@@ -25,7 +25,7 @@ jobs:
   alpine:
     runs-on: ubuntu-latest
 
-    # Do not run in forks
+    # Do not run in forks (necessary because of scheduled runs)
     if: github.repository == 'igraph/igraph'
 
     defaults:
@@ -50,10 +50,10 @@ jobs:
         run: lscpu
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref_name }}
+          ref: ${{ github.event_name == 'schedule' && 'main' || github.ref_name }}
 
       - name: Install dependencies
         uses: jirutka/setup-alpine@v1
@@ -92,7 +92,7 @@ jobs:
 
       - name: Restore cache
         # setup the GitHub cache used to maintain the ccache from one job to the next
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           # location of the ccache of the chroot in the root file system
           path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
@@ -134,7 +134,7 @@ jobs:
       - name: Cache
         # Save the cache after we are done (successfully) building
         # This helps to retain the ccache even if the subsequent steps are failing.
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
           key: ${{ steps.ccache-prepare.outputs.key }}

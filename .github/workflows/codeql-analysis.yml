@@ -8,10 +8,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ main, develop ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ master, develop ]
+    branches: [ main, develop ]
   schedule:
     - cron: '24 13 * * 4'
 
@@ -24,6 +24,9 @@ jobs:
       contents: read
       security-events: write
 
+    # Do not run in forks
+    if: github.repository == 'igraph/igraph'
+
     strategy:
       fail-fast: false
       matrix:
@@ -35,13 +38,13 @@ jobs:
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install ninja-build cmake libarpack2-dev libglpk-dev libgmp-dev
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
@@ -65,4 +68,4 @@ jobs:
         rm -rf build/CMakeFiles/CMakeTmp
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
