@@ -23,7 +23,7 @@ When performing a code review, keep in mind the following.
     * Standard C library headers must come last.
 
  - Check that all newly added public and private functions follow these conventions:
-    * Public functions must have a name starting with `igraph_`.
+    * Public functions must have a name starting with `igraph_`, and must be included in a public header.
     * Private functions that can be used from multiple translation units must have a name starting with `igraph_i_`, and must be included in a private header.
     * Private functions that are local to their translation unit must be marked as `static` and should not use the above two prefixes in their name.
 
@@ -85,7 +85,7 @@ When performing a code review, keep in mind the following.
 
  - Check that any scientific articles referenced in the documentation are accompanied by a weblink, ideally a DOI link of the form `https://www.doi.org/...`. References to books do not need a weblink.
 
- - Check that newly added public functions are marked as experimental by including `\experimental` in their documentation. `\experimental` must appear on a separate line, directly following the `\brief` line.
+ - Check that newly added public functions are marked as experimental by including `\experimental` in their documentation. `\experimental` must appear on a separate line, directly following the `\brief` line. `IGRAPH_EXPERIMENTAL` must appear at the beginning of the function's declaration within public headers.
 
  - Check that the documentation of newly added public functions is referenced in the appropriate `.xxml` file in the `/doc` subdirectory of the repo.
 
