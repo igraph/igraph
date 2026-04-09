@@ -109,6 +109,13 @@ igraph_error_t igraph_bh_tree_init(
     igraph_integer_t leaf_capacity
 );
 
+void igraph_bh_tree_get_scaling_params(
+    igraph_integer_t n_points,
+    igraph_integer_t dim,
+    igraph_integer_t *max_level,
+    igraph_integer_t *leaf_capacity
+);
+
 void igraph_bh_tree_destroy(igraph_bh_tree_t *tree);
 
 /**

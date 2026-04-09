@@ -207,6 +207,26 @@ static igraph_error_t build_bh_node_recursive(
     return IGRAPH_SUCCESS;
 }
 
+void igraph_bh_tree_get_scaling_params(
+    igraph_integer_t n_points,
+    igraph_integer_t dim,
+    igraph_integer_t *max_level,
+    igraph_integer_t *leaf_capacity
+) {
+    igraph_integer_t ml, lc;
+    if (dim == 2) {
+        ml = (igraph_integer_t)ceil(log2((igraph_real_t)n_points)) + 3;
+        lc = 8 + n_points / 100000;
+    } else {
+        ml = (igraph_integer_t)ceil(log2((igraph_real_t)n_points) / 3.0) + 3;
+        lc = 12 + n_points / 50000;
+    }
+    *max_level = ml < 5 ? 5 : (ml > 32 ? 32 : ml);
+    *leaf_capacity = lc < 8 ? 8 : (lc > 64 ? 64 : lc);
+    if (dim == 3) {
+        *leaf_capacity = lc < 12 ? 12 : (lc > 96 ? 96 : lc);
+    }
+}
 
 igraph_error_t igraph_bh_tree_init(
     igraph_bh_tree_t *tree,
