@@ -546,6 +546,11 @@ CYCLE_FUNC:
     # cycle that was found by the function.
     CTYPE: igraph_cycle_handler_t
 
+MOTIFS_HANDLER_FUNC:
+    # Callback function for igraph_motifs_randesu_callback(). Called with every
+    # motif that was found by the function.
+    CTYPE: igraph_motifs_handler_t
+
 BFS_FUNC:
     # Callback function for igraph_bfs(). Called with every vertex that was
     # visited during the BFS traversal.

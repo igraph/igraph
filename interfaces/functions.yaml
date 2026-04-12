@@ -401,7 +401,7 @@ igraph_hsbm_list_game:
 igraph_correlated_game:
     PARAMS: |-
         GRAPH old_graph, OUT GRAPH new_graph,
-        REAL corr, REAL p=edge_density(old.graph), OPTIONAL INDEX_VECTOR permutation
+        REAL corr, REAL p=edge_density(old_graph), OPTIONAL INDEX_VECTOR permutation
 
 igraph_correlated_pair_game:
     PARAMS: |-
@@ -1582,9 +1582,9 @@ igraph_layout_gem:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res=matrix(),
         BOOLEAN use_seed=False,
-        INTEGER maxiter=40*vcount(graph)^2,
+        INTEGER maxiter=40 * vcount(graph)^2,
         REAL temp_max=vcount(graph),
-        REAL temp_min=1/10, REAL temp_init=sqrt(vcount(graph))
+        REAL temp_min=1 / 10, REAL temp_init=sqrt(vcount(graph))
 
 igraph_layout_davidson_harel:
     PARAMS: |-
@@ -2004,6 +2004,11 @@ igraph_write_graph_dot:
 
 igraph_motifs_randesu:
     PARAMS: GRAPH graph, OUT VECTOR hist, INTEGER size=3, OPTIONAL VECTOR cut_prob
+
+igraph_motifs_randesu_callback:
+    PARAMS: |-
+        GRAPH graph, INTEGER size, OPTIONAL VECTOR cut_prob,
+        MOTIFS_HANDLER_FUNC callback, OPTIONAL EXTRA extra
 
 igraph_motifs_randesu_estimate:
     PARAMS: |-
