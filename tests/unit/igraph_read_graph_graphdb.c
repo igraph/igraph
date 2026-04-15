@@ -49,6 +49,12 @@ int main(void) {
     IGRAPH_ASSERT(igraph_read_graph_graphdb(&g, ifile, IGRAPH_DIRECTED) == IGRAPH_PARSEERROR);
     fclose(ifile);
 
+    /* Edge target vertex ID out of range. */
+    ifile = fopen("si2_b06m_s20-bad3.A98", "rb");
+    IGRAPH_ASSERT(ifile != NULL);
+    IGRAPH_ASSERT(igraph_read_graph_graphdb(&g, ifile, IGRAPH_DIRECTED) == IGRAPH_PARSEERROR);
+    fclose(ifile);
+
     igraph_set_error_handler(handler);
 
     VERIFY_FINALLY_STACK();
