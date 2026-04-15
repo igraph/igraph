@@ -12,6 +12,7 @@
 - `igraph_adjlist_init()` would incorrectly set the `IGRAPH_PROP_HAS_MULTI` cache entry to `true` under the following conditions: the input was directed with some mutual edges, but no multi-edges; the `mode=IGRAPH_ALL` and `multiple=IGRAPH_NO_MULTIPLE` parameters were set. An incorrect cache entry may cause various igraph functions to return invalid results.
 - When `igraph_adjlist_init()` or `igraph_lazy_adjlist_init()` were called with `multiple=IGRAPH_NO_MULTIPLE`, they would not remove all multi-edges under the following conditions: the input was directed, had some mutual edges, but no multi-edges; `mode=IGRAPH_ALL` was set, meaning that mutual edges effectively act like multi-edges; it was already cached that the graph had no multi-edges; This could have caused several igraph functions that ignore edge directions in directed graphs to return invalid results in some cases.
 - `igraph_read_graph_graphml()` imported the edge IDs incorrectly from GraphML files. This bug was introduced in 1.0.0. Thanks to @zxawry for the fix (PR #2894)!
+- `igraph_read_graph_graphdb()` now validates vertex IDs relative to the declared vertex count. Thanks to Kaixuan Li @MarkLee131 for the fix (PR #2908)!
 
 ## [1.0.1]
 
