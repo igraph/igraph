@@ -118,6 +118,9 @@ igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
+ * \param dimvector Vector giving the sizes of the lattice in each of
+ *        its dimensions. The dimension of the lattice will be the
+ *        same as the length of this vector.
  *
  * \return Error code. The current implementation always returns with
  *         success.
