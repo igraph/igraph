@@ -127,7 +127,7 @@ igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res
  *
  * Time complexity: TODO: ADD TIMECOMPLEXITY
  */
-igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res, igraph_vector_int_t *dimvector) {
+igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res, const igraph_vector_int_t *dimvector) {
 
     igraph_int_t i, j, no_of_nodes;
     igraph_int_t no_of_dims = igraph_vector_int_size(dimvector);
