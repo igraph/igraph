@@ -288,6 +288,11 @@ IGRAPH_EXPORT igraph_error_t igraph_voronoi(const igraph_t *graph,
                                             const igraph_vector_t *weights,
                                             igraph_neimode_t mode,
                                             igraph_voronoi_tiebreaker_t tiebreaker);
+IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(
+        const igraph_t *graph,
+        const igraph_vector_int_t *steiner_terminals,
+        const igraph_vector_t *weights,
+        igraph_real_t *result, igraph_vector_int_t *res_tree);
 
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
 
