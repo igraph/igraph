@@ -164,7 +164,7 @@ igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res,
             }
         }
 
-        igraph_i_safe_mult(block_size, VECTOR(*dimvector)[j], &block_size);
+        IGRAPH_CHECK(igraph_i_safe_mult(block_size, VECTOR(*dimvector)[j], &block_size));
     }
 
     return IGRAPH_SUCCESS;
