@@ -95,6 +95,8 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_random_3d(const igraph_t *graph, igra
 IGRAPH_EXPORT igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
                                         igraph_int_t width, igraph_int_t height);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_square(const igraph_t *graph, 
+                                                igraph_matrix_t *res, const igraph_vector_int_t *dimvector);
 IGRAPH_EXPORT igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
                                                         igraph_matrix_t *res,
                                                         igraph_bool_t use_seed,
