@@ -22,6 +22,7 @@
 #include "igraph_layout.h"
 
 #include "igraph_interface.h"
+#include "math/safe_intop.h"
 
 /**
  * \ingroup layout
@@ -116,8 +117,8 @@ igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res
  * \brief Places the vertices on a regular grid in the d-dimensional space.
  *
  * \experimental
- * 
- * \param graph Pointer to an initialized graph object 
+ *
+ * \param graph Pointer to an initialized graph object
  *        (used to validate that the number of nodes in the graph and lattice are equal)
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
@@ -133,13 +134,12 @@ igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res
 igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res, const igraph_vector_int_t *dimvector) {
     igraph_int_t i, j, no_of_nodes, block_size, current_coord, no_of_rows_current_coord;
     igraph_int_t no_of_dims = igraph_vector_int_size(dimvector);
-    igraph_vector_t ith_node_coords;
 
    IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
 
     if (graph != NULL) {
         if (no_of_nodes != igraph_vcount(graph)) {
-            IGRAPH_ERROR("Number of graph vertices does not equal to number of nodes " 
+            IGRAPH_ERROR("Number of graph vertices does not equal to number of nodes "
                          "given lattice dimensionality.", IGRAPH_EINVAL);
         }
     }
