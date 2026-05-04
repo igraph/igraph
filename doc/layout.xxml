@@ -53,7 +53,6 @@
 <!-- doxrox-include igraph_layout_square -->
 </section>
 
-
 <section id="pp-layouts"><title>Post-processing layouts</title>
 <!-- doxrox-include igraph_layout_merge_dla -->
 <!-- doxrox-include igraph_layout_align -->
