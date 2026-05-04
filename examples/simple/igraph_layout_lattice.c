@@ -42,3 +42,4 @@ int main(void) {
     igraph_vector_int_destroy(&dimvector);
     return 0;
 }
+
