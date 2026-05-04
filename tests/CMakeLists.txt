@@ -413,6 +413,7 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_layout_reingold_tilford
+  igraph_layout_lattice
 )
 
 add_legacy_tests(

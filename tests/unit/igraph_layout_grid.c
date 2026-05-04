@@ -29,7 +29,6 @@
 int main(void) {
     igraph_t g;
     igraph_matrix_t coords;
-    igraph_vector_int_t dimvector;
 
     igraph_empty(&g, 15, 0);
     igraph_matrix_init(&coords, 0, 0);
@@ -62,28 +61,8 @@ int main(void) {
     /* Automatic width and height, 3D */
     igraph_layout_grid_3d(&g, &coords, -1, -1);
     igraph_matrix_print(&coords);
-    printf("=====\n");
-
-    /* Create 4-dimensional lattice dimvector for igraph_layout_square testing */
-    igraph_vector_int_init(&dimvector, 4);
-    VECTOR(dimvector)[0] = 4;
-    VECTOR(dimvector)[1] = 3;
-    VECTOR(dimvector)[2] = 2;
-    VECTOR(dimvector)[3] = 2;
-
-    /* 4-dimensional lattice when graph is initialized */
-    igraph_empty(&g, 4*3*2*2, IGRAPH_UNDIRECTED);
-    igraph_layout_square(&g, &coords, &dimvector);
-    igraph_matrix_print(&coords);
-    printf("=======\n");
-    
-    /* 4-dimensional lattice when graph is NULL */
-    igraph_layout_square(NULL, &coords, &dimvector);
-    igraph_matrix_print(&coords);    
-    printf("=======\n");
 
     igraph_matrix_destroy(&coords);
-    igraph_matrix_destroy(&dimvector);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
