@@ -427,7 +427,7 @@ add_legacy_tests(
   igraph_layout_gem
   igraph_layout_graphopt
   igraph_layout_grid
-  igraph_layout_lattice
+  igraph_layout_square
   igraph_layout_kamada_kawai
   igraph_layout_lgl
   igraph_layout_mds
