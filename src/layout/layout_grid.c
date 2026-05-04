@@ -164,7 +164,7 @@ igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res,
             }
         }
 
-        block_size *= VECTOR(*dimvector)[j]
+        block_size *= VECTOR(*dimvector)[j];
     }
 
     return IGRAPH_SUCCESS;
