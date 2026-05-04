@@ -38,17 +38,6 @@ int main(void) {
 
     igraph_layout_square(NULL, &res_m, &dimvector);
 
-    // print lattice node coordiantes
-    igraph_integer_t i, j;
-    igraph_integer_t nrows = igraph_matrix_nrow(&res_m);
-    igraph_integer_t ncols = igraph_matrix_ncol(&res_m);
-    for (i = 0; i < nrows; i++) {
-        for (j = 0; j < ncols; j++) {
-            printf("%g ", MATRIX(res_m, i, j));
-        }
-        printf("\n");
-    }
-
     igraph_matrix_destroy(&res_m);
     igraph_vector_int_destroy(&dimvector);
     return 0;

@@ -164,46 +164,8 @@ igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res,
             }
         }
 
-        IGRAPH_CHECK(igraph_i_safe_mult(block_size, VECTOR(*dimvector)[j], &block_size));
+        block_size *= VECTOR(*dimvector)[j]
     }
 
     return IGRAPH_SUCCESS;
 }
-
-
-// igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res, const igraph_vector_int_t *dimvector) {
-
-//     igraph_int_t i, j, no_of_nodes;
-//     igraph_int_t no_of_dims = igraph_vector_int_size(dimvector);
-//     igraph_vector_t ith_node_coords;
-
-//     IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
-
-//     if (graph != NULL) {
-//         if (no_of_nodes != igraph_vcount(graph)) {
-//             IGRAPH_ERROR("Number of graph vertices does not equal to number of nodes " 
-//                          "given lattice dimensionality.", IGRAPH_EINVAL);
-//         }
-//     }
-
-//     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_dims));
-
-//     // igraph_vector_init(&ith_node_coords, no_of_dims);
-//     // for (i = 0; i < no_of_nodes; i++) {
-//     //     igraph_matrix_set_row(res, &ith_node_coords, i);
-//     //     for (j = 0; j < no_of_dims; j++) {
-//     //         VECTOR(ith_node_coords)[j]++;
-//     //         if (VECTOR(ith_node_coords)[j] < VECTOR(*dimvector)[j]) {
-//     //             break;
-//     //         }
-//     //         VECTOR(ith_node_coords)[j] = 0;
-//     //     }
-//     // }
-
-
-
-
-
-
-//     return IGRAPH_SUCCESS;
-// }
