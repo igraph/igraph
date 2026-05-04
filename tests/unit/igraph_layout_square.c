@@ -42,7 +42,7 @@ int main(void) {
     igraph_matrix_print(&coords);
     printf("=======\n");
 
-    // /* 4-dimensional lattice when graph is NULL */
+    /* 4-dimensional lattice when graph is NULL */
     igraph_layout_square(NULL, &coords, &dimvector);
     igraph_matrix_print(&coords);
     printf("=======\n");
