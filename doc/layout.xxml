@@ -49,6 +49,11 @@
 <!-- doxrox-include igraph_layout_umap_3d -->
 </section>
 
+<section id="n-dimensional-lattice-layout-generators"><title>N-dimensional Lattice Layout Generators</title>
+<!-- doxrox-include igraph_layout_square -->
+</section>
+
+
 <section id="pp-layouts"><title>Post-processing layouts</title>
 <!-- doxrox-include igraph_layout_merge_dla -->
 <!-- doxrox-include igraph_layout_align -->
