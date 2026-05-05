@@ -1471,7 +1471,7 @@ igraph_layout_grid_3d:
     PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0, INTEGER height=0
 
 igraph_layout_square:
-    PARAMS: OPTIONAL GRAPH graph, OUT MATRIX res, VECTOR dimvector
+    PARAMS: OPTIONAL GRAPH graph, OUT MATRIX res, VECTOR_INT dimvector
 
 igraph_layout_fruchterman_reingold:
     PARAMS: |-
