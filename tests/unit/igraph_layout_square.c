@@ -47,6 +47,19 @@ int main(void) {
     igraph_matrix_print(&coords);
     printf("=======\n");
 
+    igraph_destroy(&g);
+    igraph_empty(&g, 4*3*2*1, IGRAPH_UNDIRECTED);
+    printf("Check unequal number of nodes.\n");
+    CHECK_ERROR(igraph_layout_square(&g, &coords, &dimvector), IGRAPH_EINVAL);
+    igraph_destroy(&g);
+    igraph_vector_int_destroy(&dimvector);
+
+    igraph_vector_int_init(&dimvector, 2);
+    VECTOR(dimvector)[0] = 4;
+    VECTOR(dimvector)[1] = -1;
+    printf("Check negative dimension.\n");
+    CHECK_ERROR(igraph_layout_square(NULL, &coords, &dimvector), IGRAPH_EINVAL);
+
     igraph_matrix_destroy(&coords);
     igraph_vector_int_destroy(&dimvector);
     igraph_destroy(&g);
