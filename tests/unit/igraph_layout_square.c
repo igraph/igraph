@@ -62,7 +62,6 @@ int main(void) {
 
     igraph_matrix_destroy(&coords);
     igraph_vector_int_destroy(&dimvector);
-    igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
 
