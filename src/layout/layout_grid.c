@@ -143,7 +143,7 @@ igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res,
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
     }
 
-   IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
 
     if (graph != NULL) {
         if (no_of_nodes != igraph_vcount(graph)) {
