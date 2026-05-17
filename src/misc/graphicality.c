@@ -96,6 +96,11 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
  * https://dx.doi.org/10.1109/MCSE.2015.125
  *
  * </para><para>
+ * B. Cloteaux, A Sufficient Condition for Graphic Sequences with Given Largest and Smallest Entries, Length, and Sum.
+ * Discrete Mathematics & Theoretical Computer Science 20, 1 (2018).
+ * https://doi.org/10.23638/DMTCS-20-1-25.
+ *
+ * </para><para>
  * A. Berger, A note on the characterization of digraphic sequences, Discrete Math. 314, 38 (2014).
  * https://dx.doi.org/10.1016/j.disc.2013.09.010
  *
@@ -426,7 +431,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
     igraph_int_t n; /* number of non-zero degrees */
     igraph_int_t k, sum_deg, sum_ni, sum_ini;
     igraph_int_t i, dk;
-    igraph_int_t zverovich_bound;
+    igraph_int_t cloteaux_bound;
 
     if (p == 0) {
         *res = true;
@@ -436,11 +441,35 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
     /* The following implementation of the Erdős-Gallai test
      * is mostly a direct translation of the Python code given in
      *
-     * Brian Cloteaux, Is This for Real? Fast Graphicality Testing,
+     * Brian Cloteaux: Is This for Real? Fast Graphicality Testing,
      * Computing Prescriptions, pp. 91-95, vol. 17 (2015)
      * https://dx.doi.org/10.1109/MCSE.2015.125
      *
      * It uses counting sort to achieve linear runtime.
+     *
+     * This implementation in igraph replaces the Zverovich-Zverovich (ZZ)
+     * inequality test with a more general test introduced by Cloteaux in:
+     *
+     * Brian Cloteaux: A Sufficient Condition for Graphic Sequences
+     * with Given Largest and Smallest Entries, Length, and Sum.
+     * Discrete Mathematics & Theoretical Computer Science Vol. 20 no. 1 (2018)
+     * https://doi.org/10.23638/DMTCS-20-1-25.
+     *
+     * See Theorem 3 and Eq. (3) in that paper. Remember that before checking
+     * Eq. (3), it is necessary to check that:
+     *  - the degree sum is even
+     *  - dmax <= n - 1
+     * Additionally, Eq. (3) is undefined when all degrees are identical,
+     * i.e. when dmin == dmax. However, in this case, with the above conditions
+     * satisfied, the sequence is graphical.
+     *
+     * Note that unlike ZZ, Cloteaux's condition is valid even if some degrees
+     * are zero. Nevertheless, this implementation checks it specifically for
+     * the non-zero degrees, which provides a stronger test.
+     *
+     * Note that Cloteaux's condition strictly generalizes the original
+     * ZZ condition, but not the sharpening of ZZ by Cairns, Mendan and
+     * Nikolayevsky from 2015, http://dx.doi.org/10.1016/j.disc.2015.02.001
      */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_degs, p);
@@ -465,7 +494,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
 
     if (dsum % 2 != 0) {
         *res = false;
-        goto finish;
+        goto finish; /* degree sum not even => non-graphical */
     }
 
     if (n == 0) {
@@ -473,30 +502,27 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
         goto finish; /* all degrees are zero => graphical */
     }
 
-    /* According to:
-     *
-     * G. Cairns, S. Mendan, and Y. Nikolayevsky, A sharp refinement of a result of Zverovich-Zverovich,
-     * Discrete Math. 338, 1085 (2015).
-     * https://dx.doi.org/10.1016/j.disc.2015.02.001
-     *
-     * a sufficient but not necessary condition of graphicality for a sequence of
-     * n strictly positive integers is that
-     *
-     * dmin * n >= floor( (dmax + dmin + 1)^2 / 4 ) - 1
-     * if dmin is odd or (dmax + dmin) mod 4 == 1
-     *
-     * or
-     *
-     * dmin * n >= floor( (dmax + dmin + 1)^2 / 4 )
-     * otherwise.
-     */
-
-    zverovich_bound = ((dmax + dmin + 1) * (dmax + dmin + 1)) / 4;
-    if (dmin % 2 == 1 || (dmax + dmin) % 4 == 1) {
-        zverovich_bound -= 1;
+    /* Note that this condition was already checked in the loop above using the
+     * sequence length p. Here we check using the number of non-zero degrees n. */
+    if (dmax > n-1) {
+        *res = false;
+        goto finish; /* max degree too large => non-graphical */
     }
 
-    if (dmin*n >= zverovich_bound) {
+    if (dmax == dmin) {
+        *res = true;
+        goto finish; /* regular graph, graphical */
+    }
+
+    /* This version of the Cloteaux inequality is derived by adding some zeros to the degree sequences. */
+    if (dsum - dmax >= dmax * dmax) {
+        *res = true;
+        goto finish;
+    }
+
+    cloteaux_bound = (dmax - dmin) * ( (double) (n - 1 - dmax) / (n*dmax - dsum) + (double) dmin / (dsum - n*dmin));
+
+    if (cloteaux_bound >= 1) {
         *res = true;
         goto finish;
     }
