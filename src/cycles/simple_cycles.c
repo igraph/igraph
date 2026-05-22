@@ -553,7 +553,7 @@ igraph_error_t igraph_simple_cycles_callback(
             // Check if the vertex is a candidate for a cycle.
             // Note that we call igraph_degree_1() here instead of retrieving the
             // neighbor count from igraph_adjlist_get(&state.AK, i) because:
-            //  - we need to the undirected degree in all cases, and
+            //  - we need the undirected degree in all cases, and
             //  - our algorithm modifies the adjlist state.AK
             igraph_int_t degree;
             IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
