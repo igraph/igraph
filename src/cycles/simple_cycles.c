@@ -61,9 +61,18 @@ typedef struct {
     /* Boolean vector indicating which vertices are blocked */
     igraph_bitset_t v_blocked;
 
-    /* Boolean vector indicating which vertices have ever been checked.
-     * The bigger picture here is that this allows a "lazy" community decomposition */
-    igraph_bitset_t v_visited;
+    /* Boolean vector indicating which vertices belong to components that were
+     * already processed as starting points. */
+    igraph_bitset_t v_exhausted;
+
+    /* Scratch stack for component traversal. */
+    igraph_vector_int_t component_stack;
+
+    /* Scratch bitset for forward reachability within a component. */
+    igraph_bitset_t component_forward_seen;
+
+    /* Reverse adjacency list used only for directed component marking. */
+    igraph_adjlist_t AK_reverse;
 
     /* Whether the graph is directed */
     igraph_bool_t directed;
@@ -127,6 +136,60 @@ static igraph_error_t simple_cycles_unblock(
     return IGRAPH_SUCCESS;
 }
 
+static igraph_int_t simple_cycles_vertex_degree(simple_cycle_search_state_t *state, igraph_int_t v) {
+    igraph_int_t degree = igraph_vector_int_size(igraph_adjlist_get(&state->AK, v));
+
+    if (state->directed) {
+        degree += igraph_vector_int_size(igraph_adjlist_get(&state->AK_reverse, v));
+    }
+
+    return degree;
+}
+
+/**
+ * Marks low-degree vertices reachable from the start vertex as exhausted,
+ * using the cached adjacency lists.
+ */
+static igraph_error_t simple_cycles_mark_exhausted_component(
+        simple_cycle_search_state_t *state,
+        igraph_int_t s) {
+
+    igraph_vector_int_t *neighbors;
+    igraph_int_t n_neighbors;
+    igraph_int_t degree;
+
+    degree = simple_cycles_vertex_degree(state, s);
+    if (degree >= 3) {
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_clear(&state->component_stack);
+    igraph_bitset_fill(&state->component_forward_seen, false);
+
+    IGRAPH_CHECK(igraph_vector_int_push_back(&state->component_stack, s));
+    IGRAPH_BIT_SET(state->component_forward_seen, s);
+
+    while (igraph_vector_int_size(&state->component_stack) > 0) {
+        const igraph_int_t v = igraph_vector_int_pop_back(&state->component_stack);
+
+        if (simple_cycles_vertex_degree(state, v) < 3) {
+            IGRAPH_BIT_SET(state->v_exhausted, v);
+            neighbors = igraph_adjlist_get(&state->AK, v);
+            n_neighbors = igraph_vector_int_size(neighbors);
+            for (igraph_int_t i = 0; i < n_neighbors; ++i) {
+                const igraph_int_t w = VECTOR(*neighbors)[i];
+                if (!IGRAPH_BIT_TEST(state->component_forward_seen, w) &&
+                    simple_cycles_vertex_degree(state, w) < 3) {
+                    IGRAPH_BIT_SET(state->component_forward_seen, w);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&state->component_stack, w));
+                }
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * The implementation of procedure CIRCUIT from Johnson's paper
  *
@@ -168,8 +231,6 @@ static igraph_error_t simple_cycles_circuit(
     while ((recurse_deeper ||
             igraph_stack_int_size(&neigh_iteration_progress) > 0) &&
             !state->stop_search) {
-        IGRAPH_BIT_SET(state->v_visited, V);
-
         IGRAPH_ASSERT(igraph_stack_int_size(&neigh_iteration_progress) ==
                       igraph_stack_int_size(&e_stack));
         IGRAPH_ASSERT(igraph_stack_int_size(&v_stack) ==
@@ -345,11 +406,15 @@ static igraph_error_t simple_cycle_search_state_init(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&state->edge_stack, 8);
     igraph_vector_int_clear(&state->edge_stack);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->component_stack, 8);
+    igraph_vector_int_clear(&state->component_stack);
 
     // by default false
     IGRAPH_BITSET_INIT_FINALLY(&state->v_blocked, state->N);
 
-    IGRAPH_BITSET_INIT_FINALLY(&state->v_visited, state->N);
+    IGRAPH_BITSET_INIT_FINALLY(&state->v_exhausted, state->N);
+
+    IGRAPH_BITSET_INIT_FINALLY(&state->component_forward_seen, state->N);
 
     IGRAPH_CHECK(igraph_inclist_init(
                      graph, &state->IK, mode,
@@ -360,10 +425,19 @@ static igraph_error_t simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_adjlist_init_from_inclist(graph, &state->AK, &state->IK));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->AK);
 
+    if (state->directed) {
+        igraph_neimode_t reverse_mode = (mode == IGRAPH_OUT) ? IGRAPH_IN : IGRAPH_OUT;
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &state->AK_reverse, reverse_mode,
+                                         IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
+    } else {
+        IGRAPH_CHECK(igraph_adjlist_init_empty(&state->AK_reverse, state->N));
+    }
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &state->AK_reverse);
+
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
-    IGRAPH_FINALLY_CLEAN(7);
+    IGRAPH_FINALLY_CLEAN(10);
 
     return IGRAPH_SUCCESS;
 }
@@ -381,10 +455,12 @@ static igraph_error_t simple_cycle_search_state_init(
  */
 static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state) {
 
-    igraph_adjlist_destroy(&state->B);
+    igraph_bitset_destroy(&state->component_forward_seen);
+    igraph_bitset_destroy(&state->v_exhausted);
     igraph_adjlist_destroy(&state->AK);
+    igraph_adjlist_destroy(&state->AK_reverse);
+    igraph_vector_int_destroy(&state->component_stack);
     igraph_inclist_destroy(&state->IK);
-    igraph_bitset_destroy(&state->v_visited);
     igraph_bitset_destroy(&state->v_blocked);
     igraph_vector_int_destroy(&state->edge_stack);
     igraph_vector_int_destroy(&state->vertex_stack);
@@ -465,6 +541,8 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
     IGRAPH_CHECK(simple_cycles_circuit(state, s, max_cycle_length,
                  min_cycle_length, callback, arg));
 
+    IGRAPH_CHECK(simple_cycles_mark_exhausted_component(state, s));
+
     for (igraph_int_t i = 0; i < state->N; ++i) {
         // We want to remove the vertex with value s, not at position s.
         // It's fine to use binary search since we never add to, only remove from
@@ -539,24 +617,11 @@ igraph_error_t igraph_simple_cycles_callback(
     IGRAPH_CHECK(simple_cycle_search_state_init(&state, graph, mode));
     IGRAPH_FINALLY(simple_cycle_search_state_destroy, &state);
 
-    // Depending on the graph, it is rather unreasonable to search cycles
-    // from each and every node. Instead, we expect that each cycle must involve
-    // either:
-    // - a vertex with degree > 2
-    // - or, if it's a freestanding cycle, be any vertex of this connected component;
-    //   components are identified via the `state->v_visited` boolean mask.
-    //
-    // Thus, we iterate over the vertices, and check if they can be skipped as
-    // a starting point according to the rules laid out above.
+    // Depending on the graph, it is rather unreasonable to search cycles from
+    // every vertex. Instead, once a component has been searched from any one
+    // start vertex, all of its vertices are marked as exhausted and skipped.
     for (igraph_int_t i = 0; i < state.N; i++) {
-        // Check if the vertex is a candidate for a cycle.
-        // Note that we call igraph_degree_1() here instead of retrieving the
-        // neighbor count from igraph_adjlist_get(&state.AK, i) because:
-        //  - we need to the undirected degree in all cases, and
-        //  - our algorithm modifies the adjlist state.AK
-        igraph_int_t degree;
-        IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
-        if (degree < 3 && IGRAPH_BIT_TEST(state.v_visited, i)) {
+        if (IGRAPH_BIT_TEST(state.v_exhausted, i)) {
             continue;
         }
         // Check if we find a cycle starting from this vertex.
