@@ -136,6 +136,12 @@ static igraph_error_t simple_cycles_unblock(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * Marks the strongly connected component of 
+ * 
+ * the start vertex as exhausted, using the existing subcomponent
+ * implementation from igraph.
+ */
 static igraph_int_t simple_cycles_vertex_degree(simple_cycle_search_state_t *state, igraph_int_t v) {
     igraph_int_t degree = igraph_vector_int_size(igraph_adjlist_get(&state->AK, v));
 
@@ -406,13 +412,14 @@ static igraph_error_t simple_cycle_search_state_init(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&state->edge_stack, 8);
     igraph_vector_int_clear(&state->edge_stack);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->component_stack, 8);
-    igraph_vector_int_clear(&state->component_stack);
 
     // by default false
     IGRAPH_BITSET_INIT_FINALLY(&state->v_blocked, state->N);
 
     IGRAPH_BITSET_INIT_FINALLY(&state->v_exhausted, state->N);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->component_stack, 8);
+    igraph_vector_int_clear(&state->component_stack);
 
     IGRAPH_BITSET_INIT_FINALLY(&state->component_forward_seen, state->N);
 
@@ -455,11 +462,12 @@ static igraph_error_t simple_cycle_search_state_init(
  */
 static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state) {
 
-    igraph_bitset_destroy(&state->component_forward_seen);
-    igraph_bitset_destroy(&state->v_exhausted);
-    igraph_adjlist_destroy(&state->AK);
+    igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK_reverse);
+    igraph_adjlist_destroy(&state->AK);
+    igraph_bitset_destroy(&state->component_forward_seen);
     igraph_vector_int_destroy(&state->component_stack);
+    igraph_bitset_destroy(&state->v_exhausted);
     igraph_inclist_destroy(&state->IK);
     igraph_bitset_destroy(&state->v_blocked);
     igraph_vector_int_destroy(&state->edge_stack);
@@ -525,12 +533,12 @@ static igraph_error_t append_simple_cycle_result(
  * https://epubs.siam.org/doi/epdf/10.1137/0204007
  */
 static igraph_error_t simple_cycles_search_callback_from_one_vertex(
-        simple_cycle_search_state_t *state,
-        igraph_int_t s,
-        igraph_int_t min_cycle_length,
-        igraph_int_t max_cycle_length,
-        igraph_cycle_handler_t *callback,
-        void *arg) {
+    simple_cycle_search_state_t *state,
+    igraph_int_t s,
+    igraph_int_t min_cycle_length,
+    igraph_int_t max_cycle_length,
+    igraph_cycle_handler_t *callback,
+    void *arg) {
 
     // L3:
     for (igraph_int_t i = s; i < state->N; ++i) {
