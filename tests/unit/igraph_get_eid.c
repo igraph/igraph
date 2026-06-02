@@ -22,16 +22,28 @@ int main(void) {
     igraph_t g;
     igraph_int_t eid;
 
-    igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
+    igraph_small(&g, 10, IGRAPH_UNDIRECTED,
+        0,1, 0,2, 0,3, 0,4, 0,5, 0,6,
+        -1);
+
+    /* EXISTING EDGE */
+    eid = 100;
+    igraph_get_eid(&g, &eid, 4, 0, IGRAPH_UNDIRECTED, /*error=*/ false);
+    IGRAPH_ASSERT(eid == 3);
+
+    /* NON-EXISTENT EDGE with error == false */
+    eid = 100;
+    igraph_get_eid(&g, &eid, 5, 6, IGRAPH_UNDIRECTED, /*error=*/ false);
+    IGRAPH_ASSERT(eid == -1);
 
     /* NON-EXISTENT EDGE */
-    CHECK_ERROR(igraph_get_eid(&g, &eid, 5, 6, IGRAPH_UNDIRECTED, /*error=*/ 1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_get_eid(&g, &eid, 5, 6, IGRAPH_UNDIRECTED, /*error=*/ true), IGRAPH_EINVAL);
 
     /* INVALID VERTEX ID */
-    CHECK_ERROR(igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ 1), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ true), IGRAPH_EINVVID);
 
-    /* INVALID VERTEX ID even if error == 0 */
-    CHECK_ERROR(igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ 0), IGRAPH_EINVVID);
+    /* INVALID VERTEX ID even if error == false */
+    CHECK_ERROR(igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ false), IGRAPH_EINVVID);
 
     igraph_destroy(&g);
 

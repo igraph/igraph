@@ -270,7 +270,7 @@ igraph_error_t igraph_is_independent_vertex_set(const igraph_t *graph, igraph_vs
     /* Note: igraph_count_loops() already makes use of the cache. */
     if (igraph_vs_is_all(&candidate)) {
         igraph_int_t loop_count;
-        igraph_count_loops(graph, &loop_count);
+        IGRAPH_CHECK(igraph_count_loops(graph, &loop_count));
         *res = (igraph_ecount(graph) - loop_count) == 0;
         return IGRAPH_SUCCESS;
     }

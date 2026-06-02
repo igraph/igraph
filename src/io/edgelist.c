@@ -144,7 +144,8 @@ igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstrea
     while (!IGRAPH_EIT_END(it)) {
         igraph_int_t from, to;
         int ret;
-        igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
+
+        IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to));
         ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",
                       from,
                       to);

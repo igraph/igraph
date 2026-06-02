@@ -264,7 +264,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                  * we choose one uniformly to connect to. */
                 to = RNG_INTEGER(0, i-1);
             } else {
-                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+                IGRAPH_CHECK(igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum)));
             }
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
@@ -391,7 +391,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
                      * we choose one uniformly to connect to. */
                     to = RNG_INTEGER(0, i-1);
                 } else {
-                    igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+                    IGRAPH_CHECK(igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum)));
                 }
                 VECTOR(degree)[to]++;
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
@@ -776,7 +776,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
                  * we choose one uniformly to connect to. */
                 to = RNG_INTEGER(0, i-1);
             } else {
-                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+                IGRAPH_CHECK(igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum)));
             }
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;

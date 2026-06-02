@@ -133,7 +133,7 @@ static igraph_error_t weighted_local_density(const igraph_t *graph, igraph_vecto
 
     IGRAPH_CHECK(igraph_strength(graph, &str, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS, weights));
 
-    igraph_vector_mul(res, &str);
+    IGRAPH_CHECK(igraph_vector_mul(res, &str));
 
     igraph_vector_destroy(&str);
     IGRAPH_FINALLY_CLEAN(1);
@@ -598,7 +598,7 @@ igraph_error_t igraph_community_voronoi(
         VECTOR(lengths2)[i] = 1 / (VECTOR(lengths2)[i]);
     }
     if (lengths) {
-        igraph_vector_mul(&lengths2, lengths);
+        IGRAPH_CHECK(igraph_vector_mul(&lengths2, lengths));
     }
 
     if (r < 0) {

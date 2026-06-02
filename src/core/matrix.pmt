@@ -985,7 +985,7 @@ igraph_error_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
                                     const TYPE(igraph_matrix) *from) {
 
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(to, from->nrow, from->ncol));
-    FUNCTION(igraph_vector, update)(&to->data, &from->data);
+    FUNCTION(igraph_vector, update)(&to->data, &from->data); /* reserved */
     return IGRAPH_SUCCESS;
 }
 

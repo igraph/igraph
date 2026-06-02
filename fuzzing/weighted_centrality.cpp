@@ -21,6 +21,21 @@
 #include <igraph.h>
 #include <cstdlib>
 
+const igraph_real_t eps = 1e-10;
+
+bool vector_isininterval_eps(const igraph_vector_t *v, igraph_real_t lo, igraph_real_t hi) {
+    const igraph_int_t n = igraph_vector_size(v);
+
+    for (igraph_int_t i=0; i < n; i++) {
+        igraph_real_t x = VECTOR(*v)[i];
+        if (igraph_cmp_epsilon(lo, x, eps) > 0 || igraph_cmp_epsilon(x, hi, eps) > 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -49,23 +64,32 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     if (igraph_create(&graph, &edges, Data[0], IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
+        const igraph_int_t vcount = igraph_vcount(&graph);
         igraph_vector_t v;
         igraph_vector_int_t iv;
         igraph_bool_t b;
         igraph_real_t r;
 
         /* Limit graph size for the sake of performance. */
-        if (igraph_vcount(&graph) <= 64) {
+        if (vcount <= 64) {
             igraph_vector_init(&v, 0);
             igraph_vector_int_init(&iv, 0);
 
-            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_ALL, false, 4);
-            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_IN, false, 5);
+            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_UNDIRECTED, false, 4);
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)/2));
+
+            igraph_betweenness_cutoff(&graph, &weights, &v, igraph_vss_all(), IGRAPH_DIRECTED, false, 5);
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount == 0 ? 0 : (vcount-1)*(vcount-2)));
+
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_DIRECTED,
                                            false, 4);
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*(vcount-1)/2));
+
             igraph_edge_betweenness_cutoff(&graph, &weights, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID), IGRAPH_UNDIRECTED,
                                            false, 3);
-            if (igraph_vcount(&graph) >= 10) {
+            IGRAPH_ASSERT(vector_isininterval_eps(&v, 0, vcount*(vcount-1)));
+
+            if (vcount >= 10) {
                 igraph_betweenness_subset(&graph, &weights,
                                           &v,
                                           igraph_vss_range(0,5), igraph_vss_range(5,10),
@@ -81,8 +105,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             igraph_harmonic_centrality_cutoff(&graph, &v, igraph_vss_all(), IGRAPH_IN, &weights, true, 4);
             igraph_global_efficiency(&graph, &weights, &r, IGRAPH_DIRECTED);
             igraph_local_efficiency(&graph, &weights, &v, igraph_vss_all(), IGRAPH_DIRECTED, IGRAPH_OUT);
+
             igraph_pagerank(&graph, &weights, &v, &r, 0.6, IGRAPH_DIRECTED, igraph_vss_all(),
                             IGRAPH_PAGERANK_ALGO_PRPACK, NULL);
+            IGRAPH_ASSERT(vcount == 0 || igraph_almost_equals(igraph_vector_sum(&v), 1.0, 1e-10));
+
             igraph_constraint(&graph, &v, igraph_vss_all(), &weights);
 
             {

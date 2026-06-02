@@ -40,9 +40,9 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_mergegrid_init(igraph_i_lay
 
 IGRAPH_PRIVATE_EXPORT void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid);
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
-                                                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
-                                                                        igraph_int_t id);
+IGRAPH_PRIVATE_EXPORT void igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+                                                              igraph_real_t x, igraph_real_t y, igraph_real_t r,
+                                                              igraph_int_t id);
 
 igraph_int_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y);

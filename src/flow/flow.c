@@ -1380,7 +1380,7 @@ static igraph_error_t igraph_i_mincut_undirected(
         igraph_vector_int_clear(neis2);  /* TODO: free it */
 
         /* Remove the deleted vertex from the heap entirely */
-        igraph_i_cutheap_reset_undefine(&heap, last);
+        IGRAPH_CHECK(igraph_i_cutheap_reset_undefine(&heap, last));
     }
 
     *res = mincut;
@@ -1435,10 +1435,11 @@ static igraph_error_t igraph_i_mincut_undirected(
            so we first collect the edges in mergehist, we don't
            need that anymore. Then we copy it to 'cut';  */
         if (cut) {
-            igraph_int_t from, to;
             igraph_vector_int_clear(&mergehist);
             for (i = 0; i < no_of_edges; i++) {
-                igraph_edge(graph, i, &from, &to);
+                igraph_int_t from = IGRAPH_FROM(graph, i);
+                igraph_int_t to = IGRAPH_TO(graph, i);
+
                 if ((IGRAPH_BIT_TEST(mark, from) && !IGRAPH_BIT_TEST(mark, to)) ||
                     (IGRAPH_BIT_TEST(mark, to) && !IGRAPH_BIT_TEST(mark, from))) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&mergehist, i));

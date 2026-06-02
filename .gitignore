@@ -5,7 +5,13 @@
 
 /tags
 /IGRAPH_VERSION
+/NEXT_VERSION
 /build
 /build-*
 /tools/**/*.pyc
-/include/igraph_version.h
+/src/io/parsers/
+/tests/unit/*.tmp
+/Testing/
+/interfaces/.venv/
+/interfaces/*.o
+interfaces/test.cpp

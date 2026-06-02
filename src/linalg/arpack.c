@@ -620,7 +620,7 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
                 w++; l2--;
             }
         }
-        igraph_vector_update(&order, &order2);
+        IGRAPH_CHECK(igraph_vector_update(&order, &order2));
         igraph_vector_copy_to(&d2, d);
         igraph_vector_destroy(&order2);
         igraph_vector_destroy(&d2);

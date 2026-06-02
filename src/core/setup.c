@@ -36,7 +36,7 @@ static igraph_error_t setup_rng(void) {
     igraph_rng_t *rng = igraph_rng_default();
 
     if (!rng->is_seeded) {
-        igraph_rng_seed(rng, igraph_i_get_random_seed());
+        IGRAPH_CHECK(igraph_rng_seed(rng, igraph_i_get_random_seed()));
         rng->is_seeded = true;
     };
 

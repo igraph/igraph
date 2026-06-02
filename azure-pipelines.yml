@@ -12,6 +12,39 @@ variables:
   CTEST_PARALLEL_LEVEL: 4
 
 jobs:
+
+  # Windows jobs take much longer to finish. We declare them first to increase the likelihood
+  # that they are started first. When the total number of jobs running at the same time is limited,
+  # this reduces the time it takes for the full set of jobs to complete.
+  - job: windows_static
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+
+  - job: windows_shared
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+        parameters:
+          build_shared: true
+          vsver: "14.4" # latest VS2022
+          vcpkg_target_triplet: x64-windows
+
+  - job: windows_static_32
+    pool:
+      vmImage: windows-latest
+
+    steps:
+      - template: .azure/build-win.yml
+        parameters:
+          vcpkg_target_triplet: x86-windows-static-md
+          arch: x86
+          vsver: "14.4"
+
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
     steps:
@@ -78,19 +111,19 @@ jobs:
           extra_cmake_args: "-DBLA_VENDOR=OpenBLAS"
           build_shared: true
 
-  - job: linux_clang_21
+  - job: linux_clang_23
     steps:
       - script: |
           sudo apt-get install ninja-build ccache -y
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 21
+          sudo ./llvm.sh 23
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-21  -DCMAKE_CXX_COMPILER=clang++-21'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-23 -DCMAKE_CXX_COMPILER=clang++-23'
 
   - job: linux_x87
     steps:
@@ -127,24 +160,6 @@ jobs:
         parameters:
           int_blas: false
           int_lapack: false
-
-  - job: windows_static
-    pool:
-      vmImage: windows-latest
-
-    steps:
-      - template: .azure/build-win.yml
-
-  - job: windows_shared
-    pool:
-      vmImage: windows-latest
-
-    steps:
-      - template: .azure/build-win.yml
-        parameters:
-          build_shared: true
-          vsver: "14.4" # latest VS2022
-          vcpkg_target_triplet: x64-windows
 
   - job: documentation
     steps:

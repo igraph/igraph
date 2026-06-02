@@ -167,8 +167,8 @@ igraph_error_t igraph_sbm_game(
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }
@@ -178,8 +178,8 @@ igraph_error_t igraph_sbm_game(
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }
@@ -192,8 +192,8 @@ igraph_error_t igraph_sbm_game(
                     if (vfrom == vto) {
                         vto = fromsize - 1;
                     }
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }
@@ -203,8 +203,8 @@ igraph_error_t igraph_sbm_game(
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }
@@ -214,8 +214,8 @@ igraph_error_t igraph_sbm_game(
                 while (last < maxedges) {
                     vto = floor((sqrt(8 * last + 1) - 1) / 2);
                     vfrom = last - (((igraph_real_t) vto) * (vto + 1.0)) / 2.0;
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }
@@ -225,8 +225,8 @@ igraph_error_t igraph_sbm_game(
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }
@@ -236,8 +236,8 @@ igraph_error_t igraph_sbm_game(
                 while (last < maxedges) {
                     vto = floor((sqrt(8 * last + 1) + 1) / 2);
                     vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
-                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                     last += RNG_GEOM(prob);
                     last += ! multiple; /* 1 for simple graph, 0 for multigraph */;
                 }

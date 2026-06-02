@@ -344,7 +344,8 @@ igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *graph, FILE *outst
     while (!IGRAPH_EIT_END(it)) {
         igraph_int_t from, to;
         igraph_real_t cap;
-        igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
+
+        IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to));
         cap = VECTOR(*capacity)[i++];
         ret1 = fprintf(outstream, "a %" IGRAPH_PRId " %" IGRAPH_PRId " ",
                        from + 1, to + 1);

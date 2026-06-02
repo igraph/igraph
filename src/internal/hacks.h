@@ -32,7 +32,7 @@
 #include <strings.h>
 #endif
 
-#include <stdlib.h>
+#include <string.h> /* _stricmp, _strnicmp, strdup, strndup */
 
 IGRAPH_BEGIN_C_DECLS
 

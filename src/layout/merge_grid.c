@@ -21,9 +21,9 @@
 #include "igraph_memory.h"
 
 
-static igraph_error_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
-                                    igraph_real_t xc, igraph_real_t yc,
-                                    igraph_int_t *x, igraph_int_t *y) {
+static void igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
+                                            igraph_real_t xc, igraph_real_t yc,
+                                            igraph_int_t *x, igraph_int_t *y) {
     if (xc <= grid->minx) {
         *x = 0;
     } else if (xc >= grid->maxx) {
@@ -39,8 +39,6 @@ static igraph_error_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_
     } else {
         *y = floor((yc - (grid->miny)) / (grid->deltay));
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
@@ -69,9 +67,9 @@ void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
 #define MAT(i,j) (grid->data[(grid->stepsy)*(j)+(i)])
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
 
-igraph_error_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
-                                       igraph_real_t x, igraph_real_t y, igraph_real_t r,
-                                       igraph_int_t id) {
+void igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
+                                        igraph_int_t id) {
     igraph_int_t cx, cy;
     igraph_int_t i, j;
 
@@ -120,8 +118,6 @@ igraph_error_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *g
 
 #undef DIST
 #undef DIST2
-
-    return IGRAPH_SUCCESS;
 }
 
 igraph_int_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,

@@ -510,8 +510,8 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
     }
 
     for (igraph_int_t edge=0; edge < ecount; edge++) {
-        igraph_int_t from = IGRAPH_FROM(graph, edge);
-        igraph_int_t to = IGRAPH_TO(graph, edge);
+        igraph_int_t s = IGRAPH_FROM(graph, edge);
+        igraph_int_t t = IGRAPH_TO(graph, edge);
         igraph_real_t w = VECTOR(*weights)[edge];
 
         if (w == -IGRAPH_INFINITY) {
@@ -519,8 +519,8 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
             continue;
         }
 
-        if (out && MATRIX(*res, from, to) < w) MATRIX(*res, from, to) = w;
-        if (in  && MATRIX(*res, to, from) < w) MATRIX(*res, to, from) = w;
+        if (out && MATRIX(*res, s, t) < w) MATRIX(*res, s, t) = w;
+        if (in  && MATRIX(*res, t, s) < w) MATRIX(*res, t, s) = w;
     }
 
     /* Run modified Floyd Warshall */

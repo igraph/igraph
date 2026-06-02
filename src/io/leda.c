@@ -221,8 +221,8 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
             igraph_int_t eid = IGRAPH_EIT_GET(it);
-            igraph_edge(graph, eid, &from, &to);
-            igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
+            IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+            IGRAPH_CHECK(igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false));
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }
@@ -245,8 +245,8 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         while (!IGRAPH_EIT_END(it)) {
             igraph_int_t eid = IGRAPH_EIT_GET(it);
             const char *str = igraph_strvector_get(&values, eid);
-            igraph_edge(graph, eid, &from, &to);
-            igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
+            IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+            IGRAPH_CHECK(igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false));
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }
@@ -271,8 +271,8 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
 
         while (!IGRAPH_EIT_END(it)) {
             igraph_int_t eid = IGRAPH_EIT_GET(it);
-            igraph_edge(graph, eid, &from, &to);
-            igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
+            IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+            IGRAPH_CHECK(igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false));
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }
@@ -288,8 +288,8 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
     } else {
         /* Edges with no attributes */
         while (!IGRAPH_EIT_END(it)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-            igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
+            IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to));
+            IGRAPH_CHECK(igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false));
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }

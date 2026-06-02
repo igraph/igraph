@@ -175,7 +175,7 @@ igraph_error_t igraph_convex_hull_2d(
         IGRAPH_CHECK(igraph_vector_int_append(resverts, &stack));
     }
     if (rescoords != 0) {
-        igraph_matrix_select_rows(data, rescoords, &stack);
+        IGRAPH_CHECK(igraph_matrix_select_rows(data, rescoords, &stack));
     }
 
     /* Free everything */

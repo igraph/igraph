@@ -128,6 +128,11 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
             if (to < 0) {
                 IGRAPH_CHECK(handle_input_error(instream));
             }
+            if (to >= nodes) {
+                IGRAPH_ERRORF("Invalid zero-based vertex ID %" IGRAPH_PRId " in graphdb file. "
+                              "Number of vertices is %" IGRAPH_PRId ".",
+                              IGRAPH_PARSEERROR, to, nodes);
+            }
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
             IGRAPH_ALLOW_INTERRUPTION();

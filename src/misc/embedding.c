@@ -739,15 +739,15 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
     }
 
     if (zapsmall) {
-        igraph_vector_zapsmall(&tmpD, 0);
-        igraph_matrix_zapsmall(X, 0);
+        IGRAPH_CHECK(igraph_vector_zapsmall(&tmpD, 0));
+        IGRAPH_CHECK(igraph_matrix_zapsmall(X, 0));
         if (Y) {
-            igraph_matrix_zapsmall(Y, 0);
+            IGRAPH_CHECK(igraph_matrix_zapsmall(Y, 0));
         }
     }
 
     if (D) {
-        igraph_vector_update(D, &tmpD);
+        IGRAPH_CHECK(igraph_vector_update(D, &tmpD));
         if (!eigen) {
             for (i = 0; i < no; i++) {
                 VECTOR(*D)[i] = sqrt(VECTOR(*D)[i]);

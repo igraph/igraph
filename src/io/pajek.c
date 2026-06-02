@@ -686,7 +686,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     for (igraph_int_t i = 0; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
         igraph_int_t edge = IGRAPH_EIT_GET(eit);
         igraph_int_t from, to;
-        igraph_edge(graph, edge, &from,  &to);
+
+        IGRAPH_CHECK(igraph_edge(graph, edge, &from,  &to));
         if (bipartite) {
             from = VECTOR(bip_index2)[from];
             to  = VECTOR(bip_index2)[to];

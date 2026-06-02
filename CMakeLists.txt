@@ -31,7 +31,7 @@ endif()
 include(PreventInSourceBuilds)
 
 # Make use of ccache if it is present on the host system -- unless explicitly
-# asked to disable it
+# asked to disable it. This must come before the project() call.
 include(UseCCacheWhenInstalled)
 
 # Figure out the version number from Git
