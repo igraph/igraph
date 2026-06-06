@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "barnes_hut.h"
+#include "igraph_barnes_hut.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 

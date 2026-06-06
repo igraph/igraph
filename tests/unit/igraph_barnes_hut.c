@@ -21,7 +21,6 @@
 #include <stdio.h>
 
 #include "test_utilities.h"
-#include "core/barnes_hut.h"
 
 /* --- Physics Plugins (Kernels) for Testing --- */
 

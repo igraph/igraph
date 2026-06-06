@@ -18,7 +18,6 @@
 
 #include <igraph.h>
 #include "bench.h"
-#include "core/barnes_hut.h"
 
 
 /* * Dummy force calculation for benchmarking.
