@@ -346,6 +346,7 @@ int main(void) {
 
 
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2428987492
+    printf("\nTesting directed graph of type 'arrow'\n");
     igraph_small(&g, 5, IGRAPH_DIRECTED,
         0, 1,
         1, 2,
@@ -412,10 +413,11 @@ int main(void) {
     // 0 --> 1
     // |  /  |
     // vy    v
-    // 5 <-> 2
+    // 5 <=> 2
     // ^  \
     // |    v
     // 4 --> 3
+    printf("\nTesting directed graph with a 2-cycle and multiple other undirected cycles\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED,
                  0, 1,
                  0, 5,
