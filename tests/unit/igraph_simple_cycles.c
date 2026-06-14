@@ -348,13 +348,13 @@ int main(void) {
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-2428987492
     printf("\nTesting directed graph of type 'arrow'\n");
     igraph_small(&g, 5, IGRAPH_DIRECTED,
-        0, 1,
-        1, 2,
-        2, 3,
-        3, 0,
-        1, 4,
-        4, 2,
-        -1);
+                 0, 1,
+                 1, 2,
+                 2, 3,
+                 3, 0,
+                 1, 4,
+                 4, 2,
+                 -1);
     check_cycles(&g, IGRAPH_OUT, 2);
     check_cycles_permuted(&g, IGRAPH_OUT, 2);
     check_cycles_max(&g, IGRAPH_OUT, 0, 3);
@@ -365,15 +365,15 @@ int main(void) {
 
     printf("\nTesting directed graph of type 'stable boat'\n");
     igraph_small(&g, 5, IGRAPH_DIRECTED,
-         0, 2,
-         0, 3,
-         0, 4,
-         1, 0,
-         2, 3,
-         3, 4,
-         4, 1,
-         4, 3,
-        -1);
+                 0, 2,
+                 0, 3,
+                 0, 4,
+                 1, 0,
+                 2, 3,
+                 3, 4,
+                 4, 1,
+                 4, 3,
+                 -1);
     check_cycles(&g, IGRAPH_OUT, 4);
     check_cycles_permuted(&g, IGRAPH_OUT, 4);
     check_cycles_max(&g, IGRAPH_OUT, 1, 2);
@@ -439,62 +439,62 @@ int main(void) {
 
     printf("\nTesting undirected graph of type 'Mickey'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
-                     0,1,
-                     1,2,
-                     2,0,
-                     0,0,
-                     0,3,
-                     3,4,
-                     4,5,
-                     5,0,
-                     -1);
+                 0,1,
+                 1,2,
+                 2,0,
+                 0,0,
+                 0,3,
+                 3,4,
+                 4,5,
+                 5,0,
+                 -1);
     check_cycles(&g, IGRAPH_ALL, 3);
     check_cycles_permuted(&g, IGRAPH_ALL, 3);
     igraph_destroy(&g);
 
     printf("\nTesting undirected graph of type 'Mickey2'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
-                     0,1,
-                     1,2,
-                     2,0,
-                     1,1,
-                     0,3,
-                     3,4,
-                     4,5,
-                     5,0,
-                     -1);
+                 0,1,
+                 1,2,
+                 2,0,
+                 1,1,
+                 0,3,
+                 3,4,
+                 4,5,
+                 5,0,
+                 -1);
     check_cycles(&g, IGRAPH_ALL, 3);
     check_cycles_permuted(&g, IGRAPH_ALL, 3);
     igraph_destroy(&g);
     igraph_small(&g, 7, IGRAPH_DIRECTED,
-                     0,1,
-                     1,2,
-                     2,0,
-                     1,1,
-                     0,3,
-                     3,4,
-                     4,5,
-                     5,0,
-                     -1);
+                 0,1,
+                 1,2,
+                 2,0,
+                 1,1,
+                 0,3,
+                 3,4,
+                 4,5,
+                 5,0,
+                 -1);
     check_cycles(&g, IGRAPH_ALL, 3);
     igraph_destroy(&g);
 
     // as requested in https://github.com/igraph/igraph/issues/2692#issuecomment-2457627378
     printf("\nTesting undirected graph of type 'Mickey3'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
-                     0, 1,
-                     1, 2,
-                     2, 0,
-                     0, 3,
-                     3, 4,
-                     4, 5,
-                     5, 0,
-                     1, 1,
-                     5, 6,
-                     6, 5,
-                     5, 5,
-                     5, 5,
-                     -1);
+                 0, 1,
+                 1, 2,
+                 2, 0,
+                 0, 3,
+                 3, 4,
+                 4, 5,
+                 5, 0,
+                 1, 1,
+                 5, 6,
+                 6, 5,
+                 5, 5,
+                 5, 5,
+                 -1);
     check_cycles(&g, IGRAPH_ALL, 6);
     check_cycles_permuted(&g, IGRAPH_ALL, 6);
     igraph_destroy(&g);

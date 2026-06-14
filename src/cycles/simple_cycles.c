@@ -437,6 +437,7 @@ static igraph_error_t append_simple_cycle_result(
  *
  * \param state The state structure to search on.
  * \param s The vertex index to start search with.
+ * \param in_component A bitset indicating which vertices are in the same component as s.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value for no limit.
  * \param callback The callback function to call when a cycle is found.
@@ -458,7 +459,7 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex_in_component
     igraph_cycle_handler_t *callback,
     void *arg) {
 
-    for (igraph_int_t i = 0; i < state->N; ++i) {
+    for (igraph_int_t i = s; i < state->N; ++i) {
         IGRAPH_BIT_CLEAR(state->v_blocked, i);
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
@@ -545,6 +546,50 @@ igraph_error_t igraph_simple_cycles_callback(
     while (!state.stop_search) {
         igraph_int_t no_comps;
         IGRAPH_CHECK(igraph_connected_components(&working_graph, &membership, &csize, &no_comps, scc_mode));
+
+        if (!state.directed) {
+            igraph_vector_int_t comp_edges;
+            igraph_vector_int_t edges_to_delete;
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&comp_edges, no_comps);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_to_delete, 0);
+
+            igraph_int_t no_edges = igraph_ecount(&working_graph);
+            for (igraph_int_t e = 0; e < no_edges; e++) {
+                igraph_int_t u, v;
+                igraph_edge(&working_graph, e, &u, &v);
+                igraph_int_t c_id = VECTOR(membership)[u];
+                VECTOR(comp_edges)[c_id]++;
+            }
+
+            for (igraph_int_t e = 0; e < no_edges; e++) {
+                igraph_int_t u, v;
+                igraph_edge(&working_graph, e, &u, &v);
+                igraph_int_t c_id = VECTOR(membership)[u];
+                if (VECTOR(comp_edges)[c_id] < VECTOR(csize)[c_id]) {
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges_to_delete, e));
+                }
+            }
+
+            if (igraph_vector_int_size(&edges_to_delete) > 0) {
+                IGRAPH_CHECK(igraph_delete_edges(&working_graph, igraph_ess_vector(&edges_to_delete)));
+            }
+
+            for (igraph_int_t i = 0; i < state.N; i++) {
+                if (IGRAPH_BIT_TEST(removed, i)) {
+                    continue;
+                }
+                igraph_int_t c_id = VECTOR(membership)[i];
+                if (VECTOR(comp_edges)[c_id] < VECTOR(csize)[c_id]) {
+                    IGRAPH_BIT_SET(removed, i);
+                }
+            }
+
+            igraph_vector_int_destroy(&edges_to_delete);
+            igraph_vector_int_destroy(&comp_edges);
+            IGRAPH_FINALLY_CLEAN(2);
+
+            IGRAPH_CHECK(igraph_connected_components(&working_graph, &membership, &csize, &no_comps, scc_mode));
+        }
 
         // Find the first vertex in a non-trivial component
         igraph_int_t s = -1;
