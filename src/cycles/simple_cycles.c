@@ -432,12 +432,11 @@ static igraph_error_t append_simple_cycle_result(
 }
 
 /**
- * \function simple_cycles_search_callback_from_one_vertex_in_component
+ * \function simple_cycles_search_callback_from_one_vertex
  * \brief Search simple cycles starting from one vertex.
  *
  * \param state The state structure to search on.
  * \param s The vertex index to start search with.
- * \param in_component A bitset indicating which vertices are in the component to search.
  * \param max_cycle_length Limit the maximum length of cycles to search for.
  *   Pass a negative value for no limit.
  * \param callback The callback function to call when a cycle is found.
@@ -468,35 +467,6 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex_in_component
                                        min_cycle_length, callback, arg));
 
     return IGRAPH_SUCCESS;
-}
-
-/**
- * \function simple_cycles_search_callback_from_one_vertex
- * \brief Search simple cycles starting from one vertex.
- *
- * \param state The state structure to search on.
- * \param s The vertex index to start search with.
- * \param max_cycle_length Limit the maximum length of cycles to search for.
- *   Pass a negative value for no limit.
- * \param callback The callback function to call when a cycle is found.
- *   See \ref igraph_cycle_handler_t() for details.
- * \param arg The additional argument(s) for the callback function.
- *
- * \return Error code.
- *
- * https://en.wikipedia.org/wiki/Johnson%27s_algorithm
- * https://stackoverflow.com/a/35922906/3909202
- * https://epubs.siam.org/doi/epdf/10.1137/0204007
- */
-static igraph_error_t simple_cycles_search_callback_from_one_vertex(
-    simple_cycle_search_state_t *state,
-    igraph_int_t s,
-    igraph_int_t min_cycle_length,
-    igraph_int_t max_cycle_length,
-    igraph_cycle_handler_t *callback,
-    void *arg) {
-    return simple_cycles_search_callback_from_one_vertex_in_component(
-               state, s, NULL, min_cycle_length, max_cycle_length, callback, arg);
 }
 
 /**
@@ -570,9 +540,11 @@ igraph_error_t igraph_simple_cycles_callback(
     igraph_bitset_t in_component;
     IGRAPH_BITSET_INIT_FINALLY(&in_component, state.N);
 
+    igraph_connectedness_t scc_mode = state.directed ? IGRAPH_STRONG : IGRAPH_WEAK;
+
     while (!state.stop_search) {
         igraph_int_t no_comps;
-        IGRAPH_CHECK(igraph_connected_components(&working_graph, &membership, &csize, &no_comps, IGRAPH_STRONG));
+        IGRAPH_CHECK(igraph_connected_components(&working_graph, &membership, &csize, &no_comps, scc_mode));
 
         // Find the first vertex in a non-trivial component
         igraph_int_t s = -1;
