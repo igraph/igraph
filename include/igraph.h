@@ -93,5 +93,6 @@
 #include "igraph_reachability.h"
 #include "igraph_spatial.h"
 #include "igraph_sampling.h"
+#include "igraph_barnes_hut.h"
 
 #endif
