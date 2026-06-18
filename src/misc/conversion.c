@@ -22,6 +22,7 @@
 
 #include "igraph_conversion.h"
 
+#include "igraph_error.h"
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
@@ -29,6 +30,7 @@
 #include "igraph_structural.h"
 #include "igraph_sparsemat.h"
 #include "igraph_random.h"
+#include "igraph_vector_list.h"
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
@@ -158,6 +160,111 @@ igraph_error_t igraph_get_adjacency(
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup conversion
+ * \function igraph_get_adjacency_submatrix
+ * \brief A submatrix of the adjacency matrix of a graph.
+ *
+ * </para><para>
+ * The result is a submatrix of the adjacency matrix. Entry i, j of the matrix
+ * contains the number of edges connecting vertex i of the row selection
+ * to vertex j of the column selection in the unweighted case, or the total weight
+ * of edges in the weighted case.
+ *
+ * \param graph Pointer to the graph to convert
+ * \param res Pointer to an initialized matrix object, it will be
+ *        resized if needed.
+ * \param rows Vertices that make up the rows of the matrix.
+ * \param cols Vertices that make up the columns of the matrix.
+ * \param weights An optional vector containing the weight of each edge
+ *        in the graph. Supply a null pointer here to make all edges have
+ *        the same weight of 1.
+ * \param loops Constant specifying how loop edges should be handled.
+ *        Possible values:
+ *        \clist
+ *        \cli IGRAPH_NO_LOOPS
+ *          loop edges are ignored and the diagonal of the matrix will contain
+ *          zeros only
+ *        \cli IGRAPH_LOOPS_ONCE
+ *          loop edges are counted once, i.e. a vertex with a single unweighted
+ *          loop edge will have 1 in the corresponding diagonal entry
+ *        \cli IGRAPH_LOOPS_TWICE
+ *          loop edges are counted twice in \em undirected graphs, i.e. a vertex
+ *          with a single unweighted loop edge in an undirected graph will have
+ *          2 in the corresponding diagonal entry. Loop edges in directed graphs
+ *          are still counted as 1. Essentially, this means that the function is
+ *          counting the incident edge \em stems , which makes more sense when
+ *          using the adjacency matrix in linear algebra.
+ *        \endclist
+ *
+ */
+
+igraph_error_t igraph_get_adjacency_submatrix(
+    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_vs_t rows, const igraph_vs_t cols,
+    const igraph_vector_t *weights, igraph_loops_t loops
+) {
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t from, to;
+    igraph_integer_t nr_rows, nr_cols;
+    igraph_vit_t row, col;
+    igraph_vector_int_t eids;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
+
+    IGRAPH_CHECK(igraph_vs_size(graph, &rows, &nr_rows));
+    IGRAPH_CHECK(igraph_vs_size(graph, &cols, &nr_cols));
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, nr_rows, nr_cols));
+    igraph_matrix_null(res);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, rows, &row));
+    IGRAPH_FINALLY(igraph_vit_destroy, &row);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, cols, &col));
+    IGRAPH_FINALLY(igraph_vit_destroy, &col);
+
+    if (directed) {
+        for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
+            IGRAPH_VIT_RESET(col);
+            for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
+                from = IGRAPH_VIT_GET(row);
+                to = IGRAPH_VIT_GET(col);
+                if (from != to || loops != IGRAPH_NO_LOOPS) {
+                    IGRAPH_CHECK(igraph_get_all_eids_between(graph, &eids, from, to, directed));
+                    for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                }
+            }
+        }
+    } else {
+        for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
+            IGRAPH_VIT_RESET(col);
+            for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
+                from = IGRAPH_VIT_GET(row);
+                to = IGRAPH_VIT_GET(col);
+                IGRAPH_CHECK(igraph_get_all_eids_between(graph, &eids, from, to, directed));
+                for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
+                    if (to != from || loops == IGRAPH_LOOPS_TWICE) {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                    if (to == from && loops != IGRAPH_NO_LOOPS) {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                }
+            }
+        }
+    }
+
+    igraph_vit_destroy(&col);
+    igraph_vit_destroy(&row);
+    igraph_vector_int_destroy(&eids);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}
+
 
 /**
  * \function igraph_get_adjacency_sparse
