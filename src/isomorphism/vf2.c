@@ -45,6 +45,15 @@
  * </para>
  *
  * <para>
+ * VF2 subgraph searches support both induced and non-induced matching.
+ * Non-induced matching permits additional edges between the matched vertices
+ * of the larger graph. Induced matching requires the matched vertices to have
+ * exactly the same adjacency relationships as the smaller graph. Use the
+ * <code>induced</code> argument of the subgraph-isomorphism functions to select
+ * the desired behavior.
+ * </para>
+ *
+ * <para>
  * VF2 works with both directed and undirected graphs. Only simple graphs are supported.
  * Self-loops or multi-edges must not be present in the graphs. Currently, the VF2
  * functions do not check that the input graph is simple: it is the responsibility
@@ -1015,7 +1024,11 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
  *   determine whether two edges are compatible.
  * \param arg Extra argument to supply to functions \p isohandler_fn, \p
  *   node_compat_fn and \p edge_compat_fn.
- * \param induced Whether to require the matched subgraph to be induced.
+ * \param induced Whether to require induced subgraph isomorphisms. If false,
+ *   additional edges between matched vertices of \p graph1 are allowed. If
+ *   true, two matched vertices are adjacent in \p graph1 if and only if their
+ *   corresponding vertices are adjacent in \p graph2. For directed graphs,
+ *   edge direction is taken into account.
  * \return Error code.
  *
  * Time complexity: exponential.
