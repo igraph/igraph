@@ -1015,6 +1015,7 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
  *   determine whether two edges are compatible.
  * \param arg Extra argument to supply to functions \p isohandler_fn, \p
  *   node_compat_fn and \p edge_compat_fn.
+ * \param induced Whether to require the matched subgraph to be induced.
  * \return Error code.
  *
  * Time complexity: exponential.
@@ -1026,7 +1027,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
     const igraph_vector_int_t *edge_color1, const igraph_vector_int_t *edge_color2,
     igraph_vector_int_t *map12, igraph_vector_int_t *map21,
     igraph_isohandler_t *isohandler_fn, igraph_isocompat_t *node_compat_fn,
-    igraph_isocompat_t *edge_compat_fn, void *arg
+    igraph_isocompat_t *edge_compat_fn, void *arg, igraph_bool_t induced
 ) {
 
     igraph_int_t no_of_nodes1 = igraph_vcount(graph1),
@@ -1313,7 +1314,13 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             vsize = igraph_vector_int_size(inneis_1);
             for (i = 0; !end && i < vsize; i++) {
                 igraph_int_t node = VECTOR(*inneis_1)[i];
-                if (VECTOR(*core_1)[node] < 0) {
+                if (induced && VECTOR(*core_1)[node] >= 0) {
+                    igraph_int_t node2 = VECTOR(*core_1)[node];
+                    /* Reject target edges absent from the pattern. */
+                    if (!igraph_vector_int_contains_sorted(inneis_2, node2)) {
+                        end = true;
+                    }
+                } else if (VECTOR(*core_1)[node] < 0) {
                     if (VECTOR(in_1)[node] != 0) {
                         xin1++;
                     }
@@ -1325,7 +1332,13 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             vsize = igraph_vector_int_size(outneis_1);
             for (i = 0; !end && i < vsize; i++) {
                 igraph_int_t node = VECTOR(*outneis_1)[i];
-                if (VECTOR(*core_1)[node] < 0) {
+                if (induced && VECTOR(*core_1)[node] >= 0) {
+                    igraph_int_t node2 = VECTOR(*core_1)[node];
+                    /* Reject target edges absent from the pattern. */
+                    if (!igraph_vector_int_contains_sorted(outneis_2, node2)) {
+                        end = true;
+                    }
+                } else if (VECTOR(*core_1)[node] < 0) {
                     if (VECTOR(in_1)[node] != 0) {
                         xin1++;
                     }
@@ -1562,6 +1575,7 @@ static igraph_error_t igraph_i_subisomorphic_vf2_cb(
  *   determine whether two edges are compatible.
  * \param arg Extra argument to supply to functions \p node_compat_fn
  *   and \p edge_compat_fn.
+ * \param induced Whether to require the matched subgraph to be induced.
  * \return Error code.
  *
  * Time complexity: exponential.
@@ -1576,7 +1590,8 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
                              igraph_vector_int_t *map21,
                              igraph_isocompat_t *node_compat_fn,
                              igraph_isocompat_t *edge_compat_fn,
-                             void *arg) {
+                             void *arg,
+                             igraph_bool_t induced) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, iso, arg };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
@@ -1588,7 +1603,7 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
                  edge_color1, edge_color2,
                  map12, map21,
                  (igraph_isohandler_t *) igraph_i_subisomorphic_vf2_cb,
-                 ncb, ecb, &data));
+                 ncb, ecb, &data, induced));
     if (! *iso) {
         if (map12) {
             igraph_vector_int_clear(map12);
@@ -1644,6 +1659,7 @@ static igraph_error_t igraph_i_count_subisomorphisms_vf2_cb(
  *   determine whether two edges are compatible.
  * \param arg Extra argument to supply to functions \p node_compat_fn and
  *   \p edge_compat_fn.
+ * \param induced Whether to count only induced subgraph isomorphisms.
  * \return Error code.
  *
  * Time complexity: exponential.
@@ -1657,7 +1673,8 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
                                      igraph_int_t *count,
                                      igraph_isocompat_t *node_compat_fn,
                                      igraph_isocompat_t *edge_compat_fn,
-                                     void *arg) {
+                                     void *arg,
+                                     igraph_bool_t induced) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn,
                                     count, arg
@@ -1670,7 +1687,7 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
                  edge_color1, edge_color2,
                  0, 0,
                  (igraph_isohandler_t*) igraph_i_count_subisomorphisms_vf2_cb,
-                 ncb, ecb, &data));
+                 ncb, ecb, &data, induced));
     return IGRAPH_SUCCESS;
 }
 
@@ -1709,6 +1726,7 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
  *   determine whether two edges are compatible.
  * \param arg Extra argument to supply to functions \p node_compat_fn
  *   and \p edge_compat_fn.
+ * \param induced Whether to return only induced subgraph isomorphisms.
  * \return Error code.
  *
  * Time complexity: exponential.
@@ -1723,7 +1741,8 @@ igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                                    igraph_vector_int_list_t *maps,
                                    igraph_isocompat_t *node_compat_fn,
                                    igraph_isocompat_t *edge_compat_fn,
-                                   void *arg) {
+                                   void *arg,
+                                   igraph_bool_t induced) {
 
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, maps, arg };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : NULL;
@@ -1735,7 +1754,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                  edge_color1, edge_color2,
                  NULL, NULL,
                  (igraph_isohandler_t*) igraph_i_store_mapping_vf2_cb,
-                 ncb, ecb, &data));
+                 ncb, ecb, &data, induced));
 
     return IGRAPH_SUCCESS;
 }

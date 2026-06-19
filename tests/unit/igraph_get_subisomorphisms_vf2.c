@@ -59,7 +59,7 @@ void check_print_destroy(igraph_t *g1,
                          int error) {
     igraph_vector_int_list_t maps;
     igraph_vector_int_list_init(&maps, 0);
-    IGRAPH_ASSERT(igraph_get_subisomorphisms_vf2(g1, g2, vertex_color1, vertex_color2, edge_color1, edge_color2, &maps, node_compat_fn, edge_compat_fn, arg) == error);
+    IGRAPH_ASSERT(igraph_get_subisomorphisms_vf2(g1, g2, vertex_color1, vertex_color2, edge_color1, edge_color2, &maps, node_compat_fn, edge_compat_fn, arg, false) == error);
     print_and_destroy_maps(&maps);
     printf("\n");
 }
@@ -72,7 +72,10 @@ int main(void) {
     igraph_t ring, ring_dir;
     igraph_t ring_plus, ring_plus_dir;
     igraph_t ring_loop;
+    igraph_t triangle, path3, path4;
+    igraph_t transitive_triangle, directed_path3;
     igraph_t g_0, g_1;
+    igraph_int_t count;
     igraph_vector_int_t coloring;
     igraph_vector_int_t plus_edge_coloring;
     igraph_vector_int_t plus_vertex_coloring;
@@ -89,6 +92,38 @@ int main(void) {
     igraph_ring(&ring_dir, 5, /*directed*/ 1, /*mutual*/ 0, /*circular*/ 1);
     igraph_ring(&ring_loop, 5, /*directed*/ 0, /*mutual*/ 0, /*circular*/ 1);
     igraph_add_edge(&ring_loop, 2, 2);
+    igraph_small(&triangle, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, 0,2, -1);
+    igraph_small(&path3, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+    igraph_small(&path4, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, -1);
+    igraph_small(&transitive_triangle, 3, IGRAPH_DIRECTED, 0,1, 1,2, 0,2, -1);
+    igraph_small(&directed_path3, 3, IGRAPH_DIRECTED, 0,1, 1,2, -1);
+
+    igraph_count_subisomorphisms_vf2(
+        &triangle, &path3, NULL, NULL, NULL, NULL, &count, NULL, NULL, NULL, false
+    );
+    IGRAPH_ASSERT(count == 6);
+
+    igraph_count_subisomorphisms_vf2(
+        &triangle, &path3, NULL, NULL, NULL, NULL, &count, NULL, NULL, NULL, true
+    );
+    IGRAPH_ASSERT(count == 0);
+
+    igraph_count_subisomorphisms_vf2(
+        &path4, &path3, NULL, NULL, NULL, NULL, &count, NULL, NULL, NULL, true
+    );
+    IGRAPH_ASSERT(count == 4);
+
+    igraph_count_subisomorphisms_vf2(
+        &transitive_triangle, &directed_path3,
+        NULL, NULL, NULL, NULL, &count, NULL, NULL, NULL, false
+    );
+    IGRAPH_ASSERT(count == 1);
+
+    igraph_count_subisomorphisms_vf2(
+        &transitive_triangle, &directed_path3,
+        NULL, NULL, NULL, NULL, &count, NULL, NULL, NULL, true
+    );
+    IGRAPH_ASSERT(count == 0);
 
     printf("Two empty graphs:\n");
     check_print_destroy_simple(&g_0, &g_0);
@@ -142,6 +177,11 @@ int main(void) {
     igraph_destroy(&ring_plus);
     igraph_destroy(&ring_plus_dir);
     igraph_destroy(&ring_loop);
+    igraph_destroy(&triangle);
+    igraph_destroy(&path3);
+    igraph_destroy(&path4);
+    igraph_destroy(&transitive_triangle);
+    igraph_destroy(&directed_path3);
     igraph_vector_int_destroy(&coloring);
     igraph_vector_int_destroy(&plus_edge_coloring);
     igraph_vector_int_destroy(&plus_vertex_coloring);
