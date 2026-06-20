@@ -84,6 +84,10 @@ IGRAPH_EXPORT igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE 
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                           const char* vertex_attr_name, const char* edge_attr_name);
 
+IGRAPH_EXPORT igraph_error_t igraph_to_nauty(const igraph_t *graph, char **res);
+IGRAPH_EXPORT igraph_error_t igraph_from_nauty(igraph_t *graph, const char *str);
+
+
 /* -------------------------------------------------- */
 /* Convenience functions for temporary locale setting */
 /* -------------------------------------------------- */
