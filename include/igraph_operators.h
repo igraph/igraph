@@ -112,6 +112,10 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_rooted_product(igraph_t 
                                                    const igraph_t *g2,
                                                    igraph_int_t root);
 IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_mycielskian(const igraph_t *graph, igraph_t *res, igraph_int_t k);
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_corona_product(igraph_t *res,
+                                                   const igraph_t *g1,
+                                                   const igraph_t *g2,
+                                                   igraph_neimode_t mode);
 
 IGRAPH_END_C_DECLS
 
