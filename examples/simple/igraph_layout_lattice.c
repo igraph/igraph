@@ -56,6 +56,13 @@ int main(void) {
     printf("Triangular lattice layout coordinates:\n");
     igraph_matrix_print(&res_m);
 
+    printf("triangle shape ----------------\n");
+    igraph_vector_int_destroy(&dims);
+    igraph_vector_int_init(&dims, 1);
+    VECTOR(dims)[0] = 4;
+    IGRAPH_ASSERT(igraph_layout_triangular(NULL, &res_m, &dims) == IGRAPH_SUCCESS);
+    igraph_matrix_print(&res_m);
+
     igraph_matrix_destroy(&res_m);
     igraph_vector_int_destroy(&dims);
     igraph_destroy(&graph);

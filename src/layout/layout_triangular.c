@@ -22,6 +22,43 @@
 #include "math/safe_intop.h"
 
 
+igraph_error_t triangular_lattice_layout_triangle_shape(const igraph_t *graph, igraph_matrix_t *res, const igraph_vector_int_t *dims) {
+
+    igraph_integer_t i, temp_sum_res, no_of_nodes;
+    igraph_integer_t x, y, dim_length;
+
+    if (igraph_vector_int_size(dims) != 1) {
+        IGRAPH_ERROR("Triangular lattice shape layout requires a dimension vector of length 1.",
+                IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_int_any_smaller(dims, 0)) {
+        IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
+    }
+
+    // sum consecutives integers to get number of nodes: (n * (n + 1)) / 2
+    IGRAPH_CHECK(igraph_i_safe_mult(VECTOR(*dims)[0], VECTOR(*dims)[0] + 1, &temp_sum_res));
+    no_of_nodes = temp_sum_res / 2;
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+
+    dim_length = VECTOR(*dims)[0];
+    x = y = 0;
+    for (i = 0; i < no_of_nodes; i++) {
+        MATRIX(*res, i, 0) = x + 0.5 * y;
+        MATRIX(*res, i, 1) = y * sqrt(3.0) / 2.0;
+        x++;
+        if (x == dim_length) {
+            x = 0;
+            y++;
+            dim_length--;
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
 igraph_error_t triangular_lattice_layout_rectangle_shape(const igraph_t *graph, igraph_matrix_t *res, const igraph_vector_int_t *dims) {
     igraph_int_t i, no_of_nodes;
     igraph_int_t x, y;
@@ -79,7 +116,7 @@ igraph_error_t igraph_layout_triangular(igraph_t *graph, igraph_matrix_t *res, c
 
     switch (num_dims) {
     case 1:
-        // IGRAPH_CHECK(triangular_lattice_layout_triangle_shape(graph, res, dims));
+        IGRAPH_CHECK(triangular_lattice_layout_triangle_shape(graph, res, dims));
         break;
     case 2:
         IGRAPH_CHECK(triangular_lattice_layout_rectangle_shape(graph, res, dims));
