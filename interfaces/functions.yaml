@@ -2416,7 +2416,8 @@ igraph_subisomorphic_vf2:
         OPTIONAL OUT INDEX_VECTOR map12, OPTIONAL OUT INDEX_VECTOR map21,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
         OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
-        OPTIONAL EXTRA extra
+        OPTIONAL EXTRA extra,
+        BOOLEAN induced=False
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2430,7 +2431,8 @@ igraph_get_subisomorphisms_vf2_callback:
         ISOMORPHISM_FUNC ishohandler_fn,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
         OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
-        OPTIONAL EXTRA arg
+        OPTIONAL EXTRA arg,
+        BOOLEAN induced=False
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2443,7 +2445,8 @@ igraph_count_subisomorphisms_vf2:
         OUT INTEGER count,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
         OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
-        OPTIONAL EXTRA extra
+        OPTIONAL EXTRA extra,
+        BOOLEAN induced=False
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
@@ -2456,7 +2459,8 @@ igraph_get_subisomorphisms_vf2:
         OUT VECTOR_INT_LIST maps,
         OPTIONAL ISOCOMPAT_FUNC node_compat_fn,
         OPTIONAL ISOCOMPAT_FUNC edge_compat_fn,
-        OPTIONAL EXTRA extra
+        OPTIONAL EXTRA extra,
+        BOOLEAN induced=False
     DEPS: |-
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
