@@ -413,6 +413,7 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_layout_reingold_tilford
+  igraph_layout_lattice
 )
 
 add_legacy_tests(
@@ -426,6 +427,7 @@ add_legacy_tests(
   igraph_layout_gem
   igraph_layout_graphopt
   igraph_layout_grid
+  igraph_layout_square
   igraph_layout_kamada_kawai
   igraph_layout_lgl
   igraph_layout_mds
