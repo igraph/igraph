@@ -815,17 +815,21 @@ igraph_error_t igraph_delete_vertices_map(
 
     return IGRAPH_SUCCESS;
 }
-
 /**
  * \ingroup interface
  * \function igraph_vcount
  * \brief The number of vertices in a graph.
  *
- * \param graph The graph.
+ * \param graph Pointer to a valid, initialized igraph_t object.
  * \return Number of vertices.
+ *
+ * \remark
+ * The graph pointer must be non-NULL and refer to a properly initialized
+ * graph object. Behavior is undefined otherwise.
  *
  * Time complexity: O(1)
  */
+
 igraph_int_t igraph_vcount(const igraph_t *graph) {
     return graph->n;
 }
