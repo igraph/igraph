@@ -156,18 +156,20 @@ igraph_error_t igraph_cd_index(
     #pragma omp parallel
     #endif
     {
-        igraph_int_t *marker = IGRAPH_CALLOC(no_of_nodes, igraph_int_t);
+        /* marker[v] == 0 means "v not yet seen for the current focal vertex".
+         * A nonzero value packs a per-focal tag in the upper bits with two
+         * set-membership flags in the low bits (bit 0: v is a citer of focal
+         * itself, i.e. Set A below; bit 1: v is a citer of one of focal's
+         * references, i.e. Set B below). Calloc's zero-fill already means
+         * "untouched", so -- unlike a sentinel of -1 -- no per-thread
+         * initialization pass over the array is needed at all. */
+        igraph_uint_t *marker = IGRAPH_CALLOC(no_of_nodes, igraph_uint_t);
         if (marker == NULL) {
             #ifdef _OPENMP
             #pragma omp atomic write
             #endif
             oom_occurred = true;
         } else {
-            igraph_int_t i;
-            for (i = 0; i < no_of_nodes; i++) {
-                marker[i] = -1;
-            }
-
             #ifdef _OPENMP
             #pragma omp for
             #endif
@@ -188,46 +190,29 @@ igraph_error_t igraph_cd_index(
                 const igraph_vector_int_t *focal_in = igraph_adjlist_get(&in_adj, focal);
                 igraph_int_t n_focal_out = igraph_vector_int_size(focal_out);
                 igraph_int_t n_focal_in = igraph_vector_int_size(focal_in);
-                igraph_int_t candidate_count = 0;
-                igraph_real_t sum = 0.0;
+                igraph_uint_t tag = ((igraph_uint_t) idx + 1) << 2;
+                igraph_int_t count_a = 0, count_b = 0, n_distinct = 0;
+                igraph_real_t sum;
                 igraph_int_t i_count = 0;
                 igraph_int_t r, j;
 
-                /* Candidates are vertices timestamped within the window that either
-                 * cite one of focal's own references (found by walking the in-lists
-                 * of focal's out-neighbors), or cite focal directly (focal's own
-                 * in-list). Each candidate is scored and counted exactly once, the
-                 * first time it is encountered, using `marker` (stamped with `focal`)
-                 * to detect duplicates without ever needing to clear the array. */
-                for (r = 0; r < n_focal_out; r++) {
-                    igraph_int_t ref = VECTOR(*focal_out)[r];
-                    const igraph_vector_int_t *ref_in = igraph_adjlist_get(&in_adj, ref);
-                    igraph_int_t n_ref_in = igraph_vector_int_size(ref_in);
-                    for (j = 0; j < n_ref_in; j++) {
-                        igraph_int_t cand = VECTOR(*ref_in)[j];
-                        igraph_int_t t_cand = VECTOR(*timestamps)[cand];
-                        if (t_cand > t_focal && t_cand <= window_end && marker[cand] != focal) {
-                            marker[cand] = focal;
-                            candidate_count++;
-                            /* fbit: does cand cite focal directly? */
-                            if (igraph_vector_int_contains_sorted(igraph_adjlist_get(&out_adj, cand), focal)) {
-                                /* bbit: does cand also cite one of focal's own references? */
-                                const igraph_vector_int_t *cand_out = igraph_adjlist_get(&out_adj, cand);
-                                igraph_int_t n_cand_out = igraph_vector_int_size(cand_out);
-                                igraph_int_t k;
-                                igraph_bool_t bbit = false;
-                                for (k = 0; k < n_cand_out; k++) {
-                                    if (igraph_vector_int_contains_sorted(focal_out, VECTOR(*cand_out)[k])) {
-                                        bbit = true;
-                                        break;
-                                    }
-                                }
-                                sum += bbit ? -1.0 : 1.0;
-                            }
-                        }
-                    }
-                }
+                /* Sixt & Pasin's (2024) reformulation of the CD index: rather than
+                 * building one candidate set and, for each member, cross-checking
+                 * whether it cites both focal and a reference (the fbit/bbit
+                 * approach), decompose it into two independent set-membership
+                 * counts that never need to look at each other:
+                 *   Set A = vertices citing focal directly;
+                 *   Set B = vertices citing any of focal's own references.
+                 * CD = (-|A| - 2|B|) / |A union B| + 2, which is algebraically
+                 * identical to the classic per-candidate sum/|C| formulation
+                 * (s'(c) = -1 for c in A, s''(c) = -2 for c in B, and summing
+                 * s'+s'' over the union telescopes to -|A|-2|B| regardless of
+                 * overlap, since s' is 0 outside A and s'' is 0 outside B).
+                 * This removes the need to ever look up a candidate's own
+                 * out-edges, which is where the earlier fbit/bbit version spent
+                 * most of its time. */
 
+                /* Set A: focal's own citers. */
                 for (j = 0; j < n_focal_in; j++) {
                     igraph_int_t cand = VECTOR(*focal_in)[j];
                     igraph_int_t t_cand = VECTOR(*timestamps)[cand];
@@ -239,28 +224,49 @@ igraph_error_t igraph_cd_index(
                         i_count++;
                     }
 
-                    /* CD-index candidate set additionally requires t_cand to be
-                     * strictly later than focal's own timestamp. */
-                    if (t_cand > t_focal && t_cand <= window_end && marker[cand] != focal) {
-                        marker[cand] = focal;
-                        candidate_count++;
-                        /* cand cites focal directly by construction (fbit = 1);
-                         * check whether it also cites one of focal's references. */
-                        const igraph_vector_int_t *cand_out = igraph_adjlist_get(&out_adj, cand);
-                        igraph_int_t n_cand_out = igraph_vector_int_size(cand_out);
-                        igraph_int_t k;
-                        igraph_bool_t bbit = false;
-                        for (k = 0; k < n_cand_out; k++) {
-                            if (igraph_vector_int_contains_sorted(focal_out, VECTOR(*cand_out)[k])) {
-                                bbit = true;
-                                break;
-                            }
+                    /* Set A additionally requires t_cand to be strictly later
+                     * than focal's own timestamp. */
+                    if (t_cand > t_focal && t_cand <= window_end) {
+                        igraph_uint_t val = marker[cand];
+                        if ((val & ~(igraph_uint_t) 3) != tag) {
+                            val = tag;
                         }
-                        sum += bbit ? -1.0 : 1.0;
+                        if (!(val & 1)) {
+                            if ((val & 3) == 0) {
+                                n_distinct++;
+                            }
+                            marker[cand] = val | 1;
+                            count_a++;
+                        }
                     }
                 }
 
-                VECTOR(*res)[idx] = candidate_count > 0 ? sum / candidate_count : IGRAPH_NAN;
+                /* Set B: citers of any of focal's own references. */
+                for (r = 0; r < n_focal_out; r++) {
+                    igraph_int_t ref = VECTOR(*focal_out)[r];
+                    const igraph_vector_int_t *ref_in = igraph_adjlist_get(&in_adj, ref);
+                    igraph_int_t n_ref_in = igraph_vector_int_size(ref_in);
+                    for (j = 0; j < n_ref_in; j++) {
+                        igraph_int_t cand = VECTOR(*ref_in)[j];
+                        igraph_int_t t_cand = VECTOR(*timestamps)[cand];
+                        if (t_cand > t_focal && t_cand <= window_end) {
+                            igraph_uint_t val = marker[cand];
+                            if ((val & ~(igraph_uint_t) 3) != tag) {
+                                val = tag;
+                            }
+                            if (!(val & 2)) {
+                                if ((val & 3) == 0) {
+                                    n_distinct++;
+                                }
+                                marker[cand] = val | 2;
+                                count_b++;
+                            }
+                        }
+                    }
+                }
+
+                sum = -(igraph_real_t) count_a - 2.0 * count_b;
+                VECTOR(*res)[idx] = n_distinct > 0 ? sum / n_distinct + 2.0 : IGRAPH_NAN;
                 if (i_index) {
                     VECTOR(*i_index)[idx] = i_count;
                 }
