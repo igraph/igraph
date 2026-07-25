@@ -53,9 +53,10 @@
  *
  * </para><para>
  * The I-index of \c f is simply the number of vertices citing \c f directly
- * that are timestamped in <code>(t_f, t_f + W]</code>. The mCD-index is the
- * product of the CD index and the I-index, a magnitude-weighted variant of
- * the CD index.
+ * that are timestamped at most <code>t_f + W</code> (note that unlike \c C,
+ * this is not bounded below by <code>t_f</code>, matching the original
+ * definition). The mCD-index is the product of the CD index and the
+ * I-index, a magnitude-weighted variant of the CD index.
  *
  * </para><para>
  * This is a port of the algorithm implemented by the fast-cdindex library
@@ -230,25 +231,32 @@ igraph_error_t igraph_cd_index(
                 for (j = 0; j < n_focal_in; j++) {
                     igraph_int_t cand = VECTOR(*focal_in)[j];
                     igraph_int_t t_cand = VECTOR(*timestamps)[cand];
-                    if (t_cand > t_focal && t_cand <= window_end) {
+
+                    /* I-index: bounded above only, by construction (matches
+                     * both the original cdindex and fast-cdindex, neither of
+                     * which excludes in-edges timestamped at or before t_focal). */
+                    if (t_cand <= window_end) {
                         i_count++;
-                        if (marker[cand] != focal) {
-                            marker[cand] = focal;
-                            candidate_count++;
-                            /* cand cites focal directly by construction (fbit = 1);
-                             * check whether it also cites one of focal's references. */
-                            const igraph_vector_int_t *cand_out = igraph_adjlist_get(&out_adj, cand);
-                            igraph_int_t n_cand_out = igraph_vector_int_size(cand_out);
-                            igraph_int_t k;
-                            igraph_bool_t bbit = false;
-                            for (k = 0; k < n_cand_out; k++) {
-                                if (igraph_vector_int_contains_sorted(focal_out, VECTOR(*cand_out)[k])) {
-                                    bbit = true;
-                                    break;
-                                }
+                    }
+
+                    /* CD-index candidate set additionally requires t_cand to be
+                     * strictly later than focal's own timestamp. */
+                    if (t_cand > t_focal && t_cand <= window_end && marker[cand] != focal) {
+                        marker[cand] = focal;
+                        candidate_count++;
+                        /* cand cites focal directly by construction (fbit = 1);
+                         * check whether it also cites one of focal's references. */
+                        const igraph_vector_int_t *cand_out = igraph_adjlist_get(&out_adj, cand);
+                        igraph_int_t n_cand_out = igraph_vector_int_size(cand_out);
+                        igraph_int_t k;
+                        igraph_bool_t bbit = false;
+                        for (k = 0; k < n_cand_out; k++) {
+                            if (igraph_vector_int_contains_sorted(focal_out, VECTOR(*cand_out)[k])) {
+                                bbit = true;
+                                break;
                             }
-                            sum += bbit ? -1.0 : 1.0;
                         }
+                        sum += bbit ? -1.0 : 1.0;
                     }
                 }
 

@@ -63,6 +63,31 @@ int main(void) {
     printf("I index:   "); print_vector(&i_index);
     printf("mCD index: "); print_vector(&mcd);
 
+    /* I-index is bounded above only (t_cand <= t_focal + time_window), with
+     * no lower bound, matching cdindex/fast-cdindex exactly -- unlike the
+     * CD-index candidate set, which additionally requires t_cand > t_focal.
+     * Vertex 0 is cited by vertex 1 at the same timestamp and by vertex 2
+     * at an earlier timestamp; both count towards I-index but neither
+     * qualifies as a CD-index candidate, so CD/mCD are NaN while I-index
+     * is 2. */
+    {
+        igraph_t bg;
+        igraph_vector_int_t bts;
+        static const igraph_int_t raw_bts[] = {1000, 1000, 900};
+
+        igraph_small(&bg, 3, IGRAPH_DIRECTED, 1, 0, 2, 0, -1);
+        igraph_vector_int_init_array(&bts, raw_bts, 3);
+
+        igraph_cd_index(&bg, &bts, &cd, &i_index, &mcd, igraph_vss_1(0), 500);
+        printf("\nSame/earlier-timestamp in-edges (vertex 0):\n");
+        printf("CD index:  "); print_vector(&cd);
+        printf("I index:   "); print_vector(&i_index);
+        printf("mCD index: "); print_vector(&mcd);
+
+        igraph_vector_int_destroy(&bts);
+        igraph_destroy(&bg);
+    }
+
     /* Error: undirected graph. */
     {
         igraph_t ug;

@@ -6,3 +6,8 @@ Vertex 4 only:
 CD index:  ( 0.166667 )
 I index:   ( 5 )
 mCD index: ( 0.833333 )
+
+Same/earlier-timestamp in-edges (vertex 0):
+CD index:  ( NaN )
+I index:   ( 2 )
+mCD index: ( NaN )
