@@ -386,6 +386,7 @@ igraph_error_t igraph_is_potentially_connected(
             /* Strongly connected for simple graphs with self-loops unimplemented */
             return IGRAPH_UNIMPLEMENTED;
         }
+
         /* Assume simple loopless now */
         /* We follow Hong-Liu-Lai (2016) and Beineke-Harary (1965) */
         igraph_vector_int_t out_degree_cumcounts, out_degree_counts;
@@ -474,8 +475,12 @@ igraph_error_t igraph_is_potentially_connected(
                 break;
             }
         }
-
-        return true;
+        
+        igraph_vector_int_destroy(&over);
+        igraph_vector_int_destroy(&sorted_in_degrees);
+        igraph_vector_int_destroy(&sorted_out_degrees);
+        IGRAPH_FINALLY_CLEAN(3);
+        return IGRAPH_SUCCESS;
     }
 }
 
