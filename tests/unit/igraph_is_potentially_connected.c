@@ -89,36 +89,39 @@ void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igra
         printf("error!\n\n"); goto cleanup;
     }
     
-    if (g_simple) {
-        err = igraph_is_potentially_connected(ods, ids, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &c_simple);
-        if (err != IGRAPH_SUCCESS) {
-            printf("error!\n\n"); goto cleanup;
+    for (igraph_connectedness_t conn_mode = IGRAPH_WEAK; conn_mode <= IGRAPH_STRONG; conn_mode++) {
+        if (g_simple) {
+            err = igraph_is_potentially_connected(ods, ids, IGRAPH_SIMPLE_SW, conn_mode, &c_simple);
+            if (err != IGRAPH_SUCCESS) {
+                printf("error!\n\n"); goto cleanup;
+            }
         }
-    }
-    if (g_loops) {
-        err = igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &c_loops);
-        if (err != IGRAPH_SUCCESS) {
-            printf("error!\n\n"); goto cleanup;
+        if (g_loops) {
+            err = igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops);
+            if (err != IGRAPH_UNIMPLEMENTED && err != IGRAPH_SUCCESS) {
+                printf("error!\n\n"); goto cleanup;
+            }
         }
-    }
-    if (g_multi) {
-        err = igraph_is_potentially_connected(ods, ids, IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multi);
-        if (err != IGRAPH_SUCCESS) {
-            printf("error!\n\n"); goto cleanup;
+        if (g_multi) {
+            err = igraph_is_potentially_connected(ods, ids, IGRAPH_MULTI_SW, conn_mode, &c_multi);
+            if (err != IGRAPH_SUCCESS) {
+                printf("error!\n\n"); goto cleanup;
+            }
         }
-    }
-    if (g_multiloops) {
-        err = igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multiloops);
-        if (err != IGRAPH_SUCCESS) {
-            printf("error!\n\n"); goto cleanup;
+        if (g_multiloops) {
+            err = igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, conn_mode, &c_multiloops);
+            if (err != IGRAPH_SUCCESS) {
+                printf("error!\n\n"); goto cleanup;
+            }
         }
+        
+        printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n",
+               g_simple                                    ? (c_simple     ? " true" : "false") : "  n/a",
+               (g_loops && conn_mode != IGRAPH_STRONG)     ? (c_loops      ? " true" : "false") : "  n/a",
+               g_multi                                     ? (c_multi      ? " true" : "false") : "  n/a",
+               g_multiloops                                ? (c_multiloops ? " true" : "false") : "  n/a");
     }
-
-    printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n\n",
-           g_simple     ? (c_simple     ? " true" : "false") : "  n/a",
-           g_loops      ? (c_loops      ? " true" : "false") : "  n/a",
-           g_multi      ? (c_multi      ? " true" : "false") : "  n/a",
-           g_multiloops ? (c_multiloops ? " true" : "false") : "  n/a");
+    printf("\n");
     fflush(stdout);
 
 cleanup:
@@ -219,9 +222,14 @@ int main(void) {
     igraph_vector_int_init_int_end(&ids, -1, 1, 1, -1);
     directed_potentially_connected_print_destroy(&ods, &ids);
     
-    /* Too many edges for strongly connected */
-    igraph_vector_int_init_int_end(&ods, -1, 4, 4, 2, 2, -1);
-    igraph_vector_int_init_int_end(&ids, -1, 2, 2, 4, 4, -1);
+    /* Exactly one strongly connected simple realization */
+    igraph_vector_int_init_int_end(&ods, -1, 3, 2, 1, 1, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 1, 1, 3, 2, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+    
+    /* Previous but add one edge to break strongly connected simple */
+    igraph_vector_int_init_int_end(&ods, -1, 3, 3, 1, 1, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 1, 1, 3, 3, -1);
     directed_potentially_connected_print_destroy(&ods, &ids);
 
 
