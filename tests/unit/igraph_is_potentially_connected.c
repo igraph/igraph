@@ -1,0 +1,231 @@
+#include <igraph.h>
+
+#include "test_utilities.h"
+
+/* Undirected case */
+void potentially_connected_print_destroy(igraph_vector_int_t *ds) {
+    int err;
+    igraph_bool_t g_simple, g_loops, g_multi, g_multiloops;
+    igraph_bool_t c_simple, c_loops, c_multi, c_multiloops;
+
+    print_vector_int(ds);
+
+    err = igraph_is_graphical(ds, NULL, IGRAPH_SIMPLE_SW, &g_simple);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    err = igraph_is_graphical(ds, NULL, IGRAPH_LOOPS_SW, &g_loops);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    err = igraph_is_graphical(ds, NULL, IGRAPH_MULTI_SW, &g_multi);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    err = igraph_is_graphical(ds, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &g_multiloops);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    
+    if (g_simple) {
+        err = igraph_is_potentially_connected(ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &c_simple);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+    if (g_loops) {
+        err = igraph_is_potentially_connected(ds, NULL, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &c_loops);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+    if (g_multi) {
+        err = igraph_is_potentially_connected(ds, NULL, IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multi);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+    if (g_multiloops) {
+        err = igraph_is_potentially_connected(ds, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multiloops);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+
+    printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n\n",
+           g_simple     ? (c_simple     ? " true" : "false") : "  n/a",
+           g_loops      ? (c_loops      ? " true" : "false") : "  n/a",
+           g_multi      ? (c_multi      ? " true" : "false") : "  n/a",
+           g_multiloops ? (c_multiloops ? " true" : "false") : "  n/a");
+    fflush(stdout);
+cleanup:
+    igraph_vector_int_destroy(ds);
+}
+
+
+/* Directed case */
+void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igraph_vector_int_t *ids) {
+    int err;
+    igraph_bool_t g_simple, g_loops, g_multi, g_multiloops;
+    igraph_bool_t c_simple, c_loops, c_multi, c_multiloops;
+
+    print_vector_int(ods);
+    print_vector_int(ids);
+
+    err = igraph_is_graphical(ods, ids, IGRAPH_SIMPLE_SW, &g_simple);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    err = igraph_is_graphical(ods, ids, IGRAPH_LOOPS_SW, &g_loops);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    err = igraph_is_graphical(ods, ids, IGRAPH_MULTI_SW, &g_multi);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    err = igraph_is_graphical(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &g_multiloops);
+    if (err != IGRAPH_SUCCESS) {
+        printf("error!\n\n"); goto cleanup;
+    }
+    
+    if (g_simple) {
+        err = igraph_is_potentially_connected(ods, ids, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &c_simple);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+    if (g_loops) {
+        err = igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &c_loops);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+    if (g_multi) {
+        err = igraph_is_potentially_connected(ods, ids, IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multi);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+    if (g_multiloops) {
+        err = igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multiloops);
+        if (err != IGRAPH_SUCCESS) {
+            printf("error!\n\n"); goto cleanup;
+        }
+    }
+
+    printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n\n",
+           g_simple     ? (c_simple     ? " true" : "false") : "  n/a",
+           g_loops      ? (c_loops      ? " true" : "false") : "  n/a",
+           g_multi      ? (c_multi      ? " true" : "false") : "  n/a",
+           g_multiloops ? (c_multiloops ? " true" : "false") : "  n/a");
+    fflush(stdout);
+
+cleanup:
+    igraph_vector_int_destroy(ods);
+    igraph_vector_int_destroy(ids);
+}
+
+
+int main(void) {
+    igraph_vector_int_t ds, ods, ids;
+
+    igraph_set_error_handler(&igraph_error_handler_ignore);
+
+    /* Undirected case: */
+
+    /* Null graph */
+    igraph_vector_int_init(&ds, 0);
+    potentially_connected_print_destroy(&ds);
+    
+    /* Single vertex */
+    igraph_vector_int_init_int_end(&ds, -1, 0, -1);
+    potentially_connected_print_destroy(&ds);
+    
+    /* Single vertex with loop */
+    igraph_vector_int_init_int_end(&ds, -1, 1, -1);
+    potentially_connected_print_destroy(&ds);
+
+    /* Single vertex many loops */
+    igraph_vector_int_init_int_end(&ds, -1, 10, -1);
+    potentially_connected_print_destroy(&ds);
+
+    /* Two zeros */
+    igraph_vector_int_init_int_end(&ds, -1, 0, 0, -1);
+    potentially_connected_print_destroy(&ds);
+    
+    /* Short path */
+    igraph_vector_int_init_int_end(&ds, -1, 1, 1, -1);
+    potentially_connected_print_destroy(&ds);
+        
+    /* Should be disconnected for simple loopy */
+    igraph_vector_int_init_int_end(&ds, -1, 2, 2, -1);
+    potentially_connected_print_destroy(&ds);
+        
+    /* Should now be potentially connected for simple loopy */
+    igraph_vector_int_init_int_end(&ds, -1, 4, 2, 2, -1);
+    potentially_connected_print_destroy(&ds);
+
+    /* Long path */
+    igraph_vector_int_init_int_end(&ds, -1, 1, 2, 2, 2, 2, 2, 2, 2, 1, -1);
+    potentially_connected_print_destroy(&ds);
+    
+    /* Cycle and isolated vertex */
+    igraph_vector_int_init_int_end(&ds, -1, 2, 2, 2, 2, 2, 0, -1);
+    potentially_connected_print_destroy(&ds);
+    
+    /* Tree */
+    igraph_vector_int_init_int_end(&ds, -1, 3, 2, 2, 1, 1, 1, -1);
+    potentially_connected_print_destroy(&ds);
+    
+    /* Almost tree */
+    igraph_vector_int_init_int_end(&ds, -1, 3, 2, 1, 1, 1, 1, 1, -1);
+    potentially_connected_print_destroy(&ds);
+
+    /* Directed case: */
+
+    /* Null graph */
+    igraph_vector_int_init(&ods, 0);
+    igraph_vector_int_init(&ids, 0);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+
+    /* Single vertex */
+    igraph_vector_int_init_int_end(&ods, -1, 0, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 0, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+    
+    /* Single vertex with loop */
+    igraph_vector_int_init_int_end(&ods, -1, 1, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 1, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+    
+    /* Single vertex with many loops */
+    igraph_vector_int_init_int_end(&ods, -1, 10, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 10, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+
+    /* Two isolated vertices */
+    igraph_vector_int_init_int_end(&ods, -1, 0, 0, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 0, 0, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+    
+    /* Single edge */
+    igraph_vector_int_init_int_end(&ods, -1, 1, 0, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 0, 1, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+    
+    /* 2-cycle */
+    igraph_vector_int_init_int_end(&ods, -1, 1, 1, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 1, 1, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+    
+    /* Too many edges for strongly connected */
+    igraph_vector_int_init_int_end(&ods, -1, 4, 4, 2, 2, -1);
+    igraph_vector_int_init_int_end(&ids, -1, 2, 2, 4, 4, -1);
+    directed_potentially_connected_print_destroy(&ods, &ids);
+
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
+}
