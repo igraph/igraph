@@ -371,11 +371,11 @@ igraph_error_t igraph_is_potentially_connected(
         *res = min_d > 0 && m >= n-1;
         return IGRAPH_SUCCESS;
     } else /* mode == IGRAPH_STRONG */ {
-        if (min_outd == 0 || min_ind ==0) {
+        if (min_outd == 0 || min_ind == 0) {
             *res = false;
             return IGRAPH_SUCCESS;
         }
-        // Min outdegree >= 1 and min indegree >= 1
+        /* Min outdegree >= 1 and min indegree >= 1 */
         if (multigraph) {
             // Multigraphs can be connected into one hamiltonian cycle
             // Then rest of stubs can be assigned arbitrarily
@@ -392,7 +392,6 @@ igraph_error_t igraph_is_potentially_connected(
         igraph_vector_int_t out_degree_cumcounts, out_degree_counts;
         igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
         igraph_vector_int_t over;
-        igraph_vector_int_t left_pq, right_pq;
         igraph_int_t lhs, rhs_sum;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_cumcounts, n+1);
@@ -447,6 +446,13 @@ igraph_error_t igraph_is_potentially_connected(
         }
 
 
+        /* The sequence has a strongly connected realization unless a subset 
+         * of the first k vertices, in non-increasing order of out-degree,
+         * has fewer incoming edges than outgoing ones, that is unless the
+         * Beineke-Harary / Hong-Liu-Lai condition fails for some k.
+         * Be optimistic and set to false if the condition is violated below.
+         */
+        *res = true;
         for (igraph_int_t k = 1; k < n; k++) {
             const igraph_int_t indeg = VECTOR(sorted_in_degrees)[k - 1];
             const igraph_int_t outdeg = VECTOR(sorted_out_degrees)[k - 1];
@@ -475,7 +481,7 @@ igraph_error_t igraph_is_potentially_connected(
                 break;
             }
         }
-        
+
         igraph_vector_int_destroy(&over);
         igraph_vector_int_destroy(&sorted_in_degrees);
         igraph_vector_int_destroy(&sorted_out_degrees);
