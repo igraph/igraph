@@ -1161,6 +1161,12 @@ igraph_is_graphical:
         VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
         EDGE_TYPE_SW allowed_edge_types=SIMPLE, OUT BOOLEAN res
 
+igraph_is_potentially_connected:
+    PARAMS: |-
+        VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
+        EDGE_TYPE_SW allowed_edge_types=SIMPLE,
+        CONNECTEDNESS mode=WEAK, OUT BOOLEAN res
+
 #######################################
 # Visitors
 #######################################
