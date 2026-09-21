@@ -2,11 +2,26 @@
 
 #include "test_utilities.h"
 
+/* Render a result value, flagging any value that was never written,
+ * that is not 0 or 1, as UNSET so that a missing assignment is visible. */
+static const char* bool_str(igraph_bool_t v) {
+    if (v == 1) {
+        return " true";
+    }
+    if (v == 0) {
+        return "false";
+    }
+    return "UNSET";
+}
+
 /* Undirected case */
 void potentially_connected_print_destroy(igraph_vector_int_t *ds) {
     int err;
     igraph_bool_t g_simple, g_loops, g_multi, g_multiloops;
-    igraph_bool_t c_simple, c_loops, c_multi, c_multiloops;
+    /* Initialized to a value that is neither 0 nor 1 so that a result the
+     * function failed to write is reported as UNSET rather than as a
+     * spurious true/false. */
+    igraph_bool_t c_simple = 12345, c_loops = 12345, c_multi = 12345, c_multiloops = 12345;
 
     print_vector_int(ds);
 
@@ -53,10 +68,10 @@ void potentially_connected_print_destroy(igraph_vector_int_t *ds) {
     }
 
     printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n\n",
-           g_simple     ? (c_simple     ? " true" : "false") : "  n/a",
-           g_loops      ? (c_loops      ? " true" : "false") : "  n/a",
-           g_multi      ? (c_multi      ? " true" : "false") : "  n/a",
-           g_multiloops ? (c_multiloops ? " true" : "false") : "  n/a");
+           g_simple     ? bool_str(c_simple)     : "  n/a",
+           g_loops      ? bool_str(c_loops)      : "  n/a",
+           g_multi      ? bool_str(c_multi)      : "  n/a",
+           g_multiloops ? bool_str(c_multiloops) : "  n/a");
     fflush(stdout);
 cleanup:
     igraph_vector_int_destroy(ds);
@@ -67,7 +82,10 @@ cleanup:
 void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igraph_vector_int_t *ids) {
     int err;
     igraph_bool_t g_simple, g_loops, g_multi, g_multiloops;
-    igraph_bool_t c_simple, c_loops, c_multi, c_multiloops;
+    /* Initialized to a value that is neither 0 nor 1 so that a result the
+     * function failed to write is reported as UNSET rather than as a
+     * spurious true/false. */
+    igraph_bool_t c_simple = 12345, c_loops = 12345, c_multi = 12345, c_multiloops = 12345;
 
     print_vector_int(ods);
     print_vector_int(ids);
@@ -116,10 +134,10 @@ void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igra
         }
         
         printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n",
-               g_simple                                    ? (c_simple     ? " true" : "false") : "  n/a",
-               (g_loops && conn_mode != IGRAPH_STRONG)     ? (c_loops      ? " true" : "false") : "  n/a",
-               g_multi                                     ? (c_multi      ? " true" : "false") : "  n/a",
-               g_multiloops                                ? (c_multiloops ? " true" : "false") : "  n/a");
+               g_simple                                    ? bool_str(c_simple)     : "  n/a",
+               (g_loops && conn_mode != IGRAPH_STRONG)     ? bool_str(c_loops)      : "  n/a",
+               g_multi                                     ? bool_str(c_multi)      : "  n/a",
+               g_multiloops                                ? bool_str(c_multiloops) : "  n/a");
     }
     printf("\n");
     fflush(stdout);
