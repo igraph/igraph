@@ -38,39 +38,10 @@
 #define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 
 #if HAVE_LIBXML == 1
+#include <libxml/entities.h>
 #include <libxml/globals.h>
 #include <libxml/parser.h>
-
-static xmlEntity blankEntity = {
-#ifndef XML_WITHOUT_CORBA
-    NULL, /* _private */
-#endif
-    XML_ENTITY_DECL, /* type */
-    NULL, /* name */
-    NULL, /* children */
-    NULL, /* last */
-    NULL, /* parent */
-    NULL, /* next */
-    NULL, /* prev */
-    NULL, /* doc */
-
-    NULL, /* orig */
-    NULL, /* content */
-    0,    /* length */
-    XML_EXTERNAL_GENERAL_PARSED_ENTITY, /* etype */
-    NULL, /* ExternalID */
-    NULL, /* SystemID */
-
-    NULL, /* nexte */
-    NULL, /* URI */
-    0,    /* owner */
-#if LIBXML_VERSION < 21100   /* Versions < 2.11.0: */
-    1     /* checked */
-#else                        /* Starting with verson 2.11.0: */
-    1,    /* flags */
-    0     /* expandedSize */
-#endif
-};
+#include <libxml/tree.h>
 
 #define toXmlChar(a)   (BAD_CAST(a))
 #define fromXmlChar(a) ((char *)(a)) /* not the most elegant way... */
@@ -126,6 +97,11 @@ struct igraph_i_graphml_parser_state {
     igraph_vector_char_t data_char;
     igraph_int_t act_node;
     igraph_bool_t ignore_namespaces;
+
+    /* Placeholder entity handed back for unknown/undeclared XML entities.
+     * Created lazily by igraph_i_graphml_sax_handler_get_entity() and
+     * freed in igraph_i_graphml_parser_state_destroy(). */
+    xmlEntityPtr blank_entity;
 };
 
 static void igraph_i_report_unhandled_attribute_target(const char* target,
@@ -293,6 +269,24 @@ static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser
     if (state->error_message) {
         IGRAPH_FREE(state->error_message);
     }
+
+    if (state->blank_entity) {
+        /* Only libxml2 2.12 and later expose xmlFreeEntity().
+         * In earlier versions, xmlFreeNode() can be used to free an
+         * xmlEntityPtr. The structs xmlNode and xmlEntity have an identical
+         * layout at the start, and xmlFreeNode() uses their type member
+         * to determine how to free the structure.
+         *
+         * In later libxml2 versions we use xmlFreeEntity() as a means
+         * of future proofing.
+         */
+#if LIBXML_VERSION < 21200
+        xmlFreeNode((xmlNodePtr) state->blank_entity);
+#else
+        xmlFreeEntity(state->blank_entity);
+#endif
+        state->blank_entity = NULL;
+    }
 }
 
 static void igraph_i_graphml_parser_state_set_error_from_varargs(
@@ -349,10 +343,11 @@ static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ..
 
 static xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
         const xmlChar* name) {
+    struct igraph_i_graphml_parser_state *state =
+        (struct igraph_i_graphml_parser_state *) state0;
     xmlEntityPtr predef = xmlGetPredefinedEntity(name);
     const char* entityName;
 
-    IGRAPH_UNUSED(state0);
     if (predef != NULL) {
         return predef;
     }
@@ -360,7 +355,27 @@ static xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
     entityName = fromXmlChar(name);
     IGRAPH_WARNINGF("Unknown XML entity found: '%s'.", entityName);
 
-    return &blankEntity;
+    /* We return a blank placeholder entity for an unresolved reference.
+     * This is allocated lazily here using xmlNewEntity.
+     *
+     * Previous versions of igraph used a global xmlEntity variable.
+     * However, the layout of this struct changed in libxml2 2.11,
+     * and was also patched by several Linux distros including Ubuntu
+     * (see https://bugs.launchpad.net/ubuntu/+source/libxml2/+bug/2141260)
+     * Therefore we cannot rely on knowledge of the struct layout.
+     */
+    if (state->blank_entity == NULL) {
+        state->blank_entity = xmlNewEntity(
+            /* doc = */ NULL,
+            /* name = */ toXmlChar(""),
+            /* type = */ XML_EXTERNAL_GENERAL_PARSED_ENTITY,
+            /* publicID = */ NULL,
+            /* systemID = */ NULL,
+            /* content = */ toXmlChar("")
+        );
+    }
+
+    return state->blank_entity;
 }
 
 static igraph_error_t igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
