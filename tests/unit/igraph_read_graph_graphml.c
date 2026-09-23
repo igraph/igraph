@@ -136,6 +136,18 @@ int main(void) {
     dump_edge_attribute_string("id", &g);
     igraph_destroy(&g);
 
+    ifile = fopen("graphml-unknown-entity.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+    if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
+        return 1;
+    }
+    fclose(ifile);
+    dump_graph("Graph with unknown entities:\n", &g);
+    dump_vertex_attribute_string("color", &g);
+    dump_vertex_attribute_string("id", &g);
+    igraph_destroy(&g);
+
     /* The same with undirected graph */
     ifile = fopen("test.graphml", "r");
     IGRAPH_ASSERT(ifile != NULL);
