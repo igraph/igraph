@@ -20,6 +20,7 @@
 
 #include <igraph.h>
 
+#include <algorithm>
 #include <limits>
 #include <random>
 
