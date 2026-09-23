@@ -17,12 +17,13 @@ Edge attribute 'weight': 1 1 2 NaN NaN NaN 1.1
 Edge attribute 'id': 'e0' 'e1' 'e2' 'e3' 'e4' 'e5' 'e6'
 Warning: Unknown XML entity found: 'unknown'.
 Warning: Unknown XML entity found: 'unknown'.
+Warning: Unknown XML entity found: 'unknown'.
 Graph with unknown entities:
-Vertices: 1
+Vertices: 2
 Edges: 0
 Directed: 1
-Vertex attribute 'color': 'abcdef'
-Vertex attribute 'id': 'n0'
+Vertex attribute 'color': 'abcdef' 'ghij'
+Vertex attribute 'id': 'n0' 'n1'
 Warning: Unknown attribute key 'd3' in a <data> tag, ignoring attribute.
 Undirected graph:
 Vertices: 6
