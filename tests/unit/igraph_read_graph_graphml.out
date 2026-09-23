@@ -15,6 +15,14 @@ Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow'
 Vertex attribute 'id': 'n0' 'n1' 'n2' 'n3' 'n4' 'n5'
 Edge attribute 'weight': 1 1 2 NaN NaN NaN 1.1
 Edge attribute 'id': 'e0' 'e1' 'e2' 'e3' 'e4' 'e5' 'e6'
+Warning: Unknown XML entity found: 'unknown'.
+Warning: Unknown XML entity found: 'unknown'.
+Graph with unknown entities:
+Vertices: 1
+Edges: 0
+Directed: 1
+Vertex attribute 'color': 'abcdef'
+Vertex attribute 'id': 'n0'
 Warning: Unknown attribute key 'd3' in a <data> tag, ignoring attribute.
 Undirected graph:
 Vertices: 6
