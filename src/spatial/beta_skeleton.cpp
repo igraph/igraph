@@ -93,6 +93,7 @@ class NeighborCounts {
 public:
     // Boilerplate for nanoflann
     using DistanceType = igraph_real_t;
+    using IndexType = igraph_int_t;
     NeighborCounts(igraph_real_t radius, igraph_int_t a, igraph_int_t b, igraph_bool_t short_circuit)
         : radius(radius), a(a), b(b), short_circuit(short_circuit) {
         init();
@@ -149,6 +150,7 @@ class IntersectionCounts {
 public:
     // Boilerplate for nanoflann
     using DistanceType = igraph_real_t;
+    using IndexType = igraph_int_t;
     IntersectionCounts(
         igraph_real_t radius_, igraph_real_t beta_radius_,
         bool short_circuit_,
