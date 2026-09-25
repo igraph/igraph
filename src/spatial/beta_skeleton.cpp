@@ -43,16 +43,6 @@ static inline igraph_real_t ind_ind_sqr_distance(igraph_int_t a, igraph_int_t b,
     return distance;
 }
 
-static inline igraph_real_t vec_vec_sqr_dist(const igraph_vector_t *a, const igraph_vector_t *b) {
-    igraph_real_t distance = 0;
-    igraph_int_t dims = igraph_vector_size(a);
-    for (igraph_int_t i = 0; i < dims; i++) {
-        igraph_real_t temp = VECTOR(*a)[i] - VECTOR(*b)[i];
-        distance += temp * temp;
-    }
-    return distance;
-}
-
 static inline igraph_real_t vec_vec_sqr_dist(const std::vector<igraph_real_t> &a, const std::vector<igraph_real_t> &b) {
     igraph_real_t distance = 0;
     igraph_int_t dims = a.size();
@@ -63,15 +53,6 @@ static inline igraph_real_t vec_vec_sqr_dist(const std::vector<igraph_real_t> &a
     return distance;
 }
 
-static inline igraph_real_t vec_ind_sqr_dist(const igraph_vector_t *a, const igraph_int_t b, const igraph_matrix_t *points) {
-    igraph_real_t distance = 0;
-    igraph_int_t dims = igraph_matrix_ncol(points);
-    for (igraph_int_t i = 0; i < dims; i++) {
-        igraph_real_t temp = VECTOR(*a)[i] - MATRIX(*points, b, i);
-        distance += temp * temp;
-    }
-    return distance;
-}
 static inline igraph_real_t vec_ind_sqr_dist(const std::vector<igraph_real_t> &a, const igraph_int_t b, const igraph_matrix_t *points) {
     igraph_real_t distance = 0;
     igraph_int_t dims = igraph_matrix_ncol(points);
