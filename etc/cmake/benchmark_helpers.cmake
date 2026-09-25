@@ -8,6 +8,11 @@ function(add_benchmark NAME NAMESPACE)
   add_dependencies(build_benchmarks ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
+  # Some benchmarks depend on internal igraph headers
+  target_include_directories(
+    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
+  )
+
   # Some benchmarks include plfit_sampling.h from plfit. The following ensures
   # that the correct version is included, depending on whether plfit is vendored
   target_include_directories(
