@@ -14,6 +14,12 @@
 - `igraph_read_graph_graphml()` imported the edge IDs incorrectly from GraphML files. This bug was introduced in 1.0.0. Thanks to @zxawry for the fix (PR #2894)!
 - `igraph_read_graph_graphdb()` now validates vertex IDs relative to the declared vertex count. Thanks to Kaixuan Li @MarkLee131 for the fix (PR #2908)!
 
+### Other
+
+- Documentation improvements.
+- nanoflann was updated to version 1.14.0
+- Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
+
 ## [1.0.1]
 
 ### Fixed
