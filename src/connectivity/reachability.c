@@ -214,11 +214,14 @@ igraph_error_t igraph_count_reachable(const igraph_t *graph,
  * \function igraph_transitive_closure
  * \brief Computes the transitive closure of a graph.
  *
- * The resulting graph will have an edge from vertex \c i to vertex \c j
- * if \c j is reachable from \c i.
+ * The transitive closure of a graph has an from vertex \c i to vertex \c j
+ * if \c j is reachable from \c i. This function always produces the closure
+ * as a simple graph, i.e. self-loops and multi-edges will not be present,
+ * regardless of whether they appeared in the original graph.
  *
  * \param graph The graph object to analyze.
- * \param closure The resulting graph representing the transitive closure.
+ * \param closure An uninitialized graph object. The graph representing the
+ *    transitive closure will be created here.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory
  *         to perform the operation.
