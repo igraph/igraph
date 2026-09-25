@@ -211,5 +211,5 @@ igraph_error_t igraph_i_isomorphic_small(
 igraph_error_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                          igraph_bool_t *iso) {
 
-    return igraph_subisomorphic_vf2(graph1, graph2, NULL, NULL, NULL, NULL, iso, NULL, NULL, NULL, NULL, NULL);
+    return igraph_subisomorphic_vf2(graph1, graph2, NULL, NULL, NULL, NULL, iso, NULL, NULL, NULL, NULL, NULL, false);
 }

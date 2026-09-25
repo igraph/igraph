@@ -82,7 +82,7 @@ int main(void) {
         VECTOR(color2)[i + 1] = 1;
     }
     igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0,
-                                     &count, 0, 0, 0);
+                                     &count, 0, 0, 0, false);
     if (count != 21) {
         fprintf(stderr, "Count with two colors failed, expected 21, got %" IGRAPH_PRId ".\n", count);
         return 3;
