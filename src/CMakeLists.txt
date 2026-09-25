@@ -141,6 +141,7 @@ add_library(
   games/watts_strogatz.c
 
   centrality/betweenness.c
+  centrality/cd_index.c
   centrality/centrality_other.c
   centrality/centralization.c
   centrality/closeness.c
@@ -422,6 +423,10 @@ endif()
 
 if(PLFIT_LIBRARIES)
   target_link_libraries(igraph PRIVATE ${PLFIT_LIBRARIES})
+endif()
+
+if(IGRAPH_OPENMP_SUPPORT)
+  target_link_libraries(igraph PRIVATE OpenMP::OpenMP_C)
 endif()
 
 # Link igraph statically to some of the libraries from the subdirectories
