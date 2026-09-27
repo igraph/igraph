@@ -28,6 +28,53 @@
 
 #define sqr(x) ((x)*(x))
 
+static igraph_bool_t next_permutation(igraph_vector_int_t *perm) {
+    igraph_int_t *a = VECTOR(*perm), n = igraph_vector_int_size(perm);
+    igraph_int_t i = n - 2, j = n - 1, t;
+    while (i >= 0 && a[i] >= a[i + 1]) i--;
+    if (i < 0) return false;
+    while (a[j] <= a[i]) j--;
+    t = a[i]; a[i] = a[j]; a[j] = t;
+    for (i++, j = n - 1; i < j; i++, j--) {
+        t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return true;
+}
+
+/* The doubly centered squared distance matrix of a path has rank 1, so for a 2D layout,
+ * the second largest eigenvalue is a multiple eigenvalue 0. With BLIS as the BLAS,
+ * DSYEVR fails to converge for some vertex orders of the path on 4 vertices. */
+static void test_path_all_vertex_orders(void) {
+    const igraph_int_t n = 4;
+    igraph_t path, g;
+    igraph_matrix_t coords, dist_mat;
+    igraph_vector_int_t perm;
+
+    igraph_path_graph(&path, n, IGRAPH_UNDIRECTED, false);
+    igraph_matrix_init(&coords, 0, 0);
+    igraph_matrix_init(&dist_mat, 0, 0);
+    igraph_vector_int_init_range(&perm, 0, n);
+    do {
+        igraph_permute_vertices(&path, &g, &perm);
+        igraph_layout_mds(&g, &coords, NULL, 2);
+        /* A path embeds isometrically in a line, so the layout reproduces its distances. */
+        igraph_distances(&g, NULL, &dist_mat, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
+        for (igraph_int_t i = 0; i < n; i++) {
+            for (igraph_int_t j = i + 1; j < n; j++) {
+                double dist = sqrt(sqr(MATRIX(coords, i, 0) - MATRIX(coords, j, 0)) +
+                                   sqr(MATRIX(coords, i, 1) - MATRIX(coords, j, 1)));
+                IGRAPH_ASSERT(fabs(dist - MATRIX(dist_mat, i, j)) < 1e-8);
+            }
+        }
+        igraph_destroy(&g);
+    } while (next_permutation(&perm));
+
+    igraph_vector_int_destroy(&perm);
+    igraph_matrix_destroy(&dist_mat);
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&path);
+}
+
 int main(void) {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
@@ -89,6 +136,8 @@ int main(void) {
     igraph_matrix_destroy(&dist_mat);
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
+
+    test_path_all_vertex_orders();
 
     VERIFY_FINALLY_STACK();
 

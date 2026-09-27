@@ -111,6 +111,22 @@ jobs:
           extra_cmake_args: "-DBLA_VENDOR=OpenBLAS"
           build_shared: true
 
+  # BLIS as the BLAS and the reference LAPACK, like CRAN's BLIS check for R packages
+  - job: linux_static_blis
+    steps:
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build ccache libblas-dev liblapack-dev libblis4-serial -y
+          sudo update-alternatives --set libblas.so.3-x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/blis-serial/libblas.so.3
+          sudo update-alternatives --set liblapack.so.3-x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
+          extra_cmake_args: "-DBLA_VENDOR=Generic"
+
   - job: linux_clang_24
     steps:
       - script: |
