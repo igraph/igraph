@@ -829,7 +829,7 @@ static igraph_error_t community_leiden(
     igraph_vector_int_t aggregate_vertex;
     igraph_vector_int_list_t clusters;
     igraph_inclist_t edges_per_vertex;
-    igraph_bool_t continue_clustering, level_changed;
+    igraph_bool_t continue_clustering;
     igraph_int_t level = 0;
 
     /* Initialize temporary weights and membership to be used in aggregation */
@@ -886,7 +886,6 @@ static igraph_error_t community_leiden(
         IGRAPH_FINALLY(igraph_inclist_destroy, &edges_per_vertex);
 
         /* Move around the vertices in order to increase the quality */
-        level_changed = false;
         IGRAPH_CHECK(leiden_fastmove_vertices(i_graph,
                                               &edges_per_vertex,
                                               i_edge_weights,
@@ -894,25 +893,24 @@ static igraph_error_t community_leiden(
                                               resolution,
                                               nb_clusters,
                                               i_membership,
-                                              &level_changed));
-        if (level_changed) {
-            *changed = true;
-        }
+                                              changed));
 
         /* We only continue clustering if not all clusters are represented by a
          * single vertex yet
          */
         continue_clustering = (*nb_clusters < igraph_vcount(i_graph));
 
-        if (continue_clustering) {
-            /* Set original membership */
-            if (level > 0) {
-                for (i = 0; i < n; i++) {
-                    igraph_int_t v_aggregate = VECTOR(aggregate_vertex)[i];
-                    VECTOR(*membership)[i] = VECTOR(*i_membership)[v_aggregate];
-                }
+        /* Set membership at level 0 if something changed.
+         * This is only relevant for aggregate levels > 0.
+         */
+        if (*changed && level > 0) {
+            for (i = 0; i < n; i++) {
+                igraph_int_t v_aggregate = VECTOR(aggregate_vertex)[i];
+                VECTOR(*membership)[i] = VECTOR(*i_membership)[v_aggregate];
             }
+        }
 
+        if (continue_clustering) {
             /* Get vertex sets for each cluster. */
             IGRAPH_CHECK(leiden_get_clusters(i_membership, &clusters));
 
@@ -990,17 +988,6 @@ static igraph_error_t community_leiden(
         igraph_inclist_destroy(&edges_per_vertex);
         IGRAPH_FINALLY_CLEAN(1);
     } while (continue_clustering);
-
-    /* The original membership is set above only when clustering continues.
-     * If local moving on the last aggregated level moved vertices, set it
-     * here too; otherwise those moves are lost although *changed reports
-     * them, and with n_iterations < 0 the same moves repeat forever. */
-    if (level > 0 && level_changed) {
-        for (i = 0; i < n; i++) {
-            igraph_int_t v_aggregate = VECTOR(aggregate_vertex)[i];
-            VECTOR(*membership)[i] = VECTOR(*i_membership)[v_aggregate];
-        }
-    }
 
     /* Free aggregated graph and associated vectors */
     igraph_vector_int_destroy(&aggregated_membership);
