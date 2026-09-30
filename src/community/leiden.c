@@ -901,14 +901,6 @@ static igraph_error_t community_leiden(
         continue_clustering = (*nb_clusters < igraph_vcount(i_graph));
 
         if (continue_clustering) {
-            /* Set original membership */
-            if (level > 0) {
-                for (i = 0; i < n; i++) {
-                    igraph_int_t v_aggregate = VECTOR(aggregate_vertex)[i];
-                    VECTOR(*membership)[i] = VECTOR(*i_membership)[v_aggregate];
-                }
-            }
-
             /* Get vertex sets for each cluster. */
             IGRAPH_CHECK(leiden_get_clusters(i_membership, &clusters));
 
@@ -986,6 +978,15 @@ static igraph_error_t community_leiden(
         igraph_inclist_destroy(&edges_per_vertex);
         IGRAPH_FINALLY_CLEAN(1);
     } while (continue_clustering);
+
+    /* Map the cluster membership in the aggregate network (level > 0) back to the clusters
+     * in the original network (level == 0).
+     */
+    if (level > 0) {
+        for (i = 0; i < n; i++) {
+            VECTOR(*membership)[i] = VECTOR(*i_membership)[VECTOR(aggregate_vertex)[i]];
+        }
+    }
 
     /* Free aggregated graph and associated vectors */
     igraph_vector_int_destroy(&aggregated_membership);

@@ -129,6 +129,56 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     igraph_vector_destroy(&out_strength);
 }
 
+/* Every cluster found by Leiden must be connected. */
+static void check_clusters_connected(const igraph_t *graph, const igraph_vector_int_t *membership,
+                                     igraph_int_t nb_clusters) {
+    igraph_vector_int_t members;
+    igraph_vector_int_init(&members, 0);
+    for (igraph_int_t c = 0; c < nb_clusters; c++) {
+        igraph_t cluster;
+        igraph_bool_t connected;
+        igraph_vector_int_clear(&members);
+        for (igraph_int_t v = 0; v < igraph_vcount(graph); v++) {
+            if (VECTOR(*membership)[v] == c) {
+                igraph_vector_int_push_back(&members, v);
+            }
+        }
+        igraph_induced_subgraph(graph, &cluster, igraph_vss_vector(&members), IGRAPH_SUBGRAPH_AUTO);
+        igraph_is_connected(&cluster, &connected, IGRAPH_WEAK);
+        IGRAPH_ASSERT(connected);
+        igraph_destroy(&cluster);
+    }
+    igraph_vector_int_destroy(&members);
+}
+
+/* On this instance, local moving on the last aggregation level of an
+ * iteration moves vertices. Those moves used to be lost: the result then put
+ * the unconnected pairs {1, 9} and {2, 3} into one cluster for any number of
+ * iterations, and n_iterations = -1 never returned. */
+static void test_last_level_moves_are_kept(void) {
+    const igraph_int_t edges_array[] = { 9, 1, 3, 2, 8, 6 };
+    const igraph_real_t weights_array[] = { 1.7255847013682128, 1.2353514434357051, 0.7294595456799059 };
+    const igraph_int_t start[] = { 9, 0, 0, 9, 0, 8, 8, 4, 10, 1, 10 };
+    const igraph_vector_int_t edges = igraph_vector_int_view(edges_array, 6);
+    const igraph_vector_t weights = igraph_vector_view(weights_array, 3);
+    const igraph_int_t budgets[] = { 1, -1 };
+    igraph_t graph;
+    igraph_vector_int_t membership;
+    igraph_int_t nb_clusters;
+
+    igraph_create(&graph, &edges, 11, IGRAPH_UNDIRECTED);
+    for (int i = 0; i < 2; i++) {
+        igraph_vector_int_init_array(&membership, start, 11);
+        igraph_rng_seed(igraph_rng_default(), 1556328619);
+        IGRAPH_ASSERT(igraph_community_leiden_simple(&graph, &weights, IGRAPH_LEIDEN_OBJECTIVE_ER,
+                                                     1.2087812986446955, 0.01, true, budgets[i],
+                                                     &membership, &nb_clusters, NULL) == IGRAPH_SUCCESS);
+        check_clusters_connected(&graph, &membership, nb_clusters);
+        igraph_vector_int_destroy(&membership);
+    }
+    igraph_destroy(&graph);
+}
+
 int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
@@ -302,6 +352,8 @@ int main(void) {
     igraph_destroy(&graph);
 
     igraph_vector_destroy(&weights);
+
+    test_last_level_moves_are_kept();
 
     VERIFY_FINALLY_STACK();
 
