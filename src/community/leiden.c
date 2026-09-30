@@ -979,8 +979,9 @@ static igraph_error_t community_leiden(
         IGRAPH_FINALLY_CLEAN(1);
     } while (continue_clustering);
 
-    /* Map the original vertices to their clusters on the last level, once,
-     * after the loop, so that no intermediate level has to be propagated. */
+    /* Map the cluster membership in the aggregate network (level > 0) back to the clusters
+     * in the original network (level == 0).
+     */
     if (level > 0) {
         for (i = 0; i < n; i++) {
             VECTOR(*membership)[i] = VECTOR(*i_membership)[VECTOR(aggregate_vertex)[i]];
