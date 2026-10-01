@@ -515,9 +515,15 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                   vectors ? &MATRIX(*vectors, 0, 0) : 0, &ldz, VECTOR(mysupport),
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
-    if (info != 0) {
-        IGRAPH_ERROR("Invalid argument to dsyevr in workspace query.", IGRAPH_EINVAL);
+    if (info < 0) {
+        IGRAPH_ERRORF("Invalid %d-%s argument to dsyevr in workspace query.",
+                      IGRAPH_EINVAL,
+                      -info,
+                      -info > 2 ? "th" : (-info == 2 ? "nd" : "st"));
+    } else if (info >0) {
+        IGRAPH_ERROR("Internal error in dsyevr in workspace query.", IGRAPH_FAILURE);
     }
+    /* info == 0 indicates success */
 
     lwork = (int) VECTOR(work)[0];
     liwork = VECTOR(iwork)[0];
@@ -529,9 +535,15 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                   vectors ? &MATRIX(*vectors, 0, 0) : 0, &ldz, VECTOR(mysupport),
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
-    if (info != 0) {
-        IGRAPH_ERROR("Invalid argument to dsyevr in calculation.", IGRAPH_EINVAL);
+    if (info < 0) {
+        IGRAPH_ERRORF("Invalid %d-%s argument to dsyevr in calculation.",
+                      IGRAPH_EINVAL,
+                      -info,
+                      -info > 2 ? "th" : (-info == 2 ? "nd" : "st"));
+    } else if (info >0) {
+        IGRAPH_ERROR("Internal error in dsyevr in calculation.", IGRAPH_FAILURE);
     }
+    /* info == 0 indicates success */
 
     if (values) {
         IGRAPH_CHECK(igraph_vector_resize(values, m));
