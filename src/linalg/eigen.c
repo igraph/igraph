@@ -85,14 +85,14 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_mat
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ 1, /*iu=*/ which->howmany,
-                                      /*abstol=*/ 1e-14, &val1,
+                                      DBL_MIN /* approximately dlamch('S') */, &val1,
                                       vectors ? &vec1 : 0,
                                       /*support=*/ 0));
 
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ n - which->howmany + 1, /*iu=*/ n,
-                                      /*abstol=*/ 1e-14, &val2,
+                                      DBL_MIN /* approximately dlamch('S') */, &val2,
                                       vectors ? &vec2 : 0,
                                       /*support=*/ 0));
 
@@ -165,7 +165,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_mat
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_ALL, /*vl=*/ 0,
                                       /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ 0, /*iu=*/ 0,
-                                      /*abstol=*/ 1e-14, &val,
+                                      DBL_MIN /* approximately dlamch('S') */, &val,
                                       vectors ? &vec : 0,
                                       /*support=*/ 0));
 
@@ -236,7 +236,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_mat
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ il, /*iu=*/ n,
-                                      /*abstol=*/ 1e-14, values, vectors,
+                                      DBL_MIN /* approximately dlamch('S') */, values, vectors,
                                       /*support=*/ 0));
     return IGRAPH_SUCCESS;
 }
@@ -251,7 +251,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_mat
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ 1, /*iu=*/ which->howmany,
-                                      /*abstol=*/ 1e-14, values, vectors,
+                                      DBL_MIN /* approximately dlamch('S') */, values, vectors,
                                       /*support=*/ 0));
 
     return IGRAPH_SUCCESS;
@@ -287,14 +287,14 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_mat
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ 1, /*iu=*/ (which->howmany) / 2,
-                                      /*abstol=*/ 1e-14, &val1,
+                                      DBL_MIN /* approximately dlamch('S') */, &val1,
                                       vectors ? &vec1 : 0,
                                       /*support=*/ 0));
 
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ n - (which->howmany) / 2, /*iu=*/ n,
-                                      /*abstol=*/ 1e-14, &val2,
+                                      DBL_MIN /* approximately dlamch('S') */, &val2,
                                       vectors ? &vec2 : 0,
                                       /*support=*/ 0));
 
@@ -348,7 +348,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_ma
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_ALL, /*vl=*/ 0,
                                       /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ 0, /*iu=*/ 0,
-                                      /*abstol=*/ 1e-14, values, vectors,
+                                      DBL_MIN /* approximately dlamch('S') */, values, vectors,
                                       /*support=*/ 0));
 
     return IGRAPH_SUCCESS;
@@ -363,7 +363,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_mat
                                       /*vl=*/ which->vl, /*vu=*/ which->vu,
                                       /*vestimate=*/ which->vestimate,
                                       /*il=*/ 0, /*iu=*/ 0,
-                                      /*abstol=*/ 1e-14, values, vectors,
+                                      DBL_MIN /* approximately dlamch('S') */, values, vectors,
                                       /*support=*/ 0));
 
     return IGRAPH_SUCCESS;
@@ -377,7 +377,7 @@ static igraph_error_t igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_ma
     IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
                                       /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
                                       /*il=*/ which->il, /*iu=*/ which->iu,
-                                      /*abstol=*/ 1e-14, values, vectors,
+                                      DBL_MIN /* approximately dlamch('S') */, values, vectors,
                                       /*support=*/ 0));
 
     return IGRAPH_SUCCESS;
