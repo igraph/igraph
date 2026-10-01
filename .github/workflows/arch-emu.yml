@@ -6,12 +6,18 @@ name: Emulated
 # Build once at 2 AM UTC every day, as well as on demand.
 # See the Checkout action below to control which branch
 # the scheduled build happens on.
+#
+# Failures of scheduled runs are reported by GitHub to the user who last
+# edited the cron line below, so keep that in mind when changing it.
 on:
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
 concurrency: ci-arch-emu-${{ github.ref }}
+
+permissions:
+  contents: read
 
 env:
   CMAKE_GENERATOR: Ninja
@@ -30,7 +36,8 @@ jobs:
 
     defaults:
       run:
-        # Use emulated shell as default
+        # Use emulated shell as default. Steps that must run on the host
+        # runner set `shell: bash` explicitly.
         shell: alpine.sh {0}
 
     strategy:
@@ -77,11 +84,13 @@ jobs:
         run: lscpu
 
       - name: Prepare cache
-        # create key with human readable timestamp
-        # used in action/cache/restore and action/cache/save steps
+        # Create a unique key with a human-readable timestamp, used by the
+        # restore and save steps below. The restore step falls back to the
+        # most recent cache with a matching prefix.
         id: ccache-prepare
+        shell: bash
         run: |
-          echo "key=ccache:alpine:${{ matrix.arch }}:${{ github.ref }}:$(date +"%Y-%m-%d_%H-%M-%S"):${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "key=ccache:alpine:${{ matrix.arch }}:${{ github.ref }}:$(date -u +"%Y-%m-%d_%H-%M-%S")" >> "$GITHUB_OUTPUT"
 
       - name: Configure ccache
         run: |
@@ -91,16 +100,18 @@ jobs:
           which ccache
 
       - name: Restore cache
-        # setup the GitHub cache used to maintain the ccache from one job to the next
+        # Set up the GitHub cache used to maintain the ccache from one job to the next
+        id: restore
         uses: actions/cache/restore@v6
         with:
           # location of the ccache of the chroot in the root file system
           path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
           key: ${{ steps.ccache-prepare.outputs.key }}
-          # Prefer caches from the same branch. Fall back to caches from the dev branch.
+          # Prefer the newest cache from the same ref. Fall back to the newest
+          # cache for this architecture from any ref.
           restore-keys: |
-            ccache:alpine:${{ matrix.arch }}:${{ github.ref }}
-            ccache:alpine:${{ matrix.arch }}
+            ccache:alpine:${{ matrix.arch }}:${{ github.ref }}:
+            ccache:alpine:${{ matrix.arch }}:
 
       - name: Configure
         run: |
@@ -124,16 +135,20 @@ jobs:
         run: cd build && cmake --build . --target build_tests --parallel
 
       - name: Test
-        # Need a longer timeout as emulated runs are slow.
+        # Emulated runs are slow. ctest's default per-test timeout has been
+        # sufficient so far; add --timeout here if tests start timing out.
         run: cd build && ctest --output-on-failure
 
       - name: Ccache statistics
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: ccache -s
 
       - name: Cache
-        # Save the cache after we are done (successfully) building
-        # This helps to retain the ccache even if the subsequent steps are failing.
+        # Save the cache even if the Build or Test steps failed, so that a
+        # failing day does not also throw away the warm ccache. Skipped if
+        # the job was cancelled or setup failed before the cache was restored.
+        if: ${{ !cancelled() && steps.restore.outcome == 'success' }}
         uses: actions/cache/save@v6
         with:
           path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
