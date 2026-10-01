@@ -1916,23 +1916,24 @@ igraph_error_t igraph_incident(
  * \function igraph_is_same_graph
  * \brief Are two graphs identical as labelled graphs?
  *
- * Two graphs are considered to be the same if they have the same vertex and edge sets.
- * Graphs which are the same may have multiple different representations in igraph,
- * hence the need for this function.
+ * Two graphs are considered to be the same if they have the same vertex and
+ * edge sets. Graphs which are the same may have multiple different
+ * representations in igraph, hence the need for this function.
  *
  * </para><para>
- * This function verifies that the two graphs have the same directedness, the same
- * number of vertices, and that they contain precisely the same edges (regardless of their ordering)
- * when written in terms of vertex indices. Graph attributes are not taken into account.
+ * This function verifies that the two graphs have the same directedness, the
+ * same number of vertices, and that they contain precisely the same edges
+ * (regardless of their ordering) when written in terms of vertex indices.
+ * Graph attributes are not taken into account.
  *
  * </para><para>
  * This concept is different from isomorphism. For example, the graphs
  * <code>0-1, 2-1</code> and <code>1-2, 0-1</code> are considered the same
- * because they only differ in the ordering of their edge lists and the ordering
- * of vertices in an undirected edge. However, they are not the same as
- * <code>0-2, 1-2</code>, even though they are isomorphic to it.
+ * because they only differ in the ordering of their edge lists and the
+ * ordering of vertices in an undirected edge. However, they are not the same
+ * as <code>0-2, 1-2</code>, even though they are isomorphic to it.
  * Note that this latter graph contains the edge <code>0-2</code>
- * while the former two do not — thus their edge sets differ.
+ * while the former two do not, thus their edge sets differ.
  *
  * \param graph1 The first graph object.
  * \param graph2 The second graph object.
