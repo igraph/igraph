@@ -21,6 +21,35 @@
 #include <igraph.h>
 #include <cstdlib>
 
+// Verify that all communities are connected subgraphs
+void check_communities_are_connected(const igraph_t *graph, const igraph_vector_int_t *membership) {
+    igraph_vector_int_t memb, comp, map;
+    igraph_int_t vcount = igraph_vcount(graph);
+    igraph_int_t no;
+
+    igraph_vector_int_init_copy(&memb, membership);
+    igraph_reindex_membership(&memb, NULL, &no);
+
+    igraph_vector_int_init(&map, no);
+    igraph_vector_int_fill(&map, -1);
+
+    igraph_vector_int_init(&comp, 0);
+
+    igraph_connected_components(graph, &comp, NULL, NULL, IGRAPH_WEAK);
+
+    for (igraph_int_t v=0; v < vcount; v++) {
+        if (VECTOR(map)[ VECTOR(memb)[v] ] == -1) {
+            VECTOR(map)[ VECTOR(memb)[v] ] = VECTOR(comp)[v];
+        } else {
+            IGRAPH_ASSERT(VECTOR(map)[ VECTOR(memb)[v] ] == VECTOR(comp)[v]);
+        }
+    }
+
+    igraph_vector_int_destroy(&comp);
+    igraph_vector_int_destroy(&map);
+    igraph_vector_int_destroy(&memb);
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
@@ -91,7 +120,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
 
             igraph_community_walktrap(&graph, &weights, 3, &merges, &mv, &membership);
             igraph_community_edge_betweenness(&graph, &iv, &v, &merges, &iv2, &mv, &membership2, IGRAPH_DIRECTED, &weights, NULL);
+
             igraph_community_leiden(&graph, &weights, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
+            check_communities_are_connected(&graph, &membership);
 
             // Take the opportunity to run functions that can use the output of community detection,
             // potentially with weights.
@@ -143,7 +174,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             EANV(&graph, "weight", &weights);
 
             igraph_community_fastgreedy(&graph, &weights, &merges, &mv, &membership);
+
             igraph_community_leiden(&graph, &weights, NULL, NULL, 1.5, 0.01, false, 2, &membership, &i, &r);
+            check_communities_are_connected(&graph, &membership);
+
             igraph_community_multilevel(&graph, &weights, 0.8, &membership, &im, &mv);
 
             // community_spinglass() only works on connected graphs
