@@ -66,6 +66,7 @@ jobs:
         uses: jirutka/setup-alpine@v1
         with:
           arch: ${{ matrix.arch }}
+          branch: v3.22
           packages: >
             build-base
             git
