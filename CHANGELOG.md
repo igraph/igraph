@@ -14,6 +14,7 @@
 - `igraph_read_graph_graphml()` imported the edge IDs incorrectly from GraphML files. This bug was introduced in 1.0.0. Thanks to @zxawry for the fix (PR #2894)!
 - `igraph_read_graph_graphdb()` now validates vertex IDs relative to the declared vertex count. Thanks to Kaixuan Li @MarkLee131 for the fix (PR #2908)!
 - `igraph_community_leiden()` and `igraph_community_leiden_simple()` lost the vertex moves made on the last aggregation level of an iteration. The result could then contain disconnected clusters, and with a negative `n_iterations` the functions could run forever (#2934). Thanks to Lucas Lopes Felipe @lucaslopes for fixing this (PR #2935)!
+- Fixed compatibility with with some Linux distros that include a patched version of libxml2 2.9.x that changed the `xmlEntity` struct layout. Notably, RHEL 8 and derivatives, as well as Ubuntu 22.04 and 24.04 LTS are affected when recent security patches are applied. See issues #2698 and #2931.
 
 ### Other
 
