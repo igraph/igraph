@@ -941,6 +941,12 @@ add_legacy_tests(
   igraph_spatial_edge_lengths
 )
 
+# barnes hut quadtree
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_barnes_hut
+)
+
 
 # cycle bases
 add_legacy_tests(
@@ -1013,6 +1019,7 @@ add_benchmarks(
   graphicality
   igraph_adjacency
   igraph_average_path_length_unweighted
+  igraph_barnes_hut
   beta_skeletons
   igraph_betweenness
   igraph_betweenness_weighted
