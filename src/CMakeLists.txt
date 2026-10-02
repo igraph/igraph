@@ -249,6 +249,7 @@ add_library(
   operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
+  operators/rewire.cpp
   operators/simplify.c
   operators/subgraph.c
   operators/union.c
