@@ -376,6 +376,20 @@ int main(void) {
     check_cycles_max(&g, IGRAPH_OUT, 2, 6);
     igraph_destroy(&g);
 
+    // Regression test for directed 2-cycle detection in a larger graph.
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 1,
+                 0, 5,
+                 1, 5,
+                 2, 5,
+                 4, 3,
+                 4, 5,
+                 5, 2,
+                 5, 3,
+                 -1);
+    check_cycles(&g, IGRAPH_OUT, 1);
+    igraph_destroy(&g);
+
     printf("\nTesting undirected graph of type 'Mickey'\n");
     igraph_small(&g, 7, IGRAPH_UNDIRECTED,
                      0,1,
