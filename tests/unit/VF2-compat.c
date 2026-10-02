@@ -157,7 +157,7 @@ int match_rings_open_closed(void) {
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
                              /*node_compat_fn=*/ 0, /*edge_compat_fn=*/ 0,
-                             /*arg=*/ 0);
+                             /*arg=*/ 0, /*induced=*/ false);
     if (!iso) {
         exit(31);
     }
@@ -165,7 +165,7 @@ int match_rings_open_closed(void) {
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
                              compat_parity, /*edge_compat_fn=*/ 0,
-                             /*arg=*/ 0);
+                             /*arg=*/ 0, /*induced=*/ false);
     if (!iso) {
         exit(32);
     }
@@ -173,7 +173,7 @@ int match_rings_open_closed(void) {
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
                              compat_not0, /*edge_compat_fn=*/ 0,
-                             /*arg=*/ 0);
+                             /*arg=*/ 0, /*induced=*/ false);
     if (iso) {
         exit(33);
     }
@@ -183,7 +183,7 @@ int match_rings_open_closed(void) {
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
                              /*node_compat_fn=*/ 0, compat_parity,
-                             /*arg=*/ 0);
+                             /*arg=*/ 0, /*induced=*/ false);
     if (!iso) {
         exit(34);
     }
@@ -191,7 +191,7 @@ int match_rings_open_closed(void) {
     igraph_subisomorphic_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                              &iso, /*map12=*/ 0, /*map21=*/ 0,
                              /*node_compat_fn=*/ 0, compat_not0,
-                             /*arg=*/ 0);
+                             /*arg=*/ 0, /*induced=*/ false);
     if (!iso) {
         exit(35);
     }
@@ -200,7 +200,8 @@ int match_rings_open_closed(void) {
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                                      &count, /*node_compat_fn=*/ 0,
-                                     /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                                     /*edge_compat_fn=*/ 0, /*arg=*/ 0,
+                                     /*induced=*/ false);
 
     if (count != 20) {
         exit(36);
@@ -208,7 +209,8 @@ int match_rings_open_closed(void) {
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                                      &count, compat_parity,
-                                     /*edge_compat_fn=*/ 0, /*arg=*/ 0);
+                                     /*edge_compat_fn=*/ 0, /*arg=*/ 0,
+                                     /*induced=*/ false);
 
     if (count != 10) {
         exit(37);
@@ -216,7 +218,7 @@ int match_rings_open_closed(void) {
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                                      &count, compat_not0, /*edge_compat_fn=*/ 0,
-                                     /*arg=*/ 0);
+                                     /*arg=*/ 0, /*induced=*/ false);
 
     if (count != 0) {
         exit(38);
@@ -226,7 +228,8 @@ int match_rings_open_closed(void) {
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                                      &count, /*node_compat_fn=*/ 0,
-                                     compat_parity, /*arg=*/ 0);
+                                     compat_parity, /*arg=*/ 0,
+                                     /*induced=*/ false);
 
     if (count != 10) {
         exit(39);
@@ -234,7 +237,7 @@ int match_rings_open_closed(void) {
 
     igraph_count_subisomorphisms_vf2(&rc, &ro, /*colors(4x)*/ 0, 0, 0, 0,
                                      &count, /*node_compat_fn=*/ 0, compat_not0,
-                                     /*arg=*/ 0);
+                                     /*arg=*/ 0, /*induced=*/ false);
 
     if (count != 2) {
         exit(40);
