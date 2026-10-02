@@ -930,6 +930,7 @@ add_legacy_tests(
   igraph_is_graphical
   igraph_is_bigraphical
   igraph_realize_bipartite_degree_sequence
+  igraph_is_potentially_connected
 )
 
 # spatial
