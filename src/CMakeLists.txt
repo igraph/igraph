@@ -190,6 +190,9 @@ add_library(
 
   flow/flow.c
   flow/flow_conversion.c
+  flow/path_cover.c
+  flow/path_cover_antichain.c
+  flow/path_cover_chaincover.c
   flow/st-cuts.c
 
   hrg/hrg_types.cc
