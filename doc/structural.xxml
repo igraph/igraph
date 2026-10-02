@@ -126,6 +126,7 @@
 <!-- doxrox-include igraph_eigenvector_centrality -->
 <!-- doxrox-include igraph_hub_and_authority_scores -->
 <!-- doxrox-include igraph_convergence_degree -->
+<!-- doxrox-include igraph_cd_index -->
 </section>
 
 <section id="range-limited-centrality-measures"><title>Range-limited centrality measures</title>
