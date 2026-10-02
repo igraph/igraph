@@ -1,0 +1,114 @@
+Undirected, unweighted, no loops:
+0 2 0 1 1
+2 0 1 0 0
+0 1 0 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, unweighted, loops once:
+0 2 0 1 1
+2 0 1 0 0
+0 1 1 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, unweighted, loops twice:
+0 2 0 1 1
+2 0 1 0 0
+0 1 2 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, weighted, no loops:
+0 7 0 6 1
+7 0 4 0 0
+0 4 0 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Undirected, weighted, loops once:
+0 7 0 6 1
+7 0 4 0 0
+0 4 3 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Undirected, weighted, loops twice:
+0 7 0 6 1
+7 0 4 0 0
+0 4 6 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Undirected, unweighted, no loops, from [0,1,2] to [0,2]:
+0 0
+2 1
+0 0
+========
+Undirected, unweighted, loops once, from [0,1,2] to [0,2]:
+0 0
+2 1
+0 1
+========
+Undirected, unweighted, loops twice, from [0,1,2] to [0,2]:
+0 0
+2 1
+0 2
+========
+Undirected, weighted, no loops, from [0,1,2] to [0,2]:
+0 0
+7 4
+0 0
+========
+Undirected, weighted, loops once, from [0,1,2] to [0,2]:
+0 0
+7 4
+0 3
+========
+Undirected, weighted, loops twice, from [0,1,2] to [0,2]:
+0 0
+7 4
+0 6
+========
+Directed, unweighted, no loops:
+0 2 0 1 0
+0 0 1 0 0
+0 0 0 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, unweighted, loops once:
+0 2 0 1 0
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, unweighted, loops twice (same as once):
+0 2 0 1 0
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, weighted, no loops:
+0 7 0 6 0
+0 0 4 0 0
+0 0 0 3 0
+0 0 0 0 2
+1 0 0 0 0
+========
+Directed, weighted, loops once:
+0 7 0 6 0
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+1 0 0 0 0
+========
+Directed, weighted, loops twice (same as once):
+0 7 0 6 0
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+1 0 0 0 0
+========
