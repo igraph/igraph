@@ -179,6 +179,35 @@ static void test_last_level_moves_are_kept(void) {
     igraph_destroy(&graph);
 }
 
+/* Refinement must not count a vertex's self-loop as an edge to the rest of
+ * its cluster when the vertex joins a refined cluster: the singleton start
+ * excludes loops, and counting them on a join made the well-connectedness
+ * test too permissive. With the loop counted, vertex 4 ended in the cluster
+ * of 2 and 5 (quality 0.279); without it, 1 and 4 form a cluster (0.296). */
+static void test_refinement_ignores_self_loops(void) {
+    const igraph_int_t edges_array[] = { 3,0, 5,0, 4,1, 5,1, 3,2, 4,2, 5,2, 5,5 };
+    const igraph_real_t weights_array[] = { 1.398878, 0.822456, 1.153986, 0.262828,
+                                            1.156521, 1.496157, 1.238841, 2.039798 };
+    const igraph_int_t expected[] = { 0, 1, 2, 0, 1, 2 };
+    const igraph_vector_int_t edges = igraph_vector_int_view(edges_array, 16);
+    const igraph_vector_t weights = igraph_vector_view(weights_array, 8);
+    igraph_t graph;
+    igraph_vector_int_t membership;
+    igraph_int_t nb_clusters;
+
+    igraph_create(&graph, &edges, 6, IGRAPH_UNDIRECTED);
+    igraph_vector_int_init(&membership, 6);
+    igraph_rng_seed(igraph_rng_default(), 12671);
+    IGRAPH_ASSERT(igraph_community_leiden(&graph, &weights, NULL, NULL, 0.5, 0.01, false, 1,
+                                          &membership, &nb_clusters, NULL) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(nb_clusters == 3);
+    for (igraph_int_t i = 0; i < 6; i++) {
+        IGRAPH_ASSERT(VECTOR(membership)[i] == expected[i]);
+    }
+    igraph_vector_int_destroy(&membership);
+    igraph_destroy(&graph);
+}
+
 int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
@@ -354,6 +383,7 @@ int main(void) {
     igraph_vector_destroy(&weights);
 
     test_last_level_moves_are_kept();
+    test_refinement_ignores_self_loops();
 
     VERIFY_FINALLY_STACK();
 
