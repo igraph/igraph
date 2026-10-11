@@ -66,6 +66,13 @@ endif()
 # function as is (without visibility specification)
 target_compile_definitions(infomap_vendored PRIVATE IGRAPH_STATIC)
 
+# {fmt} requires the UTF-8 source and execution character set on MSVC.
+# src/community/infomap.cpp includes {fmt} through Infomap's headers and
+# gets the same flag in src/CMakeLists.txt.
+if(MSVC)
+  target_compile_options(infomap_vendored PRIVATE /utf-8)
+endif()
+
 # Infomap uses unsigned indices in OpenMP loops, which requires
 # at least OpenMP 3.0. As of 2025, MSVC only supports OpenMP 2.0,
 # thus this check is necessary.
