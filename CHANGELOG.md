@@ -21,7 +21,7 @@
 ### Other
 
 - Documentation improvements.
-- nanoflann was updated to version 1.14.0
+- nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 
 ## [1.0.1]
