@@ -859,6 +859,11 @@ unsigned int Network::addMultilayerNode(unsigned int layerId, unsigned int physi
 
 unsigned int Network::addMultilayerNode(unsigned int stateId, unsigned int layerId, unsigned int physicalId, double weight)
 {
+  return addMultilayerNode(stateId, layerId, physicalId, weight, std::string());
+}
+
+unsigned int Network::addMultilayerNode(unsigned int stateId, unsigned int layerId, unsigned int physicalId, double weight, std::string name)
+{
   m_higherOrderInputMethodCalled = true;
 
   // Create state node if not already exist, return state node id
@@ -869,7 +874,7 @@ unsigned int Network::addMultilayerNode(unsigned int stateId, unsigned int layer
     return it->second;
   }
 
-  auto ret = addStateNode(stateId, physicalId);
+  auto ret = addStateNode(stateId, physicalId, std::move(name));
   auto& stateNode = ret.first->second;
   stateNode.layerId = layerId;
   stateNode.weight = weight;

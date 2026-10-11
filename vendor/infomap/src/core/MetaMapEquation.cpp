@@ -281,10 +281,13 @@ void MetaMapEquation::updateMetaData(InfoNode& current, unsigned int oldModuleIn
 
 void MetaMapEquation::consolidateModules(std::vector<InfoNode*>& modules)
 {
-  for (auto& module : modules) {
-    if (module == nullptr)
+  // Index by position: modules[i] is the module m_moduleToMetaCollection[i] tracked.
+  // module->index has already been overwritten with the former module's index when
+  // coarse-tune consolidates sub-modules (#1138).
+  for (unsigned int moduleIndex = 0; moduleIndex < modules.size(); ++moduleIndex) {
+    if (modules[moduleIndex] == nullptr)
       continue;
-    module->ensureExtras().metaCollection = std::make_unique<MetaCollection>(m_moduleToMetaCollection[module->index]);
+    modules[moduleIndex]->ensureExtras().metaCollection = std::make_unique<MetaCollection>(m_moduleToMetaCollection[moduleIndex]);
   }
 }
 

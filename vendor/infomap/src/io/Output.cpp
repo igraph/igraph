@@ -11,6 +11,7 @@
 
 #include "Output.h"
 #include "OutputView.h"
+#include "RunMetadata.h"
 #include "../core/InfomapBase.h"
 #include "../core/StateNetwork.h"
 #include "../io/SafeFile.h"
@@ -119,11 +120,24 @@ std::string getOutputFileHeader(const InfomapBase& im, const StateNetwork& netwo
 #else
   std::string lossyInfo;
 #endif
+  // Input identity next to the codelength, so a published artifact says which
+  // file (and which seed, above) produced it (#1026). Omitted lines mean the
+  // file is unknown: an in-memory network, or an option not used.
+  std::string provenanceInfo;
+  if (im.inputIdentity().known())
+    provenanceInfo += fmt::format(FMT_STRING("\n# input fingerprint {} ({} bytes)"), im.inputIdentity().hash, im.inputIdentity().size);
+  if (im.clusterDataIdentity().known())
+    provenanceInfo += fmt::format(FMT_STRING("\n# cluster data fingerprint {}"), im.clusterDataIdentity().hash);
+  if (im.metaDataIdentity().known())
+    provenanceInfo += fmt::format(FMT_STRING("\n# meta data fingerprint {}"), im.metaDataIdentity().hash);
+  if (!im.runConfigFingerprint().empty())
+    provenanceInfo += fmt::format(FMT_STRING("\n# config fingerprint {}"), im.runConfigFingerprint());
   return fmt::format(FMT_STRING("# v{}\n"
                                 "# ./Infomap {}\n"
                                 "# started at {}\n"
                                 "# completed in {:g} s\n"
                                 "# trials {} of {}\n"
+                                "# seed {}{}\n"
                                 "# partitioned into {} levels with {} top modules\n"
                                 "# codelength {:g} bits\n"
                                 "# relative codelength savings {:g}%\n"
@@ -141,11 +155,20 @@ std::string getOutputFileHeader(const InfomapBase& im, const StateNetwork& netwo
                      // interrupt time, when doing work is least reliable.
                      im.codelengths().size(),
                      im.numTrials,
-                     im.maxTreeDepth(),
+                     // The effective seed, not whatever the user typed: the header
+                     // echoes parsedString, so a run on the default seed published
+                     // artifacts from which the one parameter reproducibility hinges
+                     // on was unrecoverable (#1026). Per-trial seeds derive from
+                     // base + offset + i, so the offset is part of the answer and is
+                     // written when a shard is not the first.
+                     im.baseSeed(),
+                     im.trialOffset == 0 ? std::string() : fmt::format(FMT_STRING(" offset {}"), im.trialOffset),
+                     im.numLevels(),
                      im.numTopModules(),
                      im.codelength(),
                      im.getRelativeCodelengthSavings() * 100,
                      flowModelToString(im.flowModel))
+      + provenanceInfo
       + (im.haveMemory() ? "\n# higher order" : "")
       + (im.haveMemory() ? states ? "\n# state level" : "\n# physical level" : "")
       + (network.isBipartite() ? bipartiteInfo : "")
@@ -301,7 +324,24 @@ void writeJsonTree(InfomapBase& im, const StateNetwork& network, std::ostream& o
   json["startedAt"] = io::stringify(im.getStartDate());
   json["completedIn"] = im.getElapsedTime().getElapsedTimeInSec();
   json["codelength"] = im.codelength();
-  json["numLevels"] = im.maxTreeDepth();
+  // See the text header: the effective seed, and the trial counts the text header
+  // has had since #906 but this output never carried (#1026).
+  json["seed"] = im.baseSeed();
+  if (im.trialOffset != 0) {
+    json["trialOffset"] = im.trialOffset;
+  }
+  json["trials"] = im.codelengths().size();
+  json["numTrials"] = im.numTrials;
+  // The same identity the text header carries (#1026); absent when unknown.
+  if (!im.runConfigFingerprint().empty())
+    json["configFingerprint"] = im.runConfigFingerprint();
+  if (im.inputIdentity().known())
+    json["input"] = Json::parse(inputIdentityJson(im.inputIdentity()));
+  if (im.clusterDataIdentity().known())
+    json["clusterData"] = Json::parse(inputIdentityJson(im.clusterDataIdentity()));
+  if (im.metaDataIdentity().known())
+    json["metaData"] = Json::parse(inputIdentityJson(im.metaDataIdentity()));
+  json["numLevels"] = im.numLevels();
   json["numTopModules"] = im.numTopModules();
 
   Json numModules = Json::array();
@@ -513,6 +553,30 @@ std::string writeCsvTree(InfomapBase& im, const StateNetwork& network, const std
   writeCsvTree(im, network, outFile, states);
   outFile.commit();
   return outputFilename;
+}
+
+} // namespace infomap
+
+namespace infomap {
+
+std::string provenanceJson(const InfomapBase& im)
+{
+  Json json;
+  json["version"] = std::string("v") + INFOMAP_VERSION;
+  json["args"] = im.parsedString;
+  json["seed"] = im.baseSeed();
+  json["trialOffset"] = im.trialOffset;
+  json["trials"] = im.codelengths().size();
+  json["numTrials"] = im.numTrials;
+  const auto canonicalConfig = canonicalConfigJson(im.getConfig());
+  json["config"] = Json::parse(canonicalConfig);
+  // The run's captured fingerprint when a run has happened, else computed from
+  // the live config so a not-yet-run instance still reports what it would run.
+  json["configFingerprint"] = im.runConfigFingerprint().empty() ? configFingerprint(im.getConfig()) : im.runConfigFingerprint();
+  json["input"] = Json::parse(inputIdentityJson(im.inputIdentity()));
+  json["clusterData"] = Json::parse(inputIdentityJson(im.clusterDataIdentity()));
+  json["metaData"] = Json::parse(inputIdentityJson(im.metaDataIdentity()));
+  return json.dump();
 }
 
 } // namespace infomap

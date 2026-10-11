@@ -72,12 +72,12 @@ Quick start with Python:
     print(result.modules())  # {node_id: module_id}
 
 ``infomap.run`` accepts a NetworkX or igraph graph, a SciPy sparse matrix, a
-``(2, E)`` edge index, a network file path, or an iterable of links, and returns
+``(2, E)`` edge index, a network file path, or an iterable of links. It returns
 an immutable ``Result``. If you only need the communities in the graph's own
 node labels, use ``infomap.find_communities(graph, seed=123, num_trials=20)``,
-which returns a NetworkX-style ``list`` of ``set``\ s of node labels (its igraph
+which returns a NetworkX-style ``list`` of ``set``\ s of node labels. Its igraph
 counterpart ``infomap.find_igraph_communities`` returns an
-``igraph.VertexClustering``).
+``igraph.VertexClustering``.
 
 For incremental construction -- adding nodes and links one at a time -- build a
 ``Network`` and run it, reading results off the returned ``Result``:
@@ -94,9 +94,10 @@ For incremental construction -- adding nodes and links one at a time -- build a
     print(result.num_top_modules, result.codelength)
     print(result.to_dataframe(columns=["node_id", "module_id", "flow"], index="node_id"))
 
-To keep one configured engine and run it repeatedly -- or to maintain code
-written against the original API -- the stateful ``Infomap`` class works the same
-way (``im = Infomap(...); im.add_link(...); result = im.run()``).
+The stateful ``Infomap`` class works the same way
+(``im = Infomap(...); im.add_link(...); result = im.run()``). Use it to keep
+one configured engine and run it repeatedly, or to maintain code written
+against the original API.
 
 For Jupyter, start with the
 `quickstart notebook <https://github.com/mapequation/infomap/blob/master/examples/notebooks/quickstart.ipynb>`_.
@@ -194,7 +195,7 @@ the native binary:
 
     npx @mapequation/infomap network.net . --tree
 
-Browser worker and React usage are documented on the `NPM`_ package page.
+The `NPM`_ package page documents browser worker and React usage.
 
 .. _NPM: https://www.npmjs.com/package/@mapequation/infomap
 
@@ -239,8 +240,8 @@ copies or outputs, mount a host directory as a separate workspace path:
         ghcr.io/mapequation/infomap:notebook \
         start.sh jupyter lab
 
-The Dockerfiles in this repository are also smoke-tested in CI and can be
-built locally:
+CI also smoke-tests the Dockerfiles in this repository, and you can build
+them locally:
 
 .. code-block:: bash
 
@@ -266,7 +267,7 @@ Building locally requires a working ``gcc`` or ``clang`` toolchain.
     cd infomap
     make build-native
 
-On macOS, the default OpenMP-enabled build may require Homebrew ``libomp``.
+On macOS, the default OpenMP-enabled build can require Homebrew ``libomp``.
 If OpenMP is unavailable, use:
 
 .. code-block:: bash
@@ -290,13 +291,12 @@ Install shell completion scripts manually with:
     mkdir -p ~/.local/share/bash-completion/completions
     ./Infomap --completion bash > ~/.local/share/bash-completion/completions/infomap
 
-For Zsh, make sure ``~/.zfunc`` is in ``fpath`` and ``compinit`` is loaded from
-``~/.zshrc``. For Bash, make sure ``bash-completion`` is sourced from
-``~/.bashrc``.
+For Zsh, make sure ``fpath`` contains ``~/.zfunc`` and ``~/.zshrc`` loads
+``compinit``. For Bash, make sure ``~/.bashrc`` sources ``bash-completion``.
 
 See ``BUILD.md`` for platform-specific maintainer build details.
 
-Maintainers should use:
+For maintainer tasks, use:
 
 - ``BUILD.md`` for local build and verification commands
 - ``RELEASING.md`` for the release flow
@@ -336,6 +336,6 @@ Infomap is released under a dual license.
 
 The code is available under the GNU General Public License version 3 or any
 later version; see `LICENSE_GPLv3.txt`_.
-For a non-copyleft license, please contact us.
+For a non-copyleft license, contact us.
 
 .. _`LICENSE_GPLv3.txt`: https://github.com/mapequation/infomap/blob/master/LICENSE_GPLv3.txt

@@ -266,6 +266,65 @@ unsigned int InfoNode::replaceWithChildren() noexcept
   return 1;
 }
 
+bool InfoNode::liftChildrenIntoParent() noexcept
+{
+  if (isLeaf() || isRoot())
+    return false;
+
+  unsigned int numChildren = 0;
+  for (InfoNode* child = firstChild; child != nullptr; child = child->next) {
+    child->parent = parent;
+    ++numChildren;
+  }
+  parent->m_childDegree += numChildren - 1;
+
+  firstChild->previous = previous;
+  lastChild->next = next;
+  if (previous != nullptr)
+    previous->next = firstChild;
+  else
+    parent->firstChild = firstChild;
+  if (next != nullptr)
+    next->previous = lastChild;
+  else
+    parent->lastChild = lastChild;
+  return true;
+}
+
+void InfoNode::restoreLiftedChildren() noexcept
+{
+  // The lifted chain runs from firstChild up to (excluding) this node's old next sibling.
+  unsigned int numChildren = 0;
+  for (InfoNode* child = firstChild; child != next; child = child->next) {
+    child->parent = this;
+    ++numChildren;
+  }
+  parent->m_childDegree -= numChildren - 1;
+
+  if (previous != nullptr)
+    previous->next = this;
+  else
+    parent->firstChild = this;
+  if (next != nullptr)
+    next->previous = this;
+  else
+    parent->lastChild = this;
+  firstChild->previous = nullptr;
+  lastChild->next = nullptr;
+}
+
+void InfoNode::destroyLifted() noexcept
+{
+  // Same release as replaceWithChildren(): a null child chain keeps the destructor
+  // from deleting the lifted children, and null siblings keep it from relinking them.
+  firstChild = nullptr;
+  lastChild = nullptr;
+  next = nullptr;
+  previous = nullptr;
+  parent = nullptr;
+  destroyNode(this);
+}
+
 void InfoNode::replaceChildrenWithGrandChildrenDebug() noexcept
 {
   if (firstChild == nullptr)

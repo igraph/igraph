@@ -349,12 +349,27 @@ std::vector<std::pair<std::string, std::string>> planReportArtifacts(const Confi
   return reports;
 }
 
-std::vector<std::string> planAllOutputPaths(const Config& config)
+std::vector<std::string> planAllOutputPaths(const Config& config, HigherOrderInput higherOrder)
 {
   std::vector<std::string> paths;
 
+  // Config::stateOutput is still false when the pre-flight runs -- it is set by
+  // configureNetworkMode() once the network is read -- so the classification is
+  // supplied instead. Every write phase now happens after that call, so one value
+  // covers them all. Getting it wrong in either direction is a live defect: too
+  // few paths lets a run destroy its own input (#1018), too many refuses a run
+  // that would have been fine.
+  //
+  // The copy preserves a stateOutput the caller set itself -- the field is public
+  // and the Python and R bindings expose a setter -- and the classification only
+  // ever turns it on, never off. So the plan agrees with the writers on that case
+  // too, which is what the forced first-order plan this replaced got wrong.
+  Config planConfig = config;
+  if (higherOrder == HigherOrderInput::Yes)
+    planConfig.setStateOutput();
+
   const auto collectPhase = [&](OutputPhase phase, int trial) {
-    for (const auto& artifact : planOutputArtifacts(config, phase, trial))
+    for (const auto& artifact : planOutputArtifacts(planConfig, phase, trial))
       paths.push_back(artifact.filename);
   };
 
@@ -364,10 +379,19 @@ std::vector<std::string> planAllOutputPaths(const Config& config)
 
   // The final modular result is written once with the canonical basename, and
   // additionally per trial when --print-all-trials uses separate files.
+  //
+  // The trial numbers are the writer's global ones -- `trialOffset + i + 1`, the
+  // same expression both writeResult call sites use -- not a local 1..numTrials.
+  // A shard planned `_trial_1.._trial_4` while writing `_trial_11.._trial_14`,
+  // which left both consumers of this plan looking at files that never exist:
+  // --no-overwrite could only discover a real collision by hitting it mid-run,
+  // after earlier artifacts were already on disk, and the input-overwrite check
+  // above could not see that a run was about to destroy an input named like one
+  // of its own per-trial outputs.
   collectPhase(OutputPhase::AfterPartition, -1);
   if (config.printAllTrials && config.numTrials > 1) {
-    for (unsigned int trial = 1; trial <= config.numTrials; ++trial)
-      collectPhase(OutputPhase::AfterPartition, static_cast<int>(trial));
+    for (unsigned int i = 0; i < config.numTrials; ++i)
+      collectPhase(OutputPhase::AfterPartition, static_cast<int>(config.trialOffset + i + 1));
   }
 
   for (const auto& report : planReportArtifacts(config))
@@ -376,9 +400,9 @@ std::vector<std::string> planAllOutputPaths(const Config& config)
   return paths;
 }
 
-void preflightOutputTargets(const Config& config)
+void preflightOutputTargets(const Config& config, HigherOrderInput higherOrder)
 {
-  const auto plannedPaths = planAllOutputPaths(config);
+  const auto plannedPaths = planAllOutputPaths(config, higherOrder);
 
   // Checked before the overwrite policy, and deliberately not subject to it:
   // writing a result over the run's own input destroys the input, and

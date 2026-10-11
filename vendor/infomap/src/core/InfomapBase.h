@@ -19,6 +19,7 @@
 #include "../io/ClusterMap.h"
 #include "../io/Network.h"
 #include "../io/Output.h"
+#include "../io/RunMetadata.h"
 #include "../utils/Log.h"
 #include "../utils/Date.h"
 #include "../utils/Stopwatch.h"
@@ -122,7 +123,9 @@ public:
   bool haveNonTrivialModules() const { return numNonTrivialTopModules() > 0; }
 
   /**
-   * Number of node levels below the root in current Infomap instance, 1 if no modules
+   * Number of node levels below the root, counted over every branch, 1 if no modules.
+   * Alias of maxTreeDepth. This is the depth the summary, the tree writer and the JSON
+   * output report, so it is what any other report of a depth should use (#1036).
    */
   unsigned int numLevels() const;
 
@@ -146,6 +149,31 @@ public:
   double getHierarchicalCodelength() const { return m_hierarchicalCodelength; }
 
   double getOneLevelCodelength() const { return m_oneLevelCodelength; }
+
+#ifndef SWIG
+  // The seed the run was configured with, which is not the same as reading
+  // seedToRandomNumberGenerator: the serial loop moves that field to the current
+  // trial's seed (base + trialOffset + index) and only gives it back when the loop
+  // ends, while updateBestResult writes the aggregate artifact from inside the loop.
+  // A header reading the live field therefore recorded the last trial's seed
+  // whenever the best trial was the last one, since restoreBestResult then performs
+  // no rewrite. Falls back to the live value until a run has captured it.
+  //
+  // Guarded from SWIG so it is not exposed as a new binding, the same way
+  // getReferenceOneLevelCodelength above is: the output writer is its only caller.
+  unsigned long baseSeed() const { return m_haveBaseSeed ? m_baseSeed : seedToRandomNumberGenerator; }
+
+  // Identity of every result-affecting input file and of the effective config,
+  // captured once when a run starts so every artifact the run writes -- the
+  // .tree/.ftree/.clu headers, the JSON tree, the manifest -- carries the same
+  // values (#1026). Unknown (empty hash) when the network was built in memory
+  // or the file was not used. Guarded from SWIG like baseSeed(); the bindings
+  // read all of it through provenanceJson().
+  const InputIdentity& inputIdentity() const { return m_inputIdentity; }
+  const InputIdentity& clusterDataIdentity() const { return m_clusterDataIdentity; }
+  const InputIdentity& metaDataIdentity() const { return m_metaDataIdentity; }
+  const std::string& runConfigFingerprint() const { return m_configFingerprint; }
+#endif
 
 #ifndef SWIG
   // One-level reference reported to the user. In lossy mode this is the lossless
@@ -269,6 +297,18 @@ public:
 private:
   class RunSession;
 
+  /**
+   * Depth of the leftmost branch: follows firstChild to the first leaf. O(depth) where
+   * numLevels is O(nodes), which is why the search uses it -- consolidateModules alone
+   * calls it ~270k times per web-NotreDame trial. It equals numLevels only on a
+   * uniform-depth tree, which every one of its call sites has by construction: they run
+   * inside the per-module optimization, below the point where sub-Infomap results are
+   * stitched in and make the tree ragged. Measured over the test suite and the benchmark
+   * networks, the two never disagreed at any of those sites. Never report this value --
+   * that is the bug in #1036.
+   */
+  unsigned int depthOfFirstLeaf() const;
+
   // Allocate a tree node from this instance's pool and stamp its owning pool
   // back-pointer so node-local teardown (deleteChildren / remove /
   // replaceWithChildren) can reclaim it without an InfomapBase handle.
@@ -344,12 +384,24 @@ private:
 
   bool haveHardPartition() const { return !m_originalLeafNodes.empty(); }
 
-  // Share the cancel flag (only) with a sub/worker Infomap. The callback is NOT
-  // inherited — only the main instance, on the owner thread, ever invokes it.
+  // Share the cancel flag and the largest-team count with a sub/worker Infomap.
+  // The callback is NOT inherited — only the main instance, on the owner thread,
+  // ever invokes it.
   InfomapBase& inheritRuntimeContext(const InfomapBase& other)
   {
     m_cancel = other.m_cancel;
+    m_largestTeam = other.m_largestTeam;
     return *this;
+  }
+
+  // Any thread, from inside a parallel region: record the size of its team. The
+  // largest one is the timing report's threads_used, so that field counts the
+  // threads the run actually started rather than predicting them (#1145).
+  void recordTeamSize(unsigned int threads) noexcept
+  {
+    auto largest = m_largestTeam->load(std::memory_order_relaxed);
+    while (threads > largest && !m_largestTeam->compare_exchange_weak(largest, threads, std::memory_order_relaxed)) {
+    }
   }
 
   // Flag-only, any thread. Call only where a throw can unwind legally — NOT
@@ -404,6 +456,16 @@ private:
    */
   InfomapBase& initPartition(const std::string& clusterDataFile, bool hard = false, const Network* network = nullptr);
 
+#ifndef SWIG
+  /**
+   * Apply cluster data that has already been parsed. A run parses --cluster-data
+   * once and applies it from here in every trial, so the file is read exactly
+   * once however many trials there are (#1072). Not binding API: the bindings
+   * set clusterDataFile and let the run do this.
+   */
+  InfomapBase& initPartition(const ClusterMap& clusterData, bool hard = false);
+#endif
+
   /**
    * Provide an initial partition of the network.
    *
@@ -437,6 +499,11 @@ private:
    * @param tree A tree path for each node
    */
   InfomapBase& initTree(const NodePaths& tree);
+
+  //! Reject cluster data that gives a module both a leaf and a sub-module as children.
+  //! Call this where a tree is parsed from input; initTree does not, because it also
+  //! materializes engine-generated trees, which cannot have that shape (#990).
+  static void validateClusterDataTreeShape(const NodePaths& tree);
 
   /**
    * Normalize tree leaf ids so the leaf id always identifies a state node in
@@ -484,11 +551,25 @@ private:
   // Init terms that is constant for the whole network
   void initTree() { return m_optimizer->initTree(); }
 
-  void initNetwork() { return m_optimizer->initNetwork(); }
+  // The objective's network-level terms describe whichever network was active when they
+  // were last initialised -- root's children, which are the leaves only sometimes. Record
+  // which, so a later leaf-level partition can restore them instead of scoring the leaves
+  // against a module network's terms (#831; see initPartition(std::vector<unsigned int>&)).
+  void initNetwork()
+  {
+    m_optimizer->initNetwork();
+    m_objectiveTermsAreForLeafNetwork = m_root.firstChild != nullptr && m_root.firstChild->isLeaf();
+  }
 
-  void initSuperNetwork() { return m_optimizer->initSuperNetwork(); }
+  void initSuperNetwork()
+  {
+    m_optimizer->initSuperNetwork();
+    m_objectiveTermsAreForLeafNetwork = false;
+  }
 
   double calcCodelength(const InfoNode& parent) const { return m_optimizer->calcCodelength(parent); }
+
+  double calcTreeCodelengthCost(unsigned int numTopModules) const { return m_optimizer->calcTreeCodelengthCost(numTopModules); }
 
   /**
    * Calculate and store codelength on all modules in the tree
@@ -572,6 +653,14 @@ private:
   unsigned int removeSubModules(bool recalculateCodelengthOnTree);
 
   unsigned int recursivePartition();
+
+  /**
+   * Dissolve every intermediate module whose index codebook no longer pays for
+   * itself: its children move into its parent, one level up. Best-first over the
+   * whole tree; each gain is priced through the objective on the spliced tree.
+   * @return the number of modules dissolved
+   */
+  unsigned int dissolveUnprofitableModules();
 
   void queueTopModules(PartitionQueue& partitionQueue);
 
@@ -666,10 +755,26 @@ protected:
   bool m_calculateEnterExitFlow = false;
 
   double m_oneLevelCodelength = 0.0;
+  unsigned long m_baseSeed = 0;
+  bool m_haveBaseSeed = false;
+  // See inputIdentity(). The wrapper's readInputData records the files it read
+  // in m_readInputPaths, since the bindings never set networkFile.
+  InputIdentity m_inputIdentity;
+  InputIdentity m_clusterDataIdentity;
+  InputIdentity m_metaDataIdentity;
+  std::string m_configFingerprint;
+  std::vector<std::string> m_readInputPaths;
+  // Hashed when the file was read, not when the run starts: a file edited in
+  // between must not be hashed in the name of a partition built from the old
+  // content. Dropped by any in-memory build call (InfomapWrapper).
+  InputIdentity m_inputIdentityFromRead;
+  bool m_networkHasInMemoryContent = false;
   unsigned int m_numNonTrivialTopModules = 0;
   unsigned int m_tuneIterationIndex = 0;
   bool m_isCoarseTune = false;
   unsigned int m_aggregationLevel = 0;
+  //! Whether the objective's network-level terms currently describe the leaf network (#831).
+  bool m_objectiveTermsAreForLeafNetwork = false;
 
   double m_hierarchicalCodelength = 0.0;
   std::vector<double> m_codelengths;
@@ -691,6 +796,10 @@ protected:
   // so the run tree shares one flag. m_ownerThreadId is stamped in run(Network&).
   std::atomic<bool> m_cancelRequested { false };
   std::atomic<bool>* m_cancel = &m_cancelRequested;
+  // The largest OpenMP team the run started, shared through the run tree the same
+  // way. Reset in run(Network&); see recordTeamSize.
+  std::atomic<unsigned int> m_largestTeamSize { 1 };
+  std::atomic<unsigned int>* m_largestTeam = &m_largestTeamSize;
   InterruptCallback m_interruptCallback = nullptr;
   void* m_interruptUserData = nullptr;
   std::thread::id m_ownerThreadId;

@@ -41,7 +41,12 @@ private:
   void calcUndirectedRegularizedFlow(const StateNetwork&, const Config&) noexcept;
   void calcUndirectedRegularizedMultilayerFlow(const StateNetwork&, const Config&);
   void calcDirectedRegularizedFlow(const StateNetwork&, const Config&) noexcept;
-  void calcDirectedRegularizedMultilayerFlow(const StateNetwork&, const Config&) noexcept;
+  // Not noexcept: this one throws on a flow imbalance it cannot normalize away,
+  // and a throw escaping a noexcept function calls std::terminate rather than
+  // reaching Infomap's error handler (#1019). The same reason
+  // calcUndirectedRegularizedMultilayerFlow and usePrecomputedFlow are unmarked;
+  // every flow method that cannot throw keeps the marking.
+  void calcDirectedRegularizedMultilayerFlow(const StateNetwork&, const Config&);
   void calcDirectedBipartiteFlow(const StateNetwork&, const Config&) noexcept;
   void calcDirdirFlow(const Config&) noexcept;
   void calcRawdirFlow() noexcept;

@@ -118,6 +118,15 @@ public:
 
   unsigned int addMultilayerNode(unsigned int stateId, unsigned int layerId, unsigned int physicalId, double weight);
 
+  /**
+   * As above, recording a name on the state node it creates. The multilayer
+   * import paths in the bindings build their state nodes here rather than via
+   * addStateNode, so without this overload a per-state name from the source
+   * graph had nowhere to go (#798). An already existing state node keeps its
+   * name, as with addStateNode.
+   */
+  unsigned int addMultilayerNode(unsigned int stateId, unsigned int layerId, unsigned int physicalId, double weight, std::string name);
+
   void addMultilayerLink(unsigned int layer1, unsigned int n1, unsigned int layer2, unsigned int n2, double weight);
   void addMultilayerLink(unsigned int stateId1, unsigned int layer1, unsigned int n1, unsigned int stateId2, unsigned int layer2, unsigned int n2, double weight);
   void addMultilayerLinks(const std::vector<unsigned int>& sourceLayerIds,

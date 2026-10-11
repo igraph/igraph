@@ -74,6 +74,9 @@ public:
 
   double calcCodelength(const InfoNode& parent) const;
 
+  // No partition-level term of its own; see MapEquation::calcTreeCodelengthCost.
+  using Base::calcTreeCodelengthCost;
+
   using Base::addMemoryContributions;
 
   using Base::addTeleportationFlow;

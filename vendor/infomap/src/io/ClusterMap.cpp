@@ -24,6 +24,8 @@ void ClusterMap::readClusterData(const std::string& filename, bool includeFlow, 
   m_flowData.clear();
   m_treePaths.clear();
   m_extension.clear();
+  m_filename = filename;
+  m_duplicateClusterIds = {};
   m_isHigherOrder = false;
   m_hasTreeLeafIdType = false;
   m_treeLeafIdType = TreeLeafIdType::physical;
@@ -177,7 +179,18 @@ void ClusterMap::readClu(const std::string& filename, bool includeFlow, const st
   SafeInFile input(filename);
   std::string line;
   std::istringstream lineStream;
-  std::map<unsigned int, unsigned int> clusterData;
+  // Repeat bookkeeping, kept only for ids that actually repeat: a well-formed clu
+  // has one row per node (#1039), so keying this off the insert result below keeps
+  // the common case at no extra storage and no extra lookup. Populated only from
+  // rows that reach m_clusterIds, so multilayer rows skipped for a layer/node the
+  // network does not have are never mistaken for duplicates. `conflicting` counts
+  // the repeats that changed the module, which is a different thing from a row
+  // repeated verbatim.
+  struct RepeatCount {
+    unsigned int rows = 0;
+    unsigned int conflicting = 0;
+  };
+  std::map<unsigned int, RepeatCount> repeats;
 
   while (!std::getline(input, line).fail()) {
     if (line.empty() || line[0] == '#' || line[0] == '*')
@@ -231,7 +244,49 @@ void ClusterMap::readClu(const std::string& filename, bool includeFlow, const st
       continue;
     }
 
-    m_clusterIds[stateId] = moduleId;
+    // insert, not find-then-assign: on a repeat its iterator already points at
+    // what the id held, so the old value, the fact that it is a repeat, and the
+    // overwrite all come out of a single traversal. A well-formed file pays exactly
+    // one lookup per row, which is what a clu reader should cost.
+    const auto insertion = m_clusterIds.insert({ stateId, moduleId });
+    const auto entry = insertion.first;
+    if (!insertion.second) {
+      const bool changesModule = entry->second != moduleId;
+      entry->second = moduleId; // the last row wins, which is what this reports on
+      auto& repeat = repeats[stateId];
+      if (repeat.rows == 0)
+        repeat.rows = 1; // the row already in m_clusterIds
+      ++repeat.rows;
+      if (changesModule)
+        ++repeat.conflicting;
+    }
+  }
+
+  // The example id is there to illustrate the problem, so a conflicting id always
+  // beats one that merely repeats a row verbatim, and within a tier the id with the
+  // most rows wins. Without the first rule a file holding both kinds could name the
+  // harmless one while the warning talks about changed modules.
+  bool exampleIsConflicting = false;
+  for (const auto& idRepeat : repeats) {
+    const auto nodeId = idRepeat.first;
+    const auto& repeat = idRepeat.second;
+    m_duplicateClusterIds.rows += repeat.rows - 1;
+    ++m_duplicateClusterIds.ids;
+
+    const bool isConflicting = repeat.conflicting > 0;
+    if (isConflicting) {
+      m_duplicateClusterIds.conflictingRows += repeat.conflicting;
+      ++m_duplicateClusterIds.conflictingIds;
+    }
+
+    const bool betterTier = isConflicting && !exampleIsConflicting;
+    const bool sameTierMoreRows = isConflicting == exampleIsConflicting
+        && repeat.rows > m_duplicateClusterIds.maxRowsForOneId;
+    if (betterTier || sameTierMoreRows) {
+      m_duplicateClusterIds.maxRowsForOneId = repeat.rows;
+      m_duplicateClusterIds.exampleId = nodeId;
+      exampleIsConflicting = isConflicting;
+    }
   }
 }
 

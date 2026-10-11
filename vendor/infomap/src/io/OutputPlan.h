@@ -51,14 +51,30 @@ std::vector<OutputArtifact> planOutputArtifacts(const Config& config, OutputPhas
 // and the no-overwrite pre-flight so the two never drift apart.
 std::vector<std::pair<std::string, std::string>> planReportArtifacts(const Config& config);
 
+// Whether the network the run is about to partition is higher-order, as
+// configureNetworkMode() will classify it once the network is read. The pre-flight
+// runs before that classification but has to plan the paths it produces, so the
+// answer is passed in rather than read off Config::stateOutput, which is still
+// false at that point (#1018).
+enum class HigherOrderInput : std::uint8_t {
+  No,
+  Yes
+};
+
 // Every file path a CLI run would write: modular artifacts across all phases
 // (expanded per trial when --print-all-trials writes separate files) plus the
 // report sidecars. Used by the no-overwrite pre-flight.
-std::vector<std::string> planAllOutputPaths(const Config& config);
+//
+// `higherOrder` stands in for Config::stateOutput, which the caller cannot have
+// set yet. It applies to every phase: all three are written after
+// configureNetworkMode() installs the flag.
+std::vector<std::string> planAllOutputPaths(const Config& config, HigherOrderInput higherOrder);
 
-// Throws InfomapError(OutputError) before any work when --no-overwrite is set and
-// any planned output path already exists. No-op when overwriting is allowed.
-void preflightOutputTargets(const Config& config);
+// Throws InfomapError(OutputError) when a planned output path is one of the run's
+// own input files, and additionally when --no-overwrite is set and any planned
+// output path already exists. No-op when overwriting is allowed and nothing
+// collides with an input.
+void preflightOutputTargets(const Config& config, HigherOrderInput higherOrder);
 
 void writeOutputArtifact(InfomapBase& infomap, Network& network, const OutputArtifact& artifact);
 

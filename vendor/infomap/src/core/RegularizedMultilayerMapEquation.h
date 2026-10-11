@@ -68,6 +68,9 @@ public:
 
   double calcCodelength(const InfoNode& parent) const;
 
+  // No partition-level term of its own; see MapEquation::calcTreeCodelengthCost.
+  using Base::calcTreeCodelengthCost;
+
   void addMemoryContributions(InfoNode& current, DeltaFlowDataType& oldModuleDelta, VectorMap<DeltaFlowDataType>& moduleDeltaFlow);
 
   void addTeleportationFlow(InfoNode& current, const std::vector<FlowDataType>& moduleFlowData, DeltaFlowDataType& oldModuleDelta, DeltaFlowDataType& newModuleDelta);

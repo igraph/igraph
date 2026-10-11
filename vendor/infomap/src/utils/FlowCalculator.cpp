@@ -726,7 +726,8 @@ void FlowCalculator::calcDirectedRegularizedFlow(const StateNetwork& network, co
   std::vector<double> alpha(N, 0);
   for (unsigned int i = 0; i < N; ++i) {
     auto t_i = t_out(i);
-    alpha[i] = t_i / (s_out[i] + t_i); // = 1 for dangling nodes
+    // = 1 for dangling nodes, also at strength 0 where t_i = 0 would make it 0/0 (#1144)
+    alpha[i] = s_out[i] > 0 ? t_i / (s_out[i] + t_i) : 1.0;
     if (config.noSelfLinks) {
       // Inflate to adjust for no self-teleportation
       // TODO: Check possible side-effects
@@ -808,7 +809,7 @@ void FlowCalculator::calcDirectedRegularizedFlow(const StateNetwork& network, co
 }
 
 #if INFOMAP_FEATURE_REGULARIZED_MULTILAYER
-void FlowCalculator::calcDirectedRegularizedMultilayerFlow(const StateNetwork& network, const Config& config) noexcept
+void FlowCalculator::calcDirectedRegularizedMultilayerFlow(const StateNetwork& network, const Config& config)
 {
   // Calculate node weights w_i = s_i/k_i, where s_i is the node strength (weighted degree) and k_i the (unweighted) degree
   unsigned int N = network.numNodes();
@@ -1153,7 +1154,8 @@ void FlowCalculator::calcUndirectedRegularizedFlow(const StateNetwork& network, 
   double sum_t = 0.0;
   for (unsigned int i = 0; i < N; ++i) {
     auto t_i = t(i);
-    alpha[i] = t_i / (s[i] + t_i);
+    // = 1 for isolated nodes, also at strength 0 where t_i = 0 would make it 0/0 (#1144)
+    alpha[i] = s[i] > 0 ? t_i / (s[i] + t_i) : 1.0;
     if (config.noSelfLinks) {
       // Inflate to adjust for no self-teleportation
       // TODO: No later side effects of cheating here? Need to normalize targets instead?

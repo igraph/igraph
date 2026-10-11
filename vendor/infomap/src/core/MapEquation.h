@@ -152,6 +152,13 @@ public:
   // Codelength
   // ===================================================
 
+  // A codelength term owned by the partition as a whole rather than by any one
+  // node's codebook, added once by calcCodelengthOnTree instead of being carried
+  // by the per-node sum. Zero here: only the biased objective has one, and a
+  // single global scalar has no per-node share to hand back from calcCodelength
+  // (#1021).
+  double calcTreeCodelengthCost(unsigned int /*numTopModules*/) const { return 0.0; }
+
   double calcCodelength(const InfoNode& parent) const
   {
     return parent.isLeafModule() ? ME::calcCodelengthOnModuleOfLeafNodes(parent) : ME::calcCodelengthOnModuleOfModules(parent);

@@ -56,7 +56,12 @@ namespace {
     return out.str();
   }
 
-  std::string fileContentFingerprint(const std::string& path, unsigned long long size)
+  // FNV-1a 64 over the whole file, one streaming pass. It used to hash the size
+  // plus the first and last 64 KiB, which was blind to a same-size edit anywhere
+  // in the interior of a file larger than 128 KiB -- precisely the edit-and-rerun
+  // workflow the fingerprint exists to catch (#1026). A full pass costs one read
+  // of data the run is about to parse anyway.
+  std::string fileContentFingerprint(const std::string& path)
   {
     std::ifstream input(path.c_str(), std::ios_base::binary);
     if (!input) {
@@ -64,22 +69,21 @@ namespace {
     }
 
     auto hash = FNV_OFFSET;
-    const std::string sizeText = fmt::to_string(size);
-    hashBytes(hash, sizeText.data(), static_cast<std::streamsize>(sizeText.size()));
-
-    constexpr std::streamoff CHUNK_SIZE = 65536;
+    constexpr std::streamsize CHUNK_SIZE = 65536;
     std::vector<char> buffer(static_cast<std::size_t>(CHUNK_SIZE));
-
-    const auto firstSize = static_cast<std::streamsize>(std::min<unsigned long long>(size, CHUNK_SIZE));
-    input.read(buffer.data(), firstSize);
-    hashBytes(hash, buffer.data(), input.gcount());
-
-    if (size > static_cast<unsigned long long>(CHUNK_SIZE)) {
-      input.clear();
-      const auto tailOffset = static_cast<std::streamoff>(size - CHUNK_SIZE);
-      input.seekg(tailOffset, std::ios_base::beg);
-      input.read(buffer.data(), static_cast<std::streamsize>(CHUNK_SIZE));
-      hashBytes(hash, buffer.data(), input.gcount());
+    while (true) {
+      input.read(buffer.data(), CHUNK_SIZE);
+      const auto got = input.gcount();
+      if (got > 0)
+        hashBytes(hash, buffer.data(), got);
+      if (got < CHUNK_SIZE)
+        break;
+    }
+    // A short read is EOF *or* an I/O error, and the two must not be confused:
+    // hashing only the readable prefix would publish a valid-looking identity
+    // for content nobody read.
+    if (input.bad()) {
+      throw std::runtime_error(fmt::format(FMT_STRING("Cannot read input file '{}': the read failed partway through."), path));
     }
 
     std::ostringstream out;
@@ -112,10 +116,13 @@ std::string canonicalConfigJson(const Config& config)
   Json json;
 
   // Input identity (path, size, content) is captured separately by the input
-  // fingerprint; the config fingerprint covers only algorithm-affecting
-  // settings, so it stays stable when the same input is referenced via a
-  // different path. The cluster/meta-data paths below have no separate content
-  // fingerprint, so they remain the only available signal and are kept.
+  // fingerprints -- network, cluster data and metadata each get one in the
+  // manifest and the artifact headers (#1026); the config fingerprint covers
+  // only algorithm-affecting settings. That makes it stable across paths for
+  // the *network* alone: the cluster-data and meta-data paths are still fields
+  // below, so moving either of those unchanged files does change this
+  // fingerprint. Their identities are published beside it, so a consumer that
+  // wants path-independence can compare hashes instead.
   //
   // How the trial budget is *divided* is deliberately excluded -- numTrials and
   // trialOffset name which slice of one budget a run executed, not what it
@@ -208,40 +215,50 @@ std::string configFingerprint(const Config& config)
   return fnvHex(canonicalConfigJson(config));
 }
 
-std::string inputFingerprintJson(const std::string& path)
+InputIdentity inputIdentity(const std::string& path)
 {
+  InputIdentity identity;
   if (path.empty())
-    return "null";
+    return identity;
 
   struct stat info;
   if (stat(path.c_str(), &info) != 0) {
-    throw std::runtime_error(fmt::format(FMT_STRING("Cannot read input file metadata for '{}'."), path));
+    // Not an error here: a missing --cluster-data or network file is reported
+    // by the reader that opens it, as a parse error the bindings classify
+    // (NetworkParseError). Capturing identity first must not change that.
+    return identity;
   }
 
-  const auto size = static_cast<unsigned long long>(info.st_size);
+  identity.path = path;
+  identity.size = static_cast<unsigned long long>(info.st_size);
+  identity.mtime = static_cast<long long>(info.st_mtime);
+  identity.hash = fileContentFingerprint(path);
+  return identity;
+}
+
+std::string inputIdentityJson(const InputIdentity& identity)
+{
+  if (!identity.known())
+    return "null";
   Json json;
-  json["path"] = path;
-  json["size"] = size;
-  json["mtime"] = static_cast<long long>(info.st_mtime);
-  json["hash"] = fileContentFingerprint(path, size);
+  json["path"] = identity.path;
+  json["size"] = identity.size;
+  json["mtime"] = identity.mtime;
+  json["hash"] = identity.hash;
   return json.dump();
+}
+
+std::string inputFingerprintJson(const std::string& path)
+{
+  return inputIdentityJson(inputIdentity(path));
 }
 
 std::string networkFingerprint(const std::string& path)
 {
-  if (path.empty())
-    return "";
-
-  struct stat info;
-  if (stat(path.c_str(), &info) != 0) {
-    throw std::runtime_error(fmt::format(FMT_STRING("Cannot read input file metadata for '{}'."), path));
-  }
-
-  const auto size = static_cast<unsigned long long>(info.st_size);
-  return fileContentFingerprint(path, size);
+  return inputIdentity(path).hash;
 }
 
-std::string runManifestJson(const Config& config)
+std::string runManifestJson(const Config& config, const RunIdentities& identities)
 {
   const auto canonicalConfig = canonicalConfigJson(config);
   Json json;
@@ -249,10 +266,29 @@ std::string runManifestJson(const Config& config)
   json["command"] = config.parsedString;
   json["num_trials"] = config.numTrials;
   json["config"] = Json::parse(canonicalConfig);
-  json["config_fingerprint"] = fnvHex(canonicalConfig);
-  json["input"] = Json::parse(inputFingerprintJson(config.networkFile));
+  json["config_fingerprint"] = identities.configFingerprint.empty() ? fnvHex(canonicalConfig) : identities.configFingerprint;
+  // The identities the run captured when it started, not a re-hash of whatever
+  // the paths point at now: re-reading could disagree if a file changed since,
+  // and a network built through the bindings has no path in the config to
+  // re-read at all, so the manifest used to report a null input for a run whose
+  // headers named a file (#1026).
+  json["input"] = Json::parse(inputIdentityJson(identities.input));
+  // Every file that changes the published partition, not only the network:
+  // a --cluster-data seed and a --meta-data file used to be recorded by path
+  // alone, so two runs on different files could not be told apart.
+  json["cluster_data"] = Json::parse(inputIdentityJson(identities.clusterData));
+  json["meta_data"] = Json::parse(inputIdentityJson(identities.metaData));
   json["outputs"] = Json::parse(outputArtifactsJson(config));
   return json.dump() + '\n';
+}
+
+std::string runManifestJson(const Config& config)
+{
+  RunIdentities identities;
+  identities.input = inputIdentity(config.networkFile);
+  identities.clusterData = inputIdentity(config.clusterDataFile);
+  identities.metaData = inputIdentity(config.metaDataFile);
+  return runManifestJson(config, identities);
 }
 
 } // namespace infomap

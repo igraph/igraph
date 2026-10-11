@@ -207,11 +207,20 @@ namespace infomath {
    * Interpolate from linear (q = 0) to log (q = 1)
    * linlog(k, 0) = k
    * linlog(k, 1) = log2(k)
+   *
+   * The Tsallis entropy of a uniform distribution already interpolates between
+   * (k - 1) / ln2 and log2(k), so two corrections rescale it onto the endpoints
+   * above. Both are written in a shape variable s(q) with s(0) = 0 and s(1) = 1,
+   * and both are held constant for q > 1. Any such s reproduces the endpoints,
+   * but only one with s'(1) = 0 joins the constant branch with a matching
+   * derivative, so s(q) = q(2 - q) keeps linlog continuously differentiable in q
+   * at q = 1 where the linear s(q) = q leaves a kink.
    */
   inline double linlog(double k, double q = 1)
   {
-    double baseCorrection = q <= 1 ? (1 - q) * std::log(2) + q : 1;
-    double offsetCorrection = q <= 1 ? 1 - q : 0;
+    double shape = q <= 1 ? q * (2 - q) : 1;
+    double baseCorrection = (1 - shape) * std::log(2) + shape;
+    double offsetCorrection = 1 - shape;
     return tsallisEntropyUniform(k, q) * baseCorrection + offsetCorrection;
   }
 

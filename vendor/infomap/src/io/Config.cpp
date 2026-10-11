@@ -13,6 +13,7 @@
 #include "ParameterCatalog.h"
 #include "ProgramInterface.h"
 #include "SafeFile.h"
+#include "../utils/Console.h"
 #include "../utils/FileURI.h"
 #include "../utils/Log.h"
 #include "../utils/convert.h"
@@ -183,8 +184,20 @@ namespace {
 
     if (config.directed || (config.flowModelIsSet && config.flowModel != FlowModel::undirected))
       throw std::runtime_error("--lossy requires undirected flow");
-    if (config.stateInput || config.multilayerInput || !config.additionalInput.empty())
-      throw std::runtime_error("--lossy does not support memory or multilayer networks");
+    // No input check here, deliberately. This function runs during flag parsing, before
+    // any file is opened: `stateInput`/`multilayerInput` are set by
+    // configureNetworkMode() when the network is READ, and no CLI option sets them
+    // (`additionalInput` is library-only -- a SWIG property with no CLI binding). An
+    // earlier cut rejected those three fields here and could never fire from the CLI.
+    // The rejection that actually fires is in InfomapBase::initOptimizer(), where the
+    // input type is known; it covers everything this did, plus meta data. Two things it
+    // is worth being precise about rather than calling it a strict superset: a *States
+    // file is rejected there iff its state->physical map is non-identity, since
+    // StateNetwork only sets m_haveMemoryInput when node.id != node.physicalId (an
+    // identity *States file is first-order in substance and runs under --lossy); and
+    // that guard reads haveMemory() without honouring the forceNoMemory argument, unlike
+    // the objective dispatch just below it -- unreachable under --lossy today, because
+    // lossy is rejected before any sub-Infomap is constructed. See #1004.
     if (config.haveMetaData())
       throw std::runtime_error("--lossy does not support meta data");
     if (config.recordedTeleportation || config.regularized)
@@ -331,6 +344,22 @@ namespace {
     Log::init(config.verbosity, config.silent, config.verboseNumberPrecision);
   }
 
+  // --pretty/--no-pretty have been no-ops since pretty console output became the
+  // only rendering (applyRuntimeOutputInteractions), and the 3.0 cleanup removes
+  // the flag from the command line (#756) -- but it never said so on any surface,
+  // so the first notice a script would get was the rejection (#915). One line
+  // where the flag was typed, emitted after logging is initialised so --silent
+  // mutes it like every other warning.
+  void warnAboutDeprecatedNoOps(const Config& config)
+  {
+    for (const auto& option : config.parsedOptions) {
+      if (option.longName == "pretty") {
+        Console::warn(0, "--pretty/--no-pretty is deprecated and has no effect: pretty console output is always on. The flag leaves the command line in 3.0; drop it from your invocation.");
+        return;
+      }
+    }
+  }
+
   // What the flags say about silence, read before anything is parsed.
   //
   // Log visibility comes from the parsed Config, which does not exist yet while
@@ -431,6 +460,7 @@ namespace {
     }
 
     initializeLogging(config);
+    warnAboutDeprecatedNoOps(config);
   }
 
 } // namespace
