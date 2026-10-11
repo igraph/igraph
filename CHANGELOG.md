@@ -17,11 +17,13 @@
 - Fixed compatibility with with some Linux distros that include a patched version of libxml2 2.9.x that changed the `xmlEntity` struct layout. Notably, RHEL 8 and derivatives, as well as Ubuntu 22.04 and 24.04 LTS are affected when recent security patches are applied. See issues #2698 and #2931.
 - `igraph_lapack_dsyevr()` incorrectly reported an internal faiure in the `dsyevr` LAPACK routine as an invalid argument error. The issued error message now separates invalid argument errors from internal errors.
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eingevalues close to zero. This fixed a convergence issues in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
+- `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
 
 ### Other
 
 - Documentation improvements.
 - nanoflann was updated to version 1.14.0
+- Infomap was updated to version 2.15.1. The vendored copy is now unmodified upstream source.
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 
 ## [1.0.1]

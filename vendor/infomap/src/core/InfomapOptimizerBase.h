@@ -17,6 +17,8 @@
 
 namespace infomap {
 
+class StateNetwork;
+
 class InfomapOptimizerBase {
   friend class InfomapBase;
   using FlowDataType = FlowData;
@@ -46,20 +48,38 @@ public:
 
   virtual double getMetaCodelength(bool /*unweighted*/ = false) const { return 0.0; }
 
-  void setInterruptionHandler(interruptionHandlerFn *interruptionHandler) {
-    this->interruptionHandler = interruptionHandler;
-  }
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+  // Lossy map equation metrics; zero for every other objective.
+  virtual double getLossyRate() const { return 0.0; } // L_lossy (bits/step)
+  virtual double getLossyDistortion() const { return 0.0; } // D = sum over noise modules of H_i
+  virtual double getLossyOneLevelLossless() const { return 0.0; } // L_1 = H(p_alpha), lambda-independent
+#endif
+
+  // Forward per-network properties (e.g. total degree, node count) to the objective.
+  // Only meaningful for objectives that use them (BiasedMapEquation); a no-op otherwise.
+  // Stored per-instance so parallel trial workers don't share mutable state.
+  virtual void setNetworkProperties(const StateNetwork& /*network*/) {}
+
+  // Propagate already-computed network properties from a parent optimizer to a sub/super
+  // Infomap instance (which has no full StateNetwork of its own). No-op unless the objective
+  // uses them (BiasedMapEquation).
+  virtual void inheritNetworkPropertiesFrom(const InfomapOptimizerBase& /*parent*/) {}
+
+  // Propagate the objective's own parameters -- what it minimises, as opposed to the network
+  // it minimises over -- from a parent optimizer. Needed by the super-level instance, which is
+  // built without memory and therefore from a default Config. No-op unless the objective has
+  // such parameters (BiasedMapEquation). See getSuperInfomap.
+  virtual void inheritObjectiveParametersFrom(const InfomapOptimizerBase& /*parent*/) {}
+
+  // Whether this objective implements the parameters above: the entropy bias correction and the
+  // preferred-module-count cost. Only BiasedMapEquation does, so --entropy-corrected and
+  // --preferred-number-of-modules are inert on every other objective. Declared by the objective
+  // rather than derived from the input flags so the run path cannot disagree with
+  // InfomapBase::initOptimizer about which objective is in use (#904).
+  virtual bool implementsObjectiveParameters() const { return false; }
 
 protected:
   virtual unsigned int numActiveModules() const = 0;
-
-  void checkInterruption() {
-    if (interruptionHandler) {
-      if (interruptionHandler()) {
-        throw infomap::InterruptException();
-      }
-    }
-  }
 
   // ===================================================
   // Run: Init: *
@@ -94,18 +114,11 @@ protected:
 
   virtual bool restoreConsolidatedOptimizationPointIfNoImprovement(bool forceRestore = false) = 0;
 
-#if 0
   // ===================================================
   // Debug: *
   // ===================================================
 
   virtual void printDebug() = 0;
-#endif
-
-private:
-
-  interruptionHandlerFn *interruptionHandler = NULL;
-
 };
 
 } /* namespace infomap */

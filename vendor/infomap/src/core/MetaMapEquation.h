@@ -23,7 +23,7 @@ namespace infomap {
 
 class InfoNode;
 
-class MetaMapEquation : private MapEquation<> {
+class MetaMapEquation final : private MapEquation<> {
   using Base = MapEquation<>;
 
 public:
@@ -36,9 +36,9 @@ public:
 
   using Base::getIndexCodelength;
 
-  double getModuleCodelength() const override;
+  double getModuleCodelength() const;
 
-  double getCodelength() const override;
+  double getCodelength() const;
 
   double getMetaCodelength(bool unweighted = false) const
   {
@@ -49,38 +49,49 @@ public:
   // IO
   // ===================================================
 
-  std::ostream& print(std::ostream& out) const override;
+  std::ostream& print(std::ostream& out) const;
   friend std::ostream& operator<<(std::ostream&, const MetaMapEquation&);
 
   // ===================================================
   // Init
   // ===================================================
 
-  void init(const Config& config) override;
+  void init(const Config& config);
 
-  void initTree(InfoNode& root) override;
+  void initTree(InfoNode& root);
 
-  void initNetwork(InfoNode& root) override;
+  void initNetwork(InfoNode& root);
 
   using Base::initSuperNetwork;
 
   using Base::initSubNetwork;
 
-  void initPartition(std::vector<InfoNode*>& nodes) override;
+  void initPartition(std::vector<InfoNode*>& nodes);
 
   // ===================================================
   // Codelength
   // ===================================================
 
-  double calcCodelength(const InfoNode& parent) const override;
+  double calcCodelength(const InfoNode& parent) const;
 
   using Base::addMemoryContributions;
+
+  using Base::addTeleportationFlow;
 
   double getDeltaCodelengthOnMovingNode(InfoNode& current,
                                         DeltaFlow& oldModuleDelta,
                                         DeltaFlow& newModuleDelta,
                                         std::vector<FlowData>& moduleFlowData,
-                                        std::vector<unsigned int>& moduleMembers) override;
+                                        std::vector<unsigned int>& moduleMembers);
+
+  using Base::hoistOldSide;
+
+  double getDeltaCodelengthOnMovingNodeHoisted(InfoNode& current,
+                                               DeltaFlow& oldModuleDelta,
+                                               const OldSideTerms& oldSide,
+                                               DeltaFlow& newModuleDelta,
+                                               std::vector<FlowData>& moduleFlowData,
+                                               std::vector<unsigned int>& moduleMembers);
 
   // ===================================================
   // Consolidation
@@ -90,23 +101,21 @@ public:
                                     DeltaFlow& oldModuleDelta,
                                     DeltaFlow& newModuleDelta,
                                     std::vector<FlowData>& moduleFlowData,
-                                    std::vector<unsigned int>& moduleMembers) override;
+                                    std::vector<unsigned int>& moduleMembers);
 
-  void consolidateModules(std::vector<InfoNode*>& modules) override;
+  void consolidateModules(std::vector<InfoNode*>& modules);
 
-#if 0
   // ===================================================
   // Debug
   // ===================================================
 
-  void printDebug() const override;
-#endif
+  void printDebug() const;
 
 private:
   // ===================================================
   // Private member functions
   // ===================================================
-  double calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent) const override;
+  double calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent) const;
 
   // ===================================================
   // Init
@@ -120,7 +129,7 @@ private:
   // Codelength
   // ===================================================
 
-  void calculateCodelength(std::vector<InfoNode*>& nodes) override;
+  void calculateCodelength(std::vector<InfoNode*>& nodes);
 
   using Base::calculateCodelengthTerms;
 

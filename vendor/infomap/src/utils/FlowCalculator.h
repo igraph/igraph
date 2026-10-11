@@ -10,7 +10,8 @@
 #ifndef FLOW_CALCULATOR_H_
 #define FLOW_CALCULATOR_H_
 
-#include <map>
+#include <unordered_map>
+#include <string>
 #include <vector>
 
 namespace infomap {
@@ -36,8 +37,11 @@ public:
 private:
   void calcUndirectedFlow() noexcept;
   void calcDirectedFlow(const StateNetwork&, const Config&) noexcept;
+  void calcDirectedRelaxToSelfFlow(const StateNetwork&, const Config&) noexcept;
   void calcUndirectedRegularizedFlow(const StateNetwork&, const Config&) noexcept;
+  void calcUndirectedRegularizedMultilayerFlow(const StateNetwork&, const Config&);
   void calcDirectedRegularizedFlow(const StateNetwork&, const Config&) noexcept;
+  void calcDirectedRegularizedMultilayerFlow(const StateNetwork&, const Config&) noexcept;
   void calcDirectedBipartiteFlow(const StateNetwork&, const Config&) noexcept;
   void calcDirdirFlow(const Config&) noexcept;
   void calcRawdirFlow() noexcept;
@@ -45,15 +49,23 @@ private:
 
   void finalize(StateNetwork&, const Config&, bool) noexcept;
 
+  void addFlowNote(const std::string& note);
+  void recordPageRank(unsigned int iterations, double error, bool converged) noexcept;
+
+  double accumulateDanglingRank() const noexcept;
+
   unsigned int numNodes;
+  //! One past the last dangling node, for the directed model's dangling-first
+  //! ordering. Zero when that ordering was not applied -- see danglingIndices.
   unsigned int nonDanglingStartIndex = 0;
   unsigned int bipartiteStartIndex = 0;
   unsigned int bipartiteLinkStartIndex = 0;
 
   double sumLinkWeight = 0;
   double sumWeightedDegree = 0;
+  double sumTeleFlow = 0;
 
-  std::map<unsigned int, unsigned int> nodeIndexMap;
+  std::unordered_map<unsigned int, unsigned int> nodeIndexMap;
   std::vector<double> nodeFlow;
   std::vector<double> nodeTeleportWeights;
   std::vector<double> nodeTeleportFlow;
@@ -61,8 +73,20 @@ private:
   std::vector<double> exitFlow;
   std::vector<double> sumLinkOutWeight;
   std::vector<unsigned int> nodeOutDegree;
+  //! Positions of the dangling nodes when they are not a prefix of nodeFlow.
+  //! Bipartite input keeps the network's node order, because the feature side is
+  //! identified by an index range, so the dangling-first ordering is unavailable.
+  std::vector<unsigned int> danglingIndices;
   using FlowLink = detail::FlowLink;
   std::vector<FlowLink> flowLinks;
+
+  std::string m_flowMethod;
+  std::string m_teleportation;
+  std::vector<std::string> m_flowNotes;
+  unsigned int m_pageRankIterations = 0;
+  double m_pageRankError = 0.0;
+  bool m_havePageRank = false;
+  bool m_pageRankConverged = true;
 };
 
 inline void calculateFlow(StateNetwork& network, const Config& config)

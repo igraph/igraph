@@ -21,9 +21,8 @@
 namespace infomap {
 
 class InfoNode;
-struct MemNodeSet;
 
-class MemMapEquation : private MapEquation<FlowData, MemDeltaFlow> {
+class MemMapEquation final : private MapEquation<FlowData, MemDeltaFlow> {
   using Base = MapEquation<FlowData, MemDeltaFlow>;
 
 public:
@@ -44,64 +43,73 @@ public:
   // IO
   // ===================================================
 
-  std::ostream& print(std::ostream& out) const override;
+  std::ostream& print(std::ostream& out) const;
   friend std::ostream& operator<<(std::ostream&, const MemMapEquation&);
 
   // ===================================================
   // Init
   // ===================================================
 
-  void init(const Config& config) override;
+  void init(const Config& config);
 
-  void initTree(InfoNode& /*root*/) override { }
+  void initTree(InfoNode& /*root*/) {}
 
-  void initNetwork(InfoNode& root) override;
+  void initNetwork(InfoNode& root);
 
-  void initSuperNetwork(InfoNode& root) override;
+  void initSuperNetwork(InfoNode& root);
 
-  void initSubNetwork(InfoNode& root) override;
+  void initSubNetwork(InfoNode& root);
 
-  void initPartition(std::vector<InfoNode*>& nodes) override;
+  void initPartition(std::vector<InfoNode*>& nodes);
 
   // ===================================================
   // Codelength
   // ===================================================
 
-  double calcCodelength(const InfoNode& parent) const override;
+  double calcCodelength(const InfoNode& parent) const;
 
-  void addMemoryContributions(InfoNode& current, MemDeltaFlow& oldModuleDelta, VectorMap<MemDeltaFlow>& moduleDeltaFlow) override;
+  void addMemoryContributions(InfoNode& current, DeltaFlowDataType& oldModuleDelta, VectorMap<DeltaFlowDataType>& moduleDeltaFlow);
+
+  using Base::addTeleportationFlow;
 
   double getDeltaCodelengthOnMovingNode(InfoNode& current,
-                                        MemDeltaFlow& oldModuleDelta,
-                                        MemDeltaFlow& newModuleDelta,
-                                        std::vector<FlowData>& moduleFlowData,
-                                        std::vector<unsigned int>& moduleMembers) override;
+                                        DeltaFlowDataType& oldModuleDelta,
+                                        DeltaFlowDataType& newModuleDelta,
+                                        std::vector<FlowDataType>& moduleFlowData,
+                                        std::vector<unsigned int>& moduleMembers);
+
+  using Base::hoistOldSide;
+
+  double getDeltaCodelengthOnMovingNodeHoisted(InfoNode& current,
+                                               DeltaFlowDataType& oldModuleDelta,
+                                               const OldSideTerms& oldSide,
+                                               DeltaFlowDataType& newModuleDelta,
+                                               std::vector<FlowDataType>& moduleFlowData,
+                                               std::vector<unsigned int>& moduleMembers);
 
   // ===================================================
   // Consolidation
   // ===================================================
 
   void updateCodelengthOnMovingNode(InfoNode& current,
-                                    MemDeltaFlow& oldModuleDelta,
-                                    MemDeltaFlow& newModuleDelta,
-                                    std::vector<FlowData>& moduleFlowData,
-                                    std::vector<unsigned int>& moduleMembers) override;
+                                    DeltaFlowDataType& oldModuleDelta,
+                                    DeltaFlowDataType& newModuleDelta,
+                                    std::vector<FlowDataType>& moduleFlowData,
+                                    std::vector<unsigned int>& moduleMembers);
 
-  void consolidateModules(std::vector<InfoNode*>& modules) override;
+  void consolidateModules(std::vector<InfoNode*>& modules);
 
-#if 0
   // ===================================================
   // Debug
   // ===================================================
 
-  void printDebug() const override;
-#endif
+  void printDebug() const;
 
 private:
   // ===================================================
   // Private member functions
   // ===================================================
-  double calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent) const override;
+  double calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent) const;
 
   // ===================================================
   // Init
@@ -115,7 +123,7 @@ private:
   // Codelength
   // ===================================================
 
-  void calculateCodelength(std::vector<InfoNode*>& nodes) override;
+  void calculateCodelength(std::vector<InfoNode*>& nodes);
 
   using Base::calculateCodelengthTerms;
 
@@ -129,7 +137,7 @@ private:
 
   void updatePhysicalNodes(InfoNode& current, unsigned int oldModuleIndex, unsigned int bestModuleIndex);
 
-  void addMemoryContributionsAndUpdatePhysicalNodes(InfoNode& current, MemDeltaFlow& oldModuleDelta, MemDeltaFlow& newModuleDelta);
+  void addMemoryContributionsAndUpdatePhysicalNodes(InfoNode& current, DeltaFlowDataType& oldModuleDelta, DeltaFlowDataType& newModuleDelta);
 
 public:
   // ===================================================
@@ -156,17 +164,11 @@ private:
   using Base::exitNetworkFlow;
   using Base::exitNetworkFlow_log_exitNetworkFlow;
 
-  using ModuleToMemNodes = std::map<unsigned int, MemNodeSet>;
+  using ModuleToMemNodes = std::vector<ModuleMemNodes>; // sorted by module id
 
-  std::vector<ModuleToMemNodes> m_physToModuleToMemNodes; // vector[physicalNodeID] map<moduleID, {#memNodes, sumFlow}>
+  std::vector<ModuleToMemNodes> m_physToModuleToMemNodes; // vector[physicalNodeID] sorted vector of {moduleID, #memNodes, sumFlow}
   unsigned int m_numPhysicalNodes = 0;
   bool m_memoryContributionsAdded = false;
-};
-
-struct MemNodeSet {
-  MemNodeSet(unsigned int numMemNodes, double sumFlow) : numMemNodes(numMemNodes), sumFlow(sumFlow) { }
-  unsigned int numMemNodes; // use counter to check for zero to avoid round-off errors in sumFlow
-  double sumFlow;
 };
 
 } // namespace infomap

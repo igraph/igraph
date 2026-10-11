@@ -13,6 +13,7 @@
 #include "InfomapConfig.h"
 #include "InfoEdge.h"
 #include "InfoNode.h"
+#include "ObjectPool.h"
 #include "InfomapOptimizerBase.h"
 #include "iterators/InfomapIterator.h"
 #include "../io/ClusterMap.h"
@@ -25,17 +26,34 @@
 #include <vector>
 #include <deque>
 #include <map>
+#include <array>
+#include <atomic>
+#include <stdexcept>
 #include <limits>
+#include <memory>
 #include <string>
-#include <iostream>
-#include <sstream>
+#include <thread>
+#include <ostream>
 
 namespace infomap {
 
 namespace detail {
   class PartitionQueue;
+  struct PartitionTaskRecord;
   struct PerLevelStat;
 } // namespace detail
+
+// Cooperative cancellation hook (issue #412). Return true to stop the run at the
+// next checkpoint. Invoked only on the owner thread, so it is safe to enter
+// host-language APIs (R_CheckUserInterrupt, PyErr_CheckSignals) from it.
+using InterruptCallback = bool (*)(void* userData);
+
+// Thrown out of run() on cancellation; std::runtime_error so existing
+// catch(std::exception) unwinding still applies.
+class InterruptionError : public std::runtime_error {
+public:
+  InterruptionError() : std::runtime_error("Infomap run interrupted.") {}
+};
 
 class InfomapBase : public InfomapConfig<InfomapBase> {
   template <typename Objective>
@@ -46,7 +64,7 @@ class InfomapBase : public InfomapConfig<InfomapBase> {
 public:
   using PartitionQueue = detail::PartitionQueue;
 
-  InfomapBase() : InfomapConfig<InfomapBase>() { initOptimizer(); }
+  InfomapBase() { initOptimizer(); }
 
   explicit InfomapBase(const Config& conf) : InfomapConfig<InfomapBase>(conf), m_network(conf) { initOptimizer(); }
 
@@ -57,7 +75,7 @@ public:
     m_initialParameters = m_currentParameters = flags;
   }
 
-  virtual ~InfomapBase() = default;
+  ~InfomapBase() override = default;
 
   // ===================================================
   // Iterators
@@ -129,13 +147,43 @@ public:
 
   double getOneLevelCodelength() const { return m_oneLevelCodelength; }
 
+#ifndef SWIG
+  // One-level reference reported to the user. In lossy mode this is the lossless
+  // L_1 = H(p_alpha) (a lambda-independent upper bound), not the lambda-dependent
+  // corrected one-module objective that m_oneLevelCodelength holds for the optimizer.
+  // Guarded from SWIG so it is not exposed as a new binding; callers below use it.
+  double getReferenceOneLevelCodelength() const
+  {
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+    if (lossy)
+      return m_optimizer->getLossyOneLevelLossless();
+#endif
+    return m_oneLevelCodelength;
+  }
+#endif
+
   double getRelativeCodelengthSavings() const
   {
-    auto oneLevelCodelength = getOneLevelCodelength();
+    auto oneLevelCodelength = getReferenceOneLevelCodelength();
     return oneLevelCodelength < 1e-16 ? 0 : 1.0 - codelength() / oneLevelCodelength;
   }
 
+#ifndef SWIG
+  double getRelativeCodelengthSavings(double codelength) const
+  {
+    auto oneLevelCodelength = getReferenceOneLevelCodelength();
+    return oneLevelCodelength < 1e-16 ? 0 : 1.0 - codelength / oneLevelCodelength;
+  }
+#endif
+
   double getEntropyRate() { return m_entropyRate; }
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+  double getLossyRate() const { return m_optimizer->getLossyRate(); }
+  double getLossyDistortion() const { return m_optimizer->getLossyDistortion(); }
+  double getLossyOneLevelLossless() const { return m_optimizer->getLossyOneLevelLossless(); }
+  // 1-based indices of the top modules that are noise modules (l_i > lambda * H_i).
+  std::vector<unsigned int> noiseTopModules() const;
+#endif
   double getMaxEntropy() { return m_maxEntropy; }
   double getMaxFlow() { return m_maxFlow; }
 
@@ -163,6 +211,24 @@ public:
   InfomapBase& setInitialPartition(const InitialPartition& moduleIds)
   {
     m_initialPartition = moduleIds;
+    m_multilayerInitialPartition.clear();
+    return *this;
+  }
+
+  // Initial partition for a multilayer network keyed by physical identity, given
+  // as parallel (layer_id, node_id, module_id) arrays. Resolution to state ids
+  // is deferred until the network is built (the state ids don't exist before
+  // then); see initTrialPartition. (issue #616)
+  InfomapBase& setMultilayerInitialPartition(const std::vector<unsigned int>& layerIds,
+                                             const std::vector<unsigned int>& nodeIds,
+                                             const std::vector<unsigned int>& moduleIds)
+  {
+    if (layerIds.size() != nodeIds.size() || layerIds.size() != moduleIds.size())
+      throw std::invalid_argument("setMultilayerInitialPartition: layer/node/module arrays must have equal length");
+    m_multilayerInitialPartition.assign(layerIds.size(), {});
+    for (std::size_t i = 0; i < layerIds.size(); ++i)
+      m_multilayerInitialPartition[i] = { layerIds[i], nodeIds[i], moduleIds[i] };
+    m_initialPartition.clear();
     return *this;
   }
 
@@ -170,7 +236,51 @@ public:
 
   void run(Network& network);
 
+  // ===================================================
+  // Cooperative interruption (issue #412)
+  // ===================================================
+
+  // Polled on the owner thread during run(); return true to abort with an
+  // InterruptionError. No handler = unchanged behavior.
+  InfomapBase& setInterruptHandler(InterruptCallback callback, void* userData = nullptr)
+  {
+    m_interruptCallback = callback;
+    m_interruptUserData = userData;
+    return *this;
+  }
+
+  InfomapBase& clearInterruptHandler()
+  {
+    m_interruptCallback = nullptr;
+    m_interruptUserData = nullptr;
+    return *this;
+  }
+
+  bool hasInterruptHandler() const { return m_interruptCallback != nullptr; }
+
+  // Thread-safe push to cancel an in-progress run, observed at the next
+  // checkpoint. A request made before run() is cleared at run entry (so it does
+  // not pre-cancel a fresh run). Relaxed (no companion data) — ordering comes
+  // from the OpenMP joins.
+  void requestInterrupt() noexcept { m_cancel->store(true, std::memory_order_relaxed); }
+
+  bool interruptRequested() const noexcept { return m_cancel->load(std::memory_order_relaxed); }
+
 private:
+  class RunSession;
+
+  // Allocate a tree node from this instance's pool and stamp its owning pool
+  // back-pointer so node-local teardown (deleteChildren / remove /
+  // replaceWithChildren) can reclaim it without an InfomapBase handle.
+  template <typename... Args>
+  InfoNode& allocNode(Args&&... args)
+  {
+    InfoNode& node = *m_nodePool.alloc(std::forward<Args>(args)...);
+    node.m_pool = &m_nodePool;
+    node.m_edgePool = &m_edgePool;
+    return node;
+  }
+
   bool isFullNetwork() const { return m_isMain && m_aggregationLevel == 0; }
   bool isFirstLoop() const { return m_tuneIterationIndex == 0 && isFullNetwork(); }
 
@@ -184,18 +294,31 @@ private:
 
   InfomapBase& getSubInfomap(InfoNode& node) const
   {
-    return node.setInfomap(getNewInfomapInstance())
-        .setIsMain(false)
-        .setSubLevel(m_subLevel + 1)
-        .setNonMainConfig(*this);
+    auto& subInfomap = node.setInfomap(getNewInfomapInstance())
+                           .setIsMain(false)
+                           .setSubLevel(m_subLevel + 1)
+                           .setNonMainConfig(*this)
+                           .inheritRuntimeContext(*this);
+    // Carry the full-network properties down so entropy bias correction stays consistent
+    // across the hierarchy (this used to be a shared static).
+    subInfomap.m_optimizer->inheritNetworkPropertiesFrom(*m_optimizer);
+    return subInfomap;
   }
 
   InfomapBase& getSuperInfomap(InfoNode& node) const
   {
-    return node.setInfomap(getNewInfomapInstanceWithoutMemory())
-        .setIsMain(false)
-        .setSubLevel(m_subLevel + SUPER_LEVEL_ADDITION)
-        .setNonMainConfig(*this);
+    auto& superInfomap = node.setInfomap(getNewInfomapInstanceWithoutMemory())
+                             .setIsMain(false)
+                             .setSubLevel(m_subLevel + SUPER_LEVEL_ADDITION)
+                             .setNonMainConfig(*this)
+                             .inheritRuntimeContext(*this);
+    superInfomap.m_optimizer->inheritNetworkPropertiesFrom(*m_optimizer);
+    // getNewInfomapInstanceWithoutMemory builds the objective from a default Config, so unlike a
+    // sub-Infomap this one has to be told what to minimise. findHierarchicalSuperModules compares
+    // its codelength directly against this instance's index codelength, and the two are only
+    // comparable when both objectives are configured alike (#904).
+    superInfomap.m_optimizer->inheritObjectiveParametersFrom(*m_optimizer);
+    return superInfomap;
   }
 
   /**
@@ -220,6 +343,33 @@ private:
   bool isMainInfomap() const { return m_isMain; }
 
   bool haveHardPartition() const { return !m_originalLeafNodes.empty(); }
+
+  // Share the cancel flag (only) with a sub/worker Infomap. The callback is NOT
+  // inherited — only the main instance, on the owner thread, ever invokes it.
+  InfomapBase& inheritRuntimeContext(const InfomapBase& other)
+  {
+    m_cancel = other.m_cancel;
+    return *this;
+  }
+
+  // Flag-only, any thread. Call only where a throw can unwind legally — NOT
+  // inside an OpenMP structured block.
+  void checkCancelled() const
+  {
+    if (m_cancel->load(std::memory_order_relaxed))
+      throw InterruptionError();
+  }
+
+  // The thread-id guard keeps the callback off worker threads even when this
+  // object's methods run inside the task graph (off-thread it is a flag check).
+  void pollInterrupt()
+  {
+    if (m_interruptCallback != nullptr
+        && std::this_thread::get_id() == m_ownerThreadId
+        && m_interruptCallback(m_interruptUserData))
+      m_cancel->store(true, std::memory_order_relaxed);
+    checkCancelled();
+  }
 
   // ===================================================
   // Run: *
@@ -246,7 +396,8 @@ private:
   /**
    * Provide an initial partition of the network.
    *
-   * @param clusterDataFile A .clu file containing cluster data.
+   * @param clusterDataFile A .clu, .tree or .ftree file containing cluster data.
+   * Tree input may be physical or state-level on higher-order networks.
    * @param hard If true, the provided clusters will not be splitted. This reduces the
    * effective network size during the optimization phase but the hard partitions are
    * after that replaced by the original nodes.
@@ -286,6 +437,16 @@ private:
    * @param tree A tree path for each node
    */
   InfomapBase& initTree(const NodePaths& tree);
+
+  /**
+   * Normalize tree leaf ids so the leaf id always identifies a state node in
+   * m_leafNodes. For higher-order networks, physical-id rows are expanded by
+   * mapping each physical id to all state ids that share it.
+   *
+   * @param tree Tree paths as parsed from a .tree/.ftree cluster file.
+   * @param numNodesNotInNetwork Output count of physical ids that don't match any state node.
+   */
+  NodePaths normalizeTreePaths(const TreePaths& tree, unsigned int& numNodesNotInNetwork) const;
 
   void init();
 
@@ -416,7 +577,7 @@ private:
 
   void queueLeafModules(PartitionQueue& partitionQueue);
 
-  bool processPartitionQueue(PartitionQueue& queue, PartitionQueue& nextLevel) const;
+  void partitionModuleRecursively(InfoNode& module, unsigned int level, detail::PartitionTaskRecord& record) const;
 
 public:
   // ===================================================
@@ -469,20 +630,22 @@ public:
   std::string writeClu(const std::string& filename = "", bool states = false, int moduleIndexLevel = 1) { return infomap::writeClu(*this, m_network, filename, states, moduleIndexLevel); }
 
 private:
-
-#if 0
   // ===================================================
   // Debug: *
   // ===================================================
 
   void printDebug() const { return m_optimizer->printDebug(); }
-#endif
 
   // ===================================================
   // Members
   // ===================================================
 
 protected:
+  // Declared before m_root so the tree (whose nodes live in m_nodePool) is
+  // reclaimed by ~m_root before the pool storage is dropped. Destruction runs
+  // in reverse declaration order.
+  NodePool m_nodePool;
+  EdgePool m_edgePool;
   InfoNode m_root;
   std::vector<InfoNode*> m_leafNodes;
   std::vector<InfoNode*> m_moduleNodes;
@@ -491,7 +654,10 @@ protected:
   std::vector<InfoNode*> m_originalLeafNodes;
 
   Network m_network;
-  InitialPartition m_initialPartition = {}; // nodeId -> moduleId
+  InitialPartition m_initialPartition; // nodeId -> moduleId
+  // Pending physical multilayer partition: {layer_id, node_id, module_id} rows,
+  // resolved to state ids in initTrialPartition once the network is built.
+  std::vector<std::array<unsigned int, 3>> m_multilayerInitialPartition;
 
   const unsigned int SUPER_LEVEL_ADDITION = 1 << 20;
   bool m_isMain = true;
@@ -507,6 +673,7 @@ protected:
 
   double m_hierarchicalCodelength = 0.0;
   std::vector<double> m_codelengths;
+  std::vector<unsigned int> m_numTopModules;
   double m_entropyRate = 0.0;
   double m_maxEntropy = 0.0;
   double m_maxFlow = 0.0;
@@ -518,6 +685,15 @@ protected:
   Stopwatch m_elapsedTime = Stopwatch(false);
   std::string m_initialParameters;
   std::string m_currentParameters;
+
+  // Cooperative interruption (issue #412). m_cancel points at m_cancelRequested
+  // (self) or, for sub/worker instances, at the main's flag (inheritRuntimeContext),
+  // so the run tree shares one flag. m_ownerThreadId is stamped in run(Network&).
+  std::atomic<bool> m_cancelRequested { false };
+  std::atomic<bool>* m_cancel = &m_cancelRequested;
+  InterruptCallback m_interruptCallback = nullptr;
+  void* m_interruptUserData = nullptr;
+  std::thread::id m_ownerThreadId;
 
   std::unique_ptr<InfomapOptimizerBase> m_optimizer;
 };

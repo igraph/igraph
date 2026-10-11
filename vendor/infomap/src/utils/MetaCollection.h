@@ -20,7 +20,7 @@ struct FlowCount {
   FlowCount() = default;
 
   explicit FlowCount(double flow)
-      : flow(flow), count(1) { }
+      : flow(flow), count(1) {}
 
   FlowCount& operator+=(const FlowCount& o)
   {

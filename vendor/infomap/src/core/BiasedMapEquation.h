@@ -23,7 +23,7 @@ namespace infomap {
 class InfoNode;
 class StateNetwork;
 
-class BiasedMapEquation : private MapEquation<> {
+class BiasedMapEquation final : private MapEquation<> {
   using Base = MapEquation<>;
 
 public:
@@ -34,11 +34,11 @@ public:
   // Getters
   // ===================================================
 
-  double getIndexCodelength() const override;
+  double getIndexCodelength() const;
 
-  double getModuleCodelength() const override;
+  double getModuleCodelength() const;
 
-  double getCodelength() const override;
+  double getCodelength() const;
 
   double getEntropyBiasCorrection() const;
 
@@ -46,7 +46,7 @@ public:
   // IO
   // ===================================================
 
-  std::ostream& print(std::ostream& out) const override;
+  std::ostream& print(std::ostream& out) const;
 
   friend std::ostream& operator<<(std::ostream&, const BiasedMapEquation&);
 
@@ -54,31 +54,42 @@ public:
   // Init
   // ===================================================
 
-  void init(const Config& config) override;
+  void init(const Config& config);
 
-  void initTree(InfoNode& /*root*/) override { }
+  void initTree(InfoNode& /*root*/) {}
 
-  void initNetwork(InfoNode& root) override;
+  void initNetwork(InfoNode& root);
 
   using Base::initSuperNetwork;
 
   using Base::initSubNetwork;
 
-  void initPartition(std::vector<InfoNode*>& nodes) override;
+  void initPartition(std::vector<InfoNode*>& nodes);
 
   // ===================================================
   // Codelength
   // ===================================================
 
-  double calcCodelength(const InfoNode& parent) const override;
+  double calcCodelength(const InfoNode& parent) const;
 
   using Base::addMemoryContributions;
+
+  using Base::addTeleportationFlow;
 
   double getDeltaCodelengthOnMovingNode(InfoNode& current,
                                         DeltaFlow& oldModuleDelta,
                                         DeltaFlow& newModuleDelta,
                                         std::vector<FlowData>& moduleFlowData,
-                                        std::vector<unsigned int>& moduleMembers) override;
+                                        std::vector<unsigned int>& moduleMembers);
+
+  using Base::hoistOldSide;
+
+  double getDeltaCodelengthOnMovingNodeHoisted(InfoNode& current,
+                                               DeltaFlow& oldModuleDelta,
+                                               const OldSideTerms& oldSide,
+                                               DeltaFlow& newModuleDelta,
+                                               std::vector<FlowData>& moduleFlowData,
+                                               std::vector<unsigned int>& moduleMembers);
 
   // ===================================================
   // Consolidation
@@ -88,24 +99,22 @@ public:
                                     DeltaFlow& oldModuleDelta,
                                     DeltaFlow& newModuleDelta,
                                     std::vector<FlowData>& moduleFlowData,
-                                    std::vector<unsigned int>& moduleMembers) override;
+                                    std::vector<unsigned int>& moduleMembers);
 
-  void consolidateModules(std::vector<InfoNode*>& modules) override;
+  void consolidateModules(std::vector<InfoNode*>& modules);
 
-#if 0
   // ===================================================
   // Debug
   // ===================================================
 
-  void printDebug() const override;
-#endif
+  void printDebug() const;
 
 private:
   // ===================================================
   // Private member functions
   // ===================================================
-  double calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent) const override;
-  double calcCodelengthOnModuleOfModules(const InfoNode& parent) const override;
+  double calcCodelengthOnModuleOfLeafNodes(const InfoNode& parent) const;
+  double calcCodelengthOnModuleOfModules(const InfoNode& parent) const;
 
   static int getDeltaNumModulesIfMoving(unsigned int oldModule, unsigned int newModule, std::vector<unsigned int>& moduleMembers);
 
@@ -117,13 +126,15 @@ private:
   // Codelength
   // ===================================================
 
-  void calculateCodelength(std::vector<InfoNode*>& nodes) override;
+  void calculateCodelength(std::vector<InfoNode*>& nodes);
 
   using Base::calculateCodelengthTerms;
 
   using Base::calculateCodelengthFromCodelengthTerms;
 
   double calcNumModuleCost(unsigned int numModules) const;
+
+  unsigned int numModulesAfterMove(int deltaNumModules) const;
 
   double calcIndexEntropyBiasCorrection(unsigned int numModules) const;
   double calcModuleEntropyBiasCorrection() const;
@@ -168,11 +179,37 @@ private:
   double entropyBiasCorrectionMultiplier = 1;
   double indexEntropyBiasCorrection = 0;
   double moduleEntropyBiasCorrection = 0;
-  static double s_totalDegree;
-  static unsigned int s_numNodes;
+  double m_totalDegree = 1;
+  unsigned int m_numNodes = 0;
 
 public:
-  static void setNetworkProperties(const StateNetwork& network);
+  void setNetworkProperties(const StateNetwork& network);
+
+  // Copy the whole-network properties from a parent objective. Sub/super Infomap instances
+  // partition InfoNodes and have no StateNetwork of their own, but the entropy bias correction
+  // must keep using the full network's total degree and node count (previously a shared static).
+  void setNetworkPropertiesFrom(const BiasedMapEquation& other)
+  {
+    m_totalDegree = other.m_totalDegree;
+    m_numNodes = other.m_numNodes;
+  }
+
+  // Copy what the objective minimises from a parent objective. The super-level Infomap is built
+  // without memory, which today means from a default Config, so its objective would otherwise run
+  // with the entropy correction off and no module-count preference however the run was configured.
+  // findHierarchicalSuperModules then weighed that uncorrected super codelength against this
+  // objective's corrected index codelength and could accept a super level that makes the tree
+  // worse than the two-level partition the same trial had just found (#904).
+  //
+  // Only the objective's own parameters travel. The flow model deliberately does not: the super
+  // network's node flows are aggregated module enter flows that already carry teleportation, so
+  // handing the super objective a recordedTeleportation of true would count it twice.
+  void setObjectiveParametersFrom(const BiasedMapEquation& other)
+  {
+    preferredNumModules = other.preferredNumModules;
+    useEntropyBiasCorrection = other.useEntropyBiasCorrection;
+    entropyBiasCorrectionMultiplier = other.entropyBiasCorrectionMultiplier;
+  }
 };
 
 } // namespace infomap
