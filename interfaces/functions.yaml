@@ -762,7 +762,7 @@ igraph_personalized_pagerank_vs:
         OPTIONAL INOUT PAGERANKOPT options
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,
-        options ON algo
+        reset_vids ON graph, options ON algo
 
 igraph_rewire:
     PARAMS: INOUT GRAPH rewire, INTEGER n, EDGE_TYPE_SW allowed_edge_types=SIMPLE, OPTIONAL OUT REWIRING_STATS stats
