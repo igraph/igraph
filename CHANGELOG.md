@@ -22,7 +22,7 @@
 ### Other
 
 - Documentation improvements.
-- nanoflann was updated to version 1.14.0
+- nanoflann was updated to version 2.0.1
 - Infomap was updated to upstream commit e13ee372, which comes after version 2.15.1. The vendored copy is now unmodified upstream source.
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 
