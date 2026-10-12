@@ -90,6 +90,21 @@ int main(void) {
 
     igraph_destroy(&graph);
 
+    // in a complete graph, no MCMC move improves the likelihood; the result
+    // must still be a valid dendrogram
+    igraph_full(&graph, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_hrg_init(&hrg, igraph_vcount(&graph));
+    igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 10);
+    igraph_from_hrg_dendrogram(&dendrogram, &hrg, NULL);
+    {
+        igraph_bool_t is_tree;
+        igraph_is_tree(&dendrogram, &is_tree, NULL, IGRAPH_ALL);
+        IGRAPH_ASSERT(is_tree);
+    }
+    igraph_destroy(&dendrogram);
+    igraph_hrg_destroy(&hrg);
+    igraph_destroy(&graph);
+
     // graph must have at least 3 vertices at the moment
     igraph_full(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_hrg_init(&hrg, igraph_vcount(&graph));

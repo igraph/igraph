@@ -102,6 +102,10 @@ static void markovChainMonteCarlo(dendro &d, const igraph_int_t period,
     // over the set of sampled dendrogram models (in a Bayesian
     // model averaging sense), you'll need to code that yourself.
 
+    // record the initial HRG structure so that the result is valid even if
+    // none of the MCMC moves improve the likelihood
+    d.recordDendrogramStructure(hrg);
+
     // do 'period' MCMC moves before doing anything else
     for (igraph_int_t i = 0; i < period; i++) {
 

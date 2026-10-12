@@ -17,6 +17,7 @@
 - Fixed compatibility with with some Linux distros that include a patched version of libxml2 2.9.x that changed the `xmlEntity` struct layout. Notably, RHEL 8 and derivatives, as well as Ubuntu 22.04 and 24.04 LTS are affected when recent security patches are applied. See issues #2698 and #2931.
 - `igraph_lapack_dsyevr()` incorrectly reported an internal faiure in the `dsyevr` LAPACK routine as an invalid argument error. The issued error message now separates invalid argument errors from internal errors.
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eingevalues close to zero. This fixed a convergence issues in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
+- `igraph_hrg_fit()` returned an invalid, all-zero HRG model when `steps` was positive and none of the MCMC moves improved the likelihood of the initial dendrogram, e.g. for complete graphs. Using such a model in other HRG functions could crash igraph. The initial dendrogram is now returned in this case.
 
 ### Other
 
