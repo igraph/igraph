@@ -1,4 +1,4 @@
-name: MINGW
+name: MSYS2
 
 # TODO: Check the BRANCHES element when merging the branch 'develop' to, say, 'main'.
 on:
@@ -22,13 +22,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: ['x86_64', 'ucrt-x86_64']
+        arch: ['x86_64', 'ucrt-x86_64', 'clang-x86_64']
         shared_libs: ['shared', 'static']
         include:
           - arch: x86_64
             msystem: MINGW64
           - arch: ucrt-x86_64
             msystem: UCRT64
+          - arch: clang-x86_64
+            msystem: CLANG64
 
     defaults:
       run:
@@ -39,6 +41,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
+          suppress-deprecation-warnings: msystem-mingw64
           install: git base-devel mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-ninja mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-ccache mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-arpack
           update: true
 
