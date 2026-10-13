@@ -31,7 +31,7 @@ jobs:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
-          vsver: "14.4" # latest VS2022
+          vsver: "14.2" # latest VS2019
           vcpkg_target_triplet: x64-windows
 
   - job: windows_static_32
@@ -43,7 +43,6 @@ jobs:
         parameters:
           vcpkg_target_triplet: x86-windows-static-md
           arch: x86
-          vsver: "14.4"
 
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
