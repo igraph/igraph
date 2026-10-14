@@ -166,7 +166,7 @@ static igraph_error_t igraph_i_graphml_parse_boolean(
     }
 
     if (trimmed_length > 0) {
-        if (isdigit(trimmed[0])) {
+        if (isdigit((unsigned char) trimmed[0])) {
             IGRAPH_CHECK(igraph_i_parse_integer(trimmed, trimmed_length, &value));
         } else {
             IGRAPH_ERRORF("Cannot parse '%.*s' as Boolean value.", IGRAPH_PARSEERROR,
