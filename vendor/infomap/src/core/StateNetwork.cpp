@@ -191,6 +191,9 @@ bool StateNetwork::addLinkToMap(unsigned int sourceId, unsigned int targetId, do
       linkData.weight += weight;
       ++m_numAggregatedLinks;
       --m_numLinks;
+      if (sourceId == targetId) {
+        --m_numSelfLinks; // merged into an existing self-link
+      }
       addedNewLink = false;
     } else {
       linkData.weight = weight;
@@ -308,6 +311,12 @@ void StateNetwork::clearLinks()
   // m_numAggregatedLinks = m_rawLinkCount - 0. m_numLinks/m_numAggregatedLinks keep
   // their pre-clear values so a post-clear numLinks() still reports the count (as
   // before); forEachLink() yields nothing by design (empty node list).
+  // An unbuilt buffer was never merged, so m_numLinks never counted its links and its
+  // self-link occurrences are not distinct self-links either. Keeping them would make
+  // sumDegree() = 2 * numLinks() - numSelfLinks() wrap around.
+  if (!m_useMapBuild && !m_linksFinalized) {
+    m_numSelfLinks = 0;
+  }
   m_rawLinkCount = 0;
   m_linksFinalized = true;
 }
@@ -517,6 +526,7 @@ void StateNetwork::buildCsrFromBuffer()
 
   std::size_t k = 0;
   unsigned int curSourceIndex = 0;
+  unsigned int numSelfLinks = 0;
   while (k < numTriples) {
     const unsigned int src = buf[order[k]].source;
     const unsigned int tgt = buf[order[k]].target;
@@ -525,6 +535,9 @@ void StateNetwork::buildCsrFromBuffer()
     while (m < numTriples && buf[order[m]].source == src && buf[order[m]].target == tgt) {
       w += buf[order[m]].weight; // arrival order via the index tiebreak
       ++m;
+    }
+    if (src == tgt) {
+      ++numSelfLinks;
     }
     const unsigned int srcIdx = indexOfId(src);
     while (curSourceIndex < srcIdx) {
@@ -545,6 +558,10 @@ void StateNetwork::buildCsrFromBuffer()
 
   m_numLinks = static_cast<unsigned int>(m_linkTargets.size());
   m_numAggregatedLinks = m_rawLinkCount - m_numLinks;
+  // addLink counted every self-link occurrence. Parallel self-links have just been
+  // merged, so count them the way m_numLinks counts links: two parallel self-loops
+  // on a node with no other links made sumDegree() 0, and three made it wrap around.
+  m_numSelfLinks = numSelfLinks;
   m_linkFlows.assign(m_linkTargets.size(), 0.0);
 
   // m_outWeights is deliberately NOT derived in mode A: first-order consumers

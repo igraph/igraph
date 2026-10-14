@@ -2397,8 +2397,7 @@ void InfomapBase::hierarchicalPartition()
     }
 
     else if (fastHierarchicalSolution == 1) {
-      const bool shouldRestoreSilent = isMainInfomap() && !Log::isThreadMuted();
-      bool isSilent = shouldRestoreSilent && Log::isSilent();
+      Log::ScopedSilentRestore restoreSilent(isMainInfomap() && !Log::isThreadMuted());
 
       double codelengthBefore = 0.0;
       double codelengthAfter = 0.0;
@@ -2465,8 +2464,7 @@ void InfomapBase::hierarchicalPartition()
         }
       }
 
-      if (shouldRestoreSilent)
-        Log::setSilent(isSilent);
+      restoreSilent.restore();
 
       const double diffCodelength = codelengthBefore - codelengthAfter;
       Console::detail(1, "fine-tune bottom modules: improvement {:g}% {} codelength {}", (diffCodelength / codelengthBefore) * 100, Console::arrow(), io::toPrecision(codelengthAfter));
@@ -2499,13 +2497,26 @@ void InfomapBase::hierarchicalPartition()
     return;
   }
 
+  // The recursive search below starts over from the super modules and can end above the
+  // super-level tree it threw away (#837). Keep that tree and its codelength to fall back on.
+  NodePaths superLevelTree;
+  double superLevelCodelength = 0.0;
   if (fastHierarchicalSolution == 0) {
+    superLevelCodelength = m_hierarchicalCodelength;
+    superLevelTree.reserve(numLeafNodes());
+    for (auto it(iterLeafNodes()); !it.isEnd(); ++it)
+      superLevelTree.emplace_back(it->stateId, it.path());
     removeSubModules(true);
     m_hierarchicalCodelength = calcCodelengthOnTree(root(), true);
   }
 
   recursivePartition();
   dissolveUnprofitableModules();
+
+  if (!superLevelTree.empty() && m_hierarchicalCodelength > superLevelCodelength + minimumCodelengthImprovement) {
+    Console::detail(1, "recursive: codelength {} above the super-level tree's {}, restoring it", io::toPrecision(m_hierarchicalCodelength), io::toPrecision(superLevelCodelength));
+    initTree(superLevelTree);
+  }
 }
 
 void InfomapBase::partition()
@@ -2854,8 +2865,12 @@ void InfomapBase::findTopModulesRepeatedly(unsigned int maxLevels)
     passList.push_back(fmt::format(FMT_STRING("{}*{}"), numActiveBeforeMove, numOptimizationLoops));
     Log(3).print("done! -> codelength {} in {} modules.\n", io::stringify(*this), numActiveModules());
 
-    // If no improvement, revert codelength terms to the last consolidated state
-    if (haveModules() && restoreConsolidatedOptimizationPointIfNoImprovement()) {
+    // If no improvement, revert codelength terms to the last consolidated state. A pass that
+    // merges nothing leaves the partition as it was, but rescoring it can shave a few ULPs off
+    // the codelength, which would count as an improvement and buy another identical pass.
+    // Metadata rescoring can drift down indefinitely (#1134), so such a pass always ends here.
+    const bool mergedNothing = numActiveModules() == numActiveBeforeMove;
+    if (haveModules() && restoreConsolidatedOptimizationPointIfNoImprovement(mergedNothing)) {
       Log(3).print("-> Restored to codelength {} in {} modules.\n", io::stringify(*this), numTopModules());
       break;
     }
@@ -3039,11 +3054,10 @@ unsigned int InfomapBase::findHierarchicalSuperModules(unsigned int superLevelLi
   do {
     Console::detail(1, "super iter {}: searching {} modules", numLevelsCreated + 1, numTopModules());
     const bool shouldMuteNestedMainRun = isMainInfomap() && !Log::isThreadMuted();
-    bool isSilent = false;
-    if (shouldMuteNestedMainRun) {
-      isSilent = Log::isSilent();
+    // Unmutes again if superInfomap.run() throws InterruptionError (#1134).
+    Log::ScopedSilentRestore restoreSilent(shouldMuteNestedMainRun);
+    if (shouldMuteNestedMainRun)
       Log::setSilent(true);
-    }
     InfoNode tmp(m_root.data); // Temporary owner for the super Infomap instance
     auto& superInfomap = getSuperInfomap(tmp)
                              .setTwoLevel(true);
@@ -3051,9 +3065,7 @@ unsigned int InfomapBase::findHierarchicalSuperModules(unsigned int superLevelLi
     // No interrupt catch needed: local `tmp` owns the super-Infomap, so
     // ~InfoNode frees it if run() throws InterruptionError (#412).
     superInfomap.run();
-    if (shouldMuteNestedMainRun) {
-      Log::setSilent(isSilent);
-    }
+    restoreSilent.restore();
     double superCodelength = superInfomap.getCodelength();
     double superIndexCodelength = superInfomap.getIndexCodelength();
 

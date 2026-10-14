@@ -216,23 +216,13 @@ double MetaMapEquation::getCurrentModuleMetaCodelength(unsigned int module, Info
   auto& currentMetaCollection = m_moduleToMetaCollection[module];
   const MetaCollection* nodeMeta = current.metaCollectionPtr();
 
-  double moduleMetaCodelength = 0.0;
+  if (addRemoveOrNothing == 0 || nodeMeta == nullptr)
+    return currentMetaCollection.calculateEntropy();
 
-  if (addRemoveOrNothing == 0 || nodeMeta == nullptr) {
-    moduleMetaCodelength = currentMetaCollection.calculateEntropy();
-  }
-  // If add or remove, do the change, calculate new codelength and then undo the change
-  else if (addRemoveOrNothing == 1) {
-    currentMetaCollection.add(*nodeMeta);
-    moduleMetaCodelength = currentMetaCollection.calculateEntropy();
-    currentMetaCollection.remove(*nodeMeta);
-  } else {
-    currentMetaCollection.remove(*nodeMeta);
-    moduleMetaCodelength = currentMetaCollection.calculateEntropy();
-    currentMetaCollection.add(*nodeMeta);
-  }
-
-  return moduleMetaCodelength;
+  // Score the module as if the node were added or removed, without touching the collection.
+  // Adding and then removing it again left a rounding residue behind on every evaluation,
+  // which drifted the metadata term down by a few ULPs per pass (#1134).
+  return currentMetaCollection.calculateEntropyWith(*nodeMeta, addRemoveOrNothing == 1 ? 1 : -1);
 }
 
 // ===================================================

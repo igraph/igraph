@@ -131,6 +131,39 @@ public:
     return m_total.flow * metaCodelength;
   }
 
+  // Entropy of this collection with `other` added (sign > 0) or removed (sign < 0), without
+  // modifying it. Same arithmetic, in the same order, as add() or remove() followed by
+  // calculateEntropy(); undoing that change afterwards is not exact in floating point.
+  double calculateEntropyWith(const MetaCollection& other, int sign) const
+  {
+    const double total = sign > 0 ? m_total.flow + other.m_total.flow : m_total.flow - other.m_total.flow;
+    double metaCodelength = 0.0;
+    auto it = m_metaToFlowCount.begin();
+    auto otherIt = other.m_metaToFlowCount.begin();
+    while (it != m_metaToFlowCount.end() || otherIt != other.m_metaToFlowCount.end()) {
+      FlowCount flowCount;
+      if (otherIt == other.m_metaToFlowCount.end() || (it != m_metaToFlowCount.end() && it->first < otherIt->first)) {
+        flowCount = it->second;
+        ++it;
+      } else {
+        const bool shared = it != m_metaToFlowCount.end() && it->first == otherIt->first;
+        if (shared) {
+          flowCount = it->second;
+          ++it;
+        }
+        if (sign > 0)
+          flowCount += otherIt->second;
+        else
+          flowCount -= otherIt->second;
+        ++otherIt;
+      }
+      if (flowCount.empty())
+        continue; // remove() erases an entry whose count reaches zero
+      metaCodelength -= infomath::plogp(flowCount.flow / total);
+    }
+    return total * metaCodelength;
+  }
+
   void clear()
   {
     m_total.reset();

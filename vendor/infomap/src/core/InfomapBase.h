@@ -338,7 +338,8 @@ private:
                            .setIsMain(false)
                            .setSubLevel(m_subLevel + 1)
                            .setNonMainConfig(*this)
-                           .inheritRuntimeContext(*this);
+                           .inheritRuntimeContext(*this)
+                           .inheritInterruptHandler(*this);
     // Carry the full-network properties down so entropy bias correction stays consistent
     // across the hierarchy (this used to be a shared static).
     subInfomap.m_optimizer->inheritNetworkPropertiesFrom(*m_optimizer);
@@ -351,7 +352,8 @@ private:
                              .setIsMain(false)
                              .setSubLevel(m_subLevel + SUPER_LEVEL_ADDITION)
                              .setNonMainConfig(*this)
-                             .inheritRuntimeContext(*this);
+                             .inheritRuntimeContext(*this)
+                             .inheritInterruptHandler(*this);
     superInfomap.m_optimizer->inheritNetworkPropertiesFrom(*m_optimizer);
     // getNewInfomapInstanceWithoutMemory builds the objective from a default Config, so unlike a
     // sub-Infomap this one has to be told what to minimise. findHierarchicalSuperModules compares
@@ -385,12 +387,22 @@ private:
   bool haveHardPartition() const { return !m_originalLeafNodes.empty(); }
 
   // Share the cancel flag and the largest-team count with a sub/worker Infomap.
-  // The callback is NOT inherited — only the main instance, on the owner thread,
-  // ever invokes it.
+  // The callback is NOT inherited here — a parallel-trial worker only reads the flag.
   InfomapBase& inheritRuntimeContext(const InfomapBase& other)
   {
     m_cancel = other.m_cancel;
     m_largestTeam = other.m_largestTeam;
+    return *this;
+  }
+
+  // A nested sub/super Infomap also takes the callback and the owner thread, so a
+  // signal is still polled while the main instance waits inside its run(). The
+  // owner-thread guard in pollInterrupt() keeps the callback on that thread (#1134).
+  InfomapBase& inheritInterruptHandler(const InfomapBase& other)
+  {
+    m_interruptCallback = other.m_interruptCallback;
+    m_interruptUserData = other.m_interruptUserData;
+    m_ownerThreadId = other.m_ownerThreadId;
     return *this;
   }
 

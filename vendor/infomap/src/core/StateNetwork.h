@@ -121,6 +121,8 @@ protected:
   unsigned int m_numLinks = 0;
   double m_sumLinkWeight = 0.0;
   unsigned int m_numSelfLinksFound = 0;
+  // Distinct self-links after aggregation, like m_numLinks, so that sumDegree()
+  // compares like with like. m_numSelfLinksFound counts every occurrence.
   unsigned int m_numSelfLinks = 0;
   double m_sumSelfLinkWeight = 0.0;
   unsigned int m_numAggregatedLinks = 0;
@@ -266,7 +268,15 @@ public:
     return m_numLinks;
   }
   double sumLinkWeight() const { return m_sumLinkWeight; }
-  unsigned int numSelfLinks() const { return m_numSelfLinks; }
+  // Finalizes like numLinks(): parallel self-links are only merged in the CSR build,
+  // so sumDegree() must not see a count from before it, whichever operand runs first.
+  unsigned int numSelfLinks() const
+  {
+#ifndef SWIG
+    if (!m_useMapBuild) ensureFinalized();
+#endif
+    return m_numSelfLinks;
+  }
   double sumSelfLinkWeight() const { return m_sumSelfLinkWeight; }
   // Use convention of counting self-links only once, treating them as directed
   double sumWeightedDegree() const { return 2 * sumLinkWeight() - sumSelfLinkWeight(); }

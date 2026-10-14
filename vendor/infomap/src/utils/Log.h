@@ -60,6 +60,30 @@ public:
     bool m_enabled;
   };
 
+  // Remembers the process-wide silent flag and puts it back on every exit from the
+  // scope, an exception included, so an interrupted nested run cannot leave the
+  // engine muted. restore() puts it back early; the destructor then does nothing.
+  class ScopedSilentRestore {
+  public:
+    explicit ScopedSilentRestore(bool enabled = true) : m_enabled(enabled), m_previous(s_silent) {}
+
+    ~ScopedSilentRestore() { restore(); }
+
+    void restore()
+    {
+      if (m_enabled)
+        s_silent = m_previous;
+      m_enabled = false;
+    }
+
+    ScopedSilentRestore(const ScopedSilentRestore&) = delete;
+    ScopedSilentRestore& operator=(const ScopedSilentRestore&) = delete;
+
+  private:
+    bool m_enabled;
+    bool m_previous;
+  };
+
   /**
    * Log when level is below or equal Log::verboseLevel()
    * and maxLevel is above or equal Log::verboseLevel()
