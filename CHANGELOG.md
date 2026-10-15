@@ -6,6 +6,9 @@
 
 - `igraph_hamming()` creates a Hamming graph (experimental function). Thanks to @zxawry for contributing this functionality in #2890!
 - `igraph_is_triangle_free()` determines whether a graph contains no triangles (experimental function).
+- The VF2 subgraph-isomorphism functions can now restrict matches to induced
+  subgraphs using the new `induced` argument. Non-induced matching remains
+  available by passing `false`.
 
 ### Fixed
 
