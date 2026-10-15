@@ -56,6 +56,35 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
 
 }
 
+static void check_rewiring_2(igraph_tree_mode_t tree_mode, const char* description) {
+
+    igraph_t g;
+    igraph_vector_int_t degree_before, degree_after;
+
+    igraph_kary_tree(&g, 10, 3, tree_mode);
+
+    igraph_vector_int_init(&degree_before, 0);
+    igraph_degree(&g, &degree_before, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS);
+
+    igraph_rewire_2(&g, 1000, IGRAPH_SIMPLE_SW);
+
+    igraph_vector_int_init(&degree_after, 0);
+    igraph_degree(&g, &degree_after, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS);
+
+    if (!igraph_vector_int_all_e(&degree_before, &degree_after)) {
+
+        printf("%s: graph degrees changed. Rewired graph is below.\n", description);
+        print_graph(&g);
+
+        abort();
+    }
+
+    igraph_destroy(&g);
+    igraph_vector_int_destroy(&degree_before);
+    igraph_vector_int_destroy(&degree_after);
+
+}
+
 int main(void) {
     igraph_rng_seed(igraph_rng_default(), 3925);
 
@@ -75,6 +104,8 @@ int main(void) {
     check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, 0, "Undirected, no loops, adjlist-method");
     check_rewiring(IGRAPH_TREE_UNDIRECTED, 0, 1, "Undirected, loops, standard-method");
     check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, 1, "Undirected, loops, adjlist-method");
+
+    check_rewiring_2(IGRAPH_TREE_UNDIRECTED, "Simple graph, igraph_rewire_2");
 
     VERIFY_FINALLY_STACK();
     return 0;

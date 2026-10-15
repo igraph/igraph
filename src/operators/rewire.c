@@ -56,6 +56,10 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_int_t n, igraph_bool_t lo
         return IGRAPH_SUCCESS;
     }
 
+    if (! loops) {
+        return igraph_rewire_2(graph, n, IGRAPH_SIMPLE_SW);
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 2);
 
     if (use_adjlist) {
