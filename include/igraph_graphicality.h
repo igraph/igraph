@@ -66,7 +66,7 @@ IGRAPH_EXPORT igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *de
                                         igraph_edge_type_sw_t allowed_edge_types,
                                         igraph_bool_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_is_potentially_connected(const igraph_vector_int_t *out_degrees,
+IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_is_potentially_connected(const igraph_vector_int_t *out_degrees,
                                         const igraph_vector_int_t *in_degrees,
                                         igraph_edge_type_sw_t allowed_edge_types,
                                         igraph_connectedness_t mode,

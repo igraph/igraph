@@ -252,6 +252,8 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * \function igraph_is_potentially_connected
  * \brief Is there a connected graph with the given graphical degree sequence?
  *
+ * \experimental
+ *
  * This function determines if there is a connected graph with a given graphical
  * degree sequence. While it is safe to pass any sequence of non-negative integers
  * as input, the result will only be meaningful if the sequence was graphical.
