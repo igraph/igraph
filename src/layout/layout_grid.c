@@ -22,6 +22,7 @@
 #include "igraph_layout.h"
 
 #include "igraph_interface.h"
+#include "math/safe_intop.h"
 
 /**
  * \ingroup layout
@@ -105,6 +106,73 @@ igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res
                 y = 0; z++;
             }
         }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup layout
+ * \function igraph_layout_square
+ * \brief Places the vertices on a regular grid in the d-dimensional space.
+ *
+ * \experimental
+ *
+ * \param graph Pointer to an initialized graph object, or \c NULL. If it
+ *        is not \c NULL, the function validates that the number of vertices
+ *        in the graph is equal to the number of lattice points determined
+ *        by \p dimvector. If it is \c NULL, no such validation is performed.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
+ * \param dimvector Vector giving the sizes of the lattice in each of
+ *        its dimensions. The dimension of the lattice will be the
+ *        same as the length of this vector.
+ *
+ * \return Error code, \c IGRAPH_SUCCESS on success, \c IGRAPH_EINVAL if the number of
+ *         vertices does not match the number of lattice nodes, \c IGRAPH_EOVERFLOW
+ *         if the product of the lattice dimensions overflows, or an error from
+ *         \ref igraph_matrix_resize() if the result matrix cannot be resized.
+ *
+ * Time complexity: O(|V|*d), the number of vertices multiplied by number of dimensions
+ */
+igraph_error_t igraph_layout_square(const igraph_t *graph, igraph_matrix_t *res, const igraph_vector_int_t *dimvector) {
+    igraph_int_t i, j, no_of_nodes, block_size, current_coord, no_of_rows_current_coord;
+    igraph_int_t no_of_dims = igraph_vector_int_size(dimvector);
+
+    if (igraph_vector_int_any_smaller(dimvector, 0)) {
+        IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
+
+    if (graph != NULL) {
+        if (no_of_nodes != igraph_vcount(graph)) {
+            IGRAPH_ERROR("The vertex count must match the lattice size "
+                         "implied by dimvector.", IGRAPH_EINVAL);
+        }
+    }
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_dims));
+
+    block_size = 1;
+    for (j = 0; j < no_of_dims; j++) {
+        current_coord = 0;
+        no_of_rows_current_coord = 0;
+
+        for (i = 0; i < no_of_nodes; i++) {
+            MATRIX(*res, i, j) = current_coord;
+            no_of_rows_current_coord++;
+
+            if (no_of_rows_current_coord == block_size) {
+                no_of_rows_current_coord = 0;
+                current_coord++;
+                if (current_coord == VECTOR(*dimvector)[j]) {
+                    current_coord = 0;
+                }
+            }
+        }
+
+        block_size *= VECTOR(*dimvector)[j];
     }
 
     return IGRAPH_SUCCESS;
