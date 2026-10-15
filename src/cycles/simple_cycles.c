@@ -549,15 +549,17 @@ igraph_error_t igraph_simple_cycles_callback(
     // Thus, we iterate over the vertices, and check if they can be skipped as
     // a starting point according to the rules laid out above.
     for (igraph_int_t i = 0; i < state.N; i++) {
-        // Check if the vertex is a candidate for a cycle.
-        // Note that we call igraph_degree_1() here instead of retrieving the
-        // neighbor count from igraph_adjlist_get(&state.AK, i) because:
-        //  - we need to the undirected degree in all cases, and
-        //  - our algorithm modifies the adjlist state.AK
-        igraph_int_t degree;
-        IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
-        if (degree < 3 && IGRAPH_BIT_TEST(state.v_visited, i)) {
-            continue;
+        if (!state.directed) {
+            // Check if the vertex is a candidate for a cycle.
+            // Note that we call igraph_degree_1() here instead of retrieving the
+            // neighbor count from igraph_adjlist_get(&state.AK, i) because:
+            //  - we need the undirected degree in all cases, and
+            //  - our algorithm modifies the adjlist state.AK
+            igraph_int_t degree;
+            IGRAPH_CHECK(igraph_degree_1(graph, &degree, i, IGRAPH_ALL, true));
+            if (degree < 3 && IGRAPH_BIT_TEST(state.v_visited, i)) {
+                continue;
+            }
         }
         // Check if we find a cycle starting from this vertex.
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {

@@ -1819,6 +1819,16 @@ Edge IDs in cycles:
   0: ( 0 3 6 5 2 4 )
   1: ( 1 5 2 4 )
 }
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 2 5 )
+}
+Edge IDs in cycles:
+{
+  0: ( 3 6 )
+}
 
 Testing undirected graph of type 'Mickey'
 Finished search, found 3 cycles, expected 3 cycles. Max cycle length was -1 vertices.
