@@ -10,8 +10,9 @@
 #ifndef INFOMAP_ITERATOR_H_
 #define INFOMAP_ITERATOR_H_
 
-#include <deque>
+#include <vector>
 #include <map>
+#include <memory>
 #include <cmath>
 
 namespace infomap {
@@ -27,16 +28,22 @@ struct InfomapIterator {
 protected:
   InfoNode* m_root = nullptr;
   InfoNode* m_current = nullptr;
-  int m_moduleIndexLevel = -1;
+  int m_moduleIndexLevel = -1; // TODO: Not used.
   unsigned int m_moduleIndex = 0;
-  std::deque<unsigned int> m_path; // The tree path to current node (indexing starting from one!)
+  std::vector<unsigned int> m_path; // The tree path to current node (indexing starting from one!)
   unsigned int m_depth = 0;
+  // Keeps storage that m_current may point into alive for as long as this position
+  // exists. copy() and operator++(int) return the *base* class by value, so a derived
+  // iterator holding its own nodes is sliced -- and the surviving m_current pointed into
+  // storage that died with the temporary. Anchoring it here means the slice keeps it
+  // (#900). Empty for iterators that only point into the engine's own tree.
+  std::shared_ptr<void> m_positionStorage;
 
 public:
   InfomapIterator() = default;
 
   InfomapIterator(InfoNode* nodePointer, int moduleIndexLevel = -1)
-      : m_root(nodePointer), m_current(nodePointer), m_moduleIndexLevel(moduleIndexLevel) { }
+      : m_root(nodePointer), m_current(nodePointer), m_moduleIndexLevel(moduleIndexLevel) {}
 
   virtual ~InfomapIterator() = default;
   InfomapIterator(const InfomapIterator&) = default;
@@ -75,7 +82,7 @@ public:
     return *this;
   }
 
-  const std::deque<unsigned int>& path() const noexcept { return m_path; }
+  const std::vector<unsigned int>& path() const noexcept { return m_path; }
 
   unsigned int moduleIndex() const noexcept { return m_moduleIndex; }
 
@@ -88,13 +95,18 @@ public:
   double modularCentrality() const noexcept;
 
   bool isEnd() const noexcept { return m_current == nullptr; }
+
+  virtual InfomapIterator copy() const noexcept
+  {
+    return InfomapIterator(*this);
+  }
 };
 
 struct InfomapModuleIterator : public InfomapIterator {
 public:
-  InfomapModuleIterator() : InfomapIterator() { }
+  InfomapModuleIterator() {}
 
-  InfomapModuleIterator(InfoNode* nodePointer, int moduleIndexLevel = -1) : InfomapIterator(nodePointer, moduleIndexLevel) { }
+  InfomapModuleIterator(InfoNode* nodePointer, int moduleIndexLevel = -1) : InfomapIterator(nodePointer, moduleIndexLevel) {}
 
   ~InfomapModuleIterator() override = default;
   InfomapModuleIterator(const InfomapModuleIterator&) = default;
@@ -108,7 +120,12 @@ public:
   {
     InfomapModuleIterator copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
+  }
+
+  InfomapIterator copy() const noexcept override
+  {
+    return InfomapModuleIterator(*this);
   }
 
   using InfomapIterator::childIndex;
@@ -120,7 +137,7 @@ public:
 
 struct InfomapLeafModuleIterator : public InfomapIterator {
 public:
-  InfomapLeafModuleIterator() : InfomapIterator() { }
+  InfomapLeafModuleIterator() {}
 
   InfomapLeafModuleIterator(InfoNode* nodePointer, int moduleIndexLevel = -1)
       : InfomapIterator(nodePointer, moduleIndexLevel) { init(); }
@@ -142,7 +159,12 @@ public:
   {
     InfomapLeafModuleIterator copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
+  }
+
+  InfomapIterator copy() const noexcept override
+  {
+    return InfomapLeafModuleIterator(*this);
   }
 
   using InfomapIterator::childIndex;
@@ -154,7 +176,7 @@ public:
 
 struct InfomapLeafIterator : public InfomapIterator {
 public:
-  InfomapLeafIterator() : InfomapIterator() { }
+  InfomapLeafIterator() {}
 
   InfomapLeafIterator(InfoNode* nodePointer, int moduleIndexLevel = -1)
       : InfomapIterator(nodePointer, moduleIndexLevel) { init(); }
@@ -176,7 +198,12 @@ public:
   {
     InfomapLeafIterator copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
+  }
+
+  InfomapIterator copy() const noexcept override
+  {
+    return InfomapLeafIterator(*this);
   }
 
   using InfomapIterator::childIndex;
@@ -193,19 +220,35 @@ public:
  */
 struct InfomapIteratorPhysical : public InfomapIterator {
 protected:
-  std::map<unsigned int, InfoNode> m_physNodes;
-  std::map<unsigned int, InfoNode>::iterator m_physIter;
+  using PhysNodes = std::map<unsigned int, InfoNode>;
+  // Shared, so a copied or sliced position keeps the very nodes it points at rather than
+  // a deep copy its iterators do not belong to: the defaulted copy left m_current and
+  // m_physIter bound to the source's map, which is why comparing a copied iterator's
+  // position against its own end() compared iterators from two different maps (#900).
+  std::shared_ptr<PhysNodes> m_physNodes;
+  PhysNodes::iterator m_physIter;
   InfomapIterator m_oldIter;
 
+  //! Fresh storage for the next leaf module, leaving any handed-out position untouched.
+  void resetPhysNodes()
+  {
+    m_physNodes = std::make_shared<PhysNodes>();
+    anchorPhysNodes();
+  }
+
+  //! Point the base's anchor at this iterator's nodes. Called again after every
+  //! assignment from a base iterator, which copies the base's empty anchor over ours.
+  void anchorPhysNodes() { m_positionStorage = m_physNodes; }
+
 public:
-  InfomapIteratorPhysical() : InfomapIterator() { }
+  InfomapIteratorPhysical() {}
 
   InfomapIteratorPhysical(InfoNode* nodePointer, int moduleIndexLevel = -1)
-      : InfomapIterator(nodePointer, moduleIndexLevel) { }
+      : InfomapIterator(nodePointer, moduleIndexLevel) {}
 
   ~InfomapIteratorPhysical() override = default;
   InfomapIteratorPhysical(const InfomapIteratorPhysical&) = default;
-  InfomapIteratorPhysical(const InfomapIterator& other) : InfomapIterator(other) { }
+  InfomapIteratorPhysical(const InfomapIterator& other) : InfomapIterator(other) {}
 
   InfomapIteratorPhysical(InfomapIteratorPhysical&&) = default;
   InfomapIteratorPhysical& operator=(const InfomapIteratorPhysical&) = default;
@@ -225,7 +268,12 @@ public:
   {
     InfomapIteratorPhysical copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
+  }
+
+  InfomapIterator copy() const noexcept override
+  {
+    return InfomapIteratorPhysical(*this);
   }
 
   using InfomapIterator::childIndex;
@@ -242,13 +290,15 @@ public:
  */
 struct InfomapLeafIteratorPhysical : public InfomapIteratorPhysical {
 public:
-  InfomapLeafIteratorPhysical() : InfomapIteratorPhysical() { }
+  InfomapLeafIteratorPhysical() {}
 
   InfomapLeafIteratorPhysical(InfoNode* nodePointer, int moduleIndexLevel = -1)
       : InfomapIteratorPhysical(nodePointer, moduleIndexLevel) { init(); }
 
-  InfomapLeafIteratorPhysical(const InfomapLeafIteratorPhysical& other)
-      : InfomapIteratorPhysical(other) { init(); }
+  // No init() here: a copy has to stand where the source stands. init() advances past
+  // non-leaves, so on a leaf position it is a no-op and on any other position it moves
+  // the copy somewhere the source never was (#900).
+  InfomapLeafIteratorPhysical(const InfomapLeafIteratorPhysical& other) = default;
 
   ~InfomapLeafIteratorPhysical() override = default;
   InfomapLeafIteratorPhysical(InfomapLeafIteratorPhysical&&) = default;
@@ -268,7 +318,12 @@ public:
   {
     InfomapLeafIteratorPhysical copy(*this);
     ++(*this);
-    return std::move(copy);
+    return copy;
+  }
+
+  InfomapIterator copy() const noexcept override
+  {
+    return InfomapLeafIteratorPhysical(*this);
   }
 
   using InfomapIteratorPhysical::childIndex;
@@ -290,7 +345,7 @@ protected:
 public:
   InfomapParentIterator() = default;
 
-  InfomapParentIterator(InfoNode* nodePointer) : m_current(nodePointer) { }
+  InfomapParentIterator(InfoNode* nodePointer) : m_current(nodePointer) {}
 
   ~InfomapParentIterator() = default;
 

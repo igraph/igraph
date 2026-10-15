@@ -10,7 +10,7 @@
 #ifndef INFOEDGE_H_
 #define INFOEDGE_H_
 
-#include <iostream>
+#include <iosfwd>
 
 namespace infomap {
 
@@ -18,7 +18,7 @@ struct EdgeData {
 public:
   EdgeData() = default;
 
-  EdgeData(double weight, double flow) : weight(weight), flow(flow) { }
+  EdgeData(double weight, double flow) : weight(weight), flow(flow) {}
 
   double weight;
   double flow;
@@ -26,12 +26,22 @@ public:
 
 class InfoNode;
 
+#ifndef SWIG
+// Internal allocation plumbing; kept out of the SWIG bindings so the pool type
+// does not leak into the generated wrappers.
+class InfoEdge;
+
+template <typename T>
+class ObjectPool;
+using EdgePool = ObjectPool<InfoEdge>;
+#endif
+
 class InfoEdge {
 public:
   InfoEdge(InfoNode& source, InfoNode& target, double weight, double flow)
       : data(weight, flow),
         source(&source),
-        target(&target) { }
+        target(&target) {}
 
   InfoNode& other(InfoNode& node) const;
 

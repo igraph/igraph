@@ -23,7 +23,7 @@ public:
       : m_capacity(capacity),
         m_values(capacity),
         m_redirect(capacity, 0),
-        m_maxOffset(std::numeric_limits<unsigned int>::max() - 1 - capacity) { }
+        m_maxOffset(std::numeric_limits<unsigned int>::max() - 1 - capacity) {}
 
   void startRound()
   {
@@ -37,12 +37,14 @@ public:
     }
   }
 
-  void add(unsigned int index, T value)
+  void add(unsigned int index, const T& value)
   {
     if (isSet(index)) {
       m_values[m_redirect[index] - m_offset] += value;
     } else {
       m_redirect[index] = m_offset + m_size;
+      // m_values is pre-sized to capacity: callers hold references into it
+      // across add() calls, so it must never reallocate within a round.
       m_values[m_size] = value;
       ++m_size;
     }
@@ -56,6 +58,11 @@ public:
   unsigned int size()
   {
     return m_size;
+  }
+
+  unsigned int capacity() const
+  {
+    return m_capacity;
   }
 
   T& operator[](unsigned int index)
