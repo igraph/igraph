@@ -1,0 +1,9 @@
+# .git is deliberately kept: CMake derives the version number from it.
+/build
+/build-*
+/Testing
+/tags
+/interfaces/.venv
+*~
+.*.swp
+.vscode
