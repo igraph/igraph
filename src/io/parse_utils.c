@@ -32,8 +32,8 @@
  */
 void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res, size_t *res_len) {
     const char *beg = str, *end = str + str_len;
-    while (beg < end && isspace(beg[0]) ) beg++;
-    while (end > beg && isspace(end[-1])) end--;
+    while (beg < end && isspace((unsigned char) beg[0]) ) beg++;
+    while (end > beg && isspace((unsigned char) end[-1])) end--;
     *res = beg;
     *res_len = end - beg;
 }

@@ -281,7 +281,7 @@ static igraph_error_t pajek_escape(const char* src, char** dest) {
         } else if (*s == '"') {
             need_escape = true;
             destlen += 4;
-        } else if (!isalnum(*s)) {
+        } else if (!isalnum((unsigned char) *s)) {
             need_escape = true;
         }
     }

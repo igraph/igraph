@@ -794,12 +794,12 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
     size_t i, len = strlen(orig), newlen = 0, plen = 0;
 
     /* do we need a prefix? */
-    if (len == 0 || !isalpha(orig[0])) {
+    if (len == 0 || !isalpha((unsigned char) orig[0])) {
         snprintf(strno, sizeof(strno) - 1, "igraph");
         plen = newlen = strlen(strno);
     }
     for (i = 0; i < len; i++) {
-        if (isalnum(orig[i])) {
+        if (isalnum((unsigned char) orig[i])) {
             newlen++;
         }
     }
@@ -807,7 +807,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
     IGRAPH_CHECK_OOM(*key, "Writing GML format failed.");
     memcpy(*key, strno, plen * sizeof(char));
     for (i = 0; i < len; i++) {
-        if (isalnum(orig[i])) {
+        if (isalnum((unsigned char) orig[i])) {
             (*key)[plen++] = orig[i];
         }
     }

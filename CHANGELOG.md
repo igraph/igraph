@@ -18,6 +18,7 @@
 - `igraph_lapack_dsyevr()` incorrectly reported an internal faiure in the `dsyevr` LAPACK routine as an invalid argument error. The issued error message now separates invalid argument errors from internal errors.
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eingevalues close to zero. This fixed a convergence issues in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
 - `igraph_hrg_fit()` returned an invalid, all-zero HRG model when `steps` was positive and none of the MCMC moves improved the likelihood of the initial dendrogram, e.g. for complete graphs. Using such a model in other HRG functions could crash igraph. The initial dendrogram is now returned in this case.
+- Resolved undefined behaviour when passing signed `char` to `<ctype.h>` functions in file format parsers. The issue could potentially cause out-of-bounds access when igraph was compiled with MSVC. Thanks to Riha Ilyas @riha-dev for fixing this (PR #2944)!
 - `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
 
 ### Other
