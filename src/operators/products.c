@@ -512,7 +512,7 @@ static igraph_error_t modular_product(igraph_t *res,
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
  *         graphs \p g1 and \p g2 are incompatible for the requested product.
  *
- * \sa \ref igraph_rooted_product() for the rooted product.
+ * \sa \ref igraph_rooted_product(), \ref igraph_corona_product() for other types of graph products.
  */
 
 igraph_error_t igraph_product(igraph_t *res,
@@ -571,11 +571,11 @@ igraph_error_t igraph_product(igraph_t *res,
  * \param root The root vertex id of the second graph.
  *
  * \return Error code:
- *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input
- *         graphs \p g1 and \p g2 are incompatible for the requested product.
+ *         \c IGRAPH_EINVAL if the input graphs \p g1 and \p g2 are incompatible
+ *         for the rooted product.
  *         \c IGRAPH_EINVVID if invalid vertex ID passed as \p root.
  *
- * \sa \ref igraph_product() for other types of graph products.
+ * \sa \ref igraph_product(), \ref igraph_corona_product() for other types of graph products.
  *
  * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1|)
  * where |V1| and |V2| are the number of vertices, and
@@ -641,6 +641,137 @@ igraph_error_t igraph_rooted_product(igraph_t *res,
             VECTOR(edges)[edge_index++] = j * vcount2 + from; // ((j, from))
             VECTOR(edges)[edge_index++] = j * vcount2 + to; // ((j, to))
         }
+    }
+
+    IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_corona_product
+ * \brief The corona graph product of two graphs.
+ *
+ * \experimental
+ *
+ * This function computes the corona product of two graphs. The two graphs
+ * must be of the same type, either directed or undirected. If a product of
+ * an undirected and a directed graph is required, convert one of them to the
+ * appropriate type using \ref igraph_to_directed() or \ref igraph_to_undirected().
+ *
+ * </para><para>
+ * There are |V1| copies of the second graph, and the first graph is the
+ * center graph. Thus, the number of vertices in the product graph is
+ * <code>|V1| * (|V2| + 1)</code>. The vertex IDs in the product graph may be
+ * represented as <code>(i, j)</code>, where <code>0 &lt;= i &lt; |V1|</code> and
+ * <code>0 &lt;= j &lt;= |V2|</code>. The vertex ID <code>(i, 0)</code> corresponds to
+ * the center graph, and the vertex ID <code>(i, j)</code> for <code>j &gt; 0</code>
+ * corresponds to the <code>i-th</code> copy of vertex ID <code>(j-1)</code> of
+ * graph \p g2. Then <code>(i, j)</code> is mapped to a unique vertex index in
+ * the product graph using <code>index = i * (|V2| + 1) + j</code>.
+ *
+ * </para><para>
+ * In the corona product graph of G and H, the central graph is G, and all
+ * the vertices of i-th copy of H are connected to the i-th vertex of G.
+ * Thus, the number of edges in the product graph is
+ * <code>|V1| |E2| + |V1| |V2| + |E1|</code>.
+ *
+ * \param res Pointer to an uninitialized graph object. The product graph will
+ *   be stored here.
+ * \param g1 The first operand graph.
+ * \param g2 The second operand graph. It must have the same directedness as \p g1.
+ * \param mode The direction of the edges in the product graph from the centre graph
+ *  to the copies of the second graph. It can be one of \c IGRAPH_OUT or \c IGRAPH_IN.
+ *  It is ignored if the operands are undirected.
+ *
+ * \return Error code:
+ *         \c IGRAPH_EINVAL if the input graphs \p g1 and \p g2 are incompatible
+ *         for the corona product.
+ *
+ * \sa \ref igraph_product(), \ref igraph_rooted_product() for other types of graph products.
+ *
+ * Time complexity: O(|V1| |V2| + |V1| |E2| + |E1| + |V1|)
+ * where |V1| and |V2| are the number of vertices, and
+ * |E1| and |E2| are the number of edges of the operands.
+ */
+
+igraph_error_t igraph_corona_product(igraph_t *res,
+                                     const igraph_t *g1,
+                                     const igraph_t *g2,
+                                     igraph_neimode_t mode) {
+
+    const igraph_bool_t directed = igraph_is_directed(g1);
+
+    if (igraph_is_directed(g2) != directed) {
+        IGRAPH_ERROR("Corona product between a directed and an undirected graph is invalid.",
+                     IGRAPH_EINVAL);
+    }
+
+    const igraph_integer_t vcount1 = igraph_vcount(g1);
+    const igraph_integer_t vcount2 = igraph_vcount(g2);
+
+    const igraph_integer_t ecount1 = igraph_ecount(g1);
+    const igraph_integer_t ecount2 = igraph_ecount(g2);
+    igraph_integer_t vcount;
+    igraph_integer_t ecount, ecount_double;
+    igraph_vector_int_t edges;
+
+    // New vertex count = vcount1 * (vcount2+1)
+    IGRAPH_SAFE_MULT(vcount1, vcount2, &vcount);
+    IGRAPH_SAFE_ADD(vcount, vcount1, &vcount);
+
+    // No. of edges: e1 + v1.e2 + v1.v2
+    {
+        igraph_integer_t tmp;
+        IGRAPH_SAFE_MULT(vcount1, vcount2, &tmp);
+        IGRAPH_SAFE_MULT(vcount1, ecount2, &ecount);
+        IGRAPH_SAFE_ADD(tmp, ecount, &ecount);
+        IGRAPH_SAFE_ADD(ecount1, ecount, &ecount);
+    }
+
+    IGRAPH_SAFE_MULT(ecount, 2, &ecount_double);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ecount_double);
+    // Indexing of vertex: (i, j), 0 <= i < v1, 0 <= j <=v2
+    igraph_integer_t edge_index = 0;
+    // if j = 0, then it is the centre graph, else it is the copy of graph g2
+    // types of edges: 1. (i, 0) to (i, j) for j != 0 --> centre to outer graph edges --> v1.v2
+    //      2. (i, u+1) to (i, v+1) for each i and edge u-->v exists in g2 --> edges of g2 in copies of g2 --> v1.e2
+    //      3. (u, 0) to (v, 0) for every edge (u,v) in g1 --> original edge of g1 --> e1
+
+    for (igraph_integer_t i = 0; i < vcount1; ++i) {
+        // Type 1 Edge:
+        for (igraph_integer_t j = 1; j <= vcount2; ++j) {
+            // If IGRAPH_ALL is given, it will still add edges from centre to out
+            if (mode & IGRAPH_OUT) {
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1);
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + j;
+            }
+            else if (mode & IGRAPH_IN) {
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + j;
+                VECTOR(edges)[edge_index++] = i * (vcount2 + 1);
+            }
+        }
+
+        // Type 2 Edge
+        for (igraph_integer_t j = 0; j < ecount2; j++) {
+            igraph_integer_t from = IGRAPH_FROM(g2, j);
+            igraph_integer_t to = IGRAPH_TO(g2, j);
+
+            VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + (from + 1);
+            VECTOR(edges)[edge_index++] = i * (vcount2 + 1) + (to + 1);
+        }
+    }
+
+    // Type 3 Edge:
+    for (igraph_integer_t i = 0; i < ecount1; ++i) {
+        igraph_integer_t from = IGRAPH_FROM(g1, i);
+        igraph_integer_t to = IGRAPH_TO(g1, i);
+
+        VECTOR(edges)[edge_index++] = from * (vcount2 + 1);
+        VECTOR(edges)[edge_index++] = to * (vcount2 + 1);
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, vcount, directed));
