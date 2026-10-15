@@ -300,6 +300,12 @@ igraph_error_t igraph_is_potentially_connected(
         IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
     }
 
+    if (!multigraph && loopy && mode == IGRAPH_STRONG) {
+        /* Strongly connected for simple graphs with self-loops unimplemented */
+        IGRAPH_ERROR("Potentially strongly connected check is not implemented"
+                     " for simple directed graphs with loops.", IGRAPH_UNIMPLEMENTED);
+    }
+
     if (directed) {
         if (igraph_vector_int_size(in_degrees) != n) {
             IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
@@ -388,8 +394,8 @@ igraph_error_t igraph_is_potentially_connected(
             return IGRAPH_SUCCESS;
         }
         if (loopy) {
-            /* Strongly connected for simple graphs with self-loops unimplemented */
-            return IGRAPH_UNIMPLEMENTED;
+            /* TODO: Implement potentially strongly connected for loopy simple directed graph case.
+             * This is now caught at the beginning of this function and IGRAPH_UNIMPLEMENTED is returned. */
         }
 
         /* Assume simple loopless now */
@@ -451,7 +457,7 @@ igraph_error_t igraph_is_potentially_connected(
         }
 
 
-        /* The sequence has a strongly connected realization unless a subset 
+        /* The sequence has a strongly connected realization unless a subset
          * of the first k vertices, in non-increasing order of out-degree,
          * has fewer incoming edges than outgoing ones, that is unless the
          * Beineke-Harary / Hong-Liu-Lai condition fails for some k.
