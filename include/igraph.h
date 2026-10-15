@@ -66,6 +66,7 @@
 #include "igraph_motifs.h"
 #include "igraph_operators.h"
 #include "igraph_flow.h"
+#include "igraph_path_cover.h"
 #include "igraph_nongraph.h"
 #include "igraph_cocitation.h"
 #include "igraph_adjlist.h"

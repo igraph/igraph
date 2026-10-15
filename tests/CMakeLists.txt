@@ -642,6 +642,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_all_st_mincuts
   igraph_dominator_tree
+  igraph_minimum_path_cover
   igraph_st_mincut_value
   igraph_vertex_disjoint_paths
   igraph_adhesion
@@ -1031,6 +1032,7 @@ add_benchmarks(
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
+  igraph_minimum_path_cover
   igraph_nearest_neighbor_graph
   igraph_neighborhood
   igraph_pagerank
