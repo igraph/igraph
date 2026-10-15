@@ -398,7 +398,8 @@ igraph_error_t igraph_is_potentially_connected(
         igraph_vector_int_t sorted_in_degrees, sorted_out_degrees;
         igraph_vector_int_t over;
         igraph_int_t lhs, rhs_sum;
-
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, n);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, n);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degree_cumcounts, n+1);
 
         /* Compute out_degree_cumcounts[d+1] to be the no. of out-degrees == d */
@@ -408,7 +409,9 @@ igraph_error_t igraph_is_potentially_connected(
             if (indeg >= n || outdeg >= n) {
                 *res = false;
                 igraph_vector_int_destroy(&out_degree_cumcounts);
-                IGRAPH_FINALLY_CLEAN(1);
+                igraph_vector_int_destroy(&sorted_in_degrees);
+                igraph_vector_int_destroy(&sorted_out_degrees);
+                IGRAPH_FINALLY_CLEAN(3);
                 return IGRAPH_SUCCESS;
             }
             VECTOR(out_degree_cumcounts)[outdeg + 1]++;
@@ -418,9 +421,6 @@ igraph_error_t igraph_is_potentially_connected(
         for (igraph_int_t outdeg = 0; outdeg < n; outdeg++) {
             VECTOR(out_degree_cumcounts)[outdeg+1] += VECTOR(out_degree_cumcounts)[outdeg];
         }
-
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_out_degrees, n);
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&sorted_in_degrees, n);
 
         /* In the following loop, out_degree_counts[d] keeps track of the number of vertices
          * with out-degree d that were already placed. */
