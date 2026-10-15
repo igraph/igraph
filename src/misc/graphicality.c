@@ -296,9 +296,14 @@ igraph_error_t igraph_is_potentially_connected(
 
     if (!directed) {
         mode = IGRAPH_WEAK;
+    } else if (mode != IGRAPH_WEAK && mode != IGRAPH_STRONG) {
+        IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
     }
 
     if (directed) {
+        if (igraph_vector_int_size(in_degrees) != n) {
+            IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
+        }
         igraph_integer_t outdegsum = 0, indegsum = 0;
 
         for (igraph_integer_t i=0; i < n; i++) {
