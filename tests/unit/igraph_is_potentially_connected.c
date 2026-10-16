@@ -24,25 +24,15 @@ void potentially_connected_print_destroy(igraph_vector_int_t *ds) {
 
     print_vector_int(ds);
 
-    igraph_is_graphical(ds, NULL, IGRAPH_SIMPLE_SW, &g_simple);
-    if (g_simple) {
-        igraph_is_potentially_connected(ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &c_simple);
-    }
-
-    igraph_is_graphical(ds, NULL, IGRAPH_LOOPS_SW, &g_loops);
-    if (g_loops) {
-        igraph_is_potentially_connected(ds, NULL, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &c_loops);
-    }
-
     igraph_is_graphical(ds, NULL, IGRAPH_MULTI_SW, &g_multi);
-    if (g_multi) {
-        igraph_is_potentially_connected(ds, NULL, IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multi);
-    }
-
     igraph_is_graphical(ds, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &g_multiloops);
-    if (g_multiloops) {
-        igraph_is_potentially_connected(ds, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multiloops);
-    }
+    igraph_is_graphical(ds, NULL, IGRAPH_LOOPS_SW, &g_loops);
+    igraph_is_graphical(ds, NULL, IGRAPH_SIMPLE_SW, &g_simple);
+
+    igraph_is_potentially_connected(ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &c_simple);
+    igraph_is_potentially_connected(ds, NULL, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &c_loops);
+    igraph_is_potentially_connected(ds, NULL, IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multi);
+    igraph_is_potentially_connected(ds, NULL, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &c_multiloops);
 
     printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n\n",
            g_simple     ? bool_str(c_simple)     : "  n/a",
@@ -71,25 +61,18 @@ void directed_potentially_connected_print_destroy(igraph_vector_int_t *ods, igra
     igraph_is_graphical(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &g_multiloops);
 
     for (igraph_connectedness_t conn_mode = IGRAPH_WEAK; conn_mode <= IGRAPH_STRONG; conn_mode++) {
-        if (g_simple) {
-            igraph_is_potentially_connected(ods, ids, IGRAPH_SIMPLE_SW, conn_mode, &c_simple);
+
+        igraph_is_potentially_connected(ods, ids, IGRAPH_SIMPLE_SW, conn_mode, &c_simple);
+        if (conn_mode == IGRAPH_WEAK) {
+            igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops);
+        } else {
+            CHECK_ERROR(
+                igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops),
+                IGRAPH_UNIMPLEMENTED
+            );
         }
-        if (g_loops) {
-            if (conn_mode == IGRAPH_WEAK) {
-                igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops);
-            } else {
-                CHECK_ERROR(
-                    igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW, conn_mode, &c_loops),
-                    IGRAPH_UNIMPLEMENTED
-                );
-            }
-        }
-        if (g_multi) {
-            igraph_is_potentially_connected(ods, ids, IGRAPH_MULTI_SW, conn_mode, &c_multi);
-        }
-        if (g_multiloops) {
-            igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, conn_mode, &c_multiloops);
-        }
+        igraph_is_potentially_connected(ods, ids, IGRAPH_MULTI_SW, conn_mode, &c_multi);
+        igraph_is_potentially_connected(ods, ids, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, conn_mode, &c_multiloops);
 
         printf("simple: %s, loops: %s, multi: %s, multiloops: %s\n",
                g_simple                                    ? bool_str(c_simple)     : "  n/a",
@@ -204,8 +187,7 @@ int main(void) {
     igraph_vector_int_init_int_end(&ids, -1, 1, 1, 3, 3, -1);
     directed_potentially_connected_print_destroy(&ods, &ids);
 
-
     VERIFY_FINALLY_STACK();
-
+    
     return 0;
 }
