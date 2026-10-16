@@ -280,6 +280,10 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  * \param res Pointer to a Boolean. The result will be stored here.
  *
  * \return Error code.
+ * 
+ * \sa \ref igraph_is_graphical
+ *
+ * Time complexity: O(n), where n is the length of the degree sequence(s).
  */
 igraph_error_t igraph_is_potentially_connected(
         const igraph_vector_int_t *out_degrees,
