@@ -276,7 +276,9 @@ igraph_error_t igraph_is_bigraphical(const igraph_vector_int_t *degrees1,
  *     \endclist
  * \param mode Can be \c IGRAPH_WEAK or \c IGRAPH_STRONG. Controls checking
  *     for a weakly or strongly connected realization of the degrees.
- *     Ignored in the undirected case.
+ *     Ignored in the undirected case. For directed graphs, \c IGRAPH_STRONG
+ *     with self-loops allowed but multi-edges disallowed is not implemented
+ *     and returns \c IGRAPH_UNIMPLEMENTED.
  * \param res Pointer to a Boolean. The result will be stored here.
  *
  * \return Error code.
