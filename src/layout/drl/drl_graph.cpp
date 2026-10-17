@@ -822,6 +822,7 @@ void graph::update_nodes ( ) {
     bool all_fixed;                     // check if all nodes are fixed
 
     // initial node list consists of 0,1,...,num_procs
+    node_indices.reserve( num_procs );
     for ( int i = 0; i < num_procs; i++ ) {
         node_indices.push_back( i );
     }
