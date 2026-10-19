@@ -83,10 +83,12 @@ int main(void) {
     check_cycles(&g, IGRAPH_OUT, 1);
     igraph_destroy(&g);
 
-    // printf("\nTesting large directed cycle graph\n");
-    // igraph_ring(&g, 10000, IGRAPH_DIRECTED, /*mutual=*/ false, /*circular=*/ true);
-    // check_cycles(&g, 1);
-    // igraph_destroy(&g);
+    printf("\nTesting large directed cycle graph\n");
+    igraph_ring(&g, 10000, IGRAPH_DIRECTED, /*mutual=*/ false, /*circular=*/ true);
+    check_cycles(&g, IGRAPH_OUT, 1);
+    check_cycles(&g, IGRAPH_IN, 1);
+    check_cycles(&g, IGRAPH_ALL, 1);
+    igraph_destroy(&g);
 
     printf("\nTesting directed star\n");
     igraph_star(&g, 7, IGRAPH_STAR_OUT, 1);
@@ -433,6 +435,22 @@ int main(void) {
                      5, 5,
                      -1);
     check_cycles(&g, IGRAPH_ALL, 6);
+    igraph_destroy(&g);
+
+    // https://github.com/igraph/igraph/issues/2911
+    // The only cycle is the 2-cycle 2 <-> 5.
+    printf("\nTesting directed graph with a single 2-cycle (issue #2911)\n");
+    igraph_small(&g, 6, IGRAPH_DIRECTED,
+                 0, 1,
+                 0, 5,
+                 1, 5,
+                 2, 5,
+                 4, 3,
+                 4, 5,
+                 5, 2,
+                 5, 3,
+                 -1);
+    check_cycles(&g, IGRAPH_OUT, 1);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

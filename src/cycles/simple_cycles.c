@@ -456,8 +456,16 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
         igraph_cycle_handler_t *callback,
         void *arg) {
 
-    // L3:
-    for (igraph_int_t i = s; i < state->N; ++i) {
+    // L3: reset the blocked flags and B lists before the search.
+    //
+    // This must cover *all* vertices, not only those with index >= s.
+    // Johnson's algorithm removes each start vertex after its search, so in the
+    // original algorithm the vertices below s are gone. Here, however, start
+    // vertices may be skipped (see igraph_simple_cycles_callback()). Skipped
+    // vertices are never removed, and an earlier search may have left them
+    // blocked. Stale state on such vertices caused cycles to be missed, see
+    // https://github.com/igraph/igraph/issues/2911
+    for (igraph_int_t i = 0; i < state->N; ++i) {
         IGRAPH_BIT_CLEAR(state->v_blocked, i);
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
@@ -539,15 +547,24 @@ igraph_error_t igraph_simple_cycles_callback(
     IGRAPH_CHECK(simple_cycle_search_state_init(&state, graph, mode));
     IGRAPH_FINALLY(simple_cycle_search_state_destroy, &state);
 
-    // Depending on the graph, it is rather unreasonable to search cycles
-    // from each and every node. Instead, we expect that each cycle must involve
-    // either:
-    // - a vertex with degree > 2
-    // - or, if it's a freestanding cycle, be any vertex of this connected component;
-    //   components are identified via the `state->v_visited` boolean mask.
+    // It is not necessary to start a search from every vertex. A vertex is
+    // skipped as a start vertex if its undirected degree (counting self-loops
+    // twice and parallel edges separately) is less than 3, and an earlier
+    // search has already visited it. This does not lose any cycles:
     //
-    // Thus, we iterate over the vertices, and check if they can be skipped as
-    // a starting point according to the rules laid out above.
+    // - Each cycle is found by the search from the first of its vertices that
+    //   is used as a start vertex, so it is enough that at least one of its
+    //   vertices is used. A cycle that contains a vertex of degree >= 3
+    //   satisfies this, since such vertices are never skipped.
+    // - Suppose instead that every vertex of a cycle has degree 2. Then the
+    //   cycle's vertices have no other edges, so the cycle forms an entire
+    //   weakly connected component. No search that starts in another component
+    //   can enter it, so the lowest-numbered vertex of the cycle is still
+    //   unvisited when the loop below reaches it, and it is used as a start.
+    //
+    // Skipped vertices are never removed from the graph, unlike the vertices
+    // that were used as starts. The per-search state must therefore be reset
+    // for them as well; see simple_cycles_search_callback_from_one_vertex().
     for (igraph_int_t i = 0; i < state.N; i++) {
         // Check if the vertex is a candidate for a cycle.
         // Note that we call igraph_degree_1() here instead of retrieving the

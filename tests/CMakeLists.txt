@@ -361,6 +361,7 @@ add_legacy_tests(
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_rooted_product
   igraph_simple_cycles
+  igraph_simple_cycles_random
   igraph_similarity
   igraph_transitive_closure
   igraph_transitivity_avglocal_undirected
