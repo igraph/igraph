@@ -46,7 +46,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_vector_bool_t bv;
         igraph_matrix_t m;
         igraph_int_t i, i2;
-        igraph_bool_t b, b2, loop, multi, graphical;
+        igraph_bool_t b, b2;
+        igraph_bool_t loop, multi;
+        igraph_bool_t graphical;
+        igraph_bool_t weakly_connected, strongly_connected;
+        igraph_bool_t potentially_weakly_connected, potentially_strongly_connected;
         igraph_real_t r;
         igraph_t g;
 
@@ -73,13 +77,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         igraph_reciprocity(&graph, &r, true, IGRAPH_RECIPROCITY_DEFAULT);
 
         /* Graphicality and graph realization based on the degrees of 'graph'. */
+        igraph_is_connected(&graph, &weakly_connected, IGRAPH_WEAK);
+        igraph_is_connected(&graph, &strongly_connected, IGRAPH_STRONG);
         igraph_has_loop(&graph, &loop);
         igraph_has_multiple(&graph, &multi);
         igraph_degree(&graph, &iv1, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
         igraph_degree(&graph, &iv2, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
         igraph_is_graphical(&iv1, &iv2, IGRAPH_SIMPLE_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_WEAK, &potentially_weakly_connected);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_STRONG, &potentially_strongly_connected);
         if (!loop && !multi) {
             IGRAPH_ASSERT(graphical);
+            if (weakly_connected) IGRAPH_ASSERT(potentially_weakly_connected);
+            if (strongly_connected) IGRAPH_ASSERT(potentially_strongly_connected);
         }
         if (graphical) {
             igraph_realize_degree_sequence(&g, &iv1, &iv2, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
@@ -100,8 +110,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 IGRAPH_EINVAL);
         }
         igraph_is_graphical(&iv1, &iv2, IGRAPH_LOOPS_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_LOOPS_SW, IGRAPH_WEAK, &potentially_weakly_connected);
+        // Unimplemented:
+        // igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_LOOPS_SW, IGRAPH_STRONG, &potentially_strongly_connected);
         if (!multi) {
             IGRAPH_ASSERT(graphical);
+            if (weakly_connected) IGRAPH_ASSERT(potentially_weakly_connected);
+            // Unimplemented:
+            // if (strongly_connected) IGRAPH_ASSERT(potentially_strongly_connected);
         }
         if (graphical) {
             /* Directed realization with loops but no multi-edges is not yet implemented. */
@@ -124,12 +140,20 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
                 IGRAPH_EINVAL);
         }
         igraph_is_graphical(&iv1, &iv2, IGRAPH_MULTI_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_MULTI_SW, IGRAPH_WEAK, &potentially_weakly_connected);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_MULTI_SW, IGRAPH_STRONG, &potentially_strongly_connected);
         if (!loop) {
             IGRAPH_ASSERT(graphical);
+            if (weakly_connected) IGRAPH_ASSERT(potentially_weakly_connected);
+            if (strongly_connected) IGRAPH_ASSERT(potentially_strongly_connected);
             /* Directed realization with multi-edges but no loops is not yet implemented. */
         }
         igraph_is_graphical(&iv1, &iv2, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &graphical);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_WEAK, &potentially_weakly_connected);
+        igraph_is_potentially_connected(&iv1, &iv2, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, IGRAPH_STRONG, &potentially_strongly_connected);
         IGRAPH_ASSERT(graphical);
+        if (weakly_connected) IGRAPH_ASSERT(potentially_weakly_connected);
+        if (strongly_connected) IGRAPH_ASSERT(potentially_strongly_connected);
         /* Directed realization with loops and multi-edges is not yet implemented. */
         /* Realize as bipartite (equivalent). */
         igraph_realize_bipartite_degree_sequence(&g, &iv1, &iv2, IGRAPH_MULTI_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
