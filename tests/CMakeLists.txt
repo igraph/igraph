@@ -854,6 +854,11 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
+  FOLDER tests/unit NAMES
+  cut_separator_validity
+)
+
+add_legacy_tests(
   FOLDER tests/regression NAMES
   bug-1033045
 )
