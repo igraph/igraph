@@ -22,19 +22,19 @@
 
 /**
  * \function igraph_atlas
- * \brief Create a small graph from the \quote Graph Atlas \endquote.
+ * \brief Creates a small graph from the \quote Graph Atlas \endquote.
  *
  * The graph atlas contains all simple undirected unlabeled graphs on between
  * 0 and 7 vertices. The number of the graph is given as a parameter.
  * The graphs are listed:
  *      \olist
- *      \oli in increasing order of number of vertices;
+ *      \oli in increasing order of the number of vertices;
  *      \oli for a fixed number of vertices, in increasing order of the
  *           number of edges;
  *      \oli for fixed numbers of vertices and edges, in lexicographically
  *           increasing order of the degree sequence, for example
  *           111223 &lt; 112222;
- *      \oli for fixed degree sequence, in increasing number of
+ *      \oli for a fixed degree sequence, in increasing number of
  *           automorphisms.
  *      \endolist
  *
@@ -48,7 +48,7 @@
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param number The number of the graph to generate. Must be between 0 and
- *    1252 (inclusive). Graphs on 0-7 vertices start at numbers 0, 1, 2, 4,
+ *    1252 (inclusive). Graphs on 0–7 vertices start at numbers 0, 1, 2, 4,
  *    8, 19, 53, and 209, respectively.
  * \return Error code.
  *

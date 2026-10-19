@@ -69,7 +69,7 @@ static igraph_real_t total_possible_edges(igraph_int_t vcount,
  * \param weights Vector of edge weights. If \c NULL all weights are
  *    assumed to be 1.
  * \param res Initialized vector, the result will be written here. <code>res[i]</code>
- *    contain the density of the remaining graph after \c i vertices have been
+ *    contains the density of the remaining graph after \c i vertices have been
  *    removed. If \p normalized is set to \c false, it contains the remaining
  *    edge count (or remaining total edge weights if weights were given).
  * \param vertex_order Vector giving the order in which vertices are removed.

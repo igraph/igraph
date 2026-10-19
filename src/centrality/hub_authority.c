@@ -215,7 +215,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * Results are scaled so that the largest hub and authority scores are both 1.
  *
  * </para><para>
- * The concept of hub and authority scores were developed for \em directed graphs.
+ * The concept of hub and authority scores was developed for \em directed graphs.
  * In undirected graphs, both the hub and authority scores are equal to the
  * eigenvector centrality, which can be computed using
  * \ref igraph_eigenvector_centrality().
@@ -229,17 +229,17 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
- * Algorithms, \eme 1998. Extended version in \emb Journal of the
- * ACM \eme 46 (1999).
+ * Algorithms\eme, 1998. Extended version in \emb Journal of the
+ * ACM\eme 46 (1999).
  * https://doi.org/10.1145/324133.324140
  * Also appears as IBM Research Report RJ 10076, May 1997.
  *
- * \param graph The input graph. Can be directed and undirected.
+ * \param graph The input graph. Can be directed or undirected.
  * \param hub_vector Pointer to an initialized vector, the hub scores are
- *    stored here. If a null pointer then it is ignored.
+ *    stored here. If a null pointer, then it is ignored.
  * \param authority_vector Pointer to an initialized vector, the authority
- *    scores are stored here. If a null pointer then it is ignored.
- * \param value If not a null pointer then the eigenvalue
+ *    scores are stored here. If a null pointer, then it is ignored.
+ * \param value If not a null pointer, then the eigenvalue
  *    corresponding to the calculated eigenvectors is stored here.
  * \param weights A null pointer (meaning no edge weights), or a vector
  *     giving the weights of the edges.
@@ -250,7 +250,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  *    the degree of the vertices.
  * \return Error code.
  *
- * Time complexity: depends on the input graph, usually it is O(|V|),
+ * Time complexity: depends on the input graph; usually it is O(|V|),
  * the number of vertices.
  *
  * \sa \ref igraph_pagerank(), \ref igraph_personalized_pagerank();

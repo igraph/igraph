@@ -138,11 +138,11 @@ static void igraph_rng_mt19937_destroy(void *vstate) {
  * comparable in speed to the other generators. The original generator
  * used a default seed of 4357 and choosing \c s equal to zero in
  * \c igraph_rng_mt19937_seed() reproduces this. Later versions switched to
- * 5489 as the default seed, you can choose this explicitly via
+ * 5489 as the default seed; you can choose this explicitly via
  * \ref igraph_rng_seed() instead if you require it.
  *
  * </para><para>
- * For more information see,
+ * For more information, see
  * Makoto Matsumoto and Takuji Nishimura, “Mersenne Twister: A
  * 623-dimensionally equidistributed uniform pseudorandom number
  * generator”. ACM Transactions on Modeling and Computer Simulation,

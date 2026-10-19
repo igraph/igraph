@@ -41,7 +41,7 @@ IGRAPH_BEGIN_C_DECLS
  * R boolean vectors and treat them as an igraph_vector_bool_t, which requires
  * us to align igraph_bool_t with R's boolean type.
  *
- * Any other use-case of overriding igraph's bool type is completely
+ * Any other use case of overriding igraph's bool type is completely
  * unsupported.
  */
 #define IGRAPH_BOOL_TYPE bool

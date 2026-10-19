@@ -11,7 +11,7 @@
 graph every time they are called. igraph includes many such generators.
 Some implement stochastic graph construction processes inspired by real-world
 mechanics, such as preferential attachment, while others are designed to
-produce graphs with certain used properties (e.g. fixed number of edges,
+produce graphs with specified properties (e.g. fixed number of edges,
 fixed degrees, etc.)</para>
 
 <section id="erdos-renyi-games"><title>The Erdős-Rényi and related models</title>

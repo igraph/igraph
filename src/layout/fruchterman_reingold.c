@@ -322,10 +322,10 @@ static igraph_error_t igraph_layout_i_grid_fr(
  *        of movement allowed along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
- * \param grid Whether to use the (fast but less accurate) grid based
+ * \param grid Whether to use the (fast but less accurate) grid-based
  *        version of the algorithm. Possible values: \c
  *        IGRAPH_LAYOUT_GRID, \c IGRAPH_LAYOUT_NOGRID, \c
- *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid based
+ *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid-based
  *        version only for large graphs, currently the ones with
  *        more than 1000 vertices.
  * \param weights Pointer to a vector containing edge weights. Weights must
@@ -423,7 +423,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \function igraph_layout_fruchterman_reingold_3d
  * \brief 3D Fruchterman-Reingold algorithm.
  *
- * This is the 3D version of the force based Fruchterman-Reingold layout.
+ * This is the 3D version of the force-based Fruchterman-Reingold layout.
  * See \ref igraph_layout_fruchterman_reingold() for the 2D version.
  *
  * \param graph Pointer to an initialized graph object.
@@ -435,7 +435,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param start_temp Start temperature. This is the maximum amount
- *        of movement alloved along one axis, within one step, for a
+ *        of movement allowed along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
  * \param weights Pointer to a vector containing edge weights. Weights must

@@ -60,7 +60,7 @@ igraph_error_t igraph_status(const char *message, void *data) {
 
 /**
  * \function igraph_statusf
- * \brief Report status, more flexible printf-like version.
+ * \brief Reports status, more flexible printf-like version.
  *
  * This is the more flexible version of \ref igraph_status(),
  * that has a syntax similar to the \c printf standard C library function.
@@ -90,7 +90,7 @@ igraph_error_t igraph_statusf(const char *message, void *data, ...) {
 
 /**
  * \function igraph_status_handler_stderr
- * A simple predefined status handler function.
+ * \brief A simple predefined status handler function.
  *
  * A simple status handler function that writes the status
  * message to the standard error.
@@ -112,7 +112,7 @@ igraph_error_t igraph_status_handler_stderr(const char *message, void *data) {
 
 /**
  * \function igraph_set_status_handler
- * Install of uninstall a status handler function.
+ * \brief Installs or uninstalls a status handler function.
  *
  * To uninstall the currently installed status handler, call
  * this function with a null pointer.

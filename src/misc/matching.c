@@ -521,7 +521,7 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * graph.
  *
  * The algorithm works reliably only if the weights are integers. The
- * \c eps parameter should specity a very small number; if the slack on
+ * \c eps parameter should specify a very small number; if the slack on
  * an edge falls below \c eps, it will be considered tight. If all your
  * weights are integers, you can safely set \c eps to zero.
  */

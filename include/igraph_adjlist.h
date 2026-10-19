@@ -59,7 +59,7 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, i
 
 /**
  * \define igraph_adjlist_get
- * \brief Query a vector in an adjacency list.
+ * \brief Queries a vector in an adjacency list.
  *
  * Returns a pointer to an \ref igraph_vector_int_t object from an
  * adjacency list. The vector can be modified as desired.
@@ -88,7 +88,7 @@ IGRAPH_EXPORT igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, F
 
 /**
  * \define igraph_inclist_get
- * \brief Query a vector in an incidence list.
+ * \brief Queries a vector in an incidence list.
  *
  * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
  * incidence list containing edge IDs. The vector can be modified,
@@ -121,7 +121,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_lazy_adjlist_size(const i
 
 /**
  * \define igraph_lazy_adjlist_has
- * \brief Are adjacenct vertices already stored in a lazy adjacency list?
+ * \brief Are adjacent vertices already stored in a lazy adjacency list?
  *
  * \param al The lazy adjacency list.
  * \param no The vertex ID to query.
@@ -134,7 +134,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_lazy_adjlist_size(const i
 
 /**
  * \define igraph_lazy_adjlist_get
- * \brief Query neighbor vertices.
+ * \brief Queries neighbor vertices.
  *
  * If the function is called for the first time for a vertex then the
  * result is stored in the adjacency list and no further query
@@ -145,7 +145,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_lazy_adjlist_size(const i
  * \param no The vertex ID to query.
  * \return Pointer to a vector, or \c NULL upon error. Errors can only
  *   occur the first time this function is called for a given vertex.
- *   It is safe to modify this vector,
+ *   It is safe to modify this vector;
  *   modification does not affect the original graph.
  *
  * \sa \ref igraph_lazy_adjlist_has() to check if this function has
@@ -190,7 +190,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_lazy_inclist_size(const i
 
 /**
  * \define igraph_lazy_inclist_get
- * \brief Query incident edges.
+ * \brief Queries incident edges.
  *
  * If the function is called for the first time for a vertex, then the
  * result is stored in the incidence list and no further query
@@ -201,7 +201,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_int_t igraph_lazy_inclist_size(const i
  * \param no The vertex ID to query.
  * \return Pointer to a vector, or \c NULL upon error. Errors can only
  *   occur the first time this function is called for a given vertex.
- *   It is safe to modify this vector,
+ *   It is safe to modify this vector;
  *   modification does not affect the original graph.
  *
  * \sa \ref igraph_lazy_inclist_has() to check if this function has

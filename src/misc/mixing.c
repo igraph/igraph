@@ -215,7 +215,7 @@ igraph_error_t igraph_assortativity_nominal(
  *
  * </para><para>
  * When edge weights are given, they are effectively treated as edge multiplicities.
- * The above formulas are valid for weighted graph as well when \c m is interpreted
+ * The above formulas are valid for weighted graphs as well when \c m is interpreted
  * as the total edge weight (instead of the edge count) and \c k as vertex strengths
  * (instead of degrees).
  *
@@ -243,7 +243,7 @@ igraph_error_t igraph_assortativity_nominal(
  * https://doi.org/10.1093/acprof%3Aoso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
- * \param weights The edge weights. Pass \c NULL to compute unweighed
+ * \param weights The edge weights. Pass \c NULL to compute unweighted
  *     assortativity, which in effect assumes all weights to be 1.
  * \param values The vertex values, these can be arbitrary numeric
  *     values.
@@ -770,7 +770,7 @@ static igraph_error_t mixing_matrix(
  * </para><para>
  * In directed graphs, directionally connected <code>u -> v</code> pairs
  * are considered. The joint degree distribution of an undirected graph is the
- * same as that of the corresponding directed graph in which all connection are
+ * same as that of the corresponding directed graph in which all connections are
  * bidirectional, assuming that \p from_mode is \c IGRAPH_OUT, \p to_mode is
  * \c IGRAPH_IN and \p directed_neighbors is true.
  *
@@ -844,7 +844,7 @@ static igraph_error_t mixing_matrix(
  *
  * \sa \ref igraph_joint_degree_matrix() for computing the joint degree matrix;
  * \ref igraph_assortativity_degree() and \ref igraph_assortativity() for
- * degree correlations coefficients, and \ref igraph_degree_correlation_vector()
+ * degree correlation coefficients, and \ref igraph_degree_correlation_vector()
  * for the degree correlation function.
  *
  * Time complexity: O(E), where E is the number of edges in the input graph.
@@ -932,7 +932,7 @@ igraph_error_t igraph_joint_degree_distribution(
  * \brief Mixing matrix for vertex categories.
  *
  * Computes the mixing matrix M_ij, i.e. the joint distribution of vertex types
- * at the endpoints directed of edges. Categories are represented by non-negative integer
+ * at the endpoints of directed edges. Categories are represented by non-negative integer
  * indices, passed in \p from_types and \p to_types. The row and column counts of \p m
  * will be one larger than the largest source and target type, respectively. Re-index type
  * vectors using \ref igraph_reindex_membership() if they are not contiguous integers,
@@ -961,7 +961,7 @@ igraph_error_t igraph_joint_degree_distribution(
  *
  * </para><para>
  * \ref igraph_joint_degree_distribution() is a special case of this function, with
- * categories consisting vertices of the same degree.
+ * categories consisting of vertices of the same degree.
  *
  * </para><para>
  * References:
@@ -978,7 +978,7 @@ igraph_error_t igraph_joint_degree_distribution(
  * \param from_types Vertex types for source vertices. These must be non-negative integers.
  * \param to_types Vertex types for target vertices. These must be non-negative integers.
  *    If \c NULL, it is assumed to be the same as \p from_types.
- * \param directed Whether to treat edges are directed. Ignored for undirected graphs.
+ * \param directed Whether to treat edges as directed. Ignored for undirected graphs.
  * \param normalized Whether to normalize the matrix so that entries sum to 1.0.
  *    If false, matrix entries will be connection counts. Normalization is not
  *    meaningful if some edge weights are negative.

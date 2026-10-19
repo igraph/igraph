@@ -396,7 +396,7 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
 
 /**
  * \function igraph_lune_beta_skeleton
- * \brief The lune based β-skeleton of a spatial point set.
+ * \brief The lune-based β-skeleton of a spatial point set.
  *
  * \experimental
  *
@@ -416,11 +416,11 @@ static igraph_error_t filter_edges(igraph_vector_int_t *edges, const igraph_matr
  *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create the
- *     graph. Each row is a point, dimensionality is inferred from the column count.
+ *     graph. Each row is a point; dimensionality is inferred from the column count.
  *
  * \return Error code.
  *
- * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * Time complexity: Around O(n^floor(d/2) log n), where n is the number of points
  * and d is the dimensionality of the point set.
  *
  */
@@ -454,15 +454,15 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
 
 /**
  * \function igraph_circle_beta_skeleton
- * \brief The circle based β-skeleton of a 2D spatial point set.
+ * \brief The circle-based β-skeleton of a 2D spatial point set.
  *
  * \experimental
  *
- * This function constructs the circle based β-skeleton of a 2D spatial point set.
+ * This function constructs the circle-based β-skeleton of a 2D spatial point set.
  *
  * </para><para>
  * A larger \p beta value results in a larger region, and a sparser graph.
- * Values of beta &lt; 1 are considerably slower
+ * Values of beta &lt; 1 are considerably slower.
  *
  * \param graph A pointer to the graph that will be created.
  * \param points An n-by-2 matrix containing the points that will be used to
@@ -470,7 +470,7 @@ igraph_error_t igraph_lune_beta_skeleton(igraph_t *graph, const igraph_matrix_t 
  * \param beta A positive real value used to parameterize the graph.
  * \return Error code.
  *
- * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * Time complexity: Around O(n^floor(d/2) log n), where n is the number of points
  * and d is the dimensionality of the point set.
  *
  */
@@ -596,18 +596,18 @@ public:
 
 /**
  * \function igraph_beta_weighted_gabriel_graph
- * \brief A Gabriel graph, with edges weighted by the β value at which it disappears.
+ * \brief A Gabriel graph, with edges weighted by the β value at which they disappear.
  *
  * \experimental
  *
  * This function generates a Gabriel graph, and for each edge of this graph it
  * computes the threshold β value at which the edge ceases to be part of the
  * lune-based β-skeleton. For edges that continue to be part of β-skeletons
- * for arbitrarily large β, \c IGRAPH_INFINITΥ is returned.
+ * for arbitrarily large β, \c IGRAPH_INFINITY is returned.
  *
  * </para><para>
- * The \p max_beta cutoff parameter controls the largest β value to consider
- * For edges that persist above this β value, \c IGRAPH_INFINITΥ is returned.
+ * The \p max_beta cutoff parameter controls the largest β value to consider.
+ * For edges that persist above this β value, \c IGRAPH_INFINITY is returned.
  * This parameter serves to improve performance: the smaller this cutoff,
  * the faster the computation. Pass \c IGRAPH_INFINITY to use no cutoff.
  *
@@ -615,7 +615,7 @@ public:
  * \param weights Will contain the edge weights corresponding to the edge
  *    indices from the graph.
  * \param points A matrix containing the points that will be used.
- *    Each row is a point, dimensionality is inferred from the column count.
+ *    Each row is a point; dimensionality is inferred from the column count.
  *    There must be no duplicate points.
  * \param max_beta Maximum value of beta to search to, higher values will be
  *    represented as \c IGRAPH_INFINITY.
@@ -626,7 +626,7 @@ public:
  * to only generate a Gabriel graph, without edge weights.
  *
  *
- * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * Time complexity: Around O(n^floor(d/2) log n), where n is the number of points
  * and d is the dimensionality of the point set. Though large values of max_beta
  * can cause long run times if there are edges that disappear only at large betas.
  *
@@ -705,7 +705,7 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  * In the Gabriel graph of a point set, two points A and B are connected if
  * there is no other point C within the closed ball of which AB is a diameter.
  * The Gabriel graph is connected, and in 2D it is planar. igraph supports
- * computing the Gabriel graph of arbitrary dimensional point sets.
+ * computing the Gabriel graph of point sets of arbitrary dimension.
  *
  * </para><para>
  * The Gabriel graph is a special case of lune-based and circle-based β-skeletons
@@ -715,12 +715,12 @@ igraph_error_t igraph_beta_weighted_gabriel_graph(
  * \param points The point set that will be used. Each row is a point,
  *    dimensionality is inferred from column count.
  *
- * \return Error Code.
+ * \return Error code.
  * \sa The Gabriel graph is a special case of
  *     \ref igraph_lune_beta_skeleton() and \ref igraph_circle_beta_skeleton()
  *     where <code>β = 1</code>.
  *
- * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * Time complexity: Around O(n^floor(d/2) log n), where n is the number of points
  * and d is the dimensionality of the point set.
  *
  */
@@ -771,10 +771,10 @@ igraph_error_t igraph_gabriel_graph(igraph_t *graph, const igraph_matrix_t *poin
  *     Dimensionality is inferred from the column number.
  * \return Error code.
  *
- * \sa \ref igraph_lune_beta_skeleton() to compute the lune based β-skeleton
+ * \sa \ref igraph_lune_beta_skeleton() to compute the lune-based β-skeleton
  * for <code>β = 2</code> or other β values.
  *
- * Time Complexity: Around O(n^floor(d/2) log n), where n is the number of points
+ * Time complexity: Around O(n^floor(d/2) log n), where n is the number of points
  * and d is the dimensionality of the point set.
  *
  */

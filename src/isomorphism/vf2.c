@@ -853,7 +853,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
  *   colors as well. Supply a null pointer here if your graphs are not
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
- * \param count Point to an integer, the result will be stored here.
+ * \param count Pointer to an integer, the result will be stored here.
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.
@@ -975,7 +975,7 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
  *
  * This function is the pair of \ref igraph_get_isomorphisms_vf2_callback(),
  * for subgraph isomorphism problems. It searches for subgraphs of \p
- * graph1 which are isomorphic to \p graph2. When it founds an
+ * graph1 which are isomorphic to \p graph2. When it finds an
  * isomorphic mapping it calls the supplied callback \p isohandler_fn.
  * The mapping (and its inverse) and the additional \p arg argument
  * are supplied to the callback.
@@ -998,7 +998,7 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
  * \param edge_color2 The edge color vector for the second graph.
  * \param map12 Pointer to a vector or \c NULL. If not \c NULL, then an
  *    isomorphic mapping from \p graph1 to \p graph2 is stored here.
- * \param map21 Pointer to a vector ot \c NULL. If not \c NULL, then
+ * \param map21 Pointer to a vector or \c NULL. If not \c NULL, then
  *    an isomorphic mapping from \p graph2 to \p graph1 is stored
  *    here.
  * \param isohandler_fn A pointer to a function of type \ref
@@ -1551,7 +1551,7 @@ static igraph_error_t igraph_i_subisomorphic_vf2_cb(
  *    is stored here.
  * \param map12 Pointer to a vector or \c NULL. If not \c NULL, then an
  *    isomorphic mapping from \p graph1 to \p graph2 is stored here.
- * \param map21 Pointer to a vector ot \c NULL. If not \c NULL, then
+ * \param map21 Pointer to a vector or \c NULL. If not \c NULL, then
  *    an isomorphic mapping from \p graph2 to \p graph1 is stored
  *    here.
  * \param node_compat_fn A pointer to a function of type \ref
@@ -1676,7 +1676,7 @@ igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const ig
 
 /**
  * \function igraph_get_subisomorphisms_vf2
- * \brief Return all subgraph isomorphic mappings.
+ * \brief Returns all subgraph isomorphic mappings.
  *
  * This function collects all isomorphic mappings of \p graph2 to a
  * subgraph of \p graph1. It uses the \ref

@@ -110,8 +110,8 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
  * from a distribution (that is assumed to follow a power-law of course). In
  * a power-law distribution, it is generally assumed that P(X=x) is
  * proportional to x<superscript>-alpha</superscript>, where x is a positive number and alpha
- * is greater than 1. In many real-world cases, the power-law behaviour kicks
- * in only above a threshold value \em xmin. The goal of this functions is to
+ * is greater than 1. In many real-world cases, the power-law behavior kicks
+ * in only above a threshold value \em xmin. The goal of this function is to
  * determine \em alpha if \em xmin is given, or to determine \em xmin and the
  * corresponding value of \em alpha.
  *
@@ -144,7 +144,7 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
  *             \ref igraph_plfit_result_calculate_p_value() to calculate the
  *             p-value itself
  * \param xmin the minimum value in the sample vector where the power-law
- *             behaviour is expected to kick in. Samples smaller than \c xmin
+ *             behavior is expected to kick in. Samples smaller than \c xmin
  *             will be ignored by the algorithm. Pass zero here if you want to
  *             include all the samples. If \c xmin is negative, the algorithm
  *             will attempt to determine its best value automatically.

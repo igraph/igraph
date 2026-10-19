@@ -905,7 +905,7 @@ igraph_bool_t igraph_has_attribute_table(void) {
 
 /**
  * \function igraph_attribute_combination_init
- * \brief Initialize attribute combination list.
+ * \brief Initializes an attribute combination list.
  *
  * \param comb The uninitialized attribute combination list.
  * \return Error code.
@@ -919,7 +919,7 @@ igraph_error_t igraph_attribute_combination_init(igraph_attribute_combination_t 
 
 /**
  * \function igraph_attribute_combination_destroy
- * \brief Destroy attribute combination list.
+ * \brief Destroys an attribute combination list.
  *
  * \param comb The attribute combination list.
  *
@@ -940,13 +940,13 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
 
 /**
  * \function igraph_attribute_combination_add
- * \brief Add combination record to attribute combination list.
+ * \brief Adds a combination record to an attribute combination list.
  *
  * \param comb The attribute combination list.
  * \param name The name of the attribute. If the name already exists
  *             the attribute combination record will be replaced.
  *             Use NULL to add a default combination record for all
- *             atributes not in the list.
+ *             attributes not in the list.
  * \param type The type of the attribute combination. See \ref
  *             igraph_attribute_combination_type_t for the options.
  * \param func Function to be used if \p type is
@@ -1012,7 +1012,7 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
 
 /**
  * \function igraph_attribute_combination_remove
- * \brief Remove a record from an attribute combination list.
+ * \brief Removes a record from an attribute combination list.
  *
  * \param comb The attribute combination list.
  * \param name The attribute name of the attribute combination record
@@ -1087,14 +1087,14 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
 
 /**
  * \function igraph_attribute_combination
- * \brief Initialize attribute combination list and add records.
+ * \brief Initializes an attribute combination list and adds records.
  *
  * \param comb The uninitialized attribute combination list.
  * \param ...  A list of 'name, type[, func]', where:
  * \param name The name of the attribute. If the name already exists
  *             the attribute combination record will be replaced.
  *             Use NULL to add a default combination record for all
- *             atributes not in the list.
+ *             attributes not in the list.
  * \param type The type of the attribute combination. See \ref
  *             igraph_attribute_combination_type_t for the options.
  * \param func Function to be used if \p type is
@@ -1102,8 +1102,8 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
  * The list is closed by setting the name to \c IGRAPH_NO_MORE_ATTRIBUTES.
  * \return Error code.
  *
- * Time complexity: O(n^2), where n is the number attribute
- *                  combinations records to add.
+ * Time complexity: O(n^2), where n is the number of attribute
+ *                  combination records to add.
  *
  * \example examples/simple/igraph_attribute_combination.c
  */

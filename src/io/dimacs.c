@@ -94,7 +94,7 @@
  * \param target Pointer to an integer, the (igraph) ID of the target
  *    node will be stored here. It is ignored if \c NULL.
  * \param capacity Pointer to an initialized vector, the capacity of
- *    the edges will be stored here if not \ NULL.
+ *    the edges will be stored here if not \c NULL.
  * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
@@ -300,9 +300,9 @@ igraph_error_t igraph_read_graph_dimacs_flow(
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream.
- * \param source Integer, the id of the source vertex for the maximum
+ * \param source Integer, the ID of the source vertex for the maximum
  *     flow.
- * \param target Integer, the id of the target vertex.
+ * \param target Integer, the ID of the target vertex.
  * \param capacity Pointer to an initialized vector containing the
  *     edge capacity values.
  * \return Error code.

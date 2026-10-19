@@ -95,7 +95,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  * \ref igraph_get_eids().
  *
  * \param  path  the input vector. It will be modified in-place and it will be
- *         resized as needed. When the vector contains less than two vertex IDs,
+ *         resized as needed. When the vector contains fewer than two vertex IDs,
  *         it will be cleared.
  * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory to expand
  *         the vector.

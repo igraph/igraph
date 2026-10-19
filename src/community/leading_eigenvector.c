@@ -37,7 +37,7 @@
  * \section about_leading_eigenvector_methods
  *
  * <para>
- * The function documented in these section implements the
+ * The function documented in this section implements the
  * <quote>leading eigenvector</quote> method developed by Mark Newman and
  * published in MEJ Newman: Finding community structure using the
  * eigenvectors of matrices, Phys Rev E 74:036104 (2006).</para>
@@ -55,7 +55,7 @@
  * <para>
  * The leading eigenvector method works by calculating the eigenvector
  * of the modularity matrix for the largest positive eigenvalue and
- * then separating vertices into two community based on the sign of
+ * then separating vertices into two communities based on the sign of
  * the corresponding element in the eigenvector. If all elements in
  * the eigenvector are of the same sign that means that the network
  * has no underlying community structure.
@@ -66,7 +66,7 @@
  * The leading eigenvector community structure detection method is
  * implemented in \ref igraph_community_leading_eigenvector(). After
  * the initial split, the following splits are done in a way to
- * optimize modularity regarding to the original network. Note that
+ * optimize modularity with respect to the original network. Note that
  * any further refinement, for example using Kernighan-Lin, as
  * proposed in Section V.A of Newman (2006), is not implemented here.
  * </para>
@@ -249,7 +249,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    agglomerative algorithm. Unlike with most other hierarchical
  *    community detection functions in igraph, the integers in this matrix
  *    represent community indices, not vertex indices. If at the end of
- *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
+ *    the algorithm (after \p steps steps were performed) there are <quote>p</quote>
  *    communities, then these are numbered from zero to <code>p-1</code>.
  *    The first line of the matrix contains the first <quote>merge</quote>
  *    (which is in reality the last split) of two communities into
@@ -259,7 +259,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    This argument is ignored if it is \c NULL.
  * \param membership The membership of the vertices after all the
  *    splits were performed will be stored here. The vector must be
- *    initialized  before calling and will be resized as needed.
+ *    initialized before calling and will be resized as needed.
  *    This argument is ignored if it is \c NULL. This argument can
  *    also be used to supply a starting configuration for the community
  *    finding, in the format of a membership vector. In this case the
@@ -279,7 +279,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * \param eigenvalues Pointer to an initialized vector or a null
  *    pointer. If not a null pointer, then the eigenvalues calculated
  *    along the community structure detection are stored here. The
- *    non-positive eigenvalues, that do not result a split, are stored
+ *    non-positive eigenvalues, that do not result in a split, are stored
  *    as well.
  * \param eigenvectors If not a null pointer, then the eigenvectors
  *    that are calculated in each step of the algorithm are stored here,
@@ -297,14 +297,14 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *      value in the vector contains the initial number of
  *      communities.
  *    \cli IGRAPH_LEVC_HIST_SPLIT
- *      Split a community into two communities. The id of the splitted
+ *      Split a community into two communities. The ID of the split
  *      community is given in the next element of the history vector.
- *      The id of the first new community is the same as the id of the
- *      splitted community. The id of the second community equals to
+ *      The ID of the first new community is the same as the ID of the
+ *      split community. The ID of the second community equals
  *      the number of communities before the split.
  *    \cli IGRAPH_LEVC_HIST_FAILED
  *      Tried to split a community, but it was not worth it, as it
- *      does not result in a bigger modularity value. The id of the
+ *      does not result in a bigger modularity value. The ID of the
  *      community is given in the next element of the vector.
  *    \endclist
  * \param callback A null pointer or a function of type \ref
@@ -313,8 +313,8 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    calculation. If the callback returns \c IGRAPH_STOP, then the
  *    community finding algorithm stops. If it returns \c IGRAPH_SUCCESS,
  *    the algorithm continues normally. Any other return value is considered
- *    an igraph error code and will terminete the algorithm with the same
- *    error code. See the arguments passed to the callback at the documentation
+ *    an igraph error code and will terminate the algorithm with the same
+ *    error code. See the arguments passed to the callback in the documentation
  *    of \ref igraph_community_leading_eigenvector_callback_t.
  * \param callback_extra Extra argument to pass to the callback
  *    function.
@@ -757,7 +757,7 @@ igraph_error_t igraph_community_leading_eigenvector(
 
 /**
  * \function igraph_le_community_to_membership
- * \brief Cut an incomplete dendrogram after a given number of merges, starting with an initial cluster assignment.
+ * \brief Cuts an incomplete dendrogram after a given number of merges, starting with an initial cluster assignment.
  *
  * This function takes a dendrogram whose leaves are cluster IDs given in an
  * initial cluster assignment provided in \p membership. Then it updates
@@ -768,7 +768,7 @@ igraph_error_t igraph_community_leading_eigenvector(
  * vertices.
  *
  * </para><para>
- * This dendrogram format is suitable for divise hierarchical community
+ * This dendrogram format is suitable for divisive hierarchical community
  * detection algorithms that stop before dividing the graph into individual
  * vertices, such as \ref igraph_community_leading_eigenvector().
  *

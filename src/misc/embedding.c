@@ -818,7 +818,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
  *
  * </para><para>
  * For undirected graphs, the latent positions are calculated as
- * X = U^n D^(1/2) where U^n equals to the first no columns of U, and
+ * X = U^n D^(1/2) where U^n equals the first n columns of U, and
  * D^(1/2) is a diagonal matrix containing the square root of the selected
  * singular values on the diagonal.
  *
@@ -857,7 +857,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
  * \param D Initialized vector or a null pointer. If not a null
  *        pointer, then the eigenvalues (for undirected graphs) or the
  *        singular values (for directed graphs) are stored here.
- * \param cvec A numeric vector, its length is the number vertices in the
+ * \param cvec A numeric vector, its length is the number of vertices in the
  *        graph. This vector is added to the diagonal of the adjacency
  *        matrix, before performing the SVD.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
@@ -1107,7 +1107,7 @@ igraph_error_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
  * For spectral embedding, these are the singular values of the adjacency
  * matrix. The singular values are assumed to be generated from a
  * Gaussian mixture distribution with two components that have different
- * means and same variance. The dimensionality d is chosen to
+ * means and the same variance. The dimensionality d is chosen to
  * maximize the likelihood when the d largest singular values are
  * assigned to one component of the mixture and the rest of the singular
  * values assigned to the other component.

@@ -57,8 +57,8 @@
  * \function igraph_strvector_init
  * \brief Initializes a string vector.
  *
- * Reserves memory for the string vector, a string vector must be
- * first initialized before calling other functions on it.
+ * Reserves memory for the string vector. A string vector must be
+ * initialized before calling other functions on it.
  * All elements of the string vector are set to the empty string.
  *
  * \param sv Pointer to an initialized string vector.
@@ -147,8 +147,8 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_int_t idx,
  * \function igraph_strvector_set_len
  * \brief Sets an element of the string vector given a buffer and its size.
  *
- * This is almost the same as \ref igraph_strvector_set, but the new
- * value is not a zero terminated string, but its length is given.
+ * This is almost the same as \ref igraph_strvector_set(), but the new
+ * value is not a zero-terminated string, but its length is given.
  *
  * \param sv The string vector.
  * \param idx The position to set.
@@ -289,7 +289,7 @@ igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
  * \param from The second string vector, it is kept unchanged.
  * \return Error code.
  *
- * \sa \ref igraph_strvector_merge()
+ * \sa \ref igraph_strvector_merge().
  *
  * Time complexity: O(n+l2), n is the number of strings in the new
  * string vector, l2 is the total length of strings in the \p from
@@ -352,10 +352,10 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
  * \param from The source vector. It will be cleared.
  * \return Error code.
  *
- * \sa \ref igraph_strvector_append()
+ * \sa \ref igraph_strvector_append().
  *
  * Time complexity: O(l2) if \p to has sufficient capacity, O(2*l1+l2) otherwise,
- *   where l1 and l2 are the lengths of \p to and \from respectively.
+ *   where l1 and l2 are the lengths of \p to and \p from, respectively.
  */
 igraph_error_t igraph_strvector_merge(igraph_strvector_t *to, igraph_strvector_t *from) {
     const char **p1, **p2, **pe;
@@ -466,7 +466,7 @@ igraph_int_t igraph_strvector_capacity(const igraph_strvector_t *sv) {
  * Note that this function does \em not change the size of the
  * string vector. Let us see a small example to clarify things: if you
  * reserve space for 100 strings and the size of your
- * vector was (and still is) 60, then you can surely add additional 40
+ * vector was (and still is) 60, then you can surely add an additional 40
  * strings to your vector before it will be copied.
  *
  * \param sv The string vector object.
@@ -721,7 +721,7 @@ void igraph_strvector_swap(igraph_strvector_t *v1, igraph_strvector_t *v2) {
 
 /**
  * \function igraph_strvector_swap_elements
- * \brief Swap two elements in a string vector.
+ * \brief Swaps two elements in a string vector.
  *
  * Note that currently no range checking is performed.
  *

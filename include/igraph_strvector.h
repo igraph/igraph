@@ -41,11 +41,11 @@ typedef struct s_igraph_strvector {
  * \define STR
  * \brief Indexing string vectors.
  *
- * This is a macro that allows to query the elements of a string vector, just
+ * This is a macro that allows querying the elements of a string vector, just
  * like \ref igraph_strvector_get(). Note this macro cannot be used to set an
  * element. Use \ref igraph_strvector_set() to set an element instead.
  *
- * \param sv The string vector
+ * \param sv The string vector.
  * \param i The index of the element.
  * \return The element at position \p i.
  *

@@ -74,7 +74,7 @@ IGRAPH_BEGIN_C_DECLS
  *
  * <para>\a igraph functions can run into various problems preventing them
  * from normal operation. The user might have supplied invalid arguments,
- * e.g. a non-square matrix when a square-matrix was expected, or the program
+ * e.g. a non-square matrix when a square matrix was expected, or the program
  * has run out of memory while some more memory allocation is required, etc.
  * </para>
  *
@@ -91,7 +91,7 @@ IGRAPH_BEGIN_C_DECLS
  *
  * <para>
  * If \a igraph runs into an error - an invalid argument was supplied
- * to a function, or we've ran out of memory - the control is
+ * to a function, or we've run out of memory - the control is
  * transferred to the \emb error handler \eme function.
  * </para><para>
  * The default error handler is \ref igraph_error_handler_abort which
@@ -108,7 +108,7 @@ IGRAPH_BEGIN_C_DECLS
  * These deallocate the temporarily allocated memory (more about this
  * later) and return with the error code. The latter also prints an
  * error message. If you use these error handlers you need to take
- * care about possible errors yourself by checking the return value of
+ * care of possible errors yourself by checking the return value of
  * (almost) every non-void \a igraph function.
  * </para><para>
  * Independently of the error handler installed, all functions in the
@@ -124,9 +124,9 @@ IGRAPH_BEGIN_C_DECLS
 /**
  * \section error_codes Error codes
  *
- * <para>Every \a igraph function which can fail return a
+ * <para>Every \a igraph function which can fail returns a
  * single integer error code. Some functions are very simple and
- * cannot run into any error, these may return other types, or
+ * cannot run into any error; these may return other types, or
  * \type void as well. The error codes are defined by the
  * \ref igraph_error_type_t enumeration.
  * </para>
@@ -162,7 +162,7 @@ IGRAPH_BEGIN_C_DECLS
  * </para>
  *
  * <para>
- * As of \a igraph 0.10, temporary memory is dellocated in stages, through
+ * As of \a igraph 0.10, temporary memory is deallocated in stages, through
  * multiple calls to the error handler (and indirectly to \ref IGRAPH_FINALLY_FREE()).
  * Therefore, error handlers that do not abort the program
  * immediately are expected to return. The error handler should not perform
@@ -198,7 +198,7 @@ IGRAPH_BEGIN_C_DECLS
  * number of objects to remove from the stack. If an error happens
  * however, the error handler should call \ref IGRAPH_FINALLY_FREE() to
  * deallocate each object added to the stack. This means that the
- * temporary objects allocated in the calling function (and etc.) will
+ * temporary objects allocated in the calling function (and so on) will
  * be freed as well.
  * </para>
  */
@@ -338,7 +338,7 @@ typedef enum {
  *
  * This type is used as the return type of igraph functions that return an
  * error code. It is a type alias because \type igraph_error_t used to be
- * an \c int, and was used slightly differenly than \type igraph_error_type_t.
+ * an \c int, and was used slightly differently than \type igraph_error_type_t.
  */
 typedef igraph_error_type_t igraph_error_t;
 
@@ -351,7 +351,7 @@ typedef igraph_error_type_t igraph_error_t;
  * \param reason Textual description of the error.
  * \param file The source file in which the error is noticed.
  * \param line The number of the line in the source file which triggered
- *   the error
+ *   the error.
  * \param igraph_errno The \a igraph error code.
  */
 
@@ -360,7 +360,7 @@ typedef void igraph_error_handler_t(const char *reason, const char *file,
 
 /**
  * \var igraph_error_handler_abort
- * \brief Abort program in case of error.
+ * \brief Aborts the program in case of error.
  *
  * The default error handler, prints an error message and aborts the
  * program.
@@ -370,7 +370,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN igraph_error_handler_t igraph_error_handl
 
 /**
  * \var igraph_error_handler_ignore
- * \brief Ignore errors.
+ * \brief Ignores errors.
  *
  * This error handler frees the temporarily allocated memory and returns
  * with the error code.
@@ -380,7 +380,7 @@ IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_ignore;
 
 /**
  * \var igraph_error_handler_printignore
- * \brief Print and ignore errors.
+ * \brief Prints and ignores errors.
  *
  * Frees temporarily allocated memory, prints an error message to the
  * standard error and returns with the error code.
@@ -408,7 +408,7 @@ IGRAPH_EXPORT igraph_error_handler_t *igraph_set_error_handler(igraph_error_hand
  * \a igraph functions usually use this macro when they notice an error.
  * It calls
  * \ref igraph_error() with the proper parameters and if that returns
- * the macro returns the "calling" function as well, with the error
+ * the macro returns from the calling function as well, with the error
  * code. If for some (suspicious) reason you want to call the error
  * handler without returning from the current function, call
  * \ref igraph_error() directly.
@@ -443,7 +443,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file,
  * \a igraph functions can use this macro when they notice an error and
  * want to pass on extra information to the user about what went wrong.
  * It calls \ref igraph_errorf() with the proper parameters and if that
- * returns the macro returns the "calling" function as well, with the
+ * returns the macro returns from the calling function as well, with the
  * error code. If for some (suspicious) reason you want to call the
  * error handler without returning from the current function, call
  * \ref igraph_errorf() directly.
@@ -454,7 +454,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file,
  *   with the error code. E.g. if the error code is \c IGRAPH_EINVAL,
  *   its associated text (see  \ref igraph_strerror()) is "Invalid
  *   value" and this string should explain which parameter was invalid
- *   and maybe what was expected and what was recieved.
+ *   and maybe what was expected and what was received.
  * \param igraph_errno The \a igraph error code.
  * \param ... The additional arguments to be substituted into the
  *   template string.
@@ -546,13 +546,13 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_EXIT(void);
  * \brief The number of registered objects.
  *
  * Returns the number of objects in the stack of temporarily allocated
- * objects. This function is handy if you write an own igraph routine and
+ * objects. This function is handy if you write your own igraph routine and
  * you want to make sure it handles errors properly. A properly written
  * igraph routine should not leave pointers to temporarily allocated objects
  * in the finally stack, because otherwise an \ref IGRAPH_FINALLY_FREE call
  * in another igraph function would result in freeing these objects as well
- * (and this is really hard to debug, since the error will be not in that
- * function that shows erroneous behaviour). Therefore, it is advised to
+ * (and this is really hard to debug, since the error will not be in the
+ * function that shows erroneous behavior). Therefore, it is advised to
  * write your own test cases and examine \ref IGRAPH_FINALLY_STACK_SIZE
  * before and after your test cases - the numbers should be equal.
  */
@@ -646,7 +646,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * returns to the auxiliary calling code (like \ref
  * igraph_error_handler_ignore and \ref
  * igraph_error_handler_printignore), and the \a igraph function
- * signalling the error is called from another \a igraph function
+ * signaling the error is called from another \a igraph function
  * then we need to make sure that the error is propagated back to
  * the auxiliary (i.e. non-igraph) calling function. This is achieved
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
@@ -810,7 +810,7 @@ IGRAPH_EXPORT void igraph_warningf(const char *reason,
  * </para>
  *
  * <para>
- * Fatal error handlers do not return. Typically, they might abort the
+ * Fatal error handlers do not return. Typically, they might abort
  * the program immediately, or in the case of the high-level \a igraph
  * interfaces, they might return to the top level using a
  * <code>longjmp()</code>. The fatal error handler is only called when
@@ -844,7 +844,7 @@ IGRAPH_EXPORT igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_hand
 
 /**
  * \var igraph_fatal_handler_abort
- * \brief Abort program in case of fatal error.
+ * \brief Aborts the program in case of fatal error.
  *
  * The default fatal error handler, prints an error message and aborts the program.
  */
@@ -914,7 +914,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason,
  *
  * </para><para>
  * Since a typical fatal error handler does a <code>longjmp()</code>, avoid using this
- * macro in C++ code. With most compilers, destructor will not be called when
+ * macro in C++ code. With most compilers, destructors will not be called when
  * <code>longjmp()</code> leaves the current scope.
  *
  * \param condition The condition to be checked.

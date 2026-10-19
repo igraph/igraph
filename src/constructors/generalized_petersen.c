@@ -22,7 +22,7 @@
 
 /**
  * \function igraph_generalized_petersen
- * \brief Creates a Generalized Petersen graph.
+ * \brief Creates a generalized Petersen graph.
  *
  * The generalized Petersen graph <code>G(n, k)</code> consists of \p n vertices
  * \c v_0, ..., \c v_n forming an "outer" cycle graph, and \p n additional vertices
@@ -40,7 +40,7 @@
  * </para><para>
  * M. E. Watkins,
  * A Theorem on Tait Colorings with an Application to the Generalized Petersen Graphs,
- * Journal of Combinatorial Theory 6, 152-164 (1969).
+ * Journal of Combinatorial Theory 6, 152–164 (1969).
  * https://doi.org/10.1016%2FS0021-9800%2869%2980116-X
  *
  * \param graph Pointer to an uninitialized graph object, the result will

@@ -47,7 +47,7 @@ IGRAPH_BEGIN_C_DECLS
 /**
  * \ingroup bitset
  * \define IGRAPH_BIT_MASK
- * \brief Computes mask used to access a specific bit of an integer.
+ * \brief Computes a mask used to access a specific bit of an integer.
  *
  * \experimental
  *
@@ -57,7 +57,7 @@ IGRAPH_BEGIN_C_DECLS
  * \verbatim IGRAPH_BIT_MASK(10) \endverbatim
  * to obtain an integer where only the 11th least significant bit is set.
  *
- * Note that passing negative values here results in undefined behaviour.
+ * Note that passing negative values here results in undefined behavior.
  *
  * \param b The only bit index that should have its bit set.
  *
@@ -68,7 +68,7 @@ IGRAPH_BEGIN_C_DECLS
 /**
  * \ingroup bitset
  * \define IGRAPH_BIT_SLOT
- * \brief Computes index used to access a specific slot of a bitset.
+ * \brief Computes an index used to access a specific slot of a bitset.
  *
  * \experimental
  *
@@ -95,7 +95,7 @@ IGRAPH_BEGIN_C_DECLS
  * \verbatim IGRAPH_BIT_SET(bitset, 3) \endverbatim
  * will set the fourth least significant bit in the bitset to 1.
  *
- * \param bitset The bitset
+ * \param bitset The bitset.
  * \param i The bit index that should have its bit set to 1 after the operation.
  *
  * Time complexity: O(1).
@@ -113,7 +113,7 @@ IGRAPH_BEGIN_C_DECLS
  * \verbatim IGRAPH_BIT_CLEAR(bitset, 4) \endverbatim
  * will set the fifth least significant bit in the bitset to 0.
  *
- * \param bitset The bitset
+ * \param bitset The bitset.
  * \param i The bit index that should have its bit set to 0 after the operation.
  *
  * Time complexity: O(1).
@@ -134,7 +134,7 @@ IGRAPH_BEGIN_C_DECLS
  * \verbatim IGRAPH_BIT_TEST(bitset, 7) \endverbatim
  * will test the eighth least significant bit in the bitset.
  *
- * \param bitset The bitset
+ * \param bitset The bitset.
  * \param i The bit index that should have its bit tested.
  *
  * Time complexity: O(1).

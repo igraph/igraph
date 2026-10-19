@@ -96,9 +96,9 @@ igraph_int_t igraph_i_clz64(igraph_uint_t x) {
  * <para>The \type igraph_bitset_t data type is a simple and efficient
  * interface to arrays containing boolean values. It is similar to
  * the \type bitset template in the C++ standard library, although the main
- * difference being the C++ version's size is initialized at compile time.</para>
+ * difference is that the C++ version's size is fixed at compile time.</para>
  *
- * <para>The \type igraph_bitset_t type and use O(n/w) space
+ * <para>The \type igraph_bitset_t type uses O(n/w) space
  * to store n elements, where w is the bit width of \type igraph_int_t,
  * the integer type used throughout the library (either 32 or 64).
  * Sometimes they use more, this is because bitsets can
@@ -118,7 +118,7 @@ igraph_int_t igraph_i_clz64(igraph_uint_t x) {
  *
  * <para>Note that while the interface of bitset functions is similar to
  * igraph's vector functions, there is one major difference: bitset functions
- * such as \ref igraph_bitset_and() do not verify that that sizes of input
+ * such as \ref igraph_bitset_and() do not verify that the sizes of input
  * parameters are compatible, and do not automatically resize the output
  * parameter. Doing so is the responsibility of the user.</para>
  */
@@ -154,7 +154,7 @@ igraph_int_t igraph_i_clz64(igraph_uint_t x) {
  *
  * </para><para>
  * Every bitset object initialized by this function should be
- * destroyed (ie. the memory allocated for it should be freed) when it
+ * destroyed (i.e. the memory allocated for it should be freed) when it
  * is not needed anymore, the \ref igraph_bitset_destroy() function is
  * responsible for this.
  *
@@ -233,7 +233,7 @@ igraph_error_t igraph_bitset_init_copy(igraph_bitset_t *dest, const igraph_bitse
 /**
  * \ingroup bitset
  * \function igraph_bitset_update
- * \brief Update a bitset from another one.
+ * \brief Updates a bitset from another one.
  *
  * The size and contents of \p dest will be identical to that of \p src.
  *
@@ -286,7 +286,7 @@ igraph_int_t igraph_bitset_capacity(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_size
  * \brief Returns the length of the bitset.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \return The size of the bitset.
  *
  * Time complexity: O(1).
@@ -311,7 +311,7 @@ igraph_int_t igraph_bitset_size(const igraph_bitset_t *bitset) {
  * Note that this function does \em not change the size of the
  * bitset. Let us see a small example to clarify things: if you
  * reserve space for 100 elements and the size of your
- * bitset was (and still is) 60, then you can surely add additional 40
+ * bitset was (and still is) 60, then you can surely add an additional 40
  * elements to your bitset before it will be copied.
  *
  * \param bitset The bitset object.
@@ -359,7 +359,7 @@ igraph_error_t igraph_bitset_reserve(igraph_bitset_t *bitset, igraph_int_t capac
  * one. In this case the newly appeared elements in the bitset are
  * set to zero.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \param new_size The new size of the bitset.
  * \return Error code,
  *         \c IGRAPH_ENOMEM if there is not enough
@@ -401,7 +401,7 @@ igraph_error_t igraph_bitset_resize(igraph_bitset_t *bitset, igraph_int_t new_si
  * Returns the number of set bits, also called the population count,
  * of the bitset.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \return The population count of the bitset.
  *
  * Time complexity: O(n/w).
@@ -433,7 +433,7 @@ igraph_int_t igraph_bitset_popcount(const igraph_bitset_t *bitset) {
  * zeros in the bitset before the first one is encountered. If the bitset
  * is all zeros, then its size is returned.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \return The number of leading zeros in the bitset.
  *
  * Time complexity: O(n/w).
@@ -467,7 +467,7 @@ igraph_int_t igraph_bitset_countl_zero(const igraph_bitset_t *bitset) {
  * in the bitset before the first zero is encountered.
  * If the bitset is all ones, then its size is returned.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \return The number of leading ones in the bitset.
  *
  * Time complexity: O(n/w).
@@ -501,7 +501,7 @@ igraph_int_t igraph_bitset_countl_one(const igraph_bitset_t *bitset) {
  * zeros in the bitset before the first one is encountered.
  * If the bitset is all zeros, then its size is returned.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \return The number of trailing zeros in the bitset.
  *
  * Time complexity: O(n/w).
@@ -534,7 +534,7 @@ igraph_int_t igraph_bitset_countr_zero(const igraph_bitset_t *bitset) {
  * in the bitset before the first zero is encountered.
  * If the bitset is all ones, then its size is returned.
  *
- * \param bitset The bitset object
+ * \param bitset The bitset object.
  * \return The number of trailing ones in the bitset.
  *
  * Time complexity: O(n/w).
@@ -649,16 +649,16 @@ igraph_bool_t igraph_bitset_is_any_one(const igraph_bitset_t *bitset) {
  * \function igraph_bitset_or
  * \brief Bitwise OR of two bitsets.
  *
- * Applies a bitwise or to the contents of two bitsets and stores it in an
+ * Applies a bitwise OR to the contents of two bitsets and stores it in an
  * already initialized bitset. The destination bitset may be equal to one
  * (or even both) of the sources. When working with bitsets, it is common
- * that those created are of the same size fixed size. Therefore, this
- * function does not check the sizes of the bitsets passed to it, the caller
+ * that those created are of the same fixed size. Therefore, this
+ * function does not check the sizes of the bitsets passed to it; the caller
  * must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src1 A bitset. Must have have same size as \p dest.
- * \param src2 A bitset. Must have have same size as \p dest.
+ * \param src1 A bitset. Must have the same size as \p dest.
+ * \param src2 A bitset. Must have the same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -675,16 +675,16 @@ void igraph_bitset_or(igraph_bitset_t *dest,
  * \function igraph_bitset_and
  * \brief Bitwise AND of two bitsets.
  *
- * Applies a bitwise and to the contents of two bitsets and stores it in an
+ * Applies a bitwise AND to the contents of two bitsets and stores it in an
  * already initialized bitset. The destination bitset may be equal to one
  * (or even both) of the sources. When working with bitsets, it is common
- * that those created are of the same size fixed size. Therefore, this
- * function does not check the sizes of the bitsets passed to it, the caller
+ * that those created are of the same fixed size. Therefore, this
+ * function does not check the sizes of the bitsets passed to it; the caller
  * must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src1 A bitset. Must have have same size as \p dest.
- * \param src2 A bitset. Must have have same size as \p dest.
+ * \param src1 A bitset. Must have the same size as \p dest.
+ * \param src2 A bitset. Must have the same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -700,16 +700,16 @@ void igraph_bitset_and(igraph_bitset_t *dest, const igraph_bitset_t *src1, const
  * \function igraph_bitset_xor
  * \brief Bitwise XOR of two bitsets.
  *
- * Applies a bitwise xor to the contents of two bitsets and stores it in
+ * Applies a bitwise XOR to the contents of two bitsets and stores it in
  * an already initialized bitset. The destination bitset may be equal to
  * one (or even both) of the sources. When working with bitsets, it is common
- * that those created are of the same size fixed size. Therefore, this
- * function does not check the sizes of the bitsets passed to it, the caller
+ * that those created are of the same fixed size. Therefore, this
+ * function does not check the sizes of the bitsets passed to it; the caller
  * must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src1 A bitset. Must have have same size as \p dest.
- * \param src2 A bitset. Must have have same size as \p dest.
+ * \param src1 A bitset. Must have the same size as \p dest.
+ * \param src2 A bitset. Must have the same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -726,14 +726,14 @@ void igraph_bitset_xor(igraph_bitset_t *dest,
  * \function igraph_bitset_not
  * \brief Bitwise negation of a bitset.
  *
- * Applies a bitwise not to the contents of a bitset and stores it in an
+ * Applies a bitwise NOT to the contents of a bitset and stores it in an
  * already initialized bitset. The destination bitset may be equal to the
  * source. When working with bitsets, it is common that those created are
- * of the same size fixed size. Therefore, this function does not check the
- * sizes of the bitsets passed to it, the caller must do so if necessary.
+ * of the same fixed size. Therefore, this function does not check the
+ * sizes of the bitsets passed to it; the caller must do so if necessary.
  *
  * \param dest The bitset object where the result is stored
- * \param src A bitset. Must have have same size as \p dest.
+ * \param src A bitset. Must have the same size as \p dest.
  *
  * Time complexity: O(n/w).
  */
@@ -754,7 +754,7 @@ void igraph_bitset_not(igraph_bitset_t *dest, const igraph_bitset_t *src) {
  * \param bitset The bitset object to modify.
  * \param value The value to set for all bits.
  *
- * \sa \ref igraph_bitset_null()
+ * \sa \ref igraph_bitset_null().
  *
  * Time complexity: O(n/w).
  */
@@ -772,7 +772,7 @@ void igraph_bitset_fill(igraph_bitset_t *bitset, igraph_bool_t value) {
  *
  * \param bitset The bitset object to clear all bits in.
  *
- * \sa \ref igraph_bitset_fill()
+ * \sa \ref igraph_bitset_fill().
  *
  * Time complexity: O(n/w).
  */

@@ -50,7 +50,7 @@ static igraph_error_t null_heuristic(
  * the lowest estimated length. This length estimate is the sum of two
  * numbers: the distance from the source (\p from) to the intermediate vertex,
  * and the value returned by the heuristic function. The heuristic function
- * provides an estimate the distance between intermediate candidate
+ * provides an estimate of the distance between intermediate candidate
  * vertices and the target vertex \p to. The A* algorithm is guaranteed
  * to give the correct shortest path (if one exists) only if the heuristic
  * does not overestimate distances, i.e. if the heuristic function is
@@ -86,7 +86,7 @@ static igraph_error_t null_heuristic(
  * |E| is the number of edges in the graph.
  * The running time depends on the accuracy of the distance estimates
  * returned by the heuristic function. Assuming that the heuristic
- * is admissible, the better the estimates, the shortert the running
+ * is admissible, the better the estimates, the shorter the running
  * time.
  */
 

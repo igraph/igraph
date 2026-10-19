@@ -33,7 +33,7 @@
 
 /**
  * \function igraph_density
- * \brief Calculate the density of a graph.
+ * \brief Calculates the density of a graph.
  *
  * The density of a graph is simply the ratio of the actual number of its
  * edges and the largest possible number of edges it could have.
@@ -55,7 +55,7 @@
  *
  * \param graph The input graph object. It must not have parallel edges.
  * \param res Pointer to a real number, the result will be stored here.
- * \param weights Vector of edge weights. Pass \c NULL to to perform
+ * \param weights Vector of edge weights. Pass \c NULL to perform
  *   an unweighted density calculation.
  * \param loops Boolean constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
@@ -183,7 +183,7 @@ igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
  * \param weights The edge weights, in the order of the edge IDs, must
  *    have appropriate length. Weights must be non-negative.
  * \param res An initialized vector, the results are stored here.
- * \param vids Vertex selector that specifies the vertices which to calculate
+ * \param vids Vertex selector that specifies the vertices for which to calculate
  *    the measure.
  * \return Error code.
  *

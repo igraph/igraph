@@ -48,8 +48,8 @@
 /**
  * \section igraph_dqueue
  * <para>
- * This is the classic data type of the double ended queue. Most of
- * the time it is used if a First-In-First-Out (FIFO) behavior is
+ * This is the classic data type of the double-ended queue. Most of
+ * the time it is used if a first-in-first-out (FIFO) behavior is
  * needed. See the operations below.
  * </para>
  *
@@ -61,9 +61,9 @@
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_init
- * \brief Initialize a double ended queue (deque).
+ * \brief Initializes a double-ended queue (deque).
  *
- * The queue will be always empty.
+ * The queue will always be empty.
  *
  * \param q Pointer to an uninitialized deque.
  * \param capacity How many elements to allocate memory for.
@@ -90,7 +90,7 @@ igraph_error_t FUNCTION(igraph_dqueue, init)(TYPE(igraph_dqueue)* q, igraph_int_
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_destroy
- * \brief Destroy a double ended queue.
+ * \brief Destroys a double-ended queue.
  *
  * \param q The queue to destroy.
  *
@@ -105,7 +105,7 @@ void FUNCTION(igraph_dqueue, destroy)(TYPE(igraph_dqueue)* q) {
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_empty
- * \brief Decide whether the queue is empty.
+ * \brief Decides whether the queue is empty.
  *
  * \param q The queue.
  * \return Boolean, true if \p q contains at least one element,
@@ -123,7 +123,7 @@ igraph_bool_t FUNCTION(igraph_dqueue, empty)(const TYPE(igraph_dqueue)* q) {
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_clear
- * \brief Remove all elements from the queue.
+ * \brief Removes all elements from the queue.
  *
  * \param q The queue.
  *
@@ -140,7 +140,7 @@ void FUNCTION(igraph_dqueue, clear)(TYPE(igraph_dqueue)* q) {
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_full
- * \brief Check whether the queue is full.
+ * \brief Checks whether the queue is full.
  *
  * If a queue is full the next \ref igraph_dqueue_push() operation will allocate
  * more memory.
@@ -148,7 +148,7 @@ void FUNCTION(igraph_dqueue, clear)(TYPE(igraph_dqueue)* q) {
  * \param q The queue.
  * \return \c true if \p q is full, \c false otherwise.
  *
- * Time complecity: O(1).
+ * Time complexity: O(1).
  */
 
 igraph_bool_t FUNCTION(igraph_dqueue, full)(TYPE(igraph_dqueue)* q) {
@@ -226,7 +226,7 @@ BASE FUNCTION(igraph_dqueue, back)(const TYPE(igraph_dqueue)* q) {
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_pop
- * \brief Remove the head.
+ * \brief Removes the head.
  *
  * Removes and returns the first element in the queue. The queue must
  * be non-empty.
@@ -404,7 +404,7 @@ igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FIL
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_get
- * \brief Access an element in a queue.
+ * \brief Accesses an element in a queue.
  *
  * \param q The queue.
  * \param idx The index of the element within the queue.

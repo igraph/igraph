@@ -34,7 +34,7 @@
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the average local transitivity,
  * this probability is calculated for each vertex and then the average
- * is taken. Vertices with less than two neighbors require special treatment,
+ * is taken. Vertices with fewer than two neighbors require special treatment,
  * they will either be left out from the calculation or they will be considered
  * as having zero transitivity, depending on the \c mode argument.
  * Edge directions and edge multiplicities are ignored.
@@ -54,7 +54,7 @@
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
  *
- * \param graph The input graph. Edge directions and multiplicites are ignored.
+ * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat vertices with degree less than two.
  *    \c IGRAPH_TRANSITIVITY_NAN leaves them out from averaging,
@@ -484,7 +484,7 @@ static igraph_error_t count_triangles_and_triples(
  * vertex triples, in a graph. Edge directions, edge multiplicities, and self-loops
  * are ignored.
  *
- * \param graph The graph object. Edge directions and multiplicites are ignored.
+ * \param graph The graph object. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory for
@@ -505,12 +505,12 @@ igraph_error_t igraph_count_triangles(const igraph_t *graph, igraph_real_t *res)
 
 /**
  * \function igraph_count_adjacent_triangles
- * \brief Count the number of triangles a vertex is part of.
+ * \brief Counts the number of triangles a vertex is part of.
  *
  * \param graph The input graph. Edge directions and multiplicities are ignored.
- * \param res Initiliazed vector, the results are stored here.
+ * \param res Initialized vector, the results are stored here.
  * \param vids The vertices to perform the calculation for.
- * \return Error mode.
+ * \return Error code.
  *
  * \sa \ref igraph_list_triangles() to list triangles,
  * \ref igraph_count_triangles() to count all triangles at once.
@@ -532,7 +532,7 @@ igraph_error_t igraph_count_adjacent_triangles(const igraph_t *graph,
 
 /**
  * \function igraph_list_triangles
- * \brief Find all triangles in a graph.
+ * \brief Finds all triangles in a graph.
  *
  * </para><para>
  * The triangles are reported as a long list of vertex ID triplets. Use
@@ -594,7 +594,7 @@ igraph_error_t igraph_list_triangles(const igraph_t *graph,
  * S. Wasserman and K. Faust: Social Network Analysis: Methods and
  * Applications. Cambridge: Cambridge University Press, 1994.
  *
- * \param graph The graph object. Edge directions and multiplicites are ignored.
+ * \param graph The graph object. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
  * \param mode Defines how to treat graphs with no connected triples.
  *   \c IGRAPH_TRANSITIVITY_NAN returns \c NaN in this case,

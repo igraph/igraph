@@ -856,24 +856,24 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
  * for details.
  *
  * </para><para>
- * The graph, vertex and edges attributes are written to the
+ * The graph, vertex and edge attributes are written to the
  * file as well, if they are numeric or string. Boolean attributes are converted
  * to numeric, with 0 and 1 used for false and true, respectively.
  * NaN values of numeric attributes are skipped, as NaN is not part of the GML
  * specification and other software may not be able to read files containing them.
  * This is consistent with \ref igraph_read_graph_gml(), which produces NaN
  * when an attribute value is missing. In contrast with NaN, infinite values
- * are retained. Ensure that none of the numeric attributes values are infinite
+ * are retained. Ensure that none of the numeric attribute values are infinite
  * to produce a conformant GML file that can be read by other software.
  *
  * </para><para>
  * As igraph is more forgiving about attribute names, it might
- * be necessary to simplify the them before writing to the GML file.
+ * be necessary to simplify them before writing to the GML file.
  * This way we'll have a syntactically correct GML file. The following
  * simple procedure is performed on each attribute name: first the alphanumeric
  * characters are extracted, the others are ignored. Then if the first character
  * is not a letter then the attribute name is prefixed with <quote>igraph</quote>.
- * Note that this might result identical names for two attributes, igraph
+ * Note that this might result in identical names for two attributes; igraph
  * does not check this.
  *
  * </para><para>
@@ -881,10 +881,10 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
  * If the <parameter>id</parameter> argument is not \c NULL then it should be a numeric
  * vector with the vertex IDs and the <quote>id</quote> vertex attribute is
  * ignored (if there is one). If <parameter>id</parameter> is \c NULL and there is a
- * numeric <quote>id</quote> vertex attribute, it will be used instead. If ids
+ * numeric <quote>id</quote> vertex attribute, it will be used instead. If IDs
  * are not specified in either way then the regular igraph vertex IDs are used.
- * If some of the supplied id values are invalid (non-integer or NaN), all supplied
- * id are ignored and igraph vertex IDs are used instead.
+ * If some of the supplied ID values are invalid (non-integer or NaN), all supplied
+ * IDs are ignored and igraph vertex IDs are used instead.
  *
  * </para><para>
  * Note that whichever way vertex IDs are specified, their uniqueness is not checked.

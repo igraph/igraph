@@ -1183,10 +1183,10 @@ static igraph_error_t igraph_i_layout_umap(
  *
  * </para><para>
  * The general UMAP workflow is to start from vectors, compute a sparse distance
- * graph that only contains edges between simiar points (e.g. a k-nearest neighbors
+ * graph that only contains edges between similar points (e.g. a k-nearest neighbors
  * graph), and then convert these distances into exponentially decaying weights
  * between 0 and 1 that are larger for points that are closest neighbors in the
- * distance graph. If a graph without any distances associated to the edges is used,
+ * distance graph. If a graph without any distances associated with the edges is used,
  * all weights will be set to 1.
  *
  * </para><para>
@@ -1195,7 +1195,7 @@ static igraph_error_t igraph_i_layout_umap(
  * associated distances, and then call this function on that graph. If you already
  * have a distance graph, or you have a graph with no distances, you can call this
  * function directly. If you already have a graph with meaningful weights
- * associated to each edge, you can also call this function, but set the argument
+ * associated with each edge, you can also call this function, but set the argument
  * \p distances_are_weights to true. To compute weights from distances
  * without computing the layout, see \ref igraph_layout_umap_compute_weights().
  *

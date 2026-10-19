@@ -301,7 +301,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
  * \param weights The edge weights. All edge weights must be
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
- *       is returned. Passa a null pointer here if the graph is unweighted.
+ *       is returned. Pass a null pointer here if the graph is unweighted.
  *       Edges with positive infinite weight are ignored.
  * \param res Pointer to a real number, this will contain the result.
  * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
@@ -631,13 +631,13 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
  *
  * The local efficiency of a network around a vertex is defined as follows:
  * We remove the vertex and compute the distances (shortest path lengths) between
- * its neighbours through the rest of the network. The local efficiency around the
+ * its neighbors through the rest of the network. The local efficiency around the
  * removed vertex is the average of the inverse of these distances.
  *
  * </para><para>
  * The inverse distance between two vertices which are not reachable from each other
  * is considered to be zero. The local efficiency around a vertex with fewer than two
- * neighbours is taken to be zero by convention.
+ * neighbors is taken to be zero by convention.
  *
  * </para><para>
  * Reference:
@@ -663,12 +663,12 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
  *    in directed graphs. Ignored in undirected graphs.
  *         \clist
  *         \cli IGRAPH_ALL
- *              take both in- and out-neighbours;
+ *              take both in- and out-neighbors;
  *              this is a reasonable default for high-level interfaces.
  *         \cli IGRAPH_OUT
- *              take only out-neighbours
+ *              take only out-neighbors
  *         \cli IGRAPH_IN
- *              take only in-neighbours
+ *              take only in-neighbors
  *         \endclist
  * \return Error code:
  *         \clist
@@ -817,12 +817,12 @@ igraph_error_t igraph_local_efficiency(
  *    in directed graphs. Ignored in undirected graphs.
  *         \clist
  *         \cli IGRAPH_ALL
- *              take both in- and out-neighbours;
+ *              take both in- and out-neighbors;
  *              this is a reasonable default for high-level interfaces.
  *         \cli IGRAPH_OUT
- *              take only out-neighbours
+ *              take only out-neighbors
  *         \cli IGRAPH_IN
- *              take only in-neighbours
+ *              take only in-neighbors
  *         \endclist
  * \return Error code:
  *         \clist
@@ -879,7 +879,7 @@ igraph_error_t igraph_average_local_efficiency(
  * The diameter of a graph is the length of the longest shortest path it has,
  * i.e. the maximum eccentricity of the graph's vertices.
  * This function computes both the diameter, as well as a corresponding path.
- * The diameter of the null graph is considered be infinity by convention.
+ * The diameter of the null graph is considered to be infinity by convention.
  *
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
  *
@@ -1386,7 +1386,7 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *        \cli IGRAPH_ENOMEM
  *           Not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from or \p to is an invalid vertex id.
+ *           \p from or \p to is an invalid vertex ID.
  *        \cli IGRAPH_EINVMODE
  *           Invalid mode argument.
  *        \cli IGRAPH_EINVAL

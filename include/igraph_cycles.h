@@ -67,7 +67,7 @@ IGRAPH_EXPORT igraph_error_t igraph_find_cycle(
  *
  * \param vertices The vertices of the current cycle. Must not be modified.
  * \param edges The edges of the current cycle. Must not be modified.
- * \param arg The extra parameter passed to \ref igraph_simple_cycles_callback()
+ * \param arg The extra parameter passed to \ref igraph_simple_cycles_callback().
  * \return Error code; \c IGRAPH_SUCCESS to continue the search or
  *   \c IGRAPH_STOP to stop the search without signaling an error.
  */

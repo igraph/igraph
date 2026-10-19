@@ -29,7 +29,7 @@
 
 /**
  * \function igraph_almost_equals
- * \brief Compare two double-precision floats with a tolerance.
+ * \brief Compares two double-precision floats with a tolerance.
  *
  * Determines whether two double-precision floats are "almost equal"
  * to each other with a given level of tolerance on the relative error.
@@ -65,7 +65,7 @@ igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
 
 /**
  * \function igraph_cmp_epsilon
- * \brief Compare two double-precision floats with a tolerance.
+ * \brief Compares two double-precision floats with a tolerance.
  *
  * Determines whether two double-precision floats are "almost equal"
  * to each other with a given level of tolerance on the relative error.
@@ -124,7 +124,7 @@ int igraph_cmp_epsilon(double a, double b, double eps) {
 
 /**
  * \function igraph_complex_almost_equals
- * \brief Compare two complex numbers with a tolerance.
+ * \brief Compares two complex numbers with a tolerance.
  *
  * Determines whether two complex numbers are "almost equal"
  * to each other with a given level of tolerance on the relative error.

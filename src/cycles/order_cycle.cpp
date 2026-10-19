@@ -32,7 +32,7 @@ struct eid_pair_t : public std::pair<igraph_int_t, igraph_int_t> {
 
 /**
  * \function igraph_i_order_cycle
- * \brief Reorders edges of a cycle in cycle order
+ * \brief Reorders edges of a cycle in cycle order.
  *
  * This function takes \p cycle, a vector of arbitrarily ordered edge IDs,
  * representing a graph cycle. It produces a vector \p res containing the

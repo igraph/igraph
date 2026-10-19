@@ -60,7 +60,7 @@
 
 /**
  * \function igraph_bipartite_projection_size
- * \brief Calculate the number of vertices and edges in the bipartite projections.
+ * \brief Calculates the number of vertices and edges in the bipartite projections.
  *
  * This function calculates the number of vertices and edges in the
  * two projections of a bipartite network. This is useful if you have
@@ -298,7 +298,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
 /**
  * \function igraph_bipartite_projection
- * \brief Create one or both projections of a bipartite (two-mode) network.
+ * \brief Creates one or both projections of a bipartite (two-mode) network.
  *
  * Creates one or both projections of a bipartite graph.
  *
@@ -308,15 +308,15 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
  * but not within V1 or within V2. The \p types parameter specifies
  * which vertex should be considered a member of one or the other
  * partition. The projection to V1 has vertex set V1, and two vertices
- * are connected if they have at least one common neighbour in V2.
- * The number of common neighbours is returned in \p multiplicity1,
+ * are connected if they have at least one common neighbor in V2.
+ * The number of common neighbors is returned in \p multiplicity1,
  * if requested.
  *
  * \param graph The bipartite input graph. Directedness of the edges
  *   is ignored.
  * \param types Boolean vector giving the vertex types of the graph.
  * \param proj1 Pointer to an uninitialized graph object, the first
- *   projection will be created here. It a null pointer, then it is
+ *   projection will be created here. If a null pointer, then it is
  *   ignored, see also the \p probe1 argument.
  * \param proj2 Pointer to an uninitialized graph object, the second
  *   projection is created here, if it is not a null pointer. See also
@@ -529,7 +529,7 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
 
 /**
  * \function igraph_create_bipartite
- * \brief Create a bipartite graph.
+ * \brief Creates a bipartite graph.
  *
  * This is a simple wrapper function to create a bipartite graph. It
  * does a little more than \ref igraph_create(), e.g. it checks that
@@ -852,7 +852,7 @@ igraph_error_t igraph_weighted_biadjacency(
  *   If \c NULL, all edges are assumed to have weight 1.
  * \param res Pointer to an initialized matrix, the result is stored
  *   here. An element of the matrix gives the number of edges
- *   (irrespectively of their direction), or sum of edge weights,
+ *   (irrespective of their direction), or sum of edge weights,
  *   between the two corresponding vertices. The rows will correspond
  *   to vertices with type \c false, the columns correspond to vertices
  *   with type \c true.
@@ -957,7 +957,7 @@ igraph_error_t igraph_get_biadjacency(
 
 /**
  * \function igraph_is_bipartite
- * \brief Check whether a graph is bipartite.
+ * \brief Checks whether a graph is bipartite.
  *
  * This function checks whether a graph is bipartite. It tries
  * to find a mapping that gives a possible division of the vertices into two
@@ -965,7 +965,7 @@ igraph_error_t igraph_get_biadjacency(
  * edge.
  *
  * </para><para>
- * The existence of such a mapping is equivalent of having no circuits of
+ * The existence of such a mapping is equivalent to having no circuits of
  * odd length in the graph. A graph with loop edges cannot be bipartite.
  *
  * </para><para>
@@ -978,7 +978,7 @@ igraph_error_t igraph_get_biadjacency(
  * \param types Pointer to an initialized boolean vector, or a null
  *   pointer. If not a null pointer and a mapping was found, then it
  *   is stored here. If not a null pointer, but no mapping was found,
- *   the contents of this vector is invalid.
+ *   the contents of this vector are invalid.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -1316,7 +1316,7 @@ static igraph_error_t bipartite_gnm_simple(
 
 /**
  * \function igraph_bipartite_game_gnm
- * \brief Generate a random bipartite graph with a fixed number of edges.
+ * \brief Generates a random bipartite graph with a fixed number of edges.
  *
  * The <code>G(n1, n2, m)</code> model uniformly samples bipartite graphs with
  * \p n1 bottom vertices and \p n2 top vertices, and precisely \p m edges.
@@ -1597,7 +1597,7 @@ static igraph_error_t gnp_bipartite_large(
  * bottom vertices and \p n2 top vertices is realized independently with
  * probability \p p. This is equivalent to a maximum entropy model with
  * a constraint on the \em expected total edge count. This view allows
- * a multigraph extension, in which case \p is interpreted as the expected
+ * a multigraph extension, in which case \p p is interpreted as the expected
  * number of edges between any vertex pair. See \ref igraph_erdos_renyi_game_gnp()
  * for more details.
  *

@@ -129,7 +129,7 @@ static igraph_error_t dimension_dispatcher(
  *
  * \param graph A pointer to the graph that will be created.
  * \param points A matrix containing the points that will be used to create
- *    the graph. Each row is a point, dimensionality is inferred from the
+ *    the graph. Each row is a point; dimensionality is inferred from the
  *    column count.
  * \param metric The distance metric to use. See \ref igraph_metric_t.
  * \param k At most how many neighbors will be added for each vertex, set to

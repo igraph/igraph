@@ -48,9 +48,9 @@
  *
  * </para><para>
  * While there is no universally adopted definition of closeness centrality
- * for disconnected graphs, there have been some attempts for generalizing
- * the concept to the disconnected case. One type of approach considers the mean distance
- * only to reachable vertices, then re-scales the obtained certrality score
+ * for disconnected graphs, there have been some attempts at generalizing
+ * the concept to the disconnected case. One type of approach considers the
+ * mean distance only to reachable vertices, then rescales the obtained centrality score
  * by a factor that depends on the number of reachable vertices
  * (i.e. the size of the component in the undirected case).
  * To facilitate computing these generalizations of closeness centrality,
@@ -88,7 +88,7 @@
  *          undirected one for the computation.
  *        \endclist
  * \param weights An optional vector containing edge weights for weighted
- *        closeness. NaN values re not allowed as weights. Supply a null
+ *        closeness. NaN values are not allowed as weights. Supply a null
  *        pointer here for traditional, unweighted closeness.
  * \param normalized If true, the inverse of the mean distance to reachable
  *        vertices is returned. If false, the inverse of the sum of distances
@@ -265,11 +265,11 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 /**
  * \ingroup structural
  * \function igraph_closeness_cutoff
- * \brief Range limited closeness centrality.
+ * \brief Range-limited closeness centrality.
  *
  * This function computes a range-limited version of closeness centrality
  * by considering only those shortest paths whose length is no greater
- * then the given cutoff value.
+ * than the given cutoff value.
  *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
@@ -280,7 +280,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  * \param all_reachable Pointer to a Boolean. If not \c NULL, it indicates if all
  *        vertices of the graph were reachable from each vertex in \p vids within
  *        the given cutoff distance.
- * \param vids The vertices for which the range limited closeness centrality
+ * \param vids The vertices for which the range-limited closeness centrality
  *             will be computed.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
@@ -664,16 +664,16 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
 /**
  * \ingroup structural
  * \function igraph_harmonic_centrality_cutoff
- * \brief Range limited harmonic centrality.
+ * \brief Range-limited harmonic centrality.
  *
- * This function computes the range limited version of harmonic centrality:
+ * This function computes the range-limited version of harmonic centrality:
  * only those shortest paths are considered whose length is not above the given cutoff.
  * The inverse distance to vertices not reachable within the cutoff is considered
  * to be zero.
  *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
- *        range limited harmonic centrality scores for the given vertices.
+ *        range-limited harmonic centrality scores for the given vertices.
  * \param vids The vertices for which the harmonic centrality will be computed.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
@@ -690,7 +690,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
  *        weighted harmonic centrality. No edge weight may be NaN.
  *        If \c NULL, all weights are considered to be one.
  * \param normalized Boolean, whether to normalize the result. If true,
- *        the result is the mean inverse path length to other vertices.
+ *        the result is the mean inverse path length to other vertices,
  *        i.e. it is normalized by the number of vertices minus one.
  *        If false, the result is the sum of inverse path lengths to other
  *        vertices.
@@ -745,7 +745,7 @@ igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_v
  * References:
  *
  * </para><para>
- * M. Marchiori and V. Latora, Harmony in the small-world, Physica A 285, pp. 539-546 (2000).
+ * M. Marchiori and V. Latora, Harmony in the small-world, Physica A 285, pp. 539–546 (2000).
  * https://doi.org/10.1016/S0378-4371%2800%2900311-3
  *
  * </para><para>
@@ -789,7 +789,7 @@ igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_v
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n|E|) for the unweighted case and O(n*|E|log|V|+|V|)
+ * Time complexity: O(n|E|) for the unweighted case and O(n|E|log|V|+|V|)
  * for the weighted case, where n is the number
  * of vertices for which the calculation is done, |V| is the number of vertices
  * and |E| is the number of edges in the graph.

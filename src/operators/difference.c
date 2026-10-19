@@ -33,7 +33,7 @@
  * \brief Calculates the difference of two graphs.
  *
  * The number of vertices in the result is the number of vertices in
- * the original graph, i.e. the left, first operand. In the results
+ * the original graph, i.e. the left, first operand. In the result
  * graph only edges will be included from \p orig which are not
  * present in \p sub.
  *
@@ -45,7 +45,7 @@
  * \sa \ref igraph_intersection() and \ref igraph_union() for other
  * operators.
  *
- * Time complexity: O(|V|+|E|), |V| is the number vertices in
+ * Time complexity: O(|V|+|E|), |V| is the number of vertices in
  * the smaller graph, |E| is the
  * number of edges in the result graph.
  *

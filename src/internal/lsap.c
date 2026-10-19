@@ -634,17 +634,17 @@ void preprocess(AP *p) {
  * \function igraph_solve_lsap
  * \brief Solve a balanced linear assignment problem.
  *
- * This functions solves a linear assignment problem using the Hungarian
+ * This function solves a linear assignment problem using the Hungarian
  * method. A number of tasks, an equal number of agents, and the cost
  * of each agent to perform the tasks is given. This function then
  * assigns one task to each agent in such a way that the total cost is
  * minimized.
  *
- * </param><param>
+ * </para><para>
  * If the cost should be maximized instead of minimized, the cost matrix
  * should be negated.
  *
- * </param><param>
+ * </para><para>
  * To solve an unbalanced assignment problem, where the number of agents
  * is greater than the number of tasks, extra tasks with zero costs
  * should be added.

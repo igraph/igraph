@@ -33,7 +33,7 @@
  * vertices, also known as structural holes.
  *
  * </para><para>
- * Burt's constraint is higher if ego has less, or mutually stronger
+ * Burt's constraint is higher if ego has fewer, or mutually stronger
  * related (i.e. more redundant) contacts. Burt's measure of
  * constraint, C[i], of vertex i's ego network V[i], is defined for
  * directed and valued graphs,
@@ -67,7 +67,7 @@
  *        \c NULL then each edge is supposed to have the same weight.
  * \return Error code.
  *
- * Time complexity: O(|V|+E|+n*d^2), n is the number of vertices for
+ * Time complexity: O(|V|+|E|+n*d^2), n is the number of vertices for
  * which the constraint is calculated and d is the average degree, |V|
  * is the number of vertices, |E| the number of edges in the
  * graph. If the weights argument is \c NULL then the time complexity

@@ -26,10 +26,10 @@
 
 /**
  * \function igraph_centralization
- * \brief Calculate the centralization score from the node level scores.
+ * \brief Calculates the centralization score from the node-level scores.
  *
  * For a centrality score defined on the vertices of a graph, it is
- * possible to define a graph level centralization index, by
+ * possible to define a graph-level centralization index by
  * calculating the sum of the deviations from the maximum centrality
  * score. Consequently, the higher the centralization index of the
  * graph, the more centralized the structure is.
@@ -37,7 +37,7 @@
  * </para><para>
  * In order to make graphs of different sizes comparable,
  * the centralization index is usually normalized to a number between
- * zero and one, by dividing the (unnormalized) centralization score
+ * zero and one by dividing by the (unnormalized) centralization score
  * of the most centralized structure with the same number of vertices.
  *
  * </para><para>
@@ -47,24 +47,24 @@
  * whether loop edges are allowed, etc.
  *
  * </para><para>
- * This function simply calculates the graph level index, if the node
- * level scores and the theoretical maximum are given. It is called by
+ * This function simply calculates the graph-level index if the node-level
+ * scores and the theoretical maximum are given. It is called by
  * all the measure-specific centralization functions. It uses the calculation
  *
  * </para><para>
  * <code>C = sum_v ((max_u c_u) - c_v)</code>
  *
  * </para><para>
- * where \c c are the centrality scores passed in \p scores. If \p normalized
- * is \c true, then <code>C/theoretical_max</code> is returned.
+ * where \c c denotes the centrality scores passed in \p scores. If \p normalized
+ * is \c true, then <code>C / theoretical_max</code> is returned.
  *
  * \param scores A vector containing the node-level centrality scores.
- * \param theoretical_max The graph level centrality score of the most
+ * \param theoretical_max The graph-level centrality score of the most
  *     centralized graph with the same number of vertices. Only used
- *     if \c normalized set to true.
+ *     if \p normalized is set to \c true.
  * \param normalized Boolean, whether to normalize the centralization
- *     by dividing the supplied theoretical maximum.
- * \return The graph level index.
+ *     by dividing by the supplied theoretical maximum.
+ * \return The graph-level index.
  *
  * \sa \ref igraph_centralization_degree(), \ref
  * igraph_centralization_betweenness(), \ref
@@ -99,17 +99,17 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
 
 /**
  * \function igraph_centralization_degree
- * \brief Calculate vertex degree and graph centralization.
+ * \brief Calculates vertex degree and graph centralization.
  *
  * This function calculates the degree of the vertices by passing its
- * arguments to \ref igraph_degree(); and it calculates the graph
- * level centralization index based on the results by calling \ref
- * igraph_centralization().
+ * arguments to \ref igraph_degree(), and it calculates the graph-level
+ * centralization index based on the results by calling
+ * \ref igraph_centralization().
  *
  * \param graph The input graph.
  * \param res A vector if you need the node-level degree scores, or a
  *     null pointer otherwise.
- * \param mode Constant the specifies the type of degree for directed
+ * \param mode Constant that specifies the type of degree for directed
  *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
  *     IGRAPH_ALL. This argument is ignored for undirected graphs.
  * \param loops Specifies how to treat loop edges when calculating the
@@ -119,9 +119,9 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  *     graphs and once in directed graphs.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
- * \param theoretical_max Pointer to real number or a null pointer. If
+ * \param theoretical_max Pointer to a real number or a null pointer. If
  *     not a null pointer, then the theoretical maximum graph
- *     centrality score for a graph with the same number vertices is
+ *     centrality score for a graph with the same number of vertices is
  *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
@@ -175,7 +175,7 @@ igraph_error_t igraph_centralization_degree(
  * based on vertex degree.
  *
  * </para><para>
- * There are two ways to call this function, the first is to supply a
+ * There are two ways to call this function. The first is to supply a
  * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
  * considered as well. The \p nodes argument is ignored in
@@ -272,11 +272,11 @@ igraph_error_t igraph_centralization_degree_tmax(
 
 /**
  * \function igraph_centralization_betweenness
- * \brief Calculate vertex betweenness and graph centralization.
+ * \brief Calculates vertex betweenness and graph centralization.
  *
  * This function calculates the betweenness centrality of the vertices
- * by passing its arguments to \ref igraph_betweenness(); and it
- * calculates the graph level centralization index based on the
+ * by passing its arguments to \ref igraph_betweenness(), and it
+ * calculates the graph-level centralization index based on the
  * results by calling \ref igraph_centralization().
  *
  * \param graph The input graph.
@@ -286,9 +286,9 @@ igraph_error_t igraph_centralization_degree_tmax(
  *     calculating betweenness.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
- * \param theoretical_max Pointer to real number or a null pointer. If
+ * \param theoretical_max Pointer to a real number or a null pointer. If
  *     not a null pointer, then the theoretical maximum graph
- *     centrality score for a graph with the same number vertices is
+ *     centrality score for a graph with the same number of vertices is
  *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
@@ -344,7 +344,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  * based on vertex betweenness.
  *
  * </para><para>
- * There are two ways to call this function, the first is to supply a
+ * There are two ways to call this function. The first is to supply a
  * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
  * considered as well. The \p nodes argument is ignored in
@@ -408,25 +408,25 @@ igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_closeness
- * \brief Calculate vertex closeness and graph centralization.
+ * \brief Calculates vertex closeness and graph centralization.
  *
  * This function calculates the closeness centrality of the vertices
- * by passing its arguments to \ref igraph_closeness(); and it
- * calculates the graph level centralization index based on the
+ * by passing its arguments to \ref igraph_closeness(), and it
+ * calculates the graph-level centralization index based on the
  * results by calling \ref igraph_centralization().
  *
  * \param graph The input graph.
  * \param res A vector if you need the node-level closeness scores, or a
  *     null pointer otherwise.
- * \param mode Constant the specifies the type of closeness for directed
+ * \param mode Constant that specifies the type of closeness for directed
  *     graphs. Possible values: \c IGRAPH_IN, \c IGRAPH_OUT and \c
- *     IGRAPH_ALL. This argument is ignored for undirected graphs. See
- *     \ref igraph_closeness() argument with the same name for more.
+ *     IGRAPH_ALL. This argument is ignored for undirected graphs. See the
+ *     argument with the same name in \ref igraph_closeness() for details.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
- * \param theoretical_max Pointer to real number or a null pointer. If
+ * \param theoretical_max Pointer to a real number or a null pointer. If
  *     not a null pointer, then the theoretical maximum graph
- *     centrality score for a graph with the same number vertices is
+ *     centrality score for a graph with the same number of vertices is
  *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
@@ -484,7 +484,7 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
  * based on vertex closeness.
  *
  * </para><para>
- * There are two ways to call this function, the first is to supply a
+ * There are two ways to call this function. The first is to supply a
  * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
  * considered as well. The \p nodes argument is ignored in
@@ -551,11 +551,11 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_eigenvector_centrality
- * \brief Calculate eigenvector centrality scores and graph centralization.
+ * \brief Calculates eigenvector centrality scores and graph centralization.
  *
  * This function calculates the eigenvector centrality of the vertices
- * by passing its arguments to \ref igraph_eigenvector_centrality();
- * and it calculates the graph level centralization index based on the
+ * by passing its arguments to \ref igraph_eigenvector_centrality(),
+ * and it calculates the graph-level centralization index based on the
  * results by calling \ref igraph_centralization().
  *
  * </para><para>
@@ -568,7 +568,7 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * on the choice of normalization for centralities. This function makes
  * the specific choice of scaling vertex-level centrality scores by their
  * maximum (i.e. it uses the ∞-norm). Other normalization choices, such
- * as the 1-norm or 2-norm are not currently implemented.
+ * as the 1-norm or 2-norm, are not currently implemented.
  *
  * \param graph The input graph.
  * \param vector A vector if you need the node-level eigenvector
@@ -585,9 +585,9 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  *    calculated based on the degree of the vertices.
  * \param centralization Pointer to a real number, the centralization
  *     score is placed here.
- * \param theoretical_max Pointer to real number or a null pointer. If
+ * \param theoretical_max Pointer to a real number or a null pointer. If
  *     not a null pointer, then the theoretical maximum graph
- *     centrality score for a graph with the same number vertices is
+ *     centrality score for a graph with the same number of vertices is
  *     stored here.
  * \param normalized Boolean, whether to calculate a normalized
  *     centralization score. See \ref igraph_centralization() for how
@@ -597,8 +597,8 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
  * \sa \ref igraph_centralization(), \ref igraph_eigenvector_centrality().
  *
  * Time complexity: the complexity of \ref
- * igraph_eigenvector_centrality() plus O(|V|), the number of vertices
- * for the calculating the centralization.
+ * igraph_eigenvector_centrality() plus O(|V|), the number of vertices,
+ * for calculating the centralization.
  */
 
 igraph_error_t igraph_centralization_eigenvector_centrality(
@@ -653,7 +653,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  * based on vertex eigenvector centrality.
  *
  * </para><para>
- * There are two ways to call this function, the first is to supply a
+ * There are two ways to call this function. The first is to supply a
  * graph as the \p graph argument, and then the number of
  * vertices is taken from this object, and its directedness is
  * considered as well. The \p nodes argument is ignored in
@@ -661,7 +661,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
  * supplied graph is undirected.
  *
  * </para><para>
- * The other way is to supply a null pointer as the \p graph. argument.
+ * The other way is to supply a null pointer as the \p graph argument.
  * In this case the \p nodes and \p mode arguments are considered.
  *
  * </para><para>

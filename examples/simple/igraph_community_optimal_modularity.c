@@ -38,7 +38,7 @@ int main(void) {
 
     errcode = igraph_community_optimal_modularity(&graph, NULL, 1, &modularity, &membership);
     if (errcode == IGRAPH_UNIMPLEMENTED) {
-        /* igraph was not build with GLPK; functionality unavailable, so we quit */
+        /* igraph was not built with GLPK; functionality unavailable, so we quit */
         return 77;
     }
 

@@ -572,10 +572,10 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
- * \param edge_res Pointer to an initialised vector. The indices of edges
+ * \param edge_res Pointer to an initialized vector. The indices of edges
  *                 belonging to the cycle will be stored here. May be \c NULL
  *                 if it is not needed by the caller.
- * \param vertex_res Pointer to an initialised vector. The indices of vertices
+ * \param vertex_res Pointer to an initialized vector. The indices of vertices
  *                   belonging to the cycle will be stored here. The first and
  *                   last vertex in the vector will be the same. May be \c NULL
  *                   if it is not needed by the caller.
@@ -635,10 +635,10 @@ igraph_error_t igraph_eulerian_cycle(
  * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
- * \param edge_res Pointer to an initialised vector. The indices of edges
+ * \param edge_res Pointer to an initialized vector. The indices of edges
  *                 belonging to the path will be stored here. May be \c NULL
  *                 if it is not needed by the caller.
- * \param vertex_res Pointer to an initialised vector. The indices of vertices
+ * \param vertex_res Pointer to an initialized vector. The indices of vertices
  *                   belonging to the path will be stored here. May be \c NULL
  *                   if it is not needed by the caller.
  * \return Error code:

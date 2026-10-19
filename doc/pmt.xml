@@ -10,7 +10,7 @@
 Some of the container types listed in this section are defined for
 many base types. This is similar to templates in C++ and generics in
 Ada, but it is implemented via preprocessor macros since the C language
-cannot handle it. Here is the list of template types and the all base
+cannot handle it. Here is the list of template types and all the base
 types they currently support:
 <glosslist>
 
@@ -18,7 +18,7 @@ types they currently support:
   Vector is currently defined for <type>igraph_real_t</type>,
   <type>igraph_int_t</type> (int), <type>char</type> (char),
   <type>igraph_bool_t</type> (bool), <type>igraph_complex_t</type>
-  (complex) and  and <type>void *</type> (ptr). The default is
+  (complex) and <type>void *</type> (ptr). The default is
   <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
@@ -53,7 +53,7 @@ types they currently support:
 <glossentry><glossterm>heap</glossterm><glossdef><para>
   Heap is currently defined for <type>igraph_real_t</type>,
   <type>igraph_int_t</type> (int), <type>char</type> (char).
-  In addition both maximum and minimum heaps are available.
+  In addition, both maximum and minimum heaps are available.
   The default is the <type>igraph_real_t</type> maximum heap.
 </para></glossdef></glossentry>
 
@@ -139,7 +139,7 @@ Some examples:
 Note that the <link linkend="VECTOR">VECTOR</link> and the <link
 linkend="MATRIX">MATRIX</link> macros can be used on <emphasis>all</emphasis>
 vector and matrix types. <link linkend="VECTOR">VECTOR</link> cannot be used
-on <emphasis>lists</emphasis> of vectors, though, only on the individial
+on <emphasis>lists</emphasis> of vectors, though, only on the individual
 vectors in the list.
 </para>
 

@@ -202,21 +202,22 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
 
 /**
  * \function igraph_trussness
- * \brief Finding the "trussness" of the edges in a network.
+ * \brief The "trussness" of the edges in a network.
  *
- * A k-truss is a subgraph in which every edge occurs in at least <code>k-2</code> triangles
+ * A k-truss is a subgraph in which every edge occurs in at least <code>k - 2</code> triangles
  * in the subgraph. The trussness of an edge indicates the highest k-truss that
  * the edge occurs in.
  *
  * </para><para>
  * This function returns the highest \c k for each edge. If you are interested in
  * a particular k-truss subgraph, you can subset the graph to those edges
- * which are <code>&gt;= k</code> because each k-truss is a subgraph of a <code>(k–1)</code>-truss
- * Thus, to get all 4-trusses, take <code>k >= 4</code> because the 5-trusses, 6-trusses,
+ * whose trussness is <code>&gt;= k</code>, because each k-truss is a subgraph
+ * of a <code>(k - 1)</code>-truss.
+ * Thus, to get all 4-trusses, take <code>k &gt;= 4</code> because the 5-trusses, 6-trusses,
  * etc. need to be included.
  *
  * </para><para>
- * The current implementation of this function iteratively decrements support
+ * The current implementation of this function iteratively decrements the support
  * of each edge using O(|E|) space and O(|E|^1.5) time. The implementation does
  * not support multigraphs; use \ref igraph_simplify() to collapse edges before
  * calling this function.
@@ -227,11 +228,11 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
  * </para><para>
  * See Algorithm 2 in:
  * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
- * Proceedings of the VLDB Endowment 5.9 (2012): 812-823.
+ * Proceedings of the VLDB Endowment 5.9 (2012): 812–823.
  * https://doi.org/10.14778/2311906.2311909
  *
  * \param graph The input graph. Loop edges are allowed; multigraphs are not.
- * \param truss Pointer to initialized vector of truss values that will
+ * \param truss Pointer to an initialized vector of truss values that will
  * indicate the highest k-truss each edge occurs in. It will be resized as
  * needed.
  * \return Error code.

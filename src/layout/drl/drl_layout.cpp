@@ -206,8 +206,8 @@ namespace drl {
  *
  * <para>
  * Only a subset of the complete DrL functionality is
- * included in igraph, parallel runs and recursive, multi-level
- * layouting is not supported.
+ * included in igraph; parallel runs and recursive, multi-level
+ * layout are not supported.
  * </para>
  *
  * <para>

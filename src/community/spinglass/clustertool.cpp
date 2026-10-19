@@ -96,7 +96,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  * </para><para>
  * From version 0.6, igraph also supports an extension to
  * the algorithm that allows negative edge weights. This is described
- * in  V. A. Traag and Jeroen Bruggeman: Community detection in networks
+ * in V. A. Traag and Jeroen Bruggeman: Community detection in networks
  * with positive and negative links, http://arxiv.org/abs/0811.2329 .
  *
  * \param graph The input graph, it may be directed but the direction
@@ -107,7 +107,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  *     implementation.
  * \param modularity Pointer to a real number, if not \c NULL then the
  *     modularity score of the solution will be stored here. This is the
- *     gereralized modularity, taking into account the resolution parameter
+ *     generalized modularity, taking into account the resolution parameter
  *     \p gamma. See \ref igraph_modularity() for details.
  * \param temperature Pointer to a real number, if not \c NULL then
  *     the temperature at the end of the algorithm will be stored
@@ -118,13 +118,13 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  *     first cluster numbered zero. The vector will be resized as
  *     needed.
  * \param csize Pointer to an initialized vector or \c NULL. If not \c
- *     NULL then the sizes of the clusters will stored here in cluster
+ *     NULL then the sizes of the clusters will be stored here in cluster
  *     number order. The vector will be resized as needed.
  * \param spins Integer giving the number of spins, i.e. the maximum
  *     number of clusters. Even if the number of spins is high the number of
  *     clusters in the result might be small.
  * \param parupdate A Boolean constant, whether to update all spins in
- *     parallel. It is not implemented in the \c IGRAPH_SPINCOMM_INP_NEG
+ *     parallel. It is not implemented in the \c IGRAPH_SPINCOMM_IMP_NEG
  *     implementation.
  * \param starttemp Real number, the temperature at the start. A reasonable
  *     default is 1.0.
@@ -137,7 +137,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defines
  *     the null model based on which the actual clustering is done. If
  *     this is \c IGRAPH_SPINCOMM_UPDATE_SIMPLE then the random graph
- *     (i.e. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
+ *     (i.e. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE_CONFIG then the
  *     configuration model is used. The configuration means that the
  *     baseline for the clustering is a random graph with the same
  *     degree distribution as the input graph.
@@ -147,11 +147,11 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  * \param implementation Constant, chooses between the two
  *     implementations of the spin-glass algorithm that are included
  *     in igraph. \c IGRAPH_SPINCOMM_IMP_ORIG selects the original
- *     implementation, this is faster, \c IGRAPH_SPINCOMM_INP_NEG selects
+ *     implementation, this is faster, \c IGRAPH_SPINCOMM_IMP_NEG selects
  *     an implementation that allows negative edge weights.
  * \param gamma_minus Real number. Parameter for the \c IGRAPH_SPINCOMM_IMP_NEG
  *     implementation. This acts as a resolution parameter for the negative part
- *     of the network. Smaller values of \p gamma_minus leads to fewer negative
+ *     of the network. Smaller values of \p gamma_minus lead to fewer negative
  *     edges within clusters. If this argument is set to zero, the algorithm
  *     reduces to a graph coloring algorithm when all edges have negative
  *     weights, using the number of spins as the number of colors.
@@ -392,24 +392,24 @@ static igraph_error_t igraph_i_community_spinglass_orig(
  *    clusters will contain zero vertices.
  * \param update_rule The type of the update rule. Possible values: \c
  *     IGRAPH_SPINCOMM_UPDATE_SIMPLE and \c
- *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defined
+ *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defines
  *     the null model based on which the actual clustering is done. If
  *     this is \c IGRAPH_SPINCOMM_UPDATE_SIMPLE then the random graph
- *     (ie. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
+ *     (i.e. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE_CONFIG then the
  *     configuration model is used. The configuration means that the
  *     baseline for the clustering is a random graph with the same
  *     degree distribution as the input graph.
  * \param gamma Real number. The gamma parameter of the
- *     algorithm. This defined the weight of the missing and existing
+ *     algorithm. This defines the weight of the missing and existing
  *     links in the quality function for the clustering. The default
  *     value in the original code was 1.0, which is equal weight to
  *     missing and existing edges. Smaller values make the existing
- *     links contibute more to the energy function which is minimized
+ *     links contribute more to the energy function which is minimized
  *     in the algorithm. Bigger values make the missing links more
  *     important. (If my understanding is correct.)
  * \return Error code.
  *
- * \sa igraph_community_spinglass() for the traditional version of the
+ * \sa \ref igraph_community_spinglass() for the traditional version of the
  * algorithm.
  *
  * Time complexity: TODO.

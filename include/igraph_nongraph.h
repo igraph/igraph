@@ -57,7 +57,7 @@ IGRAPH_BEGIN_C_DECLS
  *               parameters.
  * \member D     The test statistic of a Kolmogorov-Smirnov test that compares
  *               the fitted distribution with the input vector. Smaller scores
- *               denote better fit.
+ *               denote a better fit.
  * \member p     The p-value of the Kolmogorov-Smirnov test; \c NaN if it has
  *               not been calculated yet. Small p-values (less than 0.05)
  *               indicate that the test rejected the hypothesis that the

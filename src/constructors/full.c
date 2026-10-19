@@ -139,10 +139,10 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_int_t n, igraph_bool_t direct
  *   of each type.
  * \param directed Boolean, whether to create a directed graph.
  * \param mode A constant that gives the type of connections for
- *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
- *   of low-index vertices to high-index vertices; if
+ *   directed graphs. If \c IGRAPH_OUT, then edges point from
+ *   low-index vertices to high-index vertices; if
  *   \c IGRAPH_IN, then the opposite direction is realized;
- *   \c IGRAPH_ALL, then mutual edges will be created.
+ *   if \c IGRAPH_ALL, then mutual edges will be created.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -255,7 +255,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
  *
  * </para><para>
  * The Turán graph with \p n vertices and \p r partitions is the densest
- * graph on \p n  vertices that does not contain a clique of size
+ * graph on \p n vertices that does not contain a clique of size
  * <code>r+1</code>.
  *
  * </para><para>
@@ -336,11 +336,11 @@ igraph_error_t igraph_turan(igraph_t *graph,
  * \param graph Pointer to an uninitialized graph object, the result
  *    is stored here.
  * \param n The number of vertices.
- * \param directed Whether to created a directed graph. If false an
+ * \param directed Whether to create a directed graph. If false, an
  *    undirected graph is created.
  * \return Error code.
  *
- * \sa \ref igraph_full()
+ * \sa \ref igraph_full().
  *
  * Time complexity: O(|V|^2) = O(|E|),
  * where |V| is the number of vertices and |E| is the number of edges.

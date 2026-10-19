@@ -32,7 +32,7 @@
     <listitem>
       <para>
         <emphasis role="strong">adjacency list</emphasis>: A data
-        structure that associates a list of neighbours (i.e. adjacent
+        structure that associates a list of neighbors (i.e. adjacent
         vertices) to each vertex.
       </para>
     </listitem>
