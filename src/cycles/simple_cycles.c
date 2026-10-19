@@ -61,6 +61,13 @@ typedef struct {
     /* Boolean vector indicating which vertices are blocked */
     igraph_bitset_t v_blocked;
 
+    /* The vertices that the current search has blocked at least once, each
+     * listed once, and the corresponding indicator bitset. Only these vertices
+     * can have state (a blocked flag or a non-empty B list) that must be
+     * reset after the search; see simple_cycles_reset_touched(). */
+    igraph_vector_int_t touched;
+    igraph_bitset_t v_touched;
+
     /* Boolean vector indicating which vertices have ever been checked.
      * The bigger picture here is that this allows a "lazy" community decomposition */
     igraph_bitset_t v_visited;
@@ -187,6 +194,10 @@ static igraph_error_t simple_cycles_circuit(
             //        V, igraph_vector_int_size(&state->vertex_stack),
             //        igraph_stack_int_size(&v_stack));
             IGRAPH_BIT_SET(state->v_blocked, V);
+            if (!IGRAPH_BIT_TEST(state->v_touched, V)) {
+                IGRAPH_BIT_SET(state->v_touched, V);
+                IGRAPH_CHECK(igraph_vector_int_push_back(&state->touched, V));
+            }
         } else {
             // back to what we were doing before
             i0 = igraph_stack_int_pop(&neigh_iteration_progress);
@@ -273,6 +284,9 @@ static igraph_error_t simple_cycles_circuit(
             } else {
                 for (igraph_int_t i = 0; i < num_neighbors; ++i) {
                     const igraph_int_t W = VECTOR(*neighbors)[i];
+                    // W must be in 'touched', so that its B list is cleared
+                    // after this search. See simple_cycles_reset_touched().
+                    IGRAPH_ASSERT(IGRAPH_BIT_TEST(state->v_touched, W));
                     if (!igraph_vector_int_contains(igraph_adjlist_get(&state->B, W), V)) {
                         IGRAPH_CHECK(
                             igraph_vector_int_push_back(igraph_adjlist_get(&state->B, W), V));
@@ -351,6 +365,13 @@ static igraph_error_t simple_cycle_search_state_init(
 
     IGRAPH_BITSET_INIT_FINALLY(&state->v_visited, state->N);
 
+    IGRAPH_BITSET_INIT_FINALLY(&state->v_touched, state->N);
+
+    // Each vertex appears at most once, so reserving N elements means that
+    // pushing to 'touched' never reallocates.
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->touched, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&state->touched, state->N));
+
     IGRAPH_CHECK(igraph_inclist_init(
                      graph, &state->IK, mode,
                      IGRAPH_LOOPS_ONCE // each self-loop counts as a single cycle
@@ -363,7 +384,7 @@ static igraph_error_t simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
-    IGRAPH_FINALLY_CLEAN(7);
+    IGRAPH_FINALLY_CLEAN(9);
 
     return IGRAPH_SUCCESS;
 }
@@ -384,6 +405,8 @@ static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state
     igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
+    igraph_vector_int_destroy(&state->touched);
+    igraph_bitset_destroy(&state->v_touched);
     igraph_bitset_destroy(&state->v_visited);
     igraph_bitset_destroy(&state->v_blocked);
     igraph_vector_int_destroy(&state->edge_stack);
@@ -431,6 +454,69 @@ static igraph_error_t append_simple_cycle_result(
 }
 
 /**
+ * Resets the per-search state (blocked flags and B lists) after a search.
+ *
+ * Only the vertices in state->touched are visited, so the cost is at most
+ * proportional to the work done by the search, rather than O(N). Resetting
+ * every vertex with index >= s, as Johnson's original algorithm does, is
+ * not enough here: start vertices may be skipped, and skipped vertices are
+ * never removed from the graph, so they may keep stale state from an earlier
+ * search. That caused cycles to be missed, see
+ * https://github.com/igraph/igraph/issues/2911
+ *
+ * Invariant (I): when a search starts, no vertex is blocked and every B list
+ * is empty.
+ *
+ * Lemma: if (I) holds when a search starts, then every vertex W that is
+ * blocked at any time during the search, or that receives an entry in B[W],
+ * is in 'touched'.
+ *
+ * Proof:
+ *
+ * 1. Blocked vertices. Under (I), nothing is blocked when the search starts.
+ *    The only place that sets v_blocked is the push of a vertex in
+ *    simple_cycles_circuit(), which also adds it to 'touched'. So every vertex
+ *    that is blocked at any time during the search is in 'touched', even if it
+ *    was unblocked later.
+ *
+ * 2. B entries. B[W] gains entries only in L2, when the vertex V being popped
+ *    has local_found and loop_length_stop both false; UNBLOCK only removes
+ *    entries. W is then a neighbour of V, and when W was examined in L1 for V,
+ *    one of three cases applied:
+ *    - W == S. Impossible here: that branch sets local_found as its first
+ *      statement, before the checks that may skip the cycle.
+ *    - W not blocked. Either the search recursed into W, so W was pushed and
+ *      is in 'touched' by step 1, or the length limit prevented it, which sets
+ *      loop_length_stop and is impossible here.
+ *    - W blocked. Then W is in 'touched' by step 1.
+ *    Membership in 'touched' is all that is needed, even if W has since been
+ *    unblocked.
+ *
+ * 3. Induction. This function clears v_blocked, v_touched and B for exactly
+ *    the vertices in 'touched'. By the lemma, these are the only vertices
+ *    with state, so (I) holds for the next search. It holds for the first
+ *    search because the state is initialized empty.
+ *
+ * The proof uses only that both flags are false at the moment L2 writes to B,
+ * not that they stay set for the rest of the search once set. It therefore
+ * remains valid if the flags are made per DFS level, like the flag f in
+ * Johnson's paper, provided that the outcome of processing each neighbour is
+ * preserved until the L2 decision at that level.
+ *
+ * The B write in L2 asserts that W is in 'touched'.
+ */
+static void simple_cycles_reset_touched(simple_cycle_search_state_t *state) {
+    const igraph_int_t n = igraph_vector_int_size(&state->touched);
+    for (igraph_int_t i = 0; i < n; ++i) {
+        const igraph_int_t v = VECTOR(state->touched)[i];
+        IGRAPH_BIT_CLEAR(state->v_blocked, v);
+        IGRAPH_BIT_CLEAR(state->v_touched, v);
+        igraph_vector_int_clear(igraph_adjlist_get(&state->B, v));
+    }
+    igraph_vector_int_clear(&state->touched);
+}
+
+/**
  * \function simple_cycles_search_callback_from_one_vertex
  * \brief Search simple cycles starting from one vertex.
  *
@@ -456,22 +542,18 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
         igraph_cycle_handler_t *callback,
         void *arg) {
 
-    // L3: reset the blocked flags and B lists before the search.
-    //
-    // This must cover *all* vertices, not only those with index >= s.
-    // Johnson's algorithm removes each start vertex after its search, so in the
-    // original algorithm the vertices below s are gone. Here, however, start
-    // vertices may be skipped (see igraph_simple_cycles_callback()). Skipped
-    // vertices are never removed, and an earlier search may have left them
-    // blocked. Stale state on such vertices caused cycles to be missed, see
-    // https://github.com/igraph/igraph/issues/2911
-    for (igraph_int_t i = 0; i < state->N; ++i) {
-        IGRAPH_BIT_CLEAR(state->v_blocked, i);
-        igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
-    }
+    // Invariant (I): when a search starts, no vertex is blocked and every
+    // B list is empty. See simple_cycles_reset_touched() for why this holds.
+    IGRAPH_ASSERT(igraph_vector_int_empty(&state->touched));
+#ifndef NDEBUG
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&state->v_blocked));
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&state->v_touched));
+#endif
 
     IGRAPH_CHECK(simple_cycles_circuit(state, s, max_cycle_length,
                  min_cycle_length, callback, arg));
+
+    simple_cycles_reset_touched(state);
 
     for (igraph_int_t i = 0; i < state->N; ++i) {
         // We want to remove the vertex with value s, not at position s.
@@ -564,7 +646,7 @@ igraph_error_t igraph_simple_cycles_callback(
     //
     // Skipped vertices are never removed from the graph, unlike the vertices
     // that were used as starts. The per-search state must therefore be reset
-    // for them as well; see simple_cycles_search_callback_from_one_vertex().
+    // for them as well; see simple_cycles_reset_touched().
     for (igraph_int_t i = 0; i < state.N; i++) {
         // Check if the vertex is a candidate for a cycle.
         // Note that we call igraph_degree_1() here instead of retrieving the
