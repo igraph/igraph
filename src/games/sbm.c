@@ -32,7 +32,7 @@
 
 /**
  * \function igraph_sbm_game
- * \brief Sample from a stochastic block model.
+ * \brief Samples from a stochastic block model.
  *
  * This function samples graphs from a stochastic block model, a generalization
  * of the G(n,p) model where the connection probability p (or expected number
@@ -49,7 +49,7 @@
  * </para><para>
  * Faust, K., &amp; Wasserman, S. (1992a).
  * Blockmodels: Interpretation and evaluation.
- * Social Networks, 14, 5-–61.
+ * Social Networks, 14, 5–61.
  * https://doi.org/10.1016/0378-8733(92)90013-W
  *
  * \param graph The output graph. This should be a pointer to an
@@ -271,7 +271,7 @@ igraph_error_t igraph_sbm_game(
  *        within a block. Must sum up to 1, and rho * m must be integer
  *        for all elements of rho.
  * \param C A square, symmetric numeric matrix, the Bernoulli rates for
- *        the clusters within a block. Its size must mach the size of the
+ *        the clusters within a block. Its size must match the size of the
  *        \p rho vector.
  * \param p The Bernoulli rate of connections between
  *        vertices in different blocks.

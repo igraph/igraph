@@ -276,7 +276,7 @@ static igraph_error_t igraph_i_adjacency_min(
  * \brief Creates a graph from an adjacency matrix.
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
- * corresponding to the first row/column will be vertex with id 0, the
+ * corresponding to the first row/column will be the vertex with ID 0, the
  * next row is for vertex 1, etc. No guarantees are given about the ordering
  * of edges.
  *
@@ -324,10 +324,10 @@ static igraph_error_t igraph_i_adjacency_min(
  *          incident on the corresponding vertex. Odd numbers in the diagonal
  *          will return an error code.
  *        \endclist
- * \return Error code,
+ * \return Error code:
  *         \c IGRAPH_EINVAL: Non-square adjacency matrix, negative entry in
  *         adjacency matrix, or an odd number was found in the diagonal with
- *         \c IGRAPH_LOOPS_TWICE
+ *         \c IGRAPH_LOOPS_TWICE.
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
@@ -726,7 +726,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  * \brief Creates a graph from a weighted adjacency matrix.
  *
  * The order of the vertices in the matrix is preserved, i.e. the vertex
- * corresponding to the first row/column will be vertex with id 0, the
+ * corresponding to the first row/column will be the vertex with ID 0, the
  * next row is for vertex 1, etc. No guarantees are given for the ordering
  * of edges.
  *
@@ -774,7 +774,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *          Treat the diagonal entries as \em twice the weight of the loop edge
  *          incident on the corresponding vertex.
  *        \endclist
- * \return Error code,
+ * \return Error code:
  *         \c IGRAPH_EINVAL: non-square matrix.
  *
  * Time complexity: O(|V||V|),
@@ -866,7 +866,7 @@ igraph_error_t igraph_weighted_adjacency(
  *             directed graph from an out-adjacency list (i.e. each
  *             list contains the successors of the corresponding
  *             vertices), \c IGRAPH_IN means a directed graph from an
- *             in-adjacency list
+ *             in-adjacency list.
  * \param duplicate Boolean constant. For undirected graphs this specifies
  *        whether each edge is included twice, in the vectors of
  *        both adjacent vertices. If this is \c false, then it is

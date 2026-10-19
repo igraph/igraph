@@ -349,12 +349,12 @@ igraph_error_t igraph_i_maximal_cliques(
  * David Eppstein, Maarten Löffler, Darren Strash:
  * Listing All Maximal Cliques in Sparse Graphs in Near-Optimal Time.
  * Algorithms and Computation, Lecture Notes in Computer Science,
- * volume 6506, pp 403-414 (2010).
+ * volume 6506, pp. 403–414 (2010).
  * https://doi.org/10.1007/978-3-642-17517-6_36
  * https://arxiv.org/abs/1006.5440
  *
  * \param graph The input graph. Edge directions are ignored.
- * \param res Pointer to list of integer vectors. The maximal cliques
+ * \param res Pointer to a list of integer vectors. The maximal cliques
  *   will be returned here as vectors of vertex IDs. Note that vertices
  *   of a clique may be returned in arbitrary order.
  * \param min_size Integer giving the minimum size of the cliques to be
@@ -362,7 +362,7 @@ igraph_error_t igraph_i_maximal_cliques(
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many cliques will be recorded. If
- *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *   negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_independent_vertex_sets() to find maximal
@@ -370,8 +370,8 @@ igraph_error_t igraph_i_maximal_cliques(
  * \ref igraph_clique_number() to find the size of the largest clique;
  * \ref igraph_cliques() to find all cliques.
  *
- * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
- * of the graph, this is typically small for sparse graphs.
+ * Time complexity: O(d(n-d)3^(d/3)) in the worst case, where d is the
+ * degeneracy of the graph, which is typically small for sparse graphs.
  *
  * \example examples/simple/igraph_maximal_cliques.c
  */
@@ -399,7 +399,7 @@ igraph_error_t igraph_i_maximal_cliques_count(
 
 /**
  * \function igraph_maximal_cliques_count
- * \brief Count the number of maximal cliques in a graph.
+ * \brief Counts the number of maximal cliques in a graph.
  *
  * See \ref igraph_maximal_cliques() for details.
  *
@@ -414,8 +414,8 @@ igraph_error_t igraph_i_maximal_cliques_count(
  *
  * \sa \ref igraph_maximal_cliques().
  *
- * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
- * of the graph, this is typically small for sparse graphs.
+ * Time complexity: O(d(n-d)3^(d/3)) in the worst case, where d is the
+ * degeneracy of the graph, which is typically small for sparse graphs.
  *
  * \example examples/simple/igraph_maximal_cliques.c
  */
@@ -441,26 +441,26 @@ igraph_error_t igraph_i_maximal_cliques_file(
 
 /**
  * \function igraph_maximal_cliques_file
- * \brief Find maximal cliques and write them to a file.
+ * \brief Finds maximal cliques and writes them to a file.
  *
  * This function enumerates all maximal cliques within a size range
- * and writes them to file. See \ref igraph_maximal_cliques() for
- * details
+ * and writes them to a file. See \ref igraph_maximal_cliques() for
+ * details.
  *
  * \param graph The input graph. Edge directions are ignored.
- * \param outfile Pointer to the output file, it should be writable.
+ * \param outfile Pointer to the output file, which should be writable.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many cliques will be output. If
- *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *   negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques().
  *
- * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
- * of the graph, this is typically small for sparse graphs.*
+ * Time complexity: O(d(n-d)3^(d/3)) in the worst case, where d is the
+ * degeneracy of the graph, which is typically small for sparse graphs.
  *
  */
 
@@ -490,11 +490,11 @@ igraph_error_t igraph_i_maximal_cliques_subset(
  * \brief Maximal cliques for a subset of initial vertices.
  *
  * This function enumerates all maximal cliques for a subset of initial
- * vertices and writes them to file. See \ref igraph_maximal_cliques()
+ * vertices and writes them to a file. See \ref igraph_maximal_cliques()
  * for details.
  *
  * \param graph The input graph. Edge directions are ignored.
- * \param subset Pointer to an \c  igraph_vector_int_t containing the
+ * \param subset Pointer to an \c igraph_vector_int_t containing the
  *   subset of initial vertices.
  * \param res Pointer to a list of integer vectors; the cliques will be
  *   stored here.
@@ -507,13 +507,13 @@ igraph_error_t igraph_i_maximal_cliques_subset(
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many cliques will be recorded. If
- *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *   negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques().
  *
- * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
- * of the graph, this is typically small for sparse graphs.
+ * Time complexity: O(d(n-d)3^(d/3)) in the worst case, where d is the
+ * degeneracy of the graph, which is typically small for sparse graphs.
  *
  */
 
@@ -545,7 +545,7 @@ igraph_error_t igraph_i_maximal_cliques_callback(
  * This function enumerates all maximal cliques within the given size range
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
  * callback function as a pointer to an \ref igraph_vector_int_t. The vector is
- * owned by the maximal clique search routine so users are expected to make a
+ * owned by the maximal clique search routine, so users are expected to make a
  * copy of the vector using \ref igraph_vector_int_init_copy() if they want to
  * hold on to it.
  *
@@ -561,8 +561,8 @@ igraph_error_t igraph_i_maximal_cliques_callback(
  *
  * \sa \ref igraph_maximal_cliques(), \ref igraph_cliques_callback().
  *
- * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
- * of the graph, this is typically small for sparse graphs.
+ * Time complexity: O(d(n-d)3^(d/3)) in the worst case, where d is the
+ * degeneracy of the graph, which is typically small for sparse graphs.
  *
  */
 
@@ -606,8 +606,8 @@ igraph_error_t igraph_i_maximal_cliques_hist(
  *
  * \sa \ref igraph_maximal_cliques(), \ref igraph_clique_size_hist().
  *
- * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
- * of the graph, this is typically small for sparse graphs.
+ * Time complexity: O(d(n-d)3^(d/3)) in the worst case, where d is the
+ * degeneracy of the graph, which is typically small for sparse graphs.
  *
  */
 

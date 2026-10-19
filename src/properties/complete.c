@@ -248,7 +248,7 @@ igraph_error_t igraph_is_clique(const igraph_t *graph, igraph_vs_t candidate,
  * \function igraph_is_independent_vertex_set
  * \brief Does a set of vertices form an independent set?
  *
- * Tests if no pairs within a set of vertices are adjacenct, i.e. whether they
+ * Tests if no pairs within a set of vertices are adjacent, i.e. whether they
  * form an independent set. An empty set and singleton set are both considered
  * to be an independent set.
  *

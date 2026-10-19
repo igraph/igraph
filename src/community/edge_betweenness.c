@@ -126,7 +126,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 VECTOR(*bridges)[midx] = i;
             }
 
-            /* The new cluster has id no_of_nodes+midx+1 */
+            /* The new cluster has ID no_of_nodes+midx+1 */
             for (igraph_int_t j = 0; j < no_of_nodes; j++) {
                 if (VECTOR(mymembership)[j] == c1 ||
                     VECTOR(mymembership)[j] == c2) {
@@ -164,7 +164,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
 
 /**
  * \function igraph_community_eb_get_merges
- * \brief Calculating the merges, i.e. the dendrogram for an edge betweenness community structure.
+ * \brief Calculates the merges, i.e. the dendrogram for an edge betweenness community structure.
  *
  * This function is handy if you have a sequence of edges which are
  * gradually removed from the network and you would like to know how
@@ -198,7 +198,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
  *    component <code>n + 1</code>, etc. The matrix will be resized as needed.
- * \param bridges Pointer to an initialized vector of \c NULL. If not
+ * \param bridges Pointer to an initialized vector or \c NULL. If not
  *     \c NULL then the indices into \p edges of all edges which caused
  *     one of the merges will be put here. This is equal to all edge removals
  *     which separated the network into more components, in reverse order.
@@ -359,12 +359,12 @@ static igraph_int_t igraph_i_which_max_active_ratio(
  * successively removes edges with the highest betweenness, recalculating
  * betweenness values after each removal. This way eventually the network splits
  * into two components, then one of these components splits again, and so on,
- * until all edges are removed. The resulting hierarhical partitioning of the
+ * until all edges are removed. The resulting hierarchical partitioning of the
  * vertices can be encoded as a dendrogram.
  *
  * </para><para>
- * In directed graphs, when \p directed is set to true, the directed version
- * of betweenness and modularity are used, however, only splits into
+ * In directed graphs, when \p directed is set to true, the directed versions
+ * of betweenness and modularity are used; however, only splits into
  * \em weakly connected components are detected.
  *
  * </para><para>
@@ -414,7 +414,7 @@ static igraph_int_t igraph_i_which_max_active_ratio(
  *     note which two clusters were merged. Clusters are numbered from
  *     zero. See \ref igraph_community_to_membership() for details. The
  *     matrix will be resized as needed.
- * \param bridges Pointer to an initialized vector of \c NULL. If not
+ * \param bridges Pointer to an initialized vector or \c NULL. If not
  *     \c NULL then the indices into \p result of all edges which caused
  *     one of the \p merges will be put here. This is equivalent to all edge removals
  *     which separated the network into more components, in reverse order.

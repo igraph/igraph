@@ -284,7 +284,7 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
  * </para><para>
  * Vertices are colored greedily, one by one, always choosing the smallest color
  * index that differs from that of already colored neighbors. Vertices are picked
- * in an order determined by the speified heuristic.
+ * in an order determined by the specified heuristic.
  * Colors are represented by non-negative integers 0, 1, 2, ...
  *
  * \param graph The input graph.

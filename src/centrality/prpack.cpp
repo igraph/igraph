@@ -78,7 +78,7 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
     }
 
     // Since PRPACK uses the algebraic method to solve PageRank, damping factors very close to 1.0
-    // may lead to numerical instability, the apperance of non-finite values, or the iteration
+    // may lead to numerical instability, the appearance of non-finite values, or the iteration
     // never terminating.
     if (damping > 0.999) {
         IGRAPH_WARNINGF(

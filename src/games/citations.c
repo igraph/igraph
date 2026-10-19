@@ -53,11 +53,11 @@ static void igraph_i_citing_cited_type_game_free (
  * is calculated where binwidth is
  * <code>nodes/agebins + 1</code>,
  * in the last expression '/' denotes integer division, so the
- * fraction part is omitted.
+ * fractional part is omitted.
  *
  * </para><para>
  * The \p preference argument specifies the preferences for the
- * citation lags, i.e. its first elements contains the attractivity
+ * citation lags, i.e. its first element contains the attractivity
  * of the very recently cited vertices, etc. The last element is
  * special, it contains the attractivity of the vertices which were
  * never cited. This element should be bigger than zero.
@@ -353,8 +353,8 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  *
  * </para><para>
  * An evolving citation network is modeled here, a single vertex and
- * its \p edges_per_step citation are added in each time step. The
- * odds the a given vertex is cited by the new vertex depends on the
+ * its \p edges_per_step citations are added in each time step. The
+ * probability that a given vertex is cited by the new vertex depends on the
  * category of both the citing and the cited vertex and is given in
  * the \p pref matrix. The categories of the citing vertex correspond
  * to the rows, the categories of the cited vertex to the columns of

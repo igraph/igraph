@@ -63,7 +63,7 @@
  * \param n The number of vertices in the graph. If smaller than the
  *        largest integer in the file it will be ignored. It is thus
  *        safe to supply zero here.
- * \param directed If true the graph is directed, if false it
+ * \param directed If true, the graph is directed; if false, it
  *        will be undirected.
  * \return Error code:
  *         \c IGRAPH_PARSEERROR: if there is a
@@ -129,7 +129,7 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  *         file.
  *
  * Time complexity: O(|E|), the
- * number of edges in the  graph. It is assumed that writing an
+ * number of edges in the graph. It is assumed that writing an
  * integer to the file requires O(1)
  * time.
  */

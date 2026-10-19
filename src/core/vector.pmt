@@ -117,7 +117,7 @@
  *
  * </para><para>
  * Every vector object initialized by this function should be
- * destroyed (ie. the memory allocated for it should be freed) when it
+ * destroyed (i.e. the memory allocated for it should be freed) when it
  * is not needed anymore, the \ref igraph_vector_destroy() function is
  * responsible for this.
  * \param v Pointer to a not yet initialized vector object.
@@ -151,7 +151,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector) *v, igraph_int_
 /**
  * \ingroup vector
  * \function igraph_vector_view
- * \brief Handle a regular C array as a \type igraph_vector_t.
+ * \brief Handles a regular C array as a \type igraph_vector_t.
  *
  * This function lets you treat an existing C array as an \ref igraph_vector_t.
  *
@@ -175,7 +175,7 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector) *v, igraph_int_
  * \param length The length of the C array.
  * \return The vector object providing the view into the array.
  *
- * Time complexity: O(1)
+ * Time complexity: O(1).
  */
 
 TYPE(igraph_vector) FUNCTION(igraph_vector, view)(
@@ -204,10 +204,10 @@ TYPE(igraph_vector) FUNCTION(igraph_vector, view)(
 /**
  * \ingroup vector
  * \function igraph_vector_init_real
- * \brief Create an \type igraph_vector_t from the parameters.
+ * \brief Creates an \type igraph_vector_t from the parameters.
  *
  * </para><para>
- * Because of how C and the C library handles variable length argument
+ * Because of how C and the C library handle variable-length argument
  * lists, it is required that you supply real constants to this
  * function. This means that
  * \verbatim igraph_vector_t v;
@@ -248,7 +248,7 @@ igraph_error_t FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector) *v, int no
 /**
  * \ingroup vector
  * \function igraph_vector_init_real_end
- * \brief Create an \type igraph_vector_t from the parameters.
+ * \brief Creates an \type igraph_vector_t from the parameters.
  *
  * </para><para>
  * This constructor is similar to \ref igraph_vector_init_real(), the only
@@ -301,7 +301,7 @@ igraph_error_t FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector) *v,
 /**
  * \ingroup vector
  * \function igraph_vector_init_int
- * \brief Create an \type igraph_vector_t containing the parameters.
+ * \brief Creates an \type igraph_vector_t containing the parameters.
  *
  * </para><para>
  * This function is similar to \ref igraph_vector_init_real(), but it expects
@@ -338,7 +338,7 @@ igraph_error_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector) *v, int no,
 /**
  * \ingroup vector
  * \function igraph_vector_init_int_end
- * \brief Create an \type igraph_vector_t from the parameters.
+ * \brief Creates an \type igraph_vector_t from the parameters.
  *
  * </para><para>
  * This constructor is similar to \ref igraph_vector_init_int(), the only
@@ -453,7 +453,7 @@ igraph_int_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector) *v) {
  * Note that this function does \em not change the size of the
  * vector. Let us see a small example to clarify things: if you
  * reserve space for 100 elements and the size of your
- * vector was (and still is) 60, then you can surely add additional 40
+ * vector was (and still is) 60, then you can surely add an additional 40
  * elements to your vector before it will be copied.
  * \param v The vector object.
  * \param capacity The new \em allocated size of the vector.
@@ -513,7 +513,7 @@ igraph_bool_t FUNCTION(igraph_vector, empty)(const TYPE(igraph_vector) *v) {
  *
  * Returns the number of elements stored in the vector.
  *
- * \param v The vector object
+ * \param v The vector object.
  * \return The size of the vector.
  *
  * Time complexity: O(1).
@@ -642,7 +642,7 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
 /**
  * \ingroup vector
  * \function igraph_vector_get
- * \brief Access an element of a vector.
+ * \brief Accesses an element of a vector.
  *
  * Unless you need a function, consider using the \ref VECTOR
  * macro instead for better performance.
@@ -665,7 +665,7 @@ BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector) *v, igraph_int_t pos
 /**
  * \ingroup vector
  * \function igraph_vector_get_ptr
- * \brief Get the address of an element of a vector.
+ * \brief Gets the address of an element of a vector.
  *
  * Unless you need a function, consider using the \ref VECTOR
  * macro instead for better performance.
@@ -732,7 +732,7 @@ void FUNCTION(igraph_vector, null)(TYPE(igraph_vector) *v) {
 
 /**
  * \function igraph_vector_fill
- * \brief Fill a vector with a constant element.
+ * \brief Fills a vector with a constant element.
  *
  * Sets each element of the vector to the supplied constant.
  *
@@ -947,8 +947,8 @@ static int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *
  * \brief Sorts the elements of the vector into ascending order.
  *
  * </para><para>
- * If the vector contains any NaN values, the resulting ordering of
- * NaN values is undefined and may appear anywhere in the vector.
+ * If the vector contains any NaN values, their ordering is undefined
+ * and they may appear anywhere in the vector.
  * \param v Pointer to an initialized vector object.
  *
  * Time complexity:
@@ -968,8 +968,8 @@ void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v) {
  * \brief Sorts the elements of the vector into descending order.
  *
  * </para><para>
- * If the vector contains any NaN values, the resulting ordering of
- * NaN values is undefined and may appear anywhere in the vector.
+ * If the vector contains any NaN values, their ordering is undefined
+ * and they may appear anywhere in the vector.
  * \param v Pointer to an initialized vector object.
  *
  * Time complexity:
@@ -1236,7 +1236,7 @@ int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs)
 /**
  * \ingroup vector
  * \function igraph_vector_resize
- * \brief Resize the vector.
+ * \brief Resizes the vector.
  *
  * </para><para>
  * Note that this function does not free any memory, just sets the
@@ -1244,7 +1244,7 @@ int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs)
  * allocate more memory if the new size is larger than the previous
  * one. In this case the newly appeared elements in the vector are
  * \em not set to zero, they are uninitialized.
- * \param v The vector object
+ * \param v The vector object.
  * \param new_size The new size of the vector.
  * \return Error code,
  *         \c IGRAPH_ENOMEM if there is not enough
@@ -1252,7 +1252,7 @@ int FUNCTION(igraph_vector, colex_cmp_untyped)(const void *lhs, const void *rhs)
  *         if the vector is made smaller.
  * \sa \ref igraph_vector_reserve() for allocating memory for future
  * extensions of a vector. \ref igraph_vector_resize_min() for
- * deallocating the unnneded memory for a vector.
+ * deallocating the unneeded memory for a vector.
  *
  * Time complexity: O(1) if the new
  * size is smaller, operating system dependent if it is larger. In the
@@ -1272,7 +1272,7 @@ igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_in
 /**
  * \ingroup vector
  * \function igraph_vector_resize_min
- * \brief Deallocate the unused memory of a vector.
+ * \brief Deallocates the unused memory of a vector.
  *
  * This function attempts to deallocate the unused reserved storage
  * of a vector. If it succeeds, \ref igraph_vector_size() and
@@ -1759,7 +1759,7 @@ void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, igraph_int_t elem) 
  * \function igraph_vector_remove_fast
  * \brief Removes a single element from a vector, \em not keeping the order of the remaining elements.
  *
- * This function removes the element with the given element from the vector by
+ * This function removes the element at the given position from the vector by
  * swapping it with the last element and then popping it off. You can use this
  * function instead of \ref igraph_vector_remove() to gain some speed if the
  * order of elements does not matter.
@@ -2278,7 +2278,7 @@ void FUNCTION(igraph_vector, scale)(TYPE(igraph_vector) *v, BASE by) {
 
 /**
  * \function igraph_vector_add_constant
- * \brief Add a constant to the vector.
+ * \brief Adds a constant to the vector.
  *
  * \p plus is added to every element of \p v. Note that overflow
  * might happen.
@@ -2413,7 +2413,7 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
 
 /**
  * \function igraph_vector_append
- * \brief Append a vector to another one.
+ * \brief Appends a vector to another one.
  *
  * The target vector will be resized (except when \p from is empty).
  * \param to The vector to append to.
@@ -2469,7 +2469,7 @@ igraph_error_t FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *
  * \brief The maximum absolute difference of \p m1 and \p m2.
  *
  * The element with the largest absolute value in \p m1 - \p m2 is
- * returned. Both vectors must be non-empty, but they not need to have
+ * returned. Both vectors must be non-empty, but they do not need to have
  * the same length, the extra elements in the longer vector are ignored. If
  * any value is NaN in the shorter vector, the result will be NaN.
  * \param m1 The first vector.
@@ -2508,7 +2508,7 @@ igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *
 
 /**
  * \function igraph_vector_update
- * \brief Update a vector from another one.
+ * \brief Updates a vector from another one.
  *
  * After this operation the contents of \p to will be exactly the same
  * as that of \p from. The vector \p to will be resized if it was originally
@@ -2530,7 +2530,7 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
 
 /**
  * \function igraph_vector_swap
- * \brief Swap all elements of two vectors.
+ * \brief Swaps all elements of two vectors.
  *
  * \param v1 The first vector.
  * \param v2 The second vector.
@@ -2549,7 +2549,7 @@ void FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) 
 
 /**
  * \function igraph_vector_swap_elements
- * \brief Swap two elements in a vector.
+ * \brief Swaps two elements in a vector.
  *
  * Note that currently no range checking is performed.
  *
@@ -2569,7 +2569,7 @@ void FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
 
 /**
  * \function igraph_vector_reverse_section
- * \brief Reverse the elements in a section of a vector.
+ * \brief Reverses the elements in a section of a vector.
  *
  * \param v The input vector.
  * \param from Index of the first element to include in the reversal.
@@ -2591,7 +2591,7 @@ void FUNCTION(igraph_vector, reverse_section)(TYPE(igraph_vector) *v, igraph_int
 
 /**
  * \function igraph_vector_reverse
- * \brief Reverse the elements of a vector.
+ * \brief Reverses the elements of a vector.
  *
  * The first element will be last, the last element will be
  * first, etc.
@@ -2681,7 +2681,7 @@ void FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
 
 /**
  * \function igraph_vector_add
- * \brief Add two vectors.
+ * \brief Adds two vectors.
  *
  * Add the elements of \p v2 to \p v1, the result is stored in \p
  * v1. The two vectors must have the same length.
@@ -2716,7 +2716,7 @@ igraph_error_t FUNCTION(igraph_vector, add)(TYPE(igraph_vector) *v1,
 
 /**
  * \function igraph_vector_sub
- * \brief Subtract a vector from another one.
+ * \brief Subtracts a vector from another one.
  *
  * Subtract the elements of \p v2 from \p v1, the result is stored in
  * \p v1. The two vectors must have the same length.
@@ -2752,7 +2752,7 @@ igraph_error_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v1,
 
 /**
  * \function igraph_vector_mul
- * \brief Multiply two vectors.
+ * \brief Multiplies two vectors.
  *
  * \p v1 will be multiplied by \p v2, elementwise. The two vectors
  * must have the same length.
@@ -2787,10 +2787,10 @@ igraph_error_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
 
 /**
  * \function igraph_vector_div
- * \brief Divide a vector by another one.
+ * \brief Divides a vector by another one.
  *
  * \p v1 is divided by \p v2, elementwise. They must have the same length. If the
- * base type of the vector can generate divide by zero errors then
+ * base type of the vector can generate division-by-zero errors then
  * please make sure that \p v2 contains no zero if you want to avoid
  * trouble.
  * \param v1 The dividend. The result is also stored here.
@@ -3137,7 +3137,7 @@ static void FUNCTION(igraph_i_vector, intersection_size_sorted)(
  * \brief Intersection size of two sorted vectors.
  *
  * Counts elements that are present in both vectors. This is particularly
- * useful for counting common neighbours of two vertices.
+ * useful for counting common neighbors of two vertices.
  *
  * </para><para>
  * For similar-size vectors, this function uses a straightforward linear scan.
@@ -3409,7 +3409,7 @@ igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FIL
 
 /**
  * \function igraph_vector_index
- * \brief Extract elements from a vector at specific indices.
+ * \brief Extracts elements from a vector at specific indices.
  *
  * \param v the vector to extract elements from
  * \param newv the result vector
@@ -3435,7 +3435,7 @@ igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
 
 /**
  * \function igraph_vector_index_in_place
- * \brief Extract elements from a vector at specific indices in-place.
+ * \brief Extracts elements from a vector at specific indices in-place.
  *
  * \param v the vector to extract elements from. This will be modified in-place.
  * \param idx vector containing the indices of the elements to extract

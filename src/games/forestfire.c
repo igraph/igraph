@@ -63,7 +63,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * </para><para>
  * The network is generated in the following way. One vertex is added at
  * a time. This vertex connects to (cites) <code>ambs</code> vertices already
- * present in the network, chosen uniformly random. Now, for each cited
+ * present in the network, chosen uniformly at random. Now, for each cited
  * vertex <code>v</code> we do the following procedure:
  * \olist
  * \oli We generate two random numbers, <code>x</code> and <code>y</code>, that are
@@ -71,7 +71,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  *   <code>rp(1-rp)</code>. (<code>p</code> is \p fw_prob, <code>r</code> is
  *   \p bw_factor.) The new vertex cites <code>x</code> outgoing neighbors
  *   and <code>y</code> incoming neighbors of <code>v</code>, from those which are
- *   not yet cited by the new vertex. If there are less than <code>x</code> or
+ *   not yet cited by the new vertex. If there are fewer than <code>x</code> or
  *   <code>y</code> such vertices available then we cite all of them.
  * \oli The same procedure is applied to all the newly cited
  *   vertices.
@@ -85,7 +85,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * conference on Knowledge discovery in data mining \eme, 177--187, 2005.
  *
  * </para><para>
- * Note however, that the version of the model in the published paper is incorrect
+ * Note, however, that the version of the model in the published paper is incorrect
  * in the sense that it cannot generate the kind of graphs the authors
  * claim. A corrected version is available from
  * https://www.cs.cmu.edu/~jure/pubs/powergrowth-tkdd.pdf, our

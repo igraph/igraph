@@ -30,7 +30,7 @@
 
 /**
  * \function igraph_unfold_tree
- * \brief Unfolding a graph into a tree, by possibly multiplicating its vertices.
+ * \brief Unfolding a graph into a tree, by possibly replicating its vertices.
  *
  * A graph is converted into a tree (or forest, if it is unconnected),
  * by performing a breadth-first search on it, and replicating
@@ -51,7 +51,7 @@
  *   in the new graph to the ones in the original is created here.
  * \return Error code.
  *
- * Time complexity: O(n+m), linear in the number vertices and edges.
+ * Time complexity: O(n+m), linear in the number of vertices and edges.
  *
  */
 igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,

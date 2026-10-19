@@ -34,13 +34,13 @@
  * for all s-t pairs using flows. The transformation splits each vertex into
  * an input vertex and an output vertex. All inbound edges of the original
  * vertex are rewired to point to the input vertex, and all outbound edges of
- * the original vertex are rewired to original from the output vertex, while
+ * the original vertex are rewired to originate from the output vertex, while
  * adding a single directed edge from the input vertex to the output vertex.
  *
  * </para><para>
  * s-t vertex connectivities can then be calculated on this modified graph by
  * setting the capacity of each edge to 1, \em except for the following edges:
- * the edges incident of the input half of the source vertex and the edges
+ * the edges incident on the input half of the source vertex and the edges
  * incident on the output half of the target vertex. The max flow on this
  * modified graph will be equal to the s-t vertex connectivity of the original
  * graph.
@@ -50,7 +50,7 @@
  * it is the responsibility of the caller to provide the capacities.
  *
  * </para><para>
- * If the original graph had \em n vertices, he function guarantees that the
+ * If the original graph had \em n vertices, the function guarantees that the
  * first \em n vertices of the result graph will correspond to the \em output
  * halves of the vertices and the remaining \em n vertices will correspond to
  * the \em input halves, in the same order as in the original graph.

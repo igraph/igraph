@@ -129,27 +129,27 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
 
 /**
  * \function igraph_linegraph
- * \brief Create the line graph of a graph.
+ * \brief Creates the line graph of a graph.
  *
- * The line graph L(G) of a G undirected graph is defined as follows.
+ * The line graph L(G) of an undirected graph G is defined as follows.
  * L(G) has one vertex for each edge in G and two different vertices in L(G)
- * are connected by an edge if their corresponding edges share an end point.
- * In a multigraph, if two end points are shared, two edges are created.
- * The single vertex of an undirected self-loop is counted as two end points.
+ * are connected by an edge if their corresponding edges share an endpoint.
+ * In a multigraph, if two endpoints are shared, two edges are created.
+ * The single vertex of an undirected self-loop is counted as two endpoints.
  *
  * </para><para>
- * The line graph L(G) of a G directed graph is slightly different:
+ * The line graph L(G) of a directed graph G is slightly different:
  * L(G) has one vertex for each edge in G and two vertices in L(G) are connected
  * by a directed edge if the target of the first vertex's corresponding edge
  * is the same as the source of the second vertex's corresponding edge.
  *
  * </para><para>
  * Self-loops are considered self-adjacent, thus their corresponding vertex
- * in the line graph will also a have a single self-loop, in both undirected
+ * in the line graph will also have a single self-loop, in both undirected
  * and directed graphs.
  *
  * </para><para>
- * Edge \em i  in the original graph will correspond to vertex \em i
+ * Edge \em i in the original graph will correspond to vertex \em i
  * in the line graph.
  *
  * </para><para>

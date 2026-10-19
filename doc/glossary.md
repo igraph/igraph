@@ -10,7 +10,7 @@ This glossary defines common terms used throughout the igraph documentation.
 
  - **attribute**: A piece of data associated with a vertex, an edge, or the graph itself. The igraph C library currently supports numeric, string and Boolean attribute values, and provides a means for implementing attribute handlers that support custom types.
  - **adjacent**: Two vertices are called **adjacent** if there is an edge connecting them. This term describes a vertex-to-vertex relation.
- - **adjacency list**: A data structure that associates a list of neighbours (i.e. adjacent vertices) to each vertex.
+ - **adjacency list**: A data structure that associates a list of neighbors (i.e. adjacent vertices) to each vertex.
  - **adjacency matrix**: A representation of a graph as a square matrix. `A_ij` gives the number of edge endpoints connecting from the `i`th vertex to the `j`th vertex. Conventionally, the diagonal of the adjacency matrix of an undirected graph contains _twice_ the number of self-loops. All igraph functions follow this convention unless noted otherwise.
  - **biadjacency matrix**: Analogous to the adjacency matrix, but used for bipartite graphs. Element `B_ij` gives the number of edges from the `i`th vertex of the first group to the `j`th vertex of the second group.
  - **bipartite graph**: A graph whose vertices can be partitioned into two groups in such a way that connections are present only between members of different groups.

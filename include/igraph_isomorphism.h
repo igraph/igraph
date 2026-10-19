@@ -103,8 +103,8 @@ typedef igraph_error_t igraph_isohandler_t(const igraph_vector_int_t *map12,
  * </para><para>Both callback functions are of type \c igraph_isocompat_t.
  * \param graph1 The first graph.
  * \param graph2 The second graph.
- * \param g1_num The id of a vertex or edge in the first graph.
- * \param g2_num The id of a vertex or edge in the second graph.
+ * \param g1_num The ID of a vertex or edge in the first graph.
+ * \param g2_num The ID of a vertex or edge in the second graph.
  * \param arg Extra argument to pass to the callback functions.
  * \return Logical scalar, whether vertex (or edge) \p g1_num in \p graph1
  *    is compatible with vertex (or edge) \p g2_num in \p graph2.
@@ -199,7 +199,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_subisomorphisms_vf2_callback(
  * \brief Information about a Bliss run.
  *
  * Some secondary information found by the Bliss algorithm is stored
- * here. It is useful if you wany to study the internal working of the
+ * here. It is useful if you want to study the internal working of the
  * algorithm.
  *
  * \member nof_nodes The number of nodes in the search tree.

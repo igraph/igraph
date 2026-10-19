@@ -135,7 +135,7 @@
  * \var igraph_i_rng_default
  * The default igraph random number generator
  *
- * This generator is used by all builtin igraph functions that need to
+ * This generator is used by all built-in igraph functions that need to
  * generate random numbers; e.g. all random graph generators.
  *
  * You can use \ref igraph_i_rng_default with \ref igraph_rng_seed()
@@ -162,7 +162,7 @@ IGRAPH_THREAD_LOCAL igraph_rng_t *igraph_i_rng_default_ptr = &igraph_i_rng_defau
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
  *    being used as the default will result in crashes and/or
  *    unpredictable results.
- * \return Pointer the previous default RNG.
+ * \return Pointer to the previous default RNG.
  *
  * Time complexity: O(1).
  */
@@ -178,7 +178,7 @@ igraph_rng_t *igraph_rng_set_default(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_default
- * \brief Query the default random number generator.
+ * \brief Queries the default random number generator.
  *
  * \return A pointer to the default random number generator.
  *
@@ -266,7 +266,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
 
 /**
  * \function igraph_rng_bits
- * \brief The number of random bits that a random number generator can produces in a single round.
+ * \brief The number of random bits that a random number generator can produce in a single round.
  *
  * \param rng The RNG.
  * \return The number of random bits that can be generated in a single round
@@ -549,7 +549,7 @@ static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uin
 
 /**
  * \function igraph_rng_get_bool
- * \brief Generate a random boolean.
+ * \brief Generates a random boolean.
  *
  * Use this function only when a single random boolean, i.e. a single bit
  * is needed at a time. It is not efficient for generating multiple bits.
@@ -573,7 +573,7 @@ igraph_bool_t igraph_rng_get_bool(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_get_integer
- * \brief Generate an integer random number from an interval.
+ * \brief Generates an integer random number from an interval.
  *
  * Generate uniformly distributed integers from the interval <code>[l, h]</code>.
  *
@@ -730,7 +730,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param p The probability of success in each trial. Must be larger
- *        than zero and smaller or equal to 1.
+ *        than zero and less than or equal to 1.
  * \return The generated geometrically distributed random number.
  *
  * Time complexity: depends on the RNG.
@@ -868,7 +868,7 @@ igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate) {
  * \ingroup internal
  *
  * This function appends the rest of the needed random numbers to the
- * result vector. It is Algoirthm A in Vitter's paper.
+ * result vector. It is Algorithm A in Vitter's paper.
  */
 
 static void igraph_i_random_sample_alga(igraph_vector_int_t *res,

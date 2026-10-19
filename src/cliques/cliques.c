@@ -175,12 +175,12 @@ static igraph_error_t igraph_i_find_k_indsets(
  * \param max_size Integer specifying the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many cliques will be recorded. If
- *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *   negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_largest_cliques() and \ref igraph_clique_number().
  *
- * Time complexity: Exponential
+ * Time complexity: Exponential.
  *
  * \example examples/simple/igraph_cliques.c
  */
@@ -206,7 +206,7 @@ igraph_error_t igraph_cliques(
  * \param graph The input graph.
  * \param hist Pointer to an initialized vector. The result will be stored
  * here. The first element will store the number of size-1 cliques, the second
- * element the number of size-2 cliques, etc.  For cliques smaller than \p min_size,
+ * element the number of size-2 cliques, etc. For cliques smaller than \p min_size,
  * zero counts will be returned.
  * \param min_size Integer specifying the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
@@ -214,9 +214,9 @@ igraph_error_t igraph_cliques(
  *   returned. If negative or zero, no upper bound will be used.
  * \return Error code.
  *
- * \sa \ref igraph_cliques() and \ref igraph_cliques_callback()
+ * \sa \ref igraph_cliques() and \ref igraph_cliques_callback().
  *
- * Time complexity: Exponential
+ * Time complexity: Exponential.
  *
  */
 igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
@@ -233,8 +233,8 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  * Cliques are fully connected subgraphs of a graph. This function
  * enumerates all cliques within the given size range and calls
  * \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as a pointer to an \ref igraph_vector_int_t.  Destroying and
- * freeing this vector is left up to the user.  Use \ref igraph_vector_int_destroy()
+ * callback function as a pointer to an \ref igraph_vector_int_t. Destroying and
+ * freeing this vector is left up to the user. Use \ref igraph_vector_int_destroy()
  * to destroy it first, then free it using \ref igraph_free().
  *
  * </para><para>The current implementation of this function
@@ -251,9 +251,9 @@ igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *h
  * \param arg Extra argument to supply to \p cliquehandler_fn.
  * \return Error code.
  *
- * \sa \ref igraph_cliques()
+ * \sa \ref igraph_cliques().
  *
- * Time complexity: Exponential
+ * Time complexity: Exponential.
  *
  */
 igraph_error_t igraph_cliques_callback(const igraph_t *graph,
@@ -265,7 +265,7 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
 
 /**
  * \function igraph_weighted_cliques
- * \brief Finds all cliques in a given weight range in a vertex weighted graph.
+ * \brief Finds all cliques in a given weight range in a vertex-weighted graph.
  *
  * </para><para>
  * Cliques are fully connected subgraphs of a graph.
@@ -286,18 +286,18 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  *   here to make each vertex have a weight of 1.
  * \param res Pointer to an initialized list of integer vectors. The cliques
  *   will be stored here as vectors of vertex IDs.
- * \param maximal If true, only maximal cliques will be returned
+ * \param maximal If true, only maximal cliques will be returned.
  * \param min_weight Integer specifying the minimum weight of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_weight Integer specifying the maximum weight of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many cliques will be recorded. If
- *   negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *   negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
- * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
+ * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques().
  *
- * Time complexity: Exponential
+ * Time complexity: Exponential.
  *
  */
 igraph_error_t igraph_weighted_cliques(
@@ -319,7 +319,7 @@ igraph_error_t igraph_weighted_cliques(
 
 /**
  * \function igraph_largest_weighted_cliques
- * \brief Finds the largest weight clique(s) in a graph.
+ * \brief Finds the maximum-weight clique(s) in a graph.
  *
  * The weight of a clique is the sum of the weights of its vertices.
  * This function finds the clique(s) having the largest weight in the graph.
@@ -340,9 +340,9 @@ igraph_error_t igraph_weighted_cliques(
  *   will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
- * \sa \ref igraph_weighted_cliques(), \ref igraph_weighted_clique_number(), \ref igraph_largest_cliques()
+ * \sa \ref igraph_weighted_cliques(), \ref igraph_weighted_clique_number(), \ref igraph_largest_cliques().
  *
- * Time complexity: TODO
+ * Time complexity: TODO.
  */
 igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_vector_int_list_t *res) {
@@ -356,10 +356,10 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
 
 /**
  * \function igraph_weighted_clique_number
- * \brief Finds the weight of the largest weight clique in the graph.
+ * \brief Finds the weight of the maximum-weight clique in the graph.
  *
  * The weight of a clique is the sum of the weights of its vertices.
- * This function finds the weight of the largest weight clique.
+ * This function finds the weight of the maximum-weight clique.
  *
  * </para><para>
  * Only positive integer vertex weights are supported.
@@ -377,9 +377,9 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
  *   pointed to by this variable.
  * \return Error code.
  *
- * \sa \ref igraph_weighted_cliques(), \ref igraph_largest_weighted_cliques(), \ref igraph_clique_number()
+ * \sa \ref igraph_weighted_cliques(), \ref igraph_largest_weighted_cliques(), \ref igraph_clique_number().
  *
- * Time complexity: TODO
+ * Time complexity: TODO.
  *
  */
 igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
@@ -409,7 +409,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * </para><para>
  * A vertex set is considered independent if there are no edges between
- * them.
+ * its vertices.
  *
  * </para><para>
  * If you are interested in the size of the largest independent vertex set,
@@ -418,25 +418,25 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  * </para><para>
  * The current implementation was ported to igraph from the Very Nauty Graph
  * Library by Keith Briggs and uses the algorithm from the paper
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm
  * for generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
+ * 6:505–517, 1977.
  *
  * \param graph The input graph.
- * \param res Pointer to an initialized list of integer vectors. The cliques
- *   will be stored here as vectors of vertex IDs.
+ * \param res Pointer to an initialized list of integer vectors. The independent
+ *   vertex sets will be stored here as vectors of vertex IDs.
  * \param min_size Integer specifying the minimum size of the sets to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the sets to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many independent vertex sets will be recorded.
- *    If negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *    If negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_largest_independent_vertex_sets(),
  * \ref igraph_independence_number().
  *
- * Time complexity: TODO
+ * Time complexity: TODO.
  *
  * \example examples/simple/igraph_independent_sets.c
  */
@@ -563,19 +563,19 @@ done:
  * </para><para>
  * The current implementation was ported to igraph from the Very Nauty Graph
  * Library by Keith Briggs and uses the algorithm from the paper
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm
  * for generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
+ * 6:505–517, 1977.
  *
  * \param graph The input graph.
- * \param res Pointer to an initialized list of integer vectors. The cliques
- *   will be stored here as vectors of vertex IDs.
+ * \param res Pointer to an initialized list of integer vectors. The independent
+ *   vertex sets will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
  * \sa \ref igraph_independent_vertex_sets(), \ref
  * igraph_maximal_independent_vertex_sets().
  *
- * Time complexity: TODO
+ * Time complexity: TODO.
  */
 
 igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
@@ -780,17 +780,17 @@ static void free_set_array(igraph_set_t *array, igraph_int_t n) {
  *
  * </para><para>
  * A maximal independent vertex set is an independent vertex set which
- * can't be extended any more by adding a new vertex to it.
+ * cannot be extended by adding a new vertex to it.
  *
  * </para><para>
  * The algorithm used here is based on the following paper:
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm for
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm for
  * generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
+ * 6:505–517, 1977.
  *
  * </para><para>
  * The implementation was originally written by Kevin O'Neill and modified
- * by K M Briggs in the Very Nauty Graph Library. I simply re-wrote it to
+ * by K. M. Briggs in the Very Nauty Graph Library. It was rewritten to
  * use igraph's data structures.
  *
  * </para><para>
@@ -798,18 +798,18 @@ static void free_set_array(igraph_set_t *array, igraph_int_t n) {
  * use \ref igraph_independence_number() instead.
  *
  * \param graph The input graph.
- * \param res Pointer to an initialized list of integer vectors. The cliques
- *   will be stored here as vectors of vertex IDs.
+ * \param res Pointer to an initialized list of integer vectors. The independent
+ *   vertex sets will be stored here as vectors of vertex IDs.
  * \param min_size Integer specifying the minimum size of the sets to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer specifying the maximum size of the sets to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param max_results At most this many independent vertex sets will be recorded.
- *    If negative, or \ref IGRAPH_UNLIMITED, no limit is applied.
+ *    If negative or \ref IGRAPH_UNLIMITED, no limit is applied.
  * \return Error code.
  *
  * \sa \ref igraph_maximal_cliques(), \ref
- * igraph_independence_number()
+ * igraph_independence_number().
  *
  * Time complexity: TODO.
  */
@@ -890,13 +890,13 @@ igraph_error_t igraph_maximal_independent_vertex_sets(
  * </para><para>
  * The current implementation was ported to igraph from the Very Nauty Graph
  * Library by Keith Briggs and uses the algorithm from the paper
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm
  * for generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
+ * 6:505–517, 1977.
  *
  * \param graph The input graph.
  * \param no The independence number will be returned to the \c
- *   igraph_int_t pointed by this variable.
+ *   igraph_int_t pointed to by this variable.
  * \return Error code.
  *
  * \sa \ref igraph_independent_vertex_sets().
@@ -1015,9 +1015,9 @@ static igraph_error_t igraph_i_largest_cliques_store(const igraph_vector_int_t* 
  *   will be stored here as vectors of vertex IDs.
  * \return Error code.
  *
- * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
+ * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques().
  *
- * Time complexity: O(3^(|V|/3)) worst case.
+ * Time complexity: O(3^(|V|/3)) in the worst case.
  */
 
 igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_list_t *res) {
@@ -1039,12 +1039,12 @@ igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_int_l
  *
  * \param graph The input graph.
  * \param no The clique number will be returned to the \c igraph_int_t
- *   pointed by this variable.
+ *   pointed to by this variable.
  * \return Error code.
  *
  * \sa \ref igraph_cliques(), \ref igraph_largest_cliques().
  *
- * Time complexity: O(3^(|V|/3)) worst case.
+ * Time complexity: O(3^(|V|/3)) in the worst case.
  */
 igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_int_t *no) {
     *no = 0;

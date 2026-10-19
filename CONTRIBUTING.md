@@ -41,13 +41,13 @@ Good bug reports are extremely helpful &mdash; thank you for reporting!
 Guidelines for bug reports:
 
 1. **Make sure that the bug is in the C code of igraph and not in one of the
-   higher level interfaces** &mdash; if you are using igraph from R, Python
+   higher-level interfaces** &mdash; if you are using igraph from R, Python
    or Mathematica, consider submitting your issue in
    [igraph/rigraph](https://github.com/igraph/rigraph/issues/new),
    [igraph/python-igraph](https://github.com/igraph/python-igraph/issues/new)
    or [szhorvat/IGraphM](https://github.com/szhorvat/IGraphM/issues/new)
    instead. If you are unsure whether your issue is in the C layer, submit
-   a bug report in the repository of the higher level interface &mdash;
+   a bug report in the repository of the higher-level interface &mdash;
    we will transfer the issue here if it indeed affects the C layer.
 
 2. **Use the GitHub issue search** &mdash; check if the issue has already been
@@ -89,7 +89,7 @@ Example:
 Feature requests are always welcome. First, take a moment to find out whether your
 idea fits with the scope and aims of the project. Please provide as much detail
 and context as possible, and where possible, references to relevant literature.
-Having said that, implementing new features can be quite time consuming, and as
+Having said that, implementing new features can be quite time-consuming, and as
 such they might not be implemented quickly. In addition, the development team
 might decide not to implement a certain feature. It is up to you to make a case
 to convince the project's developers of the merits of this feature.
@@ -113,7 +113,7 @@ project's developers might not want to merge into the project.
 Please adhere to the coding conventions used throughout a project (indentation,
 accurate comments, etc.) and any other requirements (such as test coverage).
 
-Follow the following steps if you would like to make a new pull request:
+Follow these steps if you would like to make a new pull request:
 
 1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork,
    and configure the remotes:
@@ -127,7 +127,7 @@ Follow the following steps if you would like to make a new pull request:
    git remote add upstream https://github.com/<upstream-owner>/<repo-name>
    ```
 
-2. Please checkout the section on [branching](#branching) to see whether you
+2. Please check out the section on [branching](#branching) to see whether you
    need to branch off from the `main` branch or the `develop` branch.
 
    If you cloned a while ago, get the latest changes from upstream:
@@ -192,28 +192,28 @@ this is decided.
 currently still in the development release (0.x), which in principle is a mark
 that the public API is not yet stable. Regardless, we try to maintain semantic
 versioning also for the development releases. We do so as follows. Any released
-minor version (0.x.z) will be API backwards-compatible with any previous release
+minor version (0.x.z) will be API backward-compatible with any previous release
 of the _same_ minor version (0.x.y, with y < z). This means that _if_ there is
-an API incompatible change, we will increase the minor version. For example,
-release 0.8.1 is API backwards-compatible with release 0.8.0, while release
-0.9.0 might be API incompatible with version 0.8.1. Note that this only concerns
+an API-incompatible change, we will increase the minor version. For example,
+release 0.8.1 is API backward-compatible with release 0.8.0, while release
+0.9.0 might be API-incompatible with version 0.8.1. Note that this only concerns
 the _public_ API, internal functions may change also within a minor version.
 
 There will always be two versions of `igraph`: the most recent released version,
 and the next upcoming minor release, which is by definition not yet released.
 The most recent release version is in the `main` branch, while the next
 upcoming minor release is in the `develop` branch. If you make a change that is
-API incompatible with the most recent release, it **must** be merged to
-the `develop` branch. If the change is API backwards-compatible, it **can** be
+API-incompatible with the most recent release, it **must** be merged to
+the `develop` branch. If the change is API backward-compatible, it **can** be
 merged to the `main` branch. It is possible that you build on recent
 improvements in the `develop` branch, in which case your change should of course
 target the `develop` branch. If you only add new functionality, but do not
-change anything of the existing API, this should be backwards-compatible, and
+change anything of the existing API, this should be backward-compatible, and
 can be merged in the `main` branch.
 
 When you make a new pull request, please specify the correct target branch. The
 maintainers of `igraph` may decide to retarget your pull request to the correct
-branch. Retargeting you pull request may result in merge conflicts, so it is
+branch. Retargeting your pull request may result in merge conflicts, so it is
 always good to decide **before** starting to work on something whether you
 should start from the `main` branch or from the `develop` branch. In most
 cases, changes in the `main` branch will also be merged to the `develop`

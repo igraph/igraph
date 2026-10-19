@@ -212,7 +212,7 @@ GRAPH_PTR_LIST:
 ALL_VERTEX_QTY:
     # A vector of floating-point numbers where each entry corresponds to
     # one of the vertices in a graph and its value represents some quantity
-    # associated to the vertex with the same index. Higher-level interfaces may
+    # associated with the vertex with the same index. Higher-level interfaces may
     # use this type to provide a "named vector" such that each entry can be
     # indexed either by the vertex index or by the vertex name.
     CTYPE: igraph_vector_t
@@ -413,7 +413,7 @@ GRAPH_PRODUCT_TYPE:
     FLAGS: ENUM
 
 RANDOM_TREE_METHOD:
-    # Enum that describes the various implementation of the uniform random tree
+    # Enum that describes the various implementations of the uniform random tree
     # sampling method
     CTYPE: igraph_random_tree_t
     FLAGS: ENUM
@@ -477,7 +477,7 @@ TOUNDIRECTED:
 
 TRANSITIVITY_MODE:
     # Enum that specifies how isolated vertices should be handled in transitivity
-    # calcuations
+    # calculations
     CTYPE: igraph_transitivity_mode_t
     FLAGS: ENUM
 
@@ -636,7 +636,7 @@ PAGERANKOPT:
     FLAGS: BY_REF
 
 PLFIT:
-    # Structure representing the result of a power-law fitting algorithms
+    # Structure representing the result of a power-law fitting algorithm
     CTYPE: igraph_plfit_result_t
     FLAGS: BY_REF
 

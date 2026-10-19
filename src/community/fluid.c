@@ -39,7 +39,7 @@
  *
  * </para><para>
  * This function implements the community detection method described in:
- * Parés F, Gasulla DG, et. al. (2018) Fluid Communities: A Competitive,
+ * Parés F, Gasulla DG, et al. (2018) Fluid Communities: A Competitive,
  * Scalable and Diverse Community Detection Algorithm. In: Complex Networks
  * &amp; Their Applications VI: Proceedings of Complex Networks 2017 (The Sixth
  * International Conference on Complex Networks and Their Applications),
@@ -48,7 +48,7 @@
  * \param graph The input graph. The graph must be simple and connected.
  *   Edge directions will be ignored.
  * \param no_of_communities The number of communities to be found. Must be
- *   greater than 0 and fewer than number of vertices in the graph.
+ *   greater than 0 and fewer than the number of vertices in the graph.
  * \param membership The result vector mapping vertices to the communities
  * they are assigned to.
  * \return Error code.

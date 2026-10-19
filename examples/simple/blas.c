@@ -31,7 +31,7 @@ int main(void) {
     igraph_blas_dgemv(/* transpose= */ 0, /* alpha= */ 2, &m, &x, /* beta= */ 3, &y);
     igraph_vector_print(&y);
 
-    /* Compute the squared norm of x, as well as the dor product of x and z. */
+    /* Compute the squared norm of x, as well as the dot product of x and z. */
     igraph_blas_ddot(&x, &x, &xx);
     igraph_blas_ddot(&x, &z, &xz);
     printf("x.x = %g, x.z = %g\n", xx, xz);

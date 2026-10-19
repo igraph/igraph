@@ -27,7 +27,7 @@
 
 /**
  * \function igraph_path_length_hist
- * \brief Create a histogram of all shortest path lengths.
+ * \brief Creates a histogram of all shortest path lengths.
  *
  * This function calculates a histogram by calculating the shortest path
  * length between all pairs of vertices. In directed graphs, both directions

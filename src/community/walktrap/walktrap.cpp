@@ -74,7 +74,7 @@ using namespace igraph::walktrap;
 
 /**
  * \function igraph_community_walktrap
- * \brief Community finding using a random walk based similarity measure.
+ * \brief Community finding using a similarity measure based on random walks.
  *
  * This function is the implementation of the Walktrap community
  * finding algorithm, see Pascal Pons, Matthieu Latapy: Computing
@@ -94,19 +94,19 @@ using namespace igraph::walktrap;
  *
  * \param graph The input graph, edge directions are ignored.
  * \param weights Numeric vector giving the weights of the edges.
- *     If it is a NULL pointer then all edges will have equal
+ *     If it is a \c NULL pointer then all edges will have equal
  *     weights. The weights are expected to be positive.
  * \param steps Integer constant, the length of the random walks.
- *     Typically, good results are obtained with values between
- *     3-8 with 4-5 being a reasonable default.
+ *     Typically, good results are obtained with values from
+ *     3 to 8, with 4 or 5 being a reasonable default.
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not \c NULL). Each merge is a
  *     row in a two-column matrix and contains the IDs of the merged
  *     clusters. Clusters are numbered from zero and cluster numbers
  *     smaller than the number of nodes in the network belong to the
  *     individual vertices as singleton clusters. In each step a new
- *     cluster is created from two other clusters and its id will be
- *     one larger than the largest cluster id so far. This means that
+ *     cluster is created from two other clusters and its ID will be
+ *     one larger than the largest cluster ID so far. This means that
  *     before the first merge we have \c n clusters (the number of
  *     vertices in the graph) numbered from zero to <code>n - 1</code>.
  *     The first merge creates cluster \c n, the second cluster

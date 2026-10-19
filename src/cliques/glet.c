@@ -46,13 +46,13 @@
  *
  * <para>
  * For more information on graphlet decomposition, see
- * Hossein Azari Soufiani and Edoardo M Airoldi: "Graphlet decomposition of a weighted network",
+ * Hossein Azari Soufiani and Edoardo M. Airoldi: "Graphlet decomposition of a weighted network",
  * https://arxiv.org/abs/1203.2821 and http://proceedings.mlr.press/v22/azari12/azari12.pdf
  * </para>
  *
  * <para>
  * igraph contains three functions for performing the graphlet
- * decomponsition of a graph. The first is \ref igraph_graphlets(), which
+ * decomposition of a graph. The first is \ref igraph_graphlets(), which
  * performs both steps of the method and returns a list of subgraphs
  * with their corresponding weights. The other two functions
  * correspond to the first and second steps of the algorithm, and they are
@@ -102,15 +102,14 @@ static void igraph_i_subclique_next_free(void *ptr) {
 
 /**
  * \function igraph_i_subclique_next
- * Calculate subcliques of the cliques found at the previous level
+ * \brief Calculates subcliques of the cliques found at the previous level.
  *
  * \param graph Input graph.
  * \param weight Edge weights.
  * \param ids The IDs of the vertices in the input graph.
  * \param cliques A list of \ref igraph_vector_int_t, vertex IDs for cliques.
- * \param result The result is stored here, a list of graphs is stored
- *        here.
- * \param resultids The IDs of the vertices in the result graphs is
+ * \param result The result is stored here as a list of graphs.
+ * \param resultids The IDs of the vertices in the result graphs are
  *        stored here.
  * \param clique_thr The thresholds for the cliques are stored here,
  *        if not a null pointer.
@@ -519,9 +518,9 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
 /**
  * \function igraph_graphlets_candidate_basis
- * Calculate a candidate graphlets basis
+ * \brief Calculates a candidate graphlet basis.
  *
- * \param graph The input graph, it must be a simple graph, edge directions are
+ * \param graph The input graph. It must be a simple graph. Edge directions are
  *        ignored.
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized list of integer vectors. The graphlet basis is
@@ -532,7 +531,7 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  *        here.
  * \return Error code.
  *
- * See also: \ref igraph_graphlets() and \ref igraph_graphlets_project().
+ * \sa \ref igraph_graphlets() and \ref igraph_graphlets_project().
  */
 
 igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
@@ -766,14 +765,13 @@ igraph_error_t igraph_i_graphlets_project(
 
 /**
  * \function igraph_graphlets_project
- * \brief Project a graph on a graphlets basis.
+ * \brief Projects a graph onto a graphlet basis.
  *
- * Note that the graph projected does not have to be the same that
- * was used to calculate the graphlet basis, but it is assumed that
- * it has the same number of vertices, and the vertex IDs of the two
- * graphs match.
+ * Note that the graph being projected does not have to be the one used to
+ * calculate the graphlet basis, but it is assumed that the two graphs have
+ * the same number of vertices and matching vertex IDs.
  *
- * \param graph The input graph, it must be a simple graph, edge directions are
+ * \param graph The input graph. It must be a simple graph. Edge directions are
  *        ignored.
  * \param weights Weights of the edges in the input graph, a vector.
  * \param cliques An initialized list of integer vectors. The graphlet basis is
@@ -781,15 +779,15 @@ igraph_error_t igraph_i_graphlets_project(
  *        vertex IDs, encoding a single basis subgraph.
  * \param Mu An initialized vector, the weights of the graphlets will
  *        be stored here. This vector is also used to initialize the
- *        the weight vector for the iterative algorithm, if the
- *        \c startMu argument is true.
- * \param startMu If true, then the supplied Mu vector is
- *        used as the starting point of the iteration. Otherwise a
- *        constant 1 vector is used.
+ *        weight vector for the iterative algorithm, if the
+ *        \p startMu argument is \c true.
+ * \param startMu If true, then the supplied \p Mu vector is
+ *        used as the starting point of the iteration. Otherwise, a
+ *        vector of ones is used.
  * \param niter The number of iterations to perform.
  * \return Error code.
  *
- * See also: \ref igraph_graphlets() and
+ * \sa \ref igraph_graphlets() and
  * \ref igraph_graphlets_candidate_basis().
  */
 
@@ -826,13 +824,13 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
 
 /**
  * \function igraph_graphlets
- * \brief Calculate graphlets basis and project the graph on it.
+ * \brief Calculates a graphlet basis and projects the graph onto it.
  *
  * This function simply calls \ref igraph_graphlets_candidate_basis()
  * and \ref igraph_graphlets_project(), and then orders the graphlets
  * according to decreasing weights.
  *
- * \param graph The input graph, it must be a simple graph, edge directions are
+ * \param graph The input graph. It must be a simple graph. Edge directions are
  *        ignored.
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized list of integer vectors. The graphlet basis is
@@ -843,7 +841,7 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \param niter The number of iterations to perform for the projection step.
  * \return Error code.
  *
- * See also: \ref igraph_graphlets_candidate_basis() and
+ * \sa \ref igraph_graphlets_candidate_basis() and
  * \ref igraph_graphlets_project().
  */
 

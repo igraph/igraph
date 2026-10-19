@@ -62,13 +62,13 @@ static igraph_error_t igraph_i_connected_components_strong(
  *    case it is ignored.
  * \param no Pointer to an integer, if not \c NULL then the number of
  *    components will be stored here.
- * \param mode For directed graph this specifies whether to calculate
+ * \param mode For directed graphs, this specifies whether to calculate
  *    weakly or strongly connected components. Possible values:
  *    \clist
  *    \cli IGRAPH_WEAK
  *       Compute weakly connected components, i.e. ignore edge directions.
  *    \cli IGRAPH_STRONG
- *       Compute strongly connnected components, i.e. consider edge directions.
+ *       Compute strongly connected components, i.e. consider edge directions.
  *    \endclist
  *    This parameter is ignored for undirected graphs.
  * \return Error code.
@@ -399,8 +399,8 @@ static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_b
  *
  * </para><para>
  * A graph with zero vertices (i.e. the null graph) is \em not connected by
- * definition. This behaviour changed in igraph 0.9; earlier versions assumed
- * that the null graph is connected. See the following issue on Github for the
+ * definition. This behavior changed in igraph 0.9; earlier versions assumed
+ * that the null graph is connected. See the following issue on GitHub for the
  * argument that led us to change the definition:
  * https://github.com/igraph/igraph/issues/1539
  *
@@ -572,7 +572,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \brief Decomposes a graph into connected components.
  *
  * Creates a separate graph for each component of a graph. Note that the
- * vertex IDs in the new graphs will be different than in the original
+ * vertex IDs in the new graphs will be different from those in the original
  * graph, except when there is only a single component in the original graph.
  *
  * \param graph The original graph.
@@ -963,7 +963,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
  * \sa \ref igraph_biconnected_components(), \ref igraph_is_bipartite(),
- * \ref igraph_connected_components(), \ref igraph_bridges()
+ * \ref igraph_connected_components(), \ref igraph_bridges().
  */
 
 igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_int_t *res) {
@@ -1006,11 +1006,11 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  *     a spanning tree of the biconnected component is returned.
  * \param component_edges If not a \c NULL pointer, then the edges of the
  *     biconnected components are stored here, in the same form as for
- *     \c tree_edges.
+ *     \p tree_edges.
  * \param components If not a \c NULL pointer, then the vertices of the
  *     biconnected components are stored here, in the same format as
  *     for the previous two arguments.
- * \param articulation_points If not a NULL pointer, then the
+ * \param articulation_points If not a \c NULL pointer, then the
  *     articulation points of the graph are stored in this vector.
  *     A vertex is an articulation point if its removal increases the
  *     number of (weakly) connected components in the graph.
@@ -1394,7 +1394,7 @@ exit2:
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
  * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(),
- * \ref igraph_connected_components()
+ * \ref igraph_connected_components().
  */
 
 igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges) {
@@ -1509,13 +1509,13 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * \brief The vertices reachable from a given vertex.
  *
  * This function returns the set of vertices reachable from a specified
- * vertex. In undirected graphs, this is simple the set of vertices within
+ * vertex. In undirected graphs, this is simply the set of vertices within
  * the same component.
  *
  * \param graph The graph object.
  * \param res The result, vector with the IDs of the vertices reachable
  *        from \p vertex.
- * \param vertex The id of the vertex of which the component is
+ * \param vertex The ID of the vertex of which the component is
  *        searched.
  * \param mode Type of the component for directed graphs, possible
  *        values:
@@ -1536,7 +1536,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  *        \cli IGRAPH_ENOMEM
  *          not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p vertex is an invalid vertex ID
+ *           \p vertex is an invalid vertex ID.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument passed.
  *        \endclist
@@ -1547,7 +1547,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
  * edges in the graph.
  *
  * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
- * a given set of vertices and the edges between them;
+ * of a given set of vertices and the edges between them;
  * \ref igraph_reachability() to efficiently compute the reachable set from \em all
  * vertices; \ref igraph_neighborhood() to find vertices within a given distance.
  */

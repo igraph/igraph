@@ -80,7 +80,7 @@ typedef enum {
  * - <b>ii</b> The index of the edge list by the second column.
  *   The length of this vector is the same as the number of edges.
  * - <b>os</b> Contains pointers to the edgelist (\c from
- *   and \c to for every vertex. The first edge \em from
+ *   and \c to) for every vertex. The first edge \em from
  *   vertex \c v is edge no. \c from[oi[os[v]]] if
  *   \c os[v]<os[v+1]. If \c os[v]==os[v+1] then
  *   there are no edges \em from node \c v. Its length is
@@ -100,7 +100,7 @@ typedef enum {
  * except those belonging to the minimal API in type_indexededgelist.c.
  *
  * The storage requirements for a graph with \c |V| vertices
- * and \c |E| edges is \c O(|E|+|V|).
+ * and \c |E| edges are \c O(|E|+|V|).
  */
 typedef struct {
     igraph_int_t n;

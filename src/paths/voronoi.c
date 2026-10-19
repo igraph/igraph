@@ -319,7 +319,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  *
  * </para><para>
  * This function uses a BFS search for unweighted graphs and Dijkstra's algorithm
- * for weights ones.
+ * for weighted ones.
  *
  * \param graph The graph to partition.
  * \param membership If not \c NULL, the Voronoi partition of each vertex

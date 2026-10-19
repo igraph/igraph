@@ -35,7 +35,7 @@
  *
  * The result graph contains only edges present both in the first and
  * the second graph. The number of vertices in the result graph is the
- * same as the larger from the two arguments.
+ * same as that of the larger of the two arguments.
  *
  * </para><para>
  * The directedness of the operand graphs must be the same.
@@ -64,7 +64,7 @@
  *
  * Time complexity: O(|V|+|E|), |V| is the number of nodes, |E|
  * is the number of edges in the smaller graph of the two. (The one
- * containing less vertices is considered smaller.)
+ * containing fewer vertices is considered smaller.)
  *
  * \example examples/simple/igraph_intersection.c
  */
@@ -94,13 +94,13 @@ igraph_error_t igraph_intersection(
  * graph with no vertices.
  *
  * </para><para>
- * Edge multiplicities are handled by taking the \em minimum multiplicity of the
+ * Edge multiplicities are handled by taking the \em minimum multiplicity of
  * all multiplicities for the same vertex pair (u, v) in the input graphs; this
  * will be the multiplicity of (u, v) in the result graph.
  *
  * \param res Pointer to an uninitialized graph object, the result of
  *        the operation will be stored here.
- * \param graphs Pointer vector, contains pointers to graphs objects,
+ * \param graphs Pointer vector, contains pointers to graph objects,
  *        the operands of the intersection operator.
  * \param edgemaps If not a null pointer, then it must be an initialized
  *        list of integer vectors, and the mappings of edges from the graphs to
@@ -115,7 +115,7 @@ igraph_error_t igraph_intersection(
  *
  * Time complexity: O(|V|+|E|), |V| is the number of vertices,
  * |E| is the number of edges in the smallest graph (i.e. the graph having
- * the less vertices).
+ * the fewest vertices).
  */
 igraph_error_t igraph_intersection_many(
     igraph_t *res, const igraph_vector_ptr_t *graphs,

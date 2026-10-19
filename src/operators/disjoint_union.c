@@ -53,7 +53,7 @@
  * and edge attributes, they will be lost.
  *
  * \param res  Pointer to an uninitialized graph object, the result
- *        will stored here.
+ *        will be stored here.
  * \param left The first graph.
  * \param right The second graph.
  * \return Error code.

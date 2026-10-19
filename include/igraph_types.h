@@ -90,7 +90,7 @@ typedef IGRAPH_BOOL_TYPE igraph_bool_t;
  * \define IGRAPH_VCOUNT_MAX
  * \brief The maximum number of vertices supported in igraph graphs.
  *
- * The value of this constant is one less than \c IGRAPH_INTEGER_MAX .
+ * The value of this constant is one less than \c IGRAPH_INTEGER_MAX.
  * When igraph is compiled in 32-bit mode, this means that you are limited
  * to 2<superscript>31</superscript> – 2 (about 2.1 billion) vertices. In
  * 64-bit mode, the limit is 2<superscript>63</superscript> – 2 so you are much
@@ -108,7 +108,7 @@ typedef IGRAPH_BOOL_TYPE igraph_bool_t;
  * \define IGRAPH_ECOUNT_MAX
  * \brief The maximum number of edges supported in igraph graphs.
  *
- * The value of this constant is half of \c IGRAPH_INTEGER_MAX .
+ * The value of this constant is half of \c IGRAPH_INTEGER_MAX.
  * When igraph is compiled in 32-bit mode, this means that you are limited
  * to approximately 2<superscript>30</superscript> (about 1.07 billion)
  * vertices. In 64-bit mode, the limit is approximately

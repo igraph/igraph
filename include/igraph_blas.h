@@ -32,7 +32,7 @@ IGRAPH_BEGIN_C_DECLS
  *
  * <para>
  * BLAS is a highly optimized library for basic linear algebra operations
- * such as vector-vector, matrix-vector and matrix-matrix product.
+ * such as vector-vector, matrix-vector and matrix-matrix products.
  * Please see http://www.netlib.org/blas/ for details and a reference
  * implementation in Fortran. igraph contains some wrapper functions
  * that can be used to call BLAS routines in a somewhat more
@@ -40,7 +40,7 @@ IGRAPH_BEGIN_C_DECLS
  * and even those which are included might not have wrappers;
  * the extension of the set of wrapped functions will probably be driven
  * by igraph's internal requirements. The wrapper functions usually
- * substitute double-precision floating point arrays used by BLAS with
+ * substitute double-precision floating-point arrays used by BLAS with
  * \type igraph_vector_t and \type igraph_matrix_t instances and also
  * remove those parameters (such as the number of rows/columns) that
  * can be inferred from the passed arguments directly.

@@ -43,7 +43,7 @@
  * arguments provided by this function to a null pointer.
  *
  * \param graph The input graph.
- * \param root The id of the root vertex. It is ignored if the \c
+ * \param root The ID of the root vertex. It is ignored if the \c
  *        roots argument is not a null pointer.
  * \param roots Pointer to an initialized vector, or a null
  *        pointer. If not a null pointer, then it is a vector
@@ -63,23 +63,23 @@
  * \param restricted If not a null pointer, then it must be a pointer
  *        to a vector containing vertex IDs. The BFS is carried out
  *        only on these vertices.
- * \param order If not null pointer, then the vertex IDs of the graph are
+ * \param order If not a null pointer, then the vertex IDs of the graph are
  *        stored here, in the same order as they were visited.
  * \param rank If not a null pointer, then the rank of each vertex is
  *        stored here.
- * \param parents If not a null pointer, then the id of the parent of
+ * \param parents If not a null pointer, then the ID of the parent of
  *        each vertex is stored here. When a vertex was not visited
  *        during the traversal, -2 will be stored as the ID of its parent.
  *        When a vertex was visited during the traversal and it was one of
  *        the roots of the search trees, -1 will be stored as the ID of
  *        its parent.
- * \param pred If not a null pointer, then the id of vertex that was
+ * \param pred If not a null pointer, then the ID of the vertex that was
  *        visited before the current one is stored here. If there is
  *        no such vertex (the current vertex is the root of a search
  *        tree), then -1 is stored as the predecessor of the vertex.
  *        If the vertex was not visited at all, then -2 is stored for
  *        the predecessor of the vertex.
- * \param succ If not a null pointer, then the id of the vertex that
+ * \param succ If not a null pointer, then the ID of the vertex that
  *        was visited after the current one is stored here. If there
  *        is no such vertex (the current one is the last in a search
  *        tree), then -1 is stored as the successor of the vertex.
@@ -291,14 +291,14 @@ cleanup:
  * Breadth-first search, single-source version
  *
  * An alternative breadth-first search implementation to cater for the
- * simpler use-cases when only a single breadth-first search has to be conducted
+ * simpler use cases when only a single breadth-first search has to be conducted
  * from a source node and most of the output arguments from \ref igraph_bfs
  * are not needed. It is allowed to supply null pointers as
  * the output arguments the user is not interested in, in this case they will
  * be ignored.
  *
  * \param graph The input graph.
- * \param root The id of the root vertex.
+ * \param root The ID of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and
@@ -437,7 +437,7 @@ igraph_error_t igraph_bfs_simple(
  * vertex IDs.
  *
  * \param graph The input graph.
- * \param root The id of the root vertex.
+ * \param root The ID of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and
@@ -447,7 +447,7 @@ igraph_error_t igraph_bfs_simple(
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
- * \param order If not null pointer, then the vertex IDs of the graph are
+ * \param order If not a null pointer, then the vertex IDs of the graph are
  *        stored here, in the same order as they were discovered. The tail of
  *        the vector will be padded with -1 to ensure that the length of the
  *        vector is the same as the number of vertices, even if some vertices
@@ -457,7 +457,7 @@ igraph_error_t igraph_bfs_simple(
  *        their subtree. The tail of the vector will be padded with -1 to ensure
  *        that the length of the vector is the same as the number of vertices,
  *        even if some vertices were not visited during the traversal.
- * \param parents If not a null pointer, then the id of the parent of
+ * \param parents If not a null pointer, then the ID of the parent of
  *        each vertex is stored here. -1 will be stored for the root of the
  *        search tree; -2 will be stored for vertices that were not visited.
  * \param dist If not a null pointer, then the distance from the root of

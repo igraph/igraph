@@ -42,12 +42,12 @@ IGRAPH_BEGIN_C_DECLS
  *
  * \param graph The graph that the algorithm is working on. Of course
  *   this must not be modified.
- * \param vid The id of the vertex just found by the breadth-first
+ * \param vid The ID of the vertex just found by the breadth-first
  *   search.
- * \param pred The id of the previous vertex visited. It is -1 if
+ * \param pred The ID of the previous vertex visited. It is -1 if
  *   there is no previous vertex, because the current vertex is the root
- *   is a search tree.
- * \param succ The id of the next vertex that will be visited. It is
+ *   of a search tree.
+ * \param succ The ID of the next vertex that will be visited. It is
  *   -1 if there is no next vertex, because the current vertex is the
  *   last one in a search tree.
  * \param rank The rank of the current vertex, it starts with zero.
@@ -58,7 +58,7 @@ IGRAPH_BEGIN_C_DECLS
  * \return \c IGRAPH_SUCCESS if the BFS should continue, \c IGRAPH_STOP
  *    if the BFS should stop and return to the caller normally. Any other
  *    value is treated as an igraph error code, terminating the search and
- *    returning to the caller with the same error code. If a BFS is
+ *    returning to the caller with the same error code. If a BFS
  *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
  *    contain negative values.
@@ -99,7 +99,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
  *
  * \param graph The graph that the algorithm is working on. Of course
  *   this must not be modified.
- * \param vid The id of the vertex just found by the depth-first
+ * \param vid The ID of the vertex just found by the depth-first
  *   search.
  * \param dist The distance (number of hops) of the current vertex
  *   from the root of the current search tree.
@@ -108,7 +108,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
  * \return \c IGRAPH_SUCCESS if the DFS should continue, \c IGRAPH_STOP
  *    if the DFS should stop and return to the caller normally. Any other
  *    value is treated as an igraph error code, terminating the search and
- *    returning to the caller with the same error code. If a DFS is
+ *    returning to the caller with the same error code. If a DFS
  *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
  *    contain negative values.

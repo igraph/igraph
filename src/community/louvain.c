@@ -317,7 +317,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
  *                   higher values favor more, smaller communities.
  * \return Error code.
  *
- * Time complexity: in average near linear on sparse graphs.
+ * Time complexity: on average, nearly linear on sparse graphs.
  */
 static igraph_error_t igraph_i_community_multilevel_step(
         igraph_t *graph,
@@ -531,7 +531,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
 /**
  * \ingroup communities
  * \function igraph_community_multilevel
- * \brief Finding community structure by multi-level optimization of modularity (Louvain).
+ * \brief Finds community structure by multi-level optimization of modularity (Louvain).
  *
  * This function implements a multi-level modularity optimization algorithm
  * for finding community structure, sometimes known as the Louvain algorithm.
@@ -584,7 +584,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
  *                    and it will be resized accordingly.
  * \return Error code.
  *
- * Time complexity: in average near linear on sparse graphs.
+ * Time complexity: on average, nearly linear on sparse graphs.
  *
  * \example examples/simple/igraph_community_multilevel.c
  */

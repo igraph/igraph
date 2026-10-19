@@ -40,7 +40,7 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
 
 /**
  * \function igraph_layout_lgl
- * \brief Force based layout algorithm for large graphs.
+ * \brief Force-based layout algorithm for large graphs.
  *
  * </para><para>
  * This is a layout generator similar to the Large Graph Layout
@@ -50,7 +50,7 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * placing the vertices on a grid and calculating the repulsion only
  * for vertices which are closer to each other than a limit.
  *
- * \param graph The (initialized) graph object to place. It must be connnected;
+ * \param graph The (initialized) graph object to place. It must be connected;
  *   disconnected graphs are not handled by the algorithm.
  * \param res Pointer to an initialized matrix object to hold the
  *   result. It will be resized if needed.

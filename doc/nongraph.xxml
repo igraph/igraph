@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Nongraph">
-<title>Non-graph related functions </title>
+<title>Non-graph related functions</title>
 
 <section id="igraph-version-number"><title>igraph version number</title>
 <!-- doxrox-include igraph_version -->

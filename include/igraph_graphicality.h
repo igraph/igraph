@@ -30,7 +30,7 @@ IGRAPH_BEGIN_C_DECLS
  * \brief What types of non-simple edges to allow?
  *
  * This type is used with multiple functions to specify what types of non-simple
- * edges to allow, create or consider a graph. The constants below are treated
+ * edges to allow, create or consider in a graph. The constants below are treated
  * as "switches" that can be turned on individually and combined using the
  * bitwise-or operator. For example,
  * <code>IGRAPH_LOOPS_SW</code>

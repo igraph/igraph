@@ -56,7 +56,7 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_
  *
  * This is a variant of IGRAPH_ALLOW_INTERRUPTION() that checks for interruption
  * only on every 'skips' call. The 'iter' macro parameter is the name of a variable,
- * usually of type 'int', that is used to count calls to this macto. It must be declared
+ * usually of type 'int', that is used to count calls to this macro. It must be declared
  * separately, outside of the loop where IGRAPH_ALLOW_INTERRUPTION_LIMITED() is called,
  * and initialized to 0. Example:
  *

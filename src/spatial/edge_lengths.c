@@ -37,16 +37,16 @@
  * \ref igraph_betweenness(), \ref igraph_closeness() and others.
  *
  * \param graph The graph whose edge lengths are to be computed.
- * \param lengths An initialized vector. Length will be stored here, in the
+ * \param lengths An initialized vector. Lengths will be stored here, in the
  *    order of edge IDs. It will be resized as needed.
  * \param points A matrix of vertex coordinates. Each row contains the
  *    coordinates of the corresponding vertex, in the order of vertex IDs.
- *    Arbitrary dimensional point sets are supported.
+ *    Point sets of arbitrary dimension are supported.
  * \param metric The distance metric to use. See \ref igraph_metric_t for
  *    valid values.
  * \return Error code.
  *
- * \sa \ref igraph_nearest_neighbor_graph() computes a k nearest neighbor graph
+ * \sa \ref igraph_nearest_neighbor_graph() computes a k-nearest-neighbor graph
  * and \ref igraph_delaunay_graph() computes a Delaunay graph based on a set of
  * spatial points.
  *

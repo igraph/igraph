@@ -240,7 +240,7 @@ static igraph_error_t check_name(const char *name) {
  *
  * </para><para>
  * Note that having multiple or loop edges in an
- * <code>.lgl</code> file breaks the  LGL software but \a igraph
+ * <code>.lgl</code> file breaks the LGL software but \a igraph
  * does not check for this condition.
  *
  * \param graph The graph to write.
@@ -248,7 +248,7 @@ static igraph_error_t check_name(const char *name) {
  *        writable.
  * \param names The name of a string vertex attribute, if symbolic names
  *        are to be written to the file. Supply \c NULL to write vertex
- *        ids instead.
+ *        IDs instead.
  * \param weights The name of a numerical edge attribute, which will be
  *        written as weights to the file. Supply \c NULL to skip writing
  *        edge weights.

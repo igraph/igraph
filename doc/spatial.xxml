@@ -25,7 +25,7 @@
 <!-- doxrox-include igraph_spatial_edge_lengths -->
 </section>
 
-<section id="nongraph-spatial"><title>Non-graph related spatial processing</title>
+<section id="nongraph-spatial"><title>Spatial processing unrelated to graphs</title>
 <!-- doxrox-include igraph_convex_hull_2d -->
 </section>
 
