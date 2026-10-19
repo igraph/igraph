@@ -23,6 +23,7 @@
 ### Other
 
 - Documentation improvements.
+- Proofread the documentation and error/warning message texts, correcting spelling, grammar, and formatting, using AI assistance.
 - nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
 
