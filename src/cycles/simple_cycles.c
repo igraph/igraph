@@ -49,6 +49,12 @@ typedef struct {
     /* The adjacency list of the graph */
     igraph_adjlist_t AK;
 
+    /* Directed searches only: the reverse adjacency list. RK[v] lists the
+     * vertices u whose list AK[u] contains v, i.e. the lists from which v must
+     * be removed after its search. It is not modified during the algorithm.
+     * Undirected searches use AK[v] itself, and leave RK empty. */
+    igraph_adjlist_t RK;
+
     /* The set B from Johnson's paper */
     igraph_adjlist_t B;
 
@@ -384,7 +390,16 @@ static igraph_error_t simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
-    IGRAPH_FINALLY_CLEAN(9);
+    if (state->directed) {
+        // Sorted lists, with one entry per edge, as in AK.
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &state->RK, IGRAPH_REVERSE_MODE(mode),
+                                         IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    } else {
+        IGRAPH_CHECK(igraph_adjlist_init_empty(&state->RK, 0));
+    }
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &state->RK);
+
+    IGRAPH_FINALLY_CLEAN(10);
 
     return IGRAPH_SUCCESS;
 }
@@ -402,6 +417,7 @@ static igraph_error_t simple_cycle_search_state_init(
  */
 static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state) {
 
+    igraph_adjlist_destroy(&state->RK);
     igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
@@ -517,6 +533,65 @@ static void simple_cycles_reset_touched(simple_cycle_search_state_t *state) {
 }
 
 /**
+ * Removes the finished start vertex s from the graph: deletes every entry of
+ * s from the lists AK and IK of the other vertices, then clears AK[s] and
+ * IK[s].
+ *
+ * Only the lists that can contain s are visited: those of its neighbours in
+ * the reverse direction, i.e. RK[s] for directed searches and AK[s] itself
+ * for undirected ones. (In the undirected case AK[s] lists exactly the
+ * remaining neighbours of s, since earlier removals deleted the removed
+ * vertices from both sides.) Each list is sorted, and its entries of s (one per
+ * parallel edge) form a contiguous run, which is found by binary search and
+ * removed in one step, together with the matching entries of IK.
+ *
+ * Earlier versions searched all N lists and removed only one entry of s from
+ * each, leaving the other parallel copies in place. That was O(N log d) per
+ * start vertex. The cost is now O(sum over the lists visited of
+ * (log d + the length of the list)), where the length term is the cost of
+ * shifting the remaining entries, so the total over all start vertices is
+ * bounded by O(sum over s of deg(s) * (log d_max + d_max)).
+ */
+static void simple_cycles_remove_vertex(simple_cycle_search_state_t *state,
+                                        igraph_int_t s) {
+    const igraph_vector_int_t *holders = state->directed ?
+            igraph_adjlist_get(&state->RK, s) : igraph_adjlist_get(&state->AK, s);
+    const igraph_int_t holder_count = igraph_vector_int_size(holders);
+    igraph_int_t prev = -1;
+
+    for (igraph_int_t j = 0; j < holder_count; ++j) {
+        const igraph_int_t u = VECTOR(*holders)[j];
+        // Skip s itself (self-loops; AK[s] is cleared below) and repeated
+        // entries of u (parallel edges), whose removal was already done.
+        // The holder list is sorted, so repeats are adjacent.
+        if (u == s || u == prev) {
+            continue;
+        }
+        prev = u;
+
+        igraph_vector_int_t *neis = igraph_adjlist_get(&state->AK, u);
+        igraph_int_t pos;
+        // Lists only ever shrink, so they stay sorted. For a vertex u that was
+        // removed earlier, AK[u] is empty and nothing is found.
+        if (igraph_vector_int_binsearch(neis, s, &pos)) {
+            const igraph_int_t len = igraph_vector_int_size(neis);
+            igraph_int_t from = pos, to = pos + 1;
+            while (from > 0 && VECTOR(*neis)[from - 1] == s) {
+                from--;
+            }
+            while (to < len && VECTOR(*neis)[to] == s) {
+                to++;
+            }
+            igraph_vector_int_remove_section(neis, from, to);
+            igraph_vector_int_remove_section(igraph_inclist_get(&state->IK, u), from, to);
+        }
+    }
+
+    igraph_vector_int_clear(igraph_adjlist_get(&state->AK, s));
+    igraph_vector_int_clear(igraph_inclist_get(&state->IK, s));
+}
+
+/**
  * \function simple_cycles_search_callback_from_one_vertex
  * \brief Search simple cycles starting from one vertex.
  *
@@ -555,19 +630,7 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
 
     simple_cycles_reset_touched(state);
 
-    for (igraph_int_t i = 0; i < state->N; ++i) {
-        // We want to remove the vertex with value s, not at position s.
-        // It's fine to use binary search since we never add to, only remove from
-        // an already sorted adjacency list.
-        igraph_int_t pos;
-        if (igraph_vector_int_binsearch(igraph_adjlist_get(&state->AK, i), s,
-                                        &pos)) {
-            igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
-            igraph_vector_int_remove(igraph_inclist_get(&state->IK, i), pos);
-        }
-    }
-    igraph_vector_int_clear(igraph_adjlist_get(&state->AK, s));
-    igraph_vector_int_clear(igraph_inclist_get(&state->IK, s));
+    simple_cycles_remove_vertex(state, s);
 
     return IGRAPH_SUCCESS;
 }
