@@ -31,7 +31,7 @@ void check_triangle_free(const char *name, const igraph_t *graph) {
     IGRAPH_ASSERT((!!count) == (!triangle_free));
 }
 
-static void assert_triangle_free_with_cache(const igraph_t *graph, igraph_bool_t expected) {
+void assert_triangle_free_with_cache(const igraph_t *graph, igraph_bool_t expected) {
     igraph_bool_t triangle_free, simple;
 
     igraph_invalidate_cache(graph);
@@ -48,7 +48,7 @@ static void assert_triangle_free_with_cache(const igraph_t *graph, igraph_bool_t
     IGRAPH_ASSERT(triangle_free == expected);
 }
 
-static void test_mantel_bound(void) {
+void test_mantel_bound(void) {
     const igraph_bool_t directed[] = {false, true, true, true};
     const igraph_neimode_t modes[] = {IGRAPH_ALL, IGRAPH_OUT, IGRAPH_IN, IGRAPH_ALL};
 
