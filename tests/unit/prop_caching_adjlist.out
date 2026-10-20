@@ -60,10 +60,10 @@ loop cached: 1
 multi not cached
 graph: loop, loop: 2 multi: 0, mode: 0
 loop not cached
-multi cached: 1
+multi cached: 0
 graph: loop, loop: 2 multi: 0, mode: 1
 loop not cached
-multi cached: 1
+multi cached: 0
 graph: loop, loop: 2 multi: 1, mode: 0
 loop not cached
 multi not cached
