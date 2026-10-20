@@ -421,6 +421,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
  * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm
  * for generating all the maximal independent sets. SIAM J Computing,
  * 6:505–517, 1977.
+ * https://doi.org/10.1137/0206036
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized list of integer vectors. The independent
@@ -566,6 +567,7 @@ done:
  * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm
  * for generating all the maximal independent sets. SIAM J Computing,
  * 6:505–517, 1977.
+ * https://doi.org/10.1137/0206036
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized list of integer vectors. The independent
@@ -784,9 +786,12 @@ static void free_set_array(igraph_set_t *array, igraph_int_t n) {
  *
  * </para><para>
  * The algorithm used here is based on the following paper:
+ *
+ * </para><para>
  * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm for
  * generating all the maximal independent sets. SIAM J Computing,
  * 6:505–517, 1977.
+ * https://doi.org/10.1137/0206036
  *
  * </para><para>
  * The implementation was originally written by Kevin O'Neill and modified
@@ -893,6 +898,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(
  * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirakawa. A new algorithm
  * for generating all the maximal independent sets. SIAM J Computing,
  * 6:505–517, 1977.
+ * https://doi.org/10.1137/0206036
  *
  * \param graph The input graph.
  * \param no The independence number will be returned to the \c

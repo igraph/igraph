@@ -61,8 +61,11 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  * to <code>j'</code>.
  *
  * </para><para>This reduction is used in the paper (observation 2):
+ *
+ * </para><para>
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
+ * https://doi.org/10.1002/net.3230230604
  *
  * </para><para>The original paper where this reduction was conceived is
  * Shimon Even and R. Endre Tarjan: Network Flow and Testing Graph
@@ -1008,6 +1011,7 @@ static igraph_error_t igraph_provan_shier_list(
  * vertex. Every cut is listed exactly once. The implemented algorithm
  * is described in JS Provan and DR Shier: A Paradigm for listing
  * (s,t)-cuts in graphs, Algorithmica 15, 351--372, 1996.
+ * https://doi.org/10.1007/BF01961544
  *
  * \param graph The input graph, it must be directed.
  * \param cuts An initialized list of integer vectors, the cuts are stored
@@ -1306,6 +1310,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * The implemented algorithm is described in JS Provan and DR
  * Shier: A Paradigm for listing (s,t)-cuts in graphs, Algorithmica 15,
  * 351--372, 1996.
+ * https://doi.org/10.1007/BF01961544
  *
  * \param graph The input graph, it must be directed.
  * \param value Pointer to a real number or \c NULL. The value of the minimum cut

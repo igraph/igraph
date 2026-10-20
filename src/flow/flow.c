@@ -475,6 +475,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * B. V. Cherkassky and A. V. Goldberg: On implementing the
  * push-relabel method for the maximum flow problem, (Algorithmica,
  * 19:390--410, 1997) on all the graph classes I've tried.
+ * https://doi.org/10.1007/PL00009180
  *
  * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for
@@ -1062,6 +1063,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * minimum cut between them (also called the minimum s-t cut). So \ref
  * igraph_st_mincut_value() gives the same result in all cases as \ref
  * igraph_maxflow_value().
+ * https://doi.org/10.4153/CJM-1956-045-5
  *
  * </para><para>
  * Note that the value of the maximum flow is the same as the
@@ -1588,6 +1590,7 @@ static igraph_error_t igraph_i_mincut_directed(
  * For undirected graphs we use the Stoer-Wagner
  * algorithm, as described in M. Stoer and F. Wagner: A simple min-cut
  * algorithm, Journal of the ACM, 44 585-591, 1997.
+ * https://doi.org/10.1145/263867.263872
  *
  * </para><para>
  * The first implementation of the actual cut calculation for
@@ -1668,6 +1671,7 @@ static igraph_error_t igraph_i_mincut_value_undirected(
  * directed graphs and a separate non-flow based implementation is
  * used for undirected graphs. See Mechthild Stoer and Frank Wagner: A
  * simple min-cut algorithm, Journal of the ACM 44 585--591, 1997.
+ * https://doi.org/10.1145/263867.263872
  * For directed graphs
  * the maximum flow is calculated between a fixed vertex and all the
  * other vertices in the graph and this is done in both
@@ -2132,10 +2136,16 @@ static igraph_error_t igraph_i_connectivity_checks(
  * </para>
  *
  * <para> The vertex connectivity of a graph is the same as group
- * cohesion as defined in Douglas R. White and Frank Harary: The
- * cohesiveness of blocks in social networks: node connectivity and
- * conditional density, Sociological Methodology 31:305--359, 2001
- * https://doi.org/10.1111/0081-1750.00098.
+ * cohesion as defined by White and Harary.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2243,10 +2253,16 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph,
  *
  * <para>
  * The edge connectivity of a graph is the same as group adhesion as
- * defined in Douglas R. White and Frank Harary: The cohesiveness of
- * blocks in social networks: node connectivity and conditional
- * density, Sociological Methodology 31:305--359, 2001
- * https://doi.org/10.1111/0081-1750.00098.
+ * defined by White and Harary.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2408,11 +2424,18 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph,
  * \function igraph_adhesion
  * \brief Graph adhesion, this is (almost) the same as edge connectivity.
  *
- * </para><para> This quantity is defined by White and Harary in
- * The cohesiveness of blocks in social networks: node connectivity and
- * conditional density, (Sociological Methodology 31:305--359, 2001)
- * and basically it is the edge connectivity of the graph
+ * </para><para> This quantity is defined by White and Harary
+ * and is basically the edge connectivity of the graph
  * with uniform edge weights.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph, either directed or undirected.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2443,10 +2466,17 @@ igraph_error_t igraph_adhesion(const igraph_t *graph,
  * \function igraph_cohesion
  * \brief Graph cohesion, this is the same as vertex connectivity.
  *
- * </para><para> This quantity was defined by White and Harary in <quote>The
- * cohesiveness of blocks in social networks: node connectivity and
- * conditional density</quote>, (Sociological Methodology 31:305--359, 2001)
- * and it is the same as the vertex connectivity of a graph.
+ * </para><para> This quantity was defined by White and Harary
+ * and is the same as the vertex connectivity of a graph.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Douglas R. White and Frank Harary: The cohesiveness of blocks in social
+ * networks: node connectivity and conditional density.
+ * Sociological Methodology 31:305--359, 2001.
+ * https://doi.org/10.1111/0081-1750.00098
  *
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be

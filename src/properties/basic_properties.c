@@ -159,6 +159,7 @@ igraph_error_t igraph_mean_degree(const igraph_t *graph, igraph_real_t *res,
  * This measure was defined in Nathan Eagle, Michael Macy and Rob
  * Claxton: Network Diversity and Economic Development, Science 328,
  * 1029--1031, 2010.
+ * https://doi.org/10.1126/science.1186605
  *
  * </para><para>
  * It is simply the (normalized) Shannon entropy of the

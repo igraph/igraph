@@ -227,6 +227,8 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
  *
  * </para><para>
  * See Algorithm 2 in:
+ *
+ * </para><para>
  * Wang, Jia, and James Cheng. "Truss decomposition in massive networks."
  * Proceedings of the VLDB Endowment 5.9 (2012): 812–823.
  * https://doi.org/10.14778/2311906.2311909

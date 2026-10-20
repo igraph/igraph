@@ -79,6 +79,8 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  *
  * </para><para>
  * See also:
+ *
+ * </para><para>
  * Jure Leskovec, Jon Kleinberg and Christos Faloutsos. Graphs over time:
  * densification laws, shrinking diameters and possible explanations.
  * \emb KDD '05: Proceeding of the eleventh ACM SIGKDD international

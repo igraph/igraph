@@ -247,8 +247,9 @@ static INLINE igraph_real_t igraph_i_median_4(igraph_real_t x1,
  *
  * </para><para>
  * For more details, see K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual
- * Understanding of Hierarchical Systems". IEEE Transactions on Systems, Man and
- * Cybernetics 11(2):109-125, 1981.
+ * Understanding of Hierarchical System Structures". IEEE Transactions on
+ * Systems, Man and Cybernetics 11(2):109-125, 1981.
+ * https://doi.org/10.1109/TSMC.1981.4308636
  *
  * \param graph Pointer to an initialized graph object.
  * \param res   Pointer to an initialized matrix object. This will contain

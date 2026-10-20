@@ -51,12 +51,19 @@ using namespace fitHRG;
  * </para>
  *
  * <para>Please read the following two articles for more about
- * hierarchical random graphs: A. Clauset, C. Moore, and M.E.J. Newman.
+ * hierarchical random graphs:
+ *
+ * </para><para>
+ * A. Clauset, C. Moore, and M.E.J. Newman.
  * Hierarchical structure and the prediction of missing links in networks.
- * Nature 453, 98 - 101 (2008); and A. Clauset, C. Moore, and M.E.J. Newman.
+ * Nature 453, 98 - 101 (2008).
+ * https://doi.org/10.1038/nature06830
+ * </para><para>
+ * A. Clauset, C. Moore, and M.E.J. Newman.
  * Structural Inference of Hierarchies in Networks. In E. M. Airoldi
  * et al. (Eds.): ICML 2006 Ws, Lecture Notes in Computer Science
  * 4503, 1-13. Springer-Verlag, Berlin Heidelberg (2007).
+ * https://doi.org/10.1007/978-3-540-73133-7_1
  * </para>
  *
  * <para>

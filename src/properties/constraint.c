@@ -53,6 +53,7 @@
  * </para><para>
  * Burt, R.S. (2004). Structural holes and good ideas. American
  * Journal of Sociology 110, 349-399.
+ * https://doi.org/10.1086/421787
  *
  * </para><para>
  * The first R version of this function was contributed by Jeroen
