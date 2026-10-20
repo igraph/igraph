@@ -39,6 +39,7 @@
  * from the local neighborhood of each vertex. For details, see
  * Priebe, C. E., Conroy, J. M., Marchette, D. J., Park, Y. (2005).
  * Scan Statistics on Enron Graphs. Computational and Mathematical Organization Theory.
+ * https://doi.org/10.1007/s10588-005-5378-z
  * </para>
  */
 

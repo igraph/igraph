@@ -36,6 +36,7 @@
  * The GEM layout algorithm, as described in Arne Frick, Andreas Ludwig,
  * Heiko Mehldau: A Fast Adaptive Layout Algorithm for Undirected Graphs,
  * Proc. Graph Drawing 1994, LNCS 894, pp. 388-403, 1995.
+ * https://doi.org/10.1007/3-540-58950-3_393
  * \param graph The input graph. Edge directions are ignored in
  *        directed graphs.
  * \param res The result is stored here. If the \p use_seed argument

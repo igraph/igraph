@@ -40,7 +40,8 @@
  * The function documented in this section implements the
  * <quote>leading eigenvector</quote> method developed by Mark Newman and
  * published in MEJ Newman: Finding community structure using the
- * eigenvectors of matrices, Phys Rev E 74:036104 (2006).</para>
+ * eigenvectors of matrices, Phys Rev E 74:036104 (2006).
+ * https://doi.org/10.1103/PhysRevE.74.036104</para>
  *
  * <para>
  * The heart of the method is the definition of the modularity matrix

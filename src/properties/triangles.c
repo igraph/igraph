@@ -53,6 +53,7 @@
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
+ * https://doi.org/10.1038/30918
  *
  * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to a real variable, the result will be stored here.
@@ -348,6 +349,7 @@ static igraph_error_t transitivity_local_undirected4(const igraph_t *graph,
  * </para><para>
  * D. J. Watts and S. Strogatz: Collective dynamics of small-world networks.
  * Nature 393(6684):440-442 (1998).
+ * https://doi.org/10.1038/30918
  *
  * \param graph The input graph. Edge directions and multiplicities are ignored.
  * \param res Pointer to an initialized vector, the result will be

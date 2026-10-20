@@ -39,6 +39,8 @@
  *
  * </para><para>
  * This function implements the community detection method described in:
+ *
+ * </para><para>
  * Parés F, Gasulla DG, et al. (2018) Fluid Communities: A Competitive,
  * Scalable and Diverse Community Detection Algorithm. In: Complex Networks
  * &amp; Their Applications VI: Proceedings of Complex Networks 2017 (The Sixth

@@ -730,6 +730,8 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
  *
  * </para><para>
  * The implementation is based on the following paper:
+ *
+ * </para><para>
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533–541, 1993.
  * https://doi.org/10.1002/net.3230230604

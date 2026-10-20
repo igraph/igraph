@@ -60,7 +60,10 @@ using namespace drl3d;
  * The DrL layout generator, 3d version.
  *
  * This function implements the force-directed DrL layout generator.
- * Please see more in the technical report: Martin, S., Brown, W.M.,
+ * Please see more in the technical report:
+ *
+ * </para><para>
+ * Martin, S., Brown, W.M.,
  * Klavans, R., Boyack, K.W., DrL: Distributed Recursive (Graph)
  * Layout. SAND Reports, 2008. 2936: p. 1-10.
  *

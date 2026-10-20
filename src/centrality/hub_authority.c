@@ -227,6 +227,8 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  *
  * </para><para>
  * See the following reference on the meaning of this score:
+ *
+ * </para><para>
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
  * Algorithms\eme, 1998. Extended version in \emb Journal of the

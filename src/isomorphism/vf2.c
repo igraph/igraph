@@ -34,9 +34,9 @@
  *
  * <para>
  * The VF2 algorithm can search for a subgraph in a larger graph, or check if two
- * graphs are isomorphic. See P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
- * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
- * Workshop on Graph-based Representations, Italy, 2001.
+ * graphs are isomorphic. See L. P. Cordella, P. Foggia, C. Sansone, M. Vento,
+ * An Improved algorithm for matching large graphs, Proc. of the 3rd
+ * IAPR-TC-15 International Workshop on Graph-based Representations, Italy, 2001.
  * </para>
  *
  * <para>
@@ -85,9 +85,9 @@ static igraph_error_t igraph_i_perform_vf2_pre_checks(
  *
  * </para><para>
  * This function is an implementation of the VF2 isomorphism algorithm,
- * see P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
- * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
- * Workshop on Graph-based Representations, Italy, 2001.</para>
+ * see L. P. Cordella, P. Foggia, C. Sansone, M. Vento,
+ * An Improved algorithm for matching large graphs, Proc. of the 3rd
+ * IAPR-TC-15 International Workshop on Graph-based Representations, Italy, 2001.</para>
  *
  * <para>For using it you need to define a callback function of type
  * \ref igraph_isohandler_t. This function will be called whenever VF2

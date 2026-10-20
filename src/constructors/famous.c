@@ -340,6 +340,7 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           Krackhardt, D. Assessing the Political Landscape:
  *           Structure, Cognition, and Power in Organizations.
  *           Admin. Sci. Quart. 35, 342–369, 1990.
+ *           https://doi.org/10.2307/2393394
  *   \cli Levi
  *           The graph is a 4-arc transitive cubic graph; it has
  *           30 vertices and 45 edges.
@@ -404,6 +405,7 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           W. W. Zachary, An information flow model for conflict and
  *           fission in small groups, Journal of Anthropological
  *           Research 33, 452–473 (1977).
+ *           https://doi.org/10.1086/jar.33.4.3629752
  * \endclist
  *
  * \param graph Pointer to an uninitialized graph object.

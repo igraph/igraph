@@ -944,7 +944,8 @@ igraph_error_t igraph_motifs_randesu_no(
  * </para><para>
  * Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
  * Structure in Sociometric Data.  American Journal of Sociology,
- * 70, 492-513.
+ * 76, 492-513.
+ * https://doi.org/10.1086/224954
  *
  * \param graph The input graph. For an undirected graph, there are no
  *    asymmetric connections.
