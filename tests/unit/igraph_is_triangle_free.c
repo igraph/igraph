@@ -53,6 +53,14 @@ int main(void) {
     check_triangle_free("C_4", &graph);
     igraph_destroy(&graph);
 
+    /* K2,3 is triangle-free even when the simplicity cache enables the Mantel shortcut. */
+    igraph_small(&graph, 5, IGRAPH_UNDIRECTED,
+                 0,2, 0,3, 0,4, 1,2, 1,3, 1,4, -1);
+    check_triangle_free("K2,3", &graph);
+    igraph_is_simple(&graph, &simple, IGRAPH_UNDIRECTED); /* populate cache */
+    check_triangle_free("K2,3", &graph);
+    igraph_destroy(&graph);
+
     igraph_full(&graph, 4, IGRAPH_UNDIRECTED, false);
     check_triangle_free("K4", &graph);
     igraph_is_simple(&graph, &simple, IGRAPH_UNDIRECTED); /* populate cache */
