@@ -1563,7 +1563,7 @@ igraph_error_t igraph_subcomponent(
     igraph_vector_int_t tmp = IGRAPH_VECTOR_NULL;
 
     if (vertex < 0 || vertex >= no_of_nodes) {
-        IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Vertex ID out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {

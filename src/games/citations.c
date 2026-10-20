@@ -103,7 +103,7 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERRORF("The `preference' vector should be of length `agebins' plus one."
-                     "Number of agebins is %" IGRAPH_PRId ", preference vector is of length %" IGRAPH_PRId ".",
+                     " Number of agebins is %" IGRAPH_PRId "; preference vector is of length %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      agebins, igraph_vector_size(preference));
     }

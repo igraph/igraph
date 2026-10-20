@@ -256,7 +256,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
                       IGRAPH_EINVAL, igraph_vector_int_size(outseq), no_of_nodes);
     }
     if (!outseq && m < 0) {
-        IGRAPH_ERRORF("Numer of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
+        IGRAPH_ERRORF("Number of edges per step cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, m);
     }
     if (aging_bins <= 0) {
         IGRAPH_ERRORF("Aging bins should be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, aging_bins);

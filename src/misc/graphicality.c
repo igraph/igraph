@@ -163,7 +163,7 @@ igraph_error_t igraph_is_graphical(const igraph_vector_int_t *out_degrees,
     else
     {
         if (igraph_vector_int_size(in_degrees) != igraph_vector_int_size(out_degrees)) {
-            IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The lengths of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
         }
 
         if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW ) ) {

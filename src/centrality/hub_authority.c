@@ -76,7 +76,7 @@ static void warn_zero_entries(const igraph_vector_t *cent) {
             if (++zero_cnt > max_zero_cnt) {
                 IGRAPH_WARNINGF(
                     "More than %d%% of hub or authority scores are zeros. The presence of zero values "
-                    "indicates that the solution is not unique, thus the returned result may not be meaningful.",
+                    "indicates that the solution is not unique; thus the returned result may not be meaningful.",
                     (int) (frac * 100)
                 );
                 return;

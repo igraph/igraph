@@ -201,14 +201,14 @@ igraph_error_t igraph_read_graph_dimacs_flow(
                 EXPECT(read, 2);
                 if (str[0] == 's') {
                     if (tsource != -1) {
-                        IGRAPH_ERROR("Reading DIMACS file: multiple source vertex line.",
+                        IGRAPH_ERROR("Reading DIMACS file: multiple source vertex lines.",
                                      IGRAPH_PARSEERROR);
                     } else {
                         tsource = tmp;
                     }
                 } else if (str[0] == 't') {
                     if (ttarget != -1) {
-                        IGRAPH_ERROR("Reading DIMACS file: multiple target vertex line.",
+                        IGRAPH_ERROR("Reading DIMACS file: multiple target vertex lines.",
                                      IGRAPH_PARSEERROR);
                     } else {
                         ttarget = tmp;

@@ -302,10 +302,10 @@ igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them
     igraph_t is;
 
     if (igraph_vcount(us) != igraph_vcount(them)) {
-        IGRAPH_ERROR("Number of vertices don't match in scan-0", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices doesn't match in scan-0", IGRAPH_EINVAL);
     }
     if (igraph_is_directed(us) != igraph_is_directed(them)) {
-        IGRAPH_ERROR("Directedness don't match in scan-0", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Directedness doesn't match in scan-0", IGRAPH_EINVAL);
     }
 
     if (weights_them) {

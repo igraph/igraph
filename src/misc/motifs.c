@@ -129,7 +129,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
             histlen = 218;
             break;
         default:
-            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+            IGRAPH_ERROR("In directed graphs, only 3- and 4-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     } else {
@@ -147,7 +147,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
             histlen = 156;
             break;
         default:
-            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+            IGRAPH_ERROR("In undirected graphs, only 3- to 6-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     }
@@ -276,7 +276,7 @@ igraph_error_t igraph_motifs_randesu_callback(
             mul = 4;
             break;
         default:
-            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+            IGRAPH_ERROR("In directed graphs, only 3- and 4-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     } else {
@@ -302,7 +302,7 @@ igraph_error_t igraph_motifs_randesu_callback(
             mul = 6;
             break;
         default:
-            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+            IGRAPH_ERROR("In undirected graphs, only 3- to 6-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     }

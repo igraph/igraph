@@ -612,7 +612,7 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
     igraph_int_t size = FUNCTION(igraph_vector, size)(v);
     IGRAPH_ASSERT(0 <= pos && pos <= size);
     if (size == IGRAPH_INTEGER_MAX) {
-        IGRAPH_ERROR("Cannot insert to vector, already at maximum size.", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Cannot insert into vector, already at maximum size.", IGRAPH_EOVERFLOW);
     }
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, size + 1));
     if (pos < size) {

@@ -763,7 +763,7 @@ igraph_error_t igraph_minimum_size_separators(
     igraph_maxflow_stats_t stats;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs.",
+        IGRAPH_ERROR("Minimum size separators currently only work on undirected graphs.",
                      IGRAPH_EINVAL);
     }
 

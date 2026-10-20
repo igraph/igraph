@@ -224,7 +224,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
         IGRAPH_CHECK(check_expected_degrees(in_weights));
 
         if (igraph_vector_sum(in_weights) != wsum) {
-            IGRAPH_ERRORF("Sum of out- and in-weights must be the same, got %g and %g, respectively.",
+            IGRAPH_ERRORF("Sums of out- and in-weights must be the same, got %g and %g, respectively.",
                           IGRAPH_EINVAL, wsum, igraph_vector_sum(in_weights));
         }
     }

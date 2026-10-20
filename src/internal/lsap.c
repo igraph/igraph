@@ -115,7 +115,7 @@ igraph_error_t ap_hungarian(AP *p) {
                 ++ok;
             }
         if (ok != 1)
-            IGRAPH_ERROR("ap_hungarian: error in assignment, is not a permutation",
+            IGRAPH_ERROR("ap_hungarian: error in assignment; it is not a permutation",
                          IGRAPH_EINVAL);
     }
 

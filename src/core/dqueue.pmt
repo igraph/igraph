@@ -425,6 +425,6 @@ BASE FUNCTION(igraph_dqueue, get)(const TYPE(igraph_dqueue) *q, igraph_int_t idx
     } else {
         /* The assertions at the top make it impossible to reach here,
            but omitting this branch would cause compiler warnings. */
-        IGRAPH_FATAL("Out of bounds access in dqueue.");
+        IGRAPH_FATAL("Out-of-bounds access in dqueue.");
     }
 }

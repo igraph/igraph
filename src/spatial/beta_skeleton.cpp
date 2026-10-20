@@ -481,7 +481,7 @@ igraph_error_t igraph_circle_beta_skeleton(igraph_t *graph, const igraph_matrix_
     IGRAPH_VECTOR_INT_INIT_FINALLY(&potential_edges, 0);
 
     if (igraph_matrix_ncol(points) != 2) {
-        IGRAPH_ERROR("Circle based beta skeletons are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Circle-based beta skeletons are only supported in 2 dimensions.", IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_CHECK(beta_skeleton_edge_superset(&potential_edges, points, beta));

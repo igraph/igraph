@@ -51,7 +51,7 @@ igraph_error_t igraph_rng_sample_sphere_surface(
     igraph_int_t i, j;
 
     if (dim < 2) {
-        IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
+        IGRAPH_ERROR("Sphere must be at least two-dimensional to sample from "
                      "surface.", IGRAPH_EINVAL);
     }
     if (n < 0) {
