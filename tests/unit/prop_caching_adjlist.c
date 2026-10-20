@@ -19,6 +19,24 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+int test_single_loop(void) {
+    igraph_t graph;
+    igraph_adjlist_t adjlist;
+    igraph_bool_t has_multiple;
+
+    igraph_small(&graph, 1, IGRAPH_UNDIRECTED, 0, 0, -1);
+    igraph_adjlist_init(&graph, &adjlist, IGRAPH_ALL,
+                        IGRAPH_LOOPS_TWICE, IGRAPH_NO_MULTIPLE);
+    igraph_adjlist_destroy(&adjlist);
+
+    /* The two incidences of a single loop must not be cached as parallel edges. */
+    igraph_has_multiple(&graph, &has_multiple);
+    IGRAPH_ASSERT(!has_multiple);
+
+    igraph_destroy(&graph);
+    return 0;
+}
+
 int test_caching(void) {
     igraph_t g_simple, g_loop, g_multiloop, g_multi, g_multi_and_loop;
     char *g_desc[] = {"simple", "loop", "multiloop", "multi", "multi and loop"};
@@ -80,6 +98,7 @@ int test_caching(void) {
 
 int main(void) {
 
+    RUN_TEST(test_single_loop);
     RUN_TEST(test_caching);
 
     VERIFY_FINALLY_STACK();
