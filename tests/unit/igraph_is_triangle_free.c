@@ -31,6 +31,46 @@ void check_triangle_free(const char *name, const igraph_t *graph) {
     IGRAPH_ASSERT((!!count) == (!triangle_free));
 }
 
+static void assert_triangle_free_with_cache(const igraph_t *graph, igraph_bool_t expected) {
+    igraph_bool_t triangle_free, simple;
+
+    igraph_invalidate_cache(graph);
+    igraph_is_triangle_free(graph, &triangle_free);
+    IGRAPH_ASSERT(triangle_free == expected);
+
+    /* For directed graphs, also cache whether reciprocal edges exist. */
+    igraph_is_simple(graph, &simple, IGRAPH_UNDIRECTED);
+    igraph_is_triangle_free(graph, &triangle_free);
+    IGRAPH_ASSERT(triangle_free == expected);
+
+    igraph_invalidate_cache(graph);
+    igraph_is_triangle_free(graph, &triangle_free);
+    IGRAPH_ASSERT(triangle_free == expected);
+}
+
+static void test_mantel_bound(void) {
+    const igraph_bool_t directed[] = {false, true, true, true};
+    const igraph_neimode_t modes[] = {IGRAPH_ALL, IGRAPH_OUT, IGRAPH_IN, IGRAPH_ALL};
+
+    for (igraph_int_t n = 4; n <= 9; n++) {
+        for (int mode = 0; mode < 4; mode++) {
+            igraph_t graph;
+
+            /* The underlying simple graph attains Mantel's bound for both
+             * even and odd vertex counts, including K2,3 and K3,4. */
+            igraph_full_bipartite(&graph, NULL, n / 2, n - n / 2, directed[mode], modes[mode]);
+            assert_triangle_free_with_cache(&graph, true);
+
+            /* An edge inside the first part creates triangles and, for graphs
+             * without reciprocal edges, exceeds Mantel's bound by one. */
+            igraph_add_edge(&graph, 0, 1);
+            assert_triangle_free_with_cache(&graph, false);
+
+            igraph_destroy(&graph);
+        }
+    }
+}
+
 int main(void) {
     igraph_t graph;
     igraph_bool_t simple, acyclic;
@@ -110,6 +150,8 @@ int main(void) {
     igraph_is_simple(&graph, &simple, IGRAPH_UNDIRECTED); /* populate cache */
     check_triangle_free("Non-simple, no triangle, high edge count", &graph);
     igraph_destroy(&graph);
+
+    test_mantel_bound();
 
     VERIFY_FINALLY_STACK();
 

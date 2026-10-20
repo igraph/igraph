@@ -953,11 +953,10 @@ igraph_error_t igraph_is_triangle_free(const igraph_t *graph, igraph_bool_t *res
 
     /* Attempt using Mantel's theorem:
      *
-     * If ecount > vcount^2 / 4, the graph has a triangle.
-     *
-     * This calculation needs to be made with care to avoid integer overflow
-     * or false positives due to rounding errors. Note that in igraph, 2*ecount
-     * never overflows.
+     * If ecount > floor(vcount^2 / 4), the graph has a triangle.
+     * The bound equals floor(vcount / 2) * ceil(vcount / 2), which we compute
+     * using integer arithmetic. If the product would overflow, ecount cannot
+     * exceed it, so we skip this shortcut.
      *
      * However, Mantel's condition is valid only for simple graphs. If it holds,
      * we will check if the graph is already known to be simple from the property
@@ -968,8 +967,10 @@ igraph_error_t igraph_is_triangle_free(const igraph_t *graph, igraph_bool_t *res
      * so dense that starting to look for triangles directly is likely to
      * short-circuit quickly.
      */
-    if (IGRAPH_INTEGER_MAX / vcount >= vcount/2 && /* avoid overflow */
-        2*ecount > (vcount / 2) * vcount /* Mantel */) {
+    const igraph_int_t half_lo = vcount / 2;
+    const igraph_int_t half_hi = vcount - half_lo;
+    if (IGRAPH_INTEGER_MAX / half_hi >= half_lo && /* avoid overflow */
+        ecount > half_lo * half_hi /* Mantel */) {
         igraph_bool_t known_simple = true;
 
         if (! igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP)) {
