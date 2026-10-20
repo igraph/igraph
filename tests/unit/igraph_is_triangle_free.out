@@ -2,6 +2,8 @@ Null graph: yes
 Singleton with loop: yes
 C_3:  no
 C_4: yes
+K2,3: yes
+K2,3: yes
 K4:  no
 K4:  no
 Directed K4:  no
