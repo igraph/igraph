@@ -1,6 +1,12 @@
 name: CIFuzz
 on: [pull_request]
 permissions: {}
+
+# Stop fuzzing an older revision when a new commit is pushed to the same PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
  Fuzzing:
    runs-on: ubuntu-latest
