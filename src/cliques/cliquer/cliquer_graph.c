@@ -606,7 +606,7 @@ void graph_print(graph_t *g) {
 					refl++;
 				}
 				if (!SET_CONTAINS_FAST(g->edges[j],i)) {
-					printf("*ASYMMERTIC*");
+					printf("*ASYMMETRIC*");
 					asymm++;
 				}
 			}
@@ -674,7 +674,7 @@ boolean graph_test(graph_t *g,FILE *output) {
 			if (output)
 				fprintf(output,"   WARNING: Graph edge set "
 					"NULL!\n"
-					"   (further warning suppressed)\n");
+					"   (further warnings suppressed)\n");
 			return FALSE;
 		}
 		if (SET_MAX_SIZE(g->edges[i]) < g->n) {
