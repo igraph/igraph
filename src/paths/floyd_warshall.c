@@ -341,10 +341,11 @@ igraph_error_t igraph_i_distances_floyd_warshall(
         }
     }
 
-    /* If there are zero or one vertices, nothing needs to be done.
+    /* With zero or one vertices, no path calculation is needed, but the
+     * source and target selectors must still be applied.
      * This is special-cased so that at later stages we can rely on no_of_nodes - 1 >= 0. */
     if (no_of_nodes <= 1) {
-        return IGRAPH_SUCCESS;
+        return igraph_i_matrix_subset_vertices(res, graph, from, to);
     }
 
     switch (method) {
