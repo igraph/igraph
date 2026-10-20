@@ -19,6 +19,59 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+void test_small_graph_selectors(void) {
+    const igraph_floyd_warshall_algorithm_t methods[] = {
+        IGRAPH_FLOYD_WARSHALL_ORIGINAL,
+        IGRAPH_FLOYD_WARSHALL_TREE,
+        IGRAPH_FLOYD_WARSHALL_AUTOMATIC
+    };
+    igraph_matrix_t result;
+    igraph_vector_t weights;
+    igraph_vector_int_t sources;
+
+    igraph_matrix_init(&result, 0, 0);
+    igraph_vector_init(&weights, 0);
+    igraph_vector_int_init(&sources, 0);
+
+    for (igraph_int_t n = 0; n <= 1; n++) {
+        /* Repeated sources are permitted and must produce repeated rows. */
+        igraph_vector_int_resize(&sources, 2 * n);
+        igraph_vector_int_null(&sources);
+        const igraph_vs_t from[] = {igraph_vss_all(), igraph_vss_none(), igraph_vss_vector(&sources)};
+        const igraph_vs_t to[] = {igraph_vss_all(), igraph_vss_none()};
+        const igraph_int_t nrows[] = {n, 0, 2 * n};
+        const igraph_int_t ncols[] = {n, 0};
+
+        for (int directed = 0; directed < 2; directed++) {
+            igraph_t graph;
+            igraph_empty(&graph, n, directed);
+            for (int weighted = 0; weighted < 2; weighted++) {
+                for (int method = 0; method < 3; method++) {
+                    for (int f = 0; f < 3; f++) {
+                        for (int t = 0; t < 2; t++) {
+                            IGRAPH_ASSERT(igraph_distances_floyd_warshall(
+                                &graph, &result, from[f], to[t], weighted ? &weights : NULL,
+                                IGRAPH_OUT, methods[method]) == IGRAPH_SUCCESS);
+                            IGRAPH_ASSERT(igraph_matrix_nrow(&result) == nrows[f]);
+                            IGRAPH_ASSERT(igraph_matrix_ncol(&result) == ncols[t]);
+                            for (igraph_int_t i = 0; i < nrows[f]; i++) {
+                                for (igraph_int_t j = 0; j < ncols[t]; j++) {
+                                    IGRAPH_ASSERT(MATRIX(result, i, j) == 0);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            igraph_destroy(&graph);
+        }
+    }
+
+    igraph_vector_int_destroy(&sources);
+    igraph_vector_destroy(&weights);
+    igraph_matrix_destroy(&result);
+}
+
 int main(void) {
     igraph_t g;
     igraph_matrix_t d, d2;
@@ -113,6 +166,8 @@ int main(void) {
 
     igraph_matrix_destroy(&d2);
     igraph_matrix_destroy(&d);
+
+    test_small_graph_selectors();
 
     VERIFY_FINALLY_STACK();
     return 0;
