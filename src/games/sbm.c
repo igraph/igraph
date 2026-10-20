@@ -328,7 +328,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
     for (i = 0; i < k; i++) {
         igraph_real_t s = VECTOR(*rho)[i] * m;
         if (fabs(round(s) - s) > sq_dbl_epsilon) {
-            IGRAPH_ERROR("`rho' * `m' is not integer in HSBM", IGRAPH_EINVAL);
+            IGRAPH_ERROR("`rho' * `m' is not an integer in HSBM", IGRAPH_EINVAL);
         }
     }
 
@@ -479,7 +479,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
     }
     if (igraph_matrix_list_size(Clist) != no_blocks &&
         igraph_vector_int_size(mlist) != no_blocks) {
-        IGRAPH_ERROR("`rholist' must have same length as `Clist' and `m' "
+        IGRAPH_ERROR("`rholist' must have the same length as `Clist' and `m' "
                      "for HSBM.", IGRAPH_EINVAL);
     }
     if (p < 0 || p > 1) {
@@ -533,7 +533,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
         for (j = 0; j < k; j++) {
             igraph_real_t s = VECTOR(*rho)[j] * m;
             if (fabs(round(s) - s) > sq_dbl_epsilon) {
-                IGRAPH_ERROR("`rho' * `m' is not integer in HSBM.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("`rho' * `m' is not an integer in HSBM.", IGRAPH_EINVAL);
             }
         }
     }

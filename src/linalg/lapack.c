@@ -336,7 +336,7 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
     } else if (*info < 0) {
         switch (*info) {
         case -1:
-            IGRAPH_ERROR("Invalid number of rows/column.", IGRAPH_FAILURE);
+            IGRAPH_ERROR("Invalid number of rows/columns.", IGRAPH_FAILURE);
             break;
         case -2:
             IGRAPH_ERROR("Invalid number of RHS vectors.", IGRAPH_FAILURE);

@@ -1404,7 +1404,7 @@ igraph_error_t igraph_community_leiden_simple(
         if (igraph_vector_int_size(membership) != vcount) {
             IGRAPH_ERRORF("Requesting to start the computation from a specific "
                           "community assignment, but the given membership vector "
-                          "has a different size (%" IGRAPH_PRId " than the vertex "
+                          "has a different size (%" IGRAPH_PRId ") than the vertex "
                           "count (%" IGRAPH_PRId ").",
                           IGRAPH_EINVAL,
                           igraph_vector_int_size(membership), vcount);

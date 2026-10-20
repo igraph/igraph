@@ -288,7 +288,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     igraph_bool_t conn;
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot work with an unconnected graph.", IGRAPH_EINVAL);
     }
 
     network net;
@@ -456,7 +456,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         igraph_bool_t conn;
         IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
         if (!conn) {
-            IGRAPH_ERROR("Cannot work with disconnected graph.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot work with a disconnected graph.", IGRAPH_EINVAL);
         }
 
         network net;
@@ -565,7 +565,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     igraph_bool_t conn;
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot work with an unconnected graph.", IGRAPH_EINVAL);
     }
 
     if (weights && igraph_vector_size(weights) > 0) {

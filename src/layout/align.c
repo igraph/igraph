@@ -100,8 +100,8 @@ igraph_error_t igraph_layout_align(const igraph_t *graph, igraph_matrix_t *layou
      * Skipping the check is necessary due to the different handling of
      * zero-by-n matrices i various systems. */
     if (dim == 0) {
-        IGRAPH_ERROR("Vertex coordinates must be at least one dimensional, "
-                     "but received a zero-dimensional input.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Vertex coordinates must be at least one-dimensional, "
+                     "but a zero-dimensional input was received.", IGRAPH_EINVAL);
     }
 
     /* Shift layout to origin. */

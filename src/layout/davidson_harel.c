@@ -169,7 +169,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
         IGRAPH_ERROR("Number of iterations must not be negative for the Davidson-Harel layout.", IGRAPH_EINVAL);
     }
     if (fineiter < 0) {
-        IGRAPH_ERROR("Number of fine tuning iterations must not be negative for the Davidson-Harel layout.",
+        IGRAPH_ERROR("Number of fine-tuning iterations must not be negative for the Davidson-Harel layout.",
                      IGRAPH_EINVAL);
     }
     if (cool_fact <= 0 || cool_fact >= 1) {

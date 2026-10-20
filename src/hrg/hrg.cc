@@ -955,7 +955,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     // Number of nodes must be odd
     if (no_of_nodes % 2 == 0) {
-        IGRAPH_ERROR("Complete HRG graph must have odd number of vertices.",
+        IGRAPH_ERROR("Complete HRG graph must have an odd number of vertices.",
                      IGRAPH_EINVAL);
     }
 

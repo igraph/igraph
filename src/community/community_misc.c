@@ -931,7 +931,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
     igraph_real_t frac_pairs_in_1, frac_pairs_in_2;
 
     if (igraph_vector_int_size(v1) <= 1) {
-        IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
+        IGRAPH_ERRORF("Rand indices are not defined for zero or one vertex. "
         "Found membership vector of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, igraph_vector_int_size(v1));
     }
 

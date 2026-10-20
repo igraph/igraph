@@ -521,14 +521,14 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       igraph_gml_tree_line(node, j));
                     }
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERRORF("Non-integer node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                        IGRAPH_ERRORF("Non-integer node ID in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
                     id = igraph_gml_tree_get_integer(node, j);
                     IGRAPH_CHECK(igraph_trie_get(&trie, strid(id, ""), &trie_id));
                     if (trie_id != trie_size) {
                         /* This id has already been seen in a previous node. */
-                        IGRAPH_ERRORF("Duplicate node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                        IGRAPH_ERRORF("Duplicate node ID in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
                     hasid = true;
@@ -721,12 +721,12 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             to = igraph_gml_tree_get_integer(edge, toidx);
             IGRAPH_CHECK(igraph_trie_check(&trie, strid(from, ""), &from));
             if (from < 0) {
-                IGRAPH_ERRORF("Unknown source node id found in an edge in GML file, line %" IGRAPH_PRId ".",
+                IGRAPH_ERRORF("Unknown source node ID found in an edge in GML file, line %" IGRAPH_PRId ".",
                              IGRAPH_PARSEERROR, igraph_gml_tree_line(edge, fromidx));
             }
             IGRAPH_CHECK(igraph_trie_check(&trie, strid(to, ""), &to));
             if (to < 0) {
-                IGRAPH_ERRORF("Unknown target node id found in an edge in GML file, line %" IGRAPH_PRId ".",
+                IGRAPH_ERRORF("Unknown target node ID found in an edge in GML file, line %" IGRAPH_PRId ".",
                              IGRAPH_PARSEERROR, igraph_gml_tree_line(edge, toidx));
             }
             VECTOR(edges)[edgeptr++] = from;
@@ -1024,13 +1024,13 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
      */
     if (myid) {
         if (igraph_vector_size(myid) != no_of_nodes) {
-            IGRAPH_ERROR("Size of id vector must match vertex count.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Size of ID vector must match vertex count.", IGRAPH_EINVAL);
         }
         for (i = 0; i < no_of_nodes; ++i) {
             igraph_real_t val = VECTOR(*myid)[i];
             igraph_real_t trunc_val = trunc(val);
             if (! (val == trunc_val && igraph_i_is_real_representable_as_integer(trunc_val))) {
-                IGRAPH_WARNINGF("%g is not a valid integer id for GML files, ignoring all supplied ids.", val);
+                IGRAPH_WARNINGF("%g is not a valid integer ID for GML files, ignoring all supplied IDs.", val);
                 if (myid == &v_myid) {
                     igraph_vector_destroy(&v_myid);
                     IGRAPH_FINALLY_CLEAN(1);
@@ -1045,7 +1045,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         igraph_bool_t duplicate_free;
         IGRAPH_CHECK(igraph_i_vector_is_duplicate_free(myid, &duplicate_free));
         if (! duplicate_free) {
-            IGRAPH_WARNING("Duplicate id values found, ignoring supplies ids.");
+            IGRAPH_WARNING("Duplicate ID values found, ignoring supplied IDs.");
             if (myid == &v_myid) {
                 igraph_vector_destroy(&v_myid);
                 IGRAPH_FINALLY_CLEAN(1);

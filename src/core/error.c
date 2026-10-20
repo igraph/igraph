@@ -157,8 +157,8 @@ static const char *igraph_i_error_strings[] = {
     /* 57 */ NULL, // "CPU time exceeded",    /* removed in 1.0 */
     /* 58 */ "Integer or double underflow",
     /* 59 */ "Random walk got stuck",
-    /* 60 */ "Search stopped; this error should never be visible to the user, "
-    "please report this error along with the steps to reproduce it.",
+    /* 60 */ "Search stopped; this error should never be visible to the user. "
+    "Please report this error along with the steps to reproduce it.",
     /* 61 */ "Result too large",
     /* 62 */ "Input problem has no solution"
 };

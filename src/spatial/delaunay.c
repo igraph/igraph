@@ -135,7 +135,7 @@ igraph_error_t igraph_i_delaunay_edges(igraph_vector_int_t *edges, const igraph_
     }
 
     if (dim >= numpoints) {
-        IGRAPH_ERRORF("Not enough points to create simplex, need at least %" IGRAPH_PRId ".", IGRAPH_EINVAL, dim);
+        IGRAPH_ERRORF("Not enough points to create a simplex, need at least %" IGRAPH_PRId ".", IGRAPH_EINVAL, dim);
     }
 
     /* Prevent overflow in igraph_int_t -> int conversions below.

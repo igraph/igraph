@@ -439,7 +439,7 @@ static igraph_error_t betweenness_check_weights(
                 IGRAPH_ERROR("Edge weights must not contain NaN values.", IGRAPH_EINVAL);
             } else if (minweight <= IGRAPH_SHORTEST_PATH_EPSILON) {
                 IGRAPH_WARNINGF(
-                    "Some weights are smaller than the path length comparison tolerance (%g), "
+                    "Some weights are smaller than the path length comparison tolerance (%g); "
                     "betweenness calculations may suffer from numerical precision issues.",
                     IGRAPH_SHORTEST_PATH_EPSILON
                 );

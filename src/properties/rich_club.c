@@ -131,7 +131,7 @@ igraph_error_t igraph_rich_club_sequence(
         igraph_int_t v2 = IGRAPH_TO(graph, eid);
         if (!loops && normalized && !warning_issued && v1 == v2) {
             IGRAPH_WARNING("Self-loops were requested to be assumed absent, "
-                           "but encountered a self-loop. Density calculations will proceed "
+                           "but a self-loop was encountered. Density calculations will proceed "
                            "with the assumption of no loops.");
             warning_issued = true;
         }

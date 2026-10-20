@@ -1010,7 +1010,7 @@ igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
     igraph_int_t torows = to->nrow, fromrows = from->nrow;
     igraph_int_t offset, c, r, index, offset2;
     if (tocols != fromcols) {
-        IGRAPH_ERROR("Cannot do rbind, number of columns do not match.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot do rbind, number of columns does not match.", IGRAPH_EINVAL);
     }
 
     igraph_int_t new_size; /* new_size = tocols * (fromrows + torows) */
@@ -1057,7 +1057,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
     igraph_int_t tocols = to->ncol, fromcols = from->ncol;
     igraph_int_t torows = to->nrow, fromrows = from->nrow;
     if (torows != fromrows) {
-        IGRAPH_ERROR("Cannot do rbind, number of rows do not match.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot do rbind, number of rows does not match.", IGRAPH_EINVAL);
     }
 
     igraph_int_t new_tocols;
