@@ -257,7 +257,7 @@ IGRAPH_BEGIN_C_DECLS
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
- * \enumval IGRAPH_ARPACK An error happened inside a calculation implemented
+ * \enumval IGRAPH_EARPACK An error happened inside a calculation implemented
  *   in ARPACK. The calculation involved is most likely an eigenvector-related
  *   calculation.
  * \enumval IGRAPH_ENEGCYCLE Negative cycle detected while calculating shortest paths.
