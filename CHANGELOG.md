@@ -24,6 +24,7 @@
 - In igraph 1.0.0 and 1.0.1, `igraph_distances_johnson()` could return incorrect distances in `IGRAPH_IN` mode with negative weights when source and target selections differed, and could access outside the result buffer for rectangular results. Earlier releases are unaffected because Johnson’s algorithm did not support `IGRAPH_IN`.
 - `igraph_distances_floyd_warshall()` ignored source and target vertex selectors on singleton graphs, returning incorrect result matrix dimensions for empty selections or repeated source vertices. This bug was introduced in 0.10.4.
 - `igraph_community_spinglass_single()` failed to reject an invalid vertex ID equal to the vertex count.
+- `igraph_bipartite_projection()`, `igraph_community_spinglass_single()`, `igraph_dfs()`, `igraph_fundamental_cycles()`, `igraph_layout_star()`, `igraph_pseudo_diameter()`, `igraph_random_walk()`, `igraph_st_vertex_connectivity()`, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVVID` instead of `IGRAPH_EINVAL` when validating invalid scalar vertex IDs. Conversely, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVAL` instead of `IGRAPH_EINVVID` for an invalid vertex count.
 
 ### Other
 

@@ -1753,7 +1753,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(
     }
 
     if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
     }
 
     switch (neighbors) {
