@@ -636,7 +636,7 @@ igraph_error_t igraph_cycle_graph(
  *        \endclist
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
- *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
@@ -728,7 +728,7 @@ igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_int_t n, igraph_int_t ch
  *          undirected tree.
  *        \endclist
  * \return Error code:
- *         \c IGRAPH_INVMODE: invalid mode argument.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
  *         \c IGRAPH_EINVAL: invalid number of children.
  *
  * Time complexity: O(|V|+|E|), the
