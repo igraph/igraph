@@ -19,6 +19,7 @@
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eigenvalues close to zero. This fixed a convergence issue in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
 - `igraph_hrg_fit()` returned an invalid, all-zero HRG model when `steps` was positive and none of the MCMC moves improved the likelihood of the initial dendrogram, e.g. for complete graphs. Using such a model in other HRG functions could crash igraph. The initial dendrogram is now returned in this case.
 - Resolved undefined behaviour when passing signed `char` to `<ctype.h>` functions in file format parsers. The issue could potentially cause out-of-bounds access when igraph was compiled with MSVC. Thanks to Riha Ilyas @riha-dev for fixing this (PR #2944)!
+- In igraph 1.0.0 and 1.0.1, `igraph_distances_johnson()` could return incorrect distances in `IGRAPH_IN` mode with negative weights when source and target selections differed, and could access outside the result buffer for rectangular results. Earlier releases are unaffected because Johnson’s algorithm did not support `IGRAPH_IN`.
 - `igraph_distances_floyd_warshall()` ignored source and target vertex selectors on singleton graphs, returning incorrect result matrix dimensions for empty selections or repeated source vertices. This bug was introduced in 0.10.4.
 
 ### Other
