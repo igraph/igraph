@@ -183,7 +183,7 @@ void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m) {
  * \brief Returns the number of elements allocated for a matrix.
  *
  * Note that this might be different from the size of the matrix (as
- * queried by \ref igraph_matrix_size(), and specifies how many elements
+ * queried by \ref igraph_matrix_size()), and specifies how many elements
  * the matrix can hold, without reallocation.
  * \param v Pointer to the (previously initialized) matrix object
  *          to query.
@@ -373,7 +373,7 @@ void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to, ig
  * \param m Pointer to an initialized matrix object.
  *
  * Time complexity: O(n),
- * n is the number of  elements in
+ * n is the number of elements in
  * the matrix.
  */
 
@@ -584,7 +584,7 @@ void FUNCTION(igraph_matrix, scale)(TYPE(igraph_matrix) *m, BASE by) {
 
 /**
  * \function igraph_matrix_select_rows
- * \brief Select some rows of a matrix.
+ * \brief Selects some rows of a matrix.
  *
  * This function selects some rows of a matrix and returns them in a
  * new matrix. The result matrix should be initialized before calling
@@ -619,7 +619,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m
 
 /**
  * \function igraph_matrix_select_rows_cols
- * \brief Select some rows and columns of a matrix.
+ * \brief Selects some rows and columns of a matrix.
  *
  * This function selects some rows and columns of a matrix and returns
  * them in a new matrix. The result matrix should be initialized before
@@ -658,11 +658,11 @@ igraph_error_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matri
 
 /**
  * \function igraph_matrix_get_col
- * \brief Select a column.
+ * \brief Selects a column.
  *
  * Extract a column of a matrix and return it as a vector.
  * \param m The input matrix.
- * \param res The result will we stored in this vector. It should be
+ * \param res The result will be stored in this vector. It should be
  *   initialized and will be resized as needed.
  * \param index The index of the column to select.
  * \return Error code.
@@ -1010,7 +1010,7 @@ igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
     igraph_int_t torows = to->nrow, fromrows = from->nrow;
     igraph_int_t offset, c, r, index, offset2;
     if (tocols != fromcols) {
-        IGRAPH_ERROR("Cannot do rbind, number of columns do not match.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot do rbind, number of columns does not match.", IGRAPH_EINVAL);
     }
 
     igraph_int_t new_size; /* new_size = tocols * (fromrows + torows) */
@@ -1048,7 +1048,7 @@ igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
  * \param from The right matrix. It is left unchanged.
  * \return Error code.
  *
- * Time complexity: O(mn), the number of elements on the new matrix.
+ * Time complexity: O(mn), the number of elements in the new matrix.
  */
 
 igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
@@ -1057,7 +1057,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
     igraph_int_t tocols = to->ncol, fromcols = from->ncol;
     igraph_int_t torows = to->nrow, fromrows = from->nrow;
     if (torows != fromrows) {
-        IGRAPH_ERROR("Cannot do rbind, number of rows do not match.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot do rbind, number of rows does not match.", IGRAPH_EINVAL);
     }
 
     igraph_int_t new_tocols;
@@ -1071,7 +1071,7 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
 
 /**
  * \function igraph_matrix_swap
- * \brief Swap two matrices.
+ * \brief Swaps two matrices.
  *
  * The contents of the two matrices will be swapped.
  * \param m1 The first matrix.
@@ -1336,7 +1336,7 @@ igraph_error_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
  *
  * Divide \p m1 by \p m2 elementwise and store the result in \p m1.
  * The dimensions of the two matrices must match.
- * \param m1 The dividend. The result is store here.
+ * \param m1 The dividend. The result is stored here.
  * \param m2 The divisor. It is left unchanged.
  * \return Error code.
  *
@@ -1481,7 +1481,7 @@ void FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
  * Checks whether all elements are zero.
  *
  * \param m The input matrix.
- * \return Boolean, \c true is \p m contains only zeros and \c false
+ * \return Boolean, \c true if \p m contains only zeros and \c false
  *   otherwise.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1496,7 +1496,7 @@ igraph_bool_t FUNCTION(igraph_matrix, isnull)(const TYPE(igraph_matrix) *m) {
  * \brief Is the matrix empty?
  *
  * It is possible to have a matrix with zero rows or zero columns, or
- * even both. This functions checks for these.
+ * even both. This function checks for these.
  *
  * \param m The input matrix.
  * \return Boolean, \c true if the matrix contains zero elements, and
@@ -1713,7 +1713,7 @@ igraph_error_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, igrap
 
 /**
  * \function igraph_matrix_select_cols
- * \brief Select some columns of a matrix.
+ * \brief Selects some columns of a matrix.
  *
  * This function selects some columns of a matrix and returns them in a
  * new matrix. The result matrix should be initialized before calling

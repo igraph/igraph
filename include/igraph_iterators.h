@@ -124,7 +124,7 @@ typedef struct igraph_vit_t {
  * \section IGRAPH_VIT Stepping over the vertices
  *
  * <para>After creating an iterator with \ref igraph_vit_create(), it
- * points to the first vertex in the vertex determined by the vertex
+ * points to the first vertex in the vertex set determined by the vertex
  * selector (if there is any). The \ref IGRAPH_VIT_NEXT() macro steps
  * to the next vertex, \ref IGRAPH_VIT_END() checks whether there are
  * more vertices to visit, \ref IGRAPH_VIT_SIZE() gives the total size
@@ -190,7 +190,7 @@ typedef struct igraph_vit_t {
 #define IGRAPH_VIT_SIZE(vit)  ((vit).end - (vit).start)
 /**
  * \define IGRAPH_VIT_RESET
- * \brief Reset a vertex iterator.
+ * \brief Resets a vertex iterator.
  *
  * Resets a vertex iterator. After calling this macro the iterator
  * will point to the first vertex.
@@ -201,7 +201,7 @@ typedef struct igraph_vit_t {
 #define IGRAPH_VIT_RESET(vit) ((vit).pos = (vit).start)
 /**
  * \define IGRAPH_VIT_GET
- * \brief Query the current position.
+ * \brief Queries the current position.
  *
  * Gives the vertex ID of the current vertex pointed to by the
  * iterator.
@@ -342,7 +342,7 @@ typedef struct igraph_eit_t {
  * the next edge, \ref IGRAPH_EIT_END() checks whether there are more
  * edges to visit, \ref IGRAPH_EIT_SIZE() gives the number of edges in
  * the edge sequence, \ref IGRAPH_EIT_RESET() resets the iterator to
- * the first edge and \ref IGRAPH_EIT_GET() returns the id of the
+ * the first edge and \ref IGRAPH_EIT_GET() returns the ID of the
  * current edge.</para>
  */
 
@@ -382,7 +382,7 @@ typedef struct igraph_eit_t {
 #define IGRAPH_EIT_SIZE(eit)  ((eit).end - (eit).start)
 /**
  * \define IGRAPH_EIT_RESET
- * \brief Reset an edge iterator.
+ * \brief Resets an edge iterator.
  *
  * Resets an edge iterator. After calling this macro the iterator will
  * point to the first edge.
@@ -393,11 +393,11 @@ typedef struct igraph_eit_t {
 #define IGRAPH_EIT_RESET(eit) ((eit).pos = (eit).start)
 /**
  * \define IGRAPH_EIT_GET
- * \brief Query an edge iterator.
+ * \brief Queries an edge iterator.
  *
  * Gives the edge ID of the current edge pointed to by an iterator.
  * \param eit The edge iterator.
- * \return The id of the current edge.
+ * \return The ID of the current edge.
  *
  * Time complexity: O(1).
  */

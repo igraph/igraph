@@ -330,7 +330,7 @@ igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *r
 
 /**
  * \function igraph_to_directed
- * \brief Convert an undirected graph to a directed one.
+ * \brief Converts an undirected graph to a directed one.
  *
  * If the supplied graph is directed, this function does nothing.
  *
@@ -462,7 +462,7 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
 
 /**
  * \function igraph_to_undirected
- * \brief Convert a directed graph to an undirected one.
+ * \brief Converts a directed graph to an undirected one.
  *
  * </para><para>
  * If the supplied graph is undirected, this function does nothing.
@@ -760,7 +760,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise (or column-wise), such that
  * the sum of each row (or column) is one. The row-wise normalized matrix
- * is also called a \em right-stochastic and contains the transition
+ * is also called \em right-stochastic and contains the transition
  * probabilities of a random walk that follows edge directions in a directed
  * graph. The column-wise normalized matrix is called \em left-stochastic and
  * is related to random walks moving against edge directions.
@@ -846,7 +846,7 @@ igraph_error_t igraph_get_stochastic(
  * \brief The stochastic adjacency matrix of a graph.
  *
  * Stochastic matrix of a graph in sparse format. See \ref igraph_get_stochastic()
- * for the information on stochastic matrices.
+ * for information on stochastic matrices.
  *
  * \param graph The input graph.
  * \param res Pointer to an \em initialized sparse matrix, the
@@ -886,7 +886,7 @@ igraph_error_t igraph_get_stochastic_sparse(
  * \brief Converts a tree to its Pr&uuml;fer sequence.
  *
  * A Pr&uuml;fer sequence is a unique sequence of integers associated
- * with a labelled tree. A tree on n >= 2 vertices can be represented by a
+ * with a labeled tree. A tree on n >= 2 vertices can be represented by a
  * sequence of n-2 integers, each between 0 and n-1 (inclusive).
  *
  * \param graph Pointer to an initialized graph object which
@@ -898,7 +898,7 @@ igraph_error_t igraph_get_stochastic_sparse(
  *          \cli IGRAPH_ENOMEM
  *             there is not enough memory to perform the operation.
  *          \cli IGRAPH_EINVAL
- *             the graph is not a tree or it is has less than vertices
+ *             the graph is not a tree or it has fewer than two vertices
  *          \endclist
  *
  * \sa \ref igraph_from_prufer()

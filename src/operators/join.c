@@ -27,7 +27,7 @@
  *
  * First the vertices of the second graph will be relabeled with new
  * vertex IDs to have two disjoint sets of vertex IDs, then the union
- * of the two graphs will be formed. Finally, the vertces from the
+ * of the two graphs will be formed. Finally, the vertices from the
  * first graph will have edges added to each vertex from the second.
  * If the two graphs have |V1| and |V2| vertices and |E1| and |E2|
  * edges respectively then the new graph will have |V1|+|V2| vertices
@@ -36,7 +36,7 @@
  * </para><para>
  * The vertex ordering of the graphs will be preserved.
  * In other words, the vertex IDs of the first graph map to
- * identical values in the new graph, while the vertex  IDs
+ * identical values in the new graph, while the vertex IDs
  * of the second graph map to IDs incremented by the vertex
  * count of the first graph. The new edges will be grouped with the
  * other edges that share a from vertex.

@@ -1471,7 +1471,7 @@ cleanup:
  * \function igraph_subisomorphic_lad
  * Check subgraph isomorphism with the LAD algorithm
  *
- * Check whether \p pattern is isomorphic to a subgraph os \p target.
+ * Check whether \p pattern is isomorphic to a subgraph of \p target.
  * The original LAD implementation by Christine Solnon was used as the
  * basis of this code.
  *
@@ -1483,7 +1483,7 @@ cleanup:
  *
  * \param pattern The smaller graph, it can be directed or undirected.
  * \param target The bigger graph, it can be directed or undirected.
- * \param domains An integer vector list of \c NULL. The length of each
+ * \param domains An integer vector list or \c NULL. The length of each
  *    vector must match the number of vertices in the \p pattern graph.
  *    For each vertex, the IDs of the compatible vertices in the target
  *    graph are listed.

@@ -103,7 +103,7 @@ void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
  *
  * </para><para>
  * Unknown vertex or edge parameters are read as string vertex
- * or edge attributes. If the parameter name conflicts with one
+ * or edge attributes. If the parameter name conflicts with one of
  * the standard attribute names mentioned above, a <code>_</code>
  * character is appended to it to avoid conflict.
  *
@@ -345,7 +345,7 @@ static igraph_error_t pajek_escape(const char* src, char** dest) {
  * the attributes of the vertices and edges. Of course this requires
  * an attribute handler to be installed. The names of the
  * corresponding vertex and edge attributes are listed at \ref
- * igraph_read_graph_pajek(), e.g. the \c color vertex attributes
+ * igraph_read_graph_pajek(), e.g. the \c color vertex attribute
  * determines the color (\c c in Pajek) parameter.
  *
  * </para><para>
@@ -371,7 +371,7 @@ static igraph_error_t pajek_escape(const char* src, char** dest) {
  * are using an old version of Pajek, you are on Unix and you are having
  * problems reading files written by igraph on a Windows machine, convert the
  * line endings manually with a text editor or with \c unix2dos or \c iconv
- * from the command line).
+ * from the command line.
  *
  * </para><para>
  * Pajek will only interpret UTF-8 encoded files if they contain a byte-order
@@ -389,7 +389,7 @@ static igraph_error_t pajek_escape(const char* src, char** dest) {
  *
  * \sa \ref igraph_read_graph_pajek() for reading Pajek graphs, \ref
  * igraph_write_graph_graphml() for writing a graph in GraphML format,
- * this suites <command>igraph</command> graphs better.
+ * this suits <command>igraph</command> graphs better.
  *
  * \example examples/simple/igraph_write_graph_pajek.c
  */

@@ -2505,7 +2505,7 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
 
 /**
  * \function igraph_isoclass
- * \brief Determine the isomorphism class of small graphs.
+ * \brief Determines the isomorphism class of small graphs.
  *
  * </para><para>
  * All graphs with a given number of vertices belong to a number of
@@ -2523,12 +2523,12 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * isomorphism classes for directed graphs with three vertices is 16
  * (between 0 and 15), for undirected graph it is only 4. For graphs
  * with four vertices it is 218 (directed) and 11 (undirected).
- * For 5 and 6 vertex undirected graphs, it is 34 and 156, respectively.
+ * For 5- and 6-vertex undirected graphs, it is 34 and 156, respectively.
  * These values can also be retrieved using \ref igraph_graph_count().
  * For more information, see https://oeis.org/A000273 and https://oeis.org/A000088.
  *
  * </para><para>
- * At the moment, 3- and 4-vertex directed graphs and 3 to 6 vertex
+ * At the moment, 3- and 4-vertex directed graphs and 3- to 6-vertex
  * undirected graphs are supported.
  *
  * </para><para>
@@ -2542,7 +2542,7 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * \ref igraph_isoclass_create(), \ref igraph_motifs_randesu().
  *
  * Because of some limitations this function works only for graphs
- * with three of four vertices.
+ * with three or four vertices.
  *
  * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
@@ -2615,10 +2615,10 @@ igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_int_t *isoclass) {
  * \brief The isomorphism class of a subgraph of a graph.
  *
  * This function identifies the isomorphism class of the subgraph
- * induced the vertices specified in \p vids.
+ * induced by the vertices specified in \p vids.
  *
  * </para><para>
- * At the moment, 3- and 4-vertex directed graphs and 3 to 6 vertex
+ * At the moment, 3- and 4-vertex directed graphs and 3- to 6-vertex
  * undirected graphs are supported.
  *
  * </para><para>
@@ -2728,12 +2728,12 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vs_t vids,
  * </para><para>
  * The isomorphism class is an integer between 0 and the number of
  * unique unlabeled (i.e. non-isomorphic) graphs on the given number
- * of vertices and give directedness. See https://oeis.org/A000273
+ * of vertices and given directedness. See https://oeis.org/A000273
  * and https://oeis.org/A000088 for the number of directed and
  * undirected graphs on \p size nodes.
  *
  * </para><para>
- * At the moment, 3- and 4-vertex directed graphs and 3 to 6 vertex
+ * At the moment, 3- and 4-vertex directed graphs and 3- to 6-vertex
  * undirected graphs are supported.
  *
  * \param graph Pointer to an uninitialized graph object.
@@ -2897,15 +2897,15 @@ static igraph_int_t directed_graph_counts[] = {
 
 /**
  * \function igraph_graph_count
- * \brief The number of unlabelled graphs on the given number of vertices.
+ * \brief The number of unlabeled graphs on the given number of vertices.
  *
- * Gives the number of unlabelled \em simple graphs on the specified number of vertices.
+ * Gives the number of unlabeled \em simple graphs on the specified number of vertices.
  * The "isoclass" of a graph of this size is at most one less than this value.
  *
  * </para><para>
  * This function is meant to be used in conjunction with isoclass and motif finder
  * functions. It will only work for small \p n values for which the result is
- * represetable in an \type igraph_int_t. For larger \p n values, an overflow
+ * representable in an \type igraph_int_t. For larger \p n values, an overflow
  * error is raised.
  *
  * \param n The number of vertices.

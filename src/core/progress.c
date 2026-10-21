@@ -29,21 +29,21 @@ static IGRAPH_THREAD_LOCAL char igraph_i_progressmsg_buffer[1000];
 
 /**
  * \function igraph_progress
- * \brief Report the progress of a calculation from an igraph function.
+ * \brief Reports the progress of a calculation from an igraph function.
  *
  * Note that the usual way to report progress is the \ref IGRAPH_PROGRESS
  * macro, as that takes care of the return value of the progress
  * handler.
  * \param message A string describing the function or algorithm
  *     that is reporting the progress. Current igraph functions
- *     always use the name \p message argument if reporting from the
+ *     always use the same \p message argument if reporting from the
  *     same function.
  * \param percent Numeric, the percentage that was completed by the
  *     algorithm or function.
  * \param data User-defined data. Current igraph functions that
  *     report progress pass a null pointer here. Users can
  *     write their own progress handlers and functions with progress
- *     reporting, and then pass some meaningfull context here.
+ *     reporting, and then pass some meaningful context here.
  * \return Error code from the progress handler function, or \c IGRAPH_SUCCESS
  *         if no progress handler function was registered.
  *
@@ -59,7 +59,7 @@ igraph_error_t igraph_progress(const char *message, igraph_real_t percent, void 
 
 /**
  * \function igraph_progressf
- * \brief Report the progress of a calculation from an igraph function, printf-like.
+ * \brief Reports the progress of a calculation from an igraph function, printf-like.
  *
  * This is a more flexible version of \ref igraph_progress(), with
  * a printf-like template string. First the template string
@@ -77,12 +77,11 @@ igraph_error_t igraph_progress(const char *message, igraph_real_t percent, void 
  * \param data User-defined data. Current igraph functions that
  *     report progress pass a null pointer here. Users can
  *     write their own progress handlers and functions with progress
- *     reporting, and then pass some meaningfull context here.
- * \param ... Additional argument that were specified in the
+ *     reporting, and then pass some meaningful context here.
+ * \param ... Additional arguments that were specified in the
  *     \p message argument.
  * \return Error code from the progress handler function, or \c IGRAPH_SUCCESS
  *         if no progress handler function was registered.
- * \return
  */
 
 igraph_error_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
@@ -112,7 +111,7 @@ igraph_error_t igraph_progressf(const char *message, igraph_real_t percent, void
  * \param data User-defined data. Current igraph functions that
  *     report progress pass a null pointer here. Users can
  *     write their own progress handlers and functions with progress
- *     reporting, and then pass some meaningfull context here.
+ *     reporting, and then pass some meaningful context here.
  * \return This function always returns with \c IGRAPH_SUCCESS.
  *
  * Time complexity: O(1).
@@ -129,7 +128,7 @@ igraph_error_t igraph_progress_handler_stderr(const char *message, igraph_real_t
 
 /**
  * \function igraph_set_progress_handler
- * \brief Install a progress handler, or remove the current handler.
+ * \brief Installs a progress handler or removes the current handler.
  *
  * There is a single simple predefined progress handler:
  * \ref igraph_progress_handler_stderr().

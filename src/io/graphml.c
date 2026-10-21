@@ -446,7 +446,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
         IGRAPH_CHECK(igraph_attribute_record_set_type(idrec, IGRAPH_ATTRIBUTE_STRING));
         IGRAPH_CHECK(igraph_strvector_update(idrec->value.as_strvector, igraph_i_trie_borrow_keys(&state->node_trie)));
     } else {
-        IGRAPH_WARNING("Could not add vertex ids, there is already an 'id' vertex attribute.");
+        IGRAPH_WARNING("Could not add vertex IDs, there is already an 'id' vertex attribute.");
     }
 
     /* Add default attribute values for edges where needed */
@@ -475,7 +475,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
             IGRAPH_CHECK(igraph_strvector_update(idrec->value.as_strvector, &state->edgeids));
             IGRAPH_CHECK(igraph_attribute_record_resize(idrec, igraph_vector_int_size(&state->edgelist) / 2));
         } else {
-            IGRAPH_WARNING("Could not add edge ids, there is already an 'id' edge attribute.");
+            IGRAPH_WARNING("Could not add edge IDs, there is already an 'id' edge attribute.");
         }
     }
 
@@ -1458,7 +1458,7 @@ static void igraph_i_libxml_structured_error_handler(void* ctx, const xmlError *
  * graphs. Currently only the most basic import functionality is implemented
  * in igraph: it can read GraphML files without nested graphs and hyperedges.
  * Attributes of the graph are loaded only if an attribute interface
- * is attached, see \ref igraph_set_attribute_table(). String attrribute values
+ * is attached, see \ref igraph_set_attribute_table(). String attribute values
  * are returned in UTF-8 encoding.
  *
  * </para><para>

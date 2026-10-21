@@ -44,7 +44,7 @@ static igraph_error_t igraph_i_create_start_vectors(
  * functions use this minimal set for creating and manipulating
  * graphs.</para>
  *
- * <para>This is a very important principle since it makes possible to
+ * <para>This is a very important principle since it makes it possible to
  * implement other data representations by implementing only this
  * minimal set.</para>
  *
@@ -84,7 +84,7 @@ static igraph_error_t igraph_i_create_start_vectors(
  *        \cli IGRAPH_UNDIRECTED
  *          Create an \em undirected graph.
  *        \endclist
- * \param attr The graph attributes. Supply \c NULL if not graph attributes
+ * \param attr The graph attributes. Supply \c NULL if no graph attributes
  *        are to be set.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
@@ -232,7 +232,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  * first two elements define the first edge (the order is
  * <code>from</code>, <code>to</code> for directed
  * graphs). The vector
- * should contain even number of integer numbers between zero and the
+ * should contain an even number of integers between zero and the
  * number of vertices in the graph minus one (inclusive). If you also
  * want to add new vertices, call \ref igraph_add_vertices() first.
  * \param graph The graph to which the edges will be added.
@@ -855,7 +855,7 @@ igraph_int_t igraph_ecount(const igraph_t *graph) {
  *        version 0.4 this vector is always sorted, the vertex IDs are
  *        in increasing order. If one neighbor is connected with multiple
  *        edges, the neighbor will be returned multiple times.
- * \param pnode The id of the node for which the adjacent vertices are
+ * \param pnode The ID of the node for which the adjacent vertices are
  *        to be searched.
  * \param mode Defines the way adjacent vertices are searched in
  *        directed graphs. It can have the following values:
@@ -1137,7 +1137,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
 /**
  * \ingroup interface
  * \function igraph_degree_1
- * \brief The degree of of a single vertex in the graph.
+ * \brief The degree of a single vertex in the graph.
  *
  * This function calculates the in-, out- or total degree of a single vertex.
  * For a single vertex, it is more efficient than calling \ref igraph_degree().
@@ -1490,7 +1490,7 @@ igraph_error_t igraph_degree(
 
 /**
  * \function igraph_get_eid
- * \brief Get the edge ID from the endpoints of an edge.
+ * \brief Gets the edge ID from the endpoints of an edge.
  *
  * For undirected graphs \c from and \c to are exchangeable.
  *
@@ -1914,7 +1914,7 @@ igraph_error_t igraph_incident(
 
 /**
  * \function igraph_is_same_graph
- * \brief Are two graphs identical as labelled graphs?
+ * \brief Are two graphs identical as labeled graphs?
  *
  * Two graphs are considered to be the same if they have the same vertex and
  * edge sets. Graphs which are the same may have multiple different

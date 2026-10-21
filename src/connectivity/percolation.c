@@ -32,8 +32,8 @@
  * \brief Percolates a single edge.
  *
  * \param links Vector representing parents.
- * \param sizes sizes[i] is the number of children of links[i]
- * \param biggest The biggest value in sizes, is updated if a bigger cluster is created.
+ * \param sizes sizes[i] is the number of children of links[i].
+ * \param biggest The biggest value in sizes; updated if a bigger cluster is created.
  * \param a A vertex incident to the edge.
  * \param b The other vertex incident to the edge.
  */
@@ -86,7 +86,7 @@ static void percolate_edge(igraph_vector_int_t *links,
  *
  * Calculates the size of the largest connected component as edges are added
  * to a graph in the given order. This function differs from
- * \ref igraph_bond_percolation() in that it take a list of vertex pairs as input.
+ * \ref igraph_bond_percolation() in that it takes a list of vertex pairs as input.
  *
  * \param edges Vector of edges, where the i-th edge has endpoints
  *    <code>edges[2i]</code> and <code>edges[2i+1]</code>.
@@ -98,7 +98,7 @@ static void percolate_edge(igraph_vector_int_t *links,
  *
  * \sa \ref igraph_bond_percolation() to specify edges by their ID in a graph object.
  *
- * Time complexity: O(|E| a(|E|)) where a is the inverse Ackermann function,
+ * Time complexity: O(|E| a(|E|)) where a is the inverse Ackermann function;
  * for all practical purposes it is not above 5.
  */
 
@@ -207,7 +207,7 @@ igraph_error_t igraph_edgelist_percolation(
  * their endpoints; \ref igraph_site_percolation() to compute the vertex percolation
  * curve; \ref igraph_connected_components() to find the size of connected components.
  *
- * Time complexity: O(|V| + |E| a(|E|)) where a is the inverse Ackermann function,
+ * Time complexity: O(|V| + |E| a(|E|)) where a is the inverse Ackermann function;
  * for all practical purposes it is not above 5.
  */
 
@@ -311,8 +311,8 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  * \param giant_size <code>giant_size[i]</code> will contain the size of the
  *    largest component after having added the vertex with index
  *    <code>vertex_order[i]</code>.
- * \param edge_count <code>edge_count[i]</code> will contain the numer of edges
- *    in the graph having added the vertex with index
+ * \param edge_count <code>edge_count[i]</code> will contain the number of edges
+ *    in the graph after adding the vertex with index
  *    <code>vertex_order[i]</code>.
  * \param vertex_order The order the vertices are added in. Must not contain
  *    duplicates. If \c NULL, a random order will be used.
@@ -321,7 +321,7 @@ static igraph_error_t percolate_site(const igraph_t *graph,
  * \sa \ref igraph_bond_percolation() to compute the edge percolation curve;
  * \ref igraph_connected_components() to find the size of connected components.
  *
- * Time complexity: O(|V| + |E| a(|E|)) where a is the inverse Ackermann function,
+ * Time complexity: O(|V| + |E| a(|E|)) where a is the inverse Ackermann function;
  * for all practical purposes it is not above 5.
  */
 

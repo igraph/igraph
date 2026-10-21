@@ -170,13 +170,13 @@ struct infomap_igraph_rng {
  *
  * \param graph The input graph. Edge directions are taken into account.
  * \param edge_weights Numeric vector giving the weights of the edges.
- *     The random walker will favour edges with high weights over
+ *     The random walker will favor edges with high weights over
  *     edges with low weights; the probability of picking a particular
  *     outbound edge from a node is directly proportional to its weight.
  *     If it is \c NULL then all edges will have equal
  *     weights. The weights are expected to be non-negative.
  * \param vertex_weights Numeric vector giving the weights of the vertices.
- *     Vertices with higher weights are favoured by the random walker
+ *     Vertices with higher weights are favored by the random walker
  *     when it teleports to a new vertex. The probability of picking a vertex
  *     when the random walker teleports is directly proportional to the weight
  *     of the vertex. If this argument is \c NULL then all vertices will have
@@ -185,8 +185,8 @@ struct infomap_igraph_rng {
  *     (can be any integer value equal to or larger than 1).
  * \param is_regularized If true, adds a fully connected Bayesian prior network
  *     to avoid overfitting due to missing links.
- * \param regularization_strength Adjust relative strength of the Bayesian prior
- *     network used for regularization. This multiplies the default strength, a
+ * \param regularization_strength Adjusts the relative strength of the Bayesian prior
+ *     network used for regularization. This multiplies the default strength; a
  *     parameter of 1 hence uses the default regularization strength. Ignored
  *     when \p is_regularized is set to \c false.
  * \param membership Pointer to a vector. The membership vector is

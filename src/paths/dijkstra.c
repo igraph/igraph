@@ -351,7 +351,7 @@ igraph_error_t igraph_distances_dijkstra(
  *        This is a list of integer vectors where each element is an
  *        \ref igraph_vector_int_t object. The list will be resized as needed.
  *        Supply a null pointer here if you don't need these vectors.
- * \param from The id of the vertex from/to which the geodesics are
+ * \param from The ID of the vertex from/to which the geodesics are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
@@ -754,7 +754,7 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  *   will be accurate only for those vertices that are in the target
  *   vertex sequence (see \p to), since the search terminates as soon
  *   as all the target vertices have been found.
- * \param from The id of the vertex from/to which the geodesics are
+ * \param from The ID of the vertex from/to which the geodesics are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple

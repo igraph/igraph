@@ -29,7 +29,7 @@
  * \brief Generates a tree from a Pr&uuml;fer sequence.
  *
  * A Pr&uuml;fer sequence is a unique sequence of integers associated
- * with a labelled tree. A tree on <code>n</code> vertices can be represented
+ * with a labeled tree. A tree on <code>n</code> vertices can be represented
  * by a sequence of <code>n-2</code> integers, each between <code>0</code> and
  * <code>n-1</code> (inclusive).
  *
@@ -38,16 +38,16 @@
  * Linear-time Algorithms for Encoding Trees as Sequences of Node Labels
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param prufer The Pr&uuml;fer sequence
+ * \param prufer The Pr&uuml;fer sequence.
  * \return Error code:
  *          \clist
  *          \cli IGRAPH_ENOMEM
  *             there is not enough memory to perform the operation.
  *          \cli IGRAPH_EINVAL
- *             invalid Pr&uuml;fer sequence given
+ *             invalid Pr&uuml;fer sequence given.
  *          \endclist
  *
- * \sa \ref igraph_to_prufer(), \ref igraph_kary_tree(), \ref igraph_tree_game()
+ * \sa \ref igraph_to_prufer(), \ref igraph_kary_tree(), \ref igraph_tree_game().
  *
  * Time complexity: O(|V|), where |V| is the number of vertices in the tree.
  *

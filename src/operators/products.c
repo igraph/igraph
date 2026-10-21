@@ -462,7 +462,7 @@ static igraph_error_t modular_product(igraph_t *res,
  *     |E1| and |E2| are the number of edges of the operands.
  *
  *     \cli IGRAPH_PRODUCT_TENSOR
- *     Computes the tensor product (also known as categorial product) of two graphs.
+ *     Computes the tensor product (also known as categorical product) of two graphs.
  *     In the product graph, there is a connection from <code>(u1, v1)</code> to
  *     <code>(u2, v2)</code>
  *     if and only if
@@ -552,7 +552,7 @@ igraph_error_t igraph_product(igraph_t *res,
  * appropriate type using \ref igraph_to_directed() or \ref igraph_to_undirected().
  *
  * </para><para>
- * The vertex IDs in the product graph related to the IDs in the operands in
+ * The vertex IDs in the product graph are related to the IDs in the operands in
  * the same convention as in \ref igraph_product().
  *
  * </para><para>
@@ -568,7 +568,7 @@ igraph_error_t igraph_product(igraph_t *res,
  *   be stored here.
  * \param g1 The first operand graph.
  * \param g2 The second operand graph. It must have the same directedness as \p g1.
- * \param root The root vertex id of the second graph.
+ * \param root The root vertex ID of the second graph.
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL if the specified \p type is unsupported or the input

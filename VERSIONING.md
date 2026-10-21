@@ -1,6 +1,6 @@
 # Versioning and stability
 
-This document is provided for informational purposes only, to help igraph users understand how igraph's programming interface is evolving, and what stability guaratees you can rely on.  It concerns the igraph C library only.  igraph's high level interfaces (R, Python, Mathematica) have their own separate versioning schemes and compatibility policies.
+This document is provided for informational purposes only, to help igraph users understand how igraph's programming interface is evolving, and what stability guarantees you can rely on.  It concerns the igraph C library only.  igraph's high-level interfaces (R, Python, Mathematica) have their own separate versioning schemes and compatibility policies.
 
 ## Versioning
 
@@ -8,7 +8,7 @@ Starting with version 1.0, igraph follows the spirit of semantic versioning, wit
 
 - `MAJOR` is incremented after making _incompatible changes_ to the stable programming interface.  Major releases are intended to be infrequent, and are accompanied by release notes where we make the effort to provide detailed guidance on adapting to incompatible changes.
 - `MINOR` is incremented after making _additions_ to the stable programming interface.  Minor releases are issued regularly.
-- `PATCH` is incremented when making changes that do not affect compatibility (usually bug fixes, documentation improvements, or build systems changes).
+- `PATCH` is incremented when making changes that do not affect compatibility (usually bug fixes, documentation improvements, or build system changes).
 
 The three version parts are available at compile time as the macros `IGRAPH_VERSION_MAJOR`, `IGRAPH_VERSION_MINOR` and `IGRAPH_VERSION_PATCH`, or at runtime through the `igraph_version()` function.
 

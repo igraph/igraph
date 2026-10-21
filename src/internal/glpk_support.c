@@ -108,7 +108,7 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
  * will call glp_free_env() which invalidates all problems.
  * Calling glp_delete_prob() would then lead to a crash.
  * This replacement function avoids this situation by first
- * checking if GLPK is at an error state.
+ * checking if GLPK is in an error state.
  */
 void igraph_i_glp_delete_prob(glp_prob *p) {
     if (! igraph_i_glpk_error_info.is_error) {

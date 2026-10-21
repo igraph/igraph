@@ -45,7 +45,7 @@
  * \param is_separator Pointer to boolean, is S a separator?
  * \param is_minimal If not \c NULL, it is also checked whether the separator
  *    is minimal. This takes additional time.  If S is not a separator, this is
- *    set to false
+ *    set to false.
  */
 static igraph_error_t igraph_i_is_separator(
     const igraph_t *graph,
@@ -320,7 +320,7 @@ done:
  * \param res Pointer to a boolean variable, the result is stored here.
  * \return Error code.
  *
- * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
  * \example examples/simple/igraph_is_separator.c
  */
@@ -336,17 +336,17 @@ igraph_error_t igraph_is_separator(const igraph_t *graph,
  * \function igraph_is_minimal_separator
  * \brief Decides whether a set of vertices is a minimal separator.
  *
- * A vertex separator \c S is minimal is no proper subset of \c S
+ * A vertex separator \c S is minimal if no proper subset of \c S
  * is also a separator.
  *
  * \param graph The input graph. It may be directed, but edge
  *        directions are ignored.
- * \param candidate The candidate minimal separators.
+ * \param candidate The candidate minimal separator.
  * \param res Pointer to a boolean variable, the result is stored
  *        here.
  * \return Error code.
  *
- * Time complexity: O(|V|+|E|), linear in the number vertices and edges.
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
  * \example examples/simple/igraph_is_minimal_separator.c
  */
@@ -510,7 +510,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
  * Anne Berry, Jean-Paul Bordat and Olivier Cogis: Generating All the
  * Minimal Separators of a Graph, In: Peter Widmayer, Gabriele Neyer
  * and Stephan Eidenbenz (editors): Graph-theoretic concepts in
- * computer science, 1665, 167--172, 1999. Springer.
+ * computer science, 1665, 167–172, 1999. Springer.
  * https://doi.org/10.1007/3-540-46784-X_17
  *
  * \param graph The input graph. It may be directed, but edge
@@ -519,7 +519,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
  *    will be stored here.
  * \return Error code.
  *
- * \sa \ref igraph_minimum_size_separators()
+ * \sa \ref igraph_minimum_size_separators().
  *
  * Time complexity: O(n|V|^3), |V| is the number of vertices, n is the
  * number of separators.
@@ -715,7 +715,7 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
 
 /**
  * \function igraph_minimum_size_separators
- * \brief Find all minimum size separating vertex sets.
+ * \brief Finds all minimum size separating vertex sets.
  *
  * This function lists all separator vertex sets of minimum size.
  * A vertex set is a separator if its removal disconnects the graph.
@@ -723,15 +723,17 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
  * </para><para>
  * If the graph is already disconnected, no separators are returned.
  * Note that this convention differs from that used by some other
- * funtions such as \ref igraph_all_minimal_st_separators().
+ * functions such as \ref igraph_all_minimal_st_separators().
  *
  * </para><para>
  * Complete graphs have no vertex separators.
  *
  * </para><para>
  * The implementation is based on the following paper:
+ *
+ * </para><para>
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
- * a graph, Networks 23, 533--541, 1993.
+ * a graph, Networks 23, 533–541, 1993.
  * https://doi.org/10.1002/net.3230230604
  *
  * \param graph The input graph, which must be undirected.
@@ -763,7 +765,7 @@ igraph_error_t igraph_minimum_size_separators(
     igraph_maxflow_stats_t stats;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs.",
+        IGRAPH_ERROR("Minimum size separators currently only work on undirected graphs.",
                      IGRAPH_EINVAL);
     }
 

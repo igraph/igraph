@@ -87,7 +87,7 @@ void igraph_set_destroy(igraph_set_t *set) {
  * \param set The set object.
  * \return Boolean, whether the set is initialized.
  *
- * Time complexity: O(1)
+ * Time complexity: O(1).
  */
 igraph_bool_t igraph_set_inited(igraph_set_t *set) {
     return (set->stor_begin != NULL);
@@ -168,7 +168,7 @@ void igraph_set_clear(igraph_set_t *set) {
  *
  * The number of elements in the set.
  *
- * \param set The set object
+ * \param set The set object.
  * \return The size of the set.
  *
  * Time complexity: O(1).
@@ -290,7 +290,7 @@ igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_int_t e) {
 /**
  * \ingroup set
  * \function igraph_set_iterate
- * \brief Iterates through the element of the set.
+ * \brief Iterates through the elements of the set.
  *
  * Elements are returned in an arbitrary order.
  *

@@ -63,6 +63,7 @@ jobs:
           ref: ${{ github.event_name == 'schedule' && 'main' || github.ref_name }}
 
       - name: Install dependencies
+        id: alpine
         uses: jirutka/setup-alpine@v1
         with:
           arch: ${{ matrix.arch }}
@@ -105,8 +106,8 @@ jobs:
         id: restore
         uses: actions/cache/restore@v6
         with:
-          # location of the ccache of the chroot in the root file system
-          path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
+          # Use the actual chroot path reported by setup-alpine, which depends on the Alpine release.
+          path: ${{ steps.alpine.outputs.root-path }}/home/runner/.ccache
           key: ${{ steps.ccache-prepare.outputs.key }}
           # Prefer the newest cache from the same ref. Fall back to the newest
           # cache for this architecture from any ref.
@@ -152,5 +153,5 @@ jobs:
         if: ${{ !cancelled() && steps.restore.outcome == 'success' }}
         uses: actions/cache/save@v6
         with:
-          path: /home/runner/rootfs/alpine-latest-${{ matrix.arch }}/home/runner/.ccache
+          path: ${{ steps.alpine.outputs.root-path }}/home/runner/.ccache
           key: ${{ steps.ccache-prepare.outputs.key }}

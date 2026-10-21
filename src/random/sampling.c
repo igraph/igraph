@@ -23,7 +23,7 @@
 
 /**
  * \function igraph_rng_sample_sphere_surface
- * \brief Sample points uniformly from the surface of a sphere.
+ * \brief Samples points uniformly from the surface of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -51,7 +51,7 @@ igraph_error_t igraph_rng_sample_sphere_surface(
     igraph_int_t i, j;
 
     if (dim < 2) {
-        IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
+        IGRAPH_ERROR("Sphere must be at least two-dimensional to sample from "
                      "surface.", IGRAPH_EINVAL);
     }
     if (n < 0) {
@@ -86,7 +86,7 @@ igraph_error_t igraph_rng_sample_sphere_surface(
 
 /**
  * \function igraph_rng_sample_sphere_volume
- * \brief Sample points uniformly from the volume of a sphere.
+ * \brief Samples points uniformly from the volume of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -131,7 +131,7 @@ igraph_error_t igraph_rng_sample_sphere_volume(
 
 /**
  * \function igraph_rng_sample_dirichlet
- * \brief Sample points from a Dirichlet distribution.
+ * \brief Samples points from a Dirichlet distribution.
  *
  * \param rng The random number generator to use.
  * \param n The number of vectors to sample.

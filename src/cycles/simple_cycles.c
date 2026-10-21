@@ -392,7 +392,7 @@ static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state
 
 /**
  * A cycle handler that simply appends cycles to a vector list.
- * Use by \ref igraph_simple_cycles()
+ * Used by \ref igraph_simple_cycles()
  */
 static igraph_error_t append_simple_cycle_result(
         const igraph_vector_int_t *vertices,
@@ -432,7 +432,7 @@ static igraph_error_t append_simple_cycle_result(
 
 /**
  * \function simple_cycles_search_callback_from_one_vertex
- * \brief Search simple cycles starting from one vertex.
+ * \brief Searches for simple cycles starting from one vertex.
  *
  * \param state The state structure to search on.
  * \param s The vertex index to start search with.
@@ -500,7 +500,7 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
  * SIAM J. Comput. 4(1):77-84.
  * https://doi.org/10.1137/0204007
  *
- * \param graph The graph to search for
+ * \param graph The graph to search for cycles in.
  * \param mode A constant specifying how edge directions are
  *   considered in directed graphs. Valid modes are:
  *   \c IGRAPH_OUT, follows edge directions;

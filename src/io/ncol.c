@@ -56,7 +56,7 @@ void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
  * by whitespace. The vertex names themselves cannot contain
  * whitespace. They may be followed by an optional number,
  * the weight of the edge; the number can be negative and can be in
- * scientific notation. If there is no weight specified to an edge it
+ * scientific notation. If there is no weight specified for an edge it
  * is assumed to be zero.
  *
  * </para><para>
@@ -72,7 +72,7 @@ void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
  *        assigned to vertex names in the order of their appearance in
  *        the <code>.ncol</code> file. If it is not \c NULL and some unknown
  *        vertex names are found in the <code>.ncol</code> file then new vertex
- *        ids will be assigned to them.
+ *        IDs will be assigned to them.
  * \param names Boolean value. If \c true, the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
@@ -272,7 +272,7 @@ static igraph_error_t check_name(const char *name) {
  *
  * </para><para>
  * Note that having multiple or loop edges in an
- * <code>.ncol</code> file breaks the  LGL software but
+ * <code>.ncol</code> file breaks the LGL software but
  * \a igraph does not check for this condition.
  *
  * </para><para>
@@ -283,7 +283,7 @@ static igraph_error_t check_name(const char *name) {
  *        writable.
  * \param names The name of a string vertex attribute, if symbolic names
  *        are to be written to the file. Supply \c NULL to write vertex
- *        ids instead.
+ *        IDs instead.
  * \param weights The name of a numerical edge attribute, which will be
  *        written as weights to the file. Supply \c NULL to skip writing
  *        edge weights.

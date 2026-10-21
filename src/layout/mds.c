@@ -140,7 +140,7 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
 
 /**
  * \function igraph_layout_mds
- * \brief Place the vertices on a plane using multidimensional scaling.
+ * \brief Places the vertices on a plane using multidimensional scaling.
  *
  * This layout requires a distance matrix, where the intersection of
  * row i and column j specifies the desired distance between vertex i

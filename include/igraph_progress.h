@@ -60,7 +60,7 @@ IGRAPH_BEGIN_C_DECLS
  *
  * <para>
  * One can assume that the first progress handler call from a
- * calculation will be call with zero as the \p percentage argument,
+ * calculation will be made with zero as the \p percentage argument,
  * and the last call from a function will have 100 as the \p
  * percentage argument. Note, however, that if an error happens in the
  * middle of a computation, then the 100 percent call might be
@@ -88,7 +88,7 @@ IGRAPH_BEGIN_C_DECLS
  * <para>
  * It is also good practice \em not to call \ref igraph_progress() too
  * often, as this would slow down the computation. It might not be
- * worth to support progress reporting in functions with linear or
+ * worth supporting progress reporting in functions with linear or
  * log-linear time complexity, as these are fast, even with a large
  * amount of data. For functions with quadratic or higher time
  * complexity make sure that the time complexity of the progress
@@ -115,7 +115,7 @@ IGRAPH_BEGIN_C_DECLS
 
 /**
  * \typedef igraph_progress_handler_t
- * \brief Type of progress handler functions
+ * \brief Type of progress handler functions.
  *
  * This is the type of the igraph progress handler functions.
  * There is currently one such predefined function,
@@ -123,14 +123,14 @@ IGRAPH_BEGIN_C_DECLS
  * write and set up more sophisticated ones.
  * \param message A string describing the function or algorithm
  *     that is reporting the progress. Current igraph functions
- *     always use the name \p message argument if reporting from the
+ *     always use the same \p message argument if reporting from the
  *     same function.
  * \param percent Numeric, the percentage that was completed by the
  *     algorithm or function.
  * \param data User-defined data. Current igraph functions that
  *     report progress pass a null pointer here. Users can
  *     write their own progress handlers and functions with progress
- *     reporting, and then pass some meaningfull context here.
+ *     reporting, and then pass some meaningful context here.
  * \return If the return value of the progress handler is not
  *     \c IGRAPH_SUCCESS, then \ref igraph_progress() returns the
  *     error code from the progress handler intact. The \ref IGRAPH_PROGRESS()
@@ -151,9 +151,9 @@ IGRAPH_EXPORT igraph_error_t igraph_progressf(const char *message, igraph_real_t
 
 /**
  * \define IGRAPH_PROGRESS
- * \brief Report the progress of a calculation from an igraph function (macro variant).
+ * \brief Reports the progress of a calculation from an igraph function (macro variant).
  *
- * The standard way to report progress from an igraph function
+ * The standard way to report progress from an igraph function.
  * \param message A string, a textual message that references the
  *    calculation under progress.
  * \param percent Numeric scalar, the percentage that is complete.
@@ -172,10 +172,10 @@ IGRAPH_EXPORT igraph_error_t igraph_progressf(const char *message, igraph_real_t
 
 /**
  * \define IGRAPH_PROGRESSF
- * \brief Report the progress of a calculation from an igraph function, printf-like (macro variant).
+ * \brief Reports the progress of a calculation from an igraph function, printf-like (macro variant).
  *
  * This is the more flexible version of \ref IGRAPH_PROGRESS(),
- * having a printf-like syntax. As this macro takes variable
+ * having a printf-like syntax. As this macro takes a variable
  * number of arguments, they must be all supplied as a single
  * argument, enclosed in parentheses. \ref igraph_progressf() is then
  * called with the given arguments.

@@ -52,7 +52,7 @@
  *          an undirected star graph is
  *          created.
  *        \endclist
- * \param center Id of the vertex which will be the center of the
+ * \param center ID of the vertex which will be the center of the
  *          graph.
  * \return Error code:
  *         \clist
@@ -150,7 +150,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_int_t n, igraph_star_mode_t m
  * while the star graph part adds the spokes.
  *
  * </para><para>
- * Note that the two and three-vertex wheel graphs are non-simple:
+ * Note that the two- and three-vertex wheel graphs are non-simple:
  * The two-vertex wheel graph contains a self-loop, while the three-vertex
  * wheel graph contains parallel edges (a 1-cycle and a 2-cycle, respectively).
  *
@@ -172,7 +172,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_int_t n, igraph_star_mode_t m
  *          an undirected wheel graph is
  *          created.
  *        \endclist
- * \param center Id of the vertex which will be the center of the
+ * \param center ID of the vertex which will be the center of the
  *          graph.
  * \return Error code:
  *         \clist
@@ -773,7 +773,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t 
 
     idx = 0;
 
-    /* Current parent and child vertex ids.
+    /* Current parent and child vertex IDs.
      * parent -> child edges will be added. */
     child = 1;
     parent = 0;
@@ -808,7 +808,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t 
  *
  * All vertices of a regular tree, except its leaves, have the same total degree \p k.
  * This is different from a k-ary tree (\ref igraph_kary_tree()), where all
- * vertices have the same number of children, thus the degre of the root is
+ * vertices have the same number of children, thus the degree of the root is
  * one less than the degree of the other internal vertices. Regular trees
  * are also referred to as Bethe lattices.
  *
@@ -866,7 +866,7 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_int_t h, igraph_int_t
 
 /**
  * \function igraph_extended_chordal_ring
- * \brief Create an extended chordal ring.
+ * \brief Creates an extended chordal ring.
  *
  * An extended chordal ring is a cycle graph with additional chords
  * connecting its vertices.
@@ -882,7 +882,7 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_int_t h, igraph_int_t
  *
  * </para><para>
  * See also Kotsis, G: Interconnection Topologies for Parallel Processing
- * Systems, PARS Mitteilungen 11, 1-6, 1993. The igraph extended chordal
+ * Systems, PARS Mitteilungen 11, 1–6, 1993. The igraph extended chordal
  * rings are not identical to the ones in the paper. In igraph
  * the matrix specifies which edges to add. In the paper, a condition is
  * specified which should simultaneously hold between two endpoints and
@@ -898,7 +898,7 @@ igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_int_t h, igraph_int_t
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_circulant()
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_circulant().
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
@@ -968,7 +968,7 @@ igraph_error_t igraph_extended_chordal_ring(
  *
  * The hypercube graph \c Q_n has <code>2^n</code> vertices and
  * <code>2^(n-1) n</code> edges. Two vertices are connected when the binary
- * representations of their zero-based vertex IDs differs in precisely one bit.
+ * representations of their zero-based vertex IDs differ in precisely one bit.
  *
  * \param graph An uninitialized graph object.
  * \param n The dimension of the hypercube graph.
@@ -976,9 +976,9 @@ igraph_error_t igraph_extended_chordal_ring(
  *    from lower index vertices towards higher index ones.
  * \return Error code.
  *
- * \sa \ref igraph_square_lattice()
+ * \sa \ref igraph_square_lattice().
  *
- * Time complexity: O(2^n)
+ * Time complexity: O(2^n).
  */
 igraph_error_t igraph_hypercube(igraph_t *graph,
                                 igraph_int_t n, igraph_bool_t directed) {
@@ -1063,7 +1063,7 @@ igraph_error_t igraph_hypercube(igraph_t *graph,
  *    from lower index vertices towards higher index ones.
  * \return Error code.
  *
- * \sa \ref igraph_hypercube()
+ * \sa \ref igraph_hypercube().
  *
  * Time complexity: O(n q^(n+1)).
  */

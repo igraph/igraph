@@ -39,7 +39,7 @@
  * All attributes, as well as the ordering of edges and vertices are preserved.
  *
  * </para><para>
- * Note that is rarely necessary to reverse \em all edges, as almost all functions that
+ * Note that it is rarely necessary to reverse \em all edges, as almost all functions that
  * handle directed graphs take a \c mode argument that can be set to \c IGRAPH_IN to
  * effectively treat edges as reversed.
  *

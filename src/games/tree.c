@@ -145,8 +145,8 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
  * \function igraph_tree_game
  * \brief Generates a random tree with the given number of nodes.
  *
- * This function samples uniformly from the set of labelled trees,
- * i.e. it generates each labelled tree with the same probability.
+ * This function samples uniformly from the set of labeled trees,
+ * i.e. it generates each labeled tree with the same probability.
  *
  * </para><para>
  * Note that for <code>n=0</code>, the null graph is returned,

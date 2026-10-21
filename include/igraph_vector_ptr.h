@@ -88,7 +88,7 @@ IGRAPH_EXPORT igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(igrap
  * \c igraph_finally_func_t*. The cast is necessary in most cases as the
  * destructor functions we use (such as \ref igraph_vector_destroy()) take a
  * pointer to some concrete igraph data type, while \c igraph_finally_func_t
- * expects \c void*
+ * expects \c void*.
  */
 #define IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(v, func) \
     igraph_vector_ptr_set_item_destructor((v), (igraph_finally_func_t*)(func))

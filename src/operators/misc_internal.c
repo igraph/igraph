@@ -67,7 +67,7 @@ igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
     igraph_bool_t l;
 
     if (directed != igraph_is_directed(right)) {
-        IGRAPH_ERROR("Cannot create union or intersection of directed and undirected graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create union or intersection of directed and undirected graphs.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);

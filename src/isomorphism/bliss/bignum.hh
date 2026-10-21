@@ -47,12 +47,12 @@ class BigNum
   mpz_t v;
 public:
   /**
-   * \brief Create a new big number and set it to zero.
+   * \brief Creates a new big number and sets it to zero.
    */
   BigNum() {mpz_init(v); }
 
   /**
-   * \brief Destroy the number.
+   * \brief Destroys the number.
    */
   ~BigNum() {mpz_clear(v); }
 
@@ -62,7 +62,7 @@ public:
   void assign(const int n) {mpz_set_si(v, n); }
 
   /**
-   * \brief Multiply the number with \a n.
+   * \brief Multiplies the number by \a n.
    */
   void multiply(const int n) {mpz_mul_si(v, v, n); }
 
@@ -81,7 +81,7 @@ class BigNum
   long double v;
 public:
   /**
-   * \brief Create a new big number and set it to zero.
+   * \brief Creates a new big number and sets it to zero.
    */
   BigNum(): v(0.0) {}
 
@@ -91,7 +91,7 @@ public:
   void assign(const int n) {v = (long double)n; }
 
   /**
-   * \brief Multiply the number with \a n.
+   * \brief Multiplies the number by \a n.
    */
   void multiply(const int n) {v *= (long double)n; }
 };

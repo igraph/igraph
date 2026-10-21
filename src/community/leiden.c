@@ -1025,7 +1025,7 @@ static igraph_error_t community_leiden(
 /**
  * \ingroup communities
  * \function igraph_community_leiden
- * \brief Finding community structure using the Leiden algorithm.
+ * \brief Finds community structure using the Leiden algorithm.
  *
  * This function implements the Leiden algorithm for finding community
  * structure.
@@ -1034,7 +1034,7 @@ static igraph_error_t community_leiden(
  * It is similar to the multilevel algorithm, often called the Louvain
  * algorithm, but it is faster and yields higher quality solutions. It can
  * optimize both modularity and the Constant Potts Model, which does not suffer
- * from the resolution-limit (see Traag, Van Dooren &amp; Nesterov).
+ * from the resolution limit (see Traag, Van Dooren &amp; Nesterov).
  *
  * </para><para>
  * The Leiden algorithm consists of three phases: (1) local moving of vertices, (2)
@@ -1087,7 +1087,7 @@ static igraph_error_t community_leiden(
  * dividing \c γ by <code>2m</code> (by \c m in the directed case), we effectively
  * obtain an expression for modularity. Hence, the standard modularity will be
  * optimized when you supply the degrees (out- and in-degrees with directed graphs)
- * as the vertex weights and by supplying as a resolution parameter
+ * as the vertex weights and supply as a resolution parameter
  * <code>1/(2m)</code> (<code>1/m</code> with directed graphs).
  * Use the \ref igraph_community_leiden_simple() convenience function to
  * compute vertex weights automatically for modularity maximization.
@@ -1130,7 +1130,7 @@ static igraph_error_t community_leiden(
  *    of times. If this is a negative number, it will continue iterating until
  *    an iteration did not change the clustering.
  * \param membership The membership vector. This is both used as the initial
- *    membership from which optimisation starts and is updated in place. It
+ *    membership from which optimization starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
  *    is typically started using a singleton clustering. This can be achieved
  *    using \ref igraph_vector_int_init_range().
@@ -1278,7 +1278,7 @@ igraph_error_t igraph_community_leiden(
 
 /**
  * \function igraph_community_leiden_simple
- * \brief Finding community structure using the Leiden algorithm, simple interface.
+ * \brief Finds community structure using the Leiden algorithm, simple interface.
  *
  * This is a simplified interface to \ref igraph_community_leiden() for
  * convenience purposes. Instead of requiring vertex weights, it allows
@@ -1404,7 +1404,7 @@ igraph_error_t igraph_community_leiden_simple(
         if (igraph_vector_int_size(membership) != vcount) {
             IGRAPH_ERRORF("Requesting to start the computation from a specific "
                           "community assignment, but the given membership vector "
-                          "has a different size (%" IGRAPH_PRId " than the vertex "
+                          "has a different size (%" IGRAPH_PRId ") than the vertex "
                           "count (%" IGRAPH_PRId ").",
                           IGRAPH_EINVAL,
                           igraph_vector_int_size(membership), vcount);

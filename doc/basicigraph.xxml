@@ -12,8 +12,8 @@
 The &igraph; library can handle directed and
 undirected graphs. The &igraph; graphs are multisets
 of ordered (if directed) or unordered (if undirected) labeled pairs.
-The labels of the pairs plus the number of vertices always starts with
-zero and ends with the number of edges minus one. In addition to that,
+The labels of the pairs plus the number of vertices always start with
+zero and end with the number of edges minus one. In addition to that,
 a table of metadata is also attached to every graph, its most
 important entries being the number of vertices in the graph and whether
 the graph is directed or undirected.
@@ -40,7 +40,7 @@ So, to summarize, a directed graph can be imagined like this:
   )
 </programlisting>
 </informalexample>
-Here the edges are ordered pairs or vertex ids, and the graph is a multiset
+Here the edges are ordered pairs of vertex IDs, and the graph is a multiset
 of edges plus some metadata.
 </para>
 
@@ -91,7 +91,7 @@ in their documentation. To eliminate multiple edges from a graph, you can use
 their input for validity and display an informative error message
 when something goes wrong. In order to support this, the majority of functions
 return an error code. In basic usage, this code can be ignored, as the
-default behaviour is to abort the program immediately upon error. See
+default behavior is to abort the program immediately upon error. See
 <link linkend="igraph-Error">the section on error handling</link> for
 more information on this topic.
 </para>
@@ -151,7 +151,7 @@ variables of type <type>igraph_uint_t</type>.
 <para>Real numbers (i.e. quantities that can potentially be fractional or
 infinite) are represented with a type named <type>igraph_real_t</type>. Currently
 <type>igraph_real_t</type> is always aliased to <type>double</type>, but it is
-still good practice to use <type>igraph_real_t</type> in your own code for sake
+still good practice to use <type>igraph_real_t</type> in your own code for the sake
 of consistency.</para>
 
 <indexterm><primary>igraph_bool_t</primary></indexterm>

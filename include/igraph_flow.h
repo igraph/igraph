@@ -37,10 +37,10 @@ IGRAPH_BEGIN_C_DECLS
  * \brief Data structure holding statistics from the push-relabel maximum flow solver.
  *
  * \param nopush The number of push operations performed.
- * \param norelabel The number of relabel operarions performed.
- * \param nogap The number of times the gap heuristics was used.
+ * \param norelabel The number of relabel operations performed.
+ * \param nogap The number of times the gap heuristic was used.
  * \param nogapnodes The total number of vertices that were
- *        omitted form further calculations because of the gap
+ *        omitted from further calculations because of the gap
  *        heuristics.
  * \param nobfs The number of times the reverse BFS was run to
  *        assign good values to the height function. This includes

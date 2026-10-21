@@ -27,11 +27,11 @@
 /**
  * \section about_graph_isomorphism
  *
- * <para>igraph provides four set of functions to deal with graph
+ * <para>igraph provides four sets of functions to deal with graph
  * isomorphism problems.</para>
  *
  * <para>The \ref igraph_isomorphic() and \ref igraph_subisomorphic()
- * functions make up the first set (in addition with the \ref
+ * functions make up the first set (together with the \ref
  * igraph_permute_vertices() function). These functions choose the
  * algorithm which is best for the supplied input graph. (The choice is
  * not very sophisticated though, see their documentation for
@@ -62,7 +62,7 @@ static igraph_error_t igraph_i_isomorphic_small(
  *
  * In simple terms, two graphs are isomorphic if they become indistinguishable
  * from each other once their vertex labels are removed (rendering the vertices
- * within each graph indistiguishable). More precisely, two graphs are isomorphic
+ * within each graph indistinguishable). More precisely, two graphs are isomorphic
  * if there is a one-to-one mapping from the vertices of the first one
  * to the vertices of the second such that it transforms the edge set of the
  * first graph into the edge set of the second. This mapping is called
@@ -75,7 +75,7 @@ static igraph_error_t igraph_i_isomorphic_small(
  *    error is triggered.
  * \oli If one of the graphs has multi-edges then both graphs are
  *    simplified and colorized using \ref igraph_simplify_and_colorize() and sent to VF2.
- * \oli If the two graphs does not have the same number of vertices
+ * \oli If the two graphs do not have the same number of vertices
  *    and edges it returns with \c false.
  * \oli Otherwise, if the \ref igraph_isoclass() function supports both
  *    graphs (which is true for directed graphs with 3 and 4 vertices, and
@@ -189,7 +189,7 @@ igraph_error_t igraph_i_isomorphic_small(
 
 /**
  * \function igraph_subisomorphic
- * \brief Decide subgraph isomorphism.
+ * \brief Decides subgraph isomorphism.
  *
  * Check whether \p graph2 is isomorphic to a subgraph of \p graph1.
  * Currently this function just calls \ref igraph_subisomorphic_vf2()

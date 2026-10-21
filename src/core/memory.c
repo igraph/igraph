@@ -41,7 +41,7 @@
  * <para>
  * Additionally, the memory allocator functions used by igraph work around the
  * quirks of classical \c malloc(), \c realloc() and \c calloc() implementations
- * where the behaviour of allocating zero bytes is undefined. igraph allocator
+ * where the behavior of allocating zero bytes is undefined. igraph allocator
  * functions will always allocate at least one byte.
  * </para>
  */
@@ -54,9 +54,9 @@
  *
  * \param ptr Pointer to the piece of memory to be deallocated.
  *
- * Time complexity: platform dependent, ideally it should be O(1).
+ * Time complexity: platform-dependent, ideally it should be O(1).
  *
- * \sa \ref igraph_calloc(), \ref igraph_malloc(), \ref igraph_realloc()
+ * \sa \ref igraph_calloc(), \ref igraph_malloc(), \ref igraph_realloc().
  */
 
 void igraph_free(void *ptr) {
@@ -76,7 +76,7 @@ void igraph_free(void *ptr) {
  * \return Pointer to the piece of allocated memory; \c NULL if the allocation
  * failed.
  *
- * \sa \ref igraph_malloc(), \ref igraph_realloc(), \ref igraph_free()
+ * \sa \ref igraph_malloc(), \ref igraph_realloc(), \ref igraph_free().
  */
 
 void *igraph_calloc(size_t count, size_t size) {
@@ -95,7 +95,7 @@ void *igraph_calloc(size_t count, size_t size) {
  * \return Pointer to the piece of allocated memory; \c NULL if the allocation
  * failed.
  *
- * \sa \ref igraph_calloc(), \ref igraph_realloc(), \ref igraph_free()
+ * \sa \ref igraph_calloc(), \ref igraph_realloc(), \ref igraph_free().
  */
 
 void *igraph_malloc(size_t size) {
@@ -105,7 +105,7 @@ void *igraph_malloc(size_t size) {
 
 /**
  * \function igraph_realloc
- * \brief Reallocate memory that can be safely deallocated by igraph functions.
+ * \brief Reallocates memory that can be safely deallocated by igraph functions.
  *
  * This function behaves like \c realloc(), but it ensures that at least one
  * byte is allocated even when the caller asks for zero bytes.
@@ -115,7 +115,7 @@ void *igraph_malloc(size_t size) {
  * \return Pointer to the piece of allocated memory; \c NULL if the allocation
  * failed.
  *
- * \sa \ref igraph_free(), \ref igraph_malloc()
+ * \sa \ref igraph_free(), \ref igraph_malloc().
  */
 
 void *igraph_realloc(void *ptr, size_t size) {

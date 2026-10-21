@@ -49,7 +49,7 @@
  * The resolution parameter \c γ allows weighting the random null model, which
  * might be useful when finding partitions with a high modularity. Maximizing modularity
  * with higher values of the resolution parameter typically results in more, smaller clusters
- * when finding partitions with a high modularity. Lower values typically results in
+ * when finding partitions with a high modularity. Lower values typically result in
  * fewer, larger clusters. The original definition of modularity is retrieved
  * when setting <code>γ = 1</code>.
  *
@@ -107,7 +107,7 @@
  *                   stored here.
  * \return Error code.
  *
- * \sa \ref igraph_modularity_matrix()
+ * \sa \ref igraph_modularity_matrix().
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges, assuming that community indices are nonnegative and smaller
@@ -318,7 +318,7 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
  *                   undirected. For undirected graphs this is ignored.
  * \return Error code.
  *
- * \sa \ref igraph_modularity()
+ * \sa \ref igraph_modularity().
  */
 igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
                              const igraph_vector_t *weights,

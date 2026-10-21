@@ -59,12 +59,12 @@
  *   will be accurate only for those vertices that are in the target
  *   vertex sequence (see \p to), since the search terminates as soon
  *   as all the target vertices have been found.
- * \param from The id of the vertex from/to which the geodesics are
+ * \param from The ID of the vertex from/to which the geodesics are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param mode The type of shortest paths to be use for the
+ * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
  *        \cli IGRAPH_OUT
@@ -80,7 +80,7 @@
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID.
+ *           \p from is an invalid vertex ID.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist

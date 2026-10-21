@@ -31,12 +31,12 @@ IGRAPH_BEGIN_C_DECLS
  * \section about_arpack ARPACK interface in igraph
  *
  * <para>
- * ARPACK is a library for solving large scale eigenvalue problems.
+ * ARPACK is a library for solving large-scale eigenvalue problems.
  * The package is designed to compute a few eigenvalues and corresponding
  * eigenvectors of a general \c n by \c n matrix \c A. It is
  * most appropriate for large sparse or structured matrices \c A where
  * structured means that a matrix-vector product <code>w &lt;- Av</code> requires
- * order \c n rather than the usual order <code>n^2</code> floating point
+ * order \c n rather than the usual order <code>n^2</code> floating-point
  * operations. Please see https://github.com/opencollab/arpack-ng for details.
  * </para>
  *
@@ -60,7 +60,7 @@ IGRAPH_BEGIN_C_DECLS
  *   \oli Defining a function of type \ref igraph_arpack_function_t.
  *        The input of this function is a vector, and the output
  *        should be the output matrix multiplied by the input vector.
- *   \oli Calling \ref igraph_arpack_rssolve() (is the matrix is
+ *   \oli Calling \ref igraph_arpack_rssolve() (if the matrix is
  *        symmetric), or \ref igraph_arpack_rnsolve().
  * \endolist
  * The \ref igraph_arpack_options_t object can be used multiple
@@ -68,10 +68,10 @@ IGRAPH_BEGIN_C_DECLS
  * </para>
  *
  * <para>
- * If we have many eigenvalue problems to solve, then it might worth
- * to create an \ref igraph_arpack_storage_t object, and initialize it
+ * If we have many eigenvalue problems to solve, then it might be worth
+ * creating an \ref igraph_arpack_storage_t object and initializing it
  * via \ref igraph_arpack_storage_init(). This structure contains all
- * memory needed for ARPACK (with the given upper limit regerding to
+ * memory needed for ARPACK (with the given upper limit regarding
  * the size of the eigenvalue problem). Then many problems can be
  * solved using the same \ref igraph_arpack_storage_t object, without
  * always reallocating the required memory.
@@ -100,7 +100,7 @@ IGRAPH_BEGIN_C_DECLS
  *
  * Input options:
  *
- * \member bmat Character. Whether to solve a standard ('I') ot a
+ * \member bmat Character. Whether to solve a standard ('I') or a
  *    generalized problem ('B').
  * \member n Dimension of the eigenproblem.
  * \member which Specifies which eigenvalues/vectors to
@@ -116,7 +116,7 @@ IGRAPH_BEGIN_C_DECLS
  *           \cli BE
  *                Compute \c nev eigenvalues, half from each end of
  *                   the spectrum. When \c nev is odd, compute one
- *                   more from the high en than from the low
+ *                   more from the high end than from the low
  *                   end. \endclist
  *    Possible values for non-symmetric matrices:
  *    \clist \cli LM
@@ -140,7 +140,7 @@ IGRAPH_BEGIN_C_DECLS
  * \member ncv Number of Lanczos vectors to be generated. Setting this
  *    to zero means that \ref igraph_arpack_rssolve and \ref igraph_arpack_rnsolve
  *    will determine a suitable value for \c ncv automatically.
- * \member ldv Numberic scalar. It should be set to
+ * \member ldv Numeric scalar. It should be set to
  *    zero in the current igraph implementation.
  * \member ishift Either zero or one. If zero then the shifts are
  *    provided by the user via reverse communication. If one then exact
@@ -148,7 +148,7 @@ IGRAPH_BEGIN_C_DECLS
  *    Please always set this to one.
  * \member mxiter Maximum number of Arnoldi update iterations allowed.
  * \member nb Blocksize to be used in the recurrence. Please always
- *    leave this on the default value, one.
+ *    leave this at the default value, one.
  * \member mode The type of the eigenproblem to be solved.
  *    Possible values if the input matrix is symmetric:
  *    \olist
@@ -179,7 +179,7 @@ IGRAPH_BEGIN_C_DECLS
  * \member start Whether to use the supplied starting vector (1), or
  *    use a random starting vector (0). The starting vector must be
  *    supplied in the first column of the \c vectors argument of the
- *    \ref igraph_arpack_rssolve() of \ref igraph_arpack_rnsolve() call.
+ *    \ref igraph_arpack_rssolve() or \ref igraph_arpack_rnsolve() call.
  *
  * Output options:
  *
@@ -201,7 +201,7 @@ IGRAPH_BEGIN_C_DECLS
  * \member noiter Number of Arnoldi iterations taken.
  * \member nconv Number of converged Ritz values. This
  *     represents the number of Ritz values that satisfy the
- *     convergence critetion.
+ *     convergence criterion.
  * \member numop Total number of matrix-vector multiplications.
  * \member numopb Not used currently.
  * \member numreo Total number of steps of re-orthogonalization.
@@ -255,7 +255,7 @@ typedef struct igraph_arpack_options_t {
  * \struct igraph_arpack_storage_t
  * \brief Storage for ARPACK.
  *
- * Public members, do not modify them directly, these are considered
+ * Public members: do not modify them directly; these are considered
  * to be read-only.
  * \member maxn Maximum rank of matrix.
  * \member maxncv Maximum NCV.
