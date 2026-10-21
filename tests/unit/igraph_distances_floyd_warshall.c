@@ -42,7 +42,7 @@ void test_small_graph_selectors(void) {
         const igraph_int_t nrows[] = {n, 0, 2 * n};
         const igraph_int_t ncols[] = {n, 0};
 
-        for (int directed = 0; directed < 2; directed++) {
+        for (int directed = 0; directed <= 1; directed++) {
             igraph_t graph;
             igraph_empty(&graph, n, directed);
             for (int weighted = 0; weighted < 2; weighted++) {
