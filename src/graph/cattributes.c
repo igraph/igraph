@@ -2854,7 +2854,7 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(val, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent vertex attribute");
     }
 }
 
@@ -2876,7 +2876,7 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
     if (j >= 0) {
         igraph_attribute_record_list_discard(eal, j);
     } else {
-        IGRAPH_WARNING("Cannot remove non-existent graph attribute");
+        IGRAPH_WARNING("Cannot remove non-existent edge attribute");
     }
 }
 

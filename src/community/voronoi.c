@@ -533,7 +533,7 @@ igraph_error_t igraph_community_voronoi(
     }
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Edge length vector size does not match edge count.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Edge weight vector size does not match edge count.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_is_simple(graph, &simple, mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED));
