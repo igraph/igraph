@@ -376,7 +376,7 @@ static igraph_error_t igraph_i_pseudo_diameter_unweighted(
     igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
     /* We will reach here when vid_start < 0 and the graph has no vertices. */
@@ -572,7 +572,7 @@ static igraph_error_t igraph_i_pseudo_diameter_dijkstra(
     igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVVID);
     }
 
     IGRAPH_ASSERT(weights != 0);

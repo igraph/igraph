@@ -58,7 +58,7 @@ igraph_i_fundamental_cycles_bfs(
     igraph_vector_int_t u_back, v_back;
 
     if (start_vid < 0 || start_vid >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid starting vertex ID.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid starting vertex ID.", IGRAPH_EINVVID);
     }
 
     if (mark > IGRAPH_INTEGER_MAX - 2) {
@@ -218,7 +218,7 @@ igraph_error_t igraph_fundamental_cycles(
     IGRAPH_UNUSED(weights);
 
     if (start_vid >= no_of_nodes) {
-        IGRAPH_ERROR("Vertex ID out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Vertex ID out of range.", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));

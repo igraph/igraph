@@ -188,7 +188,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_random_walk(&g_line, NULL, &vertices, NULL, 0, IGRAPH_OUT, 10, IGRAPH_RANDOM_WALK_STUCK_ERROR) == IGRAPH_ERWSTUCK);
 
     printf("Vertex out of range.\n");
-    IGRAPH_ASSERT(igraph_random_walk(&g_1, NULL, &vertices, NULL, 10, IGRAPH_OUT, 0, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_random_walk(&g_1, NULL, &vertices, NULL, 10, IGRAPH_OUT, 0, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVVID);
 
     printf("Negative number of steps.\n");
     IGRAPH_ASSERT(igraph_random_walk(&g_1, NULL, &vertices, NULL, 0, IGRAPH_OUT, -10, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVAL);

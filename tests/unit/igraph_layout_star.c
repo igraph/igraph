@@ -58,7 +58,7 @@ int main(void) {
 
     printf("Checking if negative center fails nicely.\n");
     igraph_small(&g, 9, 0, -1);
-    print_and_destroy(&g, -10, NULL, IGRAPH_EINVAL);
+    print_and_destroy(&g, -10, NULL, IGRAPH_EINVVID);
 
     printf("Checking if order out of range fails nicely.\n");
     igraph_small(&g, 9, 0, -1);

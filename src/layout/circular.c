@@ -92,7 +92,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_int_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes > 0 && (center < 0 || center >= no_of_nodes)) {
-        IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVVID);
     }
     if (order && igraph_vector_int_size(order) != no_of_nodes) {
         IGRAPH_ERROR("Invalid order vector length.", IGRAPH_EINVAL);

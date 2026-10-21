@@ -56,9 +56,9 @@
  *          graph.
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_EINVVID
- *           invalid number of vertices.
  *         \cli IGRAPH_EINVAL
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVVID
  *           invalid center vertex.
  *         \cli IGRAPH_EINVMODE
  *           invalid mode argument.
@@ -79,10 +79,10 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_int_t n, igraph_star_mode_t m
     igraph_int_t i;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
     if (center < 0 || center > n - 1) {
-        IGRAPH_ERROR("Invalid center vertex.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid center vertex.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN &&
         mode != IGRAPH_STAR_MUTUAL && mode != IGRAPH_STAR_UNDIRECTED) {
@@ -176,9 +176,9 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_int_t n, igraph_star_mode_t m
  *          graph.
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_EINVVID
- *           invalid number of vertices.
  *         \cli IGRAPH_EINVAL
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVVID
  *           invalid center vertex.
  *         \cli IGRAPH_EINVMODE
  *           invalid mode argument.

@@ -304,7 +304,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
     if (start < 0 || start >= vc) {
         IGRAPH_ERRORF("Starting vertex must be between 0 and the "
                       "number of vertices in the graph (%" IGRAPH_PRId
-                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVAL,
+                      "), got %" IGRAPH_PRId ".", IGRAPH_EINVVID,
                       vc, start);
     }
     if (steps < 0) {
