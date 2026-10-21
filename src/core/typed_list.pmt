@@ -766,7 +766,7 @@ igraph_error_t FUNCTION(remove)(TYPE *v, igraph_int_t index, ITEM_TYPE *result) 
     IGRAPH_ASSERT(result != 0);
 
     if (index < 0 || index >= size) {
-        IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid index when removing item.", IGRAPH_EINVAL);
     }
 
     *result = *(FUNCTION(get_ptr)(v, index));
@@ -831,7 +831,7 @@ igraph_error_t FUNCTION(remove_fast)(TYPE *v, igraph_int_t index, ITEM_TYPE *res
     IGRAPH_ASSERT(result != 0);
 
     if (index < 0 || index >= size) {
-        IGRAPH_ERROR("invalid index when removing item", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid index when removing item.", IGRAPH_EINVAL);
     }
 
     *result = *(FUNCTION(get_ptr)(v, index));
@@ -956,7 +956,7 @@ igraph_error_t FUNCTION(sort_ind)(
 
     vind = IGRAPH_CALLOC(n, ITEM_TYPE*);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_list_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for igraph_vector_list_sort_ind.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < n; i++) {
         vind[i] = v->stor_begin + i;

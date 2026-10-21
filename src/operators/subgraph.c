@@ -367,7 +367,7 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
                 invmap, /* map_is_prepared = */ map_is_prepared);
 
     default:
-        IGRAPH_ERROR("unknown subgraph implementation type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Unknown subgraph implementation type.", IGRAPH_EINVAL);
     }
 }
 

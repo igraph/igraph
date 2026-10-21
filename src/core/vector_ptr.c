@@ -91,7 +91,7 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_int_t size)
     }
     v->stor_begin = IGRAPH_CALLOC(alloc_size, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for initializing a pointer vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -515,7 +515,7 @@ igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_int_t new
 igraph_error_t igraph_vector_ptr_init_array(igraph_vector_ptr_t *v, void *const *data, igraph_int_t length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("Cannot initialize pointer vector from array", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot initialize pointer vector from array.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + length;
     v->end = v->stor_end;
@@ -575,7 +575,7 @@ igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *to, const igraph
 
     to->stor_begin = IGRAPH_CALLOC(from_size, void*);
     if (to->stor_begin == 0) {
-        IGRAPH_ERROR("Cannot copy pointer vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot copy pointer vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     to->stor_end = to->stor_begin + igraph_vector_ptr_size(from);
     to->end = to->stor_end;
@@ -749,7 +749,7 @@ igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
 
     vind = IGRAPH_CALLOC(n, uintptr_t);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_ptr_sort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for igraph_vector_ptr_sort_ind.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < n; i++) {

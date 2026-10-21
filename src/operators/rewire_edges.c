@@ -227,7 +227,7 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
     IGRAPH_CHECK(igraph_i_edge_type_to_loops_multiple(allowed_edge_types, &loops, &multiple));
 
     if (prob < 0 || prob > 1) {
-        IGRAPH_ERROR("Rewiring probability should be between zero and one",
+        IGRAPH_ERROR("Rewiring probability should be between zero and one.",
                      IGRAPH_EINVAL);
     }
 
@@ -318,13 +318,13 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
                                  igraph_bool_t loops, igraph_neimode_t mode) {
 
     if (prob < 0 || prob > 1) {
-        IGRAPH_ERROR("Rewiring probability should be between zero and one",
+        IGRAPH_ERROR("Rewiring probability should be between zero and one.",
                      IGRAPH_EINVAL);
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     if (prob == 0) {

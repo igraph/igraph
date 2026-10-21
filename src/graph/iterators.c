@@ -671,7 +671,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
+    IGRAPH_ERROR("Cannot calculate selector length, invalid selector type.",
                  IGRAPH_EINVAL);
 }
 
@@ -883,7 +883,7 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
         }
         break;
     default:
-        IGRAPH_ERROR("Cannot convert to vector, unknown iterator type",
+        IGRAPH_ERROR("Cannot convert to vector, unknown iterator type.",
                      IGRAPH_EINVAL);
         break;
     }
@@ -1874,7 +1874,7 @@ static igraph_error_t igraph_i_eit_all_between(
     igraph_vector_int_t* vec;
 
     if (from < 0 || from >= no_of_nodes || to < 0 || to >= no_of_nodes) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_EINVVID);
     }
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -2039,7 +2039,7 @@ igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_int_t
         }
         break;
     default:
-        IGRAPH_ERROR("Cannot convert to vector, unknown iterator type",
+        IGRAPH_ERROR("Cannot convert to vector, unknown iterator type.",
                      IGRAPH_EINVAL);
         break;
     }
