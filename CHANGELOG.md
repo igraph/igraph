@@ -19,6 +19,7 @@
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eigenvalues close to zero. This fixed a convergence issue in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
 - `igraph_hrg_fit()` returned an invalid, all-zero HRG model when `steps` was positive and none of the MCMC moves improved the likelihood of the initial dendrogram, e.g. for complete graphs. Using such a model in other HRG functions could crash igraph. The initial dendrogram is now returned in this case.
 - Resolved undefined behaviour when passing signed `char` to `<ctype.h>` functions in file format parsers. The issue could potentially cause out-of-bounds access when igraph was compiled with MSVC. Thanks to Riha Ilyas @riha-dev for fixing this (PR #2944)!
+- `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` could miss cycles in directed graphs when edge directions are taken into account (`IGRAPH_OUT` or `IGRAPH_IN`), depending on vertex order (#2911, PR #2947). This bug was introduced in igraph 0.10.17. Thanks to Tim Bernhard @GenieTim for helping with debugging this issue and testing ideas!
 
 ### Other
 
@@ -26,6 +27,7 @@
 - Proofread the documentation and error/warning message texts, correcting spelling, grammar, and formatting, using AI assistance.
 - nanoflann was updated to version 2.0.1
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
+- Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
 
 ## [1.0.1]
 

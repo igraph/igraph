@@ -30,6 +30,14 @@ Edge IDs in cycles:
   0: ( 0 1 2 3 4 5 6 7 8 9 )
 }
 
+Testing large directed cycle graph
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+
 Testing directed star
 Finished search, found 0 cycles, expected 0 cycles. Max cycle length was -1 vertices.
 
@@ -1886,4 +1894,16 @@ Edge IDs in cycles:
   3: ( 11 )
   4: ( 10 )
   5: ( 8 9 )
+}
+
+Testing directed graph with a single 2-cycle (issue #2911)
+Finished search, found 1 cycles, expected 1 cycles. Max cycle length was -1 vertices.
+
+Vertex IDs in cycles:
+{
+  0: ( 5 2 )
+}
+Edge IDs in cycles:
+{
+  0: ( 6 3 )
 }
