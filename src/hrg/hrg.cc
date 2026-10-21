@@ -207,7 +207,8 @@ igraph_error_t dendro::setGraph(const igraph_t *igraph) {
     // TODO: Can this be relaxed? buildDendrogram() creates a tree with n-2 internal edges,
     // i.e. zero internal edges for a 2-vertex graph. This is not handled at the moment.
     if (no_of_nodes < 3) {
-        IGRAPH_ERROR("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.",
+                      IGRAPH_EINVAL, no_of_nodes);
     }
 
     // Create graph

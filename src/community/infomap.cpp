@@ -217,7 +217,7 @@ igraph_error_t igraph_community_infomap(
 
     if (vertex_weights) {
         if (igraph_vector_size(vertex_weights) != vcount) {
-            IGRAPH_ERROR("Length of vertex weight vector does not match edge count.",
+            IGRAPH_ERROR("Length of vertex weight vector does not match vertex count.",
                          IGRAPH_EINVAL);
         }
     }

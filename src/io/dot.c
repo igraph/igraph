@@ -289,7 +289,7 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                     CHECK(fprintf(outstream, "    %s=%d\n", VECTOR(buf), VECTOR(boolv)[0] ? 1 : 0));
                     IGRAPH_WARNING("A boolean edge attribute was converted to numeric.");
                 } else {
-                    IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored.");
+                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored.");
                 }
             }
             CHECK(fprintf(outstream, "  ];\n"));
