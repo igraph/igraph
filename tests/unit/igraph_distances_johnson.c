@@ -92,6 +92,20 @@ int main(void) {
     printf("Directed graph with loops and multi-edges, IGRAPH_ALL:\n");
     CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_ENEGCYCLE);
 
+    /* In incoming mode, 1 reaches 0 by traversing 0 -> 1 backwards.
+     * Use different source and target selectors to check reweighting. */
+    printf("Single negative edge, IGRAPH_IN, select 1 -> 0:\n");
+    igraph_small(&g_empty, 2, IGRAPH_DIRECTED, 0, 1, -1);
+    igraph_vector_resize(&weights_empty, 1);
+    VECTOR(weights_empty)[0] = -1;
+    igraph_distances_johnson(&g_empty, &result,
+                            igraph_vss_1(1), igraph_vss_1(0), &weights_empty, IGRAPH_IN);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&result) == 1);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&result) == 1);
+    print_matrix(&result);
+    IGRAPH_ASSERT(MATRIX(result, 0, 0) == -1);
+    igraph_destroy(&g_empty);
+
     igraph_matrix_destroy(&result);
     igraph_matrix_destroy(&bf_result);
     igraph_destroy(&g_lm);
