@@ -24,6 +24,7 @@
 - Resolved undefined behaviour when passing signed `char` to `<ctype.h>` functions in file format parsers. The issue could potentially cause out-of-bounds access when igraph was compiled with MSVC. Thanks to Riha Ilyas @riha-dev for fixing this (PR #2944)!
 - In igraph 1.0.0 and 1.0.1, `igraph_distances_johnson()` could return incorrect distances in `IGRAPH_IN` mode with negative weights when source and target selections differed, and could access outside the result buffer for rectangular results. Earlier releases are unaffected because Johnson’s algorithm did not support `IGRAPH_IN`.
 - `igraph_distances_floyd_warshall()` ignored source and target vertex selectors on singleton graphs, returning incorrect result matrix dimensions for empty selections or repeated source vertices. This bug was introduced in 0.10.4.
+- `igraph_community_spinglass_single()` failed to reject an invalid vertex ID equal to the vertex count.
 
 ### Other
 
