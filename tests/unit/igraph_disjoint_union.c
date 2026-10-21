@@ -64,5 +64,7 @@ int main(void) {
     igraph_vector_ptr_destroy(&glist);
     igraph_destroy(&uni);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

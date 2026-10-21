@@ -199,5 +199,7 @@ int main(void) {
 
     igraph_vector_int_destroy(&spanner);
 
-    return IGRAPH_SUCCESS;
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }
