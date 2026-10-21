@@ -42,6 +42,7 @@ static void check_directional_distances(const igraph_t *graph, const igraph_vect
 static void test_directional_selectors(void) {
     igraph_t graph;
     igraph_vector_t weights;
+    igraph_vs_t from, to;
 
     /* 0 --(-1)--> 1 --(-2)--> 2, with an additional edge 1 --(1)--> 3.
      * Maximum out-degree is 2 and maximum in-degree is 1, so the graph
@@ -59,6 +60,14 @@ static void test_directional_selectors(void) {
     check_directional_distances(&graph, &weights, igraph_vss_1(0), igraph_vss_range(1, 3));
     /* Square matrices also need correct source and target indexing. */
     check_directional_distances(&graph, &weights, igraph_vss_range(1, 3), igraph_vss_range(0, 2));
+
+    /* Reordered selectors and repeated sources, with both target selector types. */
+    igraph_vs_vector_small(&from, 2, 0, 2, 3, 1, 0, -1);
+    igraph_vs_vector_small(&to, 3, 1, 0, 2, -1);
+    check_directional_distances(&graph, &weights, from, igraph_vss_all());
+    check_directional_distances(&graph, &weights, from, to);
+    igraph_vs_destroy(&to);
+    igraph_vs_destroy(&from);
 
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
