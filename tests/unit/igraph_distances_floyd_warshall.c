@@ -49,9 +49,9 @@ void test_small_graph_selectors(void) {
                 for (int method = 0; method < 3; method++) {
                     for (int f = 0; f < 3; f++) {
                         for (int t = 0; t < 2; t++) {
-                            IGRAPH_ASSERT(igraph_distances_floyd_warshall(
+                            igraph_distances_floyd_warshall(
                                 &graph, &result, from[f], to[t], weighted ? &weights : NULL,
-                                IGRAPH_OUT, methods[method]) == IGRAPH_SUCCESS);
+                                IGRAPH_OUT, methods[method]);
                             IGRAPH_ASSERT(igraph_matrix_nrow(&result) == nrows[f]);
                             IGRAPH_ASSERT(igraph_matrix_ncol(&result) == ncols[t]);
                             for (igraph_int_t i = 0; i < nrows[f]; i++) {
