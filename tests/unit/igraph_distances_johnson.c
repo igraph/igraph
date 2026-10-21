@@ -19,12 +19,49 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+static void check_incoming_distances(const igraph_t *graph, const igraph_vector_t *weights,
+                                     igraph_vs_t from, igraph_vs_t to) {
+    igraph_matrix_t result, expected;
+
+    /* Allocate a fresh result so excess capacity cannot hide an out-of-bounds access. */
+    igraph_matrix_init(&result, 0, 0);
+    igraph_matrix_init(&expected, 0, 0);
+    igraph_distances_johnson(graph, &result, from, to, weights, IGRAPH_IN);
+    igraph_distances_bellman_ford(graph, &expected, from, to, weights, IGRAPH_IN);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&result, &expected));
+    igraph_matrix_destroy(&expected);
+    igraph_matrix_destroy(&result);
+}
+
+static void test_incoming_selectors(void) {
+    igraph_t graph;
+    igraph_vector_t weights;
+
+    /* 0 --(-1)--> 1 --(-2)--> 2 */
+    igraph_small(&graph, 3, IGRAPH_DIRECTED, 0, 1, 1, 2, -1);
+    igraph_vector_init_int(&weights, 2, -1, -2);
+
+    /* A 3-by-1 result: transposing the result indices accesses outside the buffer. */
+    check_incoming_distances(&graph, &weights, igraph_vss_all(), igraph_vss_1(1));
+    /* Exercise both the all-targets and explicit-targets reweighting branches. */
+    check_incoming_distances(&graph, &weights, igraph_vss_1(2), igraph_vss_all());
+    check_incoming_distances(&graph, &weights, igraph_vss_1(2), igraph_vss_range(0, 2));
+    /* Square matrices also need correct source and target indexing. */
+    check_incoming_distances(&graph, &weights, igraph_vss_range(1, 3), igraph_vss_range(0, 2));
+
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&graph);
+    VERIFY_FINALLY_STACK();
+}
+
 int main(void) {
     igraph_t g_empty, g_lm;
     igraph_matrix_t result;
     igraph_matrix_t bf_result;
     igraph_vs_t vids;
     igraph_vector_t weights_empty, weights_lm, weights_lm_neg_loop;
+
+    test_incoming_selectors();
 
     igraph_matrix_init(&result, 0, 0);
     igraph_matrix_init(&bf_result, 0, 0);
