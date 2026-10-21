@@ -111,6 +111,16 @@ int main(void) {
     printf("Modularity: %g\n", modularity);
     print_vector_int(&membership);
 
+    /* Invalid vertex IDs, including the upper boundary. */
+    const igraph_int_t invalid_vertices[] = {-1, igraph_vcount(&g), igraph_vcount(&g) + 1};
+    for (igraph_int_t i = 0; i < 3; i++) {
+        CHECK_ERROR(igraph_community_spinglass_single(
+                        &g, NULL, invalid_vertices[i], &membership,
+                        &cohesion, &adhesion, &inner_links, &outer_links,
+                        2, IGRAPH_SPINCOMM_UPDATE_CONFIG, 1.0),
+                    IGRAPH_EINVVID);
+    }
+
     /* Try to call this as well, we don't check the results currently.... */
 
     igraph_community_spinglass_single(&g,
@@ -129,6 +139,11 @@ int main(void) {
 
     printf("\nTrivial case: null graph.\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    CHECK_ERROR(igraph_community_spinglass_single(
+                    &g, NULL, 0, &membership,
+                    &cohesion, &adhesion, &inner_links, &outer_links,
+                    2, IGRAPH_SPINCOMM_UPDATE_CONFIG, 1.0),
+                IGRAPH_EINVVID);
     igraph_community_spinglass(&g,
                                NULL, /* no weights */
                                &modularity,

@@ -454,8 +454,8 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         if (gamma < 0.0) {
             IGRAPH_ERROR("Invalid gamma value.", IGRAPH_EINVAL);
         }
-        if (vertex < 0 || vertex > igraph_vcount(graph)) {
-            IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVAL);
+        if (vertex < 0 || vertex >= igraph_vcount(graph)) {
+            IGRAPH_ERROR("Invalid vertex ID.", IGRAPH_EINVVID);
         }
 
         /* Check whether we have a single component */
