@@ -479,7 +479,7 @@ igraph_error_t igraph_personalized_pagerank(
                 weights);
     }
 
-    IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Unknown PageRank algorithm.", IGRAPH_EINVAL);
 }
 
 /*

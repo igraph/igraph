@@ -105,7 +105,7 @@ static igraph_error_t triangular_lattice(
 
     if (row_count > 0 && lex_ordering && !igraph_vector_int_isininterval(row_lengths_vector, VECTOR(*row_lengths_vector)[0], VECTOR(*row_lengths_vector)[0])) {
         IGRAPH_ERROR(
-            "row_lengths_vector must have all the coordinates the same", IGRAPH_EINVAL);
+            "All row lengths must be equal when using lexicographic ordering.", IGRAPH_EINVAL);
     }
 
     for (i = 0; i < row_count; i++) {

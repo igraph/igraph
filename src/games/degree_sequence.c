@@ -608,7 +608,7 @@ static igraph_error_t configuration_simple_directed(
 
     IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &graphical));
     if (!graphical) {
-        IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
+        IGRAPH_ERROR("No simple directed graph can realize the given degree sequence.", IGRAPH_EINVAL);
     }
 
     ecount = igraph_vector_int_sum(out_deg);

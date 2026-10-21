@@ -112,7 +112,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_int_t n
 
     bag = IGRAPH_CALLOC(bagsize, igraph_int_t);
     if (bag == 0) {
-        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for Barabasi game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag);
 

@@ -373,7 +373,7 @@ igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
                                  const igraph_vector_t *imag) {
     igraph_int_t i, n = igraph_vector_size(real);
     if (n != igraph_vector_size(imag)) {
-        IGRAPH_ERROR("Real and imag vector sizes don't match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Real and imaginary vector sizes don't match.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_complex_init(v, n));
@@ -404,7 +404,7 @@ igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
                                        const igraph_vector_t *theta) {
     igraph_int_t i, n = igraph_vector_size(r);
     if (n != igraph_vector_size(theta)) {
-        IGRAPH_ERROR("'r' and 'theta' vector sizes don't match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("'r' and 'theta' vector sizes don't match.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vector_complex_init(v, n));

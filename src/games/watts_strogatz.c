@@ -82,14 +82,14 @@ igraph_error_t igraph_watts_strogatz_game(
     igraph_vector_bool_t periodic;
 
     if (dim < 1) {
-        IGRAPH_ERROR("WS game: dimension should be at least one", IGRAPH_EINVAL);
+        IGRAPH_ERROR("WS game: dimension should be at least one.", IGRAPH_EINVAL);
     }
     if (size < 1) {
-        IGRAPH_ERROR("WS game: lattice size should be at least one",
+        IGRAPH_ERROR("WS game: lattice size should be at least one.",
                      IGRAPH_EINVAL);
     }
     if (p < 0 || p > 1) {
-        IGRAPH_ERROR("WS game: rewiring probability should be between 0 and 1",
+        IGRAPH_ERROR("WS game: rewiring probability should be between 0 and 1.",
                      IGRAPH_EINVAL);
     }
 

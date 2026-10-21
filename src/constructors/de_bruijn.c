@@ -66,7 +66,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_int_t m, igraph_int_t n)
     int iter = 0;
 
     if (m < 0 || n < 0) {
-        IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph",
+        IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph.",
                      IGRAPH_EINVAL);
     }
 

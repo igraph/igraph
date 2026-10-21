@@ -38,7 +38,7 @@ static igraph_error_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_int_t n,
     igraph_vector_int_t prufer;
 
     if (directed) {
-        IGRAPH_ERROR("The Prufer method for random tree generation does not support directed trees", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The Prufer method for random tree generation does not support directed trees.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&prufer, n - 2);
@@ -185,6 +185,6 @@ igraph_error_t igraph_tree_game(igraph_t *graph, igraph_int_t n, igraph_bool_t d
     case IGRAPH_RANDOM_TREE_LERW:
         return igraph_i_tree_game_loop_erased_random_walk(graph, n, directed);
     default:
-        IGRAPH_ERROR("Invalid method for random tree construction", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid method for random tree construction.", IGRAPH_EINVAL);
     }
 }

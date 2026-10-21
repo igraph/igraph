@@ -309,7 +309,7 @@ igraph_int_t igraph_attribute_record_size(const igraph_attribute_record_t *attr)
             return 0;
 
         default:
-            IGRAPH_ERRORF("Unsupported attribute type: %d", IGRAPH_EINVAL, (int) attr->type);
+            IGRAPH_ERRORF("Unsupported attribute type: %d.", IGRAPH_EINVAL, (int) attr->type);
     }
 }
 
@@ -375,7 +375,7 @@ igraph_error_t igraph_attribute_record_resize(
             break;
 
         default:
-            IGRAPH_ERRORF("Unsupported attribute type: %d", IGRAPH_EINVAL, (int) attr->type);
+            IGRAPH_ERRORF("Unsupported attribute type: %d.", IGRAPH_EINVAL, (int) attr->type);
     }
 
     return IGRAPH_SUCCESS;
@@ -619,7 +619,7 @@ igraph_error_t igraph_i_attribute_init(
     if (igraph_i_attribute_table) {
         IGRAPH_CHECK(igraph_i_attribute_table->init(graph, attr));
         if (graph->attr == NULL) {
-            IGRAPH_ERROR("Attribute handler did not initialize attr pointer", IGRAPH_FAILURE);
+            IGRAPH_ERROR("Attribute handler did not initialize attr pointer.", IGRAPH_FAILURE);
         }
     }
     return IGRAPH_SUCCESS;
@@ -638,7 +638,7 @@ igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igrap
     if (from->attr && igraph_i_attribute_table) {
         IGRAPH_CHECK(igraph_i_attribute_table->copy(to, from, ga, va, ea));
         if (to->attr == NULL) {
-            IGRAPH_ERROR("Attribute handler did not initialize attr pointer", IGRAPH_FAILURE);
+            IGRAPH_ERROR("Attribute handler did not initialize attr pointer.", IGRAPH_FAILURE);
         }
     }
     return IGRAPH_SUCCESS;
