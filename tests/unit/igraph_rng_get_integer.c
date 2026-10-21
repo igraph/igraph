@@ -204,5 +204,7 @@ int main(void) {
     simple_tests();
     stress_tests();
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

@@ -190,5 +190,7 @@ int main(void) {
         igraph_matrix_destroy(&layout);
     }
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
