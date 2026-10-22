@@ -724,18 +724,20 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &tmpD, X));
 
-    if (!symmetric) {
-        /* calculate left eigenvalues */
-        IGRAPH_CHECK(igraph_matrix_resize(Y, vc, no));
-        for (i = 0; i < no; i++) {
-            igraph_real_t norm;
-            igraph_vector_t v = igraph_vector_view(&MATRIX(*Y, 0, i), vc);
-            callback_right(&MATRIX(*Y, 0, i), &MATRIX(*X, 0, i), (int) vc, &data);
-            norm = 1.0 / igraph_blas_dnrm2(&v);
-            igraph_vector_scale(&v, norm);
+    if (Y) {
+        if (!symmetric) {
+            /* calculate left eigenvalues */
+            IGRAPH_CHECK(igraph_matrix_resize(Y, vc, no));
+            for (i = 0; i < no; i++) {
+                igraph_real_t norm;
+                igraph_vector_t v = igraph_vector_view(&MATRIX(*Y, 0, i), vc);
+                callback_right(&MATRIX(*Y, 0, i), &MATRIX(*X, 0, i), (int) vc, &data);
+                norm = 1.0 / igraph_blas_dnrm2(&v);
+                igraph_vector_scale(&v, norm);
+            }
+        } else {
+            IGRAPH_CHECK(igraph_matrix_update(Y, X));
         }
-    } else if (Y) {
-        IGRAPH_CHECK(igraph_matrix_update(Y, X));
     }
 
     if (zapsmall) {
