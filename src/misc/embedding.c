@@ -726,7 +726,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
 
     if (Y) {
         if (!symmetric) {
-            /* calculate left eigenvalues */
+            /* compute right singular vectors */
             IGRAPH_CHECK(igraph_matrix_resize(Y, vc, no));
             for (i = 0; i < no; i++) {
                 igraph_real_t norm;

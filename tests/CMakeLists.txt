@@ -921,6 +921,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_adjacency_spectral_embedding
+  igraph_laplacian_spectral_embedding
 )
 
 # graphicality
