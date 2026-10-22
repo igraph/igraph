@@ -140,7 +140,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         n = 0;
     }
     if (n >= context.n) {
-        IGRAPH_WARNING("More vertices than specified in `DL' file");
+        IGRAPH_WARNING("More vertices than specified in `DL' file.");
         context.n = n;
     }
 

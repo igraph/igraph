@@ -741,7 +741,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
     if ( (!roots || igraph_vector_int_size(roots) == 0) &&
          rootlevel && igraph_vector_int_size(rootlevel) != 0 ) {
-        IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored");
+        IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored.");
     }
 
     /* ----------------------------------------------------------------------- */
