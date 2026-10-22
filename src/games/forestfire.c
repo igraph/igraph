@@ -68,7 +68,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * \olist
  * \oli We generate two random numbers, <code>x</code> and <code>y</code>, that are
  *   geometrically distributed with means <code>p/(1-p)</code> and
- *   <code>rp(1-rp)</code>. (<code>p</code> is \p fw_prob, <code>r</code> is
+ *   <code>rp/(1-rp)</code>. (<code>p</code> is \p fw_prob, <code>r</code> is
  *   \p bw_factor.) The new vertex cites <code>x</code> outgoing neighbors
  *   and <code>y</code> incoming neighbors of <code>v</code>, from those which are
  *   not yet cited by the new vertex. If there are fewer than <code>x</code> or
