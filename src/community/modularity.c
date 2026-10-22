@@ -314,8 +314,10 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
  *                   higher values favor more, smaller communities.
  * \param modmat     Pointer to an initialized matrix in which the modularity
  *                   matrix is stored.
- * \param directed   For directed graphs: if the edges should be treated as
- *                   undirected. For undirected graphs this is ignored.
+ * \param directed   Whether to use the directed or undirected version of
+ *                   the modularity matrix. If \c true, edge directions are
+ *                   respected; if \c false, they are ignored.
+ *                   Ignored for undirected graphs.
  * \return Error code.
  *
  * \sa \ref igraph_modularity().
