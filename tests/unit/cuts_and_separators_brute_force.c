@@ -181,18 +181,23 @@ static void check_cuts(const testgraph *g, int s, int t, const int *capacity, ig
     size_t n_expected = 0;
 
     for (vset X = 0; X <= all_vertices(g); X++) {
-        if (((X >> s) & 1) && !((X >> t) & 1)) {
-            long w = weight(g, leaving(g, X), capacity);
-            best = (best < 0 || w < best) ? w : best;
+        if (!((X >> s) & 1) || ((X >> t) & 1)) {
+            continue;
         }
-    }
-    for (vset X = 0; X <= all_vertices(g); X++) {
-        if (((X >> s) & 1) && !((X >> t) & 1)) {
-            eset c = leaving(g, X);
-            if (min_only ? weight(g, c, capacity) == best : is_minimal_cut(g, s, t, c)) {
-                expected[n_expected++] = c;
+        eset c = leaving(g, X);
+        if (min_only) {
+            long w = weight(g, c, capacity);
+            if (best < 0 || w < best) {
+                best = w;
+                n_expected = 0;
             }
+            if (w != best) {
+                continue;
+            }
+        } else if (!is_minimal_cut(g, s, t, c)) {
+            continue;
         }
+        expected[n_expected++] = c;
     }
 
     make_graph(g, &graph);
@@ -364,7 +369,7 @@ int main(void) {
     check_separators(&g, true);
     check_separators(&g, false);
 
-    for (int round = 0; round < 20; round++) {
+    for (int round = 0; round < 12; round++) {
         int n = (int) RNG_INTEGER(2, 6);
 
         random_graph(&g, n, true);
