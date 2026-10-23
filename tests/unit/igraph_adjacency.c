@@ -1,6 +1,6 @@
 /*
    igraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2026  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 */
 
 #include <igraph.h>
+#include <stdio.h>
+
 #include "test_utilities.h"
 
-void print_destroy(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops) {
+void print_destroy(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+                   igraph_loops_t loops) {
     igraph_t g;
     igraph_t g_sparse;
     igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
@@ -36,7 +39,8 @@ void print_destroy(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_l
     if (!same) {
         printf("Sparse graph differs from non-sparse:\n");
         print_graph_canon(&g_sparse);
-        exit(1);
+        fflush(stdout);
+        IGRAPH_ASSERT(same);
     }
 
     igraph_matrix_destroy(adjmatrix);
@@ -46,7 +50,8 @@ void print_destroy(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_l
     igraph_destroy(&g_sparse);
 }
 
-void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops, igraph_error_t error) {
+void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+                 igraph_loops_t loops, igraph_error_t error) {
     igraph_t g;
     igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
 
