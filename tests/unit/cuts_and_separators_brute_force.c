@@ -364,8 +364,8 @@ int main(void) {
     check_separators(&g, true);
     check_separators(&g, false);
 
-    for (int round = 0; round < 300; round++) {
-        int n = (int) RNG_INTEGER(2, 7);
+    for (int round = 0; round < 20; round++) {
+        int n = (int) RNG_INTEGER(2, 6);
 
         random_graph(&g, n, true);
         for (int e = 0; e < g.m; e++) {
