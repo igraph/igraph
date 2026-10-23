@@ -138,7 +138,8 @@ void check_error(const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
     igraph_sparsemat_compress(&sparse_adjmatrix, &sparse_adjmatrix_comp);
 
     CHECK_ERROR(igraph_weighted_adjacency(&g, adjmatrix, mode, &weights, loops), error);
-    CHECK_ERROR(igraph_sparse_adjacency(&g, &sparse_adjmatrix_comp, mode, loops), error);
+    CHECK_ERROR(igraph_sparse_weighted_adjacency(&g, &sparse_adjmatrix_comp,
+                                               mode, &weights, loops), error);
 
     igraph_sparsemat_destroy(&sparse_adjmatrix);
     igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
