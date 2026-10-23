@@ -1,5 +1,6 @@
-/* igraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+/*
+   igraph library.
+   Copyright (C) 2022-2026  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,16 +17,15 @@
 */
 
 #include <igraph.h>
+#include <stdio.h>
+
 #include "test_utilities.h"
 
-int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
-                const igraph_vector_int_list_t *evecs, int error_code) {
-
+void check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
+                 const igraph_vector_int_list_t *evecs) {
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_int_t i, n = igraph_vector_int_list_size(vecs);
-    if (igraph_vector_int_list_size(evecs) != n) {
-        exit(error_code + 1);
-    }
+    IGRAPH_ASSERT(igraph_vector_int_list_size(evecs) == n);
 
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *vvec = igraph_vector_int_list_get_ptr(vecs, i);
@@ -34,18 +34,14 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
         if (igraph_vector_int_size(vvec) == 0 && n2 == 0) {
             continue;
         }
-        if (igraph_vector_int_size(vvec) != n2 + 1) {
-            exit(error_code + 2);
-        }
+        IGRAPH_ASSERT(igraph_vector_int_size(vvec) == n2 + 1);
         for (j = 0; j < n2; j++) {
             igraph_int_t edge = VECTOR(*evec)[j];
             igraph_int_t from = VECTOR(*vvec)[j];
             igraph_int_t to = VECTOR(*vvec)[j + 1];
             if (directed) {
-                if (from != IGRAPH_FROM(graph, edge) ||
-                    to   != IGRAPH_TO  (graph, edge)) {
-                    exit(error_code);
-                }
+                IGRAPH_ASSERT(from == IGRAPH_FROM(graph, edge) &&
+                              to == IGRAPH_TO(graph, edge));
             } else {
                 igraph_int_t from2 = IGRAPH_FROM(graph, edge);
                 igraph_int_t to2 = IGRAPH_TO(graph, edge);
@@ -53,43 +49,35 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
                 igraph_int_t max1 = from < to ? to : from;
                 igraph_int_t min2 = from2 < to2 ? from2 : to2;
                 igraph_int_t max2 = from2 < to2 ? to2 : from2;
-                if (min1 != min2 || max1 != max2) {
-                    exit(error_code + 3);
-                }
+                IGRAPH_ASSERT(min1 == min2 && max1 == max2);
             }
         }
     }
-
-    return 0;
 }
 
-int check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* parents,
-                       const igraph_vector_int_t* inbound, int start, int error_code) {
+void check_parents_inbound(const igraph_t *graph,
+                           const igraph_vector_int_t *parents,
+                           const igraph_vector_int_t *inbound, igraph_int_t start) {
     igraph_int_t i, n = igraph_vcount(graph);
 
-    if (igraph_vector_int_size(parents) != n ||
-        igraph_vector_int_size(inbound) != n) {
-        exit(error_code);
-    }
+    IGRAPH_ASSERT(igraph_vector_int_size(parents) == n &&
+                  igraph_vector_int_size(inbound) == n);
 
     if (VECTOR(*parents)[start] != -1 || VECTOR(*inbound)[start] != -1) {
-        printf("%" IGRAPH_PRId "\n", VECTOR(*parents)[start]);
-        printf("%" IGRAPH_PRId "\n", VECTOR(*inbound)[start]);
-        exit(error_code + 1);
+        fprintf(stderr, "Source vertex %" IGRAPH_PRId
+                " must have parent and inbound edge -1.\n", start);
+        fprintf(stderr, "Actual parent: %" IGRAPH_PRId
+                "; inbound edge: %" IGRAPH_PRId "\n",
+                VECTOR(*parents)[start], VECTOR(*inbound)[start]);
+        IGRAPH_FATAL("Invalid parent or inbound edge for the source vertex.");
     }
 
     for (i = 0; i < n; i++) {
         if (VECTOR(*parents)[i] == -2) {
-            if (VECTOR(*inbound)[i] != -1) {
-                exit(error_code + 2);
-            }
+            IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
         } else if (VECTOR(*parents)[i] == -1) {
-            if (i != start) {
-                exit(error_code + 3);
-            }
-            if (VECTOR(*inbound)[i] != -1) {
-                exit(error_code + 4);
-            }
+            IGRAPH_ASSERT(i == start);
+            IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
         } else {
             igraph_int_t eid = VECTOR(*inbound)[i];
             igraph_int_t u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
@@ -98,46 +86,41 @@ int check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* pare
                 u = v;
                 v = dummy;
             }
-            if (v != i) {
-                exit(error_code + 5);
-            } else if (u != VECTOR(*parents)[i]) {
-                exit(error_code + 6);
-            }
+            IGRAPH_ASSERT(v == i);
+            IGRAPH_ASSERT(u == VECTOR(*parents)[i]);
         }
     }
-
-    return 0;
 }
 
 int main(void) {
-
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;
     igraph_vector_int_t parents, inbound;
     igraph_int_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
-    const igraph_vector_t weights_vec = igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
+    const igraph_vector_t weights_vec =
+        igraph_vector_view(weights, sizeof(weights) / sizeof(weights[0]));
     igraph_vs_t vs;
 
     /* Simple ring graph without weights */
 
-    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
+    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, /*mutual=*/ false, /*circular=*/ true);
 
     igraph_vector_int_list_init(&vecs, 0);
     igraph_vector_int_list_init(&evecs, 0);
     igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound, 0);
 
-    igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
+    igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1, -1);
 
     igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
-                                       /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
+                                       /*weights=*/ NULL, IGRAPH_OUT,
                                        &parents,
                                        /*inbound_edges=*/ &inbound);
 
-    check_evecs(&g, &vecs, &evecs, 10);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, 40);
+    check_evecs(&g, &vecs, &evecs);
+    check_parents_inbound(&g, &parents, &inbound, /*start=*/ 0);
 
     for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&vecs, i));
@@ -151,8 +134,8 @@ int main(void) {
                                        &parents,
                                        /*inbound_edges=*/ &inbound);
 
-    check_evecs(&g, &vecs, &evecs, 20);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, 50);
+    check_evecs(&g, &vecs, &evecs);
+    check_parents_inbound(&g, &parents, &inbound, /*start=*/ 0);
 
     for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&vecs, i));
