@@ -30,10 +30,10 @@
  * \brief Creates a graph with the specified edges.
  *
  * \param graph An uninitialized graph object.
- * \param edges The edges to add, the first two elements are the first
+ * \param edges The edges to add. The first two elements specify the first
  *        edge, etc.
- * \param n The number of vertices in the graph, if smaller or equal
- *        to the highest vertex ID in the \p edges vector it
+ * \param n The number of vertices in the graph. If less than or equal
+ *        to the highest vertex ID in the \p edges vector, it
  *        will be increased automatically. So it is safe to give 0
  *        here.
  * \param directed Boolean, whether to create a directed graph or
@@ -94,7 +94,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  * literal integers. If you use a variable instead of a literal, make sure
  * that it is of type <type>int</type>, as this is the type that this function
  * assumes for all variadic arguments. Using a different integer type is
- * undefined behaviour and likely to cause platform-specific issues.
+ * undefined behavior and likely to cause platform-specific issues.
  *
  * \param graph Pointer to an uninitialized graph object. The result
  *        will be stored here.

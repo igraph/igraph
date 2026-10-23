@@ -52,7 +52,7 @@
  * the out-fitnesses and \c j is selected according to the in-fitnesses). If the
  * vertices are not connected yet (or if multiple edges are allowed), we
  * connect them; otherwise we select a new pair. This is repeated until the
- * desired number of links are created.
+ * desired number of links is created.
  *
  * </para><para>
  * The \em expected degree (though not the actual degree) of each vertex will be
@@ -330,9 +330,9 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_int_t no_of_ed
  * and before \ref igraph_static_fitness_game() is called.
  *
  * </para><para>
- * Note that significant finite size effects may be observed for exponents
+ * Note that significant finite-size effects may be observed for exponents
  * smaller than 3 in the original formulation of the game. This function
- * provides an argument that lets you remove the finite size effects by
+ * provides an argument that lets you remove the finite-size effects by
  * assuming that the fitness of vertex \c i is
  * <code>(i+i0-1)^(-alpha)</code>,
  * where \c i0 is a constant chosen appropriately to ensure that the maximum

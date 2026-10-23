@@ -59,7 +59,7 @@ igraph_error_t igraph_convex_hull_2d(
 
     no_of_nodes = igraph_matrix_nrow(data);
     if (igraph_matrix_ncol(data) != 2) {
-        IGRAPH_ERROR("Only two-dimensional point sets are supports, matrix must have two columns.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Only two-dimensional point sets are supported; matrix must have two columns.", IGRAPH_EINVAL);
     }
     if (no_of_nodes == 0) {
         if (resverts) {

@@ -36,7 +36,7 @@
  *
  * Let us define the input set of an edge (i, j) as the set of vertices where
  * the shortest paths passing through (i, j) originate, and similarly, let us
- * defined the output set of an edge (i, j) as the set of vertices where the
+ * define the output set of an edge (i, j) as the set of vertices where the
  * shortest paths passing through (i, j) terminate. The convergence degree of
  * an edge is defined as the normalized value of the difference between the
  * size of the input set and the output set, i.e. the difference of them

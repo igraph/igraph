@@ -130,6 +130,7 @@ int main(void) {
 
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

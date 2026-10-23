@@ -163,5 +163,5 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
-    return IGRAPH_SUCCESS;
+    return 0;
 }

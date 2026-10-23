@@ -171,7 +171,7 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_weig
  * \member liquid_iterations Number of iterations in the liquid phase.
  * \member liquid_temperature Start temperature in the liquid phase.
  * \member liquid_attraction Attraction in the liquid phase.
- * \member liquid_damping_mult Multiplicatie damping factor, liquid phase.
+ * \member liquid_damping_mult Multiplicative damping factor, liquid phase.
  * \member expansion_iterations Number of iterations in the expansion phase.
  * \member expansion_temperature Start temperature in the expansion phase.
  * \member expansion_attraction Attraction, expansion phase.
@@ -179,13 +179,13 @@ IGRAPH_EXPERIMENTAL IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_weig
  * \member cooldown_iterations Number of iterations in the cooldown phase.
  * \member cooldown_temperature Start temperature in the cooldown phase.
  * \member cooldown_attraction Attraction in the cooldown phase.
- * \member cooldown_damping_mult Damping fact int the cooldown phase.
+ * \member cooldown_damping_mult Damping factor in the cooldown phase.
  * \member crunch_iterations Number of iterations in the crunch phase.
  * \member crunch_temperature Start temperature in the crunch phase.
  * \member crunch_attraction Attraction in the crunch phase.
  * \member crunch_damping_mult Damping factor in the crunch phase.
  * \member simmer_iterations Number of iterations in the simmer phase.
- * \member simmer_temperature Start temperature in te simmer phase.
+ * \member simmer_temperature Start temperature in the simmer phase.
  * \member simmer_attraction Attraction in the simmer phase.
  * \member simmer_damping_mult Multiplicative damping factor in the simmer phase.
  */
@@ -224,7 +224,7 @@ typedef struct igraph_layout_drl_options_t {
  *
  * These constants can be used to initialize a set of DrL parameters.
  * These can then be modified according to the user's needs.
- * \enumval IGRAPH_LAYOUT_DRL_DEFAULT The deafult parameters.
+ * \enumval IGRAPH_LAYOUT_DRL_DEFAULT The default parameters.
  * \enumval IGRAPH_LAYOUT_DRL_COARSEN Slightly modified parameters to
  *      get a coarser layout.
  * \enumval IGRAPH_LAYOUT_DRL_COARSEST An even coarser layout.

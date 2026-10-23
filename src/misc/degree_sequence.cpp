@@ -890,7 +890,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * </para><para>
  * Loopless multigraphs are generated using an analogous algorithm: an arbitrary
  * vertex is chosen, and it is connected with a single connection to a highest
- * remaining degee vertex. If self-loops are also allowed, the same algorithm
+ * remaining degree vertex. If self-loops are also allowed, the same algorithm
  * is used, but if a non-zero vertex remains at the end of the procedure, the
  * graph is completed by adding self-loops to it. Thus, the result will contain
  * at most one vertex with self-loops.
@@ -902,7 +902,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  * for constructing trees with a given degree sequence.
  *
  * </para><para>
- * For a undirected simple graph, the time complexity is O(V + alpha(V) * E).
+ * For an undirected simple graph, the time complexity is O(V + alpha(V) * E).
  * For an undirected multi graph, the time complexity is O(V * E + V log V).
  * For a directed graph, the time complexity is O(E + V^2 log V).
  *
@@ -993,7 +993,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *
  * \sa \ref igraph_is_graphical() to test graphicality without generating a graph;
  *     \ref igraph_realize_bipartite_degree_sequence() to create bipartite graphs
- *          from two degree sequence;
+ *          from two degree sequences;
  *     \ref igraph_degree_sequence_game() to generate random graphs with a given
  *          degree sequence;
  *     \ref igraph_k_regular_game() to generate random regular graphs;
@@ -1171,7 +1171,7 @@ fail:
  *          if one exists.
  *          \cli IGRAPH_REALIZE_DEGSEQ_LARGEST
  *          The vertex with the largest remaining degree is selected first, from
- *          either parition. The result is usually a graph with high positive degree
+ *          either partition. The result is usually a graph with high positive degree
  *          assortativity, and is often disconnected.
  *          \cli IGRAPH_REALIZE_DEGSEQ_INDEX
  *          The vertices are selected in order of their index.

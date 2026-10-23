@@ -39,7 +39,7 @@
  * samples from a discrete probability distribution with dynamic probabilities
  * that are updated frequently. This is achieved by creating a binary tree where
  * the leaves are the items. Each leaf contains the probability corresponding to
- * the items. Intermediate nodes of the tree always contain the sum of its two
+ * the items. Intermediate nodes of the tree always contain the sum of their two
  * children. When the value of a leaf node is updated, the values of its
  * ancestors are also updated accordingly.</para>
  *
@@ -143,7 +143,7 @@ void igraph_psumtree_destroy(igraph_psumtree_t *t) {
  * \param idx The index of the item whose value is to be retrieved.
  * \return The value corresponding to the item with the given index.
  *
- * Time complexity: O(1)
+ * Time complexity: O(1).
  */
 igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_int_t idx) {
     const igraph_vector_t *tree = &t->v;
@@ -243,7 +243,7 @@ igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_int_t idx,
  * \function igraph_psumtree_size
  * \brief Returns the size of the tree.
  *
- * \param t The tree object
+ * \param t The tree object.
  * \return The number of discrete items in the tree.
  *
  * Time complexity: O(1).
@@ -257,7 +257,7 @@ igraph_int_t igraph_psumtree_size(const igraph_psumtree_t *t) {
  * \function igraph_psumtree_sum
  * \brief Returns the sum of the values of the leaves in the tree.
  *
- * \param t The tree object
+ * \param t The tree object.
  * \return The sum of the values of the leaves in the tree.
  *
  * Time complexity: O(1).

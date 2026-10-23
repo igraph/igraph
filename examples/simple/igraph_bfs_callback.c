@@ -57,7 +57,7 @@ int main(void) {
                /*callback=*/ bfs_callback, /*extra=*/ 0);
     printf(" )\n");
 
-    /* Cleam up after ourselves */
+    /* Clean up after ourselves */
     igraph_destroy(&graph);
 
     return 0;

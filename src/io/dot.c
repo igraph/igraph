@@ -52,7 +52,7 @@ static igraph_error_t dot_escape(const char *orig, igraph_vector_char_t* result)
     /* next, check whether we need to escape the string for any other reason.
      * Also update is_number and newlen */
     for (i = 0; i < len; i++) {
-        if (isdigit(orig[i])) {
+        if (isdigit((unsigned char) orig[i])) {
             newlen++;
         } else if (orig[i] == '-' && i == 0) {
             newlen++;
@@ -67,7 +67,7 @@ static igraph_error_t dot_escape(const char *orig, igraph_vector_char_t* result)
             is_number = false; newlen++;
         } else if (orig[i] == '\\' || orig[i] == '"' || orig[i] == '\n') {
             need_quote = true; is_number = false; newlen += 2; /* will be escaped */
-        } else if (isalpha(orig[i])) {
+        } else if (isalpha((unsigned char) orig[i])) {
             is_number = false; newlen++;
         } else {
             is_number = false; need_quote = true; newlen++;
@@ -76,7 +76,7 @@ static igraph_error_t dot_escape(const char *orig, igraph_vector_char_t* result)
     if (is_number && len > 0 && orig[len - 1] == '.') {
         is_number = false;
     }
-    if (!is_number && isdigit(orig[0])) {
+    if (!is_number && isdigit((unsigned char) orig[0])) {
         need_quote = true;
     }
 
@@ -134,12 +134,12 @@ static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x, ig
  * \brief Write the graph to a stream in DOT format.
  *
  * </para><para>
- * DOT is the format used by the widely known GraphViz software, see
+ * DOT is the format used by the widely known Graphviz software, see
  * http://www.graphviz.org for details. The grammar of the DOT format
  * can be found here: http://www.graphviz.org/doc/info/lang.html
  *
  * </para><para>
- * This is only a preliminary implementation, no visualization
+ * This is only a preliminary implementation; no visualization
  * information is written.
  *
  * </para><para>

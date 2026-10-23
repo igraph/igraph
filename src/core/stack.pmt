@@ -102,7 +102,7 @@ igraph_int_t FUNCTION(igraph_stack, capacity)(const TYPE(igraph_stack) *s) {
 /**
  * \ingroup stack
  * \function igraph_stack_reserve
- * \brief Reserve memory.
+ * \brief Reserves memory.
  *
  * Reserve memory for future use. The actual size of the stack is
  * unchanged.
@@ -200,7 +200,7 @@ void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s) {
  * \param elem The element to push.
  * \return Error code.
  *
- * Time complexity: O(1) is no reallocation is needed, O(n)
+ * Time complexity: O(1) if no reallocation is needed, O(n)
  * otherwise, but it is ensured that n push operations are performed
  * in O(n) time.
  */
@@ -255,7 +255,7 @@ BASE FUNCTION(igraph_stack, pop)(TYPE(igraph_stack)* s) {
 /**
  * \ingroup stack
  * \function igraph_stack_top
- * \brief Query top element.
+ * \brief Queries the top element.
  *
  * Returns the top element of the stack, without removing it.
  * The stack must be non-empty.

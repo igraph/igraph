@@ -204,7 +204,8 @@ igraph_error_t igraph_i_distances_johnson(
     igraph_vector_destroy(&newweights);
     IGRAPH_FINALLY_CLEAN(1);
 
-    /* Reweight the shortest paths */
+    /* Reweight the shortest paths. The potentials were computed in the
+     * traversal direction, so the same correction applies in OUT and IN modes. */
     nr = igraph_matrix_nrow(res);
     nc = igraph_matrix_ncol(res);
 
@@ -216,14 +217,8 @@ igraph_error_t igraph_i_distances_johnson(
         if (igraph_vs_is_all(&to)) {
             igraph_int_t v2;
             for (v2 = 0; v2 < nc; v2++) {
-                igraph_real_t sub;
-                if (mode == IGRAPH_OUT) {
-                    sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
-                    MATRIX(*res, i, v2) -= sub;
-                } else {
-                    sub = MATRIX(bfres, 0, v2) - MATRIX(bfres, 0, v1);
-                    MATRIX(*res, v2, i) -= sub;
-                }
+                igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
+                MATRIX(*res, i, v2) -= sub;
             }
         } else {
             igraph_int_t j;
@@ -231,15 +226,9 @@ igraph_error_t igraph_i_distances_johnson(
             IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
             IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
             for (j = 0, IGRAPH_VIT_RESET(tovit); j < nc; j++, IGRAPH_VIT_NEXT(tovit)) {
-                igraph_real_t sub;
                 igraph_int_t v2 = IGRAPH_VIT_GET(tovit);
-                if (mode == IGRAPH_OUT) {
-                    sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
-                    MATRIX(*res, i, j) -= sub;
-                } else {
-                    sub = MATRIX(bfres, 0, v2) - MATRIX(bfres, 0, v1);
-                    MATRIX(*res, j, i) -= sub;
-                }
+                igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
+                MATRIX(*res, i, j) -= sub;
             }
             igraph_vit_destroy(&tovit);
             IGRAPH_FINALLY_CLEAN(1);

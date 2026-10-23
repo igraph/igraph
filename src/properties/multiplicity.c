@@ -151,7 +151,7 @@ early_exit:
 
 /**
  * \function igraph_has_multiple
- * \brief Check whether the graph has at least one multiple edge.
+ * \brief Checks whether the graph has at least one multiple edge.
  *
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
@@ -221,7 +221,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
 
 /**
  * \function igraph_is_multiple
- * \brief Find the multiple edges in a graph.
+ * \brief Finds the multiple edges in a graph.
  *
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
@@ -290,8 +290,8 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
  * \function igraph_count_multiple
  * \brief The multiplicity of some edges in a graph.
  *
- * An edge is called a multiple edge when there is one or more other
- * edge between the same two vertices. The multiplicity of an edge
+ * An edge is called a multiple edge when there are one or more other
+ * edges between the same two vertices. The multiplicity of an edge
  * is the number of edges between its endpoints.
  *
  * \param graph The input graph.
@@ -353,7 +353,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * \brief The multiplicity of a single edge in a graph.
  *
  * \param graph The input graph.
- * \param res Pointer to an iteger, the result will be stored here.
+ * \param res Pointer to an integer, the result will be stored here.
  * \param eid The ID of the edge to check.
  * \return Error code.
  *
@@ -395,7 +395,7 @@ igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_int_t *res,
 
 /**
  * \function igraph_is_mutual
- * \brief Check whether some edges of a directed graph are mutual.
+ * \brief Checks whether some edges of a directed graph are mutual.
  *
  * An (A,B) non-loop directed edge is mutual if the graph contains
  * the (B,A) edge too. Whether directed self-loops are considered mutual
@@ -474,7 +474,7 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
 
 /**
  * \function igraph_has_mutual
- * \brief Check whether a directed graph has any mutual edges.
+ * \brief Checks whether a directed graph has any mutual edges.
  *
  * An (A,B) non-loop directed edge is mutual if the graph contains
  * the (B,A) edge too. Whether directed self-loops are considered mutual
@@ -482,7 +482,7 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
  *
  * </para><para>
  * In undirected graphs, all edges are considered mutual by definition.
- * Thus for undirected graph, this function returns false only when there
+ * Thus for an undirected graph, this function returns false only when there
  * are no edges.
  *
  * </para><para>

@@ -199,15 +199,18 @@ namespace drl {
  * DrL is a sophisticated layout generator developed and implemented by
  * Shawn Martin et al. As of October 2012 the original DrL homepage is
  * unfortunately not available. You can read more about this algorithm
- * in the following technical report: Martin, S., Brown, W.M.,
+ * in the following technical report:
+ *
+ * </para><para>
+ * Martin, S., Brown, W.M.,
  * Klavans, R., Boyack, K.W., DrL: Distributed Recursive (Graph)
  * Layout. SAND Reports, 2008. 2936: p. 1-10.
  * </para>
  *
  * <para>
  * Only a subset of the complete DrL functionality is
- * included in igraph, parallel runs and recursive, multi-level
- * layouting is not supported.
+ * included in igraph; parallel runs and recursive, multi-level
+ * layout are not supported.
  * </para>
  *
  * <para>
@@ -416,7 +419,10 @@ igraph_error_t igraph_layout_drl_options_init(igraph_layout_drl_options_t *optio
  * The DrL layout generator
  *
  * This function implements the force-directed DrL layout generator.
- * Please see more in the following technical report: Martin, S.,
+ * Please see more in the following technical report:
+ *
+ * </para><para>
+ * Martin, S.,
  * Brown, W.M., Klavans, R., Boyack, K.W., DrL: Distributed Recursive
  * (Graph) Layout. SAND Reports, 2008. 2936: p. 1-10.
  * \param graph The input graph.

@@ -157,8 +157,8 @@ static const char *igraph_i_error_strings[] = {
     /* 57 */ NULL, // "CPU time exceeded",    /* removed in 1.0 */
     /* 58 */ "Integer or double underflow",
     /* 59 */ "Random walk got stuck",
-    /* 60 */ "Search stopped; this error should never be visible to the user, "
-    "please report this error along with the steps to reproduce it.",
+    /* 60 */ "Search stopped; this error should never be visible to the user. "
+    "Please report this error along with the steps to reproduce it.",
     /* 61 */ "Result too large",
     /* 62 */ "Input problem has no solution"
 };
@@ -168,11 +168,11 @@ static const char *igraph_i_error_strings[] = {
  * \function igraph_strerror
  * \brief Textual description of an error.
  *
- * This is a simple utility function, it gives a short general textual
+ * This is a simple utility function that gives a short general textual
  * description for an \a igraph error code.
  *
  * \param igraph_errno The \a igraph error code.
- * \return pointer to the textual description of the error code.
+ * \return Pointer to the textual description of the error code.
  */
 
 const char *igraph_strerror(const igraph_error_t igraph_errno) {
@@ -203,7 +203,7 @@ const char *igraph_strerror(const igraph_error_t igraph_errno) {
  * \param igraph_errno The \a igraph error code.
  * \return The error code (if it returns).
  *
- * \sa \ref igraph_errorf()
+ * \sa \ref igraph_errorf().
  */
 
 igraph_error_t igraph_error(const char *reason, const char *file, int line,
@@ -233,7 +233,7 @@ igraph_error_t igraph_error(const char *reason, const char *file, int line,
  *            format string.
  * \return The error code (if it returns).
  *
- * \sa \ref igraph_error()
+ * \sa \ref igraph_error().
  */
 
 igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
@@ -390,8 +390,8 @@ void IGRAPH_FINALLY_ENTER(void) {
  *
  * For internal use only.
  *
- * Exists the current level of the finally stack, see IGRAPH_FINALLY_ENTER()
- * for details. If an error occured inbetween the last pair of
+ * Exits the current level of the finally stack, see IGRAPH_FINALLY_ENTER()
+ * for details. If an error occurred between the last pair of
  * IGRAPH_FINALLY_ENTER()/EXIT() calls, a call to igraph_error(), typically
  * through IGRAPH_ERROR(), is mandatory directly after IGRAPH_FINALLY_EXIT().
  * This ensures that resource cleanup will properly resume.
@@ -418,7 +418,7 @@ static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 
  * \param reason Textual description of the warning.
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
- *         warning..
+ *         warning.
  */
 
 void igraph_warning_handler_ignore(const char *reason, const char *file, int line) {
@@ -438,7 +438,7 @@ void igraph_warning_handler_ignore(const char *reason, const char *file, int lin
  * \param reason Textual description of the warning.
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
- *         warning..
+ *         warning.
  */
 
 void igraph_warning_handler_print(const char *reason, const char *file, int line) {

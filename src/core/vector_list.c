@@ -94,10 +94,10 @@
  * the list may not contain "uninitialized" or "null" items; each item is
  * initialized when it comes to existence. If you create a list containing
  * one million vectors, you are not only allocating memory for one million
- * \ref igraph_vector_t object but you are also initializing one million
+ * \ref igraph_vector_t objects but you are also initializing one million
  * vectors. Also, if you have a list containing one million vectors and you
  * clear the list by calling \ref igraph_vector_list_clear(), the list will
- * implicitly destroy these lists, and any pointers that you may hold to the
+ * implicitly destroy these vectors, and any pointers that you may hold to the
  * items become invalid at once.</para>
  *
  * <para>Speaking about pointers, the typical way of working with vectors in

@@ -150,7 +150,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  * no superset of S with vertex connectivity greater than or equal to k.
  * Cohesive blocking is a process through which, given a
  * k-cohesive set of vertices, maximally l-cohesive subsets are
- * recursively identified with l>k. Thus a hiearchy of vertex subsets
+ * recursively identified with l>k. Thus a hierarchy of vertex subsets
  * is found, with the entire graph G at its root.
  *
  * </para><para>
@@ -163,13 +163,13 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  * </para><para>
  * J. Moody and D. R. White. Structural
  * cohesion and embeddedness: A hierarchical concept of social
- * groups. American Sociological Review, 68(1):103--127, Feb 2003.
+ * groups. American Sociological Review, 68(1):103–127, Feb 2003.
  * https://doi.org/10.2307/3088904
  *
  * \param graph The input graph. It must be undirected and simple. See
  *    \ref igraph_is_simple().
  * \param blocks If not a null pointer, then it must be an initialized
- *    list of integers vectors; the cohesive blocks will be stored here.
+ *    list of integer vectors; the cohesive blocks will be stored here.
  *    Each block is encoded with a vector of type \ref igraph_vector_int_t that
  *    contains the vertex IDs of the block.
  * \param cohesion If not a null pointer, then it must be an initialized

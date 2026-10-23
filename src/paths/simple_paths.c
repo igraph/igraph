@@ -29,7 +29,7 @@
 
 /**
  * \function igraph_get_all_simple_paths
- * \brief List all simple paths from one source.
+ * \brief Lists all simple paths from one source.
  *
  * A path is simple if its vertices are unique, i.e. no vertex is visited more
  * than once. This function returns paths in terms of their vertices and

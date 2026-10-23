@@ -43,7 +43,7 @@
  * a similar manner. G(n,m) graphs have a density of exactly
  * <code>p = m / m_max</code>, while G(n,p) graphs have <code>m = p m_max</code>
  * edges on \em average, where \c m_max is the number of vertex pairs. Indeed,
- * these two models turns out to be two sides of the same coin: both can be
+ * these two models turn out to be two sides of the same coin: both can be
  * understood as maximum entropy models with a constraint on the number of
  * edges. The G(n,m) is obtained from a sharp constraint, while G(n,p) from
  * an average constraint (soft constraint).
@@ -53,7 +53,7 @@
  * The maximum entropy framework allows for rigorous generalizations of these
  * models to various scenarios, of which igraph supports many, such as models
  * defined over directed graphs, bipartite graphs, multigraphs, or even over
- * edge-labelled graphs. Constraining edge counts between various subsets of
+ * edge-labeled graphs. Constraining edge counts between various subsets of
  * vertices yields further families of related models, such as
  * \ref igraph_sbm_game() (given connection probabilities between categories)
  * or \ref igraph_degree_sequence_game() (given incident edge counts, i.e.
@@ -417,7 +417,7 @@ static igraph_error_t gnm_simple(
  *
  * \sa \ref igraph_erdos_renyi_game_gnp() to sample from the related
  * <code>G(n, p)</code> model, which constrains the \em expected edge count;
- * \ref igraph_iea_game() to generate multigraph by assigning edges to vertex
+ * \ref igraph_iea_game() to generate multigraphs by assigning edges to vertex
  * pairs uniformly and independently;
  * \ref igraph_degree_sequence_game() to constrain the degree sequence;
  * \ref igraph_bipartite_game_gnm() for the bipartite version of this model;
@@ -497,7 +497,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
  * </para><para>
  * where \c A denotes the adjacency matrix and <code>!!</code> denotes
  * the double factorial. Here \c A is assumed to have twice the number of
- * self-loops on its diagonal. The corresponding  expression for directed
+ * self-loops on its diagonal. The corresponding expression for directed
  * graphs is
  *
  * </para><para>
@@ -643,7 +643,7 @@ static igraph_error_t gnp_edge_labeled(
  * In the <code>G(n, p)</code> Erdős-Rényi model, also known as the Gilbert model,
  * or Bernoulli random graph, a graph with \p n vertices is generated such that
  * every possible edge is included in the graph independently with probability
- * \p p. This is equivalent to a maximum entropy random graph model model with
+ * \p p. This is equivalent to a maximum entropy random graph model with
  * a constraint on the \em expected edge count. The maximum entropy view allows
  * for extending the model to multigraphs, as discussed by Park and Newman (2004),
  * section III.D. In this case, \p p is interpreted as the expected number of

@@ -50,7 +50,7 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
 
 /**
  * \function igraph_motifs_randesu
- * \brief Count the number of motifs in a graph.
+ * \brief Counts the number of motifs in a graph.
  *
  * </para><para>
  * Motifs are small weakly connected induced subgraphs of a given structure in a
@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  * \ref igraph_motifs_randesu_callback() for calling a callback function
  * for every motif found; \ref igraph_subisomorphic_lad() for finding
  * subgraphs on more than 4 (directed) or 6 (undirected) vertices;
- * \ref igraph_graph_count() to find the number of graph on a given
+ * \ref igraph_graph_count() to find the number of graphs on a given
  * number of vertices, i.e. the length of the \p hist vector.
  *
  * Time complexity: TODO.
@@ -129,7 +129,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
             histlen = 218;
             break;
         default:
-            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+            IGRAPH_ERROR("In directed graphs, only 3- and 4-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     } else {
@@ -147,7 +147,7 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
             histlen = 156;
             break;
         default:
-            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+            IGRAPH_ERROR("In undirected graphs, only 3- to 6-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     }
@@ -276,7 +276,7 @@ igraph_error_t igraph_motifs_randesu_callback(
             mul = 4;
             break;
         default:
-            IGRAPH_ERROR("In directed graphs, only 3 and 4 vertex motifs are supported.",
+            IGRAPH_ERROR("In directed graphs, only 3- and 4-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     } else {
@@ -302,7 +302,7 @@ igraph_error_t igraph_motifs_randesu_callback(
             mul = 6;
             break;
         default:
-            IGRAPH_ERROR("In undirected graphs, only 3 to 6 vertex motifs are supported.",
+            IGRAPH_ERROR("In undirected graphs, only 3- to 6-vertex motifs are supported.",
                          IGRAPH_UNIMPLEMENTED);
         }
     }
@@ -746,7 +746,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_real
 
 /**
  * \function igraph_motifs_randesu_no
- * \brief Count the total number of motifs in a graph.
+ * \brief Counts the total number of motifs in a graph.
  *
  * This function counts the total number of (weakly) connected
  * induced subgraphs on \p size vertices, without assigning isomorphism
@@ -944,7 +944,8 @@ igraph_error_t igraph_motifs_randesu_no(
  * </para><para>
  * Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
  * Structure in Sociometric Data.  American Journal of Sociology,
- * 70, 492-513.
+ * 76, 492-513.
+ * https://doi.org/10.1086/224954
  *
  * \param graph The input graph. For an undirected graph, there are no
  *    asymmetric connections.

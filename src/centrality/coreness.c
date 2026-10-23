@@ -27,8 +27,8 @@
  * \brief The coreness of the vertices in a graph.
  *
  * The k-core of a graph is a maximal subgraph in which each vertex
- * has at least degree k. (Degree here means the degree in the
- * subgraph of course.). The coreness of a vertex is the highest order
+ * has degree at least k (where degree refers to the degree in the
+ * subgraph). The coreness of a vertex is the highest order
  * of a k-core containing the vertex.
  *
  * </para><para>
@@ -42,7 +42,7 @@
  *        computation will be stored here. It will be resized as
  *        needed. For each vertex it contains the highest order of a
  *        core containing the vertex.
- * \param mode For directed graph it specifies whether to calculate
+ * \param mode For directed graphs, specifies whether to calculate
  *        in-cores, out-cores or the undirected version. It is ignored
  *        for undirected graphs. Possible values: \c IGRAPH_ALL
  *        undirected version, \c IGRAPH_IN in-cores, \c IGRAPH_OUT

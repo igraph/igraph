@@ -31,7 +31,7 @@
  * \brief Generates a random dot product graph.
  *
  * In this model, each vertex is represented by a latent
- * position vector. Probability of an edge between two vertices are given
+ * position vector. The probability of an edge between two vertices is given
  * by the dot product of their latent position vectors.
  *
  * </para><para>

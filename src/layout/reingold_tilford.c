@@ -666,7 +666,7 @@ igraph_error_t igraph_roots_for_tree_layout(
  *
  * </para><para>
  * Arranges the nodes in a tree where the given node is used as the root.
- * The tree is directed downwards and the parents are centered above its
+ * The tree is directed downwards and the parents are centered above their
  * children. For the exact algorithm, see:
  *
  * </para><para>
@@ -701,7 +701,7 @@ igraph_error_t igraph_roots_for_tree_layout(
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
  *   considered if not a null pointer and the \p roots argument is also given
- *   (and it is not a null pointer of an empty vector).
+ *   (and it is not a null pointer or an empty vector).
  * \return Error code.
  *
  * Added in version 0.2.

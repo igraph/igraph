@@ -172,7 +172,7 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
  * The following arguments are passed to the callback:
  * \param membership The actual membership vector, before recording
  *    the potential change implied by the newly found eigenvalue.
- * \param comm The id of the community that the algorithm tried to
+ * \param comm The ID of the community that the algorithm tried to
  *    split in the last iteration. The community IDs are indexed from
  *    zero here!
  * \param eigenvalue The eigenvalue the algorithm has just found.
@@ -182,7 +182,7 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
  *    igraph_arpack_rssolve() to solve the last eigenproblem.
  * \param arpack_extra The extra argument that was passed to the
  *    ARPACK solver.
- * \param extra Extra argument that as passed to \ref
+ * \param extra Extra argument that was passed to \ref
  *    igraph_community_leading_eigenvector().
  *
  * \sa \ref igraph_community_leading_eigenvector(), \ref

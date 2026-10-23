@@ -47,7 +47,7 @@
  * \ref igraph_vs_all() is the general \em concept of selecting all vertices
  * of a graph. A vertex selector is then a way to specify the class of vertices
  * to be visited. The selector might specify that all vertices of a graph or
- * all the neighbours of a vertex are to be visited. A vertex selector is a
+ * all the neighbors of a vertex are to be visited. A vertex selector is a
  * way of saying that you want to visit a bunch of vertices, as opposed to a
  * vertex iterator which is a concrete plan for visiting each of the
  * chosen vertices of a specific graph.</para>
@@ -303,7 +303,7 @@ igraph_vs_t igraph_vss_1(igraph_int_t vid) {
  * This function makes it possible to handle an \type igraph_vector_int_t
  * temporarily as a vertex selector. The vertex selector should be
  * thought of as a \em view into the vector. If you make changes to
- * the vector that also affects the vertex selector. Destroying the
+ * the vector, that also affects the vertex selector. Destroying the
  * vertex selector does not destroy the vector. Do not destroy the
  * vector before destroying the vertex selector, or you might get
  * strange behavior. Since selectors are not tied to any specific
@@ -350,15 +350,15 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_int_t *v) {
 
 /**
  * \function igraph_vs_vector_small
- * \brief Create a vertex set by giving its elements.
+ * \brief Creates a vertex set by giving its elements.
  *
  * This function can be used to create a vertex selector with a few
- * of vertices. Do not forget to include a <code>-1</code> after the
+ * vertices. Do not forget to include a <code>-1</code> after the
  * last vertex ID. The behavior of the function is undefined if you
  * don't use a <code>-1</code> properly.
  *
  * </para><para>
- * Note that the vertex IDs supplied will be parsed as value of type
+ * Note that the vertex IDs supplied will be parsed as values of type
  * \type int so you cannot supply arbitrarily large (too
  * large for \type int) vertex IDs here.
  *
@@ -492,7 +492,7 @@ igraph_vs_t igraph_vss_range(igraph_int_t start, igraph_int_t end) {
 
 /**
  * \function igraph_vs_destroy
- * \brief Destroy a vertex set.
+ * \brief Destroys a vertex set.
  *
  * This function should be called for all vertex selectors when they
  * are not needed. The memory allocated for the vertex selector will
@@ -526,7 +526,7 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
 
 /**
  * \function igraph_vs_is_all
- * \brief Check whether all vertices are included.
+ * \brief Checks whether all vertices are included.
  *
  * This function checks whether the vertex selector object was created
  * by \ref igraph_vs_all() or \ref igraph_vss_all(). Note that the
@@ -692,7 +692,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  *
  * </para><para>
  * The same vertex selector object can be used to instantiate any
- * number vertex iterators.
+ * number of vertex iterators.
  *
  * \param graph An \type igraph_t object, a graph.
  * \param vs A vertex selector object.
@@ -904,13 +904,13 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
  *        \cli IGRAPH_EDGEORDER_ID
  *        Edge ID order; currently performs the fastest.
  *        \cli IGRAPH_EDGEORDER_FROM
- *        Vertex ID order, the id of the \em source vertex counts for directed
+ *        Vertex ID order, the ID of the \em source vertex counts for directed
  *        graphs. The order of the incident edges of a given vertex is arbitrary.
  *        \cli IGRAPH_EDGEORDER_TO
  *        Vertex ID order, the ID of the \em target vertex counts for directed
  *        graphs. The order of the incident edges of a given vertex is arbitrary.
  *        \endclist
- *        For undirected graph the latter two is the same.
+ *        For undirected graphs, the latter two are the same.
  * \return Error code.
  * \sa \ref igraph_ess_all(), \ref igraph_es_destroy()
  *
@@ -1046,7 +1046,7 @@ igraph_error_t igraph_es_1(igraph_es_t *es, igraph_int_t eid) {
 
 /**
  * \function igraph_ess_1
- * \brief Immediate version of the single edge edge selector.
+ * \brief Immediate version of the single-edge selector.
  *
  * \param eid The ID of the edge.
  * \return The edge selector.
@@ -1064,7 +1064,7 @@ igraph_es_t igraph_ess_1(igraph_int_t eid) {
 
 /**
  * \function igraph_es_vector
- * \brief Handle a vector as an edge selector.
+ * \brief Handles a vector as an edge selector.
  *
  * Creates an edge selector which serves as a view into a vector
  * containing edge IDs. Do not destroy the vector before destroying
@@ -1433,7 +1433,7 @@ void igraph_es_destroy(igraph_es_t *es) {
 
 /**
  * \function igraph_es_is_all
- * \brief Check whether an edge selector includes all edges.
+ * \brief Checks whether an edge selector includes all edges.
  *
  * \param es Pointer to an edge selector object.
  * \return \c true if \p es was created with \ref
@@ -1486,7 +1486,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
 
 /**
  * \function igraph_es_as_vector
- * \brief Transform edge selector into vector.
+ * \brief Transforms an edge selector into a vector.
  *
  * </para><para>
  * Call this function on an edge selector to transform it into a vector.

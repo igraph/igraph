@@ -30,9 +30,9 @@ IGRAPH_BEGIN_C_DECLS
  * \section interrupthandlers Interruption handlers
  *
  * <para>
- * \a igraph is designed to be embeddable into several higher level
+ * \a igraph is designed to be embeddable into several higher-level
  * languages (R and Python interfaces are included in the original
- * package). Since most higher level languages consider internal \a igraph
+ * package). Since most higher-level languages consider internal \a igraph
  * calls as atomic, interruption requests (like Ctrl-C in Python) must
  * be handled differently depending on the environment \a igraph embeds
  * into.</para>
@@ -87,7 +87,7 @@ IGRAPH_BEGIN_C_DECLS
  * \a igraph functions. If the calculation is expected to take a long time
  * in large graphs (a simple rule of thumb is to assume this for every
  * function with a time complexity of at least O(n^2)), call
- * \ref IGRAPH_ALLOW_INTERRUPTION in regular intervals like every 10th
+ * \ref IGRAPH_ALLOW_INTERRUPTION at regular intervals like every 10th
  * iteration or so.
  * </para>
  */

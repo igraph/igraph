@@ -769,7 +769,7 @@ igraph_error_t edge_switching(
  *          where \c A denotes the adjacency matrix and <code>!!</code> denotes
  *          the double factorial. Here \c A is assumed to have twice the number of
  *          self-loops on its diagonal.
- *          The corresponding  expression for directed graphs is
+ *          The corresponding expression for directed graphs is
  *          <code>(\prod_{i,j} A_{ij}!)^{-1}</code>.
  *          Thus the probability of all simple graphs (which only have 0s and 1s
  *          in the adjacency matrix) is the same, while that of

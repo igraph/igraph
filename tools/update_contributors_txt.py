@@ -7,13 +7,13 @@ from pathlib import Path
 
 
 HEADER = """\
-Thanks goes to these wonderful people:
+Thanks go to these wonderful people:
 
 """
 
 FOOTER = """\
 
-This project follows the [all-contributors][1] specification. Contributions of any kind welcome!
+This project follows the [all-contributors][1] specification. Contributions of any kind are welcome!
 
 This file is an automatically generated, plain-text version of CONTRIBUTORS.md.
 

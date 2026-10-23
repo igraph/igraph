@@ -91,9 +91,9 @@ static IGRAPH_THREAD_LOCAL igraph_arpack_options_t igraph_i_arpack_options_defau
 
 /**
  * \function igraph_arpack_options_init
- * \brief Initialize ARPACK options.
+ * \brief Initializes ARPACK options.
  *
- * Initializes ARPACK options, set them to default values.
+ * Initializes ARPACK options, setting them to default values.
  * You can always pass the initialized \ref igraph_arpack_options_t
  * object to built-in igraph functions without any modification. The
  * built-in igraph functions modify the options to perform their
@@ -158,13 +158,13 @@ igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
 
 /**
  * \function igraph_arpack_storage_init
- * \brief Initialize ARPACK storage.
+ * \brief Initializes ARPACK storage.
  *
  * You only need this function if you want to run multiple eigenvalue
  * calculations using ARPACK, and want to spare the memory
  * allocation/deallocation between each two runs. Otherwise it is safe
  * to supply a null pointer as the \c storage argument of both \ref
- * igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() to make
+ * igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() to have
  * memory allocated and deallocated automatically.
  *
  * </para><para>
@@ -173,8 +173,8 @@ igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
  *
  * \param s The \ref igraph_arpack_storage_t object to initialize.
  * \param maxn The maximum order of the matrices.
- * \param maxncv The maximum NCV parameter intended to use.
- * \param maxldv The maximum LDV parameter intended to use.
+ * \param maxncv The maximum NCV parameter you intend to use.
+ * \param maxldv The maximum LDV parameter you intend to use.
  * \param symm Whether symmetric or non-symmetric problems will be
  *    solved using this \ref igraph_arpack_storage_t. (You cannot use
  *    the same storage both with symmetric and non-symmetric solvers.)
@@ -234,7 +234,7 @@ igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_int
 
 /**
  * \function igraph_arpack_storage_destroy
- * \brief Deallocate ARPACK storage.
+ * \brief Deallocates ARPACK storage.
  *
  * \param s The \ref igraph_arpack_storage_t object for which the
  *    memory will be deallocated.
@@ -838,7 +838,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
  *     pointer. In the latter case memory allocation and deallocation
  *     is performed automatically. Either this or the \p vectors argument
  *     must be non-null if the ARPACK iteration is started from a
- *     given starting vector. If both are given \p vectors take
+ *     given starting vector. If both are given \p vectors takes
  *     precedence.
  * \param values If not a null pointer, then it should be a pointer to an
  *     initialized vector. The eigenvalues will be stored here. The
@@ -848,7 +848,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
  *     columns of the matrix. The matrix will be resized as needed.
  *     Either this or the \p storage argument must be non-null if the
  *     ARPACK iteration is started from a given starting vector. If
- *     both are given \p vectors take precedence.
+ *     both are given \p vectors takes precedence.
  * \return Error code.
  *
  * Time complexity: depends on the matrix-vector
@@ -1090,7 +1090,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
  * \brief ARPACK solver for non-symmetric matrices.
  *
  * Please always consider calling \ref igraph_arpack_rssolve() if your
- * matrix is symmetric, it is much faster.
+ * matrix is symmetric; it is much faster.
  * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
  * </para><para>
  * Note that ARPACK is not called for 2x2 matrices as an exact algebraic
@@ -1388,9 +1388,9 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  * (usually). The other problem is that the solver might return more
  * eigenvalues than requested. The common use of this function is to
  * call it directly after \ref igraph_arpack_rnsolve with its \p
- * vectors and \p values argument and \c options->nev as \p nev.
+ * vectors and \p values arguments and \c options->nev as \p nev.
  * This will add the vectors for eigenvalues with a negative imaginary
- * part and return all vectors as 2 columns, a real and imaginary part.
+ * part and return all vectors as two columns, containing the real and imaginary parts.
  * \param vectors The eigenvector matrix, as returned by \ref
  *   igraph_arpack_rnsolve. It will be resized, typically it will be
  *   larger.
@@ -1398,7 +1398,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  *   igraph_arpack_rnsolve. It will be resized, typically extra,
  *   unneeded rows (=eigenvalues) will be removed.
  * \param nev The number of eigenvalues/vectors to keep. Can be less
- *   or equal than the number originally requested from ARPACK.
+ *   than or equal to the number originally requested from ARPACK.
  * \return Error code.
  *
  * Time complexity: linear in the number of elements in the \p vectors
@@ -1606,7 +1606,7 @@ static const char* igraph_i_arpack_error_strings[] = {
 
 /**
  * \function igraph_arpack_error_to_string
- * \brief Convert an ARPACK error code to a human-readable representation.
+ * \brief Converts an ARPACK error code to a human-readable representation.
  */
 const char* igraph_arpack_error_to_string(igraph_arpack_error_t error) {
     if (error == IGRAPH_ARPACK_NO_ERROR) {

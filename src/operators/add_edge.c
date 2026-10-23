@@ -32,11 +32,11 @@
  *
  * </para><para>
  * Note that if you want to add many edges to a big graph, then it is
- * inefficient to add them one by one, it is better to collect them into
+ * inefficient to add them one by one; it is better to collect them into
  * a vector and add all of them via a single \ref igraph_add_edges() call.
  * \param graph The graph.
- * \param from The id of the first vertex of the edge.
- * \param to The id of the second vertex of the edge.
+ * \param from The ID of the first vertex of the edge.
+ * \param to The ID of the second vertex of the edge.
  * \return Error code.
  *
  * \sa \ref igraph_add_edges() to add many edges, \ref

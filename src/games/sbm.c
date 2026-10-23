@@ -32,7 +32,7 @@
 
 /**
  * \function igraph_sbm_game
- * \brief Sample from a stochastic block model.
+ * \brief Samples from a stochastic block model.
  *
  * This function samples graphs from a stochastic block model, a generalization
  * of the G(n,p) model where the connection probability p (or expected number
@@ -49,7 +49,7 @@
  * </para><para>
  * Faust, K., &amp; Wasserman, S. (1992a).
  * Blockmodels: Interpretation and evaluation.
- * Social Networks, 14, 5-–61.
+ * Social Networks, 14, 5–61.
  * https://doi.org/10.1016/0378-8733(92)90013-W
  *
  * \param graph The output graph. This should be a pointer to an
@@ -271,7 +271,7 @@ igraph_error_t igraph_sbm_game(
  *        within a block. Must sum up to 1, and rho * m must be integer
  *        for all elements of rho.
  * \param C A square, symmetric numeric matrix, the Bernoulli rates for
- *        the clusters within a block. Its size must mach the size of the
+ *        the clusters within a block. Its size must match the size of the
  *        \p rho vector.
  * \param p The Bernoulli rate of connections between
  *        vertices in different blocks.
@@ -328,7 +328,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_int_t n,
     for (i = 0; i < k; i++) {
         igraph_real_t s = VECTOR(*rho)[i] * m;
         if (fabs(round(s) - s) > sq_dbl_epsilon) {
-            IGRAPH_ERROR("`rho' * `m' is not integer in HSBM", IGRAPH_EINVAL);
+            IGRAPH_ERROR("`rho' * `m' is not an integer in HSBM", IGRAPH_EINVAL);
         }
     }
 
@@ -479,7 +479,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
     }
     if (igraph_matrix_list_size(Clist) != no_blocks &&
         igraph_vector_int_size(mlist) != no_blocks) {
-        IGRAPH_ERROR("`rholist' must have same length as `Clist' and `m' "
+        IGRAPH_ERROR("`rholist' must have the same length as `Clist' and `m' "
                      "for HSBM.", IGRAPH_EINVAL);
     }
     if (p < 0 || p > 1) {
@@ -533,7 +533,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_int_t n,
         for (j = 0; j < k; j++) {
             igraph_real_t s = VECTOR(*rho)[j] * m;
             if (fabs(round(s) - s) > sq_dbl_epsilon) {
-                IGRAPH_ERROR("`rho' * `m' is not integer in HSBM.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("`rho' * `m' is not an integer in HSBM.", IGRAPH_EINVAL);
             }
         }
     }

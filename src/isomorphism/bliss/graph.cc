@@ -1586,7 +1586,7 @@ AbstractGraph::search(const bool canonical,
 #if defined(BLISS_VERIFY_AUTOMORPHISMS)
         /* Verify that it really is an automorphism */
         if(!is_automorphism(best_path_automorphism))
-          fatal_error("Best path automorhism validation check failed");
+          fatal_error("Best path automorphism validation check failed");
 #endif
 
         unsigned int gca_level_with_first = 0;
@@ -1907,7 +1907,7 @@ void
 Digraph::add_edge(const unsigned int vertex1, const unsigned int vertex2)
 {
   if(vertex1 >= vertices.size() or vertex2 >= vertices.size())
-    throw std::runtime_error("out of bounds vertex number");
+    throw std::runtime_error("out-of-bounds vertex number");
   //assert(vertex1 < get_nof_vertices());
   //assert(vertex2 < get_nof_vertices());
   vertices[vertex1].add_edge_to(vertex2);
@@ -3718,7 +3718,7 @@ Graph::add_edge(const unsigned int vertex1, const unsigned int vertex2)
 {
   //fprintf(stderr, "(%u,%u) ", vertex1, vertex2);
   if(vertex1 >= vertices.size() or vertex2 >= vertices.size())
-    throw std::runtime_error("out of bounds vertex number");
+    throw std::runtime_error("out-of-bounds vertex number");
   vertices[vertex1].add_edge(vertex2);
   vertices[vertex2].add_edge(vertex1);
 }

@@ -262,11 +262,11 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
 
 /**
  * \function igraph_famous
- * \brief Create a famous graph by simply providing its name.
+ * \brief Creates a famous graph by simply providing its name.
  *
  * </para><para>
  * The name of the graph can be simply supplied as a string.
- * Note that this function creates graphs which don't take any parameters,
+ * Note that this function creates graphs which don't take any parameters;
  * there are separate functions for graphs with parameters, e.g. \ref
  * igraph_full() for creating a full graph.
  *
@@ -299,8 +299,8 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           vertices, 20 and 40 edges. A semisymmetric graph is
  *           regular, edge transitive and not vertex transitive.
  *   \cli Franklin
- *           This is a graph whose embedding to the Klein
- *           bottle can be colored with six colors, it is a
+ *           This is a graph whose embedding on the Klein
+ *           bottle can be colored with six colors; it is a
  *           counterexample to the necessity of the Heawood
  *           conjecture on a Klein bottle. It has 12 vertices and 18
  *           edges.
@@ -327,7 +327,7 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           unique such graph on 11 nodes, and has 18 edges.
  *   \cli House
  *           The house graph is a 5-vertex, 6-edge graph, the
- *           schematic draw of a house if drawn properly, basically a
+ *           schematic drawing of a house if drawn properly, basically a
  *           triangle on top of a square.
  *   \cli HouseX
  *           The same as the house graph with an X in the square. 5
@@ -339,13 +339,14 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           A social network with 10 vertices and 18 edges.
  *           Krackhardt, D. Assessing the Political Landscape:
  *           Structure, Cognition, and Power in Organizations.
- *           Admin. Sci. Quart. 35, 342-369, 1990.
+ *           Admin. Sci. Quart. 35, 342–369, 1990.
+ *           https://doi.org/10.2307/2393394
  *   \cli Levi
- *           The graph is a 4-arc transitive cubic graph, it has
+ *           The graph is a 4-arc transitive cubic graph; it has
  *           30 vertices and 45 edges.
  *   \cli McGee
  *           The McGee graph is the unique 3-regular 7-cage
- *           graph, it has 24 vertices and 36 edges.
+ *           graph; it has 24 vertices and 36 edges.
  *   \cli Meredith
  *           The Meredith graph is a quartic graph on 70
  *           nodes and 140 edges that is a counterexample to the conjecture that
@@ -380,7 +381,7 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           vertices and 6 edges.
  *   \cli Thomassen
  *           The smallest hypotraceable graph,
- *           on 34 vertices and 52 edges. A hypotracable graph does
+ *           on 34 vertices and 52 edges. A hypotraceable graph does
  *           not contain a Hamiltonian path but after removing any
  *           single vertex from it the remainder always contains a
  *           Hamiltonian path. A graph containing a Hamiltonian path
@@ -403,12 +404,13 @@ static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_int_t *data)
  *           karate club at a US university in the 1970s. See
  *           W. W. Zachary, An information flow model for conflict and
  *           fission in small groups, Journal of Anthropological
- *           Research 33, 452-473 (1977).
+ *           Research 33, 452–473 (1977).
+ *           https://doi.org/10.1086/jar.33.4.3629752
  * \endclist
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param name Character constant, the name of the graph to be
- *     created, it is case insensitive.
+ *     created. It is case-insensitive.
  * \return Error code, \c IGRAPH_EINVAL if there is no graph with the
  *     given name.
  *

@@ -97,14 +97,14 @@ static igraph_error_t check_expected_degrees(const igraph_vector_t *weights) {
  * original Chung-Lu model cannot produce certain (large) expected degrees.
  *
  * </para><para>
- * The overcome this limitation, this function implements additional variants of
+ * To overcome this limitation, this function implements additional variants of
  * the model, with modified expressions for the connection probability \c p_ij
  * between vertices \c i and \c j. Let <code>q_ij = w_i w_j / S</code>, or
  * <code>q_ij = w^out_i w^in_j / S</code> in the directed case. All model
  * variants become equivalent in the limit of sparse graphs where \c q_ij
  * approaches zero. In the original Chung-Lu model, selectable by setting
  * \p variant to \c IGRAPH_CHUNG_LU_ORIGINAL, <code>p_ij = min(q_ij, 1)</code>.
- * The \c IGRAPH_CHUNG_LU_MAXENT variant, sometiems referred to a the generalized
+ * The \c IGRAPH_CHUNG_LU_MAXENT variant, sometimes referred to as the generalized
  * random graph, uses <code>p_ij = q_ij / (1 + q_ij)</code>, and is equivalent
  * to a maximum entropy model (i.e. exponential random graph model) with
  * a constraint on expected degrees; see Park and Newman (2004), Section B,
@@ -224,7 +224,7 @@ igraph_error_t igraph_chung_lu_game(igraph_t *graph,
         IGRAPH_CHECK(check_expected_degrees(in_weights));
 
         if (igraph_vector_sum(in_weights) != wsum) {
-            IGRAPH_ERRORF("Sum of out- and in-weights must be the same, got %g and %g, respectively.",
+            IGRAPH_ERRORF("Sums of out- and in-weights must be the same, got %g and %g, respectively.",
                           IGRAPH_EINVAL, wsum, igraph_vector_sum(in_weights));
         }
     }

@@ -34,7 +34,7 @@
 
 /**
  * \function igraph_community_optimal_modularity
- * \brief Calculate the community structure with the highest modularity value.
+ * \brief Calculates the community structure with the highest modularity value.
  *
  * This function calculates the optimal community structure for a graph, in
  * terms of maximal modularity score. Both undirected and directed graphs
@@ -45,14 +45,14 @@
  * into an integer programming problem, and then calling the GLPK
  * library to solve that. Please see Ulrik Brandes et al.: On
  * Modularity Clustering, IEEE Transactions on Knowledge and Data
- * Engineering 20(2):172-188, 2008
+ * Engineering 20(2):172–188, 2008
  * https://doi.org/10.1109/TKDE.2007.190689.
  *
  * </para><para>
  * Note that exact modularity optimization is an NP-complete problem, and
  * all known algorithms for it have exponential time complexity. This
  * means that you probably don't want to run this function on larger
- * graphs. Graphs with up to fifty vertices should be fine, graphs
+ * graphs. Graphs with up to fifty vertices should be fine; graphs
  * with a couple of hundred vertices might be possible.
  *
  * \param graph The input graph. It may be undirected or directed.
@@ -63,7 +63,7 @@
  *        smaller communities. Set it to 1 to use the classical definition of
  *        modularity.
  * \param modularity Pointer to a real number, or a null pointer.
- *        If it is not a null pointer, then a optimal modularity value
+ *        If it is not a null pointer, then an optimal modularity value
  *        is returned here.
  * \param membership Pointer to a vector, or a null pointer. If not a
  *        null pointer, then the membership vector of the optimal
@@ -283,7 +283,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     }
 
     if (membership) {
-        igraph_int_t comm = 0;   /* id of the last community that was found */
+        igraph_int_t comm = 0;   /* ID of the last community that was found */
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
 

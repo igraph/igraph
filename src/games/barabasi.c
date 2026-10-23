@@ -499,7 +499,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *          works for any power and A values.
  *        \cli IGRAPH_BARABASI_PSUMTREE_MULTIPLE
  *          This algorithm also uses a partial prefix-sum tree to
- *          generate the graph. The difference is, that now multiple
+ *          generate the graph. The difference is that now multiple
  *          edges are allowed. This method was implemented under the
  *          name \c igraph_nonlinear_barabasi_game before version 0.6.
  *        \endclist

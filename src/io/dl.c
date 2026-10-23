@@ -49,12 +49,12 @@ void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
  * are added as attributes. (If an attribute handler is attached.)
  *
  * </para><para> Note the specification does not mention whether the
- * format is case sensitive or not. For igraph DL files are case
+ * format is case-sensitive or not. For igraph DL files are case
  * sensitive, i.e. \c Larry and \c larry are not the same.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read the DL file from.
- * \param directed Boolean, whether to create a directed file.
+ * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
  * Time complexity: linear in terms of the number of edges and

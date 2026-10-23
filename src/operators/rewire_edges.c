@@ -202,7 +202,7 @@ static igraph_error_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_
  *
  * \param graph The input graph, this will be rewired, it can be
  *    directed or undirected.
- * \param prob The rewiring probability a constant between zero and
+ * \param prob The rewiring probability, a constant between zero and
  *    one (inclusive).
  * \param allowed_edge_types Controls whether multi-edges and self-loops
  *     are allowed in the new graph. See \ref igraph_edge_type_sw_t.

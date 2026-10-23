@@ -64,7 +64,7 @@
  * \ref igraph_neighborhood_graphs() for creating separate graphs from
  * the neighborhoods.
  *
- * Time complexity: O(n*d*o), where n is the number vertices for which
+ * Time complexity: O(n*d*o), where n is the number of vertices for which
  * the calculation is performed, d is the average degree, o is the order.
  */
 igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int_t *res,
@@ -165,7 +165,7 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
 
 /**
  * \function igraph_neighborhood
- * \brief Calculate the neighborhood of vertices.
+ * \brief Calculates the neighborhood of vertices.
  *
  * The neighborhood of a given order of a vertex includes all vertices
  * which are closer to the vertex than the order. I.e., order 0 is
@@ -304,10 +304,10 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
 
 /**
  * \function igraph_neighborhood_graphs
- * \brief Create graphs from the neighborhood(s) of some vertex/vertices.
+ * \brief Creates graphs from the neighborhood(s) of some vertex/vertices.
  *
  * The neighborhood of a given order of a vertex includes all vertices
- * which are closer to the vertex than the order. Ie. order 0 is
+ * which are closer to the vertex than the order. I.e., order 0 is
  * always the vertex itself, order 1 is the vertex plus its immediate
  * neighbors, order 2 is order 1 plus the immediate neighbors of the
  * vertices in order 1, etc.
@@ -345,7 +345,7 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
  * sizes only; \ref igraph_neighborhood() for calculating the
  * neighborhoods (but not creating graphs).
  *
- * Time complexity: O(n*(|V|+|E|)), where n is the number vertices for
+ * Time complexity: O(n*(|V|+|E|)), where n is the number of vertices for
  * which the calculation is performed, |V| and |E| are the number of
  * vertices and edges in the original input graph.
  */

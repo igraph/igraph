@@ -28,10 +28,10 @@
 
 /**
  * \function igraph_kautz
- * \brief Generate a Kautz graph.
+ * \brief Generates a Kautz graph.
  *
- * A Kautz graph is a labeled graph, vertices are labeled by strings
- * of length \c n+1 above an alphabet with \c m+1 letters, with
+ * A Kautz graph is a labeled graph. Vertices are labeled by strings
+ * of length <code>n + 1</code> over an alphabet with <code>m + 1</code> letters, with
  * the restriction that every two consecutive letters in the string
  * must be different. There is a directed edge from a vertex \c v to
  * another vertex \c w if it is possible to transform the string of
@@ -40,7 +40,7 @@
  * cannot equal the old letter, so there are no loops.
  *
  * </para><para>
- * Kautz graphs have some interesting properties, see e.g. Wikipedia
+ * Kautz graphs have some interesting properties; see, e.g., Wikipedia
  * for details.
  *
  * </para><para>
@@ -48,8 +48,8 @@
  * thanks.
  * \param graph Pointer to an uninitialized graph object, the result
  * will be stored here.
- * \param m Integer, \c m+1 is the number of letters in the alphabet.
- * \param n Integer, \c n+1 is the length of the strings.
+ * \param m Integer, <code>m + 1</code> is the number of letters in the alphabet.
+ * \param n Integer, <code>n + 1</code> is the length of the strings.
  * \return Error code.
  *
  * \sa \ref igraph_de_bruijn().

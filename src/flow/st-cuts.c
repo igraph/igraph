@@ -61,20 +61,23 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  * to <code>j'</code>.
  *
  * </para><para>This reduction is used in the paper (observation 2):
+ *
+ * </para><para>
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
+ * https://doi.org/10.1002/net.3230230604
  *
  * </para><para>The original paper where this reduction was conceived is
  * Shimon Even and R. Endre Tarjan: Network Flow and Testing Graph
  * Connectivity, SIAM J. Comput., 4(4), 507–518.
  * https://doi.org/10.1137/0204043
  *
- * \param graph A graph. Although directness is not checked, this function
+ * \param graph A graph. Although directedness is not checked, this function
  *        is commonly used only on directed graphs.
  * \param graphbar Pointer to a new directed graph that will contain the
  *        reduction, with twice as many vertices and edges.
  * \param capacity Pointer to an initialized vector or a null pointer. If
- *        not a null pointer, then it will be filled the capacity from
+ *        not a null pointer, then it will be filled with the capacities from
  *        the reduction: the first |E| elements are 1, the remaining |E|
  *        are equal to |V| (which is used to indicate infinity).
  * \return Error code.
@@ -384,7 +387,7 @@ static igraph_int_t igraph_i_dominator_EVAL(igraph_int_t v,
  * root) vertex r, such that for any vertex v, there is a path from r
  * to v. A vertex v dominates another vertex w (not equal to v), if
  * every path from r to w contains v. Vertex v is the immediate
- * dominator or w, v=idom(w), if v dominates w and every other
+ * dominator of w, v=idom(w), if v dominates w and every other
  * dominator of w dominates v. The edges {(idom(w), w)| w is not r}
  * form a directed tree, rooted at r, called the dominator tree of the
  * graph. Vertex v dominates vertex w if and only if v is an ancestor
@@ -1008,8 +1011,9 @@ static igraph_error_t igraph_provan_shier_list(
  * vertex. Every cut is listed exactly once. The implemented algorithm
  * is described in JS Provan and DR Shier: A Paradigm for listing
  * (s,t)-cuts in graphs, Algorithmica 15, 351--372, 1996.
+ * https://doi.org/10.1007/BF01961544
  *
- * \param graph The input graph, is must be directed.
+ * \param graph The input graph, it must be directed.
  * \param cuts An initialized list of integer vectors, the cuts are stored
  *        here. Each vector will contain the IDs of the edges in
  *        the cut. This argument is ignored if it is a null pointer.
@@ -1019,8 +1023,8 @@ static igraph_error_t igraph_provan_shier_list(
  *        a set, then all edges going from X to the complement of X
  *        form an (s, t) edge-cut in the graph. This argument is
  *        ignored if it is a null pointer.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \return Error code.
  *
  * Time complexity: O(n(|V|+|E|)), where |V| is the number of
@@ -1301,24 +1305,25 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * This function lists all edge cuts between two vertices, in a directed graph,
  * with minimum total capacity. Possibly, multiple cuts may have the same total
  * capacity, although there is often only one minimum cut in weighted graphs.
- * It is recommended to supply integer-values capacities. Otherwise, not all
+ * It is recommended to supply integer-valued capacities. Otherwise, not all
  * minimum cuts may be detected because of numerical roundoff errors.
  * The implemented algorithm is described in JS Provan and DR
  * Shier: A Paradigm for listing (s,t)-cuts in graphs, Algorithmica 15,
  * 351--372, 1996.
+ * https://doi.org/10.1007/BF01961544
  *
  * \param graph The input graph, it must be directed.
  * \param value Pointer to a real number or \c NULL. The value of the minimum cut
  *        is stored here, unless it is a null pointer.
- * \param cuts Pointer to initialized list of integer vectors or \c NULL.
- *        The cuts are stored here as lists of vertex IDs.
+ * \param cuts Pointer to an initialized list of integer vectors or \c NULL.
+ *        The cuts are stored here as lists of edge IDs.
  * \param partition1s Pointer to an initialized list of integer vectors or \c NULL.
  *        The list of vertex sets, generating the actual edge cuts, are stored
  *        here. Each vector contains a set of vertex IDs. If X is such
  *        a set, then all edges going from X to the complement of X
  *        form an (s,t) edge-cut in the graph.
- * \param source The id of the source vertex.
- * \param target The id of the target vertex.
+ * \param source The ID of the source vertex.
+ * \param target The ID of the target vertex.
  * \param capacity Vector of edge capacities. All capacities must be
  *        strictly positive. If this is a null pointer, then all edges
  *        are assumed to have capacity one.

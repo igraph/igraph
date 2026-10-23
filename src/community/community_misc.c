@@ -51,7 +51,7 @@
 
 /**
  * \function igraph_community_to_membership
- * \brief Cut a dendrogram after a given number of merges.
+ * \brief Cuts a dendrogram after a given number of merges.
  *
  * This function creates a membership vector from a dendrogram whose leaves
  * are individual vertices by cutting it at the specified level. It produces
@@ -79,8 +79,8 @@
  *
  * </para><para>
  * If \p merges is not a complete dendrogram, it is possible to
- * take \p steps steps if \p steps is not bigger than the number
- * lines in \p merges.
+ * take \p steps steps if \p steps is not bigger than the number of
+ * rows in \p merges.
  *
  * \param merges The two-column matrix containing the merge operations.
  * \param nodes The number of leaf nodes in the dendrogram.
@@ -399,7 +399,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  *
  * This function assesses the distance between two community structures
  * using the variation of information (VI) metric of Meila (2003), the
- * normalized mutual information (NMI) of Danon et al (2005), the
+ * normalized mutual information (NMI) of Danon et al. (2005), the
  * split-join distance of van Dongen (2000), the Rand index of Rand (1971)
  * or the adjusted Rand index of Hubert and Arabie (1985).
  *
@@ -490,12 +490,12 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  *
  * </para><para>
  * Rand WM: Objective criteria for the evaluation of clustering methods.
- * J Am Stat Assoc 66(336):846-850, 1971.
+ * J Am Stat Assoc 66(336):846–850, 1971.
  * https://doi.org/10.2307/2284239
  *
  * </para><para>
  * Hubert L and Arabie P: Comparing partitions. Journal of Classification
- * 2:193-218, 1985.
+ * 2:193–218, 1985.
  * https://doi.org/10.1007/BF01908075
  *
  * \param  comm1   the membership vector of the first community structure
@@ -505,7 +505,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  *                 selects the variation of information (VI) metric of
  *                 Meila (2003), \c IGRAPH_COMMCMP_NMI selects the
  *                 normalized mutual information measure proposed by
- *                 Danon et al (2005), \c IGRAPH_COMMCMP_SPLIT_JOIN
+ *                 Danon et al. (2005), \c IGRAPH_COMMCMP_SPLIT_JOIN
  *                 selects the split-join distance of van Dongen (2000),
  *                 \c IGRAPH_COMMCMP_RAND selects the unadjusted Rand
  *                 index (1971) and \c IGRAPH_COMMCMP_ADJUSTED_RAND
@@ -584,14 +584,14 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
  * First, each set in partition A is evaluated against all sets in partition
  * B. For each set in partition A, the best matching set in partition B is
  * found and the overlap size is calculated. (Matching is quantified by the
- * size of the overlap between the two sets). Then, the maximal overlap sizes
+ * size of the overlap between the two sets.) Then, the maximal overlap sizes
  * for each set in A are summed together and subtracted from the number of
  * elements in A.
  *
  * </para><para>
- * The split-join distance will be returned in two arguments, \c distance12
+ * The split-join distance will be returned in two arguments: \p distance12
  * will contain the projection distance of the first partition from the
- * second, while \c distance21 will be the projection distance of the second
+ * second, while \p distance21 will be the projection distance of the second
  * partition from the first. This makes it easier to detect whether a
  * partition is a subpartition of the other, since in this case, the
  * corresponding distance will be zero.
@@ -653,7 +653,7 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
 /**
  * Calculates the entropy and the mutual information for two reindexed community
  * membership vectors v1 and v2. This is needed by both Meila's and Danon's
- * community comparison measure.
+ * community comparison measures.
  */
 static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vector_int_t* v1,
         const igraph_vector_int_t* v2, double* h1, double* h2, double* mut_inf) {
@@ -753,7 +753,7 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
  * structure identification. J Stat Mech P09008, 2005.
  *
  * </para><para>
- * Time complexity: O(n log(n))
+ * Time complexity: O(n log(n)).
  */
 static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
                                      igraph_real_t* result) {
@@ -783,7 +783,7 @@ static igraph_error_t igraph_i_compare_communities_nmi(const igraph_vector_int_t
  * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
  *
  * </para><para>
- * Time complexity: O(n log(n))
+ * Time complexity: O(n log(n)).
  */
 static igraph_error_t igraph_i_compare_communities_vi(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
                                     igraph_real_t* result) {
@@ -909,11 +909,11 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  *
  * </para><para>
  * Rand WM: Objective criteria for the evaluation of clustering methods. J Am
- * Stat Assoc 66(336):846-850, 1971.
+ * Stat Assoc 66(336):846–850, 1971.
  *
  * </para><para>
  * Hubert L and Arabie P: Comparing partitions. Journal of Classification
- * 2:193-218, 1985.
+ * 2:193–218, 1985.
  *
  * </para><para>
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
@@ -931,7 +931,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
     igraph_real_t frac_pairs_in_1, frac_pairs_in_2;
 
     if (igraph_vector_int_size(v1) <= 1) {
-        IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
+        IGRAPH_ERRORF("Rand indices are not defined for zero or one vertex. "
         "Found membership vector of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, igraph_vector_int_size(v1));
     }
 

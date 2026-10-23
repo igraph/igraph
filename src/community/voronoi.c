@@ -143,7 +143,7 @@ static igraph_error_t weighted_local_density(const igraph_t *graph, igraph_vecto
 
 
 /**
- * Chooses the generated points for the Voronoi partitioning.
+ * Chooses the generator points for the Voronoi partitioning.
  *
  * Each generator has the highest local density within a radius \p r around it.
  *
@@ -471,7 +471,7 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
  * largest local relative density within a radius \p r, with the local relative
  * density of a vertex defined as
  * <code>s m / (m + k)</code>, where \c s is the strength of the vertex,
- * \c m is the number of edges within the vertex's first order neighborhood,
+ * \c m is the number of edges within the vertex's first-order neighborhood,
  * while \c k is the number of edges with only one endpoint within this
  * neighborhood.
  *

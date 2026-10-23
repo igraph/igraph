@@ -25,7 +25,7 @@
 igraph_error_t condensation(const igraph_t *graph, igraph_t *cond) {
     igraph_vector_int_t membership;
 
-    /* Data structures such as vector must be initialized in igraph before use. */
+    /* Data structures such as vectors must be initialized in igraph before use. */
     IGRAPH_CHECK(igraph_vector_int_init(&membership, 0));
 
     /* Adding the initialized vector to the "finally" stack ensures that it will

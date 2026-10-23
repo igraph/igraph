@@ -51,7 +51,7 @@ Fifth, the <link
 linkend="igraph_erdos_renyi_game_gnm"><function>igraph_erdos_renyi_game_gnm()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
-destroys it, i.e. deallocates the memory associated to it.
+destroys it, i.e. deallocates the memory associated with it.
 </para></listitem>
 </itemizedlist>
 
@@ -67,7 +67,7 @@ For compiling this program you need a C compiler. Optionally,
 It is convenient to use CMake because it can automatically discover the
 necessary compilation flags on all operating systems. Many IDEs support
 CMake, and can work with CMake projects directly. To create a CMake project
-for this example program, create a file name <filename>CMakeLists.txt</filename> with the
+for this example program, create a file named <filename>CMakeLists.txt</filename> with the
 following contents:
 
 <programlisting>
@@ -244,7 +244,7 @@ functions returning the result in a vector automatically resize it to the size t
 <para>
 <link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link>
 takes an integer vector argument specifying the dimensions of
-the lattice. In this example we generate a 30x30 two dimensional
+the lattice. In this example we generate a 30x30 two-dimensional
 periodic lattice. See the documentation of
 <link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link> in
 the reference manual for the other arguments.
@@ -281,14 +281,14 @@ structural properties are ill-defined for non-simple graphs. Loop and multi-edge
 In our next example we will calculate various centrality measures in a
 friendship graph. The friendship graph is from the famous Zachary karate
 club study. (Do a web search on "Zachary karate" if you want to know more about
-this.) Centrality measures quantify how central is the position of
-individual vertices in the graph.
+this.) Centrality measures quantify how central the position of
+individual vertices in the graph is.
 <xi:include href="../examples/tutorial/tutorial3.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
 <para>
 This example demonstrates some new operations. First of all, it shows a
-way to create a graph a list of edges stored in a plain C array.
+way to create a graph from a list of edges stored in a plain C array.
 Function <link linkend="igraph_vector_view"><function>igraph_vector_view()</function></link>
 creates a <emphasis>view</emphasis> of a C array. It does not copy any data,
 which means that you must not call
@@ -299,7 +299,7 @@ undirected graph.
 
 <para>
 Then the degree, closeness and betweenness centrality of the vertices
-is calculated and the highest values are printed. Note that the vector
+are calculated and the highest values are printed. Note that the vector
 <varname>result</varname>, into which these functions will write their
 result, must be initialized first, and also that the functions resize
 it to be able to hold the result.

@@ -52,12 +52,12 @@ IGRAPH_BEGIN_C_DECLS
 /**
  * \typedef igraph_status_handler_t
  *
- * The type of the igraph status handler functions
+ * The type of the igraph status handler functions.
  * \param message The status message.
  * \param data Additional context, with user-defined semantics.
  *        Existing igraph functions pass a null pointer here.
  * \return Error code. The current calculation will abort if you return anything
- *         else than \c IGRAPH_SUCCESS here.
+ *         other than \c IGRAPH_SUCCESS here.
  */
 
 typedef igraph_error_t igraph_status_handler_t(const char *message, void *data);
@@ -70,7 +70,7 @@ IGRAPH_EXPORT igraph_error_t igraph_status(const char *message, void *data);
 
 /**
  * \define IGRAPH_STATUS
- * Report the status of an igraph function.
+ * \brief Reports the status of an igraph function.
  *
  * Typically this function is called only a handful of times from
  * an igraph function. E.g. if an algorithm has three major
@@ -94,10 +94,10 @@ IGRAPH_EXPORT igraph_error_t igraph_statusf(const char *message, void *data, ...
 
 /**
  * \define IGRAPH_STATUSF
- * Report the status from an igraph function
+ * \brief Reports the status from an igraph function.
  *
  * This is the more flexible version of \ref IGRAPH_STATUS(),
- * having a printf-like syntax. As this macro takes variable
+ * having a printf-like syntax. As this macro takes a variable
  * number of arguments, they must be all supplied as a single
  * argument, enclosed in parentheses. \ref igraph_statusf() is then
  * called with the given arguments.
