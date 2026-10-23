@@ -8,12 +8,24 @@
  ******************************************************************************/
 
 #include "Config.h"
+#include "InfomapError.h"
+#include "OutputFormats.h"
+#include "ParameterCatalog.h"
 #include "ProgramInterface.h"
 #include "SafeFile.h"
+#include "../utils/Console.h"
 #include "../utils/FileURI.h"
 #include "../utils/Log.h"
+#include "../utils/convert.h"
+#include "../utils/format.h"
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
+#include <limits>
+#include <sstream>
 #include <vector>
 #include <stdexcept>
+#include <utility>
 
 namespace infomap {
 
@@ -24,236 +36,505 @@ constexpr int FlowModel::outdirdir;
 constexpr int FlowModel::rawdir;
 constexpr int FlowModel::precomputed;
 
+namespace {
+
+  const std::vector<std::pair<std::string, FlowModel>>& flowModelMappings()
+  {
+    static const std::vector<std::pair<std::string, FlowModel>> mappings = {
+      { "undirected", FlowModel::undirected },
+      { "directed", FlowModel::directed },
+      { "undirdir", FlowModel::undirdir },
+      { "outdirdir", FlowModel::outdirdir },
+      { "rawdir", FlowModel::rawdir },
+      { "precomputed", FlowModel::precomputed },
+    };
+    return mappings;
+  }
+
+  void enableOutputFormat(Config& config, const OutputFormat& format)
+  {
+    switch (format.kind) {
+    case OutputKind::Clu:
+      config.printClu = true;
+      break;
+    case OutputKind::Tree:
+      config.printTree = true;
+      break;
+    case OutputKind::FlowTree:
+      config.printFlowTree = true;
+      break;
+    case OutputKind::Newick:
+      config.printNewick = true;
+      break;
+    case OutputKind::Json:
+      config.printJson = true;
+      break;
+    case OutputKind::Csv:
+      config.printCsv = true;
+      break;
+    case OutputKind::PajekNetwork:
+      config.printPajekNetwork = true;
+      break;
+    case OutputKind::StateNetwork:
+      config.printStateNetwork = true;
+      break;
+    case OutputKind::FlowNetwork:
+      config.printFlowNetwork = true;
+      break;
+    }
+  }
+
+  // Config invariants applied by adaptDefaults. These describe the coherent
+  // state of a Config after fields have been set, regardless of whether the
+  // fields were set by flag parsing or by direct mutation through bindings.
+
+  void applyLibraryOutputDefaults(Config& config)
+  {
+    if (!config.isCLI && config.outDirectory.empty())
+      config.noFileOutput = true;
+  }
+
+  void validateRequiredCliOutput(const Config& config)
+  {
+    if (!config.noFileOutput && config.outDirectory.empty() && config.isCLI) {
+      throw std::runtime_error("Missing out_directory");
+    }
+  }
+
+  // Whether the caller actually passed --num-trials/-N, as opposed to landing on
+  // its default. parsedOptions records the long name whichever form was typed.
+  bool numTrialsGivenExplicitly(const Config& config)
+  {
+    for (const auto& option : config.parsedOptions) {
+      if (option.longName == "num-trials")
+        return true;
+    }
+    return false;
+  }
+
+  void applyOptionInteractions(Config& config)
+  {
+    if (config.regularized) {
+      config.recordedTeleportation = true;
+    }
+
+    if (config.noInfomap) {
+      config.numTrials = 1;
+    }
+
+    // --converge reinterprets numTrials as a cap, and falls back to the default cap
+    // when the caller did not give one. Both signals are needed to decide that:
+    //   * the value, because a library caller mutates the struct and calls
+    //     adaptDefaults(), leaving parsedOptions empty -- provenance alone would
+    //     read a deliberate numTrials = 4 as "not given" and overwrite it;
+    //   * the provenance, because numTrials == 1 was the sole sentinel before, and
+    //     as the option's minimum it is also what an explicit `-N 1 --converge`
+    //     produces, which was silently rewritten to the default cap. A cap of one
+    //     makes --converge a no-op, but that is the caller's call to make.
+    //
+    // So the fix reaches the CLI only, and two paths keep the old behaviour:
+    //   * a library caller who sets numTrials = 1 deliberately still gets the
+    //     default cap, since nothing distinguishes that from leaving it untouched;
+    //   * the Python/R bindings do parse an argument string, but their option
+    //     renderer omits any value equal to its default, so `num_trials=1` with
+    //     `converge=True` renders no --num-trials at all (measured: 6 trials on
+    //     unbalanced_hierarchy either way).
+    // That elision was assumed behaviour-preserving because the rendered defaults
+    // come from this catalog -- this option is the counter-example, since
+    // --converge makes "given as 1" mean something different from "not given".
+    // Fixing it belongs in the generator (the residue recorded in #914).
+    const bool trialCapWasChosen = numTrialsGivenExplicitly(config) || config.numTrials != 1;
+    if (config.convergeTrials && !config.noInfomap && !trialCapWasChosen) {
+      config.numTrials = Config::convergeDefaultMaxTrials;
+    }
+  }
+
+  // The matchable state id is `physId << (ceil(log2(N)) + 1) | layerId`, so an N
+  // this large makes the shift count 32 or more: undefined behaviour, which in
+  // practice changed the flows even for single-digit node ids at exit 0. Bounding N
+  // keeps the shift inside 32 bits; the companion check on the physical id lives in
+  // StateNetwork::addStateNodeWithDeterministicId.
+  void validateMatchableMultilayerIds(const Config& config)
+  {
+    // Local copy avoids odr-use of the constexpr member (no out-of-line definition).
+    const unsigned int maxLargestLayerId = Config::maxMatchableMultilayerIds;
+    if (config.matchableMultilayerIds > maxLargestLayerId) {
+      throw std::runtime_error(fmt::format(FMT_STRING("--matchable-multilayer-ids {} is too large: the largest layer id must be at most {}, so the state id shift stays within 32 bits"), config.matchableMultilayerIds, maxLargestLayerId));
+    }
+  }
+
+  void validateConvergeTrials(const Config& config)
+  {
+    if (!config.convergeTrials) {
+      return;
+    }
+    if (config.parallelTrials) {
+      throw std::runtime_error("--converge cannot be combined with --parallel-trials (auto-convergence needs each trial's result before deciding to continue)");
+    }
+    if (config.trialOffset > 0 || !config.trialResultsPath.empty()) {
+      throw std::runtime_error("--converge cannot be combined with distributed sharding (--trial-offset / --trial-results); independent shards cannot coordinate a stop");
+    }
+  }
+
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+  void applyAndValidateLossyInteraction(Config& config)
+  {
+    if (!config.lossy)
+      return;
+
+    if (config.directed || (config.flowModelIsSet && config.flowModel != FlowModel::undirected))
+      throw std::runtime_error("--lossy requires undirected flow");
+    // No input check here, deliberately. This function runs during flag parsing, before
+    // any file is opened: `stateInput`/`multilayerInput` are set by
+    // configureNetworkMode() when the network is READ, and no CLI option sets them
+    // (`additionalInput` is library-only -- a SWIG property with no CLI binding). An
+    // earlier cut rejected those three fields here and could never fire from the CLI.
+    // The rejection that actually fires is in InfomapBase::initOptimizer(), where the
+    // input type is known; it covers everything this did, plus meta data. Two things it
+    // is worth being precise about rather than calling it a strict superset: a *States
+    // file is rejected there iff its state->physical map is non-identity, since
+    // StateNetwork only sets m_haveMemoryInput when node.id != node.physicalId (an
+    // identity *States file is first-order in substance and runs under --lossy); and
+    // that guard reads haveMemory() without honouring the forceNoMemory argument, unlike
+    // the objective dispatch just below it -- unreachable under --lossy today, because
+    // lossy is rejected before any sub-Infomap is constructed. See #1004.
+    if (config.haveMetaData())
+      throw std::runtime_error("--lossy does not support meta data");
+    if (config.recordedTeleportation || config.regularized)
+      throw std::runtime_error("--lossy does not support recorded teleportation or regularization");
+    if (config.variableMarkovTime || config.markovTime != 1.0)
+      throw std::runtime_error("--lossy does not support Markov time scaling");
+
+    config.twoLevel = true;
+  }
+#endif
+
+  void applyFingerprintOnlyOutputInteraction(Config& config)
+  {
+    if (config.printConfigFingerprint) {
+      config.noFileOutput = true;
+    }
+  }
+
+  void applyRuntimeOutputInteractions(Config& config)
+  {
+    // Pretty is the only console rendering and is always on. --pretty/--no-pretty
+    // are deprecated no-ops kept for backward compatibility; neutralize them here.
+    config.prettyOutput = true;
+
+    if (config.printAllTrials && config.numTrials < 2) {
+      config.printAllTrials = false;
+    }
+  }
+
+  void validateRunReportOutput(const Config& config)
+  {
+    if (config.memoryReport && config.timingJsonPath.empty()) {
+      throw std::runtime_error("--memory-report requires --timing-json");
+    }
+    if (config.timingJsonPath == "-" && config.summaryJsonPath == "-") {
+      throw std::runtime_error("--timing-json - and --summary-json - cannot both write to stdout");
+    }
+    if (config.timingJsonPath == "-" && config.runManifestPath == "-") {
+      throw std::runtime_error("--timing-json - and --manifest-json - cannot both write to stdout");
+    }
+    if (config.summaryJsonPath == "-" && config.runManifestPath == "-") {
+      throw std::runtime_error("--summary-json - and --manifest-json - cannot both write to stdout");
+    }
+    if (config.timingJsonPath == "-" && !config.silent) {
+      throw std::runtime_error("--timing-json - requires --silent");
+    }
+    if (config.summaryJsonPath == "-" && !config.silent) {
+      throw std::runtime_error("--summary-json - requires --silent");
+    }
+    if (config.runManifestPath == "-" && !config.silent) {
+      throw std::runtime_error("--manifest-json - requires --silent");
+    }
+  }
+
+  void normalizeOutputDirectory(Config& config)
+  {
+    if (!config.haveOutput() || config.outDirectory.empty())
+      return;
+
+    if (config.outDirectory.back() != '/')
+      config.outDirectory.push_back('/');
+  }
+
+  void applyOutputNameDefault(Config& config)
+  {
+    if (config.outName.empty()) {
+      config.outName = !config.networkFile.empty() ? FileURI(config.networkFile).getName() : "no-name";
+    }
+  }
+
+  void applyThreadBudgetInteraction(Config& config)
+  {
+    if (config.numThreadsArg.empty() || config.numThreadsArg == "auto") {
+      config.numThreads = 0;
+      return;
+    }
+    const auto invalid = []() {
+      throw std::runtime_error("--num-threads must be 'auto' or a positive integer");
+    };
+    long value = 0;
+    try {
+      std::size_t consumed = 0;
+      value = std::stol(config.numThreadsArg, &consumed);
+      if (consumed != config.numThreadsArg.size()) {
+        invalid(); // trailing garbage like "4x"
+      }
+    } catch (const std::invalid_argument&) {
+      invalid();
+    } catch (const std::out_of_range&) {
+      invalid();
+    }
+    if (value < 1 || static_cast<unsigned long>(value) > std::numeric_limits<unsigned int>::max()) {
+      invalid();
+    }
+    config.numThreads = static_cast<unsigned int>(value);
+  }
+
+  // Lifecycle-only steps. These read staged parse state, touch the filesystem,
+  // or mutate global state — they are not Config invariants and must not fire
+  // when a library user calls adaptDefaults() on a mutated Config.
+
+  void rejectDeprecatedAliases(const ParsedParameterSet& parsed)
+  {
+    if (parsed.deprecatedIncludeSelfLinks) {
+      throw std::runtime_error("The --include-self-links flag is deprecated; self-links are included by default. Use --no-self-links to exclude them.");
+    }
+  }
+
+  void applyOutputDirectory(Config& config, const ParsedParameterSet& parsed)
+  {
+    if (!parsed.optionalOutputDir.empty())
+      config.outDirectory = parsed.optionalOutputDir[0];
+  }
+
+  void applyFlowModelSelection(Config& config, const ParsedParameterSet& parsed)
+  {
+    if (config.directed) {
+      config.setFlowModel(FlowModel::directed);
+      return;
+    }
+
+    if (parsed.flowModelArg.empty()) {
+      return;
+    }
+
+    FlowModel flowModel = FlowModel::undirected;
+    if (!parseFlowModel(parsed.flowModelArg, flowModel)) {
+      throw std::runtime_error(fmt::format(FMT_STRING("Unrecognized flow model: '{}'"), parsed.flowModelArg));
+    }
+    config.setFlowModel(flowModel);
+  }
+
+  void validateOutputDirectory(const Config& config)
+  {
+    if (config.haveOutput()) {
+      ensureDirectoryExists(config.outDirectory);
+    }
+    if (config.haveOutput() && !isDirectoryWritable(config.outDirectory))
+      throw InfomapError(ExitCode::OutputError, fmt::format(FMT_STRING("Can't write to directory '{}'. Check that the directory exists and that you have write permissions."), config.outDirectory));
+  }
+
+  void initializeLogging(const Config& config)
+  {
+    Log::init(config.verbosity, config.silent, config.verboseNumberPrecision);
+  }
+
+  // --pretty/--no-pretty have been no-ops since pretty console output became the
+  // only rendering (applyRuntimeOutputInteractions), and the 3.0 cleanup removes
+  // the flag from the command line (#756) -- but it never said so on any surface,
+  // so the first notice a script would get was the rejection (#915). One line
+  // where the flag was typed, emitted after logging is initialised so --silent
+  // mutes it like every other warning.
+  void warnAboutDeprecatedNoOps(const Config& config)
+  {
+    for (const auto& option : config.parsedOptions) {
+      if (option.longName == "pretty") {
+        Console::warn(0, "--pretty/--no-pretty is deprecated and has no effect: pretty console output is always on. The flag leaves the command line in 3.0; drop it from your invocation.");
+        return;
+      }
+    }
+  }
+
+  // What the flags say about silence, read before anything is parsed.
+  //
+  // Log visibility comes from the parsed Config, which does not exist yet while
+  // the flags are being read -- so a rejected argument emitted the version banner
+  // and the usage line through Log() at default verbosity
+  // (ProgramInterface::exitWithError) even for a caller that asked for silence.
+  // The Python API passes --silent on every call, so any rejected keyword put two
+  // lines of English on the process's stdout, flushed at exit after everything the
+  // Python program had written, against its documented quiet-by-default contract.
+  //
+  // Split on whitespace, the way tokenizeArgs does, and compared whole, so
+  // "--silentish" does not match; there is no short form. The parser accepts the
+  // --no-<option> negation and lets the last occurrence win (verified:
+  // "--silent --no-silent" parses to silent = false and the reverse to true), so
+  // this reads the last of either rather than the first --silent and agrees with
+  // the Config the parse is about to produce. Defaults to Config::silent's own
+  // default when neither appears.
+  //
+  // Not option-aware, and that is a deliberate limit rather than an oversight.
+  // The parser decides option-versus-value by position -- parseLongOption consumes
+  // the following token as an argument even when it starts with "--" -- so
+  // `--out-name --silent` sets out_name to the literal "--silent" with silent
+  // false, while this scan counts the token and silences the window. Telling the
+  // two apart needs the per-option requireArgument knowledge that lives in
+  // ProgramInterface, and mirroring it here would put the parser's rules in a
+  // second place that can drift. The whole cost of being wrong is that a rejected
+  // argument prints no banner in a run whose out-name is literally "--silent".
+  bool flagsRequestSilence(const std::string& flags)
+  {
+    bool silent = false;
+    std::istringstream stream(flags);
+    std::string token;
+    while (stream >> token) {
+      if (token == "--silent")
+        silent = true;
+      else if (token == "--no-silent")
+        silent = false;
+    }
+    return silent;
+  }
+
+  // Sets Log's silence for the window between the first token and
+  // initializeLogging, from the current flags alone, and restores the previous
+  // value on the way out.
+  //
+  // Unconditional on purpose. Engaging only for a silent request would leave a
+  // non-silent parse reading whatever the last run in this process happened to
+  // set -- a successful silent run leaves Log silent, so a later non-silent
+  // rejection printed nothing. Parse-time output has to follow the flags in front
+  // of it, not process history. Restoring also means a library caller that catches
+  // the error is not left with a muted engine.
+  class ScopedParseSilence {
+  public:
+    explicit ScopedParseSilence(bool silent)
+        : m_previous(Log::isSilent())
+    {
+      Log::setSilent(silent);
+    }
+
+    ~ScopedParseSilence()
+    {
+      Log::setSilent(m_previous);
+    }
+
+  private:
+    bool m_previous;
+  };
+
+  void buildConfigFromFlags(Config& config, const std::string& flags, bool isCLI)
+  {
+    config.parsedString = flags;
+
+    ProgramInterface api("Infomap",
+                         "Implementation of the Infomap clustering algorithm based on the Map Equation (see www.mapequation.org)",
+                         INFOMAP_VERSION);
+
+    api.setGroups({ "Input", "Algorithm", "Accuracy", "Output" });
+    api.setJsonParametersProvider(parameterCatalogJson);
+
+    ParsedParameterSet staging;
+    registerCatalogWithProgramInterface(api, { config, staging }, isCLI);
+
+    // Scoped to end before initializeLogging: the guard restores the previous
+    // silence on destruction, so leaving it open would undo the real setting.
+    {
+      const ScopedParseSilence parseSilence(flagsRequestSilence(flags));
+
+      api.parseArgs(flags);
+      config.parsedOptions = api.getUsedOptionArguments();
+
+      rejectDeprecatedAliases(staging);
+      applyOutputDirectory(config, staging);
+      applyFlowModelSelection(config, staging);
+
+      config.adaptDefaults();
+
+      validateOutputDirectory(config);
+    }
+
+    initializeLogging(config);
+    warnAboutDeprecatedNoOps(config);
+  }
+
+} // namespace
+
+const std::vector<std::string>& flowModelNames()
+{
+  static const std::vector<std::string> names = [] {
+    const auto& mappings = flowModelMappings();
+    std::vector<std::string> values;
+    values.reserve(mappings.size());
+    std::transform(mappings.begin(), mappings.end(), std::back_inserter(values), [](const auto& mapping) { return mapping.first; });
+    return values;
+  }();
+  return names;
+}
+
+bool parseFlowModel(const std::string& name, FlowModel& flowModel)
+{
+  for (const auto& mapping : flowModelMappings()) {
+    if (mapping.first == name) {
+      flowModel = mapping.second;
+      return true;
+    }
+  }
+  return false;
+}
+
+const char* flowModelToString(const FlowModel& flowModel)
+{
+  for (const auto& mapping : flowModelMappings()) {
+    if (mapping.second == flowModel) {
+      return mapping.first.c_str();
+    }
+  }
+  return "undirected";
+}
+
 Config::Config(const std::string& flags, bool isCLI) : isCLI(isCLI)
 {
-  ProgramInterface api("Infomap",
-                       "Implementation of the Infomap clustering algorithm based on the Map Equation (see www.mapequation.org)",
-                       INFOMAP_VERSION);
-
-  api.setGroups({ "Input", "Algorithm", "Accuracy", "Output" });
-
-  std::vector<std::string> optionalOutputDir; // Used if !isCLI
-  // --------------------- Input options ---------------------
-  if (isCLI) {
-    api.addNonOptionArgument(networkFile, "network_file", "File containing the network data. Assumes a link list format if no Pajek formatted heading.", "Input");
-  } else {
-    api.addOptionArgument(networkFile, "input", "File containing the network data. Assumes a link list format if no Pajek formatted heading.", ArgType::path, "Input");
-  }
-
-  api.addOptionArgument(skipAdjustBipartiteFlow, "skip-adjust-bipartite-flow", "Skip distributing all flow from the bipartite nodes to the primary nodes.", "Input", true);
-
-  api.addOptionArgument(bipartiteTeleportation, "bipartite-teleportation", "Teleport like the bipartite flow instead of two-step (unipartite) teleportation.", "Input", true);
-
-  api.addOptionArgument(weightThreshold, "weight-threshold", "Limit the number of links to read from the network. Ignore links with less weight than the threshold.", ArgType::number, "Input", 0.0, true);
-
-  bool deprecated_includeSelfLinks = false;
-  api.addOptionArgument(deprecated_includeSelfLinks, 'k', "include-self-links", "DEPRECATED. Include self links by default now, exclude with --no-self-links.", "Input", true).setHidden(true);
-
-  api.addOptionArgument(noSelfLinks, "no-self-links", "Exclude self links in the input network.", "Input", true);
-
-  api.addOptionArgument(nodeLimit, "node-limit", "Limit the number of nodes to read from the network. Ignore links connected to ignored nodes.", ArgType::integer, "Input", 1u, true);
-
-  api.addOptionArgument(matchableMultilayerIds, "matchable-multilayer-ids", "Construct state ids from node and layer ids that are consistent across networks for the same max number of layers. Set to at least the largest layer id among networks to match.", ArgType::integer, "Input", 1u, true);
-
-  api.addOptionArgument(clusterDataFile, 'c', "cluster-data", "Provide an initial two-level (clu format) or multi-layer (tree format) solution.", ArgType::path, "Input");
-
-  api.addOptionArgument(assignToNeighbouringModule, "assign-to-neighbouring-module", "Assign nodes without module assignments (from --cluster-data) to the module assignment of a neighbouring node if possible.", "Input", true);
-
-  api.addOptionArgument(metaDataFile, "meta-data", "Provide meta data (clu format) that should be encoded.", ArgType::path, "Input", true);
-
-  api.addOptionArgument(metaDataRate, "meta-data-rate", "Metadata encoding rate. Default is to encode each step.", ArgType::number, "Input", 0.0, true);
-
-  api.addOptionArgument(unweightedMetaData, "meta-data-unweighted", "Don't weight meta data by node flow.", "Input", true);
-
-  api.addOptionArgument(noInfomap, "no-infomap", "Don't run the optimizer. Useful to calculate codelength of provided cluster data or to print non-modular statistics.", "Input");
-
-  // --------------------- Output options ---------------------
-
-  api.addOptionArgument(outName, "out-name", "Name for the output files, e.g. [output_directory]/[out-name].tree", ArgType::string, "Output", true);
-
-  api.addOptionArgument(noFileOutput, '0', "no-file-output", "Don't write output to file.", "Output", true);
-
-  api.addOptionArgument(printTree, "tree", "Write a tree file with the modular hierarchy. Automatically enabled if no other output is specified.", "Output");
-
-  api.addOptionArgument(printFlowTree, "ftree", "Write a ftree file with the modular hierarchy including aggregated links between (nested) modules. (Used by Network Navigator)", "Output");
-
-  api.addOptionArgument(printClu, "clu", "Write a clu file with the top cluster ids for each node.", "Output");
-
-  api.addOptionArgument(cluLevel, "clu-level", "For clu output, print modules at specified depth from root. Use -1 for bottom level modules.", ArgType::integer, "Output", -1, true);
-
-  api.addOptionArgument(outputFormats, 'o', "output", "Comma-separated output formats without spaces, e.g. -o clu,tree,ftree. Options: clu, tree, ftree, newick, json, csv, network, states, flow.", ArgType::list, "Output", true);
-
-  api.addOptionArgument(hideBipartiteNodes, "hide-bipartite-nodes", "Project bipartite solution to unipartite.", "Output", true);
-
-  api.addOptionArgument(printAllTrials, "print-all-trials", "Print all trials to separate files.", "Output", true);
-
-  // --------------------- Core algorithm options ---------------------
-  api.addOptionArgument(twoLevel, '2', "two-level", "Optimize a two-level partition of the network. Default is multi-level.", "Algorithm");
-
-  std::string flowModelArg;
-
-  api.addOptionArgument(flowModelArg, 'f', "flow-model", "Specify flow model. Options: undirected, directed, undirdir, outdirdir, rawdir, precomputed.", ArgType::option, "Algorithm");
-
-  api.addOptionArgument(directed, 'd', "directed", "Assume directed links. Shorthand for '--flow-model directed'.", "Algorithm");
-
-  api.addOptionArgument(recordedTeleportation, 'e', "recorded-teleportation", "If teleportation is used to calculate the flow, also record it when minimizing codelength.", "Algorithm", true);
-
-  api.addOptionArgument(useNodeWeightsAsFlow, "use-node-weights-as-flow", "Use node weights (from api or after names in Pajek format) as flow, normalized to sum to 1", "Algorithm", true);
-
-  api.addOptionArgument(teleportToNodes, "to-nodes", "Teleport to nodes instead of to links, assuming uniform node weights if no such input data.", "Algorithm", true);
-
-  api.addOptionArgument(teleportationProbability, 'p', "teleportation-probability", "Probability of teleporting to a random node or link.", ArgType::probability, "Algorithm", 0.0, 1.0, true);
-
-  api.addOptionArgument(regularized, "regularized", "Effectively add a fully connected Bayesian prior network to not overfit due to missing links. Implies recorded teleportation", "Algorithm", true);
-
-  api.addOptionArgument(regularizationStrength, "regularization-strength", "Adjust relative strength of Bayesian prior network with this multiplier.", ArgType::number, "Algorithm", 0.0, true);
-
-  api.addOptionArgument(entropyBiasCorrection, "entropy-corrected", "Correct for negative entropy bias in small samples (many modules).", "Algorithm", true);
-
-  api.addOptionArgument(entropyBiasCorrectionMultiplier, "entropy-correction-strength", "Increase or decrease the default entropy correction with this factor.", ArgType::number, "Algorithm", true);
-
-  api.addOptionArgument(markovTime, "markov-time", "Scale link flow to change the cost of moving between modules. Higher values results in fewer modules.", ArgType::number, "Algorithm", 0.0, true);
-
-  api.addOptionArgument(variableMarkovTime, "variable-markov-time", "Increase Markov time locally to level out link flow. Reduces risk of overpartitioning sparse areas while keeping high resolution in dense areas.", "Algorithm", true);
-
-  api.addOptionArgument(variableMarkovTimeDamping, "variable-markov-damping", "Damping parameter for variable Markov time, to scale with local effective degree (0) or local entropy (1).", ArgType::number, "Algorithm", true);
-
-  api.addOptionArgument(variableMarkovTimeMinLocalScale, "variable-markov-min-scale", "Minimum local scale for nodes with zero entropy to avoid division by zero. Local Markov time is max scale divided by local scale.", ArgType::number, "Algorithm", true);
-
-  // api.addOptionArgument(markovTimeNoSelfLinks, "markov-time-no-self-links", "For testing.", "Algorithm", true);
-
-  api.addOptionArgument(preferredNumberOfModules, "preferred-number-of-modules", "Penalize solutions the more they differ from this number.", ArgType::integer, "Algorithm", 1u, true);
-
-  api.addOptionArgument(multilayerRelaxRate, "multilayer-relax-rate", "Probability to relax the constraint to move only in the current layer.", ArgType::probability, "Algorithm", 0.0, 1.0, true);
-
-  api.addOptionArgument(multilayerRelaxLimit, "multilayer-relax-limit", "Number of neighboring layers in each direction to relax to. If negative, relax to any layer.", ArgType::integer, "Algorithm", -1, true);
-
-  api.addOptionArgument(multilayerRelaxLimitUp, "multilayer-relax-limit-up", "Number of neighboring layers with higher id to relax to. If negative, relax to any layer.", ArgType::integer, "Algorithm", -1, true);
-
-  api.addOptionArgument(multilayerRelaxLimitDown, "multilayer-relax-limit-down", "Number of neighboring layers with lower id to relax to. If negative, relax to any layer.", ArgType::integer, "Algorithm", -1, true);
-
-  api.addOptionArgument(multilayerRelaxByJensenShannonDivergence, "multilayer-relax-by-jsd", "Relax proportional to the out-link similarity measured by the Jensen-Shannon divergence.", "Algorithm", true);
-
-  // --------------------- Performance and accuracy options ---------------------
-  // api.addOptionArgument(seedToRandomNumberGenerator, 's', "seed", "A seed (integer) to the random number generator for reproducible results.", ArgType::integer, "Accuracy", 1ul);
-
-  api.addOptionArgument(numTrials, 'N', "num-trials", "Number of outer-most loops to run before picking the best solution.", ArgType::integer, "Accuracy", 1u);
-
-  api.addOptionArgument(coreLoopLimit, 'M', "core-loop-limit", "Limit the number of loops that tries to move each node into the best possible module.", ArgType::integer, "Accuracy", 1u, true);
-
-  api.addOptionArgument(levelAggregationLimit, 'L', "core-level-limit", "Limit the number of times the core loops are reapplied on existing modular network to search bigger structures.", ArgType::integer, "Accuracy", 1u, true);
-
-  api.addOptionArgument(tuneIterationLimit, 'T', "tune-iteration-limit", "Limit the number of main iterations in the two-level partition algorithm. 0 means no limit.", ArgType::integer, "Accuracy", 1u, true);
-
-  api.addOptionArgument(minimumCodelengthImprovement, "core-loop-codelength-threshold", "Minimum codelength threshold for accepting a new solution in core loop.", ArgType::number, "Accuracy", 0.0, true);
-
-  api.addOptionArgument(minimumRelativeTuneIterationImprovement, "tune-iteration-relative-threshold", "Set codelength improvement threshold of each new tune iteration to 'f' times the initial two-level codelength.", ArgType::number, "Accuracy", 0.0, true);
-
-  api.addIncrementalOptionArgument(fastHierarchicalSolution, 'F', "fast-hierarchical-solution", "Find top modules fast. Use -FF to keep all fast levels. Use -FFF to skip recursive part.", "Accuracy", true);
-
-  api.addOptionArgument(preferModularSolution, "prefer-modular-solution", "Prefer modular solutions even if they are worse than putting all nodes in one module.", "Accuracy", true);
-
-  api.addOptionArgument(innerParallelization, "inner-parallelization", "Parallelize the inner-most loop for greater speed. This may give some accuracy tradeoff.", "Accuracy", true);
-
-  api.addOptionalNonOptionArguments(optionalOutputDir, "out_directory", "Directory to write the results to.", "Output");
-
-  api.addIncrementalOptionArgument(verbosity, 'v', "verbose", "Verbose output on the console. Add additional 'v' flags to increase verbosity up to -vvv.", "Output");
-
-  api.addOptionArgument(silent, "silent", "No output on the console.", "Output");
-
-  api.parseArgs(flags);
-
-  if (deprecated_includeSelfLinks) {
-    throw std::runtime_error("The --include-self-links flag is deprecated to include self links by default. Use --no-self-links to exclude.");
-  }
-
-  if (!optionalOutputDir.empty())
-    outDirectory = optionalOutputDir[0];
-
-  if (!isCLI && outDirectory.empty())
-    noFileOutput = true;
-
-  if (!noFileOutput && outDirectory.empty() && isCLI) {
-    throw std::runtime_error("Missing out_directory");
-  }
-
-  if (flowModelArg == "directed" || directed) {
-    setFlowModel(FlowModel::directed);
-  } else if (flowModelArg == "undirected") {
-    setFlowModel(FlowModel::undirected);
-  } else if (flowModelArg == "undirdir") {
-    setFlowModel(FlowModel::undirdir);
-  } else if (flowModelArg == "outdirdir") {
-    setFlowModel(FlowModel::outdirdir);
-  } else if (flowModelArg == "rawdir") {
-    setFlowModel(FlowModel::rawdir);
-  } else if (flowModelArg == "precomputed") {
-    setFlowModel(FlowModel::precomputed);
-  } else if (!flowModelArg.empty()) {
-    throw std::runtime_error(io::Str() << "Unrecognized flow model: '" << flowModelArg << "'");
-  }
-
-  if (regularized) {
-    recordedTeleportation = true;
-  }
-
-  if (*--outDirectory.end() != '/')
-    outDirectory.append("/");
-
-  if (haveOutput() && !isDirectoryWritable(outDirectory))
-    throw std::runtime_error(io::Str() << "Can't write to directory '" << outDirectory << "'. Check that the directory exists and that you have write permissions.");
-
-  if (outName.empty()) {
-    outName = !networkFile.empty() ? FileURI(networkFile).getName() : "no-name";
-  }
-
-  if (noInfomap) {
-    numTrials = 1;
-  }
-
-  parsedString = flags;
-  parsedOptions = api.getUsedOptionArguments();
-
-  if (printAllTrials && numTrials < 2) {
-    printAllTrials = false;
-  }
-
-  adaptDefaults();
-
-  Log::init(verbosity, silent, verboseNumberPrecision);
+  buildConfigFromFlags(*this, flags, isCLI);
 }
 
 void Config::adaptDefaults()
 {
   auto outputs = io::split(outputFormats, ',');
   for (std::string& o : outputs) {
-    if (o == "clu") {
-      printClu = true;
-    } else if (o == "tree") {
-      printTree = true;
-    } else if (o == "ftree") {
-      printFlowTree = true;
-    } else if (o == "newick") {
-      printNewick = true;
-    } else if (o == "json") {
-      printJson = true;
-    } else if (o == "csv") {
-      printCsv = true;
-    } else if (o == "network") {
-      printPajekNetwork = true;
-    } else if (o == "flow") {
-      printFlowNetwork = true;
-    } else if (o == "states") {
-      printStateNetwork = true;
-    } else {
-      throw std::runtime_error(io::Str() << "Unrecognized output format: '" << o << "'.");
+    const auto* format = findOutputFormat(o);
+    if (format == nullptr) {
+      throw std::runtime_error(fmt::format(FMT_STRING("Unrecognized output format: '{}'."), o));
     }
+    enableOutputFormat(*this, *format);
   }
 
   // Of no output format specified, use tree as default (if not used as a library).
   if (isCLI && !haveModularResultOutput()) {
     printTree = true;
   }
+
+  // Cross-field invariants. These run whether construction was via flag parsing
+  // or library mutation followed by adaptDefaults().
+  applyFingerprintOnlyOutputInteraction(*this);
+  applyLibraryOutputDefaults(*this);
+  validateRequiredCliOutput(*this);
+  applyOptionInteractions(*this);
+  validateConvergeTrials(*this);
+  validateMatchableMultilayerIds(*this);
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+  applyAndValidateLossyInteraction(*this);
+#endif
+  applyThreadBudgetInteraction(*this);
+  validateRunReportOutput(*this);
+  normalizeOutputDirectory(*this);
+  applyOutputNameDefault(*this);
+  applyRuntimeOutputInteractions(*this);
 }
 
 std::ostream& operator<<(std::ostream& out, FlowModel f)

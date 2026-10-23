@@ -10,13 +10,13 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#include "ParsedOption.h"
 #include "../utils/Date.h"
 #include "../version.h"
-#include "ProgramInterface.h"
 
 #include <stdexcept>
 #include <iomanip>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,7 +34,7 @@ struct FlowModel {
 
   int value = 0;
 
-  FlowModel(int val) : value(val) { }
+  FlowModel(int val) : value(val) {}
   FlowModel& operator=(int val)
   {
     value = val;
@@ -46,26 +46,12 @@ struct FlowModel {
 };
 
 std::ostream& operator<<(std::ostream& out, FlowModel f);
+const std::vector<std::string>& flowModelNames();
+bool parseFlowModel(const std::string& name, FlowModel& flowModel);
+const char* flowModelToString(const FlowModel& flowModel);
 
-inline const char* flowModelToString(const FlowModel& flowModel)
-{
-  switch (flowModel) {
-  case FlowModel::directed:
-    return "directed";
-  case FlowModel::undirdir:
-    return "undirdir";
-  case FlowModel::outdirdir:
-    return "outdirdir";
-  case FlowModel::rawdir:
-    return "rawdir";
-  case FlowModel::precomputed:
-    return "precomputed";
-  case FlowModel::undirected:
-  default:
-    return "undirected";
-  }
-}
-
+// Mutable runtime state after parameter parsing and default adaptation. Add or
+// change parameter metadata in ParameterCatalog, not by editing this struct alone.
 struct Config {
   // Input
   bool isCLI = false;
@@ -86,7 +72,7 @@ struct Config {
   double metaDataRate = 1.0;
   bool unweightedMetaData = false;
   unsigned int numMetaDataDimensions = 0;
-  bool clusterDataIsHard = false; // FIXME Not used
+  bool clusterDataIsHard = false; // Keep the initial partition instead of optimizing it away
   bool assignToNeighbouringModule = false;
   bool noInfomap = false;
 
@@ -107,6 +93,10 @@ struct Config {
   double multilayerJSRelaxRate = 0.15;
   bool multilayerRelaxByJensenShannonDivergence = false;
   int multilayerJSRelaxLimit = -1;
+  bool multilayerRelaxToSelf = false; // Couple only physical nodes across layers instead of spreading to neighbours
+  unsigned int maxFlowIterations = 400;
+  unsigned int minFlowIterations = 50;
+  double flowTolerance = 1.0e-15; // Convergence tolerance for flow calculation (PageRank)
 
   // Clustering
   bool twoLevel = false;
@@ -116,12 +106,40 @@ struct Config {
   double regularizationStrength = 1.0; // Scale Bayesian prior constant ln(N)/N with this factor
   double teleportationProbability = 0.15;
   unsigned int preferredNumberOfModules = 0;
+  unsigned int preferredNumberOfLevels = 0; // 0 = off. Soft, asymmetric depth preference (issue #308)
+  double preferredNumberOfLevelsStrength = 1.0; // Scale the depth preference; 0 disables it
   bool entropyBiasCorrection = false;
   double entropyBiasCorrectionMultiplier = 1;
-  /* unsigned long seedToRandomNumberGenerator = 123; */
+  unsigned long seedToRandomNumberGenerator = 123;
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+  bool lossy = false; // Lossy map equation: noise modules share one visit codeword
+  double lossyLambda = 1.0; // Price of one bit of forgone dynamics, in transmitted bits
+#endif
 
   // Performance and accuracy
   unsigned int numTrials = 1;
+  // --converge: run up to numTrials trials but stop once the best codelength
+  // has plateaued. The stop parameters below are calibration constants, not
+  // user-facing flags (see issue #664). Calibrated on an LFR suite spanning
+  // n=300..3000 and mixing mu=0.1..0.7: these values keep worst-case codelength
+  // regret vs a fixed N=200 run under ~0.05% while running a median of ~6 trials
+  // (<=14 worst case). Trials-to-plateau did not grow with network size, so the
+  // bounds are flat rather than size-adaptive; tolerance was insensitive across
+  // 1e-8..1e-4.
+  bool convergeTrials = false;
+#ifndef SWIG
+  // Internal calibration constants — hidden from the SWIG-wrapped binding API
+  // (they are not user-tunable; --converge is the only knob).
+  static constexpr double convergeTolerance = 1e-6; // relative best-codelength improvement that counts
+  static constexpr unsigned int convergePatience = 5; // consecutive non-improving trials before stopping
+  static constexpr unsigned int convergeMinTrials = 5; // floor before the plateau rule can fire
+  static constexpr unsigned int convergeDefaultMaxTrials = 50; // cap used when --converge is set without an explicit -N (~3.5x headroom over worst observed)
+  // Largest --matchable-multilayer-ids value whose state id still fits 32 bits: the
+  // id is `physId << (ceil(log2(N)) + 1) | layerId`, so N above 2^30 makes the shift
+  // count 32 or more, which is undefined behaviour. Shared with StateNetwork, which
+  // reports the same bound when it rejects the shift.
+  static constexpr unsigned int maxMatchableMultilayerIds = 1u << 30;
+#endif
   double minimumCodelengthImprovement = 1e-10;
   double minimumSingleNodeCodelengthImprovement = 1e-16;
   bool randomizeCoreLoopLimit = false;
@@ -133,6 +151,12 @@ struct Config {
   unsigned int fastHierarchicalSolution = 0;
   bool preferModularSolution = false;
   bool innerParallelization = false;
+  bool parallelTrials = false;
+#if INFOMAP_FEATURE_TEST_FEATURE
+  bool testFeature = false;
+#endif
+  unsigned int numRandomMoves = 5; // Amount of random moves to try in core loop, used if regularized/recorded teleportation.
+  unsigned int maxDegreeForRandomMoves = 2; // Only try random moves for nodes with degree less than or equal to this value.
 
   // Output
   std::string outDirectory;
@@ -145,6 +169,19 @@ struct Config {
   bool printCsv = false;
   bool printClu = false;
   bool printAllTrials = false;
+#ifndef SWIG
+  bool noOverwriteOutput = false;
+  bool printConfigFingerprint = false;
+  std::string timingJsonPath;
+  std::string summaryJsonPath;
+  std::string runManifestPath;
+  bool memoryReport = false;
+  std::string numThreadsArg = "auto"; // raw --num-threads / --threads argument
+  unsigned int numThreads = 0; // 0 = auto; positive = explicit request
+  unsigned int trialOffset = 0; // global index of this shard's first trial
+  std::string trialResultsPath; // --trial-results <file.json>
+  bool noFinalOutput = false; // suppress aggregate final write (per-trial still written)
+#endif
   int cluLevel = 1; // Write modules at specified depth from root. 1, 2, ... or -1 for bottom level
   bool printFlowNetwork = false;
   bool printPajekNetwork = false;
@@ -153,6 +190,10 @@ struct Config {
   unsigned int verbosity = 0;
   unsigned int verboseNumberPrecision = 9;
   bool silent = false;
+  // Pretty (structured) console output is the only console rendering and is
+  // always on; -v/-vv add diagnostics on top. --pretty/--no-pretty are
+  // deprecated no-ops kept for backward compatibility (see ParameterCatalog).
+  bool prettyOutput = true;
   bool hideBipartiteNodes = false;
 
   // Other
@@ -160,7 +201,6 @@ struct Config {
   std::string version = INFOMAP_VERSION;
   std::string parsedString;
   std::vector<ParsedOption> parsedOptions;
-  infomap::interruptionHandlerFn *interruptionHandler = NULL;
 
   Config() = default;
 
@@ -202,6 +242,10 @@ struct Config {
     multilayerJSRelaxRate = other.multilayerJSRelaxRate;
     multilayerRelaxByJensenShannonDivergence = other.multilayerRelaxByJensenShannonDivergence;
     multilayerJSRelaxLimit = other.multilayerJSRelaxLimit;
+    multilayerRelaxToSelf = other.multilayerRelaxToSelf;
+    maxFlowIterations = other.maxFlowIterations;
+    minFlowIterations = other.minFlowIterations;
+    flowTolerance = other.flowTolerance;
     twoLevel = other.twoLevel;
     noCoarseTune = other.noCoarseTune;
     recordedTeleportation = other.recordedTeleportation;
@@ -210,18 +254,41 @@ struct Config {
     teleportationProbability = other.teleportationProbability;
     entropyBiasCorrection = other.entropyBiasCorrection;
     entropyBiasCorrectionMultiplier = other.entropyBiasCorrectionMultiplier;
-    // seedToRandomNumberGenerator = other.seedToRandomNumberGenerator;
+    seedToRandomNumberGenerator = other.seedToRandomNumberGenerator;
     minimumCodelengthImprovement = other.minimumCodelengthImprovement;
     minimumSingleNodeCodelengthImprovement = other.minimumSingleNodeCodelengthImprovement;
     randomizeCoreLoopLimit = other.randomizeCoreLoopLimit;
     minimumRelativeTuneIterationImprovement = other.minimumRelativeTuneIterationImprovement;
     preferModularSolution = other.preferModularSolution;
     innerParallelization = other.innerParallelization;
+#if INFOMAP_FEATURE_TEST_FEATURE
+    testFeature = other.testFeature;
+#endif
+#if INFOMAP_FEATURE_LOSSY_MAP_EQUATION
+    lossy = other.lossy;
+    lossyLambda = other.lossyLambda;
+#endif
+    numRandomMoves = other.numRandomMoves;
+    maxDegreeForRandomMoves = other.maxDegreeForRandomMoves;
     outDirectory = other.outDirectory;
     outName = other.outName;
     outputFormats = other.outputFormats;
+#ifndef SWIG
+    noOverwriteOutput = other.noOverwriteOutput;
+    printConfigFingerprint = other.printConfigFingerprint;
+    timingJsonPath = other.timingJsonPath;
+    summaryJsonPath = other.summaryJsonPath;
+    runManifestPath = other.runManifestPath;
+    memoryReport = other.memoryReport;
+    numThreadsArg = other.numThreadsArg;
+    numThreads = other.numThreads;
+    trialOffset = other.trialOffset;
+    trialResultsPath = other.trialResultsPath;
+    noFinalOutput = other.noFinalOutput;
+#endif
     verbosity = other.verbosity;
     verboseNumberPrecision = other.verboseNumberPrecision;
+    prettyOutput = other.prettyOutput;
     startDate = other.startDate;
     version = other.version;
     return *this;
@@ -249,6 +316,9 @@ struct Config {
 
   bool isMultilayerNetwork() const { return multilayerInput || !additionalInput.empty(); }
   bool isBipartite() const { return bipartite; }
+#ifndef SWIG
+  bool isRegularizedMultilayerFlow() const { return isMultilayerNetwork() && regularized; }
+#endif
 
   bool haveMemory() const { return stateInput; }
   bool printStates() const { return stateOutput; }
@@ -256,6 +326,10 @@ struct Config {
   bool haveMetaData() const { return !metaDataFile.empty() || numMetaDataDimensions != 0; }
 
   bool haveOutput() const { return !noFileOutput; }
+
+#ifndef SWIG
+  bool overwriteOutput() const { return !noOverwriteOutput; }
+#endif
 
   bool haveModularResultOutput() const
   {
