@@ -199,6 +199,7 @@ int main(void) {
     /* weighted, directed line graph, negative weight value for edge-0 */
     ec = igraph_ecount(&g_line);
     igraph_vector_resize(&error_weights, ec);
+    igraph_vector_null(&error_weights);
     VECTOR(error_weights)[0] = -10;
     IGRAPH_ASSERT(igraph_random_walk(&g_line, &error_weights, &vertices, NULL, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVAL);
 
