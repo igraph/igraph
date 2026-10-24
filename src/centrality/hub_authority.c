@@ -302,7 +302,9 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
             my_hub_vector_p = hub_vector;
         }
         IGRAPH_CHECK(igraph_eigenvector_centrality(graph, my_hub_vector_p, value, IGRAPH_ALL, weights, options));
-        *value = (*value) * (*value); /* adjust the eigenvalue, see comment at top */
+        if (value) {
+            *value = (*value) * (*value); /* adjust the eigenvalue, see comment at top */
+        }
         if (authority_vector) {
             IGRAPH_CHECK(igraph_vector_update(authority_vector, my_hub_vector_p));
         }
