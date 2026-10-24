@@ -74,7 +74,7 @@ int main(void) {
 
     printf("check error on graph with no vertices.\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
-    CHECK_ERROR(igraph_st_vertex_connectivity(&g, &res, 0, 0, IGRAPH_VCONN_NEI_ERROR), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_st_vertex_connectivity(&g, &res, 0, 0, IGRAPH_VCONN_NEI_ERROR), IGRAPH_EINVVID);
     igraph_destroy(&g);
 
     printf("check error on graph with one vertex.\n");
