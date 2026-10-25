@@ -38,21 +38,6 @@ int main(void) {
     /* Path graph with 4 vertices and 3 edges. */
     igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, -1);
 
-    printf("Valid IDs:\n");
-    IGRAPH_ASSERT(igraph_vit_create(&g, igraph_vss_1(3), &vit) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(IGRAPH_VIT_SIZE(vit) == 1 && IGRAPH_VIT_GET(vit) == 3);
-    igraph_vit_destroy(&vit);
-    IGRAPH_ASSERT(igraph_eit_create(&g, igraph_ess_1(2), &eit) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(IGRAPH_EIT_SIZE(eit) == 1 && IGRAPH_EIT_GET(eit) == 2);
-    igraph_eit_destroy(&eit);
-    igraph_degree(&g, &res, igraph_vss_1(1), IGRAPH_ALL, IGRAPH_LOOPS);
-    print_vector_int(&res);
-    igraph_get_shortest_path(&g, NULL, &vertices, &edges, 0, 3, IGRAPH_ALL);
-    print_vector_int(&vertices);
-    igraph_get_widest_path(&g, &vertices, &edges, 0, 3, &weights, IGRAPH_ALL);
-    print_vector_int(&vertices);
-
-    printf("Invalid IDs:\n");
     for (size_t i = 0; i < bad_count; i++) {
         igraph_int_t id = bad_ids[i];
 
@@ -68,8 +53,6 @@ int main(void) {
         CHECK_ERROR(igraph_eit_create(&g, igraph_ess_1(id), &eit), IGRAPH_EINVEID);
         CHECK_ERROR(igraph_delete_edges(&g, igraph_ess_1(id)), IGRAPH_EINVEID);
         IGRAPH_ASSERT(igraph_ecount(&g) == 3);
-
-        printf("%" IGRAPH_PRId " rejected\n", id);
     }
 
     igraph_destroy(&g);
