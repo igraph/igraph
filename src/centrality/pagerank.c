@@ -484,6 +484,56 @@ igraph_error_t igraph_personalized_pagerank(
 }
 
 /*
+ * Copies the PageRank scores of the vertices in 'vit' from the first column
+ * of 'vectors' to 'vector', normalizing them so that the scores of all
+ * vertices sum to 1.
+ */
+static igraph_error_t igraph_i_pagerank_select_result(igraph_vector_t *vector,
+                                                      const igraph_matrix_t *vectors,
+                                                      igraph_vit_t *vit) {
+    igraph_int_t i;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(vectors);
+    igraph_real_t sum = 0;
+
+    for (i = 0; i < no_of_nodes; i++) {
+        sum += MATRIX(*vectors, i, 0);
+    }
+
+    IGRAPH_CHECK(igraph_vector_resize(vector, IGRAPH_VIT_SIZE(*vit)));
+    for (IGRAPH_VIT_RESET(*vit), i = 0; !IGRAPH_VIT_END(*vit);
+         IGRAPH_VIT_NEXT(*vit), i++) {
+        VECTOR(*vector)[i] = MATRIX(*vectors, IGRAPH_VIT_GET(*vit), 0) / sum;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/*
+ * Handles the special case when the result is the same as the
+ * personalization vector: graphs with no edges, or with all weights zero.
+ */
+static igraph_error_t igraph_i_pagerank_trivial_result(igraph_vector_t *vector,
+                                                       igraph_real_t *value,
+                                                       const igraph_vector_t *reset,
+                                                       igraph_matrix_t *vectors,
+                                                       igraph_vit_t *vit) {
+    igraph_int_t i;
+    igraph_int_t no_of_nodes = igraph_matrix_nrow(vectors);
+
+    if (value) {
+        *value = 1.0;
+    }
+    if (vector) {
+        for (i = 0; i < no_of_nodes; i++) {
+            MATRIX(*vectors, i, 0) = reset ? VECTOR(*reset)[i] : 1.0;
+        }
+        IGRAPH_CHECK(igraph_i_pagerank_select_result(vector, vectors, vit));
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/*
  * ARPACK-based implementation of \c igraph_personalized_pagerank.
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
@@ -501,6 +551,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_vector_t indegree;
     igraph_vector_t tmp;
     igraph_vector_t normalized_reset;
+    igraph_vit_t vit;
 
     igraph_int_t i;
     igraph_int_t no_of_nodes = igraph_vcount(graph);
@@ -535,20 +586,22 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
     }
 
+    /* Validates 'vids' before any computation. */
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
+    IGRAPH_MATRIX_INIT_FINALLY(&vectors, no_of_nodes, 1);
+
     if (no_of_edges == 0) {
         /* Special case: graph with no edges. Result is the same as the personalization vector. */
-        if (value) {
-            *value = 1.0;
-        }
-        if (vector) {
-            if (reset && no_of_nodes > 0) {
-                IGRAPH_CHECK(igraph_vector_update(vector, reset));
-                igraph_vector_scale(vector, 1.0 / reset_sum);
-            } else {
-                IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
-                igraph_vector_fill(vector, 1.0 / no_of_nodes);
-            }
-        }
+        IGRAPH_CHECK(igraph_i_pagerank_trivial_result(vector, value, reset, &vectors, &vit));
+
+        igraph_matrix_destroy(&vectors);
+        igraph_matrix_destroy(&values);
+        igraph_vit_destroy(&vit);
+        IGRAPH_FINALLY_CLEAN(3);
+
         return IGRAPH_SUCCESS;
     }
 
@@ -573,26 +626,16 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
         if (min == 0 && max == 0) {
             /* Special case: all weights are zeros. Result is the same as the personalization vector. */
-            if (value) {
-                *value = 1.0;
-            }
-            if (vector) {
-                IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
-                if (reset) {
-                    for (i=0; i < no_of_nodes; ++i) {
-                        VECTOR(*vector)[i] = VECTOR(*reset)[i];
-                    }
-                    igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
-                } else {
-                    igraph_vector_fill(vector, 1.0 / no_of_nodes);
-                }
-            }
+            IGRAPH_CHECK(igraph_i_pagerank_trivial_result(vector, value, reset, &vectors, &vit));
+
+            igraph_matrix_destroy(&vectors);
+            igraph_matrix_destroy(&values);
+            igraph_vit_destroy(&vit);
+            IGRAPH_FINALLY_CLEAN(3);
+
             return IGRAPH_SUCCESS;
         }
     }
-
-    IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
-    IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
 
     if (directed) {
         dirmode = IGRAPH_IN;
@@ -687,27 +730,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     }
 
     if (vector) {
-        igraph_vit_t vit;
-        igraph_int_t nodes_to_calc;
-        igraph_real_t sum = 0;
-
-        for (i = 0; i < no_of_nodes; i++) {
-            sum += MATRIX(vectors, i, 0);
-        }
-
-        IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
-        IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-        nodes_to_calc = IGRAPH_VIT_SIZE(vit);
-
-        IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
-        for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
-             IGRAPH_VIT_NEXT(vit), i++) {
-            VECTOR(*vector)[i] = MATRIX(vectors, IGRAPH_VIT_GET(vit), 0);
-            VECTOR(*vector)[i] /= sum;
-        }
-
-        igraph_vit_destroy(&vit);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_CHECK(igraph_i_pagerank_select_result(vector, &vectors, &vit));
     }
 
     if (options->info) {
@@ -716,7 +739,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
     igraph_matrix_destroy(&vectors);
     igraph_matrix_destroy(&values);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }

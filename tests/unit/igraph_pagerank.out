@@ -35,6 +35,22 @@ Complete graph, zero weights
 ARPACK: ( 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 )
 PRPACK: ( 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 )
 
+Edgeless graph, vertex selector
+ARPACK: ( 0.25 0.25 0.25 )
+PRPACK: ( 0.25 0.25 0.25 )
+
+Edgeless graph, personalized, vertex selector
+ARPACK: ( 0.4 0.1 0.4 )
+PRPACK: ( 0.4 0.1 0.4 )
+
+Complete graph, zero weights, vertex selector
+ARPACK: ( 0.25 0.25 0.25 )
+PRPACK: ( 0.25 0.25 0.25 )
+
+Complete graph, zero weights, personalized, vertex selector
+ARPACK: ( 0.4 0.1 0.4 )
+PRPACK: ( 0.4 0.1 0.4 )
+
 Test graph 3
 ARPACK: ( 0.143734 0.104639 0.045995 0.045995 0.155268 0.257112 0.045995 0.155268 0.045995 )
 PRPACK: ( 0.143734 0.104639 0.045995 0.045995 0.155268 0.257112 0.045995 0.155268 0.045995 )
