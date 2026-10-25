@@ -49,6 +49,12 @@ typedef struct {
     /* The adjacency list of the graph */
     igraph_adjlist_t AK;
 
+    /* Directed searches only: the reverse adjacency list. RK[v] lists the
+     * vertices u whose list AK[u] contains v, i.e. the lists from which v must
+     * be removed after its search. It is not modified during the algorithm.
+     * Undirected searches use AK[v] itself, and leave RK empty. */
+    igraph_adjlist_t RK;
+
     /* The set B from Johnson's paper */
     igraph_adjlist_t B;
 
@@ -60,6 +66,13 @@ typedef struct {
 
     /* Boolean vector indicating which vertices are blocked */
     igraph_bitset_t v_blocked;
+
+    /* The vertices that the current search has blocked at least once, each
+     * listed once, and the corresponding indicator bitset. Only these vertices
+     * can have state (a blocked flag or a non-empty B list) that must be
+     * reset after the search; see simple_cycles_reset_touched(). */
+    igraph_vector_int_t touched;
+    igraph_bitset_t v_touched;
 
     /* Boolean vector indicating which vertices have ever been checked.
      * The bigger picture here is that this allows a "lazy" community decomposition */
@@ -187,6 +200,10 @@ static igraph_error_t simple_cycles_circuit(
             //        V, igraph_vector_int_size(&state->vertex_stack),
             //        igraph_stack_int_size(&v_stack));
             IGRAPH_BIT_SET(state->v_blocked, V);
+            if (!IGRAPH_BIT_TEST(state->v_touched, V)) {
+                IGRAPH_BIT_SET(state->v_touched, V);
+                IGRAPH_CHECK(igraph_vector_int_push_back(&state->touched, V));
+            }
         } else {
             // back to what we were doing before
             i0 = igraph_stack_int_pop(&neigh_iteration_progress);
@@ -273,6 +290,9 @@ static igraph_error_t simple_cycles_circuit(
             } else {
                 for (igraph_int_t i = 0; i < num_neighbors; ++i) {
                     const igraph_int_t W = VECTOR(*neighbors)[i];
+                    // W must be in 'touched', so that its B list is cleared
+                    // after this search. See simple_cycles_reset_touched().
+                    IGRAPH_ASSERT(IGRAPH_BIT_TEST(state->v_touched, W));
                     if (!igraph_vector_int_contains(igraph_adjlist_get(&state->B, W), V)) {
                         IGRAPH_CHECK(
                             igraph_vector_int_push_back(igraph_adjlist_get(&state->B, W), V));
@@ -351,6 +371,13 @@ static igraph_error_t simple_cycle_search_state_init(
 
     IGRAPH_BITSET_INIT_FINALLY(&state->v_visited, state->N);
 
+    IGRAPH_BITSET_INIT_FINALLY(&state->v_touched, state->N);
+
+    // Each vertex appears at most once, so reserving N elements means that
+    // pushing to 'touched' never reallocates.
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&state->touched, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&state->touched, state->N));
+
     IGRAPH_CHECK(igraph_inclist_init(
                      graph, &state->IK, mode,
                      IGRAPH_LOOPS_ONCE // each self-loop counts as a single cycle
@@ -363,7 +390,16 @@ static igraph_error_t simple_cycle_search_state_init(
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
-    IGRAPH_FINALLY_CLEAN(7);
+    if (state->directed) {
+        // Sorted lists, with one entry per edge, as in AK.
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &state->RK, IGRAPH_REVERSE_MODE(mode),
+                                         IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    } else {
+        IGRAPH_CHECK(igraph_adjlist_init_empty(&state->RK, 0));
+    }
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &state->RK);
+
+    IGRAPH_FINALLY_CLEAN(10);
 
     return IGRAPH_SUCCESS;
 }
@@ -381,9 +417,12 @@ static igraph_error_t simple_cycle_search_state_init(
  */
 static void simple_cycle_search_state_destroy(simple_cycle_search_state_t *state) {
 
+    igraph_adjlist_destroy(&state->RK);
     igraph_adjlist_destroy(&state->B);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
+    igraph_vector_int_destroy(&state->touched);
+    igraph_bitset_destroy(&state->v_touched);
     igraph_bitset_destroy(&state->v_visited);
     igraph_bitset_destroy(&state->v_blocked);
     igraph_vector_int_destroy(&state->edge_stack);
@@ -431,6 +470,128 @@ static igraph_error_t append_simple_cycle_result(
 }
 
 /**
+ * Resets the per-search state (blocked flags and B lists) after a search.
+ *
+ * Only the vertices in state->touched are visited, so the cost is at most
+ * proportional to the work done by the search, rather than O(N). Resetting
+ * every vertex with index >= s, as Johnson's original algorithm does, is
+ * not enough here: start vertices may be skipped, and skipped vertices are
+ * never removed from the graph, so they may keep stale state from an earlier
+ * search. That caused cycles to be missed, see
+ * https://github.com/igraph/igraph/issues/2911
+ *
+ * Invariant (I): when a search starts, no vertex is blocked and every B list
+ * is empty.
+ *
+ * Lemma: if (I) holds when a search starts, then every vertex W that is
+ * blocked at any time during the search, or that receives an entry in B[W],
+ * is in 'touched'.
+ *
+ * Proof:
+ *
+ * 1. Blocked vertices. Under (I), nothing is blocked when the search starts.
+ *    The only place that sets v_blocked is the push of a vertex in
+ *    simple_cycles_circuit(), which also adds it to 'touched'. So every vertex
+ *    that is blocked at any time during the search is in 'touched', even if it
+ *    was unblocked later.
+ *
+ * 2. B entries. B[W] gains entries only in L2, when the vertex V being popped
+ *    has local_found and loop_length_stop both false; UNBLOCK only removes
+ *    entries. W is then a neighbour of V, and when W was examined in L1 for V,
+ *    one of three cases applied:
+ *    - W == S. Impossible here: that branch sets local_found as its first
+ *      statement, before the checks that may skip the cycle.
+ *    - W not blocked. Either the search recursed into W, so W was pushed and
+ *      is in 'touched' by step 1, or the length limit prevented it, which sets
+ *      loop_length_stop and is impossible here.
+ *    - W blocked. Then W is in 'touched' by step 1.
+ *    Membership in 'touched' is all that is needed, even if W has since been
+ *    unblocked.
+ *
+ * 3. Induction. This function clears v_blocked, v_touched and B for exactly
+ *    the vertices in 'touched'. By the lemma, these are the only vertices
+ *    with state, so (I) holds for the next search. It holds for the first
+ *    search because the state is initialized empty.
+ *
+ * The proof uses only that both flags are false at the moment L2 writes to B,
+ * not that they stay set for the rest of the search once set. It therefore
+ * remains valid if the flags are made per DFS level, like the flag f in
+ * Johnson's paper, provided that the outcome of processing each neighbour is
+ * preserved until the L2 decision at that level.
+ *
+ * The B write in L2 asserts that W is in 'touched'.
+ */
+static void simple_cycles_reset_touched(simple_cycle_search_state_t *state) {
+    const igraph_int_t n = igraph_vector_int_size(&state->touched);
+    for (igraph_int_t i = 0; i < n; ++i) {
+        const igraph_int_t v = VECTOR(state->touched)[i];
+        IGRAPH_BIT_CLEAR(state->v_blocked, v);
+        IGRAPH_BIT_CLEAR(state->v_touched, v);
+        igraph_vector_int_clear(igraph_adjlist_get(&state->B, v));
+    }
+    igraph_vector_int_clear(&state->touched);
+}
+
+/**
+ * Removes the finished start vertex s from the graph: deletes every entry of
+ * s from the lists AK and IK of the other vertices, then clears AK[s] and
+ * IK[s].
+ *
+ * Only the lists that can contain s are visited: those of its neighbours in
+ * the reverse direction, i.e. RK[s] for directed searches and AK[s] itself
+ * for undirected ones. (In the undirected case AK[s] lists exactly the
+ * remaining neighbours of s, since earlier removals deleted the removed
+ * vertices from both sides.) Each list is sorted, and its entries of s (one per
+ * parallel edge) form a contiguous run, which is found by binary search and
+ * removed in one step, together with the matching entries of IK.
+ *
+ * Earlier versions searched all N lists and removed only one entry of s from
+ * each, leaving the other parallel copies in place. That was O(N log d) per
+ * start vertex. The cost is now O(sum over the lists visited of
+ * (log d + the length of the list)), where the length term is the cost of
+ * shifting the remaining entries, so the total over all start vertices is
+ * bounded by O(sum over s of deg(s) * (log d_max + d_max)).
+ */
+static void simple_cycles_remove_vertex(simple_cycle_search_state_t *state,
+                                        igraph_int_t s) {
+    const igraph_vector_int_t *holders = state->directed ?
+            igraph_adjlist_get(&state->RK, s) : igraph_adjlist_get(&state->AK, s);
+    const igraph_int_t holder_count = igraph_vector_int_size(holders);
+    igraph_int_t prev = -1;
+
+    for (igraph_int_t j = 0; j < holder_count; ++j) {
+        const igraph_int_t u = VECTOR(*holders)[j];
+        // Skip s itself (self-loops; AK[s] is cleared below) and repeated
+        // entries of u (parallel edges), whose removal was already done.
+        // The holder list is sorted, so repeats are adjacent.
+        if (u == s || u == prev) {
+            continue;
+        }
+        prev = u;
+
+        igraph_vector_int_t *neis = igraph_adjlist_get(&state->AK, u);
+        igraph_int_t pos;
+        // Lists only ever shrink, so they stay sorted. For a vertex u that was
+        // removed earlier, AK[u] is empty and nothing is found.
+        if (igraph_vector_int_binsearch(neis, s, &pos)) {
+            const igraph_int_t len = igraph_vector_int_size(neis);
+            igraph_int_t from = pos, to = pos + 1;
+            while (from > 0 && VECTOR(*neis)[from - 1] == s) {
+                from--;
+            }
+            while (to < len && VECTOR(*neis)[to] == s) {
+                to++;
+            }
+            igraph_vector_int_remove_section(neis, from, to);
+            igraph_vector_int_remove_section(igraph_inclist_get(&state->IK, u), from, to);
+        }
+    }
+
+    igraph_vector_int_clear(igraph_adjlist_get(&state->AK, s));
+    igraph_vector_int_clear(igraph_inclist_get(&state->IK, s));
+}
+
+/**
  * \function simple_cycles_search_callback_from_one_vertex
  * \brief Searches for simple cycles starting from one vertex.
  *
@@ -456,28 +617,20 @@ static igraph_error_t simple_cycles_search_callback_from_one_vertex(
         igraph_cycle_handler_t *callback,
         void *arg) {
 
-    // L3:
-    for (igraph_int_t i = s; i < state->N; ++i) {
-        IGRAPH_BIT_CLEAR(state->v_blocked, i);
-        igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
-    }
+    // Invariant (I): when a search starts, no vertex is blocked and every
+    // B list is empty. See simple_cycles_reset_touched() for why this holds.
+    IGRAPH_ASSERT(igraph_vector_int_empty(&state->touched));
+#ifndef NDEBUG
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&state->v_blocked));
+    IGRAPH_ASSERT(igraph_bitset_is_all_zero(&state->v_touched));
+#endif
 
     IGRAPH_CHECK(simple_cycles_circuit(state, s, max_cycle_length,
                  min_cycle_length, callback, arg));
 
-    for (igraph_int_t i = 0; i < state->N; ++i) {
-        // We want to remove the vertex with value s, not at position s.
-        // It's fine to use binary search since we never add to, only remove from
-        // an already sorted adjacency list.
-        igraph_int_t pos;
-        if (igraph_vector_int_binsearch(igraph_adjlist_get(&state->AK, i), s,
-                                        &pos)) {
-            igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
-            igraph_vector_int_remove(igraph_inclist_get(&state->IK, i), pos);
-        }
-    }
-    igraph_vector_int_clear(igraph_adjlist_get(&state->AK, s));
-    igraph_vector_int_clear(igraph_inclist_get(&state->IK, s));
+    simple_cycles_reset_touched(state);
+
+    simple_cycles_remove_vertex(state, s);
 
     return IGRAPH_SUCCESS;
 }
@@ -539,15 +692,24 @@ igraph_error_t igraph_simple_cycles_callback(
     IGRAPH_CHECK(simple_cycle_search_state_init(&state, graph, mode));
     IGRAPH_FINALLY(simple_cycle_search_state_destroy, &state);
 
-    // Depending on the graph, it is rather unreasonable to search cycles
-    // from each and every node. Instead, we expect that each cycle must involve
-    // either:
-    // - a vertex with degree > 2
-    // - or, if it's a freestanding cycle, be any vertex of this connected component;
-    //   components are identified via the `state->v_visited` boolean mask.
+    // It is not necessary to start a search from every vertex. A vertex is
+    // skipped as a start vertex if its undirected degree (counting self-loops
+    // twice and parallel edges separately) is less than 3, and an earlier
+    // search has already visited it. This does not lose any cycles:
     //
-    // Thus, we iterate over the vertices, and check if they can be skipped as
-    // a starting point according to the rules laid out above.
+    // - Each cycle is found by the search from the first of its vertices that
+    //   is used as a start vertex, so it is enough that at least one of its
+    //   vertices is used. A cycle that contains a vertex of degree >= 3
+    //   satisfies this, since such vertices are never skipped.
+    // - Suppose instead that every vertex of a cycle has degree 2. Then the
+    //   cycle's vertices have no other edges, so the cycle forms an entire
+    //   weakly connected component. No search that starts in another component
+    //   can enter it, so the lowest-numbered vertex of the cycle is still
+    //   unvisited when the loop below reaches it, and it is used as a start.
+    //
+    // Skipped vertices are never removed from the graph, unlike the vertices
+    // that were used as starts. The per-search state must therefore be reset
+    // for them as well; see simple_cycles_reset_touched().
     for (igraph_int_t i = 0; i < state.N; i++) {
         // Check if the vertex is a candidate for a cycle.
         // Note that we call igraph_degree_1() here instead of retrieving the

@@ -22,11 +22,13 @@
 - `igraph_eigen_matrix_symmetric()` now uses `abstol=DBL_MIN` when calling `igraph_lapack_dsyevr()`, to achieve high relative accuracy. Previously it used `1e-14`, which is not suitable for matrices with eigenvalues close to zero. This fixed a convergence issue in `igraph_layout_mds()` when using BLIS as the BLAS implementation.
 - `igraph_hrg_fit()` returned an invalid, all-zero HRG model when `steps` was positive and none of the MCMC moves improved the likelihood of the initial dendrogram, e.g. for complete graphs. Using such a model in other HRG functions could crash igraph. The initial dendrogram is now returned in this case.
 - Resolved undefined behaviour when passing signed `char` to `<ctype.h>` functions in file format parsers. The issue could potentially cause out-of-bounds access when igraph was compiled with MSVC. Thanks to Riha Ilyas @riha-dev for fixing this (PR #2944)!
+- `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` could miss cycles in directed graphs when edge directions are taken into account (`IGRAPH_OUT` or `IGRAPH_IN`), depending on vertex order (#2911, PR #2947). This bug was introduced in igraph 0.10.17. Thanks to Tim Bernhard @GenieTim for helping with debugging this issue and testing ideas!
 - In igraph 1.0.0 and 1.0.1, `igraph_distances_johnson()` could return incorrect distances in `IGRAPH_IN` mode with negative weights when source and target selections differed, and could access outside the result buffer for rectangular results. Earlier releases are unaffected because Johnson’s algorithm did not support `IGRAPH_IN`.
 - `igraph_hub_and_authority_scores()` would crash when an undirected graph was used and the optional `value` parameter was set to `NULL`. Note hub and authority scores are meaningful in directed graphs only. In undirected graphs both are the same as eigenvector centralities.
 - `igraph_distances_floyd_warshall()` ignored source and target vertex selectors on singleton graphs, returning incorrect result matrix dimensions for empty selections or repeated source vertices. This bug was introduced in 0.10.4.
 - `igraph_community_spinglass_single()` failed to reject an invalid vertex ID equal to the vertex count.
 - `igraph_bipartite_projection()`, `igraph_community_spinglass_single()`, `igraph_dfs()`, `igraph_fundamental_cycles()`, `igraph_layout_star()`, `igraph_pseudo_diameter()`, `igraph_random_walk()`, `igraph_st_vertex_connectivity()`, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVVID` instead of `IGRAPH_EINVAL` when validating invalid scalar vertex IDs. Conversely, `igraph_star()` and `igraph_wheel()` now return `IGRAPH_EINVAL` instead of `IGRAPH_EINVVID` for an invalid vertex count.
+- `igraph_strength()` returned incorrect results when called without weights and with a vertex selection whose size differed from the vertex count. The result always had one entry per vertex of the graph: when fewer vertices were selected, it was padded with zeros; when more were selected (i.e. with repetitions), it was truncated. Results computed with weights were not affected. This bug was introduced in 0.10.0.
 - `igraph_community_infomap()` now returns `IGRAPH_INTERRUPTED` when interrupted. Previously, an interruption was reported as a generic failure (`IGRAPH_FAILURE`).
 
 ### Other
@@ -36,6 +38,7 @@
 - nanoflann was updated to version 2.0.1
 - Infomap was updated to upstream commit 6045d470, which comes after version 2.15.1. The vendored copy is now unmodified upstream source.
 - Performance improvement for `igraph_count_reachable()`. Thanks to Jonathan Berg @jberg5 for contributing this in #2926!
+- Performance improvement for `igraph_simple_cycles()` and `igraph_simple_cycles_callback()` on large graphs where the search starts from many vertices, such as sparse graphs or graphs with many small cycles. The bookkeeping done for each start vertex no longer scales with the size of the whole graph (PR #2947).
 
 ## [1.0.1]
 
