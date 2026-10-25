@@ -133,6 +133,11 @@ int main(void) {
     igraph_es_pairs(&es, &v, IGRAPH_DIRECTED);
     CHECK_ERROR(igraph_eit_create(&g, es, &eit), IGRAPH_EINVVID);
 
+    /* Single-edge selector with out-of-range edge ID should fail. */
+    CHECK_ERROR(igraph_eit_create(&g, igraph_ess_1(-1), &eit), IGRAPH_EINVEID);
+    CHECK_ERROR(igraph_eit_create(&g, igraph_ess_1(igraph_ecount(&g)), &eit), IGRAPH_EINVEID);
+    CHECK_ERROR(igraph_eit_create(&g, igraph_ess_1(IGRAPH_INTEGER_MAX), &eit), IGRAPH_EINVEID);
+
     igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
     igraph_destroy(&g_no_vertices);

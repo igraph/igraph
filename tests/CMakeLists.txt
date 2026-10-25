@@ -161,7 +161,6 @@ add_legacy_tests(
   edge_selectors
   igraph_es_path
   igraph_es_all_between
-  igraph_vs_es_1_invalid
   vertex_selectors
 )
 
