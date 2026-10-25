@@ -368,9 +368,15 @@ igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_int_t *res,
                                        igraph_int_t eid)
 {
     igraph_int_t i, n, count;
-    igraph_int_t from = IGRAPH_FROM(graph, eid);
-    igraph_int_t to = IGRAPH_TO(graph, eid);
+    igraph_int_t from, to;
     igraph_vector_int_t vids;
+
+    if (eid < 0 || eid >= igraph_ecount(graph)) {
+        IGRAPH_ERROR("Edge ID out of range.", IGRAPH_EINVEID);
+    }
+
+    from = IGRAPH_FROM(graph, eid);
+    to = IGRAPH_TO(graph, eid);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
     IGRAPH_CHECK(igraph_neighbors(
