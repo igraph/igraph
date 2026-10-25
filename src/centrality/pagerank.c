@@ -492,7 +492,7 @@ static igraph_error_t igraph_i_pagerank_select_result(igraph_vector_t *vector,
                                                       const igraph_matrix_t *vectors,
                                                       igraph_vit_t *vit) {
     igraph_int_t i;
-    igraph_int_t vcount = igraph_matrix_nrow(vectors);
+    const igraph_int_t vcount = igraph_matrix_nrow(vectors);
     igraph_real_t sum = 0;
 
     for (i = 0; i < vcount; i++) {
@@ -518,7 +518,7 @@ static igraph_error_t igraph_i_pagerank_trivial_result(igraph_vector_t *vector,
                                                        const igraph_vector_t *reset,
                                                        igraph_matrix_t *vectors,
                                                        igraph_vit_t *vit) {
-    igraph_int_t vcount = igraph_matrix_nrow(vectors);
+    const igraph_int_t vcount = igraph_matrix_nrow(vectors);
 
     if (value) {
         *value = 1.0;
